@@ -43,12 +43,46 @@ class SafetyHiddenDanger extends Component {
         this.setState({ setEditVisiable: false });
     }
 
-    setEditData = () => {
-
+    setEditData = (data,participants) => {
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"安全隐患信息批量录入",
+			code:"TEMPLATE_032",
+			description:"安全隐患信息批量录入",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({addvisible:false})						
+					})
+		})
     }
 
     onAddClick = () => {
-        debugger
         this.setState({ setEditVisiable: true });
     }
     onSelectChange = (selectedRowKeys) => {
