@@ -1,0 +1,33 @@
+[
+    {
+        "name": "将隐患从待填报变为整改中",
+        "item": {
+            "url": "{APPLICATION_SERVICE}/main/api/potential-risk/{id}/",                
+            "method": "patch",
+            "param": {
+                "status": 1
+            },
+            "replace": "id"
+        }
+    }, {
+        "name":"将隐患从待核查变为终止",
+        "item":{
+            "url": "{APPLICATION_SERVICE}/main/api/potential-risk/{id}/",
+            "method": "patch",
+            "param": {
+                "status": 2
+            },
+            "replace": "id"
+        }
+    }, {
+        "name":"将隐患从待整改变为已整改",
+        "item": {
+            "url": "{APPLICATION_SERVICE}/main/api/potential-risk/{id}/",
+            "method": "patch",
+            "param": {
+                "status": 3
+            },
+            "replace": "id"
+        }   
+    }
+]

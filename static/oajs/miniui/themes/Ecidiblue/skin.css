@@ -1,0 +1,425 @@
+﻿html, html body
+{
+    padding: 0px;
+    border: 0;
+    margin:0px;
+    width: 100%;
+    height: 100%;
+    font-family: Verdana;
+    font-size: 12px;
+    line-height:18px;
+    /*overflow:hidden;  禁止滚地条出现啊 为什么要加这个，有什么作用*/
+     overflow:visible;
+}
+
+/* button */
+.mini-button
+{
+	background:white;
+	border-color:#0b59b1;	
+    color:#003f87;
+}
+body a:hover.mini-button
+{	
+	border-color:#003f87;        
+	background:#e9f1fa;
+}
+body .mini-button-pressed, body a:hover.mini-button-pressed,
+body .mini-button-checked, body a:hover.mini-button-checked,
+body .mini-button-popup, body a:hover.mini-button-popup
+{
+	border-color:#003f87;    
+	background:#daeafc;   
+}
+body .mini-button-disabled, body a:hover.mini-button-disabled
+{
+    border-color:#d1e1f3;
+    color:#BABAC1;
+       background:white;
+}
+
+/* textbox */
+.mini-textbox-border{
+    border-color:#abadb3;
+}
+body .mini-textbox-focus .mini-textbox-border
+{
+    border-color: #abadb3;
+}
+.mini-required .mini-textbox-input
+{
+   background:#fefedb;  
+}
+.mini-required .mini-textbox-border
+{
+    background:#fefedb;
+}
+
+.mini-textbox-disabled
+{
+    cursor:default;
+    opacity: .4;
+    -moz-opacity: .4;
+    filter: alpha(opacity=40);
+}
+mini-textbox mini-required
+{
+    background:#fefedb;
+}
+
+/* buttonedit */
+.mini-buttonedit-border{
+    border-color:#abadb3;
+}
+body .mini-buttonedit-focus .mini-buttonedit-border
+{
+    border-color: #abadb3;
+}
+
+.mini-required .mini-buttonedit-border
+{
+    background:#fefedb;
+}
+.mini-buttonedit-disabled
+{
+    cursor:default;
+    opacity: .4;
+    -moz-opacity: .4;
+    filter: alpha(opacity=40);
+}
+
+
+/* calendar */
+.mini-popup
+{
+    border-color:#669dd5;
+}
+.mini-calendar
+{    
+    border-color:#669dd5;
+}
+.mini-calendar-header
+{   
+    background:url(images/common/header.gif) repeat-x scroll left top #a7d3ff;
+    border-bottom:solid 1px #73a9df;    
+}
+.mini-calendar-footer
+{
+    border-top:solid 1px #b2d1f5;
+    background:url(images/common/header.gif) repeat-x scroll left -1px #a7d3ff;
+}
+.mini-calendar-tadayButton, .mini-calendar-clearButton,
+.mini-calendar-okButton, .mini-calendar-cancelButton
+{
+	background:white;
+	border-color:#0b59b1;	
+    color:#003f87;
+}
+
+.mini-calendar-menu-selected, a:hover.mini-calendar-menu-selected
+{
+    color:#333;
+    background:#ebf5ff;
+    border:solid 1px #669dd5;
+}
+
+.mini-calendar .mini-calendar-selected
+{
+    color:#333;
+    background:#ebf5ff;
+    border:solid 1px #669dd5;
+}
+.mini-calendar .mini-calendar-today
+{
+    border:1px solid #C00000;
+}
+.mini-calendar-daysheader td
+{border-bottom:solid 1px #b2d1f5;    
+}
+
+/*------------------------- panel -----------------------*/
+
+.mini-panel-border
+{    
+    border:1px solid #669dd5;     
+}
+.mini-panel-header
+{
+    height:25px;
+    background:url(images/common/header.gif) repeat-x scroll left -0px #a7d3ff;
+    color:#0042a5;
+    font-weight:bold;
+    border-bottom:solid 1px #73a9df;
+}
+.mini-panel-header-inner
+{
+   padding-top:4px;
+}
+.mini-panel-toolbar
+{
+    border-bottom:solid 1px #73a9df;
+    background:#c3e1fe;
+}
+
+.mini-panel-footer
+{
+    border-top:solid 1px #73a9df;
+    background:#c3e1fe;
+}
+
+
+/*----------------------------- window -------------------------*/
+.mini-window .mini-panel-header
+{
+    background:url(images/common/header.gif) repeat-x scroll left -0px #a7d3ff;
+}
+.mini-window .mini-panel-footer
+{
+    background:#c3e1fe;
+}
+
+
+/*---------------------- tree -----------------------------*/
+
+
+.mini-tree-hottrack .mini-tree-node-hover
+{
+    background:url(images/common/button.gif) repeat-x 0px 50%;
+	border:solid 1px #b5afaf;		  
+}
+.mini-tree-selectedNode .mini-tree-nodeshow
+{
+    background:#e2f2fe url(images/common/hover.gif) repeat-x 0px 50%;
+	border:solid 1px #80a4d0;	
+}
+.mini-tree-leaf
+{
+    background-image:url(images/common/leaf.gif);
+}
+.mini-tree-folder
+{
+    background-image:url(images/common/folder.gif);
+}
+.mini-tree-expand .mini-tree-folder
+{
+    background-image:url(images/common/folder-open.gif);
+}
+
+
+
+/*---------------------- listbox -----------------------------*/
+.mini-listbox-border
+{    
+    border-color:#669dd5;
+}
+.mini-listbox-border td
+{
+    line-height:20px;
+}
+.mini-listbox .mini-listbox-border td{
+	border-color:#8eabe4;
+	color:#2e2e2e;
+}
+.mini-listbox .mini-listbox-item-hover td{
+   
+	border-color:#8eabe4;
+}
+.mini-listbox .mini-listbox-item-selected td{
+	
+	border-color:#8eabe4;
+}
+.mini-listbox-header
+{
+    background:url(images/common/header.gif) repeat-x scroll left top #a7d3ff;
+    border-color:#669dd5;
+    color:#0042a5;
+}
+
+
+/* grid */
+.mini-grid-border
+{
+    border-color:#669dd5;
+}
+.mini-grid-header
+{
+    background:url(images/common/header.gif) repeat-x scroll left top #a7d3ff;
+}
+.mini-grid-headerCell
+{
+    background:url(images/common/header.gif) repeat-x scroll left top #a7d3ff;
+    border-color:#669dd5;
+    color:#0042a5;
+}
+.mini-grid-cell
+{
+    border-color:#669dd5;
+    color:#2e2e2e;
+}
+.mini-grid-footer
+{
+    border-color:#669dd5;    
+    background:url(images/grid/footer.gif) repeat-x scroll left top #a7d3ff;
+}
+.mini-grid-row
+{
+}
+.mini-grid-row-alt
+{
+    background:#ebf5ff;
+}
+/*
+ .mini-grid-cell-selected
+{
+    background:#addffe;
+}
+*/
+
+.mini-grid-cell-error
+{
+    background:red;
+}
+
+
+/*----------------------- layout -----------------------*/
+.mini-layout-border
+{
+    
+}
+.mini-layout-region
+{
+    border-color:#669dd5;    
+}
+.mini-layout-region-header
+{
+    background:url(images/common/header.gif) repeat-x scroll left top #a7d3ff;
+    border-color:#669dd5;
+}
+.mini-layout-proxy
+{
+    border-color:#669dd5;
+    background:#b0d5fa;
+}
+.mini-layout-proxy-hover
+{
+    background:#cbedf1;    
+}
+
+
+/* tabs */
+.mini-tabs-bodys
+{
+     border-color:#ffffff;   /*边框颜色 border-color :#669dd5;  */  
+}
+.mini-tabs-space
+{
+  border-color:#669dd5;  /*border-color:#669dd5; */
+}
+.mini-tabs-space2
+{
+    width:1px;
+    border-bottom:solid 1px #669dd5;
+}
+.mini-tabs-space2 div{
+    height:3px;width:1px;overflow:hidden;
+}
+.mini-tab
+{
+    background:url(images/tabs/tab.gif) repeat-x scroll left top #a7d3ff;
+    padding:   3px 10px 1px 10px;
+    border-color:#8CB2E2;
+    color: #333;    
+    
+}
+.mini-tab-hover
+{    
+    background:url(images/tabs/tabs-hover.gif) repeat-x scroll left top #a7d3ff;
+}
+.mini-tab-active
+{
+    border-bottom:solid 1px #deecfd;
+   /* background:#e0eefc;*/
+    background:url(images/tabs/tab-active.gif) repeat-x scroll left top yellow;
+    
+}
+.mini-toolbar
+{
+   /* border:solid 1px #909aa6;*/
+    padding:0px;   
+    padding:0px;
+    border:0; 
+    background:white;
+   
+}
+
+
+
+
+/* mini-pager */
+.mini-pager1111111
+{   
+    padding:5px;
+    padding-top:1px;
+    padding-bottom:1px;
+    
+    height:20px;
+    border-collapse:collapse;
+    border-collapse:separate;   
+    font-size:9pt;
+    font-family: Tahoma, Verdana;         
+}
+
+/*登录滚动条 */
+.mini-mask-loading
+{
+    padding:10px 8px 10px 30px;	
+    background:#fff url(images/grid/loading.gif) no-repeat scroll 5px 50%;
+	border:2px solid #517fad;
+}
+
+
+.mini-buttonedit-icon
+{
+    background:url(images/buttonedit/icon1.gif) no-repeat -3px -0px;
+    width:18px;
+    height:16px;
+    overflow:hidden;
+    
+    display:block;
+    margin:auto;
+}
+.mini-buttonedit-icons-popup
+{
+    background:url(images/buttonedit/icon2.gif) no-repeat 0px -1px;
+}
+.mini-buttonedit-icons-date
+{
+    background:url(images/buttonedit/icon2.gif) no-repeat 0px -1px;
+}
+
+
+
+.ButtonAreaLine /*分隔线样式*/ 
+{
+   border-bottom:1px solid #809FC3;margin-bottom:5px;height:40px
+}
+.DivLine /*分隔线样式*/ 
+{
+   border-bottom:1px solid #809FC3;margin-bottom:5px;height:1px
+}
+.Line /*分隔线样式*/ 
+{
+  border-bottom:1px solid #A7D3FF;width:100%;padding:0;margin:0;
+}
+.dashedLine /*分隔线样式*/ 
+{
+  border-bottom:1px dashed  #A7D3FF;width:100%;padding:0;margin:0;
+}
+
+.ListTitleName /*列表标题单元格格式*/
+{
+color: #003F87;padding-left:2;filter: blur(add=1, direction=135, strength=2); height:25;padding-top:3;font-size:11pt;
+}
+	
+	
+	

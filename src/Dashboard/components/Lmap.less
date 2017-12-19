@@ -1,0 +1,499 @@
+.l-map {
+  .leaflet-popup-content h2 {
+    font-weight: 400 !important;
+    font-size: 12px !important;
+  }
+
+  .menuPanel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 200px;
+    transition: all .3s;
+    z-index: 980;
+
+    .aside {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      top: 0;
+      bottom: 0;
+      background-color: #e6e6e6;
+      color: #333;
+      z-index: 999;
+      overflow: auto;
+    }
+  }
+  .drawer {
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    font-size: 12px;
+    background-color: #bdbbbb;
+    color: #ffffff;
+    border-bottom: 1px solid #e6e6e6;
+  }
+
+  .nav {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #e6e6e6;
+    color: #333;
+  }
+
+  .active {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #f2f2f4;
+    color: #0080e6;
+  }
+
+  .label-text {
+    color: #000 !important;
+    font-weight: bold;
+  }
+
+  /*图例的样式*/
+  .iconList {
+    position: fixed;
+    right: 0;
+    top: 40%;
+    width: 100px;
+    z-index: 970;
+    background-color: #fff;
+  }
+
+  .imageControll {
+    width: 26px;
+    height: auto;
+    position: absolute;
+    top: 0;
+    left: -26px;
+    cursor: pointer;
+  }
+
+  .imgIcon {
+    padding: 10px 8px;
+    height: 42px;
+    position: relative;
+  }
+
+  .imgIcon p {
+    display: inline-block;
+    position: absolute;
+    top: 12px;
+    left: 36px;
+    color: #0080e6;
+  }
+
+  /*现场人员*/
+  .peopleIcon {
+    width: 21px !important;
+    height: 26px !important;
+    background-image: url("./ImageIcon/people.png");
+    background-size: 100% 100%;
+  }
+
+  /*危险源*/
+  .dangerIcon {
+    width: 21px !important;
+    height: 26px !important;
+    background-image: url("./ImageIcon/danger.png");
+    background-size: 100% 100%;
+  }
+
+  /*360全景*/
+  .allViewIcon {
+    width: 26px !important;
+    height: 26px !important;
+    background-image: url("./ImageIcon/360.png");
+    background-size: 100% 100%;
+  }
+
+  /*安全监控*/
+  .cameraIcon {
+    width: 21px !important;
+    height: 26px !important;
+    background-image: url("./ImageIcon/camera.png");
+    background-size: 100% 100%;
+  }
+
+  /*视频监控*/
+  .videoIcon {
+    width: 21px !important;
+    height: 26px !important;
+    background-image: url("./ImageIcon/video.png");
+    background-size: 100% 100%;
+  }
+
+  .treeControl {
+    position: absolute;
+    z-index: 960;
+    top: 6px;
+    right: 40px;
+  }
+
+  .cardControl {
+    margin-top: 80px;
+  }
+
+  .btnCtro {
+    position: fixed;
+    top: 80px;
+    right: 161px;
+    width: 178px;
+    height: 28px;
+    border: none;
+  }
+
+  .DisplayNone {
+    display: none !important;
+  }
+
+  .VideoList {
+    position: fixed;
+    top: 100px;
+    left: 200px;
+    z-index: 9999;
+  }
+
+  .OneVideoList {
+    width: 90%;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    margin-bottom: 4px;
+    cursor: pointer;
+  }
+
+  .ant-tree li .ant-tree-iconEle{
+    width: 16px;
+    height: 16px;
+  }
+
+  .ant-tree-iconEle {
+    background: url("./ImageIcon/people.png") no-repeat;
+    background-size: cover;
+  }
+
+  .tr-people .ant-tree-iconEle {
+    background-image: url("./ImageIcon/people.png");
+  }
+
+  .tr-safety .ant-tree-iconEle {
+    background-image: url("./ImageIcon/camera.png");
+  }
+
+  .tr-hazard .ant-tree-iconEle {
+    background-image: url("./ImageIcon/danger.png");
+  }
+
+  .tr-monitor .ant-tree-iconEle {
+    background-image: url("./ImageIcon/video.png");
+  }
+
+  .tr-area .ant-tree-iconEle {
+    background-image: url("./ImageIcon/area.png");
+  }
+
+  .tr-allview .ant-tree-iconEle {
+    background-image: url("./ImageIcon/360.png");
+  }
+
+
+  /*轨迹回放*/
+  .trackPanel {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    z-index: 1001;
+    margin-left: -340px;
+  }
+
+  .track {
+    border: 1px solid #EEE;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+    background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
+    width: 680px;
+    margin: 0 auto;
+    display: flex;
+  }
+
+  .btnCtronl {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    font-size: 20px;
+    text-align: center;
+    line-height: 32px;
+    cursor: pointer;
+  }
+
+  .slider {
+    display: inline-block;
+    flex: 1 1 auto;
+  }
+
+  .isShow {
+    flex: 0 0 90px;
+    text-align: center;
+    line-height: 32px;
+  }
+
+  .timeRange {
+    padding-top: 2px;
+    padding-left: 5px;
+    display: inline-block;
+    flex: 0 0 300px;
+  }
+
+  .trackClose {
+    flex: 0 0 20px;
+    font-size: 14px;
+    line-height: 32px;
+    display: inline-block;
+  }
+
+  .trackClose a {
+    color: #666;
+  }
+
+  /*弹出框样式*/
+  .popupBox h2 span {
+    color: #0078A8;
+  }
+
+  .popupBox .btnRow {
+    text-align: center;
+    margin-top: 5px;
+  }
+
+  .btnViewTrack {
+    display: inline-block;
+    color: #fff !important;
+    border-radius: 4px;
+    background-color: #108ee9;
+    border-color: #108ee9;
+    padding: 0 20px;
+    line-height: 24px;
+    text-decoration: none;
+  }
+
+  .btnViewTrack:hover {
+    background-color: #49a9ee;
+    border-color: #49a9ee;
+    text-decoration: none;
+  }
+
+  /*修改菜单边距*/
+  .aside .ant-collapse-content {
+    padding: 0 8px;
+  }
+
+  .foldBtn {
+    position: absolute;
+    top: 50%;
+    left: 200px;
+    width: 24px;
+    border: solid #EEE;
+    border-width: 1px 1px 1px 0;
+    border-radius: 0 5px 5px 0;
+    background: #fff;
+    padding: 12px 5px;
+    cursor: pointer;
+    z-index: 500;
+    margin-top: -20px;
+    transition: all .3s;
+  }
+
+  .animExtend {
+    /*animation: extend .3s ease both;*/
+    /*transform: translateX(0);*/
+  }
+
+  .animFold {
+    /*animation: fold .3s ease both;*/
+    /*transform: translateX(-200px);*/
+  }
+
+  .hide {
+    display: none;
+  }
+
+  .resizeSenseArea {
+    position: absolute;
+    right: -3px;
+    top: 0;
+    width: 12px;
+    height: 100%;
+    background: #00A1CB;
+    cursor: e-resize;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0);
+  }
+
+  .ant-tree-title {
+    display: inline-block;
+    white-space: normal;
+    vertical-align: top;
+    padding-right: 40px;
+  }
+
+  /*隐患详情*/
+  .riskDetail .ant-modal-footer {
+    display: none;
+  }
+
+  .riskDetail img {
+    display: block;
+    width: 305px;
+    height: 200px;
+  }
+
+  .riskDetail h3 {
+    font-weight: 300;
+    font-size: 14px;
+    margin: 0 0 10px;
+  }
+
+  .riskDetail .mb {
+    margin-bottom: 10px;
+  }
+
+  .riskDetail .divLine {
+    border-top: 1px dotted #DDD;
+  }
+
+  .riskDetail .ant-carousel .slick-slide {
+    min-height: 200px;
+    max-height: 300px;
+  }
+
+  .riskDetail .noImg {
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    background-image: url('./ImageIcon/noImg.png');
+    background-size: cover;
+  }
+
+  .vedioModal .ant-modal-content {
+    height: 90%;
+  }
+
+  .vedioModal .ant-modal-body {
+    height: calc(100% - 50px);
+  }
+
+  .vedioModal .ant-modal-footer {
+    display: none;
+  }
+
+}
+
+.map-container{
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  .l-menu{
+    flex:0 0 80px;
+    background: #D7D5D5;
+
+    .m-menu-item{
+      text-align: center;
+      cursor:pointer;
+      padding:10px;
+
+      .i-txt{
+        margin-top:5px;
+      }
+    }
+
+    .m-menu-item:hover,.selected{
+      color: #108EE9;
+      background: #ECF6FD;
+    }
+  }
+
+  .r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 解决树loading抖动问题 */
+  .ant-tree li span.ant-tree-icon_loading{
+    left: 20px;
+    background-image: none;
+  }
+  .ant-tree-icon_loading+.ant-tree-title{
+    margin-left: 20px;
+    
+  }
+}
+
+
+@keyframes extend {
+  from {
+    transform: translateX(-200px)
+  }
+  to {
+    transform: translateX(0)
+  }
+}
+
+@keyframes fold {
+  from {
+    transform: translateX(0)
+  }
+  to {
+    transform: translateX(-200px)
+  }
+}
+
+@-ms-keyframes extend {
+  from {
+    transform: translateX(-200px)
+  }
+  to {
+    transform: translateX(0)
+  }
+}
+
+@-ms-keyframes fold {
+  from {
+    transform: translateX(0)
+  }
+  to {
+    transform: translateX(-200px)
+  }
+}
+
+@-webkit-keyframes extend {
+  from {
+    transform: translateX(-200px)
+  }
+  to {
+    transform: translateX(0)
+  }
+}
+
+@-webkit-keyframes fold {
+  from {
+    transform: translateX(0)
+  }
+  to {
+    transform: translateX(-200px)
+  }
+}

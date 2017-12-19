@@ -1,0 +1,131 @@
+.flow-tree{
+    width: 622px;
+    margin-left: 160px;
+    border: 1px dashed #ccc;
+    .flow-one-line{
+     border-bottom: 1px dashed #ccc;
+      .box-left{
+        width: 120px;
+        text-align: center;
+        display: block;
+        float: left;
+      }
+      .box-right{
+        width: 500px;
+        display: block;
+        float: left;
+        position: relative;
+        .line-1{
+          width: 1px;
+          height: 114px;
+          background: #000;
+          position: absolute;
+          left: 20px;
+        }
+        .line-1-1{
+          width: 92px;
+          height: 1px;
+          background: #000;
+          position: absolute;
+          left: 20px;
+          top:142px;
+          &:after {
+            border: 6px solid transparent;
+            border-left: 12px solid #000;
+            width: 0;
+            height: 0;
+            position: absolute;
+            content: ' ';
+            left: 86px;
+            top:-6px;
+          }
+        }
+        .line-2{
+          width: 1px;
+          height: 126px;
+          background: #000;
+          position: absolute;
+          left: 20px;
+        }
+        .line-2-1{
+          width: 52px;
+          height: 1px;
+          background: #000;
+          position: absolute;
+          left: 20px;
+          top:154px;
+          &:after {
+            border: 6px solid transparent;
+            border-left: 12px solid #000;
+            width: 0;
+            height: 0;
+            position: absolute;
+            content: ' ';
+            left: 46px;
+            top:-6px;
+          }
+        }
+        .line-3{
+          width: 1px;
+          height: 82px;
+          background: #000;
+          position: absolute;
+          left: 10px;
+        }
+        .line-4-1{
+          width: 32px;
+          height: 1px;
+          background: #000;
+          position: absolute;
+          left: 111px;
+          top: 14px;
+          &:after {
+            border: 6px solid transparent;
+            border-left: 12px solid #000;
+            width: 0;
+            height: 0;
+            position: absolute;
+            content: ' ';
+            left: 27px;
+            top:-6px;
+          }
+        }
+        .line-5{
+          width: 110px;
+          height: 1px;
+          background: #000;
+          position: absolute;
+          left: 80px;
+          top: 14px;
+        }
+        .line-6{
+          width: 1px;
+          background: #000;
+          position: absolute;
+          top: -58px;
+          height: 52px;
+          left: 38px;
+          &:after {
+            border: 6px solid transparent;
+            border-top: 12px solid #000;
+            width: 0;
+            height: 0;
+            position: absolute;
+            content: ' ';
+            left: -6px;
+            top:44px;
+          }
+        }
+      }
+      .first-box{
+        height: 60px;
+        line-height: 60px;
+      }
+      .second-box{
+        height: 120px;
+      }
+      .third-box{
+        height: 260px;
+      }
+    }
+}

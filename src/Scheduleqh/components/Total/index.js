@@ -1,0 +1,1 @@
+export TotalTable from './TotalTable';

@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<title>校验错误信息</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+		<script language="JavaScript">
+			function SetMessage()
+			{	var msgstr = window.dialogArguments;
+				//msgstr="[中国人]sdfsdfds  sdfsdfsdf\n[法国人]dsfsdAAAA";
+				if (typeof(msgstr)=="undefined")
+					msgstr = "";
+			
+				var lns = "";
+				if (typeof (msgstr) == "object")  //add by chenmin 20120618 支持miniui的验证
+				    lns = msgstr
+				else
+				    lns = msgstr.split("\n");
+				    
+				for(var i=0;i<lns.length;i++)
+				{	//var ptn = /\n/g;
+					//msgstr=msgstr.replace(ptn,"<BR>");
+					var ptn = /\s/g;
+					lns[i]=lns[i].replace(ptn,"&nbsp;");
+					ptn=/\[.*\]/g;
+					lns[i]=lns[i].replace(ptn,"<B>$&</B>");
+				}
+				document.all("MessageBox").innerHTML = lns.join("<BR>");
+			}
+			function ActiveHelp()
+			{	window.open("ValidateHelp.htm","HelpWindow","height=450,width=600,status=yes,toolbar=no,menubar=no,location=no");
+			}
+		</script>
+		<LINK href="http://web.ecidi.com/sharein/css/Jcpage.css" rel="stylesheet">
+		<LINK href="http://web.ecidi.com/sharein/css/JsCtrl.css" rel="stylesheet">
+	</head>
+	<body class="TreeBody" onload="SetMessage();" style="padding:5;">
+	<div align=center>
+		<TABLE class="DefaultTable" height="100%">
+			<TBODY>
+				<TR>
+					<TD width="1%" height="1%">
+						<img border="0" src="http://web.ecidi.com/sharein/image/icon_01.gif" width="31" height="38">
+					</TD>
+					<TD width="99%"><Font style="font-size:10pt">表单验证器发现如下不合法的输入：</Font>
+					</TD>
+					<tr>
+					<td colspan="6" background="http://web.ecidi.com/sharein/image/line.gif" height="2"></td>
+					</tr>
+				</TR>
+				<TR>
+					<TD colspan="2" height="98%">
+						<div id="MessageBox" style="width:100%;height:100%;overflow:auto;"></div>
+					</TD>
+				</TR>
+				<tr>
+					<td colspan="6" background="http://web.ecidi.com/sharein/image/line.gif" height="2"></td>
+					</tr>
+				<TR>
+					<TD height="1%" align=center colspan=2>						
+						<button class="jcbutton" id="BtnClose" onclick="window.close();" type="button">关闭</button>
+					</TD>
+				</TR>
+			</TBODY>
+		</TABLE>
+	</div>
+	</body>
+</html>

@@ -1,0 +1,1 @@
+export CheckerTable from './CheckerTable';

@@ -1,0 +1,27 @@
+﻿.mini-grid-cell, .mini-grid-headerCell,
+.mini-grid-filterCell, .mini-grid-summaryCell
+{
+    overflow: hidden;
+    padding:0px;
+    border:0;
+    border-right:#a5a9ac 1px solid;
+    border-bottom:#a5a9ac 1px solid;
+    cursor:default;    
+    text-align:left;   
+    overflow:hidden;
+    _text-overflow:ellipsis; 
+    
+    padding-left:4px;	
+    padding-right:4px;        
+}
+/*a5a9ac*/
+
+
+ .ui-table-search{
+        padding-left:80px;
+        background: #f4f7fa url(images/tabimg.png) no-repeat 0 center;
+        border-bottom:1px solid #999;
+        
+    }
+    .ui-table-search th{font-weight:normal;}
+	/*.mini-grid-cell {padding:3px 0;}*/

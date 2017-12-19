@@ -1,0 +1,17 @@
+{
+	"gradeWarnData": [
+		{"value":70,"name":"隐患等级I"},
+		{"value":55,"name":"隐患等级II"},
+		{"value":45,"name":"隐患等级III"},
+		{"value":35,"name":"隐患等级IV"},
+		{"value":20,"name":"隐患等级V"}
+	],
+	"overDueData": [
+		{"value":80,"name":"按期处理"},
+		{"value":37,"name":"逾期处理"}
+	],
+	"handleData": [
+		{"value":75,"name":"已经处理"},
+		{"value":55,"name":"未处理"}
+	]
+}

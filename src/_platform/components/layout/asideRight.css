@@ -1,0 +1,10 @@
+
+.rightAside{
+    position: absolute;
+    top:0;
+    right: 0;
+    left: 178px;
+    transition: left 0.3s;
+    height: calc(100% - 53px);
+}
+

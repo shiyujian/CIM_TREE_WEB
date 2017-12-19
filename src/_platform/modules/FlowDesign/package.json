@@ -1,0 +1,21 @@
+{
+  "name": "FlowDesign",
+  "description": "流程设计器",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "ECIDI-Gu",
+  "license": "GPL",
+  "dependencies": {
+    "antd": "^2.10.4",
+    "dagre": "^0.7.4",
+    "es6-promise": "^4.1.0",
+    "prop-types": "^15.5.10",
+    "react": "^15.4.2",
+    "react-redux": "^5.0.2",
+    "redux": "^3.6.0",
+    "redux-act": "^1.1.0",
+    "redux-actions": "^1.2.2",
+    "shortid": "^2.2.8",
+    "whatwg-fetch": "^2.0.2"
+  }
+}

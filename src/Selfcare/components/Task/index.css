@@ -1,0 +1,9 @@
+.create_select{
+    display:inline-block;
+    width:calc(100% - 100px);
+}
+.start_input{
+    display:inline-block;
+    width:calc(100% - 60px);
+}
+

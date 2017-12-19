@@ -1,0 +1,4 @@
+.ant-select-dropdown{
+    max-height: 22vh !important;
+    z-index:99999999999999;
+}

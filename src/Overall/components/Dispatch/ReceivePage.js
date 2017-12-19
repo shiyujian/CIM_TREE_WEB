@@ -1,0 +1,190 @@
+import React, {Component} from 'react';
+import {Table, Tabs, Button, Row, Col, message, Modal, Popconfirm} from 'antd';
+import moment from 'moment';
+import {getUser} from '../../../_platform/auth';
+import {STATIC_DOWNLOAD_API} from '../../../_platform/api';
+
+export default class ReceivePage extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			visible: false,
+			showInfo: {}
+		}
+	}
+
+	//删除
+	_deleteClick(_id) {
+		const {actions: {deleteReceiveDocAc,getReceiveInfoAc}} = this.props;
+		deleteReceiveDocAc({id:_id,user:encodeURIComponent(getUser().org)})
+			.then(()=>{
+				message.success("删除收文成功！");
+				getReceiveInfoAc({
+					user: encodeURIComponent(getUser().org)
+				});
+			})
+	}
+
+	//查看信息详情
+	_viewClick(id) {
+		//	获取详情
+		const {actions: {getReceiveDetailAc}} = this.props;
+		this.setState({
+			visible: true
+		});
+		getReceiveDetailAc({
+			id: id,
+			user: encodeURIComponent(getUser().org)
+		})
+			.then(rst => {
+				this.setState({
+					showInfo: rst
+				});
+			})
+	}
+
+	_handleCancel() {
+		this.setState({
+			visible: false,
+			showInfo: {}
+		})
+	}
+
+	_haveView(id) {
+		const {actions: {patchReceiveDetailAc, getReceiveInfoAc}} = this.props;
+		patchReceiveDetailAc({
+			id: id,
+			user: encodeURIComponent(getUser().org)
+		}, {
+			"is_read": true
+		})
+			.then((rst) => {
+				if (rst._id) {
+					message.success("已设置已阅！");
+					getReceiveInfoAc({
+						user: encodeURIComponent(getUser().org)
+					});
+					this._handleCancel();
+				}
+			})
+
+	}
+
+	render() {
+		const {
+			receiveInfo = {}
+		} = this.props;
+		const {showInfo = {}} = this.state;
+		const {notification = {}, is_read = false, _id = ''} = showInfo;
+		const {notifications = []} = receiveInfo;
+		return (
+			<Row>
+				<Col span={22} offset={1}>
+					<Table dataSource={this._getNewArrFunc(notifications)}
+						   columns={this.columns}
+						   rowKey="_id"
+					/>
+				</Col>
+				<Modal
+					title="查看详情"
+					width="90%"
+					style={{padding: "0 20px"}}
+					visible={this.state.visible}
+					closable={false}
+					maskClosable={false}
+					footer={null}
+				>
+					{
+						notification.title &&
+						<Row>
+							<Col span={24} style={{textAlign: 'center', marginBottom: '20px'}}>
+								<h1>{notification.title}</h1>
+							</Col>
+							<Row style={{marginBottom: '20px'}}>
+								<Col span={24}>
+									<h3>来文单位：{notification.from_whom}</h3>
+									<h3>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h3>
+								</Col>
+							</Row>
+							<Row style={{marginBottom: '20px'}}>
+								<Col span={2}>
+									<h3>正文</h3>
+								</Col>
+								<Col span={22}>
+									<div style={{
+										maxHeight: '800px',
+										overflow: 'auto',
+										border: '1px solid #ccc',
+										padding: '10px'
+									}}
+										 dangerouslySetInnerHTML={{__html: notification.body_rich}}/>
+								</Col>
+							</Row>
+							<Col span={24}>
+								<h3>附件：</h3>
+								{
+									notification.fixed_external_attachments.length > 0 &&
+									<a href={STATIC_DOWNLOAD_API + notification.fixed_external_attachments[0].file_partial_url}
+									   target="_bank">{notification.fixed_external_attachments[0].file_name}</a>
+								}
+							</Col>
+							<Col span={6} offset={18}>
+								{/*!is_read &&
+								<Button type="primary" onClick={this._haveView.bind(this, _id)}>已阅</Button>*/}
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<Button onClick={this._handleCancel.bind(this)}>退出</Button>
+							</Col>
+						</Row>
+					}
+
+				</Modal>
+			</Row>
+		);
+	}
+	_getNewArrFunc(list=[]){
+		let arr=list;
+		list.map((itm,index)=>{
+			itm.index=index+1;
+		});
+		return arr;
+	}
+	columns = [
+		{
+			title: 'ID',
+			dataIndex: 'index',
+		}, {
+			title: '标题',
+			dataIndex: 'notification_title',
+		}, {
+			title: '来文单位',
+			dataIndex: 'from_whom'
+		},
+		/* {
+			title: '状态',
+			dataIndex: 'is_read',
+			render: is_read => {
+				return (is_read === false) ? "未阅" : "已阅";
+			}
+		}, */
+		{
+			title: '发送时间',
+			dataIndex: 'create_time',
+			render: create_time => {
+				return moment(create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss');
+			}
+		}, {
+			title: '操作',
+			render: record => {
+				return (
+					<span>
+						<Button onClick={this._viewClick.bind(this, record._id)}>查看</Button>
+						<Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
+									cancelText="取消">
+							<Button type="danger">删除</Button>
+						</Popconfirm>
+					</span>
+				)
+			},
+		}
+	];
+}

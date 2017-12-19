@@ -1,0 +1,59 @@
+.markerIcon {
+    width: 20px !important;
+    height: 20px !important;
+    background-image: url("./marker-icon.png");
+    background-size: 100% 100%;
+}
+
+/*安全监控*/
+.cameraIcon {
+    width: 20px !important;
+    height: 20px !important;
+    background-image: url("./camera.png");
+    background-size: 100% 100%;
+}
+/*视频监控*/
+.videoIcon {
+    width: 20px !important;
+    height: 20px !important;
+    background-image: url("./video.png");
+    background-size: 100% 100%;
+}
+
+.treeControl {
+	position: absolute;
+	z-index: 1000;
+	top: 20px;
+	right: 40px;
+}
+
+.cardControl {
+	margin-top: 80px;
+}
+
+.btnCtro {
+	position: fixed;
+    top: 92px;
+    right: 161px;
+    width: 178px;
+    height: 27px;
+    border: none;
+}
+
+.videolist{
+    position: fixed;
+    top: 100px;
+    left: 200px;
+    z-index: 9999;
+}
+.OneVideoList{
+    width: 90%;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+.DisplayNone{
+    display: none !important;
+}
