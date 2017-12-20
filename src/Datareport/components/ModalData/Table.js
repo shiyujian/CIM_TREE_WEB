@@ -63,7 +63,7 @@ export default class DesignTable extends Component {
 
 		return (
 			<div >
-				<Row style={{ marginBottom: "30px" }}>
+				<Row style={{ marginBottom: "10px" }}>
 					<Button type="default">模板下载</Button>
 					<Button style={{ marginLeft: '10PX' }} onClick={this.toggleAddition.bind(this)} type="default" >发起填报</Button>
 					<Button style={{ marginLeft: '10PX' }} onClick={this.toggleModify.bind(this)} type="default">申请变更</Button>
@@ -71,7 +71,7 @@ export default class DesignTable extends Component {
 					<Button style={{ marginLeft: '10PX' }} type="default">导出表格</Button>
 					<Search
 						style={{ width: "200px", marginLeft: 10 }}
-						placeholder="输入搜索条件"
+						placeholder="输入搜索内容"
 						onSearch={value => console.log(value)}
 					/>
 				</Row>
