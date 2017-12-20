@@ -290,7 +290,7 @@ class JianyanModal extends Component {
             width:"12%",
             render: (text, record, index) => (
                 <span>
-                    {record.construct_unit.name}
+                    {record.construct_unit ? record.construct_unit.name : "暂无"}
                 </span>
             ),
 		}, {

@@ -6,6 +6,7 @@ import {actions} from '../store/quality';
 import {actions as platformActions} from '_platform/store/global';
 import {Row,Col,Table,Input,Button} from 'antd';
 import JianyanModal from '../components/Quality/JianyanModal'
+import {WORKFLOW_CODE} from '_platform/api.js'
 import './quality.less'
 const Search = Input.Search;
 @connect(
@@ -71,7 +72,7 @@ export default class JianyanData extends Component {
 		}
 		let postdata = {
 			name:"其它验收信息批量录入",
-			code:"TEMPLATE_032",
+			code:WORKFLOW_CODE["数据报送流程"],
 			description:"其它验收信息批量录入",
 			subject:[{
 				data:JSON.stringify(data)

@@ -11,7 +11,7 @@ import safetySpecialReducer, {actions as safetySpecialActions} from './safetySpe
 import vediodataReducer, {actions as vediodataActions} from './vedioData';
 import vedioinfodataReducer, {actions as vedioinfodataActions} from './vedioInfoData';
 import workdataReducer, {actions as workdataActions} from './workdata';
-
+import CostListDataReducer, {actions as CostListDataActions} from './CostListData';
 export default handleActions({
 	//项目信息
 	[combineActions(...actionsMap(projectdataActions))]: (state = {}, action) => ({
@@ -69,5 +69,10 @@ export default handleActions({
 	[combineActions(...actionsMap(workdataActions))]: (state = {}, action) => ({
 		...state,
 		workdata: workdataReducer(state.workdata, action),
+	}),
+	// 成本结算
+	[combineActions(...actionsMap(CostListDataActions))]: (state = {}, action) => ({
+		...state,
+		CostListData: CostListDataReducer(state.CostListData, action),
 	}),
 }, {});
