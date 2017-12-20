@@ -16,10 +16,11 @@ class PriceList extends Component {
             dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
+            projects:[]
 		};
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
+        const {actions:{getAllUsers,getProjectTree}} = this.props
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -27,6 +28,16 @@ class PriceList extends Component {
                 )
             })
             this.setState({checkers})
+        });
+        getProjectTree().then(rst => {
+            if (rst.children.length) {
+                let projects = rst.children.map(item => {
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({projects})
+            }
         })
     }
 	
@@ -205,10 +216,6 @@ class PriceList extends Component {
         dataSource.splice(index,1)
         this.setState({dataSource})
     }
-    //添加
-    addto(index){
-       
-    }
 	render() {
         const columns = 
         [{
@@ -220,11 +227,15 @@ class PriceList extends Component {
 			title:'项目/子项目',
             dataIndex:'subproject',
             width:"10%",
-            // render: (text, record, index) => (
-            //     <span>
-            //         {record.project.name}
-            //     </span>
-            // ),
+            render:(record) => {
+                return (
+                    <Select style={{width:"90%"}} onSelect={ele => {
+                        this.setState({ pro: ele })
+                    }}>
+                        {this.state.projects}
+                    </Select>
+                )
+            }
         },{
             title:'单位工程',
             dataIndex:'unitengineering'
@@ -270,11 +281,9 @@ class PriceList extends Component {
                 <Popconfirm
                     placement="leftTop"
                     title="确定删除吗？"
-                    onConfirm={this.addto.bind(this, index)}
                     onConfirm={this.delete.bind(this, index)}
                     okText="确认"
                     cancelText="取消">
-                    <a>添加</a>
                     <a>删除</a>
                 </Popconfirm>
             )
@@ -366,8 +375,8 @@ class PriceList extends Component {
             unitengineering:item[2],
             projectcoding:item[3],
             valuation:item[4],
-            content:[5],
-            company:[6],
+            content:item[5],
+            company:item[6],
             total:item[7],
             remarks:item[8],
             sunmits:item[9],

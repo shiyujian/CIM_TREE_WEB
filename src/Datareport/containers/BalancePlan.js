@@ -15,7 +15,7 @@ import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radi
 const Search = Input.Search;
 import {WORKFLOW_CODE} from '_platform/api.js';
 import {getUser} from '_platform/auth';
-import {actions} from '../store/DesignData';
+import {actions} from '../store/CostListData';
 import {actions as platformActions} from '_platform/store/global';
 import {SumPlan} from '../components/CostListData';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -116,42 +116,24 @@ export default class BanlancePlan extends Component {
 			title: '备注',
 			dataIndex: 'remarks',
 		  }]
-        const data = [{
-			key: '1',
-			serialnumber: '1',
-			subproject: '植树造林项目',
-			nodetarget: '02101512152',
-			completiontime:'篮球场规划',
-            summoney: 'm2',
-            ratio:'2222',
-            remarks: '5555'
-          },{
-			key: '2',
-			serialnumber: '2',
-			subproject: '植树造林项目',
-			nodetarget: '02101512152',
-			completiontime:'篮球场规划',
-            summoney: 'm2',
-            ratio:'2222',
-            remarks: '5555'
-		  }]
+        const data = []
 
 		return (
 			<div>
 				<DynamicTitle title="结算计划" {...this.props}/>
 				<Content>
-					<div style ={{marginBottom:20}}>
-						<Button >申请变更</Button>
-						<Button style ={{marginLeft:20}}>申请删除</Button>
-						<Button style ={{marginLeft:20}}>导出表格</Button>
-						<Search
-							placeholder="请输入内容"
-							onSearch={value => console.log(value)}
-							style={{ width: 200,marginLeft:20}}
+				<Row>
+					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({lanchReapt:true})}}>批量导入</Button>
+					<Button className="btn" type="default">申请变更</Button>
+					<Button className="btn" type="default">导出表格</Button>
+					<Search 
+						className="btn"
+						style={{width:"200px"}}
+						placeholder="请输入搜索条件"
+						onSearch={value => console.log(value)}
 						/>
-						<Button style ={{marginLeft:20}} onClick={this.submit.bind(this)}>发起填报</Button>
-						<Button style ={{marginLeft:20}} onClick={this.examine.bind(this)}>发起审核</Button>
-					</div>
+				</Row>
 					<div >
 						<Table rowSelection={rowSelection} columns={columns} dataSource={data} bordered/>
 					</div>
