@@ -17,6 +17,7 @@ const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, 
 export const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
 //获取项目树
 export const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
+export const getProjectTreeDetail = createFetchAction(`${SERVICE_API}/project-tree/{{pk}}/`, []);
 export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const createWorkflow = createFetchAction(`${WORKFLOW_API}/instance/`, [], 'POST')
 export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [])
@@ -32,6 +33,7 @@ export const actions = {
 	...modifyReducer,
 	...expurgateReducer,
 	getProjectTree,
+	getProjectTreeDetail,
     uploadStaticFile,
     deleteStaticFile,
 	getWorkPackageDetail,
