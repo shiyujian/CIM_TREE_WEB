@@ -166,8 +166,8 @@ class JianyanpiModal extends Component {
         let res = {};
         const {actions:{getWorkPackageDetail}} = this.props
         let jianyanpi = await getWorkPackageDetail({code:code})
-        res.name = jianyanpi.name
-        res.code = jianyanpi.code        
+        res.name = jianyanpi.name;
+        res.code = jianyanpi.code;    
         let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
         if(fenxiang.parent.obj_type_hum === "子分部工程"){
             let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})

@@ -15,19 +15,36 @@ export default class AddFile extends Component {
             dataSource: [],
             checkers:[],//审核人下来框选项
             check:null,//审核人
+            projects:[],
+            units:[],
+            project:{},
+            unit:{},
+            beginUnit:'',
         };
     }
 
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
-        getAllUsers().then(res => {
-            let checkers = res.map(o => {
+        const {actions:{getAllUsers,getProjectTree}} = this.props;
+        getAllUsers().then(rst => {
+            let checkers = rst.map(o => {
                 return (
                     <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
             this.setState({checkers})
         })
+        getProjectTree({depth:1}).then(rst =>{
+            if(rst.status){
+                let projects = rst.children.map(item=>{
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({projects});
+            }else{
+                //获取项目信息失败
+            }
+        });
     }
     beforeUpload = (info) => {
         if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
@@ -52,6 +69,7 @@ export default class AddFile extends Component {
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
                 dataSource.push({
+                    code: dataList[i][0] ? dataList[i][0] : '',
                     filename: dataList[i][0] ? dataList[i][0] : '',
                     pubUnit: dataList[i][1] ? dataList[i][1] : '',
                     type: dataList[i][2] ? dataList[i][2] : '',
@@ -80,11 +98,47 @@ export default class AddFile extends Component {
 
     //下拉框选择人
     selectChecker(value){
-        let check = JSON.parse(value)
+        let check = JSON.parse(value);
         this.setState({check})
     }
 
+    selectUnit(value){
+        let unit = JSON.parse(value);
+        this.setState({unit,beginUnit:value});
+    }
+
+    selectProject(value){
+        debugger
+        let project = JSON.parse(value);
+        this.setState({project,units:[]});
+        const {actions:{getProjectTree}} = this.props;
+        let beginUnit = '';
+        let i=0;
+        getProjectTree({depth:2}).then(rst =>{
+            if(rst.status){
+                let units = [];
+                rst.children.map(item=>{
+                    if(item.code===project.code){  //当前选中项目
+                        units = item.children.map(unit =>{
+                            i++;
+                            if(i===1){
+                                beginUnit = JSON.stringify(unit);
+                            }
+                            return (
+                                <Option value={JSON.stringify(unit)}>{unit.name}</Option>
+                            )
+                        })
+                    }
+                })
+                this.setState({units,beginUnit});
+            }else{
+                //获取项目信息失败
+            }
+        });
+    }
+
     onok(){
+        debugger
         if(!this.state.check){
             message.info("请选择审核人")
             return
@@ -108,53 +162,7 @@ export default class AddFile extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.setEditData(this.state.dataSource,per)
-    }
-
-    //根据附件名称 也就是wbs编码获取其他信息
-    async getInfo(code){
-        console.log(this.props)
-        let res = {};
-        const {actions:{getWorkPackageDetail}} = this.props
-        let jianyanpi = await getWorkPackageDetail({code:code})
-        res.name = jianyanpi.name
-        res.code = jianyanpi.code        
-        let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
-        if(fenxiang.parent.obj_type_hum === "子分部工程"){
-            let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
-            res.unit = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
-            }
-            res.project = danwei.parent
-        }else{
-            let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
-            res.unit = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
-            }
-            res.project = danwei.parent
-        }
-        return res
+		this.props.onok(this.state.dataSource,per)
     }
 
     //删除
@@ -221,7 +229,7 @@ export default class AddFile extends Component {
     beforeUploadPicFile  = (index,file) => {
         // 上传到静态服务器
         const fileName = file.name;
-        let {dataSource} = this.state
+        let {dataSource,unit,project} = this.state;
         let temp = fileName.split(".")[0]
 		const { actions:{uploadStaticFile} } = this.props;
         const formdata = new FormData();
@@ -254,11 +262,20 @@ export default class AddFile extends Component {
                 download_url:filedata.download_url,
                 mime_type:resp.mime_type
             };
-            let jcode = file.name.split('.')[0]
-            let info = await this.getInfo(jcode)
-            dataSource[index]['file'] = attachment
-            dataSource[index] = Object.assign(dataSource[index],info)
-            this.setState({dataSource})
+            let unitProject = {
+                name:unit.name,
+                code:unit.code,
+                obj_type:unit.obj_type
+            }
+            let projectt = {
+                name:project.name,
+                code:project.code,
+                obj_type:project.obj_type
+            }
+            dataSource[index]['file'] = attachment;
+            dataSource[index]['unit'] = unitProject;
+            dataSource[index]['project'] = projectt;
+            this.setState({dataSource});
         });
         return false;
     }
@@ -273,20 +290,24 @@ export default class AddFile extends Component {
                 title:'项目名称',
                 dataIndex:'projectName',
                 width: '10%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.project.name}
-                    </span>
-                ),
+                render: (text, record, index) => {
+                    return <Select style={{width:'100px'}} className="btn" onSelect={this.selectProject.bind(this)}>
+                        {
+                            this.state.projects
+                        }
+                    </Select>
+                }
             },{
                 title:'单位工程',
                 dataIndex:'unit',
                 width: '10%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.unit.name}
-                    </span>
-                ),
+                render: (text, record, index) => {
+                    return <Select value={this.state.beginUnit} style={{width:'100px'}} className="btn" onSelect={this.selectUnit.bind(this)}>
+                        {
+                            this.state.units
+                        }
+                    </Select>
+                }
             },{
                 title:'文件名称',
                 dataIndex:'filename',
