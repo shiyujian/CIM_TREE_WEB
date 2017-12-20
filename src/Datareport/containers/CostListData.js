@@ -9,7 +9,7 @@ import PriceList from '../components/CostListData/PriceList';
 import {getUser} from '_platform/auth';
 import './quality.less';
 import {getNextStates} from '_platform/components/Progress/util';
-import {WORKFLOW_CODE} from '_platform/api'
+import {WORKFLOW_CODE} from '_platform/api.js';
 var moment = require('moment');
 const Search = Input.Search;
 @connect(

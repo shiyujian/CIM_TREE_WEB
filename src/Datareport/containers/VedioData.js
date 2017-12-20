@@ -37,9 +37,8 @@ export default class VedioData extends Component {
 				<VedioTable/>
 			</Content>
 			<UploadModal
+			 uploadModal={uploadModal}			 
 			 actions = {this.props.actions}
-			 key={uploadModal} 
-			 uploadModal={uploadModal}
 			 closeModal={this.closeModal}
 			/>
 		</Main>)
@@ -50,9 +49,5 @@ export default class VedioData extends Component {
     }
     closeModal= ()=>{
         this.setState({uploadModal:false});
-	}
-	reduxTest = ()=>{
-		const {actions:{Test}} = this.props;
-		Test('test');
 	}
 };
