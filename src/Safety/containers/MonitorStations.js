@@ -454,6 +454,7 @@ class MonitorStation extends Component {
                     duration: 2
                 });
             let response = info.file.response;
+            this.setState({nodeArray:[]});
             if(response.result==="succeed to create data in bulk"){
                 getMonitorNodes({},{unit:unitProject.code}).then((rst)=>{
                     if(rst.results){
