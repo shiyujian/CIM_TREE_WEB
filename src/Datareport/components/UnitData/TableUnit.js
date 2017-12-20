@@ -46,34 +46,34 @@ export default class TableUnit extends Component{
         console.log(selected, selectedRows, changeRows);
       },
     };
-    dataSource = [{
-      index:1,
-      code:"自动编码",
-      name:'何睿',
-      unit:'',
-      depart:'大数据与科技中心',
-      role:"暂无",
-      job:'主任',
-      tel:'1377777777',
-      email:'13475754@qq.com',
-      signature:'暂无',
-      portrait:'暂无',
-      unit:'华东院',
-      sex:'男'
-    },{
-      index:1,
-      code:"自动编码",
-      name:'何睿',
-      depart:'大数据与科技中心',
-      role:"暂无",
-      job:'主任',
-      tel:'1377777777',
-      email:'13475754@qq.com',
-      signature:'暂无',
-      portrait:'暂无',
-      unit:'华东院',
-      sex:'男'
-    }]
+    // dataSource = [{
+    //   index:1,
+    //   code:"自动编码",
+    //   name:'何睿',
+    //   unit:'',
+    //   depart:'大数据与科技中心',
+    //   role:"暂无",
+    //   job:'主任',
+    //   tel:'1377777777',
+    //   email:'13475754@qq.com',
+    //   signature:'暂无',
+    //   portrait:'暂无',
+    //   unit:'华东院',
+    //   sex:'男'
+    // },{
+    //   index:1,
+    //   code:"自动编码",
+    //   name:'何睿',
+    //   depart:'大数据与科技中心',
+    //   role:"暂无",
+    //   job:'主任',
+    //   tel:'1377777777',
+    //   email:'13475754@qq.com',
+    //   signature:'暂无',
+    //   portrait:'暂无',
+    //   unit:'华东院',
+    //   sex:'男'
+    // }]
     columns = [ {
         title: '序号',
         dataIndex: 'code',
