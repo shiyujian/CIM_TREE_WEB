@@ -124,6 +124,10 @@ export default class BalanceSchedule extends Component {
 					this.state.addvisible &&
 					<SumSpeed {...this.props} oncancel={() => {this.setState({addvisible:false})}} onok={this.setData.bind(this)}/>
 				}
+				{/* <Content>
+					结算进度
+					<SumSpeed {...this.props}/>
+				</Content> */}
 			</div>)
 	}
 };
