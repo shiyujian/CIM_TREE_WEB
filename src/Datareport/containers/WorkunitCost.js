@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {actions as platformActions} from '_platform/store/global';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {ProjectSum} from '../components/CostListData';
@@ -8,21 +7,24 @@ import {Row,Col,Table,Input,Button} from 'antd';
 import {WORKFLOW_CODE} from '_platform/api.js'
 import {getNextStates} from '_platform/components/Progress/util';
 import {getUser} from '_platform/auth';
+import {actions} from '../store/WorkunitCost';
+import {actions as platformActions} from '_platform/store/global';
+
 
 var moment = require('moment');
 const Search = Input.Search;
 
 
 
-// @connect(
-// 	state => {
-// 		const {platform} = state;
-// 		return {platform};
-// 	},
-// 	dispatch => ({
-// 		actions: bindActionCreators({...platformActions, }, dispatch),
-// 	}),
-// )
+@connect(
+	state => {
+		const {datareport: {WorkunitCost = {}} = {}, platform} = state;
+		return {...WorkunitCost, platform}
+	},
+	dispatch => ({
+		actions: bindActionCreators({...actions, ...platformActions}, dispatch)
+	})
+)
 
 
 
@@ -67,6 +69,45 @@ export default class WorkunitCost extends Component {
 	projectfill(){
 		this.setState({addvisible:true})
 	}
+	//上传回调
+	setData(data,participants){
+		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"工程量结算信息填报",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"工程量结算信息填报",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{ 
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({addvisible:false})						
+					})
+		})
+	}
 	// setAddVisible(){
 	// 	this.setState({addvisible:true})
 	// }
@@ -100,7 +141,5 @@ export default class WorkunitCost extends Component {
 			</div>)
 	}
 
-	projectfill(){
-		console.log(11111)
-	}
+	
 };

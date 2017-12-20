@@ -12,7 +12,7 @@ import vediodataReducer, {actions as vediodataActions} from './vedioData';
 import vedioinfodataReducer, {actions as vedioinfodataActions} from './vedioInfoData';
 import workdataReducer, {actions as workdataActions} from './workdata';
 import CostListDataReducer, {actions as CostListDataActions} from './CostListData';
-
+import WorkunitCostReducer, {actions as WorkunitCostActions} from './WorkunitCost';
 
 export default handleActions({
 	//项目信息
@@ -76,5 +76,10 @@ export default handleActions({
 	[combineActions(...actionsMap(CostListDataActions))]: (state = {}, action) => ({
 		...state,
 		CostListData: CostListDataReducer(state.CostListData, action),
+	}),
+	//工程量计算
+	[combineActions(...actionsMap(WorkunitCostActions))]: (state = {}, action) => ({
+		...state,
+		WorkunitCost: WorkunitCostReducer(state.WorkunitCost, action),
 	}),
 }, {});

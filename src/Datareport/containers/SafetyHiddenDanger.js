@@ -14,7 +14,8 @@ import {
     notification
 } from 'antd';
 import {actions} from '../store/quality';
-import {getUser} from '_platform/auth'
+import {getUser} from '_platform/auth';
+import {WORKFLOW_CODE} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyHiddenDanger/AddFile';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -53,7 +54,7 @@ class SafetyHiddenDanger extends Component {
 		}
 		let postdata = {
 			name:"安全隐患信息批量录入",
-			code:"TEMPLATE_032",
+			code:WORKFLOW_CODE["数据报送流程"],
 			description:"安全隐患信息批量录入",
 			subject:[{
 				data:JSON.stringify(data)

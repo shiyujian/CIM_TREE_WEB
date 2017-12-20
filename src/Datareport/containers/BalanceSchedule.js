@@ -12,7 +12,7 @@ import { bindActionCreators } from 'redux';
 
 import { DynamicTitle, Content } from '_platform/components/layout';
 import { Table, Row, Col, Button} from 'antd';
-import {SumPlan} from '../components/CostListData'
+import {SumSpeed} from '../components/CostListData'
 import {actions} from '../store/DesignData';
 import {actions as platformActions} from '_platform/store/global';
 
@@ -38,6 +38,7 @@ export default class BalanceSchedule extends Component {
 				<DynamicTitle title="结算进度表" {...this.props}/>
 				<Content>
 					结算进度
+					<SumSpeed {...this.props}/>
 				</Content>
 			</div>)
 	}

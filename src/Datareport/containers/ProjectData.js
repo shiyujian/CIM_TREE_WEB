@@ -32,7 +32,7 @@ export default class ProjectData extends Component {
 		}
 		let postdata = {
 			name:"项目信息批量录入",
-			code:"TEMPLATE_032",
+			code:"TEMPLATE_033",
 			description:"项目信息批量录入",
 			subject:[{
 				data:JSON.stringify(data)
