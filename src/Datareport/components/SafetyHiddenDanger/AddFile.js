@@ -22,15 +22,27 @@ export default class AddFile extends Component {
         };
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
-        getAllUsers().then(res => {
-            let checkers = res.map(o => {
+        const {actions:{getAllUsers,getProjectTree}} = this.props;
+        getAllUsers().then(rst => {
+            let checkers = rst.map(o => {
                 return (
                     <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
             this.setState({checkers})
         })
+        getProjectTree({depth:1}).then(rst =>{
+            if(rst.status){
+                let projects = rst.children.map(item=>{
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({projects});
+            }else{
+                //获取项目信息失败
+            }
+        });
     }
     beforeUpload = (info) => {
         if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {

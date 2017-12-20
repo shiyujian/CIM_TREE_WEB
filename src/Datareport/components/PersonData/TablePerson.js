@@ -12,7 +12,7 @@ export default class TablePerson extends Component{
                     <Button className = {style.button}>申请变更</Button>
                     <Button className = {style.button}>申请删除</Button>
                     <Button className = {style.button}>导出表格</Button>
-                    <Search className = {style.button} style={{width:"200px"}} placeholder="请输入内容" />
+                    <Search className = {style.button} style={{width:"200px"}} placeholder="输入搜索条件" />
                 </div>
                 <Table
                     columns = {this.columns}
