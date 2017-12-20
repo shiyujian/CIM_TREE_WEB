@@ -73,7 +73,6 @@ export default class PriceList extends Component {
         return (
             <div>
                <div style ={{marginBottom:20}}>
-					<Button >申请变更</Button>
 					<Button style ={{marginLeft:20}}>申请删除</Button>
 					<Button style ={{marginLeft:20}}>导出表格</Button>
 					<Search
@@ -106,7 +105,7 @@ export default class PriceList extends Component {
                         </Select>
                     </Col>
                     <Col>
-                        <Upload style={{ marginRight: "30px" }}>
+                        <Upload style={{ marginRight: "30px" }} >
                             <Button>
                                 <Icon /> 选择文件
                             </Button>

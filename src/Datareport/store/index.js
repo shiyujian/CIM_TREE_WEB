@@ -12,6 +12,8 @@ import vediodataReducer, {actions as vediodataActions} from './vedioData';
 import vedioinfodataReducer, {actions as vedioinfodataActions} from './vedioInfoData';
 import workdataReducer, {actions as workdataActions} from './workdata';
 import CostListDataReducer, {actions as CostListDataActions} from './CostListData';
+
+
 export default handleActions({
 	//项目信息
 	[combineActions(...actionsMap(projectdataActions))]: (state = {}, action) => ({

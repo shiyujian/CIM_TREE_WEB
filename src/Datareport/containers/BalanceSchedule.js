@@ -37,7 +37,7 @@ export default class BalanceSchedule extends Component {
 			<div>
 				<DynamicTitle title="结算进度表" {...this.props}/>
 				<Content>
-					计算进度
+					结算进度
 				</Content>
 			</div>)
 	}
