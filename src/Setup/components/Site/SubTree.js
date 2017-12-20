@@ -122,7 +122,7 @@ export default class SubTree extends Component {
 	//过滤掉子分部数据【itm=>itm.obj_type !== 'C_WP_PTR_S'】
 	static loop(data = []) {
 		return data.map((item) => {
-			if (item.obj_type === "C_WP_PTR_S") {
+			if (item.obj_type === "C_WP_PTR_S" || item.obj_type === "C_WP_ITM") {
 				return ;
 			}
 			if (item.children && item.children.length) {

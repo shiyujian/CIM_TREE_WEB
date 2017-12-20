@@ -6,9 +6,11 @@ import { SERVICE_API,USER_API,WORKFLOW_API} from '_platform/api';
 
 export const ModalVisible = createAction('组织Modal模态框显示隐藏');
 export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
+export const getProjects = createFetchAction(`${USER_API}/project-tree/?depth=1`);
 export const actions = {
 	ModalVisible,
-	getAllUsers
+	getAllUsers,
+	getProjects
 };
 
 export default handleActions({
