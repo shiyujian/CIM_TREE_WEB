@@ -2,16 +2,19 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import {actions} from '../store/quality';
+import {actions} from '../store/CostListData';
 import {actions as platformActions} from '_platform/store/global';
 import {Row,Col,Table,Input,Button} from 'antd';
-import PriceList from '../components/CostListData/PriceList'
-import './quality.less'
+import PriceList from '../components/CostListData/PriceList';
+import {getUser} from '_platform/auth';
+import './quality.less';
+import {getNextStates} from '_platform/components/Progress/util';
+var moment = require('moment');
 const Search = Input.Search;
 @connect(
 	state => {
-		const {datareport: {qualityData = {}} = {}, platform} = state;
-		return {...qualityData, platform}
+		const {datareport: {CostListData = {}} = {}, platform} = state;
+		return {...CostListData, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({...actions, ...platformActions}, dispatch)
@@ -30,39 +33,74 @@ export default class CostListData extends Component {
 			}
 		},{
 			title:'项目',
-			dataIndex:'project'
+			dataIndex:'project',
 		},{
 			title:'单位工程',
-			dataIndex:'unit'
+			dataIndex:'unit',
 		},{
 			title:'清单项目编号',
-			dataIndex:'code'
+			dataIndex:'projectcoding'
 		},{
 			title:'计价单项',
-			dataIndex:'name'
+			dataIndex:'valuation' 
 		},{
 			title:'工程内容/规格编号',
 			dataIndex:'rate'
 		},{
 			title:'计量单位',
-			dataIndex:'level'
+			dataIndex:'company'
 		},{
 			title:'结合单价（元）',
-			dataIndex:'construct_unit'
+			dataIndex:'total'
 		}, {
 			title:'备注',
-			render:(text,record,index) => {
-				return <span>
-					<a>预览</a>
-					<span className="ant-divider" />
-					<a>下载</a>
-				</span>
-			}
+			dataIndex:'remarks'
 		}];
 	}
 	//批量上传回调
-	setData(data){
+	setData(data,participants){
+		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"计价清单信息填报",
+			code:"TEMPLATE_033",
+			description:"计价清单信息填报",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({addvisible:false})						
+					})
+		})
+	}
+	oncancel(){
 		this.setState({addvisible:false})
+	}
+	setAddVisible(){
+		this.setState({addvisible:true})
 	}
 	render() {
 		return (
@@ -82,7 +120,7 @@ export default class CostListData extends Component {
 				</Row>
 				<Row >
 					<Col >
-						<Table columns={this.columns} dataSource={[]} rowKey="code"/>
+						<Table columns={this.columns} dataSource={[]} rowKey="key"/>
 					</Col>
 				</Row>
 				{
