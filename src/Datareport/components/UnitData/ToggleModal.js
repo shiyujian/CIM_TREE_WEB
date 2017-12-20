@@ -11,26 +11,29 @@ export default class ToggleModal extends Component{
     }
     render(){
         const {visible} = this.props;
-        let jthis = this;
-        const props = {
+        let jthis = this
+		//上传
+		const props = {
 			action: `${SERVICE_API}/excel/upload-api/` /*+ '?t_code=zjt-05'*/,
 			headers: {
 			},
 			showUploadList: false,
-		    onChange(info) {
-		        if (info.file.status !== 'uploading') {
-		        }
-		        if (info.file.status === 'done') {
-		        	let importData = info.file.response.Sheet1;
-                    let dataSource = jthis.handleExcelData(importData);
-                    jthis.setState({
-                        dataSource
-                    })
-		            message.success(`${info.file.name} file uploaded successfully`);
-		        } else if (info.file.status === 'error') {
-		            message.error(`${info.file.name}解析失败，请检查输入`);
-		        }
-		    },
+			onChange(info) {
+                console.log(info)
+				if (info.file.status !== 'uploading') {
+					// console.log(info.file, info.fileList);
+				}
+				if (info.file.status === 'done') {
+					let importData = info.file.response.Sheet1;
+					console.log('bbb', importData);
+					let { dataSource } = jthis.state
+					dataSource = jthis.handleExcelData(importData)
+					jthis.setState({ dataSource })
+					message.success(`${info.file.name} 上传成功`);
+				} else if (info.file.status === 'error') {
+					message.error(`${info.file.name}解析失败，请检查输入`);
+				}
+			},
 		};
         return (
             <Modal
@@ -87,43 +90,43 @@ export default class ToggleModal extends Component{
     columns = [{
         title: '序号',
         dataIndex: 'index',
-        key: 'Index',
+        // key: 'Index',
       }, {
-        title: '项目/子项目名称',
+        title: '单位工程名称',
         dataIndex: 'code',
-        key: 'Code',
+        // key: 'Code',
       }, {
-        title: '所属项目',
+        title: '所属项目/子项目名称',
         dataIndex: 'genus',
         key: 'Genus',
       },{
-        title: '所属区域',
+        title: '项目类型',
         dataIndex: 'area',
-        key: 'Area',
+        // key: 'Area',
       },{
-         title: '项目类型',
+         title: '项目阶段',
          dataIndex :'type',
-         key: 'Type',
-      },{
-        title: '项目地址',
-        dataIndex :'address',
-        key: 'Address',
+        //  key: 'Type',
       },{
         title: '项目红线坐标',
-        dataIndex :'coordinate',
-        key: 'Coordinate',
-      },{
-        title: '项目负责人',
-        dataIndex :'duty',
-        key:'Duty'
+        dataIndex :'address',
+        // key: 'Address',
       },{
         title: '计划开工日期',
-        dataIndex :'stime',
-        key:'Stime'
+        dataIndex :'coordinate',
+        // key: 'Coordinate',
       },{
         title: '计划竣工日期',
+        dataIndex :'duty',
+        // key:'Duty'
+      },{
+        title: '建设单位',
+        dataIndex :'stime',
+        // key:'Stime'
+      },{
+        title: '单位工程简介',
         dataIndex :'etime',
-        key:'Etime'
+        // key:'Etime'
       },{
           title:'附件',
           key:'nearby',
@@ -135,6 +138,7 @@ export default class ToggleModal extends Component{
       }]
     //处理上传excel的数据
     handleExcelData(data) {
+        console.log('data',data)
         data.splice(0, 1);
         let res = data.map(item => {
             return {
