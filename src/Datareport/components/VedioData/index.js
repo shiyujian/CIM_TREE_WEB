@@ -1,4 +1,4 @@
-export VedioUpload from './VedioUpload';
+export UploadModal from './UploadModal';
 export VedioTable from './VedioTable';
 
 export VedioInfoUpload from './VedioInfoUpload';

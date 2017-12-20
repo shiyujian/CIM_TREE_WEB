@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 
-import { Input, Form, Spin, Upload, Icon, Button, Modal,Select, message, Table, Row, Col, notification } from 'antd';
-import { UPLOAD_API, SERVICE_API } from '_platform/api';
+import { Input, Form, Spin, Upload, Icon, Button, Modal,Popconfirm,Select, message, Table, Row, Col, notification } from 'antd';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -36,6 +37,51 @@ export default class AddFile extends Component {
             });
             return false;
         }
+    }
+    //根据附件名称 也就是wbs编码获取其他信息
+    async getInfo(code){
+        console.log(this.props)
+        let res = {};
+        const {actions:{getWorkPackageDetail}} = this.props
+        let jianyanpi = await getWorkPackageDetail({code:code})
+        res.name = jianyanpi.name
+        res.code = jianyanpi.code        
+        let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
+        if(fenxiang.parent.obj_type_hum === "子分部工程"){
+            let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
+            let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
+            let zidanwei = {},danwei = {};
+            if(fenbu.parent.obj_type_hum === "子单位工程"){
+                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
+                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
+                
+            }else{
+                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
+            } 
+            res.unit = {
+                name:danwei.name,
+                code:danwei.code,
+                obj_type:danwei.obj_type
+            }
+            res.project = danwei.parent
+        }else{
+            let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
+            let zidanwei = {},danwei = {};
+            if(fenbu.parent.obj_type_hum === "子单位工程"){
+                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
+                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
+                
+            }else{
+                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
+            } 
+            res.unit = {
+                name:danwei.name,
+                code:danwei.code,
+                obj_type:danwei.obj_type
+            }
+            res.project = danwei.parent
+        }
+        return res
     }
 
     onok(){
@@ -76,18 +122,27 @@ export default class AddFile extends Component {
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
                 dataSource.push({
-                    code: dataList[i][0] ? dataList[i][0] : '',
-                    projectName: dataList[i][1] ? dataList[i][1] : '',
-                    unit: dataList[i][2] ? dataList[i][2] : '',
-                    wbs: dataList[i][3] ? dataList[i][3] : '',
-                    resUnit: dataList[i][4] ? dataList[i][4] : '',
-                    type: dataList[i][5] ? dataList[i][5] : '',
-                    upTime: dataList[i][6] ? dataList[i][6] : '',
-                    checkTime: dataList[i][7] ? dataList[i][7] : '',
-                    editTime: dataList[i][8] ? dataList[i][8] : '',
-                    result: dataList[i][9] ? dataList[i][9] : '',
-                    deadline: dataList[i][10] ? dataList[i][10] : '',
-                    editResult: dataList[i][11] ? dataList[i][11] : '',
+                    resUnit: dataList[i][0] ? dataList[i][0] : '',
+                    type: dataList[i][1] ? dataList[i][1] : '',
+                    upTime: dataList[i][2] ? dataList[i][2] : '',
+                    checkTime: dataList[i][3] ? dataList[i][3] : '',
+                    editTime: dataList[i][4] ? dataList[i][4] : '',
+                    result: dataList[i][5] ? dataList[i][5] : '',
+                    deadline: dataList[i][6] ? dataList[i][6] : '',
+                    editResult: dataList[i][7] ? dataList[i][7] : '',
+                    project:{
+                        code:"",
+                        name:"",
+                        obj_type:""
+                    },
+                    unit:{
+                        code:"",
+                        name:"",
+                        obj_type:""
+                    },
+                    file:{
+                        
+                    }
                 })
             }
             this.setState({ dataSource });
@@ -98,6 +153,117 @@ export default class AddFile extends Component {
     selectChecker(value){
         let check = JSON.parse(value)
         this.setState({check})
+    }
+
+    //删除
+    delete(index){
+        let {dataSource} = this.state
+        dataSource.splice(index,1)
+        this.setState({dataSource})
+    }
+
+    //预览
+    handlePreview(index){ 
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index].file
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
+
+    remove(index){
+        const {actions:{deleteStaticFile}} = this.props
+        let {dataSource} = this.state
+        let id = dataSource[index]['file'].id
+        deleteStaticFile({id:id})
+        let resUnit = dataSource[index].resUnit;
+        let type = dataSource[index].type;
+        let upTime = dataSource[index].upTime;
+        let checkTime = dataSource[index].checkTime;
+        let editTime = dataSource[index].editTime;
+        let result = dataSource[index].result;
+        let deadline = dataSource[index].deadline;
+        let editResult = dataSource[index].editResult;
+        dataSource[index] = {
+            resUnit: resUnit,
+            type: type,
+            upTime: upTime,
+            checkTime: checkTime,
+            editTime: editTime,
+            result: result,
+            deadline: deadline,
+            editResult: editResult,
+            project:{
+                code:"",
+                name:"",
+                obj_type:""
+            },
+            unit:{
+                code:"",
+                name:"",
+                obj_type:""
+            },
+            construct_unit:{
+                code:"",
+                name:"",
+                type:"",
+            },
+            file:{
+            }
+        }
+        this.setState({dataSource});
+    }
+
+    covertURLRelative = (originUrl) => {
+    	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+    }
+    beforeUploadPicFile  = (index,file) => {
+        // 上传到静态服务器
+        const fileName = file.name;
+        let {dataSource} = this.state
+        let temp = fileName.split(".")[0]
+		const { actions:{uploadStaticFile} } = this.props;
+        const formdata = new FormData();
+        formdata.append('a_file', file);
+        formdata.append('name', fileName);
+        let myHeaders = new Headers();
+        let myInit = { method: 'POST',
+                        headers: myHeaders,
+                        body: formdata
+                        };
+                        //uploadStaticFile({}, formdata)
+        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
+            resp = await resp.json()
+            console.log('uploadStaticFile: ', resp)
+            if (!resp || !resp.id) {
+                message.error('文件上传失败')
+                return;
+            };
+            const filedata = resp;
+            filedata.a_file = this.covertURLRelative(filedata.a_file);
+            filedata.download_url = this.covertURLRelative(filedata.a_file);
+            const attachment = {
+                size: resp.size,
+                id: filedata.id,
+                name: resp.name,
+                status: 'done',
+                url: filedata.a_file,
+                //thumbUrl: SOURCE_API + resp.a_file,
+                a_file:filedata.a_file,
+                download_url:filedata.download_url,
+                mime_type:resp.mime_type
+            };
+            let jcode = file.name.split('.')[0]
+            let info = await this.getInfo(jcode)
+            dataSource[index]['file'] = attachment
+            dataSource[index] = Object.assign(dataSource[index],info)
+            this.setState({dataSource})
+        });
+        return false;
     }
 
     render() {
@@ -164,17 +330,50 @@ export default class AddFile extends Component {
                 title:'附件',
                 width:'5%',
                 render:(text,record,index) => {
-                    return <span>
-                        <a>预览</a>
-                        <span className="ant-divider" />
-                        <a>下载</a>
-                    </span>
+                    if(record.file.id){
+                        return (<span>
+                                <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                                <span className="ant-divider" />
+                                <Popconfirm
+                                    placement="leftTop"
+                                    title="确定删除吗？"
+                                    onConfirm={this.remove.bind(this, index)}
+                                    okText="确认"
+                                    cancelText="取消">
+                                    <a>删除</a>
+                                </Popconfirm>
+                            </span>)
+                    }else{
+                        return (
+                            <span>
+                            <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this,index)}>
+                                <Button>
+                                    <Icon type="upload" />上传附件
+                                </Button>
+                            </Upload>
+                        </span>
+                        )
+                    }
+                }
+            },{
+                title:'操作',
+                render:(text,record,index) => {
+                    return  (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+                            onConfirm={this.delete.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
                 }
             }
         ];
         return (
             <Modal
-			title="安全文档上传表"
+			title="安全隐患上传表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
@@ -214,6 +413,7 @@ export default class AddFile extends Component {
                     </span> 
                 </Col>
             </Row>
+            <Preview />
                 <Row style={{ marginBottom: "30px" }}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>

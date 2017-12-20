@@ -4,9 +4,8 @@ import { bindActionCreators } from 'redux';
 
 import {Main,Content, DynamicTitle} from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import {Row, Col, Modal} from 'antd';
 
-import {VedioUpload,VedioTable,MainHeader} from '../components/VedioData';
+import {UploadModal,VedioTable,MainHeader} from '../components/VedioData';
 import { actions } from '../store/vedioData';
 
 @connect(
@@ -37,14 +36,12 @@ export default class VedioData extends Component {
 				<MainHeader showSendModal={this.showSendModal}/>
 				<VedioTable/>
 			</Content>
-			<Modal
-			 width={1280}
-			 key={uploadModal}
-			 visible={uploadModal}
-			 onCancel={this.closeModal}
-			>
-				<VedioUpload/>
-			</Modal>
+			<UploadModal
+			 actions = {this.props.actions}
+			 key={uploadModal} 
+			 uploadModal={uploadModal}
+			 closeModal={this.closeModal}
+			/>
 		</Main>)
 	}
 
