@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {actions as platformActions} from '_platform/store/global';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
@@ -7,7 +9,15 @@ import Preview from '../../../_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
-
+@connect(
+	state => {
+		const { platform} = state;
+		return { platform}
+	},
+	dispatch => ({
+		actions: bindActionCreators({ ...platformActions}, dispatch)
+	})
+)
 export default class JianyanpiCheck extends Component {
 
 	constructor(props) {
@@ -102,7 +112,7 @@ export default class JianyanpiCheck extends Component {
             width:"12%",
             render: (text, record, index) => (
                 <span>
-                    {record.construct_unit.name}
+                    {record.construct_unit ? record.construct_unit.name : "暂无"}
                 </span>
             ),
 		}, {

@@ -8,6 +8,7 @@ import {Row,Col,Table,Input,Button} from 'antd';
 import {getUser} from '_platform/auth'
 import JianyanpiModal from '../components/Quality/JianyanpiModal'
 import './quality.less'
+import {WORKFLOW_CODE} from '_platform/api.js'
 import {getNextStates} from '_platform/components/Progress/util';
 
 
@@ -76,7 +77,7 @@ export default class JianyanpiData extends Component {
 		}
 		let postdata = {
 			name:"检验批验收信息批量录入",
-			code:"TEMPLATE_032",
+			code:WORKFLOW_CODE["数据报送流程"],
 			description:"检验批验收信息批量录入",
 			subject:[{
 				data:JSON.stringify(data)

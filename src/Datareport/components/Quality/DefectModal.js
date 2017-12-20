@@ -71,7 +71,6 @@ class DefectModal extends Component {
 				download_url:filedata.download_url,
 				mime_type:resp.mime_type
             }];
-            debugger
             let jcode = file.name.split('.')[0]
             let info = await this.getInfo(jcode)
             let {dataSource} = this.state
@@ -113,90 +112,108 @@ class DefectModal extends Component {
         }
         this.setState({dataSource})
     }
-    //根据附件名称 也就是wbs编码获取其他信息
-    async getInfo(code){
-        let res = {};
-        const {actions:getWorkPackageDetail} = this.props
-        let jianyanpi = await getWorkPackageDetail({code:code})
-        res.name = jianyanpi.name
-        res.code = jianyanpi.code        
-        let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
-        if(fenxiang.parent.obj_type_hum = "子分部"){
-            let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
-            if(fenbu.parent.obj_type === "子单位"){
-                let zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                let danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-                res.construct_unit = construct_unit
-                res.unit = {
-                    name:danwei.name,
-                    code:danwei.code,
-                    obj_type:danwei.obj_type
-                }
-                res.project = danwei.parent
-            } 
-        }else{
-            let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            if(fenbu.parent.obj_type === "子单位"){
-                let zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                let danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-                res.construct_unit = construct_unit
-                res.unit = {
-                    name:danwei.name,
-                    code:danwei.code,
-                    obj_type:danwei.obj_type
-                }
-                res.project = danwei.parent
-            } 
-        }
-        return res
+    //重新编码出错，重新获取
+    dofix(index){
+        alert(index)
     }
 	render() {
-        this.columns = [{
-			title:'序号',
+        let columns = [{
+            title:'序号',
+            width:'5%',
 			render:(text,record,index) => {
 				return index+1
 			}
 		},{
 			title:'项目/子项目名称',
-			dataIndex:'project'
+            dataIndex:'project',
+            width:'8%',
+            render: (text, record, index) => (
+                record.name
+            ),
 		},{
 			title:'单位工程',
-			dataIndex:'unit'
+            dataIndex:'unit',
+            width:'8%',
+            render: (text, record, index) => (
+                record.name
+            ),
 		},{
 			title:'WBS编码',
-			dataIndex:'code'
+            dataIndex:'code',
+            width:'8%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['code']} onBlur={this.dofix.bind(this,index)} onChange={this.tableDataChange.bind(this,index,'code')}/>
+            ),
 		},{
 			title:'责任单位',
-			dataIndex:'respon_unit'
+            dataIndex:'respon_unit',
+            width:'8%',
+            render: (text, record, index) => (
+                record.name
+            ),
 		},{
 			title:'事故类型',
-			dataIndex:'acc_type'
+            dataIndex:'acc_type',
+            width:'8%',
+            render: (text, record, index) => (
+                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'acc_type')} value={this.state.dataSource[index]['acc_type']}>
+                    <Option value="一般质量事故">一般质量事故</Option>
+                    <Option value="严重质量事故">严重质量事故</Option>
+                    <Option value="重大质量事故">重大质量事故</Option>
+                </Select>
+            ),
 		},{
 			title:'上报时间',
-			dataIndex:'uploda_date'
+            dataIndex:'uploda_date',
+            width:'8%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['uploda_date']} onChange={this.tableDataChange.bind(this,index,'uploda_date')}/>
+            ),
 		},{
 			title:'核查时间',
-			dataIndex:'check_date'
+            dataIndex:'check_date',
+            width:'8%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['check_date']} onChange={this.tableDataChange.bind(this,index,'check_date')}/>
+            ),
 		},{
 			title:'整改时间',
-			dataIndex:'do_date'
+            dataIndex:'do_date',
+            width:'8%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['do_date']} onChange={this.tableDataChange.bind(this,index,'do_date')}/>
+            ),
 		},{
 			title:'事故描述',
-			dataIndex:'descrip'
+            dataIndex:'descrip',
+            width:'8%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['descrip']} onChange={this.tableDataChange.bind(this,index,'descrip')}/>
+            ),
 		},{
 			title:'排查结果',
-			dataIndex:'check_result'
+            dataIndex:'check_result',
+            width:'8%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['check_result']} onChange={this.tableDataChange.bind(this,index,'check_result')}/>
+            ),
 		},{
 			title:'整改期限',
-			dataIndex:'deadline'
+            dataIndex:'deadline',
+            width:'8%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['deadline']} onChange={this.tableDataChange.bind(this,index,'deadline')}/>
+            ),
 		},{
 			title:'整改结果',
-			dataIndex:'result'
+            dataIndex:'result',
+            width:'8%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['result']} onChange={this.tableDataChange.bind(this,index,'result')}/>
+            ),
 		}, {
-			title:'附件',
+            title:'附件',
+            width:'5%',
 			render:(text,record,index) => {
 				return <span>
 					<a>预览</a>
@@ -204,7 +221,22 @@ class DefectModal extends Component {
 					<a>下载</a>
 				</span>
 			}
-		}];
+		},{
+            title:'操作',
+            width:'3%',
+            render:(text,record,index) => {
+                return  (
+                    <Popconfirm
+                        placement="leftTop"
+                        title="确定删除吗？"
+                        onConfirm={this.delete.bind(this, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a>删除</a>
+                    </Popconfirm>
+                )
+            }
+        }];
         let jthis = this
         //上传
 		const props = {
@@ -241,7 +273,9 @@ class DefectModal extends Component {
                     <Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
-						dataSource={this.state.dataSource}
+                        dataSource={this.state.dataSource}
+                        pagination={false}
+                        scroll={{y:500}}
 						bordered />
                     <Upload {...props}>
                         <Button style={{margin:'10px 10px 10px 0px'}}>
@@ -264,22 +298,28 @@ class DefectModal extends Component {
         data.splice(0,1);
         let res = data.map(item => {
             return {
-                rate:item[1],
-                level:item[2],
-                name:item[0],
+                code:item[2],
+                acc_type:item[4],
+                uploda_date:item[5],
+                check_date:item[6],
+                do_date:item[7],
+                descrip:item[8],
+                check_result:item[9],
+                deadline:item[10],
+                result:item[11],
                 project:{
                     code:"",
-                    name:"",
+                    name:item[0],
+                    obj_type:""
+                },
+                respon_unit:{
+                    code:"",
+                    name:item[3],
                     obj_type:""
                 },
                 unit:{
                     code:"",
-                    name:"",
-                    obj_type:""
-                },
-                construct_unit:{
-                    code:"",
-                    name:"",
+                    name:item[1],
                     type:"",
                 },
                 file:{
