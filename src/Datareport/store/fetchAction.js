@@ -28,7 +28,7 @@ export default (url, [successAction, failAction], method = 'GET', defaultParams 
 			};
 
 			let u = encodeURI(getUrl(url, pathnames));
-			if ((method === 'POST' || method === 'PATCH') && Object.keys(data).length !== 0) {
+			if ((method === 'POST' || method === 'PATCH'|| method === 'PUT') && Object.keys(data).length !== 0) {
 				params.body = JSON.stringify(data)
 			} else if (method === 'GET' || method === 'DELETE') {
 				const search = serialize(data);

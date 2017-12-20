@@ -73,9 +73,8 @@ export default class JianyanpiCheck extends Component {
         dataSource.map((o) => {
             //创建文档对象
             let doc = o.related_documents.find(x => {
-                x.rel_type === 'many_jyp_rel'
+                return x.rel_type === 'many_jyp_rel'
             })
-            debugger
             if(doc){
                 doclist_p.push({
                     code:doc.code,
@@ -116,11 +115,11 @@ export default class JianyanpiCheck extends Component {
             wplist.push({
                 code:o.code,
                 extra_params:{
-                    rate:o.rate
+                    rate:o.rate,
+                    check_status:2
                 }
             })
         })
-        debugger
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
