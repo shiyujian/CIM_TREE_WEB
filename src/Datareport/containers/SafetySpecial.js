@@ -107,9 +107,6 @@ class SafetySpecial extends Component {
 		const { actions: { ChangeRow } } = this.props;
         ChangeRow('');
 	}
-	onSelectChange = (selectedRowKeys) => {
-		this.setState({ selectedRowKeys });
-	}
 
 	//删除
 	BtnDelete(e) {
