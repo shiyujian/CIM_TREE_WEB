@@ -11,16 +11,22 @@ export default class UploadFooter extends Component{
     constructor(props){
         super(props);
         this.state={
-            checkUsers:[]
+            checkUsers: []
         }
+        Object.assign(this,{    //不需要从新render的数据
+            excelUpload: false,
+            selectUser: null
+        })
     }
 
     componentDidMount(){
         const {getAllUsers} = this.props;
         getAllUsers().then(data => {
             const checkUsers = data.map(record => {
+                let {id,username,account:{person_name,person_code,organization}} = record,
+                    userData = {id,username,person_name,person_code,organization};
                 return (
-                    <Option key={record.id} value={JSON.stringify(record)}>{record.account.person_name}</Option>
+                    <Option key={id} value={JSON.stringify(userData)}>{person_name}</Option>
                 )
             })
             this.setState({checkUsers})
@@ -33,7 +39,7 @@ export default class UploadFooter extends Component{
         return(<div>
             <Row className="rowSpacing">
                 <Col span={24}>
-                    <Button type="primary" onClick={modalDownload}>模板下载</Button>
+                    <Button onClick={modalDownload} type="primary" className="spacing" >模板下载</Button>
                     <Upload className="spacing" {...this.uploadProps}>
                         <Button>
                             <Icon type="upload"/>上传附件
@@ -42,10 +48,10 @@ export default class UploadFooter extends Component{
                     {/* <Input style={{width: 300}} className="inlineBlock" disabled value="F:\XA\项目基础信息导入表.xlxs"/>
                     <Button className="spacing">上传并预览</Button> */}
                     <div className="inlineBlock">审核人: </div>
-                    <Select className="select" defaultValue={"请选择"} >
+                    <Select onSelect={this.selectCheckUser} className="select" defaultValue={"请选择"} >
                         {checkUsers}
                     </Select>
-                    <Button type="primary" className="spacing">提交</Button>
+                    <Button onClick={this.onSubmit} type="primary" className="spacing" >提交</Button>
                 </Col>
             </Row>
             <Row className="rowSpacing">
@@ -88,23 +94,40 @@ export default class UploadFooter extends Component{
                 }
         
                 let dataSource = data.map((result,index) =>{
-                    let a = {
-                        index: index,
-                        wbsCode: name.replace(/\.\w+$/,'')
-                    };
+                    let a = {};
                     dataIndex.forEach((record,index) => {
                         a[record] = result[index]
                     })
                     return a
                 })
                 dataSource.shift();
-
+                
                 storeExcelData(dataSource);
+                this.excelUpload = true;
                 message.success(`${name} 上传成功`);
             } else if (info.file.status === 'error') {
                 message.error(`${info.file.name} 上传失败`);
             }
         }
+    }
+
+    selectCheckUser = (value)=>{
+        this.selectUser = JSON.parse(value);
+    }
+
+    onSubmit = ()=>{
+        const {excelUpload, selectUser} = this;
+        const {onOk} = this.props;
+        if(!excelUpload){
+            message.error("请上传附件！");
+            return
+        }
+        if(!selectUser){
+            message.error("请选择审核人！");
+            return
+        }
+        
+        onOk(selectUser);
     }
 
 }
