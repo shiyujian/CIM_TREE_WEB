@@ -338,7 +338,7 @@ class PriceList extends Component {
         data.splice(0,1);
         let res = data.map(item => {
             return {
-                project:{
+            project:{
                     code:"",
                     name:"",
                     obj_type:""
