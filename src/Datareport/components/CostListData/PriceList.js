@@ -1,8 +1,9 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
-import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
-import '../../containers/quality.less'
+import { Input, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message } from 'antd';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import '../../containers/quality.less';
+import Preview from '../../../_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -46,7 +47,15 @@ class PriceList extends Component {
         //     message.info(`有数据未上传附件`)
         //     return
         // }
-		this.props.onok(this.state.dataSource)
+		let {check} = this.state
+        let per = {
+            id:check.id,
+            username:check.username,
+            person_name:check.account.person_name,
+            person_code:check.account.person_code,
+            organization:check.account.organization
+        }
+		this.props.onok(this.state.dataSource,per)
     }
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
