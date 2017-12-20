@@ -47,7 +47,7 @@ export default class ProjectData extends Component {
             logWorkflowEvent({pk:rst.id},
                 {
                     state:rst.current[0].id,
-                    action:'提交',
+                    action:'上传',
                     note:'发起项目填报',
                     executor:creator,
                     next_states:[{
