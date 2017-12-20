@@ -11,6 +11,7 @@ import safetySpecialReducer, {actions as safetySpecialActions} from './safetySpe
 import vediodataReducer, {actions as vediodataActions} from './vedioData';
 import vedioinfodataReducer, {actions as vedioinfodataActions} from './vedioInfoData';
 import workdataReducer, {actions as workdataActions} from './workdata';
+import scheduledataReducer, {actions as scheduledataActions} from './scheduledata';
 
 export default handleActions({
 	//项目信息
@@ -69,5 +70,10 @@ export default handleActions({
 	[combineActions(...actionsMap(workdataActions))]: (state = {}, action) => ({
 		...state,
 		workdata: workdataReducer(state.workdata, action),
+	}),
+	// 设计进度
+	[combineActions(...actionsMap(scheduledataActions))]: (state = {}, action) => ({
+		...state,
+		scheduledata: scheduledataReducer(state.scheduledata, action),
 	}),
 }, {});
