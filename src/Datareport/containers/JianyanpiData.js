@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/quality';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button} from 'antd';
+import {Row,Col,Table,Input,Button,message} from 'antd';
 import {getUser} from '_platform/auth'
 import JianyanpiModal from '../components/Quality/JianyanpiModal'
 import './quality.less'
@@ -101,7 +101,8 @@ export default class JianyanpiData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({addvisible:false})						
+						this.setState({addvisible:false})	
+						message.info("发起成功")					
 					})
 		})
 	}
@@ -120,6 +121,7 @@ export default class JianyanpiData extends Component {
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={this.setAddVisible.bind(this)}>发起填报</Button>
 					<Button className="btn" type="default">申请变更</Button>
+					<Button className="btn" type="default">申请删除</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search 
 						className="btn"
