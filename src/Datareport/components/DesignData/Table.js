@@ -88,9 +88,10 @@ export default class DesignTable extends Component {
 		);
 	}
 	toggleAddition() {
-		const { actions: { changeAdditionField } } = this.props;
+		const {addtion = {}, actions: { changeAdditionField } } = this.props;
 		console.log(this.props)
 		changeAdditionField('visible', true)
+		changeAdditionField('key', addtion.key?addtion.key+1:1)
 	}
 	toggleCheck() {
 		const { actions: { changeCheckField } } = this.props;

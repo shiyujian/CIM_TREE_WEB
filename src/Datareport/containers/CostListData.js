@@ -9,6 +9,7 @@ import PriceList from '../components/CostListData/PriceList';
 import {getUser} from '_platform/auth';
 import './quality.less';
 import {getNextStates} from '_platform/components/Progress/util';
+import {WORKFLOW_CODE} from '_platform/api'
 var moment = require('moment');
 const Search = Input.Search;
 @connect(
@@ -68,7 +69,7 @@ export default class CostListData extends Component {
 		}
 		let postdata = {
 			name:"计价清单信息填报",
-			code:"TEMPLATE_033",
+			code:WORKFLOW_CODE["数据报送流程"],
 			description:"计价清单信息填报",
 			subject:[{
 				data:JSON.stringify(data)
@@ -86,7 +87,7 @@ export default class CostListData extends Component {
                     action:'提交',
                     note:'发起填报',
                     executor:creator,
-                    next_states:[{
+                    next_states:[{ 
                         participants:[participants],
                         remark:"",
                         state:nextStates[0].to_state[0].id,

@@ -7,6 +7,7 @@ export default class TablePerson extends Component{
         return (
             <div>
                 <div>
+                  <Button className = {style.button}>模版下载</Button>
                     <Button  onClick = {this.send.bind(this)} style={{marginRight:"20px"}}>发送填报</Button>
                     <Button className = {style.button}>申请变更</Button>
                     <Button className = {style.button}>申请删除</Button>
