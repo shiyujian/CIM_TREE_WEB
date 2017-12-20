@@ -20,6 +20,7 @@ import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyHiddenDanger/AddFile';
 import {getNextStates} from '_platform/components/Progress/util';
 
+var moment = require('moment');
 const Search = Input.Search;
 
 @connect(
@@ -78,7 +79,7 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({addvisible:false})						
+						this.setState({setEditVisiable:false})						
 					})
 		})
     }

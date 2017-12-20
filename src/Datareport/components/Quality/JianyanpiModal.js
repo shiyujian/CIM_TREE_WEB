@@ -410,22 +410,23 @@ class JianyanpiModal extends Component {
         data.splice(0,1);
         let res = data.map(item => {
             return {
-                rate:item[1],
-                level:item[2],
-                name:item[0],
+                code:"",
+                rate:item[4],
+                level:item[5],
+                name:item[3],
                 project:{
                     code:"",
-                    name:"",
+                    name:item[0],
                     obj_type:""
                 },
                 unit:{
                     code:"",
-                    name:"",
+                    name:item[1],
                     obj_type:""
                 },
                 construct_unit:{
                     code:"",
-                    name:"",
+                    name:item[6],
                     type:"",
                 },
                 file:{

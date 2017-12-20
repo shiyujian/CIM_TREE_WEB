@@ -9,7 +9,9 @@ export default class ToggleModal extends Component{
             dataSource: [],
             users: [],
             projects: [],
-            checkers: []
+            checkers: [],
+            defaultPro: "",
+            defaultchecker: ""
         }
     }
     render(){
@@ -29,13 +31,13 @@ export default class ToggleModal extends Component{
                     jthis.setState({
                         dataSource
                     })
-                    console.log("datasource:",jthis.state.dataSource);
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
 		        }
 		    },
-		};
+        };
+        console.log("this.state.defaultchecker:",this.state);
         return (
             <Modal
                 visible={visible}
@@ -58,8 +60,7 @@ export default class ToggleModal extends Component{
                 </Upload>
                 <span>
                     审核人：
-                        <Select style={{ width: '200px' }} className="btn" onSelect = {ele=>{
-                            console.log(ele);
+                        <Select defaultValue={this.state.defaultchecker} style={{ width: '200px' }}  className="btn" onSelect = {ele=>{
                             this.setState({passer:ele})
                         }} >
                         {
@@ -100,6 +101,7 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
+        
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisible(false);
     }
@@ -120,7 +122,10 @@ export default class ToggleModal extends Component{
                         <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
                     )
                 })
-                this.setState({checkers})
+                this.setState({
+                    checkers,
+                    defaultchecker: rst[0].account.person_name
+                })
             }
         });
         getProjects().then(rst => {
@@ -130,7 +135,10 @@ export default class ToggleModal extends Component{
                         <Option value={JSON.stringify(item)}>{item.name}</Option>
                     )
                 })
-                this.setState({projects})
+                this.setState({
+                    projects,
+                    defaultPro: rst.children[0].name
+                })
             }
         })
     }
@@ -166,7 +174,7 @@ export default class ToggleModal extends Component{
         dataIndex: 'project',
         render:(record) => {
             return (
-                <Select style={{width:"90%"}} onSelect={ele => {
+                <Select style={{width:"90%"}} defaultValue={this.state.defaultPro} onSelect={ele => {
                     this.setState({ pro: ele })
                 }}>
                     {this.state.projects}
