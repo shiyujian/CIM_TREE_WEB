@@ -175,13 +175,7 @@ export default class DataReport extends Component {
 				name: '结算计划',
 				path: '/data/balanceplan',
 				icon: <Icon name="sign-language"/>
-			}, {
-				key: 'balanceschedule',
-				id: 'DATA.BALANCESCHEDULE',
-				name: '结算进度',
-				path: '/data/balanceschedule',
-				icon: <Icon name="sign-language"/>
-			}
+			},
 		]
 	}, {
 		key: 'SAFETY',
@@ -223,12 +217,24 @@ export default class DataReport extends Component {
 				icon: <Icon name="sign-language"/>
 			}
 		]
-	}, {
-		key: 'config',
-		id: 'DATA.CONFIG',
-		path: '/data/config',
-		name: '报送配置',
-        icon: <Icon name="tty"/>,
-	}];
+	},];
 	static defaultOpenKeys = ['basicinfo']
 }
+
+
+// {
+// 	key: 'balanceschedule',
+// 	id: 'DATA.BALANCESCHEDULE',
+// 	name: '结算进度',
+// 	path: '/data/balanceschedule',
+// 	icon: <Icon name="sign-language"/>
+// }
+
+
+// {
+// 	key: 'config',
+// 	id: 'DATA.CONFIG',
+// 	path: '/data/config',
+// 	name: '报送配置',
+// 	icon: <Icon name="tty"/>,
+// }

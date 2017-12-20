@@ -13,6 +13,7 @@ import vedioinfodataReducer, {actions as vedioinfodataActions} from './vedioInfo
 import workdataReducer, {actions as workdataActions} from './workdata';
 import scheduledataReducer, {actions as scheduledataActions} from './scheduledata';
 
+import CostListDataReducer, {actions as CostListDataActions} from './CostListData';
 export default handleActions({
 	//项目信息
 	[combineActions(...actionsMap(projectdataActions))]: (state = {}, action) => ({
@@ -76,4 +77,9 @@ export default handleActions({
 		...state,
 		scheduledata: scheduledataReducer(state.scheduledata, action),
 	}),
-}, {});
+	// 成本结算
+	[combineActions(...actionsMap(CostListDataActions))]: (state = {}, action) => ({
+		...state,
+		CostListData: CostListDataReducer(state.CostListData, action),
+	})
+}, {})

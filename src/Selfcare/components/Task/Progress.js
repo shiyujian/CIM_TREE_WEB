@@ -6,7 +6,8 @@ import { getUser } from '../../../_platform/auth';
 import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
-import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck'
+import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
+import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck'
 
 const FormItem = Form.Item;
 @connect(
@@ -29,7 +30,7 @@ export default class Progress extends Component {
 	}
 
 	render() {
-		const { state = {}, task, location, states = [],dr_qua_jyp_visible } = this.props;
+		const { state = {}, task, location, states = [],dr_qua_jyp_visible ,dr_qua_jy_visible} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
 		const { state_id = '0' } = queryString.parse(location.search) || {};
@@ -124,6 +125,10 @@ export default class Progress extends Component {
 					dr_qua_jyp_visible && 
 					<JianyanpiCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					dr_qua_jy_visible && 
+					<JianyanCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -135,10 +140,13 @@ export default class Progress extends Component {
 	}
 	async openModal(name,id){
 		const {actions:{changeDatareportVisible,getWorkflowById}} = this.props
-		let wk = await getWorkflowById({pk:id})
+		let wk = await getWorkflowById({pk:id});
+		console.log('wk',wk);
 		this.setState({wk})
 		switch (name){
 			case "检验批验收信息批量录入":changeDatareportVisible({key:'dr_qua_jyp_visible',value:true})
+				break;
+			case "其他验收信息批量录入":changeDatareportVisible({key:'dr_qua_jy_visible',value:true})
 				break;
 			default:break;
 		}
