@@ -11,12 +11,13 @@ export default class MainHeader extends Component{
         return(
             <Row>
                 <Col span={24}>
-                    <Button >模板下载</Button>
+                    <Button className="spacing">模板下载</Button>
                     <Button className="spacing" onClick={showSendModal}>发起填报</Button>
                     <Button className="spacing">申请变更</Button>
+                    <Button className="spacing">申请删除</Button>
                     <Button className="spacing">导出表格</Button>
                     <Search
-                     placeholder="请输入内容"
+                     placeholder="输入搜索条件"
                      className="spacing"
                      style={{ width: 200}}
                     />

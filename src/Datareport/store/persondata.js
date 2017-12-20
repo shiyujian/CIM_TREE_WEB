@@ -5,8 +5,10 @@ import { SERVICE_API,USER_API,WORKFLOW_API} from '_platform/api';
 
 
 export const ModalVisible = createAction('人员Modal显示隐藏');
+export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const actions = {
-	ModalVisible
+	ModalVisible,
+	getAllUsers
 };
 
 export default handleActions({

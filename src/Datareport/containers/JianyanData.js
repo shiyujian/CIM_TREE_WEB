@@ -8,6 +8,9 @@ import {Row,Col,Table,Input,Button} from 'antd';
 import JianyanModal from '../components/Quality/JianyanModal'
 import {WORKFLOW_CODE} from '_platform/api.js'
 import './quality.less'
+import {getUser} from '_platform/auth'
+import {getNextStates} from '_platform/components/Progress/util';
+var moment = require('moment');
 const Search = Input.Search;
 @connect(
 	state => {
@@ -108,11 +111,12 @@ export default class JianyanData extends Component {
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>发起填报</Button>
 					<Button className="btn" type="default">申请变更</Button>
+					<Button className="btn" type="default">申请删除</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
-						placeholder="input search text"
+						placeholder="输入搜索条件"
 						onSearch={value => console.log(value)}
 						enterButton/>
 				</Row>

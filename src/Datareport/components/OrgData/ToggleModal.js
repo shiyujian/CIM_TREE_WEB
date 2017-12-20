@@ -8,7 +8,10 @@ export default class ToggleModal extends Component{
         this.state = {
             dataSource: [],
             users: [],
-            projects: []
+            projects: [],
+            checkers: [],
+            defaultPro: "",
+            defaultchecker: ""
         }
     }
     render(){
@@ -33,7 +36,8 @@ export default class ToggleModal extends Component{
 		            message.error(`${info.file.name}解析失败，请检查输入`);
 		        }
 		    },
-		};
+        };
+        console.log("this.state.defaultchecker:",this.state);
         return (
             <Modal
                 visible={visible}
@@ -56,7 +60,7 @@ export default class ToggleModal extends Component{
                 </Upload>
                 <span>
                     审核人：
-                        <Select style={{ width: '200px' }} className="btn" onSelect = {ele=>{
+                        <Select defaultValue={this.state.defaultchecker} style={{ width: '200px' }}  className="btn" onSelect = {ele=>{
                             this.setState({passer:ele})
                         }} >
                         {
@@ -85,32 +89,25 @@ export default class ToggleModal extends Component{
                 name: item[3],
                 depart: item[4],
                 direct: item[5],
-                project: item[6],
-                unit: item[7],
-                remarks: item[8],
+                unit: item[6],
+                remarks: item[7],
             }
         })
         return res;
     }
     onok(){
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
-        let ok = this.state.dataSource.some(ele => {
-            return !ele.file;
-        });
-        // if (ok) {
-        //     message.error('有附件未上传');
-        //     return;
-        // };
         if (!this.state.passer) {
             message.error('审批人未选择');
             return;
         }
+        
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisible(false);
     }
-    cancel(){
-      const {actions:{ModalVisibleOrg,ModalVisible}} = this.props;
-      ModalVisible(false);
+    cancel() {
+        const { actions: { ModalVisibleOrg, ModalVisible } } = this.props;
+        ModalVisible(false);
     }
     onChange(){
 
@@ -125,18 +122,23 @@ export default class ToggleModal extends Component{
                         <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
                     )
                 })
-                this.setState({checkers})
+                this.setState({
+                    checkers,
+                    defaultchecker: rst[0].account.person_name
+                })
             }
         });
         getProjects().then(rst => {
-            console.log("rst:",rst);
             if (rst.children.length) {
                 let projects = rst.children.map(item => {
                     return (
                         <Option value={JSON.stringify(item)}>{item.name}</Option>
                     )
                 })
-                this.setState({projects})
+                this.setState({
+                    projects,
+                    defaultPro: rst.children[0].name
+                })
             }
         })
     }
@@ -170,13 +172,15 @@ export default class ToggleModal extends Component{
     }, {
         title: '负责项目/子项目名称',
         dataIndex: 'project',
-        // render:(record) => (
-        //     <Select onSelect = {ele => {
-        //         this.setState({pro:ele})
-        //     }}>
-        //         <Option>{this.state.projects}</Option>
-        //     </Select>
-        // )
+        render:(record) => {
+            return (
+                <Select style={{width:"90%"}} defaultValue={this.state.defaultPro} onSelect={ele => {
+                    this.setState({ pro: ele })
+                }}>
+                    {this.state.projects}
+                </Select>
+            )
+        }
     }, {
         title: '负责单位工程名称',
         dataIndex: 'unit',

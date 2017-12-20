@@ -1,3 +1,2 @@
-export AddFile from './AddFile.js';
-export ChangeFile from './ChangeFile.js';
-export DeleteFile from './DeleteFile.js';
+export TableOrg from './TableOrg';
+export ToggleModal from './ToggleModal';
