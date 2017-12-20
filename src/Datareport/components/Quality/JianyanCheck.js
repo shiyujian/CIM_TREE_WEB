@@ -18,7 +18,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...platformActions}, dispatch)
 	})
 )
-export default class JianyanpiCheck extends Component {
+export default class JianyanCheck extends Component {
 
 	constructor(props) {
 		super(props);

@@ -2,16 +2,16 @@ import React, { Component } from 'react';
 import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload } from 'antd';
 import Card from '_platform/components/panels/Card';
 import {getNextStates} from '_platform/components/Progress/util';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,WORKFLOW_CODE} from '_platform/api';
 import {getUser} from '_platform/auth';
 const Option = Select.Option;
-
+var moment = require('moment');
 
 export default class Addition extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			dataSource:[]
+			
 		};
 	}
 	componentDidMount(){
@@ -32,14 +32,13 @@ export default class Addition extends Component {
 			dataIndex: 'index',
 		}, {
 			title: '文档编码',
-			dataIndex: 'value'
+			dataIndex: 'code'
 		}, {
 			title: '文档名称',
-			dataIndex: 'alias'
+			dataIndex: 'name'
 		}, {
 			title: '项目/子项目名称',
 			dataIndex:'project',
-            width:"13%",
             render: (text, record, index) => (
                 <span>
                     {record.project.name}
@@ -48,7 +47,6 @@ export default class Addition extends Component {
 		}, {
 			title: '单位工程',
 			dataIndex:'unit',
-            width:"13%",
             render: (text, record, index) => (
                 <span>
                     {record.unit.name}
@@ -69,7 +67,7 @@ export default class Addition extends Component {
 		}, {
 			title: '文档类型',
 			render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'type')} value={addition.dataSource[index]['type']}>
+                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'type')} value={addition.dataSource[index]['filetype']}>
                     <Option value="图纸">图纸</Option>
                     <Option value="报告">报告</Option>
                 </Select>
@@ -117,9 +115,6 @@ export default class Addition extends Component {
                 }
 			}
         }, {
-			title: '上传人员',
-			dataIndex: 'time'
-		}, {
             title:'操作',
             render:(text,record,index) => {
                 return  (
@@ -160,12 +155,13 @@ export default class Addition extends Component {
 		};
 		return (
 			<Modal
+			 key={addition.key}
 			 title="设计信息上传表"
 			 width={1280}
 			 visible={addition.visible}
 			 maskClosable={false}
 			 onCancel={this.cancel.bind(this)}
-			 onOk={this.save.bind(this)}
+			 onOk={this.onok.bind(this)}
 			>
 				<div>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
@@ -199,9 +195,6 @@ export default class Addition extends Component {
 		);
 	}
 
-	save() {
-
-	}
 	//table input 输入
     tableDataChange(index, key ,e ){
 		const { addition,actions:{changeAdditionField} } = this.props;
@@ -223,12 +216,12 @@ export default class Addition extends Component {
         let {dataSource} = addition;
         let temp = fileName.split(".")[0]
         //判断有无重复
-        if(dataSource.some(o => {
-           return o.code === temp
-        })){
-            message.info("该检验批已经上传过了")
-            return false
-        }
+        // if(dataSource.some(o => {
+        //    return o.code === temp
+        // })){
+        //     message.info("该附件已经上传过了")
+        //     return false
+        // }
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
 
@@ -263,9 +256,9 @@ export default class Addition extends Component {
 				mime_type:resp.mime_type
             };
             let jcode = file.name.split('.')[0]
-            let info = await this.getInfo(jcode)
+            //let info = await this.getInfo(jcode)
             dataSource[index]['file'] = attachment
-            dataSource[index] = Object.assign(dataSource[index],info)
+            //dataSource[index] = Object.assign(dataSource[index],info)
             changeAdditionField('dataSource',dataSource)
 		});
 		return false;
@@ -418,7 +411,7 @@ export default class Addition extends Component {
 		}
 		let postdata = {
 			name:"设计信息批量录入",
-			code:"TEMPLATE_033",
+			code:WORKFLOW_CODE["数据报送流程"],
 			description:"设计信息批量录入",
 			subject:[{
 				data:JSON.stringify(data)
@@ -431,19 +424,20 @@ export default class Addition extends Component {
 		createWorkflow({},postdata).then((rst) => {
 			let nextStates =  getNextStates(rst,rst.current[0].id);
             logWorkflowEvent({pk:rst.id},
-                {
-                    state:rst.current[0].id,
-                    action:'提交',
-                    note:'发起填报',
-                    executor:creator,
-                    next_states:[{
-                        participants:[participants],
-                        remark:"",
-                        state:nextStates[0].to_state[0].id,
-                    }],
-                    attachment:null}).then(() => {
-						clearAdditionField();
-					})
+            {
+                state:rst.current[0].id,
+                action:'提交',
+                note:'发起填报',
+                executor:creator,
+                next_states:[{
+                    participants:[participants],
+                    remark:"",
+                    state:nextStates[0].to_state[0].id,
+                }],
+                attachment:null
+            }).then(() => {
+				clearAdditionField();
+			})
 		})
 	}
 
@@ -452,28 +446,17 @@ export default class Addition extends Component {
         data.splice(0,1);
         let res = data.map(item => {
             return {
-                code:'',
-                name:'',
-                project:{
-                    code:"",
-                    name:"",
-                    obj_type:""
-                },
-                unit:{
-                    code:"",
-                    name:"",
-                    obj_type:""
-                },
-                construct_unit:{
-                    code:"",
-                    name:"",
-                    type:"",
-                },
-                stage:'',
-                upload:'',
-                file:{
-
-                }
+                code:item[0],
+                name:item[1],
+                stage:item[2],
+                upunit:item[3],
+                filetype:item[4],
+                major:item[5],
+                wbsObject:item[6],
+                designObject:item[7],
+                project:{},
+                unit:{},
+                file:{}
             }
         })
         return res

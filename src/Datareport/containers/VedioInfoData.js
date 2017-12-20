@@ -4,9 +4,8 @@ import { bindActionCreators } from 'redux';
 
 import {Main,Content, DynamicTitle} from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import {Row, Col, Modal} from 'antd';
 
-import {VedioInfoUpload,VedioInfoTable,MainHeader} from '../components/VedioData';
+import {InfoUploadModal,VedioInfoTable,MainHeader} from '../components/VedioData';
 import { actions } from '../store/vedioInfoData';
 
 @connect(
@@ -37,14 +36,11 @@ export default class VedioInfoData extends Component {
 				<MainHeader showSendModal={this.showSendModal}/>
 				<VedioInfoTable/>
 			</Content>
-			<Modal
-			 width={1280}
-			 key={uploadModal}			 
-			 visible={uploadModal}
-			 onCancel={this.closeModal}
-			>
-				<VedioInfoUpload/>
-			</Modal>
+			<InfoUploadModal
+			 uploadModal={uploadModal}			 
+			 actions = {this.props.actions}
+			 closeModal={this.closeModal}
+			/>
 		</Main>)
 	}
 
@@ -53,9 +49,5 @@ export default class VedioInfoData extends Component {
     }
     closeModal= ()=>{
         this.setState({uploadModal:false});
-	}
-	reduxTest = ()=>{
-		const {actions:{Test}} = this.props;
-		Test('test');
 	}
 };
