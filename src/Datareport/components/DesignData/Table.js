@@ -69,7 +69,7 @@ export default class DesignTable extends Component {
 					<Button style={{ margin: '10px' }} type="default">导出表格</Button>
 					<Search
 						style={{ width: "200px", marginLeft: 10 }}
-						placeholder="输入搜索内容"
+						placeholder="输入搜索条件"
 						onSearch={value => console.log(value)}
 					/>
 				</Row>
