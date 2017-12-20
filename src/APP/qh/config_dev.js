@@ -23,16 +23,16 @@
 window.config = {
 	/***********************公共资源服务**************************/
 	//基础服务域名
-	'DOMAIN': 'http://bimcd.ecidi.com',
+	'DOMAIN': 'http://10.215.160.38',
 	'DOMAIN2':'http://10.215.4.36',
 	//基础服务端口
 	'API_PORT': '6544',
 
 	//静态文件存储服务IP
-	'STATIC_FILE_IP':'http://bimcd.ecidi.com',
+	'STATIC_FILE_IP':'http://10.215.160.38',
 	//静态文件存储服务预览端口
 	'STATIC_PREVIEW_PORT':'6540',
-	//静态文件存储服务上传端口
+	//静态文件存储服务上传端口 
 	'STATIC_UPLOAD_PORT':'6541',
 	//静态文件存储服务下载端口
 	'STATIC_DOWNLOAD_PORT':'6542',
@@ -60,7 +60,7 @@ window.config = {
 	//FDBServer 上传FDB文件服务
 	'FDBServer_API': 'http://urban.ecidi.com:8045/api',
 	//WJH插件的下载地址
-	'WJH_CITY_MARKER':'http://bimcd.ecidi.com:6542/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
+	'WJH_CITY_MARKER':'http://10.215.160.38:6542/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
 	//三维展示里面的cep模型数据
 	'WJH_CEP':'http://urban.ecidi.com:8006/qh20171212/qhtdbx.cep', 
 
@@ -70,7 +70,7 @@ window.config = {
 	'IMG_W':'http://t{s}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}',
 	'VEC_W':'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
 	//视频监控插件下载配置
-	'Video_PLUGIN_URL':'http://bimcd.ecidi.com:6542/media/documents/meta/WebComponentsKithas_rem_cfg.exe',
+	'Video_PLUGIN_URL':'http://10.215.160.38:6542/media/documents/meta/WebComponentsKithas_rem_cfg.exe',
 
 	/***********************单模块资源服务**************************/
 	//720云
