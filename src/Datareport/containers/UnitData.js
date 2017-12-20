@@ -5,14 +5,18 @@ import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import { actions } from '../store/unitdata';
+import {actions as action2} from '../store/quality';
+import {getNextStates} from '_platform/components/Progress/util';
 var moment = require('moment');
+import {getUser} from '_platform/auth';
+import {WORKFLOW_CODE} from '_platform/api'
 @connect(
 	state => {
 		const {platform,datareport:{unitdata}} = state;
 		return {platform,...unitdata};
 	},
 	dispatch => ({
-		actions: bindActionCreators({...platformActions,...actions}, dispatch),
+		actions: bindActionCreators({...platformActions,...actions,...action2}, dispatch),
 	}),
 )
 export default class UnitData extends Component {
@@ -28,9 +32,9 @@ export default class UnitData extends Component {
 			person_code:getUser().person_code,
 		}
 		let postdata = {
-			name:"项目信息批量录入",
-			code:"TEMPLATE_032",
-			description:"项目信息批量录入",
+			name:"单位工程信息批量录入",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"单位工程信息批量录入",
 			subject:[{
 				data:JSON.stringify(data)
 			}],
@@ -45,7 +49,7 @@ export default class UnitData extends Component {
                 {
                     state:rst.current[0].id,
                     action:'提交',
-                    note:'发起项目填报',
+                    note:'发起单位工程填报',
                     executor:creator,
                     next_states:[{
                         participants:[participants],

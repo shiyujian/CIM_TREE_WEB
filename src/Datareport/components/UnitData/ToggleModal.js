@@ -39,7 +39,7 @@ export default class ToggleModal extends Component{
             <Modal
                 visible={visible}
                 width={1280}
-                onOk={this.ok.bind(this)}
+                onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
@@ -56,15 +56,17 @@ export default class ToggleModal extends Component{
                      </Button>
                 </Upload>
                 <span>
-                    审核人：
-                        <Select style={{ width: '200px' }} className="btn" >
-                        {
-                            // this.state.checkers
-                        }
-                    </Select>
-                </span> 
-                <Button type="primary" >提交</Button>
-               <div style={{marginTop:"30px"}}>
+                审核人：
+                    <Select style={{ width: '200px' }} className="btn" onSelect = {ele=>{
+                        this.setState({passer:ele})
+                    }} >
+                    {
+                        this.state.checkers
+                    }
+                </Select>
+            </span> 
+            <Button type="primary" onClick = {this.onok.bind(this)}>提交</Button>
+            <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
                     <p style={{ paddingLeft: "25px" }}>3、日期必须带年月日，如2017年1月1日</p>
@@ -73,8 +75,17 @@ export default class ToggleModal extends Component{
             </Modal>
         )
     }
-    ok(){
+    onok(){
       const {actions:{ModalVisibleUnit}} = this.props;
+      let ok = this.state.dataSource.some(ele => {
+        return !ele.file;
+    });
+   
+    if (!this.state.passer) {
+        message.error('审批人未选择');
+        return;
+    }
+    this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
       ModalVisibleUnit(false);
     }
     cancel(){
