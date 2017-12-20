@@ -175,7 +175,13 @@ export default class DataReport extends Component {
 				name: '结算计划',
 				path: '/data/balanceplan',
 				icon: <Icon name="sign-language"/>
-			},
+			},{
+				key: 'balanceschedule',
+				id: 'DATA.BALANCESCHEDULE',
+				name: '结算进度',
+				path: '/data/balanceschedule',
+				icon: <Icon name="sign-language"/>
+			}
 		]
 	}, {
 		key: 'SAFETY',

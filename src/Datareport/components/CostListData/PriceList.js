@@ -39,13 +39,13 @@ class PriceList extends Component {
             message.info("请上传excel")
             return
         }
-        let temp = this.state.dataSource.some((o,index) => {
-                        return !o.file.id
-                    })
-        if(temp){
-            message.info(`有数据未上传附件`)
-            return
-        }
+        // let temp = this.state.dataSource.some((o,index) => {
+        //                 return !o.file.id
+        //             })
+        // if(temp){
+        //     message.info(`有数据未上传附件`)
+        //     return
+        // }
 		this.props.onok(this.state.dataSource)
     }
     covertURLRelative = (originUrl) => {
