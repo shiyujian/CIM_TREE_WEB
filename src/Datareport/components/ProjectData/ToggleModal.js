@@ -111,12 +111,33 @@ export default class ToggleModal extends Component{
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
+    beforeUploadPic(record,file){
+        const fileName = file.name;
+		// 上传到静态服务器
+		const { actions:{uploadStaticFile} } = this.props;
+		const formdata = new FormData();
+		formdata.append('a_file', file);
+        formdata.append('name', fileName);
+        let myHeaders = new Headers();
+        let myInit = { method: 'POST',
+                       headers: myHeaders,
+                       body: formdata
+                     };
+                     //uploadStaticFile({}, formdata)
+        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
+            let loadedFile = await resp.json();
+            loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
+            loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
+            record.pic = loadedFile;
+            this.forceUpdate();
+        });
+        return false;
+    }
     beforeUpload(record,file){
         console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
-
 		const formdata = new FormData();
 		formdata.append('a_file', file);
         formdata.append('name', fileName);
@@ -140,11 +161,23 @@ export default class ToggleModal extends Component{
         title: '序号',
         dataIndex: 'index',
         key: 'Index',
+      },{
+        title: '项目编码',
+        render:(record)=>{
+            let color = 'red';
+            if(record.file && record.pic){
+                color = 'green';
+            }
+            return(
+                <span style = {{color:color}}>{record.code}</span>
+            )
+        },
+        key: 'Code',
       }, {
         title: '项目/子项目名称',
         render:(record)=>{
             let color = 'red';
-            if(record.file){
+            if(record.file && record.pic){
                 color = 'green';
             }
             return(
@@ -162,19 +195,47 @@ export default class ToggleModal extends Component{
         key: 'Area',
       },{
          title: '项目类型',
-         dataIndex :'type',
+        render:(record)=>{
+            return(
+            <Select style={{ width: '70px' }} className="btn" value = {record.projType||''} onSelect={ele => {
+                record.projType = ele;
+                this.forceUpdate();
+            }} >
+                <Option value = 'construct'>建筑</Option>
+                <Option value = 'city'>市政</Option>
+            </Select>)
+        },
          key: 'Type',
       },{
         title: '项目地址',
         dataIndex :'address',
         key: 'Address',
       },{
+        title: '项目规模',
+        dataIndex: 'range',
+        key: 'Range',
+      },{
         title: '项目红线坐标',
         dataIndex :'coordinate',
         key: 'Coordinate',
       },{
+        title: '项目总投资（万元）',
+        dataIndex :'cost',
+        key: 'Cost',
+      },{
         title: '项目负责人',
-        dataIndex :'duty',
+            render: (record) => {
+                return (
+                    <Select style={{ width: '70px' }} className="btn" value = {record.projBoss||''} onSelect={ele => {
+                        record.projBoss = ele;
+                        this.forceUpdate();
+                    }} >
+                        {
+                            this.state.checkers || []
+                        }
+                    </Select>
+                );
+        },
         key:'Duty'
       },{
         title: '计划开工日期',
@@ -185,31 +246,47 @@ export default class ToggleModal extends Component{
         dataIndex :'etime',
         key:'Etime'
       },{
+        title: '项目简介',
+        dataIndex :'intro',
+        key:'Intro'
+      },{
           title:'附件',
           key:'nearby',
           render:(record) => (
             <Upload
             beforeUpload = {this.beforeUpload.bind(this,record)}
             >
-                <a>上传附件</a>
+                <a> {record.file?record.file.name:'上传附件'}</a>
             </Upload>
           )
-      }]
+      },{
+        title:'图片',
+        key:'pic',
+        render:(record) => (
+          <Upload
+          beforeUpload = {this.beforeUploadPic.bind(this,record)}
+          >
+              <a>{record.pic? record.pic.name:'点击上传'}</a>
+          </Upload>
+        )
+    }]
     //处理上传excel的数据
     handleExcelData(data) {
         data.splice(0, 1);
         let res = data.map((item,index) => {
             return {
                 index: index + 1,
-                name: item[1],
-                genus: item[2],
-                area: item[3],
-                type: item[4],
-                address: item[5],
-                coordinate: item[6],
-                duty: item[7],
-                stime: item[8],
-                etime: item[9]
+                name: item[2],
+                code:item[1],
+                genus: item[3],
+                area: item[4],
+                address: item[6],
+                coordinate: item[8],
+                stime: item[11],
+                etime: item[12],
+                range:item[7],
+                cost:item[9],
+                intro:item[13]
             }
         })
         return res;

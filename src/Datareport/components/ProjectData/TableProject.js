@@ -8,7 +8,7 @@ export default class TableProject extends Component{
 			<div>
 				<div>
 					<Button style={{ marginRight: "20px" }}>模板下载</Button>
-					<Button onClick={this.send.bind(this)} className={style.button}>批量创建</Button>
+					<Button onClick={this.send.bind(this)} className={style.button}>发起填报</Button>
 					<Button className={style.button}>申请变更</Button>
 					<Button className={style.button}>申请删除</Button>
 					<Button className={style.button}>导出表格</Button>
@@ -61,6 +61,10 @@ export default class TableProject extends Component{
         dataIndex: 'name',
         key: 'Name',
       },{
+        title: '项目规模',
+        dataIndex: 'range',
+        key: 'Range',
+      },{
          title: '项目类型',
          dataIndex :'depart',
          key: 'Depart',
@@ -92,5 +96,13 @@ export default class TableProject extends Component{
                 附件
             </span>
           )
-      }]
+      },{
+        title:'项目图片',
+        key:'pic',
+        render:(record) => (
+          <span>
+            图片
+          </span>
+        )
+    }]
 }
