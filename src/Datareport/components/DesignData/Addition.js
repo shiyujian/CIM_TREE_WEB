@@ -11,11 +11,11 @@ export default class Addition extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			
+			units:[],
 		};
 	}
 	componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
+        const {actions:{getAllUsers,getProjectTree}} = this.props
         getAllUsers().then(res => {
             let checkers = res.map((o,index) => {
                 return (
@@ -24,9 +24,20 @@ export default class Addition extends Component {
             })
             this.setState({checkers})
         })
+        getProjectTree({},{depth:1})
+        .then(res => {
+
+        	let projecttrees = res.children.map((o,index) => {
+                return (
+                    <Option key={index} value={o.pk}>{o.name}</Option>
+                )
+            })
+            this.setState({projecttrees})
+        })
     }
 	render() {
 		const { addition = {}, actions: { changeAdditionField } } = this.props;
+		debugger
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
@@ -39,18 +50,22 @@ export default class Addition extends Component {
 		}, {
 			title: '项目/子项目名称',
 			dataIndex:'project',
-            render: (text, record, index) => (
-                <span>
-                    {record.project.name}
-                </span>
+			render: (text, record, index) => (
+                <Select style={{width:'120px'}} onSelect={this.projectSelect.bind(this,index)} value={addition.dataSource[index]['project']}>
+                    {
+                    	this.state.projecttrees
+                    }
+                </Select>
             ),
 		}, {
 			title: '单位工程',
 			dataIndex:'unit',
             render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
+                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'unit')} value={addition.dataSource[index]['unit']}>
+                    {
+                    	this.state.units[index]
+                    }
+                </Select>
             ),
 		}, {
 			title: '项目阶段',
@@ -63,7 +78,7 @@ export default class Addition extends Component {
             ),
 		}, {
 			title: '提交单位',
-			dataIndex: 'version'
+			dataIndex: 'upunit'
 		}, {
 			title: '文档类型',
 			render: (text, record, index) => (
@@ -143,9 +158,6 @@ export default class Addition extends Component {
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
                     console.log(importData);
-                    // let {dataSource} = jthis.state
-                    // dataSource = jthis.handleExcelData(importData)
-                    // jthis.setState({dataSource}) 
                     changeAdditionField('dataSource',jthis.handleExcelData(importData))
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
@@ -194,9 +206,27 @@ export default class Addition extends Component {
 			</Modal>
 		);
 	}
+	projectSelect(index,value) {
+		console.log(value)
+		const {actions: {getProjectTreeDetail}} = this.props;
+		const {units} = this.state;
+		const { addition,actions:{changeAdditionField} } = this.props;
+        let {dataSource} = addition;
+		dataSource[index].project = value;
+		changeAdditionField('dataSource',dataSource)
+		getProjectTreeDetail({pk:value},{depth:1})
+		.then(res => {
+			units[index] = res.children.map((o,index) => {
+                return (
+                    <Option key={index} value={o.pk}>{o.name}</Option>
+                )
+            })
+            this.setState({units})
+		})
 
+	}
 	//table input 输入
-    tableDataChange(index, key ,e ){
+    tableDataChange(index, key , e){
 		const { addition,actions:{changeAdditionField} } = this.props;
         let {dataSource} = addition;
 		dataSource[index][key] = e.target['value'];
@@ -277,30 +307,8 @@ export default class Addition extends Component {
         let {dataSource} = addition;
         let id = dataSource[index]['file'].id
         deleteStaticFile({id:id})
-        let rate = dataSource[index].rate
-        let level = dataSource[index].level
-        dataSource[index] = {
-            rate:rate,
-            level:level,
-            name:"",
-            project:{
-                code:"",
-                name:"",
-                obj_type:""
-            },
-            unit:{
-                code:"",
-                name:"",
-                obj_type:""
-            },
-            construct_unit:{
-                code:"",
-                name:"",
-                type:"",
-            },
-            file:{
-            }
-        }
+
+        dataSource[index].file = ''
         changeAdditionField('dataSource',dataSource)
     }
     //根据附件名称 也就是wbs编码获取其他信息
@@ -454,9 +462,9 @@ export default class Addition extends Component {
                 major:item[5],
                 wbsObject:item[6],
                 designObject:item[7],
-                project:{},
-                unit:{},
-                file:{}
+                project:'',
+                unit:'',
+                file:''
             }
         })
         return res
