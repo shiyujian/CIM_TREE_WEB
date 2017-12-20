@@ -23,22 +23,22 @@
 window.config = {
 	/***********************公共资源服务**************************/
 	//基础服务域名
-	'DOMAIN': 'http://10.215.160.45',
+	'DOMAIN': 'http://10.215.160.38',
 	'DOMAIN2':'http://10.215.4.36',
 	//基础服务端口
-	'API_PORT': '6530',
+	'API_PORT': '6544',
 
 	//静态文件存储服务IP
-	'STATIC_FILE_IP':'http://10.215.160.45',
+	'STATIC_FILE_IP':'http://10.215.160.38',
 	//静态文件存储服务预览端口
-	'STATIC_PREVIEW_PORT':'6510',
+	'STATIC_PREVIEW_PORT':'6540',
 	//静态文件存储服务上传端口
-	'STATIC_UPLOAD_PORT':'6511',
+	'STATIC_UPLOAD_PORT':'6541',
 	//静态文件存储服务下载端口
-	'STATIC_DOWNLOAD_PORT':'6512',
+	'STATIC_DOWNLOAD_PORT':'6542',
 	//静态文件存储服务访问用户和密码
-	'STATIC_FILE_USER':'bimxan',
-	'STATIC_FILE_PASSWORD':'ecidibim',
+	'STATIC_FILE_USER':'qianhai',
+	'STATIC_FILE_PASSWORD':'qianhai',
 	//现场收发文接口的端口
 	'DOC_EXCHANGE_PORT': '6545',
 
@@ -49,9 +49,9 @@ window.config = {
 	'NODE_FILE_EXCHANGE_PORT': '6546',
 	
 	//word在线预览地址
-	'previewWord_API': 'http://10.215.160.40:6523/view/url?url=',
+	'previewWord_API': 'http://10.215.160.40:6500/view/url?url=',
 	//下载文档--未转发过的地址
-	'Leader_Class_URL': 'http://10.215.160.38:6593',
+	'Leader_Class_URL': 'http://10.215.160.38:6592',
 	
 	//WJH插件的下载地址
 	'WJH_CITY_MARKER':'http://10.215.160.38:6542/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',

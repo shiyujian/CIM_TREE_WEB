@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 
 import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
-import Preview from '../../../_platform/components/layout/Preview';
 import '../../containers/quality.less'
+import Preview from '../../../_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -13,9 +13,22 @@ class JianyanModal extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			dataSource:[]
+            dataSource:[],
+            checkers:[],//审核人下来框选项
+            check:null,//审核人
 		};
-	}
+    }
+    componentDidMount(){
+        const {actions:{getAllUsers}} = this.props
+        getAllUsers().then(res => {
+            let checkers = res.map(o => {
+                return (
+                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                )
+            })
+            this.setState({checkers})
+        })
+    }
 	//table input 输入
     tableDataChange(index, key ,e ){
 		const { dataSource } = this.state;
@@ -24,24 +37,64 @@ class JianyanModal extends Component {
     }
     //下拉框选择变化
     handleSelect(index,key,value){
+        debugger
         const { dataSource } = this.state;
 		dataSource[index][key] = value;
 	  	this.setState({dataSource});
     }
 	//ok
 	onok(){
-		this.props.onok(this.state.dataSource)
+        if(!this.state.check){
+            message.info("请选择审核人")
+            return
+        }
+        if(this.state.dataSource.length === 0){
+            message.info("请上传excel")
+            return
+        }
+        let temp = this.state.dataSource.some((o,index) => {
+                        return !o.file.id
+                    })
+        if(temp){
+            message.info(`有数据未上传附件`)
+            return
+        }
+        let {check} = this.state
+        let per = {
+            id:check.id,
+            username:check.username,
+            person_name:check.account.person_name,
+            person_code:check.account.person_code,
+            organization:check.account.organization
+        }
+		this.props.onok(this.state.dataSource,per)
     }
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     //附件上传
-	beforeUploadPicFile  = (index,file) => {
-        debugger
-		const fileName = file.name;
+	beforeUploadPicFile  = async(index,file) => {
+        const fileName = file.name;
+        let {dataSource} = this.state
+        let temp = fileName.split(".")[0]
+        //判断有无重复
+        if(dataSource.some(o => {
+           return o.code === temp
+        })){
+            message.info("该检验批已经上传过了")
+            return false
+        }
 		// 上传到静态服务器
-		const { actions:{uploadStaticFile} } = this.props;
-
+		const { actions:{uploadStaticFile,getWorkPackageDetail} } = this.props;
+        let workpackage = await getWorkPackageDetail({code:temp})
+        if(!workpackage.name){
+            message.info("编码值错误")
+            return
+        }
+        if(workpackage.obj_type_hum === "单元工程"){
+            message.info("请到检验批上传页面上传检验批附件")
+            return
+        }
 		const formdata = new FormData();
 		formdata.append('a_file', file);
         formdata.append('name', fileName);
@@ -61,7 +114,7 @@ class JianyanModal extends Component {
             const filedata = resp;
             filedata.a_file = this.covertURLRelative(filedata.a_file);
             filedata.download_url = this.covertURLRelative(filedata.a_file);
-            const attachment = [{
+            const attachment = {
                 size: resp.size,
                 id: filedata.id,
                 name: resp.name,
@@ -71,20 +124,19 @@ class JianyanModal extends Component {
 				a_file:filedata.a_file,
 				download_url:filedata.download_url,
 				mime_type:resp.mime_type
-            }];
+            };
+            
+            let info = await this.getInfo(workpackage)
             debugger
-            let jcode = file.name.split('.')[0]
-            let info = await this.getInfo(jcode)
-            let {dataSource} = this.state
             dataSource[index]['file'] = attachment
-            dataSource[index]['file'] = Object.assign(dataSource[index]['file'],info)
+            dataSource[index] = Object.assign(dataSource[index],info)
             this.setState({dataSource})
 		});
 		return false;
     }
     //附件删除
     remove(index){
-        const {actions:deleteStaticFile} = this.props
+        const {actions:{deleteStaticFile}} = this.props
         let {dataSource} = this.state
         let id = dataSource[index]['file'].id
         deleteStaticFile({id:id})
@@ -115,44 +167,58 @@ class JianyanModal extends Component {
         this.setState({dataSource})
     }
     //根据附件名称 也就是wbs编码获取其他信息
-    async getInfo(code){
+    async getInfo(wp){
         let res = {};
-        const {actions:getWorkPackageDetail} = this.props
-        let jianyanpi = await getWorkPackageDetail({code:code})
-        res.name = jianyanpi.name
-        res.code = jianyanpi.code        
-        let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
-        if(fenxiang.parent.obj_type_hum = "子分部"){
-            let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
-            if(fenbu.parent.obj_type === "子单位"){
-                let zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                let danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-                res.construct_unit = construct_unit
-                res.unit = {
-                    name:danwei.name,
-                    code:danwei.code,
-                    obj_type:danwei.obj_type
-                }
-                res.project = danwei.parent
-            } 
-        }else{
-            let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            if(fenbu.parent.obj_type === "子单位"){
-                let zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                let danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-                res.construct_unit = construct_unit
-                res.unit = {
-                    name:danwei.name,
-                    code:danwei.code,
-                    obj_type:danwei.obj_type
-                }
-                res.project = danwei.parent
+        const {actions:{getWorkPackageDetail}} = this.props
+        res.name = wp.name
+        res.code = wp.code  
+        let dwcode = ""
+        let getUnitLoop = async(param) => {
+            let next = {};
+            switch (param.obj_type_hum){
+                case "分项工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
+                case "子分部工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
+                case "分部工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
+                case "子单位工程":
+                    dwcode = param.parent.code
+                    break
+                case "单位工程":
+                    dwcode = param.code
+                    break
+                default:break;
             } 
         }
+        await getUnitLoop(wp)
+        let danwei = await getWorkPackageDetail({code:dwcode})
+        let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
+        res.construct_unit = construct_unit
+        res.unit = {
+            name:danwei.name,
+            code:danwei.code,
+            obj_type:danwei.obj_type
+        }
+        res.project = danwei.parent
         return res
+    }
+    //下拉框选择人
+    selectChecker(value){
+        let check = JSON.parse(value)
+        this.setState({check})
+    }
+    //删除
+    delete(index){
+        let {dataSource} = this.state
+        dataSource.splice(index,1)
+        this.setState({dataSource})
     }
     //预览
     handlePreview(index){
@@ -235,7 +301,14 @@ class JianyanModal extends Component {
                     return (<span>
                             <a onClick={this.handlePreview.bind(this,index)}>预览</a>
                             <span className="ant-divider" />
-                            <a onClick={this.remove.bind(this,index)}>删除</a>
+                            <Popconfirm
+                                placement="leftTop"
+                                title="确定删除吗？"
+                                onConfirm={this.remove.bind(this, index)}
+                                okText="确认"
+                                cancelText="取消">
+                                <a>删除</a>
+                            </Popconfirm>
 				        </span>)
                 }else{
                     return (
@@ -249,6 +322,20 @@ class JianyanModal extends Component {
                     )
                 }
 			}
+        },{
+            title:'操作',
+            render:(text,record,index) => {
+                return  (
+                    <Popconfirm
+                        placement="leftTop"
+                        title="确定删除吗？"
+                        onConfirm={this.delete.bind(this, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a>删除</a>
+                    </Popconfirm>
+                )
+            }
         }]
         let jthis = this
         //上传
@@ -267,7 +354,6 @@ class JianyanModal extends Component {
                     let {dataSource} = jthis.state
                     dataSource = jthis.handleExcelData(importData)
                     jthis.setState({dataSource}) 
-                    debugger
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
@@ -288,13 +374,23 @@ class JianyanModal extends Component {
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
 						dataSource={this.state.dataSource}
-						bordered />
+						bordered 
+                        pagination={false}
+                        scroll={{y:500}}/>
                     <Upload {...props}>
                         <Button style={{margin:'10px 10px 10px 0px'}}>
                             <Icon type="upload" />上传附件
                         </Button>
                     </Upload>
-                    <Button className="btn" type="primary">提交</Button>
+                    <span>
+                        审核人：
+                        <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            {
+                                this.state.checkers
+                            }
+                        </Select>
+                    </span> 
+                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
                     <Preview />
 				</div>
                 <div style={{marginTop:20}}>

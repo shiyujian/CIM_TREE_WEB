@@ -61,9 +61,43 @@ export default class JianyanData extends Component {
 		}];
 	}
 	//批量上传回调
-	setData(data){
-		alert()
-		this.setState({addvisible:false})
+	setData(data,participants){
+		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"其它验收信息批量录入",
+			code:"TEMPLATE_032",
+			description:"其它验收信息批量录入",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({addvisible:false})						
+					})
+		})
 	}
 	render() {
 		return (
@@ -71,7 +105,7 @@ export default class JianyanData extends Component {
 				<DynamicTitle title="检验批信息" {...this.props}/>
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
-					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>发起填报</Button>
 					<Button className="btn" type="default">申请变更</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search 
