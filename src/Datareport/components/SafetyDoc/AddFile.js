@@ -390,7 +390,6 @@ export default class AddFile extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    style={{ height: 380, marginTop: 20 }}
                     pagination={{ pageSize: 10 }}
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
