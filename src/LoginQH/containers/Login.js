@@ -41,7 +41,7 @@ class Login extends Component {
 	}
 
 	componentDidMount() {
-		console.log('this.props',this.props)
+		
 		let QH_LOGIN_USER = window.localStorage.getItem('QH_LOGIN_USER');
 		if (QH_LOGIN_USER) {
 			if(QH_LOGIN_USER.username && QH_LOGIN_USER.password){
@@ -68,7 +68,8 @@ class Login extends Component {
 				QRUrl,
 				token,
 				loginState
-			}=nextState
+			}=nextState;
+			console.log(nextState,'nextState');
 			const {actions: {getLoginState}} = this.props;
 
 			me.intervalID = setInterval(function(){
@@ -77,7 +78,6 @@ class Login extends Component {
 					console.log('rst',rst)
 					if(rst && rst.user){
 						clearInterval(me.intervalID);
-
 						const {actions: { getTasks}, history: {replace}} = me.props;
 						clearUser();
 						clearUser();
@@ -286,6 +286,7 @@ class Login extends Component {
 
 	loginFunc(data, loginType, values) {
 		const {actions: {login, getTasks}, history: {replace}} = this.props;
+		console.log('this.props',this.props)
 		clearUser();
 		clearUser();
 		clearUser();

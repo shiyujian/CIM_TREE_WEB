@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
-import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
-import '../../containers/quality.less'
+import { Input, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message } from 'antd';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
 
-class JianyanModal extends Component {
+class PriceList extends Component {
 
 	constructor(props) {
 		super(props);
@@ -29,19 +29,7 @@ class JianyanModal extends Component {
             this.setState({checkers})
         })
     }
-	//table input 输入
-    tableDataChange(index, key ,e ){
-		const { dataSource } = this.state;
-		dataSource[index][key] = e.target['value'];
-	  	this.setState({dataSource});
-    }
-    //下拉框选择变化
-    handleSelect(index,key,value){
-        debugger
-        const { dataSource } = this.state;
-		dataSource[index][key] = value;
-	  	this.setState({dataSource});
-    }
+	
 	//ok
 	onok(){
         if(!this.state.check){
@@ -52,14 +40,14 @@ class JianyanModal extends Component {
             message.info("请上传excel")
             return
         }
-        let temp = this.state.dataSource.some((o,index) => {
-                        return !o.file.id
-                    })
-        if(temp){
-            message.info(`有数据未上传附件`)
-            return
-        }
-        let {check} = this.state
+        // let temp = this.state.dataSource.some((o,index) => {
+        //                 return !o.file.id
+        //             })
+        // if(temp){
+        //     message.info(`有数据未上传附件`)
+        //     return
+        // }
+		let {check} = this.state
         let per = {
             id:check.id,
             username:check.username,
@@ -73,7 +61,7 @@ class JianyanModal extends Component {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     //附件上传
-	beforeUploadPicFile  = async(index,file) => {
+	beforeUploadPicFile  = (index,file) => {
         const fileName = file.name;
         let {dataSource} = this.state
         let temp = fileName.split(".")[0]
@@ -85,16 +73,8 @@ class JianyanModal extends Component {
             return false
         }
 		// 上传到静态服务器
-		const { actions:{uploadStaticFile,getWorkPackageDetail} } = this.props;
-        let workpackage = await getWorkPackageDetail({code:temp})
-        if(!workpackage.name){
-            message.info("编码值错误")
-            return
-        }
-        if(workpackage.obj_type_hum === "单元工程"){
-            message.info("请到检验批上传页面上传检验批附件")
-            return
-        }
+		const { actions:{uploadStaticFile} } = this.props;
+
 		const formdata = new FormData();
 		formdata.append('a_file', file);
         formdata.append('name', fileName);
@@ -125,9 +105,8 @@ class JianyanModal extends Component {
 				download_url:filedata.download_url,
 				mime_type:resp.mime_type
             };
-            
-            let info = await this.getInfo(workpackage)
-            debugger
+            let jcode = file.name.split('.')[0]
+            let info = await this.getInfo(jcode)
             dataSource[index]['file'] = attachment
             dataSource[index] = Object.assign(dataSource[index],info)
             this.setState({dataSource})
@@ -151,7 +130,7 @@ class JianyanModal extends Component {
                 name:"",
                 obj_type:""
             },
-            unit:{
+            projectcoding:{
                 code:"",
                 name:"",
                 obj_type:""
@@ -167,46 +146,52 @@ class JianyanModal extends Component {
         this.setState({dataSource})
     }
     //根据附件名称 也就是wbs编码获取其他信息
-    async getInfo(wp){
+    async getInfo(code){
+        console.log(this.props)
         let res = {};
         const {actions:{getWorkPackageDetail}} = this.props
-        res.name = wp.name
-        res.code = wp.code  
-        let dwcode = ""
-        let getUnitLoop = async(param) => {
-            let next = {};
-            switch (param.obj_type_hum){
-                case "分项工程":
-                    next = await getWorkPackageDetail({code:param.parent.code})
-                    await getUnitLoop(next)
-                    break;
-                case "子分部工程":
-                    next = await getWorkPackageDetail({code:param.parent.code})
-                    await getUnitLoop(next)
-                    break;
-                case "分部工程":
-                    next = await getWorkPackageDetail({code:param.parent.code})
-                    await getUnitLoop(next)
-                    break;
-                case "子单位工程":
-                    dwcode = param.parent.code
-                    break
-                case "单位工程":
-                    dwcode = param.code
-                    break
-                default:break;
+        let pricelist = await getWorkPackageDetail({code:code})
+        res.name = pricelist.name
+        res.code = pricelist.code        
+        let fenxiang = await getWorkPackageDetail({code:pricelist.parent.code})
+        if(fenxiang.parent.obj_type_hum === "子分部工程"){
+            let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
+            let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
+            let zidanwei = {},danwei = {};
+            if(fenbu.parent.obj_type_hum === "子单位工程"){
+                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
+                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
+                
+            }else{
+                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
             } 
+            let construct_unit = danwei.extra_params.projectcoding.find(i => i.type === "施工单位")
+            res.construct_unit = construct_unit
+            res.projectcoding = {
+                name:danwei.name,
+                code:danwei.code,
+                obj_type:danwei.obj_type
+            }
+            res.project = danwei.parent
+        }else{
+            let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
+            let zidanwei = {},danwei = {};
+            if(fenbu.parent.obj_type_hum === "子单位工程"){
+                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
+                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
+                
+            }else{
+                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
+            } 
+            let construct_unit = danwei.extra_params.projectcoding.find(i => i.type === "施工单位")
+            res.construct_unit = construct_unit
+            res.projectcoding = {
+                name:danwei.name,
+                code:danwei.code,
+                obj_type:danwei.obj_type
+            }
+            res.project = danwei.parent
         }
-        await getUnitLoop(wp)
-        let danwei = await getWorkPackageDetail({code:dwcode})
-        let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-        res.construct_unit = construct_unit
-        res.unit = {
-            name:danwei.name,
-            code:danwei.code,
-            obj_type:danwei.obj_type
-        }
-        res.project = danwei.parent
         return res
     }
     //下拉框选择人
@@ -220,118 +205,48 @@ class JianyanModal extends Component {
         dataSource.splice(index,1)
         this.setState({dataSource})
     }
-    //预览
-    handlePreview(index){
-        const {actions: {openPreview}} = this.props;
-        let f = this.state.dataSource[index].file
-        let filed = {}
-        filed.misc = f.misc;
-        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.name = f.name;
-        filed.mime_type = f.mime_type;
-        openPreview(filed);
+    //添加
+    addto(index){
+       
     }
 	render() {
         const columns = 
         [{
             title:'序号',
-            width:"5%",
 			render:(text,record,index) => {
 				return index+1
 			}
 		},{
-			title:'项目/子项目',
-            dataIndex:'project',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.project.name}
-                </span>
-            ),
-		},{
-			title:'单位工程',
-            dataIndex:'unit',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
-            ),
-		},{
-			title:'WBS编码',
-            dataIndex:'code',
-            width:"13%",
-		},{
-			title:'名称',
-            dataIndex:'name',
-            width:"13%",
-		},{
-			title:'检验合格率',
-            dataIndex:'rate',
-            width:"8%",
-            render: (text, record, index) => (
-                <Input value={this.state.dataSource[index]['rate']} onChange={this.tableDataChange.bind(this,index,'rate')}/>
-            ),
-		},{
-			title:'质量等级',
-            dataIndex:'level',
-            width:"12%",
-            render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'level')} value={this.state.dataSource[index]['level']}>
-                    <Option value="优良">优良</Option>
-                    <Option value="合格">合格</Option>
-                    <Option value="不合格">不合格</Option>
-                </Select>
-            ),
-		},{
-			title:'施工单位',
-            dataIndex:'construct_unit',
-            width:"12%",
-            render: (text, record, index) => (
-                <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
-                </span>
-            ),
-		}, {
-            title:'附件',
-            width:"11%",
-			render:(text,record,index) => {
-				if(record.file.id){
-                    return (<span>
-                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                            <span className="ant-divider" />
-                            <Popconfirm
-                                placement="leftTop"
-                                title="确定删除吗？"
-                                onConfirm={this.remove.bind(this, index)}
-                                okText="确认"
-                                cancelText="取消">
-                                <a>删除</a>
-                            </Popconfirm>
-				        </span>)
-                }else{
-                    return (
-                        <span>
-                        <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this,index)}>
-                            <Button>
-                                <Icon type="upload" />上传附件
-                            </Button>
-                        </Upload>
-                    </span>
-                    )
-                }
-			}
-        },{
-            title:'操作',
+			title: '单位工程',
+			dataIndex: 'unitproject',
+		  },{
+			title: '工作节点目标',
+			dataIndex: 'nodetarget',
+		  },{
+			title: '完成时间',
+			dataIndex: 'completiontime',
+		  },{
+			title: '支付金额（万元）',
+			dataIndex: 'summoney',
+		  },{
+			title: '累计占比',
+			dataIndex: 'ratio',
+		  },{
+			title: '备注',
+			dataIndex: 'remarks',
+		  },{
+            title:'编辑',
+            dataIndex:'edit',
             render:(text,record,index) => {
                 return  (
                     <Popconfirm
                         placement="leftTop"
                         title="确定删除吗？"
+                        onConfirm={this.addto.bind(this, index)}
                         onConfirm={this.delete.bind(this, index)}
                         okText="确认"
                         cancelText="取消">
+                        <a>添加</a>
                         <a>删除</a>
                     </Popconfirm>
                 )
@@ -354,7 +269,7 @@ class JianyanModal extends Component {
                     let {dataSource} = jthis.state
                     dataSource = jthis.handleExcelData(importData)
                     jthis.setState({dataSource}) 
-		            message.success(`${info.file.name} file uploaded successfully`);
+		            message.success(`${info.file.name} 文件上传成功`);
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
 		        }
@@ -362,21 +277,19 @@ class JianyanModal extends Component {
 		};
 		return (
 			<Modal
-			title="检验批信息上传表"
-			key={this.props.akey}
+			title="计价清单信息上传表"
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
 				<div>
-                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结果预览</h1>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
 						dataSource={this.state.dataSource}
-						bordered 
-                        pagination={false}
-                        scroll={{y:500}}/>
+						bordered />
+                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
                     <Upload {...props}>
                         <Button style={{margin:'10px 10px 10px 0px'}}>
                             <Icon type="upload" />上传附件
@@ -391,7 +304,6 @@ class JianyanModal extends Component {
                         </Select>
                     </span> 
                     <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
-                    <Preview />
 				</div>
                 <div style={{marginTop:20}}>
                     注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
@@ -407,25 +319,28 @@ class JianyanModal extends Component {
         data.splice(0,1);
         let res = data.map(item => {
             return {
-                code:item[2],
-                rate:item[4],
-                level:item[5],
-                name:item[3],
-                project:{
+            project:{
                     code:"",
-                    name:item[0],
+                    name:"",
                     obj_type:""
-                },
-                unit:{
+            },
+            unit:{
                     code:"",
-                    name:item[1],
+                    name:"",
                     obj_type:""
-                },
-                construct_unit:{
+            },
+            construct_unit:{
                     code:"",
-                    name:item[6],
+                    name:"",
                     type:"",
-                },
+            },
+            unitproject:item[1],
+            nodetarget:item[2],
+            completiontime:item[3],
+            summoney:item[4],
+            ratio:[5],
+            remarks:[6],
+            edit:item[7],
                 file:{
 
                 }
@@ -434,4 +349,4 @@ class JianyanModal extends Component {
         return res
     }
 }
-export default JianyanModal
+export default PriceList

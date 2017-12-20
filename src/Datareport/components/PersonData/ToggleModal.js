@@ -1,23 +1,36 @@
 import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
+import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
 const Search = Input.Search;
 export default class ToggleModal extends Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            dataSource: [],
+            users: [],
+            projects: []
+        }
+    }
     render(){
         const {visible} = this.props;
+        let jthis = this;
         const props = {
-            name: 'file',
-            action: '//jsonplaceholder.typicode.com/posts/',
+            action: `${SERVICE_API}/excel/upload-api/`,
             headers: {
-                authorization: 'authorization-text',
             },
+            showUploadList: false,
             onChange(info) {
                 if (info.file.status !== 'uploading') {
-                    console.log(info.file, info.fileList);
                 }
                 if (info.file.status === 'done') {
+                    let importData = info.file.response.Sheet1;
+                    let dataSource = jthis.handleExcelData(importData);
+                    jthis.setState({
+                        dataSource
+                    })
                     message.success(`${info.file.name} file uploaded successfully`);
                 } else if (info.file.status === 'error') {
-                    message.error(`${info.file.name} file upload failed.`);
+                    message.error(`${info.file.name}解析失败，请检查输入`);
                 }
             },
         };
@@ -25,7 +38,7 @@ export default class ToggleModal extends Component{
             <Modal
                 visible={visible}
                 width={1280}
-                submit={this.ok.bind(this)}
+                onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
@@ -33,6 +46,7 @@ export default class ToggleModal extends Component{
                     <Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={this.columns}
+                        dataSource = {this.state.dataSource}
                         bordered />
                     <Upload {...props}>
                         <Button style={{ margin: '10px 10px 10px 0px' }}>
@@ -41,13 +55,15 @@ export default class ToggleModal extends Component{
                     </Upload>
                     <span>
                         审核人：
-                    <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                    <Select style={{ width: '200px' }} className="btn" onSelect = {ele=>{
+                            this.setState({passer:ele})
+                        }} >
                             {
-                                // this.state.checkers
+                                this.state.checkers
                             }
                         </Select>
                     </span>
-                    <Button className="btn" type="primary" onClick={this.submit.bind(this)}>提交</Button>
+                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
                 </div>
                 <div style={{ marginTop: 20 }}>
                     注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
@@ -64,19 +80,57 @@ export default class ToggleModal extends Component{
     selectChecker(){
 
     }
-    ok(){
-      const {actions:{ModalVisible}} = this.props;
-      ModalVisible(false);
+    onok() {
+        const { actions: { ModalVisible } } = this.props;
+        let ok = this.state.dataSource.some(ele => {
+            return !ele.file;
+        });
+        if (!this.state.passer) {
+            message.error('审批人未选择');
+            return;
+        }
+        this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
+        ModalVisible(false);
     }
-    cancel(){
-      const {actions:{ModalVisible}} = this.props;
-      ModalVisible(false);
+    cancel() {
+        const { actions: { ModalVisible } } = this.props;
+        ModalVisible(false);
     }
-    onChange(){
+    onChange() {
 
+    }
+     //处理上传excel的数据
+     handleExcelData(data) {
+        data.splice(0, 1);
+        let res = data.map(item => {
+            return {
+                index: item[0],
+                code: item[1],
+                name: item[2],
+                unit: item[3],
+                depart: item[4],
+                job: item[5],
+                sex: item[6],
+                tel: item[7],
+                email: item[8],
+                signature: item[9]
+            }
+        })
+        return res;
     }
     componentDidMount(){
-
+        const {actions:{getAllUsers}} = this.props;
+        getAllUsers().then(rst => {
+            let users = [];
+            if (rst.length) {
+                let checkers = rst.map(o => {
+                    return (
+                        <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    )
+                })
+                this.setState({checkers})
+            }
+        });
     }
     columns = [ {
         title: '人员编码',

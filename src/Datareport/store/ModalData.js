@@ -1,9 +1,13 @@
 import {handleActions, combineActions, createAction} from 'redux-actions';
-import createFetchAction from './fetchAction';
+import createFetchAction from 'fetch-action';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
+import { SERVICE_API,USER_API,WORKFLOW_API} from '_platform/api';
 
 export const ID = 'DATA_MODALDATA';
+
+export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
+export const getProjects = createFetchAction(`${USER_API}/project-tree/?depth=1`);
 
 const additionReducer = fieldFactory(ID, 'addition');
 const checkReducer = fieldFactory(ID, 'check');
@@ -17,6 +21,9 @@ export const actions = {
 	...checkReducer,
 	...modifyReducer,
 	...expurgateReducer,
+
+	getAllUsers,
+	getProjects
 };
 
 export default handleActions({

@@ -166,8 +166,11 @@ class JianyanpiModal extends Component {
         let res = {};
         const {actions:{getWorkPackageDetail}} = this.props
         let jianyanpi = await getWorkPackageDetail({code:code})
-        res.name = jianyanpi.name;
-        res.code = jianyanpi.code;    
+        res.name = jianyanpi.name
+        res.code = jianyanpi.code  
+        res.pk = jianyanpi.pk
+        res.obj_type = jianyanpi.obj_type
+        res.related_documents = jianyanpi.related_documents
         let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
         if(fenxiang.parent.obj_type_hum === "子分部工程"){
             let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
@@ -407,22 +410,23 @@ class JianyanpiModal extends Component {
         data.splice(0,1);
         let res = data.map(item => {
             return {
-                rate:item[1],
-                level:item[2],
-                name:item[0],
+                code:item[2],
+                rate:item[4],
+                level:item[5],
+                name:item[3],
                 project:{
                     code:"",
-                    name:"",
+                    name:item[0],
                     obj_type:""
                 },
                 unit:{
                     code:"",
-                    name:"",
+                    name:item[1],
                     obj_type:""
                 },
                 construct_unit:{
                     code:"",
-                    name:"",
+                    name:item[6],
                     type:"",
                 },
                 file:{

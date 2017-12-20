@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload } from 'antd';
-import Card from '_platform/components/panels/Card';
+
 import { UPLOAD_API, SERVICE_API, FILE_API } from '_platform/api';
+
 const Option = Select.Option;
 
 
@@ -10,6 +11,8 @@ export default class Addition extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
+			users: [],
+			projects: []
 		};
 	}
 	render() {
@@ -51,51 +54,50 @@ export default class Addition extends Component {
 		}, {
 			title: 'fdb模型文件',
 			dataIndex: 'fdbMode',
-			
-			render:(text,record,index) => {
-				
-                    return (
-                        <span>
-                        <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this,index)}>
-                            <Button>
-                                <Icon type="upload" />上传附件
+
+			render: (text, record, index) => {
+				return (
+					<span>
+						<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index)}>
+							<Button>
+								<Icon type="upload" />上传附件
                             </Button>
-                        </Upload>
-                    </span>
-                    )
-                }
-			
+						</Upload>
+					</span>
+				)
+			}
+
 		}, {
 			title: 'tdbx模型文件',
 			dataIndex: 'tdbxMode',
-			render:(text,record,index) => {
-				
-                    return (
-                        <span>
-                        <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this,index)}>
-                            <Button>
-                                <Icon type="upload" />上传附件
+			render: (text, record, index) => {
+
+				return (
+					<span>
+						<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index)}>
+							<Button>
+								<Icon type="upload" />上传附件
                             </Button>
-                        </Upload>
-                    </span>
-                    )
-                }
+						</Upload>
+					</span>
+				)
+			}
 
 		}, {
 			title: '属性表',
 			dataIndex: 'attributeTable',
-			render:(text,record,index) => {
-				
-                    return (
-                        <span>
-                        <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this,index)}>
-                            <Button>
-                                <Icon type="upload" />上传附件
+			render: (text, record, index) => {
+
+				return (
+					<span>
+						<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index)}>
+							<Button>
+								<Icon type="upload" />上传附件
                             </Button>
-                        </Upload>
-                    </span>
-                    )
-                }
+						</Upload>
+					</span>
+				)
+			}
 		}, {
 			title: '上报时间',
 			dataIndex: 'reportingTime'
@@ -143,27 +145,24 @@ export default class Addition extends Component {
 		return (
 
 			<Modal
-				key={this.props.akey}
+				key={addition.key}
+				title="模型信息上传表"
 				width={1280}
 				visible={addition.visible}
+				maskClosable={false}
 				onCancel={this.cancel.bind(this)}
 				onOk={this.save.bind(this)}>
 
 
-				<Row style={{ marginBottom: "30px" }}>
-					<h3 style={{ textAlign: "center" }}>结果审核</h3>
-				</Row>
-				<Row style={{ marginBottom: "30px" }}>
-					<Table bordered columns={columns} dataSource={this.state.dataSource} />
+				<Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
+				<Row style={{ marginBottom: "10px",marginTop:'10px' }}>
+					<Table
+						bordered 
+						columns={columns}
+						dataSource={this.state.dataSource}
+						/>
 				</Row>
 				<Row style={{ marginBottom: "30px" }} type="flex">
-					<Col><Button style={{ marginRight: "30px" }}>模板下载</Button></Col>
-					<Col>
-						<Select style={{ marginRight: "30px" }} defaultValue="项目1">
-							<Option value="项目1">项目1</Option>
-							<Option value="项目2">项目2</Option>
-						</Select>
-					</Col>
 					<Col>
 						<Upload {...props}>
 							<Button style={{ marginRight: 30 }}>
@@ -171,15 +170,17 @@ export default class Addition extends Component {
 							</Button>
 						</Upload>
 					</Col>
-					<Col><Input placeholder="文件路径" style={{ width: "200px", marginRight: "30px" }} /></Col>
-					<Col><Button style={{ marginRight: "50px" }}>上传并预览</Button></Col>
-					<Col>导入方式:&emsp;</Col>
-					<Col>
-						<Select style={{ marginRight: "30px" }} defaultValue="1">
-							<Option value="1">不导入重复的数据</Option>
-							<Option value="2">项导入重复的数据</Option>
+					<span>
+						审核人：
+                        <Select style={{ width: '200px' }} onSelect={ele => {
+							this.setState({ passer: ele })
+						}} >
+							{
+								this.state.checkers
+							}
 						</Select>
-					</Col>
+					</span>
+					<Button type="primary" style={{ marginLeft: 20 }} onClick={this.onok.bind(this)}>提交</Button>
 				</Row>
 				<Row style={{ marginBottom: "30px" }}>
 					<p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
@@ -195,7 +196,7 @@ export default class Addition extends Component {
 		);
 	}
 
-	save() {
+	beforeUploadPicFile() {
 
 	}
 
@@ -203,6 +204,9 @@ export default class Addition extends Component {
 
 	}
 
+	save() {
+
+	}
 
 	cancel() {
 		const {
@@ -216,7 +220,7 @@ export default class Addition extends Component {
 		let res = data.map(item => {
 			console.log('woshi', item)
 			return {
-				coding:item[1],
+				coding: item[1],
 				modelName: item[4],
 				modelDescription: item[6],
 				modeType: item[7],
@@ -229,15 +233,58 @@ export default class Addition extends Component {
 	//下拉框选择
 	handleSelect(index, key, value) {
 		const { dataSource } = this.state;
-		
+
 		dataSource[index][key] = value;
-		console.log('value',value)
+		// console.log('value', value)
 		this.setState({ dataSource });
 	}
-	//上传之前检查
-	beforeUploadPicFile() {
+
+
+	onok() {
+
+		let ok = this.state.dataSource.some(ele => {
+			return !ele.file;
+		});
+		// if (ok) {
+		//     message.error('有附件未上传');
+		//     return;
+		// };
+		if (!this.state.passer) {
+			message.error('审批人未选择');
+			return;
+		}
+		this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
 
 	}
+
+
+	componentDidMount() {
+		const { actions: { getAllUsers, getProjects } } = this.props;
+		getAllUsers().then(rst => {
+			let users = [];
+			if (rst.length) {
+				let checkers = rst.map(o => {
+					return (
+						<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+					)
+				})
+				this.setState({ checkers })
+			}
+		});
+		// getProjects().then(rst => {
+		//     console.log("rst:",rst);
+		//     if (rst.children.length) {
+		//         let projects = rst.children.map(item => {
+		//             return (
+		//                 <Option value={JSON.stringify(item)}>{item.name}</Option>
+		//             )
+		//         })
+		//         this.setState({projects})
+		//     }
+		// })
+	}
+
+
 
 	static layout = {
 		labelCol: { span: 6 },
