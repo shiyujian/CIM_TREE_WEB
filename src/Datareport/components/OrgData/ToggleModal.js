@@ -29,6 +29,7 @@ export default class ToggleModal extends Component{
                     jthis.setState({
                         dataSource
                     })
+                    console.log("datasource:",jthis.state.dataSource);
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
@@ -123,7 +124,6 @@ export default class ToggleModal extends Component{
             }
         });
         getProjects().then(rst => {
-            console.log("rst:",rst);
             if (rst.children.length) {
                 let projects = rst.children.map(item => {
                     return (
@@ -164,13 +164,15 @@ export default class ToggleModal extends Component{
     }, {
         title: '负责项目/子项目名称',
         dataIndex: 'project',
-        render:(record) => (
-            <Select onSelect = {ele => {
-                this.setState({pro:ele})
-            }}>
-                <Option>{this.state.projects}</Option>
-            </Select>
-        )
+        render:(record) => {
+            return (
+                <Select style={{width:"90%"}} onSelect={ele => {
+                    this.setState({ pro: ele })
+                }}>
+                    {this.state.projects}
+                </Select>
+            )
+        }
     }, {
         title: '负责单位工程名称',
         dataIndex: 'unit',
