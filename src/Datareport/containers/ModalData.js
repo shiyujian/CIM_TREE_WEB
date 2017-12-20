@@ -75,7 +75,6 @@ export default class ModalData extends Component {
 					</Col>
 				</Row>
 				<Addition {...this.props} setData = {this.setData.bind(this)}/>
-				<Check {...this.props}/>
 				<Modify {...this.props}/>
 				<Expurgate {...this.props}/>
 			</div>

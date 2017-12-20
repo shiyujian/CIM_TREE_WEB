@@ -13,9 +13,9 @@
     "build_qh": "rimraf dist/dist_qh && cross-env proj=qh branch=production node env/build/prod",
     "build_xa": "rimraf dist/dist_xa && cross-env proj=xa branch=production node env/build/prod",
     "build_air": "rimraf dist/dist_air && cross-env proj=air branch=production node env/build/prod",
-    "build_qh_in": "rimraf dist/dist_qh && cross-env proj=qh branch=production node env/build/prod",
-    "build_xa_in": "rimraf dist/dist_xa && cross-env proj=xa branch=production node env/build/prod",
-    "build_air_in": "rimraf dist/dist_air && cross-env proj=air branch=production node env/build/prod"
+    "build_qh_in": "rimraf dist/dist_qh && cross-env proj=qh branch=dev node env/build/prod",
+    "build_xa_in": "rimraf dist/dist_xa && cross-env proj=xa branch=dev node env/build/prod",
+    "build_air_in": "rimraf dist/dist_air && cross-env proj=air branch=dev node env/build/prod"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.0",

@@ -8,7 +8,8 @@ import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
 import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
-// import safetyDocCheck from '../../../Datareport/components/SafetyDoc/safetyDocCheck';
+import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
+import Check from '../../../Datareport/components/ModalData/Check'
 
 const FormItem = Form.Item;
 @connect(
@@ -31,7 +32,7 @@ export default class Progress extends Component {
 	}
 
 	render() {
-		const { state = {}, task, location, states = [],dr_qua_jyp_visible,dr_qua_jy_visible} = this.props;
+		const { state = {}, task, location, states = [],dr_qua_jyp_visible,dr_qua_jy_visible,safety_doc_check_visible,modal_check_visbile} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
 		const { state_id = '0' } = queryString.parse(location.search) || {};
@@ -130,7 +131,14 @@ export default class Progress extends Component {
 					dr_qua_jy_visible && 
 					<JianyanCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
-			
+				{
+					safety_doc_check_visible && 
+					<SafetyDocCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					modal_check_visbile && 
+					<Check wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -149,11 +157,15 @@ export default class Progress extends Component {
 			case "检验批验收信息批量录入":
 				changeDatareportVisible({key:'dr_qua_jyp_visible',value:true})
 				break;
-			case "其他验收信息批量录入":
+			case "其它验收信息批量录入":
 				changeDatareportVisible({key:'dr_qua_jy_visible',value:true})
 				break;
-			// case "安全管理信息批量录入":changeDatareportVisible({key:'safety_doc_check_visible',value:true})
-			// 	break;
+			case "安全管理信息批量录入":
+				changeDatareportVisible({key:'safety_doc_check_visible',value:true})
+				break;
+			case "模型信息批量录入":
+				changeDatareportVisible({key:'modal_check_visbile',value:true})
+				break;
 			default:break;
 		}
 	}

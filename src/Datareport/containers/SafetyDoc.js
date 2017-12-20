@@ -19,7 +19,7 @@ import {WORKFLOW_CODE} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyDoc/AddFile';
 import {getNextStates} from '_platform/components/Progress/util';
-
+var moment = require('moment');
 const Search = Input.Search;
 
 @connect(
@@ -48,6 +48,7 @@ class SafetyDoc extends Component {
 	}
 
 	setEditData = (data,participants) =>{
+        debugger
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -81,7 +82,7 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({addvisible:false})						
+						this.setState({setEditVisiable:false})						
 					})
 		})
 	}

@@ -407,7 +407,7 @@ class JianyanModal extends Component {
         data.splice(0,1);
         let res = data.map(item => {
             return {
-                code:item[2],
+                code:"",
                 rate:item[4],
                 level:item[5],
                 name:item[3],

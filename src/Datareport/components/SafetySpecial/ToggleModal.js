@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Modal, Upload, Select, Icon } from 'antd';
+import { Table, Button, Popconfirm, message, Input, Modal, Upload, Select, Icon,notification } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API } from '_platform/api';
 const Search = Input.Search;
 export default class ToggleModal extends Component {
@@ -58,7 +58,7 @@ export default class ToggleModal extends Component {
                 <span>
                     审核人：
                         <Select style={{ width: '200px' }} className="btn" onSelect={ele => {
-                        console.log(ele);
+                        // console.log(ele);
                         this.setState({ passer: ele })
                     }} >
                         {
@@ -104,6 +104,10 @@ export default class ToggleModal extends Component {
         }
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisible(false);
+        notification.success({
+			message: '发起成功！',
+			duration: 2
+		});
     }
     cancel() {
         const { actions: { ModalVisibleOrg, ModalVisible } } = this.props;

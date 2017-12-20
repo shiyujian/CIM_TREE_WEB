@@ -44,7 +44,7 @@ export default class TableOrg extends Component {
 		{
 			title: '序号',
 			dataIndex: 'index',
-			width: '10%',
+			width: '5%',
 		},
 		{
 			title: '单位工程',
@@ -58,7 +58,7 @@ export default class TableOrg extends Component {
 		}, {
 			title: '方案名称',
 			dataIndex: 'scenarioName',
-			width: '15%',
+			width: '10%',
 		}, {
 			title: '编制单位',
 			dataIndex: 'organizationUnit',
