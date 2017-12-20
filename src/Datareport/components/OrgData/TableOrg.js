@@ -12,11 +12,12 @@ export default class TableOrg extends Component {
 		return (
 			<div>
 				<div>
-					<Button onClick={this.send.bind(this)} style={{ marginRight: "20px" }}>发送填报</Button>
+					<Button style={{ marginRight: "10px" }}>模板下载</Button>
+					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
 					<Button className={style.button}>申请变更</Button>
 					<Button className={style.button}>申请删除</Button>
 					<Button className={style.button}>导出表格</Button>
-					<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容" />
+					<Search className={style.button} style={{ width: "200px" }} placeholder="输入搜索条件" />
 				</div>
 				<Table
 					columns={this.columns}

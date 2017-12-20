@@ -6,8 +6,9 @@ export default class ToggleModal extends Component{
     constructor(props){
         super(props);
         this.state = {
-            dataSource:[],
-            users:[]
+            dataSource: [],
+            users: [],
+            projects: []
         }
     }
     render(){
@@ -37,7 +38,7 @@ export default class ToggleModal extends Component{
             <Modal
                 visible={visible}
                 width={1280}
-                onOk={this.ok.bind(this)}
+                onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
@@ -55,13 +56,15 @@ export default class ToggleModal extends Component{
                 </Upload>
                 <span>
                     审核人：
-                        <Select style={{ width: '200px' }} className="btn" >
+                        <Select style={{ width: '200px' }} className="btn" onSelect = {ele=>{
+                            this.setState({passer:ele})
+                        }} >
                         {
-                            // this.state.checkers
+                            this.state.checkers
                         }
                     </Select>
                 </span> 
-                <Button type="primary" >提交</Button>
+                <Button type="primary" onClick = {this.onok.bind(this)}>提交</Button>
                <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
@@ -89,9 +92,21 @@ export default class ToggleModal extends Component{
         })
         return res;
     }
-    ok(){
-      const {actions:{ModalVisible,ModalVisibleOrg}} = this.props;
-      ModalVisible(false);
+    onok(){
+        const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
+        let ok = this.state.dataSource.some(ele => {
+            return !ele.file;
+        });
+        // if (ok) {
+        //     message.error('有附件未上传');
+        //     return;
+        // };
+        if (!this.state.passer) {
+            message.error('审批人未选择');
+            return;
+        }
+        this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
+        ModalVisible(false);
     }
     cancel(){
       const {actions:{ModalVisibleOrg,ModalVisible}} = this.props;
@@ -101,22 +116,29 @@ export default class ToggleModal extends Component{
 
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props;
+        const {actions:{getAllUsers, getProjects}} = this.props;
         getAllUsers().then(rst => {
             let users = [];
             if (rst.length) {
-                rst.map(item => {
-                    if (item.person_name) {
-                        users.push(
-                            <option>{item.person_name}</option>
-                        )
-                    }
+                let checkers = rst.map(o => {
+                    return (
+                        <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    )
                 })
+                this.setState({checkers})
             }
-            this.setState({
-                users
-            })
-        })        
+        });
+        getProjects().then(rst => {
+            console.log("rst:",rst);
+            if (rst.children.length) {
+                let projects = rst.children.map(item => {
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({projects})
+            }
+        })
     }
     columns = [{
 
@@ -148,7 +170,13 @@ export default class ToggleModal extends Component{
     }, {
         title: '负责项目/子项目名称',
         dataIndex: 'project',
-        key: 'Project',
+        // render:(record) => (
+        //     <Select onSelect = {ele => {
+        //         this.setState({pro:ele})
+        //     }}>
+        //         <Option>{this.state.projects}</Option>
+        //     </Select>
+        // )
     }, {
         title: '负责单位工程名称',
         dataIndex: 'unit',

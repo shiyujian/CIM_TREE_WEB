@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/DesignData';
 import {actions as platformActions} from '_platform/store/global';
-
+import Preview from '../../_platform/components/layout/Preview';
 import {Table, Addition, Check, Modify, Expurgate} from '../components/DesignData';
 import {Row,Col} from 'antd';
 @connect(
@@ -28,11 +28,11 @@ export default class DesignData extends Component {
 
 					</Col>
 				</Row>
-
 				<Addition {...this.props}/>
 				<Check {...this.props}/>
 				<Modify {...this.props}/>
 				<Expurgate {...this.props}/>
+				<Preview/>
 			</div>
 		);
 	}
