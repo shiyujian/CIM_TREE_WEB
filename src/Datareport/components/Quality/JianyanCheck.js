@@ -45,7 +45,7 @@ export default class JianyanpiCheck extends Component {
    }
    //提交
     submit(){
-        this.props.closeModal("dr_qua_jyp_visible",false)
+        this.props.closeModal("dr_qua_jy_visible",false)
     }
     //预览
     handlePreview(index){
@@ -128,7 +128,7 @@ export default class JianyanpiCheck extends Component {
         }]
 		return (
             <Modal
-			title="检验批信息审批表"
+			title="其它检验信息审批表"
 			key={Math.random()}
             visible={true}
             width= {1280}

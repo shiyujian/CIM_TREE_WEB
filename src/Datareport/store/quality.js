@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import createFetchActionWithHeaders from './fetchAction';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API} from '_platform/api';
+import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base} from '_platform/api';
 
 
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
@@ -17,6 +17,8 @@ export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`,
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 //批量修改施工包
 const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
+//得到质量缺陷
+export const fetchDefectDetail = createFetchAction(`${base}/main/api/quality-defect/{{id}}/`,[])
 
 export const actions = {
 	getProjectTree,
@@ -26,7 +28,8 @@ export const actions = {
 	getAllUsers,
 	createWorkflow,
 	getWorkflow,
-	logWorkflowEvent
+	logWorkflowEvent,
+	fetchDefectDetail
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
