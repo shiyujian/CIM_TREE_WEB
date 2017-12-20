@@ -53,7 +53,7 @@ export default class ModalData extends Component {
                 {
                     state:rst.current[0].id,
                     action:'提交',
-                    note:'发起组织机构填报',
+                    note:'发起模型信息填报',
                     executor:creator,
                     next_states:[{
                         participants:[participants],

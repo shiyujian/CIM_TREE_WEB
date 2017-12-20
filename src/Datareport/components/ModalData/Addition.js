@@ -170,7 +170,7 @@ export default class Addition extends Component {
 					</Col>
 					<span>
 						审核人：
-                        <Select style={{ width: '200px' }} className="btn" onSelect={ele => {
+                        <Select style={{ width: '200px' }} onSelect={ele => {
 							this.setState({ passer: ele })
 						}} >
 							{
@@ -178,7 +178,7 @@ export default class Addition extends Component {
 							}
 						</Select>
 					</span>
-					<Button type="primary" onClick={this.onok.bind(this)}>提交</Button>
+					<Button type="primary" style={{marginLeft:20}} onClick={this.onok.bind(this)}>提交</Button>
 				</Row>
 				<Row style={{ marginBottom: "30px" }}>
 					<p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
