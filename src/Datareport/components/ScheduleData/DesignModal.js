@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 
 import { Input, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API } from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
-const { RangePicker } = DatePicker;
-const RadioGroup = Radio.Group;
+import Preview from '../../../_platform/components/layout/Preview';
 const { Option } = Select
 
 class DesignModal extends Component {
@@ -45,23 +44,31 @@ class DesignModal extends Component {
         this.setState({ dataSource });
     }
     //ok
-    onok() {
-        if (!this.state.check) {
+    onok(){
+        if(!this.state.check){
             message.info("请选择审核人")
             return
         }
-        if (this.state.dataSource.length === 0) {
+        if(this.state.dataSource.length === 0){
             message.info("请上传excel")
             return
         }
-        let temp = this.state.dataSource.some((o, index) => {
-            return !o.file.id
-        })
-        if (temp) {
-            message.info(`有数据未上传附件`)
-            return
+        // let temp = this.state.dataSource.some((o,index) => {
+        //                 return !o.file.id
+        //             })
+        // if(temp){
+        //     message.info(`有数据未上传附件`)
+        //     return
+        // }
+        let {check} = this.state
+        let per = {
+            id:check.id,
+            username:check.username,
+            person_name:check.account.person_name,
+            person_code:check.account.person_code,
+            organization:check.account.organization
         }
-        this.props.onok(this.state.dataSource)
+		this.props.onok(this.state.dataSource,per)
     }
     covertURLRelative = (originUrl) => {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -162,7 +169,16 @@ class DesignModal extends Component {
             }, {
                 title: '操作',
                 render: (text, record, index) => {
-                    return <a onClick={this.delete.bind(this, index)}>删除</a>
+                    return  (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+                            onConfirm={this.delete.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
                 }
             }]
         let jthis = this

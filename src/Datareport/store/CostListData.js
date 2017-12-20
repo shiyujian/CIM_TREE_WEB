@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import createFetchActionWithHeaders from './fetchAction';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base} from '_platform/api';
+import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API} from '_platform/api';
 
 
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');

@@ -32,7 +32,7 @@ export default class ProjectData extends Component {
 		}
 		let postdata = {
 			name:"项目信息批量录入",
-			code:"TEMPLATE_032",
+			code:"TEMPLATE_033",
 			description:"项目信息批量录入",
 			subject:[{
 				data:JSON.stringify(data)
@@ -43,11 +43,12 @@ export default class ProjectData extends Component {
 			status:"2"
 		}
 		createWorkflow({},postdata).then((rst) => {
+			console.log("rst:",rst);
 			let nextStates =  getNextStates(rst,rst.current[0].id);
             logWorkflowEvent({pk:rst.id},
                 {
                     state:rst.current[0].id,
-                    action:'提交',
+                    action:'上传',
                     note:'发起项目填报',
                     executor:creator,
                     next_states:[{
