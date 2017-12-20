@@ -820,8 +820,8 @@ class MonitorData extends Component {
                 <Content>
                     <h1 style={{textAlign:'center'}}>监测数据</h1>
                     <Row style={{marginTop:10}}>
-                        <Col span={2} style={{width:98}}><p style={{fontSize:14}}>选择监测项目:</p></Col>
-                        <Col span={3}>
+                        <Col span={3} style={{width:98}}><p style={{fontSize:14}}>选择监测项目:</p></Col>
+                        <Col span={4}>
                             <Select 
                              value={selectValue}
                              style={{width:120}}
@@ -843,7 +843,7 @@ class MonitorData extends Component {
                             :
                             null
                         }
-                        <Col span={6}>
+                        <Col span={10}>
                             <Upload {...props}
                                 onChange = {this.onFileChange.bind(this)}
                             >

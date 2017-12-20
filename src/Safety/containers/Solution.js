@@ -219,8 +219,8 @@ class Solution extends Component {
                                 });
                                 let dataSet = [];
                                 getDocumentByCode({code:code}).then((rep)=>{
-                                    let data = {};
                                     for(let i=0;i<rep.result.length;i++){
+                                        let data = {};
                                         data.projectName = rep.result[i].extra_params.projectName;
                                         data.solution = rep.result[i].extra_params.solution;
                                         data.constructionUnit = rep.result[i].extra_params.constructionUnit;
@@ -275,8 +275,8 @@ class Solution extends Component {
                                         });
                                         let dataSet = [];
                                         getDocumentByCode({code:code}).then((rep)=>{
-                                            let data = {};
                                             for(let i=0;i<rep.result.length;i++){
+                                                let data = {};
                                                 data.projectName = rep.result[i].extra_params.projectName;
                                                 data.solution = rep.result[i].extra_params.solution;
                                                 data.constructionUnit = rep.result[i].extra_params.constructionUnit;
@@ -362,8 +362,8 @@ class Solution extends Component {
         let code = "safety_solution_dir_"+project.code;
         let dataSet = [];
         getDocumentByCode({code:code}).then((rep)=>{
-            let data = {};
             for(let i=0;i<rep.result.length;i++){
+                let data = {};
                 data.projectName = rep.result[i].extra_params.projectName;
                 data.solution = rep.result[i].extra_params.solution;
                 data.constructionUnit = rep.result[i].extra_params.constructionUnit;
@@ -386,8 +386,8 @@ class Solution extends Component {
         } = this.props;
         let dataSet = [];
         getDocumentByContent({code:code,name:value}).then((rep)=>{
-            let data = {};
             for(let i=0;i<rep.result.length;i++){
+                let data = {};
                 data.projectName = rep.result[i].extra_params.projectName;
                 data.solution = rep.result[i].extra_params.solution;
                 data.constructionUnit = rep.result[i].extra_params.constructionUnit;

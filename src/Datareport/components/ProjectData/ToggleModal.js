@@ -56,12 +56,14 @@ export default class ToggleModal extends Component{
                 </Upload>
                 <span>
                     审核人：
-                        <Select style={{ width: '200px' }} className="btn" >
+                        <Select style={{ width: '200px' }} className="btn" onSelect = {ele=>{
+                            this.setState({passer:ele})
+                        }} >
                         {
-                            this.state.checkers||[]
+                            this.state.checkers || []
                         }
                     </Select>
-                </span> 
+                </span>
                 <Button type="primary" >提交</Button>
                <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
@@ -77,11 +79,15 @@ export default class ToggleModal extends Component{
         let ok = this.state.dataSource.some(ele => {
             return !ele.file;
         });
-        console.log(ok);
         if(ok){
             message.error('有附件未上传');
             return;
-        }
+        };
+        if(!this.state.passer){
+            message.error('审批人未选择');
+            return;
+        }        
+        this.props.setData(this.state.dataSource,JSON.parse(this.state.passer));
         ModalVisibleProject(false);
     }
     cancel() {

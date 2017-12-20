@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Button, Row, Col, Select, Upload, Input, message} from 'antd';
+import {Button, Row, Col, Select, Upload, Input, message, Icon} from 'antd';
 
 import VedioTable from './VedioTable';
 import './index.less';
@@ -11,36 +11,41 @@ export default class UploadFooter extends Component{
     constructor(props){
         super(props);
         this.state={
+            checkUsers:[]
         }
     }
 
+    componentDidMount(){
+        const {getAllUsers} = this.props;
+        getAllUsers().then(data => {
+            const checkUsers = data.map(record => {
+                return (
+                    <Option key={record.id} value={JSON.stringify(record)}>{record.account.person_name}</Option>
+                )
+            })
+            this.setState({checkUsers})
+        })
+    }
+
     render(){
-        const options = optionData.map(data =>{
-                return <Option key={data.key}>{data.value}</Option>
-            }),
-            importOptions = importOptionData.map(data =>{
-                return <Option key={data.key}>{data.value}</Option>
-            });
+        const {checkUsers} = this.state;
 
         return(<div>
             <Row className="rowSpacing">
-                <Col span={5}>
-                    <Button onClick={modalDownload}>模板下载</Button>
-                    <Select className="spacing" defaultValue={optionData[0].value} >
-                        {options}
-                    </Select>
-                </Col>
-                <Col span={19}>
-                    <Upload {...this.uploadProps}>
-                        <Button>选择文件</Button>
+                <Col span={24}>
+                    <Button type="primary" onClick={modalDownload}>模板下载</Button>
+                    <Upload className="spacing" {...this.uploadProps}>
+                        <Button>
+                            <Icon type="upload"/>上传附件
+                        </Button>
                     </Upload>
-                    <Input style={{width: 300}} className="inlineBlock" disabled value="F:\XA\项目基础信息导入表.xlxs"/>
-                    <Button className="spacing">上传并预览</Button>
-                    <div className="inlineBlock">导入方式: </div>
-                    <Select className="spacing" defaultValue={importOptionData[0].value} >
-                        {importOptions}
+                    {/* <Input style={{width: 300}} className="inlineBlock" disabled value="F:\XA\项目基础信息导入表.xlxs"/>
+                    <Button className="spacing">上传并预览</Button> */}
+                    <div className="inlineBlock">审核人: </div>
+                    <Select className="select" defaultValue={"请选择"} >
+                        {checkUsers}
                     </Select>
-                    <Button className="spacing">确定提交</Button>
+                    <Button type="primary" className="spacing">提交</Button>
                 </Col>
             </Row>
             <Row className="rowSpacing">
@@ -105,27 +110,14 @@ export default class UploadFooter extends Component{
 }
 
 UploadFooter.PropTypes ={
-    showChange: PropTypes.func.isRequired,
     excelTitle: PropTypes.array.isRequired,
-    dataIndex: PropTypes.array.isRequired
+    dataIndex: PropTypes.array.isRequired,
+    getAllUsers: PropTypes.func.isRequired
 }
 
 const modalDownload = ()=>{
     const downloadLink = '';
     //window.open(downloadLink);
 }
-
-const optionData = [{
-    key: 1,
-    value: '市民服务中心'
-},{
-    key: 2,
-    value: '施工单位'
-}]
-
-const importOptionData = [{
-    key: 1,
-    value: '不导入重复的数据'
-}]
 
 const acceptFile = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']

@@ -227,8 +227,8 @@ class Discipline extends Component {
                                     });
                                     let dataSet = [];
                                     getDocumentByCode({code:code}).then((rep)=>{
-                                        let data = {};
                                         for(let i=0;i<rep.result.length;i++){
+                                            let data = {};
                                             data.projectName = rep.result[i].basic_params.files[0].name;
                                             data.attachment = rep.result[i].basic_params.files[0];
                                             data.code = rep.result[i].code;
@@ -280,8 +280,8 @@ class Discipline extends Component {
                                             });
                                             let dataSet = [];
                                             getDocumentByCode({code:code}).then((rep)=>{
-                                                let data = {};
                                                 for(let i=0;i<rep.result.length;i++){
+                                                    let data = {};
                                                     data.projectName = rep.result[i].basic_params.files[0].name;
                                                     data.attachment = rep.result[i].basic_params.files[0];
                                                     data.code = rep.result[i].code;
@@ -328,8 +328,8 @@ class Discipline extends Component {
         let code = "safety_disclipline_dir_"+project.code;
         let dataSet = [];
         getDocumentByCode({code:code}).then((rep)=>{
-            let data = {};
             for(let i=0;i<rep.result.length;i++){
+                let data = {};
                 data.projectName = rep.result[i].basic_params.files[0].name;
                 data.attachment = rep.result[i].basic_params.files[0];
                 data.code = rep.result[i].code;
@@ -348,8 +348,8 @@ class Discipline extends Component {
         } = this.props;
         let dataSet = [];
         getDocumentByContent({code:code,name:value}).then((rep)=>{
-            let data = {};
             for(let i=0;i<rep.result.length;i++){
+                let data = {};
                 data.projectName = rep.result[i].basic_params.files[0].name;
                 data.attachment = rep.result[i].basic_params.files[0];
                 data.code = rep.result[i].code;

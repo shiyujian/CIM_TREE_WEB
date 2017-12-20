@@ -89,6 +89,12 @@ export const qh_menus = [{
 	title: '系统管理',
 	path: '/setup',
 	icon: <Icon name="gear"/>
+},{
+	key: 'data',
+	id: 'DATA',
+	title: '数据报送',
+	path: '/data',
+	icon: <Icon name="gear"/>
 }];
 
 export const qh_ignoreModules = ['login'];
