@@ -18,7 +18,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...platformActions}, dispatch)
 	})
 )
-export default class JianyanCheck extends Component {
+export default class SafetyDocCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -29,11 +29,6 @@ export default class JianyanCheck extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props
-        //  const {actions:{ getWorkflow }} = this.props
-        //  getWorkflow({pk:wk.id}).then(rst => {
-        //      let dataSource = JSON.parse(rst.subject[0].data)
-        //      this.setState({dataSource,wk:rst})
-        //  })
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
     }
@@ -45,7 +40,7 @@ export default class JianyanCheck extends Component {
    }
    //提交
     submit(){
-        this.props.closeModal("dr_qua_jy_visible",false)
+        this.props.closeModal("safety_doc_check_visible",false)
     }
     //预览
     handlePreview(index){
@@ -60,75 +55,68 @@ export default class JianyanCheck extends Component {
         openPreview(filed);
     }
 	render() {
-        const columns = 
-        [{
-            title:'序号',
-            width:"5%",
-			render:(text,record,index) => {
-				return index+1
-			}
-		},{
-			title:'项目/子项目',
-            dataIndex:'project',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.project.name}
-                </span>
-            ),
-		},{
-			title:'单位工程',
-            dataIndex:'unit',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
-            ),
-		},{
-			title:'WBS编码',
-            dataIndex:'code',
-            width:"13%",
-		},{
-			title:'名称',
-            dataIndex:'name',
-            width:"13%",
-		},{
-			title:'检验合格率',
-            dataIndex:'rate',
-            width:"8%",
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name*100 + '%'} 
-                </span>
-            ),
-		},{
-			title:'质量等级',
-            dataIndex:'level',
-            width:"12%",
-		},{
-			title:'施工单位',
-            dataIndex:'construct_unit',
-            width:"12%",
-            render: (text, record, index) => (
-                <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
-                </span>
-            ),
-		}, {
-            title:'附件',
-            width:"11%",
-			render:(text,record,index) => {
-                return (<span>
-                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                        <span className="ant-divider" />
-                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                    </span>)
-			}
-        }]
+        const columns = [
+            {
+                title:'编码',
+                dataIndex:'code',
+                width: '10%'
+            },{
+                title:'项目名称',
+                dataIndex:'projectName',
+                width: '10%',
+                render: (text, record, index) => (
+                    <span>
+                        {record.project.name}
+                    </span>
+                ),
+            },{
+                title:'单位工程',
+                dataIndex:'unit',
+                width: '10%',
+                render: (text, record, index) => (
+                    <span>
+                        {record.unit.name}
+                    </span>
+                ),
+            },{
+                title:'文件名称',
+                dataIndex:'filename',
+                width: '10%',
+            },{
+                title:'发布单位',
+                dataIndex:'pubUnit',
+                width: '10%',
+            },{
+                title:'版本号',
+                dataIndex:'type',
+                width: '10%',
+            },{
+                title:'实施日期',
+                dataIndex:'doTime',
+                width: '10%',
+            },{
+                title:'备注',
+                dataIndex:'remark',
+                width: '10%',
+            },{
+                title:'提交人',
+                dataIndex:'upPeople',
+                width: '10%',
+            }, {
+                title:'附件',
+                width:"10%",
+                render:(text,record,index) => {
+                    return (<span>
+                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <span className="ant-divider" />
+                            <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                        </span>)
+                }
+            }
+        ];
 		return (
             <Modal
-			title="其它检验信息审批表"
+			title="安全信息审批表"
 			key={Math.random()}
             visible={true}
             width= {1280}

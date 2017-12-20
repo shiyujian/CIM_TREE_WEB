@@ -58,6 +58,7 @@ export default class ToggleModal extends Component{
                 <span>
                     审核人：
                         <Select style={{ width: '200px' }} className="btn" onSelect = {ele=>{
+                            console.log(ele);
                             this.setState({passer:ele})
                         }} >
                         {
