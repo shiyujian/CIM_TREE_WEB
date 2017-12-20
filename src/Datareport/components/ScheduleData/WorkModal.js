@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 
 import { Input, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API } from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
-const { RangePicker } = DatePicker;
-const RadioGroup = Radio.Group;
-const { Option } = Select
+import Preview from '../../../_platform/components/layout/Preview';
+const { Option } = Select;
 
 class WorkModal extends Component {
 
@@ -45,23 +44,31 @@ class WorkModal extends Component {
         this.setState({ dataSource });
     }
     //ok
-    onok() {
-        if (!this.state.check) {
+    onok(){
+        if(!this.state.check){
             message.info("请选择审核人")
             return
         }
-        if (this.state.dataSource.length === 0) {
+        if(this.state.dataSource.length === 0){
             message.info("请上传excel")
             return
         }
-        let temp = this.state.dataSource.some((o, index) => {
-            return !o.file.id
-        })
-        if (temp) {
-            message.info(`有数据未上传附件`)
-            return
+        // let temp = this.state.dataSource.some((o,index) => {
+        //                 return !o.file.id
+        //             })
+        // if(temp){
+        //     message.info(`有数据未上传附件`)
+        //     return
+        // }
+        let {check} = this.state
+        let per = {
+            id:check.id,
+            username:check.username,
+            person_name:check.account.person_name,
+            person_code:check.account.person_code,
+            organization:check.account.organization
         }
-        this.props.onok(this.state.dataSource)
+		this.props.onok(this.state.dataSource,per)
     }
     covertURLRelative = (originUrl) => {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -187,8 +194,17 @@ class WorkModal extends Component {
                 dataIndex: 'uploads',
             }, {
                 title: '操作',
-                render: (text, record, index) => {
-                    return <a onClick={this.delete.bind(this, index)}>删除</a>
+                render:(text,record,index) => {
+                    return  (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+                            onConfirm={this.delete.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
                 }
             }]
         let jthis = this
@@ -212,7 +228,7 @@ class WorkModal extends Component {
                 }
             },
         };
-        const {selectedRowKeys} = this.state;
+        const { selectedRowKeys } = this.state;
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange,
@@ -231,14 +247,14 @@ class WorkModal extends Component {
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered 
+                        bordered
                         rowSelection={rowSelection}
                         pagination={{  //分页
                             pageSize: 6,  //显示几条一页
                             defaultPageSize: 6, //默认显示几条一页
                             showQuickJumper: true,
                             showSizeChanger: true,
-                        }}/>
+                        }} />
                     <Upload {...props}>
                         <Button style={{ margin: '10px 10px 10px 0px' }}>
                             <Icon type="upload" />上传附件
@@ -268,9 +284,9 @@ class WorkModal extends Component {
         data.splice(0, 1);
         let res = data.map(item => {
             return {
-                code:item[0],
-                name:item[1],
-                
+                code: item[0],
+                name: item[1],
+
                 project: {
                     code: "",
                     name: "",
@@ -286,13 +302,13 @@ class WorkModal extends Component {
                     name: "",
                     type: "",
                 },
-                quantity:item[5],
-                factquantity:item[6],
-                planstarttime:item[7],
-                planovertime:item[8],
-                factstarttime:item[9],
-                factovertime:item[10],
-                uploads:item[11],   
+                quantity: item[5],
+                factquantity: item[6],
+                planstarttime: item[7],
+                planovertime: item[8],
+                factstarttime: item[9],
+                factovertime: item[10],
+                uploads: item[11],
             }
         })
         return res
