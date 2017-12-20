@@ -57,6 +57,7 @@ export default class UnitData extends Component {
 		});
 	}
 	render() {
+		const {visible} = this.props;
 		return (
 			<div>
 				<DynamicTitle title="单位工程" {...this.props} />
