@@ -33,11 +33,6 @@ export default class Check extends Component {
 
 	async componentDidMount(){
         const {wk} = this.props
-        //  const {actions:{ getWorkflow }} = this.props
-        //  getWorkflow({pk:wk.id}).then(rst => {
-        //      let dataSource = JSON.parse(rst.subject[0].data)
-        //      this.setState({dataSource,wk:rst})
-        //  })
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
     }
@@ -92,15 +87,6 @@ export default class Check extends Component {
                     status:"A",
                     version:"A",
                     "basic_params": {
-                        // "files": [
-                        //     {
-                        //     "a_file": file.a_file,
-                        //     "name": file.name,
-                        //     "download_url": file.download_url,
-                        //     "misc": file.misc,
-                        //     "mime_type": file.mime_type
-                        //     },
-                        // ]
                     },
                     workpackages:[{
                         code:o.code,

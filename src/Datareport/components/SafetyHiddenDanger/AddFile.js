@@ -14,6 +14,11 @@ export default class AddFile extends Component {
             dataSource: [],
             checkers:[],//审核人下来框选项
             check:null,//审核人
+            projects:[],
+            units:[],
+            project:{},
+            unit:{},
+            beginUnit:'',
         };
     }
     componentDidMount(){
@@ -37,51 +42,6 @@ export default class AddFile extends Component {
             });
             return false;
         }
-    }
-    //根据附件名称 也就是wbs编码获取其他信息
-    async getInfo(code){
-        console.log(this.props)
-        let res = {};
-        const {actions:{getWorkPackageDetail}} = this.props
-        let jianyanpi = await getWorkPackageDetail({code:code})
-        res.name = jianyanpi.name
-        res.code = jianyanpi.code        
-        let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
-        if(fenxiang.parent.obj_type_hum === "子分部工程"){
-            let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
-            res.unit = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
-            }
-            res.project = danwei.parent
-        }else{
-            let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
-            res.unit = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
-            }
-            res.project = danwei.parent
-        }
-        return res
     }
 
     onok(){
@@ -108,7 +68,7 @@ export default class AddFile extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.setEditData(this.state.dataSource,per)
+		this.props.onok(this.state.dataSource,per)
     }
     uplodachange = (info) => {
         //info.file.status/response
@@ -130,6 +90,8 @@ export default class AddFile extends Component {
                     result: dataList[i][5] ? dataList[i][5] : '',
                     deadline: dataList[i][6] ? dataList[i][6] : '',
                     editResult: dataList[i][7] ? dataList[i][7] : '',
+                    code: dataList[i][7] ? dataList[i][7] : '',
+                    wbs: dataList[i][7] ? dataList[i][7] : '',
                     project:{
                         code:"",
                         name:"",
@@ -147,6 +109,41 @@ export default class AddFile extends Component {
             }
             this.setState({ dataSource });
         }
+    }
+
+    selectUnit(value){
+        let unit = JSON.parse(value);
+        this.setState({unit,beginUnit:value});
+    }
+
+    selectProject(value){
+        debugger
+        let project = JSON.parse(value);
+        this.setState({project,units:[]});
+        const {actions:{getProjectTree}} = this.props;
+        let beginUnit = '';
+        let i=0;
+        getProjectTree({depth:2}).then(rst =>{
+            if(rst.status){
+                let units = [];
+                rst.children.map(item=>{
+                    if(item.code===project.code){  //当前选中项目
+                        units = item.children.map(unit =>{
+                            i++;
+                            if(i===1){
+                                beginUnit = JSON.stringify(unit);
+                            }
+                            return (
+                                <Option value={JSON.stringify(unit)}>{unit.name}</Option>
+                            )
+                        })
+                    }
+                })
+                this.setState({units,beginUnit});
+            }else{
+                //获取项目信息失败
+            }
+        });
     }
 
     //下拉框选择人
@@ -224,7 +221,7 @@ export default class AddFile extends Component {
     beforeUploadPicFile  = (index,file) => {
         // 上传到静态服务器
         const fileName = file.name;
-        let {dataSource} = this.state
+        let {dataSource,unit,project} = this.state;
         let temp = fileName.split(".")[0]
 		const { actions:{uploadStaticFile} } = this.props;
         const formdata = new FormData();
@@ -257,10 +254,19 @@ export default class AddFile extends Component {
                 download_url:filedata.download_url,
                 mime_type:resp.mime_type
             };
-            let jcode = file.name.split('.')[0]
-            let info = await this.getInfo(jcode)
-            dataSource[index]['file'] = attachment
-            dataSource[index] = Object.assign(dataSource[index],info)
+            let unitProject = {
+                name:unit.name,
+                code:unit.code,
+                obj_type:unit.obj_type
+            }
+            let projectt = {
+                name:project.name,
+                code:project.code,
+                obj_type:project.obj_type
+            }
+            dataSource[index]['file'] = attachment;
+            dataSource[index]['unit'] = unitProject;
+            dataSource[index]['project'] = projectt;
             this.setState({dataSource})
         });
         return false;
@@ -276,20 +282,24 @@ export default class AddFile extends Component {
                 title: '项目名称',
                 dataIndex: 'project',
                 width: '8%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.project.name}
-                    </span>
-                ),
+                render: (text, record, index) => {
+                    return <Select style={{width:'100px'}} className="btn" onSelect={this.selectProject.bind(this)}>
+                        {
+                            this.state.projects
+                        }
+                    </Select>
+                }
             }, {
                 title: '单位工程',
                 dataIndex: 'unit',
                 width: '8%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.unit.name}
-                    </span>
-                ),
+                render: (text, record, index) => {
+                    return <Select value={this.state.beginUnit} style={{width:'100px'}} className="btn" onSelect={this.selectUnit.bind(this)}>
+                        {
+                            this.state.units
+                        }
+                    </Select>
+                }
             }, {
                 title: 'WBS',
                 dataIndex: 'wbs',
