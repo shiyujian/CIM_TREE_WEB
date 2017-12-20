@@ -161,11 +161,23 @@ export default class ToggleModal extends Component{
         title: '序号',
         dataIndex: 'index',
         key: 'Index',
+      },{
+        title: '项目编码',
+        render:(record)=>{
+            let color = 'red';
+            if(record.file && record.pic){
+                color = 'green';
+            }
+            return(
+                <span style = {{color:color}}>{record.code}</span>
+            )
+        },
+        key: 'Code',
       }, {
         title: '项目/子项目名称',
         render:(record)=>{
             let color = 'red';
-            if(record.file){
+            if(record.file && record.pic){
                 color = 'green';
             }
             return(
@@ -182,24 +194,48 @@ export default class ToggleModal extends Component{
         dataIndex: 'area',
         key: 'Area',
       },{
-        title: '项目规模',
-        dataIndex: 'range',
-        key: 'Range',
-      },{
          title: '项目类型',
-         dataIndex :'type',
+        render:(record)=>{
+            return(
+            <Select style={{ width: '70px' }} className="btn" value = {record.projType||''} onSelect={ele => {
+                record.projType = ele;
+                this.forceUpdate();
+            }} >
+                <Option value = 'construct'>建筑</Option>
+                <Option value = 'city'>市政</Option>
+            </Select>)
+        },
          key: 'Type',
       },{
         title: '项目地址',
         dataIndex :'address',
         key: 'Address',
       },{
+        title: '项目规模',
+        dataIndex: 'range',
+        key: 'Range',
+      },{
         title: '项目红线坐标',
         dataIndex :'coordinate',
         key: 'Coordinate',
       },{
+        title: '项目总投资（万元）',
+        dataIndex :'cost',
+        key: 'Cost',
+      },{
         title: '项目负责人',
-        dataIndex :'duty',
+            render: (record) => {
+                return (
+                    <Select style={{ width: '70px' }} className="btn" value = {record.projBoss||''} onSelect={ele => {
+                        record.projBoss = ele;
+                        this.forceUpdate();
+                    }} >
+                        {
+                            this.state.checkers || []
+                        }
+                    </Select>
+                );
+        },
         key:'Duty'
       },{
         title: '计划开工日期',
@@ -210,13 +246,17 @@ export default class ToggleModal extends Component{
         dataIndex :'etime',
         key:'Etime'
       },{
+        title: '项目简介',
+        dataIndex :'intro',
+        key:'Intro'
+      },{
           title:'附件',
           key:'nearby',
           render:(record) => (
             <Upload
             beforeUpload = {this.beforeUpload.bind(this,record)}
             >
-                <a>上传附件</a>
+                <a> {record.file?record.file.name:'上传附件'}</a>
             </Upload>
           )
       },{
@@ -236,15 +276,17 @@ export default class ToggleModal extends Component{
         let res = data.map((item,index) => {
             return {
                 index: index + 1,
-                name: item[1],
-                genus: item[2],
-                area: item[3],
-                type: item[4],
-                address: item[5],
-                coordinate: item[6],
-                duty: item[7],
-                stime: item[8],
-                etime: item[9]
+                name: item[2],
+                code:item[1],
+                genus: item[3],
+                area: item[4],
+                address: item[6],
+                coordinate: item[8],
+                stime: item[11],
+                etime: item[12],
+                range:item[7],
+                cost:item[9],
+                intro:item[13]
             }
         })
         return res;

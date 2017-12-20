@@ -8,7 +8,7 @@ export default class TableProject extends Component{
 			<div>
 				<div>
 					<Button style={{ marginRight: "20px" }}>模板下载</Button>
-					<Button onClick={this.send.bind(this)} className={style.button}>批量创建</Button>
+					<Button onClick={this.send.bind(this)} className={style.button}>发起填报</Button>
 					<Button className={style.button}>申请变更</Button>
 					<Button className={style.button}>申请删除</Button>
 					<Button className={style.button}>导出表格</Button>
