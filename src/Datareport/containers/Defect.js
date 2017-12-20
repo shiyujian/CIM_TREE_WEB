@@ -29,7 +29,7 @@ export default class Defect extends Component {
 				return index+1
 			}
 		},{
-			title:'项目',
+			title:'项目/子项目名称',
 			dataIndex:'project'
 		},{
 			title:'单位工程',
@@ -39,31 +39,31 @@ export default class Defect extends Component {
 			dataIndex:'code'
 		},{
 			title:'责任单位',
-			dataIndex:'name'
+			dataIndex:'respon_unit'
 		},{
 			title:'事故类型',
-			dataIndex:'rate'
+			dataIndex:'acc_type'
 		},{
 			title:'上报时间',
-			dataIndex:'level'
+			dataIndex:'uploda_date'
 		},{
 			title:'核查时间',
-			dataIndex:'construct_unit'
+			dataIndex:'check_date'
 		},{
 			title:'整改时间',
-			dataIndex:'code'
+			dataIndex:'do_date'
 		},{
 			title:'事故描述',
-			dataIndex:'name'
+			dataIndex:'descrip'
 		},{
 			title:'排查结果',
-			dataIndex:'rate'
+			dataIndex:'check_result'
 		},{
 			title:'整改期限',
-			dataIndex:'level'
+			dataIndex:'deadline'
 		},{
 			title:'整改结果',
-			dataIndex:'construct_unit'
+			dataIndex:'result'
 		}, {
 			title:'附件',
 			render:(text,record,index) => {
@@ -86,7 +86,7 @@ export default class Defect extends Component {
 				<DynamicTitle title="检验批信息" {...this.props}/>
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
-					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>发起填报</Button>
 					<Button className="btn" type="default">申请变更</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search 

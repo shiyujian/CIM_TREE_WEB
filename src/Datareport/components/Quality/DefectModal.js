@@ -154,13 +154,13 @@ class DefectModal extends Component {
         return res
     }
 	render() {
-        const columns = [{
+        this.columns = [{
 			title:'序号',
 			render:(text,record,index) => {
 				return index+1
 			}
 		},{
-			title:'项目',
+			title:'项目/子项目名称',
 			dataIndex:'project'
 		},{
 			title:'单位工程',
@@ -170,31 +170,31 @@ class DefectModal extends Component {
 			dataIndex:'code'
 		},{
 			title:'责任单位',
-			dataIndex:'name'
+			dataIndex:'respon_unit'
 		},{
 			title:'事故类型',
-			dataIndex:'rate'
+			dataIndex:'acc_type'
 		},{
 			title:'上报时间',
-			dataIndex:'level'
+			dataIndex:'uploda_date'
 		},{
 			title:'核查时间',
-			dataIndex:'construct_unit'
+			dataIndex:'check_date'
 		},{
 			title:'整改时间',
-			dataIndex:'code'
+			dataIndex:'do_date'
 		},{
 			title:'事故描述',
-			dataIndex:'name'
+			dataIndex:'descrip'
 		},{
 			title:'排查结果',
-			dataIndex:'rate'
+			dataIndex:'check_result'
 		},{
 			title:'整改期限',
-			dataIndex:'level'
+			dataIndex:'deadline'
 		},{
 			title:'整改结果',
-			dataIndex:'construct_unit'
+			dataIndex:'result'
 		}, {
 			title:'附件',
 			render:(text,record,index) => {
