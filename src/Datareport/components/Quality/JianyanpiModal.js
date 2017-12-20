@@ -72,7 +72,7 @@ class JianyanpiModal extends Component {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     //附件上传
-	beforeUploadPicFile  = (index,file) => {
+	beforeUploadPicFile  = async(index,file) => {
         const fileName = file.name;
         let {dataSource} = this.state
         let temp = fileName.split(".")[0]
@@ -84,8 +84,12 @@ class JianyanpiModal extends Component {
             return false
         }
 		// 上传到静态服务器
-		const { actions:{uploadStaticFile} } = this.props;
-
+		const { actions:{uploadStaticFile,getWorkPackageDetail} } = this.props;
+        let jyp = await getWorkPackageDetail({code:temp})
+        if(!jyp.name){
+            message.info("编码值错误")
+            return 
+        }
 		const formdata = new FormData();
 		formdata.append('a_file', file);
         formdata.append('name', fileName);
@@ -370,7 +374,9 @@ class JianyanpiModal extends Component {
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
 						dataSource={this.state.dataSource}
-						bordered />
+						bordered 
+                        pagination={false}
+                        scroll={{y:500}}/>
                     <Upload {...props}>
                         <Button style={{margin:'10px 10px 10px 0px'}}>
                             <Icon type="upload" />上传附件
