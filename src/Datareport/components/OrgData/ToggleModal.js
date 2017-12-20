@@ -166,7 +166,7 @@ export default class ToggleModal extends Component{
         dataIndex: 'project',
         render:(record) => {
             return (
-                <Select style={{width:"90%"}} defaultValue={{}} onSelect={ele => {
+                <Select style={{width:"90%"}} onSelect={ele => {
                     this.setState({ pro: ele })
                 }}>
                     {this.state.projects}
