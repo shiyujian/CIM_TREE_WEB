@@ -44,11 +44,11 @@ export default class Check extends Component {
    }
    //提交
     async submit(){
-        if(this.state.opinion === 1){
-            await this.passon();
-        }else{
-            await this.reject();
-        }
+        // if(this.state.opinion === 1){
+        //     await this.passon();
+        // }else{
+        //     await this.reject();
+        // }
         this.props.closeModal("modal_check_visbile",false)
         message.info("操作成功")
     }
@@ -175,7 +175,7 @@ export default class Check extends Component {
         				</Button>
 				    </Col>
 				    <Col span={2} push={14}>
-				    	<Button type='primary'>
+				    	<Button type='primary' onClick={this.submit.bind(this)}>
         					确认提交
         				</Button>
 				    </Col>
