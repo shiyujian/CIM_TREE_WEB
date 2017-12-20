@@ -17,7 +17,6 @@ export default class SubTree extends Component {
 		if (code.length === 0) {
 			return;
 		}
-		
 		const {actions: {setSelectWbsProjectAc, setTableDataAc, setCreate, getSectionAc, getLocationOne},wbsProjectList=[],searchWbsList=[]} = this.props;
 		setSelectWbsProjectAc(code[0]);
 		rst = [];

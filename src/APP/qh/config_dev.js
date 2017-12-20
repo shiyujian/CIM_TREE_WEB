@@ -44,7 +44,7 @@ window.config = {
 	'DOC_EXCHANGE_PORT': '6545',
 	//现场收发文接口验证用的用户名和密码
 	'DOC_EXCHANGE_USER_PASSWORD': 'bimqh:bimqh',
-	'CODE_API': 'http://bimdjd.ecidi.com:6556',
+	'CODE_API': 'http://10.215.160.41:6556',
 
 	//node服务,验评表单转化Word,pdf转word
 	'NODE_FILE_EXCHANGE_PORT': '6546',
@@ -52,20 +52,20 @@ window.config = {
 	'NODE_FILE_STATIC_API': 'http://10.215.160.45:6511',
 	
 	//word在线预览地址
-	'previewWord_API': 'http://docs.ecidi.com:6500/view/url?url=',
+	'previewWord_API': 'http://10.215.160.40:6500/view/url?url=',
 
 	//领导带班服务,安全监测动态加载模板
 	'Leader_Class_URL': 'http://10.215.160.38:6592',
 
 	//FDBServer 上传FDB文件服务
-	'FDBServer_API': 'http://urban.ecidi.com:8045/api',
+	'FDBServer_API': 'http://10.215.160.37:8045/api',
 	//WJH插件的下载地址
 	'WJH_CITY_MARKER':'http://10.215.160.38:6542/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
 	//三维展示里面的cep模型数据
-	'WJH_CEP':'http://urban.ecidi.com:8006/qh20171212/qhtdbx.cep', 
+	'WJH_CEP':'http://10.215.160.37:8006/qh20171212/qhtdbx.cep', 
 
 	//地图瓦片地址
-	'cus_tilemap':'http://bimqh.ecidi.com:6580',
+	'cus_tilemap':'http://10.215.160.39:6580',
 	'WMSTileLayerUrl':'http://t{s}.tianditu.cn/DataServer?T=cva_w&X={x}&Y={y}&L={z}',
 	'IMG_W':'http://t{s}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}',
 	'VEC_W':'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
@@ -78,7 +78,7 @@ window.config = {
 	'Video360_API': 'http://720yun.com/t/16fjzOmksu8?from=singlemessage&isappinstalled=0&pano_id=6700576',
 	'Video360_API2': 'http://720yun.com/t/16fjzOmksu8?from=singlemessage&isappinstalled=0&pano_id=6700576',
 
-	/***********************临时资源服务**************************/
+	/***********************临时资yu源服务**************************/
 	'initLeaflet': {
 		center: [22.516818, 113.868495],   //前海
 		zoomControl: false,
