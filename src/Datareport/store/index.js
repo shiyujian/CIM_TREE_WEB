@@ -11,9 +11,9 @@ import safetySpecialReducer, {actions as safetySpecialActions} from './safetySpe
 import vediodataReducer, {actions as vediodataActions} from './vedioData';
 import vedioinfodataReducer, {actions as vedioinfodataActions} from './vedioInfoData';
 import workdataReducer, {actions as workdataActions} from './workdata';
-import scheduledataReducer, {actions as scheduledataActions} from './scheduledata';
-
 import CostListDataReducer, {actions as CostListDataActions} from './CostListData';
+import WorkunitCostReducer, {actions as WorkunitCostActions} from './WorkunitCost';
+
 export default handleActions({
 	//项目信息
 	[combineActions(...actionsMap(projectdataActions))]: (state = {}, action) => ({
@@ -72,14 +72,14 @@ export default handleActions({
 		...state,
 		workdata: workdataReducer(state.workdata, action),
 	}),
-	// 设计进度
-	[combineActions(...actionsMap(scheduledataActions))]: (state = {}, action) => ({
-		...state,
-		scheduledata: scheduledataReducer(state.scheduledata, action),
-	}),
 	// 成本结算
 	[combineActions(...actionsMap(CostListDataActions))]: (state = {}, action) => ({
 		...state,
 		CostListData: CostListDataReducer(state.CostListData, action),
-	})
-}, {})
+	}),
+	//工程量计算
+	[combineActions(...actionsMap(WorkunitCostActions))]: (state = {}, action) => ({
+		...state,
+		WorkunitCost: WorkunitCostReducer(state.WorkunitCost, action),
+	}),
+}, {});

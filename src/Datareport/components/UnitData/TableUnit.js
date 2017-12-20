@@ -14,7 +14,6 @@ export default class TableUnit extends Component{
                     <Search className = {style.button} style={{width:"200px"}} placeholder="请输入内容" />
                 </div>
                 <Table
-                   
                     columns = {this.columns}
                     bordered = {true}
                     rowSelection={this.rowSelection}

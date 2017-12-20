@@ -145,22 +145,24 @@ export default class Addition extends Component {
 		return (
 
 			<Modal
-				key={this.props.akey}
+				key={addition.key}
+				title="模型信息上传表"
 				width={1280}
 				visible={addition.visible}
+				maskClosable={false}
 				onCancel={this.cancel.bind(this)}
 				onOk={this.save.bind(this)}>
 
 
-				<Row style={{ marginBottom: "30px" }}>
-					<h3 style={{ textAlign: "center" }}>结果审核</h3>
-				</Row>
-				<Row style={{ marginBottom: "30px" }}>
-					<Table bordered columns={columns} dataSource={this.state.dataSource} />
+				<Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
+				<Row style={{ marginBottom: "10px",marginTop:'10px' }}>
+					<Table
+						bordered 
+						columns={columns}
+						dataSource={this.state.dataSource}
+						/>
 				</Row>
 				<Row style={{ marginBottom: "30px" }} type="flex">
-					<Col><Button style={{ marginRight: "30px" }}>模板下载</Button></Col>
-
 					<Col>
 						<Upload {...props}>
 							<Button style={{ marginRight: 30 }}>
@@ -178,7 +180,7 @@ export default class Addition extends Component {
 							}
 						</Select>
 					</span>
-					<Button type="primary" style={{marginLeft:20}} onClick={this.onok.bind(this)}>提交</Button>
+					<Button type="primary" style={{ marginLeft: 20 }} onClick={this.onok.bind(this)}>提交</Button>
 				</Row>
 				<Row style={{ marginBottom: "30px" }}>
 					<p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
@@ -256,31 +258,31 @@ export default class Addition extends Component {
 	}
 
 
-	componentDidMount(){
-        const {actions:{getAllUsers, getProjects}} = this.props;
-        getAllUsers().then(rst => {
-            let users = [];
-            if (rst.length) {
-                let checkers = rst.map(o => {
-                    return (
-                        <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
-                    )
-                })
-                this.setState({checkers})
-            }
-        });
-        // getProjects().then(rst => {
-        //     console.log("rst:",rst);
-        //     if (rst.children.length) {
-        //         let projects = rst.children.map(item => {
-        //             return (
-        //                 <Option value={JSON.stringify(item)}>{item.name}</Option>
-        //             )
-        //         })
-        //         this.setState({projects})
-        //     }
-        // })
-    }
+	componentDidMount() {
+		const { actions: { getAllUsers, getProjects } } = this.props;
+		getAllUsers().then(rst => {
+			let users = [];
+			if (rst.length) {
+				let checkers = rst.map(o => {
+					return (
+						<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+					)
+				})
+				this.setState({ checkers })
+			}
+		});
+		// getProjects().then(rst => {
+		//     console.log("rst:",rst);
+		//     if (rst.children.length) {
+		//         let projects = rst.children.map(item => {
+		//             return (
+		//                 <Option value={JSON.stringify(item)}>{item.name}</Option>
+		//             )
+		//         })
+		//         this.setState({projects})
+		//     }
+		// })
+	}
 
 
 
