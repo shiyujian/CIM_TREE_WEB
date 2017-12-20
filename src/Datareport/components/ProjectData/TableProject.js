@@ -61,6 +61,10 @@ export default class TableProject extends Component{
         dataIndex: 'name',
         key: 'Name',
       },{
+        title: '项目规模',
+        dataIndex: 'range',
+        key: 'Range',
+      },{
          title: '项目类型',
          dataIndex :'depart',
          key: 'Depart',
@@ -92,5 +96,13 @@ export default class TableProject extends Component{
                 附件
             </span>
           )
-      }]
+      },{
+        title:'项目图片',
+        key:'pic',
+        render:(record) => (
+          <span>
+            图片
+          </span>
+        )
+    }]
 }

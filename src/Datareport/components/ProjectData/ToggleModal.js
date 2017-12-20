@@ -111,12 +111,33 @@ export default class ToggleModal extends Component{
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
+    beforeUploadPic(record,file){
+        const fileName = file.name;
+		// 上传到静态服务器
+		const { actions:{uploadStaticFile} } = this.props;
+		const formdata = new FormData();
+		formdata.append('a_file', file);
+        formdata.append('name', fileName);
+        let myHeaders = new Headers();
+        let myInit = { method: 'POST',
+                       headers: myHeaders,
+                       body: formdata
+                     };
+                     //uploadStaticFile({}, formdata)
+        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
+            let loadedFile = await resp.json();
+            loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
+            loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
+            record.pic = loadedFile;
+            this.forceUpdate();
+        });
+        return false;
+    }
     beforeUpload(record,file){
         console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
-
 		const formdata = new FormData();
 		formdata.append('a_file', file);
         formdata.append('name', fileName);
@@ -161,6 +182,10 @@ export default class ToggleModal extends Component{
         dataIndex: 'area',
         key: 'Area',
       },{
+        title: '项目规模',
+        dataIndex: 'range',
+        key: 'Range',
+      },{
          title: '项目类型',
          dataIndex :'type',
          key: 'Type',
@@ -194,7 +219,17 @@ export default class ToggleModal extends Component{
                 <a>上传附件</a>
             </Upload>
           )
-      }]
+      },{
+        title:'图片',
+        key:'pic',
+        render:(record) => (
+          <Upload
+          beforeUpload = {this.beforeUploadPic.bind(this,record)}
+          >
+              <a>{record.pic? record.pic.name:'点击上传'}</a>
+          </Upload>
+        )
+    }]
     //处理上传excel的数据
     handleExcelData(data) {
         data.splice(0, 1);
