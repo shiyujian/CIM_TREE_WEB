@@ -159,7 +159,7 @@ export default class Addition extends Component {
 				visible={addition.visible}
 				maskClosable={false}
 				onCancel={this.cancel.bind(this)}
-				onOk={this.save.bind(this)}>
+				onOk={this.onok.bind(this)}>
 				<Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
 				<Row style={{ marginBottom: "10px",marginTop:'10px' }}>
 					<Table
@@ -243,7 +243,9 @@ export default class Addition extends Component {
 
 
 	onok() {
-
+		const { actions: { changeAdditionField } } = this.props;
+		console.log(this.props)
+		changeAdditionField('visible', false);
 		let ok = this.state.dataSource.some(ele => {
 			return !ele.file;
 		});
