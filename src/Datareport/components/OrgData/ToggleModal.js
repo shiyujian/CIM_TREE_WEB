@@ -8,7 +8,8 @@ export default class ToggleModal extends Component{
         this.state = {
             dataSource: [],
             users: [],
-            projects: []
+            projects: [],
+            checkers: []
         }
     }
     render(){
@@ -85,22 +86,14 @@ export default class ToggleModal extends Component{
                 name: item[3],
                 depart: item[4],
                 direct: item[5],
-                project: item[6],
-                unit: item[7],
-                remarks: item[8],
+                unit: item[6],
+                remarks: item[7],
             }
         })
         return res;
     }
     onok(){
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
-        let ok = this.state.dataSource.some(ele => {
-            return !ele.file;
-        });
-        // if (ok) {
-        //     message.error('有附件未上传');
-        //     return;
-        // };
         if (!this.state.passer) {
             message.error('审批人未选择');
             return;
@@ -108,9 +101,9 @@ export default class ToggleModal extends Component{
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisible(false);
     }
-    cancel(){
-      const {actions:{ModalVisibleOrg,ModalVisible}} = this.props;
-      ModalVisible(false);
+    cancel() {
+        const { actions: { ModalVisibleOrg, ModalVisible } } = this.props;
+        ModalVisible(false);
     }
     onChange(){
 
@@ -170,13 +163,13 @@ export default class ToggleModal extends Component{
     }, {
         title: '负责项目/子项目名称',
         dataIndex: 'project',
-        // render:(record) => (
-        //     <Select onSelect = {ele => {
-        //         this.setState({pro:ele})
-        //     }}>
-        //         <Option>{this.state.projects}</Option>
-        //     </Select>
-        // )
+        render:(record) => (
+            <Select onSelect = {ele => {
+                this.setState({pro:ele})
+            }}>
+                <Option>{this.state.projects}</Option>
+            </Select>
+        )
     }, {
         title: '负责单位工程名称',
         dataIndex: 'unit',
