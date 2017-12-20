@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio,bordered, message } from 'antd';
+import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio,bordered, message, Popconfirm } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 const Search = Input.Search;
@@ -14,11 +14,12 @@ export default class SumPlan extends Component {
             visible: true,
             dataSource:[],
             checkers:[],//审核人下来框选项
-            check:null //审核人
+            check:null, //审核人
+            projects:[]
         }
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
+        const {actions:{getAllUsers,getProjectTree}} = this.props
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -26,6 +27,19 @@ export default class SumPlan extends Component {
                 )
             })
             this.setState({checkers})
+        });
+        getProjectTree().then(rst => {
+            if (rst.children.length) {
+                let projects = rst.children.map(item => {
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({
+                    projects,
+                    defaultPro: rst.children[0].name
+                })
+            }
         })
     }
     //下拉框选择人
@@ -33,7 +47,12 @@ export default class SumPlan extends Component {
         let check = JSON.parse(value)
         this.setState({check})
     }
-
+    //删除
+    delete(index){
+        let {dataSource} = this.state
+        dataSource.splice(index,1)
+        this.setState({dataSource})
+    }
     //ok
     onok(){
         if(!this.state.check){
@@ -79,7 +98,16 @@ export default class SumPlan extends Component {
 			}
 		},{
 			title: '项目/子项目',
-			dataIndex: 'subproject',
+            dataIndex: 'subproject',
+            render:(record) => {
+                return (
+                    <Select style={{width:"90%"}} defaultValue={this.state.defaultPro} onSelect={ele => {
+                        this.setState({ pro: ele })
+                    }}>
+                        {this.state.projects}
+                    </Select>
+                )
+            }
 		  },{
 			title: '工作节点目标',
 			dataIndex: 'nodetarget',
@@ -97,7 +125,19 @@ export default class SumPlan extends Component {
 			dataIndex: 'remarks',
 		  },{
               title: '编辑',
-              dataIndex: 'edit'
+              dataIndex: 'edit',
+              render:(text,record,index) => {
+                return  (
+                    <Popconfirm
+                        placement="leftTop"
+                        title="确定删除吗？"
+                        onConfirm={this.delete.bind(this, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a>删除</a>
+                    </Popconfirm>
+                )
+            }
           }]
 
 
