@@ -52,6 +52,10 @@ export default class ProjectSumExamine extends Component {
         this.props.closeModal("cost_pro_ck_visible",false)
         message.info("操作成功")
     }
+
+    cancel() {
+		this.props.closeModal("cost_pro_ck_visible",false)
+	}
     //通过
     async passon(){
         const {dataSource,wk} = this.state
@@ -166,7 +170,7 @@ export default class ProjectSumExamine extends Component {
 						<span>审查意见：</span>
 					</Col>
 					<Col span={4}>
-						<RadioGroup onChange={this.onChange} value={this.state.value}>
+						<RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
 					        <Radio value={1}>通过</Radio>
 					        <Radio value={2}>不通过</Radio>
 					    </RadioGroup>
@@ -182,34 +186,9 @@ export default class ProjectSumExamine extends Component {
         				</Button>
 				    </Col>
 			    </Row>
-			    <Row style={{margin: '20px 0'}}>
-				    <Col>
-				    	<TextArea rows={2} />
-				    </Col>
-			    </Row>
-			    <Row style={{marginBottom: '10px'}}>
-			    	<div>审批流程</div>
-			    </Row>
-			    <Row>
-			    	<Col span={10}>
-			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：</div>
-			    			<div>执行时间：</div>
-			    			<div>执行意见：</div>
-			    			<div style={{marginTop: '40px'}}>电子签章：</div>
-			    		</div>
-			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传</div>
-			    	</Col>
-			    	<Col span={10}>
-			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：</div>
-			    			<div>执行时间：</div>
-			    			<div>执行意见：</div>
-			    			<div style={{marginTop: '40px'}}>电子签章：</div>
-			    		</div>
-			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传审核</div>
-			    	</Col>
-			    </Row>
+                {
+                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                }
 			</Modal>
 		)
 	}
@@ -248,10 +227,5 @@ columns =
         dataIndex: 'total',
       }]
 
-	cancel() {
-		const {
-			actions: {clearCheckField}
-		} = this.props;
-		clearCheckField();
-	}
+	
 }
