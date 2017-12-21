@@ -165,7 +165,7 @@ export default class UnitToggle extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        columns = [{
+        const  columns = [{
             title: '序号',
             dataIndex: 'index',
             // key: 'Index',
@@ -228,7 +228,7 @@ export default class UnitToggle extends Component {
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
-                        columns={columns}
+                        columns={this.columns}
                         dataSource={this.state.dataSource}
                         bordered />
                     <Row>
