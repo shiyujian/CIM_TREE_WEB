@@ -61,7 +61,6 @@ export default class AddFile extends Component {
         }
     }
     uplodachange = (info) => {
-        console.log(info);
         //info.file.status/response
         if (info && info.file && info.file.status === 'done') {
             notification.success({

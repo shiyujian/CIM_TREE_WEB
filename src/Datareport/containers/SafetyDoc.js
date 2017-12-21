@@ -73,7 +73,7 @@ class SafetyDoc extends Component {
                     doTime:single.extra_params.doTime,
                     filename:single.extra_params.filename,
                     pubUnit:single.extra_params.pubUnit,
-                    unPeople:single.extra_params.unPeople,
+                    upPeople:single.extra_params.upPeople,
                     type:single.extra_params.type,
                     file:single.basic_params.files[0],
                     unit:single.extra_params.unit,
