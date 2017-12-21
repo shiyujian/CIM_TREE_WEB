@@ -20,7 +20,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class SumPlanCheck extends Component {
+export default class ProjectSumExamine extends Component {
 
 	constructor(props) {
 		super(props);
@@ -53,7 +53,7 @@ export default class SumPlanCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_qua_jsjh_visible",false)
+        this.props.closeModal("cost_pro_ck_visible",false)
         message.info("操作成功")
     }
     //通过
@@ -137,6 +137,18 @@ export default class SumPlanCheck extends Component {
         // executor.person_code = person.code;
         // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'退回',note:'滚',executor:executor,attachment:null});
     }
+    //预览
+    handlePreview(index){
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index].file
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
     //radio变化
     onChange(e){
         this.setState({opinion:e.target.value})
@@ -150,36 +162,33 @@ export default class SumPlanCheck extends Component {
 				return index+1
 			}
 		},{
-			title:'项目/子项目名称',
+			title:'项目/子项目',
             dataIndex:'subproject',
             width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.subproject.name}
-                </span>
-            ),
+        
 		},{
 			title: '单位工程',
-			dataIndex: 'unit',
+            dataIndex: 'unit_engineeing',
+            
 		  },{
-			title: '工作节点目标',
-			dataIndex: 'nodetarget',
+			title: '项目编码',
+			dataIndex: 'projectcoding',
 		  },{
-			title: '完成时间',
-			dataIndex: 'completiontime',
+			title: '项目名称',
+			dataIndex: 'projectname',
 		  },{
-			title: '支付金额（万元）',
-			dataIndex: 'summoney',
+			title: '计量单位',
+			dataIndex: 'company',
 		  },{
-			title: '累计占比',
-			dataIndex: 'ratio',
+			title: '数量',
+			dataIndex: 'number',
 		  },{
-			title: '备注',
-			dataIndex: 'remarks',
+			title: '单价',
+			dataIndex: 'total',
 		  }]
 		return (
             <Modal
-			title="结算计划审批表"
+			title="工程量结算信息审批表"
 			key={Math.random()}
             visible={true}
             width= {1280}

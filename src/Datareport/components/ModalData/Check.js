@@ -40,6 +40,7 @@ export default class Check extends Component {
     componentWillReceiveProps(props){
         const {wk} = props
         let dataSource = JSON.parse(wk.subject[0].data)
+        console.log('dataSource', dataSource)
         this.setState({dataSource,wk})
    }
    //提交
@@ -58,6 +59,7 @@ export default class Check extends Component {
         const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
         let executor = {};
         let person = getUser();
+        console.log('person', person)
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
@@ -147,7 +149,8 @@ export default class Check extends Component {
 			<Modal
 				width = {1280}
 				visible = {true}
-				onCancel = {this.cancel.bind(this)}
+				footer={null}
+				maskClosable={false}>
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>结果审核</h2>
@@ -164,7 +167,7 @@ export default class Check extends Component {
 						<span>审查意见：</span>
 					</Col>
 					<Col span={4}>
-						<RadioGroup onChange={this.onChange} value={this.state.value}>
+						<RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
 					        <Radio value={1}>通过</Radio>
 					        <Radio value={2}>不通过</Radio>
 					    </RadioGroup>
@@ -185,36 +188,18 @@ export default class Check extends Component {
 				    	<TextArea rows={2} />
 				    </Col>
 			    </Row>
-			    <Row style={{marginBottom: '10px'}}>
-			    	<div>审批流程</div>
-			    </Row>
-			    <Row>
-			    	<Col span={10}>
-			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：数据上传者</div>
-			    			<div>执行时间：2017-11-22</div>
-			    			<div>执行意见：XXXXXXXXXXXXX</div>
-			    			<div style={{marginTop: '40px'}}>电子签章：</div>
-			    		</div>
-			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传</div>
-			    	</Col>
-			    	<Col span={10}>
-			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：数据审批</div>
-			    			<div>执行时间：</div>
-			    			<div>执行意见：</div>
-			    			<div style={{marginTop: '40px'}}>电子签章：</div>
-			    		</div>
-			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传审核</div>
-			    	</Col>
-			    </Row>
+			    {
+                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                }
 			</Modal>
 		)
 	}
 
 	columns = [{
 			title: '序号',
-			dataIndex: 'index',
+			render:(text,record,index) => {
+				return index+1
+			}
 		}, {
 			title: '编码',
 			dataIndex: 'value'
@@ -252,11 +237,4 @@ export default class Check extends Component {
 			title: '上报人',
 			dataIndex: 'description11'
 		}];
-
-	cancel() {
-		const {
-			actions: {clearCheckField}
-		} = this.props;
-		clearCheckField();
-	}
 }

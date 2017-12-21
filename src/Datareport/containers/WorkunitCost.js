@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {ProjectSum} from '../components/CostListData';
+import {ProjectSumExamine} from '../components/CostListData';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {Row,Col,Table,Input,Button} from 'antd';
 import {WORKFLOW_CODE} from '_platform/api.js'
@@ -34,6 +35,7 @@ export default class WorkunitCost extends Component {
 		super(props);
 		this.state = {
 			addvisible:false,
+		
 		};
 		this.columns = [{
 			title:'序号',
@@ -41,8 +43,11 @@ export default class WorkunitCost extends Component {
 				return index+1
 			}
 		},{
-			title: '负责项目/子项目',
+			title: '项目/子项目',
 			dataIndex: 'subproject',
+		  },{
+			title: '单位工程',
+			dataIndex: 'unit_engineeing',
 		  },{
 			title: '项目编号',
 			dataIndex: 'projectcoding',
@@ -56,11 +61,8 @@ export default class WorkunitCost extends Component {
 			title: '数量',
 			dataIndex: 'number',
 		  },{
-			title: '单价（元）',
+			title: '单价',
 			dataIndex: 'total',
-		  },{
-			title: '备注',
-			dataIndex: 'remarks',
 		  }];
 	}
 	oncancel(){
@@ -108,7 +110,9 @@ export default class WorkunitCost extends Component {
 					})
 		})
 	}
-	
+	// checkout(){
+
+	// }
 	render() {
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>
@@ -116,7 +120,7 @@ export default class WorkunitCost extends Component {
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={this.projectfill.bind(this)}>发起填报</Button>
-					<Button className="btn" type="default">申请变更</Button>
+					<Button className="btn" type="default" >申请变更</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search 
 						className="btn"
@@ -134,6 +138,7 @@ export default class WorkunitCost extends Component {
 					this.state.addvisible &&
 					<ProjectSum {...this.props} oncancel={this.oncancel.bind(this)} akey={Math.random()*1234} onok={this.setData.bind(this)}/>
 				}
+				
 			</div>)
 	}
 
