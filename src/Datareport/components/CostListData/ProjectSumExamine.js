@@ -157,7 +157,8 @@ export default class ProjectSumExamine extends Component {
 					<Table
 						bordered
 						className = 'foresttable'
-						columns={this.columns}
+                        columns={this.columns}
+                        dataSource={this.state.dataSource}
 					/>
 				</Row>
 				<Row style={{margin: '20px 0'}}>
