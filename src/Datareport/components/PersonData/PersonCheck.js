@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
-import {actions} from '../../store/orgdata';
+import {actions} from '../../store/persondata';
+import {actions as actions2} from '../../store/quality';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
@@ -17,7 +18,7 @@ const {Option} = Select
 		return { platform}
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
+		actions: bindActionCreators({ ...actions,...platformActions,...actions2}, dispatch)
 	})
 )
 export default class PersonCheck extends Component {
@@ -28,10 +29,20 @@ export default class PersonCheck extends Component {
             wk:null,
             dataSource:[],
             opinion:1,//1表示通过 2表示不通过
+            signatures:[]
 		};
     }
     async componentDidMount(){
         const {wk} = this.props
+        let tempData = JSON.parse(wk.subject[0].data);
+        console.log("tempData:",tempData);
+        let signatures = [];
+        // tempData.map((item,index) => {
+            
+        // })
+        this.setState({
+            signatures
+        })
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
     }
@@ -142,6 +153,8 @@ export default class PersonCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
+        const {wk} = this.props;
+        console.log("wk",wk);
         const columns = [{
             title: '人员编码',
             dataIndex: 'code',
@@ -152,8 +165,8 @@ export default class PersonCheck extends Component {
             key: 'Name',
         }, {
             title: '所在组织机构单位',
-            dataIndex: 'org',
-            key: 'Org',
+            dataIndex: 'unit',
+            key: 'Unit',
         }, {
             title: '所属部门',
             dataIndex: 'depart',
@@ -177,7 +190,7 @@ export default class PersonCheck extends Component {
         }, {
             title: '二维码',
             dataIndex: 'signature',
-            key: 'Signature'
+            key: 'Signature',
         }];
 		return (
             <Modal
