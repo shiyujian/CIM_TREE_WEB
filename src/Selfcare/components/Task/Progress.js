@@ -9,6 +9,7 @@ import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
 import PriceListExamine from '../../../Datareport/components/CostListData/PriceListExamine';
 import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
+import DesignDataCheck from '../../../Datareport/components/DesignData/Check';
 import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
 import HiddenDangerCheck from '../../../Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
 import ModalCheck from '../../../Datareport/components/ModalData/ModalCheck';
@@ -64,7 +65,8 @@ export default class Progress extends Component {
 			dr_wor_sg_visible,
 			dr_de_sj_visible,
 			Safety_Special_check_visible,
-			dr_qua_unit_visible
+			dr_qua_unit_visible,
+			design_check_visbile
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -189,7 +191,8 @@ export default class Progress extends Component {
 				{
 					cost_pri_ck_visible && 
 					<PriceListExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
-				}{
+				}
+				{
 					cost_sum_spd_visible && 
 					<SumSpeedExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
@@ -221,6 +224,10 @@ export default class Progress extends Component {
 					dr_qua_unit_visible && 
 					<UnitToggle wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					design_check_visbile && 
+					<DesignDataCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -250,6 +257,9 @@ export default class Progress extends Component {
 				break;
 			case "模型信息批量录入":
 				changeDatareportVisible({key:'modal_check_visbile',value:true})
+				break;
+			case "设计信息批量录入":
+				changeDatareportVisible({key:'design_check_visbile',value:true})
 				break;
 			case "组织机构信息批量录入":
 				changeDatareportVisible({key:'dr_base_org_visible',value:true})
