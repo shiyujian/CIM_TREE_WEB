@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload, Cascader } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, WORKFLOW_CODE } from '_platform/api';
+import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import '../../containers/quality.less';
 const Option = Select.Option;
+const FormItem = Form.Item;
 var moment = require('moment');
 
 export default class Addition extends Component {
@@ -9,24 +11,24 @@ export default class Addition extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
-			users: [],
-			projects: [],
-			units: []
+			checkers: [],//审核人下来框选项
+			check: null,//审核人
+			project: {},
+			unit: {},
+			options: [],
 		};
 	}
+
 	componentDidMount() {
 		const { actions: { getAllUsers, getProjectTree } } = this.props;
 		getAllUsers().then(rst => {
-			let users = [];
-			if (rst.length) {
-				let checkers = rst.map(o => {
-					return (
-						<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
-					)
-				})
-				this.setState({ checkers })
-			}
-		});
+			let checkers = rst.map(o => {
+				return (
+					<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+				)
+			})
+			this.setState({ checkers })
+		})
 		getProjectTree({ depth: 1 }).then(rst => {
 			if (rst.status) {
 				let projects = rst.children.map(item => {
@@ -43,14 +45,118 @@ export default class Addition extends Component {
 				//获取项目信息失败
 			}
 		});
+	}
 
+	beforeUpload = (info) => {
+		if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
+			return true;
+		} else {
+			notification.warning({
+				message: '只能上传Excel文件！',
+				duration: 2
+			});
+			return false;
+		}
+	}
 
+	uplodachange = (info) => {
+		//info.file.status/response
+		if (info && info.file && info.file.status === 'done') {
+			notification.success({
+				message: '上传成功！',
+				duration: 2
+			});
+			let name = Object.keys(info.file.response);
+			let dataList = info.file.response[name[0]];
+			let dataSource = [];
+			for (let i = 1; i < dataList.length; i++) {
+				dataSource.push({
+					code: dataList[i][1] ? dataList[i][1] : '',
+					modelName: dataList[i][2] ? dataList[i][2] : '',
+					submittingUnit: dataList[i][3] ? dataList[i][3] : '',
+					modelDescription: dataList[i][4] ? dataList[i][4] : '',
+					modeType: dataList[i][5] ? dataList[i][5] : '',
+					fdbMode: dataList[i][6] ? dataList[i][6] : '',
+					tdbxMode: dataList[i][7] ? dataList[i][7] : '',
+					attributeTable: dataList[i][8] ? dataList[i][8] : '',
+					reportingTime: dataList[i][9] ? dataList[i][9] : '',
+					reportingName: dataList[i][10] ? dataList[i][10] : '',
+
+					project: {
+						code: "",
+						name: "",
+						obj_type: ""
+					},
+					unit: {
+						code: "",
+						name: "",
+						obj_type: ""
+					},
+					file: {
+
+					}
+
+				})
+			}
+			this.setState({ dataSource });
+		}
 	}
 
 	//下拉框选择人
 	selectChecker(value) {
 		let check = JSON.parse(value)
 		this.setState({ check })
+	}
+
+	onSelectProject = (value, selectedOptions) => {
+		let project = {};
+		let unit = {};
+		if (value.length === 2) {
+			let temp1 = JSON.parse(value[0]);
+			let temp2 = JSON.parse(value[1]);
+			project = {
+				name: temp1.name,
+				code: temp1.code,
+				obj_type: temp1.obj_type
+			}
+			unit = {
+				name: temp2.name,
+				code: temp2.code,
+				obj_type: temp2.obj_type
+			}
+			this.setState({ project, unit });
+			return;
+		}
+		//must choose all,otherwise make it null
+		this.setState({ project: {}, unit: {} });
+	}
+
+	loadData = (selectedOptions) => {
+		const { actions: { getProjectTree } } = this.props;
+		const targetOption = selectedOptions[selectedOptions.length - 1];
+		targetOption.loading = true;
+		getProjectTree({ depth: 2 }).then(rst => {
+			if (rst.status) {
+				let units = [];
+				rst.children.map(item => {
+					if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
+						units = item.children.map(unit => {
+							return (
+								{
+									value: JSON.stringify(unit),
+									label: unit.name
+								}
+							)
+						})
+					}
+				})
+				targetOption.loading = false;
+				targetOption.children = units;
+				this.setState({ options: [...this.state.options] })
+			} else {
+				//获取项目信息失败
+			}
+		});
 	}
 
 
@@ -64,7 +170,7 @@ export default class Addition extends Component {
 			}
 		}, {
 			title: '模型编码',
-			dataIndex: 'coding'
+			dataIndex: 'code'
 		}, {
 			title: '模型名称',
 			dataIndex: 'modelName'
@@ -119,34 +225,11 @@ export default class Addition extends Component {
 		}, {
 			title: 'tdbx模型',
 			dataIndex: 'tdbxMode',
-			// render: (text, record, index) => {
-
-			// 	return (
-			// 		<span>
-			// 			<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index)}>
-			// 				<Button>
-			// 					<Icon type="upload" />上传附件
-			//                 </Button>
-			// 			</Upload>
-			// 		</span>
-			// 	)
-			// }
 
 		}, {
 			title: '属性表',
 			dataIndex: 'attributeTable',
-			// render: (text, record, index) => {
 
-			// 	return (
-			// 		<span>
-			// 			<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index)}>
-			// 				<Button>
-			// 					<Icon type="upload" />上传附件
-			//                 </Button>
-			// 			</Upload>
-			// 		</span>
-			// 	)
-			// }
 		}, {
 			title: '上报时间',
 			dataIndex: 'reportingTime'
@@ -209,7 +292,7 @@ export default class Addition extends Component {
 				</Row>
 				<Row style={{ marginBottom: "30px" }} type="flex">
 					<Col>
-						<Upload {...props}>
+						<Upload {...props} onChange={this.uplodachange.bind(this)}>
 							<Button style={{ marginRight: 30 }}>
 								<Icon type="upload" />上传附件
 							</Button>
@@ -225,18 +308,18 @@ export default class Addition extends Component {
 							}
 						</Select>
 					</span>
-
-					<span>
-						项目-单位工程：
+					<Col>
+						<span>
+							项目-单位工程：
                         <Cascader
-							options={this.state.options}
-							style={{marginLeft:20}}
-							loadData={this.loadData.bind(this)}
-							onChange={this.onSelectProject.bind(this)}
-							changeOnSelect
-						/>
-					</span>
-
+								options={this.state.options}
+								className='btn'
+								loadData={this.loadData.bind(this)}
+								onChange={this.onSelectProject.bind(this)}
+								changeOnSelect
+							/>
+						</span>
+					</Col>
 
 					<Button type="primary" style={{ marginLeft: 20 }} onClick={this.onok.bind(this)}>提交</Button>
 				</Row>
@@ -250,6 +333,9 @@ export default class Addition extends Component {
 		);
 	}
 
+	ProSelect(eye) {
+		this.setState({ pro: JSON.parse(eye).name, units: JSON.parse(eye).children })
+	}
 	//点击取消返回
 	cancel() {
 		const {
@@ -263,15 +349,15 @@ export default class Addition extends Component {
 		let res = data.map(item => {
 			console.log('woshi', item)
 			return {
-				coding: item[1],
+				code: item[1],
 				// unitEngineering: item[3],
-				modelName: item[4],
-				submittingUnit: item[5],
-				modelDescription: item[6],
-				modeType: item[7],
-				tdbxMode: item[9],
-				attributeTable: item[10],
-				reportingName: item[12],
+				modelName: item[2],
+				submittingUnit: item[3],
+				modelDescription: item[4],
+				modeType: item[5],
+				tdbxMode: item[7],
+				attributeTable: item[8],
+				reportingName: item[10],
 				file: {
 
 				}
@@ -316,66 +402,6 @@ export default class Addition extends Component {
 		this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
 		changeAdditionField('visible', false);
 	}
-	//拉取信息
-	loadData = (selectedOptions) => {
-		const { actions: { getProjectTree } } = this.props;
-		const targetOption = selectedOptions[selectedOptions.length - 1];
-		targetOption.loading = true;
-		getProjectTree({ depth: 2 }).then(rst => {
-			if (rst.status) {
-				let units = [];
-				rst.children.map(item => {
-					if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
-						units = item.children.map(unit => {
-							return (
-								{
-									value: JSON.stringify(unit),
-									label: unit.name
-								}
-							)
-						})
-					}
-				})
-				targetOption.loading = false;
-				targetOption.children = units;
-				this.setState({ options: [...this.state.options] })
-			} else {
-				//获取项目信息失败
-			}
-		});
-	}
-	//项目单位选择
-	onSelectProject = (value, selectedOptions) => {
-		let project = {};
-		let unit = {};
-		if (value.length === 2) {
-			let temp1 = JSON.parse(value[0]);
-			let temp2 = JSON.parse(value[1]);
-			project = {
-				name: temp1.name,
-				code: temp1.code,
-				obj_type: temp1.obj_type
-			}
-			unit = {
-				name: temp2.name,
-				code: temp2.code,
-				obj_type: temp2.obj_type
-			}
-			let newdataSources = this.state.dataSource;
-			for (var i = 0; i < newdataSources.length; i++) {
-				newdataSources[i].subproject = project,
-					newdataSources[i].unit = unit
-			}
-			this.setState({ project, unit, dataSource: newdataSources });
-			return;
-		}
-
-		//must choose all,otherwise make it null
-		this.setState({ project: {}, unit: {} });
-	}
-
-
-
 	//预览
 	handlePreview(index) {
 		const { actions: { openPreview } } = this.props;
@@ -405,16 +431,6 @@ export default class Addition extends Component {
 		let { dataSource } = this.state
 		let id = dataSource[index]['file'].id
 		deleteStaticFile({ id: id })
-		// let rate = dataSource[index].rate
-		// let level = dataSource[index].level
-		// dataSource[index] = {
-		// 	modelName: modelName,
-		// 	modelDescription: modelDescription,
-		// 	modeType: modeType,
-		// 	reportingName:reportingName,
-		// 	file: {
-		// 	}
-		// }
 
 		dataSource[index].file = ''
 		changeAdditionField('dataSource', dataSource)
@@ -448,58 +464,7 @@ export default class Addition extends Component {
 		});
 		return false;
 	}
-	// //根据附件名称 也就是wbs编码获取其他信息
-	// async getInfo(code) {
-	// 	console.log(this.props)
-	// 	let res = {};
-	// 	const { actions: { getWorkPackageDetail } } = this.props
-	// 	let jianyanpi = await getWorkPackageDetail({ code: code })
-	// 	res.name = jianyanpi.name
-	// 	res.code = jianyanpi.code
-	// 	res.pk = jianyanpi.pk
-	// 	res.obj_type = jianyanpi.obj_type
-	// 	res.related_documents = jianyanpi.related_documents
-	// 	let fenxiang = await getWorkPackageDetail({ code: jianyanpi.parent.code })
-	// 	if (fenxiang.parent.obj_type_hum === "子分部工程") {
-	// 		let zifenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
-	// 		let fenbu = await getWorkPackageDetail({ code: zifenbu.parent.code })
-	// 		let zidanwei = {}, danwei = {};
-	// 		if (fenbu.parent.obj_type_hum === "子单位工程") {
-	// 			zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-	// 			danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
 
-	// 		} else {
-	// 			danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-	// 		}
-	// 		let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-	// 		res.construct_unit = construct_unit
-	// 		res.unit = {
-	// 			name: danwei.name,
-	// 			code: danwei.code,
-	// 			obj_type: danwei.obj_type
-	// 		}
-	// 		res.project = danwei.parent
-	// 	} else {
-	// 		let fenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
-	// 		let zidanwei = {}, danwei = {};
-	// 		if (fenbu.parent.obj_type_hum === "子单位工程") {
-	// 			zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-	// 			danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
-
-	// 		} else {
-	// 			danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-	// 		}
-	// 		let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-	// 		res.construct_unit = construct_unit
-	// 		res.unit = {
-	// 			name: danwei.name,
-	// 			code: danwei.code,
-	// 			obj_type: danwei.obj_type
-	// 		}
-	// 		res.project = danwei.parent
-	// 	}
-	// 	return res
-	// }
 	static layout = {
 		labelCol: { span: 6 },
 		wrapperCol: { span: 18 },
