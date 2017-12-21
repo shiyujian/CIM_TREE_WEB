@@ -24,7 +24,7 @@ export default class DesignTable extends Component {
 			title: '序号',
 			dataIndex: 'index',
 		}, {
-			title: '编码',
+			title: '模型编码',
 			dataIndex: 'value'
 		}, {
 			title: '项目/子项目名称',
