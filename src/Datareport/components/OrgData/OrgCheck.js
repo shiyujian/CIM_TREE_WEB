@@ -32,6 +32,7 @@ export default class OrgCheck extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props
+        console.log("wk",wk);
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
     }
@@ -142,9 +143,7 @@ export default class OrgCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        columns = [{
-
-        },
+        const  columns = [
         {
             title: '序号',
             dataIndex: 'index',

@@ -49,11 +49,6 @@ export default class DesignCheckModal extends Component {
    }
    //提交
    async submit(){
-    if(this.state.opinion === 1){
-        await this.passon();
-    }else{
-        await this.reject();
-    }
     this.props.closeModal("dr_de_sj_visible",false)
     message.info("操作成功")
 }

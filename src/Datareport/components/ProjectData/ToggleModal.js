@@ -265,7 +265,7 @@ export default class ToggleModal extends Component{
         key:'pic',
         render:(record) => (
           <Upload
-          beforeUpload = {this.beforeUploadPic.bind(this,record)}
+            beforeUpload = {this.beforeUploadPic.bind(this,record)}
           >
               <a>{record.pic? record.pic.name:'点击上传'}</a>
           </Upload>

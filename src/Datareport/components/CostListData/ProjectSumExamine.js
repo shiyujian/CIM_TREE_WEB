@@ -8,9 +8,10 @@ import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
-const {RangePicker} = DatePicker;
+import '../index.less'; 
+
 const RadioGroup = Radio.Group;
-const {Option} = Select
+const { TextArea } = Input;
 @connect(
 	state => {
 		const { platform} = state;
@@ -21,22 +22,17 @@ const {Option} = Select
 	})
 )
 export default class ProjectSumExamine extends Component {
-
 	constructor(props) {
 		super(props);
 		this.state = {
-            wk:null,
+			wk:null,
             dataSource:[],
             opinion:1,//1表示通过 2表示不通过
-		};
-    }
-    async componentDidMount(){
+		}
+	}
+
+	async componentDidMount(){
         const {wk} = this.props
-        //  const {actions:{ getWorkflow }} = this.props
-        //  getWorkflow({pk:wk.id}).then(rst => {
-        //      let dataSource = JSON.parse(rst.subject[0].data)
-        //      this.setState({dataSource,wk:rst})
-        //  })
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
     }
@@ -48,11 +44,11 @@ export default class ProjectSumExamine extends Component {
    }
    //提交
     async submit(){
-        if(this.state.opinion === 1){
-            await this.passon();
-        }else{
-            await this.reject();
-        }
+        // if(this.state.opinion === 1){
+        //     await this.passon();
+        // }else{
+        //     await this.reject();
+        // }
         this.props.closeModal("cost_pro_ck_visible",false)
         message.info("操作成功")
     }
@@ -70,56 +66,48 @@ export default class ProjectSumExamine extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        dataSource.map((o) => {
-            //创建文档对象
-            let doc = o.related_documents.find(x => {
-                return x.rel_type === 'many_jyp_rel'
-            })
-            if(doc){
-                doclist_p.push({
-                    code:doc.code,
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }else{
-                doclist_a.push({
-                    code:`rel_doc_${o.code}`,
-                    name:`rel_doc_${o.pk}`,
-                    obj_type:"C_DOC",
-                    status:"A",
-                    version:"A",
-                    "basic_params": {
-                        // "files": [
-                        //     {
-                        //     "a_file": file.a_file,
-                        //     "name": file.name,
-                        //     "download_url": file.download_url,
-                        //     "misc": file.misc,
-                        //     "mime_type": file.mime_type
-                        //     },
-                        // ]
-                    },
-                    workpackages:[{
-                        code:o.code,
-                        obj_type:o.obj_type,
-                        pk:o.pk,
-                        rel_type:"many_jyp_rel"
-                    }],
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }
-            //施工包批量
-            wplist.push({
-                code:o.code,
-                extra_params:{
-                    rate:o.rate,
-                    check_status:2
-                }
-            })
-        })
+        // dataSource.map((o) => {
+        //     //创建文档对象
+        //     let doc = o.related_documents.find(x => {
+        //         x.rel_type === 'many_jyp_rel'
+        //     })
+        //     debugger
+        //     if(doc){
+        //         doclist_p.push({
+        //             code:doc.code,
+        //             extra_params:{
+        //                 ...o
+        //             }
+        //         })
+        //     }else{
+        //         doclist_a.push({
+        //             code:`rel_doc_${o.code}`,
+        //             name:`rel_doc_${o.pk}`,
+        //             obj_type:"C_DOC",
+        //             status:"A",
+        //             version:"A",
+        //             "basic_params": {
+        //             },
+        //             workpackages:[{
+        //                 code:o.code,
+        //                 obj_type:o.obj_type,
+        //                 pk:o.pk,
+        //                 rel_type:"many_jyp_rel"
+        //             }],
+        //             extra_params:{
+        //                 ...o
+        //             }
+        //         })
+        //     }
+        //     //施工包批量
+        //     wplist.push({
+        //         code:o.code,
+        //         extra_params:{
+        //             rate:o.rate
+        //         }
+        //     })
+        // })
+      
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -153,80 +141,116 @@ export default class ProjectSumExamine extends Component {
     onChange(e){
         this.setState({opinion:e.target.value})
     }
+
 	render() {
-        const columns = 
-        [{
-            title:'序号',
-            width:"5%",
-			render:(text,record,index) => {
-				return index+1
-			}
-		},{
-			title:'项目/子项目',
-            dataIndex:'subproject',
-            width:"13%",
-        
-		},{
-			title: '单位工程',
-            dataIndex: 'unit_engineeing',
-            
-		  },{
-			title: '项目编码',
-			dataIndex: 'projectcoding',
-		  },{
-			title: '项目名称',
-			dataIndex: 'projectname',
-		  },{
-			title: '计量单位',
-			dataIndex: 'company',
-		  },{
-			title: '数量',
-			dataIndex: 'number',
-		  },{
-			title: '单价',
-			dataIndex: 'total',
-		  }]
-		return (
-            <Modal
-			title="工程量结算信息审批表"
-			key={Math.random()}
-            visible={true}
-            width= {1280}
-			footer={null}
-			maskClosable={false}>
-                <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
-                    <Table style={{ marginTop: '10px', marginBottom:'10px' }}
-                        columns={columns}
-                        dataSource={this.state.dataSource}
-                        bordered />
-                    <Row>
-                        <Col span={2}>
-                            <span>审查意见：</span>
-                        </Col>
-                        <Col span={4}>
-                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
-                                <Radio value={1}>通过</Radio>
-                                <Radio value={2}>不通过</Radio>
-                            </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
-                            <Preview />
-                        </Col>
-                    </Row>
-                    {
-                        this.state.wk && <WorkflowHistory wk={this.state.wk}/>
-                    }
-                </div>
-            </Modal>
+		return(
+			<Modal
+				width = {1280}
+				visible = {true}
+                onCancel = {this.cancel.bind(this)}
+                footer = {null}
+			>
+				<Row style={{margin: '20px 0', textAlign: 'center'}}>
+					<h2>结果审核</h2>
+				</Row>
+				<Row>
+					<Table
+						bordered
+						className = 'foresttable'
+						columns={this.columns}
+					/>
+				</Row>
+				<Row style={{margin: '20px 0'}}>
+					<Col span={2}>
+						<span>审查意见：</span>
+					</Col>
+					<Col span={4}>
+						<RadioGroup onChange={this.onChange} value={this.state.value}>
+					        <Radio value={1}>通过</Radio>
+					        <Radio value={2}>不通过</Radio>
+					    </RadioGroup>
+				    </Col>
+				    <Col span={2} push={14}>
+				    	<Button type='primary'>
+        					导出表格
+        				</Button>
+				    </Col>
+				    <Col span={2} push={14}>
+				    	<Button type='primary' onClick={this.submit.bind(this)}>
+        					确认提交
+        				</Button>
+				    </Col>
+			    </Row>
+			    <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea rows={2} />
+				    </Col>
+			    </Row>
+			    <Row style={{marginBottom: '10px'}}>
+			    	<div>审批流程</div>
+			    </Row>
+			    <Row>
+			    	<Col span={10}>
+			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
+			    			<div>执行人：</div>
+			    			<div>执行时间：</div>
+			    			<div>执行意见：</div>
+			    			<div style={{marginTop: '40px'}}>电子签章：</div>
+			    		</div>
+			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传</div>
+			    	</Col>
+			    	<Col span={10}>
+			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
+			    			<div>执行人：</div>
+			    			<div>执行时间：</div>
+			    			<div>执行意见：</div>
+			    			<div style={{marginTop: '40px'}}>电子签章：</div>
+			    		</div>
+			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传审核</div>
+			    	</Col>
+			    </Row>
+			</Modal>
 		)
-    }
+	}
+
+	
+columns = 
+    [{
+        title:'序号',
+        width:"5%",
+        render:(text,record,index) => {
+            return index+1
+        }
+    },{
+        title:'项目/子项目',
+        dataIndex:'subproject',
+        width:"13%",
+    
+    },{
+        title: '单位工程',
+        dataIndex: 'unit_engineeing',
+        
+      },{
+        title: '项目编码',
+        dataIndex: 'projectcoding',
+      },{
+        title: '项目名称',
+        dataIndex: 'projectname',
+      },{
+        title: '计量单位',
+        dataIndex: 'company',
+      },{
+        title: '数量',
+        dataIndex: 'number',
+      },{
+        title: '单价',
+        dataIndex: 'total',
+      }]
+
+	cancel() {
+		const {
+			actions: {clearCheckField}
+		} = this.props;
+		clearCheckField();
+	}
 }
