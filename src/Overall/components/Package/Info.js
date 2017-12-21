@@ -3,6 +3,7 @@ import {Row, Col, Form, Input} from 'antd';
 import {divIcon} from 'leaflet';
 import {Map, TileLayer, Marker, Polygon} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import {DefaultZoomLevel} from '_platform/api'
 const FormItem = Form.Item;
 const URL = window.config.VEC_W;
 
@@ -44,7 +45,7 @@ export default class Info extends Component {
 				</Col>
 				<Col span={12}>
 					<p style={{marginBottom: 6}}>项目定位图：</p>
-					<Map center={leafletCenter} zoom={13} zoomControl={false}
+					<Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
 					     style={{position: 'relative', height: 250, width: '100%'}}>
 						<TileLayer url={URL} subdomains={['7']}/>
 						<Polygon positions={node.location || []}/>

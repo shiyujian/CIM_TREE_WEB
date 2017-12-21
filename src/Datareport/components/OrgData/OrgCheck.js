@@ -78,7 +78,7 @@ export default class OrgCheck extends Component {
                     obj_type: "C_ORG",
                     status: "A",
                     version: "A",
-                    "extra_params": {
+                    extra_params: {
                         type:o.type,
                         depart:o.depart,
                         direct:o.direct,
@@ -87,14 +87,14 @@ export default class OrgCheck extends Component {
                         remarks:o.remarks
                     },
                     parent:{
-                        code:rst.code,
-                        pk:rst.pk,
-                        obj_type:rst.obj_type
+                        code:"ORG_ROOT",
+                        pk:"403050400306",
+                        obj_type:"C_ORG"
                     }
                 })
             })
             postOrgList({},{data_list:data_list}).then(res => {
-                if (res.length != 0) {
+                if (res.result.length) {
                     message.success("审核成功");
                 }
             });
@@ -167,7 +167,8 @@ export default class OrgCheck extends Component {
 			key={Math.random()}
             visible={true}
             width= {1280}
-			footer={null}
+            footer={null}
+            onCancel = {this.props.closeModal.bind(this,"dr_base_person_visible",false)}
 			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>

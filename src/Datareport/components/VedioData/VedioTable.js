@@ -6,8 +6,15 @@ import './index.less';
 
 export default class VedioTable extends Component{
     
+    componentDidMount(){
+        const {fileDel=false} = this.props;
+        if(fileDel){
+            this.columns.push(this.operation);
+        }
+    }
+
     render(){
-        const {dataSource = []} = this.props;
+        const {dataSource=[]} = this.props;
         return(<Row className="rowSpacing">
             <Col span={24}>
                 <Table
@@ -22,6 +29,7 @@ export default class VedioTable extends Component{
                     showTotal: showTotal
                 }}
                 rowSelection={rowSelection}
+                bordered
                 />
             </Col>
         </Row>)
@@ -74,6 +82,11 @@ export default class VedioTable extends Component{
         title: '摄像头上线时间',
         dataIndex: 'uptime'
     },{
+        title: 'wbs编码',
+        dataIndex: 'wbsCode'
+    }];
+
+    operation = {
         title: '操作',
         render: (text, record, index)=>{
             return (
@@ -87,7 +100,7 @@ export default class VedioTable extends Component{
                 </Popconfirm>
             )
         }
-    }];
+    }
 }
 
 VedioTable.PropTypes ={
@@ -95,11 +108,11 @@ VedioTable.PropTypes ={
 }
 
 const showTotal = (total,range) =>{ //显示数据总量和当前数据顺序
-    console.log("showTotal",total,range);
+    //console.log("showTotal",total,range);
 }
 
 const rowSelection = {
     onChange:(selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        //console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     }
 }

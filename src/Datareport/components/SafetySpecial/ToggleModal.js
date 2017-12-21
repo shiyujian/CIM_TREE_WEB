@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import Preview from '../../../_platform/components/layout/Preview';
+
 const Search = Input.Search;
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -34,51 +36,57 @@ export default class ToggleModal extends Component {
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
                 <Table
-                    style={{ "textAlign": "center" }}
                     columns={this.columns}
                     bordered={true}
                     dataSource={this.state.dataSource}
                 >
                 </Table>
-                <Upload
-                    onChange={this.uplodachange.bind(this)}
-                    name='file'
-                    showUploadList={false}
-                    action={`${SERVICE_API}/excel/upload-api/`}
-                    beforeUpload={this.beforeUpload.bind(this)}
-                >
-                    <Button style={{ margin: '10px 10px 10px 0px' }}>
-                        <Icon type="upload" />上传附件
-                     </Button>
-                </Upload>
-                <span>
-                    审核人：
-                        <Select style={{ width: '200px' }} className="btn" onSelect={ele => {
-                        this.setState({ passer: ele })
-                    }} >
-                        {
-                            this.state.checkers
-                        }
-                    </Select>
-                </span>
-                <span>
-                    项目-单位工程：
-                        <Cascader
-                        placeholder="请选择项目"
-                        options={this.state.options}
-                        className='btn'
-                        loadData={this.loadData.bind(this)}
-                        onChange={this.onSelectProject.bind(this)}
-                        changeOnSelect
-                    />
-                </span>
-                <Button type="primary" onClick={this.onok.bind(this)}>提交</Button>
-                <div style={{ marginTop: "30px" }}>
+                <Row style={{ marginBottom: "30px" }} type="flex">
+                    <Col><Button style={{ margin: '10px 10px 10px 0px' }}>模板下载</Button></Col>
+                    <Col>
+                        <Upload
+                            onChange={this.uplodachange.bind(this)}
+                            name='file'
+                            showUploadList={false}
+                            action={`${SERVICE_API}/excel/upload-api/`}
+                            beforeUpload={this.beforeUpload.bind(this)}
+                        >
+                            <Button style={{ margin: '10px 10px 10px 0px' }}>
+                                <Icon type="upload" />上传并预览(文件名需为英文)
+                        </Button>
+                        </Upload>
+                    </Col>
+                    <Col>
+                        <span>
+                            审核人：
+                       <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                                {
+                                    this.state.checkers
+                                }
+                            </Select>
+                        </span>
+                    </Col>
+                    <Col>
+                        <span>
+                            项目-单位工程：
+                   <Cascader
+                                options={this.state.options}
+                                className='btn'
+                                loadData={this.loadData.bind(this)}
+                                onChange={this.onSelectProject.bind(this)}
+                                changeOnSelect
+                                placeholder="请选择项目及子单位工程"
+                            />
+                        </span>
+                    </Col>
+                </Row>
+                <Preview />
+                <Row style={{ marginBottom: "30px" }}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
                     <p style={{ paddingLeft: "25px" }}>3、日期必须带年月日，如2017年1月1日</p>
                     <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.</p>
-                </div>
+                </Row>
             </Modal>
         )
     }
@@ -138,6 +146,10 @@ export default class ToggleModal extends Component {
         return false;
     }
 
+    selectChecker(value) {
+        let check = JSON.parse(value);
+        this.setState({ check })
+    }
     // parseTime(time){
     //     return new Data(time)
     // }
@@ -211,7 +223,7 @@ export default class ToggleModal extends Component {
     }
 
     loadData = (selectedOptions) => {
-        console.log('vip-selectedOptions', selectedOptions)
+        // console.log('vip-selectedOptions', selectedOptions)
         const { actions: { getProjectTree } } = this.props;
         const targetOption = selectedOptions[selectedOptions.length - 1];
         targetOption.loading = true;
@@ -239,7 +251,7 @@ export default class ToggleModal extends Component {
         });
     }
     onok() {
-        if (!this.state.passer) {
+        if (!this.state.check) {
             message.error('审批人未选择');
             return;
         }
@@ -254,8 +266,28 @@ export default class ToggleModal extends Component {
             message.info(`有数据未上传附件`)
             return
         }
+        const {project,unit} =  this.state;
+        if(!project.name){
+            message.info(`请选择项目和单位工程`);
+            return;
+        }
+        let {check} = this.state
+        let per = {
+            id:check.id,
+            username:check.username,
+            person_name:check.account.person_name,
+            person_code:check.account.person_code,
+            organization:check.account.organization
+        }
+        for(let i=0;i<this.state.dataSource.length;i++){
+            this.state.dataSource[i].project = project;
+            this.state.dataSource[i].unit = unit;
+        }
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
-        this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
+        this.props.setData(this.state.dataSource, per);
+        console.log('vip-per',per);
+        console.log('vip-dataSource',this.state.dataSource);
+        
         ModalVisible(false);
         notification.success({
             message: '发起成功！',
@@ -281,10 +313,14 @@ export default class ToggleModal extends Component {
             if (rst.status) {
                 let projects = rst.children.map(item => {
                     return (
-                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                        {
+                            value: JSON.stringify(item),
+                            label: item.name,
+                            isLeaf: false
+                        }
                     )
                 })
-                this.setState({ projects });
+                this.setState({ options: projects });
             } else {
                 //获取项目信息失败
             }
@@ -319,6 +355,7 @@ export default class ToggleModal extends Component {
                 type: "",
             },
             file: {
+
             }
         }
         this.setState({ dataSource })
@@ -360,14 +397,13 @@ export default class ToggleModal extends Component {
     }
 
     selectProject(value) {
-        debugger
         let project = JSON.parse(value);
         this.setState({ project, units: [] });
         const { actions: { getProjectTree } } = this.props;
         let beginUnit = '';
         let i = 0;
         getProjectTree({ depth: 2 }).then(rst => {
-            console.log('vip-rst',rst);
+            console.log('vip-rst', rst);
             if (rst.status) {
                 let units = [];
                 rst.children.map(item => {
@@ -398,34 +434,36 @@ export default class ToggleModal extends Component {
             width: '5%',
         }
         ,
+        // {
+        //     title: '项目/子项目名称',
+        //     dataIndex: 'projectName',
+        //     width: '15%',
+        //     render: (text, record, index) => (
+        //         <span>
+        //             {record.project.name}
+        //         </span>
+        //     )
+        // },
+        // {
+        //     title: '单位工程',
+        //     dataIndex: 'unitProject',
+        //     width: '10%',
+        //     width: '8%',
+        //     render: (text, record, index) => (
+        //         <span>
+        //             {record.unit.name}
+        //         </span>
+        //     )
+        // }
+        // , 
         {
-            title: '项目/子项目名称',
-            dataIndex: 'projectName',
-            width: '15%',
-            render: (text, record, index) => (
-                <span>
-                    {record.project.name}
-                </span>
-            )
-        },
-        {
-            title: '单位工程',
-            dataIndex: 'unitProject',
-            width: '10%',
-            width: '8%',
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
-            )
-        }, {
             title: '方案名称',
             dataIndex: 'scenarioName',
-            width: '10%',
+            width: '15%',
         }, {
             title: '编制单位',
             dataIndex: 'organizationUnit',
-            width: '10%',
+            width: '15%',
         }, {
             title: '评审时间',
             dataIndex: 'reviewTime',
@@ -442,11 +480,11 @@ export default class ToggleModal extends Component {
         }, {
             title: '备注',
             dataIndex: 'remark',
-            width: '10%',
+            width: '15%',
         }
         , {
             title: '附件',
-            width: "5%",
+            width: "15%",
             render: (text, record, index) => {
                 if (record.file.id) {
                     return (<span>

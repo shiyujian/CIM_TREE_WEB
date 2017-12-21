@@ -38,6 +38,7 @@ export default class VedioUpload extends Component{
                 <VedioTable
                  dataSource={dataSource}
                  storeExcelData={this.storeExcelData}
+                 fileDel={true}
                 />
                 <UploadFooter
                  storeExcelData= {this.storeExcelData}
@@ -58,7 +59,7 @@ export default class VedioUpload extends Component{
     onOk = async (selectUser)=>{  //发起流程，关闭Modal
         const {dataSource} = this.state,
             {closeModal, actions:{ createWorkflow, logWorkflowEvent }} = this.props,
-            name = '视频监控信息批量录入';
+            name = '视频监控批量录入';
 
         await launchProcess({dataSource,selectUser,name},{createWorkflow,logWorkflowEvent});
         message.success("上传数据成功");
@@ -71,5 +72,5 @@ VedioUpload.PropTypes ={
     closeModal: PropTypes.func.isRequired,
 }
 
-const dataIndex = ["cameraId","projectName","enginner","cameraName","ip","port","username","password","xAxes","yAxes","modal","uptime"], 
-    excelTitle = ["摄像头编码","项目/子项目名称","单位工程","摄像头名称","IP","端口","用户名","密码","X坐标","Y坐标","型号","摄像头上线时间"];
+const dataIndex = ["cameraId","projectName","enginner","cameraName","ip","port","username","password","xAxes","yAxes","modal","uptime","wbsCode"], 
+    excelTitle = ["摄像头编码","项目/子项目名称","单位工程","摄像头名称","IP","端口","用户名","密码","X坐标","Y坐标","型号","摄像头上线时间","wbs编码"];

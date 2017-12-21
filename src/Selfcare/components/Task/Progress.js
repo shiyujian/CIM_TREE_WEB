@@ -2,27 +2,30 @@ import React, { Component } from 'react';
 import { Row, Col, Form, Popconfirm, Button, Input, message, notification } from 'antd';
 import UserPicker from './UserPicker';
 import queryString from 'query-string';
-import { getUser } from '../../../_platform/auth';
+import { getUser } from '_platform/auth';
 import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
-import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
-import PriceListExamine from '../../../Datareport/components/CostListData/PriceListExamine';
-import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
-import DesignDataCheck from '../../../Datareport/components/DesignData/Check';
-import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
-import HiddenDangerCheck from '../../../Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
-import ModalCheck from '../../../Datareport/components/ModalData/ModalCheck';
-import OrgCheck from '../../../Datareport/components/OrgData/OrgCheck';
-import HPModal from '../../../Datareport/components/ProjectData/HandleProjectModal';
-import SumSpeedExamine from '../../../Datareport/components/CostListData/SumSpeedExamine';
-import PersonCheck from '../../../Datareport/components/PersonData/PersonCheck';
-import SumPlanCheck from '../../../Datareport/components/CostListData/SumPlanCheck';
-import ProjectSumExamine from '../../../Datareport/components/CostListData/ProjectSumExamine';
-import WorkCheckModal from '../../../Datareport/components/ScheduleData/WorkCheckModal';
-import DesignCheckModal from '../../../Datareport/components/ScheduleData/DesignCheckModal';
-import SafetySpecialCheck from '../../../Datareport/components/SafetySpecial/SafetySpecialCheck';
-import UnitToggle from '../../../Datareport/components/UnitData/UnitToggle';
+import JianyanpiCheck from 'Datareport/components/Quality/JianyanpiCheck';
+import PriceListExamine from 'Datareport/components/CostListData/PriceListExamine';
+import JianyanCheck from 'Datareport/components/Quality/JianyanCheck';
+import DesignDataCheck from 'Datareport/components/DesignData/Check';
+import SafetyDocCheck from 'Datareport/components/SafetyDoc/SafetyDocCheck';
+import HiddenDangerCheck from 'Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
+import ModalCheck from 'Datareport/components/ModalData/ModalCheck';
+import OrgCheck from 'Datareport/components/OrgData/OrgCheck';
+import HPModal from 'Datareport/components/ProjectData/HandleProjectModal';
+import SumSpeedExamine from 'Datareport/components/CostListData/SumSpeedExamine';
+import PersonCheck from 'Datareport/components/PersonData/PersonCheck';
+import SumPlanCheck from 'Datareport/components/CostListData/SumPlanCheck';
+import ProjectSumExamine from 'Datareport/components/CostListData/ProjectSumExamine';
+import WorkCheckModal from 'Datareport/components/ScheduleData/WorkCheckModal';
+import DesignCheckModal from 'Datareport/components/ScheduleData/DesignCheckModal';
+import SafetySpecialCheck from 'Datareport/components/SafetySpecial/SafetySpecialCheck';
+import UnitToggle from 'Datareport/components/UnitData/UnitToggle';
+import VedioCheck from 'Datareport/components/VedioData/VedioCheck';
+import VedioInfoCheck from 'Datareport/components/VedioData/VedioInfoCheck';
+import DefectModal from 'Datareport/components/Quality/DefectModal';
 
 const FormItem = Form.Item;
 @connect(
@@ -66,7 +69,10 @@ export default class Progress extends Component {
 			dr_de_sj_visible,
 			Safety_Special_check_visible,
 			dr_qua_unit_visible,
-			design_check_visbile
+			design_check_visbile,
+			safety_vedioCheck_visible,
+			safety_vedioInfoCheck_visible,
+			dr_qua_defect_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -142,12 +148,16 @@ export default class Progress extends Component {
 								// 数据报送流程
 								if(action === '通过'){
 									action = '审核';
-									link = <a onClick={this.openModal.bind(this,name,id)}>{action}</a>
+									link = <Button onClick={this.openModal.bind(this,name,id)}>{action}</Button>
 								}
 							} else {
 								link = action;
 							}
-							return (link && <a onClick={this.toggleAction.bind(this, action)} key={index} style={{width:50,height:20,textAlign:'center',display:'inline-block',marginRight: 20,borderWidth:1,borderStyle:'solid',borderColor:'#ddd',borderRadius:5 }}>{link}</a>)
+							if(action === '审核'){
+								return link
+							}else{
+								return (link && <a onClick={this.toggleAction.bind(this, action)} key={index} style={{width:50,height:20,textAlign:'center',display:'inline-block',marginRight: 20,borderWidth:1,borderStyle:'solid',borderColor:'#ddd',borderRadius:5 }}>{link}</a>)
+							}
 						})
 					}
 				</div>
@@ -228,6 +238,18 @@ export default class Progress extends Component {
 					design_check_visbile && 
 					<DesignDataCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					safety_vedioCheck_visible && 
+					<VedioCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_vedioInfoCheck_visible && 
+					<VedioInfoCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_qua_defect_visible && 
+					<DefectModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -293,6 +315,15 @@ export default class Progress extends Component {
 				break;
 			case "单位工程信息批量录入":
 				changeDatareportVisible({key:'dr_qua_unit_visible',value:true})
+				break;
+			case "视频监控批量录入":
+				changeDatareportVisible({key:'safety_vedioCheck_visible',value:true})
+				break;
+			case "影像信息批量录入":
+				changeDatareportVisible({key:'safety_vedioInfoCheck_visible',value:true})
+				break;
+			case "质量缺陷信息批量录入":
+				changeDatareportVisible({key:'dr_qua_defect_visible',value:true})
 				break;
 			default:break;
 		}

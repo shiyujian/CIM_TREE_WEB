@@ -34,23 +34,24 @@ export default class PersonCheck extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props
-        let tempData = JSON.parse(wk.subject[0].data);
-        console.log("tempData:",tempData);
-        let signatures = [];
-        // tempData.map((item,index) => {
-            
-        // })
-        this.setState({
-            signatures
-        })
+        console.log("pojoijp:",wk.subject[0].data);
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk})
+        let tempData = [...dataSource];
+        tempData.map(item => {
+            item.org = JSON.parse(item.org).name
+        })
+        this.setState({dataSource,tempData,wk})
+        console.log("oijiioj:",dataSource);
     }
 
     componentWillReceiveProps(props){
         const {wk} = props
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk})
+        let tempData = [...dataSource];
+        tempData.map(item => {
+            item.org = JSON.parse(item.org).name
+        })
+        this.setState({dataSource,tempData,wk})
    }
    //提交
     async submit(){
@@ -65,70 +66,48 @@ export default class PersonCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
+        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList,postPersonList}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
+        let data_list = [];
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        let doclist_a = [];
-        let doclist_p = [];
-        let wplist = [];
-        dataSource.map((o) => {
-            //创建文档对象
-            let doc = o.related_documents.find(x => {
-                return x.rel_type === 'many_jyp_rel'
-            })
-            if(doc){
-                doclist_p.push({
-                    code:doc.code,
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }else{
-                doclist_a.push({
-                    code:`rel_doc_${o.code}`,
-                    name:`rel_doc_${o.pk}`,
-                    obj_type:"C_DOC",
-                    status:"A",
-                    version:"A",
-                    "basic_params": {
-                        // "files": [
-                        //     {
-                        //     "a_file": file.a_file,
-                        //     "name": file.name,
-                        //     "download_url": file.download_url,
-                        //     "misc": file.misc,
-                        //     "mime_type": file.mime_type
-                        //     },
-                        // ]
-                    },
-                    workpackages:[{
-                        code:o.code,
-                        obj_type:o.obj_type,
-                        pk:o.pk,
-                        rel_type:"many_jyp_rel"
-                    }],
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }
-            //施工包批量
-            wplist.push({
-                code:o.code,
-                extra_params:{
-                    rate:o.rate,
-                    check_status:2
+        JSON.parse(wk.subject[0].data).map((o) => {
+            data_list.push({
+                code: "" + o.code,
+                name: o.name,
+                obj_type: "C_PER",
+                status: "A",
+                version: "A",
+                extra_params: {
+                    depart: o.depart,
+                    email:o.email,
+                    job:o.job,
+                    sex:o.sex,
+                    tel:o.tel,
+                    email:o.email
+                },
+                basic_params:{
+                    signature:o.signature.download_url,
+                    photo:o.signature.a_file
+                },
+                org:{
+                    pk:JSON.parse(o.org).pk,
+                    code:JSON.parse(o.org).code,
+                    obj_type:"C_ORG",
+                    rel_type:"member"
                 }
             })
         })
-        await addDocList({},{data_list:doclist_a});
-        await putDocList({},{data_list:doclist_p})
-        await updateWpData({},{data_list:wplist});
+        postPersonList({},{data_list:data_list}).then(rst => {
+            console.log("rst:",rst);
+            if (rst.result.length) {
+                message.success("审核成功");
+            }
+        })
     }
     //不通过
     async reject(){
@@ -153,6 +132,7 @@ export default class PersonCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
+        console.log("thissd;ljfidg:",this.state.tempData);
         const {wk} = this.props;
         console.log("wk",wk);
         const columns = [{
@@ -165,8 +145,8 @@ export default class PersonCheck extends Component {
             key: 'Name',
         }, {
             title: '所在组织机构单位',
-            dataIndex: 'unit',
-            key: 'Unit',
+            dataIndex: 'org',
+            key: 'Org',
         }, {
             title: '所属部门',
             dataIndex: 'depart',
@@ -189,8 +169,12 @@ export default class PersonCheck extends Component {
             key: 'Email'
         }, {
             title: '二维码',
-            dataIndex: 'signature',
-            key: 'Signature',
+            render:(record) => {
+                console.log("record:",record);
+                return (
+                    <img style={{width:"60px"}} src = {record.signature.preview_url} />
+                )
+            }
         }];
 		return (
             <Modal
@@ -198,13 +182,14 @@ export default class PersonCheck extends Component {
 			key={Math.random()}
             visible={true}
             width= {1280}
-			footer={null}
+            footer={null}
+            onCancel = {() => this.props.closeModal("dr_base_person_visible",false)}
 			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
-                        dataSource={this.state.dataSource}
+                        dataSource={this.state.tempData}
                         bordered />
                     <Row>
                         <Col span={2}>
