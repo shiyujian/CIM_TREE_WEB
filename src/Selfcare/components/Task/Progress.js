@@ -18,6 +18,7 @@ import PersonCheck from '../../../Datareport/components/PersonData/PersonCheck';
 import SumPlanCheck from '../../../Datareport/components/CostListData/SumPlanCheck';
 import ProjectSumExamine from '../../../Datareport/components/CostListData/ProjectSumExamine';
 import WorkCheckModal from '../../../Datareport/components/ScheduleData/WorkCheckModal';
+import DesignCheckModal from '../../../Datareport/components/ScheduleData/DesignCheckModal';
 
 const FormItem = Form.Item;
 @connect(
@@ -56,7 +57,8 @@ export default class Progress extends Component {
 			dr_base_person_visible,
 			dr_qua_jsjh_visible,
 			cost_pro_ck_visible,
-			dr_wor_sg_visible
+			dr_wor_sg_visible,
+			dr_de_sj_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -198,6 +200,10 @@ export default class Progress extends Component {
 					dr_wor_sg_visible && 
 					<WorkCheckModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					dr_de_sj_visible && 
+					<DesignCheckModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -248,6 +254,9 @@ export default class Progress extends Component {
 				break;
 			case "施工进度发起填报":
 				changeDatareportVisible({key:'dr_wor_sg_visible',value:true})
+				break;
+			case "设计进度发起填报":
+				changeDatareportVisible({key:'dr_de_sj_visible',value:true})
 				break;
 			default:break;
 		}
