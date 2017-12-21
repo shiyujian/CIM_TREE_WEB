@@ -142,12 +142,16 @@ export default class Progress extends Component {
 								// 数据报送流程
 								if(action === '通过'){
 									action = '审核';
-									link = <a onClick={this.openModal.bind(this,name,id)}>{action}</a>
+									link = <Button onClick={this.openModal.bind(this,name,id)}>{action}</Button>
 								}
 							} else {
 								link = action;
 							}
-							return (link && <a onClick={this.toggleAction.bind(this, action)} key={index} style={{width:50,height:20,textAlign:'center',display:'inline-block',marginRight: 20,borderWidth:1,borderStyle:'solid',borderColor:'#ddd',borderRadius:5 }}>{link}</a>)
+							if(action === '审核'){
+								return link
+							}else{
+								return (link && <a onClick={this.toggleAction.bind(this, action)} key={index} style={{width:50,height:20,textAlign:'center',display:'inline-block',marginRight: 20,borderWidth:1,borderStyle:'solid',borderColor:'#ddd',borderRadius:5 }}>{link}</a>)
+							}
 						})
 					}
 				</div>
