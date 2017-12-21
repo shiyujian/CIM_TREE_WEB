@@ -45,11 +45,11 @@ export default class Check extends Component {
    }
    //提交
     async submit(){
-        // if(this.state.opinion === 1){
-        //     await this.passon();
-        // }else{
-        //     await this.reject();
-        // }
+        if(this.state.opinion === 1){
+            await this.passon();
+        }else{
+            await this.reject();
+        }
         this.props.closeModal("modal_check_visbile",false)
         message.info("操作成功")
     }
@@ -59,7 +59,6 @@ export default class Check extends Component {
         const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
         let executor = {};
         let person = getUser();
-        console.log('person', person)
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
@@ -147,6 +146,7 @@ export default class Check extends Component {
 	render() {
 		return(
 			<Modal
+				title="模型信息审批表"
 				width = {1280}
 				visible = {true}
 				footer={null}

@@ -13,6 +13,11 @@ import HiddenDangerCheck from '../../../Datareport/components/SafetyHiddenDanger
 import Check from '../../../Datareport/components/ModalData/Check';
 import OrgCheck from '../../../Datareport/components/OrgData/OrgCheck';
 import HPModal from '../../../Datareport/components/ProjectData/HandleProjectModal';
+import SumSpeedExamine from '../../../Datareport/components/CostListData/SumSpeedExamine';
+import PersonCheck from '../../../Datareport/components/PersonData/PersonCheck';
+import SumPlanCheck from '../../../Datareport/components/CostListData/SumPlanCheck';
+import ProjectSumExamine from '../../../Datareport/components/CostListData/ProjectSumExamine';
+import WorkCheckModal from '../../../Datareport/components/ScheduleData/WorkCheckModal';
 
 const FormItem = Form.Item;
 @connect(
@@ -46,7 +51,12 @@ export default class Progress extends Component {
 			safety_hidden_check_visible,
 			modal_check_visbile,
 			dr_base_org_visible,
-			dr_xm_xx_visible
+			dr_xm_xx_visible,
+			cost_sum_spd_visible,
+			dr_base_person_visible,
+			dr_qua_jsjh_visible,
+			cost_pro_ck_visible,
+			dr_wor_sg_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -168,6 +178,26 @@ export default class Progress extends Component {
 					dr_xm_xx_visible && 
 					<HPModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					cost_sum_spd_visible && 
+					<SumSpeedExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_base_person_visible && 
+					<PersonCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_qua_jsjh_visible && 
+					<SumPlanCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					cost_pro_ck_visible && 
+					<ProjectSumExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_wor_sg_visible && 
+					<WorkCheckModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -203,6 +233,21 @@ export default class Progress extends Component {
 				break;
 			case "项目信息批量录入":
 				changeDatareportVisible({key:'dr_xm_xx_visible',value:true})
+				break;
+			case "结算进度信息填报":
+				changeDatareportVisible({key:'cost_sum_spd_visible',value:true})
+				break;
+			case "人员信息批量录入":
+				changeDatareportVisible({key:'dr_base_person_visible',value:true})
+				break;
+			case "结算计划信息填报":
+				changeDatareportVisible({key:'dr_qua_jsjh_visible',value:true})
+				break;
+			case "工程量结算信息填报":
+				changeDatareportVisible({key:'cost_pro_ck_visible',value:true})
+				break;
+			case "施工进度发起填报":
+				changeDatareportVisible({key:'dr_wor_sg_visible',value:true})
 				break;
 			default:break;
 		}
