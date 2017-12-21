@@ -176,7 +176,7 @@ module.exports = {
 			{from: '../static/1108', to: '1108/'},
 			{from: '../static/fonts', to: 'fonts/'},
 			{from: '../static/gooflow', to: 'gooflow/'},
-			/*{from: '../static/oajs', to: 'oajs/'},*/
+			{from: '../static/oajs', to: 'oajs/'},
 			{from: '../static/pdfjs', to: 'pdfjs/'},
 			{from: '../static/jquery.min.js'},
 			{from: '../static/jquery.jqprint-0.3.js'},

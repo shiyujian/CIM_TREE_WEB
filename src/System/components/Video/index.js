@@ -2,6 +2,7 @@ import React,{Component} from 'react';
 import {Form,Input,Row,Col,Button,Modal,message} from 'antd';
 import {Map, TileLayer, Marker} from 'react-leaflet';
 import {divIcon,point} from 'leaflet';
+import {DefaultZoomLevel} from '_platform/api';
 import './video.less';
 const Base64 = require('js-base64').Base64;
 const FormItem = Form.Item;
@@ -237,7 +238,7 @@ class VideoMana extends  Component{
                                                        ref="cameraForm"></WrappedCameraForm>
                 </Col>
                 <Col span={12}>
-                    <Map center={leafletCenter} zoom={13} zoomControl={true}
+                    <Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={true}
                          style={{position: 'relative', height: 336, width: '100%'}}
                          onClick={(e)=>{
                             this.setState({pos:e.latlng});
