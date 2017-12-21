@@ -11,7 +11,7 @@ import PriceListExamine from '../../../Datareport/components/CostListData/PriceL
 import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
 import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
 import HiddenDangerCheck from '../../../Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
-import Check from '../../../Datareport/components/ModalData/Check';
+import ModalCheck from '../../../Datareport/components/ModalData/ModalCheck';
 import OrgCheck from '../../../Datareport/components/OrgData/OrgCheck';
 import HPModal from '../../../Datareport/components/ProjectData/HandleProjectModal';
 import SumSpeedExamine from '../../../Datareport/components/CostListData/SumSpeedExamine';
@@ -172,7 +172,7 @@ export default class Progress extends Component {
 				}
 				{
 					modal_check_visbile && 
-					<Check wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<ModalCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					dr_base_org_visible && 

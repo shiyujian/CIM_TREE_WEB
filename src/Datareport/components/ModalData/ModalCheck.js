@@ -21,7 +21,7 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class Check extends Component {
+export default class ModalCheck extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
