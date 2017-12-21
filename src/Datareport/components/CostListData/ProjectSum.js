@@ -16,10 +16,11 @@ class PriceList extends Component {
             dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
+            projects:[]
 		};
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
+        const {actions:{getAllUsers,getProjectTree}} = this.props
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -27,6 +28,16 @@ class PriceList extends Component {
                 )
             })
             this.setState({checkers})
+        });
+        getProjectTree().then(rst => {
+            if (rst.children.length) {
+                let projects = rst.children.map(item => {
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({projects})
+            }
         })
     }
 	
@@ -217,8 +228,17 @@ class PriceList extends Component {
 				return index+1
 			}
 		},{
-			title: '项目/子项目',
-			dataIndex: 'subproject',
+			title: '负责项目/子项目',
+            dataIndex: 'subproject',
+            render:(record) => {
+                return (
+                    <Select style={{width:"90%"}} onSelect={ele => {
+                        this.setState({ pro: ele })
+                    }}>
+                        {this.state.projects}
+                    </Select>
+                )
+            }
 		  },{
 			title: '项目编码',
 			dataIndex: 'projectcoding',
@@ -246,11 +266,11 @@ class PriceList extends Component {
                 <Popconfirm
                     placement="leftTop"
                     title="确定删除吗？"
-                    onConfirm={this.addto.bind(this, index)}
+              
                     onConfirm={this.delete.bind(this, index)}
                     okText="确认"
                     cancelText="取消">
-                    <a>添加</a>
+                  
                     <a>删除</a>
                 </Popconfirm>
             )
