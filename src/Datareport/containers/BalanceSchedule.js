@@ -14,8 +14,8 @@ var moment = require('moment');
 const Search = Input.Search;
 @connect(
 	state => {
-		const {datareport: {CostListData = {}} = {}, platform} = state;
-		return {...CostListData, platform}
+		const {datareport: {SumSpeedCost = {}} = {}, platform} = state;
+		return {...SumSpeedCost, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({...actions, ...platformActions}, dispatch)
@@ -35,6 +35,9 @@ export default class BalanceSchedule extends Component {
 				return index+1
 			}
 		},{
+			title: '项目/子项目',
+			dataIndex: 'sunproject',
+		  },{
 			title: '单位工程',
 			dataIndex: 'unitproject',
 		  },{
@@ -64,9 +67,9 @@ export default class BalanceSchedule extends Component {
 			person_code:getUser().person_code,
 		}
 		let postdata = {
-			name:"结算清单信息填报",
+			name:"结算进度信息填报",
 			code:WORKFLOW_CODE["数据报送流程"],
-			description:"结算清单信息填报",
+			description:"结算进度信息填报",
 			subject:[{
 				data:JSON.stringify(data)
 			}],
@@ -102,10 +105,10 @@ export default class BalanceSchedule extends Component {
 	render() {
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>
-				<DynamicTitle title="结算进度表" {...this.props}/>
+				<DynamicTitle title="结算进度" {...this.props}/>
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
-					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>发起填报</Button>
 					<Button className="btn" type="default">申请变更</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search 
