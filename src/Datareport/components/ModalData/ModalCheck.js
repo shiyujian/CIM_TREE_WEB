@@ -45,14 +45,18 @@ export default class ModalCheck extends Component {
    }
    //提交
     async submit(){
-        if(this.state.opinion === 1){
-            await this.passon();
-        }else{
-            await this.reject();
-        }
+        // if(this.state.opinion === 1){
+        //     await this.passon();
+        // }else{
+        //     await this.reject();
+        // }
         this.props.closeModal("modal_check_visbile",false)
         message.info("操作成功")
     }
+    //取消
+    cancel() {
+		this.props.closeModal("modal_check_visbile",false)
+	}
     //通过
     async passon(){
         const {dataSource,wk} = this.state
@@ -70,7 +74,7 @@ export default class ModalCheck extends Component {
         dataSource.map((o) => {
             //创建文档对象
             let doc = o.related_documents.find(x => {
-                x.rel_type === 'many_jyp_rel'
+                x.rel_type === 'mch_rel'
             })
             debugger
             if(doc){
@@ -93,7 +97,7 @@ export default class ModalCheck extends Component {
                         code:o.code,
                         obj_type:o.obj_type,
                         pk:o.pk,
-                        rel_type:"many_jyp_rel"
+                        rel_type:"mch_rel"
                     }],
                     extra_params:{
                         ...o
@@ -144,14 +148,15 @@ export default class ModalCheck extends Component {
     }
 
 	render() {
-		console.log('sdfdfd', this.state.dataSource)
 		return(
 			<Modal
 				title="模型信息审批表"
+				key={Math.random()}
 				width = {1280}
 				visible = {true}
 				footer={null}
 				maskClosable={false}
+				onCancel = {this.cancel.bind(this)}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>结果审核</h2>
