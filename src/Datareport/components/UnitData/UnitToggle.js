@@ -165,7 +165,7 @@ export default class UnitToggle extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        columns = [{
+        const  columns = [{
             title: '序号',
             dataIndex: 'index',
             // key: 'Index',
