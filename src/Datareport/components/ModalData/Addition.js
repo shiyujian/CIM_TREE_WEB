@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload } from 'antd';
+import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload, Cascader } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, WORKFLOW_CODE } from '_platform/api';
 const Option = Select.Option;
 var moment = require('moment');
@@ -11,7 +11,7 @@ export default class Addition extends Component {
 			dataSource: [],
 			users: [],
 			projects: [],
-			units:[]
+			units: []
 		};
 	}
 	componentDidMount() {
@@ -27,27 +27,31 @@ export default class Addition extends Component {
 				this.setState({ checkers })
 			}
 		});
-		getProjectTree().then(rst => {
-            if (rst.children.length) {
-                let projects = rst.children.map(item => {
-                    return (
-                        <Option value={JSON.stringify(item)}>{item.name}</Option>
-                    )
-                })
-                this.setState({
-                    projects
-                })
-            }
-        })
+		getProjectTree({ depth: 1 }).then(rst => {
+			if (rst.status) {
+				let projects = rst.children.map(item => {
+					return (
+						{
+							value: JSON.stringify(item),
+							label: item.name,
+							isLeaf: false
+						}
+					)
+				})
+				this.setState({ options: projects });
+			} else {
+				//获取项目信息失败
+			}
+		});
 
 
 	}
 
-	 //下拉框选择人
-	 selectChecker(value){
-        let check = JSON.parse(value)
-        this.setState({check})
-    }
+	//下拉框选择人
+	selectChecker(value) {
+		let check = JSON.parse(value)
+		this.setState({ check })
+	}
 
 
 	render() {
@@ -61,40 +65,6 @@ export default class Addition extends Component {
 		}, {
 			title: '模型编码',
 			dataIndex: 'coding'
-		}, {
-			title: '项目/子项目名称',
-			dataIndex: 'project',
-			render:(record) => {
-                return (
-                    <Select style={{width:"90%"}} onSelect={this.ProSelect.bind(this)}>
-                        {this.state.projects}
-                    </Select>
-                )
-            }
-
-
-		}, {
-			title: '单位工程',
-			dataIndex: 'unit',
-			render:(record) => {
-                return (
-                   
-                    <Select style={{width:"90%"}}  onSelect={ele => {
-                            
-                            console.log('this.state',this.state);
-                        }}>
-                        {this.state.units.map(r=>{
-                            return(
-                                <Option value={r.code} key={r.code}>
-                                    {r.name}
-                                </Option>
-                            )
-                        })}
-                    </Select>
-                )
-
-			}
-
 		}, {
 			title: '模型名称',
 			dataIndex: 'modelName'
@@ -255,6 +225,19 @@ export default class Addition extends Component {
 							}
 						</Select>
 					</span>
+
+					<span>
+						项目-单位工程：
+                        <Cascader
+							options={this.state.options}
+							style={{marginLeft:20}}
+							loadData={this.loadData.bind(this)}
+							onChange={this.onSelectProject.bind(this)}
+							changeOnSelect
+						/>
+					</span>
+
+
 					<Button type="primary" style={{ marginLeft: 20 }} onClick={this.onok.bind(this)}>提交</Button>
 				</Row>
 				<Row style={{ marginBottom: "30px" }}>
@@ -267,17 +250,7 @@ export default class Addition extends Component {
 		);
 	}
 
-	ProSelect(eye){
-        this.setState({ pro: JSON.parse(eye).name ,units:JSON.parse(eye).children})
-    }
-
-
-
-	
-
-	edit() {
-
-	}
+	//点击取消返回
 	cancel() {
 		const {
 			actions: { clearAdditionField }
@@ -291,7 +264,7 @@ export default class Addition extends Component {
 			console.log('woshi', item)
 			return {
 				coding: item[1],
-				unitEngineering: item[3],
+				// unitEngineering: item[3],
 				modelName: item[4],
 				submittingUnit: item[5],
 				modelDescription: item[6],
@@ -317,8 +290,6 @@ export default class Addition extends Component {
 
 	onok() {
 		const { actions: { changeAdditionField } } = this.props;
-
-
 		let ok = this.state.dataSource.some(ele => {
 			return !ele.file;
 		});
@@ -345,7 +316,63 @@ export default class Addition extends Component {
 		this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
 		changeAdditionField('visible', false);
 	}
+	//拉取信息
+	loadData = (selectedOptions) => {
+		const { actions: { getProjectTree } } = this.props;
+		const targetOption = selectedOptions[selectedOptions.length - 1];
+		targetOption.loading = true;
+		getProjectTree({ depth: 2 }).then(rst => {
+			if (rst.status) {
+				let units = [];
+				rst.children.map(item => {
+					if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
+						units = item.children.map(unit => {
+							return (
+								{
+									value: JSON.stringify(unit),
+									label: unit.name
+								}
+							)
+						})
+					}
+				})
+				targetOption.loading = false;
+				targetOption.children = units;
+				this.setState({ options: [...this.state.options] })
+			} else {
+				//获取项目信息失败
+			}
+		});
+	}
+	//项目单位选择
+	onSelectProject = (value, selectedOptions) => {
+		let project = {};
+		let unit = {};
+		if (value.length === 2) {
+			let temp1 = JSON.parse(value[0]);
+			let temp2 = JSON.parse(value[1]);
+			project = {
+				name: temp1.name,
+				code: temp1.code,
+				obj_type: temp1.obj_type
+			}
+			unit = {
+				name: temp2.name,
+				code: temp2.code,
+				obj_type: temp2.obj_type
+			}
+			let newdataSources = this.state.dataSource;
+			for (var i = 0; i < newdataSources.length; i++) {
+				newdataSources[i].subproject = project,
+					newdataSources[i].unit = unit
+			}
+			this.setState({ project, unit, dataSource: newdataSources });
+			return;
+		}
 
+		//must choose all,otherwise make it null
+		this.setState({ project: {}, unit: {} });
+	}
 
 
 
@@ -381,8 +408,6 @@ export default class Addition extends Component {
 		// let rate = dataSource[index].rate
 		// let level = dataSource[index].level
 		// dataSource[index] = {
-
-
 		// 	modelName: modelName,
 		// 	modelDescription: modelDescription,
 		// 	modeType: modeType,
@@ -475,8 +500,6 @@ export default class Addition extends Component {
 	// 	}
 	// 	return res
 	// }
-
-
 	static layout = {
 		labelCol: { span: 6 },
 		wrapperCol: { span: 18 },
