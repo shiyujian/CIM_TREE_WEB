@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import {Table, Row, Col, Select, Input, Checkbox, Icon, notification, Button, DatePicker, Card, Upload, Modal, message,Progress} from 'antd';
 import moment from 'moment';
-import './index.css';
+import './index.less';
 import PerCarbon from './PerCarbon';
 import DelayPerCarbon from './DelayPerCarbon';
 import {getUser} from '_platform/auth';
