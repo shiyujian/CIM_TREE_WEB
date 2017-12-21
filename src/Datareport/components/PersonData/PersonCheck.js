@@ -41,6 +41,7 @@ export default class PersonCheck extends Component {
             item.org = JSON.parse(item.org).name
         })
         this.setState({dataSource,tempData,wk})
+        console.log("oijiioj:",dataSource);
     }
 
     componentWillReceiveProps(props){
@@ -74,10 +75,6 @@ export default class PersonCheck extends Component {
         executor.person_code = person.code;
         let data_list = [];
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        // let 
-        // let org = {
-        //     pk:JSON.parse(wk.current[0].org).
-        // }
         JSON.parse(wk.subject[0].data).map((o) => {
             data_list.push({
                 code: "" + o.code,
@@ -107,6 +104,9 @@ export default class PersonCheck extends Component {
         })
         postPersonList({},{data_list:data_list}).then(rst => {
             console.log("rst:",rst);
+            if (rst.result.length) {
+                message.success("审核成功");
+            }
         })
     }
     //不通过
@@ -169,8 +169,12 @@ export default class PersonCheck extends Component {
             key: 'Email'
         }, {
             title: '二维码',
-            dataIndex: 'signature',
-            key: 'Signature',
+            render:(record) => {
+                console.log("record:",record);
+                return (
+                    <img style={{width:"60px"}} src = {record.signature.preview_url} />
+                )
+            }
         }];
 		return (
             <Modal
@@ -178,7 +182,8 @@ export default class PersonCheck extends Component {
 			key={Math.random()}
             visible={true}
             width= {1280}
-			footer={null}
+            footer={null}
+            onCancel = {() => this.props.closeModal("dr_base_person_visible",false)}
 			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>

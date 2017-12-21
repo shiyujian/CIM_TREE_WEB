@@ -14,7 +14,7 @@ import workdataReducer, {actions as workdataActions} from './workdata';
 import CostListDataReducer, {actions as CostListDataActions} from './CostListData';
 import WorkunitCostReducer, {actions as WorkunitCostActions} from './WorkunitCost';
 import safetyReducer, {actions as SafetyActions} from './safety';
-
+import SumSpeedCostReducer, {actions as SumSpeedCostActions} from'./SumSpeedCost'
 export default handleActions({
 	//项目信息
 	[combineActions(...actionsMap(projectdataActions))]: (state = {}, action) => ({
@@ -87,5 +87,10 @@ export default handleActions({
 	[combineActions(...actionsMap(SafetyActions))]: (state = {}, action) => ({
 		...state,
 		safety: safetyReducer(state.safety, action),
+	}),
+	//结算进度
+	[combineActions(...actionsMap(SumSpeedCostActions))]: (state = {}, action) => ({
+		...state,
+		SumSpeedCost: SumSpeedCostReducer(state.SumSpeedCost, action),
 	}),
 }, {});

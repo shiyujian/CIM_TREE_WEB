@@ -98,7 +98,7 @@ export default class Modify extends Component {
                 subtext:'政务服务中心',
                 x:'left'
             },
-            color: ['#3B99FF', '#03E5CE', '#FFC36B'],
+            color: ['#3B99FF', '#2DDBCA', '#546D83'],
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {

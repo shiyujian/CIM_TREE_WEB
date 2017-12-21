@@ -167,7 +167,8 @@ export default class OrgCheck extends Component {
 			key={Math.random()}
             visible={true}
             width= {1280}
-			footer={null}
+            footer={null}
+            onCancel = {this.props.closeModal.bind(this,"dr_base_person_visible",false)}
 			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>

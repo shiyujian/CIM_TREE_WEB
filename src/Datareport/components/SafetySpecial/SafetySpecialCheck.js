@@ -40,11 +40,11 @@ export default class SafetySpecialCheck extends Component {
             getScheduleDir,
             postScheduleDir,
         } } = this.props;
-        let topDir = await getScheduleDir({ code: 'the_only_main_code_safetyspecial' });
+        let topDir = await getScheduleDir({ code: 'the_only_main_code_datareport' });
         if (!topDir.obj_type) {
             let postData = {
-                name: '安全管理的顶级节点',
-                code: 'the_only_main_code_safetyspecial',
+                name: '数据报送的顶级节点',
+                code: 'the_only_main_code_datareport',
                 "obj_type": "C_DIR",
                 "status": "A",
             }
@@ -58,8 +58,8 @@ export default class SafetySpecialCheck extends Component {
         this.setState({ dataSource, wk })
     }
     cancel() {
-		this.props.closeModal("Safety_Special_check_visible",false)
-	}
+        this.props.closeModal("Safety_Special_check_visible", false)
+    }
     //提交
     async submit() {
         if (this.state.option === 1) {
@@ -82,7 +82,7 @@ export default class SafetySpecialCheck extends Component {
             postScheduleDir,
             getWorkpackagesByCode
         } } = this.props;
-        debugger
+        console.log(dataSource, '-------')
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
         let code = 'datareport_safetyspecial_' + unit.code;
@@ -115,12 +115,21 @@ export default class SafetySpecialCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({ pk: wk.id }, { state: wk.current[0].id, action: '通过', note: '同意', executor: executor, attachment: null });
+
+        await logWorkflowEvent(
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id, action: '通过', note: '同意',
+                executor: executor, attachment: null
+            }
+        );
 
         //prepare the data which will store in database
         const docData = [];
         let i = 0;   //asure the code of every document only
         dataSource.map(item => {
+            debugger;
             i++;
             docData.push({
                 code: 'safetyspecial' + moment().format("YYYYMMDDHHmmss") + i,

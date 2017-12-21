@@ -13,7 +13,9 @@ export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk
 //附件上传相关
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
 const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [], 'DELETE');
-export const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
+const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
+//获取文档目录
+const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 
 export const actions = {
 	Test,
@@ -22,7 +24,8 @@ export const actions = {
 	logWorkflowEvent,
 	uploadStaticFile,
 	deleteStaticFile,
-	getWorkPackageDetail
+	getWorkPackageDetail,
+	getScheduleDir
 };
 
 export default handleActions({
