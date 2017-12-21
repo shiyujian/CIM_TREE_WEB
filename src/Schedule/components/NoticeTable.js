@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Table, Row, Col, Select, Input, Checkbox, Icon, notification, Button, DatePicker, Card, Upload, Modal, message  } from 'antd';
 import moment from 'moment';
-import './index.css';
+import './index.less';
 import {SERVICE_API, SCHEDULE_TOTAL_PLAN_URL, WORKFLOW_CODE, USER, PASSWORD, STATIC_UPLOAD_API} from '_platform/api';
 
 

@@ -11,9 +11,45 @@ export default class Addition extends Component {
 			dataSource: [],
 			users: [],
 			projects: [],
-			checkers: []
+			units:[]
 		};
 	}
+	componentDidMount() {
+		const { actions: { getAllUsers, getProjectTree } } = this.props;
+		getAllUsers().then(rst => {
+			let users = [];
+			if (rst.length) {
+				let checkers = rst.map(o => {
+					return (
+						<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+					)
+				})
+				this.setState({ checkers })
+			}
+		});
+		getProjectTree().then(rst => {
+            if (rst.children.length) {
+                let projects = rst.children.map(item => {
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({
+                    projects
+                })
+            }
+        })
+
+
+	}
+
+	 //下拉框选择人
+	 selectChecker(value){
+        let check = JSON.parse(value)
+        this.setState({check})
+    }
+
+
 	render() {
 		const { addition = {}, actions: { changeAdditionField } } = this.props;
 		const columns = [{
@@ -28,19 +64,37 @@ export default class Addition extends Component {
 		}, {
 			title: '项目/子项目名称',
 			dataIndex: 'project',
-			render: (record) => {
-				return (
-					<Select style={{ width: '120px' }} onSelect={ele => {
-						this.setState({ pro: ele })
-					}}>
-						{this.state.projects}
-					</Select>
-				)
-			}
+			render:(record) => {
+                return (
+                    <Select style={{width:"90%"}} onSelect={this.ProSelect.bind(this)}>
+                        {this.state.projects}
+                    </Select>
+                )
+            }
+
 
 		}, {
 			title: '单位工程',
-			dataIndex: 'unitEngineering'
+			dataIndex: 'unit',
+			render:(record) => {
+                return (
+                   
+                    <Select style={{width:"90%"}}  onSelect={ele => {
+                            
+                            console.log('this.state',this.state);
+                        }}>
+                        {this.state.units.map(r=>{
+                            return(
+                                <Option value={r.code} key={r.code}>
+                                    {r.name}
+                                </Option>
+                            )
+                        })}
+                    </Select>
+                )
+
+			}
+
 		}, {
 			title: '模型名称',
 			dataIndex: 'modelName'
@@ -82,7 +136,7 @@ export default class Addition extends Component {
 					return (
 						<span>
 							<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record)}>
-							
+
 								<Button>
 									<Icon type="upload" />上传附件
                             </Button>
@@ -213,17 +267,13 @@ export default class Addition extends Component {
 		);
 	}
 
+	ProSelect(eye){
+        this.setState({ pro: JSON.parse(eye).name ,units:JSON.parse(eye).children})
+    }
 
 
 
-	//table input 输入
-	tableDataChange(index, key, e) {
-		const { addition, actions: { changeAdditionField } } = this.props;
-		let { dataSource } = addition;
-		dataSource[index][key] = e.target['value'];
-		changeAdditionField('dataSource', dataSource)
-	}
-
+	
 
 	edit() {
 
@@ -241,10 +291,13 @@ export default class Addition extends Component {
 			console.log('woshi', item)
 			return {
 				coding: item[1],
-
+				unitEngineering: item[3],
 				modelName: item[4],
+				submittingUnit: item[5],
 				modelDescription: item[6],
 				modeType: item[7],
+				tdbxMode: item[9],
+				attributeTable: item[10],
 				reportingName: item[12],
 				file: {
 
@@ -256,7 +309,6 @@ export default class Addition extends Component {
 	//下拉框选择
 	handleSelect(index, key, value) {
 		const { dataSource } = this.state;
-
 		dataSource[index][key] = value;
 		// console.log('value', value)
 		this.setState({ dataSource });
@@ -265,8 +317,8 @@ export default class Addition extends Component {
 
 	onok() {
 		const { actions: { changeAdditionField } } = this.props;
-		console.log(this.props)
-	
+
+
 		let ok = this.state.dataSource.some(ele => {
 			return !ele.file;
 		});
@@ -274,6 +326,13 @@ export default class Addition extends Component {
 		//     message.error('有附件未上传');
 		//     return;
 		// };
+		let temp = this.state.dataSource.some((o, index) => {
+			return !o.file.id
+		})
+		if (temp) {
+			message.info(`有数据未上传附件`)
+			return
+		}
 		if (this.state.dataSource.length === 0) {
 			message.info("请上传excel")
 			return
@@ -282,41 +341,13 @@ export default class Addition extends Component {
 			message.error('审批人未选择');
 			return;
 		}
-		// if (!this.state.projects) {
-		// 	message.error('项目/子项目未选择');
-		// 	return;
-		// }
+
 		this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
-		// message.info('发起流程成功')
 		changeAdditionField('visible', false);
 	}
 
 
-	componentDidMount() {
-		const { actions: { getAllUsers, getProjects } } = this.props;
-		getAllUsers().then(rst => {
-			let users = [];
-			if (rst.length) {
-				let checkers = rst.map(o => {
-					return (
-						<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
-					)
-				})
-				this.setState({ checkers })
-			}
-		});
-		getProjects().then(rst => {
-			if (rst.children.length) {
-				let projects = rst.children.map(item => {
-					return (
-						<Option value={JSON.stringify(item)}>{item.name}</Option>
-					)
-				})
-				this.setState({ projects })
-			}
-		})
 
-	}
 
 	//预览
 	handlePreview(index) {
@@ -343,16 +374,14 @@ export default class Addition extends Component {
 
 	//附件删除
 	remove(index) {
-		const { actions: { deleteStaticFile,changeAdditionField } } = this.props
+		const { actions: { deleteStaticFile, changeAdditionField } } = this.props
 		let { dataSource } = this.state
-		console.log('bbb',this.state)
 		let id = dataSource[index]['file'].id
-		console.log('aaa',id)
 		deleteStaticFile({ id: id })
 		// let rate = dataSource[index].rate
 		// let level = dataSource[index].level
 		// dataSource[index] = {
-			
+
 
 		// 	modelName: modelName,
 		// 	modelDescription: modelDescription,
@@ -363,36 +392,37 @@ export default class Addition extends Component {
 		// }
 
 		dataSource[index].file = ''
-		changeAdditionField('dataSource',dataSource)
-		
+		changeAdditionField('dataSource', dataSource)
+
 		this.setState({ dataSource })
 	}
 
 	//附件上传
-	beforeUploadPicFile(record,file){
-        console.log(record,file);
-        const fileName = file.name;
+	beforeUploadPicFile(record, file) {
+		// console.log(record, file);
+		const fileName = file.name;
 		// 上传到静态服务器
-		const { actions:{uploadStaticFile} } = this.props;
+		const { actions: { uploadStaticFile } } = this.props;
 		const formdata = new FormData();
 		formdata.append('a_file', file);
-        formdata.append('name', fileName);
-        let myHeaders = new Headers();
-        let myInit = { method: 'POST',
-                       headers: myHeaders,
-                       body: formdata
-                     };
-                     //uploadStaticFile({}, formdata)
-        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
-            let loadedFile = await resp.json();
-            loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
-            loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
-            record.file = loadedFile;
-            record.code = file.name.substring(0,file.name.lastIndexOf('.'));
-            this.forceUpdate();
-        });
-        return false;
-    }
+		formdata.append('name', fileName);
+		let myHeaders = new Headers();
+		let myInit = {
+			method: 'POST',
+			headers: myHeaders,
+			body: formdata
+		};
+		//uploadStaticFile({}, formdata)
+		fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
+			let loadedFile = await resp.json();
+			loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
+			loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
+			record.file = loadedFile;
+			record.code = file.name.substring(0, file.name.lastIndexOf('.'));
+			this.forceUpdate();
+		});
+		return false;
+	}
 	// //根据附件名称 也就是wbs编码获取其他信息
 	// async getInfo(code) {
 	// 	console.log(this.props)

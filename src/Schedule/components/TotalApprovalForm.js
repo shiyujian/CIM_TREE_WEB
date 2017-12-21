@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Select, Button, Row, Col, DatePicker, Input, Icon, Checkbox, Tbale, Radio, Table, Card, notification} from 'antd';
-import style from './index.css';
+import './index.less';
 import PerCarbon from './PerCarbon';
 import Dragger from '_platform/components/panels/Dragger';
 import {getUser} from '_platform/auth';
@@ -395,7 +395,7 @@ export default class TotalApprovalForm extends Component {
                                         <Radio value={'退回'}>退回，并请在</Radio>
                                     </RadioGroup>
                                     <div style={{display: 'inline-block'}}>
-                                        <DatePicker size={'small'} 
+                                        <DatePicker  
                                             onChange={this.reReportTimeChange.bind(this)}
                                             placeholder="请选择重新填报日期" 
                                             style={{textIndent:'0',minWidth: 100,marginLeft:5,marginRight:10}}/>
