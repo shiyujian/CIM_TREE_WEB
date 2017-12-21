@@ -21,10 +21,10 @@ var moment = require('moment');
 )
 export default class OrgData extends Component {
 	setData(data,participants){
-		// console.log("data:",data);
-		// console.log("participants:",participants);
+		console.log("data:",data);
+		console.log("participants:",participants);
 		// return;
-		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		const {actions:{ createWorkflow, logWorkflowEvent}} = this.props
 		let creator = {
 			id:getUser().id,
 			username:getUser().username,
