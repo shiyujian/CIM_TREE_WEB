@@ -48,11 +48,11 @@ export default class UnitToggle extends Component {
    }
    //提交
     async submit(){
-        if(this.state.opinion === 1){
-            await this.passon();
-        }else{
-            await this.reject();
-        }
+        // if(this.state.opinion === 1){
+        //     await this.passon();
+        // }else{
+        //     await this.reject();
+        // }
         this.props.closeModal("dr_qua_unit_visible",false)
         message.info("操作成功")
     }
@@ -72,6 +72,7 @@ export default class UnitToggle extends Component {
         let wplist = [];
         dataSource.map((o) => {
             //创建文档对象
+            console.log(o)
             let doc = o.related_documents.find(x => {
                 return x.rel_type === 'many_jyp_rel'
             })
