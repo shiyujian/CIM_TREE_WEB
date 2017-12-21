@@ -19,6 +19,7 @@ import PersonCheck from '../../../Datareport/components/PersonData/PersonCheck';
 import SumPlanCheck from '../../../Datareport/components/CostListData/SumPlanCheck';
 import ProjectSumExamine from '../../../Datareport/components/CostListData/ProjectSumExamine';
 import WorkCheckModal from '../../../Datareport/components/ScheduleData/WorkCheckModal';
+import SafetySpecialCheck from '../../../Datareport/components/SafetySpecial/SafetySpecialCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -53,15 +54,13 @@ export default class Progress extends Component {
 			modal_check_visbile,
 			dr_base_org_visible,
 			dr_xm_xx_visible,
-<<<<<<< HEAD
-			cost_pri_ck_visible
-=======
+			cost_pri_ck_visible,
 			cost_sum_spd_visible,
 			dr_base_person_visible,
 			dr_qua_jsjh_visible,
 			cost_pro_ck_visible,
-			dr_wor_sg_visible
->>>>>>> bec87ec55e674913e99a7dee517539081af2af49
+			dr_wor_sg_visible,
+			Safety_Special_check_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -184,10 +183,9 @@ export default class Progress extends Component {
 					<HPModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
-<<<<<<< HEAD
 					cost_pri_ck_visible && 
 					<PriceListExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
-=======
+				}{
 					cost_sum_spd_visible && 
 					<SumSpeedExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
@@ -206,7 +204,10 @@ export default class Progress extends Component {
 				{
 					dr_wor_sg_visible && 
 					<WorkCheckModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
->>>>>>> bec87ec55e674913e99a7dee517539081af2af49
+				}
+				{
+					Safety_Special_check_visible && 
+					<SafetySpecialCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 			</div>
 		);
@@ -244,10 +245,8 @@ export default class Progress extends Component {
 			case "项目信息批量录入":
 				changeDatareportVisible({key:'dr_xm_xx_visible',value:true})
 				break;
-<<<<<<< HEAD
 			case "计价清单信息填报":
 				changeDatareportVisible({key:'cost_pri_ck_visible',value:true})
-=======
 			case "结算进度信息填报":
 				changeDatareportVisible({key:'cost_sum_spd_visible',value:true})
 				break;
@@ -262,7 +261,9 @@ export default class Progress extends Component {
 				break;
 			case "施工进度发起填报":
 				changeDatareportVisible({key:'dr_wor_sg_visible',value:true})
->>>>>>> bec87ec55e674913e99a7dee517539081af2af49
+				break;
+			case "安全专项信息批量录入":
+				changeDatareportVisible({key:'Safety_Special_check_visible',value:true})
 				break;
 			default:break;
 		}
