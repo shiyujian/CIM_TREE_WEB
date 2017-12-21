@@ -8,6 +8,7 @@ import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
 import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
+import DesignDataCheck from '../../../Datareport/components/DesignData/Check';
 import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
 import Check from '../../../Datareport/components/ModalData/Check'
 
@@ -32,7 +33,7 @@ export default class Progress extends Component {
 	}
 
 	render() {
-		const { state = {}, task, location, states = [],dr_qua_jyp_visible,dr_qua_jy_visible,safety_doc_check_visible,modal_check_visbile} = this.props;
+		const { state = {}, task, location, states = [],dr_qua_jyp_visible,dr_qua_jy_visible,safety_doc_check_visible,modal_check_visbile,design_check_visbile} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
 		const { state_id = '0' } = queryString.parse(location.search) || {};
@@ -139,6 +140,10 @@ export default class Progress extends Component {
 					modal_check_visbile && 
 					<Check wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					design_check_visbile && 
+					<DesignDataCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -165,6 +170,9 @@ export default class Progress extends Component {
 				break;
 			case "模型信息批量录入":
 				changeDatareportVisible({key:'modal_check_visbile',value:true})
+				break;
+			case "设计信息批量录入":
+				changeDatareportVisible({key:'design_check_visbile',value:true})
 				break;
 			default:break;
 		}
