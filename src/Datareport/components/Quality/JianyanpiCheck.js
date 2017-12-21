@@ -90,15 +90,9 @@ export default class JianyanpiCheck extends Component {
                     status:"A",
                     version:"A",
                     "basic_params": {
-                        // "files": [
-                        //     {
-                        //     "a_file": file.a_file,
-                        //     "name": file.name,
-                        //     "download_url": file.download_url,
-                        //     "misc": file.misc,
-                        //     "mime_type": file.mime_type
-                        //     },
-                        // ]
+                        "files": [
+                            o.file
+                        ]
                     },
                     workpackages:[{
                         code:o.code,
@@ -193,7 +187,7 @@ export default class JianyanpiCheck extends Component {
             width:"8%",
             render: (text, record, index) => (
                 <span>
-                    {record.unit.name*100 + '%'} 
+                    {(parseFloat(record.rate)*100).toFixed(1) + '%'} 
                 </span>
             ),
 		},{
@@ -227,7 +221,7 @@ export default class JianyanpiCheck extends Component {
             visible={true}
             width= {1280}
 			footer={null}
-			maskClosable={false}>
+			maskClosable={true}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}

@@ -16,10 +16,11 @@ class PriceList extends Component {
             dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
+            projects:[]
 		};
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
+        const {actions:{getAllUsers,getProjectTree}} = this.props
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -27,6 +28,17 @@ class PriceList extends Component {
                 )
             })
             this.setState({checkers})
+        });
+        getProjectTree().then(rst =>{
+            console.log('rst:',rst)
+            if (rst.children.length) {
+                let projects = rst.children.map(item => {
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({projects})
+            }
         })
     }
 	
@@ -213,8 +225,29 @@ class PriceList extends Component {
 				return index+1
 			}
 		},{
+			title: '项目/子项目',
+            dataIndex: 'sunproject',
+            render:(record) => {
+                return (
+                    <Select style={{width:"90%"}} onSelect={ele => {
+                        this.setState({ pro: ele })
+                    }}>
+                        {this.state.projects}
+                    </Select>
+                )
+            }
+		  },{
 			title: '单位工程',
-			dataIndex: 'unitproject',
+            dataIndex: 'unitproject',
+            render:(record) => {
+                return (
+                    <Select style={{width:"90%"}} onSelect={ele => {
+                        this.setState({ pro: ele })
+                    }}>
+                        {this.state.projects}
+                    </Select>
+                )
+            }
 		  },{
 			title: '工作节点目标',
 			dataIndex: 'nodetarget',
@@ -328,6 +361,7 @@ class PriceList extends Component {
                     name:"",
                     type:"",
             },
+            sunproject:item[0],
             unitproject:item[1],
             nodetarget:item[2],
             completiontime:item[3],

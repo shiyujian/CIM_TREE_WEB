@@ -97,8 +97,20 @@ export default class SumPlan extends Component {
 				return index+1
 			}
 		},{
-			title: '项目/子项目',
+			title: '项目/子项目名称',
             dataIndex: 'subproject',
+            render:(record) => {
+                return (
+                    <Select style={{width:"90%"}} defaultValue={this.state.defaultPro} onSelect={ele => {
+                        this.setState({ pro: ele })
+                    }}>
+                        {this.state.projects}
+                    </Select>
+                )
+            }
+          },{
+			title: '单位工程',
+            dataIndex: 'unit',
             render:(record) => {
                 return (
                     <Select style={{width:"90%"}} defaultValue={this.state.defaultPro} onSelect={ele => {

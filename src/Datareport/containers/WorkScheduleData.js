@@ -5,7 +5,7 @@ import { actions} from '../store/workdata';
 import { getUser} from '_platform/auth';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import { Row, Col, Table, Input, Button } from 'antd';
+import { Row, Col, Table, Input, Button, message } from 'antd';
 import WorkModal from '../components/ScheduleData/WorkModal';
 import './quality.less';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -105,7 +105,7 @@ export default class WorkScheduleData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({addvisible:false})						
+						this.setState({addvisible:false})				
 					})
 		})
 	}
@@ -140,7 +140,7 @@ export default class WorkScheduleData extends Component {
 				</Row>
 				{
 					this.state.addvisible &&
-					<WorkModal {...this.props} oncancel={this.oncancel.bind(this)} akey={Math.random() * 1234} onok={this.setData.bind(this)} />
+					<WorkModal {...this.props} oncancel={this.oncancel.bind(this)}  onok={this.setData.bind(this)} />
 				}
 			</div>
 		);

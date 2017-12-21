@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/CostListData';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button} from 'antd';
+import {Row,Col,Table,Input,Button,message} from 'antd';
 import PriceList from '../components/CostListData/PriceList';
 import {getUser} from '_platform/auth';
 import './quality.less';
@@ -93,7 +93,8 @@ export default class CostListData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({addvisible:false})						
+						this.setState({addvisible:false}),
+						message.info("发起成功")						
 					})
 		})
 	}

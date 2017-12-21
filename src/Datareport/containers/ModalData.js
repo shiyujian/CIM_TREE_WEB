@@ -61,7 +61,7 @@ export default class ModalData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
 					attachment:null
-				});
+				})
 		});
 	}
 

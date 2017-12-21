@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
 const Search = Input.Search;
+const Option = Select.Option;
 export default class ToggleModal extends Component{
     constructor(props){
         super(props);
@@ -15,6 +16,7 @@ export default class ToggleModal extends Component{
         }
     }
     render(){
+        console.log("datasource",this.state.dataSource);
         const {visible = false} = this.props;
         let jthis = this;
         const props = {
@@ -37,7 +39,6 @@ export default class ToggleModal extends Component{
 		        }
 		    },
         };
-        console.log("this.state.defaultchecker:",this.state);
         return (
             <Modal
                 visible={visible}
@@ -60,7 +61,7 @@ export default class ToggleModal extends Component{
                 </Upload>
                 <span>
                     审核人：
-                        <Select defaultValue={this.state.defaultchecker} style={{ width: '200px' }}  className="btn" onSelect = {ele=>{
+                        <Select defaultValue={this.state.defaultchecker} style={{ width: '200px' }} className="btn" onSelect = {ele=>{
                             this.setState({passer:ele})
                         }} >
                         {
@@ -101,7 +102,7 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
-        
+
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisible(false);
     }
@@ -132,7 +133,8 @@ export default class ToggleModal extends Component{
             if (rst.children.length) {
                 let projects = rst.children.map(item => {
                     return (
-                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                        // <Option value={JSON.stringify(item)}>{item.name}</Option>
+                        <Option value={item.name}>{item.name}</Option>
                     )
                 })
                 this.setState({
@@ -143,9 +145,6 @@ export default class ToggleModal extends Component{
         })
     }
     columns = [{
-
-    },
-    {
         title: '序号',
         dataIndex: 'index',
         key: 'Index',
@@ -171,11 +170,11 @@ export default class ToggleModal extends Component{
         key: 'Direct',
     }, {
         title: '负责项目/子项目名称',
-        dataIndex: 'project',
         render:(record) => {
             return (
-                <Select style={{width:"90%"}} defaultValue={this.state.defaultPro} onSelect={ele => {
-                    this.setState({ pro: ele })
+                <Select style={{width:"90%"}} value = {record.projType || this.state.defaultPro} onSelect={ele => {
+                    record.projType = ele;
+                    this.forceUpdate();
                 }}>
                     {this.state.projects}
                 </Select>

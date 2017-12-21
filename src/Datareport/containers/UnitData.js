@@ -22,8 +22,6 @@ import {WORKFLOW_CODE} from '_platform/api'
 export default class UnitData extends Component {
 	static propTypes = {};
 	setData(data,participants){
-		// console.log(data,participants)
-		// return;
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -62,7 +60,6 @@ export default class UnitData extends Component {
 	}
 	render() {
 		const {visible} = this.props;
-		console.log(visible)
 		return (
 			<div>
 				<DynamicTitle title="单位工程" {...this.props} />

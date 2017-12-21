@@ -21,7 +21,7 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class Check extends Component {
+export default class SumSpeedExamine extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -44,12 +44,12 @@ export default class Check extends Component {
    }
    //提交
     async submit(){
-        if(this.state.opinion === 1){
-            await this.passon();
-        }else{
-            await this.reject();
-        }
-        this.props.closeModal("modal_check_visbile",false)
+        // if(this.state.opinion === 1){
+        //     await this.passon();
+        // }else{
+        //     await this.reject();
+        // }
+        this.props.closeModal("cost_sum_spd_visible",false)
         message.info("操作成功")
     }
     //通过
@@ -107,7 +107,6 @@ export default class Check extends Component {
                 }
             })
         })
-        debugger
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -145,19 +144,19 @@ export default class Check extends Component {
 	render() {
 		return(
 			<Modal
-				width = {1280}
+				width = {1280}  
 				visible = {true}
-				onCancel = {this.cancel.bind(this)}
+                onCancel = {this.cancel.bind(this)}
+                footer ={null}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>结果审核</h2>
 				</Row>
 				<Row>
-					<Table
-						bordered
-						className = 'foresttable'
-						columns={this.columns}
-					/>
+                <Table style={{ marginTop: '10px', marginBottom:'10px' }}
+						columns={columns}
+						dataSource={this.state.dataSource}
+						bordered />
 				</Row>
 				<Row style={{margin: '20px 0'}}>
 					<Col span={2}>
@@ -175,7 +174,7 @@ export default class Check extends Component {
         				</Button>
 				    </Col>
 				    <Col span={2} push={14}>
-				    	<Button type='primary'>
+				    	<Button type='primary' onClick={this.submit.bind(this)}>
         					确认提交
         				</Button>
 				    </Col>
@@ -191,16 +190,16 @@ export default class Check extends Component {
 			    <Row>
 			    	<Col span={10}>
 			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：数据上传者</div>
-			    			<div>执行时间：2017-11-22</div>
-			    			<div>执行意见：XXXXXXXXXXXXX</div>
+			    			<div>执行人：</div>
+			    			<div>执行时间：</div>
+			    			<div>执行意见：</div>
 			    			<div style={{marginTop: '40px'}}>电子签章：</div>
 			    		</div>
 			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传</div>
 			    	</Col>
 			    	<Col span={10}>
 			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：数据审批</div>
+			    			<div>执行人：</div>
 			    			<div>执行时间：</div>
 			    			<div>执行意见：</div>
 			    			<div style={{marginTop: '40px'}}>电子签章：</div>
@@ -212,46 +211,34 @@ export default class Check extends Component {
 		)
 	}
 
-	columns = [{
-			title: '序号',
-			dataIndex: 'index',
-		}, {
-			title: '编码',
-			dataIndex: 'value'
-		}, {
-			title: '项目/子项目名称',
-			dataIndex: 'alias'
-		}, {
-			title: '单位工程',
-			dataIndex: 'description1'
-		}, {
-			title: '模型名称',
-			dataIndex: 'description2'
-		}, {
-			title: '提交单位',
-			dataIndex: 'description4'
-		}, {
-			title: '模型描述',
-			dataIndex: 'description5'
-		}, {
-			title: '模型类型',
-			dataIndex: 'description6'
-		}, {
-			title: 'fdb模型',
-			dataIndex: 'description7'
-		}, {
-			title: 'tdbx模型',
-			dataIndex: 'description8'
-		}, {
-			title: '属性表',
-			dataIndex: 'description9'
-		}, {
-			title: '上报时间',
-			dataIndex: 'description10'
-		}, {
-			title: '上报人',
-			dataIndex: 'description11'
-		}];
+	columns =
+                [{
+                    title:'序号',
+                    render:(text,record,index) => {
+                    return index+1
+                }
+            },{
+                title: '项目/子项目',
+                    dataIndex: 'sunproject',
+            },{
+                title: '单位工程',
+                    dataIndex: 'unitproject',
+            },{
+                title: '工作节点目标',
+                    dataIndex: 'nodetarget',
+            },{
+                title: '完成时间',
+                    dataIndex: 'completiontime',
+            },{
+                title: '支付金额（万元）',
+                    dataIndex: 'summoney',
+            },{
+                title: '累计占比',
+                    dataIndex: 'ratio',
+            },{
+                title: '备注',
+                    dataIndex: 'remarks',
+            }];
 
 	cancel() {
 		const {
