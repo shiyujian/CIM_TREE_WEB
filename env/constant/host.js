@@ -7,7 +7,7 @@
  */
 
 const IP = require('ip').address();
-const PORT = 3000;
+const PORT = 8000;
 exports.IP = IP;
 exports.PORT = PORT;
 exports.HOST = `http://${IP}:${PORT}/`;

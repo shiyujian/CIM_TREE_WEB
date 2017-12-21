@@ -82,7 +82,7 @@ export default class SafetySpecialCheck extends Component {
             postScheduleDir,
             getWorkpackagesByCode
         } } = this.props;
-        debugger
+        console.log(dataSource, '-------')
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
         let code = 'datareport_safetyspecial_' + unit.code;

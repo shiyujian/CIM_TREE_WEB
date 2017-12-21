@@ -44,9 +44,90 @@ export default class JianyanCheck extends Component {
         this.setState({dataSource,wk})
    }
    //提交
-    submit(){
-        this.props.closeModal("dr_qua_jy_visible",false)
+   async submit(){
+    if(this.state.opinion === 1){
+        await this.passon();
+    }else{
+        await this.reject();
     }
+    this.props.closeModal("dr_qua_jy_visible",false)
+    message.info("操作成功")
+}
+//通过
+async passon(){
+    const {dataSource,wk} = this.state
+    const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
+    let executor = {};
+    let person = getUser();
+    executor.id = person.id;
+    executor.username = person.username;
+    executor.person_name = person.name;
+    executor.person_code = person.code;
+    await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+    let doclist_a = [];
+    let doclist_p = [];
+    let wplist = [];
+    dataSource.map((o) => {
+        //创建文档对象
+        let doc = o.related_documents.find(x => {
+            return x.rel_type === 'many_jy_rel'
+        })
+        if(doc){
+            doclist_p.push({
+                code:doc.code,
+                extra_params:{
+                    ...o
+                }
+            })
+        }else{
+            doclist_a.push({
+                code:`rel_doc_${o.code}`,
+                name:`rel_doc_${o.pk}`,
+                obj_type:"C_DOC",
+                status:"A",
+                version:"A",
+                "basic_params": {
+                    "files": [
+                        o.file
+                    ]
+                },
+                workpackages:[{
+                    code:o.code,
+                    obj_type:o.obj_type,
+                    pk:o.pk,
+                    rel_type:"many_jy_rel"
+                }],
+                extra_params:{
+                    ...o
+                }
+            })
+        }
+        //施工包批量
+        wplist.push({
+            code:o.code,
+            extra_params:{
+                rate:o.rate,
+                check_status:2
+            }
+        })
+    })
+    await addDocList({},{data_list:doclist_a});
+    await putDocList({},{data_list:doclist_p})
+    await updateWpData({},{data_list:wplist});
+}
+//不通过
+async reject(){
+    const {wk} = this.props
+    const {actions:{deleteWorkflow}} = this.props
+    await deleteWorkflow({pk:wk.id})
+    // let executor = {};
+    // let person = getUser();
+    // executor.id = person.id;
+    // executor.username = person.username;
+    // executor.person_name = person.name;
+    // executor.person_code = person.code;
+    // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'退回',note:'滚',executor:executor,attachment:null});
+}
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
