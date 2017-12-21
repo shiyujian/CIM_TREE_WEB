@@ -38,6 +38,7 @@ export default class VedioUpload extends Component{
                 <VedioTable
                  dataSource={dataSource}
                  storeExcelData={this.storeExcelData}
+                 fileDel={true}
                 />
                 <UploadFooter
                  storeExcelData= {this.storeExcelData}
