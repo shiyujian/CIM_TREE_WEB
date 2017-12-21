@@ -8,7 +8,7 @@
 */
 import React, { Component } from 'react';
 import { Spin,Select,TreeSelect   } from 'antd';
-import style from './index.css';
+import style from './index.less';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';

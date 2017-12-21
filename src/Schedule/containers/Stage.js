@@ -10,7 +10,7 @@ import EditData from '../components/Stage/EditData';
 import moment from 'moment';
 import {SERVICE_API} from '_platform/api';
 import {getNextStates} from '_platform/components/Progress/util';
-import Schedule from './Schedule.css';
+import './Schedule.less';
 import {Link} from 'react-router-dom';
 import {WORKFLOW_CODE} from '_platform/api';
 import {SMUrl_template11} from '_platform/api';

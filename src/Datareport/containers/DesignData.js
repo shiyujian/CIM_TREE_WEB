@@ -29,7 +29,6 @@ export default class DesignData extends Component {
 					</Col>
 				</Row>
 				<Addition {...this.props}/>
-				<Check {...this.props}/>
 				<Modify {...this.props}/>
 				<Expurgate {...this.props}/>
 				<Preview/>

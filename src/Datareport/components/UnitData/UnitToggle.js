@@ -1,30 +1,26 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {actions} from '../../store/DesignData';
 import {actions as platformActions} from '_platform/store/global';
-import { Modal, Input, Form, Button, message, Table, Radio, Row, Col,DatePicker,Select } from 'antd';
-import WorkflowHistory from '../WorkflowHistory'
+import {actions} from '../../store/quality';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
-import {getUser} from '_platform/auth';
+import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
-import { CODE_PROJECT } from '_platform/api';
-import '../index.less'; 
-
-const RadioGroup = Radio.Group;
+import {getUser} from '_platform/auth';
 const {RangePicker} = DatePicker;
+const RadioGroup = Radio.Group;
 const {Option} = Select
-const { TextArea } = Input;
 @connect(
 	state => {
-		const {datareport: {designdata = {}} = {}, platform} = state;
-		return {...designdata, platform}
+		const { platform} = state;
+		return { platform}
 	},
 	dispatch => ({
-		actions: bindActionCreators({...actions, ...platformActions}, dispatch)
+		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class Check extends Component {
+export default class UnitToggle extends Component {
 
 	constructor(props) {
 		super(props);
@@ -36,6 +32,11 @@ export default class Check extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props
+        //  const {actions:{ getWorkflow }} = this.props
+        //  getWorkflow({pk:wk.id}).then(rst => {
+        //      let dataSource = JSON.parse(rst.subject[0].data)
+        //      this.setState({dataSource,wk:rst})
+        //  })
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
     }
@@ -47,12 +48,12 @@ export default class Check extends Component {
    }
    //提交
     async submit(){
-        if(this.state.opinion === 1){
-            await this.passon();
-        }else{
-            await this.reject();
-        }
-        this.props.closeModal("design_check_visbile",false)
+        // if(this.state.opinion === 1){
+        //     await this.passon();
+        // }else{
+        //     await this.reject();
+        // }
+        this.props.closeModal("dr_qua_unit_visible",false)
         message.info("操作成功")
     }
     //通过
@@ -71,6 +72,7 @@ export default class Check extends Component {
         let wplist = [];
         dataSource.map((o) => {
             //创建文档对象
+            console.log(o)
             let doc = o.related_documents.find(x => {
                 return x.rel_type === 'many_jyp_rel'
             })
@@ -148,83 +150,86 @@ export default class Check extends Component {
         filed.mime_type = f.mime_type;
         openPreview(filed);
     }
+    handlePreview(index){
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index].file
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
     //radio变化
     onChange(e){
         this.setState({opinion:e.target.value})
     }
-    cancel() {
-    	this.props.closeModal("design_check_visbile",false)
-    }
 	render() {
-        const columns = 
-        [{
-            title:'序号',
-			render:(text,record,index) => {
-				return index+1
-			}
-		}, {
-			title: '文档编码',
-			dataIndex: 'code'
-		}, {
-			title: '文档名称',
-			dataIndex: 'name'
-		}, {
-			title:'项目/子项目名称',
-            dataIndex:'project',
-            render: (text, record, index) => (
-                <span>
-                    {record.project.name}
-                </span>
-            ),
-		}, {
-			title:'单位工程',
-            dataIndex:'unit',
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
-            ),
-		}, {
-			title:'项目阶段',
-            dataIndex:'stage',
-		}, {
-			title:'提交单位',
-            dataIndex:'upunit',
-		}, {
-			title:'文档类型',
-            dataIndex:'filetype',
-		}, {
-			title:'专业',
-            dataIndex:'major',
-		}, {
-			title:'描述的WBS对象',
-            dataIndex:'wbsObject',
-		}, {
-			title: '描述的设计对象',
-			dataIndex: 'designObject'
-		}, {
+        const  columns = [{
+            title: '序号',
+            dataIndex: 'index',
+            // key: 'Index',
+          }, {
+            title: '单位工程名称',
+            dataIndex: 'code',
+            // key: 'Code',
+          }, {
+            title: '所属项目/子项目名称',
+            dataIndex: 'genus',
+            key: 'Genus',
+          },{
+            title: '项目类型',
+            dataIndex: 'area',
+            // key: 'Area',
+          },{
+             title: '项目阶段',
+             dataIndex :'type',
+            //  key: 'Type',
+          },{
+            title: '项目红线坐标',
+            dataIndex :'address',
+            // key: 'Address',
+          },{
+            title: '计划开工日期',
+            dataIndex :'coordinate',
+            // key: 'Coordinate',
+          },{
+            title: '计划竣工日期',
+            dataIndex :'duty',
+            // key:'Duty'
+          },{
+            title: '建设单位',
+            dataIndex :'stime',
+            // key:'Stime'
+          },{
+            title: '单位工程简介',
+            dataIndex :'etime',
+            // key:'Etime'
+          },{
             title:'附件',
-			render:(text,record,index) => {
-                return (<span>
-                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                        <span className="ant-divider" />
-                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                    </span>)
-			}
-        }]
+            key:'nearby',
+            render:(record) => (
+              <Upload
+              beforeUpload = {this.beforeUpload.bind(this,record)}
+              >
+                  <a> {record.file?record.file.name:'上传附件'}</a>
+              </Upload>
+            )
+      
+          }]
 		return (
             <Modal
 			title="检验批信息审批表"
+			key={Math.random()}
             visible={true}
             width= {1280}
 			footer={null}
-			maskClosable={false}
-			onCancel={this.cancel.bind(this)}
-			>
+			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
-                        columns={columns}
+                        columns={this.columns}
                         dataSource={this.state.dataSource}
                         bordered />
                     <Row>
