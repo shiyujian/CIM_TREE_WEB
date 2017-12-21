@@ -15,6 +15,7 @@ const getFieldsOK = createAction(`${ID}_GET_FIELD_OK`);
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
 const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [], 'DELETE');
 export const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
+export const getWorkPackageDetailpk = createFetchAction(`${SERVICE_API}/workpackages/{{pk}}/?all=true`,[]);
 //获取项目树
 export const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
 export const getProjectTreeDetail = createFetchAction(`${SERVICE_API}/project-tree/{{pk}}/`, []);
@@ -27,7 +28,10 @@ const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
 //批量创建文档
 export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
-
+//文档目录树相关
+const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
+const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
+const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
 
 export const actions = {
 	...additionReducer,
@@ -36,6 +40,7 @@ export const actions = {
 	...expurgateReducer,
 	getProjectTree,
 	getProjectTreeDetail,
+	getWorkPackageDetailpk,
     uploadStaticFile,
     deleteStaticFile,
 	getWorkPackageDetail,
@@ -45,7 +50,10 @@ export const actions = {
 	logWorkflowEvent,
 	updateWpData,
 	addDocList,
-	putDocList
+	putDocList,
+	getScheduleDir,
+	postScheduleDir,
+	getDocument
 };
 
 export default handleActions({

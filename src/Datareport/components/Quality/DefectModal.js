@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 
-import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
+import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message,Cascader} from 'antd';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less'
+import Preview from '../../../_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -12,9 +13,84 @@ class DefectModal extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			dataSource:[]
+            dataSource:[],
+            options:[],
+            checkers:[],
+            check:null,
+            project:{},
+            unit:{}
 		};
-	}
+    }
+    componentDidMount(){
+        const {actions:{getAllUsers,getProjectTree}} = this.props
+        getAllUsers().then(res => {
+            let checkers = res.map(o => {
+                return (
+                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                )
+            })
+            this.setState({checkers})
+        })
+        // getProjectTree({depth:1}).then(rst =>{
+        //     if(rst.status){
+        //         let projects = rst.children.map(item=>{
+        //             return (
+        //                 {
+        //                     value:JSON.stringify(item),
+        //                     label:item.name,
+        //                     isLeaf:false
+        //                 }
+        //             )
+        //         })
+        //         this.setState({options:projects});
+        //     }else{
+        //         //获取项目信息失败
+        //     }
+        // });
+    }
+     // 也就是wbs编码获取其他信息
+     async getInfo(wp){
+        let res = {};
+        const {actions:{getWorkPackageDetail}} = this.props
+        res.name = wp.name
+        res.code = wp.code  
+        let dwcode = ""
+        let getUnitLoop = async(param) => {
+            let next = {};
+            switch (param.obj_type_hum){
+                case "分项工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
+                case "子分部工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
+                case "分部工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
+                case "子单位工程":
+                    dwcode = param.parent.code
+                    break
+                case "单位工程":
+                    dwcode = param.code
+                    break
+                default:break;
+            } 
+        }
+        await getUnitLoop(wp)
+        let danwei = await getWorkPackageDetail({code:dwcode})
+        let respon_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
+        res.respon_unit = respon_unit
+        res.unit = {
+            name:danwei.name,
+            code:danwei.code,
+            obj_type:danwei.obj_type
+        }
+        res.project = danwei.parent
+        return res
+    }
 	//table input 输入
     tableDataChange(index, key ,e ){
 		const { dataSource } = this.state;
@@ -29,14 +105,41 @@ class DefectModal extends Component {
     }
 	//ok
 	onok(){
-		this.props.onok(this.state.dataSource)
+		if(!this.state.check){
+            message.info("请选择审核人")
+            return
+        }
+        if(this.state.dataSource.length === 0){
+            message.info("请上传excel")
+            return
+        }
+        let temp = this.state.dataSource.some((o,index) => {
+                        return !o.flag
+                    })
+        if(temp){
+            message.info(`有数据不正确`)
+            return
+        }
+        let {check} = this.state
+        let per = {
+            id:check.id,
+            username:check.username,
+            person_name:check.account.person_name,
+            person_code:check.account.person_code,
+            organization:check.account.organization
+        }
+		this.props.onok(this.state.dataSource,per)
     }
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     //附件上传
 	beforeUploadPicFile  = (index,file) => {
-        debugger
+        let {dataSource} = this.state        
+        if(!dataSource[index].flag){
+            message.info("这条数据编码不对")
+            return false
+        }
 		const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
@@ -60,7 +163,7 @@ class DefectModal extends Component {
             const filedata = resp;
             filedata.a_file = this.covertURLRelative(filedata.a_file);
             filedata.download_url = this.covertURLRelative(filedata.a_file);
-            const attachment = [{
+            const attachment = {
                 size: resp.size,
                 id: filedata.id,
                 name: resp.name,
@@ -70,12 +173,8 @@ class DefectModal extends Component {
 				a_file:filedata.a_file,
 				download_url:filedata.download_url,
 				mime_type:resp.mime_type
-            }];
-            let jcode = file.name.split('.')[0]
-            let info = await this.getInfo(jcode)
-            let {dataSource} = this.state
+            };
             dataSource[index]['file'] = attachment
-            dataSource[index]['file'] = Object.assign(dataSource[index]['file'],info)
             this.setState({dataSource})
 		});
 		return false;
@@ -88,75 +187,155 @@ class DefectModal extends Component {
         deleteStaticFile({id:id})
         let rate = dataSource[index].rate
         let level = dataSource[index].level
-        dataSource[index] = {
-            rate:rate,
-            level:level,
-            name:"",
-            project:{
-                code:"",
-                name:"",
-                obj_type:""
-            },
-            unit:{
-                code:"",
-                name:"",
-                obj_type:""
-            },
-            construct_unit:{
-                code:"",
-                name:"",
-                type:"",
-            },
-            file:{
-            }
-        }
+        dataSource[index]['file'] = {}
         this.setState({dataSource})
     }
-    //重新编码出错，重新获取
-    dofix(index){
-        alert(index)
+    //删除
+    delete(index){
+        let {dataSource} = this.state
+        dataSource.splice(index,1)
+        this.setState({dataSource})
     }
+    //编码错了修复
+    async getFixed(i){
+        let {dataSource} = this.state
+        let record = dataSource[i]
+        const {actions:{getWorkPackageDetail}} = this.props
+        let fenbu = await getWorkPackageDetail({code:record.code})
+        let obj = {}
+        let flag = false
+        if(fenbu.name){
+            obj = await this.getInfo(fenbu)
+            flag = true
+        }else{
+            message.info("输入编码值还是有误")
+        }
+        dataSource[i].project = obj.project
+        dataSource[i].unit = obj.unit
+        dataSource[i].respon_unit = obj.respon_unit
+        dataSource[i].flag = flag
+        this.setState({dataSource})
+    }
+    // loadData = (selectedOptions) =>{
+    //     const {actions:{getProjectTree}} = this.props;
+    //     const targetOption = selectedOptions[selectedOptions.length - 1];
+    //     targetOption.loading = true;
+    //     getProjectTree({depth:2}).then(rst =>{
+    //         if(rst.status){
+    //             let units = [];
+    //             rst.children.map(item=>{
+    //                 if(item.code===JSON.parse(targetOption.value).code){  //当前选中项目
+    //                     units = item.children.map(unit =>{
+    //                         return (
+    //                             {
+    //                                 value:JSON.stringify(unit),
+    //                                 label:unit.name
+    //                             }
+    //                         )
+    //                     })
+    //                 }
+    //             })
+    //             targetOption.loading = false;
+    //             targetOption.children = units;
+    //             this.setState({options:[...this.state.options]})
+    //         }else{
+    //             //获取项目信息失败
+    //         }
+    //     });
+    // }
+     //预览
+     handlePreview(index){
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index].file
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
+    //下拉框选择人
+    selectChecker(value){
+        let check = JSON.parse(value)
+        this.setState({check})
+    }
+    //级联下拉框选择
+    // onSelectProject = (value,selectedOptions) =>{
+    //     let project = {};
+    //     let unit = {};
+    //     if(value.length===2){
+    //         let temp1 = JSON.parse(value[0]);
+    //         let temp2 = JSON.parse(value[1]);
+    //         project = {
+    //             name:temp1.name,
+    //             code:temp1.code,
+    //             obj_type:temp1.obj_type
+    //         }
+    //         unit = {
+    //             name:temp2.name,
+    //             code:temp2.code,
+    //             obj_type:temp2.obj_type
+    //         }
+    //         this.setState({project,unit});
+    //         return;
+    //     }
+    //     //must choose all,otherwise make it null
+    //     this.setState({project:{},unit:{}});
+    // }
 	render() {
         let columns = [{
             title:'序号',
-            width:'5%',
+            width:'4%',
 			render:(text,record,index) => {
 				return index+1
 			}
 		},{
 			title:'项目/子项目名称',
             dataIndex:'project',
-            width:'8%',
-            render: (text, record, index) => (
-                record.name
-            ),
+            width:'7%',
+            render: (text, record, index) => {
+                if(record.flag){
+                    return <span style={{color:'green'}}>{record.project ? record.project.name : ''}</span>
+                }else{
+                    return <span style={{color:'red'}}>{record.project ? record.project.name : ''}</span>
+                }
+            },
 		},{
 			title:'单位工程',
             dataIndex:'unit',
-            width:'8%',
-            render: (text, record, index) => (
-                record.name
-            ),
+            width:'7%',
+            render: (text, record, index) => {
+                if(record.flag){
+                    return (<span style={{color:'green'}}>{record.unit ? record.unit.name : ''}</span>)
+                }else{
+                    return (<span style={{color:'red'}}>{record.unit ? record.unit.name : ''}</span>)
+                }
+            },
 		},{
 			title:'WBS编码',
             dataIndex:'code',
-            width:'8%',
+            width:'5%',
             render: (text, record, index) => (
-                <Input value={this.state.dataSource[index]['code']} onBlur={this.dofix.bind(this,index)} onChange={this.tableDataChange.bind(this,index,'code')}/>
+                <Input onBlur={this.getFixed.bind(this,index)} value={this.state.dataSource[index]['code']} onChange={this.tableDataChange.bind(this,index,'code')}/>
             ),
 		},{
 			title:'责任单位',
             dataIndex:'respon_unit',
-            width:'8%',
-            render: (text, record, index) => (
-                record.name
-            ),
+            width:'7%',
+            render: (text, record, index) => {
+                if(record.flag){
+                    return <span style={{color:'green'}}>{record.respon_unit ? record.respon_unit.name : ''}</span>
+                }else{
+                    return <span style={{color:'red'}}>{record.respon_unit ? record.respon_unit.name : ''}</span>
+                }
+            }
 		},{
 			title:'事故类型',
             dataIndex:'acc_type',
-            width:'8%',
+            width:'7%',
             render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'acc_type')} value={this.state.dataSource[index]['acc_type']}>
+                <Select style={{width:'80px'}} onSelect={this.handleSelect.bind(this,index,'acc_type')} value={this.state.dataSource[index]['acc_type']}>
                     <Option value="一般质量事故">一般质量事故</Option>
                     <Option value="严重质量事故">严重质量事故</Option>
                     <Option value="重大质量事故">重大质量事故</Option>
@@ -165,65 +344,84 @@ class DefectModal extends Component {
 		},{
 			title:'上报时间',
             dataIndex:'uploda_date',
-            width:'8%',
+            width:'7%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['uploda_date']} onChange={this.tableDataChange.bind(this,index,'uploda_date')}/>
             ),
 		},{
 			title:'核查时间',
             dataIndex:'check_date',
-            width:'8%',
+            width:'7%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['check_date']} onChange={this.tableDataChange.bind(this,index,'check_date')}/>
             ),
 		},{
 			title:'整改时间',
             dataIndex:'do_date',
-            width:'8%',
+            width:'7%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['do_date']} onChange={this.tableDataChange.bind(this,index,'do_date')}/>
             ),
 		},{
 			title:'事故描述',
             dataIndex:'descrip',
-            width:'8%',
+            width:'7%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['descrip']} onChange={this.tableDataChange.bind(this,index,'descrip')}/>
             ),
 		},{
 			title:'排查结果',
             dataIndex:'check_result',
-            width:'8%',
+            width:'7%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['check_result']} onChange={this.tableDataChange.bind(this,index,'check_result')}/>
             ),
 		},{
 			title:'整改期限',
             dataIndex:'deadline',
-            width:'8%',
+            width:'7%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['deadline']} onChange={this.tableDataChange.bind(this,index,'deadline')}/>
             ),
 		},{
 			title:'整改结果',
             dataIndex:'result',
-            width:'8%',
+            width:'7%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['result']} onChange={this.tableDataChange.bind(this,index,'result')}/>
             ),
 		}, {
             title:'附件',
-            width:'5%',
+            width:'10%',
 			render:(text,record,index) => {
-				return <span>
-					<a>预览</a>
-					<span className="ant-divider" />
-					<a>下载</a>
-				</span>
+				if(record.file.id){
+                    return (<span>
+                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <span className="ant-divider" />
+                            <Popconfirm
+                                placement="leftTop"
+                                title="确定删除吗？"
+                                onConfirm={this.remove.bind(this, index)}
+                                okText="确认"
+                                cancelText="取消">
+                                <a>删除</a>
+                            </Popconfirm>
+				        </span>)
+                }else{
+                    return (
+                        <span>
+                        <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this,index)}>
+                            <Button>
+                                <Icon type="upload" />上传附件
+                            </Button>
+                        </Upload>
+                    </span>
+                    )
+                }
 			}
 		},{
             title:'操作',
-            width:'3%',
+            width:'5%',
             render:(text,record,index) => {
                 return  (
                     <Popconfirm
@@ -244,7 +442,7 @@ class DefectModal extends Component {
 			headers: {
 			},
 			showUploadList: false,
-		    onChange(info) {
+		    async onChange(info) {
 		        if (info.file.status !== 'uploading') {
 		            console.log(info.file, info.fileList);
 		        }
@@ -253,7 +451,10 @@ class DefectModal extends Component {
                     console.log(importData);
                     let {dataSource} = jthis.state
                     dataSource = jthis.handleExcelData(importData)
-                    jthis.setState({dataSource}) 
+                    await jthis.setState({dataSource})
+                    dataSource.map((o,i) => {
+                        jthis.getFixed(i)
+                    })
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
@@ -267,7 +468,7 @@ class DefectModal extends Component {
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
-			maskClosable={false}
+			maskClosable={true}
 			onCancel={this.props.oncancel}>
 				<div>
                     <Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
@@ -282,7 +483,25 @@ class DefectModal extends Component {
                             <Icon type="upload" />上传附件
                         </Button>
                     </Upload>
-                    <Button className="btn" type="primary">提交</Button>
+                    {/* <span>
+                        项目-单位工程：
+                        <Cascader
+                            options={this.state.options}
+                            className='btn'
+                            loadData={this.loadData.bind(this)}
+                            onChange={this.onSelectProject.bind(this)}
+                            changeOnSelect
+                        />
+                    </span>  */}
+                    <span>
+                        审核人：
+                        <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            {
+                                this.state.checkers
+                            }
+                        </Select>
+                    </span> 
+                    <Preview/>
 				</div>
                 <div style={{marginTop:20}}>
                     注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
@@ -296,6 +515,7 @@ class DefectModal extends Component {
     //处理上传excel的数据
     handleExcelData(data){
         data.splice(0,1);
+        const {actions:{getWorkPackageDetail}} = this.props
         let res = data.map(item => {
             return {
                 code:item[2],
@@ -324,7 +544,7 @@ class DefectModal extends Component {
                 },
                 file:{
 
-                }
+                },
             }
         })
         return res

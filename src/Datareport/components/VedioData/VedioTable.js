@@ -22,6 +22,7 @@ export default class VedioTable extends Component{
                     showTotal: showTotal
                 }}
                 rowSelection={rowSelection}
+                bordered
                 />
             </Col>
         </Row>)
@@ -73,6 +74,9 @@ export default class VedioTable extends Component{
     },{
         title: '摄像头上线时间',
         dataIndex: 'uptime'
+    },{
+        title: 'wbs编码',
+        dataIndex: 'wbsCode'
     },{
         title: '操作',
         render: (text, record, index)=>{

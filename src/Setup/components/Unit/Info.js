@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Row, Col, Form, Input, Button, Card,Table,Popconfirm,message} from 'antd';
-import {STATIC_DOWNLOAD_API, SOURCE_API} from '../../../_platform/api';
+import {STATIC_DOWNLOAD_API, SOURCE_API,DefaultZoomLevel} from '_platform/api';
 import {divIcon} from 'leaflet';
 import {Map, TileLayer, Marker, Polygon} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -111,7 +111,7 @@ export default class Info extends Component {
 								<Row>
 									<Col span={12}>
 										<FormItem {...Info.layoutT} label="地图位置">
-											<Map center={leafletCenter} zoom={12} zoomControl={false}
+											<Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
 												 style={{position: 'relative', height: 240, width: '100%'}}>
 												<TileLayer url={URL} subdomains={['7']}/>
 												<Polygon positions={this._getPoints(unitInfo.extra_params.coordinates.length === 0 ? [] : unitInfo.extra_params.coordinates)}/>
@@ -120,7 +120,7 @@ export default class Info extends Component {
 									</Col>
 									<Col span={12}>
 										<FormItem {...Info.layoutT} label="模型位置">
-											<Map center={leafletCenter} zoom={12} zoomControl={false}
+											<Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
 												 style={{position: 'relative', height: 240, width: '100%'}}>
 												<TileLayer url={URL} subdomains={['7']}/>
 												<Polygon positions={this._getPoints(unitInfo.extra_params.coordinates.length === 0 ? [] : unitInfo.extra_params.coordinates)}/>

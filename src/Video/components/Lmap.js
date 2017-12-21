@@ -4,14 +4,17 @@
 import React, {Component} from 'react';
 import {Map, TileLayer, ZoomControl, WMSTileLayer, GeoJSON, Marker, Popup} from 'react-leaflet';
 import {Button, Card, Checkbox, Tag} from 'antd';
-const CheckboxGroup = Checkbox.Group;
 
 import geoJsonFeature from './geojsonFeature';
 
 import L from 'leaflet';
-
 import styles from './style.css';
 import CameraVideo from './CameraVideo';
+import {DefaultZoomLevel} from '_platform/api';
+
+const initLeaflet = window.config.initLeaflet;
+
+const CheckboxGroup = Checkbox.Group;
 
 let Popups=[]
 class ExtendedMarker extends Marker {
@@ -123,7 +126,7 @@ export default class Lmap extends Component {
 						   "bottom": 0,
 						   "left": 0,
 						   "right": 0
-					   }} zoom={11} maxZoom={18} zoomControl={false}>
+					   }} zoom={DefaultZoomLevel} maxZoom={initLeaflet?initLeaflet.maxZoom:18} zoomControl={false}>
 					  <TileLayer url={this.state.TileLayerUrl} attribution={'&copy;<a href="">ecidi</a>'}
 								 subdomains={this.subDomains}/>
 					  <WMSTileLayer url={this.WMSTileLayerUrl} subdomains={this.subDomains}/>

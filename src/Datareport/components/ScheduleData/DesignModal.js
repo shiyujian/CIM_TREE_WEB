@@ -29,7 +29,7 @@ class DesignModal extends Component {
                         <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
                     )
                 })
-                this.setState({checkers})
+                this.setState({ checkers })
             }
         });
     }
@@ -49,12 +49,12 @@ class DesignModal extends Component {
         this.setState({ dataSource });
     }
     //ok
-    onok(){
-        if(!this.state.check){
+    onok() {
+        if (!this.state.check) {
             message.info("请选择审核人")
             return
         }
-        if(this.state.dataSource.length === 0){
+        if (this.state.dataSource.length === 0) {
             message.info("请上传excel")
             return
         }
@@ -65,15 +65,15 @@ class DesignModal extends Component {
         //     message.info(`有数据未上传附件`)
         //     return
         // }
-        let {check} = this.state
+        let { check } = this.state
         let per = {
-            id:check.id,
-            username:check.username,
-            person_name:check.account.person_name,
-            person_code:check.account.person_code,
-            organization:check.account.organization
+            id: check.id,
+            username: check.username,
+            person_name: check.account.person_name,
+            person_code: check.account.person_code,
+            organization: check.account.organization
         }
-		this.props.onok(this.state.dataSource,per)
+        this.props.onok(this.state.dataSource, per)
     }
     covertURLRelative = (originUrl) => {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -105,14 +105,14 @@ class DesignModal extends Component {
             }, {
                 title: '专业',
                 dataIndex: 'major',
-                width:"140px",
+                width: "140px",
                 render: (text, record, index) => (
                     <Select style={{ width: '120px' }} onSelect={this.handleSelect.bind(this, index, 'major')} value={this.state.dataSource[index]['major']}>
                         <Option value="图纸">图纸</Option>
                         <Option value="报告">报告</Option>
                     </Select>
                 ),
-            },{
+            }, {
                 title: '实际供图时间',
                 dataIndex: 'factovertime',
             }, {
@@ -124,7 +124,7 @@ class DesignModal extends Component {
             }, {
                 title: '操作',
                 render: (text, record, index) => {
-                    return  (
+                    return (
                         <Popconfirm
                             placement="leftTop"
                             title="确定删除吗？"
@@ -157,7 +157,7 @@ class DesignModal extends Component {
                 }
             },
         };
-        const {selectedRowKeys} = this.state;
+        const { selectedRowKeys } = this.state;
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange,
@@ -176,14 +176,14 @@ class DesignModal extends Component {
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered 
+                        bordered
                         rowSelection={rowSelection}
                         pagination={{  //分页
                             pageSize: 6,  //显示几条一页
                             defaultPageSize: 6, //默认显示几条一页
                             showQuickJumper: true,
                             showSizeChanger: true,
-                        }}/>
+                        }} />
                     <Upload {...props}>
                         <Button style={{ margin: '10px 10px 10px 0px' }}>
                             <Icon type="upload" />上传附件
@@ -215,14 +215,10 @@ class DesignModal extends Component {
             return {
                 code: item[0],
                 volume: item[1],
-                name:item[2],
-                major:item[3],
-                factovertime:item[4],
-                unit: {
-                    code: "",
-                    name: "",
-                    obj_type: ""
-                },
+                name: item[2],
+                major: item[3],
+                factovertime: item[4],
+                unit: item[5],
                 uploads: item[6],
             }
         })

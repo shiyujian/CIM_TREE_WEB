@@ -227,8 +227,5 @@ export default class PriceListExamine extends Component {
     },{
         title:'备注',
         dataIndex:'remarks'
-    },{
-        title:'状态',
-        dataIndex:'sunmits'
-  }]
+    }]
 }

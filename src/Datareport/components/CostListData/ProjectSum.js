@@ -1,53 +1,69 @@
 import React, { Component } from 'react';
 
-import { Input, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message } from 'antd';
+import { Input, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message, Cascader } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker;
 const RadioGroup = Radio.Group;
-const {Option} = Select
+const { Option } = Select
 
 class PriceList extends Component {
 
-	constructor(props) {
-		super(props);
-		this.state = {
-            dataSource:[],
-            checkers:[],//审核人下来框选项
-            check:null,//审核人
-            projects:[]
-		};
+    constructor(props) {
+        super(props);
+        this.state = {
+            dataSource: [],
+            checkers: [],//审核人下来框选项
+            check: null,//审核人
+            projects: []
+        };
     }
-    componentDidMount(){
-        const {actions:{getAllUsers,getProjectTree}} = this.props
+    componentDidMount() {
+        const { actions: { getAllUsers, getProjectTree } } = this.props
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
                     <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
-            this.setState({checkers})
+            this.setState({ checkers })
         });
-        getProjectTree().then(rst => {
-            if (rst.children.length) {
+        // getProjectTree().then(rst => {
+        //     if (rst.children.length) {
+        //         let projects = rst.children.map(item => {
+        //             return (
+        //                 <Option value={JSON.stringify(item)}>{item.name}</Option>
+        //             )
+        //         })
+        //         this.setState({projects})
+        //     }
+        // })
+        getProjectTree({ depth: 1 }).then(rst => {
+            if (rst.status) {
                 let projects = rst.children.map(item => {
                     return (
-                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                        {
+                            value: JSON.stringify(item),
+                            label: item.name,
+                            isLeaf: false
+                        }
                     )
                 })
-                this.setState({projects})
+                this.setState({ options: projects });
+            } else {
+                //获取项目信息失败
             }
-        })
+        });
     }
-	
-	//提交
-	onok(){
-        if(!this.state.check){
+
+    //提交
+    onok() {
+        if (!this.state.check) {
             message.info("请选择审核人")
             return
         }
-        if(this.state.dataSource.length === 0){
+        if (this.state.dataSource.length === 0) {
             message.info("请上传excel")
             return
         }
@@ -58,49 +74,46 @@ class PriceList extends Component {
         //     message.info(`有数据未上传附件`)
         //     return
         // }
-		let {check} = this.state
+        let { check } = this.state
         let per = {
-            id:check.id,
-            username:check.username,
-            person_name:check.account.person_name,
-            person_code:check.account.person_code,
-            organization:check.account.organization
+            id: check.id,
+            username: check.username,
+            person_name: check.account.person_name,
+            person_code: check.account.person_code,
+            organization: check.account.organization
         }
-		this.props.onok(this.state.dataSource,per)
+        this.props.onok(this.state.dataSource, per)
     }
-
-
-
-
 
     covertURLRelative = (originUrl) => {
-    	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     //附件上传
-	beforeUploadPicFile  = (index,file) => {
+    beforeUploadPicFile = (index, file) => {
         const fileName = file.name;
-        let {dataSource} = this.state
+        let { dataSource } = this.state
         let temp = fileName.split(".")[0]
         //判断有无重复
-        if(dataSource.some(o => {
-           return o.code === temp
-        })){
+        if (dataSource.some(o => {
+            return o.code === temp
+        })) {
             message.info("该检验批已经上传过了")
             return false
         }
-		// 上传到静态服务器
-		const { actions:{uploadStaticFile} } = this.props;
+        // 上传到静态服务器
+        const { actions: { uploadStaticFile } } = this.props;
 
-		const formdata = new FormData();
-		formdata.append('a_file', file);
+        const formdata = new FormData();
+        formdata.append('a_file', file);
         formdata.append('name', fileName);
         let myHeaders = new Headers();
-        let myInit = { method: 'POST',
-                       headers: myHeaders,
-                       body: formdata
-                     };
-                     //uploadStaticFile({}, formdata)
-        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
+        let myInit = {
+            method: 'POST',
+            headers: myHeaders,
+            body: formdata
+        };
+        //uploadStaticFile({}, formdata)
+        fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
             resp = await resp.json()
             console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
@@ -116,271 +129,368 @@ class PriceList extends Component {
                 name: resp.name,
                 status: 'done',
                 url: filedata.a_file,
-				//thumbUrl: SOURCE_API + resp.a_file,
-				a_file:filedata.a_file,
-				download_url:filedata.download_url,
-				mime_type:resp.mime_type
+                //thumbUrl: SOURCE_API + resp.a_file,
+                a_file: filedata.a_file,
+                download_url: filedata.download_url,
+                mime_type: resp.mime_type
             };
             let jcode = file.name.split('.')[0]
             let info = await this.getInfo(jcode)
             dataSource[index]['file'] = attachment
-            dataSource[index] = Object.assign(dataSource[index],info)
-            this.setState({dataSource})
-		});
-		return false;
+            dataSource[index] = Object.assign(dataSource[index], info)
+            this.setState({ dataSource })
+        });
+        return false;
     }
     //附件删除
-    remove(index){
-        const {actions:{deleteStaticFile}} = this.props
-        let {dataSource} = this.state
+    remove(index) {
+        const { actions: { deleteStaticFile } } = this.props
+        let { dataSource } = this.state
         let id = dataSource[index]['file'].id
-        deleteStaticFile({id:id})
+        deleteStaticFile({ id: id })
         let rate = dataSource[index].rate
         let level = dataSource[index].level
         dataSource[index] = {
-            rate:rate,
-            level:level,
-            name:"",
-            project:{
-                code:"",
-                name:"",
-                obj_type:""
+            rate: rate,
+            level: level,
+            name: "",
+            project: {
+                code: "",
+                name: "",
+                obj_type: ""
             },
-            projectcoding:{
-                code:"",
-                name:"",
-                obj_type:""
+            projectcoding: {
+                code: "",
+                name: "",
+                obj_type: ""
             },
-            construct_unit:{
-                code:"",
-                name:"",
-                type:"",
+            construct_unit: {
+                code: "",
+                name: "",
+                type: "",
             },
-            file:{
+            file: {
             }
         }
-        this.setState({dataSource})
+        this.setState({ dataSource })
     }
     //根据附件名称 也就是wbs编码获取其他信息
-    async getInfo(code){
+    async getInfo(code) {
         console.log(this.props)
         let res = {};
-        const {actions:{getWorkPackageDetail}} = this.props
-        let pricelist = await getWorkPackageDetail({code:code})
+        const { actions: { getWorkPackageDetail } } = this.props
+        let pricelist = await getWorkPackageDetail({ code: code })
         res.name = pricelist.name
-        res.code = pricelist.code        
-        let fenxiang = await getWorkPackageDetail({code:pricelist.parent.code})
-        if(fenxiang.parent.obj_type_hum === "子分部工程"){
-            let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
+        res.code = pricelist.code
+        let fenxiang = await getWorkPackageDetail({ code: pricelist.parent.code })
+        if (fenxiang.parent.obj_type_hum === "子分部工程") {
+            let zifenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
+            let fenbu = await getWorkPackageDetail({ code: zifenbu.parent.code })
+            let zidanwei = {}, danwei = {};
+            if (fenbu.parent.obj_type_hum === "子单位工程") {
+                zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
+                danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
+
+            } else {
+                danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
+            }
             let construct_unit = danwei.extra_params.projectcoding.find(i => i.type === "施工单位")
             res.construct_unit = construct_unit
             res.projectcoding = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
+                name: danwei.name,
+                code: danwei.code,
+                obj_type: danwei.obj_type
             }
             res.project = danwei.parent
-        }else{
-            let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
+        } else {
+            let fenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
+            let zidanwei = {}, danwei = {};
+            if (fenbu.parent.obj_type_hum === "子单位工程") {
+                zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
+                danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
+
+            } else {
+                danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
+            }
             let construct_unit = danwei.extra_params.projectcoding.find(i => i.type === "施工单位")
             res.construct_unit = construct_unit
             res.projectcoding = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
+                name: danwei.name,
+                code: danwei.code,
+                obj_type: danwei.obj_type
             }
             res.project = danwei.parent
         }
         return res
     }
     //下拉框选择人
-    selectChecker(value){
+    selectChecker(value) {
         let check = JSON.parse(value)
-        this.setState({check})
+        this.setState({ check })
     }
     //删除
-    delete(index){
-        let {dataSource} = this.state
-        dataSource.splice(index,1)
-        this.setState({dataSource})
+    delete(index) {
+        let { dataSource } = this.state
+        dataSource.splice(index, 1)
+        this.setState({ dataSource })
     }
     //添加
-    addto(index){
-       
+    addto(index) {
+
     }
-	render() {
-        const columns = 
-        [{
-			title:'序号',
-			render:(text,record,index) => {
-				return index+1
-			}
-		},{
-			title: '项目/子项目',
-            dataIndex: 'subproject',
-            render:(record) => {
-                return (
-                    <Select style={{width:"90%"}} onSelect={ele => {
-                        this.setState({ pro: ele })
-                    }}>
-                        {this.state.projects}
-                    </Select>
-                )
+
+    // selectProject(value) {
+    //     // debugger
+    //     let project = JSON.parse(value);
+    //     this.setState({ project, units: [] });
+    //     const { actions: { getProjectTree } } = this.props;
+    //     let beginUnit = '';
+    //     let i = 0;
+    //     getProjectTree({ depth: 2 }).then(rst => {
+    //         if (rst.status) {
+    //             let units = [];
+    //             rst.children.map(item => {
+    //                 if (item.code === project.code) {  //当前选中项目
+    //                     units = item.children.map(unit => {
+    //                         // i++;
+    //                         // if (i === 1) {
+    //                         //     beginUnit = JSON.stringify(unit);
+    //                         // }
+    //                         return (
+    //                             <Option value={JSON.stringify(unit)}>{unit.name}</Option>
+    //                         )
+    //                     })
+    //                 }
+    //             })
+    //             this.setState({ units, beginUnit });
+    //         } else {
+    //             //获取项目信息失败
+    //         }
+    //     });
+    // }
+
+    // selectUnit(value) {
+    //     let unit = JSON.parse(value);
+    //     this.setState({ unit, beginUnit: value });
+    // }
+
+    loadData = (selectedOptions) => {
+        const { actions: { getProjectTree } } = this.props;
+        const targetOption = selectedOptions[selectedOptions.length - 1];
+        targetOption.loading = true;
+        getProjectTree({ depth: 2 }).then(rst => {
+            if (rst.status) {
+                let units = [];
+                rst.children.map(item => {
+                    if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
+                        units = item.children.map(unit => {
+                            return (
+                                {
+                                    value: JSON.stringify(unit),
+                                    label: unit.name
+                                }
+                            )
+                        })
+                    }
+                })
+                targetOption.loading = false;
+                targetOption.children = units;
+                this.setState({ options: [...this.state.options] })
+            } else {
+                //获取项目信息失败
             }
-		  },{
-			title: '单位工程',
-            dataIndex: 'unit_engineeing',
-             render:(record) => {
-                return (
-                    <Select style={{width:"90%"}} onSelect={ele => {
-                        this.setState({ pro: ele })
-                    }}>
-                        {this.state.projects}
-                    </Select>
-                )
+        });
+    }
+    onSelectProject = (value, selectedOptions) => {
+        let project = {};
+        let unit = {};
+        if (value.length === 2) {
+            let temp1 = JSON.parse(value[0]);
+            let temp2 = JSON.parse(value[1]);
+            project = {
+                name: temp1.name,
+                code: temp1.code,
+                obj_type: temp1.obj_type
             }
-		  },{
-			title: '项目编码',
-			dataIndex: 'projectcoding',
-		  },{
-			title: '项目名称',
-			dataIndex: 'projectname',
-		  },{
-			title: '计量单位',
-			dataIndex: 'company',
-		  },{
-			title: '数量',
-			dataIndex: 'number',
-		  },{
-			title: '单价',
-			dataIndex: 'total',
-		  },{
-            title:'编辑',
-            width:"8%",
-            dataIndex:'edit',
-            render:(text,record,index) => {
-                return  (
-                    <Popconfirm
-                        placement="leftTop"
-                        title="确定删除吗？"
-                
-                        onConfirm={this.delete.bind(this, index)}
-                        okText="确认"
-                        cancelText="取消">
-                    
-                        <a>删除</a>
-                    </Popconfirm>
-                )
+            unit = {
+                name: temp2.name,
+                code: temp2.code,
+                obj_type: temp2.obj_type
             }
-	}]
+
+            let newdataSources = this.state.dataSource;
+            for (var i = 0; i < newdataSources.length; i++) {
+                newdataSources[i].subproject = project,
+                    newdataSources[i].unit = unit
+            }
+            this.setState({ project, unit, dataSource: newdataSources });
+            return;
+        }
+        //must choose all,otherwise make it null
+        this.setState({ project: {}, unit: {} });
+    }
+    render() {
+        const columns =
+            [{
+                title: '序号',
+                render: (text, record, index) => {
+                    return index + 1
+                }
+            }, {
+                title: '项目/子项目',
+                dataIndex: 'subproject',
+                // render: (text, record, index) => {
+                //     return <Select style={{ width: '100px' }} className="btn" onSelect={this.selectProject.bind(this)}>
+                //         {
+                //             this.state.projects
+                //         }
+                //     </Select>
+                // }
+            }, {
+                title: '单位工程',
+                dataIndex: 'unit_engineeing',
+                //  render: (text, record, index) => {
+                //     return <Select value={this.state.beginUnit} style={{ width: '100px' }} className="btn" onSelect={this.selectUnit.bind(this)}>
+                //         {
+                //             this.state.units
+                //         }
+                //     </Select>
+                // }
+            }, {
+                title: '项目编码',
+                dataIndex: 'projectcoding',
+            }, {
+                title: '项目名称',
+                dataIndex: 'projectname',
+            }, {
+                title: '计量单位',
+                dataIndex: 'company',
+            }, {
+                title: '数量',
+                dataIndex: 'number',
+            }, {
+                title: '单价',
+                dataIndex: 'total',
+            }, {
+                title: '编辑',
+                width: "8%",
+                dataIndex: 'edit',
+                render: (text, record, index) => {
+                    return (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+
+                            onConfirm={this.delete.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
+                }
+            }]
         let jthis = this
         //上传
-		const props = {
-			action: `${SERVICE_API}/excel/upload-api/` /*+ '?t_code=zjt-05'*/,
-			headers: {
-			},
-			showUploadList: false,
-		    onChange(info) {
-		        if (info.file.status !== 'uploading') {
-		            console.log(info.file, info.fileList);
-		        }
-		        if (info.file.status === 'done') {
-		        	let importData = info.file.response.Sheet1;
+        const props = {
+            action: `${SERVICE_API}/excel/upload-api/` /*+ '?t_code=zjt-05'*/,
+            headers: {
+            },
+            showUploadList: false,
+            onChange(info) {
+                if (info.file.status !== 'uploading') {
+                    console.log(info.file, info.fileList);
+                }
+                if (info.file.status === 'done') {
+                    let importData = info.file.response.Sheet1;
                     console.log(importData);
-                    let {dataSource} = jthis.state
+                    let { dataSource } = jthis.state
                     dataSource = jthis.handleExcelData(importData)
-                    jthis.setState({dataSource}) 
-		            message.success(`${info.file.name} 文件上传成功`);
-		        } else if (info.file.status === 'error') {
-		            message.error(`${info.file.name}解析失败，请检查输入`);
-		        }
-		    },
-		};
-		return (
-			<Modal
-			title="工程量结算信息上传表"
-            visible={true}
-            width= {1280}
-			onOk={this.onok.bind(this)}
-			maskClosable={false}
-			onCancel={this.props.oncancel}>
-				<div>
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果预览</h1>
-					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
-						columns={columns}
-						dataSource={this.state.dataSource}
-						bordered />
-                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
+                    jthis.setState({ dataSource })
+                    message.success(`${info.file.name} 文件上传成功`);
+                } else if (info.file.status === 'error') {
+                    message.error(`${info.file.name}解析失败，请检查输入`);
+                }
+            },
+        };
+        return (
+            <Modal
+                title="工程量结算信息上传表"
+                visible={true}
+                width={1280}
+                onOk={this.onok.bind(this)}
+                maskClosable={false}
+                onCancel={this.props.oncancel}>
+                <div>
+                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果预览</h1>
+                    <Table style={{ marginTop: '10px', marginBottom: '10px' }}
+                        columns={columns}
+                        dataSource={this.state.dataSource}
+                        bordered />
+                    <Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
                     <Upload {...props}>
-                        <Button style={{margin:'10px 10px 10px 0px'}}>
+                        <Button style={{ margin: '10px 10px 10px 0px' }}>
                             <Icon type="upload" />上传附件
                         </Button>
                     </Upload>
                     <span>
                         审核人：
-                        <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
+                        <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
                             {
                                 this.state.checkers
                             }
                         </Select>
-                    </span> 
+                    </span>
                     <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
-				</div>
-                <div style={{marginTop:20}}>
+                    <span>
+                        项目-单位工程：
+                        <Cascader
+                            options={this.state.options}
+                            className='btn'
+                            loadData={this.loadData.bind(this)}
+                            onChange={this.onSelectProject.bind(this)}
+                            changeOnSelect
+                        />
+                    </span>
+                </div>
+                <div style={{ marginTop: 20 }}>
                     注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
                     &emsp;&emsp; 2、数值用半角阿拉伯数字，如：1.2<br />
                     &emsp;&emsp; 3、日期必须带年月日，如2017年1月1日<br />
                     &emsp;&emsp; 4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.<br />
                 </div>
-			</Modal>
-		)
+            </Modal>
+        )
     }
     //处理上传excel的数据
-    handleExcelData(data){
-        data.splice(0,1);
+    handleExcelData(data) {
+        data.splice(0, 1);
         let res = data.map(item => {
             return {
-            project:{
-                    code:"",
-                    name:"",
-                    obj_type:""
-            },
-            unit:{
-                    code:"",
-                    name:"",
-                    obj_type:""
-            },
-            construct_unit:{
-                    code:"",
-                    name:"",
-                    type:"",
-            },
-            subproject:item[0],
-            unit_engineeing:item[1],
-            projectcoding:item[2],
-            projectname:item[3],
-            company:item[4],
-            number:item[5],
-            total:item[6],
-            edit:item[7],
-                file:{
+                project: {
+                    code: "",
+                    name: "",
+                    obj_type: ""
+                },
+                unit: {
+                    code: "",
+                    name: "",
+                    obj_type: ""
+                },
+                construct_unit: {
+                    code: "",
+                    name: "",
+                    type: "",
+                },
+                subproject: item[0],
+                unit_engineeing: item[1],
+                projectcoding: item[2],
+                projectname: item[3],
+                company: item[4],
+                number: item[5],
+                total: item[6],
+                edit: item[7],
+                file: {
 
                 }
             }

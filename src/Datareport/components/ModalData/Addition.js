@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, WORKFLOW_CODE } from '_platform/api';
+import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import '../../containers/quality.less';
 const Option = Select.Option;
+const FormItem = Form.Item;
 var moment = require('moment');
 
 export default class Addition extends Component {
@@ -9,11 +11,155 @@ export default class Addition extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
-			users: [],
-			projects: [],
-			checkers: []
+			checkers: [],//审核人下来框选项
+			check: null,//审核人
+			project: {},
+			unit: {},
+			options: [],
 		};
 	}
+
+	componentDidMount() {
+		const { actions: { getAllUsers, getProjectTree } } = this.props;
+		getAllUsers().then(rst => {
+			let checkers = rst.map(o => {
+				return (
+					<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+				)
+			})
+			this.setState({ checkers })
+		})
+		getProjectTree({ depth: 1 }).then(rst => {
+			if (rst.status) {
+				let projects = rst.children.map(item => {
+					return (
+						{
+							value: JSON.stringify(item),
+							label: item.name,
+							isLeaf: false
+						}
+					)
+				})
+				this.setState({ options: projects });
+			} else {
+				//获取项目信息失败
+			}
+		});
+	}
+
+	beforeUpload = (info) => {
+		if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
+			return true;
+		} else {
+			notification.warning({
+				message: '只能上传Excel文件！',
+				duration: 2
+			});
+			return false;
+		}
+	}
+
+	uplodachange = (info) => {
+		//info.file.status/response
+		if (info && info.file && info.file.status === 'done') {
+			notification.success({
+				message: '上传成功！',
+				duration: 2
+			});
+			let name = Object.keys(info.file.response);
+			let dataList = info.file.response[name[0]];
+			let dataSource = [];
+			for (let i = 1; i < dataList.length; i++) {
+				dataSource.push({
+					code: dataList[i][1] ? dataList[i][1] : '',
+					modelName: dataList[i][2] ? dataList[i][2] : '',
+					submittingUnit: dataList[i][3] ? dataList[i][3] : '',
+					modelDescription: dataList[i][4] ? dataList[i][4] : '',
+					modeType: dataList[i][5] ? dataList[i][5] : '',
+					fdbMode: dataList[i][6] ? dataList[i][6] : '',
+					tdbxMode: dataList[i][7] ? dataList[i][7] : '',
+					attributeTable: dataList[i][8] ? dataList[i][8] : '',
+					reportingTime: dataList[i][9] ? dataList[i][9] : '',
+					reportingName: dataList[i][10] ? dataList[i][10] : '',
+
+					project: {
+						code: "",
+						name: "",
+						obj_type: ""
+					},
+					unit: {
+						code: "",
+						name: "",
+						obj_type: ""
+					},
+					file: {
+
+					}
+
+				})
+			}
+			this.setState({ dataSource });
+		}
+	}
+
+	//下拉框选择人
+	selectChecker(value) {
+		let check = JSON.parse(value)
+		this.setState({ check })
+	}
+
+	onSelectProject = (value, selectedOptions) => {
+		let project = {};
+		let unit = {};
+		if (value.length === 2) {
+			let temp1 = JSON.parse(value[0]);
+			let temp2 = JSON.parse(value[1]);
+			project = {
+				name: temp1.name,
+				code: temp1.code,
+				obj_type: temp1.obj_type
+			}
+			unit = {
+				name: temp2.name,
+				code: temp2.code,
+				obj_type: temp2.obj_type
+			}
+			this.setState({ project, unit });
+			return;
+		}
+		//must choose all,otherwise make it null
+		this.setState({ project: {}, unit: {} });
+	}
+
+	loadData = (selectedOptions) => {
+		const { actions: { getProjectTree } } = this.props;
+		const targetOption = selectedOptions[selectedOptions.length - 1];
+		targetOption.loading = true;
+		getProjectTree({ depth: 2 }).then(rst => {
+			if (rst.status) {
+				let units = [];
+				rst.children.map(item => {
+					if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
+						units = item.children.map(unit => {
+							return (
+								{
+									value: JSON.stringify(unit),
+									label: unit.name
+								}
+							)
+						})
+					}
+				})
+				targetOption.loading = false;
+				targetOption.children = units;
+				this.setState({ options: [...this.state.options] })
+			} else {
+				//获取项目信息失败
+			}
+		});
+	}
+
+
 	render() {
 		const { addition = {}, actions: { changeAdditionField } } = this.props;
 		const columns = [{
@@ -24,23 +170,7 @@ export default class Addition extends Component {
 			}
 		}, {
 			title: '模型编码',
-			dataIndex: 'coding'
-		}, {
-			title: '项目/子项目名称',
-			dataIndex: 'project',
-			render: (record) => {
-				return (
-					<Select style={{ width: '120px' }} onSelect={ele => {
-						this.setState({ pro: ele })
-					}}>
-						{this.state.projects}
-					</Select>
-				)
-			}
-
-		}, {
-			title: '单位工程',
-			dataIndex: 'unitEngineering'
+			dataIndex: 'code'
 		}, {
 			title: '模型名称',
 			dataIndex: 'modelName'
@@ -82,7 +212,7 @@ export default class Addition extends Component {
 					return (
 						<span>
 							<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record)}>
-							
+
 								<Button>
 									<Icon type="upload" />上传附件
                             </Button>
@@ -95,34 +225,11 @@ export default class Addition extends Component {
 		}, {
 			title: 'tdbx模型',
 			dataIndex: 'tdbxMode',
-			// render: (text, record, index) => {
-
-			// 	return (
-			// 		<span>
-			// 			<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index)}>
-			// 				<Button>
-			// 					<Icon type="upload" />上传附件
-			//                 </Button>
-			// 			</Upload>
-			// 		</span>
-			// 	)
-			// }
 
 		}, {
 			title: '属性表',
 			dataIndex: 'attributeTable',
-			// render: (text, record, index) => {
 
-			// 	return (
-			// 		<span>
-			// 			<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index)}>
-			// 				<Button>
-			// 					<Icon type="upload" />上传附件
-			//                 </Button>
-			// 			</Upload>
-			// 		</span>
-			// 	)
-			// }
 		}, {
 			title: '上报时间',
 			dataIndex: 'reportingTime'
@@ -185,7 +292,7 @@ export default class Addition extends Component {
 				</Row>
 				<Row style={{ marginBottom: "30px" }} type="flex">
 					<Col>
-						<Upload {...props}>
+						<Upload {...props} onChange={this.uplodachange.bind(this)}>
 							<Button style={{ marginRight: 30 }}>
 								<Icon type="upload" />上传附件
 							</Button>
@@ -201,6 +308,19 @@ export default class Addition extends Component {
 							}
 						</Select>
 					</span>
+					<Col>
+						<span>
+							项目-单位工程：
+                        <Cascader
+								options={this.state.options}
+								className='btn'
+								loadData={this.loadData.bind(this)}
+								onChange={this.onSelectProject.bind(this)}
+								changeOnSelect
+							/>
+						</span>
+					</Col>
+
 					<Button type="primary" style={{ marginLeft: 20 }} onClick={this.onok.bind(this)}>提交</Button>
 				</Row>
 				<Row style={{ marginBottom: "30px" }}>
@@ -213,21 +333,10 @@ export default class Addition extends Component {
 		);
 	}
 
-
-
-
-	//table input 输入
-	tableDataChange(index, key, e) {
-		const { addition, actions: { changeAdditionField } } = this.props;
-		let { dataSource } = addition;
-		dataSource[index][key] = e.target['value'];
-		changeAdditionField('dataSource', dataSource)
+	ProSelect(eye) {
+		this.setState({ pro: JSON.parse(eye).name, units: JSON.parse(eye).children })
 	}
-
-
-	edit() {
-
-	}
+	//点击取消返回
 	cancel() {
 		const {
 			actions: { clearAdditionField }
@@ -240,12 +349,15 @@ export default class Addition extends Component {
 		let res = data.map(item => {
 			console.log('woshi', item)
 			return {
-				coding: item[1],
-
-				modelName: item[4],
-				modelDescription: item[6],
-				modeType: item[7],
-				reportingName: item[12],
+				code: item[1],
+				// unitEngineering: item[3],
+				modelName: item[2],
+				submittingUnit: item[3],
+				modelDescription: item[4],
+				modeType: item[5],
+				tdbxMode: item[7],
+				attributeTable: item[8],
+				reportingName: item[10],
 				file: {
 
 				}
@@ -256,7 +368,6 @@ export default class Addition extends Component {
 	//下拉框选择
 	handleSelect(index, key, value) {
 		const { dataSource } = this.state;
-
 		dataSource[index][key] = value;
 		// console.log('value', value)
 		this.setState({ dataSource });
@@ -265,8 +376,6 @@ export default class Addition extends Component {
 
 	onok() {
 		const { actions: { changeAdditionField } } = this.props;
-		console.log(this.props)
-	
 		let ok = this.state.dataSource.some(ele => {
 			return !ele.file;
 		});
@@ -274,6 +383,13 @@ export default class Addition extends Component {
 		//     message.error('有附件未上传');
 		//     return;
 		// };
+		let temp = this.state.dataSource.some((o, index) => {
+			return !o.file.id
+		})
+		if (temp) {
+			message.info(`有数据未上传附件`)
+			return
+		}
 		if (this.state.dataSource.length === 0) {
 			message.info("请上传excel")
 			return
@@ -282,42 +398,10 @@ export default class Addition extends Component {
 			message.error('审批人未选择');
 			return;
 		}
-		// if (!this.state.projects) {
-		// 	message.error('项目/子项目未选择');
-		// 	return;
-		// }
+
 		this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
-		// message.info('发起流程成功')
 		changeAdditionField('visible', false);
 	}
-
-
-	componentDidMount() {
-		const { actions: { getAllUsers, getProjects } } = this.props;
-		getAllUsers().then(rst => {
-			let users = [];
-			if (rst.length) {
-				let checkers = rst.map(o => {
-					return (
-						<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
-					)
-				})
-				this.setState({ checkers })
-			}
-		});
-		getProjects().then(rst => {
-			if (rst.children.length) {
-				let projects = rst.children.map(item => {
-					return (
-						<Option value={JSON.stringify(item)}>{item.name}</Option>
-					)
-				})
-				this.setState({ projects })
-			}
-		})
-
-	}
-
 	//预览
 	handlePreview(index) {
 		const { actions: { openPreview } } = this.props;
@@ -343,109 +427,43 @@ export default class Addition extends Component {
 
 	//附件删除
 	remove(index) {
-		const { actions: { deleteStaticFile,changeAdditionField } } = this.props
+		const { actions: { deleteStaticFile, changeAdditionField } } = this.props
 		let { dataSource } = this.state
-		console.log('bbb',this.state)
 		let id = dataSource[index]['file'].id
-		console.log('aaa',id)
 		deleteStaticFile({ id: id })
-		// let rate = dataSource[index].rate
-		// let level = dataSource[index].level
-		// dataSource[index] = {
-			
-
-		// 	modelName: modelName,
-		// 	modelDescription: modelDescription,
-		// 	modeType: modeType,
-		// 	reportingName:reportingName,
-		// 	file: {
-		// 	}
-		// }
 
 		dataSource[index].file = ''
-		changeAdditionField('dataSource',dataSource)
-		
+		changeAdditionField('dataSource', dataSource)
+
 		this.setState({ dataSource })
 	}
 
 	//附件上传
-	beforeUploadPicFile(record,file){
-        console.log(record,file);
-        const fileName = file.name;
+	beforeUploadPicFile(record, file) {
+		// console.log(record, file);
+		const fileName = file.name;
 		// 上传到静态服务器
-		const { actions:{uploadStaticFile} } = this.props;
+		const { actions: { uploadStaticFile } } = this.props;
 		const formdata = new FormData();
 		formdata.append('a_file', file);
-        formdata.append('name', fileName);
-        let myHeaders = new Headers();
-        let myInit = { method: 'POST',
-                       headers: myHeaders,
-                       body: formdata
-                     };
-                     //uploadStaticFile({}, formdata)
-        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
-            let loadedFile = await resp.json();
-            loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
-            loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
-            record.file = loadedFile;
-            record.code = file.name.substring(0,file.name.lastIndexOf('.'));
-            this.forceUpdate();
-        });
-        return false;
-    }
-	// //根据附件名称 也就是wbs编码获取其他信息
-	// async getInfo(code) {
-	// 	console.log(this.props)
-	// 	let res = {};
-	// 	const { actions: { getWorkPackageDetail } } = this.props
-	// 	let jianyanpi = await getWorkPackageDetail({ code: code })
-	// 	res.name = jianyanpi.name
-	// 	res.code = jianyanpi.code
-	// 	res.pk = jianyanpi.pk
-	// 	res.obj_type = jianyanpi.obj_type
-	// 	res.related_documents = jianyanpi.related_documents
-	// 	let fenxiang = await getWorkPackageDetail({ code: jianyanpi.parent.code })
-	// 	if (fenxiang.parent.obj_type_hum === "子分部工程") {
-	// 		let zifenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
-	// 		let fenbu = await getWorkPackageDetail({ code: zifenbu.parent.code })
-	// 		let zidanwei = {}, danwei = {};
-	// 		if (fenbu.parent.obj_type_hum === "子单位工程") {
-	// 			zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-	// 			danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
-
-	// 		} else {
-	// 			danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-	// 		}
-	// 		let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-	// 		res.construct_unit = construct_unit
-	// 		res.unit = {
-	// 			name: danwei.name,
-	// 			code: danwei.code,
-	// 			obj_type: danwei.obj_type
-	// 		}
-	// 		res.project = danwei.parent
-	// 	} else {
-	// 		let fenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
-	// 		let zidanwei = {}, danwei = {};
-	// 		if (fenbu.parent.obj_type_hum === "子单位工程") {
-	// 			zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-	// 			danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
-
-	// 		} else {
-	// 			danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-	// 		}
-	// 		let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-	// 		res.construct_unit = construct_unit
-	// 		res.unit = {
-	// 			name: danwei.name,
-	// 			code: danwei.code,
-	// 			obj_type: danwei.obj_type
-	// 		}
-	// 		res.project = danwei.parent
-	// 	}
-	// 	return res
-	// }
-
+		formdata.append('name', fileName);
+		let myHeaders = new Headers();
+		let myInit = {
+			method: 'POST',
+			headers: myHeaders,
+			body: formdata
+		};
+		//uploadStaticFile({}, formdata)
+		fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
+			let loadedFile = await resp.json();
+			loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
+			loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
+			record.file = loadedFile;
+			record.code = file.name.substring(0, file.name.lastIndexOf('.'));
+			this.forceUpdate();
+		});
+		return false;
+	}
 
 	static layout = {
 		labelCol: { span: 6 },
