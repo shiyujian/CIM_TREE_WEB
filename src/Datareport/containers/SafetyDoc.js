@@ -13,22 +13,24 @@ import {
     Popconfirm,
     notification
 } from 'antd';
+import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
 import {getUser} from '_platform/auth';
-import {WORKFLOW_CODE} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyDoc/AddFile';
 import {getNextStates} from '_platform/components/Progress/util';
+import Preview from '../../_platform/components/layout/Preview';
 var moment = require('moment');
 const Search = Input.Search;
 
 @connect(
 	state => {
-		const {datareport: {qualityData = {}} = {}, platform} = state;
-		return {...qualityData, platform}
+		const {datareport: {qualityData = {},safety = {}} = {}, platform} = state;
+		return {...qualityData,...safety, platform}
 	},
 	dispatch => ({
-		actions: bindActionCreators({...platformActions,...actions}, dispatch)
+		actions: bindActionCreators({...platformActions,...actions,...safetyAcitons}, dispatch)
 	})
 )
 class SafetyDoc extends Component {
@@ -39,7 +41,50 @@ class SafetyDoc extends Component {
             selectedRowKeys: [],
 			setEditVisiable:false,
         }
-	}
+    }
+    
+    async componentDidMount(){
+        const {actions:{
+            getScheduleDir,
+            postScheduleDir,
+        }} = this.props;
+        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
+        if(topDir.obj_type){
+            let dir = await getScheduleDir({code:'datareport_safetydoc_1112'});
+            debugger
+            if(dir.obj_type){
+                if(dir.stored_documents.length>0){
+                    this.generateTableData(dir.stored_documents);
+                }
+            }
+        }
+    }
+    async generateTableData(data){
+        const {actions:{
+            getDocument,
+        }} = this.props;
+        let dataSource = [];
+        debugger
+        data.map(item=>{
+            getDocument({code:item.code}).then(single=>{
+                let temp = { 
+                    code:single.extra_params.code,
+                    remark:single.extra_params.remark,
+                    doTime:single.extra_params.doTime,
+                    filename:single.extra_params.filename,
+                    pubUnit:single.extra_params.pubUnit,
+                    unPeople:single.extra_params.unPeople,
+                    type:single.extra_params.type,
+                    file:single.basic_params.files[0],
+                    unit:single.extra_params.unit,
+                    projectName:single.extra_params.project
+                }
+                dataSource.push(temp);
+                this.setState({dataSource});
+            })
+        })
+    }
+
 	goCancel = () =>{
         this.setState({setEditVisiable:false});
     }
@@ -88,7 +133,19 @@ class SafetyDoc extends Component {
 	}
 	onAddClick = () =>{
 		this.setState({setEditVisiable:true});
-	}
+    }
+    
+    handlePreview(index){
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index].file
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
 	
 	render() {
         const { selectedRowKeys } = this.state;
@@ -137,11 +194,11 @@ class SafetyDoc extends Component {
                 title:'附件',
                 width:'10%',
                 render:(text,record,index) => {
-                    return <span>
-                        <a>预览</a>
-                        <span className="ant-divider" />
-                        <a>下载</a>
-                    </span>
+                    return (<span>
+                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <span className="ant-divider" />
+                            <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                        </span>)
                 }
             }
         ];
@@ -175,7 +232,8 @@ class SafetyDoc extends Component {
 					 style={{height:380,marginTop:20}}
 					 pagination = {{pageSize:10}} 
 					/>
-				</Content>
+                </Content>
+                <Preview />
 				{
 					this.state.setEditVisiable &&
 					<AddFile {...this.props} oncancel={this.goCancel.bind(this)} akey={Math.random()*1234} onok={this.setEditData.bind(this)}/>

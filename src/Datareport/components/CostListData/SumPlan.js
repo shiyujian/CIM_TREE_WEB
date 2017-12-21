@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio,bordered, message, Popconfirm } from 'antd';
+import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio,bordered, message, Popconfirm, Cascader } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 const Search = Input.Search;
@@ -28,19 +28,22 @@ export default class SumPlan extends Component {
             })
             this.setState({checkers})
         });
-        getProjectTree().then(rst => {
-            if (rst.children.length) {
-                let projects = rst.children.map(item => {
+        getProjectTree({depth:1}).then(rst =>{
+            if(rst.status){
+                let projects = rst.children.map(item=>{
                     return (
-                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                        {
+                            value:JSON.stringify(item),
+                            label:item.name,
+                            isLeaf:false
+                        }
                     )
                 })
-                this.setState({
-                    projects,
-                    defaultPro: rst.children[0].name
-                })
+                this.setState({options:projects});
+            }else{
+                //获取项目信息失败
             }
-        })
+        });
     }
     //下拉框选择人
     selectChecker(value){
@@ -80,7 +83,61 @@ export default class SumPlan extends Component {
         }
         this.props.onok(this.state.dataSource,per)
     }
-
+    loadData = (selectedOptions) =>{
+        const {actions:{getProjectTree}} = this.props;
+        const targetOption = selectedOptions[selectedOptions.length - 1];
+        targetOption.loading = true;
+        getProjectTree({depth:2}).then(rst =>{
+            if(rst.status){
+                let units = [];
+                rst.children.map(item=>{
+                    if(item.code===JSON.parse(targetOption.value).code){  //当前选中项目
+                        units = item.children.map(unit =>{
+                            return (
+                                {
+                                    value:JSON.stringify(unit),
+                                    label:unit.name
+                                }
+                            )
+                        })
+                    }
+                })
+                targetOption.loading = false;
+                targetOption.children = units;
+                this.setState({options:[...this.state.options]})
+            }else{
+                //获取项目信息失败
+            }
+        });
+    }
+    onSelectProject = (value,selectedOptions) =>{
+        let project = {};
+        let unit = {};
+        if(value.length===2){
+            let temp1 = JSON.parse(value[0]);
+            let temp2 = JSON.parse(value[1]);
+            project = {
+                name:temp1.name,
+                code:temp1.code,
+                obj_type:temp1.obj_type
+            }
+            unit = {
+                name:temp2.name,
+                code:temp2.code,
+                obj_type:temp2.obj_type
+            }
+            let newdataSources = this.state.dataSource;
+            for(var i=0;i<newdataSources.length;i++){
+                newdataSources[i].subproject = project,
+                newdataSources[i].unit = unit
+            }
+            this.setState({project,unit,dataSource:newdataSources});
+            return;
+        }
+        
+        //must choose all,otherwise make it null
+        this.setState({project:{},unit:{}});
+    }
     render () {
 		  const rowSelection = {
 			onChange: (selectedRowKeys, selectedRows) => {
@@ -97,30 +154,6 @@ export default class SumPlan extends Component {
 				return index+1
 			}
 		},{
-			title: '项目/子项目名称',
-            dataIndex: 'subproject',
-            render:(record) => {
-                return (
-                    <Select style={{width:"90%"}} defaultValue={this.state.defaultPro} onSelect={ele => {
-                        this.setState({ pro: ele })
-                    }}>
-                        {this.state.projects}
-                    </Select>
-                )
-            }
-          },{
-			title: '单位工程',
-            dataIndex: 'unit',
-            render:(record) => {
-                return (
-                    <Select style={{width:"90%"}} defaultValue={this.state.defaultPro} onSelect={ele => {
-                        this.setState({ pro: ele })
-                    }}>
-                        {this.state.projects}
-                    </Select>
-                )
-            }
-		  },{
 			title: '工作节点目标',
 			dataIndex: 'nodetarget',
 		  },{
@@ -176,7 +209,7 @@ export default class SumPlan extends Component {
                   }
               },
           };
-          
+
         return (
             <div>
                
@@ -202,7 +235,16 @@ export default class SumPlan extends Component {
                             }
                         </Select>
                     </span> 
-                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
+                    <span>
+                        项目-单位工程：
+                        <Cascader
+                        options={this.state.options}
+                        className='btn'
+                        loadData={this.loadData.bind(this)}
+                        onChange={this.onSelectProject.bind(this)}
+                        changeOnSelect
+                      />
+                    </span>
                 <Row style={{ marginBottom: "30px" }}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
