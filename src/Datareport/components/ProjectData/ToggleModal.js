@@ -203,6 +203,7 @@ export default class ToggleModal extends Component{
             }} >
                 <Option value = 'construct'>建筑</Option>
                 <Option value = 'city'>市政</Option>
+                <Option value = 'garden'>园林</Option>
             </Select>)
         },
          key: 'Type',

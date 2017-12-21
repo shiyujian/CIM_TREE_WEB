@@ -9,6 +9,7 @@ import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
 import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
 import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
+import HiddenDangerCheck from '../../../Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
 import Check from '../../../Datareport/components/ModalData/Check'
 
 const FormItem = Form.Item;
@@ -32,7 +33,17 @@ export default class Progress extends Component {
 	}
 
 	render() {
-		const { state = {}, task, location, states = [],dr_qua_jyp_visible,dr_qua_jy_visible,safety_doc_check_visible,modal_check_visbile} = this.props;
+		const { 
+			state = {}, 
+			task, 
+			location, 
+			states = [],
+			dr_qua_jyp_visible,
+			dr_qua_jy_visible,
+			safety_doc_check_visible,
+			safety_hidden_check_visible,
+			modal_check_visbile
+		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
 		const { state_id = '0' } = queryString.parse(location.search) || {};
@@ -136,6 +147,10 @@ export default class Progress extends Component {
 					<SafetyDocCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					safety_hidden_check_visible && 
+					<HiddenDangerCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
 					modal_check_visbile && 
 					<Check wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
@@ -162,6 +177,9 @@ export default class Progress extends Component {
 				break;
 			case "安全管理信息批量录入":
 				changeDatareportVisible({key:'safety_doc_check_visible',value:true})
+				break;
+			case "安全隐患信息批量录入":
+				changeDatareportVisible({key:'safety_hidden_check_visible',value:true})
 				break;
 			case "模型信息批量录入":
 				changeDatareportVisible({key:'modal_check_visbile',value:true})
