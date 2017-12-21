@@ -614,7 +614,16 @@ export default class Lmap extends Component {
 					})
 				});
 			}
-			me.setState({panorama:panorama});
+			let panoramaFir = {
+				key:32423432432423,
+				properties:{
+					name:'360全景点'
+				},
+				children:panorama
+			};
+			let panoramaArr = [];
+			panoramaArr.push(panoramaFir);
+			me.setState({panorama:panoramaArr});
 		})
 	}
 
@@ -1018,25 +1027,22 @@ export default class Lmap extends Component {
 					let kkkk = keys.find(k => k == c.key);
 					if (kkkk) {
 						checkItems[kkkk] = me.createMarker(c, checkItems[kkkk]);
-						if (featureName == 'geojsonFeature_360') {
-							checkItems[kkkk]&&checkItems[kkkk].on('click', function () {
-								me.setState({
-									panoramaModalVisble: true,
-									panoramalink: DashboardVideo360API + '/' + c.properties.link
-								});
-								/*let link = document.createElement('a');
-								link.href = c.properties.link;
-								link.target= '_blank';
-								document.body.appendChild(link);
-								link.click();
-								document.body.removeChild(link);
-								link = null;*/
-							});
-						}
 					}
 				} else {
 					c.children.forEach(cc => {
 						let kk = keys.find(k => k == cc.key);
+						if (featureName == 'geojsonFeature_360') {
+							if (kk) {
+								checkItems[kk] = me.createMarker(c, checkItems[kkkk]);
+								checkItems[kk]&&checkItems[kk].on('click', function () {
+									me.setState({
+										panoramaModalVisble: true,
+										panoramalink: DashboardVideo360API + '/' + c.properties.link
+									});
+								});
+							}
+						}
+
 						if (featureName == 'geojsonFeature_monitor') {
 							if(kk){
 								checkItems[kk] = me.createMarker(cc, checkItems[kk]);

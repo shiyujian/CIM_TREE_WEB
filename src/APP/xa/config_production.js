@@ -116,5 +116,9 @@ window.config = {
 	'ZHLoginServletCMD':'http://xaweb.simulate.com:8080/eccms/servlet/LoginServlet.cmd',
 
 	//综合展示360全景部署
-	'dashboardVideo360API':'http://192.168.3.94/QJ/容城'
+	'dashboardVideo360API':'http://192.168.3.94/QJ/容城',
+
+	//跳转到大屏
+	'nextMaxScreen':'https://www.baidu.com/'
+	
 };

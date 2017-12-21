@@ -20,9 +20,7 @@ export default class InfoUploadModal extends Component{
 
     render(){
         const {dataSource} = this.state;
-        const {actions:{getAllUsers},
-            uploadModal, closeModal
-        } = this.props;
+        const {uploadModal, closeModal, actions:{getAllUsers}} = this.props;
 
         return(
             <Modal
@@ -33,8 +31,10 @@ export default class InfoUploadModal extends Component{
              footer={null}
             >
                 <VedioInfoTable
+                 fileDel={true}
                  dataSource={dataSource}
                  storeExcelData={this.storeExcelData}
+                 actions={this.props.actions}
                 />
                 <UploadFooter
                  storeExcelData= {this.storeExcelData}
@@ -52,15 +52,26 @@ export default class InfoUploadModal extends Component{
         this.setState({dataSource});
     }
  
-     onOk = async (selectUser)=>{  //发起流程，关闭Modal
-         const {dataSource} = this.state,
-             {closeModal, actions:{ createWorkflow, logWorkflowEvent }} = this.props,
-             name = '影像信息信息批量录入';
- 
-         await launchProcess({dataSource,selectUser,name},{createWorkflow,logWorkflowEvent});
-         message.success("上传数据成功");
-         closeModal();
-     }
+    onOk = async (selectUser)=>{  //发起流程，关闭Modal
+        const {dataSource} = this.state;
+
+        let hasFile = true;
+        dataSource.forEach(record =>{
+            if(!(record.file&&record.file.id)){
+                hasFile = false;
+            }
+        })
+        if(!hasFile){
+            message.error("请上传影像");
+            return;
+        }
+
+        const {closeModal, actions:{ createWorkflow, logWorkflowEvent }} = this.props,
+            name = '影像信息批量录入';
+        await launchProcess({dataSource,selectUser,name},{createWorkflow,logWorkflowEvent});
+        message.success("上传数据成功");
+        closeModal();
+    }
 }
 
 InfoUploadModal.PropTypes ={
