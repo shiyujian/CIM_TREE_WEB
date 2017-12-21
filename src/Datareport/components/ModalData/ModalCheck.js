@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
-import {actions} from '../../store/quality';
+import {actions} from '../../store/safety';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
@@ -14,8 +14,8 @@ const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 @connect(
 	state => {
-		const { platform} = state;
-		return { platform}
+		const {datareport: {safety = {}} = {}, platform} = state;
+		return {...safety, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
@@ -28,6 +28,7 @@ export default class ModalCheck extends Component {
 			wk:null,
             dataSource:[],
             opinion:1,//1表示通过 2表示不通过
+            topDir:{},
 		}
 	}
 
@@ -35,6 +36,21 @@ export default class ModalCheck extends Component {
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
+        const {actions:{
+            getScheduleDir,
+            postScheduleDir,
+        }} = this.props;
+        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
+        if(!topDir.obj_type){
+            let postData = {
+                name:'数据报送的顶级节点',
+                code:'the_only_main_code_datareport',
+                "obj_type": "C_DIR",
+                "status": "A",
+            }
+            topDir = await postScheduleDir({},postData);
+        }
+        this.setState({topDir});
     }
 
     componentWillReceiveProps(props){
@@ -59,66 +75,97 @@ export default class ModalCheck extends Component {
 	}
     //通过
     async passon(){
-        const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
+        const {dataSource,wk,topDir} = this.state;
+        const {actions:{
+            logWorkflowEvent,
+            addDocList,
+            getScheduleDir,
+            postScheduleDir,
+            getWorkpackagesByCode
+        }} = this.props;
+        console.log('dataSource',dataSource)
+        //the unit in the dataSource array is same
+        let unit = dataSource[0].unit;
+        let project = dataSource[0].project;
+        let code = 'datareport_safetydoc_1112';
+        //get workpackage by unit's code 
+        let workpackage = await getWorkpackagesByCode({code:unit.code});
+        
+        let postDirData = {
+            "name": '安全文档目录树',
+            "code": code,
+            "obj_type": "C_DIR",
+            "status": "A",
+            related_objects: [{
+                pk: workpackage.pk,
+                code: workpackage.code,
+                obj_type: workpackage.obj_type,
+                rel_type: 'safetydoc_wp_dirctory', // 自定义，要确保唯一性
+            }],
+            "parent":{"pk":topDir.pk,"code":topDir.code,"obj_type":topDir.obj_type}
+        }
+        let dir = await getScheduleDir({code:code});
+        //no such directory
+        if(!dir.obj_type){  
+            dir = await postScheduleDir({},postDirData);
+        }
+
+        // send workflow
         let executor = {};
         let person = getUser();
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',attachment:null});
-        let doclist_a = [];
-        let doclist_p = [];
-        let wplist = [];
-        dataSource.map((o) => {
-            //创建文档对象
-            console.log('o',o)
-            let doc = o.find(x => {
-                x.modeType === 'mch_rel'
-            })
-            if(doc){
-                doclist_p.push({
-                    code:doc.code,
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }else{
-                doclist_a.push({
-                    code:`rel_doc_${o.code}`,
-                    name:`rel_doc_${o.pk}`,
-                    obj_type:"C_DOC",
-                    status:"A",
-                    version:"A",
-                    "basic_params": {
-                    	"files": [
-                            o.file
-                        ]
-                    },
-                    workpackages:[{
-                        code:o.code,
-                        obj_type:o.obj_type,
-                        pk:o.pk,
-                        modeType:"mch_rel"
-                    }],
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }
-            //施工包批量
-            wplist.push({
-                code:o.code,
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        
+        //prepare the data which will store in database
+        const docData = [];
+        let i=0;   //asure the code of every document only
+        dataSource.map(item=>{
+            i++;
+            docData.push({
+                code:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
+                name:item.file.name,
+                obj_type:"C_DOC",
+                status:'A',
+                profess_folder: {code: dir.code, obj_type: 'C_DIR'},
+                "basic_params": {
+                    "files": [
+                        {
+                          "a_file": item.file.a_file,
+                          "name": item.file.name,
+                          "download_url": item.file.download_url,
+                          "misc": "file",
+                          "mime_type": item.file.mime_type
+                        },
+                    ]
+                  },
                 extra_params:{
-                    rate:o.rate,
-                    check_status:2
+                    code:item.code,
+                    filename:item.file.name,
+                    pubUnit:item.pubUnit,
+                    type:item.type,
+                    doTime:item.doTime,
+                    remark:item.remark,
+                    upPeople:item.upPeople,
+                    unit:item.unit.name,
+                    project:item.project.name
                 }
             })
-        })
-        await addDocList({},{data_list:doclist_a});
-        await putDocList({},{data_list:doclist_p})
-        await updateWpData({},{data_list:wplist});
+        });
+        let rst = await addDocList({},{data_list:docData});
+        if(rst.result){
+            notification.success({
+                message: '创建文档成功！',
+                duration: 2
+            });
+        }else{
+            notification.error({
+                message: '创建文档失败！',
+                duration: 2
+            });
+        }
     }
     //不通过
     async reject(){
