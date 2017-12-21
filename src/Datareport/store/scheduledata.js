@@ -24,6 +24,8 @@ const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [],
 //批量创建文档
 export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
+//创建文档目录
+export const addDefectDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 
 export const actions = {
 	getProjectTree,
@@ -38,7 +40,8 @@ export const actions = {
 	putDocList,
 	addDocList,
 	deleteWorkflow,
-	updateWpData
+	updateWpData,
+	addDefectDir
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
