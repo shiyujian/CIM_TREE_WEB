@@ -72,7 +72,7 @@ export default class Progress extends Component {
 		console.log('statis',states);
 		const currentStates = states.find(state => state.id === +state_id) || {};
 		const currentStateCode = currentStates.code;
-		console.log('currentStates',currentStates);
+		console.log('currentStateCode',currentStateCode);
 		console.log("task Progress props", this.props);
 		return (
 			<div>
