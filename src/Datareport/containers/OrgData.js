@@ -69,9 +69,7 @@ export default class OrgData extends Component {
 					<TableOrg {...this.props} />
 					{
 						visible && <ToggleModal {...this.props} setData = {this.setData.bind(this)}/>
-						
 					}
-					<OrgCheck {...this.props}/>
 				</Content>
 			</div>
 			)

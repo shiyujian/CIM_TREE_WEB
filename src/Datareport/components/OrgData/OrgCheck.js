@@ -142,71 +142,45 @@ export default class OrgCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        const columns = 
-        [{
-            title:'序号',
-            width:"5%",
-			render:(text,record,index) => {
-				return index+1
-			}
-		},{
-			title:'项目/子项目',
-            dataIndex:'project',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.project.name}
-                </span>
-            ),
-		},{
-			title:'单位工程',
-            dataIndex:'unit',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
-            ),
-		},{
-			title:'WBS编码',
-            dataIndex:'code',
-            width:"13%",
-		},{
-			title:'名称',
-            dataIndex:'name',
-            width:"13%",
-		},{
-			title:'检验合格率',
-            dataIndex:'rate',
-            width:"8%",
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name*100 + '%'} 
-                </span>
-            ),
-		},{
-			title:'质量等级',
-            dataIndex:'level',
-            width:"12%",
-		},{
-			title:'施工单位',
-            dataIndex:'construct_unit',
-            width:"12%",
-            render: (text, record, index) => (
-                <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
-                </span>
-            ),
-		}, {
-            title:'附件',
-            width:"11%",
-			render:(text,record,index) => {
-                return (<span>
-                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                        <span className="ant-divider" />
-                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                    </span>)
-			}
+        columns = [{
+
+        },
+        {
+            title: '序号',
+            dataIndex: 'index',
+            key: 'Index',
+        }, {
+            title: '组织机构编码',
+            dataIndex: 'code',
+            key: 'Code',
+        }, {
+            title: '组织机构类型',
+            dataIndex: 'type',
+            key: 'Type',
+        }, {
+            title: '参建单位名称',
+            dataIndex: 'name',
+            key: 'Name',
+        }, {
+            title: '组织机构部门',
+            dataIndex: 'depart',
+            key: 'depart',
+        }, {
+            title: '直属部门',
+            dataIndex: 'direct',
+            key: 'Direct',
+        }, {
+            title: '负责项目/子项目名称',
+            dataIndex: 'project',
+            key: 'Project',
+        }, {
+            title: '负责单位工程名称',
+            dataIndex: 'unit',
+            key: 'Unit'
+        }, {
+            title: '备注',
+            dataIndex: 'remarks',
+            key: 'Remarks'
         }]
 		return (
             <Modal
