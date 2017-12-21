@@ -66,48 +66,48 @@ export default class ProjectSumExamine extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        dataSource.map((o) => {
-            //创建文档对象
-            let doc = o.related_documents.find(x => {
-                x.rel_type === 'many_jyp_rel'
-            })
-            debugger
-            if(doc){
-                doclist_p.push({
-                    code:doc.code,
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }else{
-                doclist_a.push({
-                    code:`rel_doc_${o.code}`,
-                    name:`rel_doc_${o.pk}`,
-                    obj_type:"C_DOC",
-                    status:"A",
-                    version:"A",
-                    "basic_params": {
-                    },
-                    workpackages:[{
-                        code:o.code,
-                        obj_type:o.obj_type,
-                        pk:o.pk,
-                        rel_type:"many_jyp_rel"
-                    }],
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }
-            //施工包批量
-            wplist.push({
-                code:o.code,
-                extra_params:{
-                    rate:o.rate
-                }
-            })
-        })
-        debugger
+        // dataSource.map((o) => {
+        //     //创建文档对象
+        //     let doc = o.related_documents.find(x => {
+        //         x.rel_type === 'many_jyp_rel'
+        //     })
+        //     debugger
+        //     if(doc){
+        //         doclist_p.push({
+        //             code:doc.code,
+        //             extra_params:{
+        //                 ...o
+        //             }
+        //         })
+        //     }else{
+        //         doclist_a.push({
+        //             code:`rel_doc_${o.code}`,
+        //             name:`rel_doc_${o.pk}`,
+        //             obj_type:"C_DOC",
+        //             status:"A",
+        //             version:"A",
+        //             "basic_params": {
+        //             },
+        //             workpackages:[{
+        //                 code:o.code,
+        //                 obj_type:o.obj_type,
+        //                 pk:o.pk,
+        //                 rel_type:"many_jyp_rel"
+        //             }],
+        //             extra_params:{
+        //                 ...o
+        //             }
+        //         })
+        //     }
+        //     //施工包批量
+        //     wplist.push({
+        //         code:o.code,
+        //         extra_params:{
+        //             rate:o.rate
+        //         }
+        //     })
+        // })
+      
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -214,7 +214,7 @@ export default class ProjectSumExamine extends Component {
 	}
 
 	
-     columns = 
+columns = 
     [{
         title:'序号',
         width:"5%",
