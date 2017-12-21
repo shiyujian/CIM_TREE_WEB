@@ -1,5 +1,5 @@
 export Table from './Table';
 export Addition from './Addition';
-export Check from './Check';
+export ModalCheck from './ModalCheck';
 export Modify from './Modify';
 export Expurgate from './Expurgate';
