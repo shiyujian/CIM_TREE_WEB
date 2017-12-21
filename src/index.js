@@ -27,6 +27,24 @@ if(__env__ == 'qh'){
 }
 
 if(__env__ == 'xa'){
+
+
+	$(document).keydown(function (e) {
+		
+		switch (e.keyCode) {
+			// 右
+			case 39:
+				window.location.href = window.config.nextMaxScreen;
+				break;
+			// 左
+			case 37:
+				
+				break;
+			default:
+				break;
+		}
+	});
+
 	ReactDOM.render(<XA/>, document.getElementById('root'));
 
 	if (module.hot) {

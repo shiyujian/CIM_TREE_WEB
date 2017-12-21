@@ -54,7 +54,8 @@ export const WMSTILELAYERURL = window.config.WMSTileLayerUrl;
 export const TILEURLS = {
 	1: window.config.IMG_W,
 	2: window.config.VEC_W
-}
+};
+export const DefaultZoomLevel = 14;
 //文件预览的接口
 export const previewWord_API = window.config.previewWord_API;
 export const SAFETY_MONITOR_DOWN = window.config.Leader_Class_URL;

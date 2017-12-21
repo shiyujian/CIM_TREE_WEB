@@ -1,7 +1,7 @@
 
 import React, {Component} from 'react';
 import {Radio,Table,Row,Col} from 'antd';
-import {DOWNLOAD_FILE,PDF_FILE_API} from '../../../_platform/api';
+import {DOWNLOAD_FILE,PDF_FILE_API,DefaultZoomLevel} from '_platform/api';
 import L from 'leaflet';
 import { Map, Marker, Popup, TileLayer,WMSTileLayer } from 'react-leaflet';
 import moment from 'moment';
@@ -67,7 +67,7 @@ class SafeTab extends Component{
                         dataSource={risksData} rowKey="id"></Table>
                     </div>
                     <div style={{width:'50%',flex:'1 1 50%'}}>
-                    <Map center={position} zoom={13} style={{height:'100%'}}>
+                    <Map center={position} zoom={DefaultZoomLevel} style={{height:'100%'}}>
                         <TileLayer
                         url={this.imgLayerUrl}
                         subdomains={['7']}
