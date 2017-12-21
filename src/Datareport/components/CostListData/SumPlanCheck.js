@@ -53,7 +53,7 @@ export default class SumPlanCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_qua_jyp_visible",false)
+        this.props.closeModal("dr_qua_jsjh_visible",false)
         message.info("操作成功")
     }
     //通过
