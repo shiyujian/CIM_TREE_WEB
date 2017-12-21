@@ -51,7 +51,7 @@ export default class SumPlanCheck extends Component {
     this.state = {
       wk: null,
       dataSource: [],
-      option: 1,
+      opinion: 1,
       topDir: {}
     };
   }
@@ -82,7 +82,7 @@ export default class SumPlanCheck extends Component {
   }
   //提交
   async submit() {
-    if (this.state.option === 1) {
+    if (this.state.opinion === 1) {
       await this.passon();
     } else {
       await this.reject();
@@ -281,7 +281,7 @@ export default class SumPlanCheck extends Component {
             <Col span={4}>
               <RadioGroup
                 onChange={this.onChange.bind(this)}
-                value={this.state.option}
+                value={this.state.opinion}
               >
                 <Radio value={1}>通过</Radio>
                 <Radio value={2}>不通过</Radio>

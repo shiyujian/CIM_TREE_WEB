@@ -171,7 +171,7 @@ export default class SumPlan extends Component {
   };
 
   onok() {
-    debugger;
+
     if (!this.state.check) {
       message.info("请选择审核人");
       return;
@@ -206,6 +206,10 @@ export default class SumPlan extends Component {
       this.state.dataSource[i].unit = unit;
     }
     this.props.onok(this.state.dataSource, per);
+    notification.success({
+        message: '信息上传成功！',
+        duration: 2
+    });
   }
 
   //删除
