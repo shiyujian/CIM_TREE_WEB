@@ -9,12 +9,15 @@ export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 //发起流程
 export const createWorkflow = createFetchAction(`${WORKFLOW_API}/instance/`, [], 'POST');
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
+//获取文档目录
+const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 
 export const actions = {
 	Test,
 	getAllUsers,
 	createWorkflow,
-	logWorkflowEvent
+	logWorkflowEvent,
+	getScheduleDir
 };
 
 export default handleActions({

@@ -279,7 +279,7 @@ export default class StartPlanForm extends Component {
                     <div >
                         <Button type="primary" onClick={this.submitPlan.bind(this)}>发送</Button>
                         <h1 style={{textAlign:'center'}}>总进度计划填报通知</h1>
-                        <Row gutter={15} className='mb10'>
+                        <Row gutter={30} className='mb10'>
                             <Col span={8}>
                                 <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">项目名称:</label>
                                 <div className='start_input'>
@@ -299,7 +299,7 @@ export default class StartPlanForm extends Component {
                                 </div>   
                             </Col>
                         </Row>
-                        <Row gutter={15} className='mb10'>
+                        <Row gutter={30} className='mb10'>
                             <Col span={8}>
                                 <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">施工单位:</label>
                                 <div className="start_input">
@@ -340,7 +340,7 @@ export default class StartPlanForm extends Component {
                                 </div>        
                             </Col>
                         </Row>
-                        <Row gutter={15} className='mb10'>
+                        <Row gutter={30} className='mb10'>
                             <Col span={8}>
                                 <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">监理单位:</label>
                                 <div className="start_input">

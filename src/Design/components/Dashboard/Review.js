@@ -19,7 +19,7 @@ export default class Warning extends Component {
                 {value:ReviewValue.data.delayed, name:'逾期交付'}
             ]
             const option = {
-                color: ['#2196f3', '#ff9800', '#9e9e9e'],
+                color: ['#0EF0FF', '#4A87FF', '#546D83'],
                 title : {
                     text: '成果审查进度统计',
                     subtext: ReviewValue.name,
@@ -31,7 +31,7 @@ export default class Warning extends Component {
                     formatter: "{a} <br/>{b} : {c} ({d}%)"
                 },
                 legend: {
-                    orient: 'vertical',
+                    // orient: 'vertical',
                     left: 'right',
                     y: '8%',
                     data:['提前交付','按期交付','逾期交付']

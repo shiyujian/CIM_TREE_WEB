@@ -8,7 +8,8 @@ export default class ToggleModal extends Component{
         this.state = {
             dataSource: [],
             users: [],
-            projects: []
+            projects: [],
+            org: []
         }
     }
     render(){
@@ -137,18 +138,17 @@ export default class ToggleModal extends Component{
                 index: item[0],
                 code: item[1],
                 name: item[2],
-                unit: item[3],
-                depart: item[4],
-                job: item[5],
-                sex: item[6],
-                tel: item[7],
-                email: item[8],
+                depart: item[3],
+                job: item[4],
+                sex: item[5],
+                tel: item[6],
+                email: item[7],
             }
         })
         return res;
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props;
+        const {actions:{getAllUsers,getOrgList}} = this.props;
         getAllUsers().then(rst => {
             let users = [];
             if (rst.length) {
@@ -160,6 +160,16 @@ export default class ToggleModal extends Component{
                 this.setState({checkers})
             }
         });
+        getOrgList().then(rst => {
+            if (rst.children.length) {
+                let org = rst.children.map(item => {
+                    return (
+                         <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({org})
+            }
+        })
     }
     columns = [ {
         title: '人员编码',
@@ -171,8 +181,16 @@ export default class ToggleModal extends Component{
         key: 'Name',
       },{
         title: '所在组织机构单位',
-        dataIndex: 'unit',
-        key: 'Unit',
+        render:(record) => {
+            return (
+                <Select style={{width:"90%"}} value = {record.org || this.state.defaultPro} onSelect={ele => {
+                    record.org = ele;
+                    this.forceUpdate();
+                }}>
+                    {this.state.org}
+                </Select>
+            )
+        }
       },{
          title: '所属部门',
          dataIndex :'depart',

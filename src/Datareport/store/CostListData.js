@@ -5,7 +5,11 @@ import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
 import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API} from '_platform/api';
 
-
+const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
+const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
+const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
+const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE')
+const getWorkpackagesByCode = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`, [], 'GET');
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
 const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [], 'DELETE');
 export const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
@@ -26,7 +30,12 @@ export const actions = {
 	getAllUsers,
 	createWorkflow,
 	getWorkflow,
-	logWorkflowEvent
+	logWorkflowEvent,
+	getWorkpackagesByCode,
+	deleteWorkflow,
+	getScheduleDir,
+	postScheduleDir,
+	addDocList
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

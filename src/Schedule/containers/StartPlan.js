@@ -112,5 +112,5 @@ export default class StartPlan extends Component {
 				}
 			})
 		}
-    };
+    }
 };

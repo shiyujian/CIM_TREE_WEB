@@ -1,46 +1,156 @@
 import React, { Component } from 'react';
 
-import { Input, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message } from 'antd';
+import {
+    Input, Form, Spin, Upload, Icon, Button, Modal,
+    Cascader, Select, Popconfirm, message, Table, Row, Col, notification
+} from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
-const { Option } = Select
+const FormItem = Form.Item;
+const Option = Select.Option;
 
 class DesignModal extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            selectedRowKeys: [],
             dataSource: [],
-            users: [],
-            projects: [],
-            checkers: [],//审核人下拉框选项
+            checkers: [],//审核人下来框选项
             check: null,//审核人
+            project: {},
+            unit: {},
+            options: [],
         };
     }
     componentDidMount() {
-        const { actions: { getAllUsers } } = this.props
+        const { actions: { getAllUsers, getProjectTree } } = this.props;
         getAllUsers().then(rst => {
-            let users = [];
-            if (rst.length) {
-                let checkers = rst.map(o => {
+            let checkers = rst.map(o => {
+                return (
+                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                )
+            })
+            this.setState({ checkers })
+        })
+        getProjectTree({ depth: 1 }).then(rst => {
+            if (rst.status) {
+                let projects = rst.children.map(item => {
                     return (
-                        <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                        {
+                            value: JSON.stringify(item),
+                            label: item.name,
+                            isLeaf: false
+                        }
                     )
                 })
-                this.setState({ checkers })
+                this.setState({ options: projects });
+            } else {
+                //获取项目信息失败
             }
         });
     }
-    onSelectChange = (selectedRowKeys) => {
-        this.setState({ selectedRowKeys });
+    beforeUpload = (info) => {
+        if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
+            return true;
+        } else {
+            notification.warning({
+                message: '只能上传Excel文件！',
+                duration: 2
+            });
+            return false;
+        }
     }
-    //table input 输入
-    tableDataChange(index, key, e) {
-        const { dataSource } = this.state;
-        dataSource[index][key] = e.target['value'];
-        this.setState({ dataSource });
+    uplodachange = (info) => {
+        //info.file.status/response
+        if (info && info.file && info.file.status === 'done') {
+            notification.success({
+                message: '上传成功！',
+                duration: 2
+            });
+            let name = Object.keys(info.file.response);
+            let dataList = info.file.response[name[0]];
+            let dataSource = [];
+            for (let i = 1; i < dataList.length; i++) {
+                dataSource.push({
+                    code: dataList[i][0] ? dataList[i][0] : '',
+                    volume: dataList[i][1] ? dataList[i][1] : '',
+                    name: dataList[i][2] ? dataList[i][2] : '',
+                    major: dataList[i][3] ? dataList[i][3] : '',
+                    factovertime: dataList[i][4] ? dataList[i][4] : '',
+                    designunit: dataList[i][5] ? dataList[i][5] : '',
+                    uploads: dataList[i][6] ? dataList[i][6] : '',
+                    project: {
+                        code: "",
+                        name: "",
+                        obj_type: ""
+                    },
+                    unit: {
+                        code: "",
+                        name: "",
+                        obj_type: ""
+                    },
+                })
+            }
+            this.setState({ dataSource });
+        }
+    }
+
+    //下拉框选择人
+    selectChecker(value) {
+        let check = JSON.parse(value);
+        this.setState({ check })
+    }
+
+    onSelectProject = (value, selectedOptions) => {
+        let project = {};
+        let unit = {};
+        if (value.length === 2) {
+            let temp1 = JSON.parse(value[0]);
+            let temp2 = JSON.parse(value[1]);
+            project = {
+                name: temp1.name,
+                code: temp1.code,
+                obj_type: temp1.obj_type
+            }
+            unit = {
+                name: temp2.name,
+                code: temp2.code,
+                obj_type: temp2.obj_type
+            }
+            this.setState({ project, unit });
+            return;
+        }
+        //must choose all,otherwise make it null
+        this.setState({ project: {}, unit: {} });
+    }
+
+    loadData = (selectedOptions) => {
+        const { actions: { getProjectTree } } = this.props;
+        const targetOption = selectedOptions[selectedOptions.length - 1];
+        targetOption.loading = true;
+        getProjectTree({ depth: 2 }).then(rst => {
+            if (rst.status) {
+                let units = [];
+                rst.children.map(item => {
+                    if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
+                        units = item.children.map(unit => {
+                            return (
+                                {
+                                    value: JSON.stringify(unit),
+                                    label: unit.name
+                                }
+                            )
+                        })
+                    }
+                })
+                targetOption.loading = false;
+                targetOption.children = units;
+                this.setState({ options: [...this.state.options] })
+            } else {
+                //获取项目信息失败
+            }
+        });
     }
     //下拉框选择变化
     handleSelect(index, key, value) {
@@ -48,7 +158,6 @@ class DesignModal extends Component {
         dataSource[index][key] = value;
         this.setState({ dataSource });
     }
-    //ok
     onok() {
         if (!this.state.check) {
             message.info("请选择审核人")
@@ -58,13 +167,12 @@ class DesignModal extends Component {
             message.info("请上传excel")
             return
         }
-        // let temp = this.state.dataSource.some((o,index) => {
-        //                 return !o.file.id
-        //             })
-        // if(temp){
-        //     message.info(`有数据未上传附件`)
-        //     return
-        // }
+        const { project, unit } = this.state;
+        if (!project.name) {
+            message.info(`请选择项目和单位工程`);
+            return;
+        }
+
         let { check } = this.state
         let per = {
             id: check.id,
@@ -73,21 +181,21 @@ class DesignModal extends Component {
             person_code: check.account.person_code,
             organization: check.account.organization
         }
-        this.props.onok(this.state.dataSource, per)
+        for (let i = 0; i < this.state.dataSource.length; i++) {
+            this.state.dataSource[i].project = project;
+            this.state.dataSource[i].unit = unit;
+        }
+        this.props.onok(this.state.dataSource, per);
     }
-    covertURLRelative = (originUrl) => {
-        return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-    }
-    //下拉框选择人
-    selectChecker(value) {
-        let check = JSON.parse(value)
-        this.setState({ check })
-    }
+
     //删除
     delete(index) {
         let { dataSource } = this.state
         dataSource.splice(index, 1)
         this.setState({ dataSource })
+    }
+    covertURLRelative = (originUrl) => {
+        return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     render() {
         const columns =
@@ -99,6 +207,9 @@ class DesignModal extends Component {
             }, {
                 title: '编码',
                 dataIndex: 'code',
+            }, {
+                title: '卷册',
+                dataIndex: 'volume',
             }, {
                 title: '名称',
                 dataIndex: 'name',
@@ -117,7 +228,7 @@ class DesignModal extends Component {
                 dataIndex: 'factovertime',
             }, {
                 title: '设计单位',
-                dataIndex: 'unit',
+                dataIndex: 'designunit',
             }, {
                 title: '上传人员',
                 dataIndex: 'uploads',
@@ -136,32 +247,7 @@ class DesignModal extends Component {
                     )
                 }
             }]
-        let jthis = this
-        //上传
-        const props = {
-            action: `${SERVICE_API}/excel/upload-api/` /*+ '?t_code=zjt-05'*/,
-            headers: {
-            },
-            showUploadList: false,
-            onChange(info) {
-                if (info.file.status !== 'uploading') {
-                }
-                if (info.file.status === 'done') {
-                    let importData = info.file.response.Sheet1;
-                    let { dataSource } = jthis.state
-                    dataSource = jthis.handleExcelData(importData)
-                    jthis.setState({ dataSource })
-                    message.success(`${info.file.name} file uploaded successfully`);
-                } else if (info.file.status === 'error') {
-                    message.error(`${info.file.name}解析失败，请检查输入`);
-                }
-            },
-        };
-        const { selectedRowKeys } = this.state;
-        const rowSelection = {
-            selectedRowKeys,
-            onChange: this.onSelectChange,
-        };
+
         return (
             <Modal
                 title="设计进度信息上传表"
@@ -171,58 +257,60 @@ class DesignModal extends Component {
                 onOk={this.onok.bind(this)}
                 maskClosable={false}
                 onCancel={this.props.oncancel}>
-                <div>
-                    <Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
-                    <Table style={{ marginTop: '10px', marginBottom: '10px' }}
-                        columns={columns}
-                        dataSource={this.state.dataSource}
-                        bordered
-                        rowSelection={rowSelection}
-                        pagination={{  //分页
-                            pageSize: 6,  //显示几条一页
-                            defaultPageSize: 6, //默认显示几条一页
-                            showQuickJumper: true,
-                            showSizeChanger: true,
-                        }} />
-                    <Upload {...props}>
-                        <Button style={{ margin: '10px 10px 10px 0px' }}>
-                            <Icon type="upload" />上传附件
-                        </Button>
-                    </Upload>
-                    <span>
-                        审核人：
-                        <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
-                            {
-                                this.state.checkers
-                            }
-                        </Select>
-                    </span>
-                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
-                </div>
-                <div style={{ marginTop: 20 }}>
-                    注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
-                    &emsp;&emsp; 2、数值用半角阿拉伯数字，如：1.2<br />
-                    &emsp;&emsp; 3、日期必须带年月日，如2017年1月1日<br />
-                    &emsp;&emsp; 4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.<br />
-                </div>
+                <Table
+                    columns={columns}
+                    dataSource={this.state.dataSource}
+                    bordered
+                    pagination={{  //分页
+                        pageSize: 10
+                    }} />
+                <Row style={{ marginBottom: "30px" }} type="flex">
+                    <Col><Button style={{ margin: '10px 10px 10px 0px' }}>模板下载</Button></Col>
+                    <Col>
+                        <Upload
+                            onChange={this.uplodachange.bind(this)}
+                            name='file'
+                            showUploadList={false}
+                            action={`${SERVICE_API}/excel/upload-api/`}
+                            beforeUpload={this.beforeUpload.bind(this)}
+                        >
+                            <Button style={{ margin: '10px 10px 10px 0px' }}>
+                                <Icon type="upload" />上传并预览(文件名需为英文)
+                             </Button>
+                        </Upload>
+                    </Col>
+                    <Col>
+                        <span>
+                            审核人：
+                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                                {
+                                    this.state.checkers
+                                }
+                            </Select>
+                        </span>
+                    </Col>
+                    <Col>
+                        <span>
+                            项目-单位工程：
+                        <Cascader
+                                options={this.state.options}
+                                className='btn'
+                                loadData={this.loadData.bind(this)}
+                                onChange={this.onSelectProject.bind(this)}
+                                changeOnSelect
+                            />
+                        </span>
+                    </Col>
+                </Row>
+                <Preview />
+                <Row style={{ marginBottom: "30px" }}>
+                    <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
+                    <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
+                    <p style={{ paddingLeft: "25px" }}>3、日期必须带年月日，如2017年1月1日</p>
+                    <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.</p>
+                </Row>
             </Modal>
         )
-    }
-    //处理上传excel的数据
-    handleExcelData(data) {
-        data.splice(0, 1);
-        let res = data.map(item => {
-            return {
-                code: item[0],
-                volume: item[1],
-                name: item[2],
-                major: item[3],
-                factovertime: item[4],
-                unit: item[5],
-                uploads: item[6],
-            }
-        })
-        return res
     }
 }
 export default DesignModal

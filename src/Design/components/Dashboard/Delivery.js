@@ -19,7 +19,7 @@ export default class Warning extends Component {
                 {value:DeliveryValue.data.delayed, name:'逾期交付'}
             ]
             const option = {
-                color: ['#4caf50', '#f44336', '#607d8b'],
+                color: ['#03E5CE', '#4A87FF', '#FFC36B'],
                 title : {
                     text: '设计成果交付进度统计',
                     subtext: DeliveryValue.name,
@@ -31,7 +31,7 @@ export default class Warning extends Component {
                     formatter: "{a} <br/>{b} : {c} ({d}%)"
                 },
                 legend: {
-                    orient: 'vertical',
+                    // orient: 'vertical',
                     left: 'right',
                     y: '8%',
                     data:['提前交付','按期交付','逾期交付']
