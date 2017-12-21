@@ -13,20 +13,25 @@ class DesignModal extends Component {
         this.state = {
             selectedRowKeys: [],
             dataSource: [],
+            users: [],
+            projects: [],
             checkers: [],//审核人下拉框选项
             check: null,//审核人
         };
     }
     componentDidMount() {
         const { actions: { getAllUsers } } = this.props
-        getAllUsers().then(res => {
-            let checkers = res.map(o => {
-                return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
-                )
-            })
-            this.setState({ checkers })
-        })
+        getAllUsers().then(rst => {
+            let users = [];
+            if (rst.length) {
+                let checkers = rst.map(o => {
+                    return (
+                        <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    )
+                })
+                this.setState({checkers})
+            }
+        });
     }
     onSelectChange = (selectedRowKeys) => {
         this.setState({ selectedRowKeys });
@@ -72,56 +77,6 @@ class DesignModal extends Component {
     }
     covertURLRelative = (originUrl) => {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-    }
-    //根据附件名称 也就是wbs编码获取其他信息
-    async getInfo(code) {
-        console.log(this.props)
-        let res = {};
-        // gerWorkpackageDetail
-        const { actions: { getWorkPackageDetail } } = this.props
-        let designschedule = await getWorkPackageDetail({ code: code })
-        res.name = designschedule.name
-        res.code = designschedule.code
-        let fenxiang = await getWorkPackageDetail({ code: designschedule.parent.code })
-        if (fenxiang.parent.obj_type_hum === "子分部工程") {
-            let zifenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
-            let fenbu = await getWorkPackageDetail({ code: zifenbu.parent.code })
-            let zidanwei = {}, danwei = {};
-            if (fenbu.parent.obj_type_hum === "子单位工程") {
-                zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-                danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
-
-            } else {
-                danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-            }
-            let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-            res.construct_unit = construct_unit
-            res.unit = {
-                name: danwei.name,
-                code: danwei.code,
-                obj_type: danwei.obj_type
-            }
-            res.project = danwei.parent
-        } else {
-            let fenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
-            let zidanwei = {}, danwei = {};
-            if (fenbu.parent.obj_type_hum === "子单位工程") {
-                zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-                danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
-
-            } else {
-                danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-            }
-            let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-            res.construct_unit = construct_unit
-            res.unit = {
-                name: danwei.name,
-                code: danwei.code,
-                obj_type: danwei.obj_type
-            }
-            res.project = danwei.parent
-        }
-        return res
     }
     //下拉框选择人
     selectChecker(value) {

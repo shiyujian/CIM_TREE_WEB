@@ -9,7 +9,10 @@ import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
 import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
 import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
-import Check from '../../../Datareport/components/ModalData/Check'
+import HiddenDangerCheck from '../../../Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
+import Check from '../../../Datareport/components/ModalData/Check';
+import OrgCheck from '../../../Datareport/components/OrgData/OrgCheck';
+import HPModal from '../../../Datareport/components/ProjectData/HandleProjectModal';
 
 const FormItem = Form.Item;
 @connect(
@@ -32,12 +35,26 @@ export default class Progress extends Component {
 	}
 
 	render() {
-		const { state = {}, task, location, states = [],dr_qua_jyp_visible,dr_qua_jy_visible,safety_doc_check_visible,modal_check_visbile} = this.props;
+		const { 
+			state = {}, 
+			task, 
+			location, 
+			states = [],
+			dr_qua_jyp_visible,
+			dr_qua_jy_visible,
+			safety_doc_check_visible,
+			safety_hidden_check_visible,
+			modal_check_visbile,
+			dr_base_org_visible,
+			dr_xm_xx_visible
+		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
 		const { state_id = '0' } = queryString.parse(location.search) || {};
+		console.log('statis',states);
 		const currentStates = states.find(state => state.id === +state_id) || {};
 		const currentStateCode = currentStates.code;
+		console.log('currentStates',currentStates);
 		console.log("task Progress props", this.props);
 		return (
 			<div>
@@ -106,7 +123,7 @@ export default class Progress extends Component {
 								}
 							} else if (code === WORKFLOW_CODE.数据报送流程) {
 								// 数据报送流程
-								link = <a onClick={this.openModal.bind(this,name,id)}>审核</a>
+									link = <a onClick={this.openModal.bind(this,name,id)}>审核</a>
 							} else {
 								link = action;
 							}
@@ -136,8 +153,20 @@ export default class Progress extends Component {
 					<SafetyDocCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					safety_hidden_check_visible && 
+					<HiddenDangerCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
 					modal_check_visbile && 
 					<Check wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_base_org_visible && 
+					<OrgCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_xm_xx_visible && 
+					<HPModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 			</div>
 		);
@@ -163,8 +192,17 @@ export default class Progress extends Component {
 			case "安全管理信息批量录入":
 				changeDatareportVisible({key:'safety_doc_check_visible',value:true})
 				break;
+			case "安全隐患信息批量录入":
+				changeDatareportVisible({key:'safety_hidden_check_visible',value:true})
+				break;
 			case "模型信息批量录入":
 				changeDatareportVisible({key:'modal_check_visbile',value:true})
+				break;
+			case "组织机构信息批量录入":
+				changeDatareportVisible({key:'dr_base_org_visible',value:true})
+				break;
+			case "项目信息批量录入":
+				changeDatareportVisible({key:'dr_xm_xx_visible',value:true})
 				break;
 			default:break;
 		}

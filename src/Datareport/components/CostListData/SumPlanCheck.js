@@ -20,7 +20,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class JianyanpiCheck extends Component {
+export default class SumPlanCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -53,7 +53,7 @@ export default class JianyanpiCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_qua_jyp_visible",false)
+        this.props.closeModal("dr_qua_jsjh_visible",false)
         message.info("操作成功")
     }
     //通过
@@ -137,18 +137,6 @@ export default class JianyanpiCheck extends Component {
         // executor.person_code = person.code;
         // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'退回',note:'滚',executor:executor,attachment:null});
     }
-    //预览
-    handlePreview(index){
-        const {actions: {openPreview}} = this.props;
-        let f = this.state.dataSource[index].file
-        let filed = {}
-        filed.misc = f.misc;
-        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.name = f.name;
-        filed.mime_type = f.mime_type;
-        openPreview(filed);
-    }
     //radio变化
     onChange(e){
         this.setState({opinion:e.target.value})
@@ -162,67 +150,36 @@ export default class JianyanpiCheck extends Component {
 				return index+1
 			}
 		},{
-			title:'项目/子项目',
-            dataIndex:'project',
+			title:'项目/子项目名称',
+            dataIndex:'subproject',
             width:"13%",
             render: (text, record, index) => (
                 <span>
-                    {record.project.name}
+                    {record.subproject.name}
                 </span>
             ),
 		},{
-			title:'单位工程',
-            dataIndex:'unit',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
-            ),
-		},{
-			title:'WBS编码',
-            dataIndex:'code',
-            width:"13%",
-		},{
-			title:'名称',
-            dataIndex:'name',
-            width:"13%",
-		},{
-			title:'检验合格率',
-            dataIndex:'rate',
-            width:"8%",
-            render: (text, record, index) => (
-                <span>
-                    {(parseFloat(record.rate)*100).toFixed(1) + '%'} 
-                </span>
-            ),
-		},{
-			title:'质量等级',
-            dataIndex:'level',
-            width:"12%",
-		},{
-			title:'施工单位',
-            dataIndex:'construct_unit',
-            width:"12%",
-            render: (text, record, index) => (
-                <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
-                </span>
-            ),
-		}, {
-            title:'附件',
-            width:"11%",
-			render:(text,record,index) => {
-                return (<span>
-                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                        <span className="ant-divider" />
-                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                    </span>)
-			}
-        }]
+			title: '单位工程',
+			dataIndex: 'unit',
+		  },{
+			title: '工作节点目标',
+			dataIndex: 'nodetarget',
+		  },{
+			title: '完成时间',
+			dataIndex: 'completiontime',
+		  },{
+			title: '支付金额（万元）',
+			dataIndex: 'summoney',
+		  },{
+			title: '累计占比',
+			dataIndex: 'ratio',
+		  },{
+			title: '备注',
+			dataIndex: 'remarks',
+		  }]
 		return (
             <Modal
-			title="检验批信息审批表"
+			title="结算计划审批表"
 			key={Math.random()}
             visible={true}
             width= {1280}

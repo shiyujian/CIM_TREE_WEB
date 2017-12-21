@@ -162,7 +162,6 @@ class JianyanpiModal extends Component {
     }
     //根据附件名称 也就是wbs编码获取其他信息
     async getInfo(code){
-        console.log(this.props)
         let res = {};
         const {actions:{getWorkPackageDetail}} = this.props
         let jianyanpi = await getWorkPackageDetail({code:code})
@@ -393,7 +392,6 @@ class JianyanpiModal extends Component {
                             }
                         </Select>
                     </span> 
-                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
                     <Preview />
 				</div>
                 <div style={{marginTop:20}}>

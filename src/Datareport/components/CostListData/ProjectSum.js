@@ -16,10 +16,11 @@ class PriceList extends Component {
             dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
+            projects:[]
 		};
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
+        const {actions:{getAllUsers,getProjectTree}} = this.props
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -27,10 +28,20 @@ class PriceList extends Component {
                 )
             })
             this.setState({checkers})
+        });
+        getProjectTree().then(rst => {
+            if (rst.children.length) {
+                let projects = rst.children.map(item => {
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({projects})
+            }
         })
     }
 	
-	//ok
+	//提交
 	onok(){
         if(!this.state.check){
             message.info("请选择审核人")
@@ -57,6 +68,11 @@ class PriceList extends Component {
         }
 		this.props.onok(this.state.dataSource,per)
     }
+
+
+
+
+
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
@@ -218,7 +234,28 @@ class PriceList extends Component {
 			}
 		},{
 			title: '项目/子项目',
-			dataIndex: 'subproject',
+            dataIndex: 'subproject',
+            render:(record) => {
+                return (
+                    <Select style={{width:"90%"}} onSelect={ele => {
+                        this.setState({ pro: ele })
+                    }}>
+                        {this.state.projects}
+                    </Select>
+                )
+            }
+		  },{
+			title: '单位工程',
+            dataIndex: 'unit_engineeing',
+             render:(record) => {
+                return (
+                    <Select style={{width:"90%"}} onSelect={ele => {
+                        this.setState({ pro: ele })
+                    }}>
+                        {this.state.projects}
+                    </Select>
+                )
+            }
 		  },{
 			title: '项目编码',
 			dataIndex: 'projectcoding',
@@ -232,29 +269,26 @@ class PriceList extends Component {
 			title: '数量',
 			dataIndex: 'number',
 		  },{
-			title: '结合单价（元）',
+			title: '单价',
 			dataIndex: 'total',
 		  },{
-			title: '备注',
-			dataIndex: 'remarks',
-		  },{
-        title:'编辑',
-        width:"8%",
-        dataIndex:'edit',
-        render:(text,record,index) => {
-            return  (
-                <Popconfirm
-                    placement="leftTop"
-                    title="确定删除吗？"
-                    onConfirm={this.addto.bind(this, index)}
-                    onConfirm={this.delete.bind(this, index)}
-                    okText="确认"
-                    cancelText="取消">
-                    <a>添加</a>
-                    <a>删除</a>
-                </Popconfirm>
-            )
-        }
+            title:'编辑',
+            width:"8%",
+            dataIndex:'edit',
+            render:(text,record,index) => {
+                return  (
+                    <Popconfirm
+                        placement="leftTop"
+                        title="确定删除吗？"
+                
+                        onConfirm={this.delete.bind(this, index)}
+                        okText="确认"
+                        cancelText="取消">
+                    
+                        <a>删除</a>
+                    </Popconfirm>
+                )
+            }
 	}]
         let jthis = this
         //上传
@@ -338,14 +372,14 @@ class PriceList extends Component {
                     name:"",
                     type:"",
             },
-            subproject:item[1],
+            subproject:item[0],
+            unit_engineeing:item[1],
             projectcoding:item[2],
             projectname:item[3],
             company:item[4],
-            number:[5],
-            total:[6],
-            remarks:item[7],
-            edit:item[8],
+            number:item[5],
+            total:item[6],
+            edit:item[7],
                 file:{
 
                 }

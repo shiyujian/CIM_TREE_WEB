@@ -20,7 +20,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class JianyanpiCheck extends Component {
+export default class ProjectSumExamine extends Component {
 
 	constructor(props) {
 		super(props);
@@ -53,7 +53,7 @@ export default class JianyanpiCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_qua_jyp_visible",false)
+        this.props.closeModal("cost_pro_ck_visible",false)
         message.info("操作成功")
     }
     //通过
@@ -163,66 +163,32 @@ export default class JianyanpiCheck extends Component {
 			}
 		},{
 			title:'项目/子项目',
-            dataIndex:'project',
+            dataIndex:'subproject',
             width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.project.name}
-                </span>
-            ),
+        
 		},{
-			title:'单位工程',
-            dataIndex:'unit',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
-            ),
-		},{
-			title:'WBS编码',
-            dataIndex:'code',
-            width:"13%",
-		},{
-			title:'名称',
-            dataIndex:'name',
-            width:"13%",
-		},{
-			title:'检验合格率',
-            dataIndex:'rate',
-            width:"8%",
-            render: (text, record, index) => (
-                <span>
-                    {(parseFloat(record.rate)*100).toFixed(1) + '%'} 
-                </span>
-            ),
-		},{
-			title:'质量等级',
-            dataIndex:'level',
-            width:"12%",
-		},{
-			title:'施工单位',
-            dataIndex:'construct_unit',
-            width:"12%",
-            render: (text, record, index) => (
-                <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
-                </span>
-            ),
-		}, {
-            title:'附件',
-            width:"11%",
-			render:(text,record,index) => {
-                return (<span>
-                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                        <span className="ant-divider" />
-                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                    </span>)
-			}
-        }]
+			title: '单位工程',
+            dataIndex: 'unit_engineeing',
+            
+		  },{
+			title: '项目编码',
+			dataIndex: 'projectcoding',
+		  },{
+			title: '项目名称',
+			dataIndex: 'projectname',
+		  },{
+			title: '计量单位',
+			dataIndex: 'company',
+		  },{
+			title: '数量',
+			dataIndex: 'number',
+		  },{
+			title: '单价',
+			dataIndex: 'total',
+		  }]
 		return (
             <Modal
-			title="检验批信息审批表"
+			title="工程量结算信息审批表"
 			key={Math.random()}
             visible={true}
             width= {1280}
