@@ -163,7 +163,6 @@ class JianyanpiModal extends Component {
     }
     //根据附件名称 也就是wbs编码获取其他信息
     async getInfo(code){
-        console.log(this.props)
         let res = {};
         const {actions:{getWorkPackageDetail}} = this.props
         let jianyanpi = await getWorkPackageDetail({code:code})

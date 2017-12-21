@@ -21,7 +21,7 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class Check extends Component {
+export default class ModalCheck extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -40,15 +40,16 @@ export default class Check extends Component {
     componentWillReceiveProps(props){
         const {wk} = props
         let dataSource = JSON.parse(wk.subject[0].data)
+        console.log('dataSource', dataSource)
         this.setState({dataSource,wk})
    }
    //提交
     async submit(){
-        // if(this.state.opinion === 1){
-        //     await this.passon();
-        // }else{
-        //     await this.reject();
-        // }
+        if(this.state.opinion === 1){
+            await this.passon();
+        }else{
+            await this.reject();
+        }
         this.props.closeModal("modal_check_visbile",false)
         message.info("操作成功")
     }
@@ -143,11 +144,14 @@ export default class Check extends Component {
     }
 
 	render() {
+		console.log('sdfdfd', this.state.dataSource)
 		return(
 			<Modal
+				title="模型信息审批表"
 				width = {1280}
 				visible = {true}
-				onCancel = {this.cancel.bind(this)}
+				footer={null}
+				maskClosable={false}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>结果审核</h2>
@@ -157,6 +161,7 @@ export default class Check extends Component {
 						bordered
 						className = 'foresttable'
 						columns={this.columns}
+						dataSource={this.state.dataSource}
 					/>
 				</Row>
 				<Row style={{margin: '20px 0'}}>
@@ -164,7 +169,7 @@ export default class Check extends Component {
 						<span>审查意见：</span>
 					</Col>
 					<Col span={4}>
-						<RadioGroup onChange={this.onChange} value={this.state.value}>
+						<RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
 					        <Radio value={1}>通过</Radio>
 					        <Radio value={2}>不通过</Radio>
 					    </RadioGroup>
@@ -185,78 +190,53 @@ export default class Check extends Component {
 				    	<TextArea rows={2} />
 				    </Col>
 			    </Row>
-			    <Row style={{marginBottom: '10px'}}>
-			    	<div>审批流程</div>
-			    </Row>
-			    <Row>
-			    	<Col span={10}>
-			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：数据上传者</div>
-			    			<div>执行时间：2017-11-22</div>
-			    			<div>执行意见：XXXXXXXXXXXXX</div>
-			    			<div style={{marginTop: '40px'}}>电子签章：</div>
-			    		</div>
-			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传</div>
-			    	</Col>
-			    	<Col span={10}>
-			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：数据审批</div>
-			    			<div>执行时间：</div>
-			    			<div>执行意见：</div>
-			    			<div style={{marginTop: '40px'}}>电子签章：</div>
-			    		</div>
-			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传审核</div>
-			    	</Col>
-			    </Row>
+			    {
+                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                }
 			</Modal>
 		)
 	}
 
 	columns = [{
 			title: '序号',
-			dataIndex: 'index',
+			render:(text,record,index) => {
+				return index+1
+			}
 		}, {
-			title: '编码',
-			dataIndex: 'value'
+			title: '模型编码',
+			dataIndex: 'coding'
 		}, {
 			title: '项目/子项目名称',
-			dataIndex: 'alias'
+			dataIndex: 'project'
 		}, {
 			title: '单位工程',
-			dataIndex: 'description1'
+			dataIndex: 'unitEngineering'
 		}, {
 			title: '模型名称',
-			dataIndex: 'description2'
+			dataIndex: 'modelName'
 		}, {
 			title: '提交单位',
-			dataIndex: 'description4'
+			dataIndex: 'submittingUnit'
 		}, {
 			title: '模型描述',
-			dataIndex: 'description5'
+			dataIndex: 'modelDescription'
 		}, {
 			title: '模型类型',
-			dataIndex: 'description6'
+			dataIndex: 'modeType'
 		}, {
 			title: 'fdb模型',
-			dataIndex: 'description7'
+			dataIndex: 'fdbMode'
 		}, {
 			title: 'tdbx模型',
-			dataIndex: 'description8'
+			dataIndex: 'tdbxMode'
 		}, {
 			title: '属性表',
-			dataIndex: 'description9'
+			dataIndex: 'attributeTable'
 		}, {
 			title: '上报时间',
-			dataIndex: 'description10'
+			dataIndex: 'reportingTime'
 		}, {
 			title: '上报人',
-			dataIndex: 'description11'
+			dataIndex: 'reportingName'
 		}];
-
-	cancel() {
-		const {
-			actions: {clearCheckField}
-		} = this.props;
-		clearCheckField();
-	}
 }

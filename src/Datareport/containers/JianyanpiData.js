@@ -133,7 +133,7 @@ export default class JianyanpiData extends Component {
 				</Row>
 				<Row >
 					<Col >
-						<Table columns={this.columns} dataSource={[]}/>
+						<Table columns={this.columns} dataSource={[]} rowKey="key"/>
 					</Col>
 				</Row>
 				{

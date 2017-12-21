@@ -203,6 +203,7 @@ export default class ToggleModal extends Component{
             }} >
                 <Option value = 'construct'>建筑</Option>
                 <Option value = 'city'>市政</Option>
+                <Option value = 'garden'>园林</Option>
             </Select>)
         },
          key: 'Type',
@@ -264,7 +265,7 @@ export default class ToggleModal extends Component{
         key:'pic',
         render:(record) => (
           <Upload
-          beforeUpload = {this.beforeUploadPic.bind(this,record)}
+            beforeUpload = {this.beforeUploadPic.bind(this,record)}
           >
               <a>{record.pic? record.pic.name:'点击上传'}</a>
           </Upload>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
-import { Input, Form, Spin, Upload, Icon, Button, Modal,Select, Popconfirm,message, Table, Row, Col, notification } from 'antd';
+import { Input, Form, Spin, Upload, Icon, Button, Modal,
+    Cascader ,Select, Popconfirm,message, Table, Row, Col, notification } from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
@@ -15,11 +16,9 @@ export default class AddFile extends Component {
             dataSource: [],
             checkers:[],//审核人下来框选项
             check:null,//审核人
-            projects:[],
-            units:[],
             project:{},
             unit:{},
-            beginUnit:'',
+            options:[],
         };
     }
 
@@ -37,10 +36,14 @@ export default class AddFile extends Component {
             if(rst.status){
                 let projects = rst.children.map(item=>{
                     return (
-                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                        {
+                            value:JSON.stringify(item),
+                            label:item.name,
+                            isLeaf:false
+                        }
                     )
                 })
-                this.setState({projects});
+                this.setState({options:projects});
             }else{
                 //获取项目信息失败
             }
@@ -102,35 +105,51 @@ export default class AddFile extends Component {
         this.setState({check})
     }
 
-    selectUnit(value){
-        let unit = JSON.parse(value);
-        this.setState({unit,beginUnit:value});
+    onSelectProject = (value,selectedOptions) =>{
+        let project = {};
+        let unit = {};
+        if(value.length===2){
+            let temp1 = JSON.parse(value[0]);
+            let temp2 = JSON.parse(value[1]);
+            project = {
+                name:temp1.name,
+                code:temp1.code,
+                obj_type:temp1.obj_type
+            }
+            unit = {
+                name:temp2.name,
+                code:temp2.code,
+                obj_type:temp2.obj_type
+            }
+            this.setState({project,unit});
+            return;
+        }
+        //must choose all,otherwise make it null
+        this.setState({project:{},unit:{}});
     }
 
-    selectProject(value){
-        debugger
-        let project = JSON.parse(value);
-        this.setState({project,units:[]});
+    loadData = (selectedOptions) =>{
         const {actions:{getProjectTree}} = this.props;
-        let beginUnit = '';
-        let i=0;
+        const targetOption = selectedOptions[selectedOptions.length - 1];
+        targetOption.loading = true;
         getProjectTree({depth:2}).then(rst =>{
             if(rst.status){
                 let units = [];
                 rst.children.map(item=>{
-                    if(item.code===project.code){  //当前选中项目
+                    if(item.code===JSON.parse(targetOption.value).code){  //当前选中项目
                         units = item.children.map(unit =>{
-                            i++;
-                            if(i===1){
-                                beginUnit = JSON.stringify(unit);
-                            }
                             return (
-                                <Option value={JSON.stringify(unit)}>{unit.name}</Option>
+                                {
+                                    value:JSON.stringify(unit),
+                                    label:unit.name
+                                }
                             )
                         })
                     }
                 })
-                this.setState({units,beginUnit});
+                targetOption.loading = false;
+                targetOption.children = units;
+                this.setState({options:[...this.state.options]})
             }else{
                 //获取项目信息失败
             }
@@ -154,6 +173,12 @@ export default class AddFile extends Component {
             message.info(`有数据未上传附件`)
             return
         }
+        const {project,unit} =  this.state;
+        if(!project.name){
+            message.info(`请选择项目和单位工程`);
+            return;
+        }
+
         let {check} = this.state
         let per = {
             id:check.id,
@@ -162,7 +187,11 @@ export default class AddFile extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.onok(this.state.dataSource,per)
+        for(let i=0;i<this.state.dataSource.length;i++){
+            dataSource[i].project = project;
+            dataSource[i].unit = unit;
+        }
+		this.props.onok(this.state.dataSource,per);
     }
 
     //删除
@@ -287,28 +316,6 @@ export default class AddFile extends Component {
                 dataIndex:'code',
                 width: '10%'
             },{
-                title:'项目名称',
-                dataIndex:'projectName',
-                width: '10%',
-                render: (text, record, index) => {
-                    return <Select style={{width:'100px'}} className="btn" onSelect={this.selectProject.bind(this)}>
-                        {
-                            this.state.projects
-                        }
-                    </Select>
-                }
-            },{
-                title:'单位工程',
-                dataIndex:'unit',
-                width: '10%',
-                render: (text, record, index) => {
-                    return <Select value={this.state.beginUnit} style={{width:'100px'}} className="btn" onSelect={this.selectUnit.bind(this)}>
-                        {
-                            this.state.units
-                        }
-                    </Select>
-                }
-            },{
                 title:'文件名称',
                 dataIndex:'filename',
                 width: '10%',
@@ -417,6 +424,18 @@ export default class AddFile extends Component {
                             </Select>
                         </span> 
                     </Col>
+                    <Col>
+                    <span>
+                        项目-单位工程：
+                        <Cascader
+                        options={this.state.options}
+                        className='btn'
+                        loadData={this.loadData.bind(this)}
+                        onChange={this.onSelectProject.bind(this)}
+                        changeOnSelect
+                      />
+                    </span> 
+                </Col>
                 </Row>
                 <Preview />
                 <Row style={{ marginBottom: "30px" }}>
