@@ -21,7 +21,7 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class ProjectSumExamine extends Component {
+export default class PriceListExamine extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -49,7 +49,7 @@ export default class ProjectSumExamine extends Component {
         // }else{
         //     await this.reject();
         // }
-        this.props.closeModal("cost_pro_ck_visible",false)
+        this.props.closeModal("cost_pri_ck_visible",false)
         message.info("操作成功")
     }
     //通过
@@ -66,48 +66,48 @@ export default class ProjectSumExamine extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        // dataSource.map((o) => {
-        //     //创建文档对象
-        //     let doc = o.related_documents.find(x => {
-        //         x.rel_type === 'many_jyp_rel'
-        //     })
-        //     debugger
-        //     if(doc){
-        //         doclist_p.push({
-        //             code:doc.code,
-        //             extra_params:{
-        //                 ...o
-        //             }
-        //         })
-        //     }else{
-        //         doclist_a.push({
-        //             code:`rel_doc_${o.code}`,
-        //             name:`rel_doc_${o.pk}`,
-        //             obj_type:"C_DOC",
-        //             status:"A",
-        //             version:"A",
-        //             "basic_params": {
-        //             },
-        //             workpackages:[{
-        //                 code:o.code,
-        //                 obj_type:o.obj_type,
-        //                 pk:o.pk,
-        //                 rel_type:"many_jyp_rel"
-        //             }],
-        //             extra_params:{
-        //                 ...o
-        //             }
-        //         })
-        //     }
-        //     //施工包批量
-        //     wplist.push({
-        //         code:o.code,
-        //         extra_params:{
-        //             rate:o.rate
-        //         }
-        //     })
-        // })
-      
+        dataSource.map((o) => {
+            //创建文档对象
+            let doc = o.related_documents.find(x => {
+                x.rel_type === 'many_jyp_rel'
+            })
+            debugger
+            if(doc){
+                doclist_p.push({
+                    code:doc.code,
+                    extra_params:{
+                        ...o
+                    }
+                })
+            }else{
+                doclist_a.push({
+                    code:`rel_doc_${o.code}`,
+                    name:`rel_doc_${o.pk}`,
+                    obj_type:"C_DOC",
+                    status:"A",
+                    version:"A",
+                    "basic_params": {
+                    },
+                    workpackages:[{
+                        code:o.code,
+                        obj_type:o.obj_type,
+                        pk:o.pk,
+                        rel_type:"many_jyp_rel"
+                    }],
+                    extra_params:{
+                        ...o
+                    }
+                })
+            }
+            //施工包批量
+            wplist.push({
+                code:o.code,
+                extra_params:{
+                    rate:o.rate
+                }
+            })
+        })
+        debugger
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -157,8 +157,7 @@ export default class ProjectSumExamine extends Component {
 					<Table
 						bordered
 						className = 'foresttable'
-                        columns={this.columns}
-                        dataSource={this.state.dataSource}
+						columns={this.columns}
 					/>
 				</Row>
 				<Row style={{margin: '20px 0'}}>
@@ -215,38 +214,40 @@ export default class ProjectSumExamine extends Component {
 	}
 
 	
-columns = 
-    [{
+     columns = 
+     [{
         title:'序号',
-        width:"5%",
         render:(text,record,index) => {
             return index+1
         }
     },{
         title:'项目/子项目',
-        dataIndex:'subproject',
-        width:"13%",
-    
+        dataIndex:'subproject'
     },{
-        title: '单位工程',
-        dataIndex: 'unit_engineeing',
-        
-      },{
-        title: '项目编码',
-        dataIndex: 'projectcoding',
-      },{
-        title: '项目名称',
-        dataIndex: 'projectname',
-      },{
-        title: '计量单位',
-        dataIndex: 'company',
-      },{
-        title: '数量',
-        dataIndex: 'number',
-      },{
-        title: '单价',
-        dataIndex: 'total',
-      }]
+        title:'单位工程',
+        dataIndex:'unitengineering'
+    },{
+        title:'清单项目编码',
+        dataIndex:'projectcoding'
+    },{
+        title:'计价单项',
+        dataIndex:'valuation'
+    },{
+        title:'工程内容/规格编号',
+        dataIndex:'content'
+    },{
+        title:'计价单位',
+        dataIndex:'company'
+    },{
+        title:'结合单价（元）',
+        dataIndex:'total'
+    },{
+        title:'备注',
+        dataIndex:'remarks'
+    },{
+        title:'状态',
+        dataIndex:'sunmits'
+  }]
 
 	cancel() {
 		const {

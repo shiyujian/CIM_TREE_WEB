@@ -7,10 +7,11 @@ import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
+import PriceListExamine from '../../../Datareport/components/CostListData/PriceListExamine';
 import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
 import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
 import HiddenDangerCheck from '../../../Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
-import Check from '../../../Datareport/components/ModalData/Check';
+import ModalCheck from '../../../Datareport/components/ModalData/ModalCheck';
 import OrgCheck from '../../../Datareport/components/OrgData/OrgCheck';
 import HPModal from '../../../Datareport/components/ProjectData/HandleProjectModal';
 import SumSpeedExamine from '../../../Datareport/components/CostListData/SumSpeedExamine';
@@ -19,6 +20,7 @@ import SumPlanCheck from '../../../Datareport/components/CostListData/SumPlanChe
 import ProjectSumExamine from '../../../Datareport/components/CostListData/ProjectSumExamine';
 import WorkCheckModal from '../../../Datareport/components/ScheduleData/WorkCheckModal';
 import DesignCheckModal from '../../../Datareport/components/ScheduleData/DesignCheckModal';
+import SafetySpecialCheck from '../../../Datareport/components/SafetySpecial/SafetySpecialCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -53,12 +55,14 @@ export default class Progress extends Component {
 			modal_check_visbile,
 			dr_base_org_visible,
 			dr_xm_xx_visible,
+			cost_pri_ck_visible,
 			cost_sum_spd_visible,
 			dr_base_person_visible,
 			dr_qua_jsjh_visible,
 			cost_pro_ck_visible,
 			dr_wor_sg_visible,
-			dr_de_sj_visible
+			dr_de_sj_visible,
+			Safety_Special_check_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -170,7 +174,7 @@ export default class Progress extends Component {
 				}
 				{
 					modal_check_visbile && 
-					<Check wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<ModalCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					dr_base_org_visible && 
@@ -181,6 +185,9 @@ export default class Progress extends Component {
 					<HPModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					cost_pri_ck_visible && 
+					<PriceListExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}{
 					cost_sum_spd_visible && 
 					<SumSpeedExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
@@ -203,6 +210,10 @@ export default class Progress extends Component {
 				{
 					dr_de_sj_visible && 
 					<DesignCheckModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					Safety_Special_check_visible && 
+					<SafetySpecialCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 			</div>
 		);
@@ -240,6 +251,8 @@ export default class Progress extends Component {
 			case "项目信息批量录入":
 				changeDatareportVisible({key:'dr_xm_xx_visible',value:true})
 				break;
+			case "计价清单信息填报":
+				changeDatareportVisible({key:'cost_pri_ck_visible',value:true})
 			case "结算进度信息填报":
 				changeDatareportVisible({key:'cost_sum_spd_visible',value:true})
 				break;
@@ -257,6 +270,8 @@ export default class Progress extends Component {
 				break;
 			case "设计进度发起填报":
 				changeDatareportVisible({key:'dr_de_sj_visible',value:true})
+			case "安全专项信息批量录入":
+				changeDatareportVisible({key:'Safety_Special_check_visible',value:true})
 				break;
 			default:break;
 		}

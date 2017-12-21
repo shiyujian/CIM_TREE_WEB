@@ -21,7 +21,7 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class Check extends Component {
+export default class ModalCheck extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -144,13 +144,14 @@ export default class Check extends Component {
     }
 
 	render() {
+		console.log('sdfdfd', this.state.dataSource)
 		return(
 			<Modal
 				title="模型信息审批表"
 				width = {1280}
 				visible = {true}
 				footer={null}
-				maskClosable={false}>
+				maskClosable={false}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>结果审核</h2>
@@ -160,6 +161,7 @@ export default class Check extends Component {
 						bordered
 						className = 'foresttable'
 						columns={this.columns}
+						dataSource={this.state.dataSource}
 					/>
 				</Row>
 				<Row style={{margin: '20px 0'}}>
@@ -201,40 +203,40 @@ export default class Check extends Component {
 				return index+1
 			}
 		}, {
-			title: '编码',
-			dataIndex: 'value'
+			title: '模型编码',
+			dataIndex: 'coding'
 		}, {
 			title: '项目/子项目名称',
-			dataIndex: 'alias'
+			dataIndex: 'project'
 		}, {
 			title: '单位工程',
-			dataIndex: 'description1'
+			dataIndex: 'unitEngineering'
 		}, {
 			title: '模型名称',
-			dataIndex: 'description2'
+			dataIndex: 'modelName'
 		}, {
 			title: '提交单位',
-			dataIndex: 'description4'
+			dataIndex: 'submittingUnit'
 		}, {
 			title: '模型描述',
-			dataIndex: 'description5'
+			dataIndex: 'modelDescription'
 		}, {
 			title: '模型类型',
-			dataIndex: 'description6'
+			dataIndex: 'modeType'
 		}, {
 			title: 'fdb模型',
-			dataIndex: 'description7'
+			dataIndex: 'fdbMode'
 		}, {
 			title: 'tdbx模型',
-			dataIndex: 'description8'
+			dataIndex: 'tdbxMode'
 		}, {
 			title: '属性表',
-			dataIndex: 'description9'
+			dataIndex: 'attributeTable'
 		}, {
 			title: '上报时间',
-			dataIndex: 'description10'
+			dataIndex: 'reportingTime'
 		}, {
 			title: '上报人',
-			dataIndex: 'description11'
+			dataIndex: 'reportingName'
 		}];
 }
