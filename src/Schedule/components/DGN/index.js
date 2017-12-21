@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import './styles.css';
+import './styles.less';
 
 let dgn = window.dgn;
 const $ = window.$;

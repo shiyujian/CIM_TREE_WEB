@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card} from 'antd';
-import './index.css';
+import './index.less';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;

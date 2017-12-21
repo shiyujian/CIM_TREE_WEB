@@ -21,7 +21,7 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class Check extends Component {
+export default class ModalCheck extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -45,14 +45,18 @@ export default class Check extends Component {
    }
    //提交
     async submit(){
-        if(this.state.opinion === 1){
-            await this.passon();
-        }else{
-            await this.reject();
-        }
+        // if(this.state.opinion === 1){
+        //     await this.passon();
+        // }else{
+        //     await this.reject();
+        // }
         this.props.closeModal("modal_check_visbile",false)
         message.info("操作成功")
     }
+    //取消
+    cancel() {
+		this.props.closeModal("modal_check_visbile",false)
+	}
     //通过
     async passon(){
         const {dataSource,wk} = this.state
@@ -70,7 +74,7 @@ export default class Check extends Component {
         dataSource.map((o) => {
             //创建文档对象
             let doc = o.related_documents.find(x => {
-                x.rel_type === 'many_jyp_rel'
+                x.rel_type === 'mch_rel'
             })
             debugger
             if(doc){
@@ -93,7 +97,7 @@ export default class Check extends Component {
                         code:o.code,
                         obj_type:o.obj_type,
                         pk:o.pk,
-                        rel_type:"many_jyp_rel"
+                        rel_type:"mch_rel"
                     }],
                     extra_params:{
                         ...o
@@ -104,7 +108,8 @@ export default class Check extends Component {
             wplist.push({
                 code:o.code,
                 extra_params:{
-                    rate:o.rate
+                    rate:o.rate,
+                    check_status:2
                 }
             })
         })
@@ -144,13 +149,66 @@ export default class Check extends Component {
     }
 
 	render() {
+		const columns = [{
+			title: '序号',
+			render:(text,record,index) => {
+				return index+1
+			}
+		}, {
+			title: '模型编码',
+			dataIndex: 'coding'
+		}, {
+			title: '项目/子项目名称',
+			dataIndex: 'project',
+		}, {
+			title: '单位工程',
+			dataIndex: 'unitEngineering',
+		}, {
+			title: '模型名称',
+			dataIndex: 'modelName'
+		}, {
+			title: '提交单位',
+			dataIndex: 'submittingUnit'
+		}, {
+			title: '模型描述',
+			dataIndex: 'modelDescription'
+		}, {
+			title: '模型类型',
+			dataIndex: 'modeType'
+		}, {
+			title: 'fdb模型',
+			dataIndex: 'fdbMode'
+		}, {
+			title: 'tdbx模型',
+			dataIndex: 'tdbxMode'
+		}, {
+			title: '属性表',
+			dataIndex: 'attributeTable'
+		}, {
+			title: '上报时间',
+			dataIndex: 'reportingTime'
+		}, {
+			title: '上报人',
+			dataIndex: 'reportingName'
+		}, {
+            title:'附件',
+			render:(text,record,index) => {
+                return (<span>
+                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                        <span className="ant-divider" />
+                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                    </span>)
+            }
+		}];
 		return(
 			<Modal
 				title="模型信息审批表"
+				key={Math.random()}
 				width = {1280}
 				visible = {true}
 				footer={null}
-				maskClosable={false}>
+				maskClosable={false}
+				onCancel = {this.cancel.bind(this)}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>结果审核</h2>
@@ -159,7 +217,8 @@ export default class Check extends Component {
 					<Table
 						bordered
 						className = 'foresttable'
-						columns={this.columns}
+						columns={columns}
+						dataSource={this.state.dataSource}
 					/>
 				</Row>
 				<Row style={{margin: '20px 0'}}>
@@ -181,11 +240,7 @@ export default class Check extends Component {
 				    	<Button type='primary' onClick={this.submit.bind(this)}>
         					确认提交
         				</Button>
-				    </Col>
-			    </Row>
-			    <Row style={{margin: '20px 0'}}>
-				    <Col>
-				    	<TextArea rows={2} />
+        				<Preview />
 				    </Col>
 			    </Row>
 			    {
@@ -194,47 +249,4 @@ export default class Check extends Component {
 			</Modal>
 		)
 	}
-
-	columns = [{
-			title: '序号',
-			render:(text,record,index) => {
-				return index+1
-			}
-		}, {
-			title: '编码',
-			dataIndex: 'value'
-		}, {
-			title: '项目/子项目名称',
-			dataIndex: 'alias'
-		}, {
-			title: '单位工程',
-			dataIndex: 'description1'
-		}, {
-			title: '模型名称',
-			dataIndex: 'description2'
-		}, {
-			title: '提交单位',
-			dataIndex: 'description4'
-		}, {
-			title: '模型描述',
-			dataIndex: 'description5'
-		}, {
-			title: '模型类型',
-			dataIndex: 'description6'
-		}, {
-			title: 'fdb模型',
-			dataIndex: 'description7'
-		}, {
-			title: 'tdbx模型',
-			dataIndex: 'description8'
-		}, {
-			title: '属性表',
-			dataIndex: 'description9'
-		}, {
-			title: '上报时间',
-			dataIndex: 'description10'
-		}, {
-			title: '上报人',
-			dataIndex: 'description11'
-		}];
 }

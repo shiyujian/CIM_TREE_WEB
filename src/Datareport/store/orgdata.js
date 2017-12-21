@@ -21,6 +21,7 @@ export default handleActions({
 	[ModalVisible]: (state, {payload}) => ({
 		...state,
 		visible:payload,
+		
 	}),
 	[getOrgRoot]: (state, {payload}) => ({
 		...state,

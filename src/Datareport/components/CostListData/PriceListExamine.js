@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
-import {actions} from '../../store/quality';
+import {actions} from '../../store/CostListData';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
@@ -21,7 +21,8 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class ProjectSumExamine extends Component {
+export default class PriceListExamine extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -49,13 +50,14 @@ export default class ProjectSumExamine extends Component {
         // }else{
         //     await this.reject();
         // }
-        this.props.closeModal("cost_pro_ck_visible",false)
+        this.props.closeModal("cost_pri_ck_visible",false)
         message.info("操作成功")
     }
 
     cancel() {
-		this.props.closeModal("cost_pro_ck_visible",false)
+		this.props.closeModal("cost_pri_ck_visible",false)
 	}
+
     //通过
     async passon(){
         const {dataSource,wk} = this.state
@@ -107,11 +109,12 @@ export default class ProjectSumExamine extends Component {
         //     wplist.push({
         //         code:o.code,
         //         extra_params:{
-        //             rate:o.rate
+        //             rate:o.rate,
+        //             check_status:2
         //         }
         //     })
         // })
-      
+        // 
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -170,10 +173,10 @@ export default class ProjectSumExamine extends Component {
 						<span>审查意见：</span>
 					</Col>
 					<Col span={4}>
-						<RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
-					        <Radio value={1}>通过</Radio>
-					        <Radio value={2}>不通过</Radio>
-					    </RadioGroup>
+                        <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
+                            <Radio value={1}>通过</Radio>
+                            <Radio value={2}>不通过</Radio>
+                        </RadioGroup>
 				    </Col>
 				    <Col span={2} push={14}>
 				    	<Button type='primary'>
@@ -194,38 +197,38 @@ export default class ProjectSumExamine extends Component {
 	}
 
 	
-columns = 
-    [{
+     columns = 
+     [{
         title:'序号',
-        width:"5%",
         render:(text,record,index) => {
             return index+1
         }
     },{
         title:'项目/子项目',
-        dataIndex:'subproject',
-        width:"13%",
-    
+        dataIndex:'subproject'
     },{
-        title: '单位工程',
-        dataIndex: 'unit_engineeing',
-        
-      },{
-        title: '项目编码',
-        dataIndex: 'projectcoding',
-      },{
-        title: '项目名称',
-        dataIndex: 'projectname',
-      },{
-        title: '计量单位',
-        dataIndex: 'company',
-      },{
-        title: '数量',
-        dataIndex: 'number',
-      },{
-        title: '单价',
-        dataIndex: 'total',
-      }]
-
-	
+        title:'单位工程',
+        dataIndex:'unitengineering'
+    },{
+        title:'清单项目编码',
+        dataIndex:'projectcoding'
+    },{
+        title:'计价单项',
+        dataIndex:'valuation'
+    },{
+        title:'工程内容/规格编号',
+        dataIndex:'content'
+    },{
+        title:'计价单位',
+        dataIndex:'company'
+    },{
+        title:'结合单价（元）',
+        dataIndex:'total'
+    },{
+        title:'备注',
+        dataIndex:'remarks'
+    },{
+        title:'状态',
+        dataIndex:'sunmits'
+  }]
 }
