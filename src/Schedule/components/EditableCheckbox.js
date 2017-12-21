@@ -7,7 +7,7 @@
  */
 
 import React , {Component} from 'react';
-import styles from './index.css';
+import './index.less';
 import { Timeline,BackTop , Row , Col , Select , Icon ,Table ,Form, Input, Button ,Popconfirm ,Checkbox ,message,notification } from 'antd';
 
 class EditableCheckbox extends React.Component {

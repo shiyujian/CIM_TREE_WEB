@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Select, Button, Row, Col, DatePicker, Input, Icon, Checkbox, Card, notification, Table } from 'antd';
-import style from './index.css';
+import style from './index.less';
 import PerCarbon from './PerCarbon';
 import Dragger from '_platform/components/panels/Dragger';
 import moment from 'moment';
