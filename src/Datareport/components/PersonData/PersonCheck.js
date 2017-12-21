@@ -181,7 +181,7 @@ export default class PersonCheck extends Component {
         }];
 		return (
             <Modal
-			title="人员信息信息审批表"
+			title="人员信息审批表"
 			key={Math.random()}
             visible={true}
             width= {1280}
