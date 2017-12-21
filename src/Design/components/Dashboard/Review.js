@@ -14,15 +14,17 @@ export default class Warning extends Component {
             console.log('componentWillReceiveProps',ReviewValue)
             const myChart = echarts.init(document.getElementById('resultReviewPie'));
             let data = [
-                {value:ReviewValue.data.beforehead, name:'提前交付'},
                 {value:ReviewValue.data.ontime, name:'按期交付'},
+                {value:ReviewValue.data.beforehead, name:'提前交付'},
                 {value:ReviewValue.data.delayed, name:'逾期交付'}
             ]
             const option = {
-                color: ['#0EF0FF', '#4A87FF', '#546D83'],
+                color: ['#4A87FF', '#0EF0FF', '#546D83'],
                 title : {
                     text: '成果审查进度统计',
-                    subtext: ReviewValue.name,
+                    textStyle:{
+                        color:'#74859F'
+                    },
                     x:'center',
                     left: 'left'
                 },
@@ -34,7 +36,7 @@ export default class Warning extends Component {
                     // orient: 'vertical',
                     left: 'right',
                     y: '8%',
-                    data:['提前交付','按期交付','逾期交付']
+                    data:['按期交付','提前交付','逾期交付']
                 },
                 series : [
                     {

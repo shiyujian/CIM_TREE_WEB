@@ -14,15 +14,17 @@ export default class Warning extends Component {
             console.log('componentWillReceiveProps',DeliveryValue)
             const myChart = echarts.init(document.getElementById('resultSubmitPie'));
             let data = [
-                {value:DeliveryValue.data.beforehead, name:'提前交付'},
                 {value:DeliveryValue.data.ontime, name:'按期交付'},
+                {value:DeliveryValue.data.beforehead, name:'提前交付'},
                 {value:DeliveryValue.data.delayed, name:'逾期交付'}
             ]
             const option = {
-                color: ['#03E5CE', '#4A87FF', '#FFC36B'],
+                color: ['#4A87FF', '#03E5CE', '#FFC36B'],
                 title : {
                     text: '设计成果交付进度统计',
-                    subtext: DeliveryValue.name,
+                    textStyle:{
+                        color:'#74859F'
+                    },
                     x:'center',
                     left:'left',
                 },
@@ -34,7 +36,7 @@ export default class Warning extends Component {
                     // orient: 'vertical',
                     left: 'right',
                     y: '8%',
-                    data:['提前交付','按期交付','逾期交付']
+                    data:['按期交付','提前交付','逾期交付']
                 },
                 series : [
                     {
