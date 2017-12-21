@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
+import {actions as projactions} from '../../store/ProjectData';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
-import WorkflowHistory from '../WorkflowHistory'
+import WorkflowHistory from '../WorkflowHistory';
 import Preview from '../../../_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
@@ -15,7 +16,7 @@ const {Option} = Select
 		return { platform}
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...platformActions}, dispatch)
+		actions: bindActionCreators({ ...platformActions,...projactions}, dispatch)
 	})
 )
 export default class HPModal extends Component{
@@ -42,8 +43,12 @@ export default class HPModal extends Component{
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk});
    }
-    submit(){
-        this.props.closeModal("dr_xm_xx_visible",false)
+async submit(){
+        console.log(rdg);
+        let {postProjectAc ,getProjectAc} = this.props.actions;
+        let projRoot = await getProjectAc();
+        console.log(projRoot)
+        //this.props.closeModal("dr_xm_xx_visible",false);
     }
     render(){       
         const columns =
@@ -89,7 +94,9 @@ export default class HPModal extends Component{
                 key: 'Cost',
             }, {
                 title: '项目负责人',
-                dataIndex: 'projBoss',
+                render:(record)=>{
+                    return(<span> {JSON.parse(record.projBoss).username}</span>);
+                },
                 key: 'Duty'
             }, {
                 title: '计划开工日期',
@@ -107,13 +114,13 @@ export default class HPModal extends Component{
                 title: '附件',
                 key: 'nearby',
                 render: (record) => (
-                    <a> {record.file || '暂无'}</a>
+                    <a> {record.file.name || '暂无'}</a>
                 )
             }, {
                 title: '图片',
                 key: 'pic',
                 render: (record) => (
-                    <a>{record.pic || '暂无'}</a>
+                    <a>{record.pic.name || '暂无'}</a>
                 )
             }];
         return (
@@ -134,7 +141,14 @@ export default class HPModal extends Component{
                             <span>审查意见：</span>
                         </Col>
                         <Col span={4}>
-                            <RadioGroup onChange={this.onChange} value={this.state.value}>
+                            <RadioGroup 
+                             id = 'sxqrdg'
+                             value = {this.rdgval}
+                             onChange={(event) => {
+                                console.log(event)
+                                this.rdgval = event.target.value;
+                                this.forceUpdate();
+                            }} >
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
