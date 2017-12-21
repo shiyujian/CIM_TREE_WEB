@@ -25,7 +25,7 @@ export default class Safety extends Component {
 			QualificationVerification,EducationRegister,ActionsRecord,TechnicalDisclosure,
 			FacilitiesAcceptance, SafetyCheck, HiddenDanger, SafetyRules, Special} = this.state || {};
 		const {Scheme,RiskEvaluation,Unbearable,RiskFactor,DynamicReport,Discipline,Solution} = this.state || {};
-		const {MonitorPlan,DataQuery,MonitorProject,MonitorStations,MonitorData,MonitorDataP} = this.state || {};
+		const {MonitorPlan,DataQuery,MonitorProject,MonitorStations,MonitorData,MonitorDataP,Dashboard} = this.state || {};
 		return (
 			<Body>
 				<Aside>
@@ -33,7 +33,7 @@ export default class Safety extends Component {
 				</Aside>
 				<Main>
 					{Register && <Route path="/safety/accidentManagement/register" component={Register} />}
-					{Scheme && <Route exact path="/safety" component={Scheme} />}
+					{Scheme && <Route exact path="/safety/safetyPlan/scheme" component={Scheme} />}
 					{Report && <Route path="/safety/accidentManagement/report" component={Report} />}
 					{Investigation && <Route path="/safety/accidentManagement/investigation" component={Investigation} />}
 					{Treatment && <Route path="/safety/accidentManagement/treatment" component={Treatment} />}
@@ -53,6 +53,7 @@ export default class Safety extends Component {
 					{ActionsRecord && <Route path="/safety/managementAndControl/actionsRecord" component={ActionsRecord} />}
 					{TechnicalDisclosure && <Route path="/safety/managementAndControl/technicalDisclosure" component={TechnicalDisclosure} />}
 					{FacilitiesAcceptance && <Route path="/safety/managementAndControl/facilitiesAcceptance" component={FacilitiesAcceptance} />}
+					{Dashboard && <Route path="/safety" component={Dashboard} />}
 					{SafetyCheck && <Route path="/safety/managementAndControl/safetyCheck" component={SafetyCheck} />}
 					{HiddenDanger && <Route path="/safety/managementAndControl/hiddenDanger" component={HiddenDanger} />}
 					{MonitorPlan && <Route path="/safety/safetyMonitor/plan" component={MonitorPlan} />}
@@ -68,6 +69,12 @@ export default class Safety extends Component {
 	}
 
 	static menus = [{
+		key: 'safety',
+		id: 'SAFETY.STATISTICS',
+		name: '统计分析',
+		path: '/safety',
+		icon: <Icon name="thermometer-empty"/>
+	}, {
 		key: 'safetyPlan',
 		id: 'SAFETY.SAFETYPLAN',
 		name: '安全策划',
@@ -78,7 +85,7 @@ export default class Safety extends Component {
 				key: 'scheme',
 				id: 'SAFETY.SCHEME',
 				name: '安全策划书',
-				path: '/safety',
+				path: '/safety/safetyPlan/scheme',
 				icon: <Icon name="reply-all"/>
 			}, {
 				key: 'organizationalStructure',

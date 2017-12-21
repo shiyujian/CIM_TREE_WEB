@@ -31,3 +31,4 @@ export MonitorProject from './MonitorProject';
 export MonitorStations from './MonitorStations';
 export MonitorData from './MonitorData';
 export MonitorDataP from './MonitorDataP';
+export Dashboard from './Dashboard';
