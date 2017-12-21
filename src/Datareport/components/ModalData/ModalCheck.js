@@ -67,18 +67,17 @@ export default class ModalCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',attachment:null});
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
         dataSource.map((o) => {
             //创建文档对象
             console.log('o',o)
-            let doc = o.related_documents.find(x => {
-                x.rel_type === 'many_jyp_rel'
+            let doc = o.find(x => {
+                x.modeType === 'mch_rel'
             })
             if(doc){
-            	console.log('doc',doc)
                 doclist_p.push({
                     code:doc.code,
                     extra_params:{
@@ -101,7 +100,7 @@ export default class ModalCheck extends Component {
                         code:o.code,
                         obj_type:o.obj_type,
                         pk:o.pk,
-                        rel_type:"many_jyp_rel"
+                        modeType:"mch_rel"
                     }],
                     extra_params:{
                         ...o
@@ -216,7 +215,7 @@ export default class ModalCheck extends Component {
 		return(
 			<Modal
 				title="模型信息审批表"
-				key={Math.random()}
+				// key={Math.random()}
 				width = {1280}
 				visible = {true}
 				footer={null}
