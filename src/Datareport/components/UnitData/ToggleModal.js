@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 const Search = Input.Search;
 export default class ToggleModal extends Component{
     constructor(props){
@@ -19,13 +19,11 @@ export default class ToggleModal extends Component{
 			},
 			showUploadList: false,
 			onChange(info) {
-                console.log(info)
 				if (info.file.status !== 'uploading') {
 					// console.log(info.file, info.fileList);
 				}
 				if (info.file.status === 'done') {
 					let importData = info.file.response.Sheet1;
-					console.log('bbb', importData);
 					let { dataSource } = jthis.state
 					dataSource = jthis.handleExcelData(importData)
 					jthis.setState({ dataSource })
@@ -110,7 +108,6 @@ export default class ToggleModal extends Component{
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     beforeUpload(record,file){
-        console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
@@ -175,19 +172,30 @@ export default class ToggleModal extends Component{
         dataIndex :'etime',
         // key:'Etime'
       },{
-          title:'附件',
-          key:'nearby',
-          render:(record) => (
-            <Upload
-            beforeUpload = {this.beforeUpload.bind(this,record)}
-            >
-                <a>上传附件</a>
-            </Upload>
-          )
+        title:'附件',
+        key:'nearby',
+        render:(record) => (
+          <Upload
+          beforeUpload = {this.beforeUpload.bind(this,record)}
+          >
+              <a> {record.file?record.file.name:'上传附件'}</a>
+          </Upload>
+        )
+  
       }]
+      handlePreview(index){
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index].file
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
     //处理上传excel的数据
     handleExcelData(data) {
-        console.log('data',data)
         data.splice(0, 1);
         let res = data.map(item => {
             return {

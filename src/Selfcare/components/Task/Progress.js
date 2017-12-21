@@ -19,7 +19,9 @@ import PersonCheck from '../../../Datareport/components/PersonData/PersonCheck';
 import SumPlanCheck from '../../../Datareport/components/CostListData/SumPlanCheck';
 import ProjectSumExamine from '../../../Datareport/components/CostListData/ProjectSumExamine';
 import WorkCheckModal from '../../../Datareport/components/ScheduleData/WorkCheckModal';
+import DesignCheckModal from '../../../Datareport/components/ScheduleData/DesignCheckModal';
 import SafetySpecialCheck from '../../../Datareport/components/SafetySpecial/SafetySpecialCheck';
+import UnitToggle from '../../../Datareport/components/UnitData/UnitToggle';
 
 const FormItem = Form.Item;
 @connect(
@@ -60,16 +62,15 @@ export default class Progress extends Component {
 			dr_qua_jsjh_visible,
 			cost_pro_ck_visible,
 			dr_wor_sg_visible,
-			Safety_Special_check_visible
+			dr_de_sj_visible,
+			Safety_Special_check_visible,
+			dr_qua_unit_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
 		const { state_id = '0' } = queryString.parse(location.search) || {};
-		console.log('statis',states);
 		const currentStates = states.find(state => state.id === +state_id) || {};
 		const currentStateCode = currentStates.code;
-		console.log('currentStates',currentStates);
-		console.log("task Progress props", this.props);
 		return (
 			<div>
 				<div>
@@ -137,7 +138,10 @@ export default class Progress extends Component {
 								}
 							} else if (code === WORKFLOW_CODE.数据报送流程) {
 								// 数据报送流程
-									link = <a onClick={this.openModal.bind(this,name,id)}>审核</a>
+								if(action === '通过'){
+									action = '审核';
+									link = <a onClick={this.openModal.bind(this,name,id)}>{action}</a>
+								}
 							} else {
 								link = action;
 							}
@@ -151,7 +155,7 @@ export default class Progress extends Component {
 						this.renderDelay()
 						:
 						(code === WORKFLOW_CODE.设计计划填报流程 || code === WORKFLOW_CODE.设计计划变更流程 || code === WORKFLOW_CODE.设计成果上报流程 || code === WORKFLOW_CODE.设计成果一般变更流程
-							|| code === WORKFLOW_CODE.设计成果重大变更流程 || code === WORKFLOW_CODE.总进度计划报批流程 || code === WORKFLOW_CODE.进度管控审批流程 || code === 'TEMPLATE_022') ||
+							|| code === WORKFLOW_CODE.设计成果重大变更流程 || code === WORKFLOW_CODE.总进度计划报批流程 || code === WORKFLOW_CODE.进度管控审批流程 || code === 'TEMPLATE_022'|| code === WORKFLOW_CODE.数据报送流程) ||
 						this.renderContent()
 				}
 				{
@@ -206,8 +210,16 @@ export default class Progress extends Component {
 					<WorkCheckModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					dr_de_sj_visible && 
+					<DesignCheckModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
 					Safety_Special_check_visible && 
 					<SafetySpecialCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_qua_unit_visible && 
+					<UnitToggle wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 			</div>
 		);
@@ -247,6 +259,7 @@ export default class Progress extends Component {
 				break;
 			case "计价清单信息填报":
 				changeDatareportVisible({key:'cost_pri_ck_visible',value:true})
+				break;
 			case "结算进度信息填报":
 				changeDatareportVisible({key:'cost_sum_spd_visible',value:true})
 				break;
@@ -262,8 +275,14 @@ export default class Progress extends Component {
 			case "施工进度发起填报":
 				changeDatareportVisible({key:'dr_wor_sg_visible',value:true})
 				break;
+			case "设计进度发起填报":
+				changeDatareportVisible({key:'dr_de_sj_visible',value:true})
+				break;
 			case "安全专项信息批量录入":
 				changeDatareportVisible({key:'Safety_Special_check_visible',value:true})
+				break;
+			case "单位工程信息批量录入":
+				changeDatareportVisible({key:'dr_qua_unit_visible',value:true})
 				break;
 			default:break;
 		}

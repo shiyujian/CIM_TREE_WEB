@@ -118,7 +118,8 @@ class JianyanpiModal extends Component {
 				//thumbUrl: SOURCE_API + resp.a_file,
 				a_file:filedata.a_file,
 				download_url:filedata.download_url,
-				mime_type:resp.mime_type
+                mime_type:resp.mime_type,
+                misc:resp.misc
             };
             let jcode = file.name.split('.')[0]
             let info = await this.getInfo(jcode)
@@ -369,7 +370,7 @@ class JianyanpiModal extends Component {
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
-			maskClosable={false}
+			maskClosable={true}
 			onCancel={this.props.oncancel}>
 				<div>
                     <Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>

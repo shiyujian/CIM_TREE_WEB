@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
-import {actions} from '../../store/quality';
+import {actions} from '../../store/CostListData';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
@@ -22,6 +22,7 @@ const { TextArea } = Input;
 	})
 )
 export default class PriceListExamine extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -52,6 +53,11 @@ export default class PriceListExamine extends Component {
         this.props.closeModal("cost_pri_ck_visible",false)
         message.info("操作成功")
     }
+
+    cancel() {
+		this.props.closeModal("cost_pri_ck_visible",false)
+	}
+
     //通过
     async passon(){
         const {dataSource,wk} = this.state
@@ -66,48 +72,49 @@ export default class PriceListExamine extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        dataSource.map((o) => {
-            //创建文档对象
-            let doc = o.related_documents.find(x => {
-                x.rel_type === 'many_jyp_rel'
-            })
-            debugger
-            if(doc){
-                doclist_p.push({
-                    code:doc.code,
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }else{
-                doclist_a.push({
-                    code:`rel_doc_${o.code}`,
-                    name:`rel_doc_${o.pk}`,
-                    obj_type:"C_DOC",
-                    status:"A",
-                    version:"A",
-                    "basic_params": {
-                    },
-                    workpackages:[{
-                        code:o.code,
-                        obj_type:o.obj_type,
-                        pk:o.pk,
-                        rel_type:"many_jyp_rel"
-                    }],
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }
-            //施工包批量
-            wplist.push({
-                code:o.code,
-                extra_params:{
-                    rate:o.rate
-                }
-            })
-        })
-        debugger
+        // dataSource.map((o) => {
+        //     //创建文档对象
+        //     let doc = o.related_documents.find(x => {
+        //         x.rel_type === 'many_jyp_rel'
+        //     })
+        //     debugger
+        //     if(doc){
+        //         doclist_p.push({
+        //             code:doc.code,
+        //             extra_params:{
+        //                 ...o
+        //             }
+        //         })
+        //     }else{
+        //         doclist_a.push({
+        //             code:`rel_doc_${o.code}`,
+        //             name:`rel_doc_${o.pk}`,
+        //             obj_type:"C_DOC",
+        //             status:"A",
+        //             version:"A",
+        //             "basic_params": {
+        //             },
+        //             workpackages:[{
+        //                 code:o.code,
+        //                 obj_type:o.obj_type,
+        //                 pk:o.pk,
+        //                 rel_type:"many_jyp_rel"
+        //             }],
+        //             extra_params:{
+        //                 ...o
+        //             }
+        //         })
+        //     }
+        //     //施工包批量
+        //     wplist.push({
+        //         code:o.code,
+        //         extra_params:{
+        //             rate:o.rate,
+        //             check_status:2
+        //         }
+        //     })
+        // })
+        // 
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -157,7 +164,8 @@ export default class PriceListExamine extends Component {
 					<Table
 						bordered
 						className = 'foresttable'
-						columns={this.columns}
+                        columns={this.columns}
+                        dataSource={this.state.dataSource}
 					/>
 				</Row>
 				<Row style={{margin: '20px 0'}}>
@@ -165,10 +173,10 @@ export default class PriceListExamine extends Component {
 						<span>审查意见：</span>
 					</Col>
 					<Col span={4}>
-						<RadioGroup onChange={this.onChange} value={this.state.value}>
-					        <Radio value={1}>通过</Radio>
-					        <Radio value={2}>不通过</Radio>
-					    </RadioGroup>
+                        <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
+                            <Radio value={1}>通过</Radio>
+                            <Radio value={2}>不通过</Radio>
+                        </RadioGroup>
 				    </Col>
 				    <Col span={2} push={14}>
 				    	<Button type='primary'>
@@ -181,34 +189,9 @@ export default class PriceListExamine extends Component {
         				</Button>
 				    </Col>
 			    </Row>
-			    <Row style={{margin: '20px 0'}}>
-				    <Col>
-				    	<TextArea rows={2} />
-				    </Col>
-			    </Row>
-			    <Row style={{marginBottom: '10px'}}>
-			    	<div>审批流程</div>
-			    </Row>
-			    <Row>
-			    	<Col span={10}>
-			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：</div>
-			    			<div>执行时间：</div>
-			    			<div>执行意见：</div>
-			    			<div style={{marginTop: '40px'}}>电子签章：</div>
-			    		</div>
-			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传</div>
-			    	</Col>
-			    	<Col span={10}>
-			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：</div>
-			    			<div>执行时间：</div>
-			    			<div>执行意见：</div>
-			    			<div style={{marginTop: '40px'}}>电子签章：</div>
-			    		</div>
-			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传审核</div>
-			    	</Col>
-			    </Row>
+                {
+                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                }
 			</Modal>
 		)
 	}
@@ -248,11 +231,4 @@ export default class PriceListExamine extends Component {
         title:'状态',
         dataIndex:'sunmits'
   }]
-
-	cancel() {
-		const {
-			actions: {clearCheckField}
-		} = this.props;
-		clearCheckField();
-	}
 }
