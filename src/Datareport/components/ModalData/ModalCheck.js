@@ -45,11 +45,11 @@ export default class ModalCheck extends Component {
    }
    //提交
     async submit(){
-        // if(this.state.opinion === 1){
-        //     await this.passon();
-        // }else{
-        //     await this.reject();
-        // }
+        if(this.state.opinion === 1){
+            await this.passon();
+        }else{
+            await this.reject();
+        }
         this.props.closeModal("modal_check_visbile",false)
         message.info("操作成功")
     }
@@ -67,16 +67,16 @@ export default class ModalCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',attachment:null});
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
         dataSource.map((o) => {
             //创建文档对象
-            let doc = o.related_documents.find(x => {
-                x.rel_type === 'mch_rel'
+            console.log('o',o)
+            let doc = o.find(x => {
+                x.modeType === 'mch_rel'
             })
-            debugger
             if(doc){
                 doclist_p.push({
                     code:doc.code,
@@ -92,12 +92,15 @@ export default class ModalCheck extends Component {
                     status:"A",
                     version:"A",
                     "basic_params": {
+                    	"files": [
+                            o.file
+                        ]
                     },
                     workpackages:[{
                         code:o.code,
                         obj_type:o.obj_type,
                         pk:o.pk,
-                        rel_type:"mch_rel"
+                        modeType:"mch_rel"
                     }],
                     extra_params:{
                         ...o
@@ -113,7 +116,6 @@ export default class ModalCheck extends Component {
                 }
             })
         })
-        debugger
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -160,9 +162,19 @@ export default class ModalCheck extends Component {
 		}, {
 			title: '项目/子项目名称',
 			dataIndex: 'project',
+			// render: (text, record, index) => (
+   //              <span>
+   //                  {record.project.name}
+   //              </span>
+   //          ),
 		}, {
 			title: '单位工程',
-			dataIndex: 'unitEngineering',
+			dataIndex: 'unit',
+			// render: (text, record, index) => (
+   //              <span>
+   //                  {record.unit.name}
+   //              </span>
+   //          ),
 		}, {
 			title: '模型名称',
 			dataIndex: 'modelName'
@@ -203,7 +215,7 @@ export default class ModalCheck extends Component {
 		return(
 			<Modal
 				title="模型信息审批表"
-				key={Math.random()}
+				// key={Math.random()}
 				width = {1280}
 				visible = {true}
 				footer={null}

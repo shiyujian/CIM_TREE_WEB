@@ -100,15 +100,16 @@ export default class ToggleModal extends Component{
             let loadedFile = await resp.json();
             loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
             loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
-            record.pic = loadedFile;
+            record.signature = loadedFile;
             this.forceUpdate();
         });
         return false;
     }
     onok() {
+        console.log("datasource",this.state.dataSource);
         const { actions: { ModalVisible } } = this.props;
         let ok = this.state.dataSource.some(ele => {
-            return !ele.file;
+            return !ele.signature;
         });
         if(ok){
             message.error('有附件未上传');
@@ -199,7 +200,7 @@ export default class ToggleModal extends Component{
             <Upload
                 beforeUpload={this.beforeUploadPic.bind(this, record)}
             >
-                <a>{record.pic ? record.pic.name : '点击上传'}</a>
+                <a>{record.signature ? record.signature.name : '点击上传'}</a>
             </Upload>
         )
       },{

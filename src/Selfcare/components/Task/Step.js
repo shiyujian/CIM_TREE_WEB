@@ -36,12 +36,18 @@ export default class TaskStep extends Component {
 								const { id: userID } = executor || {};
 								if (step.status === 'processing') { // 根据历史状态显示
 									const state = this.getCurrentState();
+									let executorName = '';
+									if(executor.username){
+										executorName = executor.username
+									}else{
+										executorName = executor.person_name
+									}
 									return (
 										<Step key={userID} title={
 											<div>
 												<span>{step.state.name}-(执行中)</span>
 												<span style={{ paddingLeft: 20 }}>当前执行人:</span>
-												<span style={{ color: '#108ee9' }}>{`${executor.person_name}` || `${executor.username}`}</span>
+												<span style={{ color: '#108ee9' }}>{executorName}</span>
 											</div>}
 											description={
 												userID === +user.id && <Progress state={state} states={states} transitions={transitions} users = {users} 

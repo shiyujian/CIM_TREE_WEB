@@ -28,10 +28,9 @@ const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
 //批量创建文档
 export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
-//批量创建目录
-export const addDirList = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
-export const putDirList = createFetchAction(`${SERVICE_API}/directories/`,[],'PUT');
-
+//文档目录树相关
+const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/`,[],'GET');
+const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 
 export const actions = {
 	...additionReducer,
@@ -51,8 +50,8 @@ export const actions = {
 	updateWpData,
 	addDocList,
 	putDocList,
-	addDirList,
-	putDirList
+	getScheduleDir,
+	postScheduleDir
 };
 
 export default handleActions({
