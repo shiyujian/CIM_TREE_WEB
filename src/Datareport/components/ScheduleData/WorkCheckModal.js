@@ -48,11 +48,6 @@ export default class WorkCheckModal extends Component {
     }
     //提交
     submit() {
-        if (this.state.opinion === 1) {
-            await this.passon();
-        } else {
-            await this.reject();
-        }
         this.props.closeModal("dr_wor_sg_visible", false)
         message.info("操作成功")
     }
