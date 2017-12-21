@@ -233,18 +233,32 @@ class PriceList extends Component {
 			title:'项目/子项目',
             dataIndex:'subproject',
             width:"10%",
-            render:(record) => {
+            render:(text,record,index) => {
                 return (
-                    <Select style={{width:"90%"}} onSelect={ele => {
-                        this.setState({ pro: ele })
-                    }}>
+                    <Select style={{width:"90%"}} onSelect={(ele) => {
+                        let dataSource = this.state.dataSource;
+                        dataSource[index]['subproject'] = JSON.parse(ele).name;
+                        this.setState({ dataSource })
+                    }} >
                         {this.state.projects}
                     </Select>
                 )
             }
         },{
             title:'单位工程',
-            dataIndex:'unitengineering'
+            dataIndex:'unitengineering',
+            width:"10%",
+            render:(text,record,index) => {
+                return (
+                    <Select style={{width:"90%"}} onSelect={(ele) => {
+                        let dataSource = this.state.dataSource;
+                        dataSource[index]['unitengineering'] = JSON.parse(ele).name;
+                        this.setState({ dataSource })
+                    }} >
+                        {this.state.projects}
+                    </Select>
+                )
+            }
         },{
 			title:'清单项目编码',
             dataIndex:'projectcoding',
@@ -275,10 +289,6 @@ class PriceList extends Component {
             dataIndex:'remarks',
             width:"10%",
 		},{
-			title:'状态',
-			width:"10%",
-			dataIndex:'sunmits'
-      },{
         title:'编辑',
         width:"8%",
         dataIndex:'edit',

@@ -39,7 +39,6 @@ export default class Addition extends Component {
     }
 	render() {
 		const { addition = {}, actions: { changeAdditionField } } = this.props;
-		debugger
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
@@ -178,7 +177,7 @@ export default class Addition extends Component {
 			 visible={addition.visible}
 			 maskClosable={false}
 			 onCancel={this.cancel.bind(this)}
-			 onOk={this.onok.bind(this)}
+             footer={null}
 			>
 				<div>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
@@ -464,6 +463,7 @@ export default class Addition extends Component {
                 }],
                 attachment:null
             }).then(() => {
+                message.success("成功")
 				clearAdditionField();
 			})
 		})

@@ -13,6 +13,7 @@ import vedioinfodataReducer, {actions as vedioinfodataActions} from './vedioInfo
 import workdataReducer, {actions as workdataActions} from './workdata';
 import CostListDataReducer, {actions as CostListDataActions} from './CostListData';
 import WorkunitCostReducer, {actions as WorkunitCostActions} from './WorkunitCost';
+import safetyReducer, {actions as SafetyActions} from './safety';
 
 export default handleActions({
 	//项目信息
@@ -81,5 +82,10 @@ export default handleActions({
 	[combineActions(...actionsMap(WorkunitCostActions))]: (state = {}, action) => ({
 		...state,
 		WorkunitCost: WorkunitCostReducer(state.WorkunitCost, action),
+	}),
+	//安全
+	[combineActions(...actionsMap(SafetyActions))]: (state = {}, action) => ({
+		...state,
+		safety: safetyReducer(state.safety, action),
 	}),
 }, {});

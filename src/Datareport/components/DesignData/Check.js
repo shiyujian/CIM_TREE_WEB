@@ -52,76 +52,84 @@ export default class Check extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("design_check_visbile",false)
+        //this.props.closeModal("design_check_visbile",false)
         message.info("操作成功")
     }
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
+        console.log(dataSource)
+        const {actions:{getWorkPackageDetailpk,logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        //await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
         dataSource.map((o) => {
-            //创建文档对象
-            let doc = o.related_documents.find(x => {
-                return x.rel_type === 'many_jyp_rel'
-            })
-            if(doc){
-                doclist_p.push({
-                    code:doc.code,
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }else{
-                doclist_a.push({
-                    code:`rel_doc_${o.code}`,
-                    name:`rel_doc_${o.pk}`,
-                    obj_type:"C_DOC",
-                    status:"A",
-                    version:"A",
-                    "basic_params": {
-                        // "files": [
-                        //     {
-                        //     "a_file": file.a_file,
-                        //     "name": file.name,
-                        //     "download_url": file.download_url,
-                        //     "misc": file.misc,
-                        //     "mime_type": file.mime_type
-                        //     },
-                        // ]
-                    },
-                    workpackages:[{
-                        code:o.code,
-                        obj_type:o.obj_type,
-                        pk:o.pk,
-                        rel_type:"many_jyp_rel"
-                    }],
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }
-            //施工包批量
-            wplist.push({
-                code:o.code,
-                extra_params:{
-                    rate:o.rate,
-                    check_status:2
-                }
-            })
+        	getWorkPackageDetailpk({pk:o.unit.pk})
+        	.then(wp => {
+        		console.log(wp)
+        	})
         })
-        await addDocList({},{data_list:doclist_a});
-        await putDocList({},{data_list:doclist_p})
-        await updateWpData({},{data_list:wplist});
+
+
+        //     //创建文档对象
+        //     let doc = o.related_documents.find(x => {
+        //         return x.rel_type === 'many_jyp_rel'
+        //     })
+        //     if(doc){
+        //         doclist_p.push({
+        //             code:doc.code,
+        //             extra_params:{
+        //                 ...o
+        //             }
+        //         })
+        //     }else{
+        //         doclist_a.push({
+        //             code:`rel_doc_${o.code}`,
+        //             name:`rel_doc_${o.pk}`,
+        //             obj_type:"C_DOC",
+        //             status:"A",
+        //             version:"A",
+        //             "basic_params": {
+        //                 // "files": [
+        //                 //     {
+        //                 //     "a_file": file.a_file,
+        //                 //     "name": file.name,
+        //                 //     "download_url": file.download_url,
+        //                 //     "misc": file.misc,
+        //                 //     "mime_type": file.mime_type
+        //                 //     },
+        //                 // ]
+        //             },
+        //             workpackages:[{
+        //                 code:o.code,
+        //                 obj_type:o.obj_type,
+        //                 pk:o.pk,
+        //                 rel_type:"many_jyp_rel"
+        //             }],
+        //             extra_params:{
+        //                 ...o
+        //             }
+        //         })
+        //     }
+        //     //施工包批量
+        //     wplist.push({
+        //         code:o.code,
+        //         extra_params:{
+        //             rate:o.rate,
+        //             check_status:2
+        //         }
+        //     })
+        // })
+        // await addDocList({},{data_list:doclist_a});
+        // await putDocList({},{data_list:doclist_p})
+        // await updateWpData({},{data_list:wplist});
     }
     //不通过
     async reject(){

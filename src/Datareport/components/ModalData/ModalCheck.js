@@ -45,11 +45,11 @@ export default class ModalCheck extends Component {
    }
    //提交
     async submit(){
-        // if(this.state.opinion === 1){
-        //     await this.passon();
-        // }else{
-        //     await this.reject();
-        // }
+        if(this.state.opinion === 1){
+            await this.passon();
+        }else{
+            await this.reject();
+        }
         this.props.closeModal("modal_check_visbile",false)
         message.info("操作成功")
     }
@@ -73,11 +73,12 @@ export default class ModalCheck extends Component {
         let wplist = [];
         dataSource.map((o) => {
             //创建文档对象
+            console.log('o',o)
             let doc = o.related_documents.find(x => {
-                x.rel_type === 'mch_rel'
+                x.rel_type === 'many_jyp_rel'
             })
-            debugger
             if(doc){
+            	console.log('doc',doc)
                 doclist_p.push({
                     code:doc.code,
                     extra_params:{
@@ -92,12 +93,15 @@ export default class ModalCheck extends Component {
                     status:"A",
                     version:"A",
                     "basic_params": {
+                    	"files": [
+                            o.file
+                        ]
                     },
                     workpackages:[{
                         code:o.code,
                         obj_type:o.obj_type,
                         pk:o.pk,
-                        rel_type:"mch_rel"
+                        rel_type:"many_jyp_rel"
                     }],
                     extra_params:{
                         ...o
@@ -108,11 +112,11 @@ export default class ModalCheck extends Component {
             wplist.push({
                 code:o.code,
                 extra_params:{
-                    rate:o.rate
+                    rate:o.rate,
+                    check_status:2
                 }
             })
         })
-        debugger
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -148,61 +152,7 @@ export default class ModalCheck extends Component {
     }
 
 	render() {
-		return(
-			<Modal
-				title="模型信息审批表"
-				key={Math.random()}
-				width = {1280}
-				visible = {true}
-				footer={null}
-				maskClosable={false}
-				onCancel = {this.cancel.bind(this)}
-			>
-				<Row style={{margin: '20px 0', textAlign: 'center'}}>
-					<h2>结果审核</h2>
-				</Row>
-				<Row>
-					<Table
-						bordered
-						className = 'foresttable'
-						columns={this.columns}
-						dataSource={this.state.dataSource}
-					/>
-				</Row>
-				<Row style={{margin: '20px 0'}}>
-					<Col span={2}>
-						<span>审查意见：</span>
-					</Col>
-					<Col span={4}>
-						<RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
-					        <Radio value={1}>通过</Radio>
-					        <Radio value={2}>不通过</Radio>
-					    </RadioGroup>
-				    </Col>
-				    <Col span={2} push={14}>
-				    	<Button type='primary'>
-        					导出表格
-        				</Button>
-				    </Col>
-				    <Col span={2} push={14}>
-				    	<Button type='primary' onClick={this.submit.bind(this)}>
-        					确认提交
-        				</Button>
-				    </Col>
-			    </Row>
-			    <Row style={{margin: '20px 0'}}>
-				    <Col>
-				    	<TextArea rows={2} />
-				    </Col>
-			    </Row>
-			    {
-                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
-                }
-			</Modal>
-		)
-	}
-
-	columns = [{
+		const columns = [{
 			title: '序号',
 			render:(text,record,index) => {
 				return index+1
@@ -212,10 +162,20 @@ export default class ModalCheck extends Component {
 			dataIndex: 'coding'
 		}, {
 			title: '项目/子项目名称',
-			dataIndex: 'project'
+			dataIndex: 'project',
+			// render: (text, record, index) => (
+   //              <span>
+   //                  {record.project.name}
+   //              </span>
+   //          ),
 		}, {
 			title: '单位工程',
-			dataIndex: 'unitEngineering'
+			dataIndex: 'unit',
+			// render: (text, record, index) => (
+   //              <span>
+   //                  {record.unit.name}
+   //              </span>
+   //          ),
 		}, {
 			title: '模型名称',
 			dataIndex: 'modelName'
@@ -243,5 +203,63 @@ export default class ModalCheck extends Component {
 		}, {
 			title: '上报人',
 			dataIndex: 'reportingName'
+		}, {
+            title:'附件',
+			render:(text,record,index) => {
+                return (<span>
+                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                        <span className="ant-divider" />
+                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                    </span>)
+            }
 		}];
+		return(
+			<Modal
+				title="模型信息审批表"
+				key={Math.random()}
+				width = {1280}
+				visible = {true}
+				footer={null}
+				maskClosable={false}
+				onCancel = {this.cancel.bind(this)}
+			>
+				<Row style={{margin: '20px 0', textAlign: 'center'}}>
+					<h2>结果审核</h2>
+				</Row>
+				<Row>
+					<Table
+						bordered
+						className = 'foresttable'
+						columns={columns}
+						dataSource={this.state.dataSource}
+					/>
+				</Row>
+				<Row style={{margin: '20px 0'}}>
+					<Col span={2}>
+						<span>审查意见：</span>
+					</Col>
+					<Col span={4}>
+						<RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
+					        <Radio value={1}>通过</Radio>
+					        <Radio value={2}>不通过</Radio>
+					    </RadioGroup>
+				    </Col>
+				    <Col span={2} push={14}>
+				    	<Button type='primary'>
+        					导出表格
+        				</Button>
+				    </Col>
+				    <Col span={2} push={14}>
+				    	<Button type='primary' onClick={this.submit.bind(this)}>
+        					确认提交
+        				</Button>
+        				<Preview />
+				    </Col>
+			    </Row>
+			    {
+                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                }
+			</Modal>
+		)
+	}
 }
