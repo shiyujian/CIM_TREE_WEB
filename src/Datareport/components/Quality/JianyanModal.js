@@ -362,7 +362,7 @@ class JianyanModal extends Component {
 		};
 		return (
 			<Modal
-			title="检验批信息上传表"
+			title="分项、分部、单位检验信息上传表"
 			key={this.props.akey}
             visible={true}
             width= {1280}

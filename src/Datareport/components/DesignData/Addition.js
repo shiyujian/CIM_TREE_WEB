@@ -106,6 +106,9 @@ export default class Addition extends Component {
 			title: '描述的设计对象',
 			dataIndex: 'designObject'
 		}, {
+            title: '上传人',
+            dataIndex: 'upPeople'
+        }, {
             title:'附件',
 			render:(text,record,index) => {
 				if(record.file.id){
@@ -482,7 +485,8 @@ export default class Addition extends Component {
                 major:item[4],
                 wbsObject:item[5],
                 designObject:item[6],
-                file:''
+                file:'',
+                upPeople:getUser().username,
             }
         })
         return res
