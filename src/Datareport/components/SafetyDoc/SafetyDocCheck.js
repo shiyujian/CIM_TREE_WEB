@@ -42,11 +42,11 @@ export default class SafetyDocCheck extends Component {
             getScheduleDir,
             postScheduleDir,
         }} = this.props;
-        let topDir = await getScheduleDir({code:'the_only_main_code_safetydoc'});
+        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
         if(!topDir.obj_type){
             let postData = {
-                name:'安全管理的顶级节点',
-                code:'the_only_main_code_safetydoc',
+                name:'数据报送的顶级节点',
+                code:'the_only_main_code_datareport',
                 "obj_type": "C_DIR",
                 "status": "A",
             }
@@ -84,7 +84,8 @@ export default class SafetyDocCheck extends Component {
         debugger
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
-        let code = 'datareport_safetydoc_'+unit.code;
+        let project = dataSource[0].project;
+        let code = 'datareport_safetydoc_1112';
         //get workpackage by unit's code 
         let workpackage = await getWorkpackagesByCode({code:unit.code});
         
@@ -124,7 +125,7 @@ export default class SafetyDocCheck extends Component {
             docData.push({
                 code:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
                 name:item.file.name,
-                obj_type:"C_DEOC",
+                obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},
                 "basic_params": {
@@ -145,7 +146,9 @@ export default class SafetyDocCheck extends Component {
                     type:item.type,
                     doTime:item.doTime,
                     remark:item.remark,
-                    upPeople:item.upPeople
+                    upPeople:item.upPeople,
+                    unit:item.unit.name,
+                    project:item.project.name
                 }
             })
         });
