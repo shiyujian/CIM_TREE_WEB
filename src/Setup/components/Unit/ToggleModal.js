@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Modal, Form, Input, Upload, Icon, Row, Col, Button, Select, message, TreeSelect, Spin} from 'antd';
 import {getUser} from '../../../_platform/auth';
-import {base, STATIC_DOWNLOAD_API, SOURCE_API} from '../../../_platform/api';
+import {base, STATIC_DOWNLOAD_API, SOURCE_API,DefaultZoomLevel} from '_platform/api';
 import {Map, TileLayer, Marker, Polygon} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -564,7 +564,7 @@ class ToggleModal extends Component {
 									<Row>
 										<Col span={12}>
 											<FormItem {...layoutT} label="地图位置">
-												<Map center={leafletCenter} zoom={12} zoomControl={false}
+												<Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
 													style={{ position: 'relative', height: 240, width: '100%' }}>
 													<TileLayer url={URL} subdomains={['7']} />
 													<Polygon positions={this._getPoints(this.state.coordinates || [])} />
@@ -573,7 +573,7 @@ class ToggleModal extends Component {
 										</Col>
 										<Col span={12}>
 											<FormItem {...layoutT} label="模型位置">
-												<Map center={leafletCenter} zoom={12} zoomControl={false}
+												<Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
 													style={{ position: 'relative', height: 240, width: '100%' }}>
 													<TileLayer url={URL} subdomains={['7']} />
 													<Polygon positions={this._getPoints(this.state.coordinates || [])} />

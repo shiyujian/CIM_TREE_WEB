@@ -23,6 +23,8 @@ import WorkCheckModal from '../../../Datareport/components/ScheduleData/WorkChec
 import DesignCheckModal from '../../../Datareport/components/ScheduleData/DesignCheckModal';
 import SafetySpecialCheck from '../../../Datareport/components/SafetySpecial/SafetySpecialCheck';
 import UnitToggle from '../../../Datareport/components/UnitData/UnitToggle';
+import VedioCheck from '../../../Datareport/components/VedioData/VedioCheck';
+import VedioInfoCheck from '../../../Datareport/components/VedioData/VedioInfoCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -66,7 +68,9 @@ export default class Progress extends Component {
 			dr_de_sj_visible,
 			Safety_Special_check_visible,
 			dr_qua_unit_visible,
-			design_check_visbile
+			design_check_visbile,
+			safety_vedioCheck_visible,
+			safety_vedioInfoCheck_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -142,12 +146,16 @@ export default class Progress extends Component {
 								// 数据报送流程
 								if(action === '通过'){
 									action = '审核';
-									link = <a onClick={this.openModal.bind(this,name,id)}>{action}</a>
+									link = <Button onClick={this.openModal.bind(this,name,id)}>{action}</Button>
 								}
 							} else {
 								link = action;
 							}
-							return (link && <a onClick={this.toggleAction.bind(this, action)} key={index} style={{width:50,height:20,textAlign:'center',display:'inline-block',marginRight: 20,borderWidth:1,borderStyle:'solid',borderColor:'#ddd',borderRadius:5 }}>{link}</a>)
+							if(action === '审核'){
+								return link
+							}else{
+								return (link && <a onClick={this.toggleAction.bind(this, action)} key={index} style={{width:50,height:20,textAlign:'center',display:'inline-block',marginRight: 20,borderWidth:1,borderStyle:'solid',borderColor:'#ddd',borderRadius:5 }}>{link}</a>)
+							}
 						})
 					}
 				</div>
@@ -228,6 +236,14 @@ export default class Progress extends Component {
 					design_check_visbile && 
 					<DesignDataCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					safety_vedioCheck_visible && 
+					<VedioCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_vedioInfoCheck_visible && 
+					<VedioInfoCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -293,6 +309,12 @@ export default class Progress extends Component {
 				break;
 			case "单位工程信息批量录入":
 				changeDatareportVisible({key:'dr_qua_unit_visible',value:true})
+				break;
+			case "视频监控批量录入":
+				changeDatareportVisible({key:'safety_vedioCheck_visible',value:true})
+				break;
+			case "影像信息批量录入":
+				changeDatareportVisible({key:'safety_vedioInfoCheck_visible',value:true})
 				break;
 			default:break;
 		}
