@@ -188,8 +188,8 @@ export default class AddFile extends Component {
             organization:check.account.organization
         }
         for(let i=0;i<this.state.dataSource.length;i++){
-            dataSource[i].project = project;
-            dataSource[i].unit = unit;
+            this.state.dataSource[i].project = project;
+            this.state.dataSource[i].unit = unit;
         }
 		this.props.onok(this.state.dataSource,per);
     }
