@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Select, Button, Row, Col, DatePicker, Input, Icon, Checkbox, Card, notification, Table } from 'antd';
-import style from './index.css';
+import  './index.less';
 import PerCarbon from './PerCarbon';
 import Dragger from '_platform/components/panels/Dragger';
 import moment from 'moment';
@@ -279,7 +279,7 @@ export default class StartPlanForm extends Component {
                     <div >
                         <Button type="primary" onClick={this.submitPlan.bind(this)}>发送</Button>
                         <h1 style={{textAlign:'center'}}>总进度计划填报通知</h1>
-                        <Row gutter={15} className='mb10'>
+                        <Row gutter={30} className='mb10'>
                             <Col span={8}>
                                 <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">项目名称:</label>
                                 <div className='start_input'>
@@ -299,11 +299,11 @@ export default class StartPlanForm extends Component {
                                 </div>   
                             </Col>
                         </Row>
-                        <Row gutter={15} className='mb10'>
+                        <Row gutter={30} className='mb10'>
                             <Col span={8}>
                                 <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">施工单位:</label>
                                 <div className="start_input">
-                                    <Select size={'small'} style={{ width: '100%' }}
+                                    <Select  style={{ width: '100%' }}
                                         placeholder="请选择施工单位"
                                         onChange={this.constructChange.bind(this)}>
                                         {
@@ -332,7 +332,7 @@ export default class StartPlanForm extends Component {
                             <Col span={8}>
                                 <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">填报时间:</label>
                                 <div className="start_input">
-                                    <DatePicker size={'small'} 
+                                    <DatePicker  
                                     format="YYYY-MM-DD"
                                     placeholder="请选择填报时间"
                                     onChange={this.reportTimeChange.bind(this)}
@@ -340,11 +340,11 @@ export default class StartPlanForm extends Component {
                                 </div>        
                             </Col>
                         </Row>
-                        <Row gutter={15} className='mb10'>
+                        <Row gutter={30} className='mb10'>
                             <Col span={8}>
                                 <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">监理单位:</label>
                                 <div className="start_input">
-                                    <Select size={'small'} style={{ width: '100%' }}
+                                    <Select  style={{ width: '100%' }}
                                     placeholder="请选择监理单位"
                                     onChange={this.superChange.bind(this)}
                                     >
@@ -374,7 +374,7 @@ export default class StartPlanForm extends Component {
                             <Col span={8}>
                                 <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">审核时限:</label>
                                 <div className="limit_input">
-                                    <Select size={'small'} style={{ width: '100%' }}
+                                    <Select  style={{ width: '100%' }}
                                     placeholder="请输入或选择审核时限"
                                     showSearch
                                     onChange = {this.approvalTimeChange.bind(this)}

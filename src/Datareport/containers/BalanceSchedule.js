@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import {actions} from '../store/CostListData';
+import {actions} from '../store/SumSpeedCost';
 import {actions as platformActions} from '_platform/store/global';
 import {Row,Col,Table,Input,Button} from 'antd';
 import SumSpeed from '../components/CostListData/SumSpeed';

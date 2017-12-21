@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Table, Row, Col, Select, Input, Checkbox, Icon, notification, Button, DatePicker, Card, Radio, Calendar, Modal   } from 'antd';
-import style from './index.css';
+import './index.less';
 import {getUser} from '_platform/auth';
 import moment from 'moment';
 const RadioGroup = Radio.Group;

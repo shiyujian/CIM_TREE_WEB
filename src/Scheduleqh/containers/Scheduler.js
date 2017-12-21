@@ -9,7 +9,7 @@ import AddScheduler from '../components/Scheduler/AddScheduler';
 import {actions as scheduleWorkflowActions} from '../store/scheduleWorkflow';
 import moment from 'moment';
 import {Link} from 'react-router-dom';
-import Schedule from './Schedule.css';
+import './Schedule.less';
 import { Calendar,Modal,Form,Card,Button,Row,Col,message,notification } from 'antd';
 
 @connect(

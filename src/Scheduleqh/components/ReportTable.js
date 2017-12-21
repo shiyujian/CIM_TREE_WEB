@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import {Table, Row, Col, Select, Input, Checkbox, Icon, notification, Button, DatePicker, Card, Upload, Modal, message, Steps, Spin  } from 'antd';
 import moment from 'moment';
-import './index.css';
+import './index.less';
 import PerCarbon from './PerCarbon';
 import DelayPerCarbon from './DelayPerCarbon';
 import {getUser} from '_platform/auth';
@@ -424,11 +424,11 @@ export default class ReportTable extends Component {
                                 </Col>
                             </Row>
                             <h1 className='title'>总进度计划表填报</h1>
-                            <Card className='mb10'>
-                                <Row gutter={15} className='mb10'>
+                            <Card className='mb10' >
+                                <Row  className='mb10' gutter={30}>
                                     <Col span={8}>
                                         <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">项目名称:</label>
-                                        <div className='start_input'>
+                                        <div className="start_input">
                                             <label >{item?item.project.name:''}</label>
                                         </div>
                                     </Col>
@@ -445,7 +445,7 @@ export default class ReportTable extends Component {
                                         </div>   
                                     </Col>
                                 </Row>
-                                <Row gutter={15} className='mb10'>
+                                <Row gutter={30} className='mb10' >
                                     <Col span={8}>
                                         <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">施工单位:</label>
                                         <div className='start_input'>
@@ -465,7 +465,7 @@ export default class ReportTable extends Component {
                                         </div>       
                                     </Col>
                                 </Row>
-                                <Row gutter={15} className='mb10'>
+                                <Row gutter={30} className='mb10' >
                                     <Col span={8}>
                                         <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">监理单位:</label>
                                         <div className='start_input'>
@@ -485,7 +485,7 @@ export default class ReportTable extends Component {
                                         </div>        
                                     </Col>
                                 </Row>
-                                <Row style={{marginTop:15}}>
+                                <Row style={{marginTop:15}} gutter={30}>
                                     <Col span={12}>
                                         <label style={{minWidth: 60,display: 'inline-block'}}>抄送:</label>
                                         <div className='start_input'>
@@ -501,7 +501,7 @@ export default class ReportTable extends Component {
                                 </Row>
                             </Card>
                             <Card className='mb10'>
-                                <Row >
+                                <Row gutter={10}>
                                     <Col span={8}>
                                         <label style={{minWidth: 100,display: 'inline-block'}}>请上传总进度计划</label>
                                     </Col>

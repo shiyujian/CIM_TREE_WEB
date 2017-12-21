@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Select, Button, Row, Col, DatePicker, Input, Icon, Checkbox, Tbale, Radio, Table, Card, notification} from 'antd';
-import style from './index.css';
+import './index.less';
 import PerCarbon from './PerCarbon';
 import Dragger from '_platform/components/panels/Dragger';
 import {getUser} from '_platform/auth';
@@ -328,7 +328,7 @@ export default class TotalApprovalForm extends Component {
                         <Button type="primary" onClick={this.submitPlan.bind(this)}>发送</Button>
                         <h1 style={{textAlign:'center'}}>总进度计划填报通知</h1>
                         <Card className='mb10'>
-                            <Row gutter={15} style={{marginBottom:10}}>
+                            <Row gutter={30} style={{marginBottom:10}}>
                                 <Col span={8}>
                                     <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">项目名称:</label>
                                     <div className='start_input'>
@@ -348,7 +348,7 @@ export default class TotalApprovalForm extends Component {
                                     </div>   
                                 </Col>
                             </Row>
-                            <Row gutter={15} className='mb10'>
+                            <Row gutter={30} className='mb10'>
                                 <Col span={8}>
                                     <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">施工单位:</label>
                                     <div className='start_input'>
@@ -368,7 +368,7 @@ export default class TotalApprovalForm extends Component {
                                     </div>       
                                 </Col>
                             </Row>
-                            <Row gutter={15} style={{marginTop:10}}>
+                            <Row gutter={30} style={{marginTop:10}}>
                                 <Col span={8}>
                                     <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">监理单位:</label>
                                     <div className='start_input'>
@@ -397,7 +397,7 @@ export default class TotalApprovalForm extends Component {
                                     dataSource={data}></Table>
                                 </Col>
                             </Row>
-                            <Row style={{marginTop:10}}>
+                            <Row style={{marginTop:10}} gutter={30}>
                                 <Col span={8}>
                                     <a style={{textAlign:'center',display: 'block'}} onClick={this.downloadExcel.bind(this)}>下载总进度计划表</a>
                                 </Col>
@@ -418,7 +418,7 @@ export default class TotalApprovalForm extends Component {
                                         <Radio value={'退回'}>退回，并请在</Radio>
                                     </RadioGroup>
                                     <div style={{display: 'inline-block'}}>
-                                        <DatePicker size={'small'} 
+                                        <DatePicker  
                                             onChange={this.reReportTimeChange.bind(this)}
                                             placeholder="请选择重新填报日期" 
                                             style={{textIndent:'0',minWidth: 100,marginLeft:5,marginRight:10}}/>
@@ -467,7 +467,6 @@ export default class TotalApprovalForm extends Component {
                                 </Col>
                             </Row>
                         </Card>
-
                     </div>
                 }
             </div>

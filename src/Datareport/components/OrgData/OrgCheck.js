@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/orgdata';
+import {actions as actions2} from '../../store/quality';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
@@ -17,7 +18,7 @@ const {Option} = Select
 		return { platform}
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
+		actions: bindActionCreators({ ...actions,...platformActions,...actions2}, dispatch)
 	})
 )
 export default class OrgCheck extends Component {
@@ -35,7 +36,6 @@ export default class OrgCheck extends Component {
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
     }
-
     componentWillReceiveProps(props){
         const {wk} = props
         let dataSource = JSON.parse(wk.subject[0].data)
@@ -54,7 +54,9 @@ export default class OrgCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
+        console.log("dataSource",dataSource);
+        console.log("wk",wk);
+        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList,postOrgList,getOrgRoot}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -65,59 +67,38 @@ export default class OrgCheck extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        dataSource.map((o) => {
-            //创建文档对象
-            let doc = o.related_documents.find(x => {
-                return x.rel_type === 'many_jyp_rel'
-            })
-            if(doc){
-                doclist_p.push({
-                    code:doc.code,
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }else{
-                doclist_a.push({
-                    code:`rel_doc_${o.code}`,
-                    name:`rel_doc_${o.pk}`,
-                    obj_type:"C_DOC",
-                    status:"A",
-                    version:"A",
-                    "basic_params": {
-                        // "files": [
-                        //     {
-                        //     "a_file": file.a_file,
-                        //     "name": file.name,
-                        //     "download_url": file.download_url,
-                        //     "misc": file.misc,
-                        //     "mime_type": file.mime_type
-                        //     },
-                        // ]
+        console.log("dataSource",dataSource);
+        let data_list = [];
+        getOrgRoot().then(rst => {
+            console.log("rst:",rst);
+            dataSource.map((o) => {
+                data_list.push({
+                    code:"" + o.code,
+                    name: o.name,
+                    obj_type: "C_ORG",
+                    status: "A",
+                    version: "A",
+                    extra_params: {
+                        type:o.type,
+                        depart:o.depart,
+                        direct:o.direct,
+                        project:o.project,
+                        unit:o.unit,
+                        remarks:o.remarks
                     },
-                    workpackages:[{
-                        code:o.code,
-                        obj_type:o.obj_type,
-                        pk:o.pk,
-                        rel_type:"many_jyp_rel"
-                    }],
-                    extra_params:{
-                        ...o
+                    parent:{
+                        code:"ORG_ROOT",
+                        pk:"403050400306",
+                        obj_type:"C_ORG"
                     }
                 })
-            }
-            //施工包批量
-            wplist.push({
-                code:o.code,
-                extra_params:{
-                    rate:o.rate,
-                    check_status:2
-                }
             })
+            postOrgList({},{data_list:data_list}).then(res => {
+                if (res.result.length) {
+                    message.success("审核成功");
+                }
+            });
         })
-        await addDocList({},{data_list:doclist_a});
-        await putDocList({},{data_list:doclist_p})
-        await updateWpData({},{data_list:wplist});
     }
     //不通过
     async reject(){
@@ -142,9 +123,7 @@ export default class OrgCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        columns = [{
-
-        },
+        const  columns = [
         {
             title: '序号',
             dataIndex: 'index',

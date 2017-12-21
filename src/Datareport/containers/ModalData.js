@@ -6,7 +6,6 @@ import {actions} from '../store/ModalData';
 import {actions as platformActions} from '_platform/store/global';
 import {Table, Addition, Check, Modify, Expurgate} from '../components/ModalData';
 import {Row,Col} from 'antd';
-
 import {getUser} from '_platform/auth'
 import {getNextStates} from '_platform/components/Progress/util';
 import {actions as action2} from '../store/quality';
@@ -61,11 +60,7 @@ export default class ModalData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
 					attachment:null
-				}).then(rst =>{
-					
-					console.log(this.props)
-					changeAdditionField('visible', false);
-				});
+				})
 		});
 	}
 

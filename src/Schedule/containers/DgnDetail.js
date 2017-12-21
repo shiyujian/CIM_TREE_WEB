@@ -14,7 +14,7 @@ import queryString from 'query-string';
 import {STATIC_DOWNLOAD_API,modelDownloadAddress } from '_platform/api';
 import DGN from '_platform/components/panels/DGN';
 import DataService from '../../Down/components/model.js';
-import styles from './index.css'
+import './index.less'
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 

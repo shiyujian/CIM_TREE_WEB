@@ -172,8 +172,8 @@ export default class ToggleModal extends Component{
         title: '负责项目/子项目名称',
         render:(record) => {
             return (
-                <Select style={{width:"90%"}} value = {record.projType || this.state.defaultPro} onSelect={ele => {
-                    record.projType = ele;
+                <Select style={{width:"90%"}} value = {record.project || this.state.defaultPro} onSelect={ele => {
+                    record.project = ele;
                     this.forceUpdate();
                 }}>
                     {this.state.projects}

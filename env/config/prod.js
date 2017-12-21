@@ -34,7 +34,7 @@ module.exports = merge(commonConfig, {
 			names: ['vendor']
 		}),
 		new ExtractTextPlugin({
-			filename: "static/[name].[contenthash].css",
+			filename: "[name].[contenthash].css",
 			disable: false,
 			allChunks: true
 		})
