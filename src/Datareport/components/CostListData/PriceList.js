@@ -72,7 +72,7 @@ class PriceList extends Component {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     //附件上传
-	beforeUploadPicFile  = (index,file) => {
+	beforeUploadPicFile  = async(index,file) => {
         const fileName = file.name;
         let {dataSource} = this.state
         let temp = fileName.split(".")[0]
@@ -84,8 +84,12 @@ class PriceList extends Component {
             return false
         }
 		// 上传到静态服务器
-		const { actions:{uploadStaticFile} } = this.props;
-
+        const { actions:{uploadStaticFile, getWorkPackageDetail} } = this.props;
+        let jyp = await getWorkPackageDetail({code:temp})
+        if(!jyp.name){
+            message.info("编码值错误")
+            return 
+        }
 		const formdata = new FormData();
 		formdata.append('a_file', file);
         formdata.append('name', fileName);
@@ -158,12 +162,14 @@ class PriceList extends Component {
     }
     //根据附件名称 也就是wbs编码获取其他信息
     async getInfo(code){
-        console.log(this.props)
         let res = {};
         const {actions:{getWorkPackageDetail}} = this.props
         let pricelist = await getWorkPackageDetail({code:code})
         res.name = pricelist.name
-        res.code = pricelist.code        
+        res.code = pricelist.code      
+        res.pk = pricelist.pk  
+        res.obj_type = pricelist.obj_type
+        res.related_documents = pricelist.related_documents
         let fenxiang = await getWorkPackageDetail({code:pricelist.parent.code})
         if(fenxiang.parent.obj_type_hum === "子分部工程"){
             let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
@@ -243,11 +249,11 @@ class PriceList extends Component {
 			title:'清单项目编码',
             dataIndex:'projectcoding',
             width:"10%",
-            // render: (text, record, index) => (
-            //     <span>
-            //         {record.projectcoding.name}
-            //     </span>
-            // ),
+            render: (text, record, index) => (
+                <span>
+                    {record.projectcoding.name}
+                </span>
+            ),
 		},{
 			title:'计价单项',
             dataIndex:'valuation',
@@ -302,7 +308,6 @@ class PriceList extends Component {
 		        }
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
-                    console.log(importData);
                     let {dataSource} = jthis.state
                     dataSource = jthis.handleExcelData(importData)
                     jthis.setState({dataSource}) 
@@ -314,7 +319,8 @@ class PriceList extends Component {
 		};
 		return (
 			<Modal
-			title="计价清单信息上传表"
+            title="计价清单信息上传表"
+            key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
@@ -340,7 +346,7 @@ class PriceList extends Component {
                             }
                         </Select>
                     </span> 
-                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
+                    {/* <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button> */}
 				</div>
                 <div style={{marginTop:20}}>
                     注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />

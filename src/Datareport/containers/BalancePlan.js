@@ -98,9 +98,12 @@ export default class BanlancePlan extends Component {
 			title: '序号',
 			dataIndex: 'serialnumber',
 		  },{
-			title: '项目/子项目',
+			title: '项目/子项目名称',
 			dataIndex: 'subproject',
 		  },{
+			title: '单位工程',
+			dataIndex: 'unit',
+			},{
 			title: '工作节点目标',
 			dataIndex: 'nodetarget',
 		  },{

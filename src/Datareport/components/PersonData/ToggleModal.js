@@ -80,11 +80,41 @@ export default class ToggleModal extends Component{
     selectChecker(){
 
     }
+    covertURLRelative = (originUrl) => {
+    	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+    }
+    beforeUploadPic(record,file){
+        const fileName = file.name;
+		// 上传到静态服务器
+		const { actions:{uploadStaticFile} } = this.props;
+		const formdata = new FormData();
+		formdata.append('a_file', file);
+        formdata.append('name', fileName);
+        let myHeaders = new Headers();
+        let myInit = { method: 'POST',
+                       headers: myHeaders,
+                       body: formdata
+                     };
+                     //uploadStaticFile({}, formdata)
+        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
+            let loadedFile = await resp.json();
+            loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
+            loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
+            record.signature = loadedFile;
+            this.forceUpdate();
+        });
+        return false;
+    }
     onok() {
+        console.log("datasource",this.state.dataSource);
         const { actions: { ModalVisible } } = this.props;
         let ok = this.state.dataSource.some(ele => {
-            return !ele.file;
+            return !ele.signature;
         });
+        if(ok){
+            message.error('有附件未上传');
+            return;
+        };
         if (!this.state.passer) {
             message.error('审批人未选择');
             return;
@@ -113,7 +143,6 @@ export default class ToggleModal extends Component{
                 sex: item[6],
                 tel: item[7],
                 email: item[8],
-                signature: item[9]
             }
         })
         return res;
@@ -165,9 +194,15 @@ export default class ToggleModal extends Component{
         dataIndex :'email',
         key:'Email'
       },{
-        title: '二维码',
-        dataIndex :'signature',
-        key:'Signature'
+        title:'二维码',
+        key:'signature',
+        render:(record) => (
+            <Upload
+                beforeUpload={this.beforeUploadPic.bind(this, record)}
+            >
+                <a>{record.signature ? record.signature.name : '点击上传'}</a>
+            </Upload>
+        )
       },{
         title:'编辑',
         dataIndex:'edit',

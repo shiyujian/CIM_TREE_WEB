@@ -12,6 +12,8 @@ export default class Addition extends Component {
 		super(props);
 		this.state = {
 			units:[],
+			projecttrees: [],
+			checkers: [],
 		};
 	}
 	componentDidMount(){
@@ -29,7 +31,7 @@ export default class Addition extends Component {
 
         	let projecttrees = res.children.map((o,index) => {
                 return (
-                    <Option key={index} value={o.pk}>{o.name}</Option>
+                    <Option key={index} value={JSON.stringify({pk:o.pk,name:o.name})}>{o.name}</Option>
                 )
             })
             this.setState({projecttrees})
@@ -37,10 +39,12 @@ export default class Addition extends Component {
     }
 	render() {
 		const { addition = {}, actions: { changeAdditionField } } = this.props;
-		debugger
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
+			render:(text,record,index) => {
+				return index+1
+			}
 		}, {
 			title: '文档编码',
 			dataIndex: 'code'
@@ -51,7 +55,7 @@ export default class Addition extends Component {
 			title: '项目/子项目名称',
 			dataIndex:'project',
 			render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.projectSelect.bind(this,index)} value={addition.dataSource[index]['project']}>
+                <Select style={{width:'120px'}} onSelect={this.projectSelect.bind(this,index)} value={JSON.stringify(addition.dataSource[index]['project'])||''}>
                     {
                     	this.state.projecttrees
                     }
@@ -61,7 +65,7 @@ export default class Addition extends Component {
 			title: '单位工程',
 			dataIndex:'unit',
             render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'unit')} value={addition.dataSource[index]['unit']}>
+                <Select style={{width:'120px'}} onSelect={this.unitSelect.bind(this,index)} value={JSON.stringify(addition.dataSource[index]['unit'])||''}>
                     {
                     	this.state.units[index]
                     }
@@ -82,7 +86,7 @@ export default class Addition extends Component {
 		}, {
 			title: '文档类型',
 			render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'type')} value={addition.dataSource[index]['filetype']}>
+                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'filetype')} value={addition.dataSource[index]['filetype']}>
                     <Option value="图纸">图纸</Option>
                     <Option value="报告">报告</Option>
                 </Select>
@@ -173,13 +177,14 @@ export default class Addition extends Component {
 			 visible={addition.visible}
 			 maskClosable={false}
 			 onCancel={this.cancel.bind(this)}
-			 onOk={this.onok.bind(this)}
+             footer={null}
 			>
 				<div>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 					 bordered 
-					 columns={columns} 
+					 columns={columns}
+					 rowKey='index' 
 					 dataSource={addition.dataSource}
 					/>
 					<Upload {...props}>
@@ -208,22 +213,31 @@ export default class Addition extends Component {
 	}
 	projectSelect(index,value) {
 		console.log(value)
+		let val = JSON.parse(value)
 		const {actions: {getProjectTreeDetail}} = this.props;
 		const {units} = this.state;
 		const { addition,actions:{changeAdditionField} } = this.props;
         let {dataSource} = addition;
-		dataSource[index].project = value;
+		dataSource[index].project = val;
 		changeAdditionField('dataSource',dataSource)
-		getProjectTreeDetail({pk:value},{depth:1})
+		getProjectTreeDetail({pk:val.pk},{depth:1})
 		.then(res => {
 			units[index] = res.children.map((o,index) => {
                 return (
-                    <Option key={index} value={o.pk}>{o.name}</Option>
+                    <Option key={index} value={JSON.stringify({pk:o.pk,name:o.name})}>{o.name}</Option>
                 )
             })
             this.setState({units})
 		})
 
+	}
+	unitSelect(index,value) {
+		console.log(value)
+		let val = JSON.parse(value)
+		const { addition,actions:{changeAdditionField} } = this.props;
+        let {dataSource} = addition;
+        dataSource[index].unit = val;
+        changeAdditionField('dataSource',dataSource)
 	}
 	//table input 输入
     tableDataChange(index, key , e){
@@ -288,6 +302,7 @@ export default class Addition extends Component {
             let jcode = file.name.split('.')[0]
             //let info = await this.getInfo(jcode)
             dataSource[index]['file'] = attachment
+            dataSource[index]['name'] = fileName
             //dataSource[index] = Object.assign(dataSource[index],info)
             changeAdditionField('dataSource',dataSource)
 		});
@@ -296,71 +311,75 @@ export default class Addition extends Component {
      //删除
     delete(index){
         const { addition,actions:{changeAdditionField} } = this.props;
+        let {units,projecttrees} = this.state;
         let {dataSource} = addition;
-        dataSource.splice(index,1)
+        dataSource.splice(index,1);
+        units.splice(index,1);
+        projecttrees.splice(index,1);
         changeAdditionField('dataSource',dataSource)
+        this.setState({units,projecttrees})
     }
     //附件删除
     remove(index){
         const {actions:{deleteStaticFile}} = this.props
         const { addition,actions:{changeAdditionField} } = this.props;
         let {dataSource} = addition;
-        let id = dataSource[index]['file'].id
-        deleteStaticFile({id:id})
+        let id = dataSource[index]['file'].id;
+        deleteStaticFile({id:id});
 
-        dataSource[index].file = ''
+        dataSource[index].file = '';
         changeAdditionField('dataSource',dataSource)
     }
-    //根据附件名称 也就是wbs编码获取其他信息
-    async getInfo(code){
-        console.log(this.props)
-        let res = {};
-        const {actions:{getWorkPackageDetail}} = this.props
-        let jianyanpi = await getWorkPackageDetail({code:code})
-        res.name = jianyanpi.name
-        res.code = jianyanpi.code        
-        let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
-        if(fenxiang.parent.obj_type_hum === "子分部工程"){
-            let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
+    // //根据附件名称 也就是wbs编码获取其他信息
+    // async getInfo(code){
+    //     console.log(this.props)
+    //     let res = {};
+    //     const {actions:{getWorkPackageDetail}} = this.props
+    //     let jianyanpi = await getWorkPackageDetail({code:code})
+    //     res.name = jianyanpi.name
+    //     res.code = jianyanpi.code        
+    //     let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
+    //     if(fenxiang.parent.obj_type_hum === "子分部工程"){
+    //         let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
+    //         let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
+    //         let zidanwei = {},danwei = {};
+    //         if(fenbu.parent.obj_type_hum === "子单位工程"){
+    //             zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
+    //             danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
                 
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
-            let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-            res.construct_unit = construct_unit
-            res.unit = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
-            }
-            res.project = danwei.parent
-        }else{
-            let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
+    //         }else{
+    //             danwei = await getWorkPackageDetail({code:fenbu.parent.code})
+    //         } 
+    //         let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
+    //         res.construct_unit = construct_unit
+    //         res.unit = {
+    //             name:danwei.name,
+    //             code:danwei.code,
+    //             obj_type:danwei.obj_type
+    //         }
+    //         res.project = danwei.parent
+    //     }else{
+    //         let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
+    //         let zidanwei = {},danwei = {};
+    //         if(fenbu.parent.obj_type_hum === "子单位工程"){
+    //             zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
+    //             danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
                 
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
-            let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-            res.construct_unit = construct_unit
-            res.unit = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
-            }
-            res.project = danwei.parent
-        }
-        return res
-    }
-        //下拉框选择人
+    //         }else{
+    //             danwei = await getWorkPackageDetail({code:fenbu.parent.code})
+    //         } 
+    //         let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
+    //         res.construct_unit = construct_unit
+    //         res.unit = {
+    //             name:danwei.name,
+    //             code:danwei.code,
+    //             obj_type:danwei.obj_type
+    //         }
+    //         res.project = danwei.parent
+    //     }
+    //     return res
+    // }
+    //下拉框选择人
     selectChecker(value){
         let check = JSON.parse(value)
         this.setState({check})
@@ -444,6 +463,7 @@ export default class Addition extends Component {
                 }],
                 attachment:null
             }).then(() => {
+                message.success("成功")
 				clearAdditionField();
 			})
 		})
@@ -452,23 +472,22 @@ export default class Addition extends Component {
     //处理上传excel的数据
     handleExcelData(data){
         data.splice(0,1);
-        let res = data.map(item => {
+        let res = data.map((item,index) => {
             return {
                 code:item[0],
-                name:item[1],
-                stage:item[2],
-                upunit:item[3],
-                filetype:item[4],
-                major:item[5],
-                wbsObject:item[6],
-                designObject:item[7],
-                project:'',
-                unit:'',
+                name:'',
+                stage:item[1],
+                upunit:item[2],
+                filetype:item[3],
+                major:item[4],
+                wbsObject:item[5],
+                designObject:item[6],
                 file:''
             }
         })
         return res
     }
+
 	cancel() {
 		const {
 			actions: { clearAdditionField }
