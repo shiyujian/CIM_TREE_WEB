@@ -393,7 +393,6 @@ class JianyanpiModal extends Component {
                             }
                         </Select>
                     </span> 
-                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
                     <Preview />
 				</div>
                 <div style={{marginTop:20}}>

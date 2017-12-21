@@ -193,7 +193,7 @@ export default class JianyanpiCheck extends Component {
             width:"8%",
             render: (text, record, index) => (
                 <span>
-                    {record.unit.name*100 + '%'} 
+                    {(parseFloat(record.rate)*100).toFixed(1) + '%'} 
                 </span>
             ),
 		},{
