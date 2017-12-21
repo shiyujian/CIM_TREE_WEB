@@ -3,7 +3,7 @@ import {Row, Col, Form, Input, Button,Popconfirm} from 'antd';
 import {divIcon} from 'leaflet';
 import {Map, TileLayer, Marker, Polygon} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import {STATIC_DOWNLOAD_API} from '../../../_platform/api';
+import {STATIC_DOWNLOAD_API,DefaultZoomLevel} from '_platform/api';
 import { CollapsePanel } from 'antd/lib/collapse/Collapse';
 
 const FormItem = Form.Item;
@@ -92,7 +92,7 @@ class Info extends Component {
 										</div>
 									</FormItem>
 									<FormItem {...Info.layout} label="单元地块地图">
-										<Map center={leafletCenter} zoom={12} zoomControl={false}
+										<Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
 											 style={{position: 'relative', height: 360, width: '100%'}}>
 											<TileLayer url={URL} subdomains={['7']}/>
 											<Polygon positions={this._getPoints(extra_params.coordinates.length === 0 ? [] : extra_params.coordinates)}/>

@@ -10,7 +10,7 @@ import {getUser} from '_platform/auth';
 import Preview from '../../../_platform/components/layout/Preview';
 import { CODE_PROJECT } from '_platform/api';
 import '../index.less'; 
-
+import moment from 'moment';
 const RadioGroup = Radio.Group;
 const {RangePicker} = DatePicker;
 const {Option} = Select
@@ -42,11 +42,11 @@ export default class Check extends Component {
             getScheduleDir,
             postScheduleDir,
         }} = this.props;
-        let topDir = await getScheduleDir({code:'the_only_main_code_safetydoc'});
+        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
         if(!topDir.obj_type){
             let postData = {
-                name:'安全管理的顶级节点',
-                code:'the_only_main_code_safetydoc',
+                name:'数据报送的顶级节点',
+                code:'the_only_main_code_datareport',
                 "obj_type": "C_DIR",
                 "status": "A",
             }
@@ -67,121 +67,103 @@ export default class Check extends Component {
         }else{
             await this.reject();
         }
-        //this.props.closeModal("design_check_visbile",false)
+        this.props.closeModal("design_check_visbile",false)
         message.info("操作成功")
     }
     //通过
     async passon(){
-        const {dataSource,wk} = this.state
-        console.log(dataSource)
+        const {dataSource,wk,topDir} = this.state;
         const {actions:{
-            getWorkPackageDetailpk,
             logWorkflowEvent,
-            updateWpData,
             addDocList,
-            putDocList,
             getScheduleDir,
             postScheduleDir,
-        }} = this.props
+            getWorkPackageDetailpk
+        }} = this.props;
+        //the unit in the dataSource array is same
+        let unit = dataSource[0].unit;
+        let project = dataSource[0].project;
+        let code = 'datareport_designdata';
+        //get workpackage by unit's code 
+        let workpackage = await getWorkPackageDetailpk({pk:unit.pk});
+        
+        let postDirData = {
+            "name": '设计信息目录树',
+            "code": code,
+            "obj_type": "C_DIR",
+            "status": "A",
+            related_objects: [{
+                pk: workpackage.pk,
+                code: workpackage.code,
+                obj_type: workpackage.obj_type,
+                rel_type: 'designdata_wp_dirctory', // 自定义，要确保唯一性
+            }],
+            "parent":{"pk":topDir.pk,"code":topDir.code,"obj_type":topDir.obj_type}
+        }
+        let dir = await getScheduleDir({code:code});
+        //no such directory
+        if(!dir.obj_type){  
+            dir = await postScheduleDir({},postDirData);
+        }
+
+        // send workflow
         let executor = {};
         let person = getUser();
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        //await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        let doclist_a = [];
-        let doclist_p = [];
-        let wplist = [];
-        dataSource.map( async (o) => {
-        	let workpackage = await getWorkPackageDetailpk({pk:o.unit.pk})
-            console.log(workpackage)
-            let postDirData = {
-                "name": '安全文档目录树',
-                "code": code,
-                "obj_type": "C_DIR",
-                "status": "A",
-                related_objects: [{
-                    pk: workpackage.pk,
-                    code: workpackage.code,
-                    obj_type: workpackage.obj_type,
-                    rel_type: 'safetydoc_wp_dirctory', // 自定义，要确保唯一性
-                }],
-                "parent":{"pk":topDir.pk,"code":topDir.code,"obj_type":topDir.obj_type}
-            }
-            let dir = await getScheduleDir({code:code});
-            //no such directory
-            if(!dir.obj_type){  
-                dir = await postScheduleDir({},postDirData);
-            }
-        })
-
-
-        //     //创建文档对象
-        //     let doc = o.related_documents.find(x => {
-        //         return x.rel_type === 'many_jyp_rel'
-        //     })
-        //     if(doc){
-        //         doclist_p.push({
-        //             code:doc.code,
-        //             extra_params:{
-        //                 ...o
-        //             }
-        //         })
-        //     }else{
-        //         doclist_a.push({
-        //             code:`rel_doc_${o.code}`,
-        //             name:`rel_doc_${o.pk}`,
-        //             obj_type:"C_DOC",
-        //             status:"A",
-        //             version:"A",
-        //             "basic_params": {
-        //                 // "files": [
-        //                 //     {
-        //                 //     "a_file": file.a_file,
-        //                 //     "name": file.name,
-        //                 //     "download_url": file.download_url,
-        //                 //     "misc": file.misc,
-        //                 //     "mime_type": file.mime_type
-        //                 //     },
-        //                 // ]
-        //             },
-        //             workpackages:[{
-        //                 code:o.code,
-        //                 obj_type:o.obj_type,
-        //                 pk:o.pk,
-        //                 rel_type:"many_jyp_rel"
-        //             }],
-        //             extra_params:{
-        //                 ...o
-        //             }
-        //         })
-        //     }
-        //     //施工包批量
-        //     wplist.push({
-        //         code:o.code,
-        //         extra_params:{
-        //             rate:o.rate,
-        //             check_status:2
-        //         }
-        //     })
-        // })
-        // await addDocList({},{data_list:doclist_a});
-        // await putDocList({},{data_list:doclist_p})
-        // await updateWpData({},{data_list:wplist});
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        
+        //prepare the data which will store in database
+        const docData = [];
+        let i=0;   //asure the code of every document only
+        dataSource.map(item=>{
+            i++;
+            docData.push({
+                code:'designdata'+moment().format("YYYYMMDDHHmmss")+i,
+                name:item.file.name,
+                obj_type:"C_DOC",
+                status:'A',
+                profess_folder: {code: dir.code, obj_type: 'C_DIR'},
+                "basic_params": {
+                    "files": [
+                        {
+                          "a_file": item.file.a_file,
+                          "name": item.file.name,
+                          "download_url": item.file.download_url,
+                          "misc": "file",
+                          "mime_type": item.file.mime_type
+                        },
+                    ]
+                  },
+                extra_params:{
+                    code:item.code,
+                    filename:item.file.name,
+                    pubUnit:item.upunit,
+                    filetype:item.filetype,
+                    stage:item.stage,
+                    unit:item.unit.name,
+                    project:item.project.name,
+                    upPeople:item.upPeople,
+                    major:item.major,
+                    wbsObject:item.wbsObject,
+                    designObject:item.designObject
+                }
+            })
+        });
+        let rst = await addDocList({},{data_list:docData});
+        if(rst.result){
+            message.success('创建文档成功！');
+        }else{
+            message.error('创建文档成功！');
+        }
     }
     //不通过
     async reject(){
         const {wk} = this.props
         const {actions:{deleteWorkflow}} = this.props
         await deleteWorkflow({pk:wk.id})
-        // let executor = {};
-        // let person = getUser();
-        // executor.id = person.id;
-        // executor.username = person.username;
-        // executor.person_name = person.name;
-        // executor.person_code = person.code;
-        // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'退回',note:'滚',executor:executor,attachment:null});
     }
     //预览
     handlePreview(index){
@@ -250,6 +232,9 @@ export default class Check extends Component {
 			title: '描述的设计对象',
 			dataIndex: 'designObject'
 		}, {
+            title: '上传人',
+            dataIndex: 'upPeople'
+        }, {
             title:'附件',
 			render:(text,record,index) => {
                 return (<span>
