@@ -142,7 +142,7 @@ export default class PersonCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        columns = [{
+        const columns = [{
             title: '人员编码',
             dataIndex: 'code',
             key: 'Code',

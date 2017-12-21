@@ -21,7 +21,7 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class Check extends Component {
+export default class SumSpeedExamine extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -147,7 +147,8 @@ export default class Check extends Component {
 			<Modal
 				width = {1280}
 				visible = {true}
-				onCancel = {this.cancel.bind(this)}
+                onCancel = {this.cancel.bind(this)}
+                footer ={null}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>结果审核</h2>
@@ -191,16 +192,16 @@ export default class Check extends Component {
 			    <Row>
 			    	<Col span={10}>
 			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：数据上传者</div>
-			    			<div>执行时间：2017-11-22</div>
-			    			<div>执行意见：XXXXXXXXXXXXX</div>
+			    			<div>执行人：</div>
+			    			<div>执行时间：</div>
+			    			<div>执行意见：</div>
 			    			<div style={{marginTop: '40px'}}>电子签章：</div>
 			    		</div>
 			    		<div style={{width: '300px', textAlign: 'center', fontSize: '16px'}}>数据上传</div>
 			    	</Col>
 			    	<Col span={10}>
 			    		<div style={{padding: '20px 0 0 10px', width: '300px', height: '200px', border: '1px solid #000'}}>
-			    			<div>执行人：数据审批</div>
+			    			<div>执行人：</div>
 			    			<div>执行时间：</div>
 			    			<div>执行意见：</div>
 			    			<div style={{marginTop: '40px'}}>电子签章：</div>
