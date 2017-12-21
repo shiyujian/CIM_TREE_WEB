@@ -144,13 +144,14 @@ export default class Check extends Component {
     }
 
 	render() {
+		console.log('sdfdfd', this.state.dataSource)
 		return(
 			<Modal
 				title="模型信息审批表"
 				width = {1280}
 				visible = {true}
 				footer={null}
-				maskClosable={false}>
+				maskClosable={false}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>结果审核</h2>
@@ -160,6 +161,7 @@ export default class Check extends Component {
 						bordered
 						className = 'foresttable'
 						columns={this.columns}
+						dataSource={this.state.dataSource}
 					/>
 				</Row>
 				<Row style={{margin: '20px 0'}}>
@@ -201,7 +203,7 @@ export default class Check extends Component {
 				return index+1
 			}
 		}, {
-			title: '编码',
+			title: '模型编码',
 			dataIndex: 'value'
 		}, {
 			title: '项目/子项目名称',
