@@ -5,7 +5,7 @@ import 'dhtmlx-gantt/codebase/ext/dhtmlxgantt_marker.js';
 import 'dhtmlx-gantt/codebase/ext/dhtmlxgantt_smart_rendering.js';
 import 'dhtmlx-gantt/codebase/skins/dhtmlxgantt_broadway.css';
 import {Select,Table,Spin} from 'antd';
-import style from './index.css';
+import './index.less';
 import {Link} from 'react-router-dom';
 import moment from 'moment';
 
