@@ -1,23 +1,23 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {actions as platformActions} from '_platform/store/global';
-import {actions} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { actions as platformActions } from '_platform/store/global';
+import { actions } from '../../store/workdata';
+import { Input, Col, Card, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message } from 'antd';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
-import {getUser} from '_platform/auth';
-const {RangePicker} = DatePicker;
+import { getUser } from '_platform/auth';
+const { RangePicker } = DatePicker;
 const RadioGroup = Radio.Group;
-const {Option} = Select
+const { Option } = Select
 @connect(
     state => {
-        const { platform } = state;
-        return { platform }
-    },
+		const { datareport: { workdata = {} } = {}, platform } = state;
+		return { ...workdata, platform }
+	},
     dispatch => ({
-        actions: bindActionCreators({ ...platformActions }, dispatch)
+        actions: bindActionCreators({ ...actions,...platformActions }, dispatch)
     })
 )
 export default class WorkCheckModal extends Component {
@@ -47,9 +47,18 @@ export default class WorkCheckModal extends Component {
         this.setState({ dataSource, wk })
     }
     //提交
-    submit() {
+    async submit() {
+        if(this.state.opinion === 1){
+            await this.passon();
+        }else{
+            await this.reject();
+        }
         this.props.closeModal("dr_wor_sg_visible", false)
         message.info("操作成功")
+    }
+    // 点x消失
+    oncancel() {
+        this.props.closeModal("dr_wor_sg_visible", false)
     }
     //通过
     async passon() {
@@ -67,6 +76,7 @@ export default class WorkCheckModal extends Component {
         let wplist = [];
         dataSource.map((o) => {
             //创建文档对象
+            console.log("123",o)
             let doc = o.related_documents.find(x => {
                 return x.rel_type === 'sg_rel'
             })
@@ -84,17 +94,6 @@ export default class WorkCheckModal extends Component {
                     obj_type: "C_DOC",
                     status: "A",
                     version: "A",
-                    "basic_params": {
-                        // "files": [
-                        //     {
-                        //     "a_file": file.a_file,
-                        //     "name": file.name,
-                        //     "download_url": file.download_url,
-                        //     "misc": file.misc,
-                        //     "mime_type": file.mime_type
-                        //     },
-                        // ]
-                    },
                     workpackages: [{
                         code: o.code,
                         obj_type: o.obj_type,
@@ -110,7 +109,10 @@ export default class WorkCheckModal extends Component {
             wplist.push({
                 code: o.code,
                 extra_params: {
-                    rate: o.rate,
+                    planstarttime:o.planstarttime,
+                    planovertime:o.planovertime,
+                    factstarttime:o.factstarttime,
+                    factovertime:o.factovertime,
                     check_status: 2
                 }
             })
@@ -168,11 +170,6 @@ export default class WorkCheckModal extends Component {
             }, {
                 title: '施工单位',
                 dataIndex: 'construct_unit',
-                render: (text, record, index) => (
-                    <span>
-                        {record.construct_unit.name}
-                    </span>
-                ),
             }, {
                 title: '施工图工程量',
                 dataIndex: 'quantity',
@@ -198,11 +195,12 @@ export default class WorkCheckModal extends Component {
         return (
             <Modal
                 title="施工进度审批表"
-                key={Math.random()}
                 visible={true}
                 width={1280}
                 footer={null}
-                maskClosable={false}>
+                maskClosable={true}
+                onCancel={this.oncancel.bind(this)}>
+                >
                 <div>
                     <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
@@ -214,7 +212,7 @@ export default class WorkCheckModal extends Component {
                             <span>审查意见：</span>
                         </Col>
                         <Col span={4}>
-                            <RadioGroup onChange={this.onChange} value={this.state.opinion}>
+                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>

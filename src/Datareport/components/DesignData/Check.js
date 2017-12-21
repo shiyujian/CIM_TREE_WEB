@@ -37,7 +37,22 @@ export default class Check extends Component {
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk})
+        this.setState({dataSource,wk});
+        const {actions:{
+            getScheduleDir,
+            postScheduleDir,
+        }} = this.props;
+        let topDir = await getScheduleDir({code:'the_only_main_code_safetydoc'});
+        if(!topDir.obj_type){
+            let postData = {
+                name:'安全管理的顶级节点',
+                code:'the_only_main_code_safetydoc',
+                "obj_type": "C_DIR",
+                "status": "A",
+            }
+            topDir = await postScheduleDir({},postData);
+        }
+        this.setState({topDir});
     }
 
     componentWillReceiveProps(props){
@@ -59,7 +74,15 @@ export default class Check extends Component {
     async passon(){
         const {dataSource,wk} = this.state
         console.log(dataSource)
-        const {actions:{getWorkPackageDetailpk,logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
+        const {actions:{
+            getWorkPackageDetailpk,
+            logWorkflowEvent,
+            updateWpData,
+            addDocList,
+            putDocList,
+            getScheduleDir,
+            postScheduleDir,
+        }} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -70,11 +93,27 @@ export default class Check extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        dataSource.map((o) => {
-        	getWorkPackageDetailpk({pk:o.unit.pk})
-        	.then(wp => {
-        		console.log(wp)
-        	})
+        dataSource.map( async (o) => {
+        	let workpackage = await getWorkPackageDetailpk({pk:o.unit.pk})
+            console.log(workpackage)
+            let postDirData = {
+                "name": '安全文档目录树',
+                "code": code,
+                "obj_type": "C_DIR",
+                "status": "A",
+                related_objects: [{
+                    pk: workpackage.pk,
+                    code: workpackage.code,
+                    obj_type: workpackage.obj_type,
+                    rel_type: 'safetydoc_wp_dirctory', // 自定义，要确保唯一性
+                }],
+                "parent":{"pk":topDir.pk,"code":topDir.code,"obj_type":topDir.obj_type}
+            }
+            let dir = await getScheduleDir({code:code});
+            //no such directory
+            if(!dir.obj_type){  
+                dir = await postScheduleDir({},postDirData);
+            }
         })
 
 
