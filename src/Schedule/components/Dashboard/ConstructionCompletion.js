@@ -100,7 +100,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <label style={{textAlign:'left',display:'block',fontSize:18}}>建设计划完成统计</label>
+                    <h2 style={{textAlign:'left',color:  '#74859f'}}>建设计划完成统计</h2>
                     <div id='ConstructionCompletion' style={{ width: '100%', height: '340px' }}></div>
                     <label style={{display:'block',textAlign:'center',fontSize:14}}>2017</label>
                 </Card>

@@ -83,7 +83,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <label style={{textAlign:'left',display:'block',fontSize:18}}>累计完成工程量</label>
+                    <h2 style={{textAlign:'left',color:  '#74859f'}}>累计完成工程量</h2>
                     <div id='AccumulativeCompletion' style={{ width: '100%', height: '340px' }}></div>
                     <label style={{display:'block',textAlign:'center',fontSize:14}}>2017</label>
                 </Card>
