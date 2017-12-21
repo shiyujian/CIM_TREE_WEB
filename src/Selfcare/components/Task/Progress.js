@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
+import PriceListExamine from '../../../Datareport/components/CostListData/PriceListExamine';
 import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
 import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
 import HiddenDangerCheck from '../../../Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
@@ -46,7 +47,8 @@ export default class Progress extends Component {
 			safety_hidden_check_visible,
 			modal_check_visbile,
 			dr_base_org_visible,
-			dr_xm_xx_visible
+			dr_xm_xx_visible,
+			cost_pri_ck_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -168,6 +170,10 @@ export default class Progress extends Component {
 					dr_xm_xx_visible && 
 					<HPModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					cost_pri_ck_visible && 
+					<PriceListExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -203,6 +209,9 @@ export default class Progress extends Component {
 				break;
 			case "项目信息批量录入":
 				changeDatareportVisible({key:'dr_xm_xx_visible',value:true})
+				break;
+			case "计价清单信息填报":
+				changeDatareportVisible({key:'cost_pri_ck_visible',value:true})
 				break;
 			default:break;
 		}
