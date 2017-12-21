@@ -31,12 +31,13 @@ export default class BalanceSchedule extends Component {
 		};
 		this.columns = [{
 			title:'序号',
-			render:(text,record,index) => {
+			 dataIndex:'code',
+			 render:(text,record,index) => {
 				return index+1
 			}
 		},{
 			title: '项目/子项目',
-			dataIndex: 'sunproject',
+			dataIndex: 'project',
 		  },{
 			title: '单位工程',
 			dataIndex: 'unitproject',
