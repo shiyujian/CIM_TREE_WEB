@@ -56,6 +56,10 @@ export default class SumPlanCheck extends Component {
         this.props.closeModal("dr_qua_jsjh_visible",false)
         message.info("操作成功")
     }
+    // 点击X关闭;
+    closeModel(){
+        this.props.closeModal("dr_qua_jsjh_visible",false)
+    }
     //通过
     async passon(){
         const {dataSource,wk} = this.state
@@ -70,6 +74,7 @@ export default class SumPlanCheck extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
+        console.log('dataSource',dataSource);
         // dataSource.map((o) => {
         //     //创建文档对象
         //     let doc = o.related_documents.find(x => {
@@ -142,6 +147,7 @@ export default class SumPlanCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
+        console.log('this.state',this.state.dataSource)
         const columns = 
         [{
             title:'序号',
@@ -152,7 +158,6 @@ export default class SumPlanCheck extends Component {
 		},{
 			title:'项目/子项目名称',
             dataIndex:'subproject',
-            width:"13%",
             render: (text, record, index) => (
                 <span>
                     {record.subproject.name}
@@ -160,7 +165,12 @@ export default class SumPlanCheck extends Component {
             ),
 		},{
 			title: '单位工程',
-			dataIndex: 'unit',
+            dataIndex: 'unit',
+            render: (text, record, index) => (
+                <span>
+                    {record.unit.name}
+                </span>
+            ),
 		  },{
 			title: '工作节点目标',
 			dataIndex: 'nodetarget',
@@ -180,9 +190,9 @@ export default class SumPlanCheck extends Component {
 		return (
             <Modal
 			title="结算计划审批表"
-			key={Math.random()}
             visible={true}
             width= {1280}
+            onCancel={this.closeModel.bind(this)}
 			footer={null}
 			maskClosable={false}>
                 <div>

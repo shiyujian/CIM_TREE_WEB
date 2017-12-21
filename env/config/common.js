@@ -66,7 +66,7 @@ module.exports = {
 							}
 						}
 					],
-					publicPath: 'static/css/'
+					publicPath: 'css/'
 				})
 			}, {
 				test: /\.less$/,
@@ -118,7 +118,7 @@ module.exports = {
 						loader: 'url-loader',
 						options: {
 							limit: 8192,
-							name: 'static/images/[name].[hash].[ext]'
+							name: 'images/[name].[hash].[ext]'
 						}
 					}
 				],
@@ -130,7 +130,7 @@ module.exports = {
 						loader: 'url-loader',
 						options: {
 							limit: 8192,
-							name: 'static/images/[name].[hash].[ext]'
+							name: 'images/[name].[hash].[ext]'
 						}
 					}
 				],
@@ -142,7 +142,7 @@ module.exports = {
 						loader: 'file-loader',
 						options: {
 							limit: 8192,
-							name: 'static/fonts/[hash].[ext]'
+							name: 'fonts/[hash].[ext]'
 						}
 					}
 				],
@@ -174,9 +174,9 @@ module.exports = {
 			{from: '../static/supervisord.conf'},
 			
 			{from: '../static/1108', to: '1108/'},
-			{from: '../static/fonts', to: 'static/fonts/'},
+			{from: '../static/fonts', to: 'fonts/'},
 			{from: '../static/gooflow', to: 'gooflow/'},
-			/*{from: '../static/oajs', to: 'oajs/'},*/
+			{from: '../static/oajs', to: 'oajs/'},
 			{from: '../static/pdfjs', to: 'pdfjs/'},
 			{from: '../static/jquery.min.js'},
 			{from: '../static/jquery.jqprint-0.3.js'},
@@ -185,7 +185,7 @@ module.exports = {
 
 			{from: `../src/APP/${process.env.proj}/config_${process.env.branch}.js`, to:'config.js'}
 		]),
-		new ExtractTextPlugin('static/css/[name].[contenthash].css')
+		new ExtractTextPlugin('css/[name].[contenthash].css')
 	],
 	resolve: {
 		modules: ['src', 'node_modules'],

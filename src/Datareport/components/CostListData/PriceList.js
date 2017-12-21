@@ -253,7 +253,7 @@ class PriceList extends Component {
                     <Select style={{width:"90%"}} onSelect={(ele) => {
                         let dataSource = this.state.dataSource;
                         dataSource[index]['unitengineering'] = JSON.parse(ele).name;
-                        this.setState({ dataSource })
+                        this.setState({ dataSource, pro: ele })
                     }} >
                         {this.state.projects}
                     </Select>

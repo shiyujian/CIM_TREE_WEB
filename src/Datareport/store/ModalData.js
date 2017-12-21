@@ -2,7 +2,7 @@ import {handleActions, combineActions, createAction} from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API} from '_platform/api';
+import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base} from '_platform/api';
 
 export const ID = 'DATA_MODALDATA';
 
@@ -19,18 +19,24 @@ const getFieldsOK = createAction(`${ID}_GET_FIELD_OK`);
 
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
 const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [], 'DELETE');
-export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
-export const getProjects = createFetchAction(`${SERVICE_API}/project-tree/?depth=1`);
-
 export const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
+//获取项目树
 export const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
-export const getProjectTreeDetail = createFetchAction(`${SERVICE_API}/project-tree/{{pk}}/`, []);
-
+export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const createWorkflow = createFetchAction(`${WORKFLOW_API}/instance/`, [], 'POST')
 export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [])
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 //批量修改施工包
 const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
+//得到质量缺陷
+export const fetchDefectDetail = createFetchAction(`${base}/main/api/quality-defect/{{id}}/`,[])
+//删除流程
+const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE')
+//批量创建文档
+export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
+export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
+//创建文档目录
+export const addDefectDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 
 
 export const actions = {
@@ -39,18 +45,20 @@ export const actions = {
 	...modifyReducer,
 	...expurgateReducer,
 
-	getAllUsers,
-	getProjects,
-	deleteStaticFile,
-	uploadStaticFile,
 	getProjectTree,
-	getProjectTreeDetail,
-   
+    uploadStaticFile,
+    deleteStaticFile,
 	getWorkPackageDetail,
-	
+	getAllUsers,
 	createWorkflow,
 	getWorkflow,
-	logWorkflowEvent
+	logWorkflowEvent,
+	fetchDefectDetail,
+	putDocList,
+	addDocList,
+	deleteWorkflow,
+	updateWpData,
+	addDefectDir
 };
 
 export default handleActions({

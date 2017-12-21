@@ -31,7 +31,7 @@ export default class DesignTable extends Component {
 			dataIndex: 'project'
 		}, {
 			title: '单位工程',
-			dataIndex: 'unitEngineering'
+			dataIndex: 'unit'
 		}, {
 			title: '模型名称',
 			dataIndex: 'modelName'
