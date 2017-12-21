@@ -32,32 +32,32 @@ export default class System extends Component {
 	}
 
 	static menus = [
-		{
-			key: 'code',
-			name: '编码设置',
-			icon: <Icon name="won"/>,
-			children: [{
-				key: 'Dict',
-				id: 'SYSTEM.FIELD',
-				name: '编码字段',
-				path: '/system',
-				exact: true,
-				icon: <Icon name="retweet"/>,
-			}, {
-				key: 'Code',
-				id: 'SYSTEM.CODETYPE',
-				name: '编码类型',
-				exact: true,
-				path: '/system/code',
-				icon: <Icon name="code"/>
-			}, {
-				key: 'Convention',
-				id: 'SYSTEM.CONVENTION',
-				name: '编码配置',
-				path: '/system/convention',
-				icon: <Icon name="money"/>
-			}]
-		}, 
+		// {
+		// 	key: 'code',
+		// 	name: '编码设置',
+		// 	icon: <Icon name="won"/>,
+		// 	children: [{
+		// 		key: 'Dict',
+		// 		id: 'SYSTEM.FIELD',
+		// 		name: '编码字段',
+		// 		path: '/system',
+		// 		exact: true,
+		// 		icon: <Icon name="retweet"/>,
+		// 	}, {
+		// 		key: 'Code',
+		// 		id: 'SYSTEM.CODETYPE',
+		// 		name: '编码类型',
+		// 		exact: true,
+		// 		path: '/system/code',
+		// 		icon: <Icon name="code"/>
+		// 	}, {
+		// 		key: 'Convention',
+		// 		id: 'SYSTEM.CONVENTION',
+		// 		name: '编码配置',
+		// 		path: '/system/convention',
+		// 		icon: <Icon name="money"/>
+		// 	}]
+		// }, 
 		{
 			key: 'Role',
 			id: 'SYSTEM.ROLE',
