@@ -111,7 +111,7 @@ export default class BalanceSchedule extends Component {
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
-						placeholder="input search text"
+						placeholder="输入搜索条件"
 						onSearch={value => console.log(value)}
 						/>
 				</Row>
@@ -124,10 +124,6 @@ export default class BalanceSchedule extends Component {
 					this.state.addvisible &&
 					<SumSpeed {...this.props} oncancel={() => {this.setState({addvisible:false})}} onok={this.setData.bind(this)}/>
 				}
-				{/* <Content>
-					结算进度
-					<SumSpeed {...this.props}/>
-				</Content> */}
 			</div>)
 	}
 };

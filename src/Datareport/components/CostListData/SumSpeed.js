@@ -205,10 +205,6 @@ class PriceList extends Component {
         dataSource.splice(index,1)
         this.setState({dataSource})
     }
-    //添加
-    addto(index){
-       
-    }
 	render() {
         const columns = 
         [{
@@ -242,11 +238,9 @@ class PriceList extends Component {
                     <Popconfirm
                         placement="leftTop"
                         title="确定删除吗？"
-                        onConfirm={this.addto.bind(this, index)}
                         onConfirm={this.delete.bind(this, index)}
                         okText="确认"
                         cancelText="取消">
-                        <a>添加</a>
                         <a>删除</a>
                     </Popconfirm>
                 )
@@ -338,8 +332,8 @@ class PriceList extends Component {
             nodetarget:item[2],
             completiontime:item[3],
             summoney:item[4],
-            ratio:[5],
-            remarks:[6],
+            ratio:item[5],
+            remarks:item[6],
             edit:item[7],
                 file:{
 

@@ -41,10 +41,10 @@ export default class WorkunitCost extends Component {
 				return index+1
 			}
 		},{
-			title: '项目/子项目',
+			title: '负责项目/子项目',
 			dataIndex: 'subproject',
 		  },{
-			title: '项目编码',
+			title: '项目编号',
 			dataIndex: 'projectcoding',
 		  },{
 			title: '项目名称',
@@ -56,7 +56,7 @@ export default class WorkunitCost extends Component {
 			title: '数量',
 			dataIndex: 'number',
 		  },{
-			title: '结合单价（元）',
+			title: '单价（元）',
 			dataIndex: 'total',
 		  },{
 			title: '备注',
@@ -108,11 +108,7 @@ export default class WorkunitCost extends Component {
 					})
 		})
 	}
-	// setAddVisible(){
-	// 	this.setState({addvisible:true})
-	// }
-
-
+	
 	render() {
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>

@@ -115,7 +115,7 @@ export default class CostListData extends Component {
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
-						placeholder="input search text"
+						placeholder="输入搜索条件"
 						onSearch={value => console.log(value)}
 						/>
 				</Row>

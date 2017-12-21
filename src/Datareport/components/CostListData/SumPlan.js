@@ -170,7 +170,7 @@ export default class SumPlan extends Component {
                
                 <Modal
                     visible={this.state.visible}
-                    onOk={()=>{this.props.onok()}}
+                    onOk={this.onok.bind(this)}
                     onCancel={()=>{this.props.oncancel()}}
                     width ={1280}
                     >

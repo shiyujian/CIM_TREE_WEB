@@ -61,6 +61,10 @@ export default class ModalData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
 					attachment:null
+				}).then(rst =>{
+					
+					console.log(this.props)
+					changeAdditionField('visible', false);
 				});
 		});
 	}
@@ -75,7 +79,6 @@ export default class ModalData extends Component {
 					</Col>
 				</Row>
 				<Addition {...this.props} setData = {this.setData.bind(this)}/>
-				<Check {...this.props}/>
 				<Modify {...this.props}/>
 				<Expurgate {...this.props}/>
 			</div>

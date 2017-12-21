@@ -5,8 +5,10 @@ import { SERVICE_API, USER_API, WORKFLOW_API } from '_platform/api';
 
 const ID = 'SAFETYSPECIAL';
 export const ModalVisible = createAction(`${USER_API}组织Modal模态框显示隐藏`);
+
 export const getAllUsers = createFetchAction(`${USER_API}/users/`, []);
 export const getProjects = createFetchAction(`${USER_API}/project-tree/?depth=1`);
+
 export const ShowTable = createAction(`${ID}_获取导入数据`);
 export const ChangeRow = createAction(`${ID}_申请变更数据`);
 export const DeleteRow = createAction(`${ID}_申请删除数据`);

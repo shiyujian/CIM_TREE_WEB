@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload } from 'antd';
-
 import { UPLOAD_API, SERVICE_API, FILE_API } from '_platform/api';
-
 const Option = Select.Option;
 
 
@@ -12,7 +10,8 @@ export default class Addition extends Component {
 		this.state = {
 			dataSource: [],
 			users: [],
-			projects: []
+			projects: [],
+			checkers:[]
 		};
 	}
 	render() {
@@ -28,7 +27,17 @@ export default class Addition extends Component {
 			dataIndex: 'coding'
 		}, {
 			title: '项目/子项目',
-			dataIndex: 'project'
+			dataIndex: 'project',
+			render:(record) => {
+				return (
+					<Select style={{ width: '120px' }}  onSelect={ele => {
+						this.setState({ pro: ele })
+					}}>
+						{this.state.projects}
+					</Select>
+				)
+			}
+
 		}, {
 			title: '单位工程',
 			dataIndex: 'unitEngineering'
@@ -143,7 +152,6 @@ export default class Addition extends Component {
 			},
 		};
 		return (
-
 			<Modal
 				key={addition.key}
 				title="模型信息上传表"
@@ -151,9 +159,7 @@ export default class Addition extends Component {
 				visible={addition.visible}
 				maskClosable={false}
 				onCancel={this.cancel.bind(this)}
-				onOk={this.save.bind(this)}>
-
-
+				onOk={this.onok.bind(this)}>
 				<Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
 				<Row style={{ marginBottom: "10px",marginTop:'10px' }}>
 					<Table
@@ -188,11 +194,7 @@ export default class Addition extends Component {
 					<p style={{ paddingLeft: "25px" }}>3、日期必须带年月日，如2017年1月1日</p>
 					<p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.</p>
 				</Row>
-
-
-
 			</Modal>
-
 		);
 	}
 
@@ -221,6 +223,7 @@ export default class Addition extends Component {
 			console.log('woshi', item)
 			return {
 				coding: item[1],
+				
 				modelName: item[4],
 				modelDescription: item[6],
 				modeType: item[7],
@@ -228,7 +231,6 @@ export default class Addition extends Component {
 			}
 		})
 		return res
-
 	}
 	//下拉框选择
 	handleSelect(index, key, value) {
@@ -241,7 +243,9 @@ export default class Addition extends Component {
 
 
 	onok() {
-
+		const { actions: { changeAdditionField } } = this.props;
+		console.log(this.props)
+		changeAdditionField('visible', false);
 		let ok = this.state.dataSource.some(ele => {
 			return !ele.file;
 		});
@@ -249,12 +253,20 @@ export default class Addition extends Component {
 		//     message.error('有附件未上传');
 		//     return;
 		// };
+		if(this.state.dataSource.length === 0){
+            message.info("请上传excel")
+            return
+        }
 		if (!this.state.passer) {
 			message.error('审批人未选择');
 			return;
 		}
+		// if (!this.state.projects) {
+		// 	message.error('项目/子项目未选择');
+		// 	return;
+		// }
 		this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
-
+		// message.info('发起流程成功')
 	}
 
 
@@ -271,17 +283,17 @@ export default class Addition extends Component {
 				this.setState({ checkers })
 			}
 		});
-		// getProjects().then(rst => {
-		//     console.log("rst:",rst);
-		//     if (rst.children.length) {
-		//         let projects = rst.children.map(item => {
-		//             return (
-		//                 <Option value={JSON.stringify(item)}>{item.name}</Option>
-		//             )
-		//         })
-		//         this.setState({projects})
-		//     }
-		// })
+		getProjects().then(rst => {
+            if (rst.children.length) {
+                let projects = rst.children.map(item => {
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({projects})
+            }
+        })
+		
 	}
 
 
