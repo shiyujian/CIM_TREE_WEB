@@ -128,19 +128,39 @@ export default class ModalCheck extends Component {
                 obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},
-               
+                "basic_params": {
+                    "files": [
+                        {
+                          "a_file": item.fdbfile.a_file,
+                          "name": item.fdbfile.name,
+                          "download_url": item.fdbfile.download_url,
+                          "misc": "file",
+                          "mime_type": item.fdbfile.mime_type
+                        },
+                        {
+                          "a_file": item.tdbxfile.a_file,
+                          "name": item.tdbxfile.name,
+                          "download_url": item.tdbxfile.download_url,
+                          "misc": "file",
+                          "mime_type": item.tdbxfile.mime_type
+                        },
+                        {
+                          "a_file": item.attributefile.a_file,
+                          "name": item.attributefile.name,
+                          "download_url": item.attributefile.download_url,
+                          "misc": "file",
+                          "mime_type": item.attributefile.mime_type
+                        }
+                    ]
+                },
                 extra_params:{
                     coding:item.coding,
-                    filename:item.file.name,
-                    modelName:item.modelName,
+                    filename:item.modelName,
                     submittingUnit:item.submittingUnit,
                     modelDescription:item.modelDescription,
                     modeType:item.modeType,
-                    fdbMode:item.fdbMode,
                     unit:item.unit.name,
                     project:item.project.name,
-                    tdbxMode:item.tdbxMode.name,
-                    attributeTable:item.attributeTable.name,
                     reportingTime:item.reportingTime.name,
                     reportingName:item.reportingName.name,
                 }
@@ -214,7 +234,7 @@ export default class ModalCheck extends Component {
 	                return (<span>
 	                        <a onClick={this.handlePreview.bind(this,index,'fdbfile')}>预览</a>
 	                        <span className="ant-divider" />
-	                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+	                        <a href={`${STATIC_DOWNLOAD_API}${record.fdbfile.a_file}`}>下载</a>
 	                    </span>)
 				}
             }, {
@@ -224,7 +244,7 @@ export default class ModalCheck extends Component {
 	                return (<span>
 	                        <a onClick={this.handlePreview.bind(this,index,'tdbxfile')}>预览</a>
 	                        <span className="ant-divider" />
-	                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+	                        <a href={`${STATIC_DOWNLOAD_API}${record.tdbxfile.a_file}`}>下载</a>
 	                    </span>)
 				}
 			}, {
@@ -234,7 +254,7 @@ export default class ModalCheck extends Component {
 	                return (<span>
 	                        <a onClick={this.handlePreview.bind(this,index,'attributefile')}>预览</a>
 	                        <span className="ant-divider" />
-	                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+	                        <a href={`${STATIC_DOWNLOAD_API}${record.attributefile.a_file}`}>下载</a>
 	                    </span>)
 				}
 			}, {
