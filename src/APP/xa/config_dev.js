@@ -110,5 +110,9 @@ window.config = {
 	'ZHLoginServletCMD':'http://130.130.0.206:8080/eccms/servlet/LoginServlet.cmd',
 
 	//综合展示360全景部署
-	'dashboardVideo360API':'http://720yun.com/t/59e24jfOcya'
+	'dashboardVideo360API':'http://720yun.com/t/59e24jfOcya',
+
+	//跳转到大屏
+	'nextMaxScreen':'https://www.baidu.com/'
+
 };
