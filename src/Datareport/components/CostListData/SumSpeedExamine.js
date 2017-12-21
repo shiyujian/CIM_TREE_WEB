@@ -107,7 +107,6 @@ export default class SumSpeedExamine extends Component {
                 }
             })
         })
-        debugger
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -145,7 +144,7 @@ export default class SumSpeedExamine extends Component {
 	render() {
 		return(
 			<Modal
-				width = {1280}
+				width = {1280}  
 				visible = {true}
                 onCancel = {this.cancel.bind(this)}
                 footer ={null}
@@ -154,11 +153,10 @@ export default class SumSpeedExamine extends Component {
 					<h2>结果审核</h2>
 				</Row>
 				<Row>
-					<Table
-						bordered
-						className = 'foresttable'
-						columns={this.columns}
-					/>
+                <Table style={{ marginTop: '10px', marginBottom:'10px' }}
+						columns={columns}
+						dataSource={this.state.dataSource}
+						bordered />
 				</Row>
 				<Row style={{margin: '20px 0'}}>
 					<Col span={2}>
