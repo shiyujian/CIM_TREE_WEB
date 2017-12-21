@@ -68,16 +68,23 @@ export default class Warning extends Component {
             ],
             series : [
                 {
-                    // name:'计划完成',
-                    type:'bar',
-                    data:[80, 70, 60, 84, 70, 95],
-                    barWidth: 20
+                    type: 'bar',
+                    itemStyle: {
+                        normal: {
+                            color: '#546D83'
+                        }
+                    },
+                    silent: true,
+                    barWidth: 40,
+                    barGap: '-100%', // Make series be overlap
+                    data: [100, 100, 100, 100, 100, 100]
                 },
-                // {
-                //     // name:'实际完成',
-                //     type:'bar',
-                //     data:[12082, 8680, 4015, 5813, 7556, 5493, 12082, 8680]
-                // }
+                {
+                    type: 'bar',
+                    barWidth: 40,
+                    z: 10,
+                    data:[80, 70, 60, 84, 70, 95],
+                }
             ]
         };
         
@@ -93,7 +100,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <label style={{textAlign:'left',display:'block',fontSize:14}}>建设计划完成统计</label>
+                    <label style={{textAlign:'left',display:'block',fontSize:18}}>建设计划完成统计</label>
                     <div id='ConstructionCompletion' style={{ width: '100%', height: '340px' }}></div>
                     <label style={{display:'block',textAlign:'center',fontSize:14}}>2017</label>
                 </Card>

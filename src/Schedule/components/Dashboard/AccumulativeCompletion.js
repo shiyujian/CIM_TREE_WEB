@@ -56,7 +56,20 @@ export default class Warning extends Component {
                     // name:'Step Start',
                     type:'line',
                     // step: 'start',
-                    data:[6100, 7800, 7000, 7900, 7000, 8200, 7800, 8200, 7500, 8200, 7600, 7800]
+                    data:[6100, 7800, 7000, 7900, 7000, 8200, 7800, 8200, 7500, 8200, 7600, 7800],
+                    areaStyle: {normal:{}},
+                    itemStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(
+                                0, 0, 0, 1,
+                                [
+                                    {offset: 0, color: 'rgb(160,229,254)'},
+                                    {offset: 0.5, color: 'rgb(230,241,254)'},
+                                    {offset: 1, color: 'rgb(246,250,254)'}
+                                ]
+                            )
+                        }
+                    }
                 }
             ]
         };
@@ -70,7 +83,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <label style={{textAlign:'left',display:'block',fontSize:14}}>累计完成工程量</label>
+                    <label style={{textAlign:'left',display:'block',fontSize:18}}>累计完成工程量</label>
                     <div id='AccumulativeCompletion' style={{ width: '100%', height: '340px' }}></div>
                     <label style={{display:'block',textAlign:'center',fontSize:14}}>2017</label>
                 </Card>

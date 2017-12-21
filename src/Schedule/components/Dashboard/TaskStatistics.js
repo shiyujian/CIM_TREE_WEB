@@ -62,7 +62,7 @@ export default class Warning extends Component {
                 name: 'Line 1',
                 type: 'pie',
                 clockWise: true,
-                radius: ['50%', '56%'],
+                radius: ['50%', '66%'],
                 itemStyle: {
                     normal: {
                         label: {
@@ -171,7 +171,7 @@ export default class Warning extends Component {
                 name: 'Line 1',
                 type: 'pie',
                 clockWise: true,
-                radius: ['50%', '56%'],
+                radius: ['50%', '66%'],
                 itemStyle: {
                     normal: {
                         label: {
@@ -279,7 +279,7 @@ export default class Warning extends Component {
                 name: 'Line 1',
                 type: 'pie',
                 clockWise: true,
-                radius: ['50%', '56%'],
+                radius: ['50%', '66%'],
                 itemStyle: {
                     normal: {
                         label: {
@@ -358,7 +358,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <label style={{textAlign:'left',display:'block',fontSize:14}}>任务统计</label>
+                    <label style={{textAlign:'left',display:'block',fontSize:18}}>任务统计</label>
                     <Row >
                         <Col span={8}>
                             <div id='TaskStatistics' style={{ width: '100%', height: '361px' }}></div>
