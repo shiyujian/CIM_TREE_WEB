@@ -17,5 +17,6 @@ export default handleActions({
 	[ModalVisible]: (state, {payload}) => ({
 		...state,
 		visible:payload,
+		
 	}),
 }, {});

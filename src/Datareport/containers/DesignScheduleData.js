@@ -5,7 +5,7 @@ import { actions} from '../store/scheduledata';
 import { getUser} from '_platform/auth';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import { Row, Col, Table, Input, Button } from 'antd';
+import { Row, Col, Table, Input, Button, message } from 'antd';
 import DesignModal from '../components/ScheduleData/DesignModal';
 import './quality.less';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -90,7 +90,8 @@ export default class DesignScheduleData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({addvisible:false})						
+						this.setState({addvisible:false})
+						message.success('提交成功')						
 					})
 		})
 	}
@@ -124,7 +125,7 @@ export default class DesignScheduleData extends Component {
 				</Row>
 				{
 					this.state.addvisible &&
-					<DesignModal {...this.props} oncancel={this.oncancel.bind(this)} akey={Math.random() * 1234} onok={this.setData.bind(this)} />
+					<DesignModal {...this.props} oncancel={this.oncancel.bind(this)} onok={this.setData.bind(this)} />
 				}
 			</div>
 		);

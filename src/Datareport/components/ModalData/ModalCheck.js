@@ -8,9 +8,10 @@ import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
-const {RangePicker} = DatePicker;
+import '../index.less'; 
+
 const RadioGroup = Radio.Group;
-const {Option} = Select
+const { TextArea } = Input;
 @connect(
 	state => {
 		const { platform} = state;
@@ -20,23 +21,18 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class JianyanpiCheck extends Component {
-
+export default class ModalCheck extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-            wk:null,
+			wk:null,
             dataSource:[],
             opinion:1,//1表示通过 2表示不通过
-		};
-    }
-    async componentDidMount(){
+		}
+	}
+
+	async componentDidMount(){
         const {wk} = this.props
-        //  const {actions:{ getWorkflow }} = this.props
-        //  getWorkflow({pk:wk.id}).then(rst => {
-        //      let dataSource = JSON.parse(rst.subject[0].data)
-        //      this.setState({dataSource,wk:rst})
-        //  })
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
     }
@@ -44,18 +40,23 @@ export default class JianyanpiCheck extends Component {
     componentWillReceiveProps(props){
         const {wk} = props
         let dataSource = JSON.parse(wk.subject[0].data)
+        console.log('dataSource', dataSource)
         this.setState({dataSource,wk})
    }
    //提交
     async submit(){
-        if(this.state.opinion === 1){
-            await this.passon();
-        }else{
-            await this.reject();
-        }
-        this.props.closeModal("dr_qua_jyp_visible",false)
+        // if(this.state.opinion === 1){
+        //     await this.passon();
+        // }else{
+        //     await this.reject();
+        // }
+        this.props.closeModal("modal_check_visbile",false)
         message.info("操作成功")
     }
+    //取消
+    cancel() {
+		this.props.closeModal("modal_check_visbile",false)
+	}
     //通过
     async passon(){
         const {dataSource,wk} = this.state
@@ -73,8 +74,9 @@ export default class JianyanpiCheck extends Component {
         dataSource.map((o) => {
             //创建文档对象
             let doc = o.related_documents.find(x => {
-                return x.rel_type === 'many_jyp_rel'
+                x.rel_type === 'mch_rel'
             })
+            debugger
             if(doc){
                 doclist_p.push({
                     code:doc.code,
@@ -90,15 +92,12 @@ export default class JianyanpiCheck extends Component {
                     status:"A",
                     version:"A",
                     "basic_params": {
-                        "files": [
-                            o.file
-                        ]
                     },
                     workpackages:[{
                         code:o.code,
                         obj_type:o.obj_type,
                         pk:o.pk,
-                        rel_type:"many_jyp_rel"
+                        rel_type:"mch_rel"
                     }],
                     extra_params:{
                         ...o
@@ -109,11 +108,11 @@ export default class JianyanpiCheck extends Component {
             wplist.push({
                 code:o.code,
                 extra_params:{
-                    rate:o.rate,
-                    check_status:2
+                    rate:o.rate
                 }
             })
         })
+        debugger
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         await updateWpData({},{data_list:wplist});
@@ -147,114 +146,102 @@ export default class JianyanpiCheck extends Component {
     onChange(e){
         this.setState({opinion:e.target.value})
     }
+
 	render() {
-        const columns = 
-        [{
-            title:'序号',
-            width:"5%",
+		return(
+			<Modal
+				title="模型信息审批表"
+				key={Math.random()}
+				width = {1280}
+				visible = {true}
+				footer={null}
+				maskClosable={false}
+				onCancel = {this.cancel.bind(this)}
+			>
+				<Row style={{margin: '20px 0', textAlign: 'center'}}>
+					<h2>结果审核</h2>
+				</Row>
+				<Row>
+					<Table
+						bordered
+						className = 'foresttable'
+						columns={this.columns}
+						dataSource={this.state.dataSource}
+					/>
+				</Row>
+				<Row style={{margin: '20px 0'}}>
+					<Col span={2}>
+						<span>审查意见：</span>
+					</Col>
+					<Col span={4}>
+						<RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
+					        <Radio value={1}>通过</Radio>
+					        <Radio value={2}>不通过</Radio>
+					    </RadioGroup>
+				    </Col>
+				    <Col span={2} push={14}>
+				    	<Button type='primary'>
+        					导出表格
+        				</Button>
+				    </Col>
+				    <Col span={2} push={14}>
+				    	<Button type='primary' onClick={this.submit.bind(this)}>
+        					确认提交
+        				</Button>
+				    </Col>
+			    </Row>
+			    <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea rows={2} />
+				    </Col>
+			    </Row>
+			    {
+                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                }
+			</Modal>
+		)
+	}
+
+	columns = [{
+			title: '序号',
 			render:(text,record,index) => {
 				return index+1
 			}
-		},{
-			title:'项目/子项目',
-            dataIndex:'project',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.project.name}
-                </span>
-            ),
-		},{
-			title:'单位工程',
-            dataIndex:'unit',
-            width:"13%",
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
-            ),
-		},{
-			title:'WBS编码',
-            dataIndex:'code',
-            width:"13%",
-		},{
-			title:'名称',
-            dataIndex:'name',
-            width:"13%",
-		},{
-			title:'检验合格率',
-            dataIndex:'rate',
-            width:"8%",
-            render: (text, record, index) => (
-                <span>
-                    {(parseFloat(record.rate)*100).toFixed(1) + '%'} 
-                </span>
-            ),
-		},{
-			title:'质量等级',
-            dataIndex:'level',
-            width:"12%",
-		},{
-			title:'施工单位',
-            dataIndex:'construct_unit',
-            width:"12%",
-            render: (text, record, index) => (
-                <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
-                </span>
-            ),
 		}, {
-            title:'附件',
-            width:"11%",
-			render:(text,record,index) => {
-                return (<span>
-                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                        <span className="ant-divider" />
-                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                    </span>)
-			}
-        }]
-		return (
-            <Modal
-			title="检验批信息审批表"
-			key={Math.random()}
-            visible={true}
-            width= {1280}
-			footer={null}
-			maskClosable={true}>
-                <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
-                    <Table style={{ marginTop: '10px', marginBottom:'10px' }}
-                        columns={columns}
-                        dataSource={this.state.dataSource}
-                        bordered />
-                    <Row>
-                        <Col span={2}>
-                            <span>审查意见：</span>
-                        </Col>
-                        <Col span={4}>
-                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
-                                <Radio value={1}>通过</Radio>
-                                <Radio value={2}>不通过</Radio>
-                            </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
-                            <Preview />
-                        </Col>
-                    </Row>
-                    {
-                        this.state.wk && <WorkflowHistory wk={this.state.wk}/>
-                    }
-                </div>
-            </Modal>
-		)
-    }
+			title: '模型编码',
+			dataIndex: 'coding'
+		}, {
+			title: '项目/子项目名称',
+			dataIndex: 'project'
+		}, {
+			title: '单位工程',
+			dataIndex: 'unitEngineering'
+		}, {
+			title: '模型名称',
+			dataIndex: 'modelName'
+		}, {
+			title: '提交单位',
+			dataIndex: 'submittingUnit'
+		}, {
+			title: '模型描述',
+			dataIndex: 'modelDescription'
+		}, {
+			title: '模型类型',
+			dataIndex: 'modeType'
+		}, {
+			title: 'fdb模型',
+			dataIndex: 'fdbMode'
+		}, {
+			title: 'tdbx模型',
+			dataIndex: 'tdbxMode'
+		}, {
+			title: '属性表',
+			dataIndex: 'attributeTable'
+		}, {
+			title: '上报时间',
+			dataIndex: 'reportingTime'
+		}, {
+			title: '上报人',
+			dataIndex: 'reportingName'
+		}];
 }

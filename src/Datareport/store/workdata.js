@@ -17,6 +17,13 @@ export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`,
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 //批量修改施工包
 const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
+//得到质量缺陷
+export const fetchDefectDetail = createFetchAction(`${base}/main/api/quality-defect/{{id}}/`,[])
+//删除流程
+const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE')
+//批量创建文档
+export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
+export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 
 export const actions = {
 	getProjectTree,
@@ -26,7 +33,12 @@ export const actions = {
 	getAllUsers,
 	createWorkflow,
 	getWorkflow,
-	logWorkflowEvent
+	logWorkflowEvent,
+	fetchDefectDetail,
+	putDocList,
+	addDocList,
+	deleteWorkflow,
+	updateWpData
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

@@ -11,21 +11,31 @@ class WorkModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedRowKeys: [],
-            dataSource: [],
-            checkers: [],//审核人下拉框选项
-            check: null,//审核人
+            dataSource:[],
+            checkers:[],//审核人下来框选项
+            check:null,//审核人
+            projects:[]
         };
     }
-    componentDidMount() {
-        const { actions: { getAllUsers } } = this.props
+    componentDidMount(){
+        const {actions:{getAllUsers,getProjectTree}} = this.props
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
                     <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
-            this.setState({ checkers })
+            this.setState({checkers})
+        });
+        getProjectTree().then(rst => {
+            if (rst.children.length) {
+                let projects = rst.children.map(item => {
+                    return (
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    )
+                })
+                this.setState({projects})
+            }
         })
     }
     onSelectChange = (selectedRowKeys) => {
@@ -73,56 +83,6 @@ class WorkModal extends Component {
     covertURLRelative = (originUrl) => {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
-    //根据附件名称 也就是wbs编码获取其他信息
-    async getInfo(code) {
-        console.log(this.props)
-        let res = {};
-        // gerWorkpackageDetail
-        const { actions: { getWorkPackageDetail } } = this.props
-        let workschedule = await getWorkPackageDetail({ code: code })
-        res.name = workschedule.name
-        res.code = workschedule.code
-        let fenxiang = await getWorkPackageDetail({ code: workschedule.parent.code })
-        if (fenxiang.parent.obj_type_hum === "子分部工程") {
-            let zifenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
-            let fenbu = await getWorkPackageDetail({ code: zifenbu.parent.code })
-            let zidanwei = {}, danwei = {};
-            if (fenbu.parent.obj_type_hum === "子单位工程") {
-                zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-                danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
-
-            } else {
-                danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-            }
-            let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-            res.construct_unit = construct_unit
-            res.unit = {
-                name: danwei.name,
-                code: danwei.code,
-                obj_type: danwei.obj_type
-            }
-            res.project = danwei.parent
-        } else {
-            let fenbu = await getWorkPackageDetail({ code: fenxiang.parent.code })
-            let zidanwei = {}, danwei = {};
-            if (fenbu.parent.obj_type_hum === "子单位工程") {
-                zidanwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-                danwei = await getWorkPackageDetail({ code: zidanwei.parent.code })
-
-            } else {
-                danwei = await getWorkPackageDetail({ code: fenbu.parent.code })
-            }
-            let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-            res.construct_unit = construct_unit
-            res.unit = {
-                name: danwei.name,
-                code: danwei.code,
-                obj_type: danwei.obj_type
-            }
-            res.project = danwei.parent
-        }
-        return res
-    }
     //下拉框选择人
     selectChecker(value) {
         let check = JSON.parse(value)
@@ -148,13 +108,18 @@ class WorkModal extends Component {
                 title: '任务名称',
                 dataIndex: 'name',
             }, {
-                title: '项目/子项目',
+                title: '项目/子项目名称',
                 dataIndex: 'project',
-                render: (text, record, index) => (
-                    <span>
-                        {record.project.name}
-                    </span>
-                ),
+                width:"12%",
+                render:(record) => {
+                    return (
+                        <Select style={{width:"90%"}} onSelect={ele => {
+                            this.setState({ pro: ele })
+                        }}>
+                            {this.state.projects}
+                        </Select>
+                    )
+                }
             }, {
                 title: '单位工程',
                 dataIndex: 'unit',

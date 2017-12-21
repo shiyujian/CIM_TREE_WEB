@@ -7,10 +7,22 @@ import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from '../../../Datareport/components/Quality/JianyanpiCheck';
+import PriceListExamine from '../../../Datareport/components/CostListData/PriceListExamine';
 import JianyanCheck from '../../../Datareport/components/Quality/JianyanCheck';
 import DesignDataCheck from '../../../Datareport/components/DesignData/Check';
 import SafetyDocCheck from '../../../Datareport/components/SafetyDoc/SafetyDocCheck';
-import Check from '../../../Datareport/components/ModalData/Check'
+import HiddenDangerCheck from '../../../Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
+import ModalCheck from '../../../Datareport/components/ModalData/ModalCheck';
+import OrgCheck from '../../../Datareport/components/OrgData/OrgCheck';
+import HPModal from '../../../Datareport/components/ProjectData/HandleProjectModal';
+import SumSpeedExamine from '../../../Datareport/components/CostListData/SumSpeedExamine';
+import PersonCheck from '../../../Datareport/components/PersonData/PersonCheck';
+import SumPlanCheck from '../../../Datareport/components/CostListData/SumPlanCheck';
+import ProjectSumExamine from '../../../Datareport/components/CostListData/ProjectSumExamine';
+import WorkCheckModal from '../../../Datareport/components/ScheduleData/WorkCheckModal';
+import DesignCheckModal from '../../../Datareport/components/ScheduleData/DesignCheckModal';
+import SafetySpecialCheck from '../../../Datareport/components/SafetySpecial/SafetySpecialCheck';
+import UnitToggle from '../../../Datareport/components/UnitData/UnitToggle';
 
 const FormItem = Form.Item;
 @connect(
@@ -33,13 +45,34 @@ export default class Progress extends Component {
 	}
 
 	render() {
-		const { state = {}, task, location, states = [],dr_qua_jyp_visible,dr_qua_jy_visible,safety_doc_check_visible,modal_check_visbile,design_check_visbile} = this.props;
+		const { 
+			state = {}, 
+			task, 
+			location, 
+			states = [],
+			dr_qua_jyp_visible,
+			dr_qua_jy_visible,
+			safety_doc_check_visible,
+			safety_hidden_check_visible,
+			modal_check_visbile,
+			dr_base_org_visible,
+			dr_xm_xx_visible,
+			cost_pri_ck_visible,
+			cost_sum_spd_visible,
+			dr_base_person_visible,
+			dr_qua_jsjh_visible,
+			cost_pro_ck_visible,
+			dr_wor_sg_visible,
+			dr_de_sj_visible,
+			Safety_Special_check_visible,
+			dr_qua_unit_visible,
+			design_check_visbile
+		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
 		const { state_id = '0' } = queryString.parse(location.search) || {};
 		const currentStates = states.find(state => state.id === +state_id) || {};
 		const currentStateCode = currentStates.code;
-		console.log("task Progress props", this.props);
 		return (
 			<div>
 				<div>
@@ -107,7 +140,10 @@ export default class Progress extends Component {
 								}
 							} else if (code === WORKFLOW_CODE.数据报送流程) {
 								// 数据报送流程
-								link = <a onClick={this.openModal.bind(this,name,id)}>审核</a>
+								if(action === '通过'){
+									action = '审核';
+									link = <a onClick={this.openModal.bind(this,name,id)}>{action}</a>
+								}
 							} else {
 								link = action;
 							}
@@ -121,7 +157,7 @@ export default class Progress extends Component {
 						this.renderDelay()
 						:
 						(code === WORKFLOW_CODE.设计计划填报流程 || code === WORKFLOW_CODE.设计计划变更流程 || code === WORKFLOW_CODE.设计成果上报流程 || code === WORKFLOW_CODE.设计成果一般变更流程
-							|| code === WORKFLOW_CODE.设计成果重大变更流程 || code === WORKFLOW_CODE.总进度计划报批流程 || code === WORKFLOW_CODE.进度管控审批流程 || code === 'TEMPLATE_022') ||
+							|| code === WORKFLOW_CODE.设计成果重大变更流程 || code === WORKFLOW_CODE.总进度计划报批流程 || code === WORKFLOW_CODE.进度管控审批流程 || code === 'TEMPLATE_022'|| code === WORKFLOW_CODE.数据报送流程) ||
 						this.renderContent()
 				}
 				{
@@ -137,8 +173,56 @@ export default class Progress extends Component {
 					<SafetyDocCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					safety_hidden_check_visible && 
+					<HiddenDangerCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
 					modal_check_visbile && 
-					<Check wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<ModalCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_base_org_visible && 
+					<OrgCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_xm_xx_visible && 
+					<HPModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					cost_pri_ck_visible && 
+					<PriceListExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					cost_sum_spd_visible && 
+					<SumSpeedExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_base_person_visible && 
+					<PersonCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_qua_jsjh_visible && 
+					<SumPlanCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					cost_pro_ck_visible && 
+					<ProjectSumExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_wor_sg_visible && 
+					<WorkCheckModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_de_sj_visible && 
+					<DesignCheckModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					Safety_Special_check_visible && 
+					<SafetySpecialCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_qua_unit_visible && 
+					<UnitToggle wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					design_check_visbile && 
@@ -168,11 +252,47 @@ export default class Progress extends Component {
 			case "安全管理信息批量录入":
 				changeDatareportVisible({key:'safety_doc_check_visible',value:true})
 				break;
+			case "安全隐患信息批量录入":
+				changeDatareportVisible({key:'safety_hidden_check_visible',value:true})
+				break;
 			case "模型信息批量录入":
 				changeDatareportVisible({key:'modal_check_visbile',value:true})
 				break;
 			case "设计信息批量录入":
 				changeDatareportVisible({key:'design_check_visbile',value:true})
+				break;
+			case "组织机构信息批量录入":
+				changeDatareportVisible({key:'dr_base_org_visible',value:true})
+				break;
+			case "项目信息批量录入":
+				changeDatareportVisible({key:'dr_xm_xx_visible',value:true})
+				break;
+			case "计价清单信息填报":
+				changeDatareportVisible({key:'cost_pri_ck_visible',value:true})
+				break;
+			case "结算进度信息填报":
+				changeDatareportVisible({key:'cost_sum_spd_visible',value:true})
+				break;
+			case "人员信息批量录入":
+				changeDatareportVisible({key:'dr_base_person_visible',value:true})
+				break;
+			case "结算计划信息填报":
+				changeDatareportVisible({key:'dr_qua_jsjh_visible',value:true})
+				break;
+			case "工程量结算信息填报":
+				changeDatareportVisible({key:'cost_pro_ck_visible',value:true})
+				break;
+			case "施工进度发起填报":
+				changeDatareportVisible({key:'dr_wor_sg_visible',value:true})
+				break;
+			case "设计进度发起填报":
+				changeDatareportVisible({key:'dr_de_sj_visible',value:true})
+				break;
+			case "安全专项信息批量录入":
+				changeDatareportVisible({key:'Safety_Special_check_visible',value:true})
+				break;
+			case "单位工程信息批量录入":
+				changeDatareportVisible({key:'dr_qua_unit_visible',value:true})
 				break;
 			default:break;
 		}

@@ -87,6 +87,7 @@ export default class JianyanpiData extends Component {
 			deadline:null,
 			status:"2"
 		}
+		//发起流程
 		createWorkflow({},postdata).then((rst) => {
 			let nextStates =  getNextStates(rst,rst.current[0].id);
             logWorkflowEvent({pk:rst.id},
@@ -132,7 +133,7 @@ export default class JianyanpiData extends Component {
 				</Row>
 				<Row >
 					<Col >
-						<Table columns={this.columns} dataSource={[]}/>
+						<Table columns={this.columns} dataSource={[]} rowKey="key"/>
 					</Col>
 				</Row>
 				{
