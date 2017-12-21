@@ -48,7 +48,7 @@ export default class PersonCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_org_visible",false)
+        this.props.closeModal("dr_base_person_visible",false)
         message.info("操作成功")
     }
     //通过
