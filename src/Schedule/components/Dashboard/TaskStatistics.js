@@ -358,7 +358,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <label style={{textAlign:'left',display:'block',fontSize:18}}>任务统计</label>
+                    <h2 style={{textAlign:'left',color:  '#74859f'}}>任务统计</h2>
                     <Row >
                         <Col span={8}>
                             <div id='TaskStatistics' style={{ width: '100%', height: '361px' }}></div>
