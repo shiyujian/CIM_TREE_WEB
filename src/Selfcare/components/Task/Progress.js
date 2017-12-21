@@ -69,11 +69,8 @@ export default class Progress extends Component {
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
 		const { state_id = '0' } = queryString.parse(location.search) || {};
-		console.log('statis',states);
 		const currentStates = states.find(state => state.id === +state_id) || {};
 		const currentStateCode = currentStates.code;
-		console.log('currentStateCode',currentStateCode);
-		console.log("task Progress props", this.props);
 		return (
 			<div>
 				<div>
@@ -141,7 +138,10 @@ export default class Progress extends Component {
 								}
 							} else if (code === WORKFLOW_CODE.数据报送流程) {
 								// 数据报送流程
-									link = <a onClick={this.openModal.bind(this,name,id)}>审核</a>
+								if(action === '通过'){
+									action = '审核';
+									link = <a onClick={this.openModal.bind(this,name,id)}>{action}</a>
+								}
 							} else {
 								link = action;
 							}
@@ -155,7 +155,7 @@ export default class Progress extends Component {
 						this.renderDelay()
 						:
 						(code === WORKFLOW_CODE.设计计划填报流程 || code === WORKFLOW_CODE.设计计划变更流程 || code === WORKFLOW_CODE.设计成果上报流程 || code === WORKFLOW_CODE.设计成果一般变更流程
-							|| code === WORKFLOW_CODE.设计成果重大变更流程 || code === WORKFLOW_CODE.总进度计划报批流程 || code === WORKFLOW_CODE.进度管控审批流程 || code === 'TEMPLATE_022') ||
+							|| code === WORKFLOW_CODE.设计成果重大变更流程 || code === WORKFLOW_CODE.总进度计划报批流程 || code === WORKFLOW_CODE.进度管控审批流程 || code === 'TEMPLATE_022'|| code === WORKFLOW_CODE.数据报送流程) ||
 						this.renderContent()
 				}
 				{
