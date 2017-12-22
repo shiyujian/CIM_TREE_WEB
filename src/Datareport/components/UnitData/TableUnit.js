@@ -24,51 +24,10 @@ export default class TableUnit extends Component{
         )
     }
     send(){
-      const {actions:{ModalVisibleUnit,postWorkpackages}} = this.props;
+      const {actions:{ModalVisibleUnit,postWorkpackages,postWorkpackagesOK},postWorkpackagesOKp} = this.props;
+      console.log(postWorkpackagesOKp)
       ModalVisibleUnit(true);
-      // let  postWork = {
-      //   "name":"test_workpackage_1",
-      //   "code":"test_workpackage_1_code1",
-      //   "obj_type":"C_WP_CEL",
-      //   "extra_params":{"f1":"f1","f2":"f2"},
-      //   "version":"A",
-      //   "status":"A",
-      //   "description":"description",
-      //          "contract_process":{"start_time":"","end_time":""},
-      //          "plan_process":{"start_time":"","end_time":""},
-      //          "actual_process":{"start_time":"","obj_type":""},
-      //  "response_orgs":[
-      //           {"code":"org code","name":"org name", "obj_type":"C_ORG"},
-      //           {"code":"org code2","name":"org name2", "obj_type":"C_ORG"},
-      //         ],
-      //  "parent":{"code":"partent code","name":"org name","obj_type":"C_WP_XXX"},
-      //  "qi_person":{"code":"person code","name":"org name","obj_type":"C_ORG"},
-      //  "qc_counts":{
-      //    "checked":1,
-      //    "fine":1,
-      //    "is_leaf":true,
-      //    "nonchecked":0
-      //  },
-      //  "defect_counts":{
-      //    "is_leaf":true,
-      //    "settled":1,
-      //    "executing":1,
-      //    "total":2
-      //  }
-      // },
      
-      // postWorkpackages({},postWork).then(message=>{
-      //    if(message){
-      //         alert{'dfs'}
-      //    }
-      // })
-    }
-    componentDidMount(){
-      // let dataSource = [];
-      // const { actions: { getOrgTree } }= this.props;
-      // getOrgTree({}, { depth: 7 }).then(rst => {
-      //   dataSource = rst.children;
-      // });
     }
     rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
