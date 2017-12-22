@@ -5,6 +5,7 @@ import { Input, Form, Spin, Upload, Icon, Button, Modal,
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
+import {getUser} from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -81,7 +82,7 @@ export default class AddFile extends Component {
                     planovertime: dataList[i][6] ? dataList[i][6] : '',
                     factstarttime: dataList[i][7] ? dataList[i][7] : '',
                     factovertime: dataList[i][8] ? dataList[i][8] : '',
-                    uploads: dataList[i][9] ? dataList[i][9] : '',
+                    uploads: getUser().username,
                     project:{
                         code:"",
                         name:"",
