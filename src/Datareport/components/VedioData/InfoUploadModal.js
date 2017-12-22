@@ -20,7 +20,7 @@ export default class InfoUploadModal extends Component{
 
     render(){
         const {dataSource} = this.state;
-        const {uploadModal, closeModal, actions:{getAllUsers}} = this.props;
+        const {uploadModal, closeModal, actions} = this.props;
 
         return(
             <Modal
@@ -37,10 +37,11 @@ export default class InfoUploadModal extends Component{
                  actions={this.props.actions}
                 />
                 <UploadFooter
+                 dataSource={dataSource}
                  storeExcelData= {this.storeExcelData}
                  excelTitle= {excelTitle}
                  dataIndex= {dataIndex}
-                 getAllUsers= {getAllUsers}
+                 actions= {actions}
                  onOk= {this.onOk}
                 />
             </Modal>
