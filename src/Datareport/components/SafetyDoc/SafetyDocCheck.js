@@ -186,7 +186,7 @@ export default class SafetyDocCheck extends Component {
     }
 
     onChange(e){
-        this.setState({opinion:e.target.value})
+        this.setState({option:e.target.value})
     }
 	render() {
         const columns = [
@@ -251,43 +251,40 @@ export default class SafetyDocCheck extends Component {
 		return (
             <Modal
 			title="安全信息审批表"
-			key={Math.random()}
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}>
-                <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
-                    <Table style={{ marginTop: '10px', marginBottom:'10px' }}
-                        columns={columns}
-                        dataSource={this.state.dataSource}
-                        bordered />
-                    <Row>
-                        <Col span={2}>
-                            <span>审查意见：</span>
-                        </Col>
-                        <Col span={4}>
-                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
-                                <Radio value={1}>通过</Radio>
-                                <Radio value={2}>不通过</Radio>
-                            </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
-                            <Preview />
-                        </Col>
-                    </Row>
-                    {
-                        this.state.wk && <WorkflowHistory wk={this.state.wk}/>
-                    }
-                </div>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                <Table style={{ marginTop: '10px', marginBottom:'10px' }}
+                    columns={columns}
+                    dataSource={this.state.dataSource}
+                    bordered />
+                <Row>
+                    <Col span={2}>
+                        <span>审查意见：</span>
+                    </Col>
+                    <Col span={4}>
+                        <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
+                            <Radio value={1}>通过</Radio>
+                            <Radio value={2}>不通过</Radio>
+                        </RadioGroup>
+                    </Col>
+                    <Col span={2} push={14}>
+                        <Button type='primary'>
+                            导出表格
+                        </Button>
+                    </Col>
+                    <Col span={2} push={14}>
+                        <Button type='primary' onClick={this.submit.bind(this)}>
+                            确认提交
+                        </Button>
+                        <Preview />
+                    </Col>
+                </Row>
+                {
+                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                }
             </Modal>
 		)
     }

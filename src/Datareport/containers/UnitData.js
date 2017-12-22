@@ -22,6 +22,7 @@ import {WORKFLOW_CODE} from '_platform/api'
 export default class UnitData extends Component {
 	static propTypes = {};
 	setData(data,participants){
+		console.log(data,participants)
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,

@@ -129,8 +129,7 @@ export default class AddFile extends Component {
                     },
                     file:{
                         
-                    },
-                    options:[]
+                    }
                 })
             }
             this.setState({ dataSource });
@@ -236,6 +235,8 @@ export default class AddFile extends Component {
             result: result,
             deadline: deadline,
             editResult: editResult,
+            code: code,
+            wbs: wbs,
             project:{
                 code:"",
                 name:"",
@@ -245,11 +246,6 @@ export default class AddFile extends Component {
                 code:"",
                 name:"",
                 obj_type:""
-            },
-            construct_unit:{
-                code:"",
-                name:"",
-                type:"",
             },
             file:{
             }
@@ -427,7 +423,7 @@ export default class AddFile extends Component {
                         beforeUpload={this.beforeUpload.bind(this)}
                     >
                         <Button style={{ margin:'10px 10px 10px 0px' }}>
-                            <Icon type="upload" />上传并预览(文件名需为英文)
+                            <Icon type="upload" />上传并预览
                          </Button>
                     </Upload>
                 </Col>

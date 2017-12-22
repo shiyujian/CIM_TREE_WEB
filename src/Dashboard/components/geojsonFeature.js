@@ -272,7 +272,7 @@ const geojsonFeature_360 = [{
 	}
 }];
 
-export const panorama = geojsonFeature_360;
+export const panorama_360 = geojsonFeature_360;
 
 
 

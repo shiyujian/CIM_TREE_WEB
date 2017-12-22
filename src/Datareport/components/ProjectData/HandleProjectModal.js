@@ -34,18 +34,25 @@ export default class HPModal extends Component{
         //      this.setState({dataSource,wk:rst})
         //  })
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk})
+        let tempData = [...dataSource];
+        console.log("tempData:",tempData);
+        tempData.map(item => {
+            // item.
+        })
+        this.setState({dataSource,tempData,wk})
     }
 
     componentWillReceiveProps(props){
         const {wk} = props
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk});
+        let tempData = [...dataSource];
+        this.setState({dataSource,tempData,wk});
    }
     submit(){
         this.props.closeModal("dr_xm_xx_visible",false)
     }
-    render(){       
+    render(){ 
+
         const columns =
             [{
                 title: '序号',
@@ -107,13 +114,13 @@ export default class HPModal extends Component{
                 title: '附件',
                 key: 'nearby',
                 render: (record) => (
-                    <a> {record.file || '暂无'}</a>
+                    <a> {record.file.name || '暂无'}</a>
                 )
             }, {
                 title: '图片',
                 key: 'pic',
                 render: (record) => (
-                    <a>{record.pic || '暂无'}</a>
+                    <a>{record.pic.name || '暂无'}</a>
                 )
             }];
         return (

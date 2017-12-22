@@ -35,6 +35,7 @@ export default class HiddenDangerCheck extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props;
+        debugger
         let dataSource = JSON.parse(wk.subject[0].data);
         this.setState({dataSource,wk});
         const {actions:{
@@ -84,12 +85,12 @@ export default class HiddenDangerCheck extends Component {
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
         let project = dataSource[0].project;
-        let code = 'datareport_safetydoc_1112';
+        let code = 'datareport_hiddendanger_1112';
         //get workpackage by unit's code 
         let workpackage = await getWorkpackagesByCode({code:unit.code});
         
         let postDirData = {
-            "name": '安全文档目录树',
+            "name": '安全隐患目录树',
             "code": code,
             "obj_type": "C_DIR",
             "status": "A",
@@ -97,7 +98,7 @@ export default class HiddenDangerCheck extends Component {
                 pk: workpackage.pk,
                 code: workpackage.code,
                 obj_type: workpackage.obj_type,
-                rel_type: 'safetydoc_wp_dirctory', // 自定义，要确保唯一性
+                rel_type: 'hiddendanger_wp_dirctory', // 自定义，要确保唯一性
             }],
             "parent":{"pk":topDir.pk,"code":topDir.code,"obj_type":topDir.obj_type}
         }
@@ -140,14 +141,17 @@ export default class HiddenDangerCheck extends Component {
                   },
                 extra_params:{
                     code:item.code,
-                    filename:item.file.name,
-                    pubUnit:item.pubUnit,
+                    wbs:item.wbs,
                     type:item.type,
-                    doTime:item.doTime,
-                    remark:item.remark,
-                    upPeople:item.upPeople,
+                    upTime:item.upTime,
+                    checkTime:item.checkTime,
+                    editTime:item.editTime,
                     unit:item.unit.name,
-                    project:item.project.name
+                    project:item.project.name,
+                    result:item.result,
+                    deadline:item.deadline,
+                    editResult:item.editResult,
+                    resUnit:item.resUnit
                 }
             })
         });
@@ -181,6 +185,10 @@ export default class HiddenDangerCheck extends Component {
         filed.name = f.name;
         filed.mime_type = f.mime_type;
         openPreview(filed);
+    }
+    onChange(e){
+        debugger
+        this.setState({option:e.target.value})
     }
 	render() {
         const columns = [
@@ -257,43 +265,40 @@ export default class HiddenDangerCheck extends Component {
 		return (
             <Modal
 			title="安全隐患审批表"
-			key={Math.random()}
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}>
-                <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
-                    <Table style={{ marginTop: '10px', marginBottom:'10px' }}
-                        columns={columns}
-                        dataSource={this.state.dataSource}
-                        bordered />
-                    <Row>
-                        <Col span={2}>
-                            <span>审查意见：</span>
-                        </Col>
-                        <Col span={4}>
-                            <RadioGroup onChange={this.onChange} value={this.state.value}>
-                                <Radio value={1}>通过</Radio>
-                                <Radio value={2}>不通过</Radio>
-                            </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
-                            <Preview />
-                        </Col>
-                    </Row>
-                    {
-                        this.state.wk && <WorkflowHistory wk={this.state.wk}/>
-                    }
-                </div>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                <Table style={{ marginTop: '10px', marginBottom:'10px' }}
+                    columns={columns}
+                    dataSource={this.state.dataSource}
+                    bordered />
+                <Row>
+                    <Col span={2}>
+                        <span>审查意见：</span>
+                    </Col>
+                    <Col span={4}>
+                        <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
+                            <Radio value={1}>通过</Radio>
+                            <Radio value={2}>不通过</Radio>
+                        </RadioGroup>
+                    </Col>
+                    <Col span={2} push={14}>
+                        <Button type='primary'>
+                            导出表格
+                        </Button>
+                    </Col>
+                    <Col span={2} push={14}>
+                        <Button type='primary' onClick={this.submit.bind(this)}>
+                            确认提交
+                        </Button>
+                        <Preview />
+                    </Col>
+                </Row>
+                {
+                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                }
             </Modal>
 		)
     }

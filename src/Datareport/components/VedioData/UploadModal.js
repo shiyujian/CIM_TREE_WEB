@@ -20,9 +20,7 @@ export default class VedioUpload extends Component{
 
     render(){
         const {dataSource} = this.state;
-        const {actions:{getAllUsers},
-            uploadModal, closeModal
-        } = this.props;
+        const {actions, uploadModal, closeModal} = this.props;
 
         return(
             <Modal
@@ -41,10 +39,11 @@ export default class VedioUpload extends Component{
                  fileDel={true}
                 />
                 <UploadFooter
+                 dataSource={dataSource}
                  storeExcelData= {this.storeExcelData}
                  excelTitle= {excelTitle}
                  dataIndex= {dataIndex}
-                 getAllUsers= {getAllUsers}
+                 actions= {actions}
                  onOk= {this.onOk}
                 />
             </Modal>
@@ -72,5 +71,5 @@ VedioUpload.PropTypes ={
     closeModal: PropTypes.func.isRequired,
 }
 
-const dataIndex = ["cameraId","projectName","enginner","cameraName","ip","port","username","password","xAxes","yAxes","modal","uptime","wbsCode"], 
-    excelTitle = ["摄像头编码","项目/子项目名称","单位工程","摄像头名称","IP","端口","用户名","密码","X坐标","Y坐标","型号","摄像头上线时间","wbs编码"];
+const dataIndex = ["cameraId","cameraName","ip","port","username","password","xAxes","yAxes","modal","uptime","wbsCode"], 
+    excelTitle = ["摄像头编码","摄像头名称","IP","端口","用户名","密码","X坐标","Y坐标","型号","摄像头上线时间","wbs编码"];

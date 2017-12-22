@@ -7,12 +7,12 @@ import {FILE_API} from '_platform/api';
 
 export default class VedioInfoTable extends Component{
 
-    componentDidMount(){
+    /* componentDidMount(){
         const {fileDel=false} = this.props;
         if(fileDel){
             this.columns.push(this.operation);
         }
-    }
+    } */
     
     render(){
         const {dataSource=[]} = this.props;

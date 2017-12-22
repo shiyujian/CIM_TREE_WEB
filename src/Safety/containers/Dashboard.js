@@ -3,7 +3,7 @@ import { DynamicTitle, Sidebar, Content } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Row, Col } from 'antd';
+import { Row, Col, Card } from 'antd';
 import { actions as schemeActions } from '../store/scheme';
 import ProjectUnitWrapper from '../components/ProjectUnitWrapper';
 import echarts from 'echarts';
@@ -32,8 +32,8 @@ export default class Dashboard extends Component {
         const option1 = {
             title: {
                 text: '安全隐患上报统计',
-                textStyle:{
-                    color:'#74859f'
+                textStyle: {
+                    color: '#74859f'
                 }
             },
             color: ['#FEC268', '#01E4CC', '#3797FE'],
@@ -87,8 +87,8 @@ export default class Dashboard extends Component {
         const option2 = {
             title: {
                 text: '质量缺陷上报统计',
-                textStyle:{
-                    color:'#74859f'
+                textStyle: {
+                    color: '#74859f'
                 }
             },
             color: ['#FEC268', '#01E4CC', '#3797FE'],
@@ -99,7 +99,9 @@ export default class Dashboard extends Component {
                 }
             },
             legend: {
-                data: ['重大安全隐患', '较大安全隐患', '一般安全隐患']
+                data: ['重大安全隐患', '较大安全隐患', '一般安全隐患'],
+                align: 'right',
+                right: 10
             },
             grid: {
                 left: '3%',
@@ -165,8 +167,8 @@ export default class Dashboard extends Component {
         const option3 = {
             title: {
                 text: '安全管理检查评分统计',
-                textStyle:{
-                    color:'#74859f'
+                textStyle: {
+                    color: '#74859f'
                 }
             },
             tooltip: {
@@ -214,8 +216,8 @@ export default class Dashboard extends Component {
         const option4 = {
             title: {
                 text: '安全策划上传统计',
-                textStyle:{
-                    color:'#74859f'
+                textStyle: {
+                    color: '#74859f'
                 }
             },
             color: ['#3797FE'],
@@ -277,22 +279,30 @@ export default class Dashboard extends Component {
                     </div>
                 </Sidebar>
                 <Content>
-                    <Row gutter={20}>
+                    <Row gutter={10} style={{margin: '10px 5px'}}>
                         <Col span={11}>
-                            <div id='resultChangePie1' style={{ width: '100%', height: '450px' }}></div>
+                            <Card style={{ width: '100%', height: '450px' }}>
+                                <div id='resultChangePie1' style={{ width: '100%', height: '420px' }}></div>
+                            </Card>
                         </Col>
                         <Col span={11}>
-                            <div id='resultChangePie2' style={{ width: '100%', height: '450px' }}></div>
-                            <label style={{ display: 'block', textAlign: 'center', fontSize: 14 }}>2017</label>
+                            <Card style={{ width: '100%', height: '450px' }}>
+                                <div id='resultChangePie2' style={{ width: '100%', height: '420px' }}></div>
+                                <label style={{ display: 'block', textAlign: 'center', fontSize: 14 }}>2017</label>
+                            </Card>
                         </Col>
                     </Row>
-                    <Row style={{ marginTop: 20 }} gutter={20}>
+                    <Row style={{margin: '10px 5px'}} gutter={10}>
                         <Col span={11}>
-                            <div id='resultChangePie3' style={{ width: '100%', height: '450px' }}></div>
+                            <Card style={{ width: '100%', height: '450px' }}>
+                                <div id='resultChangePie3' style={{ width: '100%', height: '420px' }}></div>
+                            </Card>
                         </Col>
                         <Col span={11}>
-                            <div id='resultChangePie4' style={{ width: '100%', height: '450px' }}></div>
-                            <label style={{ display: 'block', textAlign: 'center', fontSize: 14 }}>2017</label>
+                            <Card style={{ width: '100%', height: '450px' }}>
+                                <div id='resultChangePie4' style={{ width: '100%', height: '420px' }}></div>
+                                <label style={{ display: 'block', textAlign: 'center', fontSize: 14 }}>2017</label>
+                            </Card>
                         </Col>
                     </Row>
                 </Content>
