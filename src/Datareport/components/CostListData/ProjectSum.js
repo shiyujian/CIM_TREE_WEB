@@ -75,14 +75,14 @@ export default class ProjectSum extends Component {
             for (let i = 1; i < dataList.length; i++) {
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
-                    subproject: dataList[i][1] ? dataList[i][1] : '',
-                    unit_engineeing: dataList[i][2] ? dataList[i][2] : '',
-                    projectcoding: dataList[i][3] ? dataList[i][3] : '',
-                    projectname: dataList[i][4] ? dataList[i][4] : '',
-                    company: dataList[i][5] ? dataList[i][5] : '',
-                    number: dataList[i][6] ? dataList[i][6] : '',
-                    total: dataList[i][7] ? dataList[i][7] : '',
-                    remarks: dataList[i][8] ? dataList[i][8] : '',
+                    // subproject: dataList[i][1] ? dataList[i][1] : '',
+                    // unit: dataList[i][2] ? dataList[i][2] : '',
+                    projectcoding: dataList[i][1] ? dataList[i][1] : '',
+                    projectname: dataList[i][2] ? dataList[i][2] : '',
+                    company: dataList[i][3] ? dataList[i][3] : '',
+                    number: dataList[i][4] ? dataList[i][4] : '',
+                    total: dataList[i][5] ? dataList[i][5] : '',
+                    remarks: dataList[i][6] ? dataList[i][6] : '',
                     project: {
                         code: "",
                         name: "",
@@ -325,13 +325,6 @@ export default class ProjectSum extends Component {
                 title: '序号',
                 dataIndex: 'code',
             }, {
-                title: '项目/子项目',
-                dataIndex: 'subproject',
-                width: '10%',
-            }, {
-                title: '单位工程',
-                dataIndex: 'unit_engineeing',
-            }, {
                 title: '项目编号',
 			    dataIndex: 'projectcoding',
             }, {
@@ -416,3 +409,4 @@ export default class ProjectSum extends Component {
         )
     }
 }
+

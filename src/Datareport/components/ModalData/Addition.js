@@ -75,6 +75,7 @@ export default class Addition extends Component {
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
+                debugger
                 dataSource.push({
                     coding: dataList[i][1] ? dataList[i][1] : '',
                     modelName: dataList[i][2] ? dataList[i][2] : '',
@@ -83,7 +84,7 @@ export default class Addition extends Component {
                     modeType: dataList[i][5] ? dataList[i][5] : '',
                     tdbxMode: dataList[i][7] ? dataList[i][7] : '',
                     attributeTable: dataList[i][8] ? dataList[i][8] : '',
-                    reportingTime: dataList[i][9] ? dataList[i][9] : '',
+                    reportingTime: moment().format("l"),
                     reportingName: dataList[i][10] ? dataList[i][10] : '',
 
                     project: {
@@ -164,7 +165,7 @@ export default class Addition extends Component {
     }
 
     onok() {
-        debugger
+        
         if (!this.state.check) {
             message.info("请选择审核人")
             return
@@ -202,6 +203,7 @@ export default class Addition extends Component {
     }
     //批量上传回调
     setData(data, participants) {
+        
         const { actions: { createWorkflow, logWorkflowEvent, clearAdditionField } } = this.props
         let creator = {
             id: getUser().id,
@@ -466,13 +468,6 @@ export default class Addition extends Component {
             }, {
                 title: '上报时间',
                 dataIndex: 'reportingTime',
-                // render: (text,record,index) => {
-                //     var myDate = new Date()
-                //     console.log(record)
-                //     return (
-                       
-                //     )
-                // }
             }, {
                 title: '上报人',
                 dataIndex: 'reportingName'

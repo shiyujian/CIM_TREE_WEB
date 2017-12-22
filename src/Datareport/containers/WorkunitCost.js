@@ -1,146 +1,226 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {ProjectSum} from '../components/CostListData';
-import {ProjectSumExamine} from '../components/CostListData';
-import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import {Row,Col,Table,Input,Button} from 'antd';
-import {WORKFLOW_CODE} from '_platform/api.js'
-import {getNextStates} from '_platform/components/Progress/util';
-import {getUser} from '_platform/auth';
-import {actions} from '../store/WorkunitCost';
-import {actions as platformActions} from '_platform/store/global';
+import { ProjectSum } from '../components/CostListData';
+import { ProjectSumExamine } from '../components/CostListData';
+import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
+import { Row, Col, Table, Input, Button,Popconfirm } from 'antd';
+import { WORKFLOW_CODE } from '_platform/api.js'
+import { getNextStates } from '_platform/components/Progress/util';
+import { getUser } from '_platform/auth';
+import { actions } from '../store/WorkunitCost';
+import { actions as platformActions } from '_platform/store/global';
 
 
 var moment = require('moment');
 const Search = Input.Search;
 
-
-
 @connect(
 	state => {
-		const {datareport: {WorkunitCost = {}} = {}, platform} = state;
-		return {...WorkunitCost, platform}
+		const { datareport: { WorkunitCost = {} } = {}, platform } = state;
+		console.log('state', state);
+		return { ...WorkunitCost, platform }
 	},
 	dispatch => ({
-		actions: bindActionCreators({...actions, ...platformActions}, dispatch)
+		actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
 	})
 )
-
-
-
 
 export default class WorkunitCost extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			addvisible:false,
-		
-		};
-		this.columns = [{
-			title:'序号',
-			render:(text,record,index) => {
-				return index+1
+			addvisible: false,
+			dataSource: []
+
+		}
+	}
+	async componentDidMount() {
+		const { actions: { getScheduleDir } } = this.props;
+		let topDir = await getScheduleDir({ code: 'the_only_main_code_costsumplans' });
+		if (topDir.obj_type) {
+			let dir = await getScheduleDir({ code: 'ck' });
+			// debugger
+			if (dir.obj_type) {
+				if (dir.stored_documents.length > 0) {
+					this.generateTableData(dir.stored_documents);
+				}
 			}
-		},{
-			title: '项目/子项目',
-			dataIndex: 'subproject',
-		  },{
-			title: '单位工程',
-			dataIndex: 'unit_engineeing',
-		  },{
-			title: '项目编号',
-			dataIndex: 'projectcoding',
-		  },{
-			title: '项目名称',
-			dataIndex: 'projectname',
-		  },{
-			title: '计量单位',
-			dataIndex: 'company',
-		  },{
-			title: '数量',
-			dataIndex: 'number',
-		  },{
-			title: '单价',
-			dataIndex: 'total',
-		  }];
+		}
 	}
-	oncancel(){
-		this.setState({addvisible:false})
+	async generateTableData(data) {
+		const { actions: {
+			getDocument,
+	                 } } = this.props;
+		let dataSource = [];
+		data.map(item => {
+			getDocument({ code: item.code }).then(single => {
+				console.log('single:', single)
+				let temp = {
+					code: single.extra_params.code,
+					subproject: single.extra_params.subproject,
+					unit: single.extra_params.unit,
+					projectcoding: single.extra_params.projectcoding,
+					projectname: single.extra_params.projectname,
+					company: single.extra_params.company,
+					number: single.extra_params.number,
+					total: single.extra_params.total,
+					remarks: single.extra_params.remarks,
+
+				}
+				dataSource.push(temp);
+				this.setState({ dataSource });
+			})
+		})
 	}
-	projectfill(){
-		this.setState({addvisible:true})
+
+	// subproject: item.project.name,//项目/子项目
+	// unit: item.unit.name,//单位工程
+	// projectcoding: item.projectcoding,//项目编号
+	// projectname: item.projectname,//项目名称
+	// company: item.company,//计量单位
+	// number: item.number,//数量
+	// total: item.total,//单价
+	// remarks: item.remarks,//备注
+
+
+	oncancel() {
+		this.setState({ addvisible: false })
 	}
+	projectfill() {
+		this.setState({ addvisible: true })
+	}
+	
+	//删除
+	delete(index) {
+		let { dataSource } = this.state
+		dataSource.splice(index, 1)
+		this.setState({ dataSource })
+	}
+
 	//上传回调
-	setData(data,participants){
-		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+	setData(data, participants) {
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
-			id:getUser().id,
-			username:getUser().username,
-			person_name:getUser().person_name,
-			person_code:getUser().person_code,
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
 		}
 		let postdata = {
-			name:"工程量结算信息填报",
-			code:WORKFLOW_CODE["数据报送流程"],
-			description:"工程量结算信息填报",
-			subject:[{
-				data:JSON.stringify(data)
+			name: "工程量结算信息填报",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "工程量结算信息填报",
+			subject: [{
+				data: JSON.stringify(data)
 			}],
-			creator:creator,
-			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
-			deadline:null,
-			status:"2"
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
 		}
-		createWorkflow({},postdata).then((rst) => {
-			let nextStates =  getNextStates(rst,rst.current[0].id);
-            logWorkflowEvent({pk:rst.id},
-                {
-                    state:rst.current[0].id,
-                    action:'提交',
-                    note:'发起填报',
-                    executor:creator,
-                    next_states:[{ 
-                        participants:[participants],
-                        remark:"",
-                        state:nextStates[0].to_state[0].id,
-                    }],
-                    attachment:null}).then(() => {
-						this.setState({addvisible:false})						
-					})
+		createWorkflow({}, postdata).then((rst) => {
+			let nextStates = getNextStates(rst, rst.current[0].id);
+			logWorkflowEvent({ pk: rst.id },
+				{
+					state: rst.current[0].id,
+					action: '提交',
+					note: '发起填报',
+					executor: creator,
+					next_states: [{
+						participants: [participants],
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					attachment: null
+				}).then(() => {
+					this.setState({ addvisible: false })
+				})
 		})
 	}
 	// checkout(){
 
 	// }
 	render() {
+		const rowSelection = {
+			onChange: (selectedRowKeys, selectedRows) => {
+				console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+			},
+			getCheckboxProps: record => ({
+				disabled: record.name === 'Disabled User', // Column configuration not to be checked
+			}),
+		};
+		const columns = [{
+			title: '序号',
+			render: (text, record, index) => {
+				return index + 1
+			}
+		}, {
+			title: '项目/子项目',
+			dataIndex: 'subproject',
+		}, {
+			title: '单位工程',
+			dataIndex: 'unit',
+		}, {
+			title: '项目编号',
+			dataIndex: 'projectcoding',
+		}, {
+			title: '项目名称',
+			dataIndex: 'projectname',
+		}, {
+			title: '计量单位',
+			dataIndex: 'company',
+		}, {
+			title: '数量',
+			dataIndex: 'number',
+		}, {
+			title: '单价',
+			dataIndex: 'total',
+		}, {
+			title: '备注',
+			dataIndex: 'remarks',
+		},{
+			title: '删除',
+			render: (text, record, index) => {
+				return (
+					<Popconfirm
+						placement="leftTop"
+						title="确定删除吗？"
+						onConfirm={this.delete.bind(this, index)}
+						okText="确认"
+						cancelText="取消">
+						<a>删除</a>
+					</Popconfirm>
+				)
+			}
+		}];
 		return (
-			<div style={{overflow: 'hidden', padding: 20}}>
-				<DynamicTitle title ="工程量结算" {...this.props} />
+			<div style={{ overflow: 'hidden', padding: 20 }}>
+				<DynamicTitle title="工程量结算" {...this.props} />
 				<Row>
-					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
+					<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={this.projectfill.bind(this)}>发起填报</Button>
 					<Button className="btn" type="default" >申请变更</Button>
 					<Button className="btn" type="default">导出表格</Button>
-					<Search 
+					<Search
 						className="btn"
-						style={{width:"200px"}}
+						style={{ width: "200px" }}
 						placeholder="输入搜索条件"
 						onSearch={value => console.log(value)}
-						/>
+					/>
 				</Row>
 				<Row >
 					<Col >
-						<Table columns={this.columns} dataSource={[]} rowKey="index"/>
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.dataSource} rowKey="index" />
 					</Col>
 				</Row>
 				{
 					this.state.addvisible &&
-					<ProjectSum {...this.props} oncancel={this.oncancel.bind(this)} akey={Math.random()*1234} onok={this.setData.bind(this)}/>
+					<ProjectSum {...this.props} oncancel={this.oncancel.bind(this)} akey={Math.random() * 1234} onok={this.setData.bind(this)} />
 				}
-				
+
 			</div>)
 	}
 
-	
+
 };
