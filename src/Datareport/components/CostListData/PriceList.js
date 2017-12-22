@@ -15,13 +15,15 @@ export default class PriceList extends Component {
             dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
-            projects:[],
+            project:[],
             concatunit:{},
             options:[],
+            unit:{},
 		};
     }
     componentDidMount(){
-        const {actions:{getAllUsers,getProjectTree}} = this.props
+
+        const {actions:{getAllUsers,getWorkflowById,getProjectTree}} = this.props;
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -68,7 +70,6 @@ export default class PriceList extends Component {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
-            console.log(dataSource);
             for (let i = 1; i < dataList.length; i++) {
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
@@ -90,7 +91,8 @@ export default class PriceList extends Component {
                         obj_type:""
                     },
                     file:{
-                        id: 'pricelist'
+                        id: 'pricelist',
+                        name: 'priceList'
                     }
                     
                 })
