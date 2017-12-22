@@ -6,7 +6,7 @@ import { Input, Col, Card, Table, Row, Button, DatePicker, Radio, Select, notifi
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import { getUser } from '_platform/auth';
-import { actions } from '../../store/safety';
+import { actions } from '../../store/scheduledata';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
@@ -16,8 +16,8 @@ const { Option } = Select;
 
 @connect(
     state => {
-        const { datareport: { safety = {} } = {}, platform } = state;
-        return { ...safety, platform }
+        const { datareport: { scheduledata = {} } = {}, platform } = state;
+        return { ...scheduledata, platform }
     },
     dispatch => ({
         actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
@@ -30,7 +30,7 @@ export default class DesignCheckModal extends Component {
         this.state = {
             wk: null,
             dataSource: [],
-            option: 1,
+            opinion: 1,
             topDir: {},
         };
     }
@@ -66,7 +66,7 @@ export default class DesignCheckModal extends Component {
     }
     //提交
     async submit() {
-        if (this.state.option === 1) {
+        if (this.state.opinion === 1) {
             await this.passon();
         } else {
             await this.reject();
@@ -233,7 +233,7 @@ export default class DesignCheckModal extends Component {
                             <span>审查意见：</span>
                         </Col>
                         <Col span={4}>
-                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
+                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>

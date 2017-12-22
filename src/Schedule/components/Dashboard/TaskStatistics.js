@@ -24,13 +24,12 @@ export default class Warning extends Component {
         const myChart3 = echarts.init(document.getElementById('TaskStatistics3'));
         this.option = {
             title: {
-                text: '91%',
+                text: '填报任务',
+                top: '85%',
                 x: 'center',
-                y: 'center',
                 textStyle: {
                     fontWeight: 'normal',
-                    color: '#0580f2',
-                    fontSize: '20'
+                    fontSize: '12'
                 }
             },
             color: ['#3898FF','#D5D8DD'],
@@ -63,7 +62,7 @@ export default class Warning extends Component {
                 name: 'Line 1',
                 type: 'pie',
                 clockWise: true,
-                radius: ['50%', '56%'],
+                radius: ['50%', '66%'],
                 itemStyle: {
                     normal: {
                         label: {
@@ -77,8 +76,20 @@ export default class Warning extends Component {
                 hoverAnimation: false,
         
                 data: [{
-                    value: 80,
+                    value: 91,
                     name: '01',
+                    label: {
+                        normal: {
+                            show: true,
+                            formatter: '{d} %',
+                            textStyle: {
+                                fontSize: 20,
+                                fontWeight: "bold",
+                                color: '#0580f2',
+                            },
+                            position: "center"
+                        }
+                    },
                     itemStyle: {
                         normal: {
                             color: { // 完成的圆环的颜色
@@ -99,7 +110,7 @@ export default class Warning extends Component {
                         }
                     }
                 }, {
-                    value: 20,
+                    value: 9,
                     name: 'invisible',
                     itemStyle: {
                         normal: {
@@ -123,13 +134,12 @@ export default class Warning extends Component {
 
         this.option2 = {
             title: {
-                text: '95%',
+                text: '审核任务',
+                top: '85%',
                 x: 'center',
-                y: 'center',
                 textStyle: {
                     fontWeight: 'normal',
-                    color: '#0580f2',
-                    fontSize: '20'
+                    fontSize: '12'
                 }
             },
             color: ['rgba(176, 212, 251, 1)'],
@@ -161,7 +171,7 @@ export default class Warning extends Component {
                 name: 'Line 1',
                 type: 'pie',
                 clockWise: true,
-                radius: ['50%', '56%'],
+                radius: ['50%', '66%'],
                 itemStyle: {
                     normal: {
                         label: {
@@ -175,8 +185,20 @@ export default class Warning extends Component {
                 hoverAnimation: false,
         
                 data: [{
-                    value: 80,
+                    value: 95,
                     name: '01',
+                    label: {
+                        normal: {
+                            show: true,
+                            formatter: '{d} %',
+                            textStyle: {
+                                fontSize: 20,
+                                fontWeight: "bold",
+                                color: '#0580f2',
+                            },
+                            position: "center"
+                        }
+                    },
                     itemStyle: {
                         normal: {
                             color: { // 完成的圆环的颜色
@@ -197,7 +219,7 @@ export default class Warning extends Component {
                         }
                     }
                 }, {
-                    value: 20,
+                    value: 5,
                     name: 'invisible',
                     itemStyle: {
                         normal: {
@@ -221,30 +243,22 @@ export default class Warning extends Component {
 
         this.option3 = {
             title: {
-                text: '93%',
+                text: '进度任务',
+                top: '85%',
                 x: 'center',
-                y: 'center',
                 textStyle: {
                     fontWeight: 'normal',
-                    color: '#0580f2',
-                    fontSize: '20'
+                    fontSize: '12'
                 }
             },
-            color: ['rgba(176, 212, 251, 1)'],
+            color: ['#4caf50', '#f44336'],
+            // tooltip: {
+            //     trigger: 'item',
+            //     formatter: '{a} <br/>{b} : {c} ({d}%)'
+            // },
             legend: {
-                orient: 'vertical',
-                left: 'right',
-                y: '8%',
+                left:'right',
                 data:['按期','逾期']
-            },
-            tooltip: {
-                show: false,
-                formatter: '{a} <br/>{b} : {c} ({d}%)'
-            },
-            legend: {
-                show: false,
-                itemGap: 12,
-                data: ['01', '02']
             },
             toolbox: {
                 show: false,
@@ -265,7 +279,7 @@ export default class Warning extends Component {
                 name: 'Line 1',
                 type: 'pie',
                 clockWise: true,
-                radius: ['50%', '56%'],
+                radius: ['50%', '66%'],
                 itemStyle: {
                     normal: {
                         label: {
@@ -279,8 +293,20 @@ export default class Warning extends Component {
                 hoverAnimation: false,
         
                 data: [{
-                    value: 80,
-                    name: '01',
+                    value: 93,
+                    label: {
+                        normal: {
+                            show: true,
+                            formatter: '{d} %',
+                            textStyle: {
+                                fontSize: 20,
+                                fontWeight: "bold",
+                                color: '#0580f2',
+                            },
+                            position: "center"
+                        }
+                    },
+                    name: '按期',
                     itemStyle: {
                         normal: {
                             color: { // 完成的圆环的颜色
@@ -301,8 +327,8 @@ export default class Warning extends Component {
                         }
                     }
                 }, {
-                    value: 20,
-                    name: 'invisible',
+                    value: 7,
+                    name: '逾期',
                     itemStyle: {
                         normal: {
                             color: { // 完成的圆环的颜色
@@ -332,35 +358,19 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <h1 style={{textAlign:'left'}}>任务统计</h1>
-                    <Row gutter={5}>
+                    <h2 style={{textAlign:'left',color:  '#74859f'}}>任务统计</h2>
+                    <Row >
                         <Col span={8}>
-                            <div id='TaskStatistics' style={{ width: '100%', height: '340px' }}></div>
+                            <div id='TaskStatistics' style={{ width: '100%', height: '361px' }}></div>
                         </Col>
                         <Col span={8}>
-                            <div id='TaskStatistics2' style={{ width: '100%', height: '340px' }}></div>
+                            <div id='TaskStatistics2' style={{ width: '100%', height: '361px' }}></div>
                         </Col>
                         <Col span={8}>
-                            <div id='TaskStatistics3' style={{ width: '100%', height: '340px' }}></div>
-                        </Col>
-                    </Row>
-                    <Row gutter={5}>
-                        <Col span={8}>
-                            <div style={{textAlign:'center'}}>
-                                填报任务
-                            </div>
-                        </Col>
-                        <Col span={8}>
-                            <div style={{textAlign:'center'}}>
-                                审核任务
-                            </div>
-                        </Col>
-                        <Col span={8}>
-                            <div style={{textAlign:'center'}}>
-                                进度任务
-                            </div>
+                            <div id='TaskStatistics3' style={{ width: '100%', height: '361px' }}></div>
                         </Col>
                     </Row>
+                    <label style={{display:'block',textAlign:'center',fontSize:14}}></label>
                 </Card>
             </div>
         );

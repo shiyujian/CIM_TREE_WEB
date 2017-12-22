@@ -95,7 +95,9 @@ export default class Modify extends Component {
         const option = {
             title : {
                 text: '成果审查历史统计',
-                subtext:'政务服务中心',
+                textStyle:{
+                    color:'#74859F'
+                },
                 x:'left'
             },
             color: ['#3B99FF', '#2DDBCA', '#546D83'],
@@ -135,17 +137,41 @@ export default class Modify extends Component {
                     name: '按期交付',
                     type: 'bar',
                     barGap: 0,
-                    data: [320, 332, 301, 334, 390, 210, 123, 451, 154, 134, 423, 234]
+                    barWidth:14,
+                    itemStyle:{
+                        normal:{
+                            show:true,
+                            barBorderRadius: 50,
+                            borderWidth: 0,
+                        }
+                    },
+                    data: [230, 180, 240, 190, 140, 160, 120, 180, 160, 149, 160, 140]
                 },
                 {
                     name: '提前交付',
                     type: 'bar',
-                    data: [220, 182, 191, 234, 290, 320, 332, 301, 334, 390, 210, 123]
+                    barWidth:14,
+                    itemStyle:{
+                        normal:{
+                            show:true,
+                            barBorderRadius: 50,
+                            borderWidth: 0,
+                        }
+                    },
+                    data: [80, 130, 130, 90, 60, 40, 60, 30, 60, 80, 49, 70]
                 },
                 {
                     name: '逾期交付',
                     type: 'bar',
-                    data: [150, 232, 201, 154, 190, 191, 234, 290, 320, 332, 301, 334]
+                    barWidth:14,
+                    itemStyle:{
+                        normal:{
+                            show:true,
+                            barBorderRadius: 50,
+                            borderWidth: 0,
+                        }
+                    },
+                    data: [40, 60, 20, 20, 40, 49, 30, 20, 25, 35, 10, 5]
                 }
             ]
         }
@@ -155,7 +181,8 @@ export default class Modify extends Component {
 	render() { //todo 设计成果变更统计具体实现
 		return (
 			<Blade title="">
-				<div id='resultCountBar2' style={{ width: '100%', height: '340px' }}></div>
+				<div id='resultCountBar2' style={{ width: '100%', height: '350px' }}></div>
+                <label style={{display:'block',textAlign:'center',fontSize:14}}>2017</label>
 			</Blade>
 		);
 	}

@@ -4,12 +4,16 @@ import {bindActionCreators} from 'redux';
 import {actions, ID} from '../store/item';
 import {actions as actions2} from '../store/cells';
 import {actions as platformActions} from '_platform/store/global';
-import {message} from 'antd';
+import {message,Row,Col,Card} from 'antd';
 import {Main, Content, Sidebar, DynamicTitle} from '_platform/components/layout';
 import DocTree from '../components/DocTree';
 import Approval from '_platform/components/singleton/Approval';
 import {Filter, Table, Blueprint} from '../components/Item';
 import QualityTree from '../components/QualityTree';
+import LeftTop from '../components/Item/LeftTop'
+import LeftBottom from '../components/Item/LeftBottom'
+import RightBottom from '../components/Item/RightBottom'
+import RightTop from '../components/Item/RightTop'
 import './common.less';
 var echarts = require('echarts');
 var myChart
@@ -31,20 +35,62 @@ export default class Item extends Component {
 	static propTypes = {};
 
 	componentDidMount(){
-        const {getUnitTree, getWorkPackageDetail} = this.props.cellActions
-        myChart = echarts.init(document.getElementById('qualityChart1'));
-		myChart3 = echarts.init(document.getElementById('qualityChart3'));
-		myChart2 = echarts.init(document.getElementById('qualityChart2'));
-        getUnitTree().then(res => {
-            try {
-                const unitPk = res.children[0].children[0].pk
-                getWorkPackageDetail({pk: unitPk}).then(res => {
-                    this.initChartData(res)
-                })
-            } catch (e) {
-                console.log('not fount C_WP_UNT!')
-            }
-        })
+        // const {getUnitTree, getWorkPackageDetail} = this.props.cellActions
+        // myChart = echarts.init(document.getElementById('qualityChart1'));
+		// myChart3 = echarts.init(document.getElementById('qualityChart3'));
+		// myChart2 = echarts.init(document.getElementById('qualityChart2'));
+        // getUnitTree().then(res => {
+        //     try {
+        //         const unitPk = res.children[0].children[0].pk
+        //         getWorkPackageDetail({pk: unitPk}).then(res => {
+        //             this.initChartData(res)
+        //         })
+        //     } catch (e) {
+        //         console.log('not fount C_WP_UNT!')
+        //     }
+		// })
+		const myChart = echarts.init(document.getElementById('lefttop'));
+        let option = {
+            color:['#4786ff','#02e5cd','#ffc369'],
+            title : {
+                text: '',
+                textStyle:{
+                  color:  '#bcbcc9'
+                },
+                x:'left'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                top:'30px',
+                left: 'right',
+                data: ['已整改','整改中','待整改']
+            },
+            series : [
+                {
+                    name: '质量缺陷整改统计',
+                    type: 'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:90, name:'已整改'},
+                        {value:20, name:'整改中'},
+                        {value:5, name:'待整改'},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        
+        myChart.setOption(option,true);
 	}
 	render() {
 		const {table: {editing = false} = {}} = this.props;
@@ -57,11 +103,41 @@ export default class Item extends Component {
 					</div>
 				</Sidebar>
 				<Content>
-					<div style={{ width: '100%', height: '814px' }}>
+					{/* <div style={{ width: '100%', height: '814px' }}>
 						<div id = 'qualityChart1' style={{ display: 'inline-block', width: '100%', height: '50%' }}></div>
 						<div id = 'qualityChart2' style={{ display: 'inline-block', width: '50%', height: '50%' }}></div>
 						<div id = 'qualityChart3' style={{ display: 'inline-block', width: '50%', height: '50%' }}></div>
+					</div> */}
+					<Row gutter={10} style={{margin: '10px 5px'}}>
+					<Col span={12}>
+					<div >
+						<Card>
+							<h2 style={{textAlign:'left',color:  '#74859f'}}>质量缺陷整改统计</h2>
+							<div id='lefttop' style={{ width: '100%', height: '340px' }}></div>
+						</Card>
 					</div>
+					</Col>
+					<Col span={12}>
+						<RightTop  {...this.props} {...this.state}/>
+					</Col>
+					{/* <Col span={12}>
+						<CompletionState  {...this.props} {...this.state}/>
+					</Col> */}
+				</Row>
+				<Row gutter={10} style={{margin: '10px 5px'}}>
+					<Col span={12}>
+						<LeftBottom   {...this.props} {...this.state}/>
+					</Col>
+					<Col span={12}>
+						 <RightBottom  {...this.props} {...this.state}/>
+					</Col>
+					{/* <Col span={12}>
+						<Output  {...this.props} {...this.state}/>
+					</Col>
+					<Col span={12}>
+						 <InquiryState {...this.props} {...this.state}/>
+					</Col> */}
+				</Row>
 				</Content>
 			</Main>
 		);

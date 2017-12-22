@@ -7,6 +7,7 @@ import { actions as platformActions } from '_platform/store/global';
 
 import {InfoUploadModal,VedioInfoTable,MainHeader} from '../components/VedioData';
 import { actions } from '../store/vedioInfoData';
+import {addSerialNumber} from '../components/VedioData/commonFunc';
 
 @connect(
 	state => {
@@ -23,18 +24,35 @@ export default class VedioInfoData extends Component {
 	constructor(props){
 		super(props);
 		this.state={
-			uploadModal: false
+			uploadModal: false,
+			dataSource: []
 		}
 	}
 
+	async componentDidMount(){
+        const {actions:{getScheduleDir}} = this.props;
+        const topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
+        if(topDir.obj_type){
+            let dir = await getScheduleDir({code:'datareport_safety_vedioinfodata'});
+            if(dir.obj_type){
+                if(dir.stored_documents.length>0){
+                    this.generateTableData(dir.stored_documents);
+                }
+            }
+        }
+    }
+
 	render() {
-		const {uploadModal} = this.state;
+		const {uploadModal,dataSource} = this.state,
+		sourceData = addSerialNumber(dataSource);
 
 		return (<Main>
 			<DynamicTitle title="影像信息" {...this.props} />
 			<Content>
 				<MainHeader showSendModal={this.showSendModal}/>
-				<VedioInfoTable/>
+				<VedioInfoTable
+				dataSource={sourceData}
+				/>
 			</Content>
 			<InfoUploadModal
 			 uploadModal={uploadModal}			 
@@ -50,4 +68,19 @@ export default class VedioInfoData extends Component {
     closeModal= ()=>{
         this.setState({uploadModal:false});
 	}
+
+	generateTableData = (data)=>{
+        const {actions:{
+            getDocument,
+        }} = this.props;
+		let dataSource = []
+		data.forEach(item=>{
+			getDocument({code:item.code}).then(response=>{
+				console.log(response);
+				let {extra_params:{projectName,ShootingDate,file}} = response;
+				dataSource.push({projectName,ShootingDate,file})
+				this.setState({dataSource});
+			})
+		})
+    }
 };

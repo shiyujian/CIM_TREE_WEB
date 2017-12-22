@@ -195,6 +195,10 @@ export default class ProjectSum extends Component {
             this.state.dataSource[i].unit = unit;
         }
         this.props.onok(this.state.dataSource, per);
+        notification.success({
+            message: '信息上传成功！',
+            duration: 2
+        });
     }
 
     //删除

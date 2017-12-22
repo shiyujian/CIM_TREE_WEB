@@ -6,9 +6,16 @@ import './index.less';
 import {FILE_API} from '_platform/api';
 
 export default class VedioInfoTable extends Component{
+
+    componentDidMount(){
+        const {fileDel=false} = this.props;
+        if(fileDel){
+            this.columns.push(this.operation);
+        }
+    }
     
     render(){
-        const {dataSource = []} = this.props;
+        const {dataSource=[]} = this.props;
         return(<Row className="rowSpacing">
             <Col span={24}>
                 <Table
@@ -121,7 +128,7 @@ export default class VedioInfoTable extends Component{
         dataIndex: 'file',
         render: (text, record, index)=>{
             let revert = null;
-            if(text&&text.id){
+            if(text&&text.name){
                 revert = (<div>
                     <div className="inlineBlockNospacing">{text.name} </div>
                     {
@@ -150,19 +157,21 @@ export default class VedioInfoTable extends Component{
     },{
         title: '拍摄时间',
         dataIndex: 'ShootingDate'
-    },{
+    }];
+
+    operation = {
         title: '操作',
         render: (text, record, index)=>{
             return (
                 <Popconfirm
-                 {...popAttribute}
-                 onConfirm={()=>{ this.deleteData(index) }}
+                {...popAttribute}
+                onConfirm={()=>{ this.deleteData(index) }}
                 >
                     <a>删除</a>
                 </Popconfirm>
             )
         }
-    }];
+    }
 }
 
 VedioInfoTable.PropTypes ={
@@ -170,12 +179,12 @@ VedioInfoTable.PropTypes ={
 }
 
 const showTotal = (total,range) =>{ //显示数据总量和当前数据顺序
-    console.log("showTotal",total,range);
+    //console.log("showTotal",total,range);
 }
 
 const rowSelection = {
     onChange:(selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        //console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     }
 }
 

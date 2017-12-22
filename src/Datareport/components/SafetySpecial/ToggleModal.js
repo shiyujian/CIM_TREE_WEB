@@ -285,6 +285,9 @@ export default class ToggleModal extends Component {
         }
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
         this.props.setData(this.state.dataSource, per);
+        console.log('vip-per',per);
+        console.log('vip-dataSource',this.state.dataSource);
+        
         ModalVisible(false);
         notification.success({
             message: '发起成功！',
@@ -428,7 +431,7 @@ export default class ToggleModal extends Component {
         {
             title: '序号',
             dataIndex: 'index',
-            width: '10%',
+            width: '5%',
         }
         ,
         // {

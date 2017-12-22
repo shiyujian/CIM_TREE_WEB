@@ -65,11 +65,27 @@ export default class Warning extends Component {
                 {
                     name:'计划完成',
                     type:'bar',
+                    barWidth: 14,
+                    itemStyle: {
+                        normal: {
+                            show: true,
+                            barBorderRadius: 50,
+                            borderWidth: 0,
+                        }
+                    },
                     data:[7000, 7000, 9400, 7500, 5800, 6200, 5300, 7200, 7200, 5900, 6100, 7000]
                 },
                 {
                     name:'实际完成',
                     type:'bar',
+                    barWidth: 14,
+                    itemStyle: {
+                        normal: {
+                            show: true,
+                            barBorderRadius: 50,
+                            borderWidth: 0,
+                        }
+                    },
                     data:[7500, 7500, 8400, 5500, 5000, 7900, 5300, 7400, 6800, 7500, 5800, 7500]
                 }
             ]
@@ -83,7 +99,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <h1 style={{textAlign:'left'}}>工程量完成对比</h1>
+                    <h2 style={{textAlign:'left',color:  '#74859f'}}>工程量完成对比</h2>
                     <div id='EngineeringCompletion' style={{ width: '100%', height: '340px' }}></div>
                     <label style={{display:'block',textAlign:'center',fontSize:14}}>2017</label>
                 </Card>

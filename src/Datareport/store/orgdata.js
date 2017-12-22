@@ -9,12 +9,14 @@ export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const getProjects = createFetchAction(`${SERVICE_API}/project-tree/?depth=1`);
 export const postOrgList = createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "POST");
 export const getOrgRoot = createFetchAction(`${SERVICE_API}/org-tree/?depth=1`,[], "GET");
+export const getUnit = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/`,[], );
 export const actions = {
 	ModalVisible,
 	getAllUsers,
 	getProjects,
 	postOrgList,
-	getOrgRoot
+	getOrgRoot,
+	getUnit
 };
 
 export default handleActions({
