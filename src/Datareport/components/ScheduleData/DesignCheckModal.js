@@ -30,7 +30,7 @@ export default class DesignCheckModal extends Component {
         this.state = {
             wk: null,
             dataSource: [],
-            option: 1,
+            opinion: 1,
             topDir: {},
         };
     }
@@ -233,7 +233,7 @@ export default class DesignCheckModal extends Component {
                             <span>审查意见：</span>
                         </Col>
                         <Col span={4}>
-                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
+                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
