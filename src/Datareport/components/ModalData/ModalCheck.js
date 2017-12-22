@@ -81,7 +81,7 @@ export default class ModalCheck extends Component {
             postScheduleDir,
             getWorkpackagesByCode
         }} = this.props;
-        debugger
+        
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
         let project = dataSource[0].project;
@@ -121,10 +121,11 @@ export default class ModalCheck extends Component {
         const docData = [];
         let i=0;   //asure the code of every document only
         dataSource.map(item=>{
+            console.log('item',item)
             i++;
             docData.push({
-                code:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
-                name:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
+                code:'modelsafe'+moment().format("YYYYMMDDHHmmss")+i,
+                name:'mofelsafe'+moment().format("YYYYMMDDHHmmss")+i,
                 obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},
@@ -161,8 +162,8 @@ export default class ModalCheck extends Component {
                     modeType:item.modeType,
                     unit:item.unit.name,
                     project:item.project.name,
-                    reportingTime:item.reportingTime.name,
-                    reportingName:item.reportingName.name,
+                    reportingTime:item.reportingTime,
+                    reportingName:item.reportingName,
                 }
             })
         });
