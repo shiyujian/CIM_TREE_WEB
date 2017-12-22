@@ -114,7 +114,7 @@ export default class SumPlanCheck extends Component {
     let workpackage = await getWorkpackagesByCode({ code: unit.code });
 
     let postDirData = {
-      name: "安全文档目录树",
+      name: "结算计划目录树",
       code: code,
       obj_type: "C_DIR",
       status: "A",
