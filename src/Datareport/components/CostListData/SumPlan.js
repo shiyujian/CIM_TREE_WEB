@@ -87,15 +87,15 @@ export default class SumPlan extends Component {
       });
       let name = Object.keys(info.file.response);
       let dataList = info.file.response[name[0]];
+      console.log('datalist',dataList)
       let dataSource = [];
       for (let i = 1; i < dataList.length; i++) {
         dataSource.push({
-          code: dataList[i][0] ? dataList[i][0] : "",
-          nodetarget: dataList[i][1] ? dataList[i][1] : "",
-          completiontime: dataList[i][2] ? dataList[i][2] : "",
-          summoney: dataList[i][3] ? dataList[i][3] : "",
-          ratio: dataList[i][4] ? dataList[i][4] : "",
-          remark: dataList[i][5] ? dataList[i][5] : "",
+          nodetarget: dataList[i][0] ? dataList[i][0] : "",
+          completiontime: dataList[i][1] ? dataList[i][1] : "",
+          summoney: dataList[i][2] ? dataList[i][2] : "",
+          ratio: dataList[i][3] ? dataList[i][3] : "",
+          remark: dataList[i][4] ? dataList[i][4] : "",
         //   upPeople: dataList[i][5] ? dataList[i][5] : "",
           project: {
             code: "",
@@ -110,6 +110,7 @@ export default class SumPlan extends Component {
           file: {}
         });
       }
+      console.log('dataSource',dataSource)
       this.setState({ dataSource });
     }
   };
@@ -335,32 +336,30 @@ export default class SumPlan extends Component {
       {
         title: "序号",
         dataIndex: "code",
-        width: "10%"
+        width: "10%",
+        render:(text,record,index)=>{
+          return index+1
+        }
       },
       {
         title: "工作节点目标",
-        dataIndex: "nodetarget",
-        width: "10%"
+        dataIndex: "nodetarget"
       },
       {
         title: "完成时间",
-        dataIndex: "completiontime",
-        width: "10%"
+        dataIndex: "completiontime"
       },
       {
         title: "支付金额（万元）",
-        dataIndex: "summoney'",
-        width: "10%"
+        dataIndex: "summoney"
       },
       {
         title: "累计占比",
-        dataIndex: "ratio",
-        width: "10%"
+        dataIndex: "ratio"
       },
       {
         title: "备注",
-        dataIndex: "remark",
-        width: "10%"
+        dataIndex: "remark"
       },
       {
         title: "操作",
