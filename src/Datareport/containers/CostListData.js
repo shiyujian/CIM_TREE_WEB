@@ -89,7 +89,7 @@ export default class CostListData extends Component {
 				let temp = {
 					code:single.extra_params.code,
 					company:single.extra_params.company,
-					content:single.extra_params.content,
+					rate:single.extra_params.rate,
 					projectcoding:single.extra_params.projectcoding,
 					remarks:single.extra_params.remarks,
 					total:single.extra_params.total,

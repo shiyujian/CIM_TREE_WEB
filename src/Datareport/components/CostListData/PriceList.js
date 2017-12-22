@@ -76,7 +76,7 @@ export default class PriceList extends Component {
                     filename: dataList[i][0] ? dataList[i][0] : '',
                     projectcoding: dataList[i][1] ? dataList[i][1] : '',
                     valuation: dataList[i][2] ? dataList[i][2] : '',
-                    content: dataList[i][3] ? dataList[i][3] : '',
+                    rate: dataList[i][3] ? dataList[i][3] : '',
                     company: dataList[i][4] ? dataList[i][4] : '',
                     total: dataList[i][5] ? dataList[i][5] : '',
                     remarks: dataList[i][5] ? dataList[i][6] : '',
@@ -88,7 +88,8 @@ export default class PriceList extends Component {
                     unit:{
                         code:"",
                         name:"",
-                        obj_type:""
+                        obj_type:"",
+                        pk: ""
                     },
                     file:{
                         id: 'pricelist',
@@ -328,7 +329,7 @@ export default class PriceList extends Component {
                 width:"10%",
             },{
                 title:'工程内容/规格编号',
-                dataIndex:'content',
+                dataIndex:'rate',
                 width:"12%",
             },{
                 title:'计价单位',
