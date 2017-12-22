@@ -90,7 +90,9 @@ export default class SumPlanCheck extends Component {
     this.props.closeModal("dr_qua_jsjh_visible", false);
     message.info("操作成功");
   }
-
+  closeCheck(){
+    this.props.closeModal("dr_qua_jsjh_visible", false);    
+  }
   //通过
   async passon() {
     const { dataSource, wk, topDir } = this.state;
@@ -264,6 +266,7 @@ export default class SumPlanCheck extends Component {
         visible={true}
         width={1280}
         footer={null}
+        onCancel = {this.closeCheck.bind(this)}
         maskClosable={false}
       >
         <div>
