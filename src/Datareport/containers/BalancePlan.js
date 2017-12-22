@@ -15,15 +15,15 @@ import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radi
 const Search = Input.Search;
 import {WORKFLOW_CODE} from '_platform/api.js';
 import {getUser} from '_platform/auth';
-import {actions} from '../store/CostListData';
+import {actions} from '../store/SumPlanCost';
 import {actions as platformActions} from '_platform/store/global';
 import {SumPlan} from '../components/CostListData';
 import {getNextStates} from '_platform/components/Progress/util';
 var moment = require('moment');
 @connect(
 	state => {
-		const {datareport: {CostListData = {}} = {}, platform} = state;
-		return {...CostListData, platform}
+		const {datareport: {SumPlanCost = {}} = {}, platform} = state;
+		return {...SumPlanCost, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({...actions, ...platformActions}, dispatch)
@@ -36,7 +36,8 @@ export default class BanlancePlan extends Component {
 		super(props);
 		this.state = {
 			lanchReapt:false,
-			lanchAudit:false
+			lanchAudit:false,
+			dataSource:[]
 		};
 	}
 	submit(){
@@ -45,6 +46,43 @@ export default class BanlancePlan extends Component {
 	examine(){
 		this.setState({lanchAudit:true})
 	}
+	async componentDidMount(){
+		const { actions:{ getScheduleDir } } = this.props;
+		let topDir = await getScheduleDir({ code :'the_only_main_code_SumPlanCheck'});
+		console.log('topDir',topDir);
+		if(topDir.obj_type){
+			let dir = await getScheduleDir({code:'datareport_safetydoc_111201'});
+			console.log('dir',dir)
+			if(dir.obj_type){
+				if(dir.obj_type.length > 0){
+					this.generateTableData(dir.stored_documents);
+				}
+			}
+		}
+	}
+	async generateTableData(data) {
+		const { actions: {
+			getDocument,
+	                 } } = this.props;
+		let dataSource = [];
+		data.map(item => {
+			getDocument({ code: item.code }).then(single => {
+				console.log('single:', single)
+				let temp = {
+					subproject: single.extra_params.subproject,
+					unit: single.extra_params.unit,
+					nodetarget: single.extra_params.nodetarget,
+					completiontime: single.extra_params.completiontime,
+					summoney: single.extra_params.summoney,
+					ratio: single.extra_params.ratio,
+					remarks: single.extra_params.remark
+				}
+				dataSource.push(temp);
+				this.setState({dataSource:dataSource})
+			})
+		})
+	}
+
 	lanchOk(data,participants){
 		//批量上传回调
 			const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
@@ -97,6 +135,9 @@ export default class BanlancePlan extends Component {
           const columns = [{
 			title: '序号',
 			dataIndex: 'serialnumber',
+			render:(text,record,index) => {
+				return index+1
+			}
 		  },{
 			title: '项目/子项目名称',
 			dataIndex: 'subproject',
@@ -119,8 +160,6 @@ export default class BanlancePlan extends Component {
 			title: '备注',
 			dataIndex: 'remarks',
 		  }]
-        const data = []
-
 		return (
 			<div>
 				<DynamicTitle title="结算计划" {...this.props}/>
@@ -138,7 +177,7 @@ export default class BanlancePlan extends Component {
 						/>
 				</Row>
 					<div >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={data} bordered/>
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.dataSource} />
 					</div>
 					{this.state.lanchReapt &&
 						<SumPlan {...this.props} oncancel={()=>{this.setState({lanchReapt:false})}} onok={this.lanchOk.bind(this)} />
