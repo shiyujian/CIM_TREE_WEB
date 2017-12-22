@@ -466,13 +466,10 @@ export default class Addition extends Component {
             }, {
                 title: '上报时间',
                 dataIndex: 'reportingTime',
-                // render: (text,record,index) => {
-                //     var myDate = new Date()
-                //     console.log(record)
-                //     return (
-                       
-                //     )
-                // }
+                render: (text,record,index) => {
+                    var myDate = new Date()
+                    
+                   }
             }, {
                 title: '上报人',
                 dataIndex: 'reportingName'
