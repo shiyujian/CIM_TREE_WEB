@@ -3,7 +3,7 @@ import { DynamicTitle, Sidebar, Content } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Row, Col } from 'antd';
+import { Row, Col ,Card} from 'antd';
 import { actions as schemeActions } from '../store/scheme';
 import ProjectUnitWrapper from '../components/ProjectUnitWrapper';
 import echarts from 'echarts';
@@ -279,19 +279,19 @@ export default class Dashboard extends Component {
                 <Content>
                     <Row gutter={20}>
                         <Col span={11}>
-                            <div id='resultChangePie1' style={{ width: '100%', height: '450px' }}></div>
+                            <Card id='resultChangePie1' style={{ width: '100%', height: '450px' }}></Card>
                         </Col>
                         <Col span={11}>
-                            <div id='resultChangePie2' style={{ width: '100%', height: '450px' }}></div>
+                            <Card id='resultChangePie2' style={{ width: '100%', height: '450px' }}></Card>
                             <label style={{ display: 'block', textAlign: 'center', fontSize: 14 }}>2017</label>
                         </Col>
                     </Row>
                     <Row style={{ marginTop: 20 }} gutter={20}>
                         <Col span={11}>
-                            <div id='resultChangePie3' style={{ width: '100%', height: '450px' }}></div>
+                            <Card id='resultChangePie3' style={{ width: '100%', height: '450px' }}></Card>
                         </Col>
                         <Col span={11}>
-                            <div id='resultChangePie4' style={{ width: '100%', height: '450px' }}></div>
+                            <Card id='resultChangePie4' style={{ width: '100%', height: '450px' }}></Card>
                             <label style={{ display: 'block', textAlign: 'center', fontSize: 14 }}>2017</label>
                         </Col>
                     </Row>
