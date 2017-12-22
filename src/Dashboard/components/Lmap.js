@@ -1038,7 +1038,7 @@ export default class Lmap extends Component {
 								checkItems[kk]&&checkItems[kk].on('click', function () {
 									me.setState({
 										panoramaModalVisble: true,
-										panoramalink: DashboardVideo360API + '/' + c.properties.link
+										panoramalink: DashboardVideo360API + '/' + cc.properties.link
 									});
 								});
 							}
