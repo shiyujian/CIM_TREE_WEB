@@ -4,6 +4,7 @@ import {
     Input, Form, Spin, Upload, Icon, Button, Modal,
     Cascader, Select, Popconfirm, message, Table, Row, Col, notification
 } from 'antd';
+import {getUser} from '_platform/auth';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
@@ -79,7 +80,7 @@ class DesignModal extends Component {
                     major: dataList[i][3] ? dataList[i][3] : '',
                     factovertime: dataList[i][4] ? dataList[i][4] : '',
                     designunit: dataList[i][5] ? dataList[i][5] : '',
-                    uploads: dataList[i][6] ? dataList[i][6] : '',
+                    uploads: getUser().username,
                     project: {
                         code: "",
                         name: "",

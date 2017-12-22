@@ -221,7 +221,6 @@ export default class DesignCheckModal extends Component {
                 footer={null}
                 maskClosable={false}
                 onCancel={this.oncancel.bind(this)}>
-                >
                 <div>
                     <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}

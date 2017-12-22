@@ -82,12 +82,15 @@ export default class SafetySpecialCheck extends Component {
             postScheduleDir,
             getWorkpackagesByCode
         } } = this.props;
-        console.log(dataSource, '-------')
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
-        let code = 'datareport_safetyspecial_' + unit.code;
+        let project = dataSource[0].project;
+        // let code = 'datareport_safetyspecial_' + unit.code;
+        let code = 'datareport_safetyspecial_05';
         //get workpackage by unit's code 
         let workpackage = await getWorkpackagesByCode({ code: unit.code });
+        console.log('vip-code', code);
+        console.log('vip-workpackage', workpackage);
 
         let postDirData = {
             "name": '安全专项目录树',
@@ -134,7 +137,7 @@ export default class SafetySpecialCheck extends Component {
             docData.push({
                 code: 'safetyspecial' + moment().format("YYYYMMDDHHmmss") + i,
                 name: item.file.name,
-                obj_type: "C_DEOC",
+                obj_type: "C_DOC",
                 status: 'A',
                 profess_folder: { code: dir.code, obj_type: 'C_DIR' },
                 "basic_params": {
@@ -151,11 +154,18 @@ export default class SafetySpecialCheck extends Component {
                 extra_params: {
                     code: item.code,
                     filename: item.file.name,
-                    pubUnit: item.pubUnit,
-                    type: item.type,
-                    doTime: item.doTime,
+                    resUnit: item.resUnit,
+                    index: item.index,
+                    projectName: item.projectName,
+                    unitProject: item.unitProject,
+                    scenarioName: item.scenarioName,
+                    organizationUnit: item.organizationUnit,
+                    reviewTime: item.reviewTime,
+                    reviewComments: item.reviewComments,
+                    reviewPerson: item.reviewPerson,
                     remark: item.remark,
-                    upPeople: item.upPeople
+                    project: item.project,
+                    unit: item.unit,
                 }
             })
         });

@@ -8,7 +8,7 @@ import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base} from '_platform/api';
 
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
 const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [], 'DELETE');
-export const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
+// export const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
 const getWorkpackagesByCode = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`, [], 'GET');
 //获取项目树
 export const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
@@ -33,7 +33,7 @@ export const actions = {
 	getProjectTree,
     uploadStaticFile,
     deleteStaticFile,
-	getWorkPackageDetail,
+	// getWorkPackageDetail,
 	getWorkpackagesByCode,
 	getAllUsers,
 	getDocument,
