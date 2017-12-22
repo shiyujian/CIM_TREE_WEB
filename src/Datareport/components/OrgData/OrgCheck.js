@@ -28,6 +28,7 @@ export default class OrgCheck extends Component {
 		this.state = {
             wk:null,
             dataSource:[],
+            
             opinion:1,//1表示通过 2表示不通过
 		};
     }
