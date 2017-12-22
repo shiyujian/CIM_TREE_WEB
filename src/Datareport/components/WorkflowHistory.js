@@ -90,13 +90,20 @@ class WorkFlowHistory extends Component {
                 let rcdExecutor = records.length ? { ...records[0].participant.executor } : {};
                 // let {participant:{executor}} = records[0];
                 participants.forEach(pt => {
-                    let { executor: { person_name, id } = {} } = pt;
+                    let executor = pt.executor;
+                    let executorName = '';
+                    if(executor.username){
+                        executorName = executor.username
+                    }else{
+                        executorName = executor.person_name
+                    }
+                    let { executor: { id } = {} } = pt;
                     //过滤掉设计变更流程，在有一个审查的时候多余的一条待处理的数据
                     if (rcdExecutor.id === id) {
                         rcdExecutor.id = null; //匹配到一条就清空
                         return;
                     }
-                    cbLogs += `${person_name} 正在处理 (${name}) `;
+                    cbLogs += `${executorName} 正在处理 (${name}) `;
                 });
                 let prNode = {
                     type: 4, //节点类型 1-发起 2-已处理 3-完成 4-正在处理
