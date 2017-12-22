@@ -112,7 +112,7 @@ export default class Dashboard extends Component {
 					</div>
 				</Sidebar>
 				<Content>
-					<Row gutter={10} style={{margin: '10px 5px'}}>
+					<Row gutter={10} style={{margin: '0 5px 10px'}}>
 						{/* <Col span={8}>
 							<Change {...this.state}/>
 						</Col> */}
@@ -124,10 +124,10 @@ export default class Dashboard extends Component {
 						</Col>
 					</Row>
 					<Row gutter={10} style={{margin: '10px 5px'}}>
-						<Col span={8}>
+						<Col span={12}>
 							{ModifyLeft && <ModifyLeft {...props} DrawingReportValue={this.state.DrawingReportValue}/>}
 						</Col>
-						<Col span={16}>
+						<Col span={12}>
 							{Modify && <Modify {...props} DrawingReportValue={this.state.DrawingReportValue}/>}
 						</Col>
 					</Row>

@@ -121,12 +121,11 @@ export default class VedioCheck extends Component {
                 postScheduleDir,
                 getWorkpackagesByCode
             }} = this.props;
-            console.log(dataSource[0])
         const //{unit:{code:unitCode}} = dataSource[0],
             unitCode = 1112,    //需修改
             scheduleDircode = 'datareport_safety_vediodata'; //I'm unique
         let dir = await getScheduleDir({code:scheduleDircode});
-        console.log(dir,topDir)
+        debugger
         if(!dir.obj_type){  //no such directory
             const {pk, code, obj_type} = await getWorkpackagesByCode({code:unitCode}),
                 postDirData = {
@@ -156,7 +155,7 @@ export default class VedioCheck extends Component {
             return {
                 code:'vedioData'+moment().format("YYYYMMDDHHmmss")+item.index,  //makesure code is unique
                 name:cameraName,
-                obj_type:"C_DEOC",
+                obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},
                 extra_params

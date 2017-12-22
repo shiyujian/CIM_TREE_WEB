@@ -328,7 +328,7 @@ export default class TotalApprovalForm extends Component {
                         <Button type="primary" onClick={this.submitPlan.bind(this)}>发送</Button>
                         <h1 style={{textAlign:'center'}}>总进度计划填报通知</h1>
                         <Card className='mb10'>
-                            <Row gutter={15} style={{marginBottom:10}}>
+                            <Row gutter={30} style={{marginBottom:10}}>
                                 <Col span={8}>
                                     <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">项目名称:</label>
                                     <div className='start_input'>
@@ -348,7 +348,7 @@ export default class TotalApprovalForm extends Component {
                                     </div>   
                                 </Col>
                             </Row>
-                            <Row gutter={15} className='mb10'>
+                            <Row gutter={30} className='mb10'>
                                 <Col span={8}>
                                     <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">施工单位:</label>
                                     <div className='start_input'>
@@ -368,7 +368,7 @@ export default class TotalApprovalForm extends Component {
                                     </div>       
                                 </Col>
                             </Row>
-                            <Row gutter={15} style={{marginTop:10}}>
+                            <Row gutter={30} style={{marginTop:10}}>
                                 <Col span={8}>
                                     <label  style={{minWidth: 60,display: 'inline-block'}} htmlFor="">监理单位:</label>
                                     <div className='start_input'>
@@ -397,7 +397,7 @@ export default class TotalApprovalForm extends Component {
                                     dataSource={data}></Table>
                                 </Col>
                             </Row>
-                            <Row style={{marginTop:10}}>
+                            <Row style={{marginTop:10}} gutter={30}>
                                 <Col span={8}>
                                     <a style={{textAlign:'center',display: 'block'}} onClick={this.downloadExcel.bind(this)}>下载总进度计划表</a>
                                 </Col>
@@ -467,7 +467,6 @@ export default class TotalApprovalForm extends Component {
                                 </Col>
                             </Row>
                         </Card>
-
                     </div>
                 }
             </div>

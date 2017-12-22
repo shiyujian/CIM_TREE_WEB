@@ -8,7 +8,7 @@
 
 module.exports = () => {
 	return {
-		'icon-url': "'/static/fonts/iconfont'"
+		'icon-url': "'/fonts/iconfont'"
 		/*'disabled-color': '#4D4D4D',
 		'icon-url': "'/fonts/iconfont'",
         'table-header-bg': '#9cc8e4',

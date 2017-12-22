@@ -6,7 +6,7 @@ import {Button, Modal, Spin, message, Collapse, Checkbox} from 'antd';
 import {Icon} from 'react-fa'
 // import {Icon} from 'react-fa';
 // import {users, safetys, hazards, vedios} from './geojsonFeature';
-import {panorama} from './geojsonFeature';
+import {panorama_360} from './geojsonFeature';
 import {PDF_FILE_API, previewWord_API, CUS_TILEMAP, Video360_API2,DashboardVideo360API} from '_platform/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'
@@ -597,6 +597,7 @@ export default class Lmap extends Component {
 		getVideo360List().then(data => {
 			let metalist = data.metalist;
 			let panorama = [];
+			//panorama = panorama_360; // 测试数据
 			if(metalist && metalist.length > 0 ){
 				metalist.map(meta => {
 					panorama.push({
@@ -1033,11 +1034,11 @@ export default class Lmap extends Component {
 						let kk = keys.find(k => k == cc.key);
 						if (featureName == 'geojsonFeature_360') {
 							if (kk) {
-								checkItems[kk] = me.createMarker(c, checkItems[kkkk]);
+								checkItems[kk] = me.createMarker(cc, checkItems[kk]);
 								checkItems[kk]&&checkItems[kk].on('click', function () {
 									me.setState({
 										panoramaModalVisble: true,
-										panoramalink: DashboardVideo360API + '/' + c.properties.link
+										panoramalink: DashboardVideo360API + '/' + cc.properties.link
 									});
 								});
 							}

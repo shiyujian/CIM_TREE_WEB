@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
+import { getUnit } from '../../store/orgdata';
 const Search = Input.Search;
 const Option = Select.Option;
 export default class ToggleModal extends Component{
@@ -12,7 +13,8 @@ export default class ToggleModal extends Component{
             projects: [],
             checkers: [],
             defaultPro: "",
-            defaultchecker: ""
+            defaultchecker: "",
+            units:[]
         }
     }
     render(){
@@ -91,7 +93,7 @@ export default class ToggleModal extends Component{
                 depart: item[4],
                 direct: item[5],
                 unit: item[6],
-                remarks: item[7],
+                remarks: item[7]
             }
         })
         return res;
@@ -134,7 +136,7 @@ export default class ToggleModal extends Component{
                 let projects = rst.children.map(item => {
                     return (
                         // <Option value={JSON.stringify(item)}>{item.name}</Option>
-                        <Option value={item.name}>{item.name}</Option>
+                        <Option value={JSON.stringify(item)}>{item.name}</Option>
                     )
                 })
                 this.setState({
@@ -173,6 +175,18 @@ export default class ToggleModal extends Component{
         render:(record) => {
             return (
                 <Select style={{width:"90%"}} value = {record.project || this.state.defaultPro} onSelect={ele => {
+                    console.log("ele:",ele);
+                    // const {actions:{getUnit}} = this.props;
+                    // getUnit({},{code:JSON.parse(ele).code}).then(rst => {
+                    //     let units = rst.map(item => {
+                    //         return (
+                    //             // <Option value={JSON.stringify(item)}>{item.name}</Option>
+                    //             <Option value={item.name}>{item.name}</Option>
+                    //         )
+                    //     })
+                    //     console.log("rst:",rst);
+                    //     this.setState({units})
+                    // })
                     record.project = ele;
                     this.forceUpdate();
                 }}>
@@ -184,6 +198,15 @@ export default class ToggleModal extends Component{
         title: '负责单位工程名称',
         dataIndex: 'unit',
         key: 'Unit'
+        // render:(record) => {
+        //     return (
+        //         <Select style={{width:"90%"}} value = {record.unit || ''} onSelect={ ele => {
+        //             record.unit = ele;
+        //         }}>
+        //             {this.state.units}
+        //         </Select>
+        //     )
+        // }
     }, {
         title: '备注',
         dataIndex: 'remarks',

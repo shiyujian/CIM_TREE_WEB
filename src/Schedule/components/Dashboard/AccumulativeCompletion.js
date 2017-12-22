@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card} from 'antd';
+import './index.less';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
@@ -21,7 +22,7 @@ export default class Warning extends Component {
         const myChart = echarts.init(document.getElementById('AccumulativeCompletion'));
 
         this.optionLine = {
-            color: [ '#546d83'],
+            color: [ '#0B7FFF'],
             tooltip: {
                 trigger: 'axis'
             },
@@ -48,28 +49,27 @@ export default class Warning extends Component {
                 // }
             },
             yAxis: {
-                type: 'value',
-                min: 0,
-                max: 200,
-                interval: 40,
+                type: 'value'
             },
             series: [
                 {
                     // name:'Step Start',
                     type:'line',
                     // step: 'start',
-                    data:[38, 60, 42, 45, 38, 60, 50, 65, 40, 56, 49, 52],
-                    areaStyle: {
+                    data:[6100, 7800, 7000, 7900, 7000, 8200, 7800, 8200, 7500, 8200, 7600, 7800],
+                    areaStyle: {normal:{}},
+                    itemStyle: {
                         normal: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                offset: 0,
-                                color: '#8c9dab'
-                            }, {
-                                offset: 1,
-                                color: '#ffe'
-                            }])
+                            color: new echarts.graphic.LinearGradient(
+                                0, 0, 0, 1,
+                                [
+                                    {offset: 0, color: 'rgb(160,229,254)'},
+                                    {offset: 0.5, color: 'rgb(230,241,254)'},
+                                    {offset: 1, color: 'rgb(246,250,254)'}
+                                ]
+                            )
                         }
-                    },
+                    }
                 }
             ]
         };
@@ -83,7 +83,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <h2 style={{textAlign:'left',color:  '#74859f'}}>质量缺陷上报统计</h2>
+                    <h2 style={{textAlign:'left',color:  '#74859f'}}>累计完成工程量</h2>
                     <div id='AccumulativeCompletion' style={{ width: '100%', height: '340px' }}></div>
                     <label style={{display:'block',textAlign:'center',fontSize:14}}>2017</label>
                 </Card>

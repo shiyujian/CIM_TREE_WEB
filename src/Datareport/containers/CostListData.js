@@ -33,12 +33,6 @@ export default class CostListData extends Component {
 				return index+1
 			}
 		},{
-			title:'项目',
-			dataIndex:'project',
-		},{
-			title:'单位工程',
-			dataIndex:'unit',
-		},{
 			title:'清单项目编号',
 			dataIndex:'projectcoding'
 		},{
