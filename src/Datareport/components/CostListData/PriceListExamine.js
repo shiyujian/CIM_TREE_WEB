@@ -139,13 +139,20 @@ export default class PriceListExamine extends Component {
                     ]
                   },
                 extra_params:{
+                    code: item.code,
+                    subproject: item.project.name,
                     projectcoding:item.projectcoding,
-                    total:item.total
+                    total:item.total,
+                    valuation: item.valuation,
+                    content: item.content,
+                    company: item.company,
+                    remarks: item.remarks,
+                    unitengineering: item.unit.name
                 }
             })
         });
-        let rst = await addDocList({},{data_list:docData});
         debugger;
+        let rst = await addDocList({},{data_list:docData});
         if(rst.result){
             notification.success({
                 message: '创建文档成功！',
@@ -185,6 +192,7 @@ export default class PriceListExamine extends Component {
       const  columns = 
         [{
             title:'序号',
+            dataIndex:'code',
             render:(text,record,index) => {
                 console.log(text)
                 return index+1
