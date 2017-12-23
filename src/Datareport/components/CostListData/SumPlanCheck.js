@@ -90,7 +90,9 @@ export default class SumPlanCheck extends Component {
     this.props.closeModal("dr_qua_jsjh_visible", false);
     message.info("操作成功");
   }
-
+  closeCheck(){
+    this.props.closeModal("dr_qua_jsjh_visible", false);    
+  }
   //通过
   async passon() {
     const { dataSource, wk, topDir } = this.state;
@@ -112,7 +114,7 @@ export default class SumPlanCheck extends Component {
     let workpackage = await getWorkpackagesByCode({ code: unit.code });
 
     let postDirData = {
-      name: "安全文档目录树",
+      name: "结算计划目录树",
       code: code,
       obj_type: "C_DIR",
       status: "A",
@@ -264,6 +266,7 @@ export default class SumPlanCheck extends Component {
         visible={true}
         width={1280}
         footer={null}
+        onCancel = {this.closeCheck.bind(this)}
         maskClosable={false}
       >
         <div>

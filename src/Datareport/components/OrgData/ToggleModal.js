@@ -18,7 +18,6 @@ export default class ToggleModal extends Component{
         }
     }
     render(){
-        console.log("datasource",this.state.dataSource);
         const {visible = false} = this.props;
         let jthis = this;
         const props = {
@@ -92,8 +91,8 @@ export default class ToggleModal extends Component{
                 name: item[3],
                 depart: item[4],
                 direct: item[5],
-                unit: item[6],
-                remarks: item[7]
+                // unit: item[6],
+                remarks: item[6]
             }
         })
         return res;
@@ -175,19 +174,17 @@ export default class ToggleModal extends Component{
         render:(record) => {
             return (
                 <Select style={{width:"90%"}} value = {record.project || this.state.defaultPro} onSelect={ele => {
-                    console.log("ele:",ele);
-                    // const {actions:{getUnit}} = this.props;
-                    // getUnit({},{code:JSON.parse(ele).code}).then(rst => {
-                    //     let units = rst.map(item => {
-                    //         return (
-                    //             // <Option value={JSON.stringify(item)}>{item.name}</Option>
-                    //             <Option value={item.name}>{item.name}</Option>
-                    //         )
-                    //     })
-                    //     console.log("rst:",rst);
-                    //     this.setState({units})
-                    // })
-                    record.project = ele;
+                    record.project = JSON.parse(ele).name;
+                    console.log("ele",ele);
+                    const {actions:{getUnit}} = this.props;
+                    getUnit({code:JSON.parse(ele).code}).then(rst => {
+                        let units = rst.children.map(item => {
+                            return (
+                                <Option value={JSON.stringify(item)}>{item.name}</Option>
+                            )
+                        })
+                        this.setState({units})
+                    })
                     this.forceUpdate();
                 }}>
                     {this.state.projects}
@@ -196,17 +193,19 @@ export default class ToggleModal extends Component{
         }
     }, {
         title: '负责单位工程名称',
-        dataIndex: 'unit',
-        key: 'Unit'
-        // render:(record) => {
-        //     return (
-        //         <Select style={{width:"90%"}} value = {record.unit || ''} onSelect={ ele => {
-        //             record.unit = ele;
-        //         }}>
-        //             {this.state.units}
-        //         </Select>
-        //     )
-        // }
+        // dataIndex: 'unit',
+        // key: 'Unit',
+        render:(record) => {
+            return (
+                <Select style={{width:"90%"}} value = {record.unit || ''} onSelect={ ele => {
+                    record.unit = JSON.parse(ele).name;
+                    console.log("record.unit",record.unit);
+                    this.forceUpdate();
+                }}>
+                    {this.state.units}
+                </Select>
+            )
+        }
     }, {
         title: '备注',
         dataIndex: 'remarks',

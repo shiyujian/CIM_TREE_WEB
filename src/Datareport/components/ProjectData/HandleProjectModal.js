@@ -121,7 +121,8 @@ async submit(){
             }
         }
     }
-    render(){       
+    render(){ 
+
         const columns =
             [{
                 title: '序号',

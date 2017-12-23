@@ -37,7 +37,10 @@ export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'P
 export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 //创建文档目录
 export const addDefectDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
-
+//文档目录树相关
+const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
+const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
+const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
 
 export const actions = {
 	...additionReducer,
@@ -58,7 +61,10 @@ export const actions = {
 	addDocList,
 	deleteWorkflow,
 	updateWpData,
-	addDefectDir
+	addDefectDir,
+	getScheduleDir,
+	postScheduleDir,
+	getDocument
 };
 
 export default handleActions({

@@ -78,10 +78,16 @@ export default class SafetySpecial extends Component {
 				<Content>
 					<TableOrg {...this.props} />
 					{
-						visible && <ToggleModal {...this.props} setData={this.setData.bind(this)} key={this.state.newKey1} oncancel={this.goCancel.bind(this)}/>
+						visible && <ToggleModal {...this.props} 
+						maskClosable={false} setData={this.setData.bind(this)} key={this.state.newKey1} 
+						oncancel={this.goCancel.bind(this)}/>
 					}
 				</Content>
 			</div>
 		)
 	}
+	
+  
+
+
 };

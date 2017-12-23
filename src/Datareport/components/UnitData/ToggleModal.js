@@ -10,29 +10,33 @@ export default class ToggleModal extends Component{
         }
     }
     render(){
-        const {visible} = this.props;
+        const {actions:{postWorkpackages,postWorkpackagesOK},visible,postWorkpackagesOKp} = this.props;
+        postWorkpackagesOK()
+        console.log(postWorkpackagesOKp)
         let jthis = this
 		//上传
-		const props = {
-			action: `${SERVICE_API}/excel/upload-api/` /*+ '?t_code=zjt-05'*/,
-			headers: {
-			},
-			showUploadList: false,
-			onChange(info) {
-				if (info.file.status !== 'uploading') {
-					// console.log(info.file, info.fileList);
-				}
-				if (info.file.status === 'done') {
-					let importData = info.file.response.Sheet1;
-					let { dataSource } = jthis.state
-					dataSource = jthis.handleExcelData(importData)
-					jthis.setState({ dataSource })
-					message.success(`${info.file.name} 上传成功`);
-				} else if (info.file.status === 'error') {
-					message.error(`${info.file.name}解析失败，请检查输入`);
-				}
-			},
-		};
+        const props = {
+            action: `${SERVICE_API}/excel/upload-api/`,
+            headers: {
+            },
+            showUploadList: false,
+            onChange(info) {
+                if (info.file.status !== 'uploading') {
+                }
+                if (info.file.status === 'done') {
+                    let importData = info.file.response.Sheet1;
+                    let dataSource = jthis.handleExcelData(importData);
+                    jthis.setState({
+                        dataSource
+                    })
+                    message.success(`${info.file.name} file uploaded successfully`);
+                } else if (info.file.status === 'error') {
+                    message.error(`${info.file.name}解析失败，请检查输入`);
+                }
+            },
+        };
+  
+      
         return (
             <Modal
                 visible={visible}
@@ -49,10 +53,10 @@ export default class ToggleModal extends Component{
                 >
                 </Table>
                 <Upload {...props}>
-                    <Button style={{ margin: '10px 10px 10px 0px' }}>
-                        <Icon type="upload" />上传附件
-                     </Button>
-                </Upload>
+                <Button style={{ margin: '10px 10px 10px 0px' }}>
+                    <Icon type="upload" />上传附件
+                 </Button>
+            </Upload>
                 <span>
                 审核人：
                     <Select style={{ width: '200px' }} className="btn" onSelect = {ele=>{
@@ -63,7 +67,6 @@ export default class ToggleModal extends Component{
                     }
                 </Select>
             </span> 
-            <Button type="primary" onClick = {this.onok.bind(this)}>提交</Button>
             <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
@@ -90,9 +93,6 @@ export default class ToggleModal extends Component{
       const {actions:{ModalVisibleUnit}} = this.props;
       ModalVisibleUnit(false);
     }
-    onChange(){
-
-    }
     componentDidMount(){
         const {actions:{getAllUsers}} = this.props;
         getAllUsers().then(res => {
@@ -107,11 +107,10 @@ export default class ToggleModal extends Component{
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
-    beforeUpload(record,file){
+    beforeUploadPic(record,file){
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
-
 		const formdata = new FormData();
 		formdata.append('a_file', file);
         formdata.append('name', fileName);
@@ -125,8 +124,31 @@ export default class ToggleModal extends Component{
             let loadedFile = await resp.json();
             loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
             loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
-            record.file = loadedFile;
-            record.code = file.name.substring(0,file.name.lastIndexOf('.'));
+            record.pic = loadedFile;
+            this.forceUpdate();
+        });
+        return false;
+    }
+    beforeUpload(record,file){
+        console.log(record,file);
+        const fileName = file.name;
+		// 上传到静态服务器
+		const { actions:{uploadStaticFile} } = this.props;
+		const formdata = new FormData();
+		formdata.append('a_file', file);
+        formdata.append('name', fileName);
+        let myHeaders = new Headers();
+        let myInit = { method: 'POST',
+                       headers: myHeaders,
+                       body: formdata
+                     };
+                     //uploadStaticFile({}, formdata)
+        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
+            let loadedFile = await resp.json();
+            loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
+            loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
+            // record.file = loadedFile;
+            // record.code = file.name.substring(0,file.name.lastIndexOf('.'));
             this.forceUpdate();
         });
         return false;
@@ -134,53 +156,66 @@ export default class ToggleModal extends Component{
     columns = [{
         title: '序号',
         dataIndex: 'index',
-        // key: 'Index',
       }, {
         title: '单位工程名称',
-        dataIndex: 'code',
-        // key: 'Code',
+        dataIndex: 'unitName',
       }, {
         title: '所属项目/子项目名称',
-        dataIndex: 'genus',
-        key: 'Genus',
+        dataIndex: 'subItem',
       },{
         title: '项目类型',
-        dataIndex: 'area',
-        // key: 'Area',
+        dataIndex: 'projectType',
+        render:(record)=>{
+            return(
+            <Select style={{ width: '70px' }} onSelect={ele => {
+                // record.projType = ele;
+                this.forceUpdate();
+            }} >
+                <Option value = 'construct'>建筑</Option>
+                <Option value = 'city'>市政</Option>
+            </Select>)
+        },
       },{
          title: '项目阶段',
-         dataIndex :'type',
-        //  key: 'Type',
+         dataIndex :'projectPhase',
+         render:(record)=>{
+            return(
+            <Select style={{ width: '70px' }} onSelect={ele => {
+                // record.projType = ele;
+                this.forceUpdate();
+            }} >
+                <Option value = 'construct'>初涉阶段</Option>
+                <Option value = 'city'>施工图阶段</Option>
+                <Option value = 'city'>竣工阶段</Option>
+            </Select>)
+        },
       },{
         title: '项目红线坐标',
-        dataIndex :'address',
-        // key: 'Address',
+        dataIndex :'coordinate',
       },{
         title: '计划开工日期',
-        dataIndex :'coordinate',
-        // key: 'Coordinate',
+        dataIndex :'planStartDate',
       },{
         title: '计划竣工日期',
-        dataIndex :'duty',
-        // key:'Duty'
+        dataIndex :'planCompletionDate',
       },{
         title: '建设单位',
-        dataIndex :'stime',
-        // key:'Stime'
+        dataIndex :'constructionUnit',
       },{
         title: '单位工程简介',
-        dataIndex :'etime',
-        // key:'Etime'
+        dataIndex :'brief',
       },{
         title:'附件',
-        key:'nearby',
+        dataIndex :'nearby',        
+        title:'附件上传',
+        key:'pic',
         render:(record) => (
-          <Upload
-          beforeUpload = {this.beforeUpload.bind(this,record)}
-          >
-              <a> {record.file?record.file.name:'上传附件'}</a>
-          </Upload>
-        )
+            <Upload
+            beforeUploadPic = {this.beforeUploadPic.bind(this,record)}
+            >
+                <a> {record.file?record.file.name:'附件上传'}</a>
+            </Upload>
+          )
   
       }]
       handlePreview(index){
@@ -200,15 +235,16 @@ export default class ToggleModal extends Component{
         let res = data.map(item => {
             return {
                 index: item[0],
-                code: item[1],
-                genus: item[2],
-                area: item[3],
-                type: item[4],
-                address: item[5],
-                coordinate: item[6],
-                duty: item[7],
-                stime: item[8],
-                etime: item[9]
+                unitName: item[1],
+                subItem: item[2],
+                projectType: item[3],
+                projectPhase: item[4],
+                coordinate: item[5],
+                planStartDate: item[6],
+                planCompletionDate: item[7],
+                constructionUnit: item[8],
+                brief: item[9],
+                nearby: item[10]
             }
         })
         return res;

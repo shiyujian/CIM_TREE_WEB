@@ -15,13 +15,15 @@ export default class PriceList extends Component {
             dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
-            projects:[],
+            project:[],
             concatunit:{},
             options:[],
+            unit:{},
 		};
     }
     componentDidMount(){
-        const {actions:{getAllUsers,getProjectTree}} = this.props
+
+        const {actions:{getAllUsers,getWorkflowById,getProjectTree}} = this.props;
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -68,14 +70,13 @@ export default class PriceList extends Component {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
-            console.log(dataSource);
             for (let i = 1; i < dataList.length; i++) {
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
                     filename: dataList[i][0] ? dataList[i][0] : '',
                     projectcoding: dataList[i][1] ? dataList[i][1] : '',
                     valuation: dataList[i][2] ? dataList[i][2] : '',
-                    content: dataList[i][3] ? dataList[i][3] : '',
+                    rate: dataList[i][3] ? dataList[i][3] : '',
                     company: dataList[i][4] ? dataList[i][4] : '',
                     total: dataList[i][5] ? dataList[i][5] : '',
                     remarks: dataList[i][5] ? dataList[i][6] : '',
@@ -87,10 +88,12 @@ export default class PriceList extends Component {
                     unit:{
                         code:"",
                         name:"",
-                        obj_type:""
+                        obj_type:"",
+                        pk: ""
                     },
                     file:{
-                        id: 'pricelist'
+                        id: 'pricelist',
+                        name: 'priceList'
                     }
                     
                 })
@@ -326,7 +329,7 @@ export default class PriceList extends Component {
                 width:"10%",
             },{
                 title:'工程内容/规格编号',
-                dataIndex:'content',
+                dataIndex:'rate',
                 width:"12%",
             },{
                 title:'计价单位',

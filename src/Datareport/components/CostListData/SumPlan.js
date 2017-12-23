@@ -390,7 +390,7 @@ export default class SumPlan extends Component {
         <Table
           columns={columns}
           dataSource={this.state.dataSource}
-          bordered
+          // bordered
           pagination={{ pageSize: 10 }}
         />
         <Row style={{ marginBottom: "30px" }} type="flex">
