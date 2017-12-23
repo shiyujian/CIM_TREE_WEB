@@ -55,6 +55,7 @@ export default class VedioData extends Component {
 				/>
 			</Content>
 			<UploadModal
+			 key={uploadModal}
 			 uploadModal={uploadModal}			 
 			 actions = {this.props.actions}
 			 closeModal={this.closeModal}
@@ -76,7 +77,6 @@ export default class VedioData extends Component {
 		let dataSource = []
 		data.forEach(item=>{
 			getDocument({code:item.code}).then(response=>{
-				console.log(response);
 				let {extra_params:{cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode}} = response;
 				dataSource.push({cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode})
 				this.setState({dataSource});

@@ -77,12 +77,38 @@ export default class PersonCheck extends Component {
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         JSON.parse(wk.subject[0].data).map((o) => {
             data_list.push({
-                code: "" + o.code,
-                name: o.name,
-                obj_type: "C_PER",
-                status: "A",
-                version: "A",
-                extra_params: {
+                // code: "" + o.code,
+                // name: o.name,
+                // obj_type: "C_PER",
+                // status: "A",
+                // version: "A",
+                // first_name: '',
+                // last_name: '',
+                // extra_params: {
+                //     depart: o.depart,
+                //     email:o.email,
+                //     job:o.job,
+                //     sex:o.sex,
+                //     tel:o.tel,
+                //     email:o.email
+                // },
+                // basic_params:{
+                //     signature:o.signature.download_url,
+                //     photo:o.signature.a_file
+                // },
+                // org:{
+                //     pk:JSON.parse(o.org).pk,
+                //     code:JSON.parse(o.org).code,
+                //     obj_type:"C_ORG",
+                //     rel_type:"member"
+                // }
+                "code": "" + o.code,
+                "name":o.name,
+                "basic_params":{
+                    "photo":o.signature.download_url,
+                    "signature":o.signature.a_file
+                },
+                "extra_params": {
                     depart: o.depart,
                     email:o.email,
                     job:o.job,
@@ -90,16 +116,19 @@ export default class PersonCheck extends Component {
                     tel:o.tel,
                     email:o.email
                 },
-                basic_params:{
-                    signature:o.signature.download_url,
-                    photo:o.signature.a_file
+                "obj_type":"C_PER",
+                "org":{
+                    "code":JSON.parse(o.org).code,
+                    "obj_type": "C_ORG",
+                    "pk": JSON.parse(o.org).pk,
+                    "rel_type": "member"
                 },
-                org:{
-                    pk:JSON.parse(o.org).pk,
-                    code:JSON.parse(o.org).code,
-                    obj_type:"C_ORG",
-                    rel_type:"member"
-                }
+                "title":"title",
+                "status": "A",
+                "version": "A",
+                "first_name":"",
+                "last_name":""
+
             })
         })
         postPersonList({},{data_list:data_list}).then(rst => {

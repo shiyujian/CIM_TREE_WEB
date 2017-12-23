@@ -25,7 +25,8 @@ export default class CostListData extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			addvisible:false
+			addvisible:false,
+			dataSource: []
 		};
 		this.columns = [{
 			title:'序号',
@@ -33,6 +34,12 @@ export default class CostListData extends Component {
 				return index+1
 			}
 		},{
+            title:'项目/子项目',
+            dataIndex:'subproject',
+        },{
+            title:'单位工程',
+            dataIndex:'unitengineering'
+        },{
 			title:'清单项目编号',
 			dataIndex:'projectcoding'
 		},{
@@ -52,6 +59,50 @@ export default class CostListData extends Component {
 			dataIndex:'remarks'
 		}];
 	}
+
+	async componentDidMount () {
+		const {actions:{
+            getScheduleDir,
+            postScheduleDir,
+        }} = this.props;
+        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
+        if(topDir.obj_type){
+            let dir = await getScheduleDir({code:'datareport_pricelist_demo'});
+            
+            if(dir.obj_type){
+                if(dir.stored_documents.length>0){
+                    this.generateTableData(dir.stored_documents);
+                }
+            }
+        }
+	}
+
+	async generateTableData(data){
+        const {actions:{
+            getDocument,
+        }} = this.props;
+        let dataSource = [];
+        
+        data.map(item=>{
+            getDocument({code:item.code}).then(single=>{
+				console.log(single);
+				let temp = {
+					code:single.extra_params.code,
+					company:single.extra_params.company,
+					rate:single.extra_params.rate,
+					projectcoding:single.extra_params.projectcoding,
+					remarks:single.extra_params.remarks,
+					total:single.extra_params.total,
+					valuation:single.extra_params.valuation,
+					subproject: single.extra_params.subproject,
+					unitengineering: single.extra_params.unitengineering
+				}
+                dataSource.push(temp);
+                this.setState({dataSource});
+            })
+        })
+    }
+
 	//批量上传回调
 	setData(data,participants){
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
@@ -116,7 +167,7 @@ export default class CostListData extends Component {
 				</Row>
 				<Row >
 					<Col >
-						<Table columns={this.columns} dataSource={[]} rowKey="key"/>
+						<Table columns={this.columns} dataSource={this.state.dataSource} rowKey="key"/>
 					</Col>
 				</Row>
 				{

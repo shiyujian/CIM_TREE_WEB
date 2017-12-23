@@ -72,6 +72,47 @@ export default class WorkScheduleData extends Component {
 			dataIndex: 'uploads',
 		}];
 	}
+	async componentDidMount(){
+        const {actions:{
+            getScheduleDir,
+            postScheduleDir,
+        }} = this.props;
+        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
+        if(topDir.obj_type){
+            let dir = await getScheduleDir({code:'datareport_workdata_1111'});
+            if(dir.obj_type){
+                if(dir.stored_documents.length>0){
+                    this.generateTableData(dir.stored_documents);
+                }
+            }
+        }
+    }
+    async generateTableData(data){
+        const {actions:{
+            getDocument,
+        }} = this.props;
+        let dataSource = [];
+        data.map(item=>{
+            getDocument({code:item.code}).then(single=>{
+                let temp = { 
+                    code:single.extra_params.code,
+                    name:single.extra_params.name,
+                    project:single.extra_params.project,
+                    unit:single.extra_params.unit,
+                    construct_unit:single.extra_params.construct_unit,
+                    quantity:single.extra_params.quantity,
+                    factquantity:single.extra_params.factquantity,
+                    planstarttime:single.extra_params.planstarttime,
+                    planovertime:single.extra_params.planovertime,
+					factstarttime:single.extra_params.factstarttime,
+					factovertime:single.extra_params.factovertime,
+					uploads:single.extra_params.uploads,
+                }
+                dataSource.push(temp);
+                this.setState({dataSource});
+            })
+        })
+    }
 	goCancel = () => {
 		this.setState({ setEditVisiable: false });
 	}
@@ -147,7 +188,7 @@ export default class WorkScheduleData extends Component {
 					<Col >
 						<Table
 							columns={this.columns}
-							dataSource={[]}
+							dataSource={this.state.dataSource}
 							bordered
 							rowSelection={rowSelection}
 							style={{ height: 380, marginTop: 20 }}

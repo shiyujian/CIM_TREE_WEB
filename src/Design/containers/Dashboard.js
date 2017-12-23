@@ -112,7 +112,7 @@ export default class Dashboard extends Component {
 					</div>
 				</Sidebar>
 				<Content>
-					<Row gutter={10} style={{margin: '10px 5px'}}>
+					<Row gutter={10} style={{margin: '0 5px 10px'}}>
 						{/* <Col span={8}>
 							<Change {...this.state}/>
 						</Col> */}

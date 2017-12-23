@@ -28,7 +28,7 @@ if(__env__ == 'qh'){
 
 if(__env__ == 'xa'){
 
-
+	console.log(window.config.nextMaxScreen);
 	$(document).keydown(function (e) {
 		
 		switch (e.keyCode) {

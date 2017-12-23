@@ -20,7 +20,10 @@ const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
 //流程
 const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
-const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE')
+const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE');
+
+
+
 export const actions = {
     getScheduleDir,
     postScheduleDir,
@@ -28,7 +31,8 @@ export const actions = {
     addDocList,
     logWorkflowEvent,
     deleteWorkflow,
-    getDocument
+    getDocument,
+   
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

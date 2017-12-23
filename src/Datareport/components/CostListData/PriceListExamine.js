@@ -71,16 +71,11 @@ export default class PriceListExamine extends Component {
         message.info("操作成功")
     }
 
-    // cancel() {
-	// 	this.props.closeModal("cost_pri_ck_visible",false)
-	// }
-
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state
         const {actions:{
             logWorkflowEvent,
-            updateWpData,
             addDocList,
             putDocList,
             postScheduleDir,
@@ -90,7 +85,7 @@ export default class PriceListExamine extends Component {
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
         let project = dataSource[0].project;
-        let code = 'datareport_pricelist_1112';
+        let code = 'datareport_pricelist_demo';
         //get workpackage by unit's code 
         let workpackage = await getWorkpackagesByCode({code:unit.code});
         
@@ -144,15 +139,25 @@ export default class PriceListExamine extends Component {
                     ]
                   },
                 extra_params:{
-                    code:item.code,
-                    filename:item.file.name,
-                    unit:item.unit.valuation,
-                    project:item.project.name
+                    code: item.projectcoding,
+                    subproject: item.project.name,
+                    projectcoding:item.projectcoding,
+                    total:item.total,
+                    valuation: item.valuation,
+                    rate: item.rate,
+                    company: item.company,
+                    remarks: item.remarks,
+                    unitengineering: item.unit.name
+                },
+                workpackage: {
+                    pk: item.unit.pk || "wp_pk",
+                    code: item.unit.code,
+                    obj_type: item.unit.obj_type,
+                    rel_type: "related"
                 }
             })
         });
         let rst = await addDocList({},{data_list:docData});
-        debugger;
         if(rst.result){
             notification.success({
                 message: '创建文档成功！',
@@ -192,16 +197,28 @@ export default class PriceListExamine extends Component {
       const  columns = 
         [{
             title:'序号',
+            dataIndex:'code',
             render:(text,record,index) => {
                 console.log(text)
                 return index+1
             }
         },{
             title:'项目/子项目',
-            dataIndex:'subproject'
+            dataIndex:'subproject',
+            render: (text, record, index) => (
+                <span>
+                    {record.project.name}
+                </span>
+            ),
+
         },{
             title:'单位工程',
-            dataIndex:'unitengineering'
+            dataIndex:'unitengineering',
+            render: (text, record, index) => (
+                <span>
+                    {record.unit.name}
+                </span>
+            ),
         },{
             title:'清单项目编码',
             dataIndex:'projectcoding'
@@ -210,7 +227,7 @@ export default class PriceListExamine extends Component {
             dataIndex:'valuation'
         },{
             title:'工程内容/规格编号',
-            dataIndex:'content'
+            dataIndex:'rate'
         },{
             title:'计价单位',
             dataIndex:'company'
