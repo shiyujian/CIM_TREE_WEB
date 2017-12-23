@@ -7,6 +7,7 @@ import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Moda
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import Preview from '../../../_platform/components/layout/Preview';
+import {actions as action2} from '../../store/quality';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -16,7 +17,7 @@ const {Option} = Select
 		return { platform}
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...platformActions,...projactions}, dispatch)
+		actions: bindActionCreators({ ...platformActions,...projactions,...action2}, dispatch)
 	})
 )
 export default class HPModal extends Component{
@@ -24,8 +25,17 @@ export default class HPModal extends Component{
         super(props);
         this.state = {
             wk:null,
-            dataSource:[]
+            dataSource:[],
+            radioValue:1
         }
+    }
+    async getPersonsList(dataSource){
+        let perSet = {};
+        let {getPersonByCode} = this.props.actions;
+        for(let i=0;i< dataSource.length;i++){
+            perSet[dataSource[i].projBoss] = await getPersonByCode({code:dataSource[i].projBoss});
+        }
+        return perSet;
     }
     async componentDidMount(){
         const {wk} = this.props
@@ -34,21 +44,82 @@ export default class HPModal extends Component{
         //      let dataSource = JSON.parse(rst.subject[0].data)
         //      this.setState({dataSource,wk:rst})
         //  })
-        let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk})
+        let dataSource = JSON.parse(wk.subject[0].data);
+        let perSet = await this.getPersonsList(dataSource);
+        this.setState({dataSource,wk,perSet});
     }
 
-    componentWillReceiveProps(props){
+    async componentWillReceiveProps(props){
         const {wk} = props
-        let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk});
+        let dataSource = JSON.parse(wk.subject[0].data);
+        let perSet = await this.getPersonsList(dataSource);
+        this.setState({dataSource,wk,perSet});
    }
 async submit(){
-        console.log(rdg);
-        let {postProjectAc ,getProjectAc} = this.props.actions;
+
+        if(this.state.radioValue !==1){
+            return;
+        }
+        let {postProjectAc ,getProjectAc,postProjectListAc,postDocListAc} = this.props.actions;
         let projRoot = await getProjectAc();
-        console.log(projRoot)
-        //this.props.closeModal("dr_xm_xx_visible",false);
+        let doclist = this.state.dataSource.map(data=>{
+            data.pic.misc = 'pic';
+            return{
+                "code": data.code + 'REL_DOC_A',
+                "name": data.name + '项目关联文档',
+                "obj_type": "C_DOC",
+                "status": "A",
+                "version": "A",
+                extra_params:{
+                    intro:data.intro,
+                    area:data.area,
+                    address:data.address,
+                    cost:data.cost,
+                    etime:data.etime,
+                    stime:data.stime,
+                    projType:data.projType,
+                    range:data.range
+                },
+                basic_params:{
+                    files:[
+                        data.file,data.pic
+                    ]
+                }
+            }
+        });
+        let doclistRst = await postDocListAc({},{data_list:doclist});
+        if(doclistRst.result && doclistRst.result.length>0){
+            let reldocs = doclistRst.result;
+            let projList =  this.state.dataSource.map((data,index)=>{
+                let per = this.state.perSet[data.projBoss];
+                return{
+                    "code": data.code,
+                    "name": data.name,
+                    "obj_type": "C_PJ",
+                    response_persons:[{
+                        code:per.code,
+                        obj_type:per.obj_type,
+                        response:'dutyPerson',
+                        pk:per.pk
+                    }],
+                    "extra_params": {coordinate:data.coordinate},
+                    "version": "A",
+                    "status": "A",
+                    "parent": {code:projRoot.code,obj_type:projRoot.obj_type,pk:projRoot.pk},
+                    related_documents:[{
+                        pk:reldocs[index].pk,
+                        code:reldocs[index].code,
+                        obj_type :reldocs[index].obj_type,
+                        rel_type:'storeRelDoc'
+                    }]
+                }
+            });
+            let rst = await postProjectListAc({},{data_list:projList});
+            if(rst.result &&rst.result.length>0){
+                message.info('创建成功');
+                this.props.closeModal('dr_xm_xx_visible',false);
+            }
+        }
     }
     render(){       
         const columns =
@@ -95,7 +166,9 @@ async submit(){
             }, {
                 title: '项目负责人',
                 render:(record)=>{
-                    return(<span> {JSON.parse(record.projBoss).username}</span>);
+                    return(
+                        <span>{this.state.perSet?this.state.perSet[record.projBoss].name:''}</span>
+                    )
                 },
                 key: 'Duty'
             }, {
@@ -126,7 +199,6 @@ async submit(){
         return (
             <Modal
                 title="项目信息审批表"
-                key={Math.random()}
                 visible={true}
                 width={1280}
                 footer={null}>
@@ -142,13 +214,10 @@ async submit(){
                         </Col>
                         <Col span={4}>
                             <RadioGroup 
-                             id = 'sxqrdg'
-                             value = {this.rdgval}
+                             value = {this.state.radioValue||1}
                              onChange={(event) => {
-                                console.log(event)
-                                this.rdgval = event.target.value;
-                                this.forceUpdate();
-                            }} >
+                                this.setState({radioValue:event.target.value});
+                            }}>
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
