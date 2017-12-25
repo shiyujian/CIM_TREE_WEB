@@ -29,6 +29,8 @@ import DefectModal from 'Datareport/components/Quality/DefectModal';
 import SafetyDocDeleteCheck from 'Datareport/components/SafetyDoc/SafetyDocDeleteCheck';
 import DangerDeleteCheck from 'Datareport/components/SafetyHiddenDanger/DangerDeleteCheck';
 import CJCheck from 'Datareport/components/OrgData/CJCheck';
+import SumSpeedExamineDelete from 'Datareport/components/CostListData/SumSpeedExamineDelete';
+import WorkDeleteCheck from 'Datareport/components/ScheduleData/WorkDeleteCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -78,7 +80,9 @@ export default class Progress extends Component {
 			dr_qua_defect_visible,
 			safety_doc_delete_visible,
 			safety_hidden_delete_visible,
-			dr_base_cj_visible
+			dr_base_cj_visible,
+			cost_sum_delete_visible,
+			workdata_doc_delete_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -268,6 +272,14 @@ export default class Progress extends Component {
 					dr_base_cj_visible && 
 					<CJCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					cost_sum_delete_visible && 
+					<SumSpeedExamineDelete wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					workdata_doc_delete_visible && 
+					<WorkDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -351,6 +363,12 @@ export default class Progress extends Component {
 				break;
 			case "参建单位信息批量录入":
 				changeDatareportVisible({key:'dr_base_cj_visible',value:true})
+				break;
+			case "结算进度信息批量删除":
+				changeDatareportVisible({key:'cost_sum_delete_visible',value:true})
+				break;
+			case "施工进度批量删除":
+				changeDatareportVisible({key:'workdata_doc_delete_visible',value:true})
 				break;
 			default:break;
 		}
