@@ -136,20 +136,34 @@ export default class ToggleModal extends Component{
     }
      //处理上传excel的数据
      handleExcelData(data) {
+        const {actions: {getOrgReverse}} = this.props;
         data.splice(0, 1);
-        let res = data.map(item => {
-            return {
-                index: item[0],
-                code: item[1],
-                name: item[2],
-                depart: item[3],
-                job: item[4],
-                sex: item[5],
-                tel: item[6],
-                email: item[7],
-            }
+        let promises = data.map(item => {
+            return getOrgReverse({code: item[3]});
         })
-        return res;
+        let res, orgname = [];
+        Promise.all(promises).then(rst => {
+            console.log('rst', rst)
+            rst.map(item => {
+                orgname.push(item.children[0].name);
+            })
+            res = data.map((item, index) => {
+                return {
+                    index: item[0],
+                    code: item[1],
+                    name: item[2],
+                    org: orgname[index],
+                    depart: item[3],
+                    job: item[4],
+                    sex: item[5],
+                    tel: item[6],
+                    email: item[7],
+                }
+            })
+            this.setState({
+                dataSource:res
+            })
+        })
     }
     componentDidMount(){
         const {actions:{getAllUsers,getOrgList}} = this.props;
@@ -164,16 +178,6 @@ export default class ToggleModal extends Component{
                 this.setState({checkers})
             }
         });
-        getOrgList().then(rst => {
-            if (rst.children.length) {
-                let org = rst.children.map(item => {
-                    return (
-                         <Option value={JSON.stringify(item)}>{item.name}</Option>
-                    )
-                })
-                this.setState({org})
-            }
-        })
     }
     columns = [ {
         title: '人员编码',
@@ -185,16 +189,8 @@ export default class ToggleModal extends Component{
         key: 'Name',
       },{
         title: '所在组织机构单位',
-        render:(record) => {
-            return (
-                <Select style={{width:"90%"}} value = {record.org || this.state.defaultPro} onSelect={ele => {
-                    record.org = ele;
-                    this.forceUpdate();
-                }}>
-                    {this.state.org}
-                </Select>
-            )
-        }
+        dataIndex: 'org',
+        key: 'Org',
       },{
          title: '所属部门',
          dataIndex :'depart',
