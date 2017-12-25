@@ -33,12 +33,14 @@ export default class ToggleModal extends Component {
                 width={1280}
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
+                maskClosable={false}
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
                 <Table
                     columns={this.columns}
                     bordered={true}
                     dataSource={this.state.dataSource}
+                    rowKey={(item, index) => index}
                 >
                 </Table>
                 <Row style={{ marginBottom: "30px" }} type="flex">
@@ -52,7 +54,7 @@ export default class ToggleModal extends Component {
                             beforeUpload={this.beforeUpload.bind(this)}
                         >
                             <Button style={{ margin: '10px 10px 10px 0px' }}>
-                                <Icon type="upload" />上传并预览(文件名需为英文)
+                                <Icon type="upload" />上传并预览
                         </Button>
                         </Upload>
                     </Col>
@@ -90,7 +92,190 @@ export default class ToggleModal extends Component {
             </Modal>
         )
     }
-    covertURLRelative = (originUrl) => {
+
+    
+    selectChecker(value) {
+        let check = JSON.parse(value);
+        this.setState({ check })
+    }
+    // parseTime(time){
+    //     return new Data(time)
+    // }
+
+    uplodachange(info) {
+        //info.file.status/response
+        if (info && info.file && info.file.status === 'done') {
+            // notification.success({
+            //     message: '上传成功！',
+            //     duration: 2
+            // });
+            let name = Object.keys(info.file.response);
+            let dataList = info.file.response[name[0]];
+            let dataSource = [];
+            for (let i = 2; i < dataList.length; i++) {
+                dataSource.push({
+                    resUnit: dataList[i][0] ? dataList[i][0] : '',
+                    index: dataList[i][1] ? dataList[i][1] : '',
+                    projectName: dataList[i][2] ? dataList[i][2] : '',
+                    unitProject: dataList[i][3] ? dataList[i][3] : '',
+                    scenarioName: dataList[i][4] ? dataList[i][4] : '',
+                    organizationUnit: dataList[i][5] ? dataList[i][5] : '',
+                    reviewTime: dataList[i][6] ? dataList[i][6] : '',
+                    reviewComments: dataList[i][7] ? dataList[i][7] : '',
+                    reviewPerson: dataList[i][8] ? dataList[i][8] : '',
+                    remark: dataList[i][9] ? dataList[i][9] : '',
+                    wbs: dataList[i][9] ? dataList[i][9] : '',
+                    // code: dataList[i][9] ? dataList[i][9] : '',
+                    code: '05',
+                    project: {
+                        code: "",
+                        name: "",
+                        obj_type: ""
+                    },
+                    unit: {
+                        code: "",
+                        name: "",
+                        obj_type: ""
+                    },
+                    file: {
+                    }
+                })
+            }
+            this.setState({ dataSource });
+        }
+    }
+
+    onSelectProject(value, selectedOptions) {
+        console.log('vip-value', value)
+        console.log('vip-selectedOptions', selectedOptions)
+        let project = {};
+        let unit = {};
+        if (value.length === 2) {
+            let temp1 = JSON.parse(value[0]);
+            let temp2 = JSON.parse(value[1]);
+            project = {
+                name: temp1.name,
+                code: temp1.code,
+                obj_type: temp1.obj_type
+            }
+            unit = {
+                name: temp2.name,
+                code: temp2.code,
+                obj_type: temp2.obj_type
+            }
+            this.setState({ project, unit });
+            return;
+        }
+        //must choose all,otherwise make it null
+        this.setState({ project: {}, unit: {} });
+    }
+
+    loadData(selectedOptions) {
+        // console.log('vip-selectedOptions', selectedOptions)
+        const { actions: { getProjectTree } } = this.props;
+        const targetOption = selectedOptions[selectedOptions.length - 1];
+        targetOption.loading = true;
+        getProjectTree({ depth: 2 }).then(rst => {
+            if (rst.status) {
+                let units = [];
+                rst.children.map(item => {
+                    if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
+                        units = item.children.map(unit => {
+                            return (
+                                {
+                                    value: JSON.stringify(unit),
+                                    label: unit.name
+                                }
+                            )
+                        })
+                    }
+                })
+                targetOption.loading = false;
+                targetOption.children = units;
+                this.setState({ options: [...this.state.options] })
+            } else {
+                //获取项目信息失败
+            }
+        });
+    }
+    onok() {
+        if (!this.state.check) {
+            message.error('审批人未选择');
+            return;
+        }
+        if (this.state.dataSource.length === 0) {
+            message.info("请上传excel")
+            return
+        }
+        let temp = this.state.dataSource.some((o, index) => {
+            return !o.file.id
+        })
+        if (temp) {
+            message.info(`有数据未上传附件`)
+            return
+        }
+        const { project, unit } = this.state;
+        if (!project.name) {
+            message.info(`请选择项目和单位工程`);
+            return;
+        }
+        let { check } = this.state
+        let per = {
+            id: check.id,
+            username: check.username,
+            person_name: check.account.person_name,
+            person_code: check.account.person_code,
+            organization: check.account.organization
+        }
+        for (let i = 0; i < this.state.dataSource.length; i++) {
+            this.state.dataSource[i].project = project;
+            this.state.dataSource[i].unit = unit;
+        }
+        const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
+        this.props.setData(this.state.dataSource, per);
+        console.log('vip-per', per);
+        console.log('vip-dataSource', this.state.dataSource);
+
+        ModalVisible(false);
+        notification.success({
+            message: '发起成功！',
+            duration: 2
+        });
+    }
+    cancel() {
+        const { actions: { ModalVisibleOrg, ModalVisible } } = this.props;
+        ModalVisible(false);
+    }
+
+    componentDidMount() {
+        const { actions: { getAllUsers, getProjectTree } } = this.props;
+        getAllUsers().then(rst => {
+            let checkers = rst.map(o => {
+                return (
+                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                )
+            })
+            this.setState({ checkers })
+        })
+        getProjectTree({ depth: 1 }).then(rst => {
+            if (rst.status) {
+                let projects = rst.children.map(item => {
+                    return (
+                        {
+                            value: JSON.stringify(item),
+                            label: item.name,
+                            isLeaf: false
+                        }
+                    )
+                })
+                this.setState({ options: projects });
+            } else {
+                //获取项目信息失败
+            }
+        });
+    }
+
+    covertURLRelative(originUrl) {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     beforeUploadPicFile(index, file) {
@@ -146,186 +331,6 @@ export default class ToggleModal extends Component {
         return false;
     }
 
-    selectChecker(value) {
-        let check = JSON.parse(value);
-        this.setState({ check })
-    }
-    // parseTime(time){
-    //     return new Data(time)
-    // }
-
-    uplodachange = (info) => {
-        //info.file.status/response
-        if (info && info.file && info.file.status === 'done') {
-            // notification.success({
-            //     message: '上传成功！',
-            //     duration: 2
-            // });
-            let name = Object.keys(info.file.response);
-            let dataList = info.file.response[name[0]];
-            let dataSource = [];
-            for (let i = 2; i < dataList.length; i++) {
-                dataSource.push({
-                    resUnit: dataList[i][0] ? dataList[i][0] : '',
-                    index: dataList[i][1] ? dataList[i][1] : '',
-                    projectName: dataList[i][2] ? dataList[i][2] : '',
-                    unitProject: dataList[i][3] ? dataList[i][3] : '',
-                    scenarioName: dataList[i][4] ? dataList[i][4] : '',
-                    organizationUnit: dataList[i][5] ? dataList[i][5] : '',
-                    reviewTime: dataList[i][6] ? dataList[i][6] : '',
-                    reviewComments: dataList[i][7] ? dataList[i][7] : '',
-                    reviewPerson: dataList[i][8] ? dataList[i][8] : '',
-                    remark: dataList[i][9] ? dataList[i][9] : '',
-                    wbs: dataList[i][9] ? dataList[i][9] : '',
-                    // code: dataList[i][9] ? dataList[i][9] : '',
-                    code: '05',
-                    project: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                    unit: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                    file: {
-                    }
-                })
-            }
-            this.setState({ dataSource });
-        }
-    }
-
-    onSelectProject = (value, selectedOptions) => {
-        console.log('vip-value', value)
-        console.log('vip-selectedOptions', selectedOptions)
-        let project = {};
-        let unit = {};
-        if (value.length === 2) {
-            let temp1 = JSON.parse(value[0]);
-            let temp2 = JSON.parse(value[1]);
-            project = {
-                name: temp1.name,
-                code: temp1.code,
-                obj_type: temp1.obj_type
-            }
-            unit = {
-                name: temp2.name,
-                code: temp2.code,
-                obj_type: temp2.obj_type
-            }
-            this.setState({ project, unit });
-            return;
-        }
-        //must choose all,otherwise make it null
-        this.setState({ project: {}, unit: {} });
-    }
-
-    loadData = (selectedOptions) => {
-        // console.log('vip-selectedOptions', selectedOptions)
-        const { actions: { getProjectTree } } = this.props;
-        const targetOption = selectedOptions[selectedOptions.length - 1];
-        targetOption.loading = true;
-        getProjectTree({ depth: 2 }).then(rst => {
-            if (rst.status) {
-                let units = [];
-                rst.children.map(item => {
-                    if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
-                        units = item.children.map(unit => {
-                            return (
-                                {
-                                    value: JSON.stringify(unit),
-                                    label: unit.name
-                                }
-                            )
-                        })
-                    }
-                })
-                targetOption.loading = false;
-                targetOption.children = units;
-                this.setState({ options: [...this.state.options] })
-            } else {
-                //获取项目信息失败
-            }
-        });
-    }
-    onok() {
-        if (!this.state.check) {
-            message.error('审批人未选择');
-            return;
-        }
-        if (this.state.dataSource.length === 0) {
-            message.info("请上传excel")
-            return
-        }
-        let temp = this.state.dataSource.some((o, index) => {
-            return !o.file.id
-        })
-        if (temp) {
-            message.info(`有数据未上传附件`)
-            return
-        }
-        const {project,unit} =  this.state;
-        if(!project.name){
-            message.info(`请选择项目和单位工程`);
-            return;
-        }
-        let {check} = this.state
-        let per = {
-            id:check.id,
-            username:check.username,
-            person_name:check.account.person_name,
-            person_code:check.account.person_code,
-            organization:check.account.organization
-        }
-        for(let i=0;i<this.state.dataSource.length;i++){
-            this.state.dataSource[i].project = project;
-            this.state.dataSource[i].unit = unit;
-        }
-        const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
-        this.props.setData(this.state.dataSource, per);
-        console.log('vip-per',per);
-        console.log('vip-dataSource',this.state.dataSource);
-        
-        ModalVisible(false);
-        notification.success({
-            message: '发起成功！',
-            duration: 2
-        });
-    }
-    cancel() {
-        const { actions: { ModalVisibleOrg, ModalVisible } } = this.props;
-        ModalVisible(false);
-    }
-
-    componentDidMount() {
-        const { actions: { getAllUsers, getProjectTree } } = this.props;
-        getAllUsers().then(rst => {
-            let checkers = rst.map(o => {
-                return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
-                )
-            })
-            this.setState({ checkers })
-        })
-        getProjectTree({ depth: 1 }).then(rst => {
-            if (rst.status) {
-                let projects = rst.children.map(item => {
-                    return (
-                        {
-                            value: JSON.stringify(item),
-                            label: item.name,
-                            isLeaf: false
-                        }
-                    )
-                })
-                this.setState({ options: projects });
-            } else {
-                //获取项目信息失败
-            }
-        });
-    }
 
     //附件删除
     remove(index) {
@@ -430,8 +435,11 @@ export default class ToggleModal extends Component {
     columns = [
         {
             title: '序号',
-            dataIndex: 'index',
+            // dataIndex: 'index',
             width: '5%',
+            render: (text, record, index) => {
+                return index + 1
+            },
         }
         ,
         // {

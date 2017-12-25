@@ -70,7 +70,6 @@ export default class ProjectData extends Component {
 					{
 						visible && <ToggleModal {...this.props} setData = {this.setData.bind(this)}/>
 					}
-
 				</Content>
 			</Main>
 			)

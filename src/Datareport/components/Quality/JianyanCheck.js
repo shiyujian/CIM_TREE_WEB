@@ -2,10 +2,12 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
+import {actions} from '../../store/quality';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
+import {getUser} from '_platform/auth';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -15,7 +17,7 @@ const {Option} = Select
 		return { platform}
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...platformActions}, dispatch)
+		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
 export default class JianyanCheck extends Component {
@@ -24,7 +26,8 @@ export default class JianyanCheck extends Component {
 		super(props);
 		this.state = {
             wk:null,
-            dataSource:[]
+            dataSource:[],
+            opinion:1,//1表示通过 2表示不通过
 		};
     }
     async componentDidMount(){
@@ -128,6 +131,10 @@ async reject(){
     // executor.person_code = person.code;
     // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'退回',note:'滚',executor:executor,attachment:null});
 }
+//radio变化
+onChange(e){
+    this.setState({opinion:e.target.value})
+}
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -210,7 +217,7 @@ async reject(){
 		return (
             <Modal
 			title="其它检验信息审批表"
-			key={Math.random()}
+			key={Date.now()}
             visible={true}
             width= {1280}
 			footer={null}
@@ -226,7 +233,7 @@ async reject(){
                             <span>审查意见：</span>
                         </Col>
                         <Col span={4}>
-                            <RadioGroup onChange={this.onChange} value={this.state.value}>
+                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>

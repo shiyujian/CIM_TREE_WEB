@@ -5,7 +5,7 @@ import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/persondata';
 import {actions as actions2} from '../../store/quality';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,USER_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
@@ -34,12 +34,8 @@ export default class PersonCheck extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props
-        console.log("pojoijp:",wk.subject[0].data);
         let dataSource = JSON.parse(wk.subject[0].data)
         let tempData = [...dataSource];
-        tempData.map(item => {
-            item.org = JSON.parse(item.org).name
-        })
         this.setState({dataSource,tempData,wk})
         console.log("oijiioj:",dataSource);
     }
@@ -48,9 +44,6 @@ export default class PersonCheck extends Component {
         const {wk} = props
         let dataSource = JSON.parse(wk.subject[0].data)
         let tempData = [...dataSource];
-        tempData.map(item => {
-            item.org = JSON.parse(item.org).name
-        })
         this.setState({dataSource,tempData,wk})
    }
    //提交
@@ -66,7 +59,7 @@ export default class PersonCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList,postPersonList}} = this.props
+        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList,postPersonList,postAllUsersId,getOrgCode}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -74,36 +67,52 @@ export default class PersonCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         let data_list = [];
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        JSON.parse(wk.subject[0].data).map((o) => {
-            data_list.push({
-                code: "" + o.code,
-                name: o.name,
-                obj_type: "C_PER",
-                status: "A",
-                version: "A",
-                extra_params: {
-                    depart: o.depart,
-                    email:o.email,
-                    job:o.job,
-                    sex:o.sex,
-                    tel:o.tel,
-                    email:o.email
-                },
-                basic_params:{
-                    signature:o.signature.download_url,
-                    photo:o.signature.a_file
-                },
-                org:{
-                    pk:JSON.parse(o.org).pk,
-                    code:JSON.parse(o.org).code,
-                    obj_type:"C_ORG",
-                    rel_type:"member"
-                }
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
+        .then((rst) => {
+            let personId = rst.id;
+            postAllUsersId({id:personId})
+            .then((item) => {
+
             })
+        });
+        let promises = JSON.parse(wk.subject[0].data).map((o) => {
+            console.log('o',o)
+            return getOrgCode({code: o.depart})
+        })
+        let rst = await Promise.all(promises);
+        console.log('rst',rst)
+        rst.map((item) => {
+            console.log('item', item)
+            data_list.push({
+                "code": "" + item.code,
+                "name":item.name,
+                "basic_params":{
+                    "photo":item.signature.download_url,
+                    "signature":item.signature.a_file
+                },
+                "extra_params": {
+                    "depart": item.depart,
+                    "email":item.email,
+                    "job":item.job,
+                    "性别":item.sex,
+                    "电话":item.tel,
+                    "email":item.email
+                },
+                "obj_type":"C_PER",
+                "org":{
+                    "code":item.code,
+                    "obj_type": "C_ORG",
+                    "pk": item.pk,
+                    "rel_type": "member"
+                },
+                "title":"title",
+                "status": "A",
+                "version": "A",
+                "first_name":"",
+                "last_name":""
+            })                    
         })
         postPersonList({},{data_list:data_list}).then(rst => {
-            console.log("rst:",rst);
             if (rst.result.length) {
                 message.success("审核成功");
             }

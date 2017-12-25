@@ -1,13 +1,26 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input } from 'antd';
+import { Row, Col, Table, Form, Button, Popconfirm, message, Input, notification, Modal } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
-import style from './TableOrg.css'
+import ChangeFile from './ChangeFile';
+import DeleteFile from './DeleteFile';
+import style from './TableOrg.css';
+import { getNextStates } from '_platform/components/Progress/util';
+import { getUser } from '_platform/auth';
+import { WORKFLOW_CODE } from '_platform/api'
+let moment = require('moment');
 const Search = Input.Search;
 export default class TableOrg extends Component {
 	constructor() {
 		super();
 		this.state = {
 			dataSource: [],
+			subDataSource: [],
+			setEditVisiable: false,
+			setChangeVisiable: false,
+			setDeleteVisiable: false,
+			newKey2: Math.random(),
+			newKey3: Math.random(),
+			selectedRowKeys: [],
 		}
 	}
 	async componentDidMount() {
@@ -18,7 +31,6 @@ export default class TableOrg extends Component {
 		let topDir = await getScheduleDir({ code: 'the_only_main_code_datareport' });
 		if (topDir.obj_type) {
 			let dir = await getScheduleDir({ code: 'datareport_safetyspecial_05' });
-			debugger
 			if (dir.obj_type) {
 				if (dir.stored_documents.length > 0) {
 					this.generateTableData(dir.stored_documents);
@@ -31,10 +43,9 @@ export default class TableOrg extends Component {
             getDocument,
         } } = this.props;
 		let dataSource = [];
-		debugger
 		data.map((item, i) => {
 			getDocument({ code: item.code }).then(single => {
-				console.log('vip-single', single);
+				// console.log('vip-single', single);
 				let temp = {
 					i,
 					code: single.extra_params.code,
@@ -55,52 +66,141 @@ export default class TableOrg extends Component {
 					file: single.basic_params.files[0],
 				}
 				dataSource.push(temp);
-				this.setState({ dataSource });
-				console.log('vip-dataSource', dataSource);
+				// this.setState({
+				// 	...this.state,
+				// 	dataSource: Object.assign(this.state.dataSource, dataSource)
+				// });
+				this.setState({
+					...this.state,
+					dataSource
+				});
 			})
 		})
 	}
+	paginationOnChange(e) {
+		// console.log('vip-分页', e);
+	}
+	onSelectChange(selectedRowKeys, selectedRows) {
+		// debugger;
+		this.state.subDataSource = selectedRows;
+		console.log('selectedRowKeys changed: ', selectedRowKeys);
+		this.setState({ selectedRowKeys });
+	}
+
+	// 搜索
+	onSearchInfo(value) {
+		const { actions: { getSearcherDir } } = this.props
+		let param = "?keyword=" + value
+		getSearcherDir({ code: 'safetyspecial' }).then(rst => {
+			console.log('vip-rst', rst);
+
+			// let dataSource = this.handleData(rst)
+			// this.setState({dataSource})
+		})
+	}
+	//将数据处理成适用于表格的数据
+	handleData(data) {
+		return data.map(item => {
+			return {
+				permitNumber: item.licence.number,
+				certificateNumber: item.certificate.number,
+				acceptance: item.acceptor.name,
+				...item
+			}
+		})
+	}
+
 	render() {
+		const paginationInfo = {
+			onChange: this.paginationOnChange.bind(this),
+			showSizeChanger: true,
+			pageSizeOptions: ['5', '10', '20', '30', '40', '50'],
+			showQuickJumper: true,
+			// style: { float: "left", marginLeft: 70 },
+		}
+		const { selectedRowKeys } = this.state;
 		const rowSelection = {
-			onChange: (selectedRowKeys, selectedRows) => {
-				console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-			},
-			onSelect: (record, selected, selectedRows) => {
-				console.log(record, selected, selectedRows);
-			},
-			onSelectAll: (selected, selectedRows, changeRows) => {
-				console.log(selected, selectedRows, changeRows);
-			},
+			selectedRowKeys,
+			onChange: this.onSelectChange.bind(this),
+			getCheckboxProps: record => ({
+				disabled: record.name === 'Disabled User',
+			}),
 		};
 		return (
-			<div>
-				<div>
-					{/* <Button style={{ marginRight: "10px" }}>模板下载</Button> */}
-					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
-					<Button className={style.button}>申请变更</Button>
-					<Button className={style.button}>申请删除</Button>
-					<Button className={style.button}>导出表格</Button>
-					<Search className={style.button} style={{ width: "200px" }} placeholder="输入搜索条件" />
-				</div>
-				<Table
-					columns={this.columns}
-					bordered={true}
-					// rowSelection={this.rowSelection}
-					rowKey="code"
-					dataSource={this.state.dataSource}
-				>
-				</Table>
-			</div>
+			<Row>
+				<Row style={{ marginBottom: "30px" }}>
+					<Col span={15}>
+						<Button
+							style={{ marginRight: "30px" }}
+							onClick={this.send.bind(this)}
+						>发起填报</Button>
+						<Button
+							style={{ marginRight: "30px" }}
+							onClick={this.BtnChange.bind(this)}
+						>申请变更</Button>
+						<Button
+							style={{ marginRight: "30px" }}
+							onClick={this.BtnDelete.bind(this)}
+						>申请删除</Button>
+						<Button
+							style={{ marginRight: "30px" }}
+						// onClick={this.BtnExport.bind(this)}
+						>导出表格</Button>
+						<Search
+							placeholder="请输入内容"
+							onSearch={this.onSearchInfo.bind(this)}
+							style={{ width: 200, marginLeft: "20px" }}
+						/>
+					</Col>
+				</Row>
+				<Row>
+					<Table
+						columns={this.columns}
+						dataSource={this.state.dataSource}
+						bordered
+						pagination={paginationInfo}
+						rowSelection={rowSelection}
+						rowKey={(item, index) => index}
+					/>
+				</Row>
+				<Row>
+					{
+						!this.state.dataSource.length ? <p></p>
+							:
+							(
+								<Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+									[共：{this.state.dataSource.length}行]
+									</Col>
+							)
+					}
+				</Row>
+
+				{
+					this.state.setChangeVisiable && <ChangeFile {...this.props} {...this.state} key={this.state.newKey2}
+						goCancel={this.goCancel.bind(this)} setChangeData={this.setChangeData.bind(this)}
+					/>
+				}
+				{
+					this.state.setDeleteVisiable && <DeleteFile {...this.props} {...this.state} key={this.state.newKey3}
+						goCancel={this.goCancel.bind(this)} setDeleteData={this.setDeleteData.bind(this)}
+					/>
+				}
+
+			</Row>
 		)
 	}
 	send() {
 		const { actions: { ModalVisible } } = this.props;
 		ModalVisible(true);
 	}
-
+	goCancel() {
+		this.setState({
+			setChangeVisiable: false,
+			setDeleteVisiable: false,
+		});
+	}
 	//预览
 	handlePreview(codeId, i) {
-		// debugger;
 		const { actions: { openPreview } } = this.props;
 		let f = this.state.dataSource[i].file
 		let filed = {}
@@ -112,11 +212,138 @@ export default class TableOrg extends Component {
 		openPreview(filed);
 	}
 
+	//变更
+	BtnChange(e) {
+		if (this.state.subDataSource.length <= 0) {
+			notification.error({
+				message: '请选择数据！',
+				duration: 2
+			})
+			return;
+		}
+		this.setState({ newKey2: Math.random() + 2, setChangeVisiable: true });
+	}
+
+	// 申请变更--并发起
+	setChangeData(data, participants) {
+		// console.log('vip-data', data);
+		// console.log('vip-per', participants);
+		this.setState({
+			newKey2: Math.random() + 2,
+			setChangeVisiable: false,
+			selectedRowKeys: [],
+			subDataSource: [],
+		});
+
+		// 发起流程
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
+		let creator = { // 流程创建者
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
+		}
+		let postdata = {
+			name: "安全专项信息批量变更",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "安全专项信息批量变更",
+			subject: [{
+				data: JSON.stringify(data)
+			}],
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
+			// "deadline": "2018-12-30" # 截止日期, 空填None,
+		}
+		createWorkflow({}, postdata).then(rst => { // 创建流程实例
+			let nextStates = getNextStates(rst, rst.current[0].id); //根据当前节点获取流程下一步节点集合
+			logWorkflowEvent({ pk: rst.id }, // 
+				{
+					next_states: [{ // 时间以及下一个节点执行人
+						participants: [participants], // 参与的人
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					state: rst.current[0].id,
+					executor: creator,
+					action: '提交',
+					note: '发起安全专项变更',
+					attachment: null
+				});
+		});
+
+
+	}
+	//删除
+	BtnDelete(e) {
+		if (this.state.subDataSource.length <= 0) {
+			notification.error({
+				message: '请选择数据！',
+				duration: 2
+			})
+			return;
+		}
+		this.setState({ newKey3: Math.random() + 4, setDeleteVisiable: true });
+	}
+	// 申请删除--并发起
+	setDeleteData(data, participants) {
+		// console.log('vip-data', data);
+		// console.log('vip-per', participants);
+		this.setState({
+			newKey3: Math.random() + 2,
+			setDeleteVisiable: false,
+			selectedRowKeys: [],
+			subDataSource: [],
+		});
+		// 发起流程
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
+		let creator = { // 流程创建者
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
+		}
+		let postdata = {
+			name: "安全专项信息批量删除",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "安全专项信息批量删除",
+			subject: [{
+				data: JSON.stringify(data)
+			}],
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
+			// "deadline": "2018-12-30" # 截止日期, 空填None,
+		}
+		createWorkflow({}, postdata).then(rst => { // 创建流程实例
+			let nextStates = getNextStates(rst, rst.current[0].id); //根据当前节点获取流程下一步节点集合
+			logWorkflowEvent({ pk: rst.id }, // 
+				{
+					next_states: [{ // 时间以及下一个节点执行人
+						participants: [participants], // 参与的人
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					state: rst.current[0].id,
+					executor: creator,
+					action: '提交',
+					note: '发起安全专项删除',
+					attachment: null
+				});
+		});
+
+
+	}
 	columns = [
 		{
 			title: '序号',
-			dataIndex: 'index',
+			// dataIndex: 'index',
 			width: '5%',
+			render: (text, record, index) => {
+				return index + 1
+			},
 		},
 		{
 			title: '项目/子项目名称',
@@ -168,7 +395,6 @@ export default class TableOrg extends Component {
 						<a
 							onClick={this.handlePreview.bind(this, record.codeId, record.i)}>
 							预览
-							{/* :{record.filename} */}
 						</a>
 					)
 				} else {
@@ -180,20 +406,5 @@ export default class TableOrg extends Component {
 				}
 			}
 		},
-		// {
-		// 	title: '操作',
-		// 	render: (text, record, index) => {
-		// 		return (
-		// 			<Popconfirm
-		// 				placement="leftTop"
-		// 				title="确定删除吗？"
-		// 				onConfirm={this.delete.bind(this, index)}
-		// 				okText="确认"
-		// 				cancelText="取消">
-		// 				<a>删除</a>
-		// 			</Popconfirm>
-		// 		)
-		// 	}
-		// }
 	];
 }

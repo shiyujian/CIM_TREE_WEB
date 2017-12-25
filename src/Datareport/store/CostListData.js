@@ -6,6 +6,7 @@ import fieldFactory from '_platform/store/service/field';
 import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API} from '_platform/api';
 
 const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
+const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE')
@@ -21,12 +22,20 @@ export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`,
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 //批量修改施工包
 const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
+//上传taglists
+const addTagList = createFetchAction(`${SERVICE_API}/taglist/`,[],'POST');
+//上传tags
+const sendTags = createFetchAction(`${SERVICE_API}/tags/`,[],'POST');
+//获取施工包详情
+const getWorkPackageDetails = createFetchAction(`${SERVICE_API}/workpackages/{{code}}/?all=true`,[]);
+const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{key}}&obj_type=C_QTO`,[],'GET')
 
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
     deleteStaticFile,
 	getWorkPackageDetail,
+	getWorkPackageDetails,
 	getAllUsers,
 	createWorkflow,
 	getWorkflow,
@@ -35,7 +44,11 @@ export const actions = {
 	deleteWorkflow,
 	getScheduleDir,
 	postScheduleDir,
-	addDocList
+	addDocList,
+	getDocument,
+	addTagList,
+	sendTags,
+	getSearcher
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

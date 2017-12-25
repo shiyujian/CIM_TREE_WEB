@@ -172,6 +172,8 @@ class JianyanModal extends Component {
         const {actions:{getWorkPackageDetail}} = this.props
         res.name = wp.name
         res.code = wp.code  
+        res.pk = wp.pk
+        res.obj_type = wp.obj_type
         let dwcode = ""
         let getUnitLoop = async(param) => {
             let next = {};
@@ -207,6 +209,7 @@ class JianyanModal extends Component {
             obj_type:danwei.obj_type
         }
         res.project = danwei.parent
+        res.related_documents = danwei.related_documents
         return res
     }
     //下拉框选择人
@@ -390,7 +393,6 @@ class JianyanModal extends Component {
                             }
                         </Select>
                     </span> 
-                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
                     <Preview />
 				</div>
                 <div style={{marginTop:20}}>

@@ -9,8 +9,8 @@ export default class TablePerson extends Component{
                 <div>
                     <Button style={{marginRight:"10px"}}>模板下载</Button>
                     <Button className = {style.button} onClick = {this.send.bind(this)}>发送填报</Button>
-                    <Button className = {style.button}>申请变更</Button>
-                    <Button className = {style.button}>申请删除</Button>
+                    <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
+                    <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button>
                     <Button className = {style.button}>导出表格</Button>
                     <Search className = {style.button} style={{width:"200px"}} placeholder="输入搜索条件" />
                 </div>
@@ -24,9 +24,20 @@ export default class TablePerson extends Component{
             </div>
         )
     }
+    //发送
 	send() {
 		const { actions: { ModalVisible } } = this.props;
 		ModalVisible(true);
+	}
+	//批量删除
+	expurgate() {
+		const { actions: { ExprugateVisible } } = this.props;
+		ExprugateVisible(true);
+	}
+	//批量变更
+	modify() {
+		const { actions: { ModifyVisible } } = this.props;
+		ModifyVisible(true);
 	}
 	componentDidMount() {
 		
@@ -42,6 +53,12 @@ export default class TablePerson extends Component{
         console.log(selected, selectedRows, changeRows);
       },
     };
+
+    //删除
+    delete(){
+        
+    }
+
 	columns = [{
 		title: '人员编码',
 		dataIndex: 'code',
@@ -81,12 +98,18 @@ export default class TablePerson extends Component{
 	}, {
 		title: '编辑',
 		dataIndex: 'edit',
-		render: (record) => (
-			<span>
-				<Icon type="edit" />
-				<span style={{ "padding": "5px" }}>|</span>
-				<Icon type="delete" />
-			</span>
-		)
+		render:(record) => {
+            return  (
+                <Popconfirm
+                    placement="leftTop"
+                    title="确定删除吗？"
+                    onConfirm={this.delete.bind(this)}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    <a>删除</a>
+                </Popconfirm>
+            )
+        }
 	}]
 }
