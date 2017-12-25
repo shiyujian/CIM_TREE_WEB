@@ -17,10 +17,6 @@ export const DeleteRow = createAction(`${ID}_申请删除数据`);
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 
-
-
-
-
 export const actions = {
 	ModalVisible,
 	getAllUsers,

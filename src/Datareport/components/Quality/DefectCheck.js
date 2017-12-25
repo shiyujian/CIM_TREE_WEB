@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
+import {actions} from '../../store/quality'
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
@@ -15,7 +16,7 @@ const {Option} = Select
 		return { platform}
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...platformActions}, dispatch)
+		actions: bindActionCreators({ ...platformActions,actions}, dispatch)
 	})
 )
 export default class DefectCheck extends Component {
@@ -28,14 +29,25 @@ export default class DefectCheck extends Component {
 		};
     }
     async componentDidMount(){
+        //创建一级文档目录
         const {wk} = this.props
-        //  const {actions:{ getWorkflow }} = this.props
-        //  getWorkflow({pk:wk.id}).then(rst => {
-        //      let dataSource = JSON.parse(rst.subject[0].data)
-        //      this.setState({dataSource,wk:rst})
-        //  })
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk})
+        this.setState({dataSource,wk});
+        const {actions:{
+            getScheduleDir,
+            postScheduleDir,
+        }} = this.props;
+        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
+        if(!topDir.obj_type){
+            let postData = {
+                name:'数据报送的顶级节点',
+                code:'the_only_main_code_datareport',
+                "obj_type": "C_DIR",
+                "status": "A",
+            }
+            topDir = await postScheduleDir({},postData);
+        }
+        this.setState({topDir});
     }
 
     componentWillReceiveProps(props){
@@ -43,6 +55,7 @@ export default class DefectCheck extends Component {
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
    }
+
    //提交
    async submit(){
     if(this.state.opinion === 1){
@@ -56,7 +69,7 @@ export default class DefectCheck extends Component {
 //通过
 async passon(){
     const {dataSource,wk} = this.state
-    const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
+    const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList, getScheduleDir, postScheduleDir,}} = this.props
     let executor = {};
     let person = getUser();
     executor.id = person.id;
@@ -64,56 +77,70 @@ async passon(){
     executor.person_name = person.name;
     executor.person_code = person.code;
     await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-    let doclist_a = [];
-    let doclist_p = [];
-    let wplist = [];
-    dataSource.map((o) => {
-        //创建文档对象
-        let doc = o.related_documents.find(x => {
-            return x.rel_type === 'many_jy_rel'
-        })
-        if(doc){
-            doclist_p.push({
-                code:doc.code,
-                extra_params:{
-                    ...o
-                }
-            })
-        }else{
-            doclist_a.push({
-                code:`rel_doc_${o.code}`,
-                name:`rel_doc_${o.pk}`,
-                obj_type:"C_DOC",
-                status:"A",
-                version:"A",
-                "basic_params": {
-                    "files": [
-                        o.file
-                    ]
-                },
-                workpackages:[{
-                    code:o.code,
-                    obj_type:o.obj_type,
-                    pk:o.pk,
-                    rel_type:"many_jy_rel"
-                }],
-                extra_params:{
-                    ...o
-                }
-            })
-        }
-        //施工包批量
-        wplist.push({
-            code:o.code,
-            extra_params:{
-                rate:o.rate,
-                check_status:2
-            }
-        })
-    })
-    await addDocList({},{data_list:doclist_a});
-    await putDocList({},{data_list:doclist_p})
-    await updateWpData({},{data_list:wplist});
+    //创建二级文档目录
+    let code = "datareport_defect_1123"
+    let postDirData = {
+        "name": '安全文档目录树',
+        "code": code,
+        "obj_type": "C_DIR",
+        "status": "A",
+        related_objects: [{
+            pk: workpackage.pk,
+            code: workpackage.code,
+            obj_type: workpackage.obj_type,
+            rel_type: 'safetydoc_wp_dirctory', // 自定义，要确保唯一性
+        }],
+        "parent":{"pk":topDir.pk,"code":topDir.code,"obj_type":topDir.obj_type}
+    }
+    let dir = await getScheduleDir({code:code});
+    //no such directory
+    if(!dir.obj_type){  
+        dir = await postScheduleDir({},postDirData);
+    }
+     //prepare the data which will store in database
+     const docData = [];
+     let i=0;   //asure the code of every document only
+     dataSource.map(item=>{
+         i++;
+         docData.push({
+             code:'quality_defect'+moment().format("YYYYMMDDHHmmss")+i,
+             name:item.name + 'quality_defect',
+             obj_type:"C_DOC",
+             status:'A',
+             profess_folder: {code: dir.code, obj_type: 'C_DIR'},
+             "basic_params": {
+                 "files": [
+                     item.file
+                 ]
+               },
+             extra_params:{
+                code:item.code,
+                acc_type:item.acc_type,
+                uploda_date:item.uploda_date,
+                check_date:item.check_date,
+                do_date:item.do_date,
+                descrip:item.descrip,
+                check_result:item.check_result,
+                deadline:item.deadline,
+                result:item.result,
+                project:item.project,
+                respon_unit:item.respon_unit,
+                unit:item.unit
+             }
+         })
+     });
+     let rst = await addDocList({},{data_list:docData});
+     if(rst.result){
+         notification.success({
+             message: '创建文档成功！',
+             duration: 2
+         });
+     }else{
+         notification.error({
+             message: '创建文档失败！',
+             duration: 2
+         });
+     }
 }
 //不通过
 async reject(){
@@ -210,7 +237,7 @@ async reject(){
 		return (
             <Modal
 			title="其它检验信息审批表"
-			key={Math.random()}
+			key={new Date.now()}
             visible={true}
             width= {1280}
 			footer={null}

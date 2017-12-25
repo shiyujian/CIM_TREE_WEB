@@ -56,7 +56,7 @@ export default class ModalTable extends Component {
 					fdbMode:single.basic_params.files[0],
 					tdbxMode:single.basic_params.files[1],
 					attributeTable:single.basic_params.files[2],
-                    // reportingTime:single.extra_params.reportingTime,
+                    reportingTime:single.extra_params.reportingTime,
                     reportingName:single.extra_params.reportingName,
                     // stage:single.extra_params.stage,
                     // upPeople:single.extra_params.upPeople,

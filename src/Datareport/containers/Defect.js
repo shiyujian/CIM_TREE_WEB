@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/quality';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button} from 'antd';
+import {Row,Col,Table,Input,Button,message} from 'antd';
 import {getUser} from '_platform/auth'
 import DefectModal from '../components/Quality/DefectModal'
 import './quality.less'

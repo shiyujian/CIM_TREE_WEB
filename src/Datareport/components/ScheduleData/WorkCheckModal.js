@@ -31,13 +31,15 @@ export default class WorkCheckModal extends Component {
             wk: null,
             dataSource: [],
             opinion: 1,
+            unit: {},
+            project: {},
             topDir: {},
         };
     }
     async componentDidMount() {
         const { wk } = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({ dataSource, wk });
+        this.setState({ dataSource, wk});
         const { actions: {
             getScheduleDir,
             postScheduleDir,
@@ -58,7 +60,7 @@ export default class WorkCheckModal extends Component {
     componentWillReceiveProps(props) {
         const { wk } = props
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({ dataSource, wk })
+        this.setState({ dataSource, wk})
     }
     // 点x消失
     oncancel() {
@@ -77,102 +79,66 @@ export default class WorkCheckModal extends Component {
 
     //通过
     async passon() {
-        const { dataSource, wk, topDir } = this.state;
-        const { actions: {
-            logWorkflowEvent,
-            addDocList,
-            getScheduleDir,
-            postScheduleDir,
-            getWorkpackagesByCode,
-            updateWpData
-        } } = this.props;
-        //the unit in the dataSource array is same
-        let unit = dataSource[0].unit;
-        let project = dataSource[0].project;
-        let code = 'datareport_workdata_1111';
-        //get workpackage by unit's code 
-        let workpackage = await getWorkpackagesByCode({ code: unit.code });
+        const { dataSource, wk, unit, project } = this.state,
+            { actions: { logWorkflowEvent, updateWpData, addDocList, putDocList } } = this.props,
+            { id, username, person_name, person_code } = getUser(),
+            executor = { id, username, person_name, person_code };
 
-        let postDirData = {
-            "name": '施工进度目录树',
-            "code": code,
-            "obj_type": "C_DIR",
-            "status": "A",
-            related_objects: [{
-                pk: workpackage.pk,
-                code: workpackage.code,
-                obj_type: workpackage.obj_type,
-                rel_type: 'sg_rel', // 自定义，要确保唯一性
-            }],
-            "parent": { "pk": topDir.pk, "code": topDir.code, "obj_type": topDir.obj_type }
-        }
-        let dir = await getScheduleDir({ code: code });
-        //no such directory
-        if (!dir.obj_type) {
-            dir = await postScheduleDir({}, postDirData);
-        }
+        await logWorkflowEvent({ pk: wk.id }, { state: wk.current[0].id, action: '通过', note: '同意', executor, attachment: null });
 
-        // send workflow
-        let executor = {};
-        let person = getUser();
-        executor.id = person.id;
-        executor.username = person.username;
-        executor.person_name = person.name;
-        executor.person_code = person.code;
-        await logWorkflowEvent({ pk: wk.id }, { state: wk.current[0].id, action: '通过', note: '同意', executor: executor, attachment: null });
+
+        let doclist_a = [];
+        let doclist_p = [];
         let wplist = [];
-        //prepare the data which will store in database
-        const docData = [];
-        let i = 0;   //asure the code of every document only
-        dataSource.map(item => {
-            i++;
-            docData.push({
-                code: 'workdata' + moment().format("YYYYMMDDHHmmss") + i,
-                name: 'workdata' + moment().format("YYYYMMDDHHmmss") + i,
-                obj_type: "C_DOC",
-                status: 'A',
-                profess_folder: { code: dir.code, obj_type: 'C_DIR' },
+        dataSource.map((o)=>{
+        //创建文档对象
+        let doc = dataSource.related_documents && dataSource.related_documents.find(x => {
+            return x.rel_type === 'dataport_processmessage_construction'    //unique
+        })
+        if (doc) {
+            doclist_p.push({
+                code: doc.code,
                 extra_params: {
-                    code: item.code,
-                    name: item.name,
-                    construct_unit: item.construct_unit,
-                    quantity: item.quantity,
-                    factquantity: item.factquantity,
-                    planstarttime: item.planstarttime,
-                    planovertime: item.planovertime,
-                    factstarttime: item.factstarttime,
-                    factovertime: item.factovertime,
-                    uploads:item.uploads,
-                    unit: item.unit.name,
-                    project: item.project.name
-                },
-
-            })
-            //施工包批量
-            wplist.push({
-                code:item.unit.code,
-                extra_params: {
-                    planstarttime: item.planstarttime,
-                    planovertime: item.planovertime,
-                    factstarttime: item.factstarttime,
-                    factovertime: item.factovertime,
-                    workflow_state: 2,
+                    ...dataSource,
                 }
             })
-        });
-        await updateWpData({},{data_list:wplist});
-        let rst = await addDocList({}, { data_list: docData });
-        if (rst.result) {
-            notification.success({
-                message: '创建文档成功！',
-                duration: 2
-            });
         } else {
-            notification.error({
-                message: '创建文档失败！',
-                duration: 2
-            });
+            doclist_a.push({
+                code: `rel_doc_${o.unit.code}`,
+                name: `rel_doc_${o.unit.pk}`,  //anything
+                obj_type: "C_DOC",
+                status: "A",
+                version: "A",
+                workpackages: [{
+                    code: o.unit.code,
+                    obj_type: o.unit.obj_type, //belong workpage
+                    pk: o.unit.pk, //belong workpage
+                    rel_type: "dataport_processmessage_construction"
+                }],
+                extra_params: {
+                    ...dataSource,
+                    ...unit,
+                    ...project,
+                }
+            })
         }
+        //施工包批量
+        // 、、、、、、、、、、、、、、、没改完
+        wplist.push({
+            code: o.unit.code,
+            extra_params: {
+                planstarttime: o.planstarttime,
+                planovertime: o.planovertime,
+                factstarttime: o.factstarttime,
+                factovertime: o.factovertime,
+                check_status: 2
+            }
+        })
+    })
+        await addDocList({}, { data_list: doclist_a });
+        await putDocList({}, { data_list: doclist_p })
+        await updateWpData({}, { data_list: wplist });
+        message.success("批量上传数据成功");
     }
     //不通过
     async reject() {
@@ -183,7 +149,6 @@ export default class WorkCheckModal extends Component {
 
     onChange(e) {
         this.setState({ opinion: e.target.value });
-        console.log(opinion)
     }
     render() {
         const columns =

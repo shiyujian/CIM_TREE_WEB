@@ -6,7 +6,7 @@ import {Main,Content, DynamicTitle} from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 
 import {InfoUploadModal,VedioInfoTable,MainHeader} from '../components/VedioData';
-import { actions } from '../store/vedioInfoData';
+import { actions } from '../store/vedioData';
 import {addSerialNumber} from '../components/VedioData/commonFunc';
 
 @connect(
@@ -55,6 +55,7 @@ export default class VedioInfoData extends Component {
 				/>
 			</Content>
 			<InfoUploadModal
+			 key={uploadModal}
 			 uploadModal={uploadModal}			 
 			 actions = {this.props.actions}
 			 closeModal={this.closeModal}
@@ -76,7 +77,6 @@ export default class VedioInfoData extends Component {
 		let dataSource = []
 		data.forEach(item=>{
 			getDocument({code:item.code}).then(response=>{
-				console.log(response);
 				let {extra_params:{projectName,ShootingDate,file}} = response;
 				dataSource.push({projectName,ShootingDate,file})
 				this.setState({dataSource});

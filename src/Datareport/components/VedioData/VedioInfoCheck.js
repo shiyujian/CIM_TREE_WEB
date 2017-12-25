@@ -120,8 +120,8 @@ export default class VedioInfoCheck extends Component {
                 postScheduleDir,
                 getWorkpackagesByCode
             }} = this.props;
-        const //{unit:{code:unitCode}} = dataSource[0],
-            unitCode = 1112,    //需修改
+            const unitCode = JSON.parse(dataSource[0].value[1]).code,
+            //unitCode = 1112,    //需修改
             scheduleDircode = 'datareport_safety_vedioinfodata'; //I'm unique
         let dir = await getScheduleDir({code:scheduleDircode});
         if(!dir.obj_type){  //no such directory

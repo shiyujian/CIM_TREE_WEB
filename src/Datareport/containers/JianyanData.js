@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/quality';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button} from 'antd';
+import {Row,Col,Table,Input,Button,message} from 'antd';
 import JianyanModal from '../components/Quality/JianyanModal'
 import {WORKFLOW_CODE} from '_platform/api.js'
 import './quality.less'
@@ -106,7 +106,7 @@ export default class JianyanData extends Component {
 	render() {
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>
-				<DynamicTitle title="检验批信息" {...this.props}/>
+				<DynamicTitle title="其他检验信息" {...this.props}/>
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>发起填报</Button>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Button, Row, Col, Select, Upload, Input, message, Icon} from 'antd';
+import {Button, Row, Col, Select, Upload, Input, message, Icon, Cascader} from 'antd';
 
 import VedioTable from './VedioTable';
 import './index.less';
@@ -11,16 +11,18 @@ export default class UploadFooter extends Component{
     constructor(props){
         super(props);
         this.state={
-            checkUsers: []
+            checkUsers: [],
+            options: []
         }
         Object.assign(this,{    //不需要从新render的数据
             excelUpload: false,
-            selectUser: null
+            selectUser: null,
+            project: false
         })
     }
 
     componentDidMount(){
-        const {getAllUsers} = this.props;
+        const {actions:{getAllUsers,getProjectTree}} = this.props;
         getAllUsers().then(data => {
             const checkUsers = data.map(record => {
                 let {id,username,account:{person_name,person_code,organization}} = record,
@@ -31,10 +33,22 @@ export default class UploadFooter extends Component{
             })
             this.setState({checkUsers})
         })
+        getProjectTree({depth:1}).then(rst =>{
+            if(rst.status){
+                const options = rst.children.map(item=>{
+                    return {
+                        value:JSON.stringify(item),
+                        label:item.name,
+                        isLeaf:false
+                    }
+                })
+                this.setState({options});
+            }
+        });
     }
 
     render(){
-        const {checkUsers} = this.state;
+        const {checkUsers,options} = this.state;
 
         return(<div>
             <Row className="rowSpacing">
@@ -51,7 +65,16 @@ export default class UploadFooter extends Component{
                     <Select onSelect={this.selectCheckUser} className="select" defaultValue={"请选择"} >
                         {checkUsers}
                     </Select>
-                    <Button onClick={this.onSubmit} type="primary" className="spacing" >提交</Button>
+                    <div className="inlineBlock">项目-单位工程：</div>
+                    <Cascader
+                        options={options}
+                        //className='btn'
+                        loadData={this.loadData}
+                        onChange={this.onChange}
+                        placeholder={"请选择项目-单位工程"}
+                        changeOnSelect
+                    />
+                    <Button onClick={this.onSubmit} type="primary" className="spacing" >提交</Button>                  
                 </Col>
             </Row>
             <Row className="rowSpacing">
@@ -103,7 +126,9 @@ export default class UploadFooter extends Component{
                 dataSource.shift();
                 
                 storeExcelData(dataSource);
-                this.excelUpload = true;
+                Object.assign(this,{
+                    excelUpload: true
+                })
                 message.success(`${name} 上传成功`);
             } else if (info.file.status === 'error') {
                 message.error(`${info.file.name} 上传失败`);
@@ -116,8 +141,8 @@ export default class UploadFooter extends Component{
     }
 
     onSubmit = ()=>{
-        const {excelUpload, selectUser} = this;
-        const {onOk} = this.props;
+        const {excelUpload, selectUser,project} = this,
+            {onOk} = this.props;
         if(!excelUpload){
             message.error("请上传附件！");
             return
@@ -126,8 +151,56 @@ export default class UploadFooter extends Component{
             message.error("请选择审核人！");
             return
         }
+        if(!project){
+            message.error("请选择项目-单位工程！");
+            return
+        }
         
         onOk(selectUser);
+    }
+
+    loadData = (selectedOptions)=>{
+        const {actions:{getProjectTree}} = this.props,
+            targetOption = selectedOptions[selectedOptions.length - 1]; //其实只有一个
+        targetOption.loading = true;
+        getProjectTree({depth:2}).then(rst =>{
+            if(rst.status){
+                let units = [];
+                rst.children.forEach(item=>{
+                    if(item.code === JSON.parse(targetOption.value).code){  //当前选中项目?
+                        units = item.children.map(unit =>{
+                            const {name,code,obj_type} = unit;
+                            return {
+                                value: JSON.stringify({name,code,obj_type}),
+                                label: name
+                            }
+                        })
+                    }
+                })
+                Object.assign(targetOption,{
+                    loading: false,
+                    children: units
+                })
+                this.setState({options:[...this.state.options]})    //不知道为啥，官方文档这么写的
+            }
+        });
+    }
+
+    onChange = (value)=>{
+        value;
+        if(value.length===2){
+            const {storeExcelData,dataSource} = this.props,
+                project = {
+                    projectName: JSON.parse(value[0]).name,
+                    enginner: JSON.parse(value[1]).name,
+                    value: value
+                };
+            const sourceData = dataSource.map(data=>{
+                return Object.assign({},data,project)
+            })
+            storeExcelData(sourceData)
+            this.project = true;
+        }
     }
 
 }
@@ -141,6 +214,11 @@ UploadFooter.PropTypes ={
 const modalDownload = ()=>{
     const downloadLink = '';
     //window.open(downloadLink);
+}
+
+const projectReturn = (data={})=>{
+    const {name,code,obj_type} = data;
+    return {name,code,obj_type}
 }
 
 const acceptFile = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']

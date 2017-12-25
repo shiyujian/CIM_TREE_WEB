@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {TablePerson, ToggleModal} from '../components/PersonData'
+import {TablePerson, ToggleModal, PersonExpurgate, PersonModify} from '../components/PersonData'
 import {actions as platformActions} from '_platform/store/global';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -63,7 +63,7 @@ export default class PersonData extends Component {
 		});
 	}
 	render() {
-		const {visible} = this.props;
+		const {visible, Exvisible, Modvisible} = this.props;
 		return (
 			<div>
 				<DynamicTitle title="人员信息" {...this.props} />
@@ -73,9 +73,14 @@ export default class PersonData extends Component {
 				<Content>
 					<TablePerson {...this.props} />
 					{
-						visible && <ToggleModal {...this.props} setData = {this.setData.bind(this)}/>
+						// visible && <ToggleModal {...this.props} setData = {this.setData.bind(this)}/>,
+						// Exvisible && <PersonExpurgate {...this.props}/>,
+						// Modvisible && <PersonModify {...this.props}/>
 					}
 				</Content>
+				<ToggleModal {...this.props} setData = {this.setData.bind(this)}/>
+				<PersonExpurgate {...this.props}/>
+				<PersonModify {...this.props}/>
 			</div>
 			)
 	}

@@ -18,16 +18,19 @@ export default class ToggleModal extends Component{
 			headers: {
 			},
 			showUploadList: false,
-		    onChange(info) {
+		    async onChange(info) {
 		        if (info.file.status !== 'uploading') {
 		        }
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
                     let dataSource = jthis.handleExcelData(importData);
-                    jthis.setState({
-                        dataSource
-                    })
-		            message.success(`${info.file.name} file uploaded successfully`);
+                    message.success(`${info.file.name} file uploaded successfully`);
+                    let perSet = {};
+                    let {getPersonByCode} = jthis.props.actions;
+                    for(let i=0;i< dataSource.length;i++){
+                        perSet[dataSource[i].projBoss] = await getPersonByCode({code:dataSource[i].projBoss});
+                    }
+                    jthis.setState({perSet,dataSource});
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
 		        }
@@ -100,12 +103,15 @@ export default class ToggleModal extends Component{
     componentDidMount(){
         const {actions:{getAllUsers}} = this.props
         getAllUsers().then(res => {
+            console.log(res);
+            let set = {};
             let checkers = res.map(o => {
+                set[o.id] = o;
                 return (
                     <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
-            this.setState({checkers})
+            this.setState({checkers,usersSet:set})
         });
     }
     covertURLRelative = (originUrl) => {
@@ -152,7 +158,7 @@ export default class ToggleModal extends Component{
             loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
             loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
             record.file = loadedFile;
-            record.code = file.name.substring(0,file.name.lastIndexOf('.'));
+            // record.code = file.name.substring(0,file.name.lastIndexOf('.'));
             this.forceUpdate();
         });
         return false;
@@ -225,17 +231,10 @@ export default class ToggleModal extends Component{
         key: 'Cost',
       },{
         title: '项目负责人',
-            render: (record) => {
-                return (
-                    <Select style={{ width: '70px' }} className="btn" value = {record.projBoss||''} onSelect={ele => {
-                        record.projBoss = ele;
-                        this.forceUpdate();
-                    }} >
-                        {
-                            this.state.checkers || []
-                        }
-                    </Select>
-                );
+        render:(record)=>{
+            return(
+                <span>{this.state.perSet?this.state.perSet[record.projBoss].name:''}</span>
+            )
         },
         key:'Duty'
       },{
@@ -287,7 +286,9 @@ export default class ToggleModal extends Component{
                 etime: item[12],
                 range:item[7],
                 cost:item[9],
-                intro:item[13]
+                intro:item[13],
+                projType:item[5],
+                projBoss:item[10]
             }
         })
         return res;

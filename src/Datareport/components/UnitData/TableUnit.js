@@ -7,7 +7,8 @@ export default class TableUnit extends Component{
         return (
             <div>
                 <div>
-                    <Button  onClick = {this.send.bind(this)} style={{marginRight:"20px"}}>发送填报</Button>
+                <Button style={{ marginRight: "10px" }}  className = {style.button}>模板下载</Button>
+                    <Button  className = {style.button} onClick = {this.send.bind(this)}>发送填报</Button>
                     <Button className = {style.button}>申请变更</Button>
                     <Button className = {style.button}>申请删除</Button>
                     <Button className = {style.button}>导出表格</Button>
