@@ -23,7 +23,7 @@ const {Option} = Select;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class SumSpeedExamineDelete extends Component {
+export default class SumPlanDelateCheck extends Component {
 
 	constructor(props) {
 		super(props);
