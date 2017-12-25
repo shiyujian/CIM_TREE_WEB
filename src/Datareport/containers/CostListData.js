@@ -26,7 +26,8 @@ export default class CostListData extends Component {
 		super(props);
 		this.state = {
 			addvisible:false,
-			dataSource: []
+			dataSource: [],
+			selectedRowKeys: []
 		};
 		this.columns = [{
 			title:'序号',
@@ -57,21 +58,6 @@ export default class CostListData extends Component {
 		}, {
 			title:'备注',
 			dataIndex:'remarks'
-		},{
-			title: '删除',
-			dataIndex:'edit',
-			render: (text, record, index) => {
-				return (
-					<Popconfirm
-						placement="leftTop"
-						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, index)}
-						okText="确认"
-						cancelText="取消">
-						<a>删除</a>
-					</Popconfirm>
-				)
-			}
 		}];
 	}
 
@@ -87,67 +73,20 @@ export default class CostListData extends Component {
 		let dataSource = [];
 		let data = await getSearcher({key:"priceListName"});
 		data.result.map(item=>{
-            // getDocument({code:item.code}).then(single=>{
-				let temp = {
-					code:item.extra_params.code,
-					company:item.extra_params.company,
-					rate:item.extra_params.rate,
-					projectcoding:item.extra_params.projectcoding,
-					remarks:item.extra_params.remarks,
-					total:item.extra_params.total,
-					valuation:item.extra_params.valuation,
-					subproject: item.extra_params.subproject,
-					unitengineering: item.extra_params.unitengineering
-				}
-                dataSource.push(temp);
-				this.setState({dataSource});
-            // })
+			let temp = {
+				code:item.extra_params.code,
+				company:item.extra_params.company,
+				rate:item.extra_params.rate,
+				projectcoding:item.extra_params.projectcoding,
+				remarks:item.extra_params.remarks,
+				total:item.extra_params.total,
+				valuation:item.extra_params.valuation,
+				subproject: item.extra_params.subproject,
+				unitengineering: item.extra_params.unitengineering
+			}
+			dataSource.push(temp);
+			this.setState({dataSource});
 		})
-
-        // let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
-        // if(topDir.obj_type){
-        //     let dir = await getScheduleDir({code:'datareport_pricelist_demo'});
-		// 	console.log(dir);
-		// 	debugger;
-        //     if(dir.obj_type){
-        //         if(dir.stored_documents.length>0){
-		// 			this.generateTableData(dir.stored_documents);
-		// 			let datas = await getSearcher({key:"helloname"})
-		// 			console.log(datas);
-        //         }
-        //     }
-		// }
-	}
-
-	// async generateTableData(data){
-    //     const {actions:{
-    //         getDocument,
-    //     }} = this.props;
-    //     let dataSource = [];
-    //     console.log(data);
-    //     data.map(item=>{
-    //         getDocument({code:item.code}).then(single=>{
-	// 			let temp = {
-	// 				code:single.extra_params.code,
-	// 				company:single.extra_params.company,
-	// 				rate:single.extra_params.rate,
-	// 				projectcoding:single.extra_params.projectcoding,
-	// 				remarks:single.extra_params.remarks,
-	// 				total:single.extra_params.total,
-	// 				valuation:single.extra_params.valuation,
-	// 				subproject: single.extra_params.subproject,
-	// 				unitengineering: single.extra_params.unitengineering
-	// 			}
-    //             dataSource.push(temp);
-	// 			this.setState({dataSource});
-    //         })
-	// 	})
-	// }
-	
-	delete(index) {
-		let { dataSource } = this.state
-		dataSource.splice(index, 1)
-		this.setState({ dataSource })
 	}
 
 	//批量上传回调
@@ -173,21 +112,21 @@ export default class CostListData extends Component {
 		}
 		createWorkflow({},postdata).then((rst) => {
 			let nextStates =  getNextStates(rst,rst.current[0].id);
-            logWorkflowEvent({pk:rst.id},
-                {
-                    state:rst.current[0].id,
-                    action:'提交',
-                    note:'发起填报',
-                    executor:creator,
-                    next_states:[{ 
-                        participants:[participants],
-                        remark:"",
-                        state:nextStates[0].to_state[0].id,
-                    }],
-                    attachment:null}).then(() => {
-						this.setState({addvisible:false}),
-						message.info("发起成功")						
-					})
+            logWorkflowEvent({pk:rst.id},{
+				state:rst.current[0].id,
+				action:'提交',
+				note:'发起填报',
+				executor:creator,
+				next_states:[{ 
+					participants:[participants],
+					remark:"",
+					state:nextStates[0].to_state[0].id,
+				}],
+				attachment:null
+			}).then(() => {
+				this.setState({addvisible:false}),
+				message.info("发起成功")						
+			})
 		})
 	}
 	oncancel(){
@@ -196,7 +135,15 @@ export default class CostListData extends Component {
 	setAddVisible(){
 		this.setState({addvisible:true})
 	}
+	onSelectChange = (selectedRowKeys) => {
+		this.setState({ selectedRowKeys });
+	}
 	render() {
+		const { selectedRowKeys } = this.state;
+		const rowSelection = {
+			selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="计价清单" {...this.props}/>
@@ -204,6 +151,7 @@ export default class CostListData extends Component {
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
 					<Button className="btn" type="default">申请变更</Button>
+					<Button className="btn" type="default">申请删除</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search 
 						className="btn"
@@ -214,7 +162,11 @@ export default class CostListData extends Component {
 				</Row>
 				<Row >
 					<Col >
-						<Table columns={this.columns} dataSource={this.state.dataSource} rowKey="key"/>
+						<Table
+							columns={this.columns}
+							dataSource={this.state.dataSource}
+							rowSelection={rowSelection}
+							rowKey="key"/>
 					</Col>
 				</Row>
 				{
