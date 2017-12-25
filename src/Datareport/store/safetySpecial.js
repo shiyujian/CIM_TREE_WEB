@@ -17,6 +17,11 @@ export const DeleteRow = createAction(`${ID}_申请删除数据`);
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 
+// 查询
+const getSearcherDir = createFetchAction(`${SERVICE_API}/searcher/?keyword={{code}}&&obj_type=C_DOC`,[],'GET');
+
+
+
 export const actions = {
 	ModalVisible,
 	getAllUsers,
@@ -26,6 +31,7 @@ export const actions = {
 	DeleteRow,
 	getScheduleDir,
 	postScheduleDir,
+	getSearcherDir,
 };
 
 export default handleActions({

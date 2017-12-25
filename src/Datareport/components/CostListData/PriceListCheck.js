@@ -22,7 +22,7 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class PriceListExamine extends Component {
+export default class PriceListCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -80,7 +80,9 @@ export default class PriceListExamine extends Component {
             putDocList,
             postScheduleDir,
             getScheduleDir,
-            getWorkpackagesByCode
+            getWorkpackagesByCode,
+            addTagList,
+            sendTags
         }} = this.props;
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
@@ -117,28 +119,22 @@ export default class PriceListExamine extends Component {
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         
         //prepare the data which will store in database
-        const docData = [];
+        const tagLists = [];
         let i=0;   //asure the code of every document only
         dataSource.map(item => {
             i++;
-            docData.push({
-                code:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
-                name:item.file.name,
-                obj_type:"C_DOC",
-                status:'A',
-                profess_folder: {code: dir.code, obj_type: 'C_DIR'},
-                "basic_params": {
-                    "files": [
-                        {
-                          "a_file": item.file.a_file,
-                          "name": item.file.name,
-                          "download_url": item.file.download_url,
-                          "misc": "file",
-                          "mime_type": item.file.mime_type
-                        },
-                    ]
-                  },
-                extra_params:{
+            tagLists.push({
+                "name": 'priceListName' + moment().format("YYYYMMDDHHmmss")+i,
+                // "code": 'costList'+moment().format("YYYYMMDDHHmmss")+i,
+                "code": 'priceListCode' + moment().format("YYYYMMDDHHmmss")+i,
+                "obj_type": "C_QTO",
+                "status": "A",
+                "version": "A",
+                "unit": "元",
+                "unit_price": +item.total,
+                "kind": "01",
+                "description": "计价清单创建taglists",
+                "extra_params": {
                     code: item.projectcoding,
                     subproject: item.project.name,
                     projectcoding:item.projectcoding,
@@ -149,26 +145,77 @@ export default class PriceListExamine extends Component {
                     remarks: item.remarks,
                     unitengineering: item.unit.name
                 },
-                workpackage: {
-                    pk: item.unit.pk || "wp_pk",
-                    code: item.unit.code,
-                    obj_type: item.unit.obj_type,
-                    rel_type: "related"
+                "workpackage":{
+                    "pk":item.unit.pk || "wp_pk",
+                    "code":item.unit.code, 
+                    "obj_type":item.unit.obj_type,
+                    "rel_type":"price_list_check"
                 }
             })
+            // docData.push({
+            //     code:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
+            //     name:item.file.name,
+            //     obj_type:"C_DOC",
+            //     status:'A',
+            //     profess_folder: {code: dir.code, obj_type: 'C_DIR'},
+            //     "basic_params": {
+            //         "files": [
+            //             {
+            //               "a_file": item.file.a_file,
+            //               "name": item.file.name,
+            //               "download_url": item.file.download_url,
+            //               "misc": "file",
+            //               "mime_type": item.file.mime_type
+            //             },
+            //         ]
+            //       },
+            //     extra_params:{
+            //         code: item.projectcoding,
+            //         subproject: item.project.name,
+            //         projectcoding:item.projectcoding,
+            //         total:item.total,
+            //         valuation: item.valuation,
+            //         rate: item.rate,
+            //         company: item.company,
+            //         remarks: item.remarks,
+            //         unitengineering: item.unit.name
+            //     },
+            //     workpackage: {
+            //         pk: item.unit.pk || "wp_pk",
+            //         code: item.unit.code,
+            //         obj_type: item.unit.obj_type,
+            //         rel_type: "related"
+            //     }
+            // })
         });
-        let rst = await addDocList({},{data_list:docData});
-        if(rst.result){
-            notification.success({
-                message: '创建文档成功！',
-                duration: 2
-            });
-        }else{
-            notification.error({
-                message: '创建文档失败！',
-                duration: 2
-            });
-        }
+        let rst = await addTagList({},{data_list:tagLists});
+        // await sendTags({}, {
+        //     "name": "test_tag_1",
+        //     "code": "test_tag_1_code1",
+        //     "obj_type": "C_QTO",
+        //     "status": "A",
+        //     "version": "A",
+        //     "unit": "m3",
+        //     "unit_price": 100,
+        //     "kind": "01",
+        //     "description": "xxx",
+        //     "extra_params": {"f1":"f1", "f2":"f2"}
+        //     "workpackage":{"pk":"wp_pk", "code":"code", 
+        //     "obj_type":"C_WP_CEL","rel_type":"related",}
+        // })
+        debugger;
+        // let rst = await addDocList({},{data_list:docData});
+        // if(rst.result){
+        //     notification.success({
+        //         message: '创建文档成功！',
+        //         duration: 2
+        //     });
+        // }else{
+        //     notification.error({
+        //         message: '创建文档失败！',
+        //         duration: 2
+        //     });
+        // }
     }
     //不通过
     async reject(){
@@ -191,6 +238,13 @@ export default class PriceListExamine extends Component {
     //radio变化
     onChange(e){
         this.setState({opinion:e.target.value})
+    }
+
+    //删除
+    delete(index) {
+        let { dataSource } = this.state
+        dataSource.splice(index, 1)
+        this.setState({ dataSource })
     }
 
 	render() {
