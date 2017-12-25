@@ -340,7 +340,7 @@ export default class Progress extends Component {
 			case "安全管理信息批量删除":
 				changeDatareportVisible({key:'safety_doc_delete_visible',value:true})
 				break;
-			case "安全隐患批量删除":
+			case "安全隐患信息批量删除":
 				changeDatareportVisible({key:'safety_hidden_delete_visible',value:true})
 				break;
 			default:break;
