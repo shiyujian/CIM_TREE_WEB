@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/CostListData';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button,message} from 'antd';
+import {Row,Col,Table,Input,Button,message,Popconfirm} from 'antd';
 import PriceList from '../components/CostListData/PriceList';
 import {getUser} from '_platform/auth';
 import './quality.less';
@@ -57,6 +57,21 @@ export default class CostListData extends Component {
 		}, {
 			title:'备注',
 			dataIndex:'remarks'
+		},{
+			title: '删除',
+			dataIndex:'edit',
+			render: (text, record, index) => {
+				return (
+					<Popconfirm
+						placement="leftTop"
+						title="确定删除吗？"
+						onConfirm={this.delete.bind(this, index)}
+						okText="确认"
+						cancelText="取消">
+						<a>删除</a>
+					</Popconfirm>
+				)
+			}
 		}];
 	}
 
@@ -101,7 +116,13 @@ export default class CostListData extends Component {
                 this.setState({dataSource});
             })
         })
-    }
+	}
+	
+	delete(index) {
+		let { dataSource } = this.state
+		dataSource.splice(index, 1)
+		this.setState({ dataSource })
+	}
 
 	//批量上传回调
 	setData(data,participants){
