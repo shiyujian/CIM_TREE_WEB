@@ -114,7 +114,6 @@ export default class SumSpeed extends Component {
   //下拉框选择人
   selectChecker(value) {
     let check = JSON.parse(value);
-    console.log('check:',check)
     this.setState({ check });
   }
 
@@ -127,12 +126,14 @@ export default class SumSpeed extends Component {
       project = {
         name: temp1.name,
         code: temp1.code,
-        obj_type: temp1.obj_type
+        obj_type: temp1.obj_type,
+        pk:temp1.pk
       };
       unit = {
         name: temp2.name,
         code: temp2.code,
-        obj_type: temp2.obj_type
+        obj_type: temp2.obj_type,
+        pk:temp2.pk
       };
       this.setState({ project, unit });
       return;
@@ -215,20 +216,6 @@ export default class SumSpeed extends Component {
     dataSource.splice(index, 1);
     this.setState({ dataSource });
   }
-
-  //预览
-  // handlePreview(index){
-  //     const {actions: {openPreview}} = this.props;
-  //     let f = this.state.dataSource[index].file
-  //     let filed = {}
-  //     filed.misc = f.misc;
-  //     filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-  //     filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-  //     filed.name = f.name;
-  //     filed.mime_type = f.mime_type;
-  //     openPreview(filed);
-  // }
-
   remove(index) {
     const { actions: { deleteStaticFile } } = this.props;
     let { dataSource } = this.state;
@@ -267,64 +254,6 @@ export default class SumSpeed extends Component {
     };
     this.setState({ dataSource });
   }
-
-  covertURLRelative = originUrl => {
-    return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, "");
-  };
-  // beforeUploadPicFile  = (index,file) => {
-  //     // 上传到静态服务器
-  //     const project = file.name;
-  //     let {dataSource,unit,project} = this.state;
-  //     let temp = project.split(".")[0]
-  // 	const { actions:{uploadStaticFile} } = this.props;
-  //     const formdata = new FormData();
-  //     formdata.append('a_file', file);
-  //     formdata.append('name', project);
-  //     let myHeaders = new Headers();
-  //     let myInit = { method: 'POST',
-  //                     headers: myHeaders,
-  //                     body: formdata
-  //                     };
-  //                     //uploadStaticFile({}, formdata)
-  //     fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
-  //         resp = await resp.json()
-  //         console.log('uploadStaticFile: ', resp)
-  //         if (!resp || !resp.id) {
-  //             message.error('文件上传失败')
-  //             return;
-  //         };
-  //         const filedata = resp;
-  //         filedata.a_file = this.covertURLRelative(filedata.a_file);
-  //         filedata.download_url = this.covertURLRelative(filedata.a_file);
-  //         const attachment = {
-  //             size: resp.size,
-  //             id: filedata.id,
-  //             name: resp.name,
-  //             status: 'done',
-  //             url: filedata.a_file,
-  //             //thumbUrl: SOURCE_API + resp.a_file,
-  //             a_file:filedata.a_file,
-  //             download_url:filedata.download_url,
-  //             mime_type:resp.mime_type
-  //         };
-  //         let unitProject = {
-  //             name:unit.name,
-  //             code:unit.code,
-  //             obj_type:unit.obj_type
-  //         }
-  //         let projectt = {
-  //             name:project.name,
-  //             code:project.code,
-  //             obj_type:project.obj_type
-  //         }
-  //         dataSource[index]['file'] = attachment;
-  //         dataSource[index]['unit'] = unitProject;
-  //         dataSource[index]['project'] = projectt;
-  //         this.setState({dataSource});
-  //     });
-  //     return false;
-  // }
-
   render() {
     const columns = [
       {
@@ -375,7 +304,6 @@ export default class SumSpeed extends Component {
     return (
       <Modal
         title="结算进度上传表"
-        key={this.props.akey}
         visible={true}
         width={1280}
         onOk={this.onok.bind(this)}
@@ -408,13 +336,6 @@ export default class SumSpeed extends Component {
           <Col>
             <span>
               审核人：
-              {/* <Select
-                style={{ width: "200px" }}
-                className="btn"
-                onSelect={this.selectChecker.bind(this)}
-              >
-                {this.state.checkers}
-              </Select> */}
               <Select
                 mode="combobox"
                 style={{width:200}}
