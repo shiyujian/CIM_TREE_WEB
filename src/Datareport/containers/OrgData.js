@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {TableOrg, ToggleModal, OrgCheck} from '../components/OrgData'
+import {TableOrg, ToggleModal, OrgCheck, ToggleModalCJ} from '../components/OrgData'
 import {actions as platformActions} from '_platform/store/global';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -21,8 +21,8 @@ var moment = require('moment');
 )
 export default class OrgData extends Component {
 	setData(data,participants){
-		console.log("data:",data);
-		console.log("participants:",participants);
+		// console.log("data:",data);
+		// console.log("participants:",participants);
 		// return;
 		const {actions:{ createWorkflow, logWorkflowEvent}} = this.props
 		let creator = {
@@ -61,7 +61,7 @@ export default class OrgData extends Component {
 		});
 	}
 	render() {
-		const {visible} = this.props;
+		const {visible, visibleCJ} = this.props;
 		return (
 			<div>
 				<DynamicTitle title="组织机构" {...this.props} />
@@ -69,6 +69,9 @@ export default class OrgData extends Component {
 					<TableOrg {...this.props} />
 					{
 						visible && <ToggleModal {...this.props} setData = {this.setData.bind(this)}/>
+					}
+					{
+						visibleCJ && <ToggleModalCJ {...this.props} />
 					}
 				</Content>
 			</div>

@@ -10,13 +10,17 @@ export const getProjectAc = createFetchAction(`${SERVICE_API}/project-tree/?dept
 export const postProjectListAc = createFetchAction(`${SERVICE_API}/projectlist/`, [],'POST');
 export const postDocListAc = createFetchAction(`${SERVICE_API}/documentlist/`, [],'POST');
 export const getPersonByCode = createFetchAction(`${SERVICE_API}/persons/code/{{code}}/`, [],'GET');
+export const getProjectByCode = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/?all=true`, [],'GET');
+export const getDocByCode = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [],'GET');
 export const actions = {
 	ModalVisibleProject,
 	postProjectAc,
 	getProjectAc,
 	postProjectListAc,
 	postDocListAc,
-	getPersonByCode
+	getPersonByCode,
+	getProjectByCode,
+	getDocByCode
 };
 export default handleActions({
 	[ModalVisibleProject]: (state, {payload}) => ({

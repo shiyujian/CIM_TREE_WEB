@@ -7,7 +7,7 @@ const Search = Input.Search;
 const Option = Select.Option;
 const SHOW_PARENT = TreeSelect.SHOW_PARENT;
 const TreeNode = TreeSelect.TreeNode;
-export default class ToggleModal extends Component{
+export default class ToggleModalCJ extends Component{
     constructor(props){
         super(props);
         this.state = {
@@ -22,8 +22,48 @@ export default class ToggleModal extends Component{
             selectUnit:[]
         }
     }
+    setData(data,participants){
+		// console.log("data:",data);
+		// console.log("participants:",participants);
+		// return;
+		const {actions:{ createWorkflow, logWorkflowEvent}} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"参建单位信息批量录入",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"参建单位信息批量录入",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起参建单位填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+					attachment:null
+				});
+		});
+	}
     render(){
-        const {visible = false} = this.props;
+        const {visibleCJ = false} = this.props;
         let jthis = this;
         const props = {
 			action: `${SERVICE_API}/excel/upload-api/`,
@@ -33,7 +73,10 @@ export default class ToggleModal extends Component{
 		        }
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
-                    jthis.handleExcelData(importData);
+                    let dataSource = jthis.handleExcelData(importData);
+                    jthis.setState({
+                        dataSource
+                    })
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
@@ -42,7 +85,7 @@ export default class ToggleModal extends Component{
         };
         return (
             <Modal
-                visible={visible}
+                visible={visibleCJ}
                 width={1280}
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
@@ -81,7 +124,7 @@ export default class ToggleModal extends Component{
         )
     }
      //处理上传excel的数据
-    handleExcelData(data) {
+     handleExcelData(data) {
         const {actions:{getOrgReverse}} = this.props;
         data.splice(0, 1);
         let type = [], canjian = [];
@@ -93,6 +136,8 @@ export default class ToggleModal extends Component{
             rst.map(item => {
                 type.push(item.children[0].name);
                 canjian.push(item.children[0].children[0].name);
+                console.log("type:",type)
+                console.log("canjian:",canjian)
             })
             res = data.map((item,index) => {
                 return {
@@ -108,26 +153,24 @@ export default class ToggleModal extends Component{
                     direct: item[3],
                     remarks: item[4]
                 }
-            });
-            this.setState({
-                dataSource:res
             })
         })
+        return res;
     }
     onok(){
-        const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
+        const { actions: { ModalVisibleCJ, } } = this.props;
         if (!this.state.passer) {
             message.error('审批人未选择');
             return;
         }
         console.log(this.state.selectPro);
         console.log(this.state.selectUnit);
-        this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
-        ModalVisible(false);
+        this.setData.bind(this, this.state.dataSource, JSON.parse(this.state.passer));
+        ModalVisibleCJ(false);
     }
     cancel() {
-        const { actions: { ModalVisibleOrg, ModalVisible } } = this.props;
-        ModalVisible(false);
+        const { actions: { ModalVisibleCJ } } = this.props;
+        ModalVisibleCJ(false);
     }
     onChange(){
 
@@ -221,11 +264,11 @@ export default class ToggleModal extends Component{
         dataIndex: 'index',
         key: 'Index',
     }, {
-        title: '组织机构编码',
+        title: '参建单位编码',
         dataIndex: 'code',
         key: 'Code',
     }, {
-        title: '组织机构类型',
+        title: '机构类型',
         dataIndex: 'type',
         key: 'Type',
     }, {
@@ -236,10 +279,6 @@ export default class ToggleModal extends Component{
         title: '组织机构部门',
         dataIndex: 'depart',
         key: 'depart',
-    }, {
-        title: '直属部门',
-        dataIndex: 'direct',
-        key: 'Direct',
     }, {
         title: '负责项目/子项目名称',
         width:"15%",

@@ -14,6 +14,7 @@ export default class TableOrg extends Component {
 				<div>
 					<Button style={{ marginRight: "10px" }}>模板下载</Button>
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
+					<Button className={style.button} onClick={this.sendCJ.bind(this)}>发送参建单位</Button>
 					<Button className={style.button}>申请变更</Button>
 					<Button className={style.button}>申请删除</Button>
 					<Button className={style.button}>导出表格</Button>
@@ -33,6 +34,10 @@ export default class TableOrg extends Component {
 	send() {
 		const { actions: { ModalVisible } } = this.props;
 		ModalVisible(true);
+	}
+	sendCJ() {
+		const { actions: { ModalVisibleCJ } } = this.props;
+		ModalVisibleCJ(true);
 	}
 	componentDidMount() {
 		// let dataSource = [];
@@ -70,8 +75,8 @@ export default class TableOrg extends Component {
 		key: 'Type',
 	}, {
 		title: '参建单位名称',
-		dataIndex: 'name',
-		key: 'Name',
+        dataIndex: 'canjian',
+        key: 'Canjian',
 	}, {
 		title: '组织机构部门',
 		dataIndex: 'depart',

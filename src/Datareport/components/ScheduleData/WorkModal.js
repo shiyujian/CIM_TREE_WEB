@@ -178,7 +178,8 @@ export default class WorkModal extends Component {
 		const {actions: {getProjectTreeDetail}} = this.props;
 		const {units} = this.state;
         let {dataSource} = this.state;
-		dataSource[index].project = val;
+        dataSource[index].project = val;
+        this.forceUpdate();
 		getProjectTreeDetail({pk:val.pk},{depth:1})
 		.then(res => {
 			units[index] = res.children.map((o,index) => {
@@ -194,6 +195,7 @@ export default class WorkModal extends Component {
 		let val = JSON.parse(value)
         let {dataSource} = this.state;
         dataSource[index].unit = val;
+        this.forceUpdate();
 	}
      //删除
     delete(index){

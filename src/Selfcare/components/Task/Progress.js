@@ -26,6 +26,9 @@ import UnitToggle from 'Datareport/components/UnitData/UnitToggle';
 import VedioCheck from 'Datareport/components/VedioData/VedioCheck';
 import VedioInfoCheck from 'Datareport/components/VedioData/VedioInfoCheck';
 import DefectModal from 'Datareport/components/Quality/DefectModal';
+import SafetyDocDeleteCheck from 'Datareport/components/SafetyDoc/SafetyDocDeleteCheck';
+import DangerDeleteCheck from 'Datareport/components/SafetyHiddenDanger/DangerDeleteCheck';
+import CJCheck from 'Datareport/components/OrgData/CJCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -72,7 +75,10 @@ export default class Progress extends Component {
 			design_check_visbile,
 			safety_vedioCheck_visible,
 			safety_vedioInfoCheck_visible,
-			dr_qua_defect_visible
+			dr_qua_defect_visible,
+			safety_doc_delete_visible,
+			safety_hidden_delete_visible,
+			dr_base_cj_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -250,6 +256,18 @@ export default class Progress extends Component {
 					dr_qua_defect_visible && 
 					<DefectModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					safety_doc_delete_visible && 
+					<SafetyDocDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_hidden_delete_visible && 
+					<DangerDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_base_cj_visible && 
+					<CJCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -324,6 +342,15 @@ export default class Progress extends Component {
 				break;
 			case "质量缺陷信息批量录入":
 				changeDatareportVisible({key:'dr_qua_defect_visible',value:true})
+				break;
+			case "安全管理信息批量删除":
+				changeDatareportVisible({key:'safety_doc_delete_visible',value:true})
+				break;
+			case "安全隐患信息批量删除":
+				changeDatareportVisible({key:'safety_hidden_delete_visible',value:true})
+				break;
+			case "参建单位信息批量录入":
+				changeDatareportVisible({key:'dr_base_cj_visible',value:true})
 				break;
 			default:break;
 		}
