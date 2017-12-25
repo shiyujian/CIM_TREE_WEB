@@ -22,12 +22,19 @@ export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`,
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 //批量修改施工包
 const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
+//上传taglists
+const addTagList = createFetchAction(`${SERVICE_API}/taglist/`,[],'POST');
+//上传tags
+const sendTags = createFetchAction(`${SERVICE_API}/tags/`,[],'POST');
+//获取施工包详情
+const getWorkPackageDetails = createFetchAction(`${SERVICE_API}/workpackages/{{code}}/?all=true`,[]);
 
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
     deleteStaticFile,
 	getWorkPackageDetail,
+	getWorkPackageDetails,
 	getAllUsers,
 	createWorkflow,
 	getWorkflow,
@@ -37,7 +44,9 @@ export const actions = {
 	getScheduleDir,
 	postScheduleDir,
 	addDocList,
-	getDocument
+	getDocument,
+	addTagList,
+	sendTags
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

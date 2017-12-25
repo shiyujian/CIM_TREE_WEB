@@ -78,8 +78,13 @@ export default class CostListData extends Component {
 	async componentDidMount () {
 		const {actions:{
             getScheduleDir,
-            postScheduleDir,
-        }} = this.props;
+			postScheduleDir,
+			getTagLists,
+			getWorkPackageDetails
+		}} = this.props;
+		let taglists = await getWorkPackageDetails({code:"priceListWorkPackage"});
+		console.log(taglists);
+		debugger;
         let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
         if(topDir.obj_type){
             let dir = await getScheduleDir({code:'datareport_pricelist_demo'});
@@ -100,7 +105,6 @@ export default class CostListData extends Component {
         
         data.map(item=>{
             getDocument({code:item.code}).then(single=>{
-				console.log(single);
 				let temp = {
 					code:single.extra_params.code,
 					company:single.extra_params.company,

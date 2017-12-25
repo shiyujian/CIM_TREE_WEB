@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from 'Datareport/components/Quality/JianyanpiCheck';
-import PriceListExamine from 'Datareport/components/CostListData/PriceListExamine';
+import PriceListCheck from 'Datareport/components/CostListData/PriceListCheck';
 import JianyanCheck from 'Datareport/components/Quality/JianyanCheck';
 import DesignDataCheck from 'Datareport/components/DesignData/Check';
 import SafetyDocCheck from 'Datareport/components/SafetyDoc/SafetyDocCheck';
@@ -200,7 +200,7 @@ export default class Progress extends Component {
 				}
 				{
 					cost_pri_ck_visible && 
-					<PriceListExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<PriceListCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					cost_sum_spd_visible && 
