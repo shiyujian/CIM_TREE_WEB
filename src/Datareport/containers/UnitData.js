@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import { actions } from '../store/unitdata';
 import {actions as action2} from '../store/quality';
+import {actions as action3} from '../store/ProjectData';
 import {getNextStates} from '_platform/components/Progress/util';
 var moment = require('moment');
 import {getUser} from '_platform/auth';
@@ -16,7 +17,7 @@ import {WORKFLOW_CODE} from '_platform/api'
 		return {platform,...unitdata};
 	},
 	dispatch => ({
-		actions: bindActionCreators({...platformActions,...actions,...action2}, dispatch),
+		actions: bindActionCreators({...platformActions,...actions,...action2,...action3}, dispatch),
 	}),
 )
 export default class UnitData extends Component {
@@ -58,6 +59,7 @@ export default class UnitData extends Component {
 					attachment:null
 				});
 		});
+		this.props.actions.ModalVisibleUnit(false);
 	}
 	render() {
 		const {visible} = this.props;
