@@ -129,7 +129,7 @@ export default class WorkCheckModal extends Component {
             })
         })
         await addDocList({}, { data_list: doclist_a });
-        await putDocList({}, { data_list: doclist_p })
+        await putDocList({}, { data_list: doclist_p });
         await updateWpData({}, { data_list: wplist });
         message.success("批量上传数据成功");
     }

@@ -19,6 +19,7 @@ export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`,
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 //批量修改施工包
 const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
+
 //得到质量缺陷
 export const fetchDefectDetail = createFetchAction(`${base}/main/api/quality-defect/{{id}}/`,[])
 //删除流程
