@@ -134,7 +134,6 @@ export default class DesignTable extends Component {
 				}
 				<Row>
 					<Table
-						size="middle"
 						bordered
 						columns={columns}
 						rowSelection={rowSelection}

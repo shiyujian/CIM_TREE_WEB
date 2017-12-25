@@ -126,7 +126,7 @@ export default class Check extends Component {
                 obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},
-                "basic_params": {
+                basic_params: {
                     "files": [
                         {
                           "a_file": item.file.a_file,
@@ -136,7 +136,7 @@ export default class Check extends Component {
                           "mime_type": item.file.mime_type
                         },
                     ]
-                  },
+                },
                 extra_params:{
                     code:item.code,
                     filename:item.file.name,
