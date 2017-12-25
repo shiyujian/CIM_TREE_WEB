@@ -88,26 +88,62 @@ export default class TableOrg extends Component {
 	}
 
 	// 搜索
-	onSearchInfo(value) {
+	async	onSearchInfo(value) {
 		const { actions: { getSearcherDir } } = this.props
-		let param = "?keyword=" + value
-		getSearcherDir({ code: 'safetyspecial' }).then(rst => {
-			console.log('vip-rst', rst);
 
-			// let dataSource = this.handleData(rst)
+		const code_Todir = "datareport_safetyspecial_05";
+		let param1 = code_Todir + "/?doc_code=safetyspecial&keys=organizationUnit&values=" + value; // 编制单位
+		let param2 = code_Todir + "/?doc_code=safetyspecial&keys=scenarioName&values=" + value; // 方案名称
+		debugger;
+		let data1 = await getSearcherDir({ keyword: param1 }).then(rst => {
+			console.log('vip-rst1', rst);
+			if (rst.result.length <= 0) return [];
+			let dataSource = this.handleData(rst.result)
+			return dataSource;
 			// this.setState({dataSource})
 		})
+		let data2 = await getSearcherDir({ keyword: param2 }).then(rst => {
+			console.log('vip-rst2', rst);
+			if (rst.result.length <= 0) return [];
+			let dataSource = this.handleData(rst.result)
+			return dataSource;
+			// this.setState({dataSource})
+		})
+		this.setState({
+			dataSource: Object.assign(data1, data2)
+		})
+		console.log('vip-dataSource', this.state.dataSource);
 	}
 	//将数据处理成适用于表格的数据
 	handleData(data) {
-		return data.map(item => {
-			return {
-				permitNumber: item.licence.number,
-				certificateNumber: item.certificate.number,
-				acceptance: item.acceptor.name,
-				...item
+		let dataSource = [];
+		data.map((single, i) => {
+			let temp = {
+				i,
+				code: single.extra_params.code,
+				codeId: single.code,
+				filename: single.extra_params.filename,
+				index: single.extra_params.index,
+				organizationUnit: single.extra_params.organizationUnit,
+				project: single.extra_params.project,
+				projectName: single.extra_params.project.name,
+				remark: single.extra_params.remark,
+				resUnit: single.extra_params.resUnit,
+				reviewComments: single.extra_params.reviewComments,
+				reviewPerson: single.extra_params.reviewPerson,
+				reviewTime: single.extra_params.reviewTime,
+				scenarioName: single.extra_params.scenarioName,
+				unit: single.extra_params.unit,
+				unitProject: single.extra_params.unit.name,
+				file: single.basic_params.files[0],
 			}
+			dataSource.push(temp);
+			// this.setState({
+			// 	...this.state,
+			// 	dataSource: Object.assign(this.state.dataSource, dataSource)
+			// });
 		})
+		return dataSource;
 	}
 
 	render() {
@@ -147,7 +183,7 @@ export default class TableOrg extends Component {
 						// onClick={this.BtnExport.bind(this)}
 						>导出表格</Button>
 						<Search
-							placeholder="请输入内容"
+							placeholder="请输入方案名称"
 							onSearch={this.onSearchInfo.bind(this)}
 							style={{ width: 200, marginLeft: "20px" }}
 						/>
@@ -174,7 +210,6 @@ export default class TableOrg extends Component {
 							)
 					}
 				</Row>
-
 				{
 					this.state.setChangeVisiable && <ChangeFile {...this.props} {...this.state} key={this.state.newKey2}
 						goCancel={this.goCancel.bind(this)} setChangeData={this.setChangeData.bind(this)}
@@ -185,7 +220,6 @@ export default class TableOrg extends Component {
 						goCancel={this.goCancel.bind(this)} setDeleteData={this.setDeleteData.bind(this)}
 					/>
 				}
-
 			</Row>
 		)
 	}

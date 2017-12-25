@@ -310,7 +310,6 @@ export default class ChangeFile extends Component {
 								</Col>
                             )
                     }
-
                 </Row>
                 <Row style={{ marginBottom: 16 }}>
                     <Col span={6}>
