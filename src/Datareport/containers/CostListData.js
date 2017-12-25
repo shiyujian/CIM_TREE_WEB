@@ -80,47 +80,69 @@ export default class CostListData extends Component {
             getScheduleDir,
 			postScheduleDir,
 			getTagLists,
-			getWorkPackageDetails
+			getWorkPackageDetails,
+			getSearcher
 		}} = this.props;
-		let taglists = await getWorkPackageDetails({code:"priceListWorkPackage"});
-		console.log(taglists);
-		debugger;
-        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
-        if(topDir.obj_type){
-            let dir = await getScheduleDir({code:'datareport_pricelist_demo'});
-            
-            if(dir.obj_type){
-                if(dir.stored_documents.length>0){
-                    this.generateTableData(dir.stored_documents);
-                }
-            }
-        }
-	}
-
-	async generateTableData(data){
-        const {actions:{
-            getDocument,
-        }} = this.props;
-        let dataSource = [];
-        
-        data.map(item=>{
-            getDocument({code:item.code}).then(single=>{
+		
+		let dataSource = [];
+		let data = await getSearcher({key:"priceListName"});
+		data.result.map(item=>{
+            // getDocument({code:item.code}).then(single=>{
 				let temp = {
-					code:single.extra_params.code,
-					company:single.extra_params.company,
-					rate:single.extra_params.rate,
-					projectcoding:single.extra_params.projectcoding,
-					remarks:single.extra_params.remarks,
-					total:single.extra_params.total,
-					valuation:single.extra_params.valuation,
-					subproject: single.extra_params.subproject,
-					unitengineering: single.extra_params.unitengineering
+					code:item.extra_params.code,
+					company:item.extra_params.company,
+					rate:item.extra_params.rate,
+					projectcoding:item.extra_params.projectcoding,
+					remarks:item.extra_params.remarks,
+					total:item.extra_params.total,
+					valuation:item.extra_params.valuation,
+					subproject: item.extra_params.subproject,
+					unitengineering: item.extra_params.unitengineering
 				}
                 dataSource.push(temp);
-                this.setState({dataSource});
-            })
-        })
+				this.setState({dataSource});
+            // })
+		})
+
+        // let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
+        // if(topDir.obj_type){
+        //     let dir = await getScheduleDir({code:'datareport_pricelist_demo'});
+		// 	console.log(dir);
+		// 	debugger;
+        //     if(dir.obj_type){
+        //         if(dir.stored_documents.length>0){
+		// 			this.generateTableData(dir.stored_documents);
+		// 			let datas = await getSearcher({key:"helloname"})
+		// 			console.log(datas);
+        //         }
+        //     }
+		// }
 	}
+
+	// async generateTableData(data){
+    //     const {actions:{
+    //         getDocument,
+    //     }} = this.props;
+    //     let dataSource = [];
+    //     console.log(data);
+    //     data.map(item=>{
+    //         getDocument({code:item.code}).then(single=>{
+	// 			let temp = {
+	// 				code:single.extra_params.code,
+	// 				company:single.extra_params.company,
+	// 				rate:single.extra_params.rate,
+	// 				projectcoding:single.extra_params.projectcoding,
+	// 				remarks:single.extra_params.remarks,
+	// 				total:single.extra_params.total,
+	// 				valuation:single.extra_params.valuation,
+	// 				subproject: single.extra_params.subproject,
+	// 				unitengineering: single.extra_params.unitengineering
+	// 			}
+    //             dataSource.push(temp);
+	// 			this.setState({dataSource});
+    //         })
+	// 	})
+	// }
 	
 	delete(index) {
 		let { dataSource } = this.state

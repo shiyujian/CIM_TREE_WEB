@@ -28,6 +28,7 @@ const addTagList = createFetchAction(`${SERVICE_API}/taglist/`,[],'POST');
 const sendTags = createFetchAction(`${SERVICE_API}/tags/`,[],'POST');
 //获取施工包详情
 const getWorkPackageDetails = createFetchAction(`${SERVICE_API}/workpackages/{{code}}/?all=true`,[]);
+const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{key}}&obj_type=C_QTO`,[],'GET')
 
 export const actions = {
 	getProjectTree,
@@ -46,7 +47,8 @@ export const actions = {
 	addDocList,
 	getDocument,
 	addTagList,
-	sendTags
+	sendTags,
+	getSearcher
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

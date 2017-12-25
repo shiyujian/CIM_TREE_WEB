@@ -343,6 +343,22 @@ export default class PriceList extends Component {
                 title:'备注',
                 dataIndex:'remarks',
                 width:"10%",
+            },{
+                title:'编辑',
+                width:"10%",
+                dataIndex:'edit',
+                render:(text,record,index) => {
+                    return  (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+                            onConfirm={this.remove.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
+                }
             }];
 		return (
 			<Modal
