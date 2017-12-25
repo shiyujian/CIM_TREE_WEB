@@ -58,6 +58,10 @@ class DefectModal extends Component {
         let getUnitLoop = async(param) => {
             let next = {};
             switch (param.obj_type_hum){
+                case "单元工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
                 case "分项工程":
                     next = await getWorkPackageDetail({code:param.parent.code})
                     await getUnitLoop(next)
@@ -200,6 +204,9 @@ class DefectModal extends Component {
     async getFixed(i){
         let {dataSource} = this.state
         let record = dataSource[i]
+        if(dataSource[i].flag){
+            return
+        }
         const {actions:{getWorkPackageDetail}} = this.props
         let fenbu = await getWorkPackageDetail({code:record.code})
         let obj = {}
@@ -207,13 +214,13 @@ class DefectModal extends Component {
         if(fenbu.name){
             obj = await this.getInfo(fenbu)
             flag = true
+            dataSource[i].project = obj.project
+            dataSource[i].unit = obj.unit
+            dataSource[i].respon_unit = obj.respon_unit
+            dataSource[i].flag = flag
         }else{
             message.info("输入编码值还是有误")
         }
-        dataSource[i].project = obj.project
-        dataSource[i].unit = obj.unit
-        dataSource[i].respon_unit = obj.respon_unit
-        dataSource[i].flag = flag
         this.setState({dataSource})
     }
     // loadData = (selectedOptions) =>{

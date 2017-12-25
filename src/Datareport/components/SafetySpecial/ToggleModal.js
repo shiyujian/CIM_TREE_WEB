@@ -33,12 +33,15 @@ export default class ToggleModal extends Component {
                 width={1280}
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
+                maskClosable={false}
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
                 <Table
                     columns={this.columns}
                     bordered={true}
                     dataSource={this.state.dataSource}
+                    rowKey={(item, index) => index}
+
                 >
                 </Table>
                 <Row style={{ marginBottom: "30px" }} type="flex">
@@ -266,28 +269,28 @@ export default class ToggleModal extends Component {
             message.info(`有数据未上传附件`)
             return
         }
-        const {project,unit} =  this.state;
-        if(!project.name){
+        const { project, unit } = this.state;
+        if (!project.name) {
             message.info(`请选择项目和单位工程`);
             return;
         }
-        let {check} = this.state
+        let { check } = this.state
         let per = {
-            id:check.id,
-            username:check.username,
-            person_name:check.account.person_name,
-            person_code:check.account.person_code,
-            organization:check.account.organization
+            id: check.id,
+            username: check.username,
+            person_name: check.account.person_name,
+            person_code: check.account.person_code,
+            organization: check.account.organization
         }
-        for(let i=0;i<this.state.dataSource.length;i++){
+        for (let i = 0; i < this.state.dataSource.length; i++) {
             this.state.dataSource[i].project = project;
             this.state.dataSource[i].unit = unit;
         }
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
         this.props.setData(this.state.dataSource, per);
-        console.log('vip-per',per);
-        console.log('vip-dataSource',this.state.dataSource);
-        
+        console.log('vip-per', per);
+        console.log('vip-dataSource', this.state.dataSource);
+
         ModalVisible(false);
         notification.success({
             message: '发起成功！',

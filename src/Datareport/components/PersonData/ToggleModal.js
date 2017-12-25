@@ -130,6 +130,10 @@ export default class ToggleModal extends Component{
     onChange() {
 
     }
+    //删除
+    delete(){
+        
+    }
      //处理上传excel的数据
      handleExcelData(data) {
         data.splice(0, 1);
@@ -225,11 +229,15 @@ export default class ToggleModal extends Component{
         title:'编辑',
         dataIndex:'edit',
         render:(record) => (
-          <span>
-              <Icon type="edit" />
-              <span style={{"padding":"5px"}}>|</span>
-              <Icon type="delete" />
-          </span>
+            <Popconfirm
+                placement="leftTop"
+                title="确定删除吗？"
+                onConfirm={this.delete.bind(this)}
+                okText="确认"
+                cancelText="取消"
+            >
+                <a>删除</a>
+            </Popconfirm>
         )
-      }]
+    }]
 }

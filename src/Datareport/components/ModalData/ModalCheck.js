@@ -123,8 +123,8 @@ export default class ModalCheck extends Component {
         dataSource.map(item=>{
             i++;
             docData.push({
-                code:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
-                name:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
+                code:'modaldoc'+moment().format("YYYYMMDDHHmmss")+i,
+                name:'modaldoc'+moment().format("YYYYMMDDHHmmss")+i,
                 obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},

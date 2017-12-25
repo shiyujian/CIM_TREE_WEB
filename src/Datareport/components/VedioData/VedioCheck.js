@@ -121,11 +121,10 @@ export default class VedioCheck extends Component {
                 postScheduleDir,
                 getWorkpackagesByCode
             }} = this.props;
-        const //{unit:{code:unitCode}} = dataSource[0],
-            unitCode = 1112,    //需修改
+        const unitCode = JSON.parse(dataSource[0].value[1]).code,
+            //unitCode = 1112,    //需修改
             scheduleDircode = 'datareport_safety_vediodata'; //I'm unique
         let dir = await getScheduleDir({code:scheduleDircode});
-        debugger
         if(!dir.obj_type){  //no such directory
             const {pk, code, obj_type} = await getWorkpackagesByCode({code:unitCode}),
                 postDirData = {
@@ -149,8 +148,8 @@ export default class VedioCheck extends Component {
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor,attachment:null});
 
         const docData = dataSource.map(item =>{ //prepare the data which will store in database
-            const {cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode} = item,
-                extra_params = {cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode};
+            const {cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,value} = item,
+                extra_params = {cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,value};
 
             return {
                 code:'vedioData'+moment().format("YYYYMMDDHHmmss")+item.index,  //makesure code is unique
