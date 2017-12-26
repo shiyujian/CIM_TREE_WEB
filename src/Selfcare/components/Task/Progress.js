@@ -42,6 +42,7 @@ import HandelDelProjModal from 'Datareport/components/ProjectData/HandleDelProj'
 import DelCheck from 'Datareport/components/OrgData/delCheck';
 import DocEditFileCheck from 'Datareport/components/SafetyDoc/DocEditFileCheck';
 import DangerEditFileCheck from 'Datareport/components/SafetyHiddenDanger/DangerEditFileCheck';
+import DesignDeleteCheck from 'Datareport/components/ScheduleData/DesignDeleteCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -103,7 +104,8 @@ export default class Progress extends Component {
 			dr_del_proj_visible,
 			dr_base_del_visible,
 			safety_doc_edit_visible,
-			safety_hidden_edit_visible
+			safety_hidden_edit_visible,
+			scheduledata_doc_delete_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -341,6 +343,10 @@ export default class Progress extends Component {
 					safety_hidden_edit_visible && 
 					<DangerEditFileCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					scheduledata_doc_delete_visible && 
+					<DesignDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -460,6 +466,9 @@ export default class Progress extends Component {
 				break;
 			case "安全隐患信息批量变更":
 				changeDatareportVisible({key:'safety_hidden_edit_visible',value:true})
+				break;
+			case "设计进度批量删除":
+				changeDatareportVisible({key:'scheduledata_doc_delete_visible',value:true})
 				break;
 			default:break;
 		}
