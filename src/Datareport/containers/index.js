@@ -9,7 +9,7 @@ export JianyanData from './JianyanData';
 export ModalData from './ModalData';
 export OrgData from './OrgData';
 export PersonData from './PersonData';
-export ProjectData from './ProjectData1';
+export ProjectData from './ProjectData';
 export SafetyDoc from './SafetyDoc';
 
 export SafetyHiddenDanger from './SafetyHiddenDanger';

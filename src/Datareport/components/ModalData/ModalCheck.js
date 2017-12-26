@@ -16,8 +16,8 @@ const {Option} = Select;
 
 @connect(
 	state => {
-        const {datareport: {safety = {}} = {}, platform} = state;
-		return {...safety, platform}
+        const {datareport: {ModalData = {}} = {}, platform} = state;
+		return {...ModalData, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
@@ -161,8 +161,8 @@ export default class ModalCheck extends Component {
                     modeType:item.modeType,
                     unit:item.unit.name,
                     project:item.project.name,
-                    reportingTime:item.reportingTime.name,
-                    reportingName:item.reportingName.name,
+                    reportingTime:item.reportingTime,
+                    reportingName:item.reportingName,
                 }
             })
         });

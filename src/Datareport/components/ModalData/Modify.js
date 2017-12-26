@@ -58,7 +58,7 @@ export default class Modify extends Component {
 				onCancel = {this.cancel.bind(this)}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
-					<h2>申请表更页面</h2>
+					<h2>申请变更页面</h2>
 				</Row>
 				<Row>
 					<Table

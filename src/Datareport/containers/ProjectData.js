@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {actions as action2} from '../store/quality';
 import { bindActionCreators } from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import { actions } from '../store/projectData';
+import { actions } from '../store/ProjectData';
 import {getUser} from '_platform/auth'
 import {getNextStates} from '_platform/components/Progress/util';
 

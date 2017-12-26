@@ -62,57 +62,74 @@ export default class OrgCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        console.log("dataSource",dataSource);
         let data_list = [];
         let promises = dataSource.map((o) => {
-            console.log("o",o);
             return getOrgPk({code:o.direct})
-            // .then(rst => {
-            //     data_list.push({
-            //         code: "" + o.code,
-            //         name: o.depart,
-            //         obj_type: "C_ORG",
-            //         status: "A",
-            //         version: "A",
-            //         extra_params: {
-            //             type: o.type,
-            //             canjian: o.canjian,
-            //             direct: o.direct,
-            //             project: o.selectPro,
-            //             unit: o.selectUnit,
-            //             remarks: o.remarks
-            //         },
-            //         parent: {
-            //             code:o.direct,
-            //             pk: rst.pk,
-            //             obj_type: "C_ORG"
-            //         }
-            //     })
-            // })
         });
         let rst = await Promise.all(promises);
-        // return;
-        console.log("data_list:", data_list);
+        dataSource.map((o, index) => {
+            data_list.push({
+                code: "" + o.code,
+                name: o.depart,
+                obj_type: "C_ORG",
+                status: "A",
+                version: "A",
+                extra_params: {
+                    org_type: o.type,
+                    canjian: o.canjian,
+                    direct: o.direct,
+                    project: o.selectPro,
+                    unit: o.selectUnit,
+                    remarks: o.remarks
+                },
+                parent: {
+                    code: o.direct,
+                    pk: rst[index].pk,
+                    obj_type: "C_ORG"
+                }
+            })
+        })
         postOrgList({}, { data_list: data_list }).then(res => {
-            res.map(item => {
+            dataSource.map((item, index) => {
                 item.selectPro.map(it => {
                     let proCode = it.split("--")[0];
                     // 取出项目中所的orgs
                     getProject({code:proCode}).then(rstPro => {
                         let pro_orgs = rstPro.response_orgs;
+                        let pk = res.result[index].pk
                         pro_orgs.push({
                             code:item.code,
-                            obj_type:"C_ORG"
+                            obj_type:"C_ORG",
+                            pk:pk
                         });
-                        pro_orgs.map(item => {
-                            putProject({code:item.code},{response_orgs:pro_orgs}).then(rst => {
-                                console.log("rst:",rst);
-                            })
-                        })
+                        putProject({ code: proCode }, {
+                            version: "A",
+                            response_orgs: pro_orgs
+                        }).then(rst => {
+                            console.log("rst:", rst);
+                        }) 
+                    });
+                }) 
+                item.selectUnit.map(it => {
+                    let unitCode = it.split("--")[0];
+                    getUnitAc({code:unitCode}).then(rstUnit => {
+                        let unit_orgs = rstUnit.response_orgs;
+                        let pk = res.result[index].pk
+                        unit_orgs.push({
+                            code:item.code,
+                            obj_type:"C_ORG",
+                            pk:pk
+                        });
+                        putUnit({ code: unitCode }, {
+                            version: "A",
+                            response_orgs: unit_orgs
+                        }).then(rst => {
+                            console.log("rst:", rst);
+                        }) 
                     })
                 })
             })
