@@ -115,9 +115,9 @@ export default class OrgData extends Component {
 			person_code: getUser().person_code,
 		}
 		let postdata = {
-			name: "组织机构信息信息批量删除",
+			name: "组织机构信息批量删除",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "组织机构信息信息批量删除",
+			description: "组织机构信息批量删除",
 			subject: [{
 				data: JSON.stringify(data)
 			}],
