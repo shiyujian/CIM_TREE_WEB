@@ -43,6 +43,7 @@ import DelCheck from 'Datareport/components/OrgData/delCheck';
 import DocEditFileCheck from 'Datareport/components/SafetyDoc/DocEditFileCheck';
 import DangerEditFileCheck from 'Datareport/components/SafetyHiddenDanger/DangerEditFileCheck';
 import DesignDeleteCheck from 'Datareport/components/ScheduleData/DesignDeleteCheck';
+import SumSpeedExamineChange from 'Datareport/components/CostListData/SumSpeedExamineChange';
 
 const FormItem = Form.Item;
 @connect(
@@ -105,7 +106,8 @@ export default class Progress extends Component {
 			dr_base_del_visible,
 			safety_doc_edit_visible,
 			safety_hidden_edit_visible,
-			scheduledata_doc_delete_visible
+			scheduledata_doc_delete_visible,
+			cost_sum_change_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -347,6 +349,10 @@ export default class Progress extends Component {
 					scheduledata_doc_delete_visible && 
 					<DesignDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					cost_sum_change_visible && 
+					<SumSpeedExamineChange wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -469,6 +475,9 @@ export default class Progress extends Component {
 				break;
 			case "设计进度批量删除":
 				changeDatareportVisible({key:'scheduledata_doc_delete_visible',value:true})
+				break;
+			case "结算进度信息变更":
+				changeDatareportVisible({key:'cost_sum_change_visible',value:true})
 				break;
 			default:break;
 		}
