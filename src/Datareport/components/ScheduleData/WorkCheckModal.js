@@ -210,7 +210,11 @@ export default class WorkCheckModal extends Component {
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered />
+                        bordered
+                        rowKey={(record)=>{
+                            return record.index
+                        }} 
+                        />
                     <Row>
                         <Col span={2}>
                             <span>审查意见：</span>

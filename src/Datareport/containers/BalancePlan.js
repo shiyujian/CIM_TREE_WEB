@@ -54,13 +54,14 @@ export default class BanlancePlan extends Component {
 		 console.log(data);
 		data.map(item => {
 			let datas = {
-				subproject: item.project.name,
-				unit: item.unit.name,
-				nodetarget: item.nodetarget,
-				completiontime: item.completiontime,
-				summoney: item.summoney,
-				ratio: item.ratio,
-				remarks: item.remark
+				subproject: item.extra_params.project.name,
+				unit: item.extra_params.unit.name,
+				nodetarget: item.extra_params.nodetarget,
+				completiontime: item.extra_params.completiontime,
+				summoney: item.extra_params.summoney,
+				ratio: item.extra_params.ratio,
+				remarks: item.extra_params.remark,
+				code:item.code
 			}
 			dataSour.push(datas)
 		})
@@ -72,13 +73,7 @@ export default class BanlancePlan extends Component {
 	componentDidMount(){
 		const {actions:{ getExBySearch }}=this.props;
 		getExBySearch().then(rst=>{
-			console.log('rest',rst);
-			let dataSource = []
-			rst.result.map(item => {
-				dataSource.push(item.extra_params)
-			})
-			console.log('dataSource',dataSource);
-			this.generateTableData(dataSource)
+			this.generateTableData(rst.result)
 		})
 	}
 	lanchOk(data, participants) {
