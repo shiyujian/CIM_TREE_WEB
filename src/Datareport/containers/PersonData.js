@@ -75,9 +75,9 @@ export default class PersonData extends Component {
 			person_code: getUser().person_code,
 		}
 		let postdata = {
-			name: "组织机构信息信息批量删除",
+			name: "人员信息批量删除",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "组织机构信息信息批量删除",
+			description: "人员信息批量删除",
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -92,7 +92,7 @@ export default class PersonData extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起组织机构信息删除',
+					note: '发起人员信息删除',
 					executor: creator,
 					next_states: [{
 						participants: [participants],

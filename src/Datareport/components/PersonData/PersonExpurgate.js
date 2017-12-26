@@ -131,13 +131,14 @@ export default class PersonExpurgate extends Component {
 	}
 
 	onok() {
-        console.log("datasource",this.state.dataSource);
+		console.log('passer', this.state.passer)
         const { actions: { ExprugateVisible } } = this.props;
         if (!this.state.passer) {
             message.error('审批人未选择');
             return;
         }
-        this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
+        this.props.setDataDel(this.state.dataSource, this.state.passer);
+
         ExprugateVisible(false);
     }
 
