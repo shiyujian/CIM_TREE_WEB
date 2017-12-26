@@ -7,51 +7,29 @@ export default class TablePerson extends Component{
 	constructor(props) {
 		super(props);
 		this.state = {
-			
+			dataSource: [],
+			deleData:[]
 		}
 	}
     render(){
-    	let rowSelection = {
-			selectedRowKeys:this.state.selectedRowKeys||[],
-			onChange: (selectedRowKeys, selectedRows) => {
-				this.setState({selectedRowKeys,selectedRows})
-			}
-		};
-		console.log('rowSelection',rowSelection)
         return (
             <div>
                 <div>
                     <Button style={{marginRight:"10px"}}>模板下载</Button>
                     <Button className = {style.button} onClick = {this.send.bind(this)}>发送填报</Button>
                     <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
-                    <Button className = {style.button} onClick = {()=>{
-						if(this.state.selectedRows && this.state.selectedRows.length>0)
-						{
-							this.setState({deling:true});
-							return;
-						}
-						message.warning('请至少选择一条');
-					}}>申请删除</Button>
+                    <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button>
                     <Button className = {style.button}>导出表格</Button>
                     <Search className = {style.button} style={{width:"200px"}} placeholder="输入搜索条件" />
                 </div>
                 <Table
                     columns = {this.columns}
                     bordered = {true}
-                    rowSelection={rowSelection}
-                    dataSource = {this.state.dataSource || []}
+                    rowSelection={this.rowSelection}
+                    dataSource = {this.state.dataSource}
+                    rowKey = 'code'
                 >
                 </Table>
-                {
-					this.state.deling &&
-					<DelPer
-						onCancel={() => {
-							this.setState({ deling: false });
-						}}
-						dataSource={this.state.selectedRows}
-						actions={this.props.actions}
-					/>
-				}
             </div>
         )
     }
@@ -62,8 +40,13 @@ export default class TablePerson extends Component{
 	}
 	//批量删除
 	expurgate() {
-		const { actions: { ExprugateVisible } } = this.props;
-		ExprugateVisible(true);
+		const { actions: { ExprugateVisible, setDeletePer } } = this.props;
+		if(this.state.deleData.length){
+			setDeletePer(this.state.deleData);
+			ExprugateVisible(true);
+		}else{
+			message.warning("请先选中要删除的数据");
+		}
 	}
 	//批量变更
 	modify() {
@@ -78,6 +61,23 @@ export default class TablePerson extends Component{
 		console.log('orgRoot',orgRoot)
 		this.setState({dataSource: orgRoot})
 	}
+
+	rowSelection = {
+		onChange: (selectedRowKeys, selectedRows) => {
+			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+		},
+		onSelect: (record, selected, selectedRows) => {
+			this.setState({
+				deleData:selectedRows
+			})
+		},
+		onSelectAll: (selected, selectedRows, changeRows) => {
+			console.log(selected, selectedRows, changeRows);
+			this.setState({
+				deleData:selectedRows
+			})
+		},
+	};
 
     //删除
     delete(){
