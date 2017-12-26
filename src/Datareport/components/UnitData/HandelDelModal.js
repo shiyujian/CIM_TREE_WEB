@@ -37,7 +37,7 @@ export default class HandelDelModal extends Component {
         console.log(wk);
         let data = JSON.parse(wk.subject[0].data);
         console.log(data);
-        this.setState({dataSource:data.dataSource,wk,project:data.project});
+        this.setState({dataSource:data,wk});
     }
     componentWillReceiveProps(props){
         const {wk} = props
@@ -57,59 +57,29 @@ export default class HandelDelModal extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,postDocListAc,postUnitList}} = this.props
+        const {actions:{logWorkflowEvent,postDocListAc,postUnitList,putUnitList}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        let doclist = this.state.dataSource.map(data=>{
-            return{
-                "code": data.code + 'REL_DOC_DW_A',
-                "name": data.name + '单位工程关联文档',
-                "obj_type": "C_DOC",
-                "status": "A",
-                "version": "A",
-                extra_params:{
-                    intro:data.intro,
-                    etime:data.etime,
-                    stime:data.stime,
-                    projType:data.projType,
-                    stage:data.stage,
-                    rsp_orgName:[data.rsp_org.name]
+        let dataList = this.state.dataSource.map(data=>{
+            return {
+                code:data.code,
+                parent:{
+                    pk: data.pk,
+                    code:data.code,
+                    obj_type:data.obj_type
                 },
-                basic_params:{
-                    files:[
-                        data.file
-                    ]
-                }
-            }
+                version:'A'
+            };
         });
-        let doclistRst = await postDocListAc({},{data_list:doclist});
-        if(doclistRst.result && doclistRst.result.length>0){
-            let reldocs = doclistRst.result;
-            let dwList =  this.state.dataSource.map((data,index)=>{
-                return{
-                    response_orgs:[{pk:data.rsp_org.pk,code:data.rsp_org.code,obj_type:data.rsp_org.obj_type}],
-                    "code": data.code,
-                    "name": data.name,
-                    "obj_type": "C_WP_UNT",
-                    "extra_params": {coordinate:data.coordinate},
-                    "version": "A",
-                    "status": "A",
-                    "parent": {code:this.state.project.code,obj_type:this.state.project.obj_type,pk:this.state.project.pk},
-                    related_documents:[{
-                        pk:reldocs[index].pk,
-                        code:reldocs[index].code,
-                        obj_type :reldocs[index].obj_type,
-                        rel_type:'storeRelDoc'
-                    }]
-                }
-            });
-            let dwrst = postUnitList({},{data_list:dwList});
+        let rst = await putUnitList({},{data_list:dataList});
+        if(rst && rst.result && rst.result.length>0){
+            console.log(rst);
+            await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         }
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
     }
     beforeUpload(record,file){
         console.log(record,file);
@@ -235,7 +205,7 @@ export default class HandelDelModal extends Component {
       let projname = this.state.project?this.state.project.name:'';
 		return (
             <Modal
-			title="单位工程信息审批表"
+			title="单位工程删除审批表"
             visible={true}
             width= {1280}
 			footer={null}
