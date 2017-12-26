@@ -5,6 +5,7 @@ import { Input, Form, Spin, Upload, Icon, Button, Modal,
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
+import EditableCell from '../EditableCell';
 const {Option} = Select
 
 export default class PriceModifyModal extends Component {
@@ -68,36 +69,107 @@ export default class PriceModifyModal extends Component {
         this.setState({dataSource})
     }
 
+    onCellChange = (index, key, record) => {      //编辑某个单元格
+        const { dataSource } = this.state;
+        return (value) => {
+            dataSource[index][key] = value;
+            record[key] = value;
+        };
+    }
+
 	render() {
         const columns = 
             [{
                 title:'编码',
                 dataIndex:'code',
-                width: '10%'
+                width: '10%',
+                render: (text, record, index) => (
+                    <div>
+                        <EditableCell
+                            value={record.code}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "code", record)}
+                        />
+                    </div>
+                )
             },{
                 title:'清单项目编码',
                 dataIndex:'projectcoding',
-                width:"10%"
+                width:"10%",
+                render: (text, record, index) => (
+                    <div>
+                        <EditableCell
+                            value={record.code}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "code", record)}
+                        />
+                    </div>
+                )
             },{
                 title:'计价单项',
                 dataIndex:'valuation',
                 width:"10%",
+                render: (text, record, index) => (
+                    <div>
+                        <EditableCell
+                            value={record.code}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "code", record)}
+                        />
+                    </div>
+                )
             },{
                 title:'工程内容/规格编号',
                 dataIndex:'rate',
                 width:"12%",
+                render: (text, record, index) => (
+                    <div>
+                        <EditableCell
+                            value={record.code}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "code", record)}
+                        />
+                    </div>
+                )
             },{
                 title:'计价单位',
                 dataIndex:'company',
                 width:"10%",
+                render: (text, record, index) => (
+                    <div>
+                        <EditableCell
+                            value={record.code}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "code", record)}
+                        />
+                    </div>
+                )
             },{
                 title:'结合单价（元）',
                 dataIndex:'total',
                 width:"10%",
+                render: (text, record, index) => (
+                    <div>
+                        <EditableCell
+                            value={record.code}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "code", record)}
+                        />
+                    </div>
+                )
             },{
                 title:'备注',
                 dataIndex:'remarks',
                 width:"10%",
+                render: (text, record, index) => (
+                    <div>
+                        <EditableCell
+                            value={record.code}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "code", record)}
+                        />
+                    </div>
+                )
             },{
                 title: "操作",
                 render: (text, record, index) => {

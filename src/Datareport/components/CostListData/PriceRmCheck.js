@@ -73,9 +73,9 @@ export default class PriceRmCheck extends Component {
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         let docList = []
-        dataSource.map(item => docList.push(item.code))
+        dataSource.map(item => docList.push(item.pk))
         //prepare the data which will store in database
-        let rst = await removeDocList({},{data_list:docList});
+        let rst = await removeDocList({},{pk_list:docList.join(',')});
         
         debugger;
         if(rst.result){

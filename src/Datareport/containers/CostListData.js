@@ -28,47 +28,45 @@ export default class CostListData extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			selectedRowKeys: [],
 			addvisible:false,
 			rmModal: false,
 			modifyModal: false,
 			excelModal: false,
 			dataSource: [],
-			selectedRowKeys: [],
-			cacheDataSource: [],
-			modifyData: [],
-			delData: [],
-			excelData: []
+			subDatas: []
 		};
 		this.columns = [{
 			title:'序号',
 			render:(text,record,index) => {
 				return index+1
 			}
-		},{
-            title:'项目/子项目',
-            dataIndex:'subproject',
-        },{
-            title:'单位工程',
-            dataIndex:'unitengineering'
-        },{
-			title:'清单项目编号',
-			dataIndex:'projectcoding'
-		},{
-			title:'计价单项',
-			dataIndex:'valuation' 
-		},{
-			title:'工程内容/规格编号',
-			dataIndex:'rate'
-		},{
-			title:'计量单位',
-			dataIndex:'company'
-		},{
-			title:'结合单价（元）',
-			dataIndex:'total'
-		}, {
-			title:'备注',
-			dataIndex:'remarks'
-		}];
+			},{
+				title:'项目/子项目',
+				dataIndex:'subproject',
+			},{
+				title:'单位工程',
+				dataIndex:'unitengineering'
+			},{
+				title:'清单项目编号',
+				dataIndex:'projectcoding'
+			},{
+				title:'计价单项',
+				dataIndex:'valuation' 
+			},{
+				title:'工程内容/规格编号',
+				dataIndex:'rate'
+			},{
+				title:'计量单位',
+				dataIndex:'company'
+			},{
+				title:'结合单价（元）',
+				dataIndex:'total'
+			}, {
+				title:'备注',
+				dataIndex:'remarks'
+			}
+		];
 	}
 
 	async componentDidMount () {
@@ -82,7 +80,7 @@ export default class CostListData extends Component {
 		
 		let dataSource = [];
 		let data = await getSearcher({key:"priceListName"});
-		data.result.map(item=>{
+		data.result.map((item,index)=>{
 			let temp = {
 				code:item.extra_params.code,
 				company:item.extra_params.company,
@@ -92,11 +90,15 @@ export default class CostListData extends Component {
 				total:item.extra_params.total,
 				valuation:item.extra_params.valuation,
 				subproject: item.extra_params.subproject,
-				unitengineering: item.extra_params.unitengineering
+				unitengineering: item.extra_params.unitengineering,
+				extraCode:item.code,
+				key: index + 1,
+				pk: item.pk
 			}
 			dataSource.push(temp);
 		})
 		this.setState({dataSource, cacheDataSource: dataSource});
+		debugger;
 	}
 
 	//批量上传回调
@@ -180,22 +182,6 @@ export default class CostListData extends Component {
 		})
 	}
 
-	applyRm () {
-		let rmData = this.getSelectItems();
-		this.setState({
-			rmModal:true,
-			rmData
-		})
-	}
-
-	applyModify () {
-		let modifyData = this.getSelectItems();
-		this.setState({
-			modifyModal:true,
-			modifyData
-		})
-	}
-
 	setModifyData(data,participants){
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
@@ -236,16 +222,6 @@ export default class CostListData extends Component {
 		})
 	}
 
-	applyExcel () {
-		// let dataSource = this.state.dataSource;
-		// let selectedRowKeys = this.state.selectedRowKeys
-		let excelData = this.getSelectItems();
-		this.setState({
-			excelModal:true,
-			excelData
-		})
-	}
-
 	getSelectItems () {
 		let dataSource = this.state.dataSource;
 		let selectedRowKeys = this.state.selectedRowKeys;
@@ -262,8 +238,9 @@ export default class CostListData extends Component {
 	setAddVisible(){
 		this.setState({addvisible:true})
 	}
-	onSelectChange = (selectedRowKeys) => {
-		this.setState({ selectedRowKeys });
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+		console.log(selectedRows, selectedRowKeys)
+		this.setState({ selectedRowKeys, subDatas: selectedRows});
 	}
 	//全局搜索
 	search(value) {
@@ -301,9 +278,9 @@ export default class CostListData extends Component {
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
-					<Button className="btn" type="default" onClick={this.applyModify.bind(this)}>申请变更</Button>
-					<Button className="btn" type="default" onClick={this.applyRm.bind(this)}>申请删除</Button>
-					<Button className="btn" type="default" onClick={this.applyExcel.bind(this)}>导出表格</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({modifyModal:true})}}>申请变更</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({rmModal:true})}}>申请删除</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({excelModal:true})}}>导出表格</Button>
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
@@ -326,15 +303,15 @@ export default class CostListData extends Component {
 				}
 				{
 					this.state.modifyModal &&
-					<PriceModifyModal {...this.props} modifyData={this.state.modifyData} oncancel={() => {this.setState({modifyModal:false})}} onok={this.setModifyData.bind(this)}/>
+					<PriceModifyModal {...this.props} modifyData={this.state.subDatas} oncancel={() => {this.setState({modifyModal:false})}} onok={this.setModifyData.bind(this)}/>
 				}
 				{
 					this.state.rmModal &&
-					<PriceRmModal {...this.props} rmData={this.state.rmData} oncancel={() => {this.setState({rmModal:false})}} onok={this.setRmData.bind(this)}/>
+					<PriceRmModal {...this.props} rmData={this.state.subDatas} oncancel={() => {this.setState({rmModal:false})}} onok={this.setRmData.bind(this)}/>
 				}
 				{
 					this.state.excelModal &&
-					<PriceExcelModal {...this.props} excelData={this.state.excelData} oncancel={() => {this.setState({excelModal:false})}} onok={this.setExcelData.bind(this)}/>
+					<PriceExcelModal {...this.props} excelData={this.state.subDatas} oncancel={() => {this.setState({excelModal:false})}} onok={this.setExcelData.bind(this)}/>
 				}
 			</div>
 		);
