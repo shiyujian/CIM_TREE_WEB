@@ -55,6 +55,7 @@ export default class WorkScheduleData extends Component {
 						factstarttime: single.extra_params.factstarttime,
 						factovertime: single.extra_params.factovertime,
 						uploads: single.extra_params.uploads,
+						delcode:single.code,
 					}
 					dataSource.push(temp);
 					this.setState({ dataSource });
@@ -194,6 +195,9 @@ export default class WorkScheduleData extends Component {
 							rowSelection={rowSelection}
 							style={{ height: 380, marginTop: 20 }}
 							pagination={{ pageSize: 10 }}
+							rowKey={(record)=>{
+								return record.index
+							}}
 						/>
 					</Col>
 				</Row>
