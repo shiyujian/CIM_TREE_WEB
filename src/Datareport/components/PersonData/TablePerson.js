@@ -1,32 +1,57 @@
 import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon} from 'antd';
 import style from './TableOrg.css'
+import DelPer from './PersonExpurgate';
 const Search = Input.Search;
 export default class TablePerson extends Component{
 	constructor(props) {
 		super(props);
 		this.state = {
-			dataSource: [],
+			
 		}
 	}
     render(){
+    	let rowSelection = {
+			selectedRowKeys:this.state.selectedRowKeys||[],
+			onChange: (selectedRowKeys, selectedRows) => {
+				this.setState({selectedRowKeys,selectedRows})
+			}
+		};
+		console.log('rowSelection',rowSelection)
         return (
             <div>
                 <div>
                     <Button style={{marginRight:"10px"}}>模板下载</Button>
                     <Button className = {style.button} onClick = {this.send.bind(this)}>发送填报</Button>
                     <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
-                    <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button>
+                    <Button className = {style.button} onClick = {()=>{
+						if(this.state.selectedRows && this.state.selectedRows.length>0)
+						{
+							this.setState({deling:true});
+							return;
+						}
+						message.warning('请至少选择一条');
+					}}>申请删除</Button>
                     <Button className = {style.button}>导出表格</Button>
                     <Search className = {style.button} style={{width:"200px"}} placeholder="输入搜索条件" />
                 </div>
                 <Table
                     columns = {this.columns}
                     bordered = {true}
-                    rowSelection={this.rowSelection}
-                    dataSource = {this.state.dataSource}
+                    rowSelection={rowSelection}
+                    dataSource = {this.state.dataSource || []}
                 >
                 </Table>
+                {
+					this.state.deling &&
+					<DelPer
+						onCancel={() => {
+							this.setState({ deling: false });
+						}}
+						dataSource={this.state.selectedRows}
+						actions={this.props.actions}
+					/>
+				}
             </div>
         )
     }
@@ -53,17 +78,6 @@ export default class TablePerson extends Component{
 		console.log('orgRoot',orgRoot)
 		this.setState({dataSource: orgRoot})
 	}
-    rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-      onSelect: (record, selected, selectedRows) => {
-        console.log(record, selected, selectedRows);
-      },
-      onSelectAll: (selected, selectedRows, changeRows) => {
-        console.log(selected, selectedRows, changeRows);
-      },
-    };
 
     //删除
     delete(){

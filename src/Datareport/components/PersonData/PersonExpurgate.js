@@ -1,14 +1,81 @@
 import React, { Component } from 'react';
-import { Modal, Input, Form, Button, message, Table, Radio, Row, Col } from 'antd';
+import { Modal, Input, Form, Button, message, Table, Radio, Row, Col, Select } from 'antd';
 import { CODE_PROJECT } from '_platform/api';
 import '../index.less'; 
+import {getUser} from '_platform/auth';
+import {getNextStates} from '_platform/components/Progress/util';
+import {WORKFLOW_CODE} from '_platform/api'
 
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
+var moment = require('moment');
 
 export default class PersonExpurgate extends Component {
+	constructor(props){
+        super(props);
+        this.state = {
+            dataSource: [],
+        }
+    }
+
+    ExpPerson(){
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props;
+        let participants = this.state.passer;
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"项目批量删除申请",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"项目批量删除申请",
+			subject:[{
+				data:JSON.stringify(this.props.dataSource)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起项目批量删除申请',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+					attachment:null
+				}).then(rst=>{
+                    this.props.onCancel();
+                });
+		});
+    }
+
+    componentDidMount(){
+        const {actions:{getAllUsers,getOrgList}} = this.props;
+        getAllUsers().then(res => {
+            console.log(res);
+            let set = {};
+            let checkers = res.map(o => {
+                set[o.id] = o;
+                return (
+                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                )
+            })
+            this.setState({ checkers, usersSet: set });
+        });
+    }
 
 	render() {
+		const {Exvisible} = this.props;
 		const columns = [ {
 	        title: '人员编码',
 	        dataIndex: 'code',
@@ -19,16 +86,8 @@ export default class PersonExpurgate extends Component {
 	        key: 'Name',
 	      },{
 	        title: '所在组织机构单位',
-	        render:(record) => {
-	            return (
-	                <Select style={{width:"90%"}} value = {record.org || this.state.defaultPro} onSelect={ele => {
-	                    record.org = ele;
-	                    this.forceUpdate();
-	                }}>
-	                    {this.state.org}
-	                </Select>
-	            )
-	        }
+	        dataIndex: 'org',
+            key: 'Org',
 	      },{
 	         title: '所属部门',
 	         dataIndex :'depart',
@@ -52,62 +111,62 @@ export default class PersonExpurgate extends Component {
 	      },{
 	        title:'二维码',
 	        key:'signature',
-	        render:(record) => (
-	            <Upload
-	                beforeUpload={this.beforeUploadPic.bind(this, record)}
-	            >
-	                <a>{record.signature ? record.signature.name : '点击上传'}</a>
-	            </Upload>
-	        )
+	        
 	      },{
-        title:'编辑',
-        dataIndex:'edit',
-        render:(record) => (
-            <Popconfirm
-                placement="leftTop"
-                title="确定删除吗？"
-                onConfirm={this.delete.bind(this)}
-                okText="确认"
-                cancelText="取消"
-            >
-                <a>删除</a>
-            </Popconfirm>
-        )
-    }]
+	        title:'编辑',
+	        dataIndex:'edit',
+	        render:(record) => (
+	            <Popconfirm
+	                placement="leftTop"
+	                title="确定删除吗？"
+	                onConfirm={this.delete.bind(this)}
+	                okText="确认"
+	                cancelText="取消"
+	            >
+	                <a>删除</a>
+	            </Popconfirm>
+	        )
+	    }]
 		
-		return(
-			<Modal
-				width = {1280}
-				visible={true}
-				onCancel = {() => this.props.closeModal("person_exp_visible",false)}
-			>
-				<Row style={{margin: '20px 0', textAlign: 'center'}}>
-					<h2>删除项目申请页面</h2>
-				</Row>
-				<Row>
-					<Table
-						bordered
-						className = 'foresttable'
-						columns={columns}
-					/>
-				</Row>
-				<Row style={{marginTop: '20px'}}>
-					<Col span={2} push={22}>
-						<Button type="default" onClick={this.submit.bind(this)}>确认导入</Button>
-					</Col>
-				</Row>
-				<Row style={{marginBottom: '20px'}}>
-					<Col span={2}>
-						<span>删除原因：</span>
-					</Col>
-			    </Row>
-			    <Row style={{margin: '20px 0'}}>
-				    <Col>
-				    	<TextArea rows={2} />
-				    </Col>
-			    </Row>
-			</Modal>
-		)
+		return (
+            <Modal
+                onCancel={this.props.onCancel}
+                title="项目删除申请表"
+                visible={true}
+                width={1280}
+                footer={null}
+                maskClosable={false}>
+                <Table
+                    columns={columns}
+                    bordered={true}
+                    dataSource={this.props.dataSource || []}
+                />
+                <span>
+                    审核人：
+                    <Select style={{ width: '200px' }} className="btn" onSelect={ele => {
+                        this.setState({ passer: JSON.parse(ele) })
+                    }} >
+                        {
+                            this.state.checkers || []
+                        }
+                    </Select>
+
+                </span>
+                <Button
+	                onClick = {
+	                    ()=>{
+	                        if(!this.state.passer){
+	                            message.error('未选择审核人');
+	                            return;
+	                        }
+	                        this.ExpPerson();
+	                    }
+	                }
+	                type='primary' >
+                    提交
+                </Button>
+            </Modal>
+        )
 	}
 
 	onChange = (e) => {
@@ -117,9 +176,27 @@ export default class PersonExpurgate extends Component {
 	    });
 	}
 
-	//提交
-    async submit(){
-        this.props.closeModal("person_exp_visible",false)
-        message.info("操作成功")
+	onok() {
+        console.log("datasource",this.state.dataSource);
+        const { actions: { ExprugateVisible } } = this.props;
+        let ok = this.state.dataSource.some(ele => {
+            return !ele.signature;
+        });
+        if (!this.state.passer) {
+            message.error('审批人未选择');
+            return;
+        }
+        this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
+        ExprugateVisible(false);
+    }
+
+	//删除
+    delete(){
+        
+    }
+
+	cancel() {
+        const { actions: { ExprugateVisible } } = this.props;
+        ExprugateVisible(false);
     }
 }
