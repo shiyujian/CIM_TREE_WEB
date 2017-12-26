@@ -23,7 +23,7 @@ const { Option } = Select;
         actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
     })
 )
-export default class ExpurgateCheck extends Component {
+export default class ModifyCheck extends Component {
 
     constructor(props) {
         super(props);
@@ -36,7 +36,7 @@ export default class ExpurgateCheck extends Component {
     async componentDidMount() {
         const { wk } = this.props
         let dataSources = JSON.parse(wk.subject[0].data)
-        console.log('asdfxsfdgg:',dataSources)
+       
         let dataSource = [];
         dataSources.map(item => {
             dataSource.push(item)
@@ -52,46 +52,13 @@ export default class ExpurgateCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("expurgate_check_visbile", false);
+        this.props.closeModal("modify_check_visbile", false);
         message.info("操作成功");
     }
 
     //通过
     async passon() {
-        const { dataSource, wk, topDir } = this.state;
-        console.log('da',dataSource)
-        const { actions: {
-            logWorkflowEvent,
-            delDocList
-        } } = this.props;
-
-        // send workflow
-        let executor = {};
-        let person = getUser();
-        executor.id = person.id;
-        executor.username = person.username;
-        executor.person_name = person.name;
-        executor.person_code = person.code;
-        await logWorkflowEvent({ pk: wk.id }, { state: wk.current[0].id, action: '通过', note: '同意', executor: executor, attachment: null });
-         
-        const docCode = [];
-        dataSource.map(item=>{
-            docCode.push(item.code);
-        })
        
-
-        let rst = await delDocList({}, { code_list: docCode });
-        if (rst.result) {
-            notification.success({
-                message: '删除文档成功！',
-                duration: 2
-            });
-        } else {
-            notification.error({
-                message: '删除文档失败！',
-                duration: 2
-            });
-        }
     }
     //不通过
     async reject() {
@@ -103,7 +70,7 @@ export default class ExpurgateCheck extends Component {
         this.setState({ option: e.target.value })
     }
     render() {
-        console.log('wadsdf', this.state.dataSource)
+      
 
         const columns = [{
             title: '序号',
@@ -155,7 +122,7 @@ export default class ExpurgateCheck extends Component {
 
         return (
             <Modal
-                title="模型信息删除审批表"
+                title="模型信息更改审批表"
                 footer={null}
                 visible={true}
                 width={1280}
@@ -197,6 +164,6 @@ export default class ExpurgateCheck extends Component {
     }
 
     cancel() {
-        this.props.closeModal("expurgate_check_visbile", false)
+        this.props.closeModal("modify_check_visbile", false)
     }
 }

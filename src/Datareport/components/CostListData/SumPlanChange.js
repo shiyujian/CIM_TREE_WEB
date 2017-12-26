@@ -7,7 +7,7 @@ import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-export default class SumSpeedDelete extends Component {
+export default class SumPlanChange extends Component {
 
     constructor(props) {
         super(props);
@@ -64,70 +64,93 @@ export default class SumSpeedDelete extends Component {
         this.setState({dataSource});
     }
 
+    //table input 输入
+    tableDataChange(index, key ,e ){
+		const { dataSource } = this.state;
+		dataSource[index][key] = e.target['value'];
+	  	this.setState({dataSource});
+    }
+
     render() {
-        const columns =[
+        console.log('this.state',this.state);
+        const columns = [
             {
-              title: "序号",
-              dataIndex: "number",
-              render: (text, record, index) => {
-                return index + 1;
-              }
-            },{
+                title: "序号",
+                dataIndex: "code",
+                width: "10%",
+                render:(text,record,index)=>{
+                  return index+1
+                }
+              },
+              ,
+              {
                 title: "项目/子项目",
-                dataIndex: "project"
+                dataIndex: "subproject"
               },
               {
                 title: "单位工程",
                 dataIndex: "unit"
               },
-            {
-              title: "工作节点目标",
-              dataIndex: "nodetarget"
-            },
-            {
-              title: "完成时间",
-              dataIndex: "completiontime"
-            },
-            {
-              title: "支付金额（万元）",
-              dataIndex: "summoney"
-            },
-            {
-              title: "累计占比",
-              dataIndex: "ratio"
-            },
-            {
-              title: "备注",
-              dataIndex: "remarks"
-            },
-            // {
-            //   title: "编辑",
-            //   dataIndex: "edit",
-            //   render: (text, record, index) => {
-            //     return (
-            //       <Popconfirm
-            //         placement="leftTop"
-            //         title="确定删除吗？"
-            //         onConfirm={this.delete.bind(this, index)}
-            //         okText="确认"
-            //         cancelText="取消"
-            //       >
-            //         <a>删除</a>
-            //       </Popconfirm>
-            //     );
-            //   }
-            // }
-          ];
+              {
+                title: "工作节点目标",
+                dataIndex: "nodetarget",
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[index]['nodetarget']} onChange={this.tableDataChange.bind(this,index,'nodetarget')}/>
+                )
+              },
+              {
+                title: "完成时间",
+                dataIndex: "completiontime",
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[index]['completiontime']} onChange={this.tableDataChange.bind(this,index,'completiontime')}/>
+                )
+              },
+              {
+                title: "支付金额（万元）",
+                dataIndex: "summoney",
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[index]['summoney']} onChange={this.tableDataChange.bind(this,index,'summoney')}/>
+                )
+              },
+              {
+                title: "累计占比",
+                dataIndex: "ratio",
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[index]['ratio']} onChange={this.tableDataChange.bind(this,index,'ratio')}/>
+                )
+              },
+              {
+                title: "备注",
+                dataIndex: "remarks",
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[index]['remarks']} onChange={this.tableDataChange.bind(this,index,'remarks')}/>
+                )
+              },
+              {
+                title: "操作",
+                render: (text, record, index) => {
+                  return (
+                    <Popconfirm
+                      placement="leftTop"
+                      title="确定删除吗？"
+                      onConfirm={this.delete.bind(this, index)}
+                      okText="确认"
+                      cancelText="取消"
+                    >
+                      <a>删除</a>
+                    </Popconfirm>
+                  );
+                }
+              }
+        ];
         return (
             <Modal
-			title="结算进度删除流程表"
-			key={this.props.akey}
+			title="结算计划变更表"
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
-            <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度删除流程</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -138,7 +161,7 @@ export default class SumSpeedDelete extends Component {
                     <Col>
                         <span>
                             审核人：
-                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)} mode="combobox" placeholder="可搜索审查人">
+                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
                                 {
                                     this.state.checkers
                                 }

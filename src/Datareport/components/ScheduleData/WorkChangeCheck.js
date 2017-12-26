@@ -6,7 +6,7 @@ import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,notification,Po
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import {getUser} from '_platform/auth';
-import {actions} from '../../store/scheduledata';
+import {actions} from '../../store/workdata';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
@@ -16,14 +16,14 @@ const {Option} = Select;
 
 @connect(
 	state => {
-        const {datareport: {scheduledata = {}} = {}, platform} = state;
-		return {...scheduledata, platform}
+        const {datareport: {workdata = {}} = {}, platform} = state;
+		return {...workdata, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class DesignDeleteCheck extends Component {
+export default class WorkChangeCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -51,19 +51,18 @@ export default class DesignDeleteCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("scheduledata_doc_delete_visible",false);
+        this.props.closeModal("workdata_doc_change_visible",false);
         message.info("操作成功");
     }
     // 点x消失
     oncancel() {
-        this.props.closeModal("scheduledata_doc_delete_visible", false);
+        this.props.closeModal("workdata_doc_change_visible", false)
     }
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state;
         const {actions:{
             logWorkflowEvent,
-            delDocList
         }} = this.props;
         
         // send workflow
@@ -74,22 +73,23 @@ export default class DesignDeleteCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        let delCode = [];
-        dataSource.map(item=>{
-            delCode.push(item.delcode);
-        })
-        let rst = await delDocList({},{code_list:delCode});
-        if(rst.result){
-            notification.success({
-                message: '删除文档成功！',
-                duration: 2
-            });
-        }else{
-            notification.error({
-                message: '删除文档失败！',
-                duration: 2
-            });
-        }
+        // let code_list = "";
+        // dataSource.map(item=>{
+        //     item.delcode+=",";
+        //     code_list += item.delcode;
+        // })
+        // let rst = await delDocList({},{code_list});
+        // if(rst.result){
+        //     notification.success({
+        //         message: '删除文档成功！',
+        //         duration: 2
+        //     });
+        // }else{
+        //     notification.error({
+        //         message: '删除文档失败！',
+        //         duration: 2
+        //     });
+        // }
     }
     //不通过
     async reject(){
@@ -101,19 +101,17 @@ export default class DesignDeleteCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        const columns = [{
+        const columns =
+        [{
             title: '序号',
             render: (text, record, index) => {
                 return index + 1
             }
         }, {
-            title: '编码',
+            title: 'WBS编码',
             dataIndex: 'code',
         }, {
-            title: '卷册',
-            dataIndex: 'volume',
-        }, {
-            title: '名称',
+            title: '任务名称',
             dataIndex: 'name',
         }, {
             title: '项目/子项目',
@@ -122,21 +120,33 @@ export default class DesignDeleteCheck extends Component {
             title: '单位工程',
             dataIndex: 'unit',
         }, {
-            title: '专业',
-            dataIndex: 'major',
+            title: '施工单位',
+            dataIndex: 'construct_unit',
         }, {
-            title: '实际供图时间',
+            title: '施工图工程量',
+            dataIndex: 'quantity',
+        }, {
+            title: '实际工程量',
+            dataIndex: 'factquantity',
+        }, {
+            title: '计划开始时间',
+            dataIndex: 'planstarttime',
+        }, {
+            title: '计划结束时间',
+            dataIndex: 'planovertime',
+        }, {
+            title: '实际开始时间',
+            dataIndex: 'factstarttime',
+        }, {
+            title: '实际结束时间',
             dataIndex: 'factovertime',
         }, {
-            title: '设计单位',
-            dataIndex: 'designunit',
-        }, {
-            title: '上传人员',
-            dataIndex: 'uploads',
-        }];
+            title: '变更人员',
+            dataIndex: 'editors',
+        },]
 		return (
             <Modal
-			title="设计进度删除审批表"
+			title="施工进度变更审批表"
             visible={true}
             width= {1280}
 			footer={null}

@@ -8,6 +8,7 @@ import {Row,Col,Table,Input,Button,message} from 'antd';
 import {getUser} from '_platform/auth';
 import SumSpeed from '../components/CostListData/SumSpeed';
 import SumSpeedDelete from '../components/CostListData/SumSpeedDelete';
+import SumSpeedChange from '../components/CostListData/SumSpeedChange';
 import './quality.less';
 import {WORKFLOW_CODE} from '_platform/api.js';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -30,6 +31,7 @@ export default class BalanceSchedule extends Component {
 		this.state = {
             addvisible:false,
             deletevisible:false,
+            changevisible:false,
             selectedRowKeys: [],
             dataSourceSelected:[],
 		};
@@ -76,15 +78,19 @@ export default class BalanceSchedule extends Component {
       let dataSource =[];
       getAllresult ().then(o=>{
         let dataSource = [];
-        o.result.map(single=>{
+        console.log('o',o)
+        console.log('')
+        o.result.map(rst=>{
           let temp = {
-            project: single.extra_params.project.name,
-            nodetarget: single.extra_params.nodetarget,
-            completiontime: single.extra_params.completiontime,
-            remarks: single.extra_params.remarks,
-            ratio: single.extra_params.ratio,
-            unit: single.extra_params.unit.name,
-            summoney: single.extra_params.summoney
+            code:rst.code,
+            project: rst.extra_params.project.name,
+            nodetarget: rst.extra_params.nodetarget,
+            completiontime: rst.extra_params.completiontime,
+            remarks: rst.extra_params.remarks,
+            ratio: rst.extra_params.ratio,
+            unit: rst.extra_params.unit.name,
+            summoney: rst.extra_params.summoney,
+            deletecode:rst.code
           }
           dataSource.push(temp);
           this.setState({ dataSource });
@@ -129,6 +135,47 @@ export default class BalanceSchedule extends Component {
                     }],
                     attachment:null}).then(() => {
 						this.setState({addvisible:false})	
+						// message.info("发起成功")					
+					})
+		})
+  }
+  //变更流程
+  setChangeData(data,participants){
+		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"结算进度信息变更",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"结算进度信息变更",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		//发起流程
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({changevisible:false})	
 						// message.info("发起成功")					
 					})
 		})
@@ -184,15 +231,22 @@ createWorkflow({},postdata).then((rst) => {
 	oncancel(){
         this.setState({addvisible:false})
         this.setState({deletevisible:false})
+        this.setState({changevisible:false})
 	}
 	setAddVisible(){
         this.setState({addvisible:true})
        
   }
-  setdltVisible(){
+  setchgVisible(){
+    this.setState({changevisible:true})
+  }
+  setdleVisible(){
     this.setState({deletevisible:true})
   }
+  
+  onSearch(){
 
+  }
 	render() {
     const { selectedRowKeys } = this.state;
 		const rowSelection = {
@@ -205,14 +259,15 @@ createWorkflow({},postdata).then((rst) => {
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={this.setAddVisible.bind(this)}>发起填报</Button>
-					<Button className="btn" type="default" >申请变更</Button>
-					<Button className="btn" type="default" onClick={this.setdltVisible.bind(this)}>申请删除</Button>
+					<Button className="btn" type="default" onClick={this.setchgVisible.bind(this)}>申请变更</Button>
+					<Button className="btn" type="default" onClick={this.setdleVisible.bind(this)}>申请删除</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
 						placeholder="输入搜索条件"
-						onSearch={value => console.log(value)}
+            onSearch={this.onSearch.bind(this)}
+            
 						/>
 				</Row>
 				<Row >
@@ -227,6 +282,10 @@ createWorkflow({},postdata).then((rst) => {
                 {
 					this.state.deletevisible &&
 					<SumSpeedDelete {...this.props} {...this.state } oncancel={this.oncancel.bind(this)} onok={this.setDeleteData.bind(this)}/>
+                }
+                {
+					this.state.changevisible &&
+					<SumSpeedChange {...this.props} {...this.state } oncancel={this.oncancel.bind(this)} onok={this.setChangeData.bind(this)}/>
                 }
 			</div>
 		);

@@ -23,7 +23,7 @@ const {Option} = Select;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class DesignDeleteCheck extends Component {
+export default class DesignChangeCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -51,19 +51,18 @@ export default class DesignDeleteCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("scheduledata_doc_delete_visible",false);
+        this.props.closeModal("scheduledata_doc_change_visible",false);
         message.info("操作成功");
     }
     // 点x消失
     oncancel() {
-        this.props.closeModal("scheduledata_doc_delete_visible", false);
+        this.props.closeModal("scheduledata_doc_change_visible", false)
     }
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state;
         const {actions:{
             logWorkflowEvent,
-            delDocList
         }} = this.props;
         
         // send workflow
@@ -74,22 +73,23 @@ export default class DesignDeleteCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        let delCode = [];
-        dataSource.map(item=>{
-            delCode.push(item.delcode);
-        })
-        let rst = await delDocList({},{code_list:delCode});
-        if(rst.result){
-            notification.success({
-                message: '删除文档成功！',
-                duration: 2
-            });
-        }else{
-            notification.error({
-                message: '删除文档失败！',
-                duration: 2
-            });
-        }
+        // let code_list = "";
+        // dataSource.map(item=>{
+        //     item.delcode+=",";
+        //     code_list += item.delcode;
+        // })
+        // let rst = await delDocList({},{code_list});
+        // if(rst.result){
+        //     notification.success({
+        //         message: '删除文档成功！',
+        //         duration: 2
+        //     });
+        // }else{
+        //     notification.error({
+        //         message: '删除文档失败！',
+        //         duration: 2
+        //     });
+        // }
     }
     //不通过
     async reject(){
@@ -131,12 +131,12 @@ export default class DesignDeleteCheck extends Component {
             title: '设计单位',
             dataIndex: 'designunit',
         }, {
-            title: '上传人员',
-            dataIndex: 'uploads',
+            title: '变更人员',
+            dataIndex: 'editors',
         }];
 		return (
             <Modal
-			title="设计进度删除审批表"
+			title="施工进度变更审批表"
             visible={true}
             width= {1280}
 			footer={null}

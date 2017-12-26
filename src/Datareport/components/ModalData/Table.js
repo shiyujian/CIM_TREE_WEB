@@ -48,9 +48,9 @@ export default class ModalTable extends Component {
 		let dataSource = [];
 
 		data.map(item => {
-
+			
 			getDocument({ code: item.code }).then(single => {
-
+				
 				let temp = {
 					coding: single.extra_params.coding,
 					modelName: single.extra_params.filename,
@@ -65,6 +65,7 @@ export default class ModalTable extends Component {
 					attributeTable: single.basic_params.files[2],
 					reportingTime: single.extra_params.reportingTime,
 					reportingName: single.extra_params.reportingName,
+					code:item.code
 					// stage:single.extra_params.stage,
 					// upPeople:single.extra_params.upPeople,
 					// wbsObject:single.extra_params.wbsObject,
@@ -200,9 +201,10 @@ export default class ModalTable extends Component {
 		changeCheckField('visible', true)
 	}
 	toggleModify() {
-		const { actions: { changeModifyField } } = this.props;
+		const { actions: { changeModifyField,getdele } } = this.props;
 		console.log(this.props)
 		changeModifyField('visible', true)
+		getdele(this.state.dataSourceSelected)
 	}
 	toggleExpurgate() {
 		const { actions: { changeExpurgateField,getdele } } = this.props;

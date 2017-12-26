@@ -2,10 +2,10 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
-import {actions} from '../../store/orgdata';
+import {actions} from '../../store/persondata';
 import {actions as actions2} from '../../store/quality';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,USER_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
@@ -13,34 +13,38 @@ const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
 @connect(
-	state => {
-		const { platform} = state;
-		return { platform}
-	},
-	dispatch => ({
-		actions: bindActionCreators({ ...actions,...platformActions,...actions2}, dispatch)
-	})
+    state => {
+        const { platform} = state;
+        return { platform}
+    },
+    dispatch => ({
+        actions: bindActionCreators({ ...actions,...platformActions,...actions2}, dispatch)
+    })
 )
-export default class DelCheck extends Component {
+export default class ExpCheck extends Component {
 
-	constructor(props) {   
-		super(props);
-		this.state = {
+    constructor(props) {
+        super(props);
+        this.state = {
             wk:null,
             dataSource:[],
             opinion:1,//1表示通过 2表示不通过
-		};
+            signatures:[]
+        };
     }
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        console.log("dataSource:",dataSource);
-        this.setState({dataSource,wk})
+        let tempData = [...dataSource];
+        this.setState({dataSource,tempData,wk})
+        console.log("oijiioj:",dataSource);
     }
+
     componentWillReceiveProps(props){
         const {wk} = props
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk})
+        let tempData = [...dataSource];
+        this.setState({dataSource,tempData,wk})
    }
    //提交
     async submit(){
@@ -49,36 +53,25 @@ export default class DelCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_del_visible",false)
+        this.props.closeModal("person_expcheck_visible",false)
         message.info("操作成功")
     }
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent, deleteOrgList, getOrgPk}} = this.props
+        const {actions:{deleteUserList,logWorkflowEvent,updateWpData,addDocList,putDocList,postPersonList,postAllUsersId,getOrgCode}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        console.log("dataSource",dataSource);
-        let data_list = [];
-        dataSource.map((item, index) => {
-            data_list.push({
-                code:"" + item.code,
-                parent:{
-                    pk: ""+ item.pk,
-                    code:"" + item.code,
-                    obj_type:item.obj_type
-                },
-                version:'A'
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
+        let dataList = this.state.dataSource.map((data) => {
+            console.log('data',data.id)
+            deleteUserList({pk:data.id}).then(rst => {
             })
         })
-        deleteOrgList({},{data_list: data_list}).then(rst => {
-            console.log("rst:",rst);
-        })
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
     }
     //不通过
     async reject(){
@@ -102,54 +95,65 @@ export default class DelCheck extends Component {
     onChange(e){
         this.setState({opinion:e.target.value})
     }
-	render() {
+    render() {
+        console.log("thissd;ljfidg:",this.state.tempData);
+        const {wk} = this.props;
+        console.log("wk",wk);
         const columns = [{
-            title: '组织机构编码',
-            dataIndex: 'code',
+            title: '序号',
+            dataIndex: 'index',
+            key: 'Index',
+        }, {
+            title: '人员编码',
+            dataIndex: 'account.person_code',
             key: 'Code',
         }, {
-            title: '组织机构类型',
-            dataIndex: 'extra_params.org_type',
-            key: 'Type',
-        }, {
-            title: '参建单位名称',
-            dataIndex: 'extra_params.canjian',
-            key: 'Canjian',
-        }, {
-            title: '组织机构部门',
-            dataIndex: 'name',
+            title: '姓名',
+            dataIndex: 'account.person_name',
             key: 'Name',
         }, {
-            title: '直属部门',
-            dataIndex: 'extra_params.direct',
-            key: 'Direct',
+            title: '所在组织机构单位',
+            dataIndex: 'account.organization',
+            key: 'Org',
         }, {
-            title: '负责项目/子项目名称',
-            dataIndex: 'extra_params.project',
-            key: 'Project',
-        },{
-            title: '负责单位工程名称',
-            dataIndex: 'extra_params.unit',
-            key: 'Unit'
-        },{
-            title: '备注',
-            dataIndex: 'extra_params.remarks',
-            key: 'Remarks'
+            title: '所属部门',
+            dataIndex: 'account.org_code',
+            key: 'Depart',
+        }, {
+            title: '职务',
+            dataIndex: 'job',
+            key: 'Job',
+        }, {
+            title: '性别',
+            dataIndex: 'sex',
+            key: 'Sex'
+        }, {
+            title: '手机号码',
+            dataIndex: 'tel',
+            key: 'Tel'
+        }, {
+            title: '邮箱',
+            dataIndex: 'email',
+            key: 'Email'
+        }, {
+            title: '二维码',
+            dataIndex: 'account.person_signature_url',
+            key: 'Signature'
         }]
-		return (
+        return (
             <Modal
-			title="组织机构信息审批表"
-			// key={Math.random()}
+            title="人员信息删除审批表"
+            key={Math.random()}
             visible={true}
             width= {1280}
             footer={null}
-            onCancel = {this.props.closeModal.bind(this,"dr_base_del_visible",false)}
-			maskClosable={false}>
+            onCancel = {() => this.props.closeModal("person_expcheck_visible",false)}
+            maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
-                        dataSource={this.state.dataSource}
+                        dataSource={this.state.tempData}
                         bordered />
                     <Row>
                         <Col span={2}>
@@ -178,6 +182,6 @@ export default class DelCheck extends Component {
                     }
                 </div>
             </Modal>
-		)
+        )
     }
 }

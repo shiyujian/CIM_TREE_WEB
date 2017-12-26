@@ -6,7 +6,7 @@ import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,notification,Po
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import {getUser} from '_platform/auth';
-import {actions} from '../../store/scheduledata';
+import {actions} from '../../store/SumPlanCost';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
@@ -16,21 +16,21 @@ const {Option} = Select;
 
 @connect(
 	state => {
-        const {datareport: {scheduledata = {}} = {}, platform} = state;
-		return {...scheduledata, platform}
+		const { datareport: { SumPlanCost = {} } = {}, platform } = state;
+		return { ...SumPlanCost, platform }
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
+		actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
 	})
 )
-export default class DesignDeleteCheck extends Component {
+export default class SumPlanChangeCheck extends Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
             wk:null,
             dataSource:[],
-            opinion:1,
+            option:1,
 		};
     }
     async componentDidMount(){
@@ -44,26 +44,47 @@ export default class DesignDeleteCheck extends Component {
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
    }
+
+
+
+   //test
+   test(){
+    const {dataSource,wk,topDir} = this.state;
+    console.log('data',dataSource,wk,topDir)
+    let delateArr = [];
+    dataSource.map(item=>{
+        delateArr.push(item.code)
+    });
+
+    console.log(delateArr.join(','));
+   }
    //提交
     async submit(){
-        if(this.state.opinion === 1){
+        if(this.state.option === 1){
             await this.passon();
         }else{
             await this.reject();
         }
-        this.props.closeModal("scheduledata_doc_delete_visible",false);
+        this.props.closeModal("dr_qua_jsjh_change_visible",false);
         message.info("操作成功");
     }
-    // 点x消失
-    oncancel() {
-        this.props.closeModal("scheduledata_doc_delete_visible", false);
-    }
+
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state;
+        let doclist_c = [];
+        dataSource.map(item=>{
+            doclist_c.push({
+                code:item.code,
+                obj_type: "C_DOC",
+                status:"A",
+                version:"A",
+                extra_params:item
+            })
+        });
         const {actions:{
             logWorkflowEvent,
-            delDocList
+            putDocList
         }} = this.props;
         
         // send workflow
@@ -74,22 +95,8 @@ export default class DesignDeleteCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        let delCode = [];
-        dataSource.map(item=>{
-            delCode.push(item.delcode);
-        })
-        let rst = await delDocList({},{code_list:delCode});
-        if(rst.result){
-            notification.success({
-                message: '删除文档成功！',
-                duration: 2
-            });
-        }else{
-            notification.error({
-                message: '删除文档失败！',
-                duration: 2
-            });
-        }
+        await putDocList({},{data_list:doclist_c})
+        
     }
     //不通过
     async reject(){
@@ -97,73 +104,77 @@ export default class DesignDeleteCheck extends Component {
         const {actions:{deleteWorkflow}} = this.props
         await deleteWorkflow({pk:wk.id})
     }
+    //取消
+    cancel() {
+        this.props.closeModal("dr_qua_jsjh_change_visible", false);
+      }
     onChange(e){
-        this.setState({opinion:e.target.value})
+        this.setState({option:e.target.value})
     }
 	render() {
-        const columns = [{
-            title: '序号',
-            render: (text, record, index) => {
-                return index + 1
+        console.log(this.state.dataSource)
+        const columns = [
+            {
+              title: "序号",
+              dataIndex: "number",
+              render: (text, record, index) => {
+                return index + 1;
+              }
+            },
+            {
+              title: "项目/子项目",
+              dataIndex: "subproject"
+            },
+            {
+              title: "单位工程",
+              dataIndex: "unit"
+            },
+            {
+              title: "工作节点目标",
+              dataIndex: "nodetarget"
+            },
+            {
+              title: "完成时间",
+              dataIndex: "completiontime"
+            },
+            {
+              title: "支付金额（万元）",
+              dataIndex: "summoney"
+            },
+            {
+              title: "累计占比",
+              dataIndex: "ratio"
+            },
+            {
+              title: "备注",
+              dataIndex: "remarks"
             }
-        }, {
-            title: '编码',
-            dataIndex: 'code',
-        }, {
-            title: '卷册',
-            dataIndex: 'volume',
-        }, {
-            title: '名称',
-            dataIndex: 'name',
-        }, {
-            title: '项目/子项目',
-            dataIndex: 'project',
-        }, {
-            title: '单位工程',
-            dataIndex: 'unit',
-        }, {
-            title: '专业',
-            dataIndex: 'major',
-        }, {
-            title: '实际供图时间',
-            dataIndex: 'factovertime',
-        }, {
-            title: '设计单位',
-            dataIndex: 'designunit',
-        }, {
-            title: '上传人员',
-            dataIndex: 'uploads',
-        }];
+          ]
 		return (
             <Modal
-			title="设计进度删除审批表"
+			title="结算计划信息变更审批表"
             visible={true}
             width= {1280}
-			footer={null}
-			maskClosable={false}
-            onCancel={this.oncancel.bind(this)}
-            >
+            footer={null}
+            onCancel={this.cancel.bind(this)}
+			maskClosable={false}>
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
-                    bordered
-                    rowKey={(record)=>{
-                        return record.index
-                    }} 
-                    />
+                    bordered />
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>
                     </Col>
                     <Col span={4}>
-                        <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
+                        <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
                             <Radio value={1}>通过</Radio>
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
                     <Col span={2} push={14}>
-                        <Button type='primary'>
+                        <Button type='primary' onClick = {this.test.bind(this)}>
                             导出表格
                         </Button>
                     </Col>

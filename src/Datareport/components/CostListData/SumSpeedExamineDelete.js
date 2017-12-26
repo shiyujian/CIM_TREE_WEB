@@ -6,7 +6,7 @@ import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,notification,Po
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import {getUser} from '_platform/auth';
-import {actions} from '../../store/safety';
+import {actions} from '../../store/SumSpeedCost';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
@@ -16,8 +16,8 @@ const {Option} = Select;
 
 @connect(
 	state => {
-        const {datareport: {safety = {}} = {}, platform} = state;
-		return {...safety, platform}
+        const {datareport: {SumSpeedCost = {}} = {}, platform} = state;
+		return {...SumSpeedCost, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
@@ -72,12 +72,14 @@ export default class SumSpeedExamineDelete extends Component {
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         
-        const docCode = [];
+        let deletecode = [];
         dataSource.map(item=>{
-            docCode.push(item.docCode);
+            console.log('item:',item.code)
+            deletecode.push(item.code)
+            console.log("deletecode:",deletecode)
         })
         
-        let rst = await delDocList({},{codeList:docData});
+        let rst = await delDocList({},{code_list:deletecode.join(',')});
         if(rst.result){
             notification.success({
                 message: '删除文档成功！',
@@ -89,6 +91,7 @@ export default class SumSpeedExamineDelete extends Component {
                 duration: 2
             });
         }
+        
     }
     //不通过
     async reject(){
@@ -99,6 +102,9 @@ export default class SumSpeedExamineDelete extends Component {
     onChange(e){
         this.setState({option:e.target.value})
     }
+    cancel() {
+        this.props.closeModal("cost_sum_delete_visible", false);
+      }
 	render() {
         const columns = [
             {
@@ -110,13 +116,11 @@ export default class SumSpeedExamineDelete extends Component {
             },
             {
               title: "项目/子项目",
-              dataIndex: "project",
-              render: (text, record, index) => <span>{record.project.name}</span>
+              dataIndex: "project"
             },
             {
               title: "单位工程",
-              dataIndex: "unit",
-              render: (text, record, index) => <span>{record.unit.name}</span>
+              dataIndex: "unit"
             },
             {
               title: "工作节点目标",
@@ -145,12 +149,16 @@ export default class SumSpeedExamineDelete extends Component {
             visible={true}
             width= {1280}
 			footer={null}
-			maskClosable={false}>
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+			maskClosable={false}
+            onCancel={this.cancel.bind(this)}
+            >
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度删除审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
-                    bordered />
+                    bordered 
+                    rowKey="key"
+                    />
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>
