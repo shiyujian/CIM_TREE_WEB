@@ -75,7 +75,7 @@ export default class Addition extends Component {
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
-                debugger
+               
                 dataSource.push({
                     coding: dataList[i][1] ? dataList[i][1] : '',
                     modelName: dataList[i][2] ? dataList[i][2] : '',
