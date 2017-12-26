@@ -122,7 +122,7 @@ export default class ModifyCheck extends Component {
 
         return (
             <Modal
-                title="模型信息删除审批表"
+                title="模型信息更改审批表"
                 footer={null}
                 visible={true}
                 width={1280}

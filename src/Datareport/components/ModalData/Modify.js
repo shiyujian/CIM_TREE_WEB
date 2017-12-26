@@ -21,6 +21,8 @@ export default class Modify extends Component {
 		this.state = {
 			checkers: [],//审核人下来框选项
 			check: null,//审核人
+			
+			
 		};
 	}
 
@@ -36,14 +38,28 @@ export default class Modify extends Component {
 		})
 	}
 
+	//table input 输入
+	tableDataChange(index, key, e) {
+		// const { modify = {}, getall = [] } = this.props;
+		
+		// console.log('prop',props)
+		// dataSources[index][key] = e.target['value'];
+	  	// this.setState({dataSources});
+		// // console.log('data:',dataSource)
+	
+	
+	}
+
 	//下拉框选择人
 	selectChecker(value) {
 		let check = JSON.parse(value);
 		this.setState({ check })
 	}
 
+
+
 	onok() {
-		const { getall = []} = this.props;
+		const { getall = [] } = this.props;
 		let dataSource = getall;
 		console.log('woshi:', getall)
 
@@ -127,7 +143,11 @@ export default class Modify extends Component {
 			dataIndex: 'modelName'
 		}, {
 			title: '提交单位',
-			dataIndex: 'submittingUnit'
+			dataIndex: 'submittingUnit',
+			render: (text, record, index) => (
+                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index,'submittingUnit')} />
+            ),
+
 		}, {
 			title: '模型描述',
 			dataIndex: 'modelDescription'
@@ -189,6 +209,7 @@ export default class Modify extends Component {
 		return (
 			<Modal
 				title="模型信息更改表"
+				key={this.props.akey}
 				width={1280}
 				visible={modify.visible}
 				onCancel={this.cancel.bind(this)}
