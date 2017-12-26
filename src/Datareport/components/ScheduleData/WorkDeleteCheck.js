@@ -54,7 +54,10 @@ export default class WorkDeleteCheck extends Component {
         this.props.closeModal("workdata_doc_delete_visible",false);
         message.info("操作成功");
     }
-
+    // 点x消失
+    oncancel() {
+        this.props.closeModal("workdata_doc_delete_visible", false)
+    }
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state;
@@ -71,13 +74,12 @@ export default class WorkDeleteCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
-        const docCode = [];
+        let code_list = "";
         dataSource.map(item=>{
-            docCode.push(item.docCode);
+            item.delcode+=",";
+            code_list += item.delcode;
         })
-        
-        let rst = await delDocList({},{codeList:docData});
+        let rst = await delDocList({},{code_list});
         if(rst.result){
             notification.success({
                 message: '删除文档成功！',
@@ -100,67 +102,67 @@ export default class WorkDeleteCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        const columns = [
-            {
-                title:'编码',
-                dataIndex:'code',
-                width: '10%'
-            },{
-                title:'项目名称',
-                dataIndex:'projectName',
-                width: '10%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.project.name}
-                    </span>
-                ),
-            },{
-                title:'单位工程',
-                dataIndex:'unit',
-                width: '10%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.unit.name}
-                    </span>
-                ),
-            },{
-                title:'文件名称',
-                dataIndex:'filename',
-                width: '10%',
-            },{
-                title:'发布单位',
-                dataIndex:'pubUnit',
-                width: '10%',
-            },{
-                title:'版本号',
-                dataIndex:'type',
-                width: '10%',
-            },{
-                title:'实施日期',
-                dataIndex:'doTime',
-                width: '10%',
-            },{
-                title:'备注',
-                dataIndex:'remark',
-                width: '10%',
-            },{
-                title:'提交人',
-                dataIndex:'upPeople',
-                width: '10%',
+        const columns =
+        [{
+            title: '序号',
+            render: (text, record, index) => {
+                return index + 1
             }
-        ];
+        }, {
+            title: 'WBS编码',
+            dataIndex: 'code',
+        }, {
+            title: '任务名称',
+            dataIndex: 'name',
+        }, {
+            title: '项目/子项目',
+            dataIndex: 'project',
+        }, {
+            title: '单位工程',
+            dataIndex: 'unit',
+        }, {
+            title: '施工单位',
+            dataIndex: 'construct_unit',
+        }, {
+            title: '施工图工程量',
+            dataIndex: 'quantity',
+        }, {
+            title: '实际工程量',
+            dataIndex: 'factquantity',
+        }, {
+            title: '计划开始时间',
+            dataIndex: 'planstarttime',
+        }, {
+            title: '计划结束时间',
+            dataIndex: 'planovertime',
+        }, {
+            title: '实际开始时间',
+            dataIndex: 'factstarttime',
+        }, {
+            title: '实际结束时间',
+            dataIndex: 'factovertime',
+        }, {
+            title: '上传人员',
+            dataIndex: 'uploads',
+        },]
 		return (
             <Modal
 			title="施工进度删除审批表"
             visible={true}
             width= {1280}
 			footer={null}
-			maskClosable={false}>
+			maskClosable={false}
+            onCancel={this.oncancel.bind(this)}
+            >
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
-                    bordered />
+                    bordered
+                    rowKey={(record)=>{
+                        return record.index
+                    }} 
+                    />
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>

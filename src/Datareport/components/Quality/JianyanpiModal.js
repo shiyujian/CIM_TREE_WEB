@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less'
-import Preview from '../../../_platform/components/layout/Preview';
+import Preview from '_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -15,11 +15,15 @@ class JianyanpiModal extends Component {
 		this.state = {
             dataSource:[],
             checkers:[],//审核人下来框选项
-            check:null,//审核人
+            check:null,//审核人,
+            editing:false
 		};
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
+        const {actions:{getAllUsers},editData} = this.props
+        if(editData.length){
+            this.setState({dataSource:editData,editing:true})
+        }
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -52,10 +56,10 @@ class JianyanpiModal extends Component {
             return
         }
         let temp = this.state.dataSource.some((o,index) => {
-                        return !o.file.id
+                        return !(o.file.id && o.rate && o.level)
                     })
         if(temp){
-            message.info(`有数据未上传附件`)
+            message.info(`有信息未填写完整`)
             return
         }
         let {check} = this.state
@@ -74,14 +78,16 @@ class JianyanpiModal extends Component {
     //附件上传
 	beforeUploadPicFile  = async(index,file) => {
         const fileName = file.name;
-        let {dataSource} = this.state
+        let {dataSource,editing} = this.state
         let temp = fileName.split(".")[0]
-        //判断有无重复
-        if(dataSource.some(o => {
-           return o.code === temp
-        })){
-            message.info("该检验批已经上传过了")
-            return false
+        //判断添加的的时候有无重复
+        if(!editing){
+            if(dataSource.some(o => {
+                return o.code === temp
+             })){
+                 message.info("该检验批已经上传过了")
+                 return false
+             }
         }
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile,getWorkPackageDetail} } = this.props;
@@ -236,12 +242,16 @@ class JianyanpiModal extends Component {
         openPreview(filed);
     }
 	render() {
+        //如果是编辑，则上传视为不可见
+        const {editing} = this.state
+        let visible = editing ? 'none' : ""
         const columns = 
         [{
             title:'序号',
             width:"5%",
+            dataIndex:'key',
 			render:(text,record,index) => {
-				return index+1
+				return record.key+1
 			}
 		},{
 			title:'项目/子项目',
@@ -381,7 +391,7 @@ class JianyanpiModal extends Component {
                         pagination={false}
                         scroll={{y:500}}/>
                     <Upload {...props}>
-                        <Button style={{margin:'10px 10px 10px 0px'}}>
+                        <Button style={{margin:'10px 10px 10px 0px',display:visible}}>
                             <Icon type="upload" />上传附件
                         </Button>
                     </Upload>

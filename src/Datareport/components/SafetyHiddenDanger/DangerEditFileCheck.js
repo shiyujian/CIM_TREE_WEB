@@ -5,25 +5,24 @@ import {actions as platformActions} from '_platform/store/global';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,notification,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
+import {actions} from '../../store/safety';
 import {getUser} from '_platform/auth';
-import {actions} from '../../store/WorkunitCost';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
-const {Option} = Select;
-
+const {Option} = Select
 @connect(
 	state => {
-        const {datareport: {WorkunitCost = {}} = {}, platform} = state;
-		return {...WorkunitCost, platform}
+        const {datareport: {safety = {}} = {}, platform} = state;
+		return {...safety, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class ProjectSumExcalDeleteCheck extends Component {
+export default class DangerEditFileCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -34,15 +33,16 @@ export default class ProjectSumExcalDeleteCheck extends Component {
 		};
     }
     async componentDidMount(){
-        const {wk} = this.props
-        let dataSource = JSON.parse(wk.subject[0].data)
+        const {wk} = this.props;
+        debugger
+        let dataSource = JSON.parse(wk.subject[0].data);
         this.setState({dataSource,wk});
     }
 
     componentWillReceiveProps(props){
-        const {wk} = props
-        let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk})
+        const {wk} = props;
+        let dataSource = JSON.parse(wk.subject[0].data);
+        this.setState({dataSource,wk});
    }
    //提交
     async submit(){
@@ -51,7 +51,7 @@ export default class ProjectSumExcalDeleteCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_qua_cckk_delate_visible",false);
+        this.props.closeModal("safety_hidden_edit_visible",false);
         message.info("操作成功");
     }
 
@@ -71,18 +71,24 @@ export default class ProjectSumExcalDeleteCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-
-        // if(rst.result){
-        //     notification.success({
-        //         message: '删除文档成功！',
-        //         duration: 2
-        //     });
-        // }else{
-        //     notification.error({
-        //         message: '删除文档失败！',
-        //         duration: 2
-        //     });
-        // }
+        
+        const docCode = [];
+        dataSource.map(item=>{
+            docCode.push(item.docCode);
+        })
+        
+        let rst = await delDocList({},{code_list:docCode});
+        if(rst.result){
+            notification.success({
+                message: '删除文档成功！',
+                duration: 2
+            });
+        }else{
+            notification.error({
+                message: '删除文档失败！',
+                duration: 2
+            });
+        }
     }
     //不通过
     async reject(){
@@ -90,48 +96,97 @@ export default class ProjectSumExcalDeleteCheck extends Component {
         const {actions:{deleteWorkflow}} = this.props
         await deleteWorkflow({pk:wk.id})
     }
+    //预览
+    handlePreview(index){
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index].file;
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
     onChange(e){
+        debugger
         this.setState({option:e.target.value})
     }
 	render() {
-        console.log(this.state.dataSource)
         const columns = [
             {
-                title: "序号",
-                dataIndex: "code",
-                width: "10%",
-                render:(text,record,index)=>{
-                  return index+1
-                }
-              },{
-                title: '项目/子项目',
-                dataIndex: 'subproject',
+                title: '文档编码',
+                dataIndex: 'code',
+                width: '8%'
+            }, {
+                title: '项目名称',
+                dataIndex: 'project',
+                width: '8%',
+                render: (text, record, index) => (
+                    <span>
+                        {record.projectName}
+                    </span>
+                ),
             }, {
                 title: '单位工程',
                 dataIndex: 'unit',
+                width: '8%',
+                render: (text, record, index) => (
+                    <span>
+                        {record.unit}
+                    </span>
+                ),
             }, {
-                title: '清单项目编号',
-                dataIndex: 'projectcoding',
+                title: 'WBS编码',
+                dataIndex: 'wbs',
+                width: '8%',
             }, {
-                title: '项目名称',
-                dataIndex: 'projectname',
+                title: '责任单位',
+                dataIndex: 'resUnit',
+                width: '8%',
             }, {
-                title: '计量单位',
-                dataIndex: 'company',
+                title: '隐患类型',
+                dataIndex: 'type',
+                width: '5%',
             }, {
-                title: '数量',
-                dataIndex: 'number',
+                title: '上报时间',
+                dataIndex: 'upTime',
+                width: '9%',
             }, {
-                title: '单价',
-                dataIndex: 'total',
+                title: '核查时间',
+                dataIndex: 'checkTime',
+                width: '9%',
             }, {
-                title: '备注',
-                dataIndex: 'remarks',
+                title: '整改时间',
+                dataIndex: 'editTime',
+                width: '9%',
+            }, {
+                title: '排查结果',
+                dataIndex: 'result',
+                width: '6%',
+            }, {
+                title: '整改期限',
+                dataIndex: 'deadline',
+                width: '8%',
+            }, {
+                title: '整改结果',
+                dataIndex: 'editResult',
+                width: '6%',
+            }, {
+                title:'附件',
+                width:"10%",
+                render:(text,record,index) => {
+                    return (<span>
+                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <span className="ant-divider" />
+                            <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                        </span>)
+                }
             }
-          ]
+        ];
 		return (
             <Modal
-			title="工程量结算信息删除审批表"
+			title="安全隐患删除审批表"
             visible={true}
             width= {1280}
 			footer={null}

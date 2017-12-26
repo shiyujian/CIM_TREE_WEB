@@ -31,7 +31,9 @@ const getQuantitiesCode= createFetchAction(`${SERVICE_API}/tags/code/{{code}}/`,
 
 //搜索
 const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{keyword}}&obj_type=C_QTO`, [], 'GET');
-
+//删除
+const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
+const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE');
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -47,7 +49,10 @@ export const actions = {
 	postScheduleDir,
 	updateWpData,
 	getQuantitiesCode,
-	getSearcher
+	getSearcher,
+	delDocList,
+	deleteWorkflow
+
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

@@ -20,6 +20,7 @@ import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyHiddenDanger/AddFile';
 import DeleteFile from '../components/SafetyHiddenDanger/DeleteFile';
+import EditFile from '../components/SafetyHiddenDanger/EditFile';
 import {getNextStates} from '_platform/components/Progress/util';
 import Preview from '../../_platform/components/layout/Preview';
 var moment = require('moment');
@@ -68,12 +69,16 @@ class SafetyHiddenDanger extends Component {
 
     async generateTableData(data){
         const {actions:{
-            getDocument,
+            getDocumentList,
         }} = this.props;
         let dataSource = [];
-        debugger
-        data.map(item=>{
-            getDocument({code:item.code}).then(single=>{
+        let codeList = [];
+        data.map(item =>{
+            codeList.push(item.code);
+        })
+        let docList = await getDocumentList({},{list:codeList});
+        if(docList.result){
+            docList.result.map((single)=>{
                 let temp = { 
                     code:single.extra_params.code,
                     wbs:single.extra_params.wbs,
@@ -88,12 +93,12 @@ class SafetyHiddenDanger extends Component {
                     file:single.basic_params.files[0],
                     deadline:single.extra_params.deadline,
                     editResult:single.extra_params.editResult,
-                    docCode:item.code
+                    docCode:single.code
                 }
                 dataSource.push(temp);
-                this.setState({dataSource});
-            })
-        })
+            });
+        }
+        this.setState({dataSource});
     }
 
     setAddData = (data,participants) => {
@@ -169,7 +174,7 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({setAddVisiable:false})						
+						this.setState({setDeleteVisiable:false})						
 					})
 		})
     }
@@ -192,7 +197,42 @@ class SafetyHiddenDanger extends Component {
         this.setState({selectedRowKeys,dataSourceSelected});
     }
     setEditData = (data,participants) =>{
-
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"安全隐患信息批量变更",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"安全隐患信息批量变更",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({setDeleteVisiable:false})						
+					})
+		})
     }
 
     handlePreview(index){
@@ -317,7 +357,7 @@ class SafetyHiddenDanger extends Component {
                 }
                 {
                     this.state.setEditVisiable &&
-                    <DeleteFile {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} akey={Math.random()} onok={this.setEditData.bind(this)} />
+                    <EditFile {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} akey={Math.random()} onok={this.setEditData.bind(this)} />
                 }
             </Main>)
     }
