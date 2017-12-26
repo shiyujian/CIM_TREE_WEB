@@ -72,13 +72,19 @@ export default class SumPlanChangeCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state;
-        let delateArr = [];
+        let doclist_c = [];
         dataSource.map(item=>{
-            delateArr.push(item.code)
+            doclist_c.push({
+                code:item.code,
+                obj_type: "C_DOC",
+                status:"A",
+                version:"A",
+                extra_params:item
+            })
         });
         const {actions:{
             logWorkflowEvent,
-            delDocList
+            putDocList
         }} = this.props;
         
         // send workflow
@@ -89,21 +95,7 @@ export default class SumPlanChangeCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
-        await delDocList({},{code_list:delateArr.join(",")}).then(rst=>{
-            console.log(rst)
-            if(rst.result){
-                notification.success({
-                    message: '删除文档成功！',
-                    duration: 2
-                });
-            }else{
-                notification.error({
-                    message: '删除文档失败！',
-                    duration: 2
-                });
-            }
-        })
+        await putDocList({},{data_list:doclist_c})
         
     }
     //不通过
