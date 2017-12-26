@@ -7,7 +7,7 @@ import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-export default class SumSpeedDelete extends Component {
+export default class SumSpeedChange extends Component {
 
     constructor(props) {
         super(props);
@@ -54,7 +54,11 @@ export default class SumSpeedDelete extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.onok(this.state.dataSource,per);
+        this.props.onok(this.state.dataSource,per);
+        notification.success({
+            message: '信息上传成功！',
+            duration: 2
+        });
     }
 
     //删除
@@ -63,71 +67,89 @@ export default class SumSpeedDelete extends Component {
         dataSource.splice(index,1);
         this.setState({dataSource});
     }
+    //输入
+    tableDataChange(index, key ,e ){
+        const { dataSource } = this.state;
+        console.log(dataSource)
+		dataSource[index][key] = e.target['value'];
+          this.setState({dataSource});
+          console.log('dataSource:',dataSource)
+    }
 
     render() {
         const columns =[
             {
               title: "序号",
-              dataIndex: "number",
+              dataIndex: "index",
+              width:"5%",
               render: (text, record, index) => {
                 return index + 1;
               }
             },{
                 title: "项目/子项目",
-                dataIndex: "project"
+                dataIndex: "subproject",
+                // render: (text, record, index) => (
+                //     <Input value={this.state.dataSource[index]['project']} onChange={this.tableDataChange.bind(this,index,'project')}/>
+                // )
               },
               {
                 title: "单位工程",
-                dataIndex: "unit"
+                dataIndex: "unit",
+                // render: (text, record, index) => (
+                //     <Input value={this.state.dataSource[index]['unit']} onChange={this.tableDataChange.bind(this,index,'unit')}/>
+                // )
               },
             {
-              title: "工作节点目标",
-              dataIndex: "nodetarget"
+              title: "清单项目编号",
+              dataIndex: "projectcoding",
+              render: (text, record, index) => (
+                  <Input value={this.state.dataSource[index]['projectcoding']} onChange={this.tableDataChange.bind(this,index,'projectcoding')}/>
+              )
             },
             {
-              title: "完成时间",
-              dataIndex: "completiontime"
+              title: "项目名称",
+              dataIndex: "projectname",
+              render: (text, record, index) => (
+                  <Input value={this.state.dataSource[index]['projectname']} onChange={this.tableDataChange.bind(this,index,'projectname')}/>
+              )
             },
             {
-              title: "支付金额（万元）",
-              dataIndex: "summoney"
+              title: "计量单位",
+              dataIndex: "company",
+              render: (text, record, index) => (
+                  <Input value={this.state.dataSource[index]['company']} onChange={this.tableDataChange.bind(this,index,'company')}/>
+              )
             },
             {
-              title: "累计占比",
-              dataIndex: "ratio"
-            },
-            {
+              title: "数量",
+              dataIndex: "number",
+              render: (text, record, index) => (
+                  <Input value={this.state.dataSource[index]['number']} onChange={this.tableDataChange.bind(this,index,'number')}/>
+              )
+            },{
+                title: "单价",
+                dataIndex: "total",
+                render: (text, record, index) => (
+                    <Input value={this.state.dataSource[index]['total']} onChange={this.tableDataChange.bind(this,index,'total')}/>
+                )
+              },{
               title: "备注",
-              dataIndex: "remarks"
+              dataIndex: "remarks",
+              render: (text, record, index) => (
+                  <Input value={this.state.dataSource[index]['remarks']} onChange={this.tableDataChange.bind(this,index,'remarks')}/>
+              )
             },
-            // {
-            //   title: "编辑",
-            //   dataIndex: "edit",
-            //   render: (text, record, index) => {
-            //     return (
-            //       <Popconfirm
-            //         placement="leftTop"
-            //         title="确定删除吗？"
-            //         onConfirm={this.delete.bind(this, index)}
-            //         okText="确认"
-            //         cancelText="取消"
-            //       >
-            //         <a>删除</a>
-            //       </Popconfirm>
-            //     );
-            //   }
-            // }
           ];
         return (
             <Modal
-			title="结算进度删除流程表"
+			title="工程量结算变更流程表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
-            <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度删除流程</h1>
+            <h1 style ={{textAlign:'center',marginBottom:20}}>工程量结算变更流程</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

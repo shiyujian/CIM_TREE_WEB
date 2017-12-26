@@ -86,14 +86,14 @@ export default class ToggleModal extends Component {
                 <Row style={{ marginBottom: "30px" }}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
-                    <p style={{ paddingLeft: "25px" }}>3、日期必须带年月日，如2017年1月1日</p>
+                    <p style={{ paddingLeft: "25px" }}>3、请将日期的Excel单元格设置为文本格式，且必须带年月日，如2017年1月1日</p>
                     <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.</p>
                 </Row>
             </Modal>
         )
     }
 
-    
+
     selectChecker(value) {
         let check = JSON.parse(value);
         this.setState({ check })
@@ -367,9 +367,10 @@ export default class ToggleModal extends Component {
     }
     //删除
     delete(index) {
-        let { dataSource } = this.state
-        dataSource.splice(index, 1)
-        this.setState({ dataSource })
+        // debugger;
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
     }
 
     //预览
@@ -431,15 +432,11 @@ export default class ToggleModal extends Component {
         });
     }
 
-
     columns = [
         {
             title: '序号',
-            // dataIndex: 'index',
+            dataIndex: 'index',
             width: '5%',
-            render: (text, record, index) => {
-                return index + 1
-            },
         }
         ,
         // {
