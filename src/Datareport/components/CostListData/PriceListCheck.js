@@ -152,57 +152,9 @@ export default class PriceListCheck extends Component {
                     "rel_type":"price_list_check"
                 }
             })
-            // docData.push({
-            //     code:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
-            //     name:item.file.name,
-            //     obj_type:"C_DOC",
-            //     status:'A',
-            //     profess_folder: {code: dir.code, obj_type: 'C_DIR'},
-            //     "basic_params": {
-            //         "files": [
-            //             {
-            //               "a_file": item.file.a_file,
-            //               "name": item.file.name,
-            //               "download_url": item.file.download_url,
-            //               "misc": "file",
-            //               "mime_type": item.file.mime_type
-            //             },
-            //         ]
-            //       },
-            //     extra_params:{
-            //         code: item.projectcoding,
-            //         subproject: item.project.name,
-            //         projectcoding:item.projectcoding,
-            //         total:item.total,
-            //         valuation: item.valuation,
-            //         rate: item.rate,
-            //         company: item.company,
-            //         remarks: item.remarks,
-            //         unitengineering: item.unit.name
-            //     },
-            //     workpackage: {
-            //         pk: item.unit.pk || "wp_pk",
-            //         code: item.unit.code,
-            //         obj_type: item.unit.obj_type,
-            //         rel_type: "related"
-            //     }
-            // })
         });
         let rst = await addTagList({},{data_list:tagLists});
-        // await sendTags({}, {
-        //     "name": "test_tag_1",
-        //     "code": "test_tag_1_code1",
-        //     "obj_type": "C_QTO",
-        //     "status": "A",
-        //     "version": "A",
-        //     "unit": "m3",
-        //     "unit_price": 100,
-        //     "kind": "01",
-        //     "description": "xxx",
-        //     "extra_params": {"f1":"f1", "f2":"f2"}
-        //     "workpackage":{"pk":"wp_pk", "code":"code", 
-        //     "obj_type":"C_WP_CEL","rel_type":"related",}
-        // })
+        
         debugger;
         // let rst = await addDocList({},{data_list:docData});
         // if(rst.result){
