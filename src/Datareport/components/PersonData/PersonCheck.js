@@ -67,22 +67,13 @@ export default class PersonCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         let data_list = [];
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
-        .then((rst) => {
-            let personId = rst.id;
-            postAllUsersId({id:personId})
-            .then((item) => {
-
-            })
-        });
+        
         let promises = JSON.parse(wk.subject[0].data).map((o) => {
-            console.log('o',o)
             return getOrgCode({code: o.depart})
         })
         let rst = await Promise.all(promises);
-        console.log('rst',rst)
-        rst.map((item) => {
-            console.log('item', item)
+        dataSource.map((item, index) => {
+            console.log('item',item)
             data_list.push({
                 "code": "" + item.code,
                 "name":item.name,
@@ -100,9 +91,9 @@ export default class PersonCheck extends Component {
                 },
                 "obj_type":"C_PER",
                 "org":{
-                    "code":item.code,
+                    "code":item.depart,
                     "obj_type": "C_ORG",
-                    "pk": item.pk,
+                    "pk": rst[index].pk,
                     "rel_type": "member"
                 },
                 "title":"title",
@@ -112,11 +103,19 @@ export default class PersonCheck extends Component {
                 "last_name":""
             })                    
         })
+        console.log('data_list',data_list)
         postPersonList({},{data_list:data_list}).then(rst => {
+            console.log('rst', rst)
             if (rst.result.length) {
                 message.success("审核成功");
             }
         })
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
+        .then((rst) => {
+            let personId = rst.id;
+            postAllUsersId({id:personId})
+            .then((item) => {})
+        });
     }
     //不通过
     async reject(){

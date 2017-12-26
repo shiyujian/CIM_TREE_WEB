@@ -9,16 +9,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-
 import { DynamicTitle, Content } from '_platform/components/layout';
-import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio, bordered } from 'antd';
-const Search = Input.Search;
+import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio, bordered, message } from 'antd';
 import { WORKFLOW_CODE } from '_platform/api.js';
 import { getUser } from '_platform/auth';
 import { actions } from '../store/SumPlanCost';
 import { actions as platformActions } from '_platform/store/global';
 import { SumPlan } from '../components/CostListData';
+import { SumPlanDelate } from '../components/CostListData'
 import { getNextStates } from '_platform/components/Progress/util';
+const Search = Input.Search;
 var moment = require('moment');
 @connect(
 	state => {
@@ -37,7 +37,10 @@ export default class BanlancePlan extends Component {
 		this.state = {
 			lanchReapt: false,
 			lanchAudit: false,
-			dataSource: []
+			lanchdelate: false,
+			dataSource: [],
+			dataSourceSelected:[],
+            selectedRowKeys: []
 		};
 	}
 	submit() {
@@ -46,43 +49,33 @@ export default class BanlancePlan extends Component {
 	examine() {
 		this.setState({ lanchAudit: true })
 	}
-	async componentDidMount() {
-		const { actions: { getScheduleDir } } = this.props;
-		let topDir = await getScheduleDir({ code: 'the_only_main_code_SumPlanCheck' });
-		console.log('topDir', topDir);
-		if (topDir.obj_type) {
-			let dir = await getScheduleDir({ code: 'datareport_safetydoc_111201' });
-			console.log('dir', dir)
-			if (dir.obj_type) {
-				if (dir.obj_type.length > 0) {
-					this.generateTableData(dir.stored_documents);
-				}
-			}
-		}
-	}
-	async generateTableData(data) {
-		const { actions: {
-			getDocument,
-	                 } } = this.props;
-		let dataSource = [];
+	 generateTableData(data) {
+		 let dataSour = [];
+		 console.log(data);
 		data.map(item => {
-			getDocument({ code: item.code }).then(single => {
-				console.log('single:', single)
-				let temp = {
-					subproject: single.extra_params.subproject,
-					unit: single.extra_params.unit,
-					nodetarget: single.extra_params.nodetarget,
-					completiontime: single.extra_params.completiontime,
-					summoney: single.extra_params.summoney,
-					ratio: single.extra_params.ratio,
-					remarks: single.extra_params.remark
-				}
-				dataSource.push(temp);
-				this.setState({ dataSource: dataSource })
-			})
+			let datas = {
+				subproject: item.extra_params.project.name,
+				unit: item.extra_params.unit.name,
+				nodetarget: item.extra_params.nodetarget,
+				completiontime: item.extra_params.completiontime,
+				summoney: item.extra_params.summoney,
+				ratio: item.extra_params.ratio,
+				remarks: item.extra_params.remark,
+				code:item.code
+			}
+			dataSour.push(datas)
+		})
+		this.setState({
+			dataSource:dataSour
 		})
 	}
 
+	componentDidMount(){
+		const {actions:{ getExBySearch }}=this.props;
+		getExBySearch().then(rst=>{
+			this.generateTableData(rst.result)
+		})
+	}
 	lanchOk(data, participants) {
 		//批量上传回调
 		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
@@ -119,19 +112,69 @@ export default class BanlancePlan extends Component {
 					}],
 					attachment: null
 				}).then(() => {
-					this.setState({ lanchReapt: false })
+					this.setState({ lanchReapt: false });
+					message.info('发起流程成功')					
 				})
 		})
 
 	}
+	delateOk(data, participants) {
+		//批量上传回调
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
+		let creator = {
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
+		}
+		let postdata = {
+			name: "结算计划信息删除",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "结算计划信息删除",
+			subject: [{
+				data: JSON.stringify(data)
+			}],
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
+		}
+		createWorkflow({}, postdata).then((rst) => {
+			let nextStates = getNextStates(rst, rst.current[0].id);
+			logWorkflowEvent({ pk: rst.id },
+				{
+					state: rst.current[0].id,
+					action: '提交',
+					note: '发起填报',
+					executor: creator,
+					next_states: [{
+						participants: [participants],
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					attachment: null
+				}).then(() => {
+					this.setState({ lanchdelate: false });
+					message.info('发起流程成功')
+				})
+		})
+
+	}
+
+	onSelectChange = (selectedRowKeys) => {
+        const {dataSource} = this.state;
+        let dataSourceSelected = [];
+        for(let i=0;i<selectedRowKeys.length;i++){
+            dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
+        }
+        this.setState({selectedRowKeys,dataSourceSelected});
+    }
+
 	render() {
+		const { selectedRowKeys } = this.state;
 		const rowSelection = {
-			onChange: (selectedRowKeys, selectedRows) => {
-				console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-			},
-			getCheckboxProps: record => ({
-				disabled: record.name === 'Disabled User', // Column configuration not to be checked
-			}),
+			selectedRowKeys,
+			onChange: this.onSelectChange,
 		};
 		const columns = [{
 			title: '序号',
@@ -168,7 +211,8 @@ export default class BanlancePlan extends Component {
 					<Row>
 						<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
 						<Button className="btn" type="default" onClick={() => { this.setState({ lanchReapt: true }) }}>批量导入</Button>
-						<Button className="btn" type="default">申请变更</Button>
+						<Button className="btn" type="default" onClick={() => { this.setState({ lanchAudit: true }) }}>申请变更</Button>
+						<Button className="btn" type="default" onClick={() => { this.setState({ lanchdelate: true }) }}>申请删除</Button>
 						<Button className="btn" type="default">导出表格</Button>
 						<Search
 							className="btn"
@@ -182,6 +226,9 @@ export default class BanlancePlan extends Component {
 					</div>
 					{this.state.lanchReapt &&
 						<SumPlan {...this.props} oncancel={() => { this.setState({ lanchReapt: false }) }} onok={this.lanchOk.bind(this)} />
+					}
+					{this.state.lanchdelate &&
+						<SumPlanDelate {...this.props} {...this.state} oncancel={() => { this.setState({ lanchdelate: false }) }} onok={this.delateOk.bind(this)} />
 					}
 				</Content>
 			</div>)

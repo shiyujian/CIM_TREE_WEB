@@ -11,6 +11,7 @@ import {Row,Col} from 'antd';
 	state => {
 		const {datareport: {modaldata = {}} = {}, platform} = state;
 		return {...modaldata, platform}
+		
 	},
 	dispatch => ({
 		actions: bindActionCreators({...actions, ...platformActions}, dispatch)

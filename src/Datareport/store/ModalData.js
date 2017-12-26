@@ -41,13 +41,18 @@ export const addDefectDir = createFetchAction(`${SERVICE_API}/directories/`,[],'
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
+//批量删除
+const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
+//存储选择要删除的数据的数据
+const getdele = createAction(`${ID}_GET_dele`);
 
 export const actions = {
 	...additionReducer,
 	...checkReducer,
 	...modifyReducer,
 	...expurgateReducer,
-
+   
+	
 	getProjectTree,
     uploadStaticFile,
     deleteStaticFile,
@@ -64,7 +69,10 @@ export const actions = {
 	addDefectDir,
 	getScheduleDir,
 	postScheduleDir,
-	getDocument
+	getDocument,
+	getdele,
+	delDocList
+	
 };
 
 export default handleActions({
@@ -87,5 +95,9 @@ export default handleActions({
 	[getFieldsOK]: (state, {payload: {results = []} = {}}) => ({
 		...state,
 		fields: results
+	}),
+	[getdele]: (state, {payload}) => ({
+		...state,
+		getall: payload
 	})
 }, {});
