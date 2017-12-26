@@ -47,6 +47,8 @@ import SumSpeedExamineChange from 'Datareport/components/CostListData/SumSpeedEx
 import JianyanpiDelete from 'Datareport/components/Quality/JyDeleteCheck';
 import SumPlanChangeCheck from 'Datareport/components/CostListData/SumPlanChangeCheck';
 import ProjectSumChangeChock from 'Datareport/components/CostListData/ProjectSumChangeChock';
+import SafetySpecialDeleteCheck from 'Datareport/components/SafetySpecial/SafetySpecialDeleteCheck';
+import SafetySpecialEditCheck from 'Datareport/components/SafetySpecial/SafetySpecialEditCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -113,7 +115,9 @@ export default class Progress extends Component {
 			cost_sum_change_visible,
 			dr_qua_jy_del_visible,
 			dr_qua_jsjh_change_visible,
-			cost_sum_cckk_visible
+			cost_sum_cckk_visible,
+			Safety_Special_delete_visible,
+			Safety_Special_edit_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -371,6 +375,14 @@ export default class Progress extends Component {
 					cost_sum_cckk_visible && 
 					<ProjectSumChangeChock wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					Safety_Special_delete_visible && 
+					<SafetySpecialDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					Safety_Special_edit_visible && 
+					<SafetySpecialEditCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -505,6 +517,12 @@ export default class Progress extends Component {
 				break;
 			case "工程量结算信息变更":
 				changeDatareportVisible({key:'cost_sum_cckk_visible',value:true})
+				break;
+			case "安全专项信息批量删除":
+				changeDatareportVisible({key:'Safety_Special_delete_visible',value:true})
+				break;
+			case "安全专项信息批量变更":
+				changeDatareportVisible({key:'Safety_Special_edit_visible',value:true})
 				break;
 			default:break;
 		}
