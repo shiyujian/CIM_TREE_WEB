@@ -27,6 +27,7 @@ import SafetySpecialCheck from 'Datareport/components/SafetySpecial/SafetySpecia
 import UnitToggle from 'Datareport/components/UnitData/UnitToggle';
 import VedioCheck from 'Datareport/components/VedioData/VedioCheck';
 import VedioInfoCheck from 'Datareport/components/VedioData/VedioInfoCheck';
+import DefectCheck from 'Datareport/components/Quality/DefectCheck';
 import DefectModal from 'Datareport/components/Quality/DefectModal';
 import SafetyDocDeleteCheck from 'Datareport/components/SafetyDoc/SafetyDocDeleteCheck';
 import DangerDeleteCheck from 'Datareport/components/SafetyHiddenDanger/DangerDeleteCheck';
@@ -282,7 +283,7 @@ export default class Progress extends Component {
 				}
 				{
 					dr_qua_defect_visible && 
-					<DefectModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<DefectCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					safety_doc_delete_visible && 
