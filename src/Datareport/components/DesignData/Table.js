@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress } from 'antd';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
 export default class DesignTable extends Component {
 	constructor(props) {
-		super(props)
+		super(props);
+		this.header = ['序号','文档编码','文档名称','项目/子项目名称','单位工程','项目阶段','提交单位',
+						'文档类型','专业','描述的WBS对象','描述的设计对象','上传人员'];
 		this.state = {
 			selectedRowKeys: [],
 			alldatas:[],
@@ -151,7 +153,7 @@ export default class DesignTable extends Component {
 					<Button style={{ margin: '10px' }} onClick={this.toggleAddition.bind(this)} type="default" >发起填报</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleModify.bind(this)} type="default">申请变更</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleExpurgate.bind(this)} type="default">申请删除</Button>
-					<Button style={{ margin: '10px' }} type="default">导出表格</Button>
+					<Button style={{ margin: '10px' }} onClick={this.getExcel.bind(this)} type="default">导出表格</Button>
 					<Search
 						style={{ width: "200px", marginLeft: 10 }}
 						placeholder="输入搜索条件"
@@ -192,16 +194,52 @@ export default class DesignTable extends Component {
 	}
 	toggleModify() {
 		const {modify = {}, actions: { changeModifyField } } = this.props;
-		console.log(this.props)
-		changeModifyField('visible', true)
-		changeModifyField('key', modify.key?modify.key+1:1)
+		console.log(this.props,'modify.selectedDatas',modify.selectedDatas)
+		if(!(modify.selectedDatas&&modify.selectedDatas.length)){
+			message.warning('Nothing selected')
+		} else if(!this.judge(modify.selectedDatas)) {
+			message.warning('Different unit had been selected, check your selected lines please ')
+		} else {
+			changeModifyField('visible', true)
+			changeModifyField('key', modify.key?modify.key+1:1)
+		}
 	}
 	toggleExpurgate() {
 		const {expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		console.log(this.props)
-		changeExpurgateField('visible', true)
-		changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
+		if(!(expurgate.selectedDatas&&expurgate.selectedDatas.length)){
+			message.warning('Nothing selected')
+		} else {
+			changeExpurgateField('visible', true)
+			changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
+		}
 	}
+	judge(arr) {
+		return arr.every(item => item.extra_params.unit.pk === arr[0].extra_params.unit.pk)
+	}
+	//下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    //数据导出
+    getExcel(){
+        const {actions:{jsonToExcel}} = this.props;
+        const {dataSource} = this.state;
+        let rows = [];
+        rows.push(this.header);
+        dataSource.map(item => {
+            rows.push([item.index,item.code,item.filename,item.project.name,item.unit.name,item.stage,item.pubUnit,item.filetype,item.major,item.wbsObject,item.designObject,item.upPeople]);
+        })
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+            this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
+    }
 }
-
-

@@ -64,6 +64,7 @@ export default class ProjectSumExcalDeleteCheck extends Component {
         }} = this.props;
         
         // send workflow
+
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -71,18 +72,23 @@ export default class ProjectSumExcalDeleteCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-
-        // if(rst.result){
-        //     notification.success({
-        //         message: '删除文档成功！',
-        //         duration: 2
-        //     });
-        // }else{
-        //     notification.error({
-        //         message: '删除文档失败！',
-        //         duration: 2
-        //     });
-        // }
+        const docCode = [];
+        dataSource.map(item=>{
+            docCode.push(item.code);
+        })
+        
+        let rst = await delDocList({},{code_list:docCode});
+        if(rst.result){
+            notification.success({
+                message: '删除文档成功！',
+                duration: 2
+            });
+        }else{
+            notification.error({
+                message: '删除文档失败！',
+                duration: 2
+            });
+        }
     }
     //不通过
     async reject(){

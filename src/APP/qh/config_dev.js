@@ -47,9 +47,9 @@ window.config = {
 	'CODE_API': 'http://10.215.160.41:6556',
 
 	//node服务,验评表单转化Word,pdf转word
-	'NODE_FILE_EXCHANGE_PORT': '6546',
-	//'NODE_FILE_EXCHANGE_PORT': '6525',
-	'NODE_FILE_STATIC_API': 'http://10.215.160.45:6511',
+	//'NODE_FILE_EXCHANGE_PORT': '6546',  
+	'NODE_FILE_EXCHANGE_PORT': '6525',
+	'NODE_FILE_STATIC_API': 'http://10.215.160.45',//6511
 	
 	//word在线预览地址
 	'previewWord_API': 'http://10.215.160.40:6500/view/url?url=',

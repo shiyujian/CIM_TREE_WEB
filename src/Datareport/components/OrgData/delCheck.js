@@ -23,7 +23,7 @@ const {Option} = Select
 )
 export default class DelCheck extends Component {
 
-	constructor(props) {
+	constructor(props) {   
 		super(props);
 		this.state = {
             wk:null,

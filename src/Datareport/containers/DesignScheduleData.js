@@ -63,7 +63,8 @@ export default class DesignScheduleData extends Component {
 					major: single.extra_params.major,
 					factovertime: single.extra_params.factovertime,
 					designunit: single.extra_params.designunit,
-					uploads: single.extra_params.uploads
+					uploads: single.extra_params.uploads,
+					delcode:single.code,
 				}
 				dataSource.push(temp);
 				this.setState({ dataSource });

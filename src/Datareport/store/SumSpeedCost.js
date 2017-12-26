@@ -31,6 +31,8 @@ export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'P
 export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
 const getAllresult = createFetchAction(`${SERVICE_API}/searcher/?keyword=rel_doooco_&obj_type=C_DOC`, [], 'GET');
+//删除流程
+const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -49,7 +51,8 @@ export const actions = {
 	postScheduleDir,
 	getWorkpackagesByCode,
 	getDocument,
-	getAllresult
+	getAllresult,
+	delDocList
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
