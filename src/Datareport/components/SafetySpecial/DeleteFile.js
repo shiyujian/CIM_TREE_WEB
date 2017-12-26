@@ -57,11 +57,9 @@ export default class DeleteFile extends Component {
         const columns = [
             {
                 title: '序号',
-                // dataIndex: 'index',
+                dataIndex: 'i',
                 width: '5%',
-                render: (text, record, index) => {
-                    return index + 1
-                },
+
             },
             {
                 title: '项目/子项目名称',
@@ -123,7 +121,23 @@ export default class DeleteFile extends Component {
                         )
                     }
                 }
-            },
+            }
+            , {
+                title: '操作',
+                render: (text, record, index) => {
+                    return (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+                            // onConfirm={this.delete.bind(this, index, record.i)}
+                            onConfirm={this.delete.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
+                }
+            }
         ];
 
         const paginationInfoModal = {
@@ -142,7 +156,7 @@ export default class DeleteFile extends Component {
                 onCancel={this.cancel.bind(this)}
                 maskClosable={false}
             >
-                <h1 style={{ textAlign: 'center', fontSize: 14, color: '#333' }}>删除项目申请页面</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>删除项目申请页面</h1>
                 <Row >
                     <Table
                         columns={columns}
@@ -188,6 +202,15 @@ export default class DeleteFile extends Component {
             </Modal>
         )
     }; // render
+
+    //删除
+    delete(index) {
+        // debugger;
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
+    }
+
     onok() {
         if (!this.state.check) {
             message.error('审批人未选择');

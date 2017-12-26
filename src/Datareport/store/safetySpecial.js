@@ -18,11 +18,7 @@ const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 
 // 查询
-// const getSearcherDir = createFetchAction(`${SERVICE_API}/searcher/?keyword={{code}}&&obj_type=C_DOC`,[],'GET');
 const getSearcherDir = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{keyword}}`,[],'GET');
-// http://10.215.160.38:6544/service/
-// construction/api/doc_searcher/dir_code/
-// datareport_safetyspecial_05/?doc_code=safetyspecial&keys=organizationUnit,scenarioName&values=中建三局集团有限公司,安全环水保管理制度
 
 export const actions = {
 	ModalVisible,
