@@ -39,7 +39,9 @@ import ExpurgateCheck from 'Datareport/components/ModalData/ExpurgateCheck';
 import HandelDelModal from 'Datareport/components/UnitData/HandelDelModal';
 import ProjectSumExcalDeleteCheck from 'Datareport/components/CostListData/ProjectSumExcalDeleteCheck';
 import HandelDelProjModal from 'Datareport/components/ProjectData/HandleDelProj';
-import delCheck from 'Datareport/components/OrgData/delCheck';
+import DelCheck from 'Datareport/components/OrgData/delCheck';
+import DocEditFileCheck from 'Datareport/components/SafetyDoc/DocEditFileCheck';
+import DangerEditFileCheck from 'Datareport/components/SafetyHiddenDanger/DangerEditFileCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -99,7 +101,9 @@ export default class Progress extends Component {
 			dr_del_unit_visible,
 			dr_qua_cckk_delate_visible,
 			dr_del_proj_visible,
-			dr_base_del_visible
+			dr_base_del_visible,
+			safety_doc_edit_visible,
+			safety_hidden_edit_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -327,7 +331,15 @@ export default class Progress extends Component {
 				}
 				{
 					dr_base_del_visible && 
-					<delCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<DelCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_doc_edit_visible && 
+					<DocEditFileCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_hidden_edit_visible && 
+					<DangerEditFileCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 			</div>
 		);
@@ -440,8 +452,14 @@ export default class Progress extends Component {
 			case "项目批量删除申请":
 				changeDatareportVisible({key:'dr_del_proj_visible',value:true})
 				break;
-			case "组织机构信息信息批量删除":
+			case "组织机构信息批量删除":
 				changeDatareportVisible({key:'dr_base_del_visible',value:true})
+				break;
+			case "安全管理信息批量变更":
+				changeDatareportVisible({key:'safety_doc_edit_visible',value:true})
+				break;
+			case "安全隐患信息批量变更":
+				changeDatareportVisible({key:'safety_hidden_edit_visible',value:true})
 				break;
 			default:break;
 		}
