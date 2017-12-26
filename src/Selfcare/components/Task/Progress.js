@@ -51,6 +51,8 @@ import SumPlanChangeCheck from 'Datareport/components/CostListData/SumPlanChange
 import ProjectSumChangeChock from 'Datareport/components/CostListData/ProjectSumChangeChock';
 import SafetySpecialDeleteCheck from 'Datareport/components/SafetySpecial/SafetySpecialDeleteCheck';
 import SafetySpecialEditCheck from 'Datareport/components/SafetySpecial/SafetySpecialEditCheck';
+import ExpCheck from 'Datareport/components/PersonData/ExpCheck';
+import ModifyCheck from 'Datareport/components/ModalData/ModifyCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -121,7 +123,9 @@ export default class Progress extends Component {
 			dr_qua_jsjh_change_visible,
 			cost_sum_cckk_visible,
 			Safety_Special_delete_visible,
-			Safety_Special_edit_visible
+			Safety_Special_edit_visible,
+			person_expcheck_visible,
+			modify_check_visbile
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -395,6 +399,14 @@ export default class Progress extends Component {
 					Safety_Special_edit_visible && 
 					<SafetySpecialEditCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					person_expcheck_visible && 
+					<ExpCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					modify_check_visbile && 
+					<ModifyCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -547,6 +559,12 @@ export default class Progress extends Component {
 				break;
 			case "安全专项信息批量变更":
 				changeDatareportVisible({key:'Safety_Special_edit_visible',value:true})
+				break;
+			case "人员信息批量删除":
+				changeDatareportVisible({key:'person_expcheck_visible',value:true})
+				break;
+			case "模型信息批量更改":
+				changeDatareportVisible({key:'modify_check_visbile',value:true})
 				break;
 			default:break;
 		}

@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon} from 'antd';
 import style from './TableOrg.css'
+import DelPer from './PersonExpurgate';
 const Search = Input.Search;
 export default class TablePerson extends Component{
 	constructor(props) {
 		super(props);
 		this.state = {
 			dataSource: [],
+			deleData:[]
 		}
 	}
     render(){
@@ -25,6 +27,7 @@ export default class TablePerson extends Component{
                     bordered = {true}
                     rowSelection={this.rowSelection}
                     dataSource = {this.state.dataSource}
+                    rowKey = 'code'
                 >
                 </Table>
             </div>
@@ -37,8 +40,13 @@ export default class TablePerson extends Component{
 	}
 	//批量删除
 	expurgate() {
-		const { actions: { ExprugateVisible } } = this.props;
-		ExprugateVisible(true);
+		const { actions: { ExprugateVisible, setDeletePer } } = this.props;
+		if(this.state.deleData.length){
+			setDeletePer(this.state.deleData);
+			ExprugateVisible(true);
+		}else{
+			message.warning("请先选中要删除的数据");
+		}
 	}
 	//批量变更
 	modify() {
@@ -53,17 +61,23 @@ export default class TablePerson extends Component{
 		console.log('orgRoot',orgRoot)
 		this.setState({dataSource: orgRoot})
 	}
-    rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-      onSelect: (record, selected, selectedRows) => {
-        console.log(record, selected, selectedRows);
-      },
-      onSelectAll: (selected, selectedRows, changeRows) => {
-        console.log(selected, selectedRows, changeRows);
-      },
-    };
+
+	rowSelection = {
+		onChange: (selectedRowKeys, selectedRows) => {
+			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+		},
+		onSelect: (record, selected, selectedRows) => {
+			this.setState({
+				deleData:selectedRows
+			})
+		},
+		onSelectAll: (selected, selectedRows, changeRows) => {
+			console.log(selected, selectedRows, changeRows);
+			this.setState({
+				deleData:selectedRows
+			})
+		},
+	};
 
     //删除
     delete(){
