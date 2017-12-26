@@ -6,7 +6,7 @@ import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,notification,Po
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import {getUser} from '_platform/auth';
-import {actions} from '../../store/SumPlanCost';
+import {actions} from '../../store/safety';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
@@ -16,14 +16,14 @@ const {Option} = Select;
 
 @connect(
 	state => {
-		const { datareport: { SumPlanCost = {} } = {}, platform } = state;
-		return { ...SumPlanCost, platform }
+        const {datareport: {safety = {}} = {}, platform} = state;
+		return {...safety, platform}
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
+		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class SumPlanDelateCheck extends Component {
+export default class EditFileCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -34,7 +34,8 @@ export default class SumPlanDelateCheck extends Component {
 		};
     }
     async componentDidMount(){
-        const {wk} = this.props
+        const {wk} = this.props;
+        debugger
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk});
     }
@@ -44,20 +45,6 @@ export default class SumPlanDelateCheck extends Component {
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
    }
-
-
-
-   //test
-   test(){
-    const {dataSource,wk,topDir} = this.state;
-    console.log('data',dataSource,wk,topDir)
-    let delateArr = [];
-    dataSource.map(item=>{
-        delateArr.push(item.code)
-    });
-
-    console.log(delateArr.join(','));
-   }
    //提交
     async submit(){
         if(this.state.option === 1){
@@ -65,17 +52,13 @@ export default class SumPlanDelateCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_qua_jsjh_delate_visible",false);
+        this.props.closeModal("safety_doc_edit_visible",false);
         message.info("操作成功");
     }
 
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state;
-        let delateArr = [];
-        dataSource.map(item=>{
-            delateArr.push(item.code)
-        });
         const {actions:{
             logWorkflowEvent,
             delDocList
@@ -90,21 +73,23 @@ export default class SumPlanDelateCheck extends Component {
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         
-        await delDocList({},{code_list:delateArr.join(",")}).then(rst=>{
-            console.log(rst)
-            if(rst.result){
-                notification.success({
-                    message: '删除文档成功！',
-                    duration: 2
-                });
-            }else{
-                notification.error({
-                    message: '删除文档失败！',
-                    duration: 2
-                });
-            }
+        const docCode = [];
+        dataSource.map(item=>{
+            docCode.push(item.docCode);
         })
         
+        let rst = await delDocList({},{code_list:docCode});
+        if(rst.result){
+            notification.success({
+                message: '修改文档成功！',
+                duration: 2
+            });
+        }else{
+            notification.error({
+                message: '修改文档失败！',
+                duration: 2
+            });
+        }
     }
     //不通过
     async reject(){
@@ -112,59 +97,89 @@ export default class SumPlanDelateCheck extends Component {
         const {actions:{deleteWorkflow}} = this.props
         await deleteWorkflow({pk:wk.id})
     }
-    //取消
-    cancel() {
-        this.props.closeModal("dr_qua_jsjh_delate_visible", false);
-      }
+
+    //预览
+    handlePreview(index){
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index].file
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
+
     onChange(e){
         this.setState({option:e.target.value})
     }
 	render() {
-        console.log(this.state.dataSource)
         const columns = [
             {
-              title: "序号",
-              dataIndex: "number",
-              render: (text, record, index) => {
-                return index + 1;
-              }
-            },
-            {
-              title: "项目/子项目",
-              dataIndex: "subproject"
-            },
-            {
-              title: "单位工程",
-              dataIndex: "unit"
-            },
-            {
-              title: "工作节点目标",
-              dataIndex: "nodetarget"
-            },
-            {
-              title: "完成时间",
-              dataIndex: "completiontime"
-            },
-            {
-              title: "支付金额（万元）",
-              dataIndex: "summoney"
-            },
-            {
-              title: "累计占比",
-              dataIndex: "ratio"
-            },
-            {
-              title: "备注",
-              dataIndex: "remarks"
+                title:'文档编码',
+                dataIndex:'code',
+                width: '10%'
+            },{
+                title:'项目名称',
+                dataIndex:'projectName',
+                width: '10%',
+                render: (text, record, index) => (
+                    <span>
+                        {record.projectName}
+                    </span>
+                ),
+            },{
+                title:'单位工程',
+                dataIndex:'unit',
+                width: '10%',
+                render: (text, record, index) => (
+                    <span>
+                        {record.unit}
+                    </span>
+                ),
+            },{
+                title:'文件名称',
+                dataIndex:'filename',
+                width: '10%',
+            },{
+                title:'发布单位',
+                dataIndex:'pubUnit',
+                width: '10%',
+            },{
+                title:'版本号',
+                dataIndex:'type',
+                width: '10%',
+            },{
+                title:'实施日期',
+                dataIndex:'doTime',
+                width: '10%',
+            },{
+                title:'备注',
+                dataIndex:'remark',
+                width: '10%',
+            },{
+                title:'提交人',
+                dataIndex:'upPeople',
+                width: '10%',
+            }, {
+                title:'附件',
+                width:"10%",
+                render:(text,record,index) => {
+                    return (<span>
+                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <span className="ant-divider" />
+                            <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                        </span>)
+                }
             }
-          ]
+        ];
 		return (
             <Modal
-			title="结算计划信息删除审批表"
+			title="安全信息删除审批表"
             visible={true}
             width= {1280}
-            footer={null}
-            onCancel={this.cancel.bind(this)}
+			footer={null}
 			maskClosable={false}>
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
@@ -182,7 +197,7 @@ export default class SumPlanDelateCheck extends Component {
                         </RadioGroup>
                     </Col>
                     <Col span={2} push={14}>
-                        <Button type='primary' onClick = {this.test.bind(this)}>
+                        <Button type='primary'>
                             导出表格
                         </Button>
                     </Col>

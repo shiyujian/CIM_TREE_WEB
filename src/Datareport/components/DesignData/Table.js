@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input } from 'antd';
+import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress } from 'antd';
 import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
@@ -9,6 +9,8 @@ export default class DesignTable extends Component {
 		this.state = {
 			selectedRowKeys: [],
 			alldatas:[],
+			loading: false,
+			percent: 0,
 		}
 
 	}
@@ -46,13 +48,27 @@ export default class DesignTable extends Component {
         }} = this.props;
         let dataSource = [];
         let all = [];
+        let total = data.length;
+        this.setState({loading:true,percent:0,num:0})
         data.forEach(item=>{
-            all.push(getDocument({code:item.code}))
+            all.push(getDocument({code:item.code})
+            	.then(rst => {
+            		let {num} = this.state;
+                    num++;
+                    this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
+                    if(!rst) {
+                    	message.error(`数据获取失败`)
+		    			return []
+		    		} else {
+                    	return rst
+                    }
+            	}))
         })
         Promise.all(all)
         .then(item => {
+        	this.setState({loading:false})
         	item.forEach((single,index) => {
-        		let temp = { 
+        		let temp = {
         			index:index+1,
                     code:single.extra_params.code,
                     filename:single.extra_params.filename,
@@ -151,6 +167,7 @@ export default class DesignTable extends Component {
 						rowSelection={rowSelection}
 						dataSource={this.state.dataSource}
 						rowKey="index"
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 					/>
 				</Row>
 			</div>

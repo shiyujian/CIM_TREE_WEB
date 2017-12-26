@@ -34,6 +34,7 @@ const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST
 
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
 const putDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [], 'PUT');
+const deleteDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
 
 export const actions = {
 	...additionReducer,
@@ -56,7 +57,8 @@ export const actions = {
 	getScheduleDir,
 	postScheduleDir,
 	getDocument,
-	putDocument
+	putDocument,
+	deleteDocument
 };
 
 export default handleActions({
