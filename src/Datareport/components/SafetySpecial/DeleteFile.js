@@ -10,7 +10,7 @@ export default class DeleteFile extends Component {
         super(props);
         this.state = {
             dataSource: [],
-            deleteInfo: '',
+            deleteInfoNew: '',
             users: [],
             projects: [],
             checkers: [],//审核人下来框选项
@@ -42,7 +42,7 @@ export default class DeleteFile extends Component {
     }
     onChangeText(e) {
         this.setState({
-            deleteInfo: e.target.value
+            deleteInfoNew: e.target.value
         });
     }
 
@@ -208,7 +208,7 @@ export default class DeleteFile extends Component {
             message.error('审批人未选择');
             return;
         }
-        if (!this.state.deleteInfo) {
+        if (!this.state.deleteInfoNew) {
             message.info(`请填写删除原因`);
             return;
         }
@@ -220,9 +220,9 @@ export default class DeleteFile extends Component {
             person_code: check.account.person_code,
             organization: check.account.organization
         }
-        let { deleteInfo } = this.state
+        let { deleteInfoNew } = this.state
         for (let i = 0; i < this.state.dataSource.length; i++) {
-            this.state.dataSource[i].deleteInfo = deleteInfo;
+            this.state.dataSource[i].deleteInfoNew = deleteInfoNew;
         }
         this.props.setDeleteData(this.state.dataSource, per);
         notification.success({
