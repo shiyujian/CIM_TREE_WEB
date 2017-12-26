@@ -26,6 +26,58 @@ export default class SubmitChangeModal extends Component {
             dataSource: ds
         };
     }
+    componentDidMount(){
+        const {actions:{getAllUsers}} = this.props
+        getAllUsers().then(res => {
+            console.log(res);
+            let set = {};
+            let checkers = res.map(o => {
+                set[o.id] = o;
+                return (
+                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                )
+            })
+            this.setState({checkers,usersSet:set})
+        });
+    }
+    submit(){
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"项目批量变更申请",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"项目批量变更申请",
+			subject:[{
+				data:JSON.stringify(this.state.dataSource)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起项目填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[this.state.passer],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+					attachment:null
+				});
+        });
+        this.props.onCancel();
+    }
     render() {
         return (
             <Modal
@@ -40,6 +92,30 @@ export default class SubmitChangeModal extends Component {
                     bordered={true}
                     dataSource={this.state.dataSource || []}
                 />
+                <span>
+                    审核人：
+                        <Select style={{ width: '200px' }} className="btn" onSelect = {ele=>{
+                            this.setState({passer:JSON.parse(ele)})
+                        }} >
+                        {
+                            this.state.checkers || []
+                        }
+                    </Select>
+                </span>
+                <Button onClick = {()=>{
+                    if(!this.state.passer){
+                        message.error('未选择审核人');
+                        return;
+                    }
+                    let err = this.state.dataSource.some(data=>{
+                        return data.error;
+                    });
+                    if(err){
+                        message.error('表格数据有错误');
+                        return;
+                    }
+                    this.submit();
+                }} type="primary" >提交</Button>
             </Modal>
         )
     }
@@ -132,9 +208,11 @@ export default class SubmitChangeModal extends Component {
                     let perName = '数据错误';
                     let {getPersonByCode}  = this.props.actions;
                     let perRst = await getPersonByCode({code:code});
-                    if(perRst.code && perRst.code.length>0){
-                        return perRst.name;
+                    if(perRst.code && perRst.code.length>0){                        
                         record.relPer = perRst;
+                        record.error = null;
+                        this.forceUpdate();
+                        return perRst.name;
                     }
                     record.error = true;
                     this.forceUpdate();

@@ -65,7 +65,6 @@ export default class HandelChangeProjModal extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         let dataList = this.state.dataSource.map(data=>{
-
             return {
                 code:data.code,
                 parent:{
@@ -180,13 +179,13 @@ export default class HandelChangeProjModal extends Component {
 	}, {
 		title: '项目红线坐标',
 		render:(record)=>{
-			return (<span>{record.extra_params.coordinate||''}</span>);
+			return (<span>{record.coordinate||''}</span>);
 		},
 		key: 'Project',
 	}, {
 		title: '项目负责人',
 		render:(record)=>{
-			return (<span>{record.response_persons[0]?record.response_persons[0].name:''}</span>);
+			return (<span>{record.relPer?record.relPer.name:(record.response_persons[0]?record.response_persons[0].name:'')}</span>);
 		},
 		key: 'Remarks'
 	}, {
@@ -221,7 +220,7 @@ export default class HandelChangeProjModal extends Component {
       let projname = this.state.project?this.state.project.name:'';
 		return (
             <Modal
-			title="单位工程删除审批表"
+			title="项目变更审批表"
             visible={true}
             width= {1280}
 			footer={null}
@@ -233,11 +232,6 @@ export default class HandelChangeProjModal extends Component {
                         dataSource={this.state.dataSource||[]}
                         bordered />
                     <Row>
-                        <Row>
-                            <Col span={2}>
-                                <span>{'所属项目：' + projname}</span>
-                            </Col>
-                        </Row>
                         <Col span={2}>
                             <span>审查意见：</span>
                         </Col>
