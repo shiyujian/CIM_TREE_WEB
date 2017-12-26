@@ -192,16 +192,27 @@ export default class DesignTable extends Component {
 	}
 	toggleModify() {
 		const {modify = {}, actions: { changeModifyField } } = this.props;
-		console.log(this.props)
-		changeModifyField('visible', true)
-		changeModifyField('key', modify.key?modify.key+1:1)
+		console.log(this.props,'modify.selectedDatas',modify.selectedDatas)
+		if(!(modify.selectedDatas&&modify.selectedDatas.length)){
+			message.warning('Nothing selected')
+		} else if(!this.judge(modify.selectedDatas)) {
+			message.warning('Same unit had been selected, check your selected lines please ')
+		} else {
+			changeModifyField('visible', true)
+			changeModifyField('key', modify.key?modify.key+1:1)
+		}
 	}
 	toggleExpurgate() {
 		const {expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		console.log(this.props)
-		changeExpurgateField('visible', true)
-		changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
+		if(!(expurgate.selectedDatas&&expurgate.selectedDatas.length)){
+			message.warning('Nothing selected')
+		} else {
+			changeExpurgateField('visible', true)
+			changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
+		}
+	}
+	judge(arr) {
+		return arr.every(item => item.extra_params.unit.pk === arr[0].extra_params.unit.pk)
 	}
 }
-
-
