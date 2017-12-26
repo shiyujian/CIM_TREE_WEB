@@ -56,12 +56,12 @@ export default class BanlancePlan extends Component {
 		data.map(item => {
 			let datas = {
 				subproject: item.extra_params.project.name,
-				unit: item.extra_params.unit.name,
+				unit: item.extra_params.unit.name || item.extra_params.unit,
 				nodetarget: item.extra_params.nodetarget,
 				completiontime: item.extra_params.completiontime,
 				summoney: item.extra_params.summoney,
 				ratio: item.extra_params.ratio,
-				remarks: item.extra_params.remark,
+				remarks: item.extra_params.remarks,
 				code:item.code
 			}
 			dataSour.push(datas)
@@ -197,7 +197,7 @@ export default class BanlancePlan extends Component {
 					}],
 					attachment: null
 				}).then(() => {
-					this.setState({ lanchdelate: false });
+					this.setState({ lanchChange: false });
 					message.info('发起流程成功')
 				})
 		})

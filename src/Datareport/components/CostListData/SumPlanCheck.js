@@ -187,7 +187,7 @@ export default class SumSpeedExamine extends Component {
             },
             {
               title: "备注",
-              dataIndex: "remark"
+              dataIndex: "remarks"
             }
           ]
 		return (

@@ -6,7 +6,7 @@ import { getUser } from '_platform/auth';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 import { Row, Col, Table, Input, Button, message } from 'antd';
-import { DesignModal, DesignDel } from '../components/ScheduleData';
+import { DesignModal, DesignDel,DesignChange } from '../components/ScheduleData';
 import './quality.less';
 import { getNextStates } from '_platform/components/Progress/util';
 import moment from 'moment';
@@ -162,6 +162,45 @@ export default class DesignScheduleData extends Component {
 				})
 		})
 	}
+	// 批量变更流程
+	setEditData = (data,participants) =>{
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"设计进度批量变更",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"设计进度批量变更",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({setEditVisiable:false})						
+					})
+		})
+    }
 	onBtnClick = (type) => {
 		if (type === "add") {
 			this.setState({ setAddVisiable: true });
@@ -213,6 +252,10 @@ export default class DesignScheduleData extends Component {
 				{
 					this.state.setDeleteVisiable &&
 					<DesignDel {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} onok={this.setDeleteData.bind(this)} />
+				}
+				{
+					this.state.setEditVisiable &&
+					<DesignChange {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} onok={this.setEditData.bind(this)} />
 				}
 			</div>
 		);
