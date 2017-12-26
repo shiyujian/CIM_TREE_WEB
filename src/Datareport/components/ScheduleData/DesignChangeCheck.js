@@ -23,7 +23,7 @@ const {Option} = Select;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class WorkDeleteCheck extends Component {
+export default class DesignChangeCheck extends Component {
 
 	constructor(props) {
 		super(props);

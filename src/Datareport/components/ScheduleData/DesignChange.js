@@ -11,7 +11,7 @@ import { getUser } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-export default class WorkChange extends Component {
+export default class DesignChange extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
