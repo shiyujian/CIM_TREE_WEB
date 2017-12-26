@@ -6,7 +6,7 @@ import '../index.less';
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 
-export default class Expurgate extends Component {
+export default class DesignDel extends Component {
 
 	render() {
 		const columns = [{

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload } from 'antd';
-import Card from '_platform/components/panels/Card';
+import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload,Cascader,notification} from 'antd';
 import {getNextStates} from '_platform/components/Progress/util';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,WORKFLOW_CODE} from '_platform/api';
 import {getUser} from '_platform/auth';
@@ -14,6 +13,9 @@ export default class Addition extends Component {
 			units:[],
 			projecttrees: [],
 			checkers: [],
+            project:{},
+            unit:{},
+            options:[],
 		};
 	}
 	componentDidMount(){
@@ -26,15 +28,22 @@ export default class Addition extends Component {
             })
             this.setState({checkers})
         })
-        getProjectTree({},{depth:1})
+        getProjectTree({depth:1})
         .then(res => {
-
-        	let projecttrees = res.children.map((o,index) => {
-                return (
-                    <Option key={index} value={JSON.stringify({pk:o.pk,name:o.name})}>{o.name}</Option>
-                )
-            })
-            this.setState({projecttrees})
+            if(res.status){
+                let projects = res.children.map(item=>{
+                    return (
+                        {
+                            value:JSON.stringify(item),
+                            label:item.name,
+                            isLeaf:false
+                        }
+                    )
+                })
+                this.setState({options:projects});
+            }else{
+                //获取项目信息失败
+            }
         })
     }
 	render() {
@@ -42,9 +51,6 @@ export default class Addition extends Component {
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
-			render:(text,record,index) => {
-				return index+1
-			}
 		}, {
 			title: '文档编码',
 			dataIndex: 'code'
@@ -52,29 +58,9 @@ export default class Addition extends Component {
 			title: '文档名称',
 			dataIndex: 'name'
 		}, {
-			title: '项目/子项目名称',
-			dataIndex:'project',
-			render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.projectSelect.bind(this,index)} value={JSON.stringify(addition.dataSource[index]['project'])||''}>
-                    {
-                    	this.state.projecttrees
-                    }
-                </Select>
-            ),
-		}, {
-			title: '单位工程',
-			dataIndex:'unit',
-            render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.unitSelect.bind(this,index)} value={JSON.stringify(addition.dataSource[index]['unit'])||''}>
-                    {
-                    	this.state.units[index]
-                    }
-                </Select>
-            ),
-		}, {
 			title: '项目阶段',
 			render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'stage')} value={addition.dataSource[index]['stage']}>
+                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,record.index-1,'stage')} value={addition.dataSource[record.index-1]['stage']}>
                     <Option value="初设阶段">初设阶段</Option>
                     <Option value="施工图阶段">施工图阶段</Option>
                     <Option value="竣工阶段">竣工阶段</Option>
@@ -86,7 +72,7 @@ export default class Addition extends Component {
 		}, {
 			title: '文档类型',
 			render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'filetype')} value={addition.dataSource[index]['filetype']}>
+                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,record.index-1,'filetype')} value={addition.dataSource[record.index-1]['filetype']}>
                     <Option value="图纸">图纸</Option>
                     <Option value="报告">报告</Option>
                 </Select>
@@ -94,7 +80,7 @@ export default class Addition extends Component {
 		}, {
 			title: '专业',
 			render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,index,'major')} value={addition.dataSource[index]['major']}>
+                <Select style={{width:'120px'}} onSelect={this.handleSelect.bind(this,record.index-1,'major')} value={addition.dataSource[record.index-1]['major']}>
                     <Option value="建筑">建筑</Option>
                     <Option value="结构">结构</Option>
                 </Select>
@@ -113,12 +99,12 @@ export default class Addition extends Component {
 			render:(text,record,index) => {
 				if(record.file.id){
                     return (<span>
-                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <a onClick={this.handlePreview.bind(this,record.index-1)}>预览</a>
                             <span className="ant-divider" />
                             <Popconfirm
                                 placement="leftTop"
                                 title="确定删除吗？"
-                                onConfirm={this.remove.bind(this, index)}
+                                onConfirm={this.remove.bind(this, record.index-1)}
                                 okText="确认"
                                 cancelText="取消">
                                 <a>删除</a>
@@ -127,7 +113,7 @@ export default class Addition extends Component {
                 }else{
                     return (
                         <span>
-                        <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this,index)}>
+                        <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this,record.index-1)}>
                             <Button>
                                 <Icon type="upload" />上传附件
                             </Button>
@@ -143,7 +129,7 @@ export default class Addition extends Component {
                     <Popconfirm
                         placement="leftTop"
                         title="确定删除吗？"
-                        onConfirm={this.delete.bind(this, index)}
+                        onConfirm={this.delete.bind(this, record.index)}
                         okText="确认"
                         cancelText="取消">
                         <a>删除</a>
@@ -190,7 +176,7 @@ export default class Addition extends Component {
 					 rowKey='index' 
 					 dataSource={addition.dataSource}
 					/>
-					<Upload {...props}>
+					<Upload {...props} beforeUpload={this.beforeUpload.bind(this)}>
 	                    <Button style={{margin:'10px 10px 10px 0px'}}>
 	                        <Icon type="upload" />上传附件
 	                    </Button>
@@ -203,6 +189,16 @@ export default class Addition extends Component {
                             }
                         </Select>
                     </span> 
+                    <span>
+                        项目-单位工程：
+                        <Cascader
+                        options={this.state.options}
+                        className='btn'
+                        loadData={this.loadData.bind(this)}
+                        onChange={this.onSelectProject.bind(this)}
+                        changeOnSelect
+                      />
+                    </span> 
                     <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
 				</div>
 				<div style={{marginTop:20}}>
@@ -214,40 +210,16 @@ export default class Addition extends Component {
 			</Modal>
 		);
 	}
-	projectSelect(index,value) {
-		console.log(value)
-		let val = JSON.parse(value)
-		const {actions: {getProjectTreeDetail}} = this.props;
-		const {units} = this.state;
-		const { addition,actions:{changeAdditionField} } = this.props;
-        let {dataSource} = addition;
-		dataSource[index].project = val;
-		changeAdditionField('dataSource',dataSource)
-		getProjectTreeDetail({pk:val.pk},{depth:1})
-		.then(res => {
-			units[index] = res.children.map((o,index) => {
-                return (
-                    <Option key={index} value={JSON.stringify({pk:o.pk,name:o.name})}>{o.name}</Option>
-                )
-            })
-            this.setState({units})
-		})
-
-	}
-	unitSelect(index,value) {
-		console.log(value)
-		let val = JSON.parse(value)
-		const { addition,actions:{changeAdditionField} } = this.props;
-        let {dataSource} = addition;
-        dataSource[index].unit = val;
-        changeAdditionField('dataSource',dataSource)
-	}
-	//table input 输入
-    tableDataChange(index, key , e){
-		const { addition,actions:{changeAdditionField} } = this.props;
-        let {dataSource} = addition;
-		dataSource[index][key] = e.target['value'];
-	  	changeAdditionField('dataSource',dataSource)
+    beforeUpload(info){
+        if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
+            return true;
+        } else {
+            notification.warning({
+                message: '只能上传Excel文件！',
+                duration: 2
+            });
+            return false;
+        }
     }
     //下拉框选择变化
     handleSelect(index,key,value){
@@ -255,6 +227,55 @@ export default class Addition extends Component {
         let {dataSource} = addition;
 		dataSource[index][key] = value;
 	  	changeAdditionField('dataSource',dataSource)
+    }
+    onSelectProject(value,selectedOptions){
+        let project = {};
+        let unit = {};
+        if(value.length===2){
+            let temp1 = JSON.parse(value[0]);
+            let temp2 = JSON.parse(value[1]);
+            project = {
+                name:temp1.name,
+                pk:temp1.pk,
+                obj_type:temp1.obj_type
+            }
+            unit = {
+                name:temp2.name,
+                pk:temp2.pk,
+                obj_type:temp2.obj_type
+            }
+            this.setState({project,unit});
+            return;
+        }
+        //must choose all,otherwise make it null
+        this.setState({project:{},unit:{}});
+    }
+    loadData(selectedOptions){
+        const {actions:{getProjectTree}} = this.props;
+        const targetOption = selectedOptions[selectedOptions.length - 1];
+        targetOption.loading = true;
+        getProjectTree({depth:2}).then(rst =>{
+            if(rst.status){
+                let units = [];
+                rst.children.map(item=>{
+                    if(item.code===JSON.parse(targetOption.value).code){  //当前选中项目
+                        units = item.children.map(unit =>{
+                            return (
+                                {
+                                    value:JSON.stringify(unit),
+                                    label:unit.name
+                                }
+                            )
+                        })
+                    }
+                })
+                targetOption.loading = false;
+                targetOption.children = units;
+                this.setState({options:[...this.state.options]})
+            }else{
+                //获取项目信息失败
+            }
+        });
     }
     //附件上传
 	beforeUploadPicFile  = (index,file) => {
@@ -316,10 +337,11 @@ export default class Addition extends Component {
         const { addition,actions:{changeAdditionField} } = this.props;
         let {units,projecttrees} = this.state;
         let {dataSource} = addition;
+        this.remove(index);
         dataSource.splice(index,1);
         units.splice(index,1);
         projecttrees.splice(index,1);
-        changeAdditionField('dataSource',dataSource)
+        changeAdditionField('dataSource',this.addindex(dataSource))
         this.setState({units,projecttrees})
     }
     //附件删除
@@ -333,55 +355,6 @@ export default class Addition extends Component {
         dataSource[index].file = '';
         changeAdditionField('dataSource',dataSource)
     }
-    // //根据附件名称 也就是wbs编码获取其他信息
-    // async getInfo(code){
-    //     console.log(this.props)
-    //     let res = {};
-    //     const {actions:{getWorkPackageDetail}} = this.props
-    //     let jianyanpi = await getWorkPackageDetail({code:code})
-    //     res.name = jianyanpi.name
-    //     res.code = jianyanpi.code        
-    //     let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
-    //     if(fenxiang.parent.obj_type_hum === "子分部工程"){
-    //         let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-    //         let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
-    //         let zidanwei = {},danwei = {};
-    //         if(fenbu.parent.obj_type_hum === "子单位工程"){
-    //             zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-    //             danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-    //         }else{
-    //             danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-    //         } 
-    //         let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-    //         res.construct_unit = construct_unit
-    //         res.unit = {
-    //             name:danwei.name,
-    //             code:danwei.code,
-    //             obj_type:danwei.obj_type
-    //         }
-    //         res.project = danwei.parent
-    //     }else{
-    //         let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-    //         let zidanwei = {},danwei = {};
-    //         if(fenbu.parent.obj_type_hum === "子单位工程"){
-    //             zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-    //             danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-    //         }else{
-    //             danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-    //         } 
-    //         let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-    //         res.construct_unit = construct_unit
-    //         res.unit = {
-    //             name:danwei.name,
-    //             code:danwei.code,
-    //             obj_type:danwei.obj_type
-    //         }
-    //         res.project = danwei.parent
-    //     }
-    //     return res
-    // }
     //下拉框选择人
     selectChecker(value){
         let check = JSON.parse(value)
@@ -420,6 +393,11 @@ export default class Addition extends Component {
             message.info(`有数据未上传附件`)
             return
         }
+        const {project,unit} =  this.state;
+        if(!project.name){
+            message.info(`请选择项目和单位工程`);
+            return;
+        }
         let {check} = this.state
         let per = {
             id:check.id,
@@ -427,6 +405,10 @@ export default class Addition extends Component {
             person_name:check.account.person_name,
             person_code:check.account.person_code,
             organization:check.account.organization
+        }
+        for(let i=0;i<dataSource.length;i++){
+            dataSource[i].project = project;
+            dataSource[i].unit = unit;
         }
 		this.setData(dataSource,per)
     }
@@ -489,7 +471,7 @@ export default class Addition extends Component {
                 upPeople:getUser().username,
             }
         })
-        return res
+        return this.addindex(res)
     }
 
 	cancel() {
@@ -498,7 +480,12 @@ export default class Addition extends Component {
 		} = this.props;
 		clearAdditionField();
 	}
-
+    addindex(arr) {
+        arr.forEach((item,index) => {
+            arr[index].index = ++index
+        })
+        return arr
+    }
 	static layout = {
 		labelCol: { span: 6 },
 		wrapperCol: { span: 18 },

@@ -1,29 +1,9 @@
 import React, { Component } from "react";
 
 import {
-  Input,
-  Form,
-  Spin,
-  Upload,
-  Icon,
-  Button,
-  Modal,
-  Cascader,
-  Select,
-  Popconfirm,
-  message,
-  Table,
-  Row,
-  Col,
-  notification
-} from "antd";
+  Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from "antd";
 import {
-  UPLOAD_API,
-  SERVICE_API,
-  FILE_API,
-  STATIC_DOWNLOAD_API,
-  SOURCE_API
-} from "_platform/api";
+  UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from "_platform/api";
 import "../../containers/quality.less";
 import Preview from "../../../_platform/components/layout/Preview";
 const FormItem = Form.Item;
@@ -127,15 +107,18 @@ export default class SumPlan extends Component {
     if (value.length === 2) {
       let temp1 = JSON.parse(value[0]);
       let temp2 = JSON.parse(value[1]);
+      console.log('temo',temp1,temp2)
       project = {
         name: temp1.name,
         code: temp1.code,
-        obj_type: temp1.obj_type
+        obj_type: temp1.obj_type,
+        pk:temp1.pk
       };
       unit = {
         name: temp2.name,
         code: temp2.code,
-        obj_type: temp2.obj_type
+        obj_type: temp2.obj_type,
+        pk:temp2.pk
       };
       this.setState({ project, unit });
       return;

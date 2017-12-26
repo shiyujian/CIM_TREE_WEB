@@ -4,6 +4,10 @@ import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } fr
 import ChangeFile from './ChangeFile';
 import DeleteFile from './DeleteFile';
 import style from './TableOrg.css';
+import { getNextStates } from '_platform/components/Progress/util';
+import { getUser } from '_platform/auth';
+import { WORKFLOW_CODE } from '_platform/api'
+let moment = require('moment');
 const Search = Input.Search;
 export default class TableOrg extends Component {
 	constructor() {
@@ -14,7 +18,6 @@ export default class TableOrg extends Component {
 			setEditVisiable: false,
 			setChangeVisiable: false,
 			setDeleteVisiable: false,
-			newKey1: Math.random(),
 			newKey2: Math.random(),
 			newKey3: Math.random(),
 			selectedRowKeys: [],
@@ -63,9 +66,13 @@ export default class TableOrg extends Component {
 					file: single.basic_params.files[0],
 				}
 				dataSource.push(temp);
+				// this.setState({
+				// 	...this.state,
+				// 	dataSource: Object.assign(this.state.dataSource, dataSource)
+				// });
 				this.setState({
 					...this.state,
-					dataSource: Object.assign(this.state.dataSource, dataSource)
+					dataSource
 				});
 			})
 		})
@@ -79,16 +86,28 @@ export default class TableOrg extends Component {
 		console.log('selectedRowKeys changed: ', selectedRowKeys);
 		this.setState({ selectedRowKeys });
 	}
-	//变更
-	BtnChange(e) {
-		if (this.state.subDataSource.length <= 0) {
-			notification.error({
-				message: '请选择数据！',
-				duration: 2
-			})
-			return;
-		}
-		this.setState({ newKey2: Math.random() + 2, setChangeVisiable: true });
+
+	// 搜索
+	onSearchInfo(value) {
+		const { actions: { getSearcherDir } } = this.props
+		let param = "?keyword=" + value
+		getSearcherDir({ code: 'safetyspecial' }).then(rst => {
+			console.log('vip-rst', rst);
+
+			// let dataSource = this.handleData(rst)
+			// this.setState({dataSource})
+		})
+	}
+	//将数据处理成适用于表格的数据
+	handleData(data) {
+		return data.map(item => {
+			return {
+				permitNumber: item.licence.number,
+				certificateNumber: item.certificate.number,
+				acceptance: item.acceptor.name,
+				...item
+			}
+		})
 	}
 
 	render() {
@@ -129,6 +148,7 @@ export default class TableOrg extends Component {
 						>导出表格</Button>
 						<Search
 							placeholder="请输入内容"
+							onSearch={this.onSearchInfo.bind(this)}
 							style={{ width: 200, marginLeft: "20px" }}
 						/>
 					</Col>
@@ -154,26 +174,18 @@ export default class TableOrg extends Component {
 							)
 					}
 				</Row>
-				<Modal
-					width={1280}
-					key={this.state.newKey2}
-					visible={this.state.setChangeVisiable}
-					onOk={this.setChangeData.bind(this)}
-					onCancel={this.goCancel.bind(this)}
-					maskClosable={false}
-				>
-					<ChangeFile props={this.props} state={this.state} />
-				</Modal>
-				<Modal
-					width={1280}
-					key={this.state.newKey3}
-					visible={this.state.setDeleteVisiable}
-					onOk={this.setDeleteData.bind(this)}
-					onCancel={this.goCancel.bind(this)}
-					maskClosable={false}
-				>
-					<DeleteFile props={this.props} state={this.state} />
-				</Modal>
+
+				{
+					this.state.setChangeVisiable && <ChangeFile {...this.props} {...this.state} key={this.state.newKey2}
+						goCancel={this.goCancel.bind(this)} setChangeData={this.setChangeData.bind(this)}
+					/>
+				}
+				{
+					this.state.setDeleteVisiable && <DeleteFile {...this.props} {...this.state} key={this.state.newKey3}
+						goCancel={this.goCancel.bind(this)} setDeleteData={this.setDeleteData.bind(this)}
+					/>
+				}
+
 			</Row>
 		)
 	}
@@ -200,30 +212,68 @@ export default class TableOrg extends Component {
 		openPreview(filed);
 	}
 
-	// 申请变更
-	setChangeData() {
-		const { changeInfo } = this.props;
-		// console.log('vip-变更', changeInfo);
-		if (!changeInfo) {
-			notification.warning({
-				message: '请填写变更原因！',
+	//变更
+	BtnChange(e) {
+		if (this.state.subDataSource.length <= 0) {
+			notification.error({
+				message: '请选择数据！',
 				duration: 2
 			})
 			return;
 		}
+		this.setState({ newKey2: Math.random() + 2, setChangeVisiable: true });
+	}
+
+	// 申请变更--并发起
+	setChangeData(data, participants) {
+		// console.log('vip-data', data);
+		// console.log('vip-per', participants);
 		this.setState({
+			newKey2: Math.random() + 2,
 			setChangeVisiable: false,
 			selectedRowKeys: [],
 			subDataSource: [],
 		});
-		notification.success({
-			message: '申请成功！',
-			duration: 2
-		})
-		// console.log('vip-this.props', this.props);
 
-		// const { actions: { ChangeRow } } = this.props;
-		// ChangeRow('');
+		// 发起流程
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
+		let creator = { // 流程创建者
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
+		}
+		let postdata = {
+			name: "安全专项信息批量变更",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "安全专项信息批量变更",
+			subject: [{
+				data: JSON.stringify(data)
+			}],
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
+			// "deadline": "2018-12-30" # 截止日期, 空填None,
+		}
+		createWorkflow({}, postdata).then(rst => { // 创建流程实例
+			let nextStates = getNextStates(rst, rst.current[0].id); //根据当前节点获取流程下一步节点集合
+			logWorkflowEvent({ pk: rst.id }, // 
+				{
+					next_states: [{ // 时间以及下一个节点执行人
+						participants: [participants], // 参与的人
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					state: rst.current[0].id,
+					executor: creator,
+					action: '提交',
+					note: '发起安全专项变更',
+					attachment: null
+				});
+		});
+
+
 	}
 	//删除
 	BtnDelete(e) {
@@ -236,34 +286,64 @@ export default class TableOrg extends Component {
 		}
 		this.setState({ newKey3: Math.random() + 4, setDeleteVisiable: true });
 	}
-	setDeleteData() {
-		const { deleteInfo } = this.props;
-		// console.log('vip-删除', deleteInfo);
-		if (!deleteInfo) {
-			notification.warning({
-				message: '请填写删除原因！',
-				duration: 2
-			})
-			return;
-		}
+	// 申请删除--并发起
+	setDeleteData(data, participants) {
+		// console.log('vip-data', data);
+		// console.log('vip-per', participants);
 		this.setState({
+			newKey3: Math.random() + 2,
 			setDeleteVisiable: false,
 			selectedRowKeys: [],
 			subDataSource: [],
 		});
-		notification.success({
-			message: '申请成功！',
-			duration: 2
-		})
-		const { actions: { DeleteRow } } = this.props;
-		// DeleteRow('');
+		// 发起流程
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
+		let creator = { // 流程创建者
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
+		}
+		let postdata = {
+			name: "安全专项信息批量删除",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "安全专项信息批量删除",
+			subject: [{
+				data: JSON.stringify(data)
+			}],
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
+			// "deadline": "2018-12-30" # 截止日期, 空填None,
+		}
+		createWorkflow({}, postdata).then(rst => { // 创建流程实例
+			let nextStates = getNextStates(rst, rst.current[0].id); //根据当前节点获取流程下一步节点集合
+			logWorkflowEvent({ pk: rst.id }, // 
+				{
+					next_states: [{ // 时间以及下一个节点执行人
+						participants: [participants], // 参与的人
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					state: rst.current[0].id,
+					executor: creator,
+					action: '提交',
+					note: '发起安全专项删除',
+					attachment: null
+				});
+		});
+
+
 	}
 	columns = [
 		{
 			title: '序号',
-			dataIndex: 'i',
+			// dataIndex: 'index',
 			width: '5%',
-			sorter: (a, b) => a.i - b.i,
+			render: (text, record, index) => {
+				return index + 1
+			},
 		},
 		{
 			title: '项目/子项目名称',
