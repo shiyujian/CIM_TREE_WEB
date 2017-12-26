@@ -21,7 +21,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions,...actions2}, dispatch)
 	})
 )
-export default class DelCheck extends Component {
+export default class UpdataCheck extends Component {
 
 	constructor(props) {   
 		super(props);
@@ -49,13 +49,13 @@ export default class DelCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_del_visible",false)
+        this.props.closeModal("dr_base_update_visible",false)
         message.info("操作成功")
     }
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent, deleteOrgList, getOrgPk}} = this.props
+        const {actions:{logWorkflowEvent, deleteOrg, getOrgPk}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -75,7 +75,7 @@ export default class DelCheck extends Component {
                 version:'A'
             })
         })
-        deleteOrgList({},{data_list: data_list}).then(rst => {
+        deleteOrg({},{data_list: data_list}).then(rst => {
             console.log("rst:",rst);
         })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
@@ -143,7 +143,7 @@ export default class DelCheck extends Component {
             visible={true}
             width= {1280}
             footer={null}
-            onCancel = {this.props.closeModal.bind(this,"dr_base_del_visible",false)}
+            onCancel = {this.props.closeModal.bind(this,"dr_base_update_visible",false)}
 			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
