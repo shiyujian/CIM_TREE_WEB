@@ -7,7 +7,7 @@ import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-export default class SumSpeedChange extends Component {
+export default class ProjectSumChange extends Component {
 
     constructor(props) {
         super(props);

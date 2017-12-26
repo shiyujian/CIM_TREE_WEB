@@ -104,7 +104,7 @@ export default class ProjectSum extends Component {
 
                 })
             }
-            console.log('arrAir',arrAir)
+           
         //     debugger
            Promise.all(arrAir).then((res) =>{
                res.map((o,index) => {
@@ -114,7 +114,7 @@ export default class ProjectSum extends Component {
                })
                this.setState({dataSource});  
            })
-          
+        // this.setState({dataSource});  
         }
       
     }
@@ -193,7 +193,7 @@ export default class ProjectSum extends Component {
             message.info(`有数据不正确`)
             return
         }
-        console.log('temp',temp)
+       
 
         const { project, unit } = this.state;
         if (!project.name) {
