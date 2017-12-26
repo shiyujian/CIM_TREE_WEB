@@ -200,7 +200,7 @@ export default class SafetySpecialCheck extends Component {
     onChange(e) {
         this.setState({
             ...this.state,
-            opinion: e.target.value
+            option: e.target.value
         })
     }
     render() {

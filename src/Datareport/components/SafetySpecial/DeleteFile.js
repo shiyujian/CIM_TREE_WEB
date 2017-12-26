@@ -104,25 +104,17 @@ export default class DeleteFile extends Component {
             ,
             {
                 title: '附件',
-                width: '10%',
+			    width: '10%',
                 render: (text, record) => {
-                    if (record.filename) {
-                        return (
-                            <a
-                                onClick={this.handlePreview.bind(this, record.codeId, record.i)}>
-                                预览
-                            </a>
-                        )
-                    } else {
-                        return (
-                            <span>
-                                暂无
-                            </span>
-                        )
-                    }
+                    return (<span>
+                        <a onClick={this.handlePreview.bind(this, record.codeId, record.i)}>预览</a>
+                        <span className="ant-divider" />
+                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                    </span>)
                 }
-            }
-            , {
+                }
+            , 
+            {
                 title: '操作',
                 render: (text, record, index) => {
                     return (
@@ -228,10 +220,10 @@ export default class DeleteFile extends Component {
             person_code: check.account.person_code,
             organization: check.account.organization
         }
-        // for (let i = 0; i < this.state.dataSource.length; i++) {
-        //     this.state.dataSource[i].project = project;
-        //     this.state.dataSource[i].unit = unit;
-        // }
+        let { deleteInfo } = this.state
+        for (let i = 0; i < this.state.dataSource.length; i++) {
+            this.state.dataSource[i].deleteInfo = deleteInfo;
+        }
         this.props.setDeleteData(this.state.dataSource, per);
         notification.success({
             message: '删除已发起！',

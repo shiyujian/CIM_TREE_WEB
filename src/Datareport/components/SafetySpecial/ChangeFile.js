@@ -382,9 +382,9 @@ export default class ChangeFile extends Component {
             person_code: check.account.person_code,
             organization: check.account.organization
         }
+        let { changeInfo } = this.state
         for (let i = 0; i < this.state.dataSource.length; i++) {
-            this.state.dataSource[i].project = project;
-            this.state.dataSource[i].unit = unit;
+            this.state.dataSource[i].changeInfo = changeInfo;
         }
         this.props.setChangeData(this.state.dataSource, per);
         notification.success({

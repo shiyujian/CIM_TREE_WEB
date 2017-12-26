@@ -21,7 +21,7 @@ const { TextArea } = Input;
         actions: bindActionCreators({ ...platformActions, ...actions }, dispatch)
     })
 )
-export default class SafetySpecialDeleteCheck extends Component {
+export default class SafetySpecialEditCheck extends Component {
 
     constructor(props) {
         super(props);
@@ -43,7 +43,7 @@ export default class SafetySpecialDeleteCheck extends Component {
         this.setState({ dataSource, wk })
     }
     cancel() {
-        this.props.closeModal("Safety_Special_delete_visible", false)
+        this.props.closeModal("Safety_Special_edit_visible", false)
     }
     //提交
     async submit() {
@@ -52,7 +52,7 @@ export default class SafetySpecialDeleteCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("Safety_Special_delete_visible", false);
+        this.props.closeModal("Safety_Special_edit_visible", false);
         message.info("操作成功")
     }
 
@@ -89,12 +89,12 @@ export default class SafetySpecialDeleteCheck extends Component {
         let rst = await addDocList({}, { data_list: docCode });
         if (rst.result) {
             notification.success({
-                message: '删除文档成功！',
+                message: '文档变更成功！',
                 duration: 2
             });
         } else {
             notification.error({
-                message: '删除文档失败！',
+                message: '文档变更失败！',
                 duration: 2
             });
         }
@@ -194,7 +194,7 @@ export default class SafetySpecialDeleteCheck extends Component {
         ];
         return (
             <Modal
-                title="安全信息审批表"
+                title="安全专项变更审批表"
                 visible={true}
                 width={1280}
                 footer={null}
@@ -218,7 +218,7 @@ export default class SafetySpecialDeleteCheck extends Component {
                             </RadioGroup>
                         </Col>
                         <Col span={4}>
-                           申请删除原因：{this.state.dataSource[0].deleteInfo}
+                           申请删除原因：{this.state.dataSource[0].changeInfo}
                         </Col>
                         <Col span={2} push={14}>
                             <Button type='primary'>
