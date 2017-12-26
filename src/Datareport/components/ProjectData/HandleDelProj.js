@@ -57,7 +57,7 @@ export default class HandelDelProjModal extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,postDocListAc,postUnitList,putUnitList}} = this.props
+        const {actions:{logWorkflowEvent,postDocListAc,putProjectListAc}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -65,6 +65,7 @@ export default class HandelDelProjModal extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         let dataList = this.state.dataSource.map(data=>{
+
             return {
                 code:data.code,
                 parent:{
@@ -75,7 +76,7 @@ export default class HandelDelProjModal extends Component {
                 version:'A'
             };
         });
-        let rst = await putUnitList({},{data_list:dataList});
+        let rst = await putProjectListAc({},{data_list:dataList});
         if(rst && rst.result && rst.result.length>0){
             console.log(rst);
             await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
