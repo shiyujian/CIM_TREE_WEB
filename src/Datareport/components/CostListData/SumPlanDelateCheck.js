@@ -6,7 +6,7 @@ import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,notification,Po
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import {getUser} from '_platform/auth';
-import {actions} from '../../store/safety';
+import {actions} from '../../store/SumPlanCost';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
@@ -16,11 +16,11 @@ const {Option} = Select;
 
 @connect(
 	state => {
-        const {datareport: {safety = {}} = {}, platform} = state;
-		return {...safety, platform}
+		const { datareport: { SumPlanCost = {} } = {}, platform } = state;
+		return { ...SumPlanCost, platform }
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
+		actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
 	})
 )
 export default class SumPlanDelateCheck extends Component {
@@ -44,6 +44,20 @@ export default class SumPlanDelateCheck extends Component {
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
    }
+
+
+
+   //test
+   test(){
+    const {dataSource,wk,topDir} = this.state;
+    console.log('data',dataSource,wk,topDir)
+    let delateArr = [];
+    dataSource.map(item=>{
+        delateArr.push(item.code)
+    });
+
+    console.log(delateArr.join(','));
+   }
    //提交
     async submit(){
         if(this.state.option === 1){
@@ -58,6 +72,10 @@ export default class SumPlanDelateCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state;
+        let delateArr = [];
+        dataSource.map(item=>{
+            delateArr.push(item.code)
+        });
         const {actions:{
             logWorkflowEvent,
             delDocList
@@ -72,18 +90,21 @@ export default class SumPlanDelateCheck extends Component {
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         
+        await delDocList({},{code_list:delateArr.join(",")}).then(rst=>{
+            console.log(rst)
+            if(rst.result){
+                notification.success({
+                    message: '删除文档成功！',
+                    duration: 2
+                });
+            }else{
+                notification.error({
+                    message: '删除文档失败！',
+                    duration: 2
+                });
+            }
+        })
         
-        if(rst.result){
-            notification.success({
-                message: '删除文档成功！',
-                duration: 2
-            });
-        }else{
-            notification.error({
-                message: '删除文档失败！',
-                duration: 2
-            });
-        }
     }
     //不通过
     async reject(){
@@ -91,6 +112,10 @@ export default class SumPlanDelateCheck extends Component {
         const {actions:{deleteWorkflow}} = this.props
         await deleteWorkflow({pk:wk.id})
     }
+    //取消
+    cancel() {
+        this.props.closeModal("dr_qua_jsjh_delate_visible", false);
+      }
     onChange(e){
         this.setState({option:e.target.value})
     }
@@ -138,7 +163,8 @@ export default class SumPlanDelateCheck extends Component {
 			title="结算计划信息删除审批表"
             visible={true}
             width= {1280}
-			footer={null}
+            footer={null}
+            onCancel={this.cancel.bind(this)}
 			maskClosable={false}>
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
@@ -156,7 +182,7 @@ export default class SumPlanDelateCheck extends Component {
                         </RadioGroup>
                     </Col>
                     <Col span={2} push={14}>
-                        <Button type='primary'>
+                        <Button type='primary' onClick = {this.test.bind(this)}>
                             导出表格
                         </Button>
                     </Col>
