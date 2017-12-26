@@ -31,14 +31,27 @@ export default class TableProject extends Component {
 						message.warning('请至少选择一条');
 					}}>申请删除</Button>
 					<Button className={style.button}>导出表格</Button>
-					<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容" />
+					<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容" 
+						onSearch={
+							(text) => {
+								let result = this.state.dataSource.filter(data=>{
+									return data.name.indexOf(text)>=0 || data.code.indexOf(text)>=0;
+								});
+								console.log(result);
+								if(text === ''){
+									result = this.state.dataSource;
+								}
+								this.setState({showDs:result});
+							}
+						}
+					/>
 				</div>
 				<Table
 					width="1280px"
 					columns={this.columns}
 					bordered={true}
 					rowSelection={rowSelection}
-					dataSource={this.state.dataSource||[]}
+					dataSource={this.state.showDs||[]}
 				>
 				</Table>
 				{
@@ -86,7 +99,7 @@ export default class TableProject extends Component {
 				}
 		});
 		console.log(projects);
-		this.setState({dataSource:projects,projRoot});
+		this.setState({dataSource:projects,projRoot,showDs:projects});
 	}
 
 

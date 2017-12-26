@@ -147,7 +147,10 @@ export default class WorkModal extends Component {
 					 bordered 
 					 columns={columns}
 					 rowKey='index' 
-					 dataSource={this.state.dataSource}
+                     dataSource={this.state.dataSource}
+                     rowKey={(record)=>{
+                        return record.index
+                    }}
 					/>
 					<Upload {...props}>
 	                    <Button style={{margin:'10px 10px 10px 0px'}}>

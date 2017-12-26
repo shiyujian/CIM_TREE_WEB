@@ -21,20 +21,20 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions,...actions2}, dispatch)
 	})
 )
-export default class OrgCheck extends Component {
+export default class DelCheck extends Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
             wk:null,
             dataSource:[],
-            
             opinion:1,//1表示通过 2表示不通过
 		};
     }
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
+        console.log("dataSource:",dataSource);
         this.setState({dataSource,wk})
     }
     componentWillReceiveProps(props){
@@ -49,7 +49,7 @@ export default class OrgCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_org_visible",false)
+        this.props.closeModal("dr_base_del_visible",false)
         message.info("操作成功")
     }
     //通过
@@ -66,74 +66,32 @@ export default class OrgCheck extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
+        console.log("dataSource",dataSource);
         let data_list = [];
         let promises = dataSource.map((o) => {
-            return getOrgPk({code:o.direct})
+            return getOrgPk({code:o.type})
         });
         let rst = await Promise.all(promises);
         dataSource.map((o, index) => {
             data_list.push({
                 code: "" + o.code,
-                name: o.depart,
+                name: o.canjian,
                 obj_type: "C_ORG",
                 status: "A",
                 version: "A",
                 extra_params: {
-                    org_type: o.type,
-                    canjian: o.canjian,
-                    direct: o.direct,
                     project: o.selectPro,
                     unit: o.selectUnit,
-                    remarks: o.remarks
+                    remarks: o.remarks,
+                    org_type:o.type
                 },
                 parent: {
-                    code: o.direct,
+                    code:""+o.type,
                     pk: rst[index].pk,
                     obj_type: "C_ORG"
                 }
             })
         })
-        postOrgList({}, { data_list: data_list }).then(res => {
-            dataSource.map((item, index) => {
-                item.selectPro.map(it => {
-                    let proCode = it.split("--")[0];
-                    // 取出项目中所的orgs
-                    getProject({code:proCode}).then(rstPro => {
-                        let pro_orgs = rstPro.response_orgs;
-                        let pk = res.result[index].pk
-                        pro_orgs.push({
-                            code:item.code,
-                            obj_type:"C_ORG",
-                            pk:pk
-                        });
-                        putProject({ code: proCode }, {
-                            version: "A",
-                            response_orgs: pro_orgs
-                        }).then(rst => {
-                            console.log("rst:", rst);
-                        }) 
-                    });
-                }) 
-                item.selectUnit.map(it => {
-                    let unitCode = it.split("--")[0];
-                    getUnitAc({code:unitCode}).then(rstUnit => {
-                        let unit_orgs = rstUnit.response_orgs;
-                        let pk = res.result[index].pk
-                        unit_orgs.push({
-                            code:item.code,
-                            obj_type:"C_ORG",
-                            pk:pk
-                        });
-                        putUnit({ code: unitCode }, {
-                            version: "A",
-                            response_orgs: unit_orgs
-                        }).then(rst => {
-                            console.log("rst:", rst);
-                        }) 
-                    })
-                })
-            })
-        });
     }
     //不通过
     async reject(){
@@ -158,43 +116,45 @@ export default class OrgCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        const  columns = [
-        {
+        const columns = [{
             title: '序号',
             dataIndex: 'index',
             key: 'Index',
         }, {
-            title: '组织机构编码',
+            title: '参建单位编码',
             dataIndex: 'code',
             key: 'Code',
         }, {
-            title: '组织机构类型',
+            title: '机构类型',
             dataIndex: 'type',
             key: 'Type',
         }, {
             title: '参建单位名称',
             dataIndex: 'canjian',
             key: 'Canjian',
-        }, {
-            title: '组织机构部门',
-            dataIndex: 'depart',
-            key: 'depart',
-        }, {
-            title: '直属部门',
-            dataIndex: 'direct',
-            key: 'Direct',
-        }, {
+        },{
             title: '负责项目/子项目名称',
+            width:"15%",
+            height:"64px",
             dataIndex: 'selectPro',
             key: 'SelectPro',
         }, {
             title: '负责单位工程名称',
             dataIndex: 'selectUnit',
-            key: 'SelectUnit'
+            key: 'SelectUnit',
+            width:"15%",
         }, {
             title: '备注',
             dataIndex: 'remarks',
             key: 'Remarks'
+        }, {
+            title: '编辑',
+            render: (record) => (
+                <span>
+                    <Icon style={{marginRight:"15px"}} type = "edit"/>
+                    <Icon type = "delete"/>
+                </span>
+            )
         }]
 		return (
             <Modal
@@ -203,7 +163,7 @@ export default class OrgCheck extends Component {
             visible={true}
             width= {1280}
             footer={null}
-            onCancel = {this.props.closeModal.bind(this,"dr_base_person_visible",false)}
+            onCancel = {this.props.closeModal.bind(this,"dr_base_del_visible",false)}
 			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>

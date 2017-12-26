@@ -19,6 +19,8 @@ const getWorkpackagesByCode = createFetchAction(`${SERVICE_API}/workpackages/cod
 const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
 const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
+const getDocumentList = createFetchAction(`${SERVICE_API}/documentgetlist/?key_type=code`,[],'GET');
+const putDocument = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 //流程
 const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE');
@@ -30,7 +32,9 @@ export const actions = {
     logWorkflowEvent,
     deleteWorkflow,
     getDocument,
-    delDocList
+    delDocList,
+    getDocumentList,
+    putDocument
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
