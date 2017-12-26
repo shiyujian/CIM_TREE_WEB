@@ -3,6 +3,12 @@ import {Table,Button,Popconfirm,message,Input,Icon} from 'antd';
 import style from './TableOrg.css'
 const Search = Input.Search;
 export default class TablePerson extends Component{
+	constructor(props) {
+		super(props);
+		this.state = {
+			dataSource: [],
+		}
+	}
     render(){
         return (
             <div>
@@ -18,7 +24,7 @@ export default class TablePerson extends Component{
                     columns = {this.columns}
                     bordered = {true}
                     rowSelection={this.rowSelection}
-                    dataSource = {this.dataSource}
+                    dataSource = {this.state.dataSource}
                 >
                 </Table>
             </div>
@@ -39,8 +45,13 @@ export default class TablePerson extends Component{
 		const { actions: { ModifyVisible } } = this.props;
 		ModifyVisible(true);
 	}
-	componentDidMount() {
-		
+	async componentDidMount() {
+		const {actions: {getAllUsers}} = this.props;
+		let orgAll = await getAllUsers();
+		let orgRoot = [...orgAll];
+		console.log('orgAll',orgAll)
+		console.log('orgRoot',orgRoot)
+		this.setState({dataSource: orgRoot})
 	}
     rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
@@ -58,22 +69,26 @@ export default class TablePerson extends Component{
     delete(){
         
     }
-
+    
 	columns = [{
+		title: '序号',
+		dataIndex: 'index',
+		key: 'Index',
+	}, {
 		title: '人员编码',
-		dataIndex: 'code',
+		dataIndex: 'account.person_code',
 		key: 'Code',
 	}, {
 		title: '姓名',
-		dataIndex: 'name',
+		dataIndex: 'account.person_name',
 		key: 'Name',
 	}, {
 		title: '所在组织机构单位',
-		dataIndex: 'org',
+		dataIndex: 'account.organization',
 		key: 'Org',
 	}, {
 		title: '所属部门',
-		dataIndex: 'depart',
+		dataIndex: 'account.org_code',
 		key: 'Depart',
 	}, {
 		title: '职务',
@@ -93,7 +108,7 @@ export default class TablePerson extends Component{
 		key: 'Email'
 	}, {
 		title: '二维码',
-		dataIndex: 'signature',
+		dataIndex: 'account.person_signature_url',
 		key: 'Signature'
 	}, {
 		title: '编辑',

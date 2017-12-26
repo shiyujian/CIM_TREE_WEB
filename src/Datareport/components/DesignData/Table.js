@@ -8,11 +8,20 @@ export default class DesignTable extends Component {
 		super(props)
 		this.state = {
 			selectedRowKeys: [],
+			alldatas:[],
 		}
 
 	}
 	onSelectChange = (selectedRowKeys) => {
+		const {alldatas} = this.state;
+		const { actions: { changeModifyField } } = this.props;
 		this.setState({ selectedRowKeys });
+		let selectedDatas = [];
+		selectedRowKeys.forEach(key => {
+			selectedDatas.push(alldatas[key-1])
+		})
+		console.log('selectedRowKeys',selectedRowKeys,'selectedDatas',selectedDatas,'alldatas',alldatas)
+		changeModifyField('selectedDatas',selectedDatas)
 	}
 	async componentDidMount(){
         const {actions:{
@@ -35,10 +44,15 @@ export default class DesignTable extends Component {
             getDocument,
         }} = this.props;
         let dataSource = [];
-        
-        data.map(item=>{
-            getDocument({code:item.code}).then(single=>{
-                let temp = { 
+        let all = [];
+        data.forEach(item=>{
+            all.push(getDocument({code:item.code}))
+        })
+        Promise.all(all)
+        .then(item => {
+        	item.forEach((single,index) => {
+        		let temp = { 
+        			index:index+1,
                     code:single.extra_params.code,
                     filename:single.extra_params.filename,
                     pubUnit:single.extra_params.pubUnit,
@@ -53,8 +67,8 @@ export default class DesignTable extends Component {
                     designObject:single.extra_params.designObject,
                 }
                 dataSource.push(temp);
-                this.setState({dataSource});
-            })
+        	}) 
+            this.setState({dataSource,alldatas:item});
         })
     }
 	render() {
@@ -67,9 +81,6 @@ export default class DesignTable extends Component {
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
-			render:(text,record,index) => {
-				return index+1
-			}
 		}, {
 			title: '文档编码',
 			dataIndex: 'code'
@@ -78,10 +89,10 @@ export default class DesignTable extends Component {
 			dataIndex: 'filename'
 		}, {
 			title: '项目/子项目名称',
-			dataIndex: 'project'
+			dataIndex: 'project.name'
 		}, {
 			title: '单位工程',
-			dataIndex: 'unit'
+			dataIndex: 'unit.name'
 		}, {
 			title: '项目阶段',
 			dataIndex: 'stage'
@@ -108,7 +119,7 @@ export default class DesignTable extends Component {
             width:'10%',
             render:(text,record,index) => {
                 return (<span>
-                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                        <a onClick={this.handlePreview.bind(this,record.index-1)}>预览</a>
                         <span className="ant-divider" />
                         <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                     </span>)
@@ -134,12 +145,11 @@ export default class DesignTable extends Component {
 				}
 				<Row>
 					<Table
-						size="middle"
 						bordered
 						columns={columns}
 						rowSelection={rowSelection}
 						dataSource={this.state.dataSource}
-						rowKey="_id"
+						rowKey="index"
 					/>
 				</Row>
 			</div>
@@ -162,15 +172,11 @@ export default class DesignTable extends Component {
 		changeAdditionField('visible', true)
 		changeAdditionField('key', addtion.key?addtion.key+1:1)
 	}
-	toggleCheck() {
-		const { actions: { changeCheckField } } = this.props;
-		console.log(this.props)
-		changeCheckField('visible', true)
-	}
 	toggleModify() {
-		const { actions: { changeModifyField } } = this.props;
+		const {modify = {}, actions: { changeModifyField } } = this.props;
 		console.log(this.props)
 		changeModifyField('visible', true)
+		changeModifyField('key', modify.key?modify.key+1:1)
 	}
 	toggleExpurgate() {
 		const { actions: { changeExpurgateField } } = this.props;

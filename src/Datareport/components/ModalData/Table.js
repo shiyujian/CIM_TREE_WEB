@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input } from 'antd';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
+import { WORKFLOW_CODE, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api.js';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
 export default class ModalTable extends Component {
@@ -8,66 +8,73 @@ export default class ModalTable extends Component {
 		super(props)
 		this.state = {
 			selectedRowKeys: [],
+			dataSourceSelected: [],
 		}
 
 	}
 	onSelectChange = (selectedRowKeys) => {
-		this.setState({ selectedRowKeys });
+		const { dataSource } = this.state;
+		let dataSourceSelected = [];
+		for (let i = 0; i < selectedRowKeys.length; i++) {
+			dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
+		}
+		this.setState({ selectedRowKeys,dataSourceSelected });
+		console.log('aaaaa:',dataSourceSelected)
 	}
 
-	async componentDidMount(){
-        const {actions:{
+	async componentDidMount() {
+		const { actions: {
             getScheduleDir,
-            postScheduleDir,
-		}} = this.props;
+			postScheduleDir,
+		} } = this.props;
 		// console.log('a',this.props)
-		let topDir = await getScheduleDir({code:'the_only_main_code_ModalCheck'});
-	
-        if(topDir.obj_type){
-            let dir = await getScheduleDir({code:'datareport_modaldatadoc'});
-            
-            if(dir.obj_type){
-                if(dir.stored_documents.length>0){
-                    this.generateTableData(dir.stored_documents);
-                }
-            }
-        }
+		let topDir = await getScheduleDir({ code: 'the_only_main_code_ModalCheck' });
+
+		if (topDir.obj_type) {
+			let dir = await getScheduleDir({ code: 'datareport_modaldatadoc' });
+
+			if (dir.obj_type) {
+				if (dir.stored_documents.length > 0) {
+					this.generateTableData(dir.stored_documents);
+				}
+			}
+		}
 	}
-	
-	async generateTableData(data){
-        const {actions:{
+
+	async generateTableData(data) {
+		const { actions: {
             getDocument,
-        }} = this.props;
-        let dataSource = [];
-        
-        data.map(item=>{
-			
-            getDocument({code:item.code}).then(single=>{
-				console.log("...",single)
-                let temp = { 
-                    coding:single.extra_params.coding,
-					modelName:single.extra_params.filename,
-					project:single.extra_params.project,
-					unit:single.extra_params.unit,
-                    submittingUnit:single.extra_params.submittingUnit,
-                    modelDescription:single.extra_params.modelDescription,
-                    // file:single.basic_params.files[0],
-					modeType:single.extra_params.modeType,
-					fdbMode:single.basic_params.files[0],
-					tdbxMode:single.basic_params.files[1],
-					attributeTable:single.basic_params.files[2],
-                    reportingTime:single.extra_params.reportingTime,
-                    reportingName:single.extra_params.reportingName,
-                    // stage:single.extra_params.stage,
-                    // upPeople:single.extra_params.upPeople,
-                    // wbsObject:single.extra_params.wbsObject,
-                    // designObject:single.extra_params.designObject,
-                }
-                dataSource.push(temp);
-                this.setState({dataSource});
-            })
-        })
-    }
+        } } = this.props;
+		let dataSource = [];
+
+		data.map(item => {
+
+			getDocument({ code: item.code }).then(single => {
+
+				let temp = {
+					coding: single.extra_params.coding,
+					modelName: single.extra_params.filename,
+					project: single.extra_params.project,
+					unit: single.extra_params.unit,
+					submittingUnit: single.extra_params.submittingUnit,
+					modelDescription: single.extra_params.modelDescription,
+					// file:single.basic_params.files[0],
+					modeType: single.extra_params.modeType,
+					fdbMode: single.basic_params.files[0],
+					tdbxMode: single.basic_params.files[1],
+					attributeTable: single.basic_params.files[2],
+					reportingTime: single.extra_params.reportingTime,
+					reportingName: single.extra_params.reportingName,
+					// stage:single.extra_params.stage,
+					// upPeople:single.extra_params.upPeople,
+					// wbsObject:single.extra_params.wbsObject,
+					// designObject:single.extra_params.designObject,
+				}
+				dataSource.push(temp);
+				this.setState({ dataSource });
+			})
+		})
+	}
 
 	render() {
 		const { selectedRowKeys } = this.state;
@@ -184,7 +191,7 @@ export default class ModalTable extends Component {
 	}
 	toggleAddition() {
 		const { actions: { changeAdditionField } } = this.props;
-		console.log('a',this.props)
+		console.log('a', this.props)
 		changeAdditionField('visible', true)
 	}
 	toggleCheck() {
@@ -198,9 +205,10 @@ export default class ModalTable extends Component {
 		changeModifyField('visible', true)
 	}
 	toggleExpurgate() {
-		const { actions: { changeExpurgateField } } = this.props;
+		const { actions: { changeExpurgateField,getdele } } = this.props;
 		console.log(this.props)
 		changeExpurgateField('visible', true)
+		getdele(this.state.dataSourceSelected)
 	}
 }
 

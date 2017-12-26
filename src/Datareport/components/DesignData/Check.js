@@ -36,7 +36,7 @@ export default class Check extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props
-        let dataSource = JSON.parse(wk.subject[0].data)
+        let dataSource = this.addindex(JSON.parse(wk.subject[0].data))
         this.setState({dataSource,wk});
         const {actions:{
             getScheduleDir,
@@ -57,7 +57,7 @@ export default class Check extends Component {
 
     componentWillReceiveProps(props){
         const {wk} = props
-        let dataSource = JSON.parse(wk.subject[0].data)
+        let dataSource = this.addindex(JSON.parse(wk.subject[0].data))
         this.setState({dataSource,wk})
    }
    //提交
@@ -126,25 +126,26 @@ export default class Check extends Component {
                 obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},
-                "basic_params": {
-                    "files": [
+                basic_params: {
+                    files: [
                         {
-                          "a_file": item.file.a_file,
-                          "name": item.file.name,
-                          "download_url": item.file.download_url,
-                          "misc": "file",
-                          "mime_type": item.file.mime_type
+                            a_file: item.file.a_file,
+                            name: item.file.name,
+                            download_url: item.file.download_url,
+                            misc: "file",
+                            mime_type: item.file.mime_type,
+                            id:item.file.id
                         },
                     ]
-                  },
+                },
                 extra_params:{
                     code:item.code,
                     filename:item.file.name,
                     pubUnit:item.upunit,
                     filetype:item.filetype,
                     stage:item.stage,
-                    unit:item.unit.name,
-                    project:item.project.name,
+                    unit:item.unit,
+                    project:item.project,
                     upPeople:item.upPeople,
                     major:item.major,
                     wbsObject:item.wbsObject,
@@ -184,13 +185,17 @@ export default class Check extends Component {
     cancel() {
     	this.props.closeModal("design_check_visbile",false)
     }
+    addindex(arr) {
+        arr.forEach((item,index) => {
+            arr[index].index = ++index
+        })
+        return arr
+    }
 	render() {
         const columns = 
         [{
             title:'序号',
-			render:(text,record,index) => {
-				return index+1
-			}
+            dataIndex: 'index'
 		}, {
 			title: '文档编码',
 			dataIndex: 'code'
@@ -238,7 +243,7 @@ export default class Check extends Component {
             title:'附件',
 			render:(text,record,index) => {
                 return (<span>
-                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                        <a onClick={this.handlePreview.bind(this,record.index-1)}>预览</a>
                         <span className="ant-divider" />
                         <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                     </span>)

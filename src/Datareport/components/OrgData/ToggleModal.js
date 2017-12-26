@@ -246,25 +246,6 @@ export default class ToggleModal extends Component{
         height:"64px",
         render:(record) => {
             return (
-                // <Select style={{width:"90%"}} value = {record.project || this.state.defaultPro} onSelect={ele => {
-                //     record.project = JSON.parse(ele).name;
-                //     console.log("ele",ele);
-                //     const {actions:{getUnit}} = this.props;
-                //     getUnit({code:JSON.parse(ele).code}).then(rst => {
-                //         let units = rst.children.map(item => {
-                //             return (
-                //                 <Option value={JSON.stringify(item)}>{item.name}</Option>
-                //             )
-                //         })
-                //         this.setState({units})
-                //     })
-                //     this.forceUpdate();
-                // }}>
-                //     {this.state.projects}
-                // </Select>
-                // <TreeSelect onSelect={this.onSelect.bind(this)} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
-                //     {ToggleModal.lmyloop(this.state.projects)}
-                // </TreeSelect>
                 <TreeSelect style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
                     let units = [];
