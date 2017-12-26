@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {TableOrg, ToggleModal, OrgCheck, ToggleModalCJ, ToggleModalDel} from '../components/OrgData'
+import {TableOrg, ToggleModal, OrgCheck, ToggleModalCJ, ToggleModalDel, ToggleModalUpdate} from '../components/OrgData'
 import {actions as platformActions} from '_platform/store/global';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -143,8 +143,49 @@ export default class OrgData extends Component {
 				});
 		});
 	}
+	// 更新流程
+	setDataUpdate(data,participants){
+		console.log("data:",data);
+		console.log("participants:",participants);
+		// return; 
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
+		let creator = {
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
+		}
+		let postdata = {
+			name: "组织机构信息批量更改",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "组织机构信息批量更改",
+			subject: [{
+				data: JSON.stringify(data)
+			}],
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
+		}
+		createWorkflow({}, postdata).then((rst) => {
+			let nextStates = getNextStates(rst, rst.current[0].id);
+			logWorkflowEvent({ pk: rst.id },
+				{
+					state: rst.current[0].id,
+					action: '提交',
+					note: '发起组织机构信息更改',
+					executor: creator,
+					next_states: [{
+						participants: [participants],
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					attachment: null
+				});
+		});
+	}
 	render() {
-		const {visible, visibleCJ, visibleDel} = this.props;
+		const {visible, visibleCJ, visibleDel, visibleUpdate} = this.props;
 		return (
 			<div>
 				<DynamicTitle title="组织机构" {...this.props} />
@@ -158,6 +199,9 @@ export default class OrgData extends Component {
 					}
 					{
 						visibleDel && <ToggleModalDel {...this.props} setDataDel = {this.setDataDel.bind(this)}/>
+					}
+					{
+						visibleUpdate && <ToggleModalUpdate {...this.props} setDataUpdate = {this.setDataUpdate.bind(this)}/>
 					}
 				</Content>
 			</div>

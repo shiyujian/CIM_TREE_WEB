@@ -40,12 +40,12 @@ export default class Modify extends Component {
 
 	//table input 输入
 	tableDataChange(index, key, e) {
-		// const { modify = {}, getall = [] } = this.props;
-		
-		// console.log('prop',props)
-		// dataSources[index][key] = e.target['value'];
-	  	// this.setState({dataSources});
-		// // console.log('data:',dataSource)
+		const { modify = {}, getall = [], actions:{getdele}} = this.props;
+		let dataSources = getall;
+		console.log('getall',getall)
+		dataSources[index][key] = e.target['value'];
+	  	getdele(dataSources);
+		// console.log('data:',dataSource)
 	
 	
 	}
@@ -145,7 +145,7 @@ export default class Modify extends Component {
 			title: '提交单位',
 			dataIndex: 'submittingUnit',
 			render: (text, record, index) => (
-                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index,'submittingUnit')} />
+                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'submittingUnit')} value={getall.submittingUnit} />
             ),
 
 		}, {
