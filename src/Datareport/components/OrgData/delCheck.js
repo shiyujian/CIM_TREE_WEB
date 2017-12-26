@@ -21,7 +21,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions,...actions2}, dispatch)
 	})
 )
-export default class delCheck extends Component {
+export default class DelCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -72,7 +72,6 @@ export default class delCheck extends Component {
             return getOrgPk({code:o.type})
         });
         let rst = await Promise.all(promises);
-        console.log("rst:",rst);
         dataSource.map((o, index) => {
             data_list.push({
                 code: "" + o.code,
@@ -93,48 +92,6 @@ export default class delCheck extends Component {
                 }
             })
         })
-        console.log("data_list:", data_list);
-        postOrgList({}, { data_list: data_list }).then(res => {
-            dataSource.map((item, index) => {
-                item.selectPro.map(it => {
-                    let proCode = it.split("--")[0];
-                    // 取出项目中所的orgs
-                    getProject({code:proCode}).then(rstPro => {
-                        let pro_orgs = rstPro.response_orgs;
-                        let pk = res.result[index].pk
-                        pro_orgs.push({
-                            code:item.code,
-                            obj_type:"C_ORG",
-                            pk:pk
-                        });
-                        putProject({ code: proCode }, {
-                            version: "A",
-                            response_orgs: pro_orgs
-                        }).then(rst => {
-                            console.log("rst:", rst);
-                        }) 
-                    });
-                }) 
-                item.selectUnit.map(it => {
-                    let unitCode = it.split("--")[0];
-                    getUnitAc({code:unitCode}).then(rstUnit => {
-                        let unit_orgs = rstUnit.response_orgs;
-                        let pk = res.result[index].pk
-                        unit_orgs.push({
-                            code:item.code,
-                            obj_type:"C_ORG",
-                            pk:pk
-                        });
-                        putUnit({ code: unitCode }, {
-                            version: "A",
-                            response_orgs: unit_orgs
-                        }).then(rst => {
-                            console.log("rst:", rst);
-                        }) 
-                    })
-                })
-            })
-        });
     }
     //不通过
     async reject(){
@@ -206,7 +163,7 @@ export default class delCheck extends Component {
             visible={true}
             width= {1280}
             footer={null}
-            onCancel = {this.props.closeModal.bind(this,"dr_base_cj_visible",false)}
+            onCancel = {this.props.closeModal.bind(this,"dr_base_del_visible",false)}
 			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
