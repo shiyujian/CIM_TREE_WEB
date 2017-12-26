@@ -51,6 +51,9 @@ export default class TableOrg extends Component {
 			}
 		})
 		console.log("dataSource:",dataSource);
+		dataSource.map((item, index) => {
+			item.index = index + 1
+		})
 		this.setState({dataSource})
 	}
 	rowSelection = {

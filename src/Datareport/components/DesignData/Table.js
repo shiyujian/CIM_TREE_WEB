@@ -14,7 +14,7 @@ export default class DesignTable extends Component {
 	}
 	onSelectChange = (selectedRowKeys) => {
 		const {alldatas} = this.state;
-		const { actions: { changeModifyField } } = this.props;
+		const { actions: { changeModifyField,changeExpurgateField } } = this.props;
 		this.setState({ selectedRowKeys });
 		let selectedDatas = [];
 		selectedRowKeys.forEach(key => {
@@ -22,6 +22,7 @@ export default class DesignTable extends Component {
 		})
 		console.log('selectedRowKeys',selectedRowKeys,'selectedDatas',selectedDatas,'alldatas',alldatas)
 		changeModifyField('selectedDatas',selectedDatas)
+		changeExpurgateField('selectedDatas',selectedDatas)
 	}
 	async componentDidMount(){
         const {actions:{
@@ -179,9 +180,10 @@ export default class DesignTable extends Component {
 		changeModifyField('key', modify.key?modify.key+1:1)
 	}
 	toggleExpurgate() {
-		const { actions: { changeExpurgateField } } = this.props;
+		const {expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		console.log(this.props)
 		changeExpurgateField('visible', true)
+		changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
 	}
 }
 
