@@ -77,7 +77,8 @@ export default class UnitToggle extends Component {
                     stime:data.stime,
                     projType:data.projType,
                     stage:data.stage,
-                    rsp_orgName:[data.rsp_org.name]
+                    rsp_orgName:[data.rsp_org.name],
+                    rsp_orgCode:[data.rsp_org.code]
                 },
                 basic_params:{
                     files:[
