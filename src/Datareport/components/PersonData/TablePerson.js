@@ -20,13 +20,14 @@ export default class TablePerson extends Component{
                     <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
                     <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button>
                     <Button className = {style.button}>导出表格</Button>
-                    <Search className = {style.button} style={{width:"200px"}} placeholder="输入搜索条件" />
+                    <Search className = {style.button} onSearch = {this.searchOrg.bind(this)} style={{width:"200px"}} placeholder="输入搜索条件" />
                 </div>
                 <Table
                     columns = {this.columns}
                     bordered = {true}
                     rowSelection={this.rowSelection}
                     dataSource = {this.state.dataSource}
+                    rowKey = "index"
                 >
                 </Table>
             </div>
@@ -55,10 +56,34 @@ export default class TablePerson extends Component{
 	async componentDidMount() {
 		const {actions: {getAllUsers}} = this.props;
 		let orgAll = await getAllUsers();
-		let orgRoot = [...orgAll];
+		orgAll.forEach((item, index) => {
+			console.log('item',item)
+			orgAll[index].index = index + 1;
+		})
 		console.log('orgAll',orgAll)
-		console.log('orgRoot',orgRoot)
-		this.setState({dataSource: orgRoot})
+		this.setState({dataSource: orgAll})
+	}
+
+	searchOrg(value){ 
+		let searchData = [];
+		let searchPer = this.state.dataSource
+		console.log('searchPer',searchPer)
+		if (searchPer.name.indexOf(value) != -1) {
+			searchData.push(searchPer);
+		}
+		if (searchPer.children && searchPer.children.length > 0) {
+			searchPer.children.map(it => {
+				if (it.name.indexOf(value) != -1) {
+					searchData.push(it);
+				}
+			})
+		}
+		searchData.map((item, index)=> {
+			item.index = index + 1;
+		})
+		this.setState({
+			tempData:searchData
+		})
 	}
 
 	rowSelection = {
