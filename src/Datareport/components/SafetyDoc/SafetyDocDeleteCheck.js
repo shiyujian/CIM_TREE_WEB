@@ -34,7 +34,8 @@ export default class SafetyDocDeleteCheck extends Component {
 		};
     }
     async componentDidMount(){
-        const {wk} = this.props
+        const {wk} = this.props;
+        debugger
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk});
     }
@@ -77,7 +78,7 @@ export default class SafetyDocDeleteCheck extends Component {
             docCode.push(item.docCode);
         })
         
-        let rst = await delDocList({},{codeList:docData});
+        let rst = await delDocList({},{code_list:docCode});
         if(rst.result){
             notification.success({
                 message: '删除文档成功！',
@@ -116,7 +117,7 @@ export default class SafetyDocDeleteCheck extends Component {
 	render() {
         const columns = [
             {
-                title:'编码',
+                title:'文档编码',
                 dataIndex:'code',
                 width: '10%'
             },{
@@ -125,7 +126,7 @@ export default class SafetyDocDeleteCheck extends Component {
                 width: '10%',
                 render: (text, record, index) => (
                     <span>
-                        {record.project.name}
+                        {record.projectName}
                     </span>
                 ),
             },{
@@ -134,7 +135,7 @@ export default class SafetyDocDeleteCheck extends Component {
                 width: '10%',
                 render: (text, record, index) => (
                     <span>
-                        {record.unit.name}
+                        {record.unit}
                     </span>
                 ),
             },{

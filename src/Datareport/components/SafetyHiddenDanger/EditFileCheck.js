@@ -22,7 +22,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class DangerDeleteCheck extends Component {
+export default class EditFileCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -51,7 +51,7 @@ export default class DangerDeleteCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("safety_hidden_delete_visible",false);
+        this.props.closeModal("safety_hidden_edit_visible",false);
         message.info("操作成功");
     }
 
