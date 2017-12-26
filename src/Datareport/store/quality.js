@@ -29,6 +29,9 @@ export const addDefectDir = createFetchAction(`${SERVICE_API}/directories/`,[],'
 //文档目录树相关
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
+//获取资源的api	
+const getResouce = createFetchAction(`${SERVICE_API}/searcher/?keyword={{keyword}}&obj_type={{obj_type}}`,[])
+const getRelDoc = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`,[])
 
 export const actions = {
 	getProjectTree,
@@ -46,7 +49,9 @@ export const actions = {
 	updateWpData,
 	addDefectDir,
 	getScheduleDir,
-	postScheduleDir
+	postScheduleDir,
+	getResouce,
+	getRelDoc
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

@@ -81,54 +81,72 @@ export default class DeleteFile extends Component {
     render() {
         const columns = [
             {
-                title:'编码',
-                dataIndex:'code',
-                width: '10%'
-            },{
-                title:'文件名称',
-                dataIndex:'filename',
-                width: '10%',
-            },{
-                title:'发布单位',
-                dataIndex:'pubUnit',
-                width: '10%',
-            },{
-                title:'版本号',
-                dataIndex:'type',
-                width: '10%',
-            },{
-                title:'实施日期',
-                dataIndex:'doTime',
-                width: '10%',
-            },{
-                title:'备注',
-                dataIndex:'remark',
-                width: '10%',
-            },{
-                title:'提交人',
-                dataIndex:'upPeople',
-                width: '10%',
+                title: '文档编码',
+                dataIndex: 'code',
+                width: '8%'
+            }, {
+                title: '项目名称',
+                dataIndex: 'project',
+                width: '8%',
+                render: (text, record, index) => (
+                    <span>
+                        {record.projectName}
+                    </span>
+                ),
+            }, {
+                title: '单位工程',
+                dataIndex: 'unit',
+                width: '8%',
+                render: (text, record, index) => (
+                    <span>
+                        {record.unit}
+                    </span>
+                ),
+            }, {
+                title: 'WBS编码',
+                dataIndex: 'wbs',
+                width: '8%',
+            }, {
+                title: '责任单位',
+                dataIndex: 'resUnit',
+                width: '8%',
+            }, {
+                title: '隐患类型',
+                dataIndex: 'type',
+                width: '5%',
+            }, {
+                title: '上报时间',
+                dataIndex: 'upTime',
+                width: '9%',
+            }, {
+                title: '核查时间',
+                dataIndex: 'checkTime',
+                width: '9%',
+            }, {
+                title: '整改时间',
+                dataIndex: 'editTime',
+                width: '9%',
+            }, {
+                title: '排查结果',
+                dataIndex: 'result',
+                width: '6%',
+            }, {
+                title: '整改期限',
+                dataIndex: 'deadline',
+                width: '8%',
+            }, {
+                title: '整改结果',
+                dataIndex: 'editResult',
+                width: '6%',
             }, {
                 title:'附件',
-                width:'10%',
+                width:"10%",
                 render:(text,record,index) => {
                     return (<span>
-                                <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                            </span>)
-                }
-            },{
-                title:'操作',
-                render:(text,record,index) => {
-                    return  (
-                        <Popconfirm
-                            placement="leftTop"
-                            title="确定删除吗？"
-                            onConfirm={this.delete.bind(this, index)}
-                            okText="确认"
-                            cancelText="取消">
-                            <a>删除</a>
-                        </Popconfirm>
-                    )
+                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <span className="ant-divider" />
+                            <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                        </span>)
                 }
             }
         ];

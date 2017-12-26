@@ -6,6 +6,7 @@ import { SERVICE_API,USER_API,WORKFLOW_API} from '_platform/api';
 
 export const ModalVisible = createAction('组织Modal模态框显示隐藏');
 export const ModalVisibleCJ = createAction('参建单位Modal模态框显示隐藏');
+export const ModalVisibleDel = createAction('删除组织机构Modal模态框显示隐藏');
 export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const getProjects = createFetchAction(`${SERVICE_API}/project-tree/?depth=1`);
 export const postOrgList = createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "POST");
@@ -14,9 +15,10 @@ export const getOrgReverse = createFetchAction(`${SERVICE_API}/org-tree/code/{{c
 export const getUnit = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?depth=1`,[], );
 export const putProject = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/`,[], "PUT");
 export const putUnit = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`,[], "PUT");
-export const getProject = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/`,[], "GET");
-export const getUnitAc = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`,[], "GET");
+export const getProject = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/?all=true`,[], "GET");
+export const getUnitAc = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[], "GET");
 export const getOrgPk= createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[], "GET");
+export const getOrgTree= createFetchAction(`${SERVICE_API}/org-tree/?depth=3`,[], "GET");
 
 export const actions = {
 	ModalVisible,
@@ -31,7 +33,9 @@ export const actions = {
 	getProject,
 	getUnitAc,
 	getOrgPk,
-	ModalVisibleCJ
+	ModalVisibleCJ,
+	getOrgTree,
+	ModalVisibleDel
 };
 
 export default handleActions({
@@ -47,5 +51,9 @@ export default handleActions({
 	[ModalVisibleCJ]: (state, {payload}) => ({
 		...state,
 		visibleCJ:payload,
+	}),
+	[ModalVisibleDel]: (state, {payload}) => ({
+		...state,
+		visibleDel:payload,
 	})
 }, {});

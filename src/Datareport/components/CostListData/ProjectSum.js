@@ -7,6 +7,7 @@ import {
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
+import { Promise } from 'es6-promise';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -25,7 +26,7 @@ export default class ProjectSum extends Component {
     }
 
     componentDidMount() {
-        const { actions: { getAllUsers, getProjectTree } } = this.props;
+        const { actions: { getAllUsers, getProjectTree ,getQuantitiesCode} } = this.props;
         getAllUsers().then(rst => {
             let checkers = rst.map(o => {
                 return (
@@ -64,6 +65,7 @@ export default class ProjectSum extends Component {
     }
     uplodachange = (info) => {
         //info.file.status/response
+        const { actions: { getQuantitiesCode} } = this.props;
         if (info && info.file && info.file.status === 'done') {
             notification.success({
                 message: '上传成功！',
@@ -71,8 +73,11 @@ export default class ProjectSum extends Component {
             });
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
+           
             let dataSource = [];
+            let arrAir=[];
             for (let i = 1; i < dataList.length; i++) {
+                arrAir.push(getQuantitiesCode({code:dataList[i][1]}));
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
                     // subproject: dataList[i][1] ? dataList[i][1] : '',
@@ -99,8 +104,19 @@ export default class ProjectSum extends Component {
 
                 })
             }
-            this.setState({ dataSource });
+            console.log('arrAir',arrAir)
+        //     debugger
+           Promise.all(arrAir).then((res) =>{
+               res.map((o,index) => {
+                    if(!o.name){
+                        dataSource[index]["projectcoding"]=dataList[1][1]
+                    }
+               })
+               this.setState({dataSource});  
+           })
+          
         }
+      
     }
 
     //下拉框选择人
@@ -169,13 +185,16 @@ export default class ProjectSum extends Component {
             message.info("请上传excel")
             return
         }
-        // let temp = this.state.dataSource.some((o, index) => {
-        //     return !o.file.id
-        // })
-        // if (temp) {
-        //     message.info(`有数据未上传附件`)
-        //     return
-        // }
+        let temp =this.state.dataSource.some((o,index) => {
+            // console.log('o',o.projectcoding)
+            return !o.flag
+        })
+        if(temp){
+            message.info(`有数据不正确`)
+            return
+        }
+        console.log('temp',temp)
+
         const { project, unit } = this.state;
         if (!project.name) {
             message.info(`请选择项目和单位工程`);
@@ -219,46 +238,6 @@ export default class ProjectSum extends Component {
         filed.name = f.name;
         filed.mime_type = f.mime_type;
         openPreview(filed);
-    }
-
-    remove(index) {
-        const { actions: { deleteStaticFile } } = this.props
-        let { dataSource } = this.state
-        let id = dataSource[index]['file'].id
-        deleteStaticFile({ id: id })
-        let projectcoding = dataSource[index].projectcoding;
-        let projectname = dataSource[index].projectname;
-        let company = dataSource[index].company;
-        let number = dataSource[index].number;
-        let total = dataSource[index].total;
-        let unit_engineeing = dataSource[index].unit_engineeing;
-        dataSource[index] = {
-            subproject: '',
-            pubUnit: pubUnit,
-            type: type,
-            projectname: projectname,
-            company: company,
-            number: number,
-            total:total,
-            project: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            unit: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            construct_unit: {
-                code: "",
-                name: "",
-                type: "",
-            },
-            file: {
-            }
-        }
-        this.setState({ dataSource });
     }
 
     covertURLRelative = (originUrl) => {
@@ -325,8 +304,15 @@ export default class ProjectSum extends Component {
                 title: '序号',
                 dataIndex: 'code',
             }, {
-                title: '项目编号',
-			    dataIndex: 'projectcoding',
+                title: '清单项目编号',
+                dataIndex: 'projectcoding',
+                render: (text, record, index) => {
+                    if(record.flag){
+                        return <span style={{color:'green'}}>{record.projectcoding ? record.projectcoding : ''}</span>
+                    }else{
+                        return <span style={{color:'red'}}>{record.projectcoding ? record.projectcoding : ''}</span>
+                    }
+                }
             }, {
                 title: '项目名称',
 			    dataIndex: 'projectname',

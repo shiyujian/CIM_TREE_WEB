@@ -6,7 +6,7 @@ import {actions} from '../../store/quality';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
-import Preview from '../../../_platform/components/layout/Preview';
+import Preview from '_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
@@ -84,8 +84,8 @@ async passon(){
             })
         }else{
             doclist_a.push({
-                code:`rel_doc_${o.code}`,
-                name:`rel_doc_${o.pk}`,
+                code:`rel_doc_jy_${o.code}`,
+                name:`${o.name}附件`,
                 obj_type:"C_DOC",
                 status:"A",
                 version:"A",

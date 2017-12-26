@@ -99,8 +99,8 @@ export default class WorkCheckModal extends Component {
                 })
             } else {
                 doclist_a.push({
-                    code: 'workdata' + moment().format("YYYYMMDDHHmmss")+i,
-                    name: `rel_doc_${o.unit.pk}`,  //anything
+                    code: 'rel_doc_workdata' + moment().format("YYYYMMDDHHmmss")+i,
+                    name: `rel_doc_workdata${o.unit.pk}`,  //anything
                     obj_type: "C_DOC",
                     status: "A",
                     version: "A",
@@ -210,7 +210,11 @@ export default class WorkCheckModal extends Component {
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered />
+                        bordered
+                        rowKey={(record)=>{
+                            return record.index
+                        }} 
+                        />
                     <Row>
                         <Col span={2}>
                             <span>审查意见：</span>
