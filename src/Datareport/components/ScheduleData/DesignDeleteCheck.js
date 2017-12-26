@@ -74,11 +74,11 @@ export default class DesignDeleteCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        let docCode = [];
+        let delCode = [];
         dataSource.map(item=>{
-            docCode.push(item.docCode);
+            delCode.push(item.delcode);
         })
-        let rst = await delDocList({},{code_list:docCode});
+        let rst = await delDocList({},{code_list:delCode});
         if(rst.result){
             notification.success({
                 message: '删除文档成功！',
