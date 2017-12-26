@@ -276,7 +276,6 @@ export default class PriceList extends Component {
                         //uploadStaticFile({}, formdata)
         fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
             resp = await resp.json()
-            console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
                 message.error('文件上传失败')
                 return;
@@ -352,7 +351,7 @@ export default class PriceList extends Component {
                         <Popconfirm
                             placement="leftTop"
                             title="确定删除吗？"
-                            onConfirm={this.remove.bind(this, index)}
+                            onConfirm={this.delete.bind(this, index)}
                             okText="确认"
                             cancelText="取消">
                             <a>删除</a>
@@ -404,12 +403,12 @@ export default class PriceList extends Component {
                     <span>
                         项目-单位工程：
                         <Cascader
-                        options={this.state.options}
-                        className='btn'
-                        loadData={this.loadData.bind(this)}
-                        onChange={this.onSelectProject.bind(this)}
-                        changeOnSelect
-                      />
+                            options={this.state.options}
+                            className='btn'
+                            loadData={this.loadData.bind(this)}
+                            onChange={this.onSelectProject.bind(this)}
+                            changeOnSelect
+                        />
                     </span> 
                 </Col>
                 </Row>

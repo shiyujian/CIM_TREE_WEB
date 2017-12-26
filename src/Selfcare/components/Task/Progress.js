@@ -8,6 +8,8 @@ import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from 'Datareport/components/Quality/JianyanpiCheck';
 import PriceListCheck from 'Datareport/components/CostListData/PriceListCheck';
+import PriceRmCheck from 'Datareport/components/CostListData/PriceRmCheck';
+import PriceModifyCheck from 'Datareport/components/CostListData/PriceModifyCheck';
 import JianyanCheck from 'Datareport/components/Quality/JianyanCheck';
 import DesignDataCheck from 'Datareport/components/DesignData/Check';
 import DesignDataModifyCheck from 'Datareport/components/DesignData/ModifyCheck';
@@ -72,6 +74,8 @@ export default class Progress extends Component {
 			dr_base_org_visible,
 			dr_xm_xx_visible,
 			cost_pri_ck_visible,
+			cost_pri_rm_visible,
+			cost_pri_modify_visible,
 			cost_sum_spd_visible,
 			dr_base_person_visible,
 			dr_qua_jsjh_visible,
@@ -225,6 +229,14 @@ export default class Progress extends Component {
 					<PriceListCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					cost_pri_rm_visible && 
+					<PriceRmCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					cost_pri_modify_visible && 
+					<PriceModifyCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
 					cost_sum_spd_visible && 
 					<SumSpeedExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
@@ -361,6 +373,12 @@ export default class Progress extends Component {
 			case "计价清单信息填报":
 				changeDatareportVisible({key:'cost_pri_ck_visible',value:true})
 				break;
+			case "计价清单信息删除申请":
+				changeDatareportVisible({key:'cost_pri_rm_visible',value:true})
+				break;
+			case "计价清单信息修改申请":
+				changeDatareportVisible({key:'cost_pri_modify_visible',value:true})
+				break;
 			case "结算进度信息填报":
 				changeDatareportVisible({key:'cost_sum_spd_visible',value:true})
 				break;
@@ -373,6 +391,12 @@ export default class Progress extends Component {
 			case "工程量结算信息填报":
 				changeDatareportVisible({key:'cost_pro_ck_visible',value:true})
 				break;
+			case "计价清单信息删除申请":
+				changeDatareportVisible({key:'cost_pri_rm_visible',value:true})
+				break;
+			case "计价清单信息变更申请":
+				changeDatareportVisible({key:'cost_pri_modify_visible',value:true})
+				break;	
 			case "施工进度发起填报":
 				changeDatareportVisible({key:'dr_wor_sg_visible',value:true})
 				break;

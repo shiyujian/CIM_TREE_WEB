@@ -6,6 +6,9 @@ import {actions} from '../store/CostListData';
 import {actions as platformActions} from '_platform/store/global';
 import {Row,Col,Table,Input,Button,message,Popconfirm} from 'antd';
 import PriceList from '../components/CostListData/PriceList';
+import PriceRmModal from '../components/CostListData/PriceRmModal';
+import PriceModifyModal from '../components/CostListData/PriceModifyModal';
+import PriceExcelModal from '../components/CostListData/PriceExcelModal';
 import {getUser} from '_platform/auth';
 import './quality.less';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -26,8 +29,15 @@ export default class CostListData extends Component {
 		super(props);
 		this.state = {
 			addvisible:false,
+			rmModal: false,
+			modifyModal: false,
+			excelModal: false,
 			dataSource: [],
-			selectedRowKeys: []
+			selectedRowKeys: [],
+			cacheDataSource: [],
+			modifyData: [],
+			delData: [],
+			excelData: []
 		};
 		this.columns = [{
 			title:'序号',
@@ -85,8 +95,8 @@ export default class CostListData extends Component {
 				unitengineering: item.extra_params.unitengineering
 			}
 			dataSource.push(temp);
-			this.setState({dataSource});
 		})
+		this.setState({dataSource, cacheDataSource: dataSource});
 	}
 
 	//批量上传回调
@@ -129,6 +139,123 @@ export default class CostListData extends Component {
 			})
 		})
 	}
+
+	setRmData(data,participants){
+		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"计价清单信息删除申请",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"计价清单信息删除申请",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},{
+				state:rst.current[0].id,
+				action:'提交',
+				note:'发起填报',
+				executor:creator,
+				next_states:[{ 
+					participants:[participants],
+					remark:"",
+					state:nextStates[0].to_state[0].id,
+				}],
+				attachment:null
+			}).then(() => {
+				this.setState({rmModal:false}),
+				message.info("发起成功")						
+			})
+		})
+	}
+
+	applyRm () {
+		let rmData = this.getSelectItems();
+		this.setState({
+			rmModal:true,
+			rmData
+		})
+	}
+
+	applyModify () {
+		let modifyData = this.getSelectItems();
+		this.setState({
+			modifyModal:true,
+			modifyData
+		})
+	}
+
+	setModifyData(data,participants){
+		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"计价清单信息变更申请",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"计价清单信息变更申请",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},{
+				state:rst.current[0].id,
+				action:'提交',
+				note:'发起填报',
+				executor:creator,
+				next_states:[{ 
+					participants:[participants],
+					remark:"",
+					state:nextStates[0].to_state[0].id,
+				}],
+				attachment:null
+			}).then(() => {
+				this.setState({modifyModal:false}),
+				message.info("发起成功")						
+			})
+		})
+	}
+
+	applyExcel () {
+		// let dataSource = this.state.dataSource;
+		// let selectedRowKeys = this.state.selectedRowKeys
+		let excelData = this.getSelectItems();
+		this.setState({
+			excelModal:true,
+			excelData
+		})
+	}
+
+	getSelectItems () {
+		let dataSource = this.state.dataSource;
+		let selectedRowKeys = this.state.selectedRowKeys;
+		return selectedRowKeys.map(index => dataSource[index]);
+	}
+
+	setExcelData () {
+		message.info("excel 数据导出成功")
+	}
+
 	oncancel(){
 		this.setState({addvisible:false})
 	}
@@ -137,6 +264,30 @@ export default class CostListData extends Component {
 	}
 	onSelectChange = (selectedRowKeys) => {
 		this.setState({ selectedRowKeys });
+	}
+	//全局搜索
+	search(value) {
+		if(!value.length) {
+			this.setState({
+				dataSource: this.state.cacheDataSource
+			});
+			return;
+		}
+		let dataSource = this.state.cacheDataSource;
+		let res = [];
+		for(var i  =0; i < dataSource.length; ++i) {
+			for(var j in dataSource[i]) {
+				if (dataSource[i][j] == value){
+					res.push(dataSource[i]);
+					break;
+				}
+			}
+		}
+		if(res.length) {
+			this.setState({
+				dataSource: res
+			})
+		}
 	}
 	render() {
 		const { selectedRowKeys } = this.state;
@@ -150,14 +301,14 @@ export default class CostListData extends Component {
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
-					<Button className="btn" type="default">申请变更</Button>
-					<Button className="btn" type="default">申请删除</Button>
-					<Button className="btn" type="default">导出表格</Button>
+					<Button className="btn" type="default" onClick={this.applyModify.bind(this)}>申请变更</Button>
+					<Button className="btn" type="default" onClick={this.applyRm.bind(this)}>申请删除</Button>
+					<Button className="btn" type="default" onClick={this.applyExcel.bind(this)}>导出表格</Button>
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
 						placeholder="输入搜索条件"
-						onSearch={value => console.log(value)}
+						onSearch={value => this.search(value)}
 						/>
 				</Row>
 				<Row >
@@ -172,6 +323,18 @@ export default class CostListData extends Component {
 				{
 					this.state.addvisible &&
 					<PriceList {...this.props} oncancel={() => {this.setState({addvisible:false})}} onok={this.setData.bind(this)}/>
+				}
+				{
+					this.state.modifyModal &&
+					<PriceModifyModal {...this.props} modifyData={this.state.modifyData} oncancel={() => {this.setState({modifyModal:false})}} onok={this.setModifyData.bind(this)}/>
+				}
+				{
+					this.state.rmModal &&
+					<PriceRmModal {...this.props} rmData={this.state.rmData} oncancel={() => {this.setState({rmModal:false})}} onok={this.setRmData.bind(this)}/>
+				}
+				{
+					this.state.excelModal &&
+					<PriceExcelModal {...this.props} excelData={this.state.excelData} oncancel={() => {this.setState({excelModal:false})}} onok={this.setExcelData.bind(this)}/>
 				}
 			</div>
 		);
