@@ -14,6 +14,7 @@ export const postPersonList = createFetchAction(`${SERVICE_API}/personlist/`, []
 export const getOrgList = createFetchAction(`${SERVICE_API}/org-tree/?depth=1`);
 export const getOrgReverse = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/?reverse=true`,[], "GET");
 export const getOrgCode = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[], "GET");
+export const deleteUserList = createFetchAction(`${USER_API}/users/{{pk}}/`, [], "DELETE");
 export const actions = {
 	ModalVisible,
 	getAllUsers,
@@ -25,6 +26,7 @@ export const actions = {
 	getOrgReverse,
 	getOrgCode,
 	setDeletePer,
+	deleteUserList,
 };
 
 export default handleActions({

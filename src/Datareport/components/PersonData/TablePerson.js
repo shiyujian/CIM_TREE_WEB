@@ -27,7 +27,6 @@ export default class TablePerson extends Component{
                     bordered = {true}
                     rowSelection={this.rowSelection}
                     dataSource = {this.state.dataSource}
-                    rowKey = 'code'
                 >
                 </Table>
             </div>
