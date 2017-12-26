@@ -56,10 +56,11 @@ export default class WorkunitCost extends Component {
 	                 } } = this.props;
 		let dataSource = [];
 		data.map(item => {
+			console.log('item',item)
 			getDocument({ code: item.code }).then(single => {
 				
 				let temp = {
-					code: single.extra_params.code,
+					code: item.code,
 					subproject: single.extra_params.subproject,
 					unit: single.extra_params.unit,
 					projectcoding: single.extra_params.projectcoding,
