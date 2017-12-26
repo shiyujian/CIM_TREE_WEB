@@ -15,6 +15,7 @@ export default class Modify extends Component {
 			dataSource: [],
 			units:[],
 			projecttrees: [],
+			key: -1,
 		}
 	}
 	componentDidMount(){
@@ -40,33 +41,35 @@ export default class Modify extends Component {
     }
 	componentWillReceiveProps(props){
         const {modify = {}} = props
-        let item = modify.selectedDatas
-        let dataSource = [];
-        item&&item.forEach((single,index) => {
-    		let temp = {
-    			index:index+1,
-                code:single.extra_params.code,
-                filename:single.extra_params.filename,
-                pubUnit:single.extra_params.pubUnit,
-                filetype:single.extra_params.filetype,
-                file:single.basic_params.files[0],
-                unit:single.extra_params.unit,
-                major:single.extra_params.major,
-                project:single.extra_params.project,
-                stage:single.extra_params.stage,
-                upPeople:single.extra_params.upPeople,
-                wbsObject:single.extra_params.wbsObject,
-                designObject:single.extra_params.designObject,
-            }
-            dataSource.push(temp);
-        }) 
-        this.setState({dataSource},() => {
-        	dataSource.forEach((item,index) => {
-	        	this.projectSelect(index,true,JSON.stringify(item.project))
+        if(modify.key !== this.state.key) {
+	        let item = modify.selectedDatas
+	        let dataSource = [];
+	        item&&item.forEach((single,index) => {
+	    		let temp = {
+	    			index:index+1,
+	                code:single.extra_params.code,
+	                filename:single.extra_params.filename,
+	                pubUnit:single.extra_params.pubUnit,
+	                filetype:single.extra_params.filetype,
+	                file:single.basic_params.files[0],
+	                unit:single.extra_params.unit,
+	                major:single.extra_params.major,
+	                project:single.extra_params.project,
+	                stage:single.extra_params.stage,
+	                upPeople:single.extra_params.upPeople,
+	                wbsObject:single.extra_params.wbsObject,
+	                designObject:single.extra_params.designObject,
+	            }
+	            dataSource.push(temp);
+	        }) 
+	        this.setState({dataSource,key:modify.key},() => {
+	        	dataSource.forEach((item,index) => {
+		        	this.projectSelect(index,true,JSON.stringify(item.project))
+		        })
 	        })
-        })
         
-        console.log(modify,dataSource)
+        	console.log(modify,dataSource)
+    	}
    	}
 
 	render() {
@@ -239,7 +242,7 @@ export default class Modify extends Component {
 		})
 
 	}
-	description(e){
+	description(e) {
 		this.setState({description:e.target.value})
 	}
 	unitSelect(index,value) {
@@ -331,12 +334,12 @@ export default class Modify extends Component {
 		});
 		return false;
     }
-        //附件删除
+        //附件删除、不删除文件
     remove(index){
-        const {actions:{deleteStaticFile}} = this.props
+        //const {actions:{deleteStaticFile}} = this.props
         let {dataSource} = this.state;
-        let id = dataSource[index]['file'].id;
-        deleteStaticFile({id:id});
+        // let id = dataSource[index]['file'].id;
+        // deleteStaticFile({id:id});
         dataSource[index].file = '';
         this.setState({dataSource})
     }
@@ -397,7 +400,7 @@ export default class Modify extends Component {
             {
                 state:rst.current[0].id,
                 action:'提交',
-                note:'发起变更',
+                note:description,
                 executor:creator,
                 next_states:[{
                     participants:[participants],

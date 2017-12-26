@@ -68,7 +68,7 @@ export default class Addition extends Component {
             ),
 		}, {
 			title: '提交单位',
-			dataIndex: 'upunit'
+			dataIndex: 'pubUnit'
 		}, {
 			title: '文档类型',
 			render: (text, record, index) => (
@@ -462,7 +462,7 @@ export default class Addition extends Component {
                 code:item[0],
                 name:'',
                 stage:item[1],
-                upunit:item[2],
+                pubUnit:item[2],
                 filetype:item[3],
                 major:item[4],
                 wbsObject:item[5],

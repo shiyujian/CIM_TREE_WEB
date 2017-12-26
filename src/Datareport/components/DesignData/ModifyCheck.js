@@ -24,20 +24,23 @@ const { TextArea } = Input;
 		actions: bindActionCreators({...actions, ...platformActions}, dispatch)
 	})
 )
-export default class Check extends Component {
+export default class ModifyCheck extends Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
             wk:null,
             dataSource:[],
+            origindataSource:[],
             opinion:1,//1表示通过 2表示不通过
 		};
     }
     async componentDidMount(){
         const {wk} = this.props
-        let dataSource = this.addindex(JSON.parse(wk.subject[0].data))
-        this.setState({dataSource,wk});
+        let dataSource = this.addindex(JSON.parse(wk.subject[0].data).changedata)
+        let origindataSource = this.addindex(JSON.parse(wk.subject[0].data).origindata)
+        console.log('dataSource',dataSource,'origindataSource',origindataSource)
+        this.setState({dataSource,origindataSource,wk});
         const {actions:{
             getScheduleDir,
             postScheduleDir,
@@ -57,8 +60,10 @@ export default class Check extends Component {
 
     componentWillReceiveProps(props){
         const {wk} = props
-        let dataSource = this.addindex(JSON.parse(wk.subject[0].data))
-        this.setState({dataSource,wk})
+        let dataSource = this.addindex(JSON.parse(wk.subject[0].data).changedata)
+        let origindataSource = this.addindex(JSON.parse(wk.subject[0].data).origindata)
+        console.log('dataSource',dataSource)
+        this.setState({dataSource,origindataSource,wk});
    }
    //提交
     async submit(){
@@ -67,15 +72,15 @@ export default class Check extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("design_check_visbile",false)
+        this.props.closeModal("design_modifycheck_visbile",false)
         message.info("操作成功")
     }
     //通过
     async passon(){
-        const {dataSource,wk,topDir} = this.state;
+        const {dataSource,origindataSource, wk,topDir} = this.state;
         const {actions:{
             logWorkflowEvent,
-            addDocList,
+            putDocument,
             getScheduleDir,
             postScheduleDir,
             getWorkPackageDetailpk
@@ -116,12 +121,10 @@ export default class Check extends Component {
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         
         //prepare the data which will store in database
-        const docData = [];
-        let i=0;   //asure the code of every document only
-        dataSource.map(item=>{
-            i++;
-            docData.push({
-                code:'designdata'+moment().format("YYYYMMDDHHmmss")+i,
+        const docData = [];   //asure the code of every document only
+        let all = [];
+        dataSource.forEach((item,index)=>{
+            let newdata = {
                 name:item.file.name,
                 obj_type:"C_DOC",
                 status:'A',
@@ -151,14 +154,19 @@ export default class Check extends Component {
                     wbsObject:item.wbsObject,
                     designObject:item.designObject
                 }
-            })
+            }
+            all.push(putDocument({code:origindataSource[index].code},newdata))
         });
-        let rst = await addDocList({},{data_list:docData});
-        if(rst.result){
-            message.success('创建文档成功！');
-        }else{
-            message.error('创建文档失败！');
-        }
+        Promise.all(all)
+        .then(rst => {
+            console.log(rst)
+            message.success('修改文档成功！');
+        })
+        // if(rst.result){
+        //     message.success('创建文档成功！');
+        // }else{
+        //     message.error('创建文档失败！');
+        // }
     }
     //不通过
     async reject(){
@@ -183,7 +191,7 @@ export default class Check extends Component {
         this.setState({opinion:e.target.value})
     }
     cancel() {
-    	this.props.closeModal("design_check_visbile",false)
+    	this.props.closeModal("design_modifycheck_visbile",false)
     }
     addindex(arr) {
         arr.forEach((item,index) => {
@@ -201,7 +209,7 @@ export default class Check extends Component {
 			dataIndex: 'code'
 		}, {
 			title: '文档名称',
-			dataIndex: 'name'
+			dataIndex: 'filename'
 		}, {
 			title:'项目/子项目名称',
             dataIndex:'project',
