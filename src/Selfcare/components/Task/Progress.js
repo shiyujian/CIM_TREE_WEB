@@ -53,6 +53,7 @@ import ExpCheck from 'Datareport/components/PersonData/ExpCheck';
 import ModifyCheck from 'Datareport/components/ModalData/ModifyCheck';
 import DesignChangeCheck from 'Datareport/components/ScheduleData/DesignChangeCheck';
 import WorkChangeCheck from 'Datareport/components/ScheduleData/WorkChangeCheck';
+import UpdataCheck from 'Datareport/components/OrgData/UpdataCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -125,7 +126,8 @@ export default class Progress extends Component {
 			person_expcheck_visible,
 			modify_check_visbile,
 			scheduledata_doc_change_visible,
-			workdata_doc_change_visible
+			workdata_doc_change_visible,
+			dr_base_update_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -407,6 +409,10 @@ export default class Progress extends Component {
 					workdata_doc_change_visible && 
 					<WorkChangeCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					dr_base_update_visible && 
+					<UpdataCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -559,6 +565,9 @@ export default class Progress extends Component {
 				break;
 			case "施工进度批量变更":
 				changeDatareportVisible({key:'workdata_doc_change_visible',value:true})
+				break;
+			case "组织机构信息批量更改":
+				changeDatareportVisible({key:'dr_base_update_visible',value:true})
 				break;
 			default:break;
 		}
