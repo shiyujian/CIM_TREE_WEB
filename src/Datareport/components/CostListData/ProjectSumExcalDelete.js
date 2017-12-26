@@ -55,7 +55,11 @@ export default class ProjectSumExcalDelete extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.onok(this.state.dataSource,per);
+        this.props.onok(this.state.dataSource,per);
+        notification.success({
+            message: '信息上传成功！',
+            duration: 2
+        });
     }
 
     //删除
@@ -99,22 +103,7 @@ export default class ProjectSumExcalDelete extends Component {
             }, {
                 title: '备注',
                 dataIndex: 'remarks',
-            }, {
-                title: "操作",
-                render: (text, record, index) => {
-                  return (
-                    <Popconfirm
-                      placement="leftTop"
-                      title="确定删除吗？"
-                      onConfirm={this.delete.bind(this, index)}
-                      okText="确认"
-                      cancelText="取消"
-                    >
-                      <a>删除</a>
-                    </Popconfirm>
-                  );
-                }
-              }
+            }
         ];
         return (
             <Modal
