@@ -23,7 +23,7 @@ const {Option} = Select;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class SumSpeedExamineChange extends Component {
+export default class ProjectSumChangeChock extends Component {
 
 	constructor(props) {
 		super(props);

@@ -46,6 +46,7 @@ import DesignDeleteCheck from 'Datareport/components/ScheduleData/DesignDeleteCh
 import SumSpeedExamineChange from 'Datareport/components/CostListData/SumSpeedExamineChange';
 import JianyanpiDelete from 'Datareport/components/Quality/JyDeleteCheck';
 import SumPlanChangeCheck from 'Datareport/components/CostListData/SumPlanChangeCheck';
+import ProjectSumChangeChock from 'Datareport/components/CostListData/ProjectSumChangeChock';
 
 const FormItem = Form.Item;
 @connect(
@@ -111,7 +112,8 @@ export default class Progress extends Component {
 			scheduledata_doc_delete_visible,
 			cost_sum_change_visible,
 			dr_qua_jy_del_visible,
-			dr_qua_jsjh_change_visible
+			dr_qua_jsjh_change_visible,
+			cost_sum_cckk_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -365,6 +367,10 @@ export default class Progress extends Component {
 					dr_qua_jsjh_change_visible && 
 					<SumPlanChangeCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					cost_sum_cckk_visible && 
+					<ProjectSumChangeChock wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -496,6 +502,9 @@ export default class Progress extends Component {
 				break;
 			case "结算计划信息变更":
 				changeDatareportVisible({key:'dr_qua_jsjh_change_visible',value:true})
+				break;
+			case "工程量结算信息变更":
+				changeDatareportVisible({key:'cost_sum_cckk_visible',value:true})
 				break;
 			default:break;
 		}
