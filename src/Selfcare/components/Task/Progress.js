@@ -25,7 +25,7 @@ import SafetySpecialCheck from 'Datareport/components/SafetySpecial/SafetySpecia
 import UnitToggle from 'Datareport/components/UnitData/UnitToggle';
 import VedioCheck from 'Datareport/components/VedioData/VedioCheck';
 import VedioInfoCheck from 'Datareport/components/VedioData/VedioInfoCheck';
-import DefectModal from 'Datareport/components/Quality/DefectModal';
+import DefectCheck from 'Datareport/components/Quality/DefectCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -248,7 +248,7 @@ export default class Progress extends Component {
 				}
 				{
 					dr_qua_defect_visible && 
-					<DefectModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<DefectCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 			</div>
 		);

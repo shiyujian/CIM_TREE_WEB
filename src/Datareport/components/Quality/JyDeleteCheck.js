@@ -20,23 +20,16 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class JianyanpiCheck extends Component {
+export default class JianyanpiDelete extends Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
-            wk:null,
             dataSource:[],
-            opinion:1,//1表示通过 2表示不通过
 		};
     }
     async componentDidMount(){
         const {wk} = this.props
-        //  const {actions:{ getWorkflow }} = this.props
-        //  getWorkflow({pk:wk.id}).then(rst => {
-        //      let dataSource = JSON.parse(rst.subject[0].data)
-        //      this.setState({dataSource,wk:rst})
-        //  })
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
     }
@@ -46,14 +39,14 @@ export default class JianyanpiCheck extends Component {
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk})
    }
-   //提交
+    //提交
     async submit(){
         if(this.state.opinion === 1){
             await this.passon();
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_qua_jyp_visible",false)
+        this.props.closeModal("dr_qua_jy_del_visible",false)
         message.info("操作成功")
     }
     //通过
@@ -131,6 +124,11 @@ export default class JianyanpiCheck extends Component {
         // executor.person_code = person.code;
         // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'退回',note:'滚',executor:executor,attachment:null});
     }
+//下拉框选择人
+selectChecker(value){
+    let check = JSON.parse(value)
+    this.setState({check})
+}
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -143,25 +141,22 @@ export default class JianyanpiCheck extends Component {
         filed.mime_type = f.mime_type;
         openPreview(filed);
     }
-    //radio变化
-    onChange(e){
-        this.setState({opinion:e.target.value})
-    }
 	render() {
-        const columns = 
+        let columns = 
         [{
             title:'序号',
             width:"5%",
-			render:(text,record,index) => {
-				return index+1
-			}
+			dataIndex:'key',
+			render: (text,record,index) => (
+				record.key + 1
+			),
 		},{
 			title:'项目/子项目',
             dataIndex:'project',
             width:"13%",
             render: (text, record, index) => (
                 <span>
-                    {record.project.name}
+                    {record.project ? record.project.name : ''}
                 </span>
             ),
 		},{
@@ -170,7 +165,7 @@ export default class JianyanpiCheck extends Component {
             width:"13%",
             render: (text, record, index) => (
                 <span>
-                    {record.unit.name}
+                    {record.unit ? record.unit.name : ''}
                 </span>
             ),
 		},{
@@ -185,11 +180,17 @@ export default class JianyanpiCheck extends Component {
 			title:'检验合格率',
             dataIndex:'rate',
             width:"8%",
-            render: (text, record, index) => (
-                <span>
-                    {(parseFloat(record.rate)*100).toFixed(1) + '%'} 
-                </span>
-            ),
+            render: (text, record, index) => {
+				if(record.rate){
+					return (
+						<span>
+							{(parseFloat(record.rate)*100).toFixed(1) + '%'} 
+						</span>
+					)
+				}else{
+					return (<span>暂无</span>)
+				}
+			}
 		},{
 			title:'质量等级',
             dataIndex:'level',
@@ -207,19 +208,24 @@ export default class JianyanpiCheck extends Component {
             title:'附件',
             width:"11%",
 			render:(text,record,index) => {
-                return (<span>
-                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                            <span className="ant-divider" />
-                            <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                        </span>)
+				if(record.file.a_file){
+					return (<span>
+                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                        <span className="ant-divider" />
+                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                    </span>)
+				}else{
+					return (<span>暂无</span>)
+				}
 			}
         }]
 		return (
             <Modal
-			title="检验批信息审批表"
+			title="检验信息删除"
             visible={true}
             width= {1280}
-			footer={null}
+            key={this.props.visible}
+            footer={null}
 			maskClosable={true}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
