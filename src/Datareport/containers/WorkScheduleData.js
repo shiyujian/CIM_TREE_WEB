@@ -27,6 +27,8 @@ export default class WorkScheduleData extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
+			pagination:{},
+			totalData:null,
 			selectedRowKeys: [],
 			dataSourceSelected:[],
 			setAddVisiable: false,
@@ -68,7 +70,7 @@ export default class WorkScheduleData extends Component {
 	}
 	onSelectChange = (selectedRowKeys) => {
 		const {dataSource} = this.state;
-        let dataSourceSelected = [];
+		let dataSourceSelected = [];
         for(let i=0;i<selectedRowKeys.length;i++){
             dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
         }
@@ -141,7 +143,7 @@ export default class WorkScheduleData extends Component {
                 {
                     state:rst.current[0].id,
                     action:'提交',
-                    note:'发起填报',
+                    note:'申请删除',
                     executor:creator,
                     next_states:[{
                         participants:[participants],
@@ -189,7 +191,7 @@ export default class WorkScheduleData extends Component {
                 {
                     state:rst.current[0].id,
                     action:'提交',
-                    note:'发起填报',
+                    note:'申请变更',
                     executor:creator,
                     next_states:[{
                         participants:[participants],
@@ -202,11 +204,20 @@ export default class WorkScheduleData extends Component {
 		})
     }
 	onBtnClick = (type) => {
+		const {selectedRowKeys} = this.state;
 		if(type==="add"){
             this.setState({setAddVisiable:true});
         }else if(type==="delete"){
+			if (selectedRowKeys.length === 0) {
+				message.info('请先选择数据')
+				return
+			}
             this.setState({setDeleteVisiable:true});
         }else if(type==="edit"){
+			if (selectedRowKeys.length === 0) {
+				message.info('请先选择数据')
+				return
+			}
             this.setState({setEditVisiable:true});
         }
 	}
