@@ -6,7 +6,7 @@ import '../index.less';
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 
-export default class Modify extends Component {
+export default class WorkChange extends Component {
 
 	render() {
 		const columns = [{

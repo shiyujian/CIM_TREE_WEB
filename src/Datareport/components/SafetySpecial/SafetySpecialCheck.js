@@ -75,20 +75,14 @@ export default class SafetySpecialCheck extends Component {
     async passon() {
         console.log('vip-state', this.state);
         const { dataSource, wk, topDir } = this.state;
-        const { actions: {
-            logWorkflowEvent,
-            addDocList,
-            getScheduleDir,
-            postScheduleDir,
-            getWorkpackagesByCode
-        } } = this.props;
+        const { actions: { logWorkflowEvent, addDocList, getScheduleDir, postScheduleDir, getWorkpackagesByCode } } = this.props;
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
         let project = dataSource[0].project;
         // let code = 'datareport_safetyspecial_' + unit.code;
-        let code = 'datareport_safetyspecial_05';
+        let code = 'datareport_safetyspecial_05'; // 自定义编号
         //get workpackage by unit's code 
-        let workpackage = await getWorkpackagesByCode({ code: unit.code });
+        let workpackage = await getWorkpackagesByCode({ code: unit.code }); // 获取施工包不太明白
         console.log('vip-code', code);
         console.log('vip-workpackage', workpackage);
 
@@ -119,15 +113,17 @@ export default class SafetySpecialCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
 
-        await logWorkflowEvent(
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
             {
                 pk: wk.id
             }, {
-                state: wk.current[0].id, action: '通过', note: '同意',
-                executor: executor, attachment: null
+                state: wk.current[0].id,
+                executor: executor,
+                action: '通过',
+                note: '同意',
+                attachment: null
             }
         );
-
         //prepare the data which will store in database
         const docData = [];
         let i = 0;   //asure the code of every document only
@@ -278,7 +274,7 @@ export default class SafetySpecialCheck extends Component {
         return (
             <Modal
                 title="安全信息审批表"
-                key={Math.random()}
+                // key={Math.random()}
                 visible={true}
                 width={1280}
                 footer={null}

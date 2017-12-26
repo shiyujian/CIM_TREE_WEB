@@ -21,7 +21,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions,...actions2}, dispatch)
 	})
 )
-export default class OrgCheck extends Component {
+export default class CJCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -49,7 +49,7 @@ export default class OrgCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_org_visible",false)
+        this.props.closeModal("dr_base_cj_visible",false)
         message.info("操作成功")
     }
     //通过
@@ -68,33 +68,32 @@ export default class OrgCheck extends Component {
         let wplist = [];
         console.log("dataSource",dataSource);
         let data_list = [];
-        let promises = dataSource.map((o) => {
+        dataSource.map((o) => {
             console.log("o",o);
-            return getOrgPk({code:o.direct})
-            // .then(rst => {
-            //     data_list.push({
-            //         code: "" + o.code,
-            //         name: o.depart,
-            //         obj_type: "C_ORG",
-            //         status: "A",
-            //         version: "A",
-            //         extra_params: {
-            //             type: o.type,
-            //             canjian: o.canjian,
-            //             direct: o.direct,
-            //             project: o.selectPro,
-            //             unit: o.selectUnit,
-            //             remarks: o.remarks
-            //         },
-            //         parent: {
-            //             code:o.direct,
-            //             pk: rst.pk,
-            //             obj_type: "C_ORG"
-            //         }
-            //     })
-            // })
-        });
-        let rst = await Promise.all(promises);
+            getOrgPk({code:o.direct}).then(rst => {
+                data_list.push({
+                    code: "" + o.code,
+                    name: o.depart,
+                    obj_type: "C_ORG",
+                    status: "A",
+                    version: "A",
+                    extra_params: {
+                        type: o.type,
+                        canjian: o.canjian,
+                        direct: o.direct,
+                        project: o.selectPro,
+                        unit: o.selectUnit,
+                        remarks: o.remarks
+                    },
+                    parent: {
+                        code:o.direct,
+                        pk: rst.pk,
+                        obj_type: "C_ORG"
+                    }
+                })
+                console.log("data_list:", data_list);
+            })
+        })
         // return;
         console.log("data_list:", data_list);
         postOrgList({}, { data_list: data_list }).then(res => {
