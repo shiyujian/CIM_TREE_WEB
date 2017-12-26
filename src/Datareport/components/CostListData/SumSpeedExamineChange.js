@@ -113,34 +113,30 @@ export default class SumSpeedExamineChange extends Component {
               render: (text, record, index) => {
                 return index + 1;
               }
-            },
-            {
-              title: "项目/子项目",
-              dataIndex: "project"
-            },
-            {
-              title: "单位工程",
-              dataIndex: "unit"
-            },
-            {
-              title: "工作节点目标",
-              dataIndex: "nodetarget"
-            },
-            {
-              title: "完成时间",
-              dataIndex: "completiontime"
-            },
-            {
-              title: "支付金额（万元）",
-              dataIndex: "summoney"
-            },
-            {
-              title: "累计占比",
-              dataIndex: "ratio"
-            },
-            {
-              title: "备注",
-              dataIndex: "remarks"
+            },{
+                title: '项目/子项目',
+                dataIndex: 'subproject',
+            }, {
+                title: '单位工程',
+                dataIndex: 'unit',
+            }, {
+                title: '清单项目编号',
+                dataIndex: 'projectcoding',
+            }, {
+                title: '项目名称',
+                dataIndex: 'projectname',
+            }, {
+                title: '计量单位',
+                dataIndex: 'company',
+            }, {
+                title: '数量',
+                dataIndex: 'number',
+            }, {
+                title: '单价',
+                dataIndex: 'total',
+            }, {
+                title: '备注',
+                dataIndex: 'remarks',
             }
           ]
 		return (

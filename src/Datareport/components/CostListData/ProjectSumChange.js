@@ -55,7 +55,7 @@ export default class SumSpeedChange extends Component {
             organization:check.account.organization
         }
         this.props.onok(this.state.dataSource,per);
-        notification.error({
+        notification.success({
             message: '信息上传成功！',
             duration: 2
         });

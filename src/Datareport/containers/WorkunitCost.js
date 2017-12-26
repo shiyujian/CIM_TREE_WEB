@@ -102,11 +102,11 @@ export default class WorkunitCost extends Component {
 		this.setState({ delatevisible: false })
 	}
 	//删除
-	delete(index) {
-		let { dataSource } = this.state
-		dataSource.splice(index, 1)
-		this.setState({ dataSource })
-	}
+	// delete(index) {
+	// 	let { dataSource } = this.state
+	// 	dataSource.splice(index, 1)
+	// 	this.setState({ dataSource })
+	// }
 	setchgVisible(){
 		this.setState({changevisible:true})
 	}
@@ -278,20 +278,6 @@ export default class WorkunitCost extends Component {
 		}, {
 			title: '备注',
 			dataIndex: 'remarks',
-		},{
-			title: '删除',
-			render: (text, record, index) => {
-				return (
-					<Popconfirm
-						placement="leftTop"
-						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, index)}
-						okText="确认"
-						cancelText="取消">
-						<a>删除</a>
-					</Popconfirm>
-				)
-			}
 		}];
 		return (
 			<div style={{ overflow: 'hidden', padding: 20 }}>
