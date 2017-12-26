@@ -9,7 +9,6 @@ const { TextArea } = Input;
 export default class PersonExpurgate extends Component {
 
 	render() {
-		const {Exvisible} = this.props;
 		const columns = [ {
 	        title: '人员编码',
 	        dataIndex: 'code',
@@ -79,7 +78,7 @@ export default class PersonExpurgate extends Component {
 		return(
 			<Modal
 				width = {1280}
-				visible={Exvisible}
+				visible={true}
 				onCancel = {this.cancel.bind(this)}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
@@ -120,6 +119,6 @@ export default class PersonExpurgate extends Component {
 
 	cancel() {
         const { actions: { ExprugateVisible } } = this.props;
-        ExprugateVisible(false);
+        ExprugateVisible('person_exp_visible',false);
     }
 }

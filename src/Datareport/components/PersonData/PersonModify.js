@@ -9,7 +9,6 @@ const { TextArea } = Input;
 export default class PersonModify extends Component {
 
 	render() {
-		const {Modvisible} = this.props;
 		const columns = [ {
 	        title: '人员编码',
 	        dataIndex: 'code',
@@ -79,7 +78,7 @@ export default class PersonModify extends Component {
 		return(
 			<Modal
 				width = {1280}
-				visible={Modvisible}
+				visible={true}
 				onCancel = {this.cancel.bind(this)}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
@@ -120,6 +119,6 @@ export default class PersonModify extends Component {
 
 	cancel() {
         const { actions: { ModifyVisible } } = this.props;
-        ModifyVisible(false);
+        ModifyVisible('person_mod_visible',false);
     }
 }
