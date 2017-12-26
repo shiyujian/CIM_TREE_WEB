@@ -156,18 +156,25 @@ export default class ChangeFile extends Component {
         return false;
     }
 
-    //删除
-    delete(index, i) {
-        // debugger;
-        let { dataSource } = this.state
-        // dataSource.splice(index, 1)
-        this.setState({
-            dataSource: this.state.dataSource.filter(item => {
-                return item.i !== i;
-            })
-        })
-    }
+    // //删除
+    // delete(index, i) {
+    //     // debugger;
+    //     let { dataSource } = this.state
+    //     // dataSource.splice(index, 1)
+    //     this.setState({
+    //         dataSource: this.state.dataSource.filter(item => {
+    //             return item.i !== i;
+    //         })
+    //     })
+    // }
 
+    //删除
+    delete(index) {
+        // debugger;
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
+    }
     //预览
     handlePreview(index) {
         const { actions: { openPreview } } = this.props;
@@ -188,11 +195,8 @@ export default class ChangeFile extends Component {
         const columns = [
             {
                 title: '序号',
-                dataIndex: 'index',
+                dataIndex: 'i',
                 width: '5%',
-                render: (text, record, index) => {
-                    return index + 1
-                },
             },
             {
                 title: '单位工程',
@@ -231,16 +235,16 @@ export default class ChangeFile extends Component {
             , {
                 title: '附件',
                 width: "15%",
-                render: (text, record, index) => {
+                render: (text, record, i) => {
                     // debugger;
                     if (record.file.a_file) {
                         return (<span>
-                            <a onClick={this.handlePreview.bind(this, index)}>预览</a>
+                            <a onClick={this.handlePreview.bind(this, i)}>预览</a>
                             <span className="ant-divider" />
                             <Popconfirm
                                 placement="leftTop"
                                 title="确定删除吗？"
-                                onConfirm={this.remove.bind(this, index)}
+                                onConfirm={this.remove.bind(this, i)}
                                 okText="确认"
                                 cancelText="取消">
                                 <a>删除</a>
@@ -249,7 +253,7 @@ export default class ChangeFile extends Component {
                     } else {
                         return (
                             <span>
-                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index)}>
+                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, i)}>
                                     <Button>
                                         <Icon type="upload" />上传附件
                                 </Button>
@@ -258,14 +262,16 @@ export default class ChangeFile extends Component {
                         )
                     }
                 }
-            }, {
+            }
+            , {
                 title: '操作',
-                render: (text, record, index) => {
+                render: (text, record, i) => {
                     return (
                         <Popconfirm
                             placement="leftTop"
                             title="确定删除吗？"
-                            onConfirm={this.delete.bind(this, index, record.i)}
+                            // onConfirm={this.delete.bind(this, index, record.i)}
+                            onConfirm={this.delete.bind(this, i)}
                             okText="确认"
                             cancelText="取消">
                             <a>删除</a>
@@ -290,7 +296,7 @@ export default class ChangeFile extends Component {
                 onCancel={this.cancel.bind(this)}
                 maskClosable={false}
             >
-                <h1 style={{ textAlign: 'center', fontSize: 14, color: '#333' }}>变更申请页面</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>变更申请页面</h1>
                 <Row >
                     <Table
                         columns={columns}
@@ -310,7 +316,6 @@ export default class ChangeFile extends Component {
 								</Col>
                             )
                     }
-
                 </Row>
                 <Row style={{ marginBottom: 16 }}>
                     <Col span={6}>
@@ -377,9 +382,9 @@ export default class ChangeFile extends Component {
             person_code: check.account.person_code,
             organization: check.account.organization
         }
+        let { changeInfo } = this.state
         for (let i = 0; i < this.state.dataSource.length; i++) {
-            this.state.dataSource[i].project = project;
-            this.state.dataSource[i].unit = unit;
+            this.state.dataSource[i].changeInfo = changeInfo;
         }
         this.props.setChangeData(this.state.dataSource, per);
         notification.success({

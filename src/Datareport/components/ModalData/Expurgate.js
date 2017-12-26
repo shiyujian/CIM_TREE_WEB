@@ -46,7 +46,7 @@ export default class Expurgate extends Component {
 
 	onok() {
 		const { getall = [], actions: { changeAdditionField } } = this.props;
-		let { dataSource } = getall;
+		let  dataSource  = getall;
 		console.log('woshi:', getall)
 
 		if (!this.state.check) {
@@ -189,14 +189,12 @@ export default class Expurgate extends Component {
 
 		return (
 			<Modal
+			title="模型信息删除表"
 				width={1280}
 				visible={expurgate.visible}
 				onCancel={this.cancel.bind(this)}
 				onOk={this.onok.bind(this)}
 			>
-				<Row style={{ margin: '20px 0', textAlign: 'center' }}>
-					<h2>删除项目申请页面</h2>
-				</Row>
 				<Row>
 					<Table
 						bordered
@@ -224,7 +222,7 @@ export default class Expurgate extends Component {
 						<Button type="default">确认导入</Button>
 					</Col>
 				</Row> */}
-				<Row style={{ marginBottom: '20px' }}>
+				{/* <Row style={{ marginBottom: '20px' }}>
 					<Col span={2}>
 						<span>删除原因：</span>
 					</Col>
@@ -233,7 +231,7 @@ export default class Expurgate extends Component {
 					<Col>
 						<TextArea rows={2} />
 					</Col>
-				</Row>
+				</Row> */}
 			</Modal>
 		)
 	}

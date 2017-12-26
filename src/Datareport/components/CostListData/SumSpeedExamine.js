@@ -174,7 +174,7 @@ export default class SumSpeedExamine extends Component {
           ]
 		return (
             <Modal
-			title="结算进度信息填报"
+			title="结算进度结果审批表"
 			key={Math.random()}
             visible={true}
             width= {1280}
@@ -183,7 +183,7 @@ export default class SumSpeedExamine extends Component {
 			maskClosable={false}
             >
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}

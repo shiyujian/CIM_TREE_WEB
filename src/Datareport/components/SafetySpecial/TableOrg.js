@@ -38,16 +38,17 @@ export default class TableOrg extends Component {
 			}
 		}
 	}
+
 	async generateTableData(data) {
 		const { actions: {
             getDocument,
         } } = this.props;
 		let dataSource = [];
+		debugger;
 		data.map((item, i) => {
 			getDocument({ code: item.code }).then(single => {
-				// console.log('vip-single', single);
 				let temp = {
-					i,
+					i: i + 1,
 					code: single.extra_params.code,
 					codeId: single.code,
 					filename: single.extra_params.filename,
@@ -66,17 +67,14 @@ export default class TableOrg extends Component {
 					file: single.basic_params.files[0],
 				}
 				dataSource.push(temp);
-				// this.setState({
-				// 	...this.state,
-				// 	dataSource: Object.assign(this.state.dataSource, dataSource)
-				// });
 				this.setState({
 					...this.state,
-					dataSource
+					dataSource: dataSource.sort((x, y) => x.i - y.i)
 				});
 			})
 		})
 	}
+
 	paginationOnChange(e) {
 		// console.log('vip-分页', e);
 	}
@@ -88,26 +86,66 @@ export default class TableOrg extends Component {
 	}
 
 	// 搜索
-	onSearchInfo(value) {
+	async onSearchInfo(value) {
+		if (!value) { this.componentDidMount(); return; };
 		const { actions: { getSearcherDir } } = this.props
-		let param = "?keyword=" + value
-		getSearcherDir({ code: 'safetyspecial' }).then(rst => {
-			console.log('vip-rst', rst);
-
-			// let dataSource = this.handleData(rst)
-			// this.setState({dataSource})
+		const code_Todir = "datareport_safetyspecial_05";
+		let param1 = code_Todir + "/?doc_code=safetyspecial&keys=organizationUnit&values=" + value; // 编制单位
+		let param2 = code_Todir + "/?doc_code=safetyspecial&keys=scenarioName&values=" + value; // 方案名称
+		// let param3 = code_Todir + "/?doc_code=safetyspecial&keys=projectName&values=" + value; // 项目/子项目名称
+		// let param4 = code_Todir + "/?doc_code=safetyspecial&keys=unitProject&values=" + value; // 单位工程
+		debugger;
+		let data1 = await getSearcherDir({ keyword: param1 }).then(rst => {
+			if (rst.result.length <= 0) return [];
+			let dataSource = this.handleData(rst.result)
+			return dataSource;
 		})
+		let data2 = await getSearcherDir({ keyword: param2 }).then(rst => {
+			if (rst.result.length <= 0) return [];
+			let dataSource = this.handleData(rst.result)
+			return dataSource;
+		})
+		// let data3 = await getSearcherDir({ keyword: param3 }).then(rst => {
+		// 	if (rst.result.length <= 0) return [];
+		// 	let dataSource = this.handleData(rst.result)
+		// 	return dataSource;
+		// })
+		// let data4 = await getSearcherDir({ keyword: param4 }).then(rst => {
+		// 	if (rst.result.length <= 0) return [];
+		// 	let dataSource = this.handleData(rst.result)
+		// 	return dataSource;
+		// })
+		this.setState({
+			dataSource: Object.assign(data1, data2)
+		})
+		console.log('vip-dataSource', this.state.dataSource);
 	}
 	//将数据处理成适用于表格的数据
 	handleData(data) {
-		return data.map(item => {
-			return {
-				permitNumber: item.licence.number,
-				certificateNumber: item.certificate.number,
-				acceptance: item.acceptor.name,
-				...item
+		let dataSource = [];
+		data.map((single, i) => {
+			let temp = {
+				i: i + 1,
+				code: single.extra_params.code,
+				codeId: single.code,
+				filename: single.extra_params.filename,
+				index: single.extra_params.index,
+				organizationUnit: single.extra_params.organizationUnit,
+				project: single.extra_params.project,
+				projectName: single.extra_params.project.name,
+				remark: single.extra_params.remark,
+				resUnit: single.extra_params.resUnit,
+				reviewComments: single.extra_params.reviewComments,
+				reviewPerson: single.extra_params.reviewPerson,
+				reviewTime: single.extra_params.reviewTime,
+				scenarioName: single.extra_params.scenarioName,
+				unit: single.extra_params.unit,
+				unitProject: single.extra_params.unit.name,
+				file: single.basic_params.files[0],
 			}
+			dataSource.push(temp);
 		})
+		return dataSource;
 	}
 
 	render() {
@@ -129,7 +167,7 @@ export default class TableOrg extends Component {
 		return (
 			<Row>
 				<Row style={{ marginBottom: "30px" }}>
-					<Col span={15}>
+					<Col>
 						<Button
 							style={{ marginRight: "30px" }}
 							onClick={this.send.bind(this)}
@@ -144,12 +182,13 @@ export default class TableOrg extends Component {
 						>申请删除</Button>
 						<Button
 							style={{ marginRight: "30px" }}
-						// onClick={this.BtnExport.bind(this)}
+							onClick={this.BtnExport.bind(this)}
 						>导出表格</Button>
 						<Search
-							placeholder="请输入内容"
+							className="searchid"
+							placeholder="请输入方案名称或者编制单位全字段"
 							onSearch={this.onSearchInfo.bind(this)}
-							style={{ width: 200, marginLeft: "20px" }}
+							style={{ width: 300, marginLeft: "20px" }}
 						/>
 					</Col>
 				</Row>
@@ -174,7 +213,6 @@ export default class TableOrg extends Component {
 							)
 					}
 				</Row>
-
 				{
 					this.state.setChangeVisiable && <ChangeFile {...this.props} {...this.state} key={this.state.newKey2}
 						goCancel={this.goCancel.bind(this)} setChangeData={this.setChangeData.bind(this)}
@@ -185,7 +223,6 @@ export default class TableOrg extends Component {
 						goCancel={this.goCancel.bind(this)} setDeleteData={this.setDeleteData.bind(this)}
 					/>
 				}
-
 			</Row>
 		)
 	}
@@ -212,10 +249,20 @@ export default class TableOrg extends Component {
 		openPreview(filed);
 	}
 
+	//导出
+	BtnExport(e) {
+		if (this.state.subDataSource.length <= 0) {
+			notification.warning({
+				message: '请选择数据！',
+				duration: 2
+			})
+			return;
+		}
+	}
 	//变更
 	BtnChange(e) {
 		if (this.state.subDataSource.length <= 0) {
-			notification.error({
+			notification.warning({
 				message: '请选择数据！',
 				duration: 2
 			})
@@ -226,8 +273,6 @@ export default class TableOrg extends Component {
 
 	// 申请变更--并发起
 	setChangeData(data, participants) {
-		// console.log('vip-data', data);
-		// console.log('vip-per', participants);
 		this.setState({
 			newKey2: Math.random() + 2,
 			setChangeVisiable: false,
@@ -278,7 +323,7 @@ export default class TableOrg extends Component {
 	//删除
 	BtnDelete(e) {
 		if (this.state.subDataSource.length <= 0) {
-			notification.error({
+			notification.warn({
 				message: '请选择数据！',
 				duration: 2
 			})
@@ -333,22 +378,17 @@ export default class TableOrg extends Component {
 					attachment: null
 				});
 		});
-
-
 	}
 	columns = [
 		{
 			title: '序号',
-			// dataIndex: 'index',
+			dataIndex: 'i',
 			width: '5%',
-			render: (text, record, index) => {
-				return index + 1
-			},
 		},
 		{
 			title: '项目/子项目名称',
 			dataIndex: 'projectName',
-			width: '15%',
+			width: '10%',
 		},
 		{
 			title: '单位工程',
@@ -383,27 +423,18 @@ export default class TableOrg extends Component {
 		{
 			title: '备注',
 			dataIndex: 'remark',
-			width: '15%',
+			width: '10%',
 		}
 		,
 		{
 			title: '附件',
 			width: '10%',
 			render: (text, record) => {
-				if (record.filename) {
-					return (
-						<a
-							onClick={this.handlePreview.bind(this, record.codeId, record.i)}>
-							预览
-						</a>
-					)
-				} else {
-					return (
-						<span>
-							暂无
-						</span>
-					)
-				}
+				return (<span>
+					<a onClick={this.handlePreview.bind(this, record.codeId, record.i)}>预览</a>
+					<span className="ant-divider" />
+					<a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+				</span>)
 			}
 		},
 	];

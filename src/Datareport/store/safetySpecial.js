@@ -18,9 +18,7 @@ const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 
 // 查询
-const getSearcherDir = createFetchAction(`${SERVICE_API}/searcher/?keyword={{code}}&&obj_type=C_DOC`,[],'GET');
-
-
+const getSearcherDir = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{keyword}}`,[],'GET');
 
 export const actions = {
 	ModalVisible,
