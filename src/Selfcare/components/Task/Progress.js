@@ -49,6 +49,13 @@ import SumPlanChangeCheck from 'Datareport/components/CostListData/SumPlanChange
 import ProjectSumChangeChock from 'Datareport/components/CostListData/ProjectSumChangeChock';
 import SafetySpecialDeleteCheck from 'Datareport/components/SafetySpecial/SafetySpecialDeleteCheck';
 import SafetySpecialEditCheck from 'Datareport/components/SafetySpecial/SafetySpecialEditCheck';
+import ExpCheck from 'Datareport/components/PersonData/ExpCheck';
+import ModifyCheck from 'Datareport/components/ModalData/ModifyCheck';
+import DesignChangeCheck from 'Datareport/components/ScheduleData/DesignChangeCheck';
+import WorkChangeCheck from 'Datareport/components/ScheduleData/WorkChangeCheck';
+import UpdataCheck from 'Datareport/components/OrgData/UpdataCheck';
+import HandelChangeUnitModal from 'Datareport/components/UnitData/HandleChangeUnitModal';
+import HandelChangeProjModal from 'Datareport/components/ProjectData/HandleChangeModal';
 
 const FormItem = Form.Item;
 @connect(
@@ -117,7 +124,14 @@ export default class Progress extends Component {
 			dr_qua_jsjh_change_visible,
 			cost_sum_cckk_visible,
 			Safety_Special_delete_visible,
-			Safety_Special_edit_visible
+			Safety_Special_edit_visible,
+			person_expcheck_visible,
+			modify_check_visbile,
+			scheduledata_doc_change_visible,
+			workdata_doc_change_visible,
+			dr_base_update_visible,
+			dr_change_unit_visible,
+			dr_change_proj_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -383,6 +397,34 @@ export default class Progress extends Component {
 					Safety_Special_edit_visible && 
 					<SafetySpecialEditCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					person_expcheck_visible && 
+					<ExpCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					modify_check_visbile && 
+					<ModifyCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					scheduledata_doc_change_visible && 
+					<DesignChangeCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					workdata_doc_change_visible && 
+					<WorkChangeCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_base_update_visible && 
+					<UpdataCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_change_unit_visible && 
+					<HandelChangeUnitModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_change_proj_visible && 
+					<HandelChangeProjModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -523,6 +565,27 @@ export default class Progress extends Component {
 				break;
 			case "安全专项信息批量变更":
 				changeDatareportVisible({key:'Safety_Special_edit_visible',value:true})
+				break;
+			case "人员信息批量删除":
+				changeDatareportVisible({key:'person_expcheck_visible',value:true})
+				break;
+			case "模型信息批量更改":
+				changeDatareportVisible({key:'modify_check_visbile',value:true})
+				break;
+			case "设计进度批量变更":
+				changeDatareportVisible({key:'scheduledata_doc_change_visible',value:true})
+				break;
+			case "施工进度批量变更":
+				changeDatareportVisible({key:'workdata_doc_change_visible',value:true})
+				break;
+			case "组织机构信息批量更改":
+				changeDatareportVisible({key:'dr_base_update_visible',value:true})
+				break;
+			case "单位工程批量变更申请":
+				changeDatareportVisible({key:'dr_change_unit_visible',value:true})
+				break;
+			case "项目批量变更申请":
+				changeDatareportVisible({key:'dr_change_proj_visible',value:true})
 				break;
 			default:break;
 		}

@@ -131,7 +131,7 @@ export default class ProjectSumExamine extends Component {
                 rate: item.extra_params.rate
             }
         })
-
+       
         dataSource.map(item => {
             i++;
             docData.push({
@@ -156,9 +156,8 @@ export default class ProjectSumExamine extends Component {
             }) 
             //施工包批量
             let myprojectcoding, mynumber;
-
             for(var i  = 0; i < pairs.length; ++i) {
-                if(pairs[i].projectcoding === item.projectcoding) {
+                if(pairs[i].projectcoding === item.projectcoding ) {
                     myprojectcoding = pairs[i].projectcoding;
                     mynumber =  pairs[i].rate;
                     break; 
@@ -166,17 +165,21 @@ export default class ProjectSumExamine extends Component {
             }
             wplist.push({
                 code: item.unit.code,
+                // extra_params: {
+                //     projectcoding:item.projectcoding,
+                //     number: item.number,
+                // }
                 extra_params: {
                     projectcoding: myprojectcoding,
                     number: mynumber,
                 }
             })
         });
-        // debugger
+        
         let rst = await addDocList({}, { data_list: docData });
         await updateWpData({}, { data_list: wplist });
-          // wplist = wplist.filter(item => {
-        //     return !item.projectcoding && !item.mynumber
+        // wplist = wplist.filter(item => {
+        //     return !myprojectcoding && !mynumber
         // })
         // if(wplist.length) {
             

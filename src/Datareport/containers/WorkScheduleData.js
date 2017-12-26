@@ -27,6 +27,8 @@ export default class WorkScheduleData extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
+			pagination:{},
+			totalData:null,
 			selectedRowKeys: [],
 			dataSourceSelected:[],
 			setAddVisiable: false,
@@ -68,7 +70,7 @@ export default class WorkScheduleData extends Component {
 	}
 	onSelectChange = (selectedRowKeys) => {
 		const {dataSource} = this.state;
-        let dataSourceSelected = [];
+		let dataSourceSelected = [];
         for(let i=0;i<selectedRowKeys.length;i++){
             dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
         }
@@ -141,7 +143,7 @@ export default class WorkScheduleData extends Component {
                 {
                     state:rst.current[0].id,
                     action:'提交',
-                    note:'发起填报',
+                    note:'申请删除',
                     executor:creator,
                     next_states:[{
                         participants:[participants],
@@ -159,6 +161,63 @@ export default class WorkScheduleData extends Component {
         }else if(type==="delete"){
             this.setState({setDeleteVisiable:true});
         }else if(type==="edit"){
+            this.setState({setEditVisiable:true});
+        }
+	}
+	// 批量变更流程
+	setEditData = (data,participants) =>{
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"施工进度批量变更",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"施工进度批量变更",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'申请变更',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({setEditVisiable:false})						
+					})
+		})
+    }
+	onBtnClick = (type) => {
+		const {selectedRowKeys} = this.state;
+		if(type==="add"){
+            this.setState({setAddVisiable:true});
+        }else if(type==="delete"){
+			if (selectedRowKeys.length === 0) {
+				message.info('请先选择数据')
+				return
+			}
+            this.setState({setDeleteVisiable:true});
+        }else if(type==="edit"){
+			if (selectedRowKeys.length === 0) {
+				message.info('请先选择数据')
+				return
+			}
             this.setState({setEditVisiable:true});
         }
 	}
@@ -209,6 +268,10 @@ export default class WorkScheduleData extends Component {
 				{
 					this.state.setDeleteVisiable &&
 					<WorkDel {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} onok={this.setDeleteData.bind(this)} />
+				}
+				{
+					this.state.setEditVisiable &&
+					<WorkChange {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} onok={this.setEditData.bind(this)} />
 				}
 			</div>
 		);

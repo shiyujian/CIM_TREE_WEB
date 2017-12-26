@@ -6,7 +6,7 @@ import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,notification,Po
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import {getUser} from '_platform/auth';
-import {actions} from '../../store/WorkunitCost';
+import {actions} from '../../store/workdata';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
@@ -16,21 +16,21 @@ const {Option} = Select;
 
 @connect(
 	state => {
-        const {datareport: {WorkunitCost = {}} = {}, platform} = state;
-		return {...WorkunitCost, platform}
+        const {datareport: {workdata = {}} = {}, platform} = state;
+		return {...workdata, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class ProjectSumChangeChock extends Component {
+export default class WorkChangeCheck extends Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
             wk:null,
             dataSource:[],
-            option:1,
+            opinion:1,
 		};
     }
     async componentDidMount(){
@@ -46,33 +46,25 @@ export default class ProjectSumChangeChock extends Component {
    }
    //提交
     async submit(){
-        if(this.state.option === 1){
+        if(this.state.opinion === 1){
             await this.passon();
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_sum_cckk_visible", false);
+        this.props.closeModal("workdata_doc_change_visible",false);
         message.info("操作成功");
     }
-
+    // 点x消失
+    oncancel() {
+        this.props.closeModal("workdata_doc_change_visible", false)
+    }
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state;
         const {actions:{
             logWorkflowEvent,
-            putDocList
         }} = this.props;
-        let doclist_c = [];
-        dataSource.map(item=>{
-            doclist_c.push({
-                code:item.code,
-                obj_type: "C_DOC",
-                status:"A",
-                version:"A",
-                extra_params:item
-            })
-        });
-        await putDocList({},{data_list:doclist_c})
+        
         // send workflow
         let executor = {};
         let person = getUser();
@@ -81,8 +73,23 @@ export default class ProjectSumChangeChock extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
-        
+        // let code_list = "";
+        // dataSource.map(item=>{
+        //     item.delcode+=",";
+        //     code_list += item.delcode;
+        // })
+        // let rst = await delDocList({},{code_list});
+        // if(rst.result){
+        //     notification.success({
+        //         message: '删除文档成功！',
+        //         duration: 2
+        //     });
+        // }else{
+        //     notification.error({
+        //         message: '删除文档失败！',
+        //         duration: 2
+        //     });
+        // }
     }
     //不通过
     async reject(){
@@ -91,67 +98,76 @@ export default class ProjectSumChangeChock extends Component {
         await deleteWorkflow({pk:wk.id})
     }
     onChange(e){
-        this.setState({option:e.target.value})
+        this.setState({opinion:e.target.value})
     }
-    cancel() {
-        this.props.closeModal("cost_sum_cckk_visible", false);
-      }
 	render() {
-        const columns = [
-            {
-              title: "序号",
-              dataIndex: "index",
-              render: (text, record, index) => {
-                return index + 1;
-              }
-            },{
-                title: '项目/子项目',
-                dataIndex: 'subproject',
-            }, {
-                title: '单位工程',
-                dataIndex: 'unit',
-            }, {
-                title: '清单项目编号',
-                dataIndex: 'projectcoding',
-            }, {
-                title: '项目名称',
-                dataIndex: 'projectname',
-            }, {
-                title: '计量单位',
-                dataIndex: 'company',
-            }, {
-                title: '数量',
-                dataIndex: 'number',
-            }, {
-                title: '单价',
-                dataIndex: 'total',
-            }, {
-                title: '备注',
-                dataIndex: 'remarks',
+        const columns =
+        [{
+            title: '序号',
+            render: (text, record, index) => {
+                return index + 1
             }
-          ]
+        }, {
+            title: 'WBS编码',
+            dataIndex: 'code',
+        }, {
+            title: '任务名称',
+            dataIndex: 'name',
+        }, {
+            title: '项目/子项目',
+            dataIndex: 'project',
+        }, {
+            title: '单位工程',
+            dataIndex: 'unit',
+        }, {
+            title: '施工单位',
+            dataIndex: 'construct_unit',
+        }, {
+            title: '施工图工程量',
+            dataIndex: 'quantity',
+        }, {
+            title: '实际工程量',
+            dataIndex: 'factquantity',
+        }, {
+            title: '计划开始时间',
+            dataIndex: 'planstarttime',
+        }, {
+            title: '计划结束时间',
+            dataIndex: 'planovertime',
+        }, {
+            title: '实际开始时间',
+            dataIndex: 'factstarttime',
+        }, {
+            title: '实际结束时间',
+            dataIndex: 'factovertime',
+        }, {
+            title: '变更人员',
+            dataIndex: 'editors',
+        },]
 		return (
             <Modal
-			title="工程量结算信息变更审批表"
+			title="施工进度变更审批表"
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}
-            onCancel={this.cancel.bind(this)}
+            onCancel={this.oncancel.bind(this)}
             >
-                <h1 style ={{textAlign:'center',marginBottom:20}}>工程量结算变更审核</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
-                    bordered 
-                    rowKey="key"
+                    bordered
+                    rowKey={(record)=>{
+                        return record.index
+                    }} 
                     />
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>
                     </Col>
                     <Col span={4}>
-                        <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
+                        <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
                             <Radio value={1}>通过</Radio>
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>

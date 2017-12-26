@@ -75,7 +75,7 @@ export default class SumPlan extends Component {
           completiontime: dataList[i][1] ? dataList[i][1] : "",
           summoney: dataList[i][2] ? dataList[i][2] : "",
           ratio: dataList[i][3] ? dataList[i][3] : "",
-          remark: dataList[i][4] ? dataList[i][4] : "",
+          remarks: dataList[i][4] ? dataList[i][4] : "",
         //   upPeople: dataList[i][5] ? dataList[i][5] : "",
           project: {
             code: "",
@@ -342,7 +342,7 @@ export default class SumPlan extends Component {
       },
       {
         title: "备注",
-        dataIndex: "remark"
+        dataIndex: "remarks"
       },
       {
         title: "操作",
