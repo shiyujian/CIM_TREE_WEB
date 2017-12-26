@@ -81,7 +81,7 @@ export default class DeleteFile extends Component {
     render() {
         const columns = [
             {
-                title:'编码',
+                title:'文档编码',
                 dataIndex:'code',
                 width: '10%'
             },{

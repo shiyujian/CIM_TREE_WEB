@@ -313,11 +313,11 @@ export default class AddFile extends Component {
     render() {
         const columns = [
             {
-                title: '编码',
+                title: '文档编码',
                 dataIndex: 'code',
                 width: '8%'
             }, {
-                title: 'WBS',
+                title: 'WBS编码',
                 dataIndex: 'wbs',
                 width: '8%',
             }, {
