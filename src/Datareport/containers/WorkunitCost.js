@@ -4,6 +4,9 @@ import { bindActionCreators } from 'redux';
 import { ProjectSum } from '../components/CostListData';
 import { ProjectSumExamine } from '../components/CostListData';
 import { ProjectSumExcalDelete } from '../components/CostListData';
+
+import { ProjectSumChange } from '../components/CostListData';
+
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { Row, Col, Table, Input, Button,Popconfirm } from 'antd';
 import { WORKFLOW_CODE } from '_platform/api.js'
@@ -33,6 +36,7 @@ export default class WorkunitCost extends Component {
 		this.state = {
 			addvisible: false,
 			delatevisible:false,
+			changevisible:false,
 			dataSource: []
 
 		}
@@ -56,7 +60,7 @@ export default class WorkunitCost extends Component {
 	                 } } = this.props;
 		let dataSource = [];
 		data.map(item => {
-			console.log('item',item)
+			
 			getDocument({ code: item.code }).then(single => {
 				
 				let temp = {
@@ -89,6 +93,7 @@ export default class WorkunitCost extends Component {
 
 	oncancel() {
 		this.setState({ addvisible: false })
+		this.setState({changevisible:false})
 	}
 	projectfill() {
 		this.setState({ addvisible: true })
@@ -101,6 +106,9 @@ export default class WorkunitCost extends Component {
 		let { dataSource } = this.state
 		dataSource.splice(index, 1)
 		this.setState({ dataSource })
+	}
+	setchgVisible(){
+		this.setState({changevisible:true})
 	}
 
 	//上传回调
@@ -183,6 +191,49 @@ export default class WorkunitCost extends Component {
 				})
 		})
 	}
+
+	//变更流程
+	setChangeData(data,participants){
+		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"工程量结算信息变更",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"工程量结算信息变更",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		//发起流程
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({changevisible:false})	
+						// message.info("发起成功")					
+					})
+		})
+    }
+
 	onSelectChange = (selectedRowKeys) => {
         const {dataSource} = this.state;
         let dataSourceSelected = [];
@@ -210,7 +261,7 @@ export default class WorkunitCost extends Component {
 			title: '单位工程',
 			dataIndex: 'unit',
 		}, {
-			title: '项目编号',
+			title: '清单项目编号',
 			dataIndex: 'projectcoding',
 		}, {
 			title: '项目名称',
@@ -248,7 +299,7 @@ export default class WorkunitCost extends Component {
 				<Row>
 					<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={this.projectfill.bind(this)}>发起填报</Button>
-					<Button className="btn" type="default" >申请变更</Button>
+					<Button className="btn" type="default" onClick={this.setchgVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={() => { this.setState({ delatevisible: true }) }}>申请删除</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search
@@ -271,6 +322,10 @@ export default class WorkunitCost extends Component {
 					this.state.delatevisible &&
 					<ProjectSumExcalDelete {...this.props} {...this.state } oncancel={this.delatecancel.bind(this)} onok={this.delateData.bind(this)} />
 				}
+				{
+					this.state.changevisible &&
+					<ProjectSumChange {...this.props} {...this.state } oncancel={this.oncancel.bind(this)} onok={this.setChangeData.bind(this)}/>
+                }
 			</div>)
 	}
 
