@@ -31,7 +31,10 @@ export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'P
 //文档目录树相关
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
+
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
+const putDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [], 'PUT');
+const deleteDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
 
 export const actions = {
 	...additionReducer,
@@ -53,7 +56,9 @@ export const actions = {
 	putDocList,
 	getScheduleDir,
 	postScheduleDir,
-	getDocument
+	getDocument,
+	putDocument,
+	deleteDocument
 };
 
 export default handleActions({

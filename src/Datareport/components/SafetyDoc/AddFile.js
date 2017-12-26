@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Input, Form, Spin, Upload, Icon, Button, Modal,
     Cascader ,Select, Popconfirm,message, Table, Row, Col, notification } from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import {getUser} from '_platform/auth';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
@@ -73,12 +74,12 @@ export default class AddFile extends Component {
             for (let i = 1; i < dataList.length; i++) {
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
-                    filename: dataList[i][0] ? dataList[i][0] : '',
-                    pubUnit: dataList[i][1] ? dataList[i][1] : '',
-                    type: dataList[i][2] ? dataList[i][2] : '',
-                    doTime: dataList[i][3] ? dataList[i][3] : '',
-                    remark: dataList[i][4] ? dataList[i][4] : '',
-                    upPeople: dataList[i][5] ? dataList[i][5] : '',
+                    filename: dataList[i][1] ? dataList[i][1] : '',
+                    pubUnit: dataList[i][2] ? dataList[i][2] : '',
+                    type: dataList[i][3] ? dataList[i][3] : '',
+                    doTime: dataList[i][4] ? dataList[i][4] : '',
+                    remark: dataList[i][5] ? dataList[i][5] : '',
+                    upPeople:getUser().person_name,
                     project:{
                         code:"",
                         name:"",
@@ -196,9 +197,9 @@ export default class AddFile extends Component {
 
     //删除
     delete(index){
-        let {dataSource} = this.state
-        dataSource.splice(index,1)
-        this.setState({dataSource})
+        let {dataSource} = this.state;
+        dataSource.splice(index,1);
+        this.setState({dataSource});
     }
 
     //预览
@@ -312,7 +313,7 @@ export default class AddFile extends Component {
     render() {
         const columns = [
             {
-                title:'编码',
+                title:'文档编码',
                 dataIndex:'code',
                 width: '10%'
             },{

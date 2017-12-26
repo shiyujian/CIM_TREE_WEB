@@ -207,9 +207,9 @@ export default class ToggleModal extends Component{
                 record.projType = ele;
                 this.forceUpdate();
             }} >
-                <Option value = 'construct'>建筑</Option>
-                <Option value = 'city'>市政</Option>
-                <Option value = 'garden'>园林</Option>
+                <Option value = '建筑'>建筑</Option>
+                <Option value = '市政'>市政</Option>
+                <Option value = '园林'>园林</Option>
             </Select>)
         },
          key: 'Type',

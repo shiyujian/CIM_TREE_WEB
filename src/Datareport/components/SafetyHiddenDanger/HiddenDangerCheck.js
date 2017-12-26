@@ -202,7 +202,7 @@ export default class HiddenDangerCheck extends Component {
                 width: '8%',
                 render: (text, record, index) => (
                     <span>
-                        {record.project.name}
+                        {record.projectName}
                     </span>
                 ),
             }, {
@@ -211,11 +211,11 @@ export default class HiddenDangerCheck extends Component {
                 width: '8%',
                 render: (text, record, index) => (
                     <span>
-                        {record.unit.name}
+                        {record.unit}
                     </span>
                 ),
             }, {
-                title: 'WBS',
+                title: 'WBS编码',
                 dataIndex: 'wbs',
                 width: '8%',
             }, {

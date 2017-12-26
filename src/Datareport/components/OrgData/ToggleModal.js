@@ -1,9 +1,12 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon} from 'antd';
+import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon,TreeSelect} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
 import { getUnit } from '../../store/orgdata';
+import { Promise } from 'es6-promise';
 const Search = Input.Search;
 const Option = Select.Option;
+const SHOW_PARENT = TreeSelect.SHOW_PARENT;
+const TreeNode = TreeSelect.TreeNode;
 export default class ToggleModal extends Component{
     constructor(props){
         super(props);
@@ -14,7 +17,9 @@ export default class ToggleModal extends Component{
             checkers: [],
             defaultPro: "",
             defaultchecker: "",
-            units:[]
+            units:[],
+            selectPro:[],
+            selectUnit:[]
         }
     }
     render(){
@@ -22,18 +27,13 @@ export default class ToggleModal extends Component{
         let jthis = this;
         const props = {
 			action: `${SERVICE_API}/excel/upload-api/`,
-			headers: {
-			},
 			showUploadList: false,
 		    onChange(info) {
 		        if (info.file.status !== 'uploading') {
 		        }
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
-                    let dataSource = jthis.handleExcelData(importData);
-                    jthis.setState({
-                        dataSource
-                    })
+                    jthis.handleExcelData(importData);
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
@@ -81,21 +81,38 @@ export default class ToggleModal extends Component{
         )
     }
      //处理上传excel的数据
-     handleExcelData(data) {
+    handleExcelData(data) {
+        const {actions:{getOrgReverse}} = this.props;
         data.splice(0, 1);
-        let res = data.map(item => {
-            return {
-                index: item[0],
-                code: item[1],
-                type: item[2],
-                name: item[3],
-                depart: item[4],
-                direct: item[5],
-                // unit: item[6],
-                remarks: item[6]
-            }
+        let type = [], canjian = [];
+        let promises = data.map(item => {
+            return getOrgReverse({code:item[3]});
         })
-        return res;
+        let res;
+        Promise.all(promises).then(rst => {
+            rst.map(item => {
+                type.push(item.children[0].name);
+                canjian.push(item.children[0].children[0].name);
+            })
+            res = data.map((item,index) => {
+                return {
+                    index: item[0],
+                    code: item[1],
+                    // 组织机构类型
+                    type: type[index],
+                    // 参建单位
+                    canjian: canjian[index],
+                    // 部门
+                    depart: item[2],
+                    // 直属部门
+                    direct: item[3],
+                    remarks: item[4]
+                }
+            });
+            this.setState({
+                dataSource:res
+            })
+        })
     }
     onok(){
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
@@ -103,7 +120,8 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
-
+        console.log(this.state.selectPro);
+        console.log(this.state.selectUnit);
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisible(false);
     }
@@ -132,18 +150,71 @@ export default class ToggleModal extends Component{
         });
         getProjects().then(rst => {
             if (rst.children.length) {
-                let projects = rst.children.map(item => {
-                    return (
-                        // <Option value={JSON.stringify(item)}>{item.name}</Option>
-                        <Option value={JSON.stringify(item)}>{item.name}</Option>
-                    )
-                })
+                // let projects = rst.children.map(item => {
+                //     return (
+                //         // <Option value={JSON.stringify(item)}>{item.name}</Option>
+                //         <Option value={JSON.stringify(item)}>{item.name}</Option>
+                //     )
+                // })
+                let projects = rst.children;
                 this.setState({
                     projects,
                     defaultPro: rst.children[0].name
                 })
+                console.log("this.state.projects",this.state.projects);
             }
         })
+    }
+    static lmyloop(data = [],depth=1) {
+		if (data.length <= 0 || depth > 1) {
+			return;
+        }
+		return data.map((item) => {
+			if (item.children && item.children.length>0) {
+				return (
+					<TreeNode
+						key={`${item.code}--${item.name}`}
+						value={`${item.code}--${item.name}`}
+						title={`${item.code} ${item.name}`}>
+						{
+							ToggleModal.lmyloop(item.children,depth++)
+						}
+					</TreeNode>
+				);
+			} else {
+				return(<TreeNode
+					key={`${item.code}--${item.name}`}
+					value={`${item.code}--${item.name}`}
+                    title={`${item.code} ${item.name}`} />
+                );
+			}
+		});
+    };
+    onSelect(value,node,extra){
+        const {actions:{getUnit}} = this.props;
+        let units = [];
+        let selectPro = [];
+        let promises = extra.checkedNodes.map(item => {
+            selectPro.push(item.key);
+            return getUnit({code:item.key.split("--")[0]});
+        })
+        this.setState({selectPro});
+        Promise.all(promises).then(rst => {
+            rst.map(item => {
+                item.children.map(it => {
+                    units.push(it);
+                })
+            })
+            this.setState({units})
+            console.log("this.state.units",this.state.units);
+        })
+    }
+    onSelectUnit(value, node, extra){
+        let selectUnit = [];
+        extra.checkedNodes.map(item => {
+            selectUnit.push(item.key);
+        })
+        this.setState({selectUnit});
     }
     columns = [{
         title: '序号',
@@ -159,8 +230,8 @@ export default class ToggleModal extends Component{
         key: 'Type',
     }, {
         title: '参建单位名称',
-        dataIndex: 'name',
-        key: 'Name',
+        dataIndex: 'canjian',
+        key: 'Canjian',
     }, {
         title: '组织机构部门',
         dataIndex: 'depart',
@@ -171,39 +242,49 @@ export default class ToggleModal extends Component{
         key: 'Direct',
     }, {
         title: '负责项目/子项目名称',
+        width:"15%",
+        height:"64px",
         render:(record) => {
             return (
-                <Select style={{width:"90%"}} value = {record.project || this.state.defaultPro} onSelect={ele => {
-                    record.project = JSON.parse(ele).name;
-                    console.log("ele",ele);
+                <TreeSelect style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
-                    getUnit({code:JSON.parse(ele).code}).then(rst => {
-                        let units = rst.children.map(item => {
-                            return (
-                                <Option value={JSON.stringify(item)}>{item.name}</Option>
-                            )
+                    let units = [];
+                    let selectPro = [];
+                    let promises = extra.checkedNodes.map(item => {
+                        selectPro.push(item.key);
+                        return getUnit({code:item.key.split("--")[0]});
+                    })
+                    record.selectPro = selectPro;
+                    Promise.all(promises).then(rst => {
+                        rst.map(item => {
+                            item.children.map(it => {
+                                units.push(it);
+                            })
                         })
                         this.setState({units})
+                        console.log("this.state.units",this.state.units);
                     })
-                    this.forceUpdate();
-                }}>
-                    {this.state.projects}
-                </Select>
+
+                }} 
+                >
+                    {ToggleModal.lmyloop(this.state.projects)}
+                </TreeSelect>
             )
         }
     }, {
         title: '负责单位工程名称',
-        // dataIndex: 'unit',
-        // key: 'Unit',
+        width:"15%",
         render:(record) => {
             return (
-                <Select style={{width:"90%"}} value = {record.unit || ''} onSelect={ ele => {
-                    record.unit = JSON.parse(ele).name;
-                    console.log("record.unit",record.unit);
-                    this.forceUpdate();
-                }}>
-                    {this.state.units}
-                </Select>
+                <TreeSelect onSelect={(value, node, extra) => {
+                    let selectUnit = [];
+                    extra.checkedNodes.map(item => {
+                        selectUnit.push(item.key);
+                    })
+                    record.selectUnit = selectUnit;
+                }} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
+                    {ToggleModal.lmyloop(this.state.units)}
+                 </TreeSelect>
             )
         }
     }, {

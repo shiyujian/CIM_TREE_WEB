@@ -19,6 +19,8 @@ import {getUser} from '_platform/auth';
 import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyHiddenDanger/AddFile';
+import DeleteFile from '../components/SafetyHiddenDanger/DeleteFile';
+import EditFile from '../components/SafetyHiddenDanger/EditFile';
 import {getNextStates} from '_platform/components/Progress/util';
 import Preview from '../../_platform/components/layout/Preview';
 var moment = require('moment');
@@ -37,13 +39,16 @@ class SafetyHiddenDanger extends Component {
     constructor() {
         super();
         this.state = {
-            dataSource: [],
-            setEditVisiable: false,
+            dataSource:[],
+            dataSourceSelected:[],
             selectedRowKeys: [],
+            setAddVisiable:false,
+            setEditVisiable:false,
+            setDeleteVisiable:false,
         }
     }
-    goCancel = () => {
-        this.setState({ setEditVisiable: false });
+    goCancel = () =>{
+        this.setState({setAddVisiable:false,setDeleteVisiable:false,setEditVisiable:false});
     }
 
     async componentDidMount(){
@@ -64,12 +69,16 @@ class SafetyHiddenDanger extends Component {
 
     async generateTableData(data){
         const {actions:{
-            getDocument,
+            getDocumentList,
         }} = this.props;
         let dataSource = [];
-        debugger
-        data.map(item=>{
-            getDocument({code:item.code}).then(single=>{
+        let codeList = [];
+        data.map(item =>{
+            codeList.push(item.code);
+        })
+        let docList = await getDocumentList({},{list:codeList});
+        if(docList.result){
+            docList.result.map((single)=>{
                 let temp = { 
                     code:single.extra_params.code,
                     wbs:single.extra_params.wbs,
@@ -80,16 +89,19 @@ class SafetyHiddenDanger extends Component {
                     unit:single.extra_params.unit,
                     projectName:single.extra_params.project,
                     result:single.extra_params.result,
+                    resUnit:single.extra_params.resUnit,
+                    file:single.basic_params.files[0],
                     deadline:single.extra_params.deadline,
-                    editResult:single.extra_params.editResult
+                    editResult:single.extra_params.editResult,
+                    docCode:single.code
                 }
                 dataSource.push(temp);
-                this.setState({dataSource});
-            })
-        })
+            });
+        }
+        this.setState({dataSource});
     }
 
-    setEditData = (data,participants) => {
+    setAddData = (data,participants) => {
         const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -123,18 +135,106 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({setEditVisiable:false})						
+						this.setState({setAddVisiable:false})						
 					})
 		})
     }
 
-    onAddClick = () => {
-        this.setState({ setEditVisiable: true });
+    setDeleteData = (data,participants) =>{
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"安全隐患信息批量删除",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"安全隐患信息批量删除",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({setDeleteVisiable:false})						
+					})
+		})
+    }
+
+    onBtnClick = (type) =>{
+        if(type==="add"){
+            this.setState({setAddVisiable:true});
+        }else if(type==="delete"){
+            this.setState({setDeleteVisiable:true});
+        }else if(type==="edit"){
+            this.setState({setEditVisiable:true});
+        }
     }
     onSelectChange = (selectedRowKeys) => {
-		this.setState({ selectedRowKeys });
+        const {dataSource} = this.state;
+        let dataSourceSelected = [];
+        for(let i=0;i<selectedRowKeys.length;i++){
+            dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
+        }
+        this.setState({selectedRowKeys,dataSourceSelected});
     }
-    
+    setEditData = (data,participants) =>{
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"安全隐患信息批量变更",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"安全隐患信息批量变更",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({setDeleteVisiable:false})						
+					})
+		})
+    }
+
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
         let f = this.state.dataSource[index].file
@@ -220,16 +320,18 @@ class SafetyHiddenDanger extends Component {
                 <Content>
                     <Row style={{ marginBottom: "30px" }}>
                         <Col span={15}>
-                            <Button
-                                style={{ marginRight: "30px" }}
-                                onClick={() => this.onAddClick()}
+                            <Button 
+                            style={{ marginRight: "30px" }}
+                            onClick={()=>this.onBtnClick("add")}
                             >发起填报</Button>
-                            <Button
-                                style={{ marginRight: "30px" }}>申请变更</Button>
-                            <Button
-                                style={{ marginRight: "30px" }}>申请删除</Button>
-                            <Button
-                                style={{ marginRight: "30px" }}>导出表格</Button>
+                            <Button 
+                            style={{ marginRight: "30px" }}
+                            onClick={()=>this.onBtnClick("edit")}>申请变更</Button>
+                            <Button 
+                            style={{ marginRight: "30px" }}
+                            onClick={()=>this.onBtnClick("delete")}>申请删除</Button>
+                            <Button 
+                            style={{ marginRight: "30px" }}>导出表格</Button>
                             <Search
                                 placeholder="请输入内容"
                                 style={{ width: 200, marginLeft: "20px" }}
@@ -246,10 +348,17 @@ class SafetyHiddenDanger extends Component {
                     />
                 </Content>
                 {
-					this.state.setEditVisiable &&
-					<AddFile {...this.props} oncancel={this.goCancel.bind(this)} akey={Math.random()*1234} onok={this.setEditData.bind(this)}/>
-				}
-                
+					this.state.setAddVisiable &&
+					<AddFile {...this.props} oncancel={this.goCancel.bind(this)} akey={Math.random()*1234} onok={this.setAddData.bind(this)}/>
+                }
+                {
+                    this.state.setDeleteVisiable &&
+                    <DeleteFile {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} akey={Math.random()} onok={this.setDeleteData.bind(this)} />
+                }
+                {
+                    this.state.setEditVisiable &&
+                    <EditFile {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} akey={Math.random()} onok={this.setEditData.bind(this)} />
+                }
             </Main>)
     }
 };
