@@ -3,12 +3,13 @@ import { Table, Button, Popconfirm, message, Input } from 'antd';
 import style from './TableOrg.css'
 const Search = Input.Search;
 export default class TableOrg extends Component {
+	constructor(props){
+		super(props);
+		this.state = {
+			dataSource: []
+		}
+	}
 	render() {
-		// const { platform: { org = [] } } = this.props;
-		// let dataSource = org.children || [];
-		// dataSource.map((item, index) => {
-		// 	item.index = index + 1;
-		// })
 		return (
 			<div>
 				<div>
@@ -24,7 +25,7 @@ export default class TableOrg extends Component {
 					columns={this.columns}
 					bordered={true}
 					rowSelection={this.rowSelection}
-					// dataSource={dataSource}
+					dataSource={this.state.dataSource}
 					rowKey = "code"
 				>
 				</Table>
@@ -39,12 +40,18 @@ export default class TableOrg extends Component {
 		const { actions: { ModalVisibleCJ } } = this.props;
 		ModalVisibleCJ(true);
 	}
-	componentDidMount() {
-		// let dataSource = [];
-		// const { actions: { getOrgTree } } = this.props;
-		// getOrgTree({}, { depth: 7 }).then(rst => {
-		// 	dataSource = rst.children;
-		// });
+	async componentDidMount() {
+		let dataSource = [];
+		const { actions: { getOrgTree } } = this.props;
+		await getOrgTree().then(rst => {
+			if (rst && rst.children) {
+				rst.children.map((item, index) => {
+					dataSource.push(...item.children);
+				})
+			}
+		})
+		console.log("dataSource:",dataSource);
+		this.setState({dataSource})
 	}
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
@@ -71,31 +78,31 @@ export default class TableOrg extends Component {
 		key: 'Code',
 	}, {
 		title: '组织机构类型',
-		dataIndex: 'type',
+		dataIndex: 'extra_params.org_type',
 		key: 'Type',
 	}, {
 		title: '参建单位名称',
-        dataIndex: 'canjian',
+        dataIndex: 'extra_params.canjian',
         key: 'Canjian',
 	}, {
 		title: '组织机构部门',
-		dataIndex: 'depart',
-		key: 'depart',
+		dataIndex: 'name',
+		key: 'Name',
 	}, {
 		title: '直属部门',
-		dataIndex: 'direct',
+		dataIndex: 'extra_params.direct',
 		key: 'Direct',
 	}, {
 		title: '负责项目/子项目名称',
-		dataIndex: 'project',
+		dataIndex: 'extra_params.project',
 		key: 'Project',
 	},{
 		title: '负责单位工程名称',
-		dataIndex: 'unit',
+		dataIndex: 'extra_params.unit',
 		key: 'Unit'
 	},{
 		title: '备注',
-		dataIndex: 'remarks',
+		dataIndex: 'extra_params.remarks',
 		key: 'Remarks'
 	}]
 }

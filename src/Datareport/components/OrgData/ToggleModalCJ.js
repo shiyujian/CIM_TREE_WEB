@@ -22,46 +22,6 @@ export default class ToggleModalCJ extends Component{
             selectUnit:[]
         }
     }
-    setData(data,participants){
-		// console.log("data:",data);
-		// console.log("participants:",participants);
-		// return;
-		const {actions:{ createWorkflow, logWorkflowEvent}} = this.props
-		let creator = {
-			id:getUser().id,
-			username:getUser().username,
-			person_name:getUser().person_name,
-			person_code:getUser().person_code,
-		}
-		let postdata = {
-			name:"参建单位信息批量录入",
-			code:WORKFLOW_CODE["数据报送流程"],
-			description:"参建单位信息批量录入",
-			subject:[{
-				data:JSON.stringify(data)
-			}],
-			creator:creator,
-			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
-			deadline:null,
-			status:"2"
-		}
-		createWorkflow({},postdata).then((rst) => {
-			let nextStates =  getNextStates(rst,rst.current[0].id);
-            logWorkflowEvent({pk:rst.id},
-                {
-                    state:rst.current[0].id,
-                    action:'提交',
-                    note:'发起参建单位填报',
-                    executor:creator,
-                    next_states:[{
-                        participants:[participants],
-                        remark:"",
-                        state:nextStates[0].to_state[0].id,
-                    }],
-					attachment:null
-				});
-		});
-	}
     render(){
         const {visibleCJ = false} = this.props;
         let jthis = this;
@@ -73,10 +33,7 @@ export default class ToggleModalCJ extends Component{
 		        }
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
-                    let dataSource = jthis.handleExcelData(importData);
-                    jthis.setState({
-                        dataSource
-                    })
+                    jthis.handleExcelData(importData);
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
@@ -127,45 +84,28 @@ export default class ToggleModalCJ extends Component{
      handleExcelData(data) {
         const {actions:{getOrgReverse}} = this.props;
         data.splice(0, 1);
-        let type = [], canjian = [];
-        let promises = data.map(item => {
-            return getOrgReverse({code:item[3]});
+        let res = data.map((item, index) => {
+            return {
+                index: item[0],
+                // 组织机构类型
+                type:item[1],
+                code: item[2],
+                // 参建单位
+                canjian: item[3],
+                remarks: item[4]
+            }
+         })
+        this.setState({
+            dataSource:res
         })
-        let res;
-        Promise.all(promises).then(rst => {
-            rst.map(item => {
-                type.push(item.children[0].name);
-                canjian.push(item.children[0].children[0].name);
-                console.log("type:",type)
-                console.log("canjian:",canjian)
-            })
-            res = data.map((item,index) => {
-                return {
-                    index: item[0],
-                    code: item[1],
-                    // 组织机构类型
-                    type: type[index],
-                    // 参建单位
-                    canjian: canjian[index],
-                    // 部门
-                    depart: item[2],
-                    // 直属部门
-                    direct: item[3],
-                    remarks: item[4]
-                }
-            })
-        })
-        return res;
     }
     onok(){
-        const { actions: { ModalVisibleCJ, } } = this.props;
+        const { actions: { ModalVisibleCJ} } = this.props;
         if (!this.state.passer) {
             message.error('审批人未选择');
             return;
         }
-        console.log(this.state.selectPro);
-        console.log(this.state.selectUnit);
-        this.setData.bind(this, this.state.dataSource, JSON.parse(this.state.passer));
+        this.props.setDataCJ(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisibleCJ(false);
     }
     cancel() {
@@ -275,35 +215,12 @@ export default class ToggleModalCJ extends Component{
         title: '参建单位名称',
         dataIndex: 'canjian',
         key: 'Canjian',
-    }, {
-        title: '组织机构部门',
-        dataIndex: 'depart',
-        key: 'depart',
-    }, {
+    },{
         title: '负责项目/子项目名称',
         width:"15%",
         height:"64px",
         render:(record) => {
             return (
-                // <Select style={{width:"90%"}} value = {record.project || this.state.defaultPro} onSelect={ele => {
-                //     record.project = JSON.parse(ele).name;
-                //     console.log("ele",ele);
-                //     const {actions:{getUnit}} = this.props;
-                //     getUnit({code:JSON.parse(ele).code}).then(rst => {
-                //         let units = rst.children.map(item => {
-                //             return (
-                //                 <Option value={JSON.stringify(item)}>{item.name}</Option>
-                //             )
-                //         })
-                //         this.setState({units})
-                //     })
-                //     this.forceUpdate();
-                // }}>
-                //     {this.state.projects}
-                // </Select>
-                // <TreeSelect onSelect={this.onSelect.bind(this)} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
-                //     {ToggleModal.lmyloop(this.state.projects)}
-                // </TreeSelect>
                 <TreeSelect style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
                     let units = [];
@@ -325,7 +242,7 @@ export default class ToggleModalCJ extends Component{
 
                 }} 
                 >
-                    {ToggleModal.lmyloop(this.state.projects)}
+                    {ToggleModalCJ.lmyloop(this.state.projects)}
                 </TreeSelect>
             )
         }
@@ -341,7 +258,7 @@ export default class ToggleModalCJ extends Component{
                     })
                     record.selectUnit = selectUnit;
                 }} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
-                    {ToggleModal.lmyloop(this.state.units)}
+                    {ToggleModalCJ.lmyloop(this.state.units)}
                  </TreeSelect>
             )
         }
