@@ -34,6 +34,9 @@ const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{keywor
 //删除
 const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
 const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE');
+
+export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
+
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -51,8 +54,8 @@ export const actions = {
 	getQuantitiesCode,
 	getSearcher,
 	delDocList,
-	deleteWorkflow
-
+	deleteWorkflow,
+	putDocList
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
