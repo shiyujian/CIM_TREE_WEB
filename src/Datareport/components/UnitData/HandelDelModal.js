@@ -22,7 +22,7 @@ const Option = Select.Option
 		actions: bindActionCreators({ ...actions,...platformActions,...actions2,...projactions}, dispatch)
 	})
 )
-export default class UnitToggle extends Component {
+export default class HandelDelModal extends Component {
 
 	constructor(props) {
 		super(props);
@@ -48,7 +48,7 @@ export default class UnitToggle extends Component {
     async submit(){
         if(this.state.opinion === 1){
             await this.passon();        
-            this.props.closeModal("dr_qua_unit_visible",false);
+            this.props.closeModal("dr_del_unit_visible",false);
         }else{
             await this.reject();
         }
@@ -183,10 +183,6 @@ export default class UnitToggle extends Component {
     }
 	render() {
      const  columns = [{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'Index',
-      },{
         title: '单位工程编码',
         dataIndex:'code',
         key: 'Code',
@@ -222,14 +218,18 @@ export default class UnitToggle extends Component {
       },{
         title: '建设单位',
         render:(record)=>{
-            return(<span>{record.rsp_org.name}</span>)
-        },
+			let ogrname = '';
+			if(record.rsp_orgName && record.rsp_orgName.length>0){
+				ogrname =record.rsp_orgName[0];
+			}
+			return (<span>{ogrname}</span>)
+		},
         key:'Org'
       },{
           title:'附件',
           key:'file',
           render:(record) => (
-                <a> {record.file.name}</a>
+                <a> {record.files?record.files[0].name:'暂无'}</a>
           )
       }];
       let projname = this.state.project?this.state.project.name:'';
