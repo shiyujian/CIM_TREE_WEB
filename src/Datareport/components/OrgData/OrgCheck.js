@@ -55,9 +55,7 @@ export default class OrgCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        console.log("dataSource",dataSource);
-        console.log("wk",wk);
-        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList,postOrgList,getOrgRoot}} = this.props
+        const {actions:{logWorkflowEvent, updateWpData, addDocList, putDocList, postOrgList, getOrgRoot, putUnit, putProject, getProject, getUnitAc, getUnit, getOrgPk}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -68,38 +66,74 @@ export default class OrgCheck extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        console.log("dataSource",dataSource);
         let data_list = [];
-        getOrgRoot().then(rst => {
-            console.log("rst:",rst);
-            dataSource.map((o) => {
-                data_list.push({
-                    code:"" + o.code,
-                    name: o.name,
-                    obj_type: "C_ORG",
-                    status: "A",
-                    version: "A",
-                    extra_params: {
-                        type:o.type,
-                        depart:o.depart,
-                        direct:o.direct,
-                        project:o.project,
-                        unit:o.unit,
-                        remarks:o.remarks
-                    },
-                    parent:{
-                        code:"ORG_ROOT",
-                        pk:"403050400306",
-                        obj_type:"C_ORG"
-                    }
+        let promises = dataSource.map((o) => {
+            return getOrgPk({code:o.direct})
+        });
+        let rst = await Promise.all(promises);
+        dataSource.map((o, index) => {
+            data_list.push({
+                code: "" + o.code,
+                name: o.depart,
+                obj_type: "C_ORG",
+                status: "A",
+                version: "A",
+                extra_params: {
+                    org_type: o.type,
+                    canjian: o.canjian,
+                    direct: o.direct,
+                    project: o.selectPro,
+                    unit: o.selectUnit,
+                    remarks: o.remarks
+                },
+                parent: {
+                    code: o.direct,
+                    pk: rst[index].pk,
+                    obj_type: "C_ORG"
+                }
+            })
+        })
+        postOrgList({}, { data_list: data_list }).then(res => {
+            dataSource.map((item, index) => {
+                item.selectPro.map(it => {
+                    let proCode = it.split("--")[0];
+                    // 取出项目中所的orgs
+                    getProject({code:proCode}).then(rstPro => {
+                        let pro_orgs = rstPro.response_orgs;
+                        let pk = res.result[index].pk
+                        pro_orgs.push({
+                            code:item.code,
+                            obj_type:"C_ORG",
+                            pk:pk
+                        });
+                        putProject({ code: proCode }, {
+                            version: "A",
+                            response_orgs: pro_orgs
+                        }).then(rst => {
+                            console.log("rst:", rst);
+                        }) 
+                    });
+                }) 
+                item.selectUnit.map(it => {
+                    let unitCode = it.split("--")[0];
+                    getUnitAc({code:unitCode}).then(rstUnit => {
+                        let unit_orgs = rstUnit.response_orgs;
+                        let pk = res.result[index].pk
+                        unit_orgs.push({
+                            code:item.code,
+                            obj_type:"C_ORG",
+                            pk:pk
+                        });
+                        putUnit({ code: unitCode }, {
+                            version: "A",
+                            response_orgs: unit_orgs
+                        }).then(rst => {
+                            console.log("rst:", rst);
+                        }) 
+                    })
                 })
             })
-            postOrgList({},{data_list:data_list}).then(res => {
-                if (res.result.length) {
-                    message.success("审核成功");
-                }
-            });
-        })
+        });
     }
     //不通过
     async reject(){
@@ -139,8 +173,8 @@ export default class OrgCheck extends Component {
             key: 'Type',
         }, {
             title: '参建单位名称',
-            dataIndex: 'name',
-            key: 'Name',
+            dataIndex: 'canjian',
+            key: 'Canjian',
         }, {
             title: '组织机构部门',
             dataIndex: 'depart',
@@ -151,12 +185,12 @@ export default class OrgCheck extends Component {
             key: 'Direct',
         }, {
             title: '负责项目/子项目名称',
-            dataIndex: 'project',
-            key: 'Project',
+            dataIndex: 'selectPro',
+            key: 'SelectPro',
         }, {
             title: '负责单位工程名称',
-            dataIndex: 'unit',
-            key: 'Unit'
+            dataIndex: 'selectUnit',
+            key: 'SelectUnit'
         }, {
             title: '备注',
             dataIndex: 'remarks',

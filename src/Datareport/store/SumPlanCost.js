@@ -29,7 +29,12 @@ const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [],
 //批量创建文档
 export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
-
+// 获取施工包关联文档
+const getWorkDocumentByCode = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?rel_docs=true`, [], 'GET');
+//获取文档数据
+const getDocData = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [], 'GET');
+//搜索数据
+const getExBySearch = createFetchAction(`${SERVICE_API}/searcher/?keyword=rel_doc_jsjh&obj_type=C_DOC`, [], 'GET');
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -46,7 +51,10 @@ export const actions = {
 	updateWpData,
 	getScheduleDir,
 	postScheduleDir,
-	getWorkpackagesByCode
+	getWorkpackagesByCode,
+	getWorkDocumentByCode,
+	getDocData,
+	getExBySearch
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

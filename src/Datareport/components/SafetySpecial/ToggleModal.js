@@ -41,7 +41,6 @@ export default class ToggleModal extends Component {
                     bordered={true}
                     dataSource={this.state.dataSource}
                     rowKey={(item, index) => index}
-
                 >
                 </Table>
                 <Row style={{ marginBottom: "30px" }} type="flex">
@@ -55,7 +54,7 @@ export default class ToggleModal extends Component {
                             beforeUpload={this.beforeUpload.bind(this)}
                         >
                             <Button style={{ margin: '10px 10px 10px 0px' }}>
-                                <Icon type="upload" />上传并预览(文件名需为英文)
+                                <Icon type="upload" />上传并预览
                         </Button>
                         </Upload>
                     </Col>
@@ -93,62 +92,8 @@ export default class ToggleModal extends Component {
             </Modal>
         )
     }
-    covertURLRelative = (originUrl) => {
-        return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-    }
-    beforeUploadPicFile(index, file) {
-        // 上传到静态服务器
-        const fileName = file.name;
-        let { dataSource, unit, project } = this.state;
-        let temp = fileName.split(".")[0]
-        const { actions: { uploadStaticFile } } = this.props;
-        const formdata = new FormData();
-        formdata.append('a_file', file);
-        formdata.append('name', fileName);
-        let myHeaders = new Headers();
-        let myInit = {
-            method: 'POST',
-            headers: myHeaders,
-            body: formdata
-        };
-        fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
-            resp = await resp.json()
-            if (!resp || !resp.id) {
-                message.error('文件上传失败')
-                return;
-            };
-            const filedata = resp;
-            filedata.a_file = this.covertURLRelative(filedata.a_file);
-            filedata.download_url = this.covertURLRelative(filedata.a_file);
-            const attachment = {
-                size: resp.size,
-                id: filedata.id,
-                name: resp.name,
-                status: 'done',
-                url: filedata.a_file,
-                //thumbUrl: SOURCE_API + resp.a_file,
-                a_file: filedata.a_file,
-                download_url: filedata.download_url,
-                mime_type: resp.mime_type
-            };
-            let unitProject = {
-                name: unit.name,
-                code: unit.code,
-                obj_type: unit.obj_type
-            }
-            let projectt = {
-                name: project.name,
-                code: project.code,
-                obj_type: project.obj_type
-            }
-            dataSource[index]['file'] = attachment;
-            dataSource[index]['unit'] = unitProject;
-            dataSource[index]['project'] = projectt;
-            this.setState({ dataSource })
-        });
-        return false;
-    }
 
+    
     selectChecker(value) {
         let check = JSON.parse(value);
         this.setState({ check })
@@ -157,7 +102,7 @@ export default class ToggleModal extends Component {
     //     return new Data(time)
     // }
 
-    uplodachange = (info) => {
+    uplodachange(info) {
         //info.file.status/response
         if (info && info.file && info.file.status === 'done') {
             // notification.success({
@@ -200,7 +145,7 @@ export default class ToggleModal extends Component {
         }
     }
 
-    onSelectProject = (value, selectedOptions) => {
+    onSelectProject(value, selectedOptions) {
         console.log('vip-value', value)
         console.log('vip-selectedOptions', selectedOptions)
         let project = {};
@@ -225,7 +170,7 @@ export default class ToggleModal extends Component {
         this.setState({ project: {}, unit: {} });
     }
 
-    loadData = (selectedOptions) => {
+    loadData(selectedOptions) {
         // console.log('vip-selectedOptions', selectedOptions)
         const { actions: { getProjectTree } } = this.props;
         const targetOption = selectedOptions[selectedOptions.length - 1];
@@ -330,6 +275,63 @@ export default class ToggleModal extends Component {
         });
     }
 
+    covertURLRelative(originUrl) {
+        return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+    }
+    beforeUploadPicFile(index, file) {
+        // 上传到静态服务器
+        const fileName = file.name;
+        let { dataSource, unit, project } = this.state;
+        let temp = fileName.split(".")[0]
+        const { actions: { uploadStaticFile } } = this.props;
+        const formdata = new FormData();
+        formdata.append('a_file', file);
+        formdata.append('name', fileName);
+        let myHeaders = new Headers();
+        let myInit = {
+            method: 'POST',
+            headers: myHeaders,
+            body: formdata
+        };
+        fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
+            resp = await resp.json()
+            if (!resp || !resp.id) {
+                message.error('文件上传失败')
+                return;
+            };
+            const filedata = resp;
+            filedata.a_file = this.covertURLRelative(filedata.a_file);
+            filedata.download_url = this.covertURLRelative(filedata.a_file);
+            const attachment = {
+                size: resp.size,
+                id: filedata.id,
+                name: resp.name,
+                status: 'done',
+                url: filedata.a_file,
+                //thumbUrl: SOURCE_API + resp.a_file,
+                a_file: filedata.a_file,
+                download_url: filedata.download_url,
+                mime_type: resp.mime_type
+            };
+            let unitProject = {
+                name: unit.name,
+                code: unit.code,
+                obj_type: unit.obj_type
+            }
+            let projectt = {
+                name: project.name,
+                code: project.code,
+                obj_type: project.obj_type
+            }
+            dataSource[index]['file'] = attachment;
+            dataSource[index]['unit'] = unitProject;
+            dataSource[index]['project'] = projectt;
+            this.setState({ dataSource })
+        });
+        return false;
+    }
+
+
     //附件删除
     remove(index) {
         const { actions: { deleteStaticFile } } = this.props
@@ -433,8 +435,11 @@ export default class ToggleModal extends Component {
     columns = [
         {
             title: '序号',
-            dataIndex: 'index',
+            // dataIndex: 'index',
             width: '5%',
+            render: (text, record, index) => {
+                return index + 1
+            },
         }
         ,
         // {

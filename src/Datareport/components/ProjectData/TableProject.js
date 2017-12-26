@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Button, Popconfirm, message, Input, Icon } from 'antd';
-import style from './TableProject.css'
+import style from './TableProject.css';
+import DelProj from './DelModal';
 
 const Search = Input.Search;
 export default class TableProject extends Component {
@@ -12,7 +13,7 @@ export default class TableProject extends Component {
 		let rowSelection = {
 			selectedRowKeys:this.state.selectedRowKeys||[],
 			onChange: (selectedRowKeys, selectedRows) => {
-				this.setState({selectedRowKeys})
+				this.setState({selectedRowKeys,selectedRows})
 			}
 		};
 		return (
@@ -21,7 +22,14 @@ export default class TableProject extends Component {
 					<Button style={{ marginRight: "10px" }}>模板下载</Button>
 					<Button onClick={this.send.bind(this)} className={style.button}>发起填报</Button>
 					<Button className={style.button}>申请变更</Button>
-					<Button className={style.button}>申请删除</Button>
+					<Button className={style.button} onClick = {()=>{
+						if(this.state.selectedRows && this.state.selectedRows.length>0)
+						{
+							this.setState({deling:true});
+							return;
+						}
+						message.warning('请至少选择一条');
+					}}>申请删除</Button>
 					<Button className={style.button}>导出表格</Button>
 					<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容" />
 				</div>
@@ -33,6 +41,17 @@ export default class TableProject extends Component {
 					dataSource={this.state.dataSource||[]}
 				>
 				</Table>
+				{
+					this.state.deling &&
+					<DelProj
+						onCancel={() => {
+							this.setState({ deling: false });
+						}}
+						dataSource={this.state.selectedRows}
+						actions={this.props.actions}
+					/>
+				}
+
 			</div>
 		)
 	}

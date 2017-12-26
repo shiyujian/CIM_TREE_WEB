@@ -26,6 +26,12 @@ const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 
+// //工程量结算关联
+const getQuantitiesCode= createFetchAction(`${SERVICE_API}/tags/code/{{code}}/`,[],'GET');  
+
+//搜索
+const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{keyword}}&obj_type=C_QTO`, [], 'GET');
+
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -39,7 +45,9 @@ export const actions = {
 	addDocList,
 	getScheduleDir,
 	postScheduleDir,
-    updateWpData
+	updateWpData,
+	getQuantitiesCode,
+	getSearcher
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
