@@ -13,6 +13,7 @@ import PriceModifyCheck from 'Datareport/components/CostListData/PriceModifyChec
 import JianyanCheck from 'Datareport/components/Quality/JianyanCheck';
 import DesignDataCheck from 'Datareport/components/DesignData/Check';
 import DesignDataModifyCheck from 'Datareport/components/DesignData/ModifyCheck';
+import DesignDataExpurgateCheck from 'Datareport/components/DesignData/ExpurgateCheck';
 import SafetyDocCheck from 'Datareport/components/SafetyDoc/SafetyDocCheck';
 import HiddenDangerCheck from 'Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
 import ModalCheck from 'Datareport/components/ModalData/ModalCheck';
@@ -28,6 +29,7 @@ import SafetySpecialCheck from 'Datareport/components/SafetySpecial/SafetySpecia
 import UnitToggle from 'Datareport/components/UnitData/UnitToggle';
 import VedioCheck from 'Datareport/components/VedioData/VedioCheck';
 import VedioInfoCheck from 'Datareport/components/VedioData/VedioInfoCheck';
+import DefectCheck from 'Datareport/components/Quality/DefectCheck';
 import DefectModal from 'Datareport/components/Quality/DefectModal';
 import SafetyDocDeleteCheck from 'Datareport/components/SafetyDoc/SafetyDocDeleteCheck';
 import DangerDeleteCheck from 'Datareport/components/SafetyHiddenDanger/DangerDeleteCheck';
@@ -39,6 +41,16 @@ import ExpurgateCheck from 'Datareport/components/ModalData/ExpurgateCheck';
 import HandelDelModal from 'Datareport/components/UnitData/HandelDelModal';
 import ProjectSumExcalDeleteCheck from 'Datareport/components/CostListData/ProjectSumExcalDeleteCheck';
 import HandelDelProjModal from 'Datareport/components/ProjectData/HandleDelProj';
+import DelCheck from 'Datareport/components/OrgData/delCheck';
+import DocEditFileCheck from 'Datareport/components/SafetyDoc/DocEditFileCheck';
+import DangerEditFileCheck from 'Datareport/components/SafetyHiddenDanger/DangerEditFileCheck';
+import DesignDeleteCheck from 'Datareport/components/ScheduleData/DesignDeleteCheck';
+import SumSpeedExamineChange from 'Datareport/components/CostListData/SumSpeedExamineChange';
+import JianyanpiDelete from 'Datareport/components/Quality/JyDeleteCheck';
+import SumPlanChangeCheck from 'Datareport/components/CostListData/SumPlanChangeCheck';
+import ProjectSumChangeChock from 'Datareport/components/CostListData/ProjectSumChangeChock';
+import SafetySpecialDeleteCheck from 'Datareport/components/SafetySpecial/SafetySpecialDeleteCheck';
+import SafetySpecialEditCheck from 'Datareport/components/SafetySpecial/SafetySpecialEditCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -86,6 +98,7 @@ export default class Progress extends Component {
 			dr_qua_unit_visible,
 			design_check_visbile,
 			design_modifycheck_visbile,
+			design_expurgatecheck_visbile,
 			safety_vedioCheck_visible,
 			safety_vedioInfoCheck_visible,
 			dr_qua_defect_visible,
@@ -98,7 +111,17 @@ export default class Progress extends Component {
 			expurgate_check_visbile,
 			dr_del_unit_visible,
 			dr_qua_cckk_delate_visible,
-			dr_del_proj_visible
+			dr_del_proj_visible,
+			dr_base_del_visible,
+			safety_doc_edit_visible,
+			safety_hidden_edit_visible,
+			scheduledata_doc_delete_visible,
+			cost_sum_change_visible,
+			dr_qua_jy_del_visible,
+			dr_qua_jsjh_change_visible,
+			cost_sum_cckk_visible,
+			Safety_Special_delete_visible,
+			Safety_Special_edit_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -277,6 +300,10 @@ export default class Progress extends Component {
 					<DesignDataModifyCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					design_expurgatecheck_visbile && 
+					<DesignDataExpurgateCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
 					safety_vedioCheck_visible && 
 					<VedioCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
@@ -286,7 +313,7 @@ export default class Progress extends Component {
 				}
 				{
 					dr_qua_defect_visible && 
-					<DefectModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<DefectCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					safety_doc_delete_visible && 
@@ -328,6 +355,46 @@ export default class Progress extends Component {
 					dr_del_proj_visible && 
 					<HandelDelProjModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					dr_base_del_visible && 
+					<DelCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_doc_edit_visible && 
+					<DocEditFileCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_hidden_edit_visible && 
+					<DangerEditFileCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					scheduledata_doc_delete_visible && 
+					<DesignDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					cost_sum_change_visible && 
+					<SumSpeedExamineChange wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_qua_jy_del_visible && 
+					<JianyanpiDelete wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_qua_jsjh_change_visible && 
+					<SumPlanChangeCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					cost_sum_cckk_visible && 
+					<ProjectSumChangeChock wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					Safety_Special_delete_visible && 
+					<SafetySpecialDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					Safety_Special_edit_visible && 
+					<SafetySpecialEditCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -363,6 +430,9 @@ export default class Progress extends Component {
 				break;
 			case "设计信息批量变更":
 				changeDatareportVisible({key:'design_modifycheck_visbile',value:true})
+				break;
+			case "设计信息批量删除":
+				changeDatareportVisible({key:'design_expurgatecheck_visbile',value:true})
 				break;
 			case "组织机构信息批量录入":
 				changeDatareportVisible({key:'dr_base_org_visible',value:true})
@@ -447,6 +517,36 @@ export default class Progress extends Component {
 				break;
 			case "项目批量删除申请":
 				changeDatareportVisible({key:'dr_del_proj_visible',value:true})
+				break;
+			case "组织机构信息批量删除":
+				changeDatareportVisible({key:'dr_base_del_visible',value:true})
+				break;
+			case "安全管理信息批量变更":
+				changeDatareportVisible({key:'safety_doc_edit_visible',value:true})
+				break;
+			case "安全隐患信息批量变更":
+				changeDatareportVisible({key:'safety_hidden_edit_visible',value:true})
+				break;
+			case "设计进度批量删除":
+				changeDatareportVisible({key:'scheduledata_doc_delete_visible',value:true})
+				break;
+			case "结算进度信息变更":
+				changeDatareportVisible({key:'cost_sum_change_visible',value:true})
+				break;
+			case "检验验收信息批量删除":
+				changeDatareportVisible({key:'dr_qua_jy_del_visible',value:true})
+				break;
+			case "结算计划信息变更":
+				changeDatareportVisible({key:'dr_qua_jsjh_change_visible',value:true})
+				break;
+			case "工程量结算信息变更":
+				changeDatareportVisible({key:'cost_sum_cckk_visible',value:true})
+				break;
+			case "安全专项信息批量删除":
+				changeDatareportVisible({key:'Safety_Special_delete_visible',value:true})
+				break;
+			case "安全专项信息批量变更":
+				changeDatareportVisible({key:'Safety_Special_edit_visible',value:true})
 				break;
 			default:break;
 		}

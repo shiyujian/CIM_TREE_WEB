@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message,Cascader} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less'
-import Preview from '../../../_platform/components/layout/Preview';
+import Preview from '_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -124,6 +124,12 @@ class DefectModal extends Component {
             message.info(`有数据不正确`)
             return
         }
+        if(this.state.dataSource.some((o,index) => {
+            return !o.file.name
+        })){
+            message.info(`有数据未上传附件`)
+            return
+        }
         let {check} = this.state
         let per = {
             id:check.id,
@@ -207,13 +213,14 @@ class DefectModal extends Component {
         if(dataSource[i].flag){
             return
         }
+        let tmp = dataSource[i].file.name ? true : false
         const {actions:{getWorkPackageDetail}} = this.props
         let fenbu = await getWorkPackageDetail({code:record.code})
         let obj = {}
         let flag = false
         if(fenbu.name){
             obj = await this.getInfo(fenbu)
-            flag = true
+            flag = true && tmp
             dataSource[i].project = obj.project
             dataSource[i].unit = obj.unit
             dataSource[i].respon_unit = obj.respon_unit

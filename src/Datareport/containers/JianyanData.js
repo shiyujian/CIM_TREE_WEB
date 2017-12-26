@@ -64,6 +64,12 @@ export default class JianyanData extends Component {
 			}
 		}];
 	}
+	componentDidMount(){
+		const {actions:{getResouce}} = this.props
+		getResouce({keyword:'_',obj_type:'C_WP_CEL'}).then(rst => {
+			console.log(rst)
+		})
+	}
 	//批量上传回调
 	setData(data,participants){
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props

@@ -6,7 +6,7 @@ import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,notification,Po
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import {getUser} from '_platform/auth';
-import {actions} from '../../store/safety';
+import {actions} from '../../store/WorkunitCost';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
@@ -16,8 +16,8 @@ const {Option} = Select;
 
 @connect(
 	state => {
-        const {datareport: {safety = {}} = {}, platform} = state;
-		return {...safety, platform}
+        const {datareport: {WorkunitCost = {}} = {}, platform} = state;
+		return {...WorkunitCost, platform}
 	},
 	dispatch => ({
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
@@ -64,6 +64,7 @@ export default class ProjectSumExcalDeleteCheck extends Component {
         }} = this.props;
         
         // send workflow
+
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -71,8 +72,12 @@ export default class ProjectSumExcalDeleteCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        const docCode = [];
+        dataSource.map(item=>{
+            docCode.push(item.code);
+        })
         
-        
+        let rst = await delDocList({},{code_list:docCode});
         if(rst.result){
             notification.success({
                 message: '删除文档成功！',

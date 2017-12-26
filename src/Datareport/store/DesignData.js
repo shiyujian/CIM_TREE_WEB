@@ -1,8 +1,9 @@
 import {handleActions, combineActions, createAction} from 'redux-actions';
 import createFetchAction from './fetchAction';
+import createFetchActionWithHeader from './fetchActionWithHeader';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API} from '_platform/api';
+import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,NODE_FILE_EXCHANGE_API} from '_platform/api';
 export const ID = 'DATA_DESIGNDATA';
 
 const additionReducer = fieldFactory(ID, 'addition');
@@ -34,6 +35,9 @@ const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST
 
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
 const putDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [], 'PUT');
+const deleteDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
+//导出数据
+const jsonToExcel = createFetchActionWithHeader(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 
 export const actions = {
 	...additionReducer,
@@ -56,7 +60,9 @@ export const actions = {
 	getScheduleDir,
 	postScheduleDir,
 	getDocument,
-	putDocument
+	putDocument,
+	deleteDocument,
+	jsonToExcel
 };
 
 export default handleActions({

@@ -303,13 +303,14 @@ export default class SumSpeed extends Component {
     ];
     return (
       <Modal
-        title="结算进度上传表"
+        title="结算进度上传流程表"
         visible={true}
         width={1280}
         onOk={this.onok.bind(this)}
         maskClosable={false}
         onCancel={this.props.oncancel}
       >
+      <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度发起流程</h1>
         <Table
           columns={columns}
           dataSource={this.state.dataSource}
