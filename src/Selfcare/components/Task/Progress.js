@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from 'Datareport/components/Quality/JianyanpiCheck';
-import PriceListExamine from 'Datareport/components/CostListData/PriceListExamine';
+import PriceListCheck from 'Datareport/components/CostListData/PriceListCheck';
 import JianyanCheck from 'Datareport/components/Quality/JianyanCheck';
 import DesignDataCheck from 'Datareport/components/DesignData/Check';
 import SafetyDocCheck from 'Datareport/components/SafetyDoc/SafetyDocCheck';
@@ -26,6 +26,11 @@ import UnitToggle from 'Datareport/components/UnitData/UnitToggle';
 import VedioCheck from 'Datareport/components/VedioData/VedioCheck';
 import VedioInfoCheck from 'Datareport/components/VedioData/VedioInfoCheck';
 import DefectModal from 'Datareport/components/Quality/DefectModal';
+import SafetyDocDeleteCheck from 'Datareport/components/SafetyDoc/SafetyDocDeleteCheck';
+import DangerDeleteCheck from 'Datareport/components/SafetyHiddenDanger/DangerDeleteCheck';
+import CJCheck from 'Datareport/components/OrgData/CJCheck';
+import SumSpeedExamineDelete from 'Datareport/components/CostListData/SumSpeedExamineDelete';
+import WorkDeleteCheck from 'Datareport/components/ScheduleData/WorkDeleteCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -72,7 +77,12 @@ export default class Progress extends Component {
 			design_check_visbile,
 			safety_vedioCheck_visible,
 			safety_vedioInfoCheck_visible,
-			dr_qua_defect_visible
+			dr_qua_defect_visible,
+			safety_doc_delete_visible,
+			safety_hidden_delete_visible,
+			dr_base_cj_visible,
+			cost_sum_delete_visible,
+			workdata_doc_delete_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -200,7 +210,7 @@ export default class Progress extends Component {
 				}
 				{
 					cost_pri_ck_visible && 
-					<PriceListExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<PriceListCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					cost_sum_spd_visible && 
@@ -249,6 +259,26 @@ export default class Progress extends Component {
 				{
 					dr_qua_defect_visible && 
 					<DefectModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_doc_delete_visible && 
+					<SafetyDocDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_hidden_delete_visible && 
+					<DangerDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_base_cj_visible && 
+					<CJCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					cost_sum_delete_visible && 
+					<SumSpeedExamineDelete wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					workdata_doc_delete_visible && 
+					<WorkDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 			</div>
 		);
@@ -324,6 +354,21 @@ export default class Progress extends Component {
 				break;
 			case "质量缺陷信息批量录入":
 				changeDatareportVisible({key:'dr_qua_defect_visible',value:true})
+				break;
+			case "安全管理信息批量删除":
+				changeDatareportVisible({key:'safety_doc_delete_visible',value:true})
+				break;
+			case "安全隐患信息批量删除":
+				changeDatareportVisible({key:'safety_hidden_delete_visible',value:true})
+				break;
+			case "参建单位信息批量录入":
+				changeDatareportVisible({key:'dr_base_cj_visible',value:true})
+				break;
+			case "结算进度信息批量删除":
+				changeDatareportVisible({key:'cost_sum_delete_visible',value:true})
+				break;
+			case "施工进度批量删除":
+				changeDatareportVisible({key:'workdata_doc_delete_visible',value:true})
 				break;
 			default:break;
 		}

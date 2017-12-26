@@ -6,11 +6,12 @@ import { getUser } from '_platform/auth';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 import { Row, Col, Table, Input, Button, message } from 'antd';
-import WorkModal from '../components/ScheduleData/WorkModal';
+import { WorkModal, WorkChange, WorkDel} from '../components/ScheduleData';
 import './quality.less';
 import { getNextStates } from '_platform/components/Progress/util';
 import moment from 'moment';
 import { WORKFLOW_CODE } from '_platform/api.js';
+import Preview from '../../_platform/components/layout/Preview';
 const Search = Input.Search;
 @connect(
 	state => {
@@ -27,100 +28,53 @@ export default class WorkScheduleData extends Component {
 		this.state = {
 			dataSource: [],
 			selectedRowKeys: [],
+			dataSourceSelected:[],
+			setAddVisiable: false,
+			setDeleteVisiable: false,
 			setEditVisiable: false,
 		};
-		this.columns = [{
-			title: '序号',
-			render: (text, record, index) => {
-				return index + 1
-			}
-		}, {
-			title: 'WBS编码',
-			dataIndex: 'code',
-		}, {
-			title: '任务名称',
-			dataIndex: 'name',
-		}, {
-			title: '项目/子项目',
-			dataIndex: 'project',
-		}, {
-			title: '单位工程',
-			dataIndex: 'unit',
-		}, {
-			title: '实施单位',
-			dataIndex: 'construct_unit',
-		}, {
-			title: '施工图工程量',
-			dataIndex: 'quantity',
-		}, {
-			title: '实际工程量',
-			dataIndex: 'factquantity',
-		}, {
-			title: '计划开始时间',
-			dataIndex: 'planstarttime',
-		}, {
-			title: '计划结束时间',
-			dataIndex: 'planovertime',
-		}, {
-			title: '实际开始时间',
-			dataIndex: 'factstarttime',
-		}, {
-			title: '实际结束时间',
-			dataIndex: 'factovertime',
-		}, {
-			title: '上传人员',
-			dataIndex: 'uploads',
-		}];
 	}
-	async componentDidMount(){
-        const {actions:{
-            getScheduleDir,
-            postScheduleDir,
-        }} = this.props;
-        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
-        if(topDir.obj_type){
-            let dir = await getScheduleDir({code:'datareport_workdata_1111'});
-            if(dir.obj_type){
-                if(dir.stored_documents.length>0){
-                    this.generateTableData(dir.stored_documents);
-                }
-            }
-        }
-    }
-    async generateTableData(data){
-        const {actions:{
-            getDocument,
-        }} = this.props;
-        let dataSource = [];
-        data.map(item=>{
-            getDocument({code:item.code}).then(single=>{
-                let temp = { 
-                    code:single.extra_params.code,
-                    name:single.extra_params.name,
-                    project:single.extra_params.project,
-                    unit:single.extra_params.unit,
-                    construct_unit:single.extra_params.construct_unit,
-                    quantity:single.extra_params.quantity,
-                    factquantity:single.extra_params.factquantity,
-                    planstarttime:single.extra_params.planstarttime,
-                    planovertime:single.extra_params.planovertime,
-					factstarttime:single.extra_params.factstarttime,
-					factovertime:single.extra_params.factovertime,
-					uploads:single.extra_params.uploads,
-                }
-                dataSource.push(temp);
-                this.setState({dataSource});
-            })
-        })
-    }
+	componentDidMount() {
+		const { actions: {
+            getWorkDataList,
+        } } = this.props;
+		let dataSource = [];
+		getWorkDataList()
+			.then(data => {
+				data.result.map(single => {
+					let temp = {
+						code: single.extra_params.code,
+						name: single.extra_params.name,
+						project: single.extra_params.project.name,
+						unit: single.extra_params.unit.name,
+						construct_unit: single.extra_params.construct_unit,
+						quantity: single.extra_params.quantity,
+						factquantity: single.extra_params.factquantity,
+						planstarttime: single.extra_params.planstarttime,
+						planovertime: single.extra_params.planovertime,
+						factstarttime: single.extra_params.factstarttime,
+						factovertime: single.extra_params.factovertime,
+						uploads: single.extra_params.uploads,
+					}
+					dataSource.push(temp);
+					this.setState({ dataSource });
+				})
+			})
+
+	}
 	goCancel = () => {
-		this.setState({ setEditVisiable: false });
+		this.setState({ setAddVisiable: false, setDeleteVisiable: false, setEditVisiable: false });
 	}
 	onSelectChange = (selectedRowKeys) => {
-		this.setState({ selectedRowKeys });
+		const {dataSource} = this.state;
+        let dataSourceSelected = [];
+        for(let i=0;i<selectedRowKeys.length;i++){
+            dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
+        }
+        this.setState({selectedRowKeys,dataSourceSelected});
 	}
-
-	setEditData = (data, participants) => {
+	// 批量录入流程
+	setAddData = (data, participants) => {
 		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
 			id: getUser().id,
@@ -155,13 +109,59 @@ export default class WorkScheduleData extends Component {
 					}],
 					attachment: null
 				}).then(() => {
-					this.setState({ setEditVisiable: false })
+					this.setState({ setAddVisiable: false })
 				})
 		})
 	}
-	onAddClick = () => {
-		this.setState({ setEditVisiable: true });
+	// 批量删除流程
+	setDeleteData = (data,participants) =>{
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"施工进度批量删除",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"施工进度批量删除",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({setDeleteVisiable:false})						
+					})
+		})
+    }
+	onBtnClick = (type) => {
+		if(type==="add"){
+            this.setState({setAddVisiable:true});
+        }else if(type==="delete"){
+            this.setState({setDeleteVisiable:true});
+        }else if(type==="edit"){
+            this.setState({setEditVisiable:true});
+        }
 	}
+
 
 	render() {
 		const { selectedRowKeys } = this.state;
@@ -174,15 +174,16 @@ export default class WorkScheduleData extends Component {
 				<DynamicTitle title="施工进度" {...this.props} />
 				<Row>
 					<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
-					<Button className="btn" type="default" onClick={() => this.onAddClick()}>发起填报</Button>
-					<Button className="btn" type="default">申请变更</Button>
-					<Button className="btn" type="default">申请删除</Button>
+					<Button className="btn" type="default" onClick={() => this.onBtnClick('add')}>发起填报</Button>
+					<Button className="btn" type="default" onClick={() => this.onBtnClick('edit')}>申请变更</Button>
+					<Button className="btn" type="default" onClick={() => this.onBtnClick('delete')}>申请删除</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search
 						className="btn"
 						style={{ width: "200px" }}
 						placeholder="输入搜索条件"
-						 />
+
+					/>
 				</Row>
 				<Row >
 					<Col >
@@ -196,11 +197,59 @@ export default class WorkScheduleData extends Component {
 						/>
 					</Col>
 				</Row>
+				<Preview/>
 				{
-					this.state.setEditVisiable &&
-					<WorkModal {...this.props} oncancel={this.goCancel.bind(this)} onok={this.setEditData.bind(this)} />
+					this.state.setAddVisiable &&
+					<WorkModal {...this.props} oncancel={this.goCancel.bind(this)} onok={this.setAddData.bind(this)} />
+				}
+				{
+					this.state.setDeleteVisiable &&
+					<WorkDel {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} onok={this.setDeleteData.bind(this)} />
 				}
 			</div>
 		);
 	}
+	columns = [{
+		title: '序号',
+		render: (text, record, index) => {
+			return index + 1
+		}
+	}, {
+		title: 'WBS编码',
+		dataIndex: 'code',
+	}, {
+		title: '任务名称',
+		dataIndex: 'name',
+	}, {
+		title: '项目/子项目',
+		dataIndex: 'project',
+	}, {
+		title: '单位工程',
+		dataIndex: 'unit',
+	}, {
+		title: '实施单位',
+		dataIndex: 'construct_unit',
+	}, {
+		title: '施工图工程量',
+		dataIndex: 'quantity',
+	}, {
+		title: '实际工程量',
+		dataIndex: 'factquantity',
+	}, {
+		title: '计划开始时间',
+		dataIndex: 'planstarttime',
+	}, {
+		title: '计划结束时间',
+		dataIndex: 'planovertime',
+	}, {
+		title: '实际开始时间',
+		dataIndex: 'factstarttime',
+	}, {
+		title: '实际结束时间',
+		dataIndex: 'factovertime',
+	}, {
+		title: '上传人员',
+		dataIndex: 'uploads',
+	}];
 }
+

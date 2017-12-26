@@ -8,14 +8,14 @@ export const ModalVisibleUnit = createAction('单位工程Modal显示隐藏');
 export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const postWorkpackagesOK = createAction('单位工程Modal显示隐藏L列表数据');
 export const postWorkpackages = createFetchAction('${SERVICE_API}/project-tree/?depth=1',[postWorkpackagesOK]);
-export const postUnitRoot = createFetchAction('${SERVICE_API}/wplist/',[],"POST");
+export const postUnitList = createFetchAction(`${SERVICE_API}/wppostlist/`,[],"POST");
 
 export const actions = {
 	ModalVisibleUnit,
 	getAllUsers,
 	postWorkpackages,
 	postWorkpackagesOK,
-	postUnitRoot
+	postUnitList
 };
 
 export default handleActions({

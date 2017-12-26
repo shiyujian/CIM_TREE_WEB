@@ -19,6 +19,7 @@ import {getUser} from '_platform/auth';
 import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyDoc/AddFile';
+import DeleteFile from '../components/SafetyDoc/DeleteFile';
 import {getNextStates} from '_platform/components/Progress/util';
 import Preview from '../../_platform/components/layout/Preview';
 var moment = require('moment');
@@ -38,8 +39,11 @@ class SafetyDoc extends Component {
         super();
         this.state = {
             dataSource:[],
+            dataSourceSelected:[],
             selectedRowKeys: [],
-			setEditVisiable:false,
+            setAddVisiable:false,
+            setEditVisiable:false,
+            setDeleteVisiable:false,
         }
     }
     
@@ -77,7 +81,8 @@ class SafetyDoc extends Component {
                     type:single.extra_params.type,
                     file:single.basic_params.files[0],
                     unit:single.extra_params.unit,
-                    projectName:single.extra_params.project
+                    projectName:single.extra_params.project,
+                    docCode:item.code
                 }
                 dataSource.push(temp);
                 this.setState({dataSource});
@@ -86,14 +91,60 @@ class SafetyDoc extends Component {
     }
 
 	goCancel = () =>{
-        this.setState({setEditVisiable:false});
+        this.setState({setAddVisiable:false,setDeleteVisiable:false,setEditVisiable:false});
     }
     onSelectChange = (selectedRowKeys) => {
-		this.setState({ selectedRowKeys });
-	}
+        const {dataSource} = this.state;
+        let dataSourceSelected = [];
+        for(let i=0;i<selectedRowKeys.length;i++){
+            dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
+        }
+        this.setState({selectedRowKeys,dataSourceSelected});
+    }
+    setEditData = (data,participants) =>{
 
-	setEditData = (data,participants) =>{
-        debugger
+    }
+
+    setDeleteData = (data,participants) =>{
+        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"安全管理信息批量删除",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"安全管理信息批量删除",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起填报',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({setAddVisiable:false})						
+					})
+		})
+    }
+
+	setAddData = (data,participants) =>{
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -127,12 +178,18 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({setEditVisiable:false})						
+						this.setState({setAddVisiable:false})						
 					})
 		})
 	}
-	onAddClick = () =>{
-		this.setState({setEditVisiable:true});
+	onBtnClick = (type) =>{
+        if(type==="add"){
+            this.setState({setAddVisiable:true});
+        }else if(type==="delete"){
+            this.setState({setDeleteVisiable:true});
+        }else if(type==="edit"){
+            this.setState({setEditVisiable:true});
+        }
     }
     
     handlePreview(index){
@@ -210,12 +267,14 @@ class SafetyDoc extends Component {
                     <Col span={15}>
                         <Button 
                         style={{ marginRight: "30px" }}
-                        onClick={()=>this.onAddClick()}
+                        onClick={()=>this.onBtnClick("add")}
                         >发起填报</Button>
                         <Button 
-                        style={{ marginRight: "30px" }}>申请变更</Button>
+                        style={{ marginRight: "30px" }}
+                        onClick={()=>this.onBtnClick("edit")}>申请变更</Button>
                         <Button 
-                        style={{ marginRight: "30px" }}>申请删除</Button>
+                        style={{ marginRight: "30px" }}
+                        onClick={()=>this.onBtnClick("delete")}>申请删除</Button>
                         <Button 
                         style={{ marginRight: "30px" }}>导出表格</Button>
                         <Search
@@ -235,9 +294,17 @@ class SafetyDoc extends Component {
                 </Content>
                 <Preview />
 				{
-					this.state.setEditVisiable &&
-					<AddFile {...this.props} oncancel={this.goCancel.bind(this)} akey={Math.random()*1234} onok={this.setEditData.bind(this)}/>
-				}
+					this.state.setAddVisiable &&
+					<AddFile {...this.props} oncancel={this.goCancel.bind(this)} akey={Math.random()*1234} onok={this.setAddData.bind(this)}/>
+                }
+                {
+                    this.state.setDeleteVisiable &&
+                    <DeleteFile {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} akey={Math.random()} onok={this.setDeleteData.bind(this)} />
+                }
+                {
+                    this.state.setEditVisiable &&
+                    <DeleteFile {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} akey={Math.random()} onok={this.setEditData.bind(this)} />
+                }
 			</Main>)
 	}
 };

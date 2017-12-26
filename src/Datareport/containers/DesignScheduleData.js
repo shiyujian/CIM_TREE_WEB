@@ -68,7 +68,6 @@ export default class DesignScheduleData extends Component {
 			getScheduleDir,
 			postScheduleDir,
 		}} = this.props;
-		console.log(this.props)
 		let topDir = await getScheduleDir ({code:'the_only_main_code_datareport'});
 		if(topDir.obj_type){
 			let dir = await getScheduleDir({code:'datareport_designdata_1111'});

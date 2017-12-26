@@ -196,9 +196,9 @@ export default class AddFile extends Component {
 
     //删除
     delete(index){
-        let {dataSource} = this.state
-        dataSource.splice(index,1)
-        this.setState({dataSource})
+        let {dataSource} = this.state;
+        dataSource.splice(index,1);
+        this.setState({dataSource});
     }
 
     //预览

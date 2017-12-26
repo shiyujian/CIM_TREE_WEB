@@ -19,6 +19,9 @@ export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`,
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 //批量修改施工包
 const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
+// 获取所有施工进度数据
+export const getWorkDataList = createFetchAction(`${SERVICE_API}/searcher/?keyword=rel_doc_workdata&obj_type=C_DOC`, [], 'GET');
+
 //得到质量缺陷
 export const fetchDefectDetail = createFetchAction(`${base}/main/api/quality-defect/{{id}}/`,[])
 //删除流程
@@ -27,6 +30,8 @@ const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [],
 export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
+// 批量删除
+const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
 //创建文档目录
 export const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
@@ -48,7 +53,9 @@ export const actions = {
 	deleteWorkflow,
 	updateWpData,
 	postScheduleDir,
-	getScheduleDir
+	getScheduleDir,
+	getWorkDataList,
+	delDocList
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

@@ -3,6 +3,32 @@ import {Table,Button,Popconfirm,message,Input,Icon} from 'antd';
 import style from './TableUnit.css'
 const Search = Input.Search;
 export default class TableUnit extends Component{
+	constructor(props){
+		super(props);
+		this.state = {}
+	}
+	async componentDidMount(){
+		let {getProjectAcD3,getDocByCodeList,getDocByCodeSearcher} = this.props.actions
+		let projTree = await getProjectAcD3();
+		console.log(projTree);
+		let units = projTree.children.reduce((previewArr,currentProj)=>{
+			return previewArr.concat(currentProj.children);
+		},[]);
+		let docSet = {};
+		let docs = await getDocByCodeSearcher({code:'REL_DOC_DW_A'});
+		docs.result.forEach(doc=>{
+			docSet[doc.code] = doc;
+		});
+		units = units.map(unit=>{
+			unit.children = null;
+			if(docSet[unit.code+'REL_DOC_DW_A']){
+				return{...unit,...unit.extra_params,...docSet[unit.code+'REL_DOC_DW_A'].extra_params,...docSet[unit.code+'REL_DOC_DW_A'].basic_params}
+			}
+			return {...unit,...unit.extra_params};
+		});
+		console.log(units);
+		this.setState({units:units})
+	}
     render(){
         return (
             <div>
@@ -18,7 +44,7 @@ export default class TableUnit extends Component{
                     columns = {this.columns}
                     bordered = {true}
                     rowSelection={this.rowSelection}
-                    dataSource = {this.dataSource}
+                    dataSource = {this.state.units||[]}
                 >
                 </Table>
             </div>
@@ -42,53 +68,48 @@ export default class TableUnit extends Component{
       },
     };
 
-    columns = [ {
-        title: '序号',
-        dataIndex: 'code',
+    columns = [{
+        title: '单位工程编码',
+        dataIndex:'code',
         key: 'Code',
       }, {
         title: '单位工程名称',
-        dataIndex: 'name',
+        dataIndex:'name',
         key: 'Name',
-      },{
-        title: '所属项目/子项目名称',
-        dataIndex: 'unit',
-        key: 'Unit',
-      },{
+      }, 
+      {
          title: '项目类型',
-         dataIndex :'depart',
-         key: 'Depart',
+         dataIndex:'projType',
+         key: 'Type',
       },{
         title: '项目阶段',
-        dataIndex :'job',
-        key: 'Job',
+        dataIndex:'stage',
+         key: 'Stage',
       },{
-        title: '项目红线坐标',
-        dataIndex :'sex',
-        key:'Sex'
+        title: '单位红线坐标',
+        dataIndex :'coordinate',
+        key:'coordinate'
       },{
         title: '计划开工日期',
-        dataIndex :'tel',
-        key:'Tel'
+        dataIndex :'stime',
+        key:'Stime'
       },{
         title: '计划竣工日期',
-        dataIndex :'email',
-        key:'Email'
-      },{
-        title: '建设单位',
-        dataIndex :'signature',
-        key:'Signature'
+        dataIndex :'etime',
+        key:'Etime'
       },{
         title: '单位工程简介',
         dataIndex :'intro',
         key:'Intro'
       },{
-        title:'附件',
-        dataIndex:'edit',
-        render:(record) => (
-          <span>
-              附件上传
-          </span>
-        )
+        title: '建设单位',
+		dataIndex:'relOrg',
+        key:'Org'
+      },{
+          title:'附件',
+          key:'file',
+          render:(record) => (
+                <a> {record.files?record.files[0].name:'暂无'}</a>
+          )
       }]
 }
