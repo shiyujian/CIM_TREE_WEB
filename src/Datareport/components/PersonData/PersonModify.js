@@ -79,7 +79,7 @@ export default class PersonModify extends Component {
 			<Modal
 				width = {1280}
 				visible={true}
-				onCancel = {this.cancel.bind(this)}
+				onCancel = {() => this.props.closeModal("person_mod_visible",false)}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>申请表变更页面</h2>
@@ -93,7 +93,7 @@ export default class PersonModify extends Component {
 				</Row>
 				<Row style={{marginTop: '20px'}}>
 					<Col span={2} push={22}>
-						<Button type="default">确认变更</Button>
+						<Button type="default" onClick={this.submit.bind(this)}>确认变更</Button>
 					</Col>
 				</Row>
 				<Row style={{marginBottom: '20px'}}>
@@ -116,9 +116,9 @@ export default class PersonModify extends Component {
 	    	value: e.target.value,
 	    });
 	}
-
-	cancel() {
-        const { actions: { ModifyVisible } } = this.props;
-        ModifyVisible('person_mod_visible',false);
+	//提交
+    async submit(){
+        this.props.closeModal("person_mod_visible",false)
+        message.info("操作成功")
     }
 }

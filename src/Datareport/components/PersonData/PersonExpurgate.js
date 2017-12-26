@@ -79,7 +79,7 @@ export default class PersonExpurgate extends Component {
 			<Modal
 				width = {1280}
 				visible={true}
-				onCancel = {this.cancel.bind(this)}
+				onCancel = {() => this.props.closeModal("person_exp_visible",false)}
 			>
 				<Row style={{margin: '20px 0', textAlign: 'center'}}>
 					<h2>删除项目申请页面</h2>
@@ -93,7 +93,7 @@ export default class PersonExpurgate extends Component {
 				</Row>
 				<Row style={{marginTop: '20px'}}>
 					<Col span={2} push={22}>
-						<Button type="default">确认导入</Button>
+						<Button type="default" onClick={this.submit.bind(this)}>确认导入</Button>
 					</Col>
 				</Row>
 				<Row style={{marginBottom: '20px'}}>
@@ -117,8 +117,9 @@ export default class PersonExpurgate extends Component {
 	    });
 	}
 
-	cancel() {
-        const { actions: { ExprugateVisible } } = this.props;
-        ExprugateVisible('person_exp_visible',false);
+	//提交
+    async submit(){
+        this.props.closeModal("person_exp_visible",false)
+        message.info("操作成功")
     }
 }
