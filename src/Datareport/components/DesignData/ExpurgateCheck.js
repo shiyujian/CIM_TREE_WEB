@@ -72,7 +72,7 @@ export default class ExpurgateCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("design_modifycheck_visbile",false)
+        this.props.closeModal("design_expurgatecheck_visbile",false)
         message.info("操作成功")
     }
     //通过
@@ -80,7 +80,7 @@ export default class ExpurgateCheck extends Component {
         const {dataSource,origindataSource, wk,topDir} = this.state;
         const {actions:{
             logWorkflowEvent,
-            putDocument,
+            deleteDocument,
             getScheduleDir,
             postScheduleDir,
             getWorkPackageDetailpk
@@ -123,50 +123,14 @@ export default class ExpurgateCheck extends Component {
         //prepare the data which will store in database
         const docData = [];   //asure the code of every document only
         let all = [];
-        dataSource.forEach((item,index)=>{
-            let newdata = {
-                name:item.file.name,
-                obj_type:"C_DOC",
-                status:'A',
-                profess_folder: {code: dir.code, obj_type: 'C_DIR'},
-                basic_params: {
-                    files: [
-                        {
-                            a_file: item.file.a_file,
-                            name: item.file.name,
-                            download_url: item.file.download_url,
-                            misc: "file",
-                            mime_type: item.file.mime_type,
-                            id:item.file.id
-                        },
-                    ]
-                },
-                extra_params:{
-                    code:item.code,
-                    filename:item.file.name,
-                    pubUnit:item.pubUnit,
-                    filetype:item.filetype,
-                    stage:item.stage,
-                    unit:item.unit,
-                    project:item.project,
-                    upPeople:item.upPeople,
-                    major:item.major,
-                    wbsObject:item.wbsObject,
-                    designObject:item.designObject
-                }
-            }
-            all.push(putDocument({code:origindataSource[index].code},newdata))
+        dataSource.forEach((item,index) => {
+            all.push(deleteDocument({code:origindataSource[index].code}))
         });
         Promise.all(all)
         .then(rst => {
             console.log(rst)
-            message.success('修改文档成功！');
+            message.success('删除文档成功！');
         })
-        // if(rst.result){
-        //     message.success('创建文档成功！');
-        // }else{
-        //     message.error('创建文档失败！');
-        // }
     }
     //不通过
     async reject(){
@@ -191,7 +155,7 @@ export default class ExpurgateCheck extends Component {
         this.setState({opinion:e.target.value})
     }
     cancel() {
-    	this.props.closeModal("design_modifycheck_visbile",false)
+    	this.props.closeModal("design_expurgatecheck_visbile",false)
     }
     addindex(arr) {
         arr.forEach((item,index) => {

@@ -11,6 +11,7 @@ import PriceListCheck from 'Datareport/components/CostListData/PriceListCheck';
 import JianyanCheck from 'Datareport/components/Quality/JianyanCheck';
 import DesignDataCheck from 'Datareport/components/DesignData/Check';
 import DesignDataModifyCheck from 'Datareport/components/DesignData/ModifyCheck';
+import DesignDataExpurgateCheck from 'Datareport/components/DesignData/ExpurgateCheck';
 import SafetyDocCheck from 'Datareport/components/SafetyDoc/SafetyDocCheck';
 import HiddenDangerCheck from 'Datareport/components/SafetyHiddenDanger/HiddenDangerCheck';
 import ModalCheck from 'Datareport/components/ModalData/ModalCheck';
@@ -82,6 +83,7 @@ export default class Progress extends Component {
 			dr_qua_unit_visible,
 			design_check_visbile,
 			design_modifycheck_visbile,
+			design_expurgatecheck_visbile,
 			safety_vedioCheck_visible,
 			safety_vedioInfoCheck_visible,
 			dr_qua_defect_visible,
@@ -265,6 +267,10 @@ export default class Progress extends Component {
 					<DesignDataModifyCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					design_expurgatecheck_visbile && 
+					<DesignDataExpurgateCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
 					safety_vedioCheck_visible && 
 					<VedioCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
@@ -351,6 +357,9 @@ export default class Progress extends Component {
 				break;
 			case "设计信息批量变更":
 				changeDatareportVisible({key:'design_modifycheck_visbile',value:true})
+				break;
+			case "设计信息批量删除":
+				changeDatareportVisible({key:'design_expurgatecheck_visbile',value:true})
 				break;
 			case "组织机构信息批量录入":
 				changeDatareportVisible({key:'dr_base_org_visible',value:true})
