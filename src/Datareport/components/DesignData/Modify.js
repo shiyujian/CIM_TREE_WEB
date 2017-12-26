@@ -19,7 +19,7 @@ export default class Modify extends Component {
 		}
 	}
 	componentDidMount(){
-        const {actions:{getAllUsers,getProjectTree}} = this.props
+        const {actions:{getAllUsers}} = this.props
         getAllUsers().then(res => {
             let checkers = res.map((o,index) => {
                 return (
@@ -27,16 +27,6 @@ export default class Modify extends Component {
                 )
             })
             this.setState({checkers})
-        })
-        getProjectTree({},{depth:1})
-        .then(res => {
-        	let projecttrees = res.children.map((o,index) => {
-                return (
-                    <Option key={index} value={JSON.stringify({pk:o.pk,obj_type:o.obj_type,name:o.name})}>{o.name}</Option>
-                )
-            })
-            console.log(projecttrees)
-            this.setState({projecttrees})
         })
     }
 	componentWillReceiveProps(props){
@@ -62,13 +52,7 @@ export default class Modify extends Component {
 	            }
 	            dataSource.push(temp);
 	        }) 
-	        this.setState({dataSource,key:modify.key},() => {
-	        	dataSource.forEach((item,index) => {
-		        	this.projectSelect(index,true,JSON.stringify(item.project))
-		        })
-	        })
-        
-        	console.log(modify,dataSource)
+	        this.setState({dataSource,key:modify.key})
     	}
    	}
 
@@ -79,30 +63,18 @@ export default class Modify extends Component {
 			dataIndex: 'index',
 		}, {
 			title: '文档编码',
-			dataIndex: 'code'
+			render: (text, record, index) => (
+                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'code')} value={this.state.dataSource[record.index-1]['code']}/>
+            ),
 		}, {
 			title: '文档名称',
 			dataIndex: 'filename'
 		}, {
 			title: '项目/子项目名称',
-			dataIndex:'project',
-			render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.projectSelect.bind(this,record.index-1,false)} value={JSON.stringify(this.state.dataSource[record.index-1]['project'])||''}>
-                    {
-                    	this.state.projecttrees
-                    }
-                </Select>
-            ),
+			dataIndex:'project.name'
 		}, {
 			title: '单位工程',
-			dataIndex:'unit',
-            render: (text, record, index) => (
-                <Select style={{width:'120px'}} onSelect={this.unitSelect.bind(this,record.index-1)} value={JSON.stringify(this.state.dataSource[record.index-1]['unit'])||''}>
-                    {
-                    	this.state.units[record.index-1]
-                    }
-                </Select>
-            ),
+			dataIndex:'unit.name'
 		}, {
 			title: '项目阶段',
 			render: (text, record, index) => (
@@ -114,7 +86,9 @@ export default class Modify extends Component {
             ),
 		}, {
 			title: '提交单位',
-			dataIndex: 'pubUnit'
+			render: (text, record, index) => (
+                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'pubUnit')} value={this.state.dataSource[record.index-1]['pubUnit']}/>
+            ),
 		}, {
 			title: '文档类型',
 			render: (text, record, index) => (
@@ -133,10 +107,14 @@ export default class Modify extends Component {
             ),
 		}, {
 			title: '描述的WBS对象',
-			dataIndex: 'wbsObject'
+			render: (text, record, index) => (
+                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'wbsObject')} value={this.state.dataSource[record.index-1]['wbsObject']}/>
+            ),
 		}, {
 			title: '描述的设计对象',
-			dataIndex: 'designObject'
+			render: (text, record, index) => (
+                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'designObject')} value={this.state.dataSource[record.index-1]['designObject']}/>
+            ),
 		}, {
 			title: '上传人员',
 			dataIndex: 'upPeople'
@@ -219,39 +197,39 @@ export default class Modify extends Component {
 			</Modal>
 		)
 	}
-	projectSelect(index,isauto,value) {
-		console.log(value)
-		let val = JSON.parse(value)
-		const {actions: {getProjectTreeDetail}} = this.props;
-		const {units} = this.state;
-        let {dataSource} = this.state;
-		dataSource[index].project = val;
-		this.setState({dataSource})
-		getProjectTreeDetail({pk:val.pk},{depth:1})
-		.then(res => {
-			units[index] = res.children.map((o,index) => {
-                return (
-                    <Option key={index} value={JSON.stringify({pk:o.pk,obj_type:o.obj_type,name:o.name})}>{o.name}</Option>
-                )
-            })
-            if(!isauto){
-				dataSource[index].unit = res.children.length>0?{pk:res.children[0].pk,obj_type:res.children[0].obj_type,name:res.children[0].name}:'该项目无单位工程';
-				this.setState({dataSource})
-			}
-            this.setState({units})
-		})
+	// projectSelect(index,isauto,value) {
+	// 	console.log(value)
+	// 	let val = JSON.parse(value)
+	// 	const {actions: {getProjectTreeDetail}} = this.props;
+	// 	const {units} = this.state;
+ //        let {dataSource} = this.state;
+	// 	dataSource[index].project = val;
+	// 	this.setState({dataSource})
+	// 	getProjectTreeDetail({pk:val.pk},{depth:1})
+	// 	.then(res => {
+	// 		units[index] = res.children.map((o,index) => {
+ //                return (
+ //                    <Option key={index} value={JSON.stringify({pk:o.pk,obj_type:o.obj_type,name:o.name})}>{o.name}</Option>
+ //                )
+ //            })
+ //            if(!isauto){
+	// 			dataSource[index].unit = res.children.length>0?{pk:res.children[0].pk,obj_type:res.children[0].obj_type,name:res.children[0].name}:'该项目无单位工程';
+	// 			this.setState({dataSource})
+	// 		}
+ //            this.setState({units})
+	// 	})
 
-	}
+	// }
 	description(e) {
 		this.setState({description:e.target.value})
 	}
-	unitSelect(index,value) {
-		console.log(value)
-		let val = JSON.parse(value)
-        let {dataSource} = this.state;
-        dataSource[index].unit = val;
-        this.setState({dataSource})
-	}
+	// unitSelect(index,value) {
+	// 	console.log(value)
+	// 	let val = JSON.parse(value)
+ //        let {dataSource} = this.state;
+ //        dataSource[index].unit = val;
+ //        this.setState({dataSource})
+	// }
 
 	addindex(arr) {
 		if(arr instanceof Array === false )
@@ -260,6 +238,12 @@ export default class Modify extends Component {
             arr[index].index = ++index
         })
         return arr
+    }
+	//table input 输入
+    tableDataChange(index, key ,e ){
+		let { dataSource } = this.state;
+		dataSource[index][key] = e.target['value'];
+	  	this.setState({dataSource});
     }
     //下拉框选择变化
     handleSelect(index,key,value){

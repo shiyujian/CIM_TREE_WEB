@@ -6,7 +6,8 @@ export default class TableOrg extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			dataSource: []
+			dataSource: [],
+			deleData:[]
 		}
 	}
 	render() {
@@ -17,7 +18,7 @@ export default class TableOrg extends Component {
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
 					<Button className={style.button} onClick={this.sendCJ.bind(this)}>发送参建单位</Button>
 					<Button className={style.button}>申请变更</Button>
-					<Button className={style.button}>申请删除</Button>
+					<Button className={style.button} onClick={this.delete.bind(this)}>申请删除</Button>
 					<Button className={style.button}>导出表格</Button>
 					<Search className={style.button} style={{ width: "200px" }} placeholder="输入搜索条件" />
 				</div>
@@ -40,6 +41,16 @@ export default class TableOrg extends Component {
 		const { actions: { ModalVisibleCJ } } = this.props;
 		ModalVisibleCJ(true);
 	}
+	delete(){
+		const {actions:{setDeleteOrg,ModalVisibleDel}} = this.props;
+		console.log("this，sojpd：",this.state.deleData);
+		if(this.state.deleData.length){
+			setDeleteOrg(this.state.deleData);
+			ModalVisibleDel(true);
+		}else{
+			message.warning("请先选中要删除的数据");
+		}
+	}
 	async componentDidMount() {
 		let dataSource = [];
 		const { actions: { getOrgTree } } = this.props;
@@ -61,10 +72,15 @@ export default class TableOrg extends Component {
 			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
 		},
 		onSelect: (record, selected, selectedRows) => {
-			console.log(record, selected, selectedRows);
+			this.setState({
+				deleData:selectedRows
+			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
 			console.log(selected, selectedRows, changeRows);
+			this.setState({
+				deleData:selectedRows
+			})
 		},
 	};
 	
