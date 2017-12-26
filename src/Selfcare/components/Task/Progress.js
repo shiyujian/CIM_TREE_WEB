@@ -34,6 +34,8 @@ import WorkDeleteCheck from 'Datareport/components/ScheduleData/WorkDeleteCheck'
 import SumPlanDelateCheck from 'Datareport/components/CostListData/SumPlanDelateCheck';
 import ExpurgateCheck from 'Datareport/components/ModalData/ExpurgateCheck';
 import HandelDelModal from 'Datareport/components/UnitData/HandelDelModal';
+import ProjectSumExcalDeleteCheck from 'Datareport/components/CostListData/ProjectSumExcalDeleteCheck';
+import HandelDelProjModal from 'Datareport/components/ProjectData/HandleDelProj';
 
 const FormItem = Form.Item;
 @connect(
@@ -88,7 +90,9 @@ export default class Progress extends Component {
 			workdata_doc_delete_visible,
 			dr_qua_jsjh_delate_visible,
 			expurgate_check_visbile,
-			dr_del_unit_visible
+			dr_del_unit_visible,
+			dr_qua_cckk_delate_visible,
+			dr_del_proj_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -298,6 +302,14 @@ export default class Progress extends Component {
 					dr_del_unit_visible && 
 					<HandelDelModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					dr_qua_cckk_delate_visible && 
+					<ProjectSumExcalDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					dr_del_proj_visible && 
+					<HandelDelProjModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -396,6 +408,12 @@ export default class Progress extends Component {
 				break;
 			case "单位工程批量删除申请":
 				changeDatareportVisible({key:'dr_del_unit_visible',value:true})
+				break;
+			case "工程量结算信息删除":
+				changeDatareportVisible({key:'dr_qua_cckk_delate_visible',value:true})
+				break;
+			case "项目批量删除申请":
+				changeDatareportVisible({key:'dr_del_proj_visible',value:true})
 				break;
 			default:break;
 		}

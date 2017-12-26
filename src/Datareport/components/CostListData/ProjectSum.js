@@ -25,7 +25,7 @@ export default class ProjectSum extends Component {
     }
 
     componentDidMount() {
-        const { actions: { getAllUsers, getProjectTree } } = this.props;
+        const { actions: { getAllUsers, getProjectTree ,getQuantitiesCode} } = this.props;
         getAllUsers().then(rst => {
             let checkers = rst.map(o => {
                 return (
@@ -72,7 +72,10 @@ export default class ProjectSum extends Component {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
+            let arrAir=[];
+            getQuantitiesCode({code:dataList[1][1]})
             for (let i = 1; i < dataList.length; i++) {
+        
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
                     // subproject: dataList[i][1] ? dataList[i][1] : '',
@@ -99,6 +102,7 @@ export default class ProjectSum extends Component {
 
                 })
             }
+           
             this.setState({ dataSource });
         }
     }
@@ -169,13 +173,7 @@ export default class ProjectSum extends Component {
             message.info("请上传excel")
             return
         }
-        // let temp = this.state.dataSource.some((o, index) => {
-        //     return !o.file.id
-        // })
-        // if (temp) {
-        //     message.info(`有数据未上传附件`)
-        //     return
-        // }
+      
         const { project, unit } = this.state;
         if (!project.name) {
             message.info(`请选择项目和单位工程`);
@@ -219,46 +217,6 @@ export default class ProjectSum extends Component {
         filed.name = f.name;
         filed.mime_type = f.mime_type;
         openPreview(filed);
-    }
-
-    remove(index) {
-        const { actions: { deleteStaticFile } } = this.props
-        let { dataSource } = this.state
-        let id = dataSource[index]['file'].id
-        deleteStaticFile({ id: id })
-        let projectcoding = dataSource[index].projectcoding;
-        let projectname = dataSource[index].projectname;
-        let company = dataSource[index].company;
-        let number = dataSource[index].number;
-        let total = dataSource[index].total;
-        let unit_engineeing = dataSource[index].unit_engineeing;
-        dataSource[index] = {
-            subproject: '',
-            pubUnit: pubUnit,
-            type: type,
-            projectname: projectname,
-            company: company,
-            number: number,
-            total:total,
-            project: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            unit: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            construct_unit: {
-                code: "",
-                name: "",
-                type: "",
-            },
-            file: {
-            }
-        }
-        this.setState({ dataSource });
     }
 
     covertURLRelative = (originUrl) => {

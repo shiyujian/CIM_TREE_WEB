@@ -22,7 +22,7 @@ const Option = Select.Option
 		actions: bindActionCreators({ ...actions,...platformActions,...actions2,...projactions}, dispatch)
 	})
 )
-export default class HandelDelModal extends Component {
+export default class HandelDelProjModal extends Component {
 
 	constructor(props) {
 		super(props);
@@ -48,7 +48,7 @@ export default class HandelDelModal extends Component {
     async submit(){
         if(this.state.opinion === 1){
             await this.passon();        
-            this.props.closeModal("dr_del_unit_visible",false);
+            this.props.closeModal("dr_del_proj_visible",false);
         }else{
             await this.reject();
         }
@@ -57,7 +57,7 @@ export default class HandelDelModal extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,postDocListAc,postUnitList,putUnitList}} = this.props
+        const {actions:{logWorkflowEvent,postDocListAc,putProjectListAc}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -65,6 +65,7 @@ export default class HandelDelModal extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         let dataList = this.state.dataSource.map(data=>{
+
             return {
                 code:data.code,
                 parent:{
@@ -75,7 +76,7 @@ export default class HandelDelModal extends Component {
                 version:'A'
             };
         });
-        let rst = await putUnitList({},{data_list:dataList});
+        let rst = await putProjectListAc({},{data_list:dataList});
         if(rst && rst.result && rst.result.length>0){
             console.log(rst);
             await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
@@ -152,56 +153,71 @@ export default class HandelDelModal extends Component {
         return false;
     }
 	render() {
-     const  columns = [{
-        title: '单位工程编码',
-        dataIndex:'code',
-        key: 'Code',
-      }, {
-        title: '单位工程名称',
-        dataIndex:'name',
-        key: 'Name',
-      }, 
-      {
-         title: '项目类型',
-         dataIndex:'projType',
-         key: 'Type',
-      },{
-        title: '项目阶段',
-        dataIndex:'stage',
-         key: 'Stage',
-      },{
-        title: '单位红线坐标',
-        dataIndex :'coordinate',
-        key:'coordinate'
-      },{
-        title: '计划开工日期',
-        dataIndex :'stime',
-        key:'Stime'
-      },{
-        title: '计划竣工日期',
-        dataIndex :'etime',
-        key:'Etime'
-      },{
-        title: '单位工程简介',
-        dataIndex :'intro',
-        key:'Intro'
-      },{
-        title: '建设单位',
-        render:(record)=>{
-			let ogrname = '';
-			if(record.rsp_orgName && record.rsp_orgName.length>0){
-				ogrname =record.rsp_orgName[0];
-			}
-			return (<span>{ogrname}</span>)
+     const  columns =  [{
+		title: '序号',
+		dataIndex: 'index',
+		key: 'Index',
+	}, {
+		title: '项目/子项目名称',
+		dataIndex: 'name',
+		key: 'Name',
+	}, {
+		title: '所属区域',
+		dataIndex: 'area',
+		key: 'Area',
+	}, {
+		title: '项目规模',
+		dataIndex: 'range',
+		key: 'Range',
+	}, {
+		title: '项目类型',
+		dataIndex: 'projType',
+		key: 'ProjType',
+	}, {
+		title: '项目地址',
+		dataIndex: 'address',
+		key: 'Address',
+	}, {
+		title: '项目红线坐标',
+		render:(record)=>{
+			return (<span>{record.extra_params.coordinate||''}</span>);
 		},
-        key:'Org'
-      },{
-          title:'附件',
-          key:'file',
-          render:(record) => (
-                <a> {record.files?record.files[0].name:'暂无'}</a>
-          )
-      }];
+		key: 'Project',
+	}, {
+		title: '项目负责人',
+		render:(record)=>{
+			return (<span>{record.response_persons[0]?record.response_persons[0].name:''}</span>);
+		},
+		key: 'Remarks'
+	}, {
+		title: '计划开工日期',
+		dataIndex: 'stime',
+		key: 'Stime'
+	}, {
+		title: '计划竣工日期',
+		dataIndex: 'etime',
+		key: 'Etime'
+	},{
+		title: '简介',
+		dataIndex: 'intro',
+		key: 'Intro'
+	}, {
+		title: '附件',
+		key: 'oper',
+		render: (record) => (
+			<span>
+				附件
+			</span>
+		)
+	}, {
+		title: '项目图片',
+		key: 'pic',
+		render: (record) => (
+			<span>
+				图片
+					</span>
+		)
+	}];
       let projname = this.state.project?this.state.project.name:'';
 		return (
             <Modal

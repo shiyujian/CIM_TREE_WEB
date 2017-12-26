@@ -14,9 +14,10 @@ export const getOrgReverse = createFetchAction(`${SERVICE_API}/org-tree/code/{{c
 export const getUnit = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?depth=1`,[], );
 export const putProject = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/`,[], "PUT");
 export const putUnit = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`,[], "PUT");
-export const getProject = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/`,[], "GET");
-export const getUnitAc = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`,[], "GET");
+export const getProject = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/?all=true`,[], "GET");
+export const getUnitAc = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[], "GET");
 export const getOrgPk= createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[], "GET");
+export const getOrgTree= createFetchAction(`${SERVICE_API}/org-tree/?depth=3`,[], "GET");
 
 export const actions = {
 	ModalVisible,
@@ -31,7 +32,8 @@ export const actions = {
 	getProject,
 	getUnitAc,
 	getOrgPk,
-	ModalVisibleCJ
+	ModalVisibleCJ,
+	getOrgTree
 };
 
 export default handleActions({
