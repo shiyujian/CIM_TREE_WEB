@@ -54,7 +54,7 @@ import ModifyCheck from 'Datareport/components/ModalData/ModifyCheck';
 import DesignChangeCheck from 'Datareport/components/ScheduleData/DesignChangeCheck';
 import WorkChangeCheck from 'Datareport/components/ScheduleData/WorkChangeCheck';
 import UpdataCheck from 'Datareport/components/OrgData/UpdataCheck';
-import HandelChangeUnitModal from 'Datareport/components/UnitData/HandelChangeUnitModal';
+import HandelChangeUnitModal from 'Datareport/components/UnitData/HandleChangeUnitModal';
 import HandelChangeProjModal from 'Datareport/components/ProjectData/HandleChangeModal';
 
 const FormItem = Form.Item;
