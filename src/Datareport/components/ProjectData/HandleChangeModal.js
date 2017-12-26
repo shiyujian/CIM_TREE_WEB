@@ -57,7 +57,7 @@ export default class HandelChangeProjModal extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,postDocListAc,putProjectListAc}} = this.props
+        const {actions:{logWorkflowEvent,putDocListAc,putProjectListAc}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -65,20 +65,47 @@ export default class HandelChangeProjModal extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         let dataList = this.state.dataSource.map(data=>{
-            return {
+            let rst = {
                 code:data.code,
-                parent:{
-                    pk: data.pk,
-                    code:data.code,
-                    obj_type:data.obj_type
-                },
-                version:'A'
+                version:'A',
+                extra_params:{coordinate:data.coordinate}
             };
+            if(data.relPer){
+                rst.response_persons = [{
+                    pk:data.relPer.pk,
+                    code:data.relPer.code,
+                    obj_type:data.relPer.obj_type
+                }];
+            }
+            return rst;
+        });
+        let docList = this.state.dataSource.map(data=>{
+            let rst = {
+                code:data.related_documents[0].code,
+                version:'A',
+                extra_params:{
+                    intro:data.intro,
+                    area:data.area,
+                    address:data.address,
+                    cost:data.cost,
+                    etime:data.etime,
+                    stime:data.stime,
+                    projType:data.projType,
+                    range:data.range
+                },
+                basic_params:{
+                    files:[
+                        data.file,data.pic
+                    ]
+                }
+            };
+            return rst;
         });
         let rst = await putProjectListAc({},{data_list:dataList});
+        let docRst = await putDocListAc({},{data_list:docList});
         if(rst && rst.result && rst.result.length>0){
             console.log(rst);
-            await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+            // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         }
     }
     beforeUpload(record,file){
@@ -153,10 +180,6 @@ export default class HandelChangeProjModal extends Component {
     }
 	render() {
      const  columns =  [{
-		title: '序号',
-		dataIndex: 'index',
-		key: 'Index',
-	}, {
 		title: '项目/子项目名称',
 		dataIndex: 'name',
 		key: 'Name',
@@ -204,17 +227,13 @@ export default class HandelChangeProjModal extends Component {
 		title: '附件',
 		key: 'oper',
 		render: (record) => (
-			<span>
-				附件
-			</span>
+            <a> {record.file ? record.file.name : '暂无'}</a>
 		)
 	}, {
 		title: '项目图片',
 		key: 'pic',
 		render: (record) => (
-			<span>
-				图片
-					</span>
+            <a> {record.pic ? record.pic.name : '暂无'}</a>
 		)
 	}];
       let projname = this.state.project?this.state.project.name:'';
