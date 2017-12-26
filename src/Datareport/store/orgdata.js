@@ -6,6 +6,7 @@ import { SERVICE_API,USER_API,WORKFLOW_API} from '_platform/api';
 
 export const ModalVisible = createAction('组织Modal模态框显示隐藏');
 export const ModalVisibleCJ = createAction('参建单位Modal模态框显示隐藏');
+export const ModalVisibleDel = createAction('删除组织机构Modal模态框显示隐藏');
 export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const getProjects = createFetchAction(`${SERVICE_API}/project-tree/?depth=1`);
 export const postOrgList = createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "POST");
@@ -33,7 +34,8 @@ export const actions = {
 	getUnitAc,
 	getOrgPk,
 	ModalVisibleCJ,
-	getOrgTree
+	getOrgTree,
+	ModalVisibleDel
 };
 
 export default handleActions({
@@ -49,5 +51,9 @@ export default handleActions({
 	[ModalVisibleCJ]: (state, {payload}) => ({
 		...state,
 		visibleCJ:payload,
+	}),
+	[ModalVisibleDel]: (state, {payload}) => ({
+		...state,
+		visibleDel:payload,
 	})
 }, {});
