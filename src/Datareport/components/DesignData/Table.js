@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input } from 'antd';
+import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress } from 'antd';
 import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
@@ -9,12 +9,14 @@ export default class DesignTable extends Component {
 		this.state = {
 			selectedRowKeys: [],
 			alldatas:[],
+			loading: false,
+			percent: 0,
 		}
 
 	}
 	onSelectChange = (selectedRowKeys) => {
 		const {alldatas} = this.state;
-		const { actions: { changeModifyField } } = this.props;
+		const { actions: { changeModifyField,changeExpurgateField } } = this.props;
 		this.setState({ selectedRowKeys });
 		let selectedDatas = [];
 		selectedRowKeys.forEach(key => {
@@ -22,6 +24,7 @@ export default class DesignTable extends Component {
 		})
 		console.log('selectedRowKeys',selectedRowKeys,'selectedDatas',selectedDatas,'alldatas',alldatas)
 		changeModifyField('selectedDatas',selectedDatas)
+		changeExpurgateField('selectedDatas',selectedDatas)
 	}
 	async componentDidMount(){
         const {actions:{
@@ -45,13 +48,27 @@ export default class DesignTable extends Component {
         }} = this.props;
         let dataSource = [];
         let all = [];
+        let total = data.length;
+        this.setState({loading:true,percent:0,num:0})
         data.forEach(item=>{
-            all.push(getDocument({code:item.code}))
+            all.push(getDocument({code:item.code})
+            	.then(rst => {
+            		let {num} = this.state;
+                    num++;
+                    this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
+                    if(!rst) {
+                    	message.error(`数据获取失败`)
+		    			return []
+		    		} else {
+                    	return rst
+                    }
+            	}))
         })
         Promise.all(all)
         .then(item => {
+        	this.setState({loading:false})
         	item.forEach((single,index) => {
-        		let temp = { 
+        		let temp = {
         			index:index+1,
                     code:single.extra_params.code,
                     filename:single.extra_params.filename,
@@ -150,6 +167,7 @@ export default class DesignTable extends Component {
 						rowSelection={rowSelection}
 						dataSource={this.state.dataSource}
 						rowKey="index"
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 					/>
 				</Row>
 			</div>
@@ -174,15 +192,27 @@ export default class DesignTable extends Component {
 	}
 	toggleModify() {
 		const {modify = {}, actions: { changeModifyField } } = this.props;
-		console.log(this.props)
-		changeModifyField('visible', true)
-		changeModifyField('key', modify.key?modify.key+1:1)
+		console.log(this.props,'modify.selectedDatas',modify.selectedDatas)
+		if(!(modify.selectedDatas&&modify.selectedDatas.length)){
+			message.warning('Nothing selected')
+		} else if(!this.judge(modify.selectedDatas)) {
+			message.warning('Same unit had been selected, check your selected lines please ')
+		} else {
+			changeModifyField('visible', true)
+			changeModifyField('key', modify.key?modify.key+1:1)
+		}
 	}
 	toggleExpurgate() {
-		const { actions: { changeExpurgateField } } = this.props;
+		const {expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		console.log(this.props)
-		changeExpurgateField('visible', true)
+		if(!(expurgate.selectedDatas&&expurgate.selectedDatas.length)){
+			message.warning('Nothing selected')
+		} else {
+			changeExpurgateField('visible', true)
+			changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
+		}
+	}
+	judge(arr) {
+		return arr.every(item => item.extra_params.unit.pk === arr[0].extra_params.unit.pk)
 	}
 }
-
-

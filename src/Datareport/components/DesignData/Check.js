@@ -141,7 +141,7 @@ export default class Check extends Component {
                 extra_params:{
                     code:item.code,
                     filename:item.file.name,
-                    pubUnit:item.upunit,
+                    pubUnit:item.pubUnit,
                     filetype:item.filetype,
                     stage:item.stage,
                     unit:item.unit,
@@ -157,7 +157,7 @@ export default class Check extends Component {
         if(rst.result){
             message.success('创建文档成功！');
         }else{
-            message.error('创建文档成功！');
+            message.error('创建文档失败！');
         }
     }
     //不通过
@@ -223,7 +223,7 @@ export default class Check extends Component {
             dataIndex:'stage',
 		}, {
 			title:'提交单位',
-            dataIndex:'upunit',
+            dataIndex:'pubUnit',
 		}, {
 			title:'文档类型',
             dataIndex:'filetype',

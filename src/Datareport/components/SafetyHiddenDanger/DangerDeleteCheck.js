@@ -77,7 +77,7 @@ export default class DangerDeleteCheck extends Component {
             docCode.push(item.docCode);
         })
         
-        let rst = await delDocList({},{codeList:docData});
+        let rst = await delDocList({},{code_list:docCode});
         if(rst.result){
             notification.success({
                 message: '删除文档成功！',
@@ -124,7 +124,7 @@ export default class DangerDeleteCheck extends Component {
                 width: '8%',
                 render: (text, record, index) => (
                     <span>
-                        {record.project.name}
+                        {record.projectName}
                     </span>
                 ),
             }, {
@@ -133,11 +133,11 @@ export default class DangerDeleteCheck extends Component {
                 width: '8%',
                 render: (text, record, index) => (
                     <span>
-                        {record.unit.name}
+                        {record.unit}
                     </span>
                 ),
             }, {
-                title: 'WBS',
+                title: 'WBS编码',
                 dataIndex: 'wbs',
                 width: '8%',
             }, {

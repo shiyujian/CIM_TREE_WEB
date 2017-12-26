@@ -35,6 +35,9 @@ const getWorkDocumentByCode = createFetchAction(`${SERVICE_API}/workpackages/cod
 const getDocData = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [], 'GET');
 //搜索数据
 const getExBySearch = createFetchAction(`${SERVICE_API}/searcher/?keyword=rel_doc_jsjh&obj_type=C_DOC`, [], 'GET');
+//批量删除
+const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
+
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -54,7 +57,8 @@ export const actions = {
 	getWorkpackagesByCode,
 	getWorkDocumentByCode,
 	getDocData,
-	getExBySearch
+	getExBySearch,
+	delDocList
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

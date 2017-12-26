@@ -48,7 +48,7 @@ export default class UnitToggle extends Component {
     async submit(){
         if(this.state.opinion === 1){
             await this.passon();        
-            this.props.closeModal("dr_base_unit_visible",false);
+            this.props.closeModal("dr_qua_unit_visible",false);
         }else{
             await this.reject();
         }
@@ -76,7 +76,8 @@ export default class UnitToggle extends Component {
                     etime:data.etime,
                     stime:data.stime,
                     projType:data.projType,
-                    stage:data.stage
+                    stage:data.stage,
+                    rsp_orgName:[data.rsp_org.name]
                 },
                 basic_params:{
                     files:[
@@ -90,6 +91,7 @@ export default class UnitToggle extends Component {
             let reldocs = doclistRst.result;
             let dwList =  this.state.dataSource.map((data,index)=>{
                 return{
+                    response_orgs:[{pk:data.rsp_org.pk,code:data.rsp_org.code,obj_type:data.rsp_org.obj_type}],
                     "code": data.code,
                     "name": data.name,
                     "obj_type": "C_WP_UNT",

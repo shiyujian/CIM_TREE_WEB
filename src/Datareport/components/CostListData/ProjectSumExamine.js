@@ -80,7 +80,9 @@ export default class ProjectSumExamine extends Component {
             getScheduleDir,
             postScheduleDir,
             getWorkpackagesByCode,
-            updateWpData
+            updateWpData,
+            getQuantities,
+            getSearcher
         } } = this.props;
         // console.log('this.props',this.props)
         //the unit in the dataSource array is same
@@ -122,6 +124,14 @@ export default class ProjectSumExamine extends Component {
         const docData = [];
         let wplist = [];
         let i = 0;   //asure the code of every document only
+        let jialist = await getSearcher({keyword:'priceListName'})
+        let pairs = jialist.result.map(item => {
+            return {
+                projectcoding: item.extra_params.projectcoding,
+                rate: item.extra_params.rate
+            }
+        })
+
         dataSource.map(item => {
             i++;
             docData.push({
@@ -145,17 +155,32 @@ export default class ProjectSumExamine extends Component {
 
             }) 
             //施工包批量
+            let myprojectcoding, mynumber;
+
+            for(var i  = 0; i < pairs.length; ++i) {
+                if(pairs[i].projectcoding === item.projectcoding) {
+                    myprojectcoding = pairs[i].projectcoding;
+                    mynumber =  pairs[i].rate;
+                    break; 
+                }
+            }
             wplist.push({
                 code: item.unit.code,
                 extra_params: {
-                    projectcoding: item.projectcoding,
-                    number: item.number,
+                    projectcoding: myprojectcoding,
+                    number: mynumber,
                 }
             })
         });
         // debugger
         let rst = await addDocList({}, { data_list: docData });
         await updateWpData({}, { data_list: wplist });
+          // wplist = wplist.filter(item => {
+        //     return !item.projectcoding && !item.mynumber
+        // })
+        // if(wplist.length) {
+            
+        // }
         if (rst.result) {
             notification.success({
                 message: '创建文档成功！',
