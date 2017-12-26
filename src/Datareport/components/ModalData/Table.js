@@ -48,7 +48,7 @@ export default class ModalTable extends Component {
 		let dataSource = [];
 
 		data.map(item => {
-			console.log('bbb',item)
+			
 			getDocument({ code: item.code }).then(single => {
 				
 				let temp = {
@@ -201,9 +201,10 @@ export default class ModalTable extends Component {
 		changeCheckField('visible', true)
 	}
 	toggleModify() {
-		const { actions: { changeModifyField } } = this.props;
+		const { actions: { changeModifyField,getdele } } = this.props;
 		console.log(this.props)
 		changeModifyField('visible', true)
+		getdele(this.state.dataSourceSelected)
 	}
 	toggleExpurgate() {
 		const { actions: { changeExpurgateField,getdele } } = this.props;
