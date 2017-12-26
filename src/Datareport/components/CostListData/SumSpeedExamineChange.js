@@ -23,7 +23,7 @@ const {Option} = Select;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class SumSpeedExamineDelete extends Component {
+export default class SumSpeedExamineChange extends Component {
 
 	constructor(props) {
 		super(props);
@@ -51,7 +51,7 @@ export default class SumSpeedExamineDelete extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_sum_delete_visible",false);
+        this.props.closeModal("cost_sum_change_visible",false);
         message.info("操作成功");
     }
 
@@ -103,7 +103,7 @@ export default class SumSpeedExamineDelete extends Component {
         this.setState({option:e.target.value})
     }
     cancel() {
-        this.props.closeModal("cost_sum_delete_visible", false);
+        this.props.closeModal("cost_sum_change_visible", false);
       }
 	render() {
         const columns = [
@@ -145,14 +145,14 @@ export default class SumSpeedExamineDelete extends Component {
           ]
 		return (
             <Modal
-			title="结算进度信息删除审批表"
+			title="结算进度信息变更审批表"
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}
             onCancel={this.cancel.bind(this)}
             >
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度删除审核</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度变更审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
