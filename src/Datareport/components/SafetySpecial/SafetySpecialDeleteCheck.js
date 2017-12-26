@@ -21,7 +21,7 @@ const { TextArea } = Input;
         actions: bindActionCreators({ ...platformActions, ...actions }, dispatch)
     })
 )
-export default class SafetySpecialCheck extends Component {
+export default class SafetySpecialDeleteCheck extends Component {
 
     constructor(props) {
         super(props);
@@ -36,21 +36,6 @@ export default class SafetySpecialCheck extends Component {
         const { wk } = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({ dataSource, wk })
-        const { actions: {
-            getScheduleDir,
-            postScheduleDir,
-        } } = this.props;
-        let topDir = await getScheduleDir({ code: 'the_only_main_code_datareport' });
-        if (!topDir.obj_type) {
-            let postData = {
-                name: '数据报送的顶级节点',
-                code: 'the_only_main_code_datareport',
-                "obj_type": "C_DIR",
-                "status": "A",
-            }
-            topDir = await postScheduleDir({}, postData);
-        }
-        this.setState({ topDir });
     }
     componentWillReceiveProps(props) {
         const { wk } = props
@@ -58,7 +43,7 @@ export default class SafetySpecialCheck extends Component {
         this.setState({ dataSource, wk })
     }
     cancel() {
-        this.props.closeModal("Safety_Special_check_visible", false)
+        this.props.closeModal("Safety_Special_delete_visible", false)
     }
     //提交
     async submit() {
@@ -67,44 +52,15 @@ export default class SafetySpecialCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("Safety_Special_check_visible", false);
+        this.props.closeModal("Safety_Special_delete_visible", false);
         message.info("操作成功")
     }
 
     //通过
     async passon() {
-        console.log('vip-state', this.state);
         const { dataSource, wk, topDir } = this.state;
         const { actions: { logWorkflowEvent, addDocList, getScheduleDir, postScheduleDir, getWorkpackagesByCode } } = this.props;
-        //the unit in the dataSource array is same
-        let unit = dataSource[0].unit;
-        let project = dataSource[0].project;
-        // let code = 'datareport_safetyspecial_' + unit.code;
-        let code = 'datareport_safetyspecial_05'; // 自定义编号
-        //get workpackage by unit's code 
-        let workpackage = await getWorkpackagesByCode({ code: unit.code }); // 获取施工包不太明白
-        console.log('vip-code', code);
-        console.log('vip-workpackage', workpackage);
-
-        let postDirData = {
-            "name": '安全专项目录树',
-            "code": code,
-            "obj_type": "C_DIR",
-            "status": "A",
-            related_objects: [{
-                pk: workpackage.pk,
-                code: workpackage.code,
-                obj_type: workpackage.obj_type,
-                rel_type: 'safetyspecial_wp_dirctory', // 自定义，要确保唯一性
-            }],
-            "parent": { "pk": topDir.pk, "code": topDir.code, "obj_type": topDir.obj_type }
-        }
-        let dir = await getScheduleDir({ code: code });
-        //no such directory
-        if (!dir.obj_type) {
-            dir = await postScheduleDir({}, postDirData);
-        }
-
+      
         // send workflow
         let executor = {};
         let person = getUser();
@@ -124,56 +80,21 @@ export default class SafetySpecialCheck extends Component {
                 attachment: null
             }
         );
-        //prepare the data which will store in database
-        const docData = [];
-        let i = 0;   //asure the code of every document only
-        dataSource.map(item => {
-            debugger;
-            i++;
-            docData.push({
-                code: 'safetyspecial' + moment().format("YYYYMMDDHHmmss") + i,
-                name: item.file.name,
-                obj_type: "C_DOC",
-                status: 'A',
-                profess_folder: { code: dir.code, obj_type: 'C_DIR' },
-                "basic_params": {
-                    "files": [
-                        {
-                            "a_file": item.file.a_file,
-                            "name": item.file.name,
-                            "download_url": item.file.download_url,
-                            "misc": "file",
-                            "mime_type": item.file.mime_type
-                        },
-                    ]
-                },
-                extra_params: {
-                    code: item.code,
-                    filename: item.file.name,
-                    resUnit: item.resUnit,
-                    index: item.index,
-                    projectName: item.projectName,
-                    unitProject: item.unitProject,
-                    scenarioName: item.scenarioName,
-                    organizationUnit: item.organizationUnit,
-                    reviewTime: item.reviewTime,
-                    reviewComments: item.reviewComments,
-                    reviewPerson: item.reviewPerson,
-                    remark: item.remark,
-                    project: item.project,
-                    unit: item.unit,
-                }
-            })
-        });
-        let rst = await addDocList({}, { data_list: docData });
+        const docCode = [];
+        debugger;
+        dataSource.map(item=>{
+            docCode.push(item.codeId);
+        })
+
+        let rst = await addDocList({}, { data_list: docCode });
         if (rst.result) {
             notification.success({
-                message: '创建文档成功！',
+                message: '删除文档成功！',
                 duration: 2
             });
         } else {
             notification.error({
-                message: '创建文档失败！',
+                message: '删除文档失败！',
                 duration: 2
             });
         }
@@ -274,7 +195,6 @@ export default class SafetySpecialCheck extends Component {
         return (
             <Modal
                 title="安全信息审批表"
-                // key={Math.random()}
                 visible={true}
                 width={1280}
                 footer={null}
@@ -296,6 +216,9 @@ export default class SafetySpecialCheck extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
+                        </Col>
+                        <Col span={4}>
+                           申请删除原因：{this.state.dataSource[0].deleteInfo}
                         </Col>
                         <Col span={2} push={14}>
                             <Button type='primary'>
