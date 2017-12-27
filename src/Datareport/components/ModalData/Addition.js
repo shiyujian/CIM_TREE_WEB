@@ -264,15 +264,14 @@ export default class Addition extends Component {
     }
 
     remove(index, name) {
+        console.log('index',index,'name',name)
         const { actions: { deleteStaticFile } } = this.props
         let { dataSource } = this.state
+        console.log('data',this.state)
         let id = dataSource[index][name].id
         deleteStaticFile({ id: id })
-        dataSource[index] = {
-
-            file: {         // 有问题
-            }
-        }
+       
+        dataSource[index][name] = {}
         this.setState(dataSource)
 
     }
@@ -341,7 +340,10 @@ export default class Addition extends Component {
         const columns = [
             {
                 title: '序号',
-                dataIndex:'index'
+                dataIndex:'index',
+                render: (text, record, index) => {
+                    return index + 1
+                }
             }, {
                 title: '模型编码',
                 dataIndex: 'coding'
