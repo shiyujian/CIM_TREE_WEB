@@ -4,9 +4,12 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/quality';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button,message} from 'antd';
+import {Row,Col,Table,Input,Button,message,Spin} from 'antd';
 import JianyanModal from '../components/Quality/JianyanModal'
 import {WORKFLOW_CODE} from '_platform/api.js'
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import Preview from '_platform/components/layout/Preview';
+import JianyanpiDelete from '../components/Quality/JianyanpiDelete'
 import './quality.less'
 import {getUser} from '_platform/auth'
 import {getNextStates} from '_platform/components/Progress/util';
@@ -25,53 +28,219 @@ export default class JianyanData extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			addvisible:false
+			addvisible:false,
+			dataSource:[],
+			pagination:{},
+			loading:false,
+			totalData:null,
+			selectedRowKeys:[],
+			targetData:[],
+			deletevisible:false,
 		};
 		this.columns = [{
-			title:'序号',
-			render:(text,record,index) => {
-				return index+1
-			}
+            title:'序号',
+            width:"5%",
+			dataIndex:'key',
+			render: (text,record,index) => (
+				record.key + 1
+			),
 		},{
 			title:'项目/子项目',
-			dataIndex:'project'
+            dataIndex:'project',
+            width:"13%",
+            render: (text, record, index) => (
+                <span>
+                    {record.project ? record.project.name : '-'}
+                </span>
+            ),
 		},{
 			title:'单位工程',
-			dataIndex:'unit'
+            dataIndex:'unit',
+            width:"13%",
+            render: (text, record, index) => (
+                <span>
+                    {record.unit ? record.unit.name : '-'}
+                </span>
+            ),
 		},{
 			title:'WBS编码',
-			dataIndex:'code'
+            dataIndex:'code',
+            width:"13%",
 		},{
 			title:'名称',
-			dataIndex:'name'
+            dataIndex:'name',
+            width:"13%",
 		},{
 			title:'检验合格率',
-			dataIndex:'rate'
+            dataIndex:'rate',
+            width:"8%",
+            render: (text, record, index) => {
+				if(record.rate){
+					return (
+						<span>
+							{(parseFloat(record.rate)*100).toFixed(1) + '%'} 
+						</span>
+					)
+				}else{
+					return (<span>-</span>)
+				}
+			}
 		},{
 			title:'质量等级',
-			dataIndex:'level'
+            dataIndex:'level',
+			width:"12%",
+			render:(text,record,index) => text ? text : '-'
 		},{
 			title:'施工单位',
-			dataIndex:'construct_unit'
+            dataIndex:'construct_unit',
+            width:"12%",
+            render: (text, record, index) => (
+                <span>
+                    {record.construct_unit ? record.construct_unit.name : "-"}
+                </span>
+            ),
 		}, {
-			title:'附件',
+            title:'附件',
+            width:"11%",
 			render:(text,record,index) => {
-				return <span>
-					<a>预览</a>
-					<span className="ant-divider" />
-					<a>下载</a>
-				</span>
+				if(record.file && record.file.a_file){
+					return (<span>
+                        <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                        <span className="ant-divider" />
+                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                    </span>)
+				}else{
+					return (<span>-</span>)
+				}
 			}
-		}];
+        }]
 	}
-	componentDidMount(){
-		const {actions:{getResouce}} = this.props
-		getResouce({keyword:'_',obj_type:'C_WP_CEL'}).then(rst => {
-			console.log(rst)
+	async componentDidMount(){
+		const {actions:{getResouce,getWorkPackageDetail,getRelDoc,getProjectTree}} = this.props
+		this.setState({loading:true})
+		let fenxiang = await getResouce({keyword:'_',obj_type:'C_WP_ITM'})
+		let fenbu = await getResouce({keyword:'_',obj_type:'C_WP_PTR'});
+		let zifenbu = await getResouce({keyword:'_',obj_type:'C_WP_PTR_S'})
+		let treeData = await getProjectTree()
+		let danwei = []
+		treeData.children.map(o => {
+			danwei = danwei.concat(o.children)
+			o.children.map(t => {
+				danwei = danwei.concat(t.children)
+			})
 		})
+		let arr = danwei.concat(fenbu.result,zifenbu.result,fenxiang.result)
+		for(let index = 0;index < 10;index++){
+			let wp = await getWorkPackageDetail({code:arr[index].code})
+			let rel_doc = wp.related_documents ? wp.related_documents.find(x => {
+				return x.rel_type === 'many_jyp_rel'
+			}) : null
+			if(rel_doc){
+				let doc = await getRelDoc({code:rel_doc.code})
+				arr[index] = {...doc.extra_params,key:index}				
+			}else{
+				let obj = await this.getInfo(wp)
+				arr[index] = {...obj,key:index,file:{}}
+			}
+		}
+		this.setState({totalData:arr,dataSource:arr,pagination:{total:arr.length},loading:false})
 	}
+	//根据附件名称 也就是wbs编码获取其他信息
+    async getInfo(wp){
+        let res = {};
+        const {actions:{getWorkPackageDetail}} = this.props
+        res.name = wp.name
+        res.code = wp.code  
+        res.pk = wp.pk
+        res.obj_type = wp.obj_type
+        let dwcode = ""
+        let getUnitLoop = async(param) => {
+            let next = {};
+            switch (param.obj_type_hum){
+				case "单元工程":
+					next = await getWorkPackageDetail({code:param.parent.code})
+					await getUnitLoop(next)
+					break;
+                case "分项工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
+                case "子分部工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
+                case "分部工程":
+                    next = await getWorkPackageDetail({code:param.parent.code})
+                    await getUnitLoop(next)
+                    break;
+                case "子单位工程":
+                    dwcode = param.parent.code
+                    break
+                case "单位工程":
+                    dwcode = param.code
+                    break
+                default:break;
+            } 
+        }
+        await getUnitLoop(wp)
+        let danwei = await getWorkPackageDetail({code:dwcode})
+        // let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
+        // res.construct_unit = construct_unit
+        res.unit = {
+            name:danwei.name,
+            code:danwei.code,
+            obj_type:danwei.obj_type
+        }
+        res.project = danwei.parent
+        res.related_documents = danwei.related_documents
+        return res
+    }
+	//表格分页回调
+	handleChange = async(pagination, filters, sorter) => {
+		const {actions:{getWorkPackageDetail,getRelDoc}} = this.props		
+		this.setState({loading:true})
+		const pager = { ...this.state.pagination };
+		pager.current = pagination.current;
+		this.setState({
+		  pagination: pager,
+		});
+		let arr = this.state.dataSource
+		if(arr[(pagination.current-1)*10].key+1){
+			this.setState({loading:false})
+			return
+		}
+		for(let index = (pagination.current-1)*10;index < pagination.current*10 && index < this.state.dataSource.length;index++){
+			let wp = await getWorkPackageDetail({code:this.state.totalData[index].code})
+			let rel_doc = wp.related_documents ? wp.related_documents.find(x => {
+				return x.rel_type === 'many_jyp_rel'
+			}) : null
+			if(rel_doc){
+				let doc = await getRelDoc({code:rel_doc.code})
+				arr[index] = {...doc.extra_params,key:index}			
+			}else{
+				let obj = await this.getInfo(wp)
+				arr[index] = {...obj,key:index,file:{}}
+			}
+		}
+		this.setState({dataSource:arr,loading:false})
+	}
+	//预览
+    handlePreview(index){
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index].file
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
 	//批量上传回调
 	setData(data,participants){
+		if(this.state.targetData.length){
+			this.setState({targetData:[],selectedRowKeys:[]})
+		}
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -80,9 +249,9 @@ export default class JianyanData extends Component {
 			person_code:getUser().person_code,
 		}
 		let postdata = {
-			name:"其它验收信息批量录入",
+			name:"检验批验收信息批量录入",
 			code:WORKFLOW_CODE["数据报送流程"],
-			description:"其它验收信息批量录入",
+			description:"检验批验收信息批量录入",
 			subject:[{
 				data:JSON.stringify(data)
 			}],
@@ -91,6 +260,7 @@ export default class JianyanData extends Component {
 			deadline:null,
 			status:"2"
 		}
+		//发起流程
 		createWorkflow({},postdata).then((rst) => {
 			let nextStates =  getNextStates(rst,rst.current[0].id);
             logWorkflowEvent({pk:rst.id},
@@ -105,19 +275,99 @@ export default class JianyanData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({addvisible:false})						
+						this.setState({addvisible:false})	
+						message.info("发起成功")					
 					})
 		})
 	}
+	//删除回调
+	delData(data,participants){
+		if(this.state.targetData.length){
+			this.setState({targetData:[],selectedRowKeys:[]})
+		}
+		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"检验验收信息批量删除",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"检验验收信息批量删除",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+		//发起流程
+		createWorkflow({},postdata).then((rst) => {
+			let nextStates =  getNextStates(rst,rst.current[0].id);
+            logWorkflowEvent({pk:rst.id},
+                {
+                    state:rst.current[0].id,
+                    action:'提交',
+                    note:'发起批量删除',
+                    executor:creator,
+                    next_states:[{
+                        participants:[participants],
+                        remark:"",
+                        state:nextStates[0].to_state[0].id,
+                    }],
+                    attachment:null}).then(() => {
+						this.setState({deletevisible:false})	
+						message.info("发起成功")					
+					})
+		})
+	}
+	setEditVisible(){
+		let {selectedRowKeys,targetData,dataSource} = this.state
+		if(selectedRowKeys.length === 0){
+			message.info('请先选择数据')
+			return
+		}
+		selectedRowKeys.map(i => {
+			targetData.push({...dataSource[i]})
+		})
+		this.setState({targetData,addvisible:true})
+	}
+	setDelVisible(){
+		let {selectedRowKeys,targetData,dataSource} = this.state
+		if(selectedRowKeys.length === 0){
+			message.info('请先选择数据')
+			return
+		}
+		selectedRowKeys.map(i => {
+			targetData.push(dataSource[i])
+		})
+		this.setState({targetData,deletevisible:true})
+	}
+	// table row selected onchange
+    onSelectChange = (selectedRowKeys,selectedRows) => {
+		console.log(selectedRowKeys)
+    	this.setState({selectedRowKeys})
+	}
+	oncancel(){
+		this.setState({addvisible:false,deletevisible:false,targetData:[]})
+	}
 	render() {
+		let {selectedRowKeys} = this.state
+		const rowSelection = {
+        	selectedRowKeys,
+        	onChange: this.onSelectChange,
+    	};
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="其他检验信息" {...this.props}/>
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
-					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>发起填报</Button>
-					<Button className="btn" type="default">申请变更</Button>
-					<Button className="btn" type="default">申请删除</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({targetData:[],addvisible:true})}}>发起填报</Button>
+					<Button className="btn" type="default" onClick={this.setEditVisible.bind(this)}>申请变更</Button>
+					<Button className="btn" type="default" onClick={this.setDelVisible.bind(this)}>申请删除</Button>
 					<Button className="btn" type="default">导出表格</Button>
 					<Search 
 						className="btn"
@@ -126,14 +376,28 @@ export default class JianyanData extends Component {
 						onSearch={value => console.log(value)}
 						enterButton/>
 				</Row>
-				<Row >
-					<Col >
-						<Table columns={this.columns} dataSource={[]}/>
+				<Spin spinning={this.state.loading}>
+				<Row>
+					<Col>
+						<Table 
+						 columns={this.columns} 
+						 dataSource={this.state.dataSource} 
+						 rowKey="key"
+						 pagination={this.state.pagination}
+						 onChange={this.handleChange}
+						 rowSelection={rowSelection}
+						/>
 					</Col>
 				</Row>
+				<Preview />
+			</Spin>
 				{
 					this.state.addvisible &&
-					<JianyanModal {...this.props} oncancel={() => {this.setState({addvisible:false})}} akey={Math.random()*1234} onok={this.setData.bind(this)}/>
+					<JianyanModal {...this.props} editData={this.state.targetData} oncancel={this.oncancel.bind(this)} visible={this.state.addvisible} onok={this.setData.bind(this)}/>
+				}
+				{
+					this.state.deletevisible &&
+					<JianyanpiDelete {...this.props} visible={this.state.deletevisible} deleteData={this.state.targetData} oncancel={this.oncancel.bind(this)} onok={this.delData.bind(this)}/>
 				}
 			</div>
 		);
