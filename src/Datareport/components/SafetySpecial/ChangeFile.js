@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
+import { DatePicker, Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import EditableCell from '../EditableCell';
+import moment from 'moment';
 const FormItem = Form.Item;
 const Option = Select.Option;
 export default class ChangeFile extends Component {
@@ -156,18 +158,6 @@ export default class ChangeFile extends Component {
         return false;
     }
 
-    // //删除
-    // delete(index, i) {
-    //     // debugger;
-    //     let { dataSource } = this.state
-    //     // dataSource.splice(index, 1)
-    //     this.setState({
-    //         dataSource: this.state.dataSource.filter(item => {
-    //             return item.i !== i;
-    //         })
-    //     })
-    // }
-
     //删除
     delete(index) {
         // debugger;
@@ -211,26 +201,77 @@ export default class ChangeFile extends Component {
                 title: '方案名称',
                 dataIndex: 'scenarioName',
                 width: '15%',
+                render: (text, record, i) => (
+                    <div>
+                        <EditableCell
+                            editOnOff={false}
+                            value={record.scenarioName}
+                            onChange={this.onCellChange(i, "scenarioName", record)}
+                        />
+                    </div>
+                ),
             }, {
                 title: '编制单位',
                 dataIndex: 'organizationUnit',
                 width: '10%',
+                render: (text, record, i) => (
+                    <div>
+                        <EditableCell
+                            editOnOff={false}
+                            value={record.organizationUnit}
+                            onChange={this.onCellChange(i, "organizationUnit", record)}
+                        />
+                    </div>
+                ),
             }, {
                 title: '评审时间',
                 dataIndex: 'reviewTime',
                 width: '6%',
+                render: (text, record, i) => (
+                    <div>
+                        <DatePicker
+                            defaultValue={moment(record.reviewTime)} />
+                    </div>
+                ),
             }, {
                 title: '评审意见',
                 dataIndex: 'reviewComments',
                 width: '6%',
+                render: (text, record, i) => (
+                    <div>
+                        <EditableCell
+                            editOnOff={false}
+                            value={record.reviewComments}
+                            onChange={this.onCellChange(i, "reviewComments", record)}
+                        />
+                    </div>
+                ),
             }, {
                 title: '评审人员',
                 dataIndex: 'reviewPerson',
                 width: '6%',
+                render: (text, record, i) => (
+                    <div>
+                        <EditableCell
+                            editOnOff={false}
+                            value={record.reviewPerson}
+                            onChange={this.onCellChange(i, "reviewPerson", record)}
+                        />
+                    </div>
+                ),
             }, {
                 title: '备注',
                 dataIndex: 'remark',
                 width: '15%',
+                render: (text, record, i) => (
+                    <div>
+                        <EditableCell
+                            editOnOff={false}
+                            value={record.remark}
+                            onChange={this.onCellChange(i, "remark", record)}
+                        />
+                    </div>
+                ),
             }
             , {
                 title: '附件',
@@ -328,7 +369,7 @@ export default class ChangeFile extends Component {
                             </Select>
                         </span>
                     </Col>
-                    <Col span={6} push={1}>
+                    {/* <Col span={6} push={1}>
                         <span>
                             项目-单位工程：
                              <Cascader style={{ width: '200px' }}
@@ -339,7 +380,7 @@ export default class ChangeFile extends Component {
                                 placeholder="请选择项目及子单位工程"
                             />
                         </span>
-                    </Col>
+                    </Col> */}
                 </Row>
                 <Row>
                     <Input
@@ -353,6 +394,13 @@ export default class ChangeFile extends Component {
             </Modal>
         )
     }; // render
+    onCellChange = (index, key, record) => {      //编辑某个单元格
+        const { dataSource } = this.state;
+        return (value) => {
+            dataSource[index][key] = value;
+            record[key] = value;
+        };
+    }
     onok() {
         if (!this.state.check) {
             message.error('审批人未选择');

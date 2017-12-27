@@ -274,11 +274,12 @@ export default class SafetySpecialCheck extends Component {
         return (
             <Modal
                 title="安全信息审批表"
-                // key={Math.random()}
                 visible={true}
                 width={1280}
                 footer={null}
-                maskClosable={false}>
+                maskClosable={false}
+                onCancel={this.cancel.bind(this)}
+                >
                 <div>
                     <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}

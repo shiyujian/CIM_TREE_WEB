@@ -44,7 +44,6 @@ export default class TableOrg extends Component {
             getDocument,
         } } = this.props;
 		let dataSource = [];
-		debugger;
 		data.map((item, i) => {
 			getDocument({ code: item.code }).then(single => {
 				let temp = {
@@ -94,7 +93,6 @@ export default class TableOrg extends Component {
 		let param2 = code_Todir + "/?doc_code=safetyspecial&keys=scenarioName&values=" + value; // 方案名称
 		// let param3 = code_Todir + "/?doc_code=safetyspecial&keys=projectName&values=" + value; // 项目/子项目名称
 		// let param4 = code_Todir + "/?doc_code=safetyspecial&keys=unitProject&values=" + value; // 单位工程
-		debugger;
 		let data1 = await getSearcherDir({ keyword: param1 }).then(rst => {
 			if (rst.result.length <= 0) return [];
 			let dataSource = this.handleData(rst.result)
@@ -118,7 +116,6 @@ export default class TableOrg extends Component {
 		this.setState({
 			dataSource: Object.assign(data1, data2)
 		})
-		console.log('vip-dataSource', this.state.dataSource);
 	}
 	//将数据处理成适用于表格的数据
 	handleData(data) {
