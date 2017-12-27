@@ -93,7 +93,7 @@ export default class ProjectSumChangeChock extends Component {
         this.setState({option:e.target.value})
     }
     cancel() {
-        this.props.closeModal("cost_sum_cckk_visible", false);
+        this.props.closeModal("cost_pri_modify_visible", false);
       }
 	render() {
         const columns = [
