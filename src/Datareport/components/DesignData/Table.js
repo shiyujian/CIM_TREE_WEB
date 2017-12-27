@@ -11,6 +11,7 @@ export default class DesignTable extends Component {
 		this.state = {
 			selectedRowKeys: [],
 			alldatas:[],
+			showDs:[],
 			loading: false,
 			percent: 0,
 		}
@@ -68,10 +69,11 @@ export default class DesignTable extends Component {
         })
         Promise.all(all)
         .then(item => {
-        	this.setState({loading:false})
+        	this.setState({loading:false,percent:100})
         	item.forEach((single,index) => {
         		let temp = {
         			index:index+1,
+        			num:index+1,
                     code:single.extra_params.code,
                     filename:single.extra_params.filename,
                     pubUnit:single.extra_params.pubUnit,
@@ -87,7 +89,7 @@ export default class DesignTable extends Component {
                 }
                 dataSource.push(temp);
         	}) 
-            this.setState({dataSource,alldatas:item});
+            this.setState({dataSource,alldatas:item,showDs:dataSource});
         })
     }
 	render() {
@@ -99,7 +101,7 @@ export default class DesignTable extends Component {
 
 		const columns = [{
 			title: '序号',
-			dataIndex: 'index',
+			dataIndex: 'num',
 		}, {
 			title: '文档编码',
 			dataIndex: 'code'
@@ -157,7 +159,18 @@ export default class DesignTable extends Component {
 					<Search
 						style={{ width: "200px", marginLeft: 10 }}
 						placeholder="输入搜索条件"
-						onSearch={value => console.log(value)}
+						onSearch={
+							(text) => {
+								let result = this.state.dataSource.filter(data=>{
+									return data.filename.indexOf(text)>=0 || data.code.indexOf(text)>=0;
+								});
+								console.log(result);
+								if(text === ''){
+									result = this.state.dataSource;
+								}
+								this.setState({selectedRowKeys:[],showDs:this.addindex(result)});
+							}
+						}
 					/>
 				</Row>
 				{//<Button style={{ marginLeft: 10 }} type="primary" onClick={this.togglecheck.bind(this)}>审核</Button>
@@ -167,13 +180,19 @@ export default class DesignTable extends Component {
 						bordered
 						columns={columns}
 						rowSelection={rowSelection}
-						dataSource={this.state.dataSource}
+						dataSource={this.state.showDs}
 						rowKey="index"
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 					/>
 				</Row>
 			</div>
 		);
+	}
+	addindex(arr){
+		arr.forEach((item,index) => {
+			arr[index].num = ++index
+		})
+		return arr
 	}
 	handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -230,11 +249,11 @@ export default class DesignTable extends Component {
     //数据导出
     getExcel(){
         const {actions:{jsonToExcel}} = this.props;
-        const {dataSource} = this.state;
+        const {showDs} = this.state;
         let rows = [];
         rows.push(this.header);
-        dataSource.map(item => {
-            rows.push([item.index,item.code,item.filename,item.project.name,item.unit.name,item.stage,item.pubUnit,item.filetype,item.major,item.wbsObject,item.designObject,item.upPeople]);
+        showDs.map(item => {
+            rows.push([item.num,item.code,item.filename,item.project.name,item.unit.name,item.stage,item.pubUnit,item.filetype,item.major,item.wbsObject,item.designObject,item.upPeople]);
         })
         jsonToExcel({},{rows:rows})
         .then(rst => {
