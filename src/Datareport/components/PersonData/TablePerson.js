@@ -8,7 +8,8 @@ export default class TablePerson extends Component{
 		super(props);
 		this.state = {
 			dataSource: [],
-			deleData:[]
+			deleData: [],
+			modData: [],
 		}
 	}
     render(){
@@ -50,8 +51,14 @@ export default class TablePerson extends Component{
 	}
 	//批量变更
 	modify() {
-		const { actions: { ModifyVisible } } = this.props;
-		ModifyVisible(true);
+		const { actions: { ModifyVisible, setChangePer } } = this.props;
+		if(this.state.modData.lenth) {
+			console.log('modData', this.state.modData)
+			setChangePer(this.state.modData)
+			ModifyVisible(true);
+		} else {
+			message.warning("请先选中要变更的数据");
+		}
 	}
 	async componentDidMount() {
 		const {actions: {getAllUsers}} = this.props;
@@ -144,18 +151,5 @@ export default class TablePerson extends Component{
 	}, {
 		title: '编辑',
 		dataIndex: 'edit',
-		render:(record) => {
-            return  (
-                <Popconfirm
-                    placement="leftTop"
-                    title="确定删除吗？"
-                    onConfirm={this.delete.bind(this)}
-                    okText="确认"
-                    cancelText="取消"
-                >
-                    <a>删除</a>
-                </Popconfirm>
-            )
-        }
 	}]
 }
