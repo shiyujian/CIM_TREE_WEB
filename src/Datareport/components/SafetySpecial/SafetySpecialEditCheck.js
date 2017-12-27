@@ -59,7 +59,7 @@ export default class SafetySpecialEditCheck extends Component {
     //通过
     async passon() {
         const { dataSource, wk, topDir } = this.state;
-        const { actions: { logWorkflowEvent, addDocList, getScheduleDir, postScheduleDir, getWorkpackagesByCode } } = this.props;
+        const { actions: { logWorkflowEvent, updateDocList, getScheduleDir, postScheduleDir, getWorkpackagesByCode } } = this.props;
       
         // send workflow
         let executor = {};
@@ -81,12 +81,48 @@ export default class SafetySpecialEditCheck extends Component {
             }
         );
         const docCode = [];
-        debugger;
         dataSource.map(item=>{
-            docCode.push(item.codeId);
+            debugger;
+            i++;
+            docData.push({
+                code: item.codeId,
+                name: item.file.name,
+                obj_type: "C_DOC",
+                status: 'A',
+                profess_folder: { code: dir.code, obj_type: 'C_DIR' },
+                "basic_params": {
+                    "files": [
+                        {
+                            "a_file": item.file.a_file,
+                            "name": item.file.name,
+                            "download_url": item.file.download_url,
+                            "misc": "file",
+                            "mime_type": item.file.mime_type
+                        },
+                    ]
+                },
+                extra_params: {
+                    code: item.code,
+                    filename: item.file.name,
+                    resUnit: item.resUnit,
+                    index: item.index,
+                    projectName: item.projectName,
+                    unitProject: item.unitProject,
+                    scenarioName: item.scenarioName,
+                    organizationUnit: item.organizationUnit,
+                    reviewTime: item.reviewTime,
+                    reviewComments: item.reviewComments,
+                    reviewPerson: item.reviewPerson,
+                    remark: item.remark,
+                    project: item.project,
+                    unit: item.unit,
+                    changeInfo: item.changeInfo,
+                    codeId: item.codeId,
+                }
+            })
         })
 
-        let rst = await addDocList({}, { data_list: docCode });
+        let rst = await updateDocList({}, { data_list: docCode });
         if (rst.result) {
             notification.success({
                 message: '文档变更成功！',
