@@ -100,23 +100,23 @@ export default class SumSpeedDelete extends Component {
               title: "备注",
               dataIndex: "remarks"
             },
-            // {
-            //   title: "编辑",
-            //   dataIndex: "edit",
-            //   render: (text, record, index) => {
-            //     return (
-            //       <Popconfirm
-            //         placement="leftTop"
-            //         title="确定删除吗？"
-            //         onConfirm={this.delete.bind(this, index)}
-            //         okText="确认"
-            //         cancelText="取消"
-            //       >
-            //         <a>删除</a>
-            //       </Popconfirm>
-            //     );
-            //   }
-            // }
+            {
+              title: "编辑",
+              dataIndex: "edit",
+              render: (text, record, index) => {
+                return (
+                  <Popconfirm
+                    placement="leftTop"
+                    title="确定删除吗？"
+                    onConfirm={this.delete.bind(this, index)}
+                    okText="确认"
+                    cancelText="取消"
+                  >
+                    <a>删除</a>
+                  </Popconfirm>
+                );
+              }
+            }
           ];
         return (
             <Modal
