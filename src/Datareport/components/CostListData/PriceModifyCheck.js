@@ -61,9 +61,21 @@ export default class PriceModifyCheck extends Component {
         const {actions:{
             logWorkflowEvent,
             addDocList,
-            addTagList
+            addTagList,
+            putDocList
         }} = this.props;
-        
+
+        let doclist_c = [];
+        dataSource.map(item=>{
+            doclist_c.push({
+                code:item.extra_params,
+                obj_type: "C_DIR",
+                status:"A",
+                version:"A",
+                extra_params:item
+            })
+        });
+        let rst = await putDocList({},{data_list:doclist_c});
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -71,13 +83,6 @@ export default class PriceModifyCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
-        //prepare the data which will store in database
-        const tagLists = [];
-        dataSource.map(item => {
-            tagLists.push(item.docCode);
-        });
-        let rst = await addTagList({},{data_list:tagLists});
         
         debugger;
         if(rst.result){
@@ -101,6 +106,10 @@ export default class PriceModifyCheck extends Component {
     //radio变化
     onChange(e){
         this.setState({opinion:e.target.value})
+    }
+
+    cancel() {
+        this.props.closeModal("cost_sum_cckk_visible", false);
     }
 
 	render() {
@@ -146,6 +155,7 @@ export default class PriceModifyCheck extends Component {
 				visible = {true}
                 maskClosable={false}
                 footer = {null}
+                onCancel={this.cancel.bind(this)}
 			>
 				<div>
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>

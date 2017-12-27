@@ -70,122 +70,86 @@ export default class PriceModifyModal extends Component {
         this.setState({dataSource})
     }
 
-    onCellChange = (index, key, record) => {      //编辑某个单元格
+    //输入
+    tableDataChange(index, key ,e ){
         const { dataSource } = this.state;
-        return (value) => {
-            dataSource[index][key] = value;
-            record[key] = value;
-        };
+		dataSource[index][key] = e.target['value'];
+          this.setState({dataSource});
+          console.log('dataSource:',dataSource)
     }
 
 	render() {
         const columns = 
             [{
+                title: "序号",
+                dataIndex: "index",
+                width:"5%",
+                render: (text, record, index) => {
+                  return index + 1;
+                }
+              },{
+                title: "项目/子项目",
+                dataIndex: "subproject"
+              },
+              {
+                title: "单位工程",
+                dataIndex: "unit"
+              },
+              {
                 title:'编码',
                 dataIndex:'code',
                 width: '10%',
                 render: (text, record, index) => (
-                    <div>
-                        <EditableCell
-                            value={record.code}
-                            editOnOff={false}
-                            onChange={this.onCellChange(index, "code", record)}
-                        />
-                    </div>
+                    <Input value={this.state.dataSource[index]['code']} onChange={this.tableDataChange.bind(this,index,'code')}/>
                 )
-            },{
+              },
+              {
                 title:'清单项目编码',
                 dataIndex:'projectcoding',
                 width:"10%",
                 render: (text, record, index) => (
-                    <div>
-                        <EditableCell
-                            value={record.code}
-                            editOnOff={false}
-                            onChange={this.onCellChange(index, "code", record)}
-                        />
-                    </div>
+                    <Input value={this.state.dataSource[index]['projectcoding']} onChange={this.tableDataChange.bind(this,index,'projectcoding')}/>
                 )
-            },{
+              },
+              {
                 title:'计价单项',
                 dataIndex:'valuation',
                 width:"10%",
                 render: (text, record, index) => (
-                    <div>
-                        <EditableCell
-                            value={record.code}
-                            editOnOff={false}
-                            onChange={this.onCellChange(index, "code", record)}
-                        />
-                    </div>
+                    <Input value={this.state.dataSource[index]['valuation']} onChange={this.tableDataChange.bind(this,index,'valuation')}/>
                 )
-            },{
+              },
+              {
                 title:'工程内容/规格编号',
                 dataIndex:'rate',
                 width:"12%",
                 render: (text, record, index) => (
-                    <div>
-                        <EditableCell
-                            value={record.code}
-                            editOnOff={false}
-                            onChange={this.onCellChange(index, "code", record)}
-                        />
-                    </div>
+                    <Input value={this.state.dataSource[index]['rate']} onChange={this.tableDataChange.bind(this,index,'rate')}/>
                 )
-            },{
+              },
+              {
                 title:'计价单位',
                 dataIndex:'company',
                 width:"10%",
                 render: (text, record, index) => (
-                    <div>
-                        <EditableCell
-                            value={record.code}
-                            editOnOff={false}
-                            onChange={this.onCellChange(index, "code", record)}
-                        />
-                    </div>
+                    <Input value={this.state.dataSource[index]['company']} onChange={this.tableDataChange.bind(this,index,'company')}/>
                 )
-            },{
+              },
+              {
                 title:'结合单价（元）',
                 dataIndex:'total',
                 width:"10%",
                 render: (text, record, index) => (
-                    <div>
-                        <EditableCell
-                            value={record.code}
-                            editOnOff={false}
-                            onChange={this.onCellChange(index, "code", record)}
-                        />
-                    </div>
+                    <Input value={this.state.dataSource[index]['total']} onChange={this.tableDataChange.bind(this,index,'total')}/>
                 )
-            },{
+              },
+              {
                 title:'备注',
                 dataIndex:'remarks',
                 width:"10%",
                 render: (text, record, index) => (
-                    <div>
-                        <EditableCell
-                            value={record.code}
-                            editOnOff={false}
-                            onChange={this.onCellChange(index, "code", record)}
-                        />
-                    </div>
+                    <Input value={this.state.dataSource[index]['remarks']} onChange={this.tableDataChange.bind(this,index,'code')}/>
                 )
-            },{
-                title: "操作",
-                render: (text, record, index) => {
-                  return (
-                    <Popconfirm
-                      placement="leftTop"
-                      title="确定删除吗？"
-                      onConfirm={this.delete.bind(this, index)}
-                      okText="确认"
-                      cancelText="取消"
-                    >
-                      <a>删除</a>
-                    </Popconfirm>
-                  );
-                }
               }];
 		return (
 			<Modal
