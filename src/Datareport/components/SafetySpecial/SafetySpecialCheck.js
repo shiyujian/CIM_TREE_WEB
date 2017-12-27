@@ -7,7 +7,6 @@ import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } fr
 import WorkflowHistory from '../WorkflowHistory';
 import { getUser } from '_platform/auth';
 import { actions } from '../../store/safety';
-import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 const { RangePicker } = DatePicker;
 const RadioGroup = Radio.Group;
@@ -307,7 +306,6 @@ export default class SafetySpecialCheck extends Component {
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {

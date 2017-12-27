@@ -26,6 +26,7 @@ export default class JianyanpiDelete extends Component {
 		super(props);
 		this.state = {
             dataSource:[],
+            opinion:1
 		};
     }
     async componentDidMount(){
@@ -52,7 +53,7 @@ export default class JianyanpiDelete extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList}} = this.props
+        const {actions:{logWorkflowEvent,delDocList}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -60,56 +61,18 @@ export default class JianyanpiDelete extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        let doclist_a = [];
-        let doclist_p = [];
-        let wplist = [];
+        let code_list = "";
         dataSource.map((o) => {
-            //创建文档对象
+            debugger
             let doc = o.related_documents.find(x => {
-                return x.rel_type === 'many_jyp_rel'
+                return x.rel_type === 'many_jyp_rel' || x.rel_type === 'many_jy_rel'
             })
             if(doc){
-                doclist_p.push({
-                    code:doc.code,
-                    extra_params:{
-                        ...o
-                    }
-                })
-            }else{
-                doclist_a.push({
-                    code:`rel_doc_jyp_${o.code}`,
-                    name:`${o.name}附件`,
-                    obj_type:"C_DOC",
-                    status:"A",
-                    version:"A",
-                    "basic_params": {
-                        "files": [
-                            o.file
-                        ]
-                    },
-                    workpackages:[{
-                        code:o.code,
-                        obj_type:o.obj_type,
-                        pk:o.pk,
-                        rel_type:"many_jyp_rel"
-                    }],
-                    extra_params:{
-                        ...o
-                    }
-                })
+                //拼接code
+                code_list += `${doc.code},`
             }
-            //施工包批量
-            wplist.push({
-                code:o.code,
-                extra_params:{
-                    rate:o.rate,
-                    check_status:2
-                }
-            })
         })
-        await addDocList({},{data_list:doclist_a});
-        await putDocList({},{data_list:doclist_p})
-        await updateWpData({},{data_list:wplist});
+        await delDocList({code_list:code_list})
     }
     //不通过
     async reject(){
@@ -124,12 +87,10 @@ export default class JianyanpiDelete extends Component {
         // executor.person_code = person.code;
         // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'退回',note:'滚',executor:executor,attachment:null});
     }
-//下拉框选择人
-selectChecker(value){
-    let check = JSON.parse(value)
-    this.setState({check})
-}
-    //预览
+//radio变化
+onChange(e){
+    this.setState({opinion:e.target.value})
+}   //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
         let f = this.state.dataSource[index].file
@@ -188,7 +149,7 @@ selectChecker(value){
 						</span>
 					)
 				}else{
-					return (<span>暂无</span>)
+					return (<span>-</span>)
 				}
 			}
 		},{
@@ -201,7 +162,7 @@ selectChecker(value){
             width:"12%",
             render: (text, record, index) => (
                 <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
+                    {record.construct_unit ? record.construct_unit.name : "-"}
                 </span>
             ),
 		}, {

@@ -4,6 +4,7 @@ import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader ,Select, Popco
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
+import ECCB from '../EditCellWithCallBack';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -80,64 +81,108 @@ export default class ProjectSumChange extends Component {
         const columns =[
             {
               title: "序号",
-              dataIndex: "index",
+              dataIndex: "key",
               width:"5%",
-              render: (text, record, index) => {
-                return index + 1;
-              }
             },{
                 title: "项目/子项目",
                 dataIndex: "subproject",
-                // render: (text, record, index) => (
-                //     <Input value={this.state.dataSource[index]['project']} onChange={this.tableDataChange.bind(this,index,'project')}/>
-                // )
-              },
-              {
+            },{
                 title: "单位工程",
                 dataIndex: "unit",
-                // render: (text, record, index) => (
-                //     <Input value={this.state.dataSource[index]['unit']} onChange={this.tableDataChange.bind(this,index,'unit')}/>
-                // )
-              },
-            {
+               
+              },{
               title: "清单项目编号",
-              dataIndex: "projectcoding",
-              render: (text, record, index) => (
-                  <Input value={this.state.dataSource[index]['projectcoding']} onChange={this.tableDataChange.bind(this,index,'projectcoding')}/>
-              )
-            },
-            {
+              render: (record) => {
+                let checkVal = (value) => {
+                    record.projectcoding = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.projectcoding}
+                        checkVal={checkVal}
+                        value={record.projectcoding} />
+                )
+              },
+              key:'Projectcoding'
+            }, {     
               title: "项目名称",
-              dataIndex: "projectname",
-              render: (text, record, index) => (
-                  <Input value={this.state.dataSource[index]['projectname']} onChange={this.tableDataChange.bind(this,index,'projectname')}/>
-              )
-            },
-            {
+              render: (record) => {
+                let checkVal = (value) => {
+                    record.projectname = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.projectname}
+                        checkVal={checkVal}
+                        value={record.projectname} />
+                )
+              },
+              key:"Projectname"
+            },{
               title: "计量单位",
-              dataIndex: "company",
-              render: (text, record, index) => (
-                  <Input value={this.state.dataSource[index]['company']} onChange={this.tableDataChange.bind(this,index,'company')}/>
-              )
-            },
-            {
+           
+              render: (record) => {
+                let checkVal = (value) => {
+                    record.company= value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.company}
+                        checkVal={checkVal}
+                        value={record.company} />
+                )
+              },
+              key:"Company"
+            }, {        
               title: "数量",
-              dataIndex: "number",
-              render: (text, record, index) => (
-                  <Input value={this.state.dataSource[index]['number']} onChange={this.tableDataChange.bind(this,index,'number')}/>
-              )
+              render: (record) => {
+                let checkVal = (value) => {
+                    record.number = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.number}
+                        checkVal={checkVal}
+                        value={record.number} />
+                )
+              },
+              key:"Number"
             },{
                 title: "单价",
-                dataIndex: "total",
-                render: (text, record, index) => (
-                    <Input value={this.state.dataSource[index]['total']} onChange={this.tableDataChange.bind(this,index,'total')}/>
-                )
+               
+                render: (record) => {
+                    let checkVal = (value) => {
+                        record.total = value;
+                        return value;
+                    }
+                    return (
+                        <ECCB
+                            initCheckedValue={record.total}
+                            checkVal={checkVal}
+                            value={record.total} />
+                    )
+                  },
+                  key:"Total"
               },{
               title: "备注",
-              dataIndex: "remarks",
-              render: (text, record, index) => (
-                  <Input value={this.state.dataSource[index]['remarks']} onChange={this.tableDataChange.bind(this,index,'remarks')}/>
-              )
+            
+              render: (record) => {
+                let checkVal = (value) => {
+                    record.remarks = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.remarks}
+                        checkVal={checkVal}
+                        value={record.total} />
+                )
+              },
+              key:"Remarks"
             },
           ];
         return (

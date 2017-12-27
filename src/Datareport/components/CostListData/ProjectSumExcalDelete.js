@@ -70,15 +70,13 @@ export default class ProjectSumExcalDelete extends Component {
     }
 
     render() {
-        console.log('this.state',this.state);
+        // console.log('this.state',this.state);
         const columns = [
             {
                 title: "序号",
-                dataIndex: "code",
+                dataIndex: "key",
                 width: "10%",
-                render:(text,record,index)=>{
-                  return index+1
-                }
+                
               },{
                 title: '项目/子项目',
                 dataIndex: 'subproject',

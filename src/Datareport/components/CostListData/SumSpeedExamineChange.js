@@ -57,10 +57,21 @@ export default class SumSpeedExamineChange extends Component {
 
     //通过
     async passon(){
-        const {dataSource,wk,topDir} = this.state;
+        const {dataSource,wk} = this.state;
+        let doclist_change = [];
+        console.log('dataSource:',dataSource)
+        dataSource.map(item=>{
+            doclist_change.push({
+                code:item.code,
+                obj_type: "C_DOC",
+                status:"A",
+                version:"A",
+                extra_params:item
+            })
+        });
         const {actions:{
             logWorkflowEvent,
-            delDocList
+            putDocList
         }} = this.props;
         
         // send workflow
@@ -71,26 +82,7 @@ export default class SumSpeedExamineChange extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
-        let deletecode = [];
-        dataSource.map(item=>{
-            console.log('item:',item.code)
-            deletecode.push(item.code)
-            console.log("deletecode:",deletecode)
-        })
-        
-        let rst = await delDocList({},{code_list:deletecode.join(',')});
-        if(rst.result){
-            notification.success({
-                message: '删除文档成功！',
-                duration: 2
-            });
-        }else{
-            notification.error({
-                message: '删除文档失败！',
-                duration: 2
-            });
-        }
+        await putDocList({},{data_list:doclist_change})
         
     }
     //不通过
@@ -114,31 +106,33 @@ export default class SumSpeedExamineChange extends Component {
                 return index + 1;
               }
             },{
-                title: '项目/子项目',
-                dataIndex: 'subproject',
-            }, {
-                title: '单位工程',
-                dataIndex: 'unit',
-            }, {
-                title: '清单项目编号',
-                dataIndex: 'projectcoding',
-            }, {
-                title: '项目名称',
-                dataIndex: 'projectname',
-            }, {
-                title: '计量单位',
-                dataIndex: 'company',
-            }, {
-                title: '数量',
-                dataIndex: 'number',
-            }, {
-                title: '单价',
-                dataIndex: 'total',
-            }, {
-                title: '备注',
-                dataIndex: 'remarks',
-            }
-          ]
+                title: "项目/子项目",
+                dataIndex: "project"
+              },
+              {
+                title: "单位工程",
+                dataIndex: "unit"
+              },
+            {
+              title: "工作节点目标",
+              dataIndex: "nodetarget"
+            },
+            {
+              title: "完成时间",
+              dataIndex: "completiontime"
+            },
+            {
+              title: "支付金额（万元）",
+              dataIndex: "summoney"
+            },
+            {
+              title: "累计占比",
+              dataIndex: "ratio"
+            },
+            {
+              title: "备注",
+              dataIndex: "remarks"
+            },]
 		return (
             <Modal
 			title="结算进度信息变更审批表"

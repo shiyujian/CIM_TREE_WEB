@@ -37,6 +37,7 @@ export default class ToggleModalUpdate extends Component{
                     columns={this.columns}
                     bordered={true}
                     dataSource = {this.state.dataSource}
+                    rowKey="code"
                 >
                 </Table>
                 <span>
@@ -66,7 +67,7 @@ export default class ToggleModalUpdate extends Component{
             message.error('审批人未选择');
             return;
         }
-        this.props.setDataDel(this.state.dataSource, JSON.parse(this.state.passer));
+        this.props.setDataUpdate(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisibleUpdate(false);
     }
     cancel() {
@@ -74,7 +75,7 @@ export default class ToggleModalUpdate extends Component{
         ModalVisibleUpdate(false);
     }
     componentDidMount(){
-        const {updateOrg, actions:{getAllUsers, getProjects}} = this.props;
+        const {updateOrg, actions:{getAllUsers, getProjects, getUnit}} = this.props;
         getAllUsers().then(rst => {
             let users = [];
             if (rst.length) {
@@ -89,10 +90,29 @@ export default class ToggleModalUpdate extends Component{
                 })
             }
         });
-        this.setState({
-            dataSource:updateOrg
+        getProjects().then(rst => {
+            if (rst.children.length) {
+                let projects = rst.children;
+                this.setState({
+                    projects,
+                    defaultPro: rst.children[0].name
+                })
+                console.log("this.state.projects",this.state.projects);
+            }
+        }) 
+        this.setState({dataSource:updateOrg})
+        let units = [];
+        updateOrg.map(item => {
+            item.extra_params.project.map(it => {
+                getUnit({code:it.split("--")[0]}).then(rst => {
+                    console.log("rst:",rst);
+                    units.push(...rst.children);
+                    this.setState({
+                        units:units
+                    })
+                })
+            })
         })
-        console.log("updateOrg:",updateOrg);
     }
     columns = [ {
         title: '组织机构编码',
@@ -107,8 +127,9 @@ export default class ToggleModalUpdate extends Component{
 		title: '组织机构部门',
 		// dataIndex: 'name',
 		render:(text, record, index) =>{ 
-            return <Input value = {record.name} onChange={ele => {
+            return <Input value = {record.name || ""} onChange={ele => {
                 record.name = ele.target.value
+                this.forceUpdate();
             }}/>
         }
 	}, {
@@ -120,10 +141,10 @@ export default class ToggleModalUpdate extends Component{
 		dataIndex: 'extra_params.project',
         width:"15%",
         height:"64px",
-        render:(record) => {
-            console.log("pskg",record);
+        render:(text, record, index) => {
+
             return (
-                <TreeSelect value={record.extra_params.project} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
+                <TreeSelect value={record.selectPro || record.extra_params.project} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
                     let units = [];
                     let selectPro = [];
@@ -141,6 +162,7 @@ export default class ToggleModalUpdate extends Component{
                         this.setState({units})
                         console.log("this.state.units",this.state.units);
                     })
+                    this.forceUpdate();
 
                 }} 
                 >
@@ -149,17 +171,22 @@ export default class ToggleModalUpdate extends Component{
             )
         }
 	},{
-		title: '负责单位工程名称',
-		render:(record) => {
+        title: '负责单位工程名称',
+        width:"15%",
+		render:(text, record, index) => {
+            console.log("dfggdfg:",this.state.units);
             return (
-                <TreeSelect value={record.extra_params.unit} onSelect={(value, node, extra) => {
+                <TreeSelect value={record.selectUnit || record.extra_params.unit} onSelect={(value, node, extra) => {
                     let selectUnit = [];
                     extra.checkedNodes.map(item => {
                         selectUnit.push(item.key);
-                    })
+                    }); 
                     record.selectUnit = selectUnit;
+                    this.forceUpdate();
                 }} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
-                    {ToggleModalUpdate.lmyloop(this.state.units)}
+                    {
+                        ToggleModalUpdate.lmyloop(this.state.units) 
+                    }
                  </TreeSelect>
             )
         }
@@ -176,6 +203,7 @@ export default class ToggleModalUpdate extends Component{
 			if (item.children && item.children.length>0) {
 				return (
 					<TreeNode
+                        data = {item}
 						key={`${item.code}--${item.name}`}
 						value={`${item.code}--${item.name}`}
 						title={`${item.code} ${item.name}`}>
@@ -186,6 +214,7 @@ export default class ToggleModalUpdate extends Component{
 				);
 			} else {
 				return(<TreeNode
+                    data = {item}
 					key={`${item.code}--${item.name}`}
 					value={`${item.code}--${item.name}`}
                     title={`${item.code} ${item.name}`} />

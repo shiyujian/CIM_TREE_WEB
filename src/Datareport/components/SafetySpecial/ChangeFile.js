@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { DatePicker, Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
-import EditableCell from '../EditableCell';
+import EditableCell from './EditableCell';
 import moment from 'moment';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -10,7 +10,7 @@ export default class ChangeFile extends Component {
     constructor(props, state) {
         super(props);
         this.state = {
-            dataSource: [],
+            dataSource: this.props.subDataSource,
             changeInfo: '',
             users: [],
             projects: [],
@@ -25,11 +25,11 @@ export default class ChangeFile extends Component {
     }
 
     componentDidMount() {
-        console.log('vip-state', this.props);
-        const dataSource = this.props.subDataSource;
-        this.setState({
-            dataSource,
-        })
+        // console.log('vip-state', this.props);
+        // const dataSource = this.props.subDataSource;
+        // this.setState({
+        //     dataSource,
+        // })
 
         // 下拉框
         const { actions: { getAllUsers, getProjectTree } } = this.props;
@@ -105,6 +105,7 @@ export default class ChangeFile extends Component {
     covertURLRelative(originUrl) {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
+
     beforeUploadPicFile(index, file) {
         // 上传到静态服务器
         const fileName = file.name;
@@ -186,7 +187,7 @@ export default class ChangeFile extends Component {
             {
                 title: '序号',
                 dataIndex: 'i',
-                width: '5%',
+                width: '3%',
             },
             {
                 title: '单位工程',
@@ -200,7 +201,7 @@ export default class ChangeFile extends Component {
             }, {
                 title: '方案名称',
                 dataIndex: 'scenarioName',
-                width: '15%',
+                width: '10%',
                 render: (text, record, i) => (
                     <div>
                         <EditableCell
@@ -226,17 +227,21 @@ export default class ChangeFile extends Component {
             }, {
                 title: '评审时间',
                 dataIndex: 'reviewTime',
-                width: '6%',
-                render: (text, record, i) => (
-                    <div>
-                        <DatePicker
-                            defaultValue={moment(record.reviewTime)} />
-                    </div>
-                ),
+                width: '10%',
+                render: (text, record, i) => {
+                    return (
+                        <div>
+                            <DatePicker
+                                defaultValue={moment(record.reviewTime, "YYYY-MM-DD")}
+                                onChange={this.onCellChange(i, "reviewTime", record)}
+                            />
+                        </div>
+                    )
+                },
             }, {
                 title: '评审意见',
                 dataIndex: 'reviewComments',
-                width: '6%',
+                width: '10%',
                 render: (text, record, i) => (
                     <div>
                         <EditableCell
@@ -249,7 +254,7 @@ export default class ChangeFile extends Component {
             }, {
                 title: '评审人员',
                 dataIndex: 'reviewPerson',
-                width: '6%',
+                width: '10%',
                 render: (text, record, i) => (
                     <div>
                         <EditableCell
@@ -262,7 +267,7 @@ export default class ChangeFile extends Component {
             }, {
                 title: '备注',
                 dataIndex: 'remark',
-                width: '15%',
+                width: '10%',
                 render: (text, record, i) => (
                     <div>
                         <EditableCell
@@ -275,7 +280,7 @@ export default class ChangeFile extends Component {
             }
             , {
                 title: '附件',
-                width: "15%",
+                width: "10%",
                 render: (text, record, i) => {
                     // debugger;
                     if (record.file.a_file) {
@@ -394,11 +399,19 @@ export default class ChangeFile extends Component {
             </Modal>
         )
     }; // render
-    onCellChange = (index, key, record) => {      //编辑某个单元格
+    onCellChange = (index, key, record) => {
         const { dataSource } = this.state;
         return (value) => {
+            if (key === "reviewTime" && value) {
+                // debugger;
+                const chooseTime = new Date(value._d);
+                value = chooseTime.getFullYear() + "年" + (chooseTime.getMonth() + 1) + "月" + chooseTime.getDate() + "日";
+            }
             dataSource[index][key] = value;
             record[key] = value;
+            this.setState({
+                dataSource
+            })
         };
     }
     onok() {
@@ -413,11 +426,11 @@ export default class ChangeFile extends Component {
             message.info(`有数据未上传附件`)
             return
         }
-        const { project, unit } = this.state;
-        if (!project.name) {
-            message.info(`请选择项目和单位工程`);
-            return;
-        }
+        // const { project, unit } = this.state;
+        // if (!project.name) {
+        //     message.info(`请选择项目和单位工程`);
+        //     return;
+        // }
         if (!this.state.changeInfo) {
             message.info(`请填写变更原因`);
             return;
@@ -434,6 +447,7 @@ export default class ChangeFile extends Component {
         for (let i = 0; i < this.state.dataSource.length; i++) {
             this.state.dataSource[i].changeInfo = changeInfo;
         }
+        // debugger;
         this.props.setChangeData(this.state.dataSource, per);
         notification.success({
             message: '变更已发起！',

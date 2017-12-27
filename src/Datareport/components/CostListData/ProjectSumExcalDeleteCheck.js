@@ -78,6 +78,7 @@ export default class ProjectSumExcalDeleteCheck extends Component {
         })
         
         let rst = await delDocList({},{code_list:docCode});
+        
         if(rst.result){
             notification.success({
                 message: '删除文档成功！',

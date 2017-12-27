@@ -53,8 +53,9 @@ export default class BanlancePlan extends Component {
 	 generateTableData(data) {
 		 let dataSour = [];
 		 console.log(data);
-		data.map(item => {
+		data.map((item,key) => {
 			let datas = {
+				key:key+1,
 				subproject: item.extra_params.project.name,
 				unit: item.extra_params.unit.name || item.extra_params.unit,
 				nodetarget: item.extra_params.nodetarget,
@@ -67,7 +68,8 @@ export default class BanlancePlan extends Component {
 			dataSour.push(datas)
 		})
 		this.setState({
-			dataSource:dataSour
+			dataSource:dataSour,
+			showDat:dataSour
 		})
 	}
 
@@ -204,13 +206,13 @@ export default class BanlancePlan extends Component {
 
 	}
 
-	onSelectChange = (selectedRowKeys) => {
-        const {dataSource} = this.state;
-        let dataSourceSelected = [];
-        for(let i=0;i<selectedRowKeys.length;i++){
-            dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
-        }
-        this.setState({selectedRowKeys,dataSourceSelected});
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+        // const {dataSource} = this.state;
+        // let dataSourceSelected = [];
+        // for(let i=1;i<selectedRowKeys.length;i++){
+        //     dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
+        // }
+        this.setState({selectedRowKeys,dataSourceSelected:selectedRows});
     }
 
 	render() {
@@ -221,10 +223,7 @@ export default class BanlancePlan extends Component {
 		};
 		const columns = [{
 			title: '序号',
-			dataIndex: 'serialnumber',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex: 'key'
 		}, {
 			title: '项目/子项目名称',
 			dataIndex: 'subproject',
@@ -261,11 +260,20 @@ export default class BanlancePlan extends Component {
 							className="btn"
 							style={{ width: "200px" }}
 							placeholder="请输入搜索条件"
-							onSearch={value => console.log(value)}
+							onSearch={ text => {
+								let result = this.state.dataSource.filter(data => {
+									return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0;
+								})
+								if( text === ''){
+									result = this.state.dataSource
+								}
+								this.setState({showDat:result});
+							}
+						  }
 						/>
 					</Row>
 					<div >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.dataSource} />
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDat} />
 					</div>
 					{this.state.lanchReapt &&
 						<SumPlan {...this.props} oncancel={() => { this.setState({ lanchReapt: false }) }} onok={this.lanchOk.bind(this)} />

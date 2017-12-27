@@ -8,6 +8,8 @@ import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import JianyanpiCheck from 'Datareport/components/Quality/JianyanpiCheck';
 import PriceListCheck from 'Datareport/components/CostListData/PriceListCheck';
+import PriceRmCheck from 'Datareport/components/CostListData/PriceRmCheck';
+import PriceModifyCheck from 'Datareport/components/CostListData/PriceModifyCheck';
 import JianyanCheck from 'Datareport/components/Quality/JianyanCheck';
 import DesignDataCheck from 'Datareport/components/DesignData/Check';
 import DesignDataModifyCheck from 'Datareport/components/DesignData/ModifyCheck';
@@ -56,6 +58,7 @@ import WorkChangeCheck from 'Datareport/components/ScheduleData/WorkChangeCheck'
 import UpdataCheck from 'Datareport/components/OrgData/UpdataCheck';
 import HandelChangeUnitModal from 'Datareport/components/UnitData/HandleChangeUnitModal';
 import HandelChangeProjModal from 'Datareport/components/ProjectData/HandleChangeModal';
+import ModCheck from 'Datareport/components/PersonData/ModCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -91,6 +94,8 @@ export default class Progress extends Component {
 			dr_base_org_visible,
 			dr_xm_xx_visible,
 			cost_pri_ck_visible,
+			cost_pri_rm_visible,
+			cost_pri_modify_visible,
 			cost_sum_spd_visible,
 			dr_base_person_visible,
 			dr_qua_jsjh_visible,
@@ -103,7 +108,9 @@ export default class Progress extends Component {
 			design_modifycheck_visbile,
 			design_expurgatecheck_visbile,
 			safety_vedioCheck_visible,
+			safety_vedioDeleteCheck_visible,
 			safety_vedioInfoCheck_visible,
+			safety_vedioInfoDeleteCheck_visible,
 			dr_qua_defect_visible,
 			safety_doc_delete_visible,
 			safety_hidden_delete_visible,
@@ -131,7 +138,8 @@ export default class Progress extends Component {
 			workdata_doc_change_visible,
 			dr_base_update_visible,
 			dr_change_unit_visible,
-			dr_change_proj_visible
+			dr_change_proj_visible,
+			person_modcheck_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -262,6 +270,14 @@ export default class Progress extends Component {
 					<PriceListCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					cost_pri_rm_visible && 
+					<PriceRmCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					cost_pri_modify_visible && 
+					<PriceModifyCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
 					cost_sum_spd_visible && 
 					<SumSpeedExamine wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
@@ -307,11 +323,19 @@ export default class Progress extends Component {
 				}
 				{
 					safety_vedioCheck_visible && 
-					<VedioCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<VedioCheck type={"create"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_vedioDeleteCheck_visible &&
+					<VedioCheck type={"strike"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>					
 				}
 				{
 					safety_vedioInfoCheck_visible && 
-					<VedioInfoCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<VedioInfoCheck type={"create"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_vedioInfoDeleteCheck_visible && 
+					<VedioInfoCheck type={"strike"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					dr_qua_defect_visible && 
@@ -425,6 +449,10 @@ export default class Progress extends Component {
 					dr_change_proj_visible && 
 					<HandelChangeProjModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					person_modcheck_visible && 
+					<ModCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -432,7 +460,7 @@ export default class Progress extends Component {
 	//关闭数据报送模态框
 	closeModal(key,value){
 		const {actions:{changeDatareportVisible}} = this.props
-		changeDatareportVisible({key,value})
+		changeDatareportVisible({key,value});
 	}
 	async openModal(name,id){
 		const {actions:{changeDatareportVisible,getWorkflowById}} = this.props
@@ -473,6 +501,12 @@ export default class Progress extends Component {
 			case "计价清单信息填报":
 				changeDatareportVisible({key:'cost_pri_ck_visible',value:true})
 				break;
+			case "计价清单信息删除申请":
+				changeDatareportVisible({key:'cost_pri_rm_visible',value:true})
+				break;
+			case "计价清单信息修改申请":
+				changeDatareportVisible({key:'cost_pri_modify_visible',value:true})
+				break;
 			case "结算进度信息填报":
 				changeDatareportVisible({key:'cost_sum_spd_visible',value:true})
 				break;
@@ -485,6 +519,12 @@ export default class Progress extends Component {
 			case "工程量结算信息填报":
 				changeDatareportVisible({key:'cost_pro_ck_visible',value:true})
 				break;
+			case "计价清单信息删除申请":
+				changeDatareportVisible({key:'cost_pri_rm_visible',value:true})
+				break;
+			case "计价清单信息变更申请":
+				changeDatareportVisible({key:'cost_pri_modify_visible',value:true})
+				break;	
 			case "施工进度发起填报":
 				changeDatareportVisible({key:'dr_wor_sg_visible',value:true})
 				break;
@@ -500,8 +540,14 @@ export default class Progress extends Component {
 			case "视频监控批量录入":
 				changeDatareportVisible({key:'safety_vedioCheck_visible',value:true})
 				break;
+			case "视频监控数据删除":
+				changeDatareportVisible({key:'safety_vedioDeleteCheck_visible',value:true})				
+				break;
 			case "影像信息批量录入":
 				changeDatareportVisible({key:'safety_vedioInfoCheck_visible',value:true})
+				break;
+			case "影像信息数据删除":
+				changeDatareportVisible({key:'safety_vedioInfoDeleteCheck_visible',value:true})
 				break;
 			case "质量缺陷信息批量录入":
 				changeDatareportVisible({key:'dr_qua_defect_visible',value:true})
@@ -586,6 +632,9 @@ export default class Progress extends Component {
 				break;
 			case "项目批量变更申请":
 				changeDatareportVisible({key:'dr_change_proj_visible',value:true})
+				break;
+			case "人员信息批量更改":
+				changeDatareportVisible({key:'person_modcheck_visible',value:true})
 				break;
 			default:break;
 		}

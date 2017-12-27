@@ -12,6 +12,9 @@ export default class SubmitChangeModal extends Component {
     constructor(props) {
         super(props);
         let ds = props.dataSource.map(data => {
+            if(!data.files){
+                data.files = [];
+            }
             let rst = { ...data, ...data.extra_params };
             rst.file = rst.files.find(f=>{
                 return f.misc === 'file';
