@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import { Table, Button, Popconfirm, message, Input, Icon } from 'antd';
 import style from './TableUnit.css';
 import DelModal from './DelModal'
+import ChangeUNIT from './SubmitChangeModal'
+
 const Search = Input.Search;
+
 export default class TableUnit extends Component {
 	constructor(props) {
 		super(props);
@@ -50,7 +53,16 @@ export default class TableUnit extends Component {
 				<div>
 					<Button style={{ marginRight: "10px" }} className={style.button}>模板下载</Button>
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
-					<Button className={style.button}>申请变更</Button>
+					<Button className={style.button}
+						onClick={() => {
+							if (this.state.selectedRows && this.state.selectedRows.length > 0) {
+								this.setState({ changing: true });
+								return;
+							}
+							message.warning('请至少选择一条');
+						}
+						}
+					>申请变更</Button>
 					<Button onClick={() => {
 						if (this.state.selectedRows && this.state.selectedRows.length > 0) {
 							this.setState({ deling: true });
@@ -81,6 +93,16 @@ export default class TableUnit extends Component {
 					dataSource={this.state.showDs || []}
 				>
 				</Table>
+				{
+					this.state.changing &&
+					<ChangeUNIT
+						onCancel={() => {
+							this.setState({ changing: false });
+						}}
+						dataSource={this.state.selectedRows}
+						actions={this.props.actions}
+					/>
+				}
 				{
 					this.state.deling &&
 					<DelModal

@@ -22,7 +22,7 @@ const Option = Select.Option
 		actions: bindActionCreators({ ...actions,...platformActions,...actions2,...projactions}, dispatch)
 	})
 )
-export default class UnitToggle extends Component {
+export default class HandelChangeProjModal extends Component {
 
 	constructor(props) {
 		super(props);
@@ -37,7 +37,7 @@ export default class UnitToggle extends Component {
         console.log(wk);
         let data = JSON.parse(wk.subject[0].data);
         console.log(data);
-        this.setState({dataSource:data.dataSource,wk,project:data.project});
+        this.setState({dataSource:data,wk});
     }
     componentWillReceiveProps(props){
         const {wk} = props
@@ -48,7 +48,7 @@ export default class UnitToggle extends Component {
     async submit(){
         if(this.state.opinion === 1){
             await this.passon();        
-            this.props.closeModal("dr_qua_unit_visible",false);
+            this.props.closeModal("dr_change_proj_visible",false);
         }else{
             await this.reject();
         }
@@ -57,60 +57,56 @@ export default class UnitToggle extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,postDocListAc,postUnitList}} = this.props
+        const {actions:{logWorkflowEvent,putDocListAc,putProjectListAc}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        let doclist = this.state.dataSource.map(data=>{
-            return{
-                "code": data.code + 'REL_DOC_DW_A',
-                "name": data.name + '单位工程关联文档',
-                "obj_type": "C_DOC",
-                "status": "A",
-                "version": "A",
+        let dataList = this.state.dataSource.map(data=>{
+            let rst = {
+                code:data.code,
+                version:'A',
+                extra_params:{coordinate:data.coordinate}
+            };
+            if(data.relPer){
+                rst.response_persons = [{
+                    pk:data.relPer.pk,
+                    code:data.relPer.code,
+                    obj_type:data.relPer.obj_type
+                }];
+            }
+            return rst;
+        });
+        let docList = this.state.dataSource.map(data=>{
+            let rst = {
+                code:data.related_documents[0].code,
+                version:'A',
                 extra_params:{
                     intro:data.intro,
+                    area:data.area,
+                    address:data.address,
+                    cost:data.cost,
                     etime:data.etime,
                     stime:data.stime,
                     projType:data.projType,
-                    stage:data.stage,
-                    rsp_orgName:[data.rsp_org.name],
-                    rsp_orgCode:[data.rsp_org.code]
+                    range:data.range
                 },
                 basic_params:{
                     files:[
-                        data.file
+                        data.file,data.pic
                     ]
                 }
-            }
+            };
+            return rst;
         });
-        let doclistRst = await postDocListAc({},{data_list:doclist});
-        if(doclistRst.result && doclistRst.result.length>0){
-            let reldocs = doclistRst.result;
-            let dwList =  this.state.dataSource.map((data,index)=>{
-                return{
-                    response_orgs:[{pk:data.rsp_org.pk,code:data.rsp_org.code,obj_type:data.rsp_org.obj_type}],
-                    "code": data.code,
-                    "name": data.name,
-                    "obj_type": "C_WP_UNT",
-                    "extra_params": {coordinate:data.coordinate},
-                    "version": "A",
-                    "status": "A",
-                    "parent": {code:this.state.project.code,obj_type:this.state.project.obj_type,pk:this.state.project.pk},
-                    related_documents:[{
-                        pk:reldocs[index].pk,
-                        code:reldocs[index].code,
-                        obj_type :reldocs[index].obj_type,
-                        rel_type:'storeRelDoc'
-                    }]
-                }
-            });
-            let dwrst = postUnitList({},{data_list:dwList});
+        let rst = await putProjectListAc({},{data_list:dataList});
+        let docRst = await putDocListAc({},{data_list:docList});
+        if(rst && rst.result && rst.result.length>0){
+            console.log(rst);
+            // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         }
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
     }
     beforeUpload(record,file){
         console.log(record,file);
@@ -183,60 +179,67 @@ export default class UnitToggle extends Component {
         return false;
     }
 	render() {
-     const  columns = [{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'Index',
-      },{
-        title: '单位工程编码',
-        dataIndex:'code',
-        key: 'Code',
-      }, {
-        title: '单位工程名称',
-        dataIndex:'name',
-        key: 'Name',
-      }, 
-      {
-         title: '项目类型',
-         dataIndex:'projType',
-         key: 'Type',
-      },{
-        title: '项目阶段',
-        dataIndex:'stage',
-         key: 'Stage',
-      },{
-        title: '单位红线坐标',
-        dataIndex :'coordinate',
-        key:'coordinate'
-      },{
-        title: '计划开工日期',
-        dataIndex :'stime',
-        key:'Stime'
-      },{
-        title: '计划竣工日期',
-        dataIndex :'etime',
-        key:'Etime'
-      },{
-        title: '单位工程简介',
-        dataIndex :'intro',
-        key:'Intro'
-      },{
-        title: '建设单位',
-        render:(record)=>{
-            return(<span>{record.rsp_org.name}</span>)
-        },
-        key:'Org'
-      },{
-          title:'附件',
-          key:'file',
-          render:(record) => (
-                <a> {record.file.name}</a>
-          )
-      }];
+     const  columns =  [{
+		title: '项目/子项目名称',
+		dataIndex: 'name',
+		key: 'Name',
+	}, {
+		title: '所属区域',
+		dataIndex: 'area',
+		key: 'Area',
+	}, {
+		title: '项目规模',
+		dataIndex: 'range',
+		key: 'Range',
+	}, {
+		title: '项目类型',
+		dataIndex: 'projType',
+		key: 'ProjType',
+	}, {
+		title: '项目地址',
+		dataIndex: 'address',
+		key: 'Address',
+	}, {
+		title: '项目红线坐标',
+		render:(record)=>{
+			return (<span>{record.coordinate||''}</span>);
+		},
+		key: 'Project',
+	}, {
+		title: '项目负责人',
+		render:(record)=>{
+			return (<span>{record.relPer?record.relPer.name:(record.response_persons[0]?record.response_persons[0].name:'')}</span>);
+		},
+		key: 'Remarks'
+	}, {
+		title: '计划开工日期',
+		dataIndex: 'stime',
+		key: 'Stime'
+	}, {
+		title: '计划竣工日期',
+		dataIndex: 'etime',
+		key: 'Etime'
+	},{
+		title: '简介',
+		dataIndex: 'intro',
+		key: 'Intro'
+	}, {
+		title: '附件',
+		key: 'oper',
+		render: (record) => (
+            <a> {record.file ? record.file.name : '暂无'}</a>
+		)
+	}, {
+		title: '项目图片',
+		key: 'pic',
+		render: (record) => (
+            <a> {record.pic ? record.pic.name : '暂无'}</a>
+		)
+	}];
       let projname = this.state.project?this.state.project.name:'';
 		return (
             <Modal
-			title="单位工程信息审批表"
+			title="项目变更审批表"
             visible={true}
             width= {1280}
 			footer={null}
@@ -248,11 +251,6 @@ export default class UnitToggle extends Component {
                         dataSource={this.state.dataSource||[]}
                         bordered />
                     <Row>
-                        <Row>
-                            <Col span={2}>
-                                <span>{'所属项目：' + projname}</span>
-                            </Col>
-                        </Row>
                         <Col span={2}>
                             <span>审查意见：</span>
                         </Col>

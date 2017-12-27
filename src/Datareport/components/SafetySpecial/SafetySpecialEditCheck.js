@@ -198,7 +198,10 @@ export default class SafetySpecialEditCheck extends Component {
                 visible={true}
                 width={1280}
                 footer={null}
-                maskClosable={false}>
+                maskClosable={false}
+                onCancel={this.cancel.bind(this)}
+                >
+
                 <div>
                     <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
@@ -217,9 +220,6 @@ export default class SafetySpecialEditCheck extends Component {
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={4}>
-                           申请删除原因：{this.state.dataSource[0].changeInfo}
-                        </Col>
                         <Col span={2} push={14}>
                             <Button type='primary'>
                                 导出表格
@@ -232,6 +232,15 @@ export default class SafetySpecialEditCheck extends Component {
                             <Preview />
                         </Col>
                     </Row>
+                    {/* {
+                        this.state.dataSource[0].deleteInfo ? <Row>
+                            <Col span={4}>
+                                申请删除原因：{this.state.dataSource[0].changeInfo}
+                            </Col>
+                        </Row>
+                            :
+                            ""
+                    } */}
                     {
                         this.state.wk && <WorkflowHistory wk={this.state.wk} />
                     }

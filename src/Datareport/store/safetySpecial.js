@@ -41,12 +41,12 @@ export default handleActions({
 		...state,
 		dataSource: payload,
 	}),
-	[ChangeRow]: (state, { payload }) => ({
-		...state,
-		changeInfo: payload,
-	}),
-	[DeleteRow]: (state, { payload }) => ({
-		...state,
-		deleteInfo: payload,
-	}),
+	// [ChangeRow]: (state, { payload }) => ({
+	// 	...state,
+	// 	changeInfo: payload,
+	// }),
+	// [DeleteRow]: (state, { payload }) => ({
+	// 	...state,
+	// 	deleteInfo: payload,
+	// }),
 }, {});
