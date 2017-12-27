@@ -27,7 +27,7 @@ export default class InfoUploadModal extends Component{
              width={1280}
              title={"影像信息上传"}
              visible={uploadModal}
-             onCancel={closeModal}
+             onCancel={()=>closeModal("uploadModal")}
              footer={null}
             >
                 <VedioInfoTable
@@ -71,7 +71,7 @@ export default class InfoUploadModal extends Component{
             name = '影像信息批量录入';
         await launchProcess({dataSource,selectUser,name},{createWorkflow,logWorkflowEvent});
         message.success("上传数据成功");
-        closeModal();
+        closeModal("uploadModal");
     }
 }
 

@@ -30,6 +30,8 @@ const updateTagList = createFetchAction(`${SERVICE_API}/taglist/`,[],'POST');
 const removeDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
 //上传tags
 const sendTags = createFetchAction(`${SERVICE_API}/tags/`,[],'POST');
+//更新
+export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 
 //获取施工包详情
 const getWorkPackageDetails = createFetchAction(`${SERVICE_API}/workpackages/{{code}}/?all=true`,[]);
@@ -55,7 +57,8 @@ export const actions = {
 	addTagList,
 	sendTags,
 	getSearcher,
-	removeDocList
+	removeDocList,
+	putDocList
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

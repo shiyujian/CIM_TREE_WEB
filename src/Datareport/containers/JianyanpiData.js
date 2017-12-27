@@ -39,8 +39,7 @@ export default class JianyanpiData extends Component {
 			targetData:[],
 			deletevisible:false,
 		};
-		this.columns = 
-        [{
+		this.columns = [{
             title:'序号',
             width:"5%",
 			dataIndex:'key',
@@ -53,7 +52,7 @@ export default class JianyanpiData extends Component {
             width:"13%",
             render: (text, record, index) => (
                 <span>
-                    {record.project ? record.project.name : ''}
+                    {record.project ? record.project.name : '-'}
                 </span>
             ),
 		},{
@@ -62,7 +61,7 @@ export default class JianyanpiData extends Component {
             width:"13%",
             render: (text, record, index) => (
                 <span>
-                    {record.unit ? record.unit.name : ''}
+                    {record.unit ? record.unit.name : '-'}
                 </span>
             ),
 		},{
@@ -85,34 +84,35 @@ export default class JianyanpiData extends Component {
 						</span>
 					)
 				}else{
-					return (<span>暂无</span>)
+					return (<span>-</span>)
 				}
 			}
 		},{
 			title:'质量等级',
             dataIndex:'level',
-            width:"12%",
+			width:"12%",
+			render:(text,record,index) => text ? text : '-'	
 		},{
 			title:'施工单位',
             dataIndex:'construct_unit',
             width:"12%",
             render: (text, record, index) => (
                 <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
+                    {record.construct_unit ? record.construct_unit.name : "-"}
                 </span>
             ),
 		}, {
             title:'附件',
             width:"11%",
 			render:(text,record,index) => {
-				if(record.file.a_file){
+				if(record.file && record.file.a_file){
 					return (<span>
                         <a onClick={this.handlePreview.bind(this,index)}>预览</a>
                         <span className="ant-divider" />
                         <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                     </span>)
 				}else{
-					return (<span>暂无</span>)
+					return (<span>-</span>)
 				}
 			}
         }]
@@ -206,8 +206,8 @@ export default class JianyanpiData extends Component {
         }
         await getUnitLoop(wp)
         let danwei = await getWorkPackageDetail({code:dwcode})
-        let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-        res.construct_unit = construct_unit
+        // let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
+        // res.construct_unit = construct_unit
         res.unit = {
             name:danwei.name,
             code:danwei.code,
@@ -231,7 +231,7 @@ export default class JianyanpiData extends Component {
 			this.setState({loading:false})
 			return
 		}
-		for(let index = (pagination.current-1)*10;index < pagination.current*10;index++){
+		for(let index = (pagination.current-1)*10;index < pagination.current*10 && index < this.state.dataSource.length;index++){
 			let wp = await getWorkPackageDetail({code:this.state.totalData[index].code})
 			let rel_doc = wp.related_documents ? wp.related_documents.find(x => {
 				return x.rel_type === 'many_jyp_rel'
@@ -329,7 +329,7 @@ export default class JianyanpiData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({addvisible:false})	
+						this.setState({deletevisible:false})	
 						message.info("发起成功")					
 					})
 		})
@@ -347,7 +347,7 @@ export default class JianyanpiData extends Component {
 			return
 		}
 		selectedRowKeys.map(i => {
-			targetData.push(dataSource[i])
+			targetData.push({...dataSource[i]})
 		})
 		this.setState({targetData,addvisible:true})
 	}
@@ -406,7 +406,7 @@ export default class JianyanpiData extends Component {
 				</Spin>
 				{
 					this.state.addvisible &&
-					<JianyanpiModal {...this.props} editData={this.state.targetData} oncancel={this.oncancel.bind(this)} akey={Math.random()*1234} onok={this.setData.bind(this)}/>
+					<JianyanpiModal {...this.props} editData={this.state.targetData} oncancel={this.oncancel.bind(this)} visible={this.state.addvisible} onok={this.setData.bind(this)}/>
 				}
 				{
 					this.state.deletevisible &&

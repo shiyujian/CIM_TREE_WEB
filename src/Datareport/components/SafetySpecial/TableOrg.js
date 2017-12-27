@@ -80,13 +80,14 @@ export default class TableOrg extends Component {
 	onSelectChange(selectedRowKeys, selectedRows) {
 		// debugger;
 		this.state.subDataSource = selectedRows;
-		console.log('selectedRowKeys changed: ', selectedRowKeys);
+		// console.log('selectedRowKeys changed: ', selectedRowKeys);
 		this.setState({ selectedRowKeys });
 	}
 
 	// 搜索
 	async onSearchInfo(value) {
 		if (!value) { this.componentDidMount(); return; };
+		value=value.replace(/\s/g,"");
 		const { actions: { getSearcherDir } } = this.props
 		const code_Todir = "datareport_safetyspecial_05";
 		let param1 = code_Todir + "/?doc_code=safetyspecial&keys=organizationUnit&values=" + value; // 编制单位
@@ -270,6 +271,7 @@ export default class TableOrg extends Component {
 
 	// 申请变更--并发起
 	setChangeData(data, participants) {
+		debugger;
 		this.setState({
 			newKey2: Math.random() + 2,
 			setChangeVisiable: false,
@@ -406,6 +408,9 @@ export default class TableOrg extends Component {
 			title: '评审时间',
 			dataIndex: 'reviewTime',
 			width: '10%',
+			// render: (text, record, i) => (
+			// 	moment(record.reviewTime,"YYYY-MM-DD")
+			// ),
 		},
 		{
 			title: '评审意见',

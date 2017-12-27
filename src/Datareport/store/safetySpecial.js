@@ -20,6 +20,9 @@ const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST
 // 查询
 const getSearcherDir = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{keyword}}`,[],'GET');
 
+// 更新
+const updateDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
+
 export const actions = {
 	ModalVisible,
 	getAllUsers,
@@ -30,6 +33,7 @@ export const actions = {
 	getScheduleDir,
 	postScheduleDir,
 	getSearcherDir,
+	updateDocList,
 };
 
 export default handleActions({
