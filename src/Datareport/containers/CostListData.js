@@ -34,6 +34,7 @@ export default class CostListData extends Component {
 			modifyModal: false,
 			excelModal: false,
 			dataSource: [],
+			cacheDataSource: [],
 			subDatas: []
 		};
 		this.columns = [{
