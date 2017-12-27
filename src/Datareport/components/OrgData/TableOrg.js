@@ -68,7 +68,7 @@ export default class TableOrg extends Component {
 	// 导出excel表格
 	getExcel(){
 		console.log("dfgfg:",this.state.excelData);
-		let exhead = ['序号','组织机构编码','组织机构类型','参建单位名称','组织机构部门','直属部门','负责项目/子项目名称','负责单位工程名称','备注'];
+		let exhead = ['组织机构编码','组织机构类型','参建单位名称','组织机构部门','直属部门','负责项目/子项目名称','负责单位工程名称','备注'];
 		let rows = [exhead];
 		let getcoordinate = (param)=>{
 			if(typeof param !=='string'){
@@ -81,8 +81,8 @@ export default class TableOrg extends Component {
 			}
 		}
 		let excontent =this.state.excelData.map(data=>{
-			return [data.code,data.name,data.fatherName,data.projType||'',data.stage||'',getcoordinate(data.coordinate)
-			,data.stime||'',data.etime||'',data.intro||'',data.rsp_orgName?data.rsp_orgName[0]:'',data.files?data.files[0].name:''];
+			return [data.code || '', data.extra_params.org_type || '', data.extra_params.canjian || '', data.name ||'', data.extra_params.direct ||'', data.extra_params.project || ''
+			,data.extra_params.unit || '',data.extra_params.remarks ||''];
 		});
 		rows = rows.concat(excontent);
 		const {actions:{jsonToExcel}} = this.props;

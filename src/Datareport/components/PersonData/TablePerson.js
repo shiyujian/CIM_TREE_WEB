@@ -66,6 +66,7 @@ export default class TablePerson extends Component{
 		let orgAll = await getAllUsers();
 		orgAll.forEach((item, index) => {
 			orgAll[index].index = index + 1;
+			console.log('item',item)
 		})
 		this.setState({dataSource: orgAll})
 	}
@@ -133,15 +134,15 @@ export default class TablePerson extends Component{
 		key: 'Depart',
 	}, {
 		title: '职务',
-		dataIndex: 'job',
+		dataIndex: 'account.title',
 		key: 'Job',
 	}, {
 		title: '性别',
-		dataIndex: 'sex',
+		dataIndex: 'account.gender',
 		key: 'Sex'
 	}, {
 		title: '手机号码',
-		dataIndex: 'tel',
+		dataIndex: 'account.person_telephone',
 		key: 'Tel'
 	}, {
 		title: '邮箱',

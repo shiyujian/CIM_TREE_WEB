@@ -108,7 +108,7 @@ export default class VedioData extends Component {
 		})
 		Promise.all(all).then(item =>{
 			const dataSource = item.map((response,index)=>{
-				let {extra_params:{cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,code}} = response;
+				let {extra_params:{cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode},code} = response;
 				return {index:index+1,
 					cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,code};
 			})

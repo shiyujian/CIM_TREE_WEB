@@ -22,9 +22,18 @@ export default class VedioUpload extends Component{
                  dataSource={dataSource}
                 />
                 <ChangeFooter
+                 onOk={this.onOk}
                 />
             </Modal>
         )
+    }
+    onOk = async (selectUser,description)=>{    //dataSource需要修改
+        const {dataSource, closeModal, actions:{ createWorkflow, logWorkflowEvent }} = this.props,
+            name = '视频监控数据修改';
+
+        await launchProcess({dataSource,selectUser,name,description},{createWorkflow,logWorkflowEvent});
+        message.success("发起修改数据流程成功");
+        closeModal("deleteModal");
     }
 
 }

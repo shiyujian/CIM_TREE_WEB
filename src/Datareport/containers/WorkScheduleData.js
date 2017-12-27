@@ -291,39 +291,51 @@ export default class WorkScheduleData extends Component {
 	}, {
 		title: 'WBS编码',
 		dataIndex: 'code',
+		key: "code",
 	}, {
 		title: '任务名称',
 		dataIndex: 'name',
+		key: "name",
 	}, {
 		title: '项目/子项目',
 		dataIndex: 'project',
+		key: "project",
 	}, {
 		title: '单位工程',
 		dataIndex: 'unit',
+		key: "unit",
 	}, {
 		title: '实施单位',
 		dataIndex: 'construct_unit',
+		key: "construct_unit",
 	}, {
 		title: '施工图工程量',
 		dataIndex: 'quantity',
+		key: "quantity",
 	}, {
 		title: '实际工程量',
 		dataIndex: 'factquantity',
+		key: "factquantity",
 	}, {
 		title: '计划开始时间',
 		dataIndex: 'planstarttime',
+		key: "planstarttime",
 	}, {
 		title: '计划结束时间',
 		dataIndex: 'planovertime',
+		key: "planovertime",
 	}, {
 		title: '实际开始时间',
 		dataIndex: 'factstarttime',
+		key: "factstarttime",
 	}, {
 		title: '实际结束时间',
 		dataIndex: 'factovertime',
+		key: "factovertime",
 	}, {
 		title: '上传人员',
 		dataIndex: 'uploads',
+		key: "uploads",
 	}];
 }
 

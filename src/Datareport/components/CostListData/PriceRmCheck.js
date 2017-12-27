@@ -71,13 +71,12 @@ export default class PriceRmCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         let docList = []
-        dataSource.map(item => docList.push(item.extraCode))
+        dataSource.map(item => docList.push(item.code))
         //prepare the data which will store in database
         let rst = await removeDocList({},{code_list:docList.join(',')});
         
-        debugger;
         if(rst.result){
             notification.success({
                 message: '删除工程量项成功！',
@@ -107,8 +106,7 @@ export default class PriceRmCheck extends Component {
             title:'序号',
             dataIndex:'code',
             render:(text,record,index) => {
-                console.log(text)
-                return index+1
+                return record.key
             }
         },{
             title:'项目/子项目',

@@ -11,12 +11,12 @@ import {
     Button,
     Input,
     Popconfirm,
-    notification
+    notification,
 } from 'antd';
 import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
 import {getUser} from '_platform/auth';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyDoc/AddFile';
 import DeleteFile from '../components/SafetyDoc/DeleteFile';
@@ -141,7 +141,7 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({setDeleteVisiable:false})						
+						this.setState({setEditVisiable:false})						
 					})
 		})
     }
@@ -244,6 +244,46 @@ class SafetyDoc extends Component {
         filed.mime_type = f.mime_type;
         openPreview(filed);
     }
+
+    async onSearch(value){
+		if(!value){
+            this.componentDidMount();
+            return;
+        }
+        const {actions:{
+            searchDocument,
+        }} = this.props;
+        const param = {
+            docCode:'safetydoc',
+            keys:'filename',
+            values:value
+        }
+        let result = await searchDocument(param);
+        let dataSource = [];
+        if(result.result && result.result.length>0){
+            if(result.result){
+                result.result.map((single)=>{
+                    let temp = { 
+                        code:single.extra_params.code,
+                        remark:single.extra_params.remark,
+                        doTime:single.extra_params.doTime,
+                        filename:single.extra_params.filename,
+                        pubUnit:single.extra_params.pubUnit,
+                        upPeople:single.extra_params.upPeople,
+                        type:single.extra_params.type,
+                        file:single.basic_params.files[0],
+                        unit:single.extra_params.unit,
+                        projectName:single.extra_params.project,
+                        docCode:single.code
+                    }
+                    dataSource.push(temp);
+                });
+                this.setState({dataSource});
+            }
+        }else{
+            this.setState({dataSource});
+        }
+    }
 	
 	render() {
         const { selectedRowKeys } = this.state;
@@ -317,13 +357,16 @@ class SafetyDoc extends Component {
                         style={{ marginRight: "30px" }}
                         onClick={()=>this.onBtnClick("delete")}>申请删除</Button>
                         <Button 
+                        onClick={()=>this.getExcel()}
                         style={{ marginRight: "30px" }}>导出表格</Button>
                         <Search
-                            placeholder="请输入内容"
+                            placeholder="请输入文件名称"
+                            onSearch={this.onSearch.bind(this)}
                             style={{ width: 200, marginLeft: "20px" }}
                         />
                     </Col>
                 </Row>
+                
 					<Table 
 					 columns={columns} 
 					 dataSource={this.state.dataSource}
@@ -347,6 +390,31 @@ class SafetyDoc extends Component {
                     <EditFile {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} akey={Math.random()} onok={this.setEditData.bind(this)} />
                 }
 			</Main>)
-	}
+    }
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    //数据导出
+    getExcel(){
+        const {actions:{jsonToExcel}} = this.props;
+        const {dataSource} = this.state;
+        let rows = [];
+        rows.push(this.header);
+        dataSource.map(item => {
+            rows.push([item.code,item.remark,item.doTime,item.filename.pubUnit,item.upPeople,item.type,item.file,item.unit,item.projectName]);
+        })
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+            this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
+    }
 };
 export default Form.create()(SafetyDoc);

@@ -124,8 +124,9 @@ export default class ProjectSumExamine extends Component {
         let i = 0;   //asure the code of every document only
 
         let jialist = await getSearcher({keyword:'priceListName'})
+        let pairMap = {};
         let pairs = jialist.result.map(item => {
-            return {
+            pairMap[item.extra_params.projectcoding] = {
                 projectcoding: item.extra_params.projectcoding,
                 rate: item.extra_params.rate
             }
@@ -154,28 +155,26 @@ export default class ProjectSumExamine extends Component {
 
             }) 
             //施工包批量
-            let myprojectcoding, mynumber;
+            // let myprojectcoding, mynumber;
             // for(var i  = 0; i < pairs.length; i++) {
-            //     console.log('pairs[i].projectcoding',pairs[i].projectcoding)
-            //     console.log('item.projectcoding',item.projectcoding )
-                // if(pairs[i].projectcoding === item.projectcoding ) {
-                //     myprojectcoding = pairs[i].projectcoding;
-                //     mynumber =  pairs[i].rate;
-                //     break; 
-                // }
+            // //     console.log('pairs[i].projectcoding',pairs[i].projectcoding)
+            // //     console.log('item.projectcoding',item.projectcoding )
+            //     // if(pairs[i].projectcoding === item.projectcoding ) {
+            //     //     myprojectcoding = pairs[i].projectcoding;
+            //     //     mynumber =  pairs[i].rate;
+            //     //     break; 
+            //     // }
             // }
 
             wplist.push({
                 code: item.unit.code,
-                extra_params: {
-                    projectcoding:item.projectcoding,
-                    number: item.number,
-                }
+                extra_params: pairMap[item.projectcoding]
                 // extra_params: {
                 //     projectcoding: myprojectcoding,
                 //     number: mynumber,
                 // }
             })
+            debugger;
         });
         // postDocData = docData.filter(item => item.wplist[0].extra_params.projectcoding)
         
