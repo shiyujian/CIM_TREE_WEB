@@ -81,8 +81,7 @@ export default class ProjectSumChangeChock extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
-        
+ 
     }
     //不通过
     async reject(){
