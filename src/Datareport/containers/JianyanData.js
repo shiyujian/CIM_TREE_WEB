@@ -137,7 +137,8 @@ export default class JianyanData extends Component {
 			}) : null
 			if(rel_doc){
 				let doc = await getRelDoc({code:rel_doc.code})
-				arr[index] = {...doc.extra_params,key:index}				
+				arr[index] = {...doc.extra_params,key:index}
+				arr[index].related_documents = 	wp.related_documents			
 			}else{
 				let obj = await this.getInfo(wp)
 				arr[index] = {...obj,key:index,file:{}}
@@ -152,7 +153,8 @@ export default class JianyanData extends Component {
         res.name = wp.name
         res.code = wp.code  
         res.pk = wp.pk
-        res.obj_type = wp.obj_type
+		res.obj_type = wp.obj_type
+		res.related_documents = wp.related_documents
         let dwcode = ""
         let getUnitLoop = async(param) => {
             let next = {};
@@ -192,7 +194,6 @@ export default class JianyanData extends Component {
             obj_type:danwei.obj_type
         }
         res.project = danwei.parent
-        res.related_documents = danwei.related_documents
         return res
     }
 	//表格分页回调
@@ -216,7 +217,8 @@ export default class JianyanData extends Component {
 			}) : null
 			if(rel_doc){
 				let doc = await getRelDoc({code:rel_doc.code})
-				arr[index] = {...doc.extra_params,key:index}			
+				arr[index] = {...doc.extra_params,key:index}
+				arr[index].related_documents = 	wp.related_documents				
 			}else{
 				let obj = await this.getInfo(wp)
 				arr[index] = {...obj,key:index,file:{}}
