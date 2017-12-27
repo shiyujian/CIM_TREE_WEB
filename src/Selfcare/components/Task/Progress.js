@@ -58,6 +58,7 @@ import WorkChangeCheck from 'Datareport/components/ScheduleData/WorkChangeCheck'
 import UpdataCheck from 'Datareport/components/OrgData/UpdataCheck';
 import HandelChangeUnitModal from 'Datareport/components/UnitData/HandleChangeUnitModal';
 import HandelChangeProjModal from 'Datareport/components/ProjectData/HandleChangeModal';
+import ModCheck from 'Datareport/components/PersonData/ModCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -136,7 +137,8 @@ export default class Progress extends Component {
 			workdata_doc_change_visible,
 			dr_base_update_visible,
 			dr_change_unit_visible,
-			dr_change_proj_visible
+			dr_change_proj_visible,
+			person_modcheck_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -442,6 +444,10 @@ export default class Progress extends Component {
 					dr_change_proj_visible && 
 					<HandelChangeProjModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					person_modcheck_visible && 
+					<ModCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -618,6 +624,9 @@ export default class Progress extends Component {
 				break;
 			case "项目批量变更申请":
 				changeDatareportVisible({key:'dr_change_proj_visible',value:true})
+				break;
+			case "人员信息批量更改":
+				changeDatareportVisible({key:'person_modcheck_visible',value:true})
 				break;
 			default:break;
 		}
