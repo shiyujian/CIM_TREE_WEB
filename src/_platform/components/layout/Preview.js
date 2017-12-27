@@ -31,7 +31,7 @@ export default class Preview extends React.Component {
 		} = this.props;
 		return (
 			<Modal
-			style = {{zIndex:2000}}
+			zIndex={9999}
 			title="文件预览" footer={false} visible={previewVisible} className="preview" onOk={this.previewModal.bind(this)}
 			       onCancel={this.previewModal.bind(this)} height="100%">
 				{
