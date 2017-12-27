@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Icon } from 'antd';
+import { Table, Button, Popconfirm, message, Input, Icon, Spin } from 'antd';
 import style from './TableProject.css';
 import DelProj from './DelModal';
 import ChangeProj from './SubmitChangeModal'
@@ -8,7 +8,9 @@ const Search = Input.Search;
 export default class TableProject extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {}
+		this.state = {
+			spinning:false
+		}
 	}
 	render() {
 		let rowSelection = {
@@ -19,70 +21,71 @@ export default class TableProject extends Component {
 		};
 		return (
 			<div>
-				<div>
-					<Button style={{ marginRight: "10px" }}>模板下载</Button>
-					<Button onClick={this.send.bind(this)} className={style.button}>发起填报</Button>
-					<Button className={style.button} onClick={() => {
-						if (this.state.selectedRows && this.state.selectedRows.length > 0) {
-							this.setState({ changing: true });
-							return;
-						}
-						message.warning('请至少选择一条');
-					}
-					}>申请变更</Button>
-					<Button className={style.button} onClick={() => {
-						if (this.state.selectedRows && this.state.selectedRows.length > 0) {
-							this.setState({ deling: true });
-							return;
-						}
-						message.warning('请至少选择一条');
-					}
-					}>申请删除</Button>
-					<Button className={style.button}>导出表格</Button>
-					<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容"
-						onSearch={
-							(text) => {
-								let result = this.state.dataSource.filter(data => {
-									return data.name.indexOf(text) >= 0 || data.code.indexOf(text) >= 0;
-								});
-								console.log(result);
-								if (text === '') {
-									result = this.state.dataSource;
-								}
-								this.setState({ showDs: result });
+				<Spin spinning = {this.state.spinning}>
+					<div>
+						<Button style={{ marginRight: "10px" }}>模板下载</Button>
+						<Button onClick={this.send.bind(this)} className={style.button}>发起填报</Button>
+						<Button className={style.button} onClick={() => {
+							if (this.state.selectedRows && this.state.selectedRows.length > 0) {
+								this.setState({ changing: true });
+								return;
 							}
+							message.warning('请至少选择一条');
 						}
-					/>
-				</div>
-				<Table
-					width="1280px"
-					columns={this.columns}
-					bordered={true}
-					rowSelection={rowSelection}
-					dataSource={this.state.showDs || []}
-				>
-				</Table>
-				{
-					this.state.deling &&
-					<DelProj
-						onCancel={() => {
-							this.setState({ deling: false });
-						}}
-						dataSource={this.state.selectedRows}
-						actions={this.props.actions}
-					/>
-				}
-				{
-					this.state.changing &&
-					<ChangeProj
-						onCancel={() => {
-							this.setState({ changing: false });
-						}}
-						dataSource={this.state.selectedRows}
-						actions={this.props.actions}
-					/>
-				}
-
+						}>申请变更</Button>
+						<Button className={style.button} onClick={() => {
+							if (this.state.selectedRows && this.state.selectedRows.length > 0) {
+								this.setState({ deling: true });
+								return;
+							}
+							message.warning('请至少选择一条');
+						}
+						}>申请删除</Button>
+						<Button className={style.button}>导出表格</Button>
+						<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容"
+							onSearch={
+								(text) => {
+									let result = this.state.dataSource.filter(data => {
+										return data.name.indexOf(text) >= 0 || data.code.indexOf(text) >= 0;
+									});
+									console.log(result);
+									if (text === '') {
+										result = this.state.dataSource;
+									}
+									this.setState({ showDs: result });
+								}
+							}
+						/>
+					</div>
+					<Table
+						width="1280px"
+						columns={this.columns}
+						bordered={true}
+						rowSelection={rowSelection}
+						dataSource={this.state.showDs || []}
+					>
+					</Table>
+					{
+						this.state.deling &&
+						<DelProj
+							onCancel={() => {
+								this.setState({ deling: false });
+							}}
+							dataSource={this.state.selectedRows}
+							actions={this.props.actions}
+						/>
+					}
+					{
+						this.state.changing &&
+						<ChangeProj
+							onCancel={() => {
+								this.setState({ changing: false });
+							}}
+							dataSource={this.state.selectedRows}
+							actions={this.props.actions}
+						/>
+					}
+				</Spin>
 			</div>
 		)
 	}
@@ -91,6 +94,7 @@ export default class TableProject extends Component {
 		ModalVisibleProject(true);
 	}
 	async componentDidMount() {
+		this.setState({spinning:true});
 		let { getProjectAc, getProjectByCode, getDocByCode } = this.props.actions;
 		let projsInTree = await getProjectAc();
 		let projRoot = projsInTree;
@@ -117,7 +121,7 @@ export default class TableProject extends Component {
 			}
 		});
 		console.log(projects);
-		this.setState({ dataSource: projects, projRoot, showDs: projects });
+		this.setState({ dataSource: projects, projRoot, showDs: projects,spinning:false });
 	}
 
 

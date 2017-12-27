@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Icon } from 'antd';
+import { Table, Button, Popconfirm, message, Input, Icon ,Spin} from 'antd';
 import style from './TableUnit.css';
 import DelModal from './DelModal'
 import ChangeUNIT from './SubmitChangeModal'
@@ -14,6 +14,7 @@ export default class TableUnit extends Component {
 		}
 	}
 	async componentDidMount() {
+		this.setState({spinning:true});
 		let { getProjectAcD3, getDocByCodeList, getDocByCodeSearcher } = this.props.actions
 		let projTree = await getProjectAcD3();
 		let units = projTree.children.reduce((previewArr, currentProj) => {
@@ -32,7 +33,7 @@ export default class TableUnit extends Component {
 			}
 			return { ...unit, ...unit.extra_params };
 		});
-		this.setState({ units: units, showDs: units });
+		this.setState({ units: units, showDs: units,spinning:false });
 	}
 	render() {
 		let rowSelection = {
@@ -50,6 +51,7 @@ export default class TableUnit extends Component {
 		};
 		return (
 			<div>
+			<Spin spinning = {this.state.spinning}>
 				<div>
 					<Button style={{ marginRight: "10px" }} className={style.button}>模板下载</Button>
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
@@ -113,7 +115,7 @@ export default class TableUnit extends Component {
 						actions={this.props.actions}
 					/>
 				}
-
+				</Spin>
 			</div>
 		)
 	}
