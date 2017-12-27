@@ -7,6 +7,7 @@ import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } fr
 import WorkflowHistory from '../WorkflowHistory';
 import { getUser } from '_platform/auth';
 import { actions } from '../../store/safety';
+import { actions as action2 } from '../../store/safetySpecial';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 const { RangePicker } = DatePicker;
@@ -18,7 +19,7 @@ const { TextArea } = Input;
         return { platform, ...safetyspecial }
     },
     dispatch => ({
-        actions: bindActionCreators({ ...platformActions, ...actions }, dispatch)
+        actions: bindActionCreators({ ...platformActions, ...actions ,...action2}, dispatch)
     })
 )
 export default class SafetySpecialEditCheck extends Component {
@@ -60,7 +61,7 @@ export default class SafetySpecialEditCheck extends Component {
     async passon() {
         const { dataSource, wk, topDir } = this.state;
         const { actions: { logWorkflowEvent, updateDocList, getScheduleDir, postScheduleDir, getWorkpackagesByCode } } = this.props;
-      
+
         // send workflow
         let executor = {};
         let person = getUser();
@@ -69,27 +70,15 @@ export default class SafetySpecialEditCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
 
-        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
-            {
-                pk: wk.id
-            }, {
-                state: wk.current[0].id,
-                executor: executor,
-                action: '通过',
-                note: '同意',
-                attachment: null
-            }
-        );
-        const docCode = [];
-        dataSource.map(item=>{
+        const docData = [];
+        dataSource.map(item => {
             debugger;
-            i++;
             docData.push({
                 code: item.codeId,
                 name: item.file.name,
                 obj_type: "C_DOC",
                 status: 'A',
-                profess_folder: { code: dir.code, obj_type: 'C_DIR' },
+                profess_folder: { code: "datareport_safetyspecial_05", obj_type: 'C_DIR' },
                 "basic_params": {
                     "files": [
                         {
@@ -121,8 +110,20 @@ export default class SafetySpecialEditCheck extends Component {
                 }
             })
         })
+        console.log('vip-updateDocList', updateDocList);
 
-        let rst = await updateDocList({}, { data_list: docCode });
+        let rst = await updateDocList({}, { data_list: docData });
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '通过',
+                note: '同意',
+                attachment: null
+            }
+        );
         if (rst.result) {
             notification.success({
                 message: '文档变更成功！',
@@ -236,7 +237,7 @@ export default class SafetySpecialEditCheck extends Component {
                 footer={null}
                 maskClosable={false}
                 onCancel={this.cancel.bind(this)}
-                >
+            >
 
                 <div>
                     <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
