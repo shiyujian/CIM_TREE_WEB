@@ -168,7 +168,8 @@ export default class DesignTable extends Component {
 								if(text === ''){
 									result = this.state.dataSource;
 								}
-								this.setState({selectedRowKeys:[],showDs:this.addindex(result)});
+								this.onSelectChange([])//清空选择项
+								this.setState({showDs:this.addindex(result)});
 							}
 						}
 					/>
