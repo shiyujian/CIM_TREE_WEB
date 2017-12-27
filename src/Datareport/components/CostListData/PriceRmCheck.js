@@ -22,15 +22,14 @@ const { TextArea } = Input;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class PriceListCheck extends Component {
+export default class PriceRmCheck extends Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			wk:null,
             dataSource:[],
-            option:1,
-            topDir:{},
+            option:1
 		}
 	}
 
@@ -38,21 +37,6 @@ export default class PriceListCheck extends Component {
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({dataSource,wk});
-        const {actions:{
-            getScheduleDir,
-            postScheduleDir,
-        }} = this.props;
-        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
-        if(!topDir.obj_type){
-            let postData = {
-                name:'数据报送的顶级节点',
-                code:'the_only_main_code_datareport',
-                "obj_type": "C_DIR",
-                "status": "A",
-            }
-            topDir = await postScheduleDir({},postData);
-        }
-        this.setState({topDir});
     }
 
     componentWillReceiveProps(props){
@@ -67,7 +51,7 @@ export default class PriceListCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_pri_ck_visible",false)
+        this.props.closeModal("cost_pri_rm_visible",false)
         message.info("操作成功")
     }
 
@@ -77,38 +61,9 @@ export default class PriceListCheck extends Component {
         const {actions:{
             logWorkflowEvent,
             addDocList,
-            putDocList,
-            postScheduleDir,
-            getScheduleDir,
-            getWorkpackagesByCode,
             addTagList,
-            sendTags
+            removeDocList
         }} = this.props;
-        //the unit in the dataSource array is same
-        let unit = dataSource[0].unit;
-        let project = dataSource[0].project;
-        let code = 'datareport_pricelist_check';
-        //get workpackage by unit's code 
-        let workpackage = await getWorkpackagesByCode({code:unit.code});
-        
-        let postDirData = {
-            "name": '计价清算目录树',
-            "code": code,
-            "obj_type": "C_DIR",
-            "status": "A",
-            related_objects: [{
-                pk: workpackage.pk,
-                code: workpackage.code,
-                obj_type: workpackage.obj_type,
-                rel_type: 'pricelist_wp_dirctory', // 自定义，要确保唯一性
-            }],
-            "parent":{"pk":topDir.pk,"code":topDir.code,"obj_type":topDir.obj_type}
-        }
-        let dir = await getScheduleDir({code:code});
-        //no such directory
-        if(!dir.obj_type){  
-            dir = await postScheduleDir({},postDirData);
-        }
         
         let executor = {};
         let person = getUser();
@@ -117,53 +72,20 @@ export default class PriceListCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
+        let docList = []
+        dataSource.map(item => docList.push(item.extraCode))
         //prepare the data which will store in database
-        const tagLists = [];
-        let i=0;   //asure the code of every document only
-        dataSource.map(item => {
-            i++;
-            tagLists.push({
-                "name": 'priceListName' + moment().format("YYYYMMDDHHmmss")+i,
-                // "code": 'costList'+moment().format("YYYYMMDDHHmmss")+i,
-                "code": 'priceListCode' + moment().format("YYYYMMDDHHmmss")+i,
-                "obj_type": "C_QTO",
-                "status": "A",
-                "version": "A",
-                "unit": "元",
-                "unit_price": +item.total,
-                "kind": "01",
-                "description": "计价清单创建工程量项",
-                "extra_params": {
-                    code: item.projectcoding,
-                    subproject: item.project.name,
-                    projectcoding:item.projectcoding,
-                    total:item.total,
-                    valuation: item.valuation,
-                    rate: item.rate,
-                    company: item.company,
-                    remarks: item.remarks,
-                    unitengineering: item.unit.name
-                },
-                "workpackage":{
-                    "pk":item.unit.pk || "wp_pk",
-                    "code":item.unit.code, 
-                    "obj_type":item.unit.obj_type,
-                    "rel_type":"price_list_check"
-                }
-            })
-        });
-        let rst = await addTagList({},{data_list:tagLists});
+        let rst = await removeDocList({},{code_list:docList.join(',')});
         
         debugger;
         if(rst.result){
             notification.success({
-                message: '创建工程量项成功！',
+                message: '删除工程量项成功！',
                 duration: 2
             });
         }else{
             notification.error({
-                message: '创建工程量项失败！',
+                message: '删除工程量项失败！',
                 duration: 2
             });
         }
@@ -174,28 +96,9 @@ export default class PriceListCheck extends Component {
         const {actions:{deleteWorkflow}} = this.props
         await deleteWorkflow({pk:wk.id})
        }
-    //预览
-    handlePreview(index){
-        const {actions: {openPreview}} = this.props;
-        let f = this.state.dataSource[index].file
-        let filed = {}
-        filed.misc = f.misc;
-        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.name = f.name;
-        filed.mime_type = f.mime_type;
-        openPreview(filed);
-    }
     //radio变化
     onChange(e){
         this.setState({opinion:e.target.value})
-    }
-
-    //删除
-    delete(index) {
-        let { dataSource } = this.state
-        dataSource.splice(index, 1)
-        this.setState({ dataSource })
     }
 
 	render() {
@@ -209,21 +112,10 @@ export default class PriceListCheck extends Component {
             }
         },{
             title:'项目/子项目',
-            dataIndex:'subproject',
-            render: (text, record, index) => (
-                <span>
-                    {record.project.name}
-                </span>
-            ),
-
+            dataIndex:'subproject'
         },{
             title:'单位工程',
-            dataIndex:'unitengineering',
-            render: (text, record, index) => (
-                <span>
-                    {record.unit.name}
-                </span>
-            ),
+            dataIndex:'unitengineering'
         },{
             title:'清单项目编码',
             dataIndex:'projectcoding'
@@ -245,7 +137,7 @@ export default class PriceListCheck extends Component {
         }]
 		return(
 			<Modal
-                title="计价清单信息上传表"
+                title="计价清单信息删除审批表"
                 key={Math.random()}
 				width = {1280}
 				visible = {true}
