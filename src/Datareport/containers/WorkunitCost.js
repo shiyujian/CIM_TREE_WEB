@@ -9,7 +9,7 @@ import { ProjectSumChange } from '../components/CostListData';
 import { ProjectSumExport } from '../components/CostListData';
 
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
-import { Row, Col, Table, Input, Button,Popconfirm } from 'antd';
+import { Row, Col, Table, Input, Button,Popconfirm,message } from 'antd';
 import { WORKFLOW_CODE } from '_platform/api.js'
 import { getNextStates } from '_platform/components/Progress/util';
 import { getUser } from '_platform/auth';
@@ -62,11 +62,12 @@ export default class WorkunitCost extends Component {
 			getDocument,
 	                 } } = this.props;
 		let dataSource = [];
-		data.map(item => {
-			
+		let i=0;
+		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
-				
+				i++
 				let temp = {
+					key:i,
 					code: item.code,
 					subproject: single.extra_params.subproject,//项目/子项目
 					unit: single.extra_params.unit,//单位工程
@@ -255,13 +256,14 @@ export default class WorkunitCost extends Component {
 		}
 	}
 	//序号点击
-	onSelectChange = (selectedRowKeys) => {
-        const {dataSource} = this.state;
-        let dataSourceSelected = [];
-        for(let i=0;i<selectedRowKeys.length;i++){
-            dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
-        }
-        this.setState({selectedRowKeys,dataSourceSelected});
+	onSelectChange = (selectedRowKeys,selectedRows) => {
+		console.log('11111',selectedRowKeys,selectedRows)
+        // const {dataSource} = this.state;
+        // let dataSourceSelected = [];
+        // for(let i=0;i<selectedRowKeys.length;i++){
+        //     dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
+        // }
+        this.setState({selectedRowKeys,dataSourceSelected:selectedRows});
     }
 	
 	render() {
@@ -270,11 +272,23 @@ export default class WorkunitCost extends Component {
 			selectedRowKeys,
 			onChange: this.onSelectChange,
 		};
+		// let rowSelection = {
+		// 	selectedRowKeys: this.state.selectedRowKeys || [],
+		// 	onChange: (selectedRowKeys, selectedRows) => {
+		// 		this.setState({ selectedRowKeys: selectedRowKeys, selectedRows });
+		// 		console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+		// 	},
+			// onSelect: (record, selected, selectedRows) => {
+			// 	console.log(record, selected, selectedRows);
+			// },
+			// onSelectAll: (selected, selectedRows, changeRows) => {
+			// 	console.log(selected, selectedRows, changeRows);
+			// },
+		// };
 		const columns = [{
 			title: '序号',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex: 'key',
+			key:"key",
 		}, {
 			title: '项目/子项目',
 			dataIndex: 'subproject',
@@ -284,21 +298,27 @@ export default class WorkunitCost extends Component {
 		}, {
 			title: '清单项目编号',
 			dataIndex: 'projectcoding',
+			key:'Projectcoding'
 		}, {
 			title: '项目名称',
 			dataIndex: 'projectname',
+			key:'Projectname'
 		}, {
 			title: '计量单位',
 			dataIndex: 'company',
+			key:'Company'
 		}, {
 			title: '数量',
 			dataIndex: 'number',
+			key:'Number'
 		}, {
 			title: '单价',
 			dataIndex: 'total',
+			key:'Total'
 		}, {
 			title: '备注',
 			dataIndex: 'remarks',
+			key:'Remarks'
 		}];
 		return (
 			<div style={{ overflow: 'hidden', padding: 20 }}>
@@ -307,7 +327,8 @@ export default class WorkunitCost extends Component {
 					<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={this.projectfill.bind(this)}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.setchgVisible.bind(this)}>申请变更</Button>
-					<Button className="btn" type="default" onClick={() => { this.setState({ delatevisible: true }) }}>申请删除</Button>
+
+					<Button className="btn" type="default" onClick={() => { this.setState({ delatevisible: true })}}>申请删除</Button>
 					<Button className="btn" type="default" onClick={() => { this.setState({ exportvisible: true }) }}>导出表格</Button>
 					<Search
 						className="btn"
@@ -328,12 +349,12 @@ export default class WorkunitCost extends Component {
 				</Row>
 				<Row >
 					<Col >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs} rowKey="index" />
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs}  />
 					</Col>
 				</Row>
 				{
 					this.state.addvisible &&
-					<ProjectSum {...this.props} oncancel={this.oncancel.bind(this)} onok={this.setData.bind(this)} />
+					<ProjectSum {...this.props} oncancel={this.oncancel.bind(this)} onok={this.setData.bind(this)} rowKey="key" />
 				}
 				{
 					this.state.delatevisible &&

@@ -127,9 +127,9 @@ export default class DesignChange extends Component {
 			}
 		}, {
 			title: '变更人员',
-			dataIndex: 'editors',
+			dataIndex: 'uploads',
 			render: (text, record, index) => {
-				return <span>{getUser().username}</span>
+				return <Input value={this.state.dataSource[index]['uploads'] = getUser().username} onChange={this.tableDataChange.bind(this, index, 'uploads')} />
 			}
 		}, {
 			title: '操作',
@@ -160,9 +160,6 @@ export default class DesignChange extends Component {
 					dataSource={this.state.dataSource}
 					bordered
 					pagination={{ pageSize: 10 }}
-					rowKey={(record) => {
-						return record.index
-					}}
 				/>
 				<Row style={{ marginBottom: "30px" }} type="flex">
 					<Col>

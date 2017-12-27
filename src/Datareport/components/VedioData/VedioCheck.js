@@ -12,7 +12,7 @@ import VedioTable from './VedioTable';
 import moment from 'moment';
 
 import {actions} from '../../store/vedioData';
-
+import {throughProcess} from './commonFunc';
 
 @connect(
 	state => {
@@ -106,8 +106,9 @@ export default class VedioCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("safety_vedioCheck_visible",false)    //selfcare use
-        message.info("操作成功");        
+        const {type} = this.props;
+        this.props.closeModal(modalName[type],false)    //selfcare use
+        message.info("操作成功"); 
     }
     
     passon = async ()=>{ //通过
@@ -118,20 +119,21 @@ export default class VedioCheck extends Component {
             }} = this.props;
 
         // send workflow
-        const  {id,username,name:person_name,code:person_code} = getUser(),
+        await throughProcess(wk,{logWorkflowEvent});
+        
+        /* const  {id,username,name:person_name,code:person_code} = getUser(),
             executor = {id,username,person_name,person_code};
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor,attachment:null});
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor,attachment:null}); */
 
         switch(type){
             case "create":
-                this.createPassion();
+                this.createPassion(dataSource);
             break;
             case "strike":
                 const {actions:{deleteDocument}} = this.props;
                 const all = dataSource.map(item => {
                     return deleteDocument({code:item.code})
                 });
-                debugger
                 Promise.all(all).then(rst => {
                     console.log(rst)
                     message.success('删除文档成功！');
@@ -139,15 +141,13 @@ export default class VedioCheck extends Component {
             break;
         }
     }
-    createPassion = async ()=>{
-        const {wk,
-            actions:{
+    createPassion = async (dataSource)=>{
+        const {actions:{
                 addDocList,
                 getScheduleDir,
                 postScheduleDir,
                 getWorkpackagesByCode
             }} = this.props,
-            dataSource = JSON.parse(wk.subject[0].data),
             {topDir} = this.state;
 
         const unitCode = JSON.parse(dataSource[0].value[1]).code,
@@ -171,6 +171,7 @@ export default class VedioCheck extends Component {
         }
         const docData = dataSource.map(item =>{ //prepare the data which will store in database
             const code = 'vedioData'+moment().format("YYYYMMDDHHmmss")+item.index;  //makesure code is unique
+            delete item.index;
             return {
                 code,
                 name:item.cameraName,
@@ -197,6 +198,10 @@ export default class VedioCheck extends Component {
 }
 
 const modalTitle = {
-    create: '视频监控审批表',
-    strike: '视频监控删除表'
+    create: '视频监控数据录入审批表',
+    strike: '视频监控数据删除审核表'
+}
+const modalName = {
+    create: 'safety_vedioCheck_visible',
+    strike: 'safety_vedioDeleteCheck_visible'
 }
