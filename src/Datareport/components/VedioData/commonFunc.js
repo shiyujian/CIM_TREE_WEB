@@ -103,3 +103,12 @@ export const getAllUsers = async ()=>{
         return <Option key={id} value={JSON.stringify(userData)}>{person_name}</Option>
     })
 }
+
+//通过流程
+export const throughProcess = (wk,actions)=>{
+    const {id,username,name:person_name,code:person_code} = getUser(),
+        executor = {id,username,person_name,person_code},
+        {logWorkflowEvent} = actions;
+
+    logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor,attachment:null});
+}

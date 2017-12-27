@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import {Main,Content, DynamicTitle} from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 
-import {InfoUploadModal,VedioInfoTable,MainHeader} from '../components/VedioData';
+import {InfoUploadModal,InfoDeleteModal,VedioInfoTable,MainHeader} from '../components/VedioData';
 import { actions } from '../store/vedioData';
 import {addSerialNumber} from '../components/VedioData/commonFunc';
 
@@ -26,7 +26,9 @@ export default class VedioInfoData extends Component {
 		this.state={
 			loading:true,
 			uploadModal: false,
-			dataSource: []
+			deleteModal: false,
+			dataSource: [],
+			selectRows: []
 		}
 	}
 
@@ -44,22 +46,33 @@ export default class VedioInfoData extends Component {
     }
 
 	render() {
-		const {uploadModal,dataSource,loading} = this.state;
+		const {uploadModal,deleteModal,dataSource,loading,selectRows} = this.state;
 
 		return (<Main>
 			<DynamicTitle title="影像信息" {...this.props} />
 			<Content>
-				<MainHeader showModal={this.showModal}/>
+				<MainHeader
+				 showModal={this.showModal}
+				 selectJudge={this.selectJudge}
+				/>
 				<VedioInfoTable
 				dataSource={dataSource}
-				loading={loading}
+				loading={loading} 
+				storeSelectRows={this.storeSelectRows}
 				/>
 			</Content>
 			<InfoUploadModal
-			 key={uploadModal}
+			 key={`uploadModal${uploadModal}`}
 			 uploadModal={uploadModal}
 			 actions = {this.props.actions}
 			 closeModal={this.closeModal}
+			/>
+			<InfoDeleteModal
+			 key={`deleteModal${deleteModal}`}
+			 deleteModal={deleteModal}
+			 closeModal={this.closeModal}
+			 dataSource={selectRows}
+			 actions = {this.props.actions}
 			/>
 		</Main>)
 	}
@@ -69,8 +82,10 @@ export default class VedioInfoData extends Component {
 		a[modal] = true;
         this.setState(a);
     }
-    closeModal= ()=>{
-        this.setState({uploadModal:false});
+    closeModal= (modal)=>{
+		let a = {};
+		a[modal] = false;
+        this.setState(a);
 	}
 
 	generateTableData = (data)=>{
@@ -82,11 +97,28 @@ export default class VedioInfoData extends Component {
 		})
 		Promise.all(all).then(item =>{
 			const dataSource = item.map((response,index)=>{
-				let {extra_params:{projectName,ShootingDate,file}} = response;
+				let {extra_params:{projectName,enginner,ShootingDate,file,code}} = response;
 				return {index:index+1,
-					projectName,ShootingDate,file}
+					projectName,enginner,ShootingDate,file,code}
 			})
 			this.setState({dataSource,loading:false});
 		})
-    }
+	}
+	
+	storeSelectRows = (selectRows)=>{
+		this.setState({selectRows});
+	}
+
+	selectJudge = ()=>{
+		const {selectRows} = this.state;
+		if(selectRows.length == 0){
+			message.error("请选择数据");
+			return false
+		}
+		if(!selectRows.every((data)=> data.enginner == selectRows[0].enginner )){
+			message.error("请选择相同单位工程下的数据");
+			return false
+		}
+		return true
+	}
 };
