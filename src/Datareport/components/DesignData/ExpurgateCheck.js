@@ -7,7 +7,6 @@ import { Modal, Input, Form, Button, message, Table, Radio, Row, Col,DatePicker,
 import WorkflowHistory from '../WorkflowHistory'
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import {getUser} from '_platform/auth';
-import Preview from '../../../_platform/components/layout/Preview';
 import { CODE_PROJECT } from '_platform/api';
 import '../index.less'; 
 import moment from 'moment';
@@ -39,32 +38,9 @@ export default class ExpurgateCheck extends Component {
         const {wk} = this.props
         let dataSource = this.addindex(JSON.parse(wk.subject[0].data).changedata)
         let origindataSource = this.addindex(JSON.parse(wk.subject[0].data).origindata)
-        console.log('dataSource',dataSource,'origindataSource',origindataSource)
         this.setState({dataSource,origindataSource,wk});
-        const {actions:{
-            getScheduleDir,
-            postScheduleDir,
-        }} = this.props;
-        let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
-        if(!topDir.obj_type){
-            let postData = {
-                name:'数据报送的顶级节点',
-                code:'the_only_main_code_datareport',
-                "obj_type": "C_DIR",
-                "status": "A",
-            }
-            topDir = await postScheduleDir({},postData);
-        }
-        this.setState({topDir});
     }
 
-    componentWillReceiveProps(props){
-        const {wk} = props
-        let dataSource = this.addindex(JSON.parse(wk.subject[0].data).changedata)
-        let origindataSource = this.addindex(JSON.parse(wk.subject[0].data).origindata)
-        console.log('dataSource',dataSource)
-        this.setState({dataSource,origindataSource,wk});
-   }
    //提交
     async submit(){
         if(this.state.opinion === 1){
@@ -77,40 +53,12 @@ export default class ExpurgateCheck extends Component {
     }
     //通过
     async passon(){
-        const {dataSource,origindataSource, wk,topDir} = this.state;
+        const {dataSource, origindataSource, wk} = this.state;
         const {actions:{
             logWorkflowEvent,
             deleteDocument,
-            getScheduleDir,
-            postScheduleDir,
-            getWorkPackageDetailpk
+            deleteStaticFile,
         }} = this.props;
-        //the unit in the dataSource array is same
-        let unit = dataSource[0].unit;
-        let project = dataSource[0].project;
-        let code = 'datareport_designdata';
-        //get workpackage by unit's code 
-        let workpackage = await getWorkPackageDetailpk({pk:unit.pk});
-        
-        let postDirData = {
-            "name": '设计信息目录树',
-            "code": code,
-            "obj_type": "C_DIR",
-            "status": "A",
-            related_objects: [{
-                pk: workpackage.pk,
-                code: workpackage.code,
-                obj_type: workpackage.obj_type,
-                rel_type: 'designdata_wp_dirctory', // 自定义，要确保唯一性
-            }],
-            "parent":{"pk":topDir.pk,"code":topDir.code,"obj_type":topDir.obj_type}
-        }
-        let dir = await getScheduleDir({code:code});
-        //no such directory
-        if(!dir.obj_type){  
-            dir = await postScheduleDir({},postDirData);
-        }
-
         // send workflow
         let executor = {};
         let person = getUser();
@@ -119,17 +67,15 @@ export default class ExpurgateCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
-        //prepare the data which will store in database
-        const docData = [];   //asure the code of every document only
         let all = [];
         dataSource.forEach((item,index) => {
-            all.push(deleteDocument({code:origindataSource[index].code}))
+            all.push(deleteDocument({code:origindataSource[index].code}))   //删除文档对象
+            all.push(deleteStaticFile({id:dataSource[index].file.id}))  //删除附件
         });
         Promise.all(all)
         .then(rst => {
             console.log(rst)
-            message.success('删除文档成功！');
+            message.success('删除成功！');
         })
     }
     //不通过
@@ -232,10 +178,13 @@ export default class ExpurgateCheck extends Component {
 			>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
-                    <Table style={{ marginTop: '10px', marginBottom:'10px' }}
-                        columns={columns}
-                        dataSource={this.state.dataSource}
-                        bordered />
+                    <Table 
+                     style={{ marginTop: '10px', marginBottom:'10px' }}
+                     columns={columns}
+                     dataSource={this.state.dataSource}
+                     bordered 
+                     rowKey='index'
+                    />
                     <Row>
                         <Col span={2}>
                             <span>审查意见：</span>
@@ -250,7 +199,6 @@ export default class ExpurgateCheck extends Component {
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {

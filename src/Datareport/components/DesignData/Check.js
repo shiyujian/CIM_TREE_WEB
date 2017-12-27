@@ -7,7 +7,6 @@ import { Modal, Input, Form, Button, message, Table, Radio, Row, Col,DatePicker,
 import WorkflowHistory from '../WorkflowHistory'
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import {getUser} from '_platform/auth';
-import Preview from '../../../_platform/components/layout/Preview';
 import { CODE_PROJECT } from '_platform/api';
 import '../index.less'; 
 import moment from 'moment';
@@ -278,7 +277,6 @@ export default class Check extends Component {
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {
