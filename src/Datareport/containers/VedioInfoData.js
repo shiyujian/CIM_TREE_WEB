@@ -46,7 +46,8 @@ export default class VedioInfoData extends Component {
     }
 
 	render() {
-		const {uploadModal,deleteModal,dataSource,loading,selectRows} = this.state;
+		const {uploadModal,deleteModal,dataSource,loading,selectRows} = this.state,
+			{actions:{jsonToExcel}} = this.props;
 
 		return (<Main>
 			<DynamicTitle title="影像信息" {...this.props} />
@@ -54,6 +55,8 @@ export default class VedioInfoData extends Component {
 				<MainHeader
 				 showModal={this.showModal}
 				 selectJudge={this.selectJudge}
+				 jsonToExcel={jsonToExcel}
+				 deriveData={this.deriveData}
 				/>
 				<VedioInfoTable
 				dataSource={dataSource}
@@ -120,5 +123,13 @@ export default class VedioInfoData extends Component {
 			return false
 		}
 		return true
+	}
+
+	deriveData = ()=>{
+		const {dataSource} = this.state;
+		return dataSource.map(item=>{
+			const {index,projectName,enginner,ShootingDate,file:{name},code} = item;
+			return [index,projectName,enginner,ShootingDate,name,code]
+		})
 	}
 };
