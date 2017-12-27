@@ -1,7 +1,7 @@
 import {handleActions, combineActions,createAction} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API,USER_API,WORKFLOW_API} from '_platform/api';
+import { SERVICE_API,USER_API,WORKFLOW_API,NODE_FILE_EXCHANGE_API} from '_platform/api';
 
 
 export const ModalVisible = createAction('组织Modal模态框显示隐藏');
@@ -15,7 +15,7 @@ export const getProjects = createFetchAction(`${SERVICE_API}/project-tree/?depth
 export const postOrgList = createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "POST");
 export const getOrgRoot = createFetchAction(`${SERVICE_API}/org-tree/?depth=1`,[], "GET");
 export const getOrgReverse = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/?reverse=true`,[], "GET");
-export const getUnit = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?depth=1`,[], );
+export const getUnit = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?depth=1`,[], "GET");
 export const putProject = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/`,[], "PUT");
 export const putUnit = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`,[], "PUT");
 export const getProject = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/?all=true`,[], "GET");
@@ -23,6 +23,8 @@ export const getUnitAc = createFetchAction(`${SERVICE_API}/workpackages/code/{{c
 export const getOrgPk= createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[], "GET");
 export const getOrgTree= createFetchAction(`${SERVICE_API}/org-tree/?depth=3`,[], "GET");
 export const deleteOrgList= createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "PUT"); 
+export const putOrgList = createFetchAction(`${SERVICE_API}/orgpostlist/`, [], "PUT");
+const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 
 export const actions = {
 	ModalVisible,
@@ -43,7 +45,9 @@ export const actions = {
 	setDeleteOrg,
 	deleteOrgList,
 	ModalVisibleUpdate,
-	setUpdateOrg
+	setUpdateOrg,
+	putOrgList,
+	jsonToExcel
 };
 
 export default handleActions({
