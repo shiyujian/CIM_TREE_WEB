@@ -10,7 +10,7 @@ const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'P
 const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [], 'DELETE');
 export const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
 //获取项目树
-export const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
+//export const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
 export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const createWorkflow = createFetchAction(`${WORKFLOW_API}/instance/`, [], 'POST')
 export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [])
@@ -24,6 +24,8 @@ const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [],
 //批量创建文档
 export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
+//批量删除文档
+const delDocList = createFetchAction(`${SERVICE_API}/documentlist/?code_list={{code_list}}`,[],'DELETE');
 //创建文档目录
 export const addDefectDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 //文档目录树相关
@@ -32,7 +34,10 @@ const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST
 //获取资源的api	
 const getResouce = createFetchAction(`${SERVICE_API}/searcher/?keyword={{keyword}}&obj_type={{obj_type}}`,[])
 const getRelDoc = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`,[])
-
+//得到组织机构
+const getOrg = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`,[])
+//获取项目树
+const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/?depth=4`, []);
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -51,7 +56,10 @@ export const actions = {
 	getScheduleDir,
 	postScheduleDir,
 	getResouce,
-	getRelDoc
+	getRelDoc,
+	getOrg,
+	getProjectTree,
+	delDocList
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

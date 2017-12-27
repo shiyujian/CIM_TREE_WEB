@@ -84,12 +84,10 @@ export default class ProjectSumExamine extends Component {
             getQuantities,
             getSearcher
         } } = this.props;
-        // console.log('this.props',this.props)
-        //the unit in the dataSource array is same
+ 
         let unit = dataSource[0].unit;
         let project = dataSource[0].project;
         let code = 'ck';
-        //get workpackage by unit's code 
         let workpackage = await getWorkpackagesByCode({ code: unit.code });
 
         let postDirData = {
@@ -124,6 +122,7 @@ export default class ProjectSumExamine extends Component {
         const docData = [];
         let wplist = [];
         let i = 0;   //asure the code of every document only
+
         let jialist = await getSearcher({keyword:'priceListName'})
         let pairs = jialist.result.map(item => {
             return {
@@ -156,25 +155,29 @@ export default class ProjectSumExamine extends Component {
             }) 
             //施工包批量
             let myprojectcoding, mynumber;
-            for(var i  = 0; i < pairs.length; ++i) {
-                if(pairs[i].projectcoding === item.projectcoding ) {
-                    myprojectcoding = pairs[i].projectcoding;
-                    mynumber =  pairs[i].rate;
-                    break; 
-                }
-            }
+            // for(var i  = 0; i < pairs.length; i++) {
+            //     console.log('pairs[i].projectcoding',pairs[i].projectcoding)
+            //     console.log('item.projectcoding',item.projectcoding )
+                // if(pairs[i].projectcoding === item.projectcoding ) {
+                //     myprojectcoding = pairs[i].projectcoding;
+                //     mynumber =  pairs[i].rate;
+                //     break; 
+                // }
+            // }
+
             wplist.push({
                 code: item.unit.code,
-                // extra_params: {
-                //     projectcoding:item.projectcoding,
-                //     number: item.number,
-                // }
                 extra_params: {
-                    projectcoding: myprojectcoding,
-                    number: mynumber,
+                    projectcoding:item.projectcoding,
+                    number: item.number,
                 }
+                // extra_params: {
+                //     projectcoding: myprojectcoding,
+                //     number: mynumber,
+                // }
             })
         });
+        // postDocData = docData.filter(item => item.wplist[0].extra_params.projectcoding)
         
         let rst = await addDocList({}, { data_list: docData });
         await updateWpData({}, { data_list: wplist });

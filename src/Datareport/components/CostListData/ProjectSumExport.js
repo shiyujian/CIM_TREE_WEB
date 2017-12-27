@@ -8,7 +8,7 @@ import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-export default class ProjectSumExcalDelete extends Component {
+export default class ProjectSumExport extends Component {
 
     constructor(props) {
         super(props);
@@ -36,26 +36,27 @@ export default class ProjectSumExcalDelete extends Component {
     
 
     //下拉框选择人
-    selectChecker(value){
-        let check = JSON.parse(value);
-        this.setState({check})
-    }
+    // selectChecker(value){
+    //     let check = JSON.parse(value);
+    //     this.setState({check})
+    // }
 
 
     onok(){
-        if(!this.state.check){
-            message.info("请选择审核人")
-            return;
-        }
-        let {check} = this.state;
-        let per = {
-            id:check.id,
-            username:check.username,
-            person_name:check.account.person_name,
-            person_code:check.account.person_code,
-            organization:check.account.organization
-        }
-        this.props.onok(this.state.dataSource,per);
+        // if(!this.state.check){
+        //     message.info("请选择审核人")
+        //     return;
+        // }
+        // let {check} = this.state;
+        // let per = {
+        //     id:check.id,
+        //     username:check.username,
+        //     person_name:check.account.person_name,
+        //     person_code:check.account.person_code,
+        //     organization:check.account.organization
+        // }
+        // this.props.onok(this.state.dataSource,per);
+        
         notification.success({
             message: '信息上传成功！',
             duration: 2
@@ -74,9 +75,11 @@ export default class ProjectSumExcalDelete extends Component {
         const columns = [
             {
                 title: "序号",
-                dataIndex: "key",
+                dataIndex: "code",
                 width: "10%",
-                
+                render:(text,record,index)=>{
+                  return index+1
+                }
               },{
                 title: '项目/子项目',
                 dataIndex: 'subproject',
@@ -105,7 +108,7 @@ export default class ProjectSumExcalDelete extends Component {
         ];
         return (
             <Modal
-			title="工程量结算删除表"
+			title="工程量结算导出表格"
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
@@ -117,7 +120,7 @@ export default class ProjectSumExcalDelete extends Component {
                     bordered
                     pagination={{ pageSize: 10 }}
                 />
-                <Row style={{ marginBottom: "30px" }} type="flex">
+                {/* <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col>
                         <span>
                             审核人：
@@ -128,7 +131,7 @@ export default class ProjectSumExcalDelete extends Component {
                             </Select>
                         </span> 
                     </Col>
-                </Row>
+                </Row> */}
                 <Preview />
             </Modal>
         )

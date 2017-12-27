@@ -48,7 +48,8 @@ export default class VedioData extends Component {
     }
 
 	render() {
-		const {uploadModal,changeModal,deleteModal,dataSource,loading,selectRows} = this.state;
+		const {uploadModal,changeModal,deleteModal,dataSource,loading,selectRows} = this.state,
+			{actions:{jsonToExcel}} = this.props;
 
 		return (<Main>
 			<DynamicTitle title="视频监控" {...this.props} />
@@ -56,6 +57,8 @@ export default class VedioData extends Component {
 				<MainHeader
 				 showModal={this.showModal}
 				 selectJudge={this.selectJudge}
+				 jsonToExcel={jsonToExcel}
+				 deriveData={this.deriveData}
 				/>
 				<VedioTable
 				dataSource={dataSource}
@@ -105,7 +108,7 @@ export default class VedioData extends Component {
 		})
 		Promise.all(all).then(item =>{
 			const dataSource = item.map((response,index)=>{
-				let {extra_params:{cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,code}} = response;
+				let {extra_params:{cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode},code} = response;
 				return {index:index+1,
 					cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,code};
 			})
@@ -128,5 +131,13 @@ export default class VedioData extends Component {
 			return false
 		}
 		return true
+	}
+
+	deriveData = ()=>{
+		const {dataSource} = this.state;
+		return dataSource.map(item=>{
+			const {index,cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode} = item;
+			return [index,cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode]
+		})
 	}
 };

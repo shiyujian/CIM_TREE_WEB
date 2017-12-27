@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Button, Popconfirm, message, Input } from 'antd';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
 import style from './TableOrg.css'
 const Search = Input.Search;
 export default class TableOrg extends Component {
@@ -20,7 +21,7 @@ export default class TableOrg extends Component {
 					<Button className={style.button} onClick={this.sendCJ.bind(this)}>发送参建单位</Button>
 					<Button className={style.button} onClick={this.update.bind(this)}>申请变更</Button>
 					<Button className={style.button} onClick={this.delete.bind(this)}>申请删除</Button>
-					<Button className={style.button}>导出表格</Button>
+					<Button className={style.button} onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search className={style.button} onSearch = {this.searchOrg.bind(this)} style={{ width: "200px" }} placeholder="输入搜索条件" />
 				</div>
 				<Table
@@ -64,6 +65,43 @@ export default class TableOrg extends Component {
 			message.warning("请先选中要变更的数据");
 		}
 	}
+	// 导出excel表格
+	getExcel(){
+		console.log("dfgfg:",this.state.excelData);
+		let exhead = ['组织机构编码','组织机构类型','参建单位名称','组织机构部门','直属部门','负责项目/子项目名称','负责单位工程名称','备注'];
+		let rows = [exhead];
+		let getcoordinate = (param)=>{
+			if(typeof param !=='string'){
+				return'';
+			}
+			if((!param||param.length<=0)){
+				return ''
+			}else{
+				return param;
+			}
+		}
+		let excontent =this.state.excelData.map(data=>{
+			return [data.code || '', data.extra_params.org_type || '', data.extra_params.canjian || '', data.name ||'', data.extra_params.direct ||'', data.extra_params.project || ''
+			,data.extra_params.unit || '',data.extra_params.remarks ||''];
+		});
+		rows = rows.concat(excontent);
+		const {actions:{jsonToExcel}} = this.props;
+		console.log(rows)
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            console.log(rst);
+            this.createLink('单位工程信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
+	}
+	createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 	send() {
 		const { actions: { ModalVisible } } = this.props;
 		ModalVisible(true);
@@ -95,7 +133,7 @@ export default class TableOrg extends Component {
 		dataSource.map((item, index) => {
 			item.index = index + 1
 		})
-		this.setState({dataSource,tempData:dataSource})
+		this.setState({dataSource,tempData:dataSource});
 	}
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
@@ -103,7 +141,8 @@ export default class TableOrg extends Component {
 		},
 		onSelect: (record, selected, selectedRows) => {
 			this.setState({
-				selectData:selectedRows
+				selectData:selectedRows,
+				excelData:selectedRows
 			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {

@@ -80,7 +80,18 @@ async passon(){
                 code:doc.code,
                 extra_params:{
                     ...o
-                }
+                },
+                "basic_params": {
+                    "files": [
+                        o.file
+                    ]
+                },
+                workpackages:[{
+                    code:o.code,
+                    obj_type:o.obj_type,
+                    pk:o.pk,
+                    rel_type:"many_jyp_rel"
+                }],
             })
         }else{
             doclist_a.push({

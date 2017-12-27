@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {Modal, message} from 'antd';
 
-import VedioTable from './VedioTable';
+import VedioInfoTable from './VedioInfoTable';
 import ChangeFooter from './ChangeFooter';
 import {launchProcess} from './commonFunc';
 
-export default class DeleteUpload extends Component{
+export default class InfoDeleteUpload extends Component{
 
     render(){
         const {deleteModal, closeModal, dataSource} = this.props;
@@ -14,12 +14,12 @@ export default class DeleteUpload extends Component{
         return(
             <Modal
              width={1280}
-             title={"视频监控删除"}
+             title={"影像信息删除"}
              visible={deleteModal}
              onCancel={()=>closeModal("deleteModal")}
              footer={null}
             >
-                <VedioTable
+                <VedioInfoTable
                  dataSource={dataSource}
                 />
                 <ChangeFooter
@@ -31,7 +31,7 @@ export default class DeleteUpload extends Component{
 
     onOk = async (selectUser,description)=>{
         const {dataSource, closeModal, actions:{ createWorkflow, logWorkflowEvent }} = this.props,
-            name = '视频监控数据删除';
+            name = '影像信息数据删除';
 
         await launchProcess({dataSource,selectUser,name,description},{createWorkflow,logWorkflowEvent});
         message.success("发起删除流程成功");
@@ -40,7 +40,7 @@ export default class DeleteUpload extends Component{
 
 }
 
-DeleteUpload.PropTypes ={
+InfoDeleteUpload.PropTypes ={
     changeModal: PropTypes.bool.isRequired,
     closeModal: PropTypes.func.isRequired,
 }
