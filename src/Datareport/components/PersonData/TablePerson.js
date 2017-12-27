@@ -57,27 +57,20 @@ export default class TablePerson extends Component{
 		const {actions: {getAllUsers}} = this.props;
 		let orgAll = await getAllUsers();
 		orgAll.forEach((item, index) => {
-			console.log('item',item)
 			orgAll[index].index = index + 1;
 		})
-		console.log('orgAll',orgAll)
 		this.setState({dataSource: orgAll})
 	}
 
 	searchOrg(value){ 
 		let searchData = [];
 		let searchPer = this.state.dataSource
-		console.log('searchPer',searchPer)
-		if (searchPer.name.indexOf(value) != -1) {
-			searchData.push(searchPer);
-		}
-		if (searchPer.children && searchPer.children.length > 0) {
-			searchPer.children.map(it => {
-				if (it.name.indexOf(value) != -1) {
-					searchData.push(it);
-				}
-			})
-		}
+		searchPer.map(rst => {
+			console.log("rst", rst)
+			if (rst.account.organization.indexOf(value) != -1) {
+				searchData.push(rst);
+			}
+		})
 		searchData.map((item, index)=> {
 			item.index = index + 1;
 		})
