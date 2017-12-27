@@ -54,10 +54,12 @@ export default class DesignScheduleData extends Component {
 	async generateTableData(data) {
 		const { actions: { getDocument, } } = this.props;
 		let dataSource = [];
-		data.map((item,i) => {
+		let i = 0;
+		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
+				i++
 				let temp = {
-					key:i+1,
+					key:i,
 					code: single.extra_params.code,
 					volume: single.extra_params.volume,
 					name: single.extra_params.name,
@@ -286,29 +288,38 @@ export default class DesignScheduleData extends Component {
 	}, {
 		title: '编码',
 		dataIndex: 'code',
+		key:'code',
 	}, {
 		title: '卷册',
 		dataIndex: 'volume',
+		key:'volume',
 	}, {
 		title: '名称',
 		dataIndex: 'name',
+		key:'name',
 	}, {
 		title: '项目/子项目',
 		dataIndex: 'project',
+		key:'project',
 	}, {
 		title: '单位工程',
 		dataIndex: 'unit',
+		key:'unit',
 	}, {
 		title: '专业',
 		dataIndex: 'major',
+		key:'major',
 	}, {
 		title: '实际供图时间',
 		dataIndex: 'factovertime',
+		key:'factovertime',
 	}, {
 		title: '设计单位',
 		dataIndex: 'designunit',
+		key:'designunit',
 	}, {
 		title: '上传人员',
 		dataIndex: 'uploads',
+		key:'uploads',
 	}];
 }
