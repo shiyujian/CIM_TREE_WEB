@@ -44,14 +44,12 @@ export default class BalanceSchedule extends Component {
       dataSourceSelected: [],
       dataSource: [],
       cacheDataSource: [],
+      pagination:{},
     };
     this.columns = [
       {
         title: "序号",
-        dataIndex: "number",
-        render: (text, record, index) => {
-          return index + 1;
-        }
+        dataIndex: "key",
       },
       {
         title: "项目/子项目",
@@ -90,8 +88,9 @@ export default class BalanceSchedule extends Component {
       let dataSource = [];
       console.log("o", o);
       console.log("");
-      o.result.map(rst => {
+      o.result.map((rst,key) => {
         let temp = {
+          key:key+1,
           code: rst.code,
           project: rst.extra_params.project.name || rst.extra_params.project,
           nodetarget: rst.extra_params.nodetarget,
@@ -103,7 +102,8 @@ export default class BalanceSchedule extends Component {
           deletecode: rst.code
         };
         dataSource.push(temp);
-        this.setState({ dataSource,cacheDataSource: dataSource });
+        this.setState({ dataSource, showDat: dataSource ,pagination:{total:rst.length},loading:false});
+        // this.setState({totalData:rst.result,dataSource:arr,pagination:{total:rst.result.length},loading:false})
       });
     });
   }
@@ -251,19 +251,19 @@ export default class BalanceSchedule extends Component {
       });
     });
   };
-  onSelectChange = selectedRowKeys => {
+  onSelectChange =(selectedRowKeys,selecteRows)  => {
     const { dataSource } = this.state;
     let dataSourceSelected = [];
     for (let i = 0; i < selectedRowKeys.length; i++) {
       dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
     }
-    this.setState({ selectedRowKeys, dataSourceSelected });
+    this.setState({ selectedRowKeys, dataSourceSelected:selecteRows });
   };
   oncancel() {
     this.setState({ addvisible: false });
     this.setState({ deletevisible: false });
     this.setState({ changevisible: false });
-    this.setState({exportvisible:false})
+    this.setState({ exportvisible: false });
   }
   setAddVisible() {
     this.setState({ addvisible: true });
@@ -275,8 +275,8 @@ export default class BalanceSchedule extends Component {
     this.setState({ deletevisible: true });
   }
   setexpVisible() {
-    console.log(11)
-    this.setState({exportvisible : true});
+    console.log(11);
+    this.setState({ exportvisible: true });
   }
 
   // 搜索
@@ -301,7 +301,7 @@ export default class BalanceSchedule extends Component {
   //   // console.log('sunjects:',sunjects)
 
   //   // const code_Todir = "datareport_safetyspecial_05";
-	// 	let param1 = code_Todir + "/?doc_code=BalanceSchedule&keys=project&values=" + value;
+  // 	let param1 = code_Todir + "/?doc_code=BalanceSchedule&keys=project&values=" + value;
   //   let datas = await getSearcher({
   //     keyword: param1
   //   }).then(rst => {
@@ -314,31 +314,60 @@ export default class BalanceSchedule extends Component {
   //   });
   //   console.log("dataSource:", this.state.dataSource);
   // }
-  onSearch(value) {
-		if(!value.length) {
-			this.setState({
-				dataSource: this.state.cacheDataSource
-			});
-			return;
-    }
-    
-		let dataSource = this.state.cacheDataSource;
-		let res = [];
-		for(var i  =0; i < dataSource.length; ++i) {
-			for(var j in dataSource[i]) {
-				if (dataSource[i][j] === value){
-					res.push(dataSource[i]);
-					break;
-				}
-			}
-		}
-		if(res.length) {
-			this.setState({
-				dataSource: res
-			})
-    }
-    console.log('value:',value)
-	}
+  // onSearch(value) {
+  //   if (!value.length) {
+  //     this.setState({
+  //       dataSource: this.state.cacheDataSource
+  //     });
+  //     return;
+  //   }
+
+  //   let dataSource = this.state.cacheDataSource;
+  //   let res = [];
+  //   for (var i = 0; i < dataSource.length; ++i) {
+  //     for (var j in dataSource[i]) {
+  //       if (dataSource[i][j] === value) {
+  //         res.push(dataSource[i]);
+  //         break;
+  //       }
+  //     }
+  //   }
+  //   if (res.length) {
+  //     this.setState({
+  //       dataSource: res
+  //     });
+  //   }
+  //   console.log("value:", value);
+  // }
+  //表格分页回调
+	// handleChange = async(pagination, filters, sorter) => {
+	// 	const {actions:{getWorkPackageDetail,getRelDoc}} = this.props		
+	// 	this.setState({loading:true})
+	// 	const pager = { ...this.state.pagination };
+	// 	pager.current = pagination.current;
+	// 	this.setState({
+	// 	  pagination: pager,
+	// 	});
+	// 	let arr = this.state.dataSource
+	// 	if(arr[(pagination.current-1)*10].key+1){
+	// 		this.setState({loading:false})
+	// 		return
+	// 	}
+	// 	for(let index = (pagination.current-1)*10;index < pagination.current*10;index++){
+	// 		let wp = await getWorkPackageDetail({code:this.state.totalData[index].code})
+	// 		let rel_doc = wp.related_documents ? wp.related_documents.find(x => {
+	// 			return x.rel_type === 'many_sum_rspeed'
+	// 		}) : null
+	// 		if(rel_doc){
+	// 			let doc = await getRelDoc({code:rel_doc.code})
+	// 			arr[index] = {...doc.extra_params,key:index}			
+	// 		}else{
+	// 			let obj = await this.getInfo(wp)
+	// 			arr[index] = {...obj,key:index,file:{}}
+	// 		}
+	// 	}
+	// 	this.setState({dataSource:arr,loading:false})
+	// }
   render() {
     const { selectedRowKeys } = this.state;
     const rowSelection = {
@@ -373,8 +402,10 @@ export default class BalanceSchedule extends Component {
           >
             申请删除
           </Button>
-          <Button className="btn" type="default"
-          onClick={this.setexpVisible.bind(this)}
+          <Button
+            className="btn"
+            type="default"
+            onClick={this.setexpVisible.bind(this)}
           >
             导出表格
           </Button>
@@ -382,7 +413,17 @@ export default class BalanceSchedule extends Component {
             className="btn"
             style={{ width: "200px" }}
             placeholder="输入搜索条件"
-            onSearch={this.onSearch.bind(this)}
+            onSearch={ text => {
+              let result = this.state.dataSource.filter(data => {
+                console.log(data)
+                return data.project.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0;
+              })
+              if( text === ''){
+                result = this.state.dataSource
+              }
+              this.setState({showDat:result});
+            }
+            }
           />
         </Row>
         <Row>
@@ -390,7 +431,8 @@ export default class BalanceSchedule extends Component {
             <Table
               columns={this.columns}
               bordered
-              dataSource={this.state.dataSource}
+              dataSource={this.state.showDat}
+              onChange={this.handleChange}
               rowSelection={rowSelection}
               rowKey="key"
             />
