@@ -76,13 +76,10 @@ export default class PriceListCheck extends Component {
         const {dataSource,wk,topDir} = this.state
         const {actions:{
             logWorkflowEvent,
-            addDocList,
-            putDocList,
-            postScheduleDir,
-            getScheduleDir,
-            getWorkpackagesByCode,
             addTagList,
-            sendTags
+            sendTags,
+            getWorkpackagesByCode,
+            getScheduleDir
         }} = this.props;
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
@@ -125,7 +122,6 @@ export default class PriceListCheck extends Component {
             i++;
             tagLists.push({
                 "name": 'priceListName' + moment().format("YYYYMMDDHHmmss")+i,
-                // "code": 'costList'+moment().format("YYYYMMDDHHmmss")+i,
                 "code": 'priceListCode' + moment().format("YYYYMMDDHHmmss")+i,
                 "obj_type": "C_QTO",
                 "status": "A",

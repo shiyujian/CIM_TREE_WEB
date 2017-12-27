@@ -245,17 +245,16 @@ export default class CostListData extends Component {
 	}
 	//全局搜索
 	search(value) {
-		if(!value.length) {
-			this.setState({
-				dataSource: this.state.cacheDataSource
-			});
-			return;
-		}
 		let dataSource = this.state.cacheDataSource;
 		let res = [];
-		for(var i  =0; i < dataSource.length; ++i) {
-			for(var j in dataSource[i]) {
-				if (dataSource[i][j] == value){
+		if(!value.length) {
+			this.setState({dataSource});
+			return;
+		}
+		for(var i = 0; i < dataSource.length; ++i) {
+			for(var key in dataSource[i]) {
+				let val = String(dataSource[i][key]);
+				if(val.indexOf(String(value)) !== -1) {
 					res.push(dataSource[i]);
 					break;
 				}
@@ -264,8 +263,11 @@ export default class CostListData extends Component {
 		if(res.length) {
 			this.setState({
 				dataSource: res
-			})
+			});
+		}else{
+			message.info("请换一个字段")
 		}
+		debugger;
 	}
 	render() {
 		const { selectedRowKeys } = this.state;
