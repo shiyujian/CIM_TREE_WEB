@@ -16,7 +16,7 @@ import {
 import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
 import {getUser} from '_platform/auth';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyHiddenDanger/AddFile';
 import DeleteFile from '../components/SafetyHiddenDanger/DeleteFile';
@@ -230,7 +230,7 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({setDeleteVisiable:false})						
+						this.setState({setEditVisiable:false})						
 					})
 		})
     }
@@ -245,6 +245,49 @@ class SafetyHiddenDanger extends Component {
         filed.name = f.name;
         filed.mime_type = f.mime_type;
         openPreview(filed);
+    }
+
+    async onSearch(value){
+		if(!value){
+            this.componentDidMount();
+            return;
+        }
+        const {actions:{
+            searchDocument,
+        }} = this.props;
+        const param = {
+            docCode:'hiddenDanger',
+            keys:'wbs',
+            values:value
+        }
+        let result = await searchDocument(param);
+        let dataSource = [];
+        if(result.result && result.result.length>0){
+            if(result.result){
+                result.result.map((single)=>{
+                    let temp = { 
+                        code:single.extra_params.code,
+                        wbs:single.extra_params.wbs,
+                        type:single.extra_params.type,
+                        upTime:single.extra_params.upTime,
+                        checkTime:single.extra_params.checkTime,
+                        editTime:single.extra_params.editTime,
+                        unit:single.extra_params.unit,
+                        projectName:single.extra_params.project,
+                        result:single.extra_params.result,
+                        resUnit:single.extra_params.resUnit,
+                        file:single.basic_params.files[0],
+                        deadline:single.extra_params.deadline,
+                        editResult:single.extra_params.editResult,
+                        docCode:single.code
+                    }
+                    dataSource.push(temp);
+                });
+                this.setState({dataSource});
+            }
+        }else{
+            this.setState({dataSource});
+        }
     }
 
     render() {
@@ -331,9 +374,11 @@ class SafetyHiddenDanger extends Component {
                             style={{ marginRight: "30px" }}
                             onClick={()=>this.onBtnClick("delete")}>申请删除</Button>
                             <Button 
+                            onClick={()=>this.getExcel()}
                             style={{ marginRight: "30px" }}>导出表格</Button>
                             <Search
-                                placeholder="请输入内容"
+                                placeholder="请输入WBS编码"
+                                onSearch={this.onSearch.bind(this)}
                                 style={{ width: 200, marginLeft: "20px" }}
                             />
                         </Col>
@@ -360,6 +405,42 @@ class SafetyHiddenDanger extends Component {
                     <EditFile {...this.props} {...this.state} oncancel={this.goCancel.bind(this)} akey={Math.random()} onok={this.setEditData.bind(this)} />
                 }
             </Main>)
+    }
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    //数据导出
+    getExcel(){
+        const {actions:{jsonToExcel}} = this.props;
+        const {dataSource} = this.state;
+        let rows = [];
+        rows.push(this.header);
+        dataSource.map(item => {
+            rows.push([item.code,
+                item.wbs,
+                item.type,
+                item.upTime,
+                item.checkTime,
+                item.editTime,
+                item.result,
+                item.unit,
+                item.projectName,
+                item.resUnit,
+                item.deadline,
+                item.editResult]);
+        })
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+            this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
     }
 };
 export default Form.create()(SafetyHiddenDanger);

@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import createFetchActionWithHeaders from './fetchAction';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API} from '_platform/api';
+import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,NODE_FILE_EXCHANGE_API} from '_platform/api';
 
 //获取项目树
 export const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
@@ -21,9 +21,14 @@ const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?a
 const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
 const getDocumentList = createFetchAction(`${SERVICE_API}/documentgetlist/?key_type=code`,[],'GET');
 const putDocument = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
+//文档查询
+const searchDocument = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/datareport_safetydoc_1112/?doc_code={{docCode}}&keys={{keys}}&values={{values}}`,[],'GET');
 //流程
 const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE');
+
+//导出数据
+const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 export const actions = {
     getScheduleDir,
     postScheduleDir,
@@ -34,7 +39,9 @@ export const actions = {
     getDocument,
     delDocList,
     getDocumentList,
-    putDocument
+    putDocument,
+    searchDocument,
+    jsonToExcel
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
