@@ -26,6 +26,7 @@ export default class JianyanpiDelete extends Component {
 		super(props);
 		this.state = {
             dataSource:[],
+            opinion:1
 		};
     }
     async componentDidMount(){
@@ -62,15 +63,16 @@ export default class JianyanpiDelete extends Component {
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         let code_list = "";
         dataSource.map((o) => {
+            debugger
             let doc = o.related_documents.find(x => {
                 return x.rel_type === 'many_jyp_rel' || x.rel_type === 'many_jy_rel'
             })
             if(doc){
                 //拼接code
-            doc_list += `,${doc.code}`
+                code_list += `${doc.code},`
             }
         })
-        await delDocList({doc_list:doc_list})
+        await delDocList({code_list:code_list})
     }
     //不通过
     async reject(){
@@ -85,12 +87,10 @@ export default class JianyanpiDelete extends Component {
         // executor.person_code = person.code;
         // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'退回',note:'滚',executor:executor,attachment:null});
     }
-//下拉框选择人
-selectChecker(value){
-    let check = JSON.parse(value)
-    this.setState({check})
-}
-    //预览
+//radio变化
+onChange(e){
+    this.setState({opinion:e.target.value})
+}   //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
         let f = this.state.dataSource[index].file
@@ -149,7 +149,7 @@ selectChecker(value){
 						</span>
 					)
 				}else{
-					return (<span>暂无</span>)
+					return (<span>-</span>)
 				}
 			}
 		},{
@@ -162,7 +162,7 @@ selectChecker(value){
             width:"12%",
             render: (text, record, index) => (
                 <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
+                    {record.construct_unit ? record.construct_unit.name : "-"}
                 </span>
             ),
 		}, {

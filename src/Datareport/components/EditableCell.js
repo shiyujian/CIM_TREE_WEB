@@ -29,17 +29,8 @@ class EditableCell extends React.Component {
 	check = () => {
 		let value = this.state.value;
 		console.log(value,"value")
-		if( typeof ( Number(value) ) != "number"  || isNaN( Number(value) ) || value == undefined || value == null ){
-            notification.error({
-                message: '请填写有效的数字',
-                duration: 2,
-            });
-			// message.error("请填写有效的数字");
-			return;
-		}else{
-				if (this.props.onChange) {
-				this.props.onChange(this.state.value);
-			}
+			if (this.props.onChange) {
+			this.props.onChange(this.state.value);
 		}
 		this.setState({ editable: false });
 	}

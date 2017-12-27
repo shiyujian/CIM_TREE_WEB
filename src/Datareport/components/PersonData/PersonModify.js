@@ -62,6 +62,13 @@ export default class PersonModify extends Component {
 			title: '姓名',
 			dataIndex: 'account.person_name',
 			key: 'Name',
+			render:(text, record, index) =>{ 
+				console.log('record',record)
+	            return <Input value = {record.account.person_name || ""} onChange={ele => {
+	                record.account.person_name = ele.target.value
+	                this.forceUpdate();
+	            }}/>
+	        }
 		}, {
 			title: '所在组织机构单位',
 			dataIndex: 'account.organization',
@@ -95,7 +102,7 @@ export default class PersonModify extends Component {
 		return (
             <Modal
                 onCancel={this.cancel.bind(this)}
-                title="项目删除申请表"
+                title="项目变更申请表"
                 visible={Modvisible}
                 width={1280}
                 footer={null}

@@ -128,12 +128,14 @@ export default class VedioInfoCheck extends Component {
                 this.createPassion(dataSource);
                 break;
             case 'strike':
-                const {actions:{deleteDocument}} = this.props;
-                const all = dataSource.map(item => {
-                    return deleteDocument({code:item.code})
+                const {actions:{deleteDocument,deleteStaticFile}} = this.props;
+                let all = [] ,fileAll = [];
+                dataSource.forEach(item => {
+                    all.push( deleteDocument({code:item.code}) )
+                    fileAll.push( deleteStaticFile({id:item.file.id}) )
                 });
+                Promise.all(fileAll);
                 Promise.all(all).then(rst => {
-                    console.log(rst)
                     message.success('删除文档成功！');
                 })
                 break;
@@ -188,7 +190,7 @@ export default class VedioInfoCheck extends Component {
                         misc: "file",
                     }]
                 },
-                extra_params:{...item,code}
+                extra_params:{...item}
             }
         })
 

@@ -221,7 +221,8 @@ export default class ToggleModalCJ extends Component{
         height:"64px",
         render:(record) => {
             return (
-                <TreeSelect style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
+                <TreeSelect value={record.selectPro || "" } style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
+                 onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
                     let units = [];
                     let selectPro = [];
@@ -238,8 +239,8 @@ export default class ToggleModalCJ extends Component{
                         })
                         this.setState({units})
                         console.log("this.state.units",this.state.units);
-                    })
-
+                    });
+                    this.forceUpdate();
                 }} 
                 >
                     {ToggleModalCJ.lmyloop(this.state.projects)}
@@ -251,12 +252,13 @@ export default class ToggleModalCJ extends Component{
         width:"15%",
         render:(record) => {
             return (
-                <TreeSelect onSelect={(value, node, extra) => {
+                <TreeSelect value={record.selectUnit || ""} onSelect={(value, node, extra) => {
                     let selectUnit = [];
                     extra.checkedNodes.map(item => {
                         selectUnit.push(item.key);
                     })
                     record.selectUnit = selectUnit;
+                    this.forceUpdate();
                 }} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
                     {ToggleModalCJ.lmyloop(this.state.units)}
                  </TreeSelect>

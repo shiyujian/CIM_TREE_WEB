@@ -447,7 +447,7 @@ export default class ChangeFile extends Component {
         for (let i = 0; i < this.state.dataSource.length; i++) {
             this.state.dataSource[i].changeInfo = changeInfo;
         }
-        debugger;
+        // debugger;
         this.props.setChangeData(this.state.dataSource, per);
         notification.success({
             message: '变更已发起！',

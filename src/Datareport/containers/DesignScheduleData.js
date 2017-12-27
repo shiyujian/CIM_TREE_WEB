@@ -57,7 +57,7 @@ export default class DesignScheduleData extends Component {
 		let i = 0;
 		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
-				i++;
+				i++
 				let temp = {
 					key:i,
 					code: single.extra_params.code,
@@ -72,7 +72,7 @@ export default class DesignScheduleData extends Component {
 					delcode: single.code,
 				}
 				dataSource.push(temp);
-				this.setState({ dataSource });
+				this.setState({ dataSource ,showDat:dataSource});
 			})
 		})
 	}
@@ -239,8 +239,15 @@ export default class DesignScheduleData extends Component {
 						className="btn"
 						style={{ width: "200px" }}
 						placeholder="输入搜索条件"
-						onSearch = {
-							console.log(value)
+						onSearch={text => {
+							let result = this.state.dataSource.filter(data => {
+								return data.project.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.name.indexOf(text) >= 0 || data.major.indexOf(text) >= 0;
+							})
+							if (text === '') {
+								result = this.state.dataSource
+							}
+							this.setState({ showDat: result });
+						}
 						}
 					/>
 				</Row>
@@ -248,11 +255,12 @@ export default class DesignScheduleData extends Component {
 					<Col >
 						<Table
 							columns={this.columns}
-							dataSource={this.state.dataSource}
+							dataSource={this.state.showDat}
 							bordered
 							rowSelection={rowSelection}
 							style={{ height: 380, marginTop: 20 }}
 							pagination={{ pageSize: 10 }}
+							rowKey='key'
 						/>
 
 					</Col>
@@ -280,29 +288,38 @@ export default class DesignScheduleData extends Component {
 	}, {
 		title: '编码',
 		dataIndex: 'code',
+		key:'code',
 	}, {
 		title: '卷册',
 		dataIndex: 'volume',
+		key:'volume',
 	}, {
 		title: '名称',
 		dataIndex: 'name',
+		key:'name',
 	}, {
 		title: '项目/子项目',
 		dataIndex: 'project',
+		key:'project',
 	}, {
 		title: '单位工程',
 		dataIndex: 'unit',
+		key:'unit',
 	}, {
 		title: '专业',
 		dataIndex: 'major',
+		key:'major',
 	}, {
 		title: '实际供图时间',
 		dataIndex: 'factovertime',
+		key:'factovertime',
 	}, {
 		title: '设计单位',
 		dataIndex: 'designunit',
+		key:'designunit',
 	}, {
 		title: '上传人员',
 		dataIndex: 'uploads',
+		key:'uploads',
 	}];
 }
