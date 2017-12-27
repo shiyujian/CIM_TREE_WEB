@@ -10,6 +10,7 @@ export default class TablePerson extends Component{
 			dataSource: [],
 			deleData: [],
 			modData: [],
+			tempData:[],
 		}
 	}
     render(){
@@ -51,10 +52,10 @@ export default class TablePerson extends Component{
 	}
 	//批量变更
 	modify() {
-		const { actions: { ModifyVisible, setChangePer } } = this.props;
-		if(this.state.modData.lenth) {
+		const { actions: { ModifyVisible, setModifyPer } } = this.props;
+		if(this.state.modData.length) {
 			console.log('modData', this.state.modData)
-			setChangePer(this.state.modData)
+			setModifyPer(this.state.modData)
 			ModifyVisible(true);
 		} else {
 			message.warning("请先选中要变更的数据");
@@ -92,13 +93,15 @@ export default class TablePerson extends Component{
 		},
 		onSelect: (record, selected, selectedRows) => {
 			this.setState({
-				deleData:selectedRows
+				deleData:selectedRows,
+				modData: selectedRows
 			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
 			console.log(selected, selectedRows, changeRows);
 			this.setState({
-				deleData:selectedRows
+				deleData:selectedRows,
+				modData: selectedRows
 			})
 		},
 	};

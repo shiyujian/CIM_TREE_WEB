@@ -10,7 +10,7 @@ const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 var moment = require('moment');
 
-export default class PersonExpurgate extends Component {
+export default class PersonModify extends Component {
 	constructor(props){
         super(props);
         this.state = {
@@ -27,7 +27,7 @@ export default class PersonExpurgate extends Component {
     }
 
     componentDidMount(){
-        const {Modvisible, changePer, actions:{getAllUsers, getProjects}} = this.props;
+        const {Modvisible, modifyPer, actions:{getAllUsers, getProjects}} = this.props;
         getAllUsers().then(rst => {
             let users = [];
             if (rst.length) {
@@ -43,13 +43,13 @@ export default class PersonExpurgate extends Component {
             }
         });
         this.setState({
-            dataSource:changePer
+            dataSource:modifyPer
         })
         console.log('dataSource',this.setState)
     }
 
 	render() {
-		const {Modvisible, changePer} = this.props;
+		const {Modvisible, modifyPer} = this.props;
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
@@ -137,7 +137,7 @@ export default class PersonExpurgate extends Component {
             message.error('审批人未选择');
             return;
         }
-        this.props.setChangePer(this.state.dataSource, this.state.passer);
+        this.props.setDataUpdate(this.state.dataSource, this.state.passer);
 
         ModifyVisible(false);
     }

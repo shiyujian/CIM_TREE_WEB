@@ -8,7 +8,7 @@ export const ModalVisible = createAction('人员Modal显示隐藏');
 export const ExprugateVisible = createAction('人员删除Modal显示隐藏');
 export const ModifyVisible = createAction('人员变更Modal显示隐藏');
 export const setDeletePer = createAction('存储要删除的数据');
-export const setChangePer = createAction('存储要变更的数据');
+export const setModifyPer = createAction('存储要变更的数据');
 export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const postAllUsersId = createFetchAction(`${base}/workflowapp/api/instance/{{id}}/personflow/`, [], "POST");
 export const postPersonList = createFetchAction(`${SERVICE_API}/personlist/`, [], "POST");
@@ -28,7 +28,7 @@ export const actions = {
 	getOrgCode,
 	setDeletePer,
 	deleteUserList,
-	setChangePer,
+	setModifyPer,
 };
 
 export default handleActions({
@@ -48,8 +48,8 @@ export default handleActions({
 		...state,
 		deletePer:payload,
 	}),
-	[setChangePer]: (state, {payload}) => ({
+	[setModifyPer]: (state, {payload}) => ({
 		...state,
-		changePer:payload,
+		modifyPer:payload,
 	}),
 }, {});
