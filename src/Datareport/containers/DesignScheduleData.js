@@ -54,12 +54,10 @@ export default class DesignScheduleData extends Component {
 	async generateTableData(data) {
 		const { actions: { getDocument, } } = this.props;
 		let dataSource = [];
-		let i = 0;
-		data.map((item) => {
+		data.map((item,i) => {
 			getDocument({ code: item.code }).then(single => {
-				i++;
 				let temp = {
-					key:i,
+					key:i+1,
 					code: single.extra_params.code,
 					volume: single.extra_params.volume,
 					name: single.extra_params.name,
@@ -72,7 +70,7 @@ export default class DesignScheduleData extends Component {
 					delcode: single.code,
 				}
 				dataSource.push(temp);
-				this.setState({ dataSource });
+				this.setState({ dataSource ,showDat:dataSource});
 			})
 		})
 	}
@@ -239,8 +237,15 @@ export default class DesignScheduleData extends Component {
 						className="btn"
 						style={{ width: "200px" }}
 						placeholder="输入搜索条件"
-						onSearch = {
-							console.log(value)
+						onSearch={text => {
+							let result = this.state.dataSource.filter(data => {
+								return data.project.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.name.indexOf(text) >= 0 || data.major.indexOf(text) >= 0;
+							})
+							if (text === '') {
+								result = this.state.dataSource
+							}
+							this.setState({ showDat: result });
+						}
 						}
 					/>
 				</Row>
@@ -248,11 +253,12 @@ export default class DesignScheduleData extends Component {
 					<Col >
 						<Table
 							columns={this.columns}
-							dataSource={this.state.dataSource}
+							dataSource={this.state.showDat}
 							bordered
 							rowSelection={rowSelection}
 							style={{ height: 380, marginTop: 20 }}
 							pagination={{ pageSize: 10 }}
+							rowKey='key'
 						/>
 
 					</Col>

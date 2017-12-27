@@ -37,7 +37,6 @@ export default class DesignChangeCheck extends Component {
         const { wk } = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
         this.setState({ dataSource, wk });
-        console.log(dataSource);
     }
 
     componentWillReceiveProps(props) {
