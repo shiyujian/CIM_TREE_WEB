@@ -60,6 +60,7 @@ export default class PriceModifyModal extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
+        debugger;
 		this.props.onok(this.state.dataSource,per)
     }
     删除

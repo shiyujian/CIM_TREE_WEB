@@ -14,10 +14,6 @@ export default class VedioUpload extends Component{
         }
     }
 
-    componentWillReceiveProps(){    //初始化table的数据
-        this.state.dataSource = [];
-    }
-
     render(){
         const {dataSource} = this.state;
         const {actions, uploadModal, closeModal} = this.props;
@@ -27,7 +23,7 @@ export default class VedioUpload extends Component{
              width={1280}
              title={"视频监控上传"}
              visible={uploadModal}
-             onCancel={closeModal}
+             onCancel={()=>closeModal("uploadModal")}
              footer={null}
             >
                 {/* <Row type='flex' justify='center' >
@@ -62,7 +58,7 @@ export default class VedioUpload extends Component{
 
         await launchProcess({dataSource,selectUser,name},{createWorkflow,logWorkflowEvent});
         message.success("上传数据成功");
-        closeModal();
+        closeModal("uploadModal");
     }
 }
 
