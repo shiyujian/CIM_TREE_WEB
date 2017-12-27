@@ -270,7 +270,7 @@ export default class Addition extends Component {
         deleteStaticFile({ id: id })
         dataSource[index] = {
 
-            file: {
+            file: {         // 有问题
             }
         }
         this.setState(dataSource)
@@ -281,7 +281,7 @@ export default class Addition extends Component {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
     beforeUploadPicFile = (index, name, file) => {
-        // 上传到静态服务器
+         // 上传到静态服务器
         const fileName = file.name;
         let { dataSource, unit, project } = this.state;
         let temp = fileName.split(".")[0]
@@ -317,19 +317,7 @@ export default class Addition extends Component {
                 download_url: filedata.download_url,
                 mime_type: resp.mime_type
             };
-            let unitProject = {
-                name: unit.name,
-                code: unit.code,
-                obj_type: unit.obj_type
-            }
-            let projectt = {
-                name: project.name,
-                code: project.code,
-                obj_type: project.obj_type
-            }
             dataSource[index][name] = attachment;
-            dataSource[index]['unit'] = unitProject;
-            dataSource[index]['project'] = projectt;
             this.setState({ dataSource });
         });
         return false;
@@ -353,9 +341,7 @@ export default class Addition extends Component {
         const columns = [
             {
                 title: '序号',
-                render: (text, record, index) => {
-                    return index + 1
-                }
+                dataIndex:'index'
             }, {
                 title: '模型编码',
                 dataIndex: 'coding'

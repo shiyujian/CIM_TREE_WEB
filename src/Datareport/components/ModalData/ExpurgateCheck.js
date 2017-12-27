@@ -35,6 +35,7 @@ export default class ExpurgateCheck extends Component {
     }
     async componentDidMount() {
         const { wk } = this.props
+        console.log('wk',this.props)
         let dataSources = JSON.parse(wk.subject[0].data)
         console.log('asdfxsfdgg:',dataSources)
         let dataSource = [];
@@ -59,7 +60,7 @@ export default class ExpurgateCheck extends Component {
     //通过
     async passon() {
         const { dataSource, wk, topDir } = this.state;
-        console.log('da',dataSource)
+        
         const { actions: {
             logWorkflowEvent,
             delDocList
@@ -78,6 +79,7 @@ export default class ExpurgateCheck extends Component {
         dataSource.map(item=>{
             docCode.push(item.code);
         })
+        console.log('doc:',docCode)
        
 
         let rst = await delDocList({}, { code_list: docCode });
@@ -103,11 +105,9 @@ export default class ExpurgateCheck extends Component {
         this.setState({ option: e.target.value })
     }
     render() {
-        console.log('wadsdf', this.state.dataSource)
-
         const columns = [{
             title: '序号',
-            dataIndex: 'numbers',
+            dataIndex: 'index',
             render: (text, record, index) => {
                 return index + 1
             }
