@@ -97,7 +97,6 @@ export default class ToggleModalUpdate extends Component{
                     projects,
                     defaultPro: rst.children[0].name
                 })
-                console.log("this.state.projects",this.state.projects);
             }
         }) 
         this.setState({dataSource:updateOrg})
@@ -105,7 +104,6 @@ export default class ToggleModalUpdate extends Component{
         updateOrg.map(item => {
             item.extra_params.project.map(it => {
                 getUnit({code:it.split("--")[0]}).then(rst => {
-                    console.log("rst:",rst);
                     units.push(...rst.children);
                     this.setState({
                         units:units
@@ -142,7 +140,6 @@ export default class ToggleModalUpdate extends Component{
         width:"15%",
         height:"64px",
         render:(text, record, index) => {
-
             return (
                 <TreeSelect value={record.selectPro || record.extra_params.project} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
@@ -160,7 +157,6 @@ export default class ToggleModalUpdate extends Component{
                             })
                         })
                         this.setState({units})
-                        console.log("this.state.units",this.state.units);
                     })
                     this.forceUpdate();
 
