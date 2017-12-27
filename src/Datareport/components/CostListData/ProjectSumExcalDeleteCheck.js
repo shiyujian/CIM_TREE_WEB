@@ -99,8 +99,11 @@ export default class ProjectSumExcalDeleteCheck extends Component {
     onChange(e){
         this.setState({option:e.target.value})
     }
+    cancel() {
+        this.props.closeModal("dr_qua_cckk_delate_visible", false);
+      }
 	render() {
-        console.log(this.state.dataSource)
+      
         const columns = [
             {
                 title: "序号",
@@ -141,7 +144,9 @@ export default class ProjectSumExcalDeleteCheck extends Component {
             visible={true}
             width= {1280}
 			footer={null}
-			maskClosable={false}>
+			maskClosable={false}
+            onCancel={this.cancel.bind(this)}>
+      
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
