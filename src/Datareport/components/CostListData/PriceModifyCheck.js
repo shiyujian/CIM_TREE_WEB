@@ -104,7 +104,7 @@ export default class PriceModifyCheck extends Component {
        }
     //radio变化
     onChange(e){
-        this.setState({opinion:e.target.value})
+        this.setState({option:e.target.value})
     }
 
     cancel() {

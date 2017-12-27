@@ -184,7 +184,7 @@ export default class PriceListCheck extends Component {
     }
     //radio变化
     onChange(e){
-        this.setState({opinion:e.target.value})
+        this.setState({option:e.target.value})
     }
 
     //删除
