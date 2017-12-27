@@ -18,6 +18,9 @@ export default class TableUnit extends Component {
 		let { getProjectAcD3, getDocByCodeList, getDocByCodeSearcher } = this.props.actions
 		let projTree = await getProjectAcD3();
 		let units = projTree.children.reduce((previewArr, currentProj) => {
+			currentProj.children.forEach(dw=>{
+				dw.fatherName = currentProj.name;
+			});
 			return previewArr.concat(currentProj.children);
 		}, []);
 		let docSet = {};
@@ -135,6 +138,10 @@ export default class TableUnit extends Component {
 		title: '单位工程名称',
 		dataIndex: 'name',
 		key: 'Name',
+	}, {
+		title: '所属项目名称',
+		dataIndex: 'fatherName',
+		key: 'fatherName',
 	},
 	{
 		title: '项目类型',
