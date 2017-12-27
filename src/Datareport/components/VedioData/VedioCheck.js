@@ -11,8 +11,8 @@ import Preview from '../../../_platform/components/layout/Preview';
 import VedioTable from './VedioTable';
 import moment from 'moment';
 
-import {actions} from '../../store/safety';
-
+import {actions} from '../../store/vedioData';
+import {throughProcess} from './commonFunc';
 
 @connect(
 	state => {
@@ -50,12 +50,12 @@ export default class VedioCheck extends Component {
     }
 
     render() {
-        const {wk} = this.props,
+        const {wk,type} = this.props,
             dataSource = JSON.parse(wk.subject[0].data);
 
 		return (
             <Modal
-			title="视频监控审批表"
+			title={modalTitle[type]}
             visible={true}
             width= {1280}
 			footer={null}
@@ -83,7 +83,7 @@ export default class VedioCheck extends Component {
                         </Button>
                     </Col>
                     <Col span={2} push={14}>
-                        <Button type='primary' onClick={this.submit.bind(this)}>
+                        <Button type='primary' onClick={this.submit}>
                             确认提交
                         </Button>
                         <Preview />
@@ -106,23 +106,51 @@ export default class VedioCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("safety_vedioCheck_visible",false)    //selfcare use
-        message.info("操作成功");        
+        const {type} = this.props;
+        this.props.closeModal(modalName[type],false)    //selfcare use
+        message.info("操作成功"); 
     }
-
+    
     passon = async ()=>{ //通过
-        const {wk} = this.props,
+        const {wk,type} = this.props,
             dataSource = JSON.parse(wk.subject[0].data),
-            {topDir} = this.state,
             {actions:{
                 logWorkflowEvent,
+            }} = this.props;
+
+        // send workflow
+        await throughProcess(wk,{logWorkflowEvent});
+        
+        /* const  {id,username,name:person_name,code:person_code} = getUser(),
+            executor = {id,username,person_name,person_code};
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor,attachment:null}); */
+
+        switch(type){
+            case "create":
+                this.createPassion(dataSource);
+            break;
+            case "strike":
+                const {actions:{deleteDocument}} = this.props;
+                const all = dataSource.map(item => {
+                    return deleteDocument({code:item.code})
+                });
+                Promise.all(all).then(rst => {
+                    console.log(rst)
+                    message.success('删除文档成功！');
+                })
+            break;
+        }
+    }
+    createPassion = async (dataSource)=>{
+        const {actions:{
                 addDocList,
                 getScheduleDir,
                 postScheduleDir,
                 getWorkpackagesByCode
-            }} = this.props;
+            }} = this.props,
+            {topDir} = this.state;
+
         const unitCode = JSON.parse(dataSource[0].value[1]).code,
-            //unitCode = 1112,    //需修改
             scheduleDircode = 'datareport_safety_vediodata'; //I'm unique
         let dir = await getScheduleDir({code:scheduleDircode});
         if(!dir.obj_type){  //no such directory
@@ -141,23 +169,16 @@ export default class VedioCheck extends Component {
 
             dir = await postScheduleDir({},postDirData);
         }
-
-        // send workflow
-        const  {id,username,name:person_name,code:person_code} = getUser(),
-            executor = {id,username,person_name,person_code};
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor,attachment:null});
-
         const docData = dataSource.map(item =>{ //prepare the data which will store in database
-            const {cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,value} = item,
-                extra_params = {cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,value};
-
+            const code = 'vedioData'+moment().format("YYYYMMDDHHmmss")+item.index;  //makesure code is unique
+            delete item.index;
             return {
-                code:'vedioData'+moment().format("YYYYMMDDHHmmss")+item.index,  //makesure code is unique
-                name:cameraName,
+                code,
+                name:item.cameraName,
                 obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},
-                extra_params
+                extra_params:{...item}
             }
         })
 
@@ -174,4 +195,13 @@ export default class VedioCheck extends Component {
         const {actions:{deleteWorkflow}} = this.props
         await deleteWorkflow({pk:wk.id})
     }
+}
+
+const modalTitle = {
+    create: '视频监控数据录入审批表',
+    strike: '视频监控数据删除审核表'
+}
+const modalName = {
+    create: 'safety_vedioCheck_visible',
+    strike: 'safety_vedioDeleteCheck_visible'
 }

@@ -123,7 +123,7 @@ export default class HiddenDangerCheck extends Component {
         dataSource.map(item=>{
             i++;
             docData.push({
-                code:'safetydoc'+moment().format("YYYYMMDDHHmmss")+i,
+                code:'hiddenDanger'+moment().format("YYYYMMDDHHmmss")+i,
                 name:item.file.name,
                 obj_type:"C_DOC",
                 status:'A',

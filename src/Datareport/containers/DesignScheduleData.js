@@ -6,7 +6,7 @@ import { getUser } from '_platform/auth';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 import { Row, Col, Table, Input, Button, message } from 'antd';
-import { DesignModal, DesignDel,DesignChange } from '../components/ScheduleData';
+import { DesignModal, DesignDel, DesignChange } from '../components/ScheduleData';
 import './quality.less';
 import { getNextStates } from '_platform/components/Progress/util';
 import moment from 'moment';
@@ -27,6 +27,8 @@ export default class DesignScheduleData extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
+			totalData:null,
+			loading: false,
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			setAddVisiable: false,
@@ -52,9 +54,12 @@ export default class DesignScheduleData extends Component {
 	async generateTableData(data) {
 		const { actions: { getDocument, } } = this.props;
 		let dataSource = [];
-		data.map(item => {
+		let i = 0;
+		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
+				i++
 				let temp = {
+					key:i,
 					code: single.extra_params.code,
 					volume: single.extra_params.volume,
 					name: single.extra_params.name,
@@ -64,23 +69,18 @@ export default class DesignScheduleData extends Component {
 					factovertime: single.extra_params.factovertime,
 					designunit: single.extra_params.designunit,
 					uploads: single.extra_params.uploads,
-					delcode:single.code,
+					delcode: single.code,
 				}
 				dataSource.push(temp);
-				this.setState({ dataSource });
+				this.setState({ dataSource ,showDat:dataSource});
 			})
 		})
 	}
 	goCancel = () => {
 		this.setState({ setAddVisiable: false, setDeleteVisiable: false, setEditVisiable: false });
 	}
-	onSelectChange = (selectedRowKeys) => {
-		const { dataSource } = this.state;
-		let dataSourceSelected = [];
-		for (let i = 0; i < selectedRowKeys.length; i++) {
-			dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
-		}
-		this.setState({ selectedRowKeys, dataSourceSelected });
+	onSelectChange = (selectedRowKeys,selectedRows) => {
+        this.setState({selectedRowKeys,dataSourceSelected:selectedRows});
 	}
 	// 批量录入流程
 	setAddData = (data, participants) => {
@@ -149,7 +149,7 @@ export default class DesignScheduleData extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起填报',
+					note: '申请删除',
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -163,50 +163,60 @@ export default class DesignScheduleData extends Component {
 		})
 	}
 	// 批量变更流程
-	setEditData = (data,participants) =>{
-        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+	setEditData = (data, participants) => {
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
-			id:getUser().id,
-			username:getUser().username,
-			person_name:getUser().person_name,
-			person_code:getUser().person_code,
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
 		}
 		let postdata = {
-			name:"设计进度批量变更",
-			code:WORKFLOW_CODE["数据报送流程"],
-			description:"设计进度批量变更",
-			subject:[{
-				data:JSON.stringify(data)
+			name: "设计进度批量变更",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "设计进度批量变更",
+			subject: [{
+				data: JSON.stringify(data)
 			}],
-			creator:creator,
-			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
-			deadline:null,
-			status:"2"
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
 		}
-		createWorkflow({},postdata).then((rst) => {
-			let nextStates =  getNextStates(rst,rst.current[0].id);
-            logWorkflowEvent({pk:rst.id},
-                {
-                    state:rst.current[0].id,
-                    action:'提交',
-                    note:'发起填报',
-                    executor:creator,
-                    next_states:[{
-                        participants:[participants],
-                        remark:"",
-                        state:nextStates[0].to_state[0].id,
-                    }],
-                    attachment:null}).then(() => {
-						this.setState({setEditVisiable:false})						
-					})
+		createWorkflow({}, postdata).then((rst) => {
+			let nextStates = getNextStates(rst, rst.current[0].id);
+			logWorkflowEvent({ pk: rst.id },
+				{
+					state: rst.current[0].id,
+					action: '提交',
+					note: '申请变更',
+					executor: creator,
+					next_states: [{
+						participants: [participants],
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					attachment: null
+				}).then(() => {
+					this.setState({ setEditVisiable: false })
+				})
 		})
-    }
+	}
 	onBtnClick = (type) => {
+		const {selectedRowKeys} = this.state
 		if (type === "add") {
 			this.setState({ setAddVisiable: true });
 		} else if (type === "delete") {
+			if (selectedRowKeys.length === 0) {
+				message.info('请先选择数据')
+				return
+			}
 			this.setState({ setDeleteVisiable: true });
 		} else if (type === "edit") {
+			if (selectedRowKeys.length === 0) {
+				message.info('请先选择数据')
+				return
+			}
 			this.setState({ setEditVisiable: true });
 		}
 	}
@@ -229,22 +239,33 @@ export default class DesignScheduleData extends Component {
 						className="btn"
 						style={{ width: "200px" }}
 						placeholder="输入搜索条件"
+						onSearch={text => {
+							let result = this.state.dataSource.filter(data => {
+								return data.project.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.name.indexOf(text) >= 0 || data.major.indexOf(text) >= 0;
+							})
+							if (text === '') {
+								result = this.state.dataSource
+							}
+							this.setState({ showDat: result });
+						}
+						}
 					/>
 				</Row>
 				<Row >
 					<Col >
 						<Table
 							columns={this.columns}
-							dataSource={this.state.dataSource}
+							dataSource={this.state.showDat}
 							bordered
 							rowSelection={rowSelection}
 							style={{ height: 380, marginTop: 20 }}
 							pagination={{ pageSize: 10 }}
+							rowKey='key'
 						/>
 
 					</Col>
 				</Row>
-				<Preview/>
+				<Preview />
 				{
 					this.state.setAddVisiable &&
 					<DesignModal {...this.props} oncancel={this.goCancel.bind(this)} onok={this.setAddData.bind(this)} />
@@ -262,35 +283,43 @@ export default class DesignScheduleData extends Component {
 	}
 	columns = [{
 		title: '序号',
-		render: (text, record, index) => {
-			return index + 1
-		}
+		dataIndex:"key",
+		key:"key"
 	}, {
 		title: '编码',
 		dataIndex: 'code',
+		key:'code',
 	}, {
 		title: '卷册',
 		dataIndex: 'volume',
+		key:'volume',
 	}, {
 		title: '名称',
 		dataIndex: 'name',
+		key:'name',
 	}, {
 		title: '项目/子项目',
 		dataIndex: 'project',
+		key:'project',
 	}, {
 		title: '单位工程',
 		dataIndex: 'unit',
+		key:'unit',
 	}, {
 		title: '专业',
 		dataIndex: 'major',
+		key:'major',
 	}, {
 		title: '实际供图时间',
 		dataIndex: 'factovertime',
+		key:'factovertime',
 	}, {
 		title: '设计单位',
 		dataIndex: 'designunit',
+		key:'designunit',
 	}, {
 		title: '上传人员',
 		dataIndex: 'uploads',
+		key:'uploads',
 	}];
 }

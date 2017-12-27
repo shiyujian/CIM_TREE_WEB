@@ -12,7 +12,7 @@ export default class SumPlanChange extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dataSource: this.props.dataSourceSelected,
+            dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
             project:{},
@@ -20,7 +20,25 @@ export default class SumPlanChange extends Component {
             options:[],
         };
     }
-
+    componentWillMount(){
+        let dataSource = this.props.dataSourceSelected;
+        let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+				subproject: item.subproject,
+				unit: item.unit,
+				nodetarget: item.nodetarget,
+				completiontime: item.completiontime,
+				summoney: item.summoney,
+				ratio: item.ratio,
+				remarks: item.remarks,
+				code:item.code
+            }
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource})        
+    }
     componentDidMount(){
         const {actions:{getAllUsers,getProjectTree}} = this.props;
         getAllUsers().then(rst => {
@@ -61,26 +79,36 @@ export default class SumPlanChange extends Component {
     delete(index){
         let {dataSource} = this.state;
         dataSource.splice(index,1);
-        this.setState({dataSource});
+        let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+				subproject: item.subproject,
+				unit: item.unit,
+				nodetarget: item.nodetarget,
+				completiontime: item.completiontime,
+				summoney: item.summoney,
+				ratio: item.ratio,
+				remarks: item.remarks,
+				code:item.code
+            }
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource})   
     }
 
     //table input 输入
-    tableDataChange(index, key ,e ){
+    tableDataChange(index, key ,e ){    
 		const { dataSource } = this.state;
 		dataSource[index][key] = e.target['value'];
 	  	this.setState({dataSource});
     }
 
     render() {
-        console.log('this.state',this.state);
         const columns = [
             {
                 title: "序号",
-                dataIndex: "code",
-                width: "10%",
-                render:(text,record,index)=>{
-                  return index+1
-                }
+                dataIndex: "key"
               },
               ,
               {
@@ -95,35 +123,35 @@ export default class SumPlanChange extends Component {
                 title: "工作节点目标",
                 dataIndex: "nodetarget",
                 render:(text,record,index)=>(
-                    <Input value={this.state.dataSource[index]['nodetarget']} onChange={this.tableDataChange.bind(this,index,'nodetarget')}/>
+                    <Input value={this.state.dataSource[record.key-1]['nodetarget']} onChange={this.tableDataChange.bind(this,record.key-1,'nodetarget')}/>
                 )
               },
               {
                 title: "完成时间",
                 dataIndex: "completiontime",
                 render:(text,record,index)=>(
-                    <Input value={this.state.dataSource[index]['completiontime']} onChange={this.tableDataChange.bind(this,index,'completiontime')}/>
+                    <Input value={this.state.dataSource[record.key-1]['completiontime']} onChange={this.tableDataChange.bind(this,record.key-1,'completiontime')}/>
                 )
               },
               {
                 title: "支付金额（万元）",
                 dataIndex: "summoney",
                 render:(text,record,index)=>(
-                    <Input value={this.state.dataSource[index]['summoney']} onChange={this.tableDataChange.bind(this,index,'summoney')}/>
+                    <Input value={this.state.dataSource[record.key-1]['summoney']} onChange={this.tableDataChange.bind(this,record.key-1,'summoney')}/>
                 )
               },
               {
                 title: "累计占比",
                 dataIndex: "ratio",
                 render:(text,record,index)=>(
-                    <Input value={this.state.dataSource[index]['ratio']} onChange={this.tableDataChange.bind(this,index,'ratio')}/>
+                    <Input value={this.state.dataSource[record.key-1]['ratio']} onChange={this.tableDataChange.bind(this,record.key-1,'ratio')}/>
                 )
               },
               {
                 title: "备注",
                 dataIndex: "remarks",
                 render:(text,record,index)=>(
-                    <Input value={this.state.dataSource[index]['remarks']} onChange={this.tableDataChange.bind(this,index,'remarks')}/>
+                    <Input value={this.state.dataSource[record.key-1]['remarks']} onChange={this.tableDataChange.bind(this,record.key-1,'remarks')}/>
                 )
               },
               {
@@ -133,7 +161,7 @@ export default class SumPlanChange extends Component {
                     <Popconfirm
                       placement="leftTop"
                       title="确定删除吗？"
-                      onConfirm={this.delete.bind(this, index)}
+                      onConfirm={this.delete.bind(this, record.key-1)}
                       okText="确认"
                       cancelText="取消"
                     >

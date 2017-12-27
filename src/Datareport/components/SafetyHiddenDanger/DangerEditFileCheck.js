@@ -60,7 +60,7 @@ export default class DangerEditFileCheck extends Component {
         const {dataSource,wk,topDir} = this.state;
         const {actions:{
             logWorkflowEvent,
-            delDocList
+            putDocument
         }} = this.props;
         
         // send workflow
@@ -72,12 +72,40 @@ export default class DangerEditFileCheck extends Component {
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         
-        const docCode = [];
+        const docData = [];
         dataSource.map(item=>{
-            docCode.push(item.docCode);
-        })
-        
-        let rst = await delDocList({},{code_list:docCode});
+            docData.push({
+                code:item.docCode,
+                status:'A',
+                version: 'A',
+                "basic_params": {
+                    "files": [
+                        {
+                          "a_file": item.file.a_file,
+                          "name": item.file.name,
+                          "download_url": item.file.download_url,
+                          "misc": "file",
+                          "mime_type": item.file.mime_type
+                        },
+                    ]
+                  },
+                extra_params:{
+                    code:item.code,
+                    wbs:item.wbs,
+                    type:item.type,
+                    upTime:item.upTime,
+                    checkTime:item.checkTime,
+                    editTime:item.editTime,
+                    unit:item.unit,
+                    project:item.projectName,
+                    result:item.result,
+                    deadline:item.deadline,
+                    editResult:item.editResult,
+                    resUnit:item.resUnit
+                }
+            })
+        });
+        let rst = await putDocument({},{data_list:docData});
         if(rst.result){
             notification.success({
                 message: '删除文档成功！',
@@ -189,6 +217,7 @@ export default class DangerEditFileCheck extends Component {
 			title="安全隐患删除审批表"
             visible={true}
             width= {1280}
+            key={this.props.akey}
 			footer={null}
 			maskClosable={false}>
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>

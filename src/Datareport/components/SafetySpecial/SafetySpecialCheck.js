@@ -7,7 +7,6 @@ import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } fr
 import WorkflowHistory from '../WorkflowHistory';
 import { getUser } from '_platform/auth';
 import { actions } from '../../store/safety';
-import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 const { RangePicker } = DatePicker;
 const RadioGroup = Radio.Group;
@@ -274,11 +273,12 @@ export default class SafetySpecialCheck extends Component {
         return (
             <Modal
                 title="安全信息审批表"
-                // key={Math.random()}
                 visible={true}
                 width={1280}
                 footer={null}
-                maskClosable={false}>
+                maskClosable={false}
+                onCancel={this.cancel.bind(this)}
+                >
                 <div>
                     <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
@@ -306,7 +306,6 @@ export default class SafetySpecialCheck extends Component {
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {

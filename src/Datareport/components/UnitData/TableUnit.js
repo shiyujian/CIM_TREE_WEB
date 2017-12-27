@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Icon } from 'antd';
+import { Table, Button, Popconfirm, message, Input, Icon ,Spin} from 'antd';
 import style from './TableUnit.css';
 import DelModal from './DelModal'
+import ChangeUNIT from './SubmitChangeModal'
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
 const Search = Input.Search;
+
 export default class TableUnit extends Component {
 	constructor(props) {
 		super(props);
@@ -11,9 +14,13 @@ export default class TableUnit extends Component {
 		}
 	}
 	async componentDidMount() {
+		this.setState({spinning:true});
 		let { getProjectAcD3, getDocByCodeList, getDocByCodeSearcher } = this.props.actions
 		let projTree = await getProjectAcD3();
 		let units = projTree.children.reduce((previewArr, currentProj) => {
+			currentProj.children.forEach(dw=>{
+				dw.fatherName = currentProj.name;
+			});
 			return previewArr.concat(currentProj.children);
 		}, []);
 		let docSet = {};
@@ -29,7 +36,7 @@ export default class TableUnit extends Component {
 			}
 			return { ...unit, ...unit.extra_params };
 		});
-		this.setState({ units: units, showDs: units });
+		this.setState({ units: units, showDs: units,spinning:false });
 	}
 	render() {
 		let rowSelection = {
@@ -47,10 +54,20 @@ export default class TableUnit extends Component {
 		};
 		return (
 			<div>
+			<Spin spinning = {this.state.spinning}>
 				<div>
 					<Button style={{ marginRight: "10px" }} className={style.button}>模板下载</Button>
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
-					<Button className={style.button}>申请变更</Button>
+					<Button className={style.button}
+						onClick={() => {
+							if (this.state.selectedRows && this.state.selectedRows.length > 0) {
+								this.setState({ changing: true });
+								return;
+							}
+							message.warning('请至少选择一条');
+						}
+						}
+					>申请变更</Button>
 					<Button onClick={() => {
 						if (this.state.selectedRows && this.state.selectedRows.length > 0) {
 							this.setState({ deling: true });
@@ -58,7 +75,7 @@ export default class TableUnit extends Component {
 						}
 						message.warning('请至少选择一条');
 					}} className={style.button}>申请删除</Button>
-					<Button className={style.button}>导出表格</Button>
+					<Button onClick = {this.getExcel.bind(this)} className={style.button}>导出表格</Button>
 					<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容"
 						onSearch={
 							(text) => {
@@ -82,16 +99,25 @@ export default class TableUnit extends Component {
 				>
 				</Table>
 				{
-					this.state.deling &&
-					<DelModal
+					this.state.changing &&
+					<ChangeUNIT
 						onCancel={() => {
-							this.setState({ deling: false });
+							this.setState({ changing: false });
 						}}
 						dataSource={this.state.selectedRows}
 						actions={this.props.actions}
 					/>
 				}
-
+				{
+					this.state.deling &&
+					<DelModal
+						onCancel={() => {
+							this.setState({ deling: false });
+						}}
+						actions={this.props.actions}
+					/>
+				}
+				</Spin>
 			</div>
 		)
 	}
@@ -102,7 +128,42 @@ export default class TableUnit extends Component {
 
 	}
 
-
+	createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+	getExcel(){
+		console.log(this.state.showDs);
+		let exhead = ['单位工程编码','单位工程名称','所属项目名称','项目类型','项目阶段','单位红线坐标','计划开工日期','计划竣工日期','简介','建设单位','附件'];
+		let rows = [exhead];
+		let getcoordinate = (param)=>{
+			if(typeof param !=='string'){
+				return'';
+			}
+			if((!param||param.length<=0)){
+				return ''
+			}else{
+				return param;
+			}
+		}
+		let excontent =this.state.showDs.map(data=>{
+			return [data.code,data.name,data.fatherName,data.projType||'',data.stage||'',getcoordinate(data.coordinate)
+			,data.stime||'',data.etime||'',data.intro||'',data.rsp_orgName?data.rsp_orgName[0]:'',data.files?data.files[0].name:''];
+		});
+		rows = rows.concat(excontent);
+		const {actions:{jsonToExcel}} = this.props;
+		console.log(rows)
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            console.log(rst);
+            this.createLink('单位工程信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
+	}
 	columns = [{
 		title: '单位工程编码',
 		dataIndex: 'code',
@@ -111,6 +172,10 @@ export default class TableUnit extends Component {
 		title: '单位工程名称',
 		dataIndex: 'name',
 		key: 'Name',
+	}, {
+		title: '所属项目名称',
+		dataIndex: 'fatherName',
+		key: 'fatherName',
 	},
 	{
 		title: '项目类型',

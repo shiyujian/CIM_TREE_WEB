@@ -80,8 +80,6 @@ export default class ProjectSum extends Component {
                 arrAir.push(getQuantitiesCode({code:dataList[i][1]}));
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
-                    // subproject: dataList[i][1] ? dataList[i][1] : '',
-                    // unit: dataList[i][2] ? dataList[i][2] : '',
                     projectcoding: dataList[i][1] ? dataList[i][1] : '',
                     projectname: dataList[i][2] ? dataList[i][2] : '',
                     company: dataList[i][3] ? dataList[i][3] : '',
@@ -104,7 +102,7 @@ export default class ProjectSum extends Component {
 
                 })
             }
-            console.log('arrAir',arrAir)
+           
         //     debugger
            Promise.all(arrAir).then((res) =>{
                res.map((o,index) => {
@@ -114,7 +112,7 @@ export default class ProjectSum extends Component {
                })
                this.setState({dataSource});  
            })
-          
+        this.setState({dataSource});  
         }
       
     }
@@ -193,7 +191,7 @@ export default class ProjectSum extends Component {
             message.info(`有数据不正确`)
             return
         }
-        console.log('temp',temp)
+       
 
         const { project, unit } = this.state;
         if (!project.name) {

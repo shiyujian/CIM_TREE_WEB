@@ -1,114 +1,133 @@
 import React, { Component } from 'react';
-import { Modal, Input, Form, Button, message, Table, Radio, Row, Col } from 'antd';
+import { Modal, Input, Form, Button, message, Table, Radio, Row, Col, Select } from 'antd';
 import { CODE_PROJECT } from '_platform/api';
 import '../index.less'; 
+import {getUser} from '_platform/auth';
+import {getNextStates} from '_platform/components/Progress/util';
+import {WORKFLOW_CODE} from '_platform/api'
 
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
+var moment = require('moment');
 
 export default class PersonModify extends Component {
+	constructor(props){
+        super(props);
+        this.state = {
+            dataSource: [],
+            users: [],
+            projects: [],
+            checkers: [],
+            defaultPro: "",
+            defaultchecker: "",
+            units:[],
+            selectPro:[],
+            selectUnit:[]
+        }
+    }
+
+    componentDidMount(){
+        const {Modvisible, modifyPer, actions:{getAllUsers, getProjects}} = this.props;
+        getAllUsers().then(rst => {
+            let users = [];
+            if (rst.length) {
+                let checkers = rst.map(o => {
+                    return (
+                        <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    )
+                })
+                this.setState({
+                    checkers,
+                    defaultchecker: rst[0].account.person_name
+                })
+            }
+        });
+        this.setState({
+            dataSource:modifyPer
+        })
+        console.log('dataSource',this.setState)
+    }
 
 	render() {
-		const {Modvisible} = this.props;
-		const columns = [ {
-	        title: '人员编码',
-	        dataIndex: 'code',
-	        key: 'Code',
-	      }, {
-	        title: '姓名',
-	        dataIndex: 'name',
-	        key: 'Name',
-	      },{
-	        title: '所在组织机构单位',
-	        render:(record) => {
-	            return (
-	                <Select style={{width:"90%"}} value = {record.org || this.state.defaultPro} onSelect={ele => {
-	                    record.org = ele;
-	                    this.forceUpdate();
-	                }}>
-	                    {this.state.org}
-	                </Select>
-	            )
+		const {Modvisible, modifyPer} = this.props;
+		const columns = [{
+			title: '序号',
+			dataIndex: 'index',
+			key: 'Index',
+		}, {
+			title: '人员编码',
+			dataIndex: 'account.person_code',
+			key: 'Code',
+		}, {
+			title: '姓名',
+			dataIndex: 'account.person_name',
+			key: 'Name',
+			render:(text, record, index) =>{ 
+				console.log('record',record)
+	            return <Input value = {record.account.person_name || ""} onChange={ele => {
+	                record.account.person_name = ele.target.value
+	                this.forceUpdate();
+	            }}/>
 	        }
-	      },{
-	         title: '所属部门',
-	         dataIndex :'depart',
-	         key: 'Depart',
-	      },{
-	        title: '职务',
-	        dataIndex :'job',
-	        key: 'Job',
-	      },{
-	        title: '性别',
-	        dataIndex :'sex',
-	        key:'Sex'
-	      },{
-	        title: '手机号码',
-	        dataIndex :'tel',
-	        key:'Tel'
-	      },{
-	        title: '邮箱',
-	        dataIndex :'email',
-	        key:'Email'
-	      },{
-	        title:'二维码',
-	        key:'signature',
-	        render:(record) => (
-	            <Upload
-	                beforeUpload={this.beforeUploadPic.bind(this, record)}
-	            >
-	                <a>{record.signature ? record.signature.name : '点击上传'}</a>
-	            </Upload>
-	        )
-	      },{
-        title:'编辑',
-        dataIndex:'edit',
-        render:(record) => (
-            <Popconfirm
-                placement="leftTop"
-                title="确定删除吗？"
-                onConfirm={this.delete.bind(this)}
-                okText="确认"
-                cancelText="取消"
-            >
-                <a>删除</a>
-            </Popconfirm>
-        )
-    }]
+		}, {
+			title: '所在组织机构单位',
+			dataIndex: 'account.organization',
+			key: 'Org',
+		}, {
+			title: '所属部门',
+			dataIndex: 'account.org_code',
+			key: 'Depart',
+		}, {
+			title: '职务',
+			dataIndex: 'job',
+			key: 'Job',
+		}, {
+			title: '性别',
+			dataIndex: 'sex',
+			key: 'Sex'
+		}, {
+			title: '手机号码',
+			dataIndex: 'tel',
+			key: 'Tel'
+		}, {
+			title: '邮箱',
+			dataIndex: 'email',
+			key: 'Email'
+		}, {
+			title: '二维码',
+			dataIndex: 'account.person_signature_url',
+			key: 'Signature'
+		}]
 		
-		return(
-			<Modal
-				width = {1280}
-				visible={Modvisible}
-				onCancel = {this.cancel.bind(this)}
-			>
-				<Row style={{margin: '20px 0', textAlign: 'center'}}>
-					<h2>申请表变更页面</h2>
-				</Row>
-				<Row>
-					<Table
-						bordered
-						className = 'foresttable'
-						columns={columns}
-					/>
-				</Row>
-				<Row style={{marginTop: '20px'}}>
-					<Col span={2} push={22}>
-						<Button type="default">确认变更</Button>
-					</Col>
-				</Row>
-				<Row style={{marginBottom: '20px'}}>
-					<Col span={2}>
-						<span>变更原因：</span>
-					</Col>
-			    </Row>
-			    <Row style={{margin: '20px 0'}}>
-				    <Col>
-				    	<TextArea rows={2} />
-				    </Col>
-			    </Row>
-			</Modal>
-		)
+		return (
+            <Modal
+                onCancel={this.cancel.bind(this)}
+                title="项目变更申请表"
+                visible={Modvisible}
+                width={1280}
+                footer={null}
+                maskClosable={false}>
+                <Table
+                    columns={columns}
+                    bordered={true}
+                    dataSource={this.state.dataSource}
+                />
+                <span>
+                    审核人：
+                    <Select style={{ width: '200px' }} className="btn" onSelect={ele => {
+                        this.setState({ passer: JSON.parse(ele) })
+                    }} >
+                        {
+                            this.state.checkers || []
+                        }
+                    </Select>
+
+                </span>
+                <Button onClick = {this.onok.bind(this)} type='primary' >
+                    提交
+                </Button>
+            </Modal>
+        )
 	}
 
 	onChange = (e) => {
@@ -117,6 +136,23 @@ export default class PersonModify extends Component {
 	    	value: e.target.value,
 	    });
 	}
+
+	onok() {
+		console.log('passer', this.state.passer)
+        const { actions: { ModifyVisible } } = this.props;
+        if (!this.state.passer) {
+            message.error('审批人未选择');
+            return;
+        }
+        this.props.setDataUpdate(this.state.dataSource, this.state.passer);
+
+        ModifyVisible(false);
+    }
+
+	//删除
+    delete(){
+        
+    }
 
 	cancel() {
         const { actions: { ModifyVisible } } = this.props;

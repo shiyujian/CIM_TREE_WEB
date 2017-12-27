@@ -59,8 +59,8 @@ export default class SafetySpecialDeleteCheck extends Component {
     //通过
     async passon() {
         const { dataSource, wk, topDir } = this.state;
-        const { actions: { logWorkflowEvent, addDocList, getScheduleDir, postScheduleDir, getWorkpackagesByCode } } = this.props;
-      
+        const { actions: { logWorkflowEvent, addDocList, delDocList, getScheduleDir, postScheduleDir, getWorkpackagesByCode } } = this.props;
+
         // send workflow
         let executor = {};
         let person = getUser();
@@ -81,12 +81,11 @@ export default class SafetySpecialDeleteCheck extends Component {
             }
         );
         const docCode = [];
-        debugger;
-        dataSource.map(item=>{
+        // debugger;
+        dataSource.map(item => {
             docCode.push(item.codeId);
         })
-
-        let rst = await addDocList({}, { data_list: docCode });
+        let rst = await delDocList({}, { code_list: docCode });
         if (rst.result) {
             notification.success({
                 message: '删除文档成功！',
@@ -198,7 +197,10 @@ export default class SafetySpecialDeleteCheck extends Component {
                 visible={true}
                 width={1280}
                 footer={null}
-                maskClosable={false}>
+                maskClosable={false}
+                onCancel={this.cancel.bind(this)}
+            >
+
                 <div>
                     <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
@@ -217,9 +219,6 @@ export default class SafetySpecialDeleteCheck extends Component {
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={4}>
-                           申请删除原因：{this.state.dataSource[0].deleteInfo}
-                        </Col>
                         <Col span={2} push={14}>
                             <Button type='primary'>
                                 导出表格
@@ -232,6 +231,15 @@ export default class SafetySpecialDeleteCheck extends Component {
                             <Preview />
                         </Col>
                     </Row>
+                    {/* {
+                        this.state.dataSource[0].deleteInfo ? <Row>
+                            <Col span={4}>
+                                申请删除原因：{this.state.dataSource[0].deleteInfo}
+                            </Col>
+                        </Row>
+                            :
+                            ""
+                    } */}
                     {
                         this.state.wk && <WorkflowHistory wk={this.state.wk} />
                     }

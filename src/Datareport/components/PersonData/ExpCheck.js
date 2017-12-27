@@ -59,63 +59,19 @@ export default class ExpCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent,updateWpData,addDocList,putDocList,postPersonList,postAllUsersId,getOrgCode}} = this.props
+        const {actions:{deleteUserList,logWorkflowEvent,updateWpData,addDocList,putDocList,postPersonList,postAllUsersId,getOrgCode}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        let data_list = [];
-        
-        let promises = JSON.parse(wk.subject[0].data).map((o) => {
-            return getOrgCode({code: o.depart})
-        })
-        let rst = await Promise.all(promises);
-        dataSource.map((item, index) => {
-            console.log('item',item)
-            data_list.push({
-                "code": "" + item.code,
-                "name":item.name,
-                "basic_params":{
-                    "photo":item.signature.download_url,
-                    "signature":item.signature.a_file
-                },
-                "extra_params": {
-                    "depart": item.depart,
-                    "email":item.email,
-                    "job":item.job,
-                    "性别":item.sex,
-                    "电话":item.tel,
-                    "email":item.email
-                },
-                "obj_type":"C_PER",
-                "org":{
-                    "code":item.depart,
-                    "obj_type": "C_ORG",
-                    "pk": rst[index].pk,
-                    "rel_type": "member"
-                },
-                "title":"title",
-                "status": "A",
-                "version": "A",
-                "first_name":"",
-                "last_name":""
-            })                    
-        })
-        console.log('data_list',data_list)
-        postPersonList({},{data_list:data_list}).then(rst => {
-            console.log('rst', rst)
-            if (rst.result.length) {
-                message.success("审核成功");
-            }
-        })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
-        .then((rst) => {
-            let personId = rst.id;
-            postAllUsersId({id:personId})
-            .then((item) => {})
-        });
+        let dataList = this.state.dataSource.map((data) => {
+            console.log('data',data.id)
+            deleteUserList({pk:data.id}).then(rst => {
+            })
+        })
     }
     //不通过
     async reject(){
@@ -144,20 +100,24 @@ export default class ExpCheck extends Component {
         const {wk} = this.props;
         console.log("wk",wk);
         const columns = [{
+            title: '序号',
+            dataIndex: 'index',
+            key: 'Index',
+        }, {
             title: '人员编码',
-            dataIndex: 'code',
+            dataIndex: 'account.person_code',
             key: 'Code',
         }, {
             title: '姓名',
-            dataIndex: 'name',
+            dataIndex: 'account.person_name',
             key: 'Name',
         }, {
             title: '所在组织机构单位',
-            dataIndex: 'org',
+            dataIndex: 'account.organization',
             key: 'Org',
         }, {
             title: '所属部门',
-            dataIndex: 'depart',
+            dataIndex: 'account.org_code',
             key: 'Depart',
         }, {
             title: '职务',
@@ -177,13 +137,9 @@ export default class ExpCheck extends Component {
             key: 'Email'
         }, {
             title: '二维码',
-            render:(record) => {
-                console.log("record:",record);
-                return (
-                    <img style={{width:"60px"}} src = {record.signature.preview_url} />
-                )
-            }
-        }];
+            dataIndex: 'account.person_signature_url',
+            key: 'Signature'
+        }]
         return (
             <Modal
             title="人员信息删除审批表"

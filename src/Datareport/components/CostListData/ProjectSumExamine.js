@@ -84,12 +84,10 @@ export default class ProjectSumExamine extends Component {
             getQuantities,
             getSearcher
         } } = this.props;
-        // console.log('this.props',this.props)
-        //the unit in the dataSource array is same
+ 
         let unit = dataSource[0].unit;
         let project = dataSource[0].project;
         let code = 'ck';
-        //get workpackage by unit's code 
         let workpackage = await getWorkpackagesByCode({ code: unit.code });
 
         let postDirData = {
@@ -124,14 +122,16 @@ export default class ProjectSumExamine extends Component {
         const docData = [];
         let wplist = [];
         let i = 0;   //asure the code of every document only
+
         let jialist = await getSearcher({keyword:'priceListName'})
+        let pairMap = {};
         let pairs = jialist.result.map(item => {
-            return {
+            pairMap[item.extra_params.projectcoding] = {
                 projectcoding: item.extra_params.projectcoding,
                 rate: item.extra_params.rate
             }
         })
-
+       
         dataSource.map(item => {
             i++;
             docData.push({
@@ -155,28 +155,33 @@ export default class ProjectSumExamine extends Component {
 
             }) 
             //施工包批量
-            let myprojectcoding, mynumber;
+            // let myprojectcoding, mynumber;
+            // for(var i  = 0; i < pairs.length; i++) {
+            // //     console.log('pairs[i].projectcoding',pairs[i].projectcoding)
+            // //     console.log('item.projectcoding',item.projectcoding )
+            //     // if(pairs[i].projectcoding === item.projectcoding ) {
+            //     //     myprojectcoding = pairs[i].projectcoding;
+            //     //     mynumber =  pairs[i].rate;
+            //     //     break; 
+            //     // }
+            // }
 
-            for(var i  = 0; i < pairs.length; ++i) {
-                if(pairs[i].projectcoding === item.projectcoding) {
-                    myprojectcoding = pairs[i].projectcoding;
-                    mynumber =  pairs[i].rate;
-                    break; 
-                }
-            }
             wplist.push({
                 code: item.unit.code,
-                extra_params: {
-                    projectcoding: myprojectcoding,
-                    number: mynumber,
-                }
+                extra_params: pairMap[item.projectcoding]
+                // extra_params: {
+                //     projectcoding: myprojectcoding,
+                //     number: mynumber,
+                // }
             })
+            debugger;
         });
-        // debugger
+        // postDocData = docData.filter(item => item.wplist[0].extra_params.projectcoding)
+        
         let rst = await addDocList({}, { data_list: docData });
         await updateWpData({}, { data_list: wplist });
-          // wplist = wplist.filter(item => {
-        //     return !item.projectcoding && !item.mynumber
+        // wplist = wplist.filter(item => {
+        //     return !myprojectcoding && !mynumber
         // })
         // if(wplist.length) {
             

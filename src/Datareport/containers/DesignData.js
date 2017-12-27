@@ -5,7 +5,7 @@ import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/compo
 import {actions} from '../store/DesignData';
 import {actions as platformActions} from '_platform/store/global';
 import Preview from '../../_platform/components/layout/Preview';
-import {Table, Addition, Check, Modify, Expurgate} from '../components/DesignData';
+import {Table, Addition, Modify, Expurgate} from '../components/DesignData';
 import {Row,Col} from 'antd';
 @connect(
 	state => {
@@ -31,7 +31,7 @@ export default class DesignData extends Component {
 				<Addition {...this.props}/>
 				<Modify {...this.props}/>
 				<Expurgate {...this.props}/>
-				<Preview/>
+				
 			</div>
 		);
 	}

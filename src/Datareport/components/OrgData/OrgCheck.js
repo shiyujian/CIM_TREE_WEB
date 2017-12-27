@@ -95,43 +95,47 @@ export default class OrgCheck extends Component {
         })
         postOrgList({}, { data_list: data_list }).then(res => {
             dataSource.map((item, index) => {
-                item.selectPro.map(it => {
-                    let proCode = it.split("--")[0];
-                    // 取出项目中所的orgs
-                    getProject({code:proCode}).then(rstPro => {
-                        let pro_orgs = rstPro.response_orgs;
-                        let pk = res.result[index].pk
-                        pro_orgs.push({
-                            code:item.code,
-                            obj_type:"C_ORG",
-                            pk:pk
+                if (item.selectPro.length !== 0) {
+                    item.selectPro.map(it => {
+                        let proCode = it.split("--")[0];
+                        // 取出项目中所的orgs
+                        getProject({code:proCode}).then(rstPro => {
+                            let pro_orgs = rstPro.response_orgs;
+                            let pk = res.result[index].pk
+                            pro_orgs.push({
+                                code:item.code,
+                                obj_type:"C_ORG",
+                                pk:pk
+                            });
+                            putProject({ code: proCode }, {
+                                version: "A",
+                                response_orgs: pro_orgs
+                            }).then(rst => {
+                                console.log("rst:", rst);
+                            }) 
                         });
-                        putProject({ code: proCode }, {
-                            version: "A",
-                            response_orgs: pro_orgs
-                        }).then(rst => {
-                            console.log("rst:", rst);
-                        }) 
-                    });
-                }) 
-                item.selectUnit.map(it => {
-                    let unitCode = it.split("--")[0];
-                    getUnitAc({code:unitCode}).then(rstUnit => {
-                        let unit_orgs = rstUnit.response_orgs;
-                        let pk = res.result[index].pk
-                        unit_orgs.push({
-                            code:item.code,
-                            obj_type:"C_ORG",
-                            pk:pk
-                        });
-                        putUnit({ code: unitCode }, {
-                            version: "A",
-                            response_orgs: unit_orgs
-                        }).then(rst => {
-                            console.log("rst:", rst);
-                        }) 
+                    }) 
+                }
+                if (item.selectUnit.length !== 0) {
+                    item.selectUnit.map(it => {
+                        let unitCode = it.split("--")[0];
+                        getUnitAc({code:unitCode}).then(rstUnit => {
+                            let unit_orgs = rstUnit.response_orgs;
+                            let pk = res.result[index].pk
+                            unit_orgs.push({
+                                code:item.code,
+                                obj_type:"C_ORG",
+                                pk:pk
+                            });
+                            putUnit({ code: unitCode }, {
+                                version: "A",
+                                response_orgs: unit_orgs
+                            }).then(rst => {
+                                console.log("rst:", rst);
+                            }) 
+                        })
                     })
-                })
+                }
             })
         });
     }

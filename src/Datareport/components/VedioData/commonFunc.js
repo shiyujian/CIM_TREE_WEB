@@ -1,10 +1,15 @@
+import React from 'react';
+import {message, Select} from 'antd';
+const Option = Select.Option;
 import {getUser} from '_platform/auth';
 import {getNextStates} from '_platform/components/Progress/util';
-import {WORKFLOW_CODE} from '_platform/api.js'
-const moment = require('moment'); 
+import {WORKFLOW_CODE} from '_platform/api.js';
+import {FILE_API, USER_API} from '_platform/api';
+const moment = require('moment');
+//import {actions} from '../../store/vedioData';
 
 export const launchProcess = (data,actions)=>{  //发起流程
-    const {dataSource,selectUser,name} = data,
+    const {dataSource,selectUser,name,description=null} = data,
         {createWorkflow,logWorkflowEvent} = actions;
     
     const {id,username,person_name,person_code} = getUser(),
@@ -29,7 +34,7 @@ export const launchProcess = (data,actions)=>{  //发起流程
         logWorkflowEvent({pk:pk},{
             state:currentId,
             action:'提交',
-            note:'发起填报',
+            note:description?description:'发起填报',
             executor:creator,
             next_states:[{
                 participants:[selectUser],
@@ -41,11 +46,69 @@ export const launchProcess = (data,actions)=>{  //发起流程
     })
 }
 
-export const addSerialNumber = (data=[])=>{
+export const addSerialNumber = (data=[])=>{ //给数据添加序号
     let n = 1 ;
     return data.map(record =>{
         return Object.assign({},record,{
             index: n++
         })
     })
+}
+
+const myHeaders = new Headers();    //创建一个fetch请求头
+
+export const uploadFile = async (file)=>{   //上传文件返回文件的部分信息
+    const formdata = new FormData();
+
+    formdata.append('a_file', file);
+    formdata.append('name', file.name);
+    const myInit = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata
+    };
+
+    const resp = await (await fetch(`${FILE_API}/api/user/files/`,myInit)).json();
+    if (!resp || !resp.id) {
+        message.error('文件上传失败')
+        return;
+    };
+    let filedata = resp;
+    filedata.a_file = covertURLRelative(filedata.a_file);
+    filedata.download_url = covertURLRelative(filedata.a_file);
+
+    const {size,id,name,a_file,download_url,mime_type} = filedata;
+    return {
+        size,id, name, a_file ,download_url, mime_type,
+        status: 'done',
+        url: a_file
+    };
+}
+const covertURLRelative = (originUrl) => {
+    return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+}
+
+export const getAllUsers = async ()=>{
+    const myInit = {
+        method: 'GET',
+        headers: myHeaders
+    };
+
+    const resp = await (await fetch(`${USER_API}/users/`,myInit)).json();
+    
+    return resp.map(record=>{
+        const {id,username,account:{person_name,person_code,organization}} = record,
+            userData = {id,username,person_name,person_code,organization};
+        
+        return <Option key={id} value={JSON.stringify(userData)}>{person_name}</Option>
+    })
+}
+
+//通过流程
+export const throughProcess = (wk,actions)=>{
+    const {id,username,name:person_name,code:person_code} = getUser(),
+        executor = {id,username,person_name,person_code},
+        {logWorkflowEvent} = actions;
+
+    logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor,attachment:null});
 }

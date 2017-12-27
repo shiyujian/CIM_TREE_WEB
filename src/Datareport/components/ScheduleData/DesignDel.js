@@ -123,9 +123,6 @@ export default class DesignDel extends Component {
 					dataSource={this.state.dataSource}
 					bordered
 					pagination={{ pageSize: 10 }}
-					rowKey={(record) => {
-						return record.index
-					}}
 				/>
 				<Row style={{ marginBottom: "30px" }} type="flex">
 					<Col>

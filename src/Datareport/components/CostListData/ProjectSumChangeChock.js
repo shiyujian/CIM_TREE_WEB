@@ -51,7 +51,7 @@ export default class ProjectSumChangeChock extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_sum_cckk_visible",false);
+        this.props.closeModal("cost_sum_cckk_visible", false);
         message.info("操作成功");
     }
 
@@ -60,9 +60,19 @@ export default class ProjectSumChangeChock extends Component {
         const {dataSource,wk,topDir} = this.state;
         const {actions:{
             logWorkflowEvent,
-            delDocList
+            putDocList
         }} = this.props;
-        
+        let doclist_c = [];
+        dataSource.map(item=>{
+            doclist_c.push({
+                code:item.code,
+                obj_type: "C_DOC",
+                status:"A",
+                version:"A",
+                extra_params:item
+            })
+        });
+        await putDocList({},{data_list:doclist_c})
         // send workflow
         let executor = {};
         let person = getUser();
@@ -71,27 +81,7 @@ export default class ProjectSumChangeChock extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
-        let deletecode = [];
-        dataSource.map(item=>{
-            console.log('item:',item.code)
-            deletecode.push(item.code)
-            console.log("deletecode:",deletecode)
-        })
-        
-        let rst = await delDocList({},{code_list:deletecode.join(',')});
-        if(rst.result){
-            notification.success({
-                message: '删除文档成功！',
-                duration: 2
-            });
-        }else{
-            notification.error({
-                message: '删除文档失败！',
-                duration: 2
-            });
-        }
-        
+ 
     }
     //不通过
     async reject(){
@@ -103,7 +93,7 @@ export default class ProjectSumChangeChock extends Component {
         this.setState({option:e.target.value})
     }
     cancel() {
-        this.props.closeModal("cost_sum_change_visible", false);
+        this.props.closeModal("cost_pri_modify_visible", false);
       }
 	render() {
         const columns = [
@@ -113,34 +103,30 @@ export default class ProjectSumChangeChock extends Component {
               render: (text, record, index) => {
                 return index + 1;
               }
-            },
-            {
-              title: "项目/子项目",
-              dataIndex: "project"
-            },
-            {
-              title: "单位工程",
-              dataIndex: "unit"
-            },
-            {
-              title: "工作节点目标",
-              dataIndex: "nodetarget"
-            },
-            {
-              title: "完成时间",
-              dataIndex: "completiontime"
-            },
-            {
-              title: "支付金额（万元）",
-              dataIndex: "summoney"
-            },
-            {
-              title: "累计占比",
-              dataIndex: "ratio"
-            },
-            {
-              title: "备注",
-              dataIndex: "remarks"
+            },{
+                title: '项目/子项目',
+                dataIndex: 'subproject',
+            }, {
+                title: '单位工程',
+                dataIndex: 'unit',
+            }, {
+                title: '清单项目编号',
+                dataIndex: 'projectcoding',
+            }, {
+                title: '项目名称',
+                dataIndex: 'projectname',
+            }, {
+                title: '计量单位',
+                dataIndex: 'company',
+            }, {
+                title: '数量',
+                dataIndex: 'number',
+            }, {
+                title: '单价',
+                dataIndex: 'total',
+            }, {
+                title: '备注',
+                dataIndex: 'remarks',
             }
           ]
 		return (

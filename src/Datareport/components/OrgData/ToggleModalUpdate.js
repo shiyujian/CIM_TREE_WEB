@@ -23,10 +23,10 @@ export default class ToggleModalUpdate extends Component{
         }
     }
     render(){
-        const {visibleUpdata} = this.props;
+        const {visibleUpdate} = this.props;
         return (
             <Modal
-                visible={visibleUpdata}
+                visible={visibleUpdate}
                 width={1280}
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
@@ -37,6 +37,7 @@ export default class ToggleModalUpdate extends Component{
                     columns={this.columns}
                     bordered={true}
                     dataSource = {this.state.dataSource}
+                    rowKey="code"
                 >
                 </Table>
                 <span>
@@ -66,7 +67,7 @@ export default class ToggleModalUpdate extends Component{
             message.error('审批人未选择');
             return;
         }
-        this.props.setDataDel(this.state.dataSource, JSON.parse(this.state.passer));
+        this.props.setDataUpdate(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisibleUpdate(false);
     }
     cancel() {
@@ -74,7 +75,7 @@ export default class ToggleModalUpdate extends Component{
         ModalVisibleUpdate(false);
     }
     componentDidMount(){
-        const {updateOrg, actions:{getAllUsers, getProjects}} = this.props;
+        const {updateOrg, actions:{getAllUsers, getProjects, getUnit}} = this.props;
         getAllUsers().then(rst => {
             let users = [];
             if (rst.length) {
@@ -89,32 +90,46 @@ export default class ToggleModalUpdate extends Component{
                 })
             }
         });
-        this.setState({
-            dataSource:updateOrg
+        getProjects().then(rst => {
+            if (rst.children.length) {
+                let projects = rst.children;
+                this.setState({
+                    projects,
+                    defaultPro: rst.children[0].name
+                })
+            }
+        }) 
+        this.setState({dataSource:updateOrg})
+        let units = [];
+        updateOrg.map(item => {
+            item.extra_params.project.map(it => {
+                getUnit({code:it.split("--")[0]}).then(rst => {
+                    units.push(...rst.children);
+                    this.setState({
+                        units:units
+                    })
+                })
+            })
         })
     }
     columns = [ {
         title: '组织机构编码',
         dataIndex:"code",
-		render:(record) => (
-            <Input value={record.code} />
-        )
 	}, {
 		title: '组织机构类型',
 		dataIndex: 'extra_params.org_type',
-		render:(record) => (
-            <Input value={record.extra_params.org_type} />
-        )
 	}, {
 		title: '参建单位名称',
         dataIndex: 'extra_params.canjian',
-        render:(record) => (
-            <Input value={extra_params.canjian} />
-        )
 	}, {
 		title: '组织机构部门',
-		dataIndex: 'name',
-		key: 'Name',
+		// dataIndex: 'name',
+		render:(text, record, index) =>{ 
+            return <Input value = {record.name || ""} onChange={ele => {
+                record.name = ele.target.value
+                this.forceUpdate();
+            }}/>
+        }
 	}, {
 		title: '直属部门',
 		dataIndex: 'extra_params.direct',
@@ -122,14 +137,85 @@ export default class ToggleModalUpdate extends Component{
 	}, {
 		title: '负责项目/子项目名称',
 		dataIndex: 'extra_params.project',
-		key: 'Project',
+        width:"15%",
+        height:"64px",
+        render:(text, record, index) => {
+            return (
+                <TreeSelect value={record.selectPro || record.extra_params.project} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
+                    const {actions:{getUnit}} = this.props;
+                    let units = [];
+                    let selectPro = [];
+                    let promises = extra.checkedNodes.map(item => {
+                        selectPro.push(item.key);
+                        return getUnit({code:item.key.split("--")[0]});
+                    })
+                    record.selectPro = selectPro;
+                    Promise.all(promises).then(rst => {
+                        rst.map(item => {
+                            item.children.map(it => {
+                                units.push(it);
+                            })
+                        })
+                        this.setState({units})
+                    })
+                    this.forceUpdate();
+
+                }} 
+                >
+                    {ToggleModalUpdate.lmyloop(this.state.projects)}
+                </TreeSelect>
+            )
+        }
 	},{
-		title: '负责单位工程名称',
-		dataIndex: 'extra_params.unit',
-		key: 'Unit'
+        title: '负责单位工程名称',
+        width:"15%",
+		render:(text, record, index) => {
+            console.log("dfggdfg:",this.state.units);
+            return (
+                <TreeSelect value={record.selectUnit || record.extra_params.unit} onSelect={(value, node, extra) => {
+                    let selectUnit = [];
+                    extra.checkedNodes.map(item => {
+                        selectUnit.push(item.key);
+                    }); 
+                    record.selectUnit = selectUnit;
+                    this.forceUpdate();
+                }} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
+                    {
+                        ToggleModalUpdate.lmyloop(this.state.units) 
+                    }
+                 </TreeSelect>
+            )
+        }
 	},{
 		title: '备注',
 		dataIndex: 'extra_params.remarks',
 		key: 'Remarks'
-	}]
+    }]
+    static lmyloop(data = [],depth=1) {
+		if (data.length <= 0 || depth > 1) {
+			return;
+        }
+		return data.map((item) => {
+			if (item.children && item.children.length>0) {
+				return (
+					<TreeNode
+                        data = {item}
+						key={`${item.code}--${item.name}`}
+						value={`${item.code}--${item.name}`}
+						title={`${item.code} ${item.name}`}>
+						{
+							ToggleModal.lmyloop(item.children,depth++)
+						}
+					</TreeNode>
+				);
+			} else {
+				return(<TreeNode
+                    data = {item}
+					key={`${item.code}--${item.name}`}
+					value={`${item.code}--${item.name}`}
+                    title={`${item.code} ${item.name}`} />
+                );
+			}
+		});
+    };
 }
