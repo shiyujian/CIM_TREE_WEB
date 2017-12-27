@@ -1,7 +1,7 @@
 import { handleActions, combineActions, createAction } from 'redux-actions';
 import { actionsMap } from '_platform/store/util';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API, USER_API, WORKFLOW_API } from '_platform/api';
+import { SERVICE_API, USER_API, WORKFLOW_API,NODE_FILE_EXCHANGE_API } from '_platform/api';
 
 const ID = 'SAFETYSPECIAL';
 export const ModalVisible = createAction(`${USER_API}组织Modal模态框显示隐藏`);
@@ -16,9 +16,12 @@ export const DeleteRow = createAction(`${ID}_申请删除数据`);
 //文档目录树相关
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
-
 // 查询
 const getSearcherDir = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{keyword}}`,[],'GET');
+// 更新
+const updateDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
+// 导出
+const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 
 export const actions = {
 	ModalVisible,
@@ -30,6 +33,8 @@ export const actions = {
 	getScheduleDir,
 	postScheduleDir,
 	getSearcherDir,
+	updateDocList,
+	jsonToExcel,
 };
 
 export default handleActions({

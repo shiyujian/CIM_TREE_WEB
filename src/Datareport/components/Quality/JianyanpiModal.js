@@ -33,10 +33,25 @@ class JianyanpiModal extends Component {
             this.setState({checkers})
         })
     }
+    componentWillReceiveProps(){
+        const {editData} = this.props
+        if(editData.length){
+            this.setState({dataSource:editData,editing:true})
+        }
+    }
 	//table input 输入
     tableDataChange(index, key ,e ){
 		const { dataSource } = this.state;
 		dataSource[index][key] = e.target['value'];
+	  	this.setState({dataSource});
+    }
+    tableDataChange1(index ,e ){
+		const { dataSource } = this.state;
+		dataSource[index]['construct_unit'] = {
+            name: '',
+            code: e.target.value,
+            type: ''
+        }
 	  	this.setState({dataSource});
     }
     //下拉框选择变化
@@ -56,7 +71,7 @@ class JianyanpiModal extends Component {
             return
         }
         let temp = this.state.dataSource.some((o,index) => {
-                        return !(o.file.id && o.rate && o.level)
+                        return !(o.file.id && o.rate && o.level && o.construct_unit && o.construct_unit.type)
                     })
         if(temp){
             message.info(`有信息未填写完整`)
@@ -127,10 +142,12 @@ class JianyanpiModal extends Component {
                 mime_type:resp.mime_type,
                 misc:resp.misc
             };
-            let jcode = file.name.split('.')[0]
-            let info = await this.getInfo(jcode)
             dataSource[index]['file'] = attachment
-            dataSource[index] = Object.assign(dataSource[index],info)
+            if(!this.state.editing){
+                let jcode = file.name.split('.')[0]
+                let info = await this.getInfo(jcode)
+                dataSource[index] = {...dataSource[index],...info}
+            }
             this.setState({dataSource})
 		});
 		return false;
@@ -189,8 +206,8 @@ class JianyanpiModal extends Component {
             }else{
                 danwei = await getWorkPackageDetail({code:fenbu.parent.code})
             } 
-            let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-            res.construct_unit = construct_unit
+            // let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
+            // res.construct_unit = construct_unit
             res.unit = {
                 name:danwei.name,
                 code:danwei.code,
@@ -207,8 +224,8 @@ class JianyanpiModal extends Component {
             }else{
                 danwei = await getWorkPackageDetail({code:fenbu.parent.code})
             } 
-            let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-            res.construct_unit = construct_unit
+            // let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
+            // res.construct_unit = construct_unit
             res.unit = {
                 name:danwei.name,
                 code:danwei.code,
@@ -228,6 +245,23 @@ class JianyanpiModal extends Component {
         let {dataSource} = this.state
         dataSource.splice(index,1)
         this.setState({dataSource})
+    }
+    //校验组织机构
+    fixOrg(index){
+        const {actions:{getOrg}} = this.props
+        let {dataSource} = this.state
+        getOrg({code:dataSource[index].construct_unit.code}).then(rst => {
+            if(rst.code){
+                dataSource[index]['construct_unit'] = {
+                    name: rst.name,
+                    code: rst.code,
+                    type: rst.obj_type
+                }
+                this.setState({dataSource})
+            }else{
+                message.info("输错了")
+            }
+        })
     }
     //预览
     handlePreview(index){
@@ -301,11 +335,13 @@ class JianyanpiModal extends Component {
 			title:'施工单位',
             dataIndex:'construct_unit',
             width:"12%",
-            render: (text, record, index) => (
-                <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
-                </span>
-            ),
+            render: (text, record, index) => {
+                if(record.construct_unit && record.construct_unit.type){
+                    return record.construct_unit.name
+                }else{
+                    return (<Input style={{color:'red'}} value={record.construct_unit ? record.construct_unit.code : ''} onBlur={this.fixOrg.bind(this,index)} onChange={this.tableDataChange1.bind(this,index)}/>)
+                }
+            },
 		}, {
             title:'附件',
             width:"11%",
@@ -357,7 +393,7 @@ class JianyanpiModal extends Component {
 			headers: {
 			},
 			showUploadList: false,
-		    onChange(info) {
+		    async onChange(info) {
 		        if (info.file.status !== 'uploading') {
 		            console.log(info.file, info.fileList);
 		        }
@@ -365,7 +401,7 @@ class JianyanpiModal extends Component {
 		        	let importData = info.file.response.Sheet1;
                     console.log(importData);
                     let {dataSource} = jthis.state
-                    dataSource = jthis.handleExcelData(importData)
+                    dataSource = await jthis.handleExcelData(importData)
                     jthis.setState({dataSource}) 
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
@@ -376,7 +412,7 @@ class JianyanpiModal extends Component {
 		return (
 			<Modal
 			title="检验批信息上传表"
-			key={this.props.akey}
+			key={this.props.visible}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
@@ -415,10 +451,15 @@ class JianyanpiModal extends Component {
 		)
     }
     //处理上传excel的数据
-    handleExcelData(data){
+    async handleExcelData(data){
+        const {actions:{getOrg}} = this.props
         data.splice(0,1);
-        let res = data.map(item => {
-            return {
+        let res = []
+        for(let i = 0; i < data.length; i++){
+            let item = data[i]
+            let con = await getOrg({code:item[6]})
+            res.push({
+                key:i,
                 code:"",
                 rate:item[4],
                 level:item[5],
@@ -434,15 +475,15 @@ class JianyanpiModal extends Component {
                     obj_type:""
                 },
                 construct_unit:{
-                    code:"",
-                    name:item[6],
-                    type:"",
+                    code: con.code ? con.code : item[6],
+                    name: con.name ? con.name : "",
+                    type: con.type ? con.type : "",
                 },
                 file:{
 
                 }
-            }
-        })
+            })
+        }
         return res
     }
 }

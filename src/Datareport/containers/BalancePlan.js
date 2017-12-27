@@ -53,8 +53,9 @@ export default class BanlancePlan extends Component {
 	 generateTableData(data) {
 		 let dataSour = [];
 		 console.log(data);
-		data.map(item => {
+		data.map((item,key) => {
 			let datas = {
+				key:key+1,
 				subproject: item.extra_params.project.name,
 				unit: item.extra_params.unit.name || item.extra_params.unit,
 				nodetarget: item.extra_params.nodetarget,
@@ -205,20 +206,16 @@ export default class BanlancePlan extends Component {
 
 	}
 
-	onSelectChange = (selectedRowKeys) => {
-        const {dataSource} = this.state;
-        let dataSourceSelected = [];
-        for(let i=0;i<selectedRowKeys.length;i++){
-            dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
-        }
-        this.setState({selectedRowKeys,dataSourceSelected});
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+        // const {dataSource} = this.state;
+        // let dataSourceSelected = [];
+        // for(let i=1;i<selectedRowKeys.length;i++){
+        //     dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
+        // }
+        this.setState({selectedRowKeys,dataSourceSelected:selectedRows});
     }
 
 	render() {
-		console.log(
-			"afdsaf",
-			this.state.showDat
-		)
 		const { selectedRowKeys } = this.state;
 		const rowSelection = {
 			selectedRowKeys,
@@ -226,10 +223,7 @@ export default class BanlancePlan extends Component {
 		};
 		const columns = [{
 			title: '序号',
-			dataIndex: 'serialnumber',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex: 'key'
 		}, {
 			title: '项目/子项目名称',
 			dataIndex: 'subproject',

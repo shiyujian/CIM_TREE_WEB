@@ -16,10 +16,14 @@ class JianyanModal extends Component {
             dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
+            editing:false
 		};
     }
     componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
+        const {actions:{getAllUsers},editData} = this.props
+        if(editData.length){
+            this.setState({dataSource:editData,editing:true})
+        }
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -29,15 +33,30 @@ class JianyanModal extends Component {
             this.setState({checkers})
         })
     }
+    componentWillReceiveProps(){
+        const {editData} = this.props
+        if(editData.length){
+            this.setState({dataSource:editData,editing:true})
+        }
+    }
 	//table input 输入
     tableDataChange(index, key ,e ){
 		const { dataSource } = this.state;
 		dataSource[index][key] = e.target['value'];
 	  	this.setState({dataSource});
     }
+    tableDataChange1(index ,e ){
+		const { dataSource } = this.state;
+		dataSource[index]['construct_unit'] = {
+            name: '',
+            code: e.target.value,
+            type: ''
+        }
+	  	this.setState({dataSource});
+    }
+
     //下拉框选择变化
     handleSelect(index,key,value){
-        debugger
         const { dataSource } = this.state;
 		dataSource[index][key] = value;
 	  	this.setState({dataSource});
@@ -53,10 +72,10 @@ class JianyanModal extends Component {
             return
         }
         let temp = this.state.dataSource.some((o,index) => {
-                        return !o.file.id
+                        return !(o.file.id  && o.level && o.rate && o.construct_unit && o.construct_unit.type)
                     })
         if(temp){
-            message.info(`有数据未上传附件`)
+            message.info(`有数据数据不正确`)
             return
         }
         let {check} = this.state
@@ -75,14 +94,16 @@ class JianyanModal extends Component {
     //附件上传
 	beforeUploadPicFile  = async(index,file) => {
         const fileName = file.name;
-        let {dataSource} = this.state
+        let {dataSource,editing} = this.state
         let temp = fileName.split(".")[0]
-        //判断有无重复
-        if(dataSource.some(o => {
-           return o.code === temp
-        })){
-            message.info("该检验批已经上传过了")
-            return false
+        //判断添加的的时候有无重复
+        if(!editing){
+            if(dataSource.some(o => {
+                return o.code === temp
+             })){
+                 message.info("该检验批已经上传过了")
+                 return false
+             }
         }
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile,getWorkPackageDetail} } = this.props;
@@ -126,10 +147,11 @@ class JianyanModal extends Component {
 				mime_type:resp.mime_type
             };
             
-            let info = await this.getInfo(workpackage)
-            debugger
             dataSource[index]['file'] = attachment
-            dataSource[index] = Object.assign(dataSource[index],info)
+            if(!this.state.editing){
+                let info = await this.getInfo(workpackage)
+                dataSource[index] = {...dataSource[index],...info}
+            }
             this.setState({dataSource})
 		});
 		return false;
@@ -156,11 +178,6 @@ class JianyanModal extends Component {
                 name:"",
                 obj_type:""
             },
-            construct_unit:{
-                code:"",
-                name:"",
-                type:"",
-            },
             file:{
             }
         }
@@ -174,6 +191,7 @@ class JianyanModal extends Component {
         res.code = wp.code  
         res.pk = wp.pk
         res.obj_type = wp.obj_type
+        res.related_documents = wp.related_documents        
         let dwcode = ""
         let getUnitLoop = async(param) => {
             let next = {};
@@ -201,15 +219,14 @@ class JianyanModal extends Component {
         }
         await getUnitLoop(wp)
         let danwei = await getWorkPackageDetail({code:dwcode})
-        let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-        res.construct_unit = construct_unit
+        //let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
+       // res.construct_unit = construct_unit
         res.unit = {
             name:danwei.name,
             code:danwei.code,
             obj_type:danwei.obj_type
         }
         res.project = danwei.parent
-        res.related_documents = danwei.related_documents
         return res
     }
     //下拉框选择人
@@ -235,7 +252,27 @@ class JianyanModal extends Component {
         filed.mime_type = f.mime_type;
         openPreview(filed);
     }
+    //校验组织机构
+    fixOrg(index){
+        const {actions:{getOrg}} = this.props
+        let {dataSource} = this.state
+        getOrg({code:dataSource[index].construct_unit.code}).then(rst => {
+            if(rst.code){
+                dataSource[index]['construct_unit'] = {
+                    name: rst.name,
+                    code: rst.code,
+                    type: rst.obj_type
+                }
+                this.setState({dataSource})
+            }else{
+                message.info("输错了")
+            }
+        })
+    }
 	render() {
+        //如果是编辑，则上传视为不可见
+        const {editing} = this.state
+        let visible = editing ? 'none' : ""
         const columns = 
         [{
             title:'序号',
@@ -291,11 +328,13 @@ class JianyanModal extends Component {
 			title:'施工单位',
             dataIndex:'construct_unit',
             width:"12%",
-            render: (text, record, index) => (
-                <span>
-                    {record.construct_unit ? record.construct_unit.name : "暂无"}
-                </span>
-            ),
+            render: (text, record, index) => {
+                if(record.construct_unit && record.construct_unit.type){
+                    return record.construct_unit.name
+                }else{
+                    return (<Input style={{color:'red'}} value={record.construct_unit ? record.construct_unit.code : ''} onBlur={this.fixOrg.bind(this,index)} onChange={this.tableDataChange1.bind(this,index)}/>)
+                }
+            },
 		}, {
             title:'附件',
             width:"11%",
@@ -347,7 +386,7 @@ class JianyanModal extends Component {
 			headers: {
 			},
 			showUploadList: false,
-		    onChange(info) {
+		    async onChange(info) {
 		        if (info.file.status !== 'uploading') {
 		            console.log(info.file, info.fileList);
 		        }
@@ -355,7 +394,7 @@ class JianyanModal extends Component {
 		        	let importData = info.file.response.Sheet1;
                     console.log(importData);
                     let {dataSource} = jthis.state
-                    dataSource = jthis.handleExcelData(importData)
+                    dataSource = await jthis.handleExcelData(importData)
                     jthis.setState({dataSource}) 
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
@@ -366,9 +405,9 @@ class JianyanModal extends Component {
 		return (
 			<Modal
 			title="分项、分部、单位检验信息上传表"
-			key={this.props.akey}
             visible={true}
             width= {1280}
+            key={this.props.visible}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
@@ -381,7 +420,7 @@ class JianyanModal extends Component {
                         pagination={false}
                         scroll={{y:500}}/>
                     <Upload {...props}>
-                        <Button style={{margin:'10px 10px 10px 0px'}}>
+                        <Button style={{margin:'10px 10px 10px 0px',display:visible}}>
                             <Icon type="upload" />上传附件
                         </Button>
                     </Upload>
@@ -405,10 +444,15 @@ class JianyanModal extends Component {
 		)
     }
     //处理上传excel的数据
-    handleExcelData(data){
+    async handleExcelData(data){
+        const {actions:{getOrg}} = this.props
         data.splice(0,1);
-        let res = data.map(item => {
-            return {
+        let res = []
+        for(let i = 0; i < data.length; i++){
+            let item = data[i]
+            let con = await getOrg({code:item[6]})
+            res.push({
+                key:i,
                 code:"",
                 rate:item[4],
                 level:item[5],
@@ -424,15 +468,15 @@ class JianyanModal extends Component {
                     obj_type:""
                 },
                 construct_unit:{
-                    code:"",
-                    name:item[6],
-                    type:"",
+                    code: con.code ? con.code : item[6],
+                    name: con.name ? con.name : "",
+                    type: con.type ? con.type : "",
                 },
                 file:{
 
                 }
-            }
-        })
+            })
+        }
         return res
     }
 }

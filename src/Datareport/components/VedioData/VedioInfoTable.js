@@ -9,7 +9,8 @@ import {uploadFile} from './commonFunc';
 export default class VedioInfoTable extends Component{
     
     render(){
-        const {dataSource=[], loading=false} = this.props;
+        const {dataSource=[], loading=false, storeSelectRows=null} = this.props;
+        const rowSelection = storeSelectRows? this.rowSelect : null;
         return(<Row className="rowSpacing">
             <Col span={24}>
                 <Table
@@ -77,6 +78,9 @@ export default class VedioInfoTable extends Component{
         title: '项目/子项目名称',
         dataIndex: 'projectName'
     },{
+        title: '单位工程',
+        dataIndex: 'enginner'
+    },{
         title: '影像上传',
         dataIndex: 'file',
         render: (text, record, index)=>{
@@ -125,6 +129,14 @@ export default class VedioInfoTable extends Component{
             )
         }
     }
+
+    rowSelect = {
+        onChange:(selectedRowKeys, selectedRows) => {
+            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            const {storeSelectRows} = this.props;
+            storeSelectRows(selectedRows);
+        }
+    }
 }
 
 VedioInfoTable.PropTypes ={
@@ -133,12 +145,6 @@ VedioInfoTable.PropTypes ={
 
 const showTotal = (total,range) =>{ //显示数据总量和当前数据顺序
     //console.log("showTotal",total,range);
-}
-
-const rowSelection = {
-    onChange:(selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    }
 }
 
 const popAttribute = {
