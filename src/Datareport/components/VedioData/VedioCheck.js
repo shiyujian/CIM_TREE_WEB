@@ -178,7 +178,7 @@ export default class VedioCheck extends Component {
                 obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},
-                extra_params:{...item,code}
+                extra_params:{...item}
             }
         })
 

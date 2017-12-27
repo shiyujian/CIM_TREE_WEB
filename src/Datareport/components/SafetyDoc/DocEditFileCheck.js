@@ -76,7 +76,9 @@ export default class DocEditFileCheck extends Component {
         const docData = [];
         dataSource.map(item=>{
             docData.push({
+                code:item.docCode,
                 status:'A',
+                version: 'A',
                 "basic_params": {
                     "files": [
                         {
@@ -96,13 +98,13 @@ export default class DocEditFileCheck extends Component {
                     doTime:item.doTime,
                     remark:item.remark,
                     upPeople:item.upPeople,
-                    unit:item.unit.name,
-                    project:item.project.name
+                    unit:item.unit,
+                    project:item.projectName
                 }
             })
         });
         
-        let rst = await delDocList({},{data_list:docCode});
+        let rst = await putDocument({},{data_list:docData});
         if(rst.result){
             notification.success({
                 message: '修改文档成功！',
@@ -200,7 +202,8 @@ export default class DocEditFileCheck extends Component {
         ];
 		return (
             <Modal
-			title="安全信息删除审批表"
+            title="安全信息删除审批表"
+            key={this.props.akey}
             visible={true}
             width= {1280}
 			footer={null}

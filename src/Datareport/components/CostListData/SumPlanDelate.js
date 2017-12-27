@@ -13,7 +13,7 @@ export default class SumPlanDelate extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dataSource: this.props.dataSourceSelected,
+            dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
             project:{},
@@ -21,7 +21,25 @@ export default class SumPlanDelate extends Component {
             options:[],
         };
     }
-
+    componentWillMount(){
+        let dataSource = this.props.dataSourceSelected;
+        let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+				subproject: item.subproject,
+				unit: item.unit,
+				nodetarget: item.nodetarget,
+				completiontime: item.completiontime,
+				summoney: item.summoney,
+				ratio: item.ratio,
+				remarks: item.remarks,
+				code:item.code
+            }
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource})        
+    }
     componentDidMount(){
         const {actions:{getAllUsers,getProjectTree}} = this.props;
         getAllUsers().then(rst => {
@@ -62,7 +80,22 @@ export default class SumPlanDelate extends Component {
     delete(index){
         let {dataSource} = this.state;
         dataSource.splice(index,1);
-        this.setState({dataSource});
+        let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+				subproject: item.subproject,
+				unit: item.unit,
+				nodetarget: item.nodetarget,
+				completiontime: item.completiontime,
+				summoney: item.summoney,
+				ratio: item.ratio,
+				remarks: item.remarks,
+				code:item.code
+            }
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource}) 
     }
 
     render() {
@@ -70,11 +103,7 @@ export default class SumPlanDelate extends Component {
         const columns = [
             {
                 title: "序号",
-                dataIndex: "code",
-                width: "10%",
-                render:(text,record,index)=>{
-                  return index+1
-                }
+                dataIndex: "key"
               },
               ,
               {
@@ -112,7 +141,7 @@ export default class SumPlanDelate extends Component {
                     <Popconfirm
                       placement="leftTop"
                       title="确定删除吗？"
-                      onConfirm={this.delete.bind(this, index)}
+                      onConfirm={this.delete.bind(this, record.key-1)}
                       okText="确认"
                       cancelText="取消"
                     >

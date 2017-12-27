@@ -57,18 +57,12 @@ export default class SumSpeedExport extends Component {
 		this.props.onok(this.state.dataSource,per);
     }
 
-    //删除
-    // delete(index){
-    //     let {dataSource} = this.state;
-    //     dataSource.splice(index,1);
-    //     this.setState({dataSource});
-    // }
    
     render() {
         const columns =[
             {
               title: "序号",
-              dataIndex: "number",
+              dataIndex: "key",
               width:"5%",
               render: (text, record, index) => {
                 return index + 1;

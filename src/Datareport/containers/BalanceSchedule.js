@@ -53,31 +53,38 @@ export default class BalanceSchedule extends Component {
       },
       {
         title: "项目/子项目",
-        dataIndex: "project"
+        dataIndex: "project",
+        key:'Project'
       },
       {
         title: "单位工程",
-        dataIndex: "unit"
+        dataIndex: "unit",
+        Key:'Unit'
       },
       {
         title: "工作节点目标",
-        dataIndex: "nodetarget"
+        dataIndex: "nodetarget",
+        key:"Nodetarget"
       },
       {
         title: "完成时间",
-        dataIndex: "completiontime"
+        dataIndex: "completiontime",
+        key:'Completiontime'
       },
       {
         title: "支付金额（万元）",
-        dataIndex: "summoney"
+        dataIndex: "summoney",
+        key:'Summoney'
       },
       {
         title: "累计占比",
-        dataIndex: "ratio"
+        dataIndex: "ratio",
+        key:'Ratio'
       },
       {
         title: "备注",
-        dataIndex: "remarks"
+        dataIndex: "remarks",
+        key:'Remarks'
       }
     ];
   }
