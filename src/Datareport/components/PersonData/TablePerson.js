@@ -8,7 +8,9 @@ export default class TablePerson extends Component{
 		super(props);
 		this.state = {
 			dataSource: [],
-			deleData:[]
+			deleData: [],
+			modData: [],
+			tempData:[],
 		}
 	}
     render(){
@@ -50,34 +52,33 @@ export default class TablePerson extends Component{
 	}
 	//批量变更
 	modify() {
-		const { actions: { ModifyVisible } } = this.props;
-		ModifyVisible(true);
+		const { actions: { ModifyVisible, setModifyPer } } = this.props;
+		if(this.state.modData.length) {
+			console.log('modData', this.state.modData)
+			setModifyPer(this.state.modData)
+			ModifyVisible(true);
+		} else {
+			message.warning("请先选中要变更的数据");
+		}
 	}
 	async componentDidMount() {
 		const {actions: {getAllUsers}} = this.props;
 		let orgAll = await getAllUsers();
 		orgAll.forEach((item, index) => {
-			console.log('item',item)
 			orgAll[index].index = index + 1;
 		})
-		console.log('orgAll',orgAll)
 		this.setState({dataSource: orgAll})
 	}
 
 	searchOrg(value){ 
 		let searchData = [];
 		let searchPer = this.state.dataSource
-		console.log('searchPer',searchPer)
-		if (searchPer.name.indexOf(value) != -1) {
-			searchData.push(searchPer);
-		}
-		if (searchPer.children && searchPer.children.length > 0) {
-			searchPer.children.map(it => {
-				if (it.name.indexOf(value) != -1) {
-					searchData.push(it);
-				}
-			})
-		}
+		searchPer.map(rst => {
+			console.log("rst", rst)
+			if (rst.account.organization.indexOf(value) != -1) {
+				searchData.push(rst);
+			}
+		})
 		searchData.map((item, index)=> {
 			item.index = index + 1;
 		})
@@ -92,13 +93,15 @@ export default class TablePerson extends Component{
 		},
 		onSelect: (record, selected, selectedRows) => {
 			this.setState({
-				deleData:selectedRows
+				deleData:selectedRows,
+				modData: selectedRows
 			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
 			console.log(selected, selectedRows, changeRows);
 			this.setState({
-				deleData:selectedRows
+				deleData:selectedRows,
+				modData: selectedRows
 			})
 		},
 	};
@@ -151,18 +154,5 @@ export default class TablePerson extends Component{
 	}, {
 		title: '编辑',
 		dataIndex: 'edit',
-		render:(record) => {
-            return  (
-                <Popconfirm
-                    placement="leftTop"
-                    title="确定删除吗？"
-                    onConfirm={this.delete.bind(this)}
-                    okText="确认"
-                    cancelText="取消"
-                >
-                    <a>删除</a>
-                </Popconfirm>
-            )
-        }
 	}]
 }

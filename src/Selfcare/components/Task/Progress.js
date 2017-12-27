@@ -58,6 +58,7 @@ import WorkChangeCheck from 'Datareport/components/ScheduleData/WorkChangeCheck'
 import UpdataCheck from 'Datareport/components/OrgData/UpdataCheck';
 import HandelChangeUnitModal from 'Datareport/components/UnitData/HandleChangeUnitModal';
 import HandelChangeProjModal from 'Datareport/components/ProjectData/HandleChangeModal';
+import ModCheck from 'Datareport/components/PersonData/ModCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -107,6 +108,7 @@ export default class Progress extends Component {
 			design_modifycheck_visbile,
 			design_expurgatecheck_visbile,
 			safety_vedioCheck_visible,
+			safety_vedioDeleteCheck_visible,
 			safety_vedioInfoCheck_visible,
 			dr_qua_defect_visible,
 			safety_doc_delete_visible,
@@ -135,7 +137,8 @@ export default class Progress extends Component {
 			workdata_doc_change_visible,
 			dr_base_update_visible,
 			dr_change_unit_visible,
-			dr_change_proj_visible
+			dr_change_proj_visible,
+			person_modcheck_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -319,7 +322,11 @@ export default class Progress extends Component {
 				}
 				{
 					safety_vedioCheck_visible && 
-					<VedioCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<VedioCheck type={"create"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_vedioDeleteCheck_visible &&
+					<VedioCheck type={"strike"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>					
 				}
 				{
 					safety_vedioInfoCheck_visible && 
@@ -437,6 +444,10 @@ export default class Progress extends Component {
 					dr_change_proj_visible && 
 					<HandelChangeProjModal wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					person_modcheck_visible && 
+					<ModCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -524,6 +535,9 @@ export default class Progress extends Component {
 			case "视频监控批量录入":
 				changeDatareportVisible({key:'safety_vedioCheck_visible',value:true})
 				break;
+			case "视频监控数据删除":
+				changeDatareportVisible({key:'safety_vedioDeleteCheck_visible',value:true})				
+				break;
 			case "影像信息批量录入":
 				changeDatareportVisible({key:'safety_vedioInfoCheck_visible',value:true})
 				break;
@@ -610,6 +624,9 @@ export default class Progress extends Component {
 				break;
 			case "项目批量变更申请":
 				changeDatareportVisible({key:'dr_change_proj_visible',value:true})
+				break;
+			case "人员信息批量更改":
+				changeDatareportVisible({key:'person_modcheck_visible',value:true})
 				break;
 			default:break;
 		}

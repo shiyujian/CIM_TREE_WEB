@@ -6,6 +6,7 @@ import VedioTable from './VedioTable';
 import './index.less';
 const Option = Select.Option;
 import { SERVICE_API} from '_platform/api';
+import {getAllUsers} from './commonFunc';
 
 export default class UploadFooter extends Component{
     constructor(props){
@@ -21,18 +22,11 @@ export default class UploadFooter extends Component{
         })
     }
 
-    componentDidMount(){
-        const {actions:{getAllUsers,getProjectTree}} = this.props;
-        getAllUsers().then(data => {
-            const checkUsers = data.map(record => {
-                let {id,username,account:{person_name,person_code,organization}} = record,
-                    userData = {id,username,person_name,person_code,organization};
-                return (
-                    <Option key={id} value={JSON.stringify(userData)}>{person_name}</Option>
-                )
-            })
-            this.setState({checkUsers})
-        })
+    async componentDidMount(){
+        const {actions:{getProjectTree}} = this.props;
+        const checkUsers = await getAllUsers(); //获取所有的用户
+        this.setState({checkUsers});
+
         getProjectTree({depth:1}).then(rst =>{
             if(rst.status){
                 const options = rst.children.map(item=>{
@@ -74,7 +68,7 @@ export default class UploadFooter extends Component{
                         placeholder={"请选择项目-单位工程"}
                         changeOnSelect
                     />
-                    <Button onClick={this.onSubmit} type="primary" className="spacing" >提交</Button>                  
+                    <Button onClick={this.onSubmit} type="primary" className="spacing" >提交</Button>               
                 </Col>
             </Row>
             <Row className="rowSpacing">
@@ -187,7 +181,6 @@ export default class UploadFooter extends Component{
     }
 
     onChange = (value)=>{
-        value;
         if(value.length===2){
             const {storeExcelData,dataSource} = this.props,
                 project = {
