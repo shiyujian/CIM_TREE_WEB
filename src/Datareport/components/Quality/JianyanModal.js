@@ -191,6 +191,7 @@ class JianyanModal extends Component {
         res.code = wp.code  
         res.pk = wp.pk
         res.obj_type = wp.obj_type
+        res.related_documents = wp.related_documents        
         let dwcode = ""
         let getUnitLoop = async(param) => {
             let next = {};
@@ -226,7 +227,6 @@ class JianyanModal extends Component {
             obj_type:danwei.obj_type
         }
         res.project = danwei.parent
-        res.related_documents = danwei.related_documents
         return res
     }
     //下拉框选择人

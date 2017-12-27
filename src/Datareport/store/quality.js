@@ -58,7 +58,8 @@ export const actions = {
 	getResouce,
 	getRelDoc,
 	getOrg,
-	getProjectTree
+	getProjectTree,
+	delDocList
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
