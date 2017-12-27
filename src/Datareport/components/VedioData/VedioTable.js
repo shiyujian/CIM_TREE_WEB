@@ -5,24 +5,17 @@ import {Row, Col, Table, Icon, Popconfirm} from 'antd';
 import './index.less';
 
 export default class VedioTable extends Component{
-    
-    /* componentDidMount(){
-        const {fileDel=false} = this.props;
-        if(fileDel){
-            this.columns.push(this.operation);
-        }
-    } */
 
     render(){
-        const {dataSource=[]} = this.props;
+        const {dataSource=[],loading =false,storeSelectRows =null} = this.props;
+        const rowSelection = storeSelectRows? this.rowSelect : null;
         return(<Row className="rowSpacing">
             <Col span={24}>
                 <Table
+                loading={loading}
                 dataSource={dataSource}
                 columns={this.columns}
-                rowKey={(record)=>{
-                    return record.index
-                }}
+                rowKey='index'
                 pagination={{
                     defaultPageSize: 10,
                     showQuickJumper: true,
@@ -40,6 +33,14 @@ export default class VedioTable extends Component{
         let data = JSON.parse(JSON.stringify(dataSource));
         data.splice(index,1);
         storeExcelData(data);
+    }
+
+    rowSelect = {
+        onChange:(selectedRowKeys, selectedRows) => {
+            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            const {storeSelectRows} = this.props;
+            storeSelectRows(selectedRows);
+        }
     }
 
     columns = [{
@@ -104,15 +105,9 @@ export default class VedioTable extends Component{
 }
 
 VedioTable.PropTypes ={
-    dataSource: PropTypes.object.isRequired
+    dataSource: PropTypes.array.isRequired
 }
 
 const showTotal = (total,range) =>{ //显示数据总量和当前数据顺序
     //console.log("showTotal",total,range);
-}
-
-const rowSelection = {
-    onChange:(selectedRowKeys, selectedRows) => {
-        //console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    }
 }
