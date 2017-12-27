@@ -107,6 +107,7 @@ export default class Progress extends Component {
 			design_modifycheck_visbile,
 			design_expurgatecheck_visbile,
 			safety_vedioCheck_visible,
+			safety_vedioDeleteCheck_visible,
 			safety_vedioInfoCheck_visible,
 			dr_qua_defect_visible,
 			safety_doc_delete_visible,
@@ -319,7 +320,11 @@ export default class Progress extends Component {
 				}
 				{
 					safety_vedioCheck_visible && 
-					<VedioCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<VedioCheck type={"create"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_vedioDeleteCheck_visible &&
+					<VedioCheck type={"strike"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>					
 				}
 				{
 					safety_vedioInfoCheck_visible && 
@@ -523,6 +528,9 @@ export default class Progress extends Component {
 				break;
 			case "视频监控批量录入":
 				changeDatareportVisible({key:'safety_vedioCheck_visible',value:true})
+				break;
+			case "视频监控数据删除":
+				changeDatareportVisible({key:'safety_vedioDeleteCheck_visible',value:true})				
 				break;
 			case "影像信息批量录入":
 				changeDatareportVisible({key:'safety_vedioInfoCheck_visible',value:true})
