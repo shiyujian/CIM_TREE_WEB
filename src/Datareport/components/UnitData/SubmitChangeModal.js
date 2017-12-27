@@ -121,11 +121,16 @@ export default class SubmitChangeUnitModal extends Component {
             title: '单位工程编码',
             dataIndex: 'code',
             key: 'Code',
-        }, {
+        },{
             title: '单位工程名称',
             dataIndex: 'name',
             key: 'Name',
         },
+        {
+            title: '所属项目名称',
+            dataIndex: 'fatherName',
+            key: 'fatherName',
+        } ,
         {
             title: '项目类型',
             render: (record) => {

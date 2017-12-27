@@ -175,7 +175,7 @@ export default class ProjectSumExamine extends Component {
                 }
             })
         });
-        
+        debugger
         let rst = await addDocList({}, { data_list: docData });
         await updateWpData({}, { data_list: wplist });
         // wplist = wplist.filter(item => {

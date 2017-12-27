@@ -33,6 +33,8 @@ const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?a
 const getAllresult = createFetchAction(`${SERVICE_API}/searcher/?keyword=rel_doooco_&obj_type=C_DOC`, [], 'GET');
 //删除流程
 const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
+// 查询
+const getSearcher = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{keyword}}`,[],'GET');
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -52,7 +54,8 @@ export const actions = {
 	getWorkpackagesByCode,
 	getDocument,
 	getAllresult,
-	delDocList
+	delDocList,
+	getSearcher
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

@@ -6,6 +6,7 @@ import { ProjectSumExamine } from '../components/CostListData';
 import { ProjectSumExcalDelete } from '../components/CostListData';
 
 import { ProjectSumChange } from '../components/CostListData';
+import { ProjectSumExport } from '../components/CostListData';
 
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { Row, Col, Table, Input, Button,Popconfirm } from 'antd';
@@ -37,7 +38,9 @@ export default class WorkunitCost extends Component {
 			addvisible: false,
 			delatevisible:false,
 			changevisible:false,
-			dataSource: []
+			exportvisible:false,
+			dataSource: [],
+			againDataSource:[],
 
 		}
 	}
@@ -65,50 +68,43 @@ export default class WorkunitCost extends Component {
 				
 				let temp = {
 					code: item.code,
-					subproject: single.extra_params.subproject,
-					unit: single.extra_params.unit,
-					projectcoding: single.extra_params.projectcoding,
-					projectname: single.extra_params.projectname,
-					company: single.extra_params.company,
-					number: single.extra_params.number,
-					total: single.extra_params.total,
-					remarks: single.extra_params.remarks,
+					subproject: single.extra_params.subproject,//项目/子项目
+					unit: single.extra_params.unit,//单位工程
+					projectcoding: single.extra_params.projectcoding,//项目编号
+					projectname: single.extra_params.projectname,//项目名称
+					company: single.extra_params.company,//计量单位
+					number: single.extra_params.number,//数量
+					total: single.extra_params.total,//单价
+					remarks: single.extra_params.remarks,//备注
 
 				}
 				dataSource.push(temp);
 				
 			})
 		})
-		this.setState({ dataSource });
-		debugger;
+		this.setState({ 
+			dataSource:dataSource,
+			showDs:dataSource
+		 });
+		// debugger;
 	}
-
-	// subproject: item.project.name,//项目/子项目
-	// unit: item.unit.name,//单位工程
-	// projectcoding: item.projectcoding,//项目编号
-	// projectname: item.projectname,//项目名称
-	// company: item.company,//计量单位
-	// number: item.number,//数量
-	// total: item.total,//单价
-	// remarks: item.remarks,//备注
-
-
+	//点×取消
 	oncancel() {
 		this.setState({ addvisible: false })
 		this.setState({changevisible:false})
-	}
-	projectfill() {
-		this.setState({ addvisible: true })
+		this.setState({exportvisible:false,})
+		
 	}
 	delatecancel() {
 		this.setState({ delatevisible: false })
 	}
-	//删除
-	// delete(index) {
-	// 	let { dataSource } = this.state
-	// 	dataSource.splice(index, 1)
-	// 	this.setState({ dataSource })
-	// }
+
+	//发起变更模态框
+	projectfill() {
+		this.setState({ addvisible: true })
+	}
+	
+   //申请变更模态框
 	setchgVisible(){
 		this.setState({changevisible:true})
 	}
@@ -153,6 +149,7 @@ export default class WorkunitCost extends Component {
 				})
 		})
 	}
+	//工程量结算信息删除
 	delateData(data, participants) {
 		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
@@ -234,8 +231,30 @@ export default class WorkunitCost extends Component {
 						// message.info("发起成功")					
 					})
 		})
-    }
-
+	}
+	//导出表格
+	setExportData(data,participants){
+		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+		let creator = {
+			id:getUser().id,
+			username:getUser().username,
+			person_name:getUser().person_name,
+			person_code:getUser().person_code,
+		}
+		let postdata = {
+			name:"工程量结算信息变更",
+			code:WORKFLOW_CODE["数据报送流程"],
+			description:"工程量结算信息变更",
+			subject:[{
+				data:JSON.stringify(data)
+			}],
+			creator:creator,
+			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
+			deadline:null,
+			status:"2"
+		}
+	}
+	//序号点击
 	onSelectChange = (selectedRowKeys) => {
         const {dataSource} = this.state;
         let dataSourceSelected = [];
@@ -244,7 +263,7 @@ export default class WorkunitCost extends Component {
         }
         this.setState({selectedRowKeys,dataSourceSelected});
     }
-
+	
 	render() {
 		const { selectedRowKeys } = this.state;
 		const rowSelection = {
@@ -289,17 +308,27 @@ export default class WorkunitCost extends Component {
 					<Button className="btn" type="default" onClick={this.projectfill.bind(this)}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.setchgVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={() => { this.setState({ delatevisible: true }) }}>申请删除</Button>
-					<Button className="btn" type="default">导出表格</Button>
+					<Button className="btn" type="default" onClick={() => { this.setState({ exportvisible: true }) }}>导出表格</Button>
 					<Search
 						className="btn"
 						style={{ width: "200px" }}
 						placeholder="输入搜索条件"
-						onSearch={value => console.log(value)}
+						onSearch={(text) => {
+							let result = this.state.dataSource.filter(data => {
+								console.log('data',data)
+								return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.projectname.indexOf(text) >= 0 || data.company.indexOf(text) >= 0 ;
+							});
+							console.log(result);
+							if (text === '') {
+								result = this.state.dataSource;
+							}
+							this.setState({ showDs: result });
+						}}
 					/>
 				</Row>
 				<Row >
 					<Col >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.dataSource} rowKey="index" />
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs} rowKey="index" />
 					</Col>
 				</Row>
 				{
@@ -313,7 +342,11 @@ export default class WorkunitCost extends Component {
 				{
 					this.state.changevisible &&
 					<ProjectSumChange {...this.props} {...this.state } oncancel={this.oncancel.bind(this)} onok={this.setChangeData.bind(this)}/>
-                }
+				}
+				{
+					this.state.exportvisible &&
+					<ProjectSumExport  {...this.props} {...this.state } oncancel={this.oncancel.bind(this)} onok={this.setExportData.bind(this)}/>
+				}
 			</div>)
 	}
 

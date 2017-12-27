@@ -282,12 +282,7 @@ export default class ModifyCheck extends Component {
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
+                        <Col span={2} push={16}>
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>

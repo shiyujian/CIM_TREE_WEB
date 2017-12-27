@@ -67,7 +67,8 @@ export default class BanlancePlan extends Component {
 			dataSour.push(datas)
 		})
 		this.setState({
-			dataSource:dataSour
+			dataSource:dataSour,
+			showDat:dataSour
 		})
 	}
 
@@ -214,6 +215,10 @@ export default class BanlancePlan extends Component {
     }
 
 	render() {
+		console.log(
+			"afdsaf",
+			this.state.showDat
+		)
 		const { selectedRowKeys } = this.state;
 		const rowSelection = {
 			selectedRowKeys,
@@ -261,11 +266,20 @@ export default class BanlancePlan extends Component {
 							className="btn"
 							style={{ width: "200px" }}
 							placeholder="请输入搜索条件"
-							onSearch={value => console.log(value)}
+							onSearch={ text => {
+								let result = this.state.dataSource.filter(data => {
+									return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0;
+								})
+								if( text === ''){
+									result = this.state.dataSource
+								}
+								this.setState({showDat:result});
+							}
+						  }
 						/>
 					</Row>
 					<div >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.dataSource} />
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDat} />
 					</div>
 					{this.state.lanchReapt &&
 						<SumPlan {...this.props} oncancel={() => { this.setState({ lanchReapt: false }) }} onok={this.lanchOk.bind(this)} />
