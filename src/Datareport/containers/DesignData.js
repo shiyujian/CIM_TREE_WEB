@@ -31,7 +31,7 @@ export default class DesignData extends Component {
 				<Addition {...this.props}/>
 				<Modify {...this.props}/>
 				<Expurgate {...this.props}/>
-				<Preview/>
+				
 			</div>
 		);
 	}

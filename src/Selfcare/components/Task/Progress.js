@@ -110,6 +110,7 @@ export default class Progress extends Component {
 			safety_vedioCheck_visible,
 			safety_vedioDeleteCheck_visible,
 			safety_vedioInfoCheck_visible,
+			safety_vedioInfoDeleteCheck_visible,
 			dr_qua_defect_visible,
 			safety_doc_delete_visible,
 			safety_hidden_delete_visible,
@@ -330,7 +331,11 @@ export default class Progress extends Component {
 				}
 				{
 					safety_vedioInfoCheck_visible && 
-					<VedioInfoCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+					<VedioInfoCheck type={"create"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_vedioInfoDeleteCheck_visible && 
+					<VedioInfoCheck type={"strike"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					dr_qua_defect_visible && 
@@ -540,6 +545,9 @@ export default class Progress extends Component {
 				break;
 			case "影像信息批量录入":
 				changeDatareportVisible({key:'safety_vedioInfoCheck_visible',value:true})
+				break;
+			case "影像信息数据删除":
+				changeDatareportVisible({key:'safety_vedioInfoDeleteCheck_visible',value:true})
 				break;
 			case "质量缺陷信息批量录入":
 				changeDatareportVisible({key:'dr_qua_defect_visible',value:true})

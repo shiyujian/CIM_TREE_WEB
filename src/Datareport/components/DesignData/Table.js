@@ -15,17 +15,15 @@ export default class DesignTable extends Component {
 			loading: false,
 			percent: 0,
 		}
-
 	}
 	onSelectChange = (selectedRowKeys) => {
 		const {alldatas} = this.state;
-		const { actions: { changeModifyField,changeExpurgateField } } = this.props;
-		this.setState({ selectedRowKeys });
+		const {actions: {changeModifyField,changeExpurgateField}} = this.props;
+		this.setState({selectedRowKeys});
 		let selectedDatas = [];
 		selectedRowKeys.forEach(key => {
 			selectedDatas.push(alldatas[key-1])
 		})
-		console.log('selectedRowKeys',selectedRowKeys,'selectedDatas',selectedDatas,'alldatas',alldatas)
 		changeModifyField('selectedDatas',selectedDatas)
 		changeExpurgateField('selectedDatas',selectedDatas)
 	}
@@ -37,7 +35,6 @@ export default class DesignTable extends Component {
         let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
         if(topDir.obj_type){
             let dir = await getScheduleDir({code:'datareport_designdata'});
-            
             if(dir.obj_type){
                 if(dir.stored_documents.length>0){
                     this.generateTableData(dir.stored_documents);
@@ -45,7 +42,7 @@ export default class DesignTable extends Component {
             }
         }
     }
-    async generateTableData(data){
+    generateTableData(data){
         const {actions:{
             getDocument,
         }} = this.props;
@@ -61,7 +58,7 @@ export default class DesignTable extends Component {
                     this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
                     if(!rst) {
                     	message.error(`数据获取失败`)
-		    			return []
+		    			return {}
 		    		} else {
                     	return rst
                     }
@@ -70,25 +67,29 @@ export default class DesignTable extends Component {
         Promise.all(all)
         .then(item => {
         	this.setState({loading:false,percent:100})
-        	item.forEach((single,index) => {
-        		let temp = {
-        			index:index+1,
-        			num:index+1,
-                    code:single.extra_params.code,
-                    filename:single.extra_params.filename,
-                    pubUnit:single.extra_params.pubUnit,
-                    filetype:single.extra_params.filetype,
-                    file:single.basic_params.files[0],
-                    unit:single.extra_params.unit,
-                    major:single.extra_params.major,
-                    project:single.extra_params.project,
-                    stage:single.extra_params.stage,
-                    upPeople:single.extra_params.upPeople,
-                    wbsObject:single.extra_params.wbsObject,
-                    designObject:single.extra_params.designObject,
-                }
-                dataSource.push(temp);
-        	}) 
+        	try {
+				item.forEach((single,index) => {
+	        		let temp = {
+	        			index:index+1,
+	        			num:index+1,
+	                    code:single.extra_params.code,
+	                    filename:single.extra_params.filename,
+	                    pubUnit:single.extra_params.pubUnit,
+	                    filetype:single.extra_params.filetype,
+	                    file:single.basic_params.files[0],
+	                    unit:single.extra_params.unit,
+	                    major:single.extra_params.major,
+	                    project:single.extra_params.project,
+	                    stage:single.extra_params.stage,
+	                    upPeople:single.extra_params.upPeople,
+	                    wbsObject:single.extra_params.wbsObject,
+	                    designObject:single.extra_params.designObject,
+	                }
+	                dataSource.push(temp);
+        		}) 
+        	} catch(e){
+        		message.error(`数据获取失败`)
+        	}
             this.setState({dataSource,alldatas:item,showDs:dataSource});
         })
     }
