@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import {message} from 'antd';
 
 import {Main,Content, DynamicTitle} from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 
-import {UploadModal,VedioTable,MainHeader} from '../components/VedioData';
+import {UploadModal,ChangeModal,DeleteModal,VedioTable,MainHeader} from '../components/VedioData';
 import { actions } from '../store/vedioData';
 import {addSerialNumber} from '../components/VedioData/commonFunc';
 
@@ -24,8 +25,12 @@ export default class VedioData extends Component {
 	constructor(props){
 		super(props);
 		this.state={
+			loading:true,
 			uploadModal: false,
-			dataSource: []
+			changeModal: false,
+			deleteModal: false,
+			dataSource: [],
+			selectRows: []
 		}
 	}
 
@@ -43,44 +48,85 @@ export default class VedioData extends Component {
     }
 
 	render() {
-		const {uploadModal,dataSource} = this.state,
-			sourceData = addSerialNumber(dataSource);
+		const {uploadModal,changeModal,deleteModal,dataSource,loading,selectRows} = this.state;
 
 		return (<Main>
 			<DynamicTitle title="视频监控" {...this.props} />
 			<Content>
-				<MainHeader showSendModal={this.showSendModal}/>
+				<MainHeader
+				 showModal={this.showModal}
+				 selectJudge={this.selectJudge}
+				/>
 				<VedioTable
-				dataSource={sourceData}
+				dataSource={dataSource}
+				loading={loading}
+				storeSelectRows={this.storeSelectRows}
 				/>
 			</Content>
 			<UploadModal
-			 key={uploadModal}
-			 uploadModal={uploadModal}			 
+			 key={`uploadModal${uploadModal}`}
+			 uploadModal={uploadModal}
 			 actions = {this.props.actions}
 			 closeModal={this.closeModal}
+			/>
+			<ChangeModal
+			 key={`changeModal${changeModal}`}
+			 changeModal={changeModal}
+			 closeModal={this.closeModal}
+			 dataSource={selectRows}
+			/>
+			<DeleteModal
+			 key={`deleteModal${deleteModal}`}
+			 deleteModal={deleteModal}
+			 closeModal={this.closeModal}
+			 dataSource={selectRows}
+			 actions = {this.props.actions}
 			/>
 		</Main>)
 	}
 
-	showSendModal = ()=>{
-        this.setState({uploadModal:true});
+	showModal = (modal)=>{
+		let a = {};
+		a[modal] = true;
+        this.setState(a);
     }
-    closeModal= ()=>{
-        this.setState({uploadModal:false});
+    closeModal= (modal)=>{
+		let a = {};
+		a[modal] = false;
+        this.setState(a);
 	}
 
 	generateTableData = (data)=>{
         const {actions:{
             getDocument,
         }} = this.props;
-		let dataSource = []
-		data.forEach(item=>{
-			getDocument({code:item.code}).then(response=>{
-				let {extra_params:{cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode}} = response;
-				dataSource.push({cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode})
-				this.setState({dataSource});
-			})
+		const all = data.map(item=>{
+			return getDocument({code:item.code})
 		})
-    }
+		Promise.all(all).then(item =>{
+			const dataSource = item.map((response,index)=>{
+				let {extra_params:{cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,code}} = response;
+				return {index:index+1,
+					cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,code};
+			})
+			this.setState({dataSource,loading:false});
+		})
+	}
+	
+	storeSelectRows = (selectRows)=>{
+		this.setState({selectRows});
+	}
+
+	selectJudge = ()=>{
+		const {selectRows} = this.state;
+		if(selectRows.length == 0){
+			message.error("请选择数据");
+			return false
+		}
+		if(!selectRows.every((data)=> data.enginner == selectRows[0].enginner )){
+			message.error("请选择相同单位工程下的数据");
+			return false
+		}
+		return true
+	}
 };
