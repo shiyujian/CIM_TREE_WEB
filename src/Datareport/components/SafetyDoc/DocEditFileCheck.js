@@ -23,7 +23,7 @@ const {Option} = Select;
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class EditFileCheck extends Component {
+export default class DocEditFileCheck extends Component {
 
 	constructor(props) {
 		super(props);
@@ -61,7 +61,7 @@ export default class EditFileCheck extends Component {
         const {dataSource,wk,topDir} = this.state;
         const {actions:{
             logWorkflowEvent,
-            delDocList
+            putDocument
         }} = this.props;
         
         // send workflow
@@ -73,12 +73,36 @@ export default class EditFileCheck extends Component {
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         
-        const docCode = [];
+        const docData = [];
         dataSource.map(item=>{
-            docCode.push(item.docCode);
-        })
+            docData.push({
+                status:'A',
+                "basic_params": {
+                    "files": [
+                        {
+                          "a_file": item.file.a_file,
+                          "name": item.file.name,
+                          "download_url": item.file.download_url,
+                          "misc": "file",
+                          "mime_type": item.file.mime_type
+                        },
+                    ]
+                  },
+                extra_params:{
+                    code:item.code,
+                    filename:item.filename,
+                    pubUnit:item.pubUnit,
+                    type:item.type,
+                    doTime:item.doTime,
+                    remark:item.remark,
+                    upPeople:item.upPeople,
+                    unit:item.unit.name,
+                    project:item.project.name
+                }
+            })
+        });
         
-        let rst = await delDocList({},{code_list:docCode});
+        let rst = await delDocList({},{data_list:docCode});
         if(rst.result){
             notification.success({
                 message: '修改文档成功！',

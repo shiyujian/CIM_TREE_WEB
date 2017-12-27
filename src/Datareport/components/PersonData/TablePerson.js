@@ -1,12 +1,16 @@
 import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon} from 'antd';
 import style from './TableOrg.css'
+import DelPer from './PersonExpurgate';
 const Search = Input.Search;
 export default class TablePerson extends Component{
 	constructor(props) {
 		super(props);
 		this.state = {
 			dataSource: [],
+			deleData: [],
+			modData: [],
+			tempData:[],
 		}
 	}
     render(){
@@ -18,13 +22,14 @@ export default class TablePerson extends Component{
                     <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
                     <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button>
                     <Button className = {style.button}>导出表格</Button>
-                    <Search className = {style.button} style={{width:"200px"}} placeholder="输入搜索条件" />
+                    <Search className = {style.button} onSearch = {this.searchOrg.bind(this)} style={{width:"200px"}} placeholder="输入搜索条件" />
                 </div>
                 <Table
                     columns = {this.columns}
                     bordered = {true}
                     rowSelection={this.rowSelection}
                     dataSource = {this.state.dataSource}
+                    rowKey = "index"
                 >
                 </Table>
             </div>
@@ -37,33 +42,69 @@ export default class TablePerson extends Component{
 	}
 	//批量删除
 	expurgate() {
-		const { actions: { ExprugateVisible } } = this.props;
-		ExprugateVisible(true);
+		const { actions: { ExprugateVisible, setDeletePer } } = this.props;
+		if(this.state.deleData.length){
+			setDeletePer(this.state.deleData);
+			ExprugateVisible(true);
+		}else{
+			message.warning("请先选中要删除的数据");
+		}
 	}
 	//批量变更
 	modify() {
-		const { actions: { ModifyVisible } } = this.props;
-		ModifyVisible(true);
+		const { actions: { ModifyVisible, setModifyPer } } = this.props;
+		if(this.state.modData.length) {
+			console.log('modData', this.state.modData)
+			setModifyPer(this.state.modData)
+			ModifyVisible(true);
+		} else {
+			message.warning("请先选中要变更的数据");
+		}
 	}
 	async componentDidMount() {
 		const {actions: {getAllUsers}} = this.props;
 		let orgAll = await getAllUsers();
-		let orgRoot = [...orgAll];
-		console.log('orgAll',orgAll)
-		console.log('orgRoot',orgRoot)
-		this.setState({dataSource: orgRoot})
+		orgAll.forEach((item, index) => {
+			orgAll[index].index = index + 1;
+		})
+		this.setState({dataSource: orgAll})
 	}
-    rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-      onSelect: (record, selected, selectedRows) => {
-        console.log(record, selected, selectedRows);
-      },
-      onSelectAll: (selected, selectedRows, changeRows) => {
-        console.log(selected, selectedRows, changeRows);
-      },
-    };
+
+	searchOrg(value){ 
+		let searchData = [];
+		let searchPer = this.state.dataSource
+		searchPer.map(rst => {
+			console.log("rst", rst)
+			if (rst.account.organization.indexOf(value) != -1) {
+				searchData.push(rst);
+			}
+		})
+		searchData.map((item, index)=> {
+			item.index = index + 1;
+		})
+		this.setState({
+			tempData:searchData
+		})
+	}
+
+	rowSelection = {
+		onChange: (selectedRowKeys, selectedRows) => {
+			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+		},
+		onSelect: (record, selected, selectedRows) => {
+			this.setState({
+				deleData:selectedRows,
+				modData: selectedRows
+			})
+		},
+		onSelectAll: (selected, selectedRows, changeRows) => {
+			console.log(selected, selectedRows, changeRows);
+			this.setState({
+				deleData:selectedRows,
+				modData: selectedRows
+			})
+		},
+	};
 
     //删除
     delete(){
@@ -113,18 +154,5 @@ export default class TablePerson extends Component{
 	}, {
 		title: '编辑',
 		dataIndex: 'edit',
-		render:(record) => {
-            return  (
-                <Popconfirm
-                    placement="leftTop"
-                    title="确定删除吗？"
-                    onConfirm={this.delete.bind(this)}
-                    okText="确认"
-                    cancelText="取消"
-                >
-                    <a>删除</a>
-                </Popconfirm>
-            )
-        }
 	}]
 }

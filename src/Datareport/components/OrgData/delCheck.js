@@ -21,9 +21,9 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions,...actions2}, dispatch)
 	})
 )
-export default class delCheck extends Component {
+export default class DelCheck extends Component {
 
-	constructor(props) {
+	constructor(props) {   
 		super(props);
 		this.state = {
             wk:null,
@@ -55,86 +55,30 @@ export default class delCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent, updateWpData, addDocList, putDocList, postOrgList, getOrgRoot, putUnit, putProject, getProject, getUnitAc, getUnit, getOrgPk}} = this.props
+        const {actions:{logWorkflowEvent, deleteOrgList, getOrgPk}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        let doclist_a = [];
-        let doclist_p = [];
-        let wplist = [];
         console.log("dataSource",dataSource);
         let data_list = [];
-        let promises = dataSource.map((o) => {
-            return getOrgPk({code:o.type})
-        });
-        let rst = await Promise.all(promises);
-        console.log("rst:",rst);
-        dataSource.map((o, index) => {
+        dataSource.map((item, index) => {
             data_list.push({
-                code: "" + o.code,
-                name: o.canjian,
-                obj_type: "C_ORG",
-                status: "A",
-                version: "A",
-                extra_params: {
-                    project: o.selectPro,
-                    unit: o.selectUnit,
-                    remarks: o.remarks,
-                    org_type:o.type
+                code:"" + item.code,
+                parent:{
+                    pk: ""+ item.pk,
+                    code:"" + item.code,
+                    obj_type:item.obj_type
                 },
-                parent: {
-                    code:""+o.type,
-                    pk: rst[index].pk,
-                    obj_type: "C_ORG"
-                }
+                version:'A'
             })
         })
-        console.log("data_list:", data_list);
-        postOrgList({}, { data_list: data_list }).then(res => {
-            dataSource.map((item, index) => {
-                item.selectPro.map(it => {
-                    let proCode = it.split("--")[0];
-                    // 取出项目中所的orgs
-                    getProject({code:proCode}).then(rstPro => {
-                        let pro_orgs = rstPro.response_orgs;
-                        let pk = res.result[index].pk
-                        pro_orgs.push({
-                            code:item.code,
-                            obj_type:"C_ORG",
-                            pk:pk
-                        });
-                        putProject({ code: proCode }, {
-                            version: "A",
-                            response_orgs: pro_orgs
-                        }).then(rst => {
-                            console.log("rst:", rst);
-                        }) 
-                    });
-                }) 
-                item.selectUnit.map(it => {
-                    let unitCode = it.split("--")[0];
-                    getUnitAc({code:unitCode}).then(rstUnit => {
-                        let unit_orgs = rstUnit.response_orgs;
-                        let pk = res.result[index].pk
-                        unit_orgs.push({
-                            code:item.code,
-                            obj_type:"C_ORG",
-                            pk:pk
-                        });
-                        putUnit({ code: unitCode }, {
-                            version: "A",
-                            response_orgs: unit_orgs
-                        }).then(rst => {
-                            console.log("rst:", rst);
-                        }) 
-                    })
-                })
-            })
-        });
+        deleteOrgList({},{data_list: data_list}).then(rst => {
+            console.log("rst:",rst);
+        })
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
     }
     //不通过
     async reject(){
@@ -160,53 +104,46 @@ export default class delCheck extends Component {
     }
 	render() {
         const columns = [{
-            title: '序号',
-            dataIndex: 'index',
-            key: 'Index',
-        }, {
-            title: '参建单位编码',
+            title: '组织机构编码',
             dataIndex: 'code',
             key: 'Code',
         }, {
-            title: '机构类型',
-            dataIndex: 'type',
+            title: '组织机构类型',
+            dataIndex: 'extra_params.org_type',
             key: 'Type',
         }, {
             title: '参建单位名称',
-            dataIndex: 'canjian',
+            dataIndex: 'extra_params.canjian',
             key: 'Canjian',
-        },{
+        }, {
+            title: '组织机构部门',
+            dataIndex: 'name',
+            key: 'Name',
+        }, {
+            title: '直属部门',
+            dataIndex: 'extra_params.direct',
+            key: 'Direct',
+        }, {
             title: '负责项目/子项目名称',
-            width:"15%",
-            height:"64px",
-            dataIndex: 'selectPro',
-            key: 'SelectPro',
-        }, {
+            dataIndex: 'extra_params.project',
+            key: 'Project',
+        },{
             title: '负责单位工程名称',
-            dataIndex: 'selectUnit',
-            key: 'SelectUnit',
-            width:"15%",
-        }, {
+            dataIndex: 'extra_params.unit',
+            key: 'Unit'
+        },{
             title: '备注',
-            dataIndex: 'remarks',
+            dataIndex: 'extra_params.remarks',
             key: 'Remarks'
-        }, {
-            title: '编辑',
-            render: (record) => (
-                <span>
-                    <Icon style={{marginRight:"15px"}} type = "edit"/>
-                    <Icon type = "delete"/>
-                </span>
-            )
         }]
 		return (
             <Modal
 			title="组织机构信息审批表"
-			key={Math.random()}
+			// key={Math.random()}
             visible={true}
             width= {1280}
             footer={null}
-            onCancel = {this.props.closeModal.bind(this,"dr_base_cj_visible",false)}
+            onCancel = {this.props.closeModal.bind(this,"dr_base_del_visible",false)}
 			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>

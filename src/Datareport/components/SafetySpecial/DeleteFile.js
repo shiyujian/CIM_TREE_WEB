@@ -10,7 +10,7 @@ export default class DeleteFile extends Component {
         super(props);
         this.state = {
             dataSource: [],
-            deleteInfo: '',
+            deleteInfoNew: '',
             users: [],
             projects: [],
             checkers: [],//审核人下来框选项
@@ -42,7 +42,7 @@ export default class DeleteFile extends Component {
     }
     onChangeText(e) {
         this.setState({
-            deleteInfo: e.target.value
+            deleteInfoNew: e.target.value
         });
     }
 
@@ -57,11 +57,9 @@ export default class DeleteFile extends Component {
         const columns = [
             {
                 title: '序号',
-                // dataIndex: 'index',
+                dataIndex: 'i',
                 width: '5%',
-                render: (text, record, index) => {
-                    return index + 1
-                },
+
             },
             {
                 title: '项目/子项目名称',
@@ -106,24 +104,32 @@ export default class DeleteFile extends Component {
             ,
             {
                 title: '附件',
-                width: '10%',
+			    width: '10%',
                 render: (text, record) => {
-                    if (record.filename) {
-                        return (
-                            <a
-                                onClick={this.handlePreview.bind(this, record.codeId, record.i)}>
-                                预览
-                            </a>
-                        )
-                    } else {
-                        return (
-                            <span>
-                                暂无
-                            </span>
-                        )
-                    }
+                    return (<span>
+                        <a onClick={this.handlePreview.bind(this, record.codeId, record.i)}>预览</a>
+                        <span className="ant-divider" />
+                        <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
+                    </span>)
                 }
-            },
+                }
+            , 
+            {
+                title: '操作',
+                render: (text, record, index) => {
+                    return (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+                            // onConfirm={this.delete.bind(this, index, record.i)}
+                            onConfirm={this.delete.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
+                }
+            }
         ];
 
         const paginationInfoModal = {
@@ -142,7 +148,7 @@ export default class DeleteFile extends Component {
                 onCancel={this.cancel.bind(this)}
                 maskClosable={false}
             >
-                <h1 style={{ textAlign: 'center', fontSize: 14, color: '#333' }}>删除项目申请页面</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>删除项目申请页面</h1>
                 <Row >
                     <Table
                         columns={columns}
@@ -188,12 +194,21 @@ export default class DeleteFile extends Component {
             </Modal>
         )
     }; // render
+
+    //删除
+    delete(index) {
+        // debugger;
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
+    }
+
     onok() {
         if (!this.state.check) {
             message.error('审批人未选择');
             return;
         }
-        if (!this.state.deleteInfo) {
+        if (!this.state.deleteInfoNew) {
             message.info(`请填写删除原因`);
             return;
         }
@@ -205,10 +220,10 @@ export default class DeleteFile extends Component {
             person_code: check.account.person_code,
             organization: check.account.organization
         }
-        // for (let i = 0; i < this.state.dataSource.length; i++) {
-        //     this.state.dataSource[i].project = project;
-        //     this.state.dataSource[i].unit = unit;
-        // }
+        let { deleteInfoNew } = this.state
+        for (let i = 0; i < this.state.dataSource.length; i++) {
+            this.state.dataSource[i].deleteInfoNew = deleteInfoNew;
+        }
         this.props.setDeleteData(this.state.dataSource, per);
         notification.success({
             message: '删除已发起！',

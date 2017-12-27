@@ -62,85 +62,89 @@ export default class PersonData extends Component {
 				});
 		});
 	}
-
-	setDeleteData = (data,participants) =>{
-        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+	// 删除流程
+	setDataDel(data,participants){
+		console.log("data:",data);
+		console.log("participants:",participants);
+		// return; 
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
-			id:getUser().id,
-			username:getUser().username,
-			person_name:getUser().person_name,
-			person_code:getUser().person_code,
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
 		}
 		let postdata = {
-			name:"人员信息批量删除",
-			code:WORKFLOW_CODE["数据报送流程"],
-			description:"人员信息批量删除",
-			subject:[{
-				data:JSON.stringify(data)
+			name: "人员信息批量删除",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "人员信息批量删除",
+			subject: [{
+				data: JSON.stringify(data)
 			}],
-			creator:creator,
-			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
-			deadline:null,
-			status:"2"
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
 		}
-		createWorkflow({},postdata).then((rst) => {
-			let nextStates =  getNextStates(rst,rst.current[0].id);
-            logWorkflowEvent({pk:rst.id},
-                {
-                    state:rst.current[0].id,
-                    action:'提交',
-                    note:'发起填报',
-                    executor:creator,
-                    next_states:[{
-                        participants:[participants],
-                        remark:"",
-                        state:nextStates[0].to_state[0].id,
-                    }],
-                    attachment:null}).then(() => {
-						this.setState({setAddVisiable:false})						
-					})
-		})
-    }
+		createWorkflow({}, postdata).then((rst) => {
+			let nextStates = getNextStates(rst, rst.current[0].id);
+			logWorkflowEvent({ pk: rst.id },
+				{
+					state: rst.current[0].id,
+					action: '提交',
+					note: '发起人员信息删除',
+					executor: creator,
+					next_states: [{
+						participants: [participants],
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					attachment: null
+				});
+		});
+	}
 
-    setChangeData = (data,participants) =>{
-        const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+	// 更新流程
+	setDataUpdate(data,participants){
+		console.log("data:",data);
+		console.log("participants:",participants);
+		// return; 
+		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
-			id:getUser().id,
-			username:getUser().username,
-			person_name:getUser().person_name,
-			person_code:getUser().person_code,
+			id: getUser().id,
+			username: getUser().username,
+			person_name: getUser().person_name,
+			person_code: getUser().person_code,
 		}
 		let postdata = {
-			name:"人员信息批量变更",
-			code:WORKFLOW_CODE["数据报送流程"],
-			description:"人员信息批量变更",
-			subject:[{
-				data:JSON.stringify(data)
+			name: "人员信息批量更改",
+			code: WORKFLOW_CODE["数据报送流程"],
+			description: "人员信息批量更改",
+			subject: [{
+				data: JSON.stringify(data)
 			}],
-			creator:creator,
-			plan_start_time:moment(new Date()).format('YYYY-MM-DD'),
-			deadline:null,
-			status:"2"
+			creator: creator,
+			plan_start_time: moment(new Date()).format('YYYY-MM-DD'),
+			deadline: null,
+			status: "2"
 		}
-		createWorkflow({},postdata).then((rst) => {
-			let nextStates =  getNextStates(rst,rst.current[0].id);
-            logWorkflowEvent({pk:rst.id},
-                {
-                    state:rst.current[0].id,
-                    action:'提交',
-                    note:'发起填报',
-                    executor:creator,
-                    next_states:[{
-                        participants:[participants],
-                        remark:"",
-                        state:nextStates[0].to_state[0].id,
-                    }],
-                    attachment:null}).then(() => {
-						this.setState({setAddVisiable:false})						
-					})
-		})
-    }
-
+		createWorkflow({}, postdata).then((rst) => {
+			let nextStates = getNextStates(rst, rst.current[0].id);
+			logWorkflowEvent({ pk: rst.id },
+				{
+					state: rst.current[0].id,
+					action: '提交',
+					note: '发起人员信息更改',
+					executor: creator,
+					next_states: [{
+						participants: [participants],
+						remark: "",
+						state: nextStates[0].to_state[0].id,
+					}],
+					attachment: null
+				});
+		});
+	}
 	render() {
 		const {visible, Exvisible, Modvisible} = this.props;
 		return (
@@ -152,14 +156,15 @@ export default class PersonData extends Component {
 				<Content>
 					<TablePerson {...this.props} />
 					{
-						// visible && <ToggleModal {...this.props} setData = {this.setData.bind(this)}/>,
-						// Exvisible && <PersonExpurgate {...this.props}/>,
-						// Modvisible && <PersonModify {...this.props}/>
+						visible && <ToggleModal {...this.props} setData = {this.setData.bind(this)}/>
+					}
+					{
+						Exvisible && <PersonExpurgate {...this.props} setDataDel = {this.setDataDel.bind(this)}/>
+					}
+					{
+						Modvisible && <PersonModify {...this.props} setDataUpdate = {this.setDataUpdate.bind(this)}/>
 					}
 				</Content>
-				<ToggleModal {...this.props} setData = {this.setData.bind(this)}/>
-				<PersonExpurgate {...this.props}/>
-				<PersonModify {...this.props}/>
 			</div>
 			)
 	}

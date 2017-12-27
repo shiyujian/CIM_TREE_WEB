@@ -22,7 +22,7 @@ const {Option} = Select
 		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
 	})
 )
-export default class EditFileCheck extends Component {
+export default class DangerEditFileCheck extends Component {
 
 	constructor(props) {
 		super(props);

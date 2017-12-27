@@ -1,28 +1,29 @@
 import React, { Component } from 'react';
 import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress } from 'antd';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
 export default class DesignTable extends Component {
 	constructor(props) {
-		super(props)
+		super(props);
+		this.header = ['序号','文档编码','文档名称','项目/子项目名称','单位工程','项目阶段','提交单位',
+						'文档类型','专业','描述的WBS对象','描述的设计对象','上传人员'];
 		this.state = {
 			selectedRowKeys: [],
 			alldatas:[],
+			showDs:[],
 			loading: false,
 			percent: 0,
 		}
-
 	}
 	onSelectChange = (selectedRowKeys) => {
 		const {alldatas} = this.state;
-		const { actions: { changeModifyField,changeExpurgateField } } = this.props;
-		this.setState({ selectedRowKeys });
+		const {actions: {changeModifyField,changeExpurgateField}} = this.props;
+		this.setState({selectedRowKeys});
 		let selectedDatas = [];
 		selectedRowKeys.forEach(key => {
 			selectedDatas.push(alldatas[key-1])
 		})
-		console.log('selectedRowKeys',selectedRowKeys,'selectedDatas',selectedDatas,'alldatas',alldatas)
 		changeModifyField('selectedDatas',selectedDatas)
 		changeExpurgateField('selectedDatas',selectedDatas)
 	}
@@ -34,7 +35,6 @@ export default class DesignTable extends Component {
         let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
         if(topDir.obj_type){
             let dir = await getScheduleDir({code:'datareport_designdata'});
-            
             if(dir.obj_type){
                 if(dir.stored_documents.length>0){
                     this.generateTableData(dir.stored_documents);
@@ -42,7 +42,7 @@ export default class DesignTable extends Component {
             }
         }
     }
-    async generateTableData(data){
+    generateTableData(data){
         const {actions:{
             getDocument,
         }} = this.props;
@@ -58,7 +58,7 @@ export default class DesignTable extends Component {
                     this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
                     if(!rst) {
                     	message.error(`数据获取失败`)
-		    			return []
+		    			return {}
 		    		} else {
                     	return rst
                     }
@@ -66,26 +66,31 @@ export default class DesignTable extends Component {
         })
         Promise.all(all)
         .then(item => {
-        	this.setState({loading:false})
-        	item.forEach((single,index) => {
-        		let temp = {
-        			index:index+1,
-                    code:single.extra_params.code,
-                    filename:single.extra_params.filename,
-                    pubUnit:single.extra_params.pubUnit,
-                    filetype:single.extra_params.filetype,
-                    file:single.basic_params.files[0],
-                    unit:single.extra_params.unit,
-                    major:single.extra_params.major,
-                    project:single.extra_params.project,
-                    stage:single.extra_params.stage,
-                    upPeople:single.extra_params.upPeople,
-                    wbsObject:single.extra_params.wbsObject,
-                    designObject:single.extra_params.designObject,
-                }
-                dataSource.push(temp);
-        	}) 
-            this.setState({dataSource,alldatas:item});
+        	this.setState({loading:false,percent:100})
+        	try {
+				item.forEach((single,index) => {
+	        		let temp = {
+	        			index:index+1,
+	        			num:index+1,
+	                    code:single.extra_params.code,
+	                    filename:single.extra_params.filename,
+	                    pubUnit:single.extra_params.pubUnit,
+	                    filetype:single.extra_params.filetype,
+	                    file:single.basic_params.files[0],
+	                    unit:single.extra_params.unit,
+	                    major:single.extra_params.major,
+	                    project:single.extra_params.project,
+	                    stage:single.extra_params.stage,
+	                    upPeople:single.extra_params.upPeople,
+	                    wbsObject:single.extra_params.wbsObject,
+	                    designObject:single.extra_params.designObject,
+	                }
+	                dataSource.push(temp);
+        		}) 
+        	} catch(e){
+        		message.error(`数据获取失败`)
+        	}
+            this.setState({dataSource,alldatas:item,showDs:dataSource});
         })
     }
 	render() {
@@ -97,7 +102,7 @@ export default class DesignTable extends Component {
 
 		const columns = [{
 			title: '序号',
-			dataIndex: 'index',
+			dataIndex: 'num',
 		}, {
 			title: '文档编码',
 			dataIndex: 'code'
@@ -151,11 +156,23 @@ export default class DesignTable extends Component {
 					<Button style={{ margin: '10px' }} onClick={this.toggleAddition.bind(this)} type="default" >发起填报</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleModify.bind(this)} type="default">申请变更</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleExpurgate.bind(this)} type="default">申请删除</Button>
-					<Button style={{ margin: '10px' }} type="default">导出表格</Button>
+					<Button style={{ margin: '10px' }} onClick={this.getExcel.bind(this)} type="default">导出表格</Button>
 					<Search
 						style={{ width: "200px", marginLeft: 10 }}
 						placeholder="输入搜索条件"
-						onSearch={value => console.log(value)}
+						onSearch={
+							(text) => {
+								let result = this.state.dataSource.filter(data=>{
+									return data.filename.indexOf(text)>=0 || data.code.indexOf(text)>=0;
+								});
+								console.log(result);
+								if(text === ''){
+									result = this.state.dataSource;
+								}
+								this.onSelectChange([])//清空选择项
+								this.setState({showDs:this.addindex(result)});
+							}
+						}
 					/>
 				</Row>
 				{//<Button style={{ marginLeft: 10 }} type="primary" onClick={this.togglecheck.bind(this)}>审核</Button>
@@ -165,13 +182,19 @@ export default class DesignTable extends Component {
 						bordered
 						columns={columns}
 						rowSelection={rowSelection}
-						dataSource={this.state.dataSource}
+						dataSource={this.state.showDs}
 						rowKey="index"
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 					/>
 				</Row>
 			</div>
 		);
+	}
+	addindex(arr){
+		arr.forEach((item,index) => {
+			arr[index].num = ++index
+		})
+		return arr
 	}
 	handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -192,16 +215,52 @@ export default class DesignTable extends Component {
 	}
 	toggleModify() {
 		const {modify = {}, actions: { changeModifyField } } = this.props;
-		console.log(this.props)
-		changeModifyField('visible', true)
-		changeModifyField('key', modify.key?modify.key+1:1)
+		console.log(this.props,'modify.selectedDatas',modify.selectedDatas)
+		if(!(modify.selectedDatas&&modify.selectedDatas.length)){
+			message.warning('Nothing selected')
+		} else if(!this.judge(modify.selectedDatas)) {
+			message.warning('Different unit had been selected, check your selected lines please ')
+		} else {
+			changeModifyField('visible', true)
+			changeModifyField('key', modify.key?modify.key+1:1)
+		}
 	}
 	toggleExpurgate() {
 		const {expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		console.log(this.props)
-		changeExpurgateField('visible', true)
-		changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
+		if(!(expurgate.selectedDatas&&expurgate.selectedDatas.length)){
+			message.warning('Nothing selected')
+		} else {
+			changeExpurgateField('visible', true)
+			changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
+		}
 	}
+	judge(arr) {
+		return arr.every(item => item.extra_params.unit.pk === arr[0].extra_params.unit.pk)
+	}
+	//下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    //数据导出
+    getExcel(){
+        const {actions:{jsonToExcel}} = this.props;
+        const {showDs} = this.state;
+        let rows = [];
+        rows.push(this.header);
+        showDs.map(item => {
+            rows.push([item.num,item.code,item.filename,item.project.name,item.unit.name,item.stage,item.pubUnit,item.filetype,item.major,item.wbsObject,item.designObject,item.upPeople]);
+        })
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+            this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
+    }
 }
-
-

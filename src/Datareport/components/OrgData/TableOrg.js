@@ -6,7 +6,9 @@ export default class TableOrg extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			dataSource: []
+			dataSource: [],
+			selectData:[],
+			tempData:[],
 		}
 	}
 	render() {
@@ -16,21 +18,51 @@ export default class TableOrg extends Component {
 					<Button style={{ marginRight: "10px" }}>模板下载</Button>
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
 					<Button className={style.button} onClick={this.sendCJ.bind(this)}>发送参建单位</Button>
-					<Button className={style.button}>申请变更</Button>
-					<Button className={style.button}>申请删除</Button>
+					<Button className={style.button} onClick={this.update.bind(this)}>申请变更</Button>
+					<Button className={style.button} onClick={this.delete.bind(this)}>申请删除</Button>
 					<Button className={style.button}>导出表格</Button>
-					<Search className={style.button} style={{ width: "200px" }} placeholder="输入搜索条件" />
+					<Search className={style.button} onSearch = {this.searchOrg.bind(this)} style={{ width: "200px" }} placeholder="输入搜索条件" />
 				</div>
 				<Table
 					columns={this.columns}
 					bordered={true}
 					rowSelection={this.rowSelection}
-					dataSource={this.state.dataSource}
+					dataSource={this.state.tempData}
 					rowKey = "code"
 				>
 				</Table>
 			</div>
 		)
+	}
+	searchOrg(value){ 
+		let searchData = [];
+		this.state.dataSource.map(item => {
+			if (item.name.indexOf(value) != -1) {
+				searchData.push(item);
+			}
+			if (item.children && item.children.length > 0) {
+				item.children.map(it => {
+					if (it.name.indexOf(value) != -1) {
+						searchData.push(it);
+					}
+				})
+			}
+		})
+		searchData.map((item, index)=> {
+			item.index = index + 1;
+		})
+		this.setState({
+			tempData:searchData
+		})
+	}
+	update(){
+		const { actions: { ModalVisibleUpdate, setUpdateOrg } } = this.props;
+		if(this.state.selectData.length){
+			setUpdateOrg(this.state.selectData);
+			ModalVisibleUpdate(true)
+		}else{
+			message.warning("请先选中要变更的数据");
+		}
 	}
 	send() {
 		const { actions: { ModalVisible } } = this.props;
@@ -39,6 +71,15 @@ export default class TableOrg extends Component {
 	sendCJ() {
 		const { actions: { ModalVisibleCJ } } = this.props;
 		ModalVisibleCJ(true);
+	}
+	delete(){
+		const {actions:{setDeleteOrg,ModalVisibleDel}} = this.props;
+		if(this.state.selectData.length){
+			setDeleteOrg(this.state.selectData);
+			ModalVisibleDel(true);
+		}else{
+			message.warning("请先选中要删除的数据");
+		}
 	}
 	async componentDidMount() {
 		let dataSource = [];
@@ -54,17 +95,22 @@ export default class TableOrg extends Component {
 		dataSource.map((item, index) => {
 			item.index = index + 1
 		})
-		this.setState({dataSource})
+		this.setState({dataSource,tempData:dataSource})
 	}
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
 			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
 		},
 		onSelect: (record, selected, selectedRows) => {
-			console.log(record, selected, selectedRows);
+			this.setState({
+				selectData:selectedRows
+			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
 			console.log(selected, selectedRows, changeRows);
+			this.setState({
+				selectData:selectedRows
+			})
 		},
 	};
 	

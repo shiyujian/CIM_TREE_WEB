@@ -72,7 +72,14 @@ export default class SumSpeedDelete extends Component {
               render: (text, record, index) => {
                 return index + 1;
               }
-            },
+            },{
+                title: "项目/子项目",
+                dataIndex: "project"
+              },
+              {
+                title: "单位工程",
+                dataIndex: "unit"
+              },
             {
               title: "工作节点目标",
               dataIndex: "nodetarget"
@@ -93,33 +100,34 @@ export default class SumSpeedDelete extends Component {
               title: "备注",
               dataIndex: "remarks"
             },
-            {
-              title: "编辑",
-              dataIndex: "edit",
-              render: (text, record, index) => {
-                return (
-                  <Popconfirm
-                    placement="leftTop"
-                    title="确定删除吗？"
-                    onConfirm={this.delete.bind(this, index)}
-                    okText="确认"
-                    cancelText="取消"
-                  >
-                    <a>删除</a>
-                  </Popconfirm>
-                );
-              }
-            }
+            // {
+            //   title: "编辑",
+            //   dataIndex: "edit",
+            //   render: (text, record, index) => {
+            //     return (
+            //       <Popconfirm
+            //         placement="leftTop"
+            //         title="确定删除吗？"
+            //         onConfirm={this.delete.bind(this, index)}
+            //         okText="确认"
+            //         cancelText="取消"
+            //       >
+            //         <a>删除</a>
+            //       </Popconfirm>
+            //     );
+            //   }
+            // }
           ];
         return (
             <Modal
-			title="结算进度删除表"
+			title="结算进度删除流程表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+            <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度删除流程</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

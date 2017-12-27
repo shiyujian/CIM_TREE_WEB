@@ -23,9 +23,10 @@ export default class ToggleModalDel extends Component{
         }
     }
     render(){
+        const {visibleDel, deleteOrg} = this.props;
         return (
             <Modal
-                visible={visibleCJ}
+                visible={visibleDel}
                 width={1280}
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
@@ -38,11 +39,6 @@ export default class ToggleModalDel extends Component{
                     dataSource = {this.state.dataSource}
                 >
                 </Table>
-                <Upload {...props}>
-                    <Button style={{ margin: '10px 10px 10px 0px' }}>
-                        <Icon type="upload" />上传附件
-                     </Button>
-                </Upload>
                 <span>
                     审核人：
                         <Select defaultValue={this.state.defaultchecker} style={{ width: '200px' }} className="btn" onSelect = {ele=>{
@@ -78,42 +74,56 @@ export default class ToggleModalDel extends Component{
         ModalVisibleDel(false);
     }
     componentDidMount(){
+        const {visibleDel, deleteOrg, actions:{getAllUsers, getProjects}} = this.props;
+        getAllUsers().then(rst => {
+            let users = [];
+            if (rst.length) {
+                let checkers = rst.map(o => {
+                    return (
+                        <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    )
+                })
+                this.setState({
+                    checkers,
+                    defaultchecker: rst[0].account.person_name
+                })
+            }
+        });
+        this.setState({
+            dataSource:deleteOrg
+        })
     }
-    columns = [{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'Index',
-    }, {
-        title: '参建单位编码',
-        dataIndex: 'code',
-        key: 'Code',
-    }, {
-        title: '机构类型',
-        dataIndex: 'type',
-        key: 'Type',
-    }, {
-        title: '参建单位名称',
-        dataIndex: 'canjian',
+    columns = [ {
+		title: '组织机构编码',
+		dataIndex: 'code',
+		key: 'Code',
+	}, {
+		title: '组织机构类型',
+		dataIndex: 'extra_params.org_type',
+		key: 'Type',
+	}, {
+		title: '参建单位名称',
+        dataIndex: 'extra_params.canjian',
         key: 'Canjian',
-    },{
-        title: '负责项目/子项目名称',
-        dataIndex: 'project',
-        key: 'Project'
-    }, {
-        title: '负责单位工程名称',
-        dataIndex: "unit",
-        key: "Unit"
-    }, {
-        title: '备注',
-        dataIndex: 'remarks',
-        key: 'Remarks'
-    }, {
-        title: '编辑',
-        render: (record) => (
-            <span>
-                <Icon style={{marginRight:"15px"}} type = "edit"/>
-                <Icon type = "delete"/>
-            </span>
-        )
-    }]
+	}, {
+		title: '组织机构部门',
+		dataIndex: 'name',
+		key: 'Name',
+	}, {
+		title: '直属部门',
+		dataIndex: 'extra_params.direct',
+		key: 'Direct',
+	}, {
+		title: '负责项目/子项目名称',
+		dataIndex: 'extra_params.project',
+		key: 'Project',
+	},{
+		title: '负责单位工程名称',
+		dataIndex: 'extra_params.unit',
+		key: 'Unit'
+	},{
+		title: '备注',
+		dataIndex: 'extra_params.remarks',
+		key: 'Remarks'
+	}]
 }

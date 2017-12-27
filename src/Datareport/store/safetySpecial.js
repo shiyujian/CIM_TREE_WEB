@@ -18,9 +18,10 @@ const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 
 // 查询
-const getSearcherDir = createFetchAction(`${SERVICE_API}/searcher/?keyword={{code}}&&obj_type=C_DOC`,[],'GET');
+const getSearcherDir = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{keyword}}`,[],'GET');
 
-
+// 更新
+const updateDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 
 export const actions = {
 	ModalVisible,
@@ -32,6 +33,7 @@ export const actions = {
 	getScheduleDir,
 	postScheduleDir,
 	getSearcherDir,
+	updateDocList,
 };
 
 export default handleActions({
@@ -43,12 +45,12 @@ export default handleActions({
 		...state,
 		dataSource: payload,
 	}),
-	[ChangeRow]: (state, { payload }) => ({
-		...state,
-		changeInfo: payload,
-	}),
-	[DeleteRow]: (state, { payload }) => ({
-		...state,
-		deleteInfo: payload,
-	}),
+	// [ChangeRow]: (state, { payload }) => ({
+	// 	...state,
+	// 	changeInfo: payload,
+	// }),
+	// [DeleteRow]: (state, { payload }) => ({
+	// 	...state,
+	// 	deleteInfo: payload,
+	// }),
 }, {});

@@ -7,6 +7,9 @@ import { SERVICE_API,USER_API,WORKFLOW_API} from '_platform/api';
 export const ModalVisible = createAction('组织Modal模态框显示隐藏');
 export const ModalVisibleCJ = createAction('参建单位Modal模态框显示隐藏');
 export const ModalVisibleDel = createAction('删除组织机构Modal模态框显示隐藏');
+export const ModalVisibleUpdate = createAction('变更组织机构Modal模态框显示隐藏');
+export const setDeleteOrg = createAction('存储要删除的数据');
+export const setUpdateOrg = createAction('存储要变更的数据');
 export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const getProjects = createFetchAction(`${SERVICE_API}/project-tree/?depth=1`);
 export const postOrgList = createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "POST");
@@ -19,6 +22,7 @@ export const getProject = createFetchAction(`${SERVICE_API}/projects/code/{{code
 export const getUnitAc = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[], "GET");
 export const getOrgPk= createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[], "GET");
 export const getOrgTree= createFetchAction(`${SERVICE_API}/org-tree/?depth=3`,[], "GET");
+export const deleteOrgList= createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "PUT"); 
 
 export const actions = {
 	ModalVisible,
@@ -35,14 +39,17 @@ export const actions = {
 	getOrgPk,
 	ModalVisibleCJ,
 	getOrgTree,
-	ModalVisibleDel
+	ModalVisibleDel,
+	setDeleteOrg,
+	deleteOrgList,
+	ModalVisibleUpdate,
+	setUpdateOrg
 };
 
 export default handleActions({
 	[ModalVisible]: (state, {payload}) => ({
 		...state,
 		visible:payload,
-		
 	}),
 	[getOrgRoot]: (state, {payload}) => ({
 		...state,
@@ -52,8 +59,21 @@ export default handleActions({
 		...state,
 		visibleCJ:payload,
 	}),
+	[setDeleteOrg]: (state, {payload}) => ({
+		...state,
+		deleteOrg:payload,
+	}),
 	[ModalVisibleDel]: (state, {payload}) => ({
 		...state,
 		visibleDel:payload,
+	}),
+	[ModalVisibleUpdate]: (state, {payload}) => ({
+		...state,
+		visibleUpdate:payload,
+	}),
+	[setUpdateOrg]: (state, {payload}) => ({
+		...state,
+		updateOrg:payload,
 	})
+	
 }, {});

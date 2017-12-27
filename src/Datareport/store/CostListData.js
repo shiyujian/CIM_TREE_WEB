@@ -24,11 +24,19 @@ export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk
 const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
 //上传taglists
 const addTagList = createFetchAction(`${SERVICE_API}/taglist/`,[],'POST');
+//批量更新tags
+const updateTagList = createFetchAction(`${SERVICE_API}/taglist/`,[],'POST');
+//批量删除tags
+const removeDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
 //上传tags
 const sendTags = createFetchAction(`${SERVICE_API}/tags/`,[],'POST');
+//更新
+export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
+
 //获取施工包详情
 const getWorkPackageDetails = createFetchAction(`${SERVICE_API}/workpackages/{{code}}/?all=true`,[]);
-const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{key}}&obj_type=C_QTO`,[],'GET')
+const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{key}}&obj_type=C_QTO`,[],'GET');
+const getStrictSearch = createFetchAction(`${SERVICE_API}/doc_searcher/{{dir_code}}/L001/?doc_code=G01&doc_name=N01&keys=key1,key2&values=value1,value2`,[],'GET');
 
 export const actions = {
 	getProjectTree,
@@ -48,7 +56,9 @@ export const actions = {
 	getDocument,
 	addTagList,
 	sendTags,
-	getSearcher
+	getSearcher,
+	removeDocList,
+	putDocList
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
