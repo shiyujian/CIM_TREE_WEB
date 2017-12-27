@@ -267,7 +267,6 @@ export default class CostListData extends Component {
 		}else{
 			message.info("请换一个字段")
 		}
-		debugger;
 	}
 	render() {
 		const { selectedRowKeys } = this.state;
