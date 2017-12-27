@@ -154,6 +154,7 @@ export default class Modify extends Component {
 			 width = {1280}
 			 visible = {modify.visible}
 			 title="设计信息申请变更表"
+			 maskClosable={false}
 			 onCancel = {this.cancel.bind(this)}
 			 footer={null}
 			>
