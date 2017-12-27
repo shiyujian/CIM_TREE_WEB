@@ -68,8 +68,8 @@ export default class PriceModifyCheck extends Component {
         let doclist_c = [];
         dataSource.map(item=>{
             doclist_c.push({
-                code:item.extra_params,
-                obj_type: "C_DIR",
+                code:item.code,
+                obj_type: "C_QTO",
                 status:"A",
                 version:"A",
                 extra_params:item
@@ -84,7 +84,6 @@ export default class PriceModifyCheck extends Component {
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         
-        debugger;
         if(rst.result){
             notification.success({
                 message: '变更工程量项成功！',
@@ -118,8 +117,7 @@ export default class PriceModifyCheck extends Component {
             title:'序号',
             dataIndex:'code',
             render:(text,record,index) => {
-                console.log(text)
-                return index+1
+                return record.key
             }
         },{
             title:'项目/子项目',

@@ -8,7 +8,6 @@ import {Row,Col,Table,Input,Button,message,Popconfirm} from 'antd';
 import PriceList from '../components/CostListData/PriceList';
 import PriceRmModal from '../components/CostListData/PriceRmModal';
 import PriceModifyModal from '../components/CostListData/PriceModifyModal';
-import PriceExcelModal from '../components/CostListData/PriceExcelModal';
 import {getUser} from '_platform/auth';
 import './quality.less';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -35,13 +34,15 @@ export default class CostListData extends Component {
 			excelModal: false,
 			dataSource: [],
 			cacheDataSource: [],
-			subDatas: []
+			selectedRows: [],
+			
 		};
 		this.columns = [{
-			title:'序号',
-			render:(text,record,index) => {
-				return index+1
-			}
+				title:'序号',
+				dataIndex:'code',
+				render:(text,record,index) => {
+					return record.key
+				}
 			},{
 				title:'项目/子项目',
 				dataIndex:'subproject',
@@ -83,7 +84,7 @@ export default class CostListData extends Component {
 		let data = await getSearcher({key:"priceListName"});
 		data.result.map((item,index)=>{
 			let temp = {
-				code:item.extra_params.code,
+				code:item.code,
 				company:item.extra_params.company,
 				rate:item.extra_params.rate,
 				projectcoding:item.extra_params.projectcoding,
@@ -92,14 +93,12 @@ export default class CostListData extends Component {
 				valuation:item.extra_params.valuation,
 				subproject: item.extra_params.subproject,
 				unitengineering: item.extra_params.unitengineering,
-				extraCode:item.code,
 				key: index + 1,
 				pk: item.pk
 			}
 			dataSource.push(temp);
 		})
 		this.setState({dataSource, cacheDataSource: dataSource});
-		debugger;
 	}
 
 	//批量上传回调
@@ -223,16 +222,6 @@ export default class CostListData extends Component {
 		})
 	}
 
-	getSelectItems () {
-		let dataSource = this.state.dataSource;
-		let selectedRowKeys = this.state.selectedRowKeys;
-		return selectedRowKeys.map(index => dataSource[index]);
-	}
-
-	setExcelData () {
-		message.info("excel 数据导出成功")
-	}
-
 	oncancel(){
 		this.setState({addvisible:false})
 	}
@@ -240,21 +229,27 @@ export default class CostListData extends Component {
 		this.setState({addvisible:true})
 	}
 	onSelectChange = (selectedRowKeys, selectedRows) => {
-		console.log(selectedRows, selectedRowKeys)
-		this.setState({ selectedRowKeys, subDatas: selectedRows});
+		this.setState({selectedRowKeys, selectedRows});
 	}
 	//全局搜索
 	search(value) {
+		value = String(value);
+		let oldData = this.state.dataSource;
 		let dataSource = this.state.cacheDataSource;
 		let res = [];
 		if(!value.length) {
-			this.setState({dataSource});
-			return;
+			if(oldData.length !== dataSource.length){
+				this.setState({dataSource});
+				return;
+			}else {
+				message.warn("请输入查询字段");
+				return;
+			}
 		}
 		for(var i = 0; i < dataSource.length; ++i) {
 			for(var key in dataSource[i]) {
 				let val = String(dataSource[i][key]);
-				if(val.indexOf(String(value)) !== -1) {
+				if(val.indexOf(value) !== -1) {
 					res.push(dataSource[i]);
 					break;
 				}
@@ -268,6 +263,16 @@ export default class CostListData extends Component {
 			message.info("请换一个字段")
 		}
 	}
+
+	openModal (type) {
+		if(!this.state.selectedRows.length) {
+			message.warn("请选择数据");
+			return;
+		}
+		this.setState({
+			[type]: true
+		})
+	}
 	render() {
 		const { selectedRowKeys } = this.state;
 		const rowSelection = {
@@ -280,9 +285,9 @@ export default class CostListData extends Component {
 				<Row>
 					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
 					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
-					<Button className="btn" type="default" onClick={() => {this.setState({modifyModal:true})}}>申请变更</Button>
-					<Button className="btn" type="default" onClick={() => {this.setState({rmModal:true})}}>申请删除</Button>
-					<Button className="btn" type="default" onClick={() => {this.setState({excelModal:true})}}>导出表格</Button>
+					<Button className="btn" type="default" onClick={this.openModal.bind(this, "modifyModal")}>申请变更</Button>
+					<Button className="btn" type="default" onClick={this.openModal.bind(this, "rmModal")}>申请删除</Button>
+					<Button className="btn" type="default" onClick={this.openModal.bind(this, "excelModal")}>导出表格</Button>
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
@@ -305,15 +310,11 @@ export default class CostListData extends Component {
 				}
 				{
 					this.state.modifyModal &&
-					<PriceModifyModal {...this.props} modifyData={this.state.subDatas} oncancel={() => {this.setState({modifyModal:false})}} onok={this.setModifyData.bind(this)}/>
+					<PriceModifyModal {...this.props} modifyData={this.state.selectedRows} oncancel={() => {this.setState({modifyModal:false})}} onok={this.setModifyData.bind(this)}/>
 				}
 				{
 					this.state.rmModal &&
-					<PriceRmModal {...this.props} rmData={this.state.subDatas} oncancel={() => {this.setState({rmModal:false})}} onok={this.setRmData.bind(this)}/>
-				}
-				{
-					this.state.excelModal &&
-					<PriceExcelModal {...this.props} excelData={this.state.subDatas} oncancel={() => {this.setState({excelModal:false})}} onok={this.setExcelData.bind(this)}/>
+					<PriceRmModal {...this.props} rmData={this.state.selectedRows} oncancel={() => {this.setState({rmModal:false})}} onok={this.setRmData.bind(this)}/>
 				}
 			</div>
 		);
