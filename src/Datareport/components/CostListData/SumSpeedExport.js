@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 
-import { Input, Form, Spin, Upload, Icon, Button, Modal,
-    Cascader ,Select, Popconfirm,message, Table, Row, Col, notification } from 'antd';
+import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader ,Select, Popconfirm,message, Table, Row, Col, notification } from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-export default class ProjectSumExcalDelete extends Component {
+export default class SumSpeedExport extends Component {
 
     constructor(props) {
         super(props);
@@ -36,17 +35,17 @@ export default class ProjectSumExcalDelete extends Component {
     
 
     //下拉框选择人
-    selectChecker(value){
-        let check = JSON.parse(value);
-        this.setState({check})
-    }
+    // selectChecker(value){
+    //     let check = JSON.parse(value);
+    //     this.setState({check})
+    // }
 
 
     onok(){
-        if(!this.state.check){
-            message.info("请选择审核人")
-            return;
-        }
+        // if(!this.state.check){
+        //     message.info("请选择审核人")
+        //     return;
+        // }
         let {check} = this.state;
         let per = {
             id:check.id,
@@ -55,82 +54,82 @@ export default class ProjectSumExcalDelete extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-        this.props.onok(this.state.dataSource,per);
-        notification.success({
-            message: '信息上传成功！',
-            duration: 2
-        });
+		this.props.onok(this.state.dataSource,per);
     }
 
     //删除
-    delete(index){
-        let {dataSource} = this.state;
-        dataSource.splice(index,1);
-        this.setState({dataSource});
-    }
-
+    // delete(index){
+    //     let {dataSource} = this.state;
+    //     dataSource.splice(index,1);
+    //     this.setState({dataSource});
+    // }
+   
     render() {
-        // console.log('this.state',this.state);
-        const columns = [
+        const columns =[
             {
-                title: "序号",
-                dataIndex: "code",
-                width: "10%",
-                render:(text,record,index)=>{
-                  return index+1
-                }
-              },{
-                title: '项目/子项目',
-                dataIndex: 'subproject',
-            }, {
-                title: '单位工程',
-                dataIndex: 'unit',
-            }, {
-                title: '清单项目编号',
-                dataIndex: 'projectcoding',
-            }, {
-                title: '项目名称',
-                dataIndex: 'projectname',
-            }, {
-                title: '计量单位',
-                dataIndex: 'company',
-            }, {
-                title: '数量',
-                dataIndex: 'number',
-            }, {
-                title: '单价',
-                dataIndex: 'total',
-            }, {
-                title: '备注',
-                dataIndex: 'remarks',
-            }
-        ];
+              title: "序号",
+              dataIndex: "number",
+              width:"5%",
+              render: (text, record, index) => {
+                return index + 1;
+              }
+            },{
+                title: "项目/子项目",
+                dataIndex: "project",
+              },
+              {
+                title: "单位工程",
+                dataIndex: "unit",
+              },
+            {
+              title: "工作节点目标",
+              dataIndex: "nodetarget",
+            },
+            {
+              title: "完成时间",
+              dataIndex: "completiontime",
+            },
+            {
+              title: "支付金额（万元）",
+              dataIndex: "summoney",
+            },
+            {
+              title: "累计占比",
+              dataIndex: "ratio",
+            },
+            {
+              title: "备注",
+              dataIndex: "remarks",
+            },
+          ];
         return (
             <Modal
-			title="工程量结算删除表"
+			title="结算进度导出表格表"
+			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+            <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度导出表格表</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{ pageSize: 10 }}
                 />
-                <Row style={{ marginBottom: "30px" }} type="flex">
+                {/* <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col>
                         <span>
                             审核人：
-                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)} mode="combobox" placeholder="可搜索审查人">
                                 {
                                     this.state.checkers
                                 }
                             </Select>
                         </span> 
                     </Col>
-                </Row>
+                </Row> */}
                 <Preview />
             </Modal>
         )

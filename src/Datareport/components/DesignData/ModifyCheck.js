@@ -7,7 +7,6 @@ import { Modal, Input, Form, Button, message, Table, Radio, Row, Col,DatePicker,
 import WorkflowHistory from '../WorkflowHistory'
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import {getUser} from '_platform/auth';
-import Preview from '../../../_platform/components/layout/Preview';
 import { CODE_PROJECT } from '_platform/api';
 import '../index.less'; 
 import moment from 'moment';
@@ -83,7 +82,8 @@ export default class ModifyCheck extends Component {
             putDocument,
             getScheduleDir,
             postScheduleDir,
-            getWorkPackageDetailpk
+            getWorkPackageDetailpk,
+            deleteStaticFile
         }} = this.props;
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
@@ -119,9 +119,7 @@ export default class ModifyCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        
-        //prepare the data which will store in database
-        const docData = [];   //asure the code of every document only
+    
         let all = [];
         dataSource.forEach((item,index)=>{
             let newdata = {
@@ -156,17 +154,15 @@ export default class ModifyCheck extends Component {
                 }
             }
             all.push(putDocument({code:origindataSource[index].code},newdata))
+            if(item.file.isnew){
+                all.push(deleteStaticFile({id:origindataSource[index].basic_params.files[0].id})) //删除旧附件
+            }
         });
         Promise.all(all)
         .then(rst => {
             console.log(rst)
             message.success('修改文档成功！');
         })
-        // if(rst.result){
-        //     message.success('创建文档成功！');
-        // }else{
-        //     message.error('创建文档失败！');
-        // }
     }
     //不通过
     async reject(){
@@ -282,16 +278,10 @@ export default class ModifyCheck extends Component {
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
+                        <Col span={2} push={16}>
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {

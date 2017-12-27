@@ -4,21 +4,16 @@ import PropTypes from 'prop-types';
 import {Row, Col, Table, Upload, Button, Icon, Popconfirm} from 'antd';
 import './index.less';
 import {FILE_API} from '_platform/api';
+import {uploadFile} from './commonFunc';
 
 export default class VedioInfoTable extends Component{
-
-    /* componentDidMount(){
-        const {fileDel=false} = this.props;
-        if(fileDel){
-            this.columns.push(this.operation);
-        }
-    } */
     
     render(){
-        const {dataSource=[]} = this.props;
+        const {dataSource=[], loading=false} = this.props;
         return(<Row className="rowSpacing">
             <Col span={24}>
                 <Table
+                loading={loading}
                 dataSource={dataSource}
                 columns={this.columns}
                 rowKey={(record)=>{
@@ -37,6 +32,7 @@ export default class VedioInfoTable extends Component{
     }
 
     deleteData = (index)=>{
+        this.fileRemove(index);
         const {dataSource = [],storeExcelData} = this.props;
         let data = JSON.parse(JSON.stringify(dataSource));
         data.splice(index,1);
@@ -45,7 +41,6 @@ export default class VedioInfoTable extends Component{
 
     beforeUpload = async (index,file)=>{   //附件上传
         const {dataSource} = this.props,
-            {name} = file,
             filename = name.replace(/\.\w+$/,'');
         if(dataSource.some(data => {
             return data.code === filename
@@ -54,56 +49,14 @@ export default class VedioInfoTable extends Component{
             return false
         }
 
-        /* 编码？应该不需要
-        const detail = await getWorkPackageDetail({code:filename});
-        if(!detail.name){
-            message.info("编码值错误");
-            return false;
-        }
-        编码end */
+        const attachment = await uploadFile(file);
+        let sourceData = JSON.parse(JSON.stringify(dataSource));
+        Object.assign(sourceData[index],{
+            file:attachment
+        })
+        const {storeExcelData} = this.props;
+        storeExcelData(sourceData)
 
-        const formdata = new FormData(),
-            myHeaders = new Headers();
-		formdata.append('a_file', file);
-        formdata.append('name', name);
-        const myInit = {
-            method: 'POST',
-            headers: myHeaders,
-            body: formdata
-        };
-
-        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
-            resp = await resp.json()
-            if (!resp || !resp.id) {
-                message.error('文件上传失败')
-                return;
-            };
-            let filedata = resp;
-            filedata.a_file = covertURLRelative(filedata.a_file);
-            filedata.download_url = covertURLRelative(filedata.a_file);
-
-            const {size,id,name,a_file,download_url,mime_type} = filedata;
-            const attachment = {
-                size,id, name, a_file ,download_url, mime_type,
-                status: 'done',
-                url: a_file
-            };
-            const jcode = file.name.replace(/\.\w+$/,'');
-
-            let sourceData = JSON.parse(JSON.stringify(dataSource));
-
-            /* wbs编码
-            const info = await this.getInfo(jcode);
-            sourceData[index] = Object.assign({},dataSource[index],info)
-            wbs编码end */
-            Object.assign(sourceData[index],{
-                file:attachment
-            })
-
-            const {storeExcelData} = this.props;
-            storeExcelData(sourceData)
-        });
-        
 		return false;
     }
 
@@ -127,7 +80,7 @@ export default class VedioInfoTable extends Component{
         title: '影像上传',
         dataIndex: 'file',
         render: (text, record, index)=>{
-            let revert = null;
+            let revert = null,fileIndex = record.index-1;
             if(text&&text.name){
                 revert = (<div>
                     <div className="inlineBlockNospacing">{text.name} </div>
@@ -135,7 +88,7 @@ export default class VedioInfoTable extends Component{
                         this.props.fileDel &&
                         <Popconfirm
                         {...popAttribute}
-                        onConfirm={()=>{ this.fileRemove(index) }}
+                        onConfirm={()=>{ this.fileRemove(fileIndex) }}
                         >
                             <a><Icon type="close"/></a>
                         </Popconfirm>
@@ -144,7 +97,7 @@ export default class VedioInfoTable extends Component{
             }else{
                 revert = <Upload 
                          showUploadList={false}
-                         beforeUpload={(file, fileList)=>{ this.beforeUpload(index,file) }}
+                         beforeUpload={(file, fileList)=>{ this.beforeUpload(fileIndex,file) }}
                          customRequest = {()=>{}}
                         >
                         <Button>
@@ -175,7 +128,7 @@ export default class VedioInfoTable extends Component{
 }
 
 VedioInfoTable.PropTypes ={
-    dataSource: PropTypes.object.isRequired
+    dataSource: PropTypes.array.isRequired
 }
 
 const showTotal = (total,range) =>{ //显示数据总量和当前数据顺序
@@ -184,12 +137,8 @@ const showTotal = (total,range) =>{ //显示数据总量和当前数据顺序
 
 const rowSelection = {
     onChange:(selectedRowKeys, selectedRows) => {
-        //console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     }
-}
-
-const covertURLRelative = (originUrl) => {
-    return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
 }
 
 const popAttribute = {
