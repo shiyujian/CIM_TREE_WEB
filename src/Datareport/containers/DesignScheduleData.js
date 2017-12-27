@@ -27,6 +27,8 @@ export default class DesignScheduleData extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
+			totalData:null,
+			loading: false,
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			setAddVisiable: false,
@@ -52,9 +54,12 @@ export default class DesignScheduleData extends Component {
 	async generateTableData(data) {
 		const { actions: { getDocument, } } = this.props;
 		let dataSource = [];
-		data.map(item => {
+		let i = 0;
+		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
+				i++;
 				let temp = {
+					key:i,
 					code: single.extra_params.code,
 					volume: single.extra_params.volume,
 					name: single.extra_params.name,
@@ -74,13 +79,8 @@ export default class DesignScheduleData extends Component {
 	goCancel = () => {
 		this.setState({ setAddVisiable: false, setDeleteVisiable: false, setEditVisiable: false });
 	}
-	onSelectChange = (selectedRowKeys) => {
-		const { dataSource } = this.state;
-		let dataSourceSelected = [];
-		for (let i = 0; i < selectedRowKeys.length; i++) {
-			dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
-		}
-		this.setState({ selectedRowKeys, dataSourceSelected });
+	onSelectChange = (selectedRowKeys,selectedRows) => {
+        this.setState({selectedRowKeys,dataSourceSelected:selectedRows});
 	}
 	// 批量录入流程
 	setAddData = (data, participants) => {
@@ -239,6 +239,9 @@ export default class DesignScheduleData extends Component {
 						className="btn"
 						style={{ width: "200px" }}
 						placeholder="输入搜索条件"
+						onSearch = {
+							console.log(value)
+						}
 					/>
 				</Row>
 				<Row >
@@ -272,9 +275,8 @@ export default class DesignScheduleData extends Component {
 	}
 	columns = [{
 		title: '序号',
-		render: (text, record, index) => {
-			return index + 1
-		}
+		dataIndex:"key",
+		key:"key"
 	}, {
 		title: '编码',
 		dataIndex: 'code',

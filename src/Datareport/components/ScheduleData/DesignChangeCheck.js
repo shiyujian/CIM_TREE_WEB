@@ -1,57 +1,58 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {actions as platformActions} from '_platform/store/global';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,notification,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { actions as platformActions } from '_platform/store/global';
+import { Input, Col, Card, Table, Row, Button, DatePicker, Radio, Select, notification, Popconfirm, Modal, Upload, Icon, message } from 'antd';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
-import {getUser} from '_platform/auth';
-import {actions} from '../../store/scheduledata';
+import { getUser } from '_platform/auth';
+import { actions } from '../../store/scheduledata';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker;
 const RadioGroup = Radio.Group;
-const {Option} = Select;
+const { Option } = Select;
 
 @connect(
-	state => {
-        const {datareport: {scheduledata = {}} = {}, platform} = state;
-		return {...scheduledata, platform}
-	},
-	dispatch => ({
-		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
-	})
+    state => {
+        const { datareport: { scheduledata = {} } = {}, platform } = state;
+        return { ...scheduledata, platform }
+    },
+    dispatch => ({
+        actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
+    })
 )
 export default class DesignChangeCheck extends Component {
 
-	constructor(props) {
-		super(props);
-		this.state = {
-            wk:null,
-            dataSource:[],
-            opinion:1,
-		};
+    constructor(props) {
+        super(props);
+        this.state = {
+            wk: null,
+            dataSource: [],
+            opinion: 1,
+        };
     }
-    async componentDidMount(){
-        const {wk} = this.props
+    async componentDidMount() {
+        const { wk } = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk});
+        this.setState({ dataSource, wk });
+        console.log(dataSource);
     }
 
-    componentWillReceiveProps(props){
-        const {wk} = props
+    componentWillReceiveProps(props) {
+        const { wk } = props
         let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({dataSource,wk})
-   }
-   //提交
-    async submit(){
-        if(this.state.opinion === 1){
+        this.setState({ dataSource, wk })
+    }
+    //提交
+    async submit() {
+        if (this.state.opinion === 1) {
             await this.passon();
-        }else{
+        } else {
             await this.reject();
         }
-        this.props.closeModal("scheduledata_doc_change_visible",false);
+        this.props.closeModal("scheduledata_doc_change_visible", false);
         message.info("操作成功");
     }
     // 点x消失
@@ -59,12 +60,13 @@ export default class DesignChangeCheck extends Component {
         this.props.closeModal("scheduledata_doc_change_visible", false)
     }
     //通过
-    async passon(){
-        const {dataSource,wk,topDir} = this.state;
-        const {actions:{
+    async passon() {
+        const { dataSource, wk, topDir } = this.state;
+        const { actions: {
             logWorkflowEvent,
-        }} = this.props;
-        
+            putDocList
+        } } = this.props;
+
         // send workflow
         let executor = {};
         let person = getUser();
@@ -72,35 +74,51 @@ export default class DesignChangeCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        // let code_list = "";
-        // dataSource.map(item=>{
-        //     item.delcode+=",";
-        //     code_list += item.delcode;
-        // })
-        // let rst = await delDocList({},{code_list});
-        // if(rst.result){
-        //     notification.success({
-        //         message: '删除文档成功！',
-        //         duration: 2
-        //     });
-        // }else{
-        //     notification.error({
-        //         message: '删除文档失败！',
-        //         duration: 2
-        //     });
-        // }
+        await logWorkflowEvent({ pk: wk.id }, { state: wk.current[0].id, action: '通过', note: '同意', executor: executor, attachment: null });
+        let editList = [];
+        dataSource.map(item => {
+            editList.push({
+                code:item.delcode,
+                obj_type:"C_DOC",
+                status:"A",
+                version:"A",
+                extra_params:{
+                    code: item.code,
+                    volume:item.volume,
+                    name: item.name,
+                    major: item.major,
+                    factovertime: item.factovertime,
+                    factquantity: item.factquantity,
+                    uploads: item.uploads,
+                    designunit: item.designunit,
+                    unit: item.unit,
+                    project: item.project
+                }
+            })
+        });
+        let rst = await putDocList({},{data_list:editList});
+        if(rst.result){
+            notification.success({
+                message: '修改文档成功！',
+                duration: 2
+            });
+        }else{
+            notification.error({
+                message: '修改文档失败！',
+                duration: 2
+            });
+        }
     }
     //不通过
-    async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+    async reject() {
+        const { wk } = this.props
+        const { actions: { deleteWorkflow } } = this.props
+        await deleteWorkflow({ pk: wk.id })
     }
-    onChange(e){
-        this.setState({opinion:e.target.value})
+    onChange(e) {
+        this.setState({ opinion: e.target.value })
     }
-	render() {
+    render() {
         const columns = [{
             title: '序号',
             render: (text, record, index) => {
@@ -132,26 +150,23 @@ export default class DesignChangeCheck extends Component {
             dataIndex: 'designunit',
         }, {
             title: '变更人员',
-            dataIndex: 'editors',
+            dataIndex: 'uploads',
         }];
-		return (
+        return (
             <Modal
-			title="施工进度变更审批表"
-            visible={true}
-            width= {1280}
-			footer={null}
-			maskClosable={false}
-            onCancel={this.oncancel.bind(this)}
+                title="设计变更审批表"
+                visible={true}
+                width={1280}
+                footer={null}
+                maskClosable={false}
+                onCancel={this.oncancel.bind(this)}
             >
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
-                <Table style={{ marginTop: '10px', marginBottom:'10px' }}
+                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    rowKey={(record)=>{
-                        return record.index
-                    }} 
-                    />
+                />
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>
@@ -175,9 +190,9 @@ export default class DesignChangeCheck extends Component {
                     </Col>
                 </Row>
                 {
-                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                    this.state.wk && <WorkflowHistory wk={this.state.wk} />
                 }
             </Modal>
-		)
+        )
     }
 }

@@ -27,8 +27,8 @@ export default class WorkScheduleData extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
-			pagination:{},
 			totalData:null,
+			loading: false,
 			selectedRowKeys: [],
 			dataSourceSelected:[],
 			setAddVisiable: false,
@@ -36,19 +36,20 @@ export default class WorkScheduleData extends Component {
 			setEditVisiable: false,
 		};
 	}
-	componentDidMount() {
+	async componentDidMount() {
 		const { actions: {
             getWorkDataList,
         } } = this.props;
 		let dataSource = [];
 		getWorkDataList()
 			.then(data => {
-				data.result.map(single => {
+				data.result.map((single,i) => {
 					let temp = {
+						key:++i,
 						code: single.extra_params.code,
 						name: single.extra_params.name,
-						project: single.extra_params.project.name,
-						unit: single.extra_params.unit.name,
+						project: single.extra_params.project.name || single.extra_params.project,
+						unit: single.extra_params.unit.name || single.extra_params.unit,
 						construct_unit: single.extra_params.construct_unit,
 						quantity: single.extra_params.quantity,
 						factquantity: single.extra_params.factquantity,
@@ -58,6 +59,9 @@ export default class WorkScheduleData extends Component {
 						factovertime: single.extra_params.factovertime,
 						uploads: single.extra_params.uploads,
 						delcode:single.code,
+						wpcode:single.extra_params.unit.code,
+						obj_type:single.extra_params.unit.obj_type,
+						pk:single.extra_params.unit.pk,
 					}
 					dataSource.push(temp);
 					this.setState({ dataSource });
@@ -68,13 +72,8 @@ export default class WorkScheduleData extends Component {
 	goCancel = () => {
 		this.setState({ setAddVisiable: false, setDeleteVisiable: false, setEditVisiable: false });
 	}
-	onSelectChange = (selectedRowKeys) => {
-		const {dataSource} = this.state;
-		let dataSourceSelected = [];
-        for(let i=0;i<selectedRowKeys.length;i++){
-            dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
-        }
-        this.setState({selectedRowKeys,dataSourceSelected});
+	onSelectChange = (selectedRowKeys,selectedRows) => {
+        this.setState({selectedRowKeys,dataSourceSelected:selectedRows});
 	}
 	// 批量录入流程
 	setAddData = (data, participants) => {
@@ -242,6 +241,9 @@ export default class WorkScheduleData extends Component {
 						className="btn"
 						style={{ width: "200px" }}
 						placeholder="输入搜索条件"
+						onSearch={
+							console.log(value)
+						}
 
 					/>
 				</Row>
@@ -254,9 +256,7 @@ export default class WorkScheduleData extends Component {
 							rowSelection={rowSelection}
 							style={{ height: 380, marginTop: 20 }}
 							pagination={{ pageSize: 10 }}
-							rowKey={(record)=>{
-								return record.index
-							}}
+							rowKey='key'
 						/>
 					</Col>
 				</Row>
@@ -278,9 +278,8 @@ export default class WorkScheduleData extends Component {
 	}
 	columns = [{
 		title: '序号',
-		render: (text, record, index) => {
-			return index + 1
-		}
+		dataIndex:"key",
+		key:"key",
 	}, {
 		title: 'WBS编码',
 		dataIndex: 'code',

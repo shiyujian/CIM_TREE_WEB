@@ -9,6 +9,7 @@ import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base} from '_platform/api';
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
 const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [], 'DELETE');
 export const getWorkPackageDetail = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
+export const getWorkPackageDetailpk = createFetchAction(`${SERVICE_API}/workpackages/{{pk}}/?all=true`,[]);
 const getWorkpackagesByCode = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`, [], 'GET');
 //获取项目树
 export const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
@@ -26,6 +27,7 @@ const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [],
 export const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
+const putDocument = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 // 批量删除
 const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
 //创建文档目录
@@ -36,6 +38,7 @@ export const actions = {
     uploadStaticFile,
     deleteStaticFile,
 	getWorkPackageDetail,
+	getWorkPackageDetailpk,
 	getWorkpackagesByCode,
 	getAllUsers,
 	getDocument,
@@ -49,7 +52,8 @@ export const actions = {
 	updateWpData,
 	postScheduleDir,
 	getScheduleDir,
-	delDocList
+	delDocList,
+	putDocument
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
