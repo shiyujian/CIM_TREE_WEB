@@ -76,9 +76,11 @@ export default class WorkunitCost extends Component {
 
 				}
 				dataSource.push(temp);
-				this.setState({ dataSource });
+				
 			})
 		})
+		this.setState({ dataSource });
+		debugger;
 	}
 
 	// subproject: item.project.name,//项目/子项目
