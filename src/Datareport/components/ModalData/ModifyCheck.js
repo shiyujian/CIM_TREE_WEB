@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { actions as platformActions } from '_platform/store/global';
-import { Input, Col, Card, Table, Row, Button, DatePicker, Radio, Select, notification, Popconfirm, Modal, Upload, Icon, message } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
-import WorkflowHistory from '../WorkflowHistory';
-import { getUser } from '_platform/auth';
-import { actions } from '../../store/safety';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {actions} from '../../store/ModalData';
+import {actions as platformActions} from '_platform/store/global';
+import { Modal, Input, Form, Button, message, Table, Radio, Row, Col,DatePicker,Select } from 'antd';
+import WorkflowHistory from '../WorkflowHistory'
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
+import {getUser} from '_platform/auth';
 import Preview from '../../../_platform/components/layout/Preview';
+import { CODE_PROJECT } from '_platform/api';
+import '../index.less'; 
 import moment from 'moment';
+
 
 const { RangePicker } = DatePicker;
 const RadioGroup = Radio.Group;
@@ -33,16 +36,39 @@ export default class ModifyCheck extends Component {
             option: 1,
         };
     }
-    async componentDidMount() {
+    async componentWillReceiveProps() {
         const { wk } = this.props
+
         let dataSources = JSON.parse(wk.subject[0].data)
-       
+        console.log('dataSources', dataSources)
         let dataSource = [];
         dataSources.map(item => {
             dataSource.push(item)
         })
         this.setState({ dataSource, wk });
     }
+
+    async componentDidMount() {
+        const { wk } = this.props
+        let dataSource = JSON.parse(wk.subject[0].data)
+        this.setState({ dataSource, wk });
+        const { actions: {
+            getScheduleDir,
+            postScheduleDir,
+        } } = this.props;
+        let topDir = await getScheduleDir({ code: 'the_only_main_code_ModalCheck' });
+        if (!topDir.obj_type) {
+            let postData = {
+                name: '数据报送的顶级节点',
+                code: 'the_only_main_code_datareport',
+                "obj_type": "C_DIR",
+                "status": "A",
+            }
+            topDir = await postScheduleDir({}, postData);
+        }
+        this.setState({ topDir });
+    }
+
 
 
     //提交
@@ -58,8 +84,109 @@ export default class ModifyCheck extends Component {
 
     //通过
     async passon() {
+        const { dataSource, wk, topDir } = this.state;
+        const { actions: {
+            logWorkflowEvent,
+            putDocument,
+            getScheduleDir,
+            postScheduleDir,
+            getWorkpackagesByCode
+        } } = this.props;
        
+        let unit = dataSource[0].unit;
+        console.log('data',unit)
+        
+        let project = dataSource[0].project;
+        let code = 'datareport_modaldatadoc';
+        //get workpackage by unit's code 
+        let workpackage = await getWorkpackagesByCode({ code:unit.code });
+
+        let postDirData = {
+            "name": '模型信息目录树',
+            "code": code,
+            "obj_type": "C_DIR",
+            "status": "A",
+            related_objects: [{
+                pk: workpackage.pk,
+                code: workpackage.code,
+                obj_type: workpackage.obj_type,
+                rel_type: 'modaldata_wp_dirctory', // 自定义，要确保唯一性
+            }],
+            "parent": { "pk": topDir.pk, "code": topDir.code, "obj_type": topDir.obj_type }
+        }
+        let dir = await getScheduleDir({ code: code });
+        //no such directory
+        if (!dir.obj_type) {
+            dir = await postScheduleDir({}, postDirData);
+        }
+
+        // send workflow
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent({ pk: wk.id }, { state: wk.current[0].id, action: '通过', note: '同意', executor: executor, attachment: null });
+
+        //prepare the data which will store in database
+        const docData = [];   //asure the code of every document only
+        let all = [];
+        dataSource.forEach((item, index) => {
+            console.log('item',item)
+            let newdata = {
+                name: item.fdbMode.name,
+                obj_type: "C_DOC",
+                status: 'A',
+                profess_folder: { code: dir.code, obj_type: 'C_DIR' },
+                basic_params: {
+                    files: [
+                        {
+                            "a_file":item.fdbMode.a_file,
+                            "name": item.fdbMode.name,
+                            "download_url": item.fdbMode.download_url,
+                            "misc": "file",
+                            "mime_type": item.fdbMode.mime_type
+                          },
+                          {
+                            "a_file": item.tdbxMode.a_file,
+                            "name": item.tdbxMode.name,
+                            "download_url": item.tdbxMode.download_url,
+                            "misc": "file",
+                            "mime_type": item.tdbxMode.mime_type
+                          },
+                          {
+                            "a_file": item.attributeTable.a_file,
+                            "name": item.attributeTable.name,
+                            "download_url": item.attributeTable.download_url,
+                            "misc": "file",
+                            "mime_type": item.attributeTable.mime_type
+                          }
+                    ]
+                },
+                extra_params: {
+                    code:item.code,
+                    coding:item.coding,
+                    filename:item.modelName,
+                    submittingUnit:item.submittingUnit,
+                    modelDescription:item.modelDescription,
+                    modeType:item.modeType,
+                    unit:item.unit,
+                    project:item.project,
+                    reportingTime:item.reportingTime,
+                    reportingName:item.reportingName,
+                }
+            }
+            all.push(putDocument({ code: dataSource[index].code }, newdata))
+        });
+        Promise.all(all)
+            .then(rst => {
+                console.log('rst',rst)
+                message.success('修改文档成功！');
+            })
+
     }
+   
     //不通过
     async reject() {
         const { wk } = this.props
@@ -70,11 +197,11 @@ export default class ModifyCheck extends Component {
         this.setState({ option: e.target.value })
     }
     render() {
-      
+
 
         const columns = [{
             title: '序号',
-            dataIndex: 'numbers',
+            dataIndex: 'index',
             render: (text, record, index) => {
                 return index + 1
             }

@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2016-present, ecidi.
- * All rights reserved.
- *
- * This source code is licensed under the GPL-2.0 license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
 import React , {Component} from 'react';
 import { Timeline,BackTop , Row , Col , Select , Icon ,Table ,Form, Input, Button ,Popconfirm ,Checkbox ,message,notification } from 'antd';
 
@@ -26,11 +18,21 @@ class EditableCell extends React.Component {
 		this.setState({ value });
 	}
 
+	// 这里需要去判断
 	check = () => {
+		// debugger;
 		let value = this.state.value;
-		console.log(value,"value")
-			if (this.props.onChange) {
-			this.props.onChange(this.state.value);
+		// console.log(value,"vip-value")
+		if(!value || value == undefined || value == null ){
+            notification.error({
+                message: '没有完成填写',
+                duration: 2,
+            });
+			return;
+		}else{
+				if (this.props.onChange) {
+				this.props.onChange(this.state.value);
+			}
 		}
 		this.setState({ editable: false });
 	}

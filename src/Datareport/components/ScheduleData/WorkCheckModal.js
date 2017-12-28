@@ -116,7 +116,6 @@ export default class WorkCheckModal extends Component {
                 })
             }
             //施工包批量
-            // 、、、、、、、、、、、、、、、没改完
             wplist.push({
                 code: o.unit.code,
                 extra_params: {
@@ -210,10 +209,7 @@ export default class WorkCheckModal extends Component {
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered
-                        rowKey={(record)=>{
-                            return record.index
-                        }} 
+                        bordered 
                         />
                     <Row>
                         <Col span={2}>

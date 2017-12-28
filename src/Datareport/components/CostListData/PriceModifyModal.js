@@ -13,7 +13,7 @@ export default class PriceModifyModal extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-            dataSource:[],
+            dataSource:this.props.modifyData,
             checkers:[],//审核人下来框选项
             check:null,//审核人
             project:[],
@@ -24,10 +24,7 @@ export default class PriceModifyModal extends Component {
     }
     componentDidMount(){
 
-        const {actions:{getAllUsers,getWorkflowById,getProjectTree}, modifyData} = this.props;
-        this.setState({
-            dataSource: modifyData
-        })
+        const {actions:{getAllUsers,getWorkflowById,getProjectTree}} = this.props;
         getAllUsers().then(res => {
             let checkers = res.map(o => {
                 return (
@@ -60,7 +57,6 @@ export default class PriceModifyModal extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-        debugger;
 		this.props.onok(this.state.dataSource,per)
     }
     删除
@@ -71,44 +67,43 @@ export default class PriceModifyModal extends Component {
     }
 
     //输入
-    tableDataChange(index, key ,e ){
+    onCellChange = (index, key, record) => {      //编辑某个单元格
         const { dataSource } = this.state;
-		dataSource[index][key] = e.target['value'];
-          this.setState({dataSource});
-          console.log('dataSource:',dataSource)
+        return (value) => {
+            dataSource[index][key] = value;
+            record[key] = value;
+        };
     }
 
 	render() {
         const columns = 
             [{
                 title: "序号",
-                dataIndex: "index",
+                dataIndex: "code",
                 width:"5%",
-                render: (text, record, index) => {
-                  return index + 1;
-                }
+                render:(text,record,index) => {
+					return record.key
+				}
               },{
                 title: "项目/子项目",
                 dataIndex: "subproject"
               },
               {
                 title: "单位工程",
-                dataIndex: "unit"
-              },
-              {
-                title:'编码',
-                dataIndex:'code',
-                width: '10%',
-                render: (text, record, index) => (
-                    <Input value={this.state.dataSource[index]['code']} onChange={this.tableDataChange.bind(this,index,'code')}/>
-                )
+                dataIndex: "unitengineering"
               },
               {
                 title:'清单项目编码',
                 dataIndex:'projectcoding',
                 width:"10%",
                 render: (text, record, index) => (
-                    <Input value={this.state.dataSource[index]['projectcoding']} onChange={this.tableDataChange.bind(this,index,'projectcoding')}/>
+                    <div>
+                        <EditableCell
+                            value={record.projectcoding}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "projectcoding", record)}
+                        />
+                    </div>
                 )
               },
               {
@@ -116,7 +111,13 @@ export default class PriceModifyModal extends Component {
                 dataIndex:'valuation',
                 width:"10%",
                 render: (text, record, index) => (
-                    <Input value={this.state.dataSource[index]['valuation']} onChange={this.tableDataChange.bind(this,index,'valuation')}/>
+                    <div>
+                        <EditableCell
+                            value={record.valuation}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "valuation", record)}
+                        />
+                    </div>
                 )
               },
               {
@@ -124,7 +125,13 @@ export default class PriceModifyModal extends Component {
                 dataIndex:'rate',
                 width:"12%",
                 render: (text, record, index) => (
-                    <Input value={this.state.dataSource[index]['rate']} onChange={this.tableDataChange.bind(this,index,'rate')}/>
+                    <div>
+                        <EditableCell
+                            value={record.rate}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "rate", record)}
+                        />
+                    </div>
                 )
               },
               {
@@ -132,7 +139,13 @@ export default class PriceModifyModal extends Component {
                 dataIndex:'company',
                 width:"10%",
                 render: (text, record, index) => (
-                    <Input value={this.state.dataSource[index]['company']} onChange={this.tableDataChange.bind(this,index,'company')}/>
+                    <div>
+                        <EditableCell
+                            value={record.company}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "company", record)}
+                        />
+                    </div>
                 )
               },
               {
@@ -140,7 +153,13 @@ export default class PriceModifyModal extends Component {
                 dataIndex:'total',
                 width:"10%",
                 render: (text, record, index) => (
-                    <Input value={this.state.dataSource[index]['total']} onChange={this.tableDataChange.bind(this,index,'total')}/>
+                    <div>
+                        <EditableCell
+                            value={record.total}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "total", record)}
+                        />
+                    </div>
                 )
               },
               {
@@ -148,7 +167,13 @@ export default class PriceModifyModal extends Component {
                 dataIndex:'remarks',
                 width:"10%",
                 render: (text, record, index) => (
-                    <Input value={this.state.dataSource[index]['remarks']} onChange={this.tableDataChange.bind(this,index,'code')}/>
+                    <div>
+                        <EditableCell
+                            value={record.remarks}
+                            editOnOff={false}
+                            onChange={this.onCellChange(index, "remarks", record)}
+                        />
+                    </div>
                 )
               }];
 		return (

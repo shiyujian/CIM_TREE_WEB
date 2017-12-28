@@ -131,7 +131,7 @@ export default class PriceListCheck extends Component {
                 "kind": "01",
                 "description": "计价清单创建工程量项",
                 "extra_params": {
-                    code: item.projectcoding,
+                    code: item.code,
                     subproject: item.project.name,
                     projectcoding:item.projectcoding,
                     total:item.total,
@@ -151,7 +151,6 @@ export default class PriceListCheck extends Component {
         });
         let rst = await addTagList({},{data_list:tagLists});
         
-        debugger;
         if(rst.result){
             notification.success({
                 message: '创建工程量项成功！',
@@ -184,7 +183,7 @@ export default class PriceListCheck extends Component {
     }
     //radio变化
     onChange(e){
-        this.setState({opinion:e.target.value})
+        this.setState({option:e.target.value})
     }
 
     //删除
@@ -200,8 +199,7 @@ export default class PriceListCheck extends Component {
             title:'序号',
             dataIndex:'code',
             render:(text,record,index) => {
-                console.log(text)
-                return index+1
+                return record.key
             }
         },{
             title:'项目/子项目',

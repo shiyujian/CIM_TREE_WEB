@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Col, Table, Form, Button, Popconfirm, message, Input, notification, Modal } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, NODE_FILE_EXCHANGE_API } from '_platform/api';
 import ChangeFile from './ChangeFile';
 import DeleteFile from './DeleteFile';
 import style from './TableOrg.css';
@@ -21,6 +21,7 @@ export default class TableOrg extends Component {
 			newKey2: Math.random(),
 			newKey3: Math.random(),
 			selectedRowKeys: [],
+			loading: false,
 		}
 	}
 	async componentDidMount() {
@@ -38,40 +39,45 @@ export default class TableOrg extends Component {
 			}
 		}
 	}
-
 	async generateTableData(data) {
-		const { actions: {
-            getDocument,
-        } } = this.props;
-		let dataSource = [];
-		data.map((item, i) => {
-			getDocument({ code: item.code }).then(single => {
-				let temp = {
-					i: i + 1,
-					code: single.extra_params.code,
-					codeId: single.code,
-					filename: single.extra_params.filename,
-					index: single.extra_params.index,
-					organizationUnit: single.extra_params.organizationUnit,
-					project: single.extra_params.project,
-					projectName: single.extra_params.project.name,
-					remark: single.extra_params.remark,
-					resUnit: single.extra_params.resUnit,
-					reviewComments: single.extra_params.reviewComments,
-					reviewPerson: single.extra_params.reviewPerson,
-					reviewTime: single.extra_params.reviewTime,
-					scenarioName: single.extra_params.scenarioName,
-					unit: single.extra_params.unit,
-					unitProject: single.extra_params.unit.name,
-					file: single.basic_params.files[0],
-				}
-				dataSource.push(temp);
-				this.setState({
-					...this.state,
-					dataSource: dataSource.sort((x, y) => x.i - y.i)
-				});
-			})
+		this.setState({
+			loading: true,
 		})
+		const { actions: { getDocument, } } = this.props;
+		let dataSource = [];
+		let promises = data.map((item, i) => {
+			return getDocument({ code: item.code });
+		});
+		let projects = await Promise.all(promises);
+		promises = projects.map((single, i) => {
+			let temp = {
+				i: i + 1,
+				code: single.extra_params.code,
+				codeId: single.code,
+				filename: single.extra_params.filename,
+				index: single.extra_params.index,
+				organizationUnit: single.extra_params.organizationUnit,
+				project: single.extra_params.project,
+				projectName: single.extra_params.project.name,
+				remark: single.extra_params.remark,
+				resUnit: single.extra_params.resUnit,
+				reviewComments: single.extra_params.reviewComments,
+				reviewPerson: single.extra_params.reviewPerson,
+				reviewTime: single.extra_params.reviewTime,
+				scenarioName: single.extra_params.scenarioName,
+				unit: single.extra_params.unit,
+				unitProject: single.extra_params.unit.name,
+				file: single.basic_params.files[0],
+			}
+			dataSource.push(temp);
+		});
+		// debugger;
+		this.setState({
+			...this.state,
+			loading: false,
+			dataSource
+			// dataSource: dataSource.sort((x, y) => x.i - y.i)
+		});
 	}
 
 	paginationOnChange(e) {
@@ -80,13 +86,14 @@ export default class TableOrg extends Component {
 	onSelectChange(selectedRowKeys, selectedRows) {
 		// debugger;
 		this.state.subDataSource = selectedRows;
-		console.log('selectedRowKeys changed: ', selectedRowKeys);
+		// console.log('selectedRowKeys changed: ', selectedRowKeys);
 		this.setState({ selectedRowKeys });
 	}
 
 	// 搜索
 	async onSearchInfo(value) {
 		if (!value) { this.componentDidMount(); return; };
+		value = value.replace(/\s/g, "");
 		const { actions: { getSearcherDir } } = this.props
 		const code_Todir = "datareport_safetyspecial_05";
 		let param1 = code_Todir + "/?doc_code=safetyspecial&keys=organizationUnit&values=" + value; // 编制单位
@@ -197,6 +204,7 @@ export default class TableOrg extends Component {
 						pagination={paginationInfo}
 						rowSelection={rowSelection}
 						rowKey={(item, index) => index}
+						loading={this.state.loading}
 					/>
 				</Row>
 				<Row>
@@ -248,6 +256,7 @@ export default class TableOrg extends Component {
 
 	//导出
 	BtnExport(e) {
+		debugger;
 		if (this.state.subDataSource.length <= 0) {
 			notification.warning({
 				message: '请选择数据！',
@@ -255,6 +264,31 @@ export default class TableOrg extends Component {
 			})
 			return;
 		}
+		let exhead = ['序号', '项目/子项目名称', '单位工程', '方案名称', '编制单位', '评审时间', '评审意见', '评审人员', '备注', '附件'];
+		let rows = [];
+		rows.push(exhead);
+		let excontent = this.state.subDataSource.map(data => {
+			let item = [
+				data.i,
+				data.projectName,
+				data.unitProject,
+				data.scenarioName,
+				data.organizationUnit,
+				data.reviewTime,
+				data.reviewComments,
+				data.reviewPerson,
+				data.remark,
+				data.filename
+			];
+			rows.push(item);
+		});
+		const { actions: { jsonToExcel } } = this.props;
+		console.log(rows)
+		jsonToExcel({}, { rows: rows })
+			.then(rst => {
+				console.log(rst);
+				this.createLink('项目信息导出表', NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
+			})
 	}
 	//变更
 	BtnChange(e) {
@@ -270,6 +304,7 @@ export default class TableOrg extends Component {
 
 	// 申请变更--并发起
 	setChangeData(data, participants) {
+		debugger;
 		this.setState({
 			newKey2: Math.random() + 2,
 			setChangeVisiable: false,
@@ -406,6 +441,9 @@ export default class TableOrg extends Component {
 			title: '评审时间',
 			dataIndex: 'reviewTime',
 			width: '10%',
+			// render: (text, record, i) => (
+			// 	moment(record.reviewTime,"YYYY-MM-DD")
+			// ),
 		},
 		{
 			title: '评审意见',

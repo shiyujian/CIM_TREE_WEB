@@ -67,10 +67,61 @@ export default class ModCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
-        let dataList = this.state.dataSource.map((data) => {
-            console.log('data',data.id)
-            deleteUserList({pk:data.id}).then(rst => {
-            })
+        .then((rst) => {
+            let personId = rst.id;
+            postAllUsersId({id:personId})
+            .then((item) => {})
+        });
+        let data_list = [];
+        
+        let promises = JSON.parse(wk.subject[0].data).map((o) => {
+            console.log('o',o)
+            return getOrgCode({code: o.account.org_code})
+        })
+        let rst = await Promise.all(promises);
+        console.log('dataSource',dataSource)
+        dataSource.map((item, index) => {
+            console.log('item',item)
+            data_list.push({
+                // "code": "" + rst.code,
+                // "name":rst.name,
+                // "basic_params":{
+                //     "photo":item.account.person_avatar_url,
+                //     "signature":item.signature.a_file
+                // },
+                // "extra_params": {
+                //     "depart": item.account.org_code,
+                //     "email":item.email,
+                //     "job":item.job,
+                //     "性别":item.sex,
+                //     "电话":item.tel,
+                //     "email":item.email
+                // },
+                // "obj_type":"C_PER",
+                // "org":{
+                //     "code":item.account.org_code,
+                //     "obj_type": "C_ORG",
+                //     "pk": rst[index].pk,
+                //     "rel_type": "member"
+                // },
+                // "title":"title",
+                // "status": "A",
+                // "version": "A",
+                // "first_name":"",
+                // "last_name":""
+                "code": item.username,
+                "name": item.account.person_name,
+                "org": item.account.organization,
+                "depart": item.account.org_code,
+                "email": item.email
+            })                    
+        })
+        console.log('data_list',data_list)
+        postPersonList({},{data_list:data_list}).then(rst => {
+            console.log('rst', rst)
+            if (rst.result.length) {
+                message.success("审核成功");
+            }
         })
     }
     //不通过
@@ -100,24 +151,20 @@ export default class ModCheck extends Component {
         const {wk} = this.props;
         console.log("wk",wk);
         const columns = [{
-            title: '序号',
-            dataIndex: 'index',
-            key: 'Index',
-        }, {
             title: '人员编码',
-            dataIndex: 'account.person_code',
+            dataIndex: 'code',
             key: 'Code',
         }, {
             title: '姓名',
-            dataIndex: 'account.person_name',
+            dataIndex: 'name',
             key: 'Name',
         }, {
             title: '所在组织机构单位',
-            dataIndex: 'account.organization',
+            dataIndex: 'org',
             key: 'Org',
         }, {
             title: '所属部门',
-            dataIndex: 'account.org_code',
+            dataIndex: 'depart',
             key: 'Depart',
         }, {
             title: '职务',
@@ -137,9 +184,13 @@ export default class ModCheck extends Component {
             key: 'Email'
         }, {
             title: '二维码',
-            dataIndex: 'account.person_signature_url',
-            key: 'Signature'
-        }]
+            render:(record) => {
+                console.log("record:",record);
+                return (
+                    <img style={{width:"60px"}} src = {record.account.relative_avatar_url} />
+                )
+            }
+        }];
         return (
             <Modal
             title="人员信息变更审批表"

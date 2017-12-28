@@ -148,9 +148,6 @@ export default class DesignDeleteCheck extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    rowKey={(record)=>{
-                        return record.index
-                    }} 
                     />
                 <Row>
                     <Col span={2}>

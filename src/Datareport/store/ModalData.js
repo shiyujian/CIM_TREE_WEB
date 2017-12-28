@@ -46,6 +46,9 @@ const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE')
 //存储选择要删除的数据的数据
 const getdele = createAction(`${ID}_GET_dele`);
 
+const getWorkpackagesByCode = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`, [], 'GET');
+const putDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [], 'PUT');
+
 export const actions = {
 	...additionReducer,
 	...checkReducer,
@@ -71,7 +74,9 @@ export const actions = {
 	postScheduleDir,
 	getDocument,
 	getdele,
-	delDocList
+	delDocList,
+	getWorkpackagesByCode,
+	putDocument
 	
 };
 

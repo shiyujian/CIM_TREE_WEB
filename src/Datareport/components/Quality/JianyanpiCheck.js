@@ -80,7 +80,18 @@ export default class JianyanpiCheck extends Component {
                     code:doc.code,
                     extra_params:{
                         ...o
-                    }
+                    },
+                    workpackages:[{
+                        code:o.code,
+                        obj_type:o.obj_type,
+                        pk:o.pk,
+                        rel_type:"many_jyp_rel"
+                    }],
+                    "basic_params": {
+                        "files": [
+                            o.file
+                        ]
+                    },
                 })
             }else{
                 doclist_a.push({
