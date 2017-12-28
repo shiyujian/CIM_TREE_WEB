@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import createFetchActionWithHeaders from './fetchAction';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API} from '_platform/api';
+import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,NODE_FILE_EXCHANGE_API} from '_platform/api';
 
 const addDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'POST');
 const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?all=true`, [], 'GET');
@@ -21,22 +21,18 @@ export const createWorkflow = createFetchAction(`${WORKFLOW_API}/instance/`, [],
 export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [])
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 //批量修改施工包
-const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
-//上传taglists
-const addTagList = createFetchAction(`${SERVICE_API}/taglist/`,[],'POST');
-//批量更新tags
-const updateTagList = createFetchAction(`${SERVICE_API}/taglist/`,[],'POST');
-//批量删除tags
-const removeDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
-//上传tags
-const sendTags = createFetchAction(`${SERVICE_API}/tags/`,[],'POST');
-//更新
-export const putDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
+export const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
+//工程量项（taglists）
+export const addTagList = createFetchAction(`${SERVICE_API}/taglist/`,[],'POST');
+export const removeDocList = createFetchAction(`${SERVICE_API}/taglist/`,[],'DELETE');
+export const putDocList = createFetchAction(`${SERVICE_API}/taglist/`,[],'PUT');
 
 //获取施工包详情
 const getWorkPackageDetails = createFetchAction(`${SERVICE_API}/workpackages/{{code}}/?all=true`,[]);
 const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{key}}&obj_type=C_QTO`,[],'GET');
 const getStrictSearch = createFetchAction(`${SERVICE_API}/doc_searcher/{{dir_code}}/L001/?doc_code=G01&doc_name=N01&keys=key1,key2&values=value1,value2`,[],'GET');
+//导出数据
+const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 
 export const actions = {
 	getProjectTree,
@@ -55,10 +51,10 @@ export const actions = {
 	addDocList,
 	getDocument,
 	addTagList,
-	sendTags,
 	getSearcher,
 	removeDocList,
-	putDocList
+	putDocList,
+	jsonToExcel
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

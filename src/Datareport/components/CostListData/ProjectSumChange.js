@@ -34,6 +34,27 @@ export default class ProjectSumChange extends Component {
         })
     }
     
+    componentWillMount(){
+        let dataSource = this.props.dataSourceSelected;
+        let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+                code: item.code,
+                subproject: item.subproject,//项目/子项目
+                unit: item.unit,//单位工程
+                projectcoding: item.projectcoding,//项目编号
+                projectname: item.projectname,//项目名称
+                company: item.company,//计量单位
+                number: item.number,//数量
+                total: item.total,//单价
+                remarks: item.remarks,//备注
+            }
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource})        
+    }
+
 
     //下拉框选择人
     selectChecker(value){
@@ -62,20 +83,37 @@ export default class ProjectSumChange extends Component {
         });
     }
 
+    
     //删除
     delete(index){
         let {dataSource} = this.state;
         dataSource.splice(index,1);
-        this.setState({dataSource});
+        let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+                code: item.code,
+                subproject: item.subproject,//项目/子项目
+                unit: item.unit,//单位工程
+                projectcoding: item.projectcoding,//项目编号
+                projectname: item.projectname,//项目名称
+                company: item.company,//计量单位
+                number: item.number,//数量
+                total: item.total,//单价
+                remarks: item.remarks,//备注
+            }
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource})   
     }
     //输入
-    tableDataChange(index, key ,e ){
-        const { dataSource } = this.state;
-        console.log(dataSource)
-		dataSource[index][key] = e.target['value'];
-          this.setState({dataSource});
-          console.log('dataSource:',dataSource)
-    }
+    // tableDataChange(index, key ,e ){
+    //     const { dataSource } = this.state;
+    //     console.log(dataSource)
+	// 	dataSource[index][key] = e.target['value'];
+    //       this.setState({dataSource});
+    //       console.log('dataSource:',dataSource)
+    // }
 
     render() {
         const columns =[
@@ -121,8 +159,7 @@ export default class ProjectSumChange extends Component {
               },
               key:"Projectname"
             },{
-              title: "计量单位",
-           
+              title: "计量单位",         
               render: (record) => {
                 let checkVal = (value) => {
                     record.company= value;
@@ -152,8 +189,7 @@ export default class ProjectSumChange extends Component {
               },
               key:"Number"
             },{
-                title: "单价",
-               
+                title: "单价",               
                 render: (record) => {
                     let checkVal = (value) => {
                         record.total = value;
@@ -169,7 +205,6 @@ export default class ProjectSumChange extends Component {
                   key:"Total"
               },{
               title: "备注",
-            
               render: (record) => {
                 let checkVal = (value) => {
                     record.remarks = value;
@@ -179,11 +214,26 @@ export default class ProjectSumChange extends Component {
                     <ECCB
                         initCheckedValue={record.remarks}
                         checkVal={checkVal}
-                        value={record.total} />
+                        value={record.remarks} />
                 )
               },
               key:"Remarks"
-            },
+            },{
+                title: "操作",
+                render: (text, record, index) => {
+                  return (
+                    <Popconfirm
+                      placement="leftTop"
+                      title="确定删除吗？"
+                      onConfirm={this.delete.bind(this, record.key-1)}
+                      okText="确认"
+                      cancelText="取消"
+                    >
+                      <a>删除</a>
+                    </Popconfirm>
+                  );
+                }
+              }
           ];
         return (
             <Modal

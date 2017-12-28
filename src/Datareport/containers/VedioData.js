@@ -30,8 +30,11 @@ export default class VedioData extends Component {
 			changeModal: false,
 			deleteModal: false,
 			dataSource: [],
-			selectRows: []
+			selectRows: [],
 		}
+		Object.assign(this,{
+			originalData: []
+		})
 	}
 
 	async componentDidMount(){
@@ -49,7 +52,7 @@ export default class VedioData extends Component {
 
 	render() {
 		const {uploadModal,changeModal,deleteModal,dataSource,loading,selectRows} = this.state,
-			{actions:{jsonToExcel}} = this.props;
+			{actions,actions:{jsonToExcel}} = this.props;
 
 		return (<Main>
 			<DynamicTitle title="视频监控" {...this.props} />
@@ -59,6 +62,7 @@ export default class VedioData extends Component {
 				 selectJudge={this.selectJudge}
 				 jsonToExcel={jsonToExcel}
 				 deriveData={this.deriveData}
+				 onSearch={this.onSearch}
 				/>
 				<VedioTable
 				dataSource={dataSource}
@@ -69,7 +73,7 @@ export default class VedioData extends Component {
 			<UploadModal
 			 key={`uploadModal${uploadModal}`}
 			 uploadModal={uploadModal}
-			 actions = {this.props.actions}
+			 actions = {actions}
 			 closeModal={this.closeModal}
 			/>
 			<ChangeModal
@@ -77,13 +81,14 @@ export default class VedioData extends Component {
 			 changeModal={changeModal}
 			 closeModal={this.closeModal}
 			 dataSource={selectRows}
+			 actions={actions}
 			/>
 			<DeleteModal
 			 key={`deleteModal${deleteModal}`}
 			 deleteModal={deleteModal}
 			 closeModal={this.closeModal}
 			 dataSource={selectRows}
-			 actions = {this.props.actions}
+			 actions = {actions}
 			/>
 		</Main>)
 	}
@@ -112,6 +117,7 @@ export default class VedioData extends Component {
 				return {index:index+1,
 					cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,code};
 			})
+			this.originalData = dataSource;
 			this.setState({dataSource,loading:false});
 		})
 	}
@@ -139,5 +145,16 @@ export default class VedioData extends Component {
 			const {index,cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode} = item;
 			return [index,cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode]
 		})
+	}
+
+	onSearch = (text)=>{
+		const {originalData} = this;
+		let result = originalData.filter(data=>{
+			return String(data.cameraName).indexOf(text)>=0 || String(data.cameraId).indexOf(text)>=0;
+		});
+		if(text === ''){
+			result = originalData;
+		}
+		this.setState({dataSource:addSerialNumber(result)});
 	}
 };
