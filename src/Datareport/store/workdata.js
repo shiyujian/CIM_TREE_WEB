@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import createFetchActionWithHeaders from './fetchAction';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base} from '_platform/api';
+import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base,NODE_FILE_EXCHANGE_API} from '_platform/api';
 
 
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
@@ -35,6 +35,8 @@ const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE')
 //创建文档目录
 export const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
+//导出数据
+const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 export const actions = {
 	getProjectTree,
 	getProjectTreeDetail,
@@ -55,7 +57,8 @@ export const actions = {
 	postScheduleDir,
 	getScheduleDir,
 	getWorkDataList,
-	delDocList
+	delDocList,
+	jsonToExcel
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

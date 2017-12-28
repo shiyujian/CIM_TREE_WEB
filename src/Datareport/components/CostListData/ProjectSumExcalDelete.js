@@ -33,7 +33,27 @@ export default class ProjectSumExcalDelete extends Component {
             this.setState({checkers})
         })
     }
-    
+    componentWillMount(){
+        let dataSource = this.props.dataSourceSelected;
+        let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+                code: item.code,
+                subproject: item.subproject,//项目/子项目
+                unit: item.unit,//单位工程
+                projectcoding: item.projectcoding,//项目编号
+                projectname: item.projectname,//项目名称
+                company: item.company,//计量单位
+                number: item.number,//数量
+                total: item.total,//单价
+                remarks: item.remarks,//备注
+            }
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource})        
+    }
+
 
     //下拉框选择人
     selectChecker(value){
