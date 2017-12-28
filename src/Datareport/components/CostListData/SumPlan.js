@@ -376,9 +376,9 @@ export default class SumPlan extends Component {
           pagination={{ pageSize: 10 }}
         />
         <Row style={{ marginBottom: "30px" }} type="flex">
-          <Col>
+          {/* <Col>
             <Button style={{ margin: "10px 10px 10px 0px" }}>模板下载</Button>
-          </Col>
+          </Col> */}
           <Col>
             <Upload
               onChange={this.uplodachange.bind(this)}
