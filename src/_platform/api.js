@@ -19,13 +19,13 @@
 */
 window.config = window.config || {};
 
-let DOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP,NODE_FILE_EXCHANGE_API;
+let DOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
 
 DOMAIN = window.config.DOMAIN;
 USER = window.config.STATIC_FILE_USER;
 PASSWORD = window.config.STATIC_FILE_PASSWORD;
 STATIC_FILE_IP = window.config.STATIC_FILE_IP;
-NODE_FILE_EXCHANGE_API = window.config.NODE_FILE_STATIC_URL;
+
 
 /***********************公共资源服务**************************/
 export { DOMAIN, USER, PASSWORD, TREE_CODE };
@@ -42,7 +42,7 @@ export const DOWNLOAD_FILE = `${STATIC_FILE_IP}:${window.config.STATIC_DOWNLOAD_
 export const CUS_TILEMAP = window.config.cus_tilemap;
 export const CODE_API = window.config.DOC_EXCHANGE_URL;
 export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
-
+export const NODE_FILE_EXCHANGE_API = window.config.NODE_FILE_STATIC_URL;
 //FDBServer API
 export const FDBSERVICE_API = `${window.config.FDBServer_API}`;
 export const SAFETY_MONITOR = `${base}/service/appserver`;
