@@ -57,6 +57,7 @@ export default class VedioInfoData extends Component {
 				 selectJudge={this.selectJudge}
 				 jsonToExcel={jsonToExcel}
 				 deriveData={this.deriveData}
+				 storeDateSource={this.storeDateSource}
 				/>
 				<VedioInfoTable
 				dataSource={dataSource}
@@ -131,5 +132,9 @@ export default class VedioInfoData extends Component {
 			const {index,projectName,enginner,ShootingDate,file:{name},code} = item;
 			return [index,projectName,enginner,ShootingDate,name,code]
 		})
+	}
+
+	storeDateSource = (dataSource)=>{
+		this.setState({dataSource});
 	}
 };
