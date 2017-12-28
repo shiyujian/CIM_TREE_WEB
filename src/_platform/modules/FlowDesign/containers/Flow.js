@@ -321,7 +321,11 @@ class Flow extends Component {
 			}, {
 				status: 1
 			}).then(resp => {
-				message.info("已经激活");
+				if(resp.status === 0){
+					message.info("已经激活");
+				} else {
+					message.info("激活失败");
+				}
 				this.getList().then(result => {
 					this.onSelect([select_id]);
 				});
