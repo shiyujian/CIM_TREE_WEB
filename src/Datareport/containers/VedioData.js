@@ -30,8 +30,11 @@ export default class VedioData extends Component {
 			changeModal: false,
 			deleteModal: false,
 			dataSource: [],
-			selectRows: []
+			selectRows: [],
 		}
+		Object.assign(this,{
+			originalData: []
+		})
 	}
 
 	async componentDidMount(){
@@ -59,6 +62,7 @@ export default class VedioData extends Component {
 				 selectJudge={this.selectJudge}
 				 jsonToExcel={jsonToExcel}
 				 deriveData={this.deriveData}
+				 onSearch={this.onSearch}
 				/>
 				<VedioTable
 				dataSource={dataSource}
@@ -112,6 +116,7 @@ export default class VedioData extends Component {
 				return {index:index+1,
 					cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode,code};
 			})
+			this.originalData = dataSource;
 			this.setState({dataSource,loading:false});
 		})
 	}
@@ -139,5 +144,16 @@ export default class VedioData extends Component {
 			const {index,cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode} = item;
 			return [index,cameraId,projectName,enginner,cameraName,ip,port,username,password,xAxes,yAxes,modal,uptime,wbsCode]
 		})
+	}
+
+	onSearch = (text)=>{
+		const {originalData} = this;
+		let result = originalData.filter(data=>{
+			return String(data.cameraName).indexOf(text)>=0 || String(data.cameraId).indexOf(text)>=0;
+		});
+		if(text === ''){
+			result = originalData;
+		}
+		this.setState({dataSource:addSerialNumber(result)});
 	}
 };
