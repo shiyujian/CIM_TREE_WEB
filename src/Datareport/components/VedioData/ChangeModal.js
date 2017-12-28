@@ -4,11 +4,26 @@ import {Modal, message} from 'antd';
 
 import VedioTable from './VedioTable';
 import ChangeFooter from './ChangeFooter';
+import {launchProcess} from './commonFunc';
 
 export default class VedioUpload extends Component{
+    constructor(props){
+        super(props);
+        this.state={
+            dataSource: []
+        }
+    }
+
+    componentDidMount(){
+        const {dataSource} = this.props,
+            sourceData = JSON.parse(JSON.stringify(dataSource));
+
+        this.setState({dataSource:sourceData})
+    }
 
     render(){
-        const {changeModal, closeModal, dataSource} = this.props;
+        const {changeModal, closeModal} = this.props,
+            {dataSource} = this.state;
 
         return(
             <Modal
@@ -20,6 +35,8 @@ export default class VedioUpload extends Component{
             >
                 <VedioTable
                  dataSource={dataSource}
+                 storeData={this.storeData}
+                 edit={true}
                 />
                 <ChangeFooter
                  onOk={this.onOk}
@@ -27,15 +44,20 @@ export default class VedioUpload extends Component{
             </Modal>
         )
     }
+
     onOk = async (selectUser,description)=>{    //dataSource需要修改
-        const {dataSource, closeModal, actions:{ createWorkflow, logWorkflowEvent }} = this.props,
+        const { closeModal, actions:{ createWorkflow, logWorkflowEvent }} = this.props,
+            {dataSource} = this.state,
             name = '视频监控数据修改';
 
         await launchProcess({dataSource,selectUser,name,description},{createWorkflow,logWorkflowEvent});
         message.success("发起修改数据流程成功");
-        closeModal("deleteModal");
+        closeModal("changeModal");
     }
 
+    storeData = (dataSource)=>{
+        this.setState({dataSource});
+    }
 }
 
 VedioUpload.PropTypes ={
