@@ -109,7 +109,8 @@ export default class VedioTable extends Component{
         render: (text,record,index) => this.renderColumns(text,index,'modal')
     },{
         title: '摄像头上线时间',
-        dataIndex: 'uptime'
+        dataIndex: 'uptime',
+        render: (text,record,index) => this.renderColumns(text,index,'uptime')
     },{
         title: 'wbs编码',
         dataIndex: 'wbsCode',
