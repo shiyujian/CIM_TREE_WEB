@@ -356,6 +356,30 @@ export default class JianyanData extends Component {
 	oncancel(){
 		this.setState({addvisible:false,deletevisible:false,targetData:[]})
 	}
+	//搜索
+	async onSearch(value){
+		this.setState({loading:true})
+		let {totalData} = this.state
+		const {actions:{getWorkPackageDetail,getRelDoc}} = this.props
+		let dataSource = totalData.filter(o => {
+			return (o.name.indexOf(value) > -1) || (o.code.indexOf(value) > -1)
+		})
+		for(let index = 0;index < 10;index++){
+			let wp = await getWorkPackageDetail({code:dataSource[index].code})
+			let rel_doc = wp.related_documents ? wp.related_documents.find(x => {
+				return x.rel_type === 'many_jyp_rel'
+			}) : null
+			if(rel_doc){
+				let doc = await getRelDoc({code:rel_doc.code})
+				dataSource[index] = {...doc.extra_params,key:index}
+				dataSource[index].related_documents = 	wp.related_documents					
+			}else{
+				let obj = await this.getInfo(wp)
+				dataSource[index] = {...obj,key:index,file:{}}
+			}
+		}
+		this.setState({dataSource,pagination:{total:dataSource.length},loading:false})
+	}
 	render() {
 		let {selectedRowKeys} = this.state
 		const rowSelection = {
@@ -375,7 +399,7 @@ export default class JianyanData extends Component {
 						className="btn"
 						style={{width:"200px"}}
 						placeholder="输入搜索条件"
-						onSearch={value => console.log(value)}
+						onSearch={this.onSearch.bind(this)}
 						enterButton/>
 				</Row>
 				<Spin spinning={this.state.loading}>

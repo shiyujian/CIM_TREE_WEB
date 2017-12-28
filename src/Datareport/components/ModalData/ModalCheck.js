@@ -81,7 +81,7 @@ export default class ModalCheck extends Component {
             postScheduleDir,
             getWorkpackagesByCode
         }} = this.props;
-        debugger
+       
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
         let project = dataSource[0].project;
@@ -159,8 +159,8 @@ export default class ModalCheck extends Component {
                     submittingUnit:item.submittingUnit,
                     modelDescription:item.modelDescription,
                     modeType:item.modeType,
-                    unit:item.unit.name,
-                    project:item.project.name,
+                    unit:item.unit,
+                    project:item.project,
                     reportingTime:item.reportingTime,
                     reportingName:item.reportingName,
                 }

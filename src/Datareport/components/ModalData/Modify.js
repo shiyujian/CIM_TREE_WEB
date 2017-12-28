@@ -21,8 +21,9 @@ export default class Modify extends Component {
 		this.state = {
 			checkers: [],//审核人下来框选项
 			check: null,//审核人
-			
-			
+			alldatas:[],
+			dataSource: [],
+			key: -1,
 		};
 	}
 
@@ -38,17 +39,38 @@ export default class Modify extends Component {
 		})
 	}
 
-	//table input 输入
-	tableDataChange(index, key, e) {
-		const { modify = {}, getall = [], actions:{getdele}} = this.props;
-		let dataSources = getall;
-		console.log('getall',getall)
-		dataSources[index][key] = e.target['value'];
-	  	getdele(dataSources);
-		// console.log('data:',dataSource)
+	componentWillReceiveProps(props){
+        const {modify = {}} = props
+        if(modify.key !== this.state.key) {
+	        let item = modify.selectedDatas
+	        let dataSource = [];
+	        item&&item.forEach((single,index) => {
+	    		let temp = {
+	    			index:index+1,
+	                code:single.code,
+					coding: single.extra_params.coding,
+					modelName: single.extra_params.filename,
+					project: single.extra_params.project,
+					unit: single.extra_params.unit,
+					submittingUnit: single.extra_params.submittingUnit,
+					modelDescription: single.extra_params.modelDescription,
+					// file:single.basic_params.files[0],
+					modeType: single.extra_params.modeType,
+					fdbMode: single.basic_params.files[0],
+					tdbxMode: single.basic_params.files[1],
+					attributeTable: single.basic_params.files[2],
+					reportingTime: single.extra_params.reportingTime,
+					reportingName: single.extra_params.reportingName,
+	            }
+	            dataSource.push(temp);
+	        }) 
+	        this.setState({dataSource,key:modify.key})
+    	}
+   	}
+
 	
-	
-	}
+
+
 
 	//下拉框选择人
 	selectChecker(value) {
@@ -56,13 +78,15 @@ export default class Modify extends Component {
 		this.setState({ check })
 	}
 
-
+	//table input 输入
+    tableDataChange(index, key ,e ){
+		let { dataSource } = this.state;
+		dataSource[index][key] = e.target['value'];
+	    this.setState({dataSource});
+    }
 
 	onok() {
-		const { getall = [] } = this.props;
-		let dataSource = getall;
-		console.log('woshi:', getall)
-
+		let {dataSource} = this.state;
 		if (!this.state.check) {
 			message.info("请选择审核人")
 			return;
@@ -76,10 +100,11 @@ export default class Modify extends Component {
 			organization: check.account.organization
 		}
 		this.setChangeData(dataSource, per)
+		console.log('我是：',dataSource)
 	}
 
 	setChangeData = (data, participants) => {
-		const { actions: { createWorkflow, logWorkflowEvent, clearModifyField } } = this.props
+		const {modify = {}, actions: { createWorkflow, logWorkflowEvent, clearModifyField } } = this.props
 		let creator = {
 			id: getUser().id,
 			username: getUser().username,
@@ -114,21 +139,19 @@ export default class Modify extends Component {
 					attachment: null
 				}).then(() => {
 					message.success("成功")
-					clearModifyField()
+					clearModifyField('visible',false)
 				})
 		})
 	}
 
 
 	render() {
-		const { modify = {}, getall = [], actions: { changeModifyField } } = this.props;
-		let dataSource = getall;
+		const {modify = {}, actions: {changeModifyField}} = this.props;
+		
 		const columns = [{
 			title: '序号',
-			dataIndex: 'numbers',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex: 'index',
+			
 		}, {
 			title: '模型编码',
 			dataIndex: 'coding'
@@ -140,17 +163,24 @@ export default class Modify extends Component {
 			dataIndex: 'unit'
 		}, {
 			title: '模型名称',
-			dataIndex: 'modelName'
+			dataIndex: 'modelName',
+			render: (text, record, index) => (
+				<Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'modelName')} defaultValue={record.modelName}/>
+            ),
+
 		}, {
 			title: '提交单位',
 			dataIndex: 'submittingUnit',
 			render: (text, record, index) => (
-                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'submittingUnit')} value={getall.submittingUnit} />
+				<Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'submittingUnit')} defaultValue={record.submittingUnit}/>
             ),
 
 		}, {
 			title: '模型描述',
-			dataIndex: 'modelDescription'
+			dataIndex: 'modelDescription',
+			render: (text, record, index) => (
+				<Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'modelDescription')} defaultValue={record.modelDescription}/>
+            ),
 		}, {
 			title: '模型类型',
 			dataIndex: 'modeType'
@@ -209,11 +239,12 @@ export default class Modify extends Component {
 		return (
 			<Modal
 				title="模型信息更改表"
-				key={this.props.akey}
+				key={modify.key}
 				width={1280}
 				visible={modify.visible}
 				onCancel={this.cancel.bind(this)}
 				onOk={this.onok.bind(this)}
+			
 			>
 
 				<Row>
@@ -221,7 +252,8 @@ export default class Modify extends Component {
 						bordered
 						className='foresttable'
 						columns={columns}
-						dataSource={getall}
+						rowKey='index' 
+						dataSource={this.state.dataSource}
 					/>
 				</Row>
 				{/* <Row style={{ marginTop: '20px' }}>
@@ -261,6 +293,6 @@ export default class Modify extends Component {
 		const {
 			actions: { clearModifyField }
 		} = this.props;
-		clearModifyField();
+		clearModifyField('visible',false);
 	}
 }

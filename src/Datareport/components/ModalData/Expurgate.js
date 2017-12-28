@@ -19,7 +19,8 @@ export default class Expurgate extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-
+			dataSource: [],
+			key: -1,
 			checkers: [],//审核人下来框选项
 			check: null,//审核人
 
@@ -38,6 +39,39 @@ export default class Expurgate extends Component {
 		})
 	}
 
+	componentWillReceiveProps(props) {
+		const { expurgate = {} } = props
+		if (expurgate.key !== this.state.key) {
+			let item = expurgate.selectedDatas
+			console.log('item',item)
+			let dataSource = [];
+			item && item.forEach((single, index) => {
+				console.log('sin',single)
+				let temp = {
+					code: single.code,
+				    index: index + 1,
+					coding: single.extra_params.coding,
+					modelName: single.extra_params.filename,
+					project: single.extra_params.project,
+					unit: single.extra_params.unit,
+					submittingUnit: single.extra_params.submittingUnit,
+					modelDescription: single.extra_params.modelDescription,
+					// file:single.basic_params.files[0],
+					modeType: single.extra_params.modeType,
+					fdbMode: single.basic_params.files[0],
+					tdbxMode: single.basic_params.files[1],
+					attributeTable: single.basic_params.files[2],
+					reportingTime: single.extra_params.reportingTime,
+					reportingName: single.extra_params.reportingName,
+					
+				}
+				dataSource.push(temp);
+			})
+			this.setState({ dataSource, key: expurgate.key })
+			console.log(expurgate, dataSource)
+		}
+	}
+
 	//下拉框选择人
 	selectChecker(value) {
 		let check = JSON.parse(value);
@@ -45,10 +79,8 @@ export default class Expurgate extends Component {
 	}
 
 	onok() {
-		const { getall = [], actions: { changeAdditionField } } = this.props;
-		let  dataSource  = getall;
-		console.log('woshi:', getall)
-
+		let {dataSource} = this.state;
+	
 		if (!this.state.check) {
 			message.info("请选择审核人")
 			return;
@@ -107,13 +139,11 @@ export default class Expurgate extends Component {
 
 	render() {
 
-		const { expurgate = {}, getall = [], actions: { changeExpurgateField } } = this.props;
+		const {expurgate = {}} = this.props;
 		const columns = [{
 			title: '序号',
-			dataIndex: 'numbers',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex: 'index',
+		
 		}, {
 			title: '模型编码',
 			dataIndex: 'coding'
@@ -189,7 +219,7 @@ export default class Expurgate extends Component {
 
 		return (
 			<Modal
-			title="模型信息删除表"
+				title="模型信息删除表"
 				width={1280}
 				visible={expurgate.visible}
 				onCancel={this.cancel.bind(this)}
@@ -200,7 +230,8 @@ export default class Expurgate extends Component {
 						bordered
 						className='foresttable'
 						columns={columns}
-						dataSource={getall}
+						rowKey='index'
+						dataSource={this.state.dataSource}
 					/>
 				</Row>
 
@@ -216,39 +247,19 @@ export default class Expurgate extends Component {
 						</span>
 					</Col>
 				</Row>
-{/* 
-				<Row style={{ marginTop: '20px' }}>
-					<Col span={2} push={22}>
-						<Button type="default">确认导入</Button>
-					</Col>
-				</Row> */}
-				{/* <Row style={{ marginBottom: '20px' }}>
-					<Col span={2}>
-						<span>删除原因：</span>
-					</Col>
-				</Row>
-				<Row style={{ margin: '20px 0' }}>
-					<Col>
-						<TextArea rows={2} />
-					</Col>
-				</Row> */}
+				
 			</Modal>
 		)
 	}
 
-	 //删除
-	 delete(index){
-        const { getall=[],actions:{changeExpurgateField} } = this.props;
-        
-		let dataSource = getall;
-		console.log('ads',{dataSource})
+	//删除
+	delete(index){
+        let {dataSource} = this.state;
         dataSource.splice(index,1);
-       
-        changeExpurgateField('dataSource',dataSource)
-    
+        this.setState({dataSource});
     }
 
-	
+
 
 	onChange = (e) => {
 		console.log('radio checked', e.target.value);
