@@ -44,6 +44,17 @@ export default class ToggleModal extends Component {
                     rowKey={(item, index) => index}
                 >
                 </Table>
+                <Row>
+                    {
+                        !this.state.dataSource.length ? <p></p>
+                            :
+                            (
+                                <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                                    [共：{this.state.dataSource.length}行]
+								</Col>
+                            )
+                    }
+                </Row>
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col><Button
                         style={{ margin: '10px 10px 10px 0px' }}

@@ -9,7 +9,7 @@ export default class DeleteFile extends Component {
     constructor(props, state) {
         super(props);
         this.state = {
-            dataSource: [],
+            dataSource: this.props.subDataSource,
             deleteInfoNew: '',
             users: [],
             projects: [],
@@ -25,9 +25,9 @@ export default class DeleteFile extends Component {
     componentDidMount() {
         // console.log('vip-state', this.props);
         // const dataSource = this.props.subDataSource;
-        this.setState({
-            dataSource,
-        })
+        // this.setState({
+        //     dataSource,
+        // })
 
         // 下拉框
         const { actions: { getAllUsers, getProjectTree } } = this.props;

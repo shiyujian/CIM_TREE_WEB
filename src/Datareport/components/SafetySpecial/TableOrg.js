@@ -242,9 +242,9 @@ export default class TableOrg extends Component {
 	handlePreview(codeId, i) {
 		let { dataSource } = this.state;
 		const { actions: { openPreview } } = this.props;
-		let ff = {},f={};
-        ff = dataSource.filter((item, i) => {
-            return item.codeId === codeId;
+		let ff = {}, f = {};
+		ff = dataSource.filter((item, i) => {
+			return item.codeId === codeId;
 		});
 		f = ff[0].file;
 		let filed = {}
@@ -265,11 +265,14 @@ export default class TableOrg extends Component {
 			})
 			return;
 		}
-		let exhead = ['序号', '项目/子项目名称', '单位工程', '方案名称', '编制单位', '评审时间', '评审意见', '评审人员', '备注', '附件'];
+		let exhead1 = ['名称', '重大安全专项方案'];
+		let exhead2 = ['重大安全专项方案','序号', '项目/子项目名称', '单位工程', '方案名称', '编制单位', '评审时间', '评审意见', '评审人员', '备注', '附件'];
 		let rows = [];
-		rows.push(exhead);
+		rows.push(exhead1);
+		rows.push(exhead2);
 		let excontent = this.state.subDataSource.map(data => {
 			let item = [
+				'重大安全专项方案',
 				data.i,
 				data.projectName,
 				data.unitProject,
@@ -285,12 +288,21 @@ export default class TableOrg extends Component {
 		});
 		const { actions: { jsonToExcel } } = this.props;
 		console.log(rows)
+		// debugger;
 		jsonToExcel({}, { rows: rows })
 			.then(rst => {
-				console.log(rst);
-				console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
-				this.createLink(this,"安全专项导出信息",NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+				let name = 	"安全专项导出信息"+moment(new Date()).format('YYYY-MM-DD-h:mm:ss-a')+'.xlsx';
+				this.createLink(name, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
 			})
+	}
+	createLink(name, url) {    //导出
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download', name);
+		link.setAttribute('target', '_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
 	}
 	//变更
 	BtnChange(e) {
