@@ -3,7 +3,7 @@ import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import fieldFactory from '_platform/store/service/field';
 import {base} from '_platform/api';
-const getLoginUser = createFetchAction(`${base}/accounts/api/users/{{id}}`, [], 'GET');
+const getLoginUser = createFetchAction(`${base}/accounts/api/users/{{id}}/`, [], 'GET');
 export const actions2 = {
 	getLoginUser
 };
