@@ -258,34 +258,41 @@ export default class SumSpeed extends Component {
     const columns = [
       {
         title: "序号",
-        dataIndex: "number",
+        dataIndex: "key",
         render: (text, record, index) => {
           return index + 1;
         }
       },
       {
         title: "工作节点目标",
-        dataIndex: "nodetarget"
+        dataIndex: "nodetarget",
+        key:"Nodetarget"
+
       },
       {
         title: "完成时间",
-        dataIndex: "completiontime"
+        dataIndex: "completiontime",
+        key:'Completiontime'
       },
       {
         title: "支付金额（万元）",
-        dataIndex: "summoney"
+        dataIndex: "summoney",
+        key:'Summoney'
       },
       {
         title: "累计占比",
-        dataIndex: "ratio"
+        dataIndex: "ratio",
+        key:'Ratio'
       },
       {
         title: "备注",
-        dataIndex: "remarks"
+        dataIndex: "remarks",
+        key:'Remarks'
       },
       {
         title: "编辑",
         dataIndex: "edit",
+        key:'Edit',
         render: (text, record, index) => {
           return (
             <Popconfirm
@@ -318,9 +325,9 @@ export default class SumSpeed extends Component {
           pagination={{ pageSize: 10 }}
         />
         <Row style={{ marginBottom: "30px" }} type="flex">
-          <Col>
+          {/* <Col>
             <Button style={{ margin: "10px 10px 10px 0px" }}>模板下载</Button>
-          </Col>
+          </Col> */}
           <Col>
             <Upload
               onChange={this.uplodachange.bind(this)}
@@ -338,10 +345,8 @@ export default class SumSpeed extends Component {
             <span>
               审核人：
               <Select
-                mode="combobox"
                 style={{width:200}}
                 className = "btn"
-                placeholder="可搜索审查人"
                 onChange = {this.selectChecker.bind(this)}
               >
                     {this.state.checkers}
@@ -357,6 +362,7 @@ export default class SumSpeed extends Component {
                 loadData={this.loadData.bind(this)}
                 onChange={this.onSelectProject.bind(this)}
                 changeOnSelect
+                placeholder ="请选择项目-单位工程"
               />
             </span>
           </Col>
