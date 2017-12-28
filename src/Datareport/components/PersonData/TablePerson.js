@@ -28,7 +28,7 @@ export default class TablePerson extends Component{
                     columns = {this.columns}
                     bordered = {true}
                     rowSelection={this.rowSelection}
-                    dataSource = {this.state.dataSource}
+                    dataSource = {this.state.tempData}
                     rowKey = "index"
                 >
                 </Table>
@@ -63,19 +63,18 @@ export default class TablePerson extends Component{
 	}
 	async componentDidMount() {
 		const {actions: {getAllUsers}} = this.props;
-		let orgAll = await getAllUsers();
-		orgAll.forEach((item, index) => {
-			orgAll[index].index = index + 1;
-			console.log('item',item)
+		let dataSource = await getAllUsers();
+		dataSource.forEach((item, index) => {
+			dataSource[index].index = index + 1;
 		})
-		this.setState({dataSource: orgAll})
+		this.setState({dataSource, tempData: dataSource})
 	}
 
-	searchOrg(value){ 
+	searchOrg(value){
 		let searchData = [];
 		let searchPer = this.state.dataSource
 		searchPer.map(rst => {
-			console.log("rst", rst)
+			console.log("rst", rst.account.organization)
 			if (rst.account.organization.indexOf(value) != -1) {
 				searchData.push(rst);
 			}

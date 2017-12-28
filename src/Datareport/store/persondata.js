@@ -12,6 +12,7 @@ export const setModifyPer = createAction('存储要变更的数据');
 export const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 export const postAllUsersId = createFetchAction(`${base}/workflowapp/api/instance/{{id}}/personflow/`, [], "POST");
 export const postPersonList = createFetchAction(`${SERVICE_API}/personlist/`, [], "POST");
+export const putPersonList = createFetchAction(`${SERVICE_API}/personlist/`, [], "PUT");
 export const getOrgList = createFetchAction(`${SERVICE_API}/org-tree/?depth=1`);
 export const getOrgReverse = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/?reverse=true`,[], "GET");
 export const getOrgCode = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[], "GET");
@@ -29,6 +30,7 @@ export const actions = {
 	setDeletePer,
 	deleteUserList,
 	setModifyPer,
+	putPersonList,
 };
 
 export default handleActions({

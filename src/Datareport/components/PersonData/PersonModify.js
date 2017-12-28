@@ -45,7 +45,6 @@ export default class PersonModify extends Component {
         this.setState({
             dataSource:modifyPer
         })
-        console.log('dataSource',this.setState)
     }
 
 	render() {
@@ -62,8 +61,7 @@ export default class PersonModify extends Component {
 			title: '姓名',
 			dataIndex: 'account.person_name',
 			key: 'Name',
-			render:(text, record, index) =>{ 
-				console.log('record',record)
+			render:(text, record, index) =>{
 	            return <Input value = {record.account.person_name || ""} onChange={ele => {
 	                record.account.person_name = ele.target.value
 	                this.forceUpdate();
@@ -77,22 +75,55 @@ export default class PersonModify extends Component {
 			title: '所属部门',
 			dataIndex: 'account.org_code',
 			key: 'Depart',
+			render:(text, record, index) =>{
+	            return <Input value = {record.account.org_code || ""} onChange={ele => {
+	                record.account.org_code = ele.target.value
+	                this.forceUpdate();
+	            }}/>
+	        }
 		}, {
 			title: '职务',
-			dataIndex: 'job',
+			dataIndex: 'account.title',
 			key: 'Job',
+			render:(text, record, index) =>{
+	            return <Input value = {record.account.title || ""} onChange={ele => {
+	                record.account.title = ele.target.value
+	                this.forceUpdate();
+	            }}/>
+	        }
 		}, {
 			title: '性别',
-			dataIndex: 'sex',
-			key: 'Sex'
+			dataIndex: 'account.gender',
+			key: 'Sex',
+			render:(text, record, index) =>{
+	            return <Select value = {record.account.gender} onChange={ele => {
+	                record.account.gender = ele
+	                this.forceUpdate();
+	            }}>
+	            	<Option value="男">男</Option>
+	            	<Option value="女">女</Option>
+	            </Select>
+	        }
 		}, {
 			title: '手机号码',
-			dataIndex: 'tel',
-			key: 'Tel'
+			dataIndex: 'account.person_telephone',
+			key: 'Tel',
+			render:(text, record, index) =>{
+	            return <Input value = {record.account.person_telephone || ""} onChange={ele => {
+	                record.account.person_telephone = ele.target.value
+	                this.forceUpdate();
+	            }}/>
+	        }
 		}, {
 			title: '邮箱',
 			dataIndex: 'email',
-			key: 'Email'
+			key: 'Email',
+			render:(text, record, index) =>{
+	            return <Input value = {record.email || ""} onChange={ele => {
+	                record.email = ele.target.value
+	                this.forceUpdate();
+	            }}/>
+	        }
 		}, {
 			title: '二维码',
 			dataIndex: 'account.person_signature_url',
