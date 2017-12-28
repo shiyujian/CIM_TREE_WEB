@@ -10,8 +10,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { DynamicTitle, Content } from '_platform/components/layout';
-import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio, bordered, message } from 'antd';
-import { WORKFLOW_CODE } from '_platform/api.js';
+import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio, bordered, message, Progress } from 'antd';
+import { WORKFLOW_CODE, NODE_FILE_EXCHANGE_API, DataReportTemplate_SettlementPlan} from '_platform/api.js';
 import { getUser } from '_platform/auth';
 import { actions } from '../store/SumPlanCost';
 import { actions as platformActions } from '_platform/store/global';
@@ -39,6 +39,8 @@ export default class BanlancePlan extends Component {
 			lanchReapt: false,
 			lanchChange: false,
 			lanchdelate: false,
+			loading:false,
+			percent:0,
 			dataSource: [],
 			dataSourceSelected:[],
             selectedRowKeys: []
@@ -75,7 +77,9 @@ export default class BanlancePlan extends Component {
 
 	componentDidMount(){
 		const {actions:{ getExBySearch }}=this.props;
+		this.setState({loading:true,percent:0})
 		getExBySearch().then(rst=>{
+			this.setState({loading:false,percent:100})
 			this.generateTableData(rst.result)
 		})
 	}
@@ -213,8 +217,58 @@ export default class BanlancePlan extends Component {
         //     dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
         // }
         this.setState({selectedRowKeys,dataSourceSelected:selectedRows});
-    }
+	}
 
+
+	// 模板下载
+	getTemplate(){
+		console.log('moban1',DataReportTemplate_SettlementPlan);
+		this.createLink('结算计划模板',DataReportTemplate_SettlementPlan)
+	}
+
+	//文件下载;
+	createLink = (name,url) =>{
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download',this);
+		link.setAttribute('target','_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+
+
+
+	// 表格导出
+	getExcel(){
+		if(this.state.dataSourceSelected.length <=0){
+			message.warning('请先选择要导出的数据');
+			return
+		}
+		const { actions:{jsonToExcel}} = this.props;
+		const {dataSourceSelected} = this.state;
+		let rows = [];
+		rows.push(["项目/子项目名称","单位工程","工作节点目标","完成时间","支付金额(万元)","累计占比","备注"]);
+		console.log('this',dataSourceSelected);
+		dataSourceSelected.map(item =>{
+			rows.push([
+				item.subproject,
+				item.unit,
+				item.nodetarget,
+				item.completiontime,
+				item.summoney,
+				item.ratio,
+				item.remarks
+			])
+		})
+		console.log('rows',rows);
+		jsonToExcel({},{rows:rows}).then(
+			rst=>{
+				this.createLink('name',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+				console.log(rst,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+			}
+		)
+	}
 	render() {
 		const { selectedRowKeys } = this.state;
 		const rowSelection = {
@@ -245,24 +299,37 @@ export default class BanlancePlan extends Component {
 		}, {
 			title: '备注',
 			dataIndex: 'remarks',
+			render:(text,record,index)=>{
+			  return record.remarks ?record.remarks :'—'
+			}
 		}]
 		return (
 			<div>
 				<DynamicTitle title="结算计划" {...this.props} />
 				<Content>
 					<Row>
-						<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
+						<Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.getTemplate.bind(this)}>模板下载</Button>
 						<Button className="btn" type="default" onClick={() => { this.setState({ lanchReapt: true }) }}>批量导入</Button>
-						<Button className="btn" type="default" onClick={() => { this.setState({ lanchChange: true }) }}>申请变更</Button>
-						<Button className="btn" type="default" onClick={() => { this.setState({ lanchdelate: true }) }}>申请删除</Button>
-						<Button className="btn" type="default">导出表格</Button>
+						<Button className="btn" type="default" onClick={() => { 
+							if(this.state.dataSourceSelected.length <=0){
+								message.warning('请选择要变更的数据');
+								return
+							}
+							this.setState({ lanchChange: true }) }}>申请变更</Button>
+						<Button className="btn" type="default" onClick={() => { 
+							if(this.state.dataSourceSelected.length <=0){
+								message.warning('请选择要删除的数据');
+								return
+							}
+							this.setState({ lanchdelate: true }) }}>申请删除</Button>
+						<Button className="btn" type="default" onClick={this.getExcel.bind(this)} >导出表格</Button>
 						<Search
 							className="btn"
 							style={{ width: "200px" }}
 							placeholder="请输入搜索条件"
 							onSearch={ text => {
 								let result = this.state.dataSource.filter(data => {
-									return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0;
+									return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.nodetarget.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0;
 								})
 								if( text === ''){
 									result = this.state.dataSource
@@ -273,7 +340,9 @@ export default class BanlancePlan extends Component {
 						/>
 					</Row>
 					<div >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDat} />
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDat} 
+							loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}												
+						/>
 					</div>
 					{this.state.lanchReapt &&
 						<SumPlan {...this.props} oncancel={() => { this.setState({ lanchReapt: false }) }} onok={this.lanchOk.bind(this)} />

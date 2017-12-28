@@ -9,7 +9,8 @@ export default class ToggleModal extends Component{
             dataSource: [],
             users: [],
             projects: [],
-            org: []
+            org: [],
+            falg: true,
         }
     }
     render(){
@@ -120,6 +121,10 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
+        if(this.state.falg === false) {
+            message.error('部门不存在，无法提交');
+            return;
+        }
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisible(false);
     }
@@ -143,9 +148,17 @@ export default class ToggleModal extends Component{
         })
         let res, orgname = [];
         Promise.all(promises).then(rst => {
-            console.log('rst', rst)
             rst.map(item => {
-                orgname.push(item.children[0].name);
+                console.log('item',item)
+                if(item.children.length === 0) {
+                    orgname.push('');
+                    this.setState({
+                        falg: false
+                    })
+                }
+                else{
+                    orgname.push(item.children[0].name);
+                }
             })
             res = data.map((item, index) => {
                 return {
@@ -166,7 +179,7 @@ export default class ToggleModal extends Component{
         })
     }
     componentDidMount(){
-        const {actions:{getAllUsers,getOrgList}} = this.props;
+        const {actions:{getAllUsers, getOrgList}} = this.props;
         getAllUsers().then(rst => {
             let users = [];
             if (rst.length) {
@@ -193,8 +206,19 @@ export default class ToggleModal extends Component{
         key: 'Org',
       },{
          title: '所属部门',
-         dataIndex :'depart',
-         key: 'Depart',
+         // dataIndex :'depart',
+         // key: 'Depart',
+         render: (record) => {
+            if (record.org === '') {
+                return <span style={{color: 'red'}}>
+                    {record.depart}
+                </span>
+            } else {
+                return <span>
+                    {record.depart}
+                </span>
+            }
+         }
       },{
         title: '职务',
         dataIndex :'job',

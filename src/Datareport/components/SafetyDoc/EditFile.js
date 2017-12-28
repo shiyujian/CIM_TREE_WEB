@@ -223,15 +223,6 @@ export default class EditFile extends Component {
                 title: '发布单位',
                 dataIndex: 'pubUnit',
                 width: '10%',
-                render: (text, record, index) => (
-                    <div>
-                        <EditableCell
-                            editOnOff={false}
-                            value={record.pubUnit}
-                            onChange={this.onCellChange(index, "pubUnit", record)}
-                        />
-                    </div>
-                ),
             }, {
                 title: '版本号',
                 dataIndex: 'type',

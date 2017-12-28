@@ -142,7 +142,7 @@ export default class SafetyDocCheck extends Component {
                 extra_params:{
                     code:item.code,
                     filename:item.file.name,
-                    pubUnit:item.pubUnit,
+                    pubUnit:item.pubUnit.name,
                     type:item.type,
                     doTime:item.doTime,
                     remark:item.remark,

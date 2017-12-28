@@ -21,7 +21,7 @@ export default class TableOrg extends Component {
 			newKey2: Math.random(),
 			newKey3: Math.random(),
 			selectedRowKeys: [],
-			loading: false,
+			loading: true,
 		}
 	}
 	async componentDidMount() {
@@ -40,9 +40,6 @@ export default class TableOrg extends Component {
 		}
 	}
 	async generateTableData(data) {
-		this.setState({
-			loading: true,
-		})
 		const { actions: { getDocument, } } = this.props;
 		let dataSource = [];
 		let promises = data.map((item, i) => {
@@ -243,8 +240,13 @@ export default class TableOrg extends Component {
 	}
 	//预览
 	handlePreview(codeId, i) {
+		let { dataSource } = this.state;
 		const { actions: { openPreview } } = this.props;
-		let f = this.state.dataSource[i].file
+		let ff = {}, f = {};
+		ff = dataSource.filter((item, i) => {
+			return item.codeId === codeId;
+		});
+		f = ff[0].file;
 		let filed = {}
 		filed.misc = f.misc;
 		filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -256,7 +258,6 @@ export default class TableOrg extends Component {
 
 	//导出
 	BtnExport(e) {
-		debugger;
 		if (this.state.subDataSource.length <= 0) {
 			notification.warning({
 				message: '请选择数据！',
@@ -264,11 +265,14 @@ export default class TableOrg extends Component {
 			})
 			return;
 		}
-		let exhead = ['序号', '项目/子项目名称', '单位工程', '方案名称', '编制单位', '评审时间', '评审意见', '评审人员', '备注', '附件'];
+		let exhead1 = ['名称', '重大安全专项方案'];
+		let exhead2 = ['重大安全专项方案','序号', '项目/子项目名称', '单位工程', '方案名称', '编制单位', '评审时间', '评审意见', '评审人员', '备注', '附件'];
 		let rows = [];
-		rows.push(exhead);
+		rows.push(exhead1);
+		rows.push(exhead2);
 		let excontent = this.state.subDataSource.map(data => {
 			let item = [
+				'重大安全专项方案',
 				data.i,
 				data.projectName,
 				data.unitProject,
@@ -284,11 +288,21 @@ export default class TableOrg extends Component {
 		});
 		const { actions: { jsonToExcel } } = this.props;
 		console.log(rows)
+		// debugger;
 		jsonToExcel({}, { rows: rows })
 			.then(rst => {
-				console.log(rst);
-				this.createLink('项目信息导出表', NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
+				let name = 	"安全专项导出信息"+moment(new Date()).format('YYYY-MM-DD-h:mm:ss-a')+'.xlsx';
+				this.createLink(name, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
 			})
+	}
+	createLink(name, url) {    //导出
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download', name);
+		link.setAttribute('target', '_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
 	}
 	//变更
 	BtnChange(e) {
@@ -304,7 +318,6 @@ export default class TableOrg extends Component {
 
 	// 申请变更--并发起
 	setChangeData(data, participants) {
-		debugger;
 		this.setState({
 			newKey2: Math.random() + 2,
 			setChangeVisiable: false,
