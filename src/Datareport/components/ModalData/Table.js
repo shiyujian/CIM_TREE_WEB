@@ -9,6 +9,7 @@ export default class ModalTable extends Component {
 		this.state = {
 			selectedRowKeys: [],
 			// dataSourceSelected: [],
+			
 			alldatas:[],
 			loading: false,
 			percent: 0,
@@ -85,6 +86,7 @@ export default class ModalTable extends Component {
         	item.forEach((single,index) => {
         		let temp = {
 					index:index+1,
+					
 					coding: single.extra_params.coding,
 					modelName: single.extra_params.filename,
 					project: single.extra_params.project.name,
@@ -106,7 +108,7 @@ export default class ModalTable extends Component {
 				}
                 dataSource.push(temp);
         	}) 
-            this.setState({dataSource,alldatas:item});
+            this.setState({dataSource,alldatas:item,showDs:dataSource});
         })
     }
 	
@@ -194,7 +196,19 @@ export default class ModalTable extends Component {
 					<Search
 						style={{ width: "200px", marginLeft: 10 }}
 						placeholder="输入搜索条件"
-						onSearch={value => console.log(value)}
+						onSearch={
+							(text) => {
+								let result = this.state.dataSource.filter(data=>{
+									return data.modelName.indexOf(text)>=0 || data.coding.indexOf(text)>=0;
+								});
+								console.log(result);
+								if(text === ''){
+									result = this.state.dataSource;
+								}
+								this.onSelectChange([])//清空选择项
+								this.setState({showDs:result});
+							}
+						}
 					/>
 				</Row>
 				{//<Button style={{ marginLeft: 10 }} type="primary" onClick={this.togglecheck.bind(this)}>审核</Button>
@@ -205,7 +219,7 @@ export default class ModalTable extends Component {
 						bordered
 						columns={columns}
 						rowSelection={rowSelection}
-						dataSource={this.state.dataSource}
+						dataSource={this.state.showDs}
 						rowKey="index"
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 					/>
@@ -213,6 +227,8 @@ export default class ModalTable extends Component {
 			</div>
 		);
 	}
+
+	
 	//预览
 	handlePreview(index) {
 		const { actions: { openPreview } } = this.props;
