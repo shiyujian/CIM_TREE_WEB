@@ -8,7 +8,14 @@ import './index.less'
 
 export default class MainHeader extends Component{
     render(){
-        const {showModal, selectJudge} = this.props;
+        const {showModal, selectJudge,onSearch=null,storeDateSource} = this.props;
+        const search = onSearch
+            ? <Search
+             placeholder="输入搜索条件"
+             className="spacing"
+             style={{ width: 200}}
+             onSearch={onSearch}
+            /> :null;
         return(
             <Row>
                 <Col span={24}>
@@ -17,11 +24,7 @@ export default class MainHeader extends Component{
                     <Button className="spacing" onClick={()=>{selectJudge() && showModal("changeModal")} }>申请变更</Button>
                     <Button className="spacing" onClick={()=>{selectJudge() && showModal("deleteModal")} }>申请删除</Button>
                     <Button className="spacing" onClick={this.getExcel}>导出表格</Button>
-                    <Search
-                     placeholder="输入搜索条件"
-                     className="spacing"
-                     style={{ width: 200}}
-                    />
+                    {search}
                 </Col>
             </Row>
         )
