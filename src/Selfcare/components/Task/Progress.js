@@ -151,79 +151,89 @@ export default class Progress extends Component {
 				<div>
 					{
 						actions.map((action, index) => {
-							let link;
+							let url;
 							if (code === WORKFLOW_CODE.设计计划填报流程) {
 								//填报计划
 								if (currentStateCode === 'START') {
-									link = <Link to={`/design/plan/3?workflowID=${id}`}>{action}</Link>
+									// link = <Link to={`/design/plan/3?workflowID=${id}`}>{action}</Link>
+									url = `/design/plan/3?workflowID=${id}`
 								} else if (currentStateCode === 'STATE02') {
 									//审查计划
-									link = <Link to={`/design/plan/4?workflowID=${id}`}>{action}</Link>
+									// link = <Link to={`/design/plan/4?workflowID=${id}`}>{action}</Link>
+									url = `/design/plan/4?workflowID=${id}`
 								}
 								//交付计划变更
 							} else if (code === WORKFLOW_CODE.设计计划变更流程) {
 								// 计划变更
 								if (currentStateCode === 'START') {
-									link = <Link to={`/design/plan/5?workflowID=${id}`}>{action}</Link>
+									// link = <Link to={`/design/plan/5?workflowID=${id}`}>{action}</Link>
+									url = `/design/plan/5?workflowID=${id}`
 								} else if (currentStateCode === 'STATE02') {
 									//计划变更审查
-									link = <Link to={`/design/plan/6?workflowID=${id}`}>{action}</Link>
+									// link = <Link to={`/design/plan/6?workflowID=${id}`}>{action}</Link>
+									url = `/design/plan/6?workflowID=${id}`
 								}
 								//设计成果上报
 							} else if (code === WORKFLOW_CODE.设计成果上报流程) {
 								//设计上报
 								if (currentStateCode === 'START') {
-									link = <Link to={`/design/reportResult?workflowID=${id}`}>{action}</Link>
+									// link = <Link to={`/design/reportResult?workflowID=${id}`}>{action}</Link>
+									url = `/design/reportResult?workflowID=${id}`
 								} else if (currentStateCode === 'STATE02') {
 									//设计审查
-									link = <Link to={`/design/approvalResult?workflowID=${id}`}>{action}</Link>
+									// link = <Link to={`/design/approvalResult?workflowID=${id}`}>{action}</Link>
+									url = `/design/approvalResult?workflowID=${id}`
 								}
 								//设计成果变更
 							} else if (code === WORKFLOW_CODE.设计成果一般变更流程 || code === WORKFLOW_CODE.设计成果重大变更流程) {
 								// 设计成果变更
 								if (currentStateCode === 'START') {
-									link = <Link to={`/design/modify?workflowID=${id}`}>{action}</Link>
+									// link = <Link to={`/design/modify?workflowID=${id}`}>{action}</Link>
+									url = `/design/modify?workflowID=${id}`
 								} else if (currentStateCode === 'STATE02') {
 									//设计成果变更审查
-									link = <Link to={`/design/modifyApproval?workflowID=${id}`}>{action}</Link>
+									// link = <Link to={`/design/modifyApproval?workflowID=${id}`}>{action}</Link>
+									url = `/design/modifyApproval?workflowID=${id}`
 								}
 							} else if (code === 'TEMPLATE_022') { // 报批
-								if(currentStateCode === 'START'){
-									link = <Link to={`/overall/approval#${subject[0].unitInfo}&${subject[0].blockId}`}>{action}</Link>
-								}else if(currentStateCode === 'STATE02'){
-									link = <Link to={`/overall/approval#${subject[0].unitInfo}&${subject[0].blockId}`}>{action}</Link>
-								}
+									// link = <Link to={`/overall/approval#${subject[0].unitInfo}&${subject[0].blockId}`}>{action}</Link>
+									url = `/overall/approval#${subject[0].unitInfo}&${subject[0].blockId}`
 								//总进度进度填报/审批
 							} else if (code === WORKFLOW_CODE.总进度计划报批流程) {
 								// 进度填报
 								if (currentStateCode === 'START') {
-									link = <Link to={`/schedule/totalreport?totalReportID=${id}`}>{action}</Link>
+									// link = <Link to={`/schedule/totalreport?totalReportID=${id}`}>{action}</Link>
+									url = `/schedule/totalreport?totalReportID=${id}`
 								} else if (currentStateCode === 'STATE02') {
 									//进度审批
-									link = <Link to={`/schedule/totalapproval?totalApprovalID=${id}`}>{action}</Link>
+									// link = <Link to={`/schedule/totalapproval?totalApprovalID=${id}`}>{action}</Link>
+									url = `/schedule/totalapproval?totalApprovalID=${id}`
 								}
 								//总进度进度填报
 							} else if (code === WORKFLOW_CODE.进度管控审批流程) {
 								// 进度填报
 								if (currentStateCode === 'START') {
-									link = <Link to={`/schedule/stagereport?stageReportID=${id}`}>{action}</Link>
+									// link = <Link to={`/schedule/stagereport?stageReportID=${id}`}>{action}</Link>
+									url = `/schedule/stagereport?stageReportID=${id}`
 								} else if (currentStateCode === 'STATE02') {
 									//进度审批
-									link = <Link to={`/schedule/stageapproval?stageApprovalID=${id}`}>{action}</Link>
+									// link = <Link to={`/schedule/stageapproval?stageApprovalID=${id}`}>{action}</Link>
+									url = `/schedule/stageapproval?stageApprovalID=${id}`
 								}
 							} else if (code === WORKFLOW_CODE.数据报送流程) {
 								// 数据报送流程
 								if(action === '通过'){
 									action = '审核';
-									link = <Button onClick={this.openModal.bind(this,name,id)}>{action}</Button>
+									url = <Button onClick={this.openModal.bind(this,name,id)}>{action}</Button>
 								}
 							} else {
-								link = action;
+								url = action;
 							}
 							if(action === '审核'){
-								return link
+								return url
 							}else{
-								return (link && <a onClick={this.toggleAction.bind(this, action)} key={index} style={{width:50,height:20,textAlign:'center',display:'inline-block',marginRight: 20,borderWidth:1,borderStyle:'solid',borderColor:'#ddd',borderRadius:5 }}>{link}</a>)
+								// return (link && <Button onClick={this.toggleAction.bind(this, action)} key={index} style={{width:50,height:20,textAlign:'center',display:'inline-block',marginRight: 20,borderWidth:1,borderStyle:'solid',borderColor:'#ddd',borderRadius:5 }}>{link}</Button>)
+								return (url && <Link to={url}><Button style={{marginRight:20}}>{action}</Button></Link>)
 							}
 						})
 					}
