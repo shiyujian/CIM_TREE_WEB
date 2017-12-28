@@ -237,11 +237,13 @@ export default class Addition extends Component {
             project = {
                 name:temp1.name,
                 pk:temp1.pk,
+                code:temp1.code,
                 obj_type:temp1.obj_type
             }
             unit = {
                 name:temp2.name,
                 pk:temp2.pk,
+                code:temp2.code,
                 obj_type:temp2.obj_type
             }
             this.setState({project,unit});
