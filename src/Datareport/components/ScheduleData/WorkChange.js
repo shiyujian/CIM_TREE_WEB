@@ -8,6 +8,7 @@ import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } fr
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import { getUser } from '_platform/auth';
+import ECCB from '../EditCellWithCallBack';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -23,16 +24,47 @@ export default class WorkChange extends Component {
 			options: [],
 		};
 	}
+	componentWillMount(){
+		let dataSource = this.props.dataSourceSelected;
+		let newdataSource = [];
+		console.log("123",dataSource)
+		dataSource.map((item,key)=>{
+			console.log(item);
+			let newDatas = {
+				key:key+1,
+				code: item.code,
+				name: item.name,
+				project:item.project,
+				unit: item.unit,
+				construct_unit: item.construct_unit,
+				quantity: item.quantity,
+				factquantity: item.factquantity,
+				planstarttime: item.planstarttime,
+				planovertime: item.planovertime,
+				factstarttime: item.factstarttime,
+				factovertime: item.factovertime,
+				uploads: item.uploads,
+				delcode: item.delcode,
+				wpcode: item.wpcode,
+				obj_type: item.obj_type,
+				pk: item.pk,
+			}
+			newdataSource.push(newDatas);
+		})
+		this.setState({dataSource:newdataSource});
+	}
 	componentDidMount() {
 		const { actions: { getAllUsers } } = this.props;
+		
 		getAllUsers().then(rst => {
-			let checkers = rst.map(o => {
+			let checkers = rst.map((o,index) => {
 				return (
-					<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+					<Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
 				)
 			})
 			this.setState({ checkers })
 		})
+
 	}
 	//下拉框选择人
 	selectChecker(value) {
@@ -59,7 +91,30 @@ export default class WorkChange extends Component {
 	delete(index) {
 		let { dataSource } = this.state;
 		dataSource.splice(index, 1);
-		this.setState({ dataSource });
+		let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+				code: item.code,
+				name: item.name,
+				project:item.project,
+				unit: item.unit,
+				construct_unit: item.construct_unit,
+				quantity: item.quantity,
+				factquantity: item.factquantity,
+				planstarttime: item.planstarttime,
+				planovertime: item.planovertime,
+				factstarttime: item.factstarttime,
+				factovertime: item.factovertime,
+				uploads: item.uploads,
+				delcode: item.delcode,
+				wpcode: item.wpcode,
+				obj_type: item.obj_type,
+				pk: item.pk,
+            }
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource})  
 	}
 	//table input 输入
 	tableDataChange(index, key, e) {
@@ -72,18 +127,25 @@ export default class WorkChange extends Component {
 	render() {
 		const columns = [{
 			title: '序号',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex:"key"
 		}, {
 			title: 'WBS编码',
 			dataIndex: 'code',
 		}, {
 			title: '任务名称',
-			dataIndex: 'name',
-			render: (text, record, index) => {
-				return <Input value={this.state.dataSource[index]['name']} onChange={this.tableDataChange.bind(this, index, 'name')} />
-			}
+			render: (record) => {
+                let checkVal = (value) => {
+                    record.name = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.name}
+                        checkVal={checkVal}
+                        value={record.name} />
+				)
+			},
+			key:"Name"
 		}, {
 			title: '项目/子项目',
 			dataIndex: 'project',
@@ -92,49 +154,112 @@ export default class WorkChange extends Component {
 			dataIndex: 'unit',
 		}, {
 			title: '实施单位',
-			dataIndex: 'construct_unit',
-			render: (text, record, index) => {
-				return <Input value={this.state.dataSource[index]['construct_unit']} onChange={this.tableDataChange.bind(this, index, 'construct_unit')} />
-			}
+			render: (record) => {
+                let checkVal = (value) => {
+                    record.construct_unit = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.construct_unit}
+                        checkVal={checkVal}
+                        value={record.construct_unit} />
+				)
+			},
+			key:"construct_unit"
 		}, {
 			title: '施工图工程量',
-			dataIndex: 'quantity',
-			render: (text, record, index) => {
-				return <Input value={this.state.dataSource[index]['quantity']} onChange={this.tableDataChange.bind(this, index, 'quantity')} />
-			}
+			render: (record) => {
+                let checkVal = (value) => {
+                    record.quantity = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.quantity}
+                        checkVal={checkVal}
+                        value={record.quantity} />
+				)
+			},
+			key:"quantity"
 		}, {
 			title: '实际工程量',
-			dataIndex: 'factquantity',
-			render: (text, record, index) => {
-				return <Input value={this.state.dataSource[index]['factquantity']} onChange={this.tableDataChange.bind(this, index, 'factquantity')} />
-			}
+			render: (record) => {
+                let checkVal = (value) => {
+                    record.factquantity = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.factquantity}
+                        checkVal={checkVal}
+                        value={record.factquantity} />
+				)
+			},
+			key:"factquantity"
 		}, {
 			title: '计划开始时间',
-			dataIndex: 'planstarttime',
-			render: (text, record, index) => {
-				return <Input value={this.state.dataSource[index]['planstarttime']} onChange={this.tableDataChange.bind(this, index, 'planstarttime')} />
-			}
+			render: (record) => {
+                let checkVal = (value) => {
+                    record.planstarttime = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.planstarttime}
+                        checkVal={checkVal}
+                        value={record.planstarttime} />
+				)
+			},
+			key:"planstarttime"
 		}, {
 			title: '计划结束时间',
-			dataIndex: 'planovertime',
-			render: (text, record, index) => {
-				return <Input value={this.state.dataSource[index]['planovertime']} onChange={this.tableDataChange.bind(this, index, 'planovertime')} />
-			}
+			render: (record) => {
+                let checkVal = (value) => {
+                    record.planovertime = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.planovertime}
+                        checkVal={checkVal}
+                        value={record.planovertime} />
+				)
+			},
+			key:"planovertime"
 		}, {
 			title: '实际开始时间',
-			dataIndex: 'factstarttime',
-			render: (text, record, index) => {
-				return <Input value={this.state.dataSource[index]['factstarttime']} onChange={this.tableDataChange.bind(this, index, 'factstarttime')} />
-			}
+			render: (record) => {
+                let checkVal = (value) => {
+                    record.factstarttime = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.factstarttime}
+                        checkVal={checkVal}
+                        value={record.factstarttime} />
+				)
+			},
+			key:"factstarttime"
 		}, {
 			title: '实际结束时间',
-			dataIndex: 'factovertime',
-			render: (text, record, index) => {
-				return <Input value={this.state.dataSource[index]['factovertime']} onChange={this.tableDataChange.bind(this, index, 'factovertime')} />
-			}
+			render: (record) => {
+                let checkVal = (value) => {
+                    record.factovertime = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.factovertime}
+                        checkVal={checkVal}
+                        value={record.factovertime} />
+				)
+			},
+			key:"factovertime"
 		}, {
 			title: '变更人员',
-			dataIndex: 'uploads',
+			dataIndex:"uploads",
 			render: (text, record, index) => {
 				return <Input value={this.state.dataSource[index]['uploads'] = getUser().username} onChange={this.tableDataChange.bind(this, index, 'uploads')}/>
 			}
@@ -167,6 +292,7 @@ export default class WorkChange extends Component {
 					dataSource={this.state.dataSource}
 					bordered
 					pagination={{ pageSize: 10 }}
+					rowkey='key'
 				/>
 				<Row style={{ marginBottom: "30px" }} type="flex">
 					<Col>

@@ -5,6 +5,7 @@ export DeleteModal from './DeleteModal';
 
 export InfoUploadModal from './InfoUploadModal';
 export VedioInfoTable from './VedioInfoTable';
+export InfoChangeModal from './InfoChangeModal';
 export InfoDeleteModal from './InfoDeleteModal';
 
 export MainHeader from './MainHeader';

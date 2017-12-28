@@ -23,10 +23,7 @@
 window.config = {
 	/***********************公共资源服务**************************/
 	//基础服务域名
-	'DOMAIN': 'http://192.168.192.10',
-	'DOMAIN2':'http://192.168.192.10',
-	//基础服务端口
-	'API_PORT': '7530',
+	'DOMAIN': 'http://192.168.192.10:7530',
 
 	//静态文件存储服务IP
 	'STATIC_FILE_IP':'http://192.168.192.10',
@@ -41,12 +38,13 @@ window.config = {
 	'STATIC_FILE_PASSWORD':'qianhai',
 
 	//现场收发文接口的端口
-	'DOC_EXCHANGE_PORT': '7532',
+	'DOC_EXCHANGE_URL': 'http://bimdjd.ecidi.com:6556',
 	//现场收发文接口验证用的用户名和密码
 	'DOC_EXCHANGE_USER_PASSWORD': 'bimqh:bimqh',
-	'CODE_API': 'http://bimdjd.ecidi.com:6556',
-	//node服务,验评表单转化Word
-	'NODE_FILE_EXCHANGE_PORT': '7570',
+
+	//开发环境配置,部署时记得修改
+	//node服务,验评表单转化Word,pdf转word
+	'NODE_FILE_STATIC_URL': 'http://10.215.160.38:6546',
 	
 	//word在线预览地址
 	'previewWord_API': 'http://192.168.192.11:80/view/url?url=',

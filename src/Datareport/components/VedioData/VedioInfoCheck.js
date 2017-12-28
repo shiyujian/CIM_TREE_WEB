@@ -127,6 +127,9 @@ export default class VedioInfoCheck extends Component {
             case 'create':
                 this.createPassion(dataSource);
                 break;
+            case "change":
+                this.changePassion(dataSource);
+                break;
             case 'strike':
                 const {actions:{deleteDocument,deleteStaticFile}} = this.props;
                 let all = [] ,fileAll = [];
@@ -201,6 +204,43 @@ export default class VedioInfoCheck extends Component {
             notification.error({message: '创建文档失败！',duration: 2});
         }
     }
+    changePassion = async (dataSource)=>{
+        const {actions:{putDocument, deleteStaticFile}} = this.props;
+        let deleteFileAll = []
+        const data_list = dataSource.map(item=>{
+            if(item.deleteFile){    //删除旧的文件
+                const {deleteFile:{id}} = item;
+                deleteFileAll.push( deleteStaticFile({id}) )
+            }
+
+            const {file:{a_file,name,download_url,mime_type}} = item;
+            const extra = JSON.parse(JSON.stringify(item));
+            
+            delete extra.code;
+            delete extra.index;
+            delete extra.deleteFile;
+            return {
+                code:item.code,
+                status:'A',
+                version: 'A',
+                basic_params: {
+                    files: [{
+                        a_file,name,download_url,mime_type,
+                        misc: "file",
+                    }]
+                },
+                extra_params:{...extra}
+            }
+        });
+
+        Promise.all(deleteFileAll);
+        const {result} = await putDocument({},{data_list});
+        if(result){
+            notification.success({message: '修改文档成功！',duration: 2});
+        }else{
+            notification.error({message: '修改文档失败！',duration: 2});
+        }
+    }
 
     reject = async ()=>{    //不通过
         const {wk} = this.props
@@ -211,9 +251,11 @@ export default class VedioInfoCheck extends Component {
 
 const modalTitle = {
     create: '影像信息数据录入审批表',
-    strike: '影像信息数据删除审核表'
+    strike: '影像信息数据删除审核表',
+    change: '影像信息数据删除审核表'
 }
 const modalName = {
     create: 'safety_vedioInfoCheck_visible',
-    strike: 'safety_vedioInfoDeleteCheck_visible'
+    strike: 'safety_vedioInfoDeleteCheck_visible',
+    change: 'safety_vedioInfoChangeCheck_visible'
 }
