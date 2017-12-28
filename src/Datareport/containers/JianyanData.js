@@ -7,7 +7,7 @@ import {actions as platformActions} from '_platform/store/global';
 import {Row,Col,Table,Input,Button,message,Spin} from 'antd';
 import JianyanModal from '../components/Quality/JianyanModal'
 import {WORKFLOW_CODE} from '_platform/api.js'
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_SubdivisionUnitProjectAcceptance} from '_platform/api';
 import Preview from '_platform/components/layout/Preview';
 import JianyanpiDelete from '../components/Quality/JianyanpiDelete'
 import './quality.less'
@@ -149,43 +149,16 @@ export default class JianyanData extends Component {
 	//根据附件名称 也就是wbs编码获取其他信息
     async getInfo(wp){
         let res = {};
-        const {actions:{getWorkPackageDetail}} = this.props
+        const {actions:{getTreeRootNode}} = this.props
         res.name = wp.name
         res.code = wp.code  
         res.pk = wp.pk
 		res.obj_type = wp.obj_type
 		res.related_documents = wp.related_documents
         let dwcode = ""
-        let getUnitLoop = async(param) => {
-            let next = {};
-            switch (param.obj_type_hum){
-				case "单元工程":
-					next = await getWorkPackageDetail({code:param.parent.code})
-					await getUnitLoop(next)
-					break;
-                case "分项工程":
-                    next = await getWorkPackageDetail({code:param.parent.code})
-                    await getUnitLoop(next)
-                    break;
-                case "子分部工程":
-                    next = await getWorkPackageDetail({code:param.parent.code})
-                    await getUnitLoop(next)
-                    break;
-                case "分部工程":
-                    next = await getWorkPackageDetail({code:param.parent.code})
-                    await getUnitLoop(next)
-                    break;
-                case "子单位工程":
-                    dwcode = param.parent.code
-                    break
-                case "单位工程":
-                    dwcode = param.code
-                    break
-                default:break;
-            } 
-        }
-        await getUnitLoop(wp)
-        let danwei = await getWorkPackageDetail({code:dwcode})
+        let rootNode = await getTreeRootNode({code:wp.code})
+		let project = rootNode.children[0]
+		let danwei = project.children[0]
         // let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
         // res.construct_unit = construct_unit
         res.unit = {
@@ -193,7 +166,7 @@ export default class JianyanData extends Component {
             code:danwei.code,
             obj_type:danwei.obj_type
         }
-        res.project = danwei.parent
+        res.project = project
         return res
     }
 	//表格分页回调
@@ -206,11 +179,11 @@ export default class JianyanData extends Component {
 		  pagination: pager,
 		});
 		let arr = this.state.dataSource
-		if(arr[(pagination.current-1)*10].key+1){
-			this.setState({loading:false})
-			return
-		}
 		for(let index = (pagination.current-1)*10;index < pagination.current*10 && index < this.state.dataSource.length;index++){
+			if(arr[index].key+1){
+				arr[index].key = index
+				continue;
+			}
 			let wp = await getWorkPackageDetail({code:this.state.totalData[index].code})
 			let rel_doc = wp.related_documents ? wp.related_documents.find(x => {
 				return x.rel_type === 'many_jyp_rel'
@@ -365,6 +338,10 @@ export default class JianyanData extends Component {
 			return (o.name.indexOf(value) > -1) || (o.code.indexOf(value) > -1)
 		})
 		for(let index = 0;index < 10;index++){
+			if(dataSource[index].key+1){
+				dataSource[index].key = index
+				continue;
+			}
 			let wp = await getWorkPackageDetail({code:dataSource[index].code})
 			let rel_doc = wp.related_documents ? wp.related_documents.find(x => {
 				return x.rel_type === 'many_jyp_rel'
@@ -378,7 +355,7 @@ export default class JianyanData extends Component {
 				dataSource[index] = {...obj,key:index,file:{}}
 			}
 		}
-		this.setState({dataSource,pagination:{total:dataSource.length},loading:false})
+		this.setState({dataSource,pagination:{total:dataSource.length,current:1},loading:false})
 	}
 	render() {
 		let {selectedRowKeys} = this.state
@@ -390,7 +367,9 @@ export default class JianyanData extends Component {
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="其他检验信息" {...this.props}/>
 				<Row>
-					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
+					<Button style={{margin:'10px 10px 10px 0px'}} type="default">
+						<a href={`${DataReportTemplate_SubdivisionUnitProjectAcceptance}`}>模板下载</a>
+					</Button>
 					<Button className="btn" type="default" onClick={() => {this.setState({targetData:[],addvisible:true})}}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.setEditVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.setDelVisible.bind(this)}>申请删除</Button>
