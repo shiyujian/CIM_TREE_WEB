@@ -23,6 +23,8 @@ const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 //删除数据
 const deleteDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
+//修改数据
+const putDocument = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 //导出数据
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 
@@ -39,6 +41,7 @@ export const actions = {
 	getScheduleDir,
 	postScheduleDir,
 	deleteDocument,
+	putDocument,
 	jsonToExcel
 };
 
