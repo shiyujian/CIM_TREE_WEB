@@ -245,7 +245,11 @@ export default class CostListData extends Component {
 
 	getExcel () {
 		const {actions:{jsonToExcel}} = this.props;
-        const {showDs} = this.state;
+		const showDs = this.state.selectedRows;
+		if(!showDs.length) {
+			message.warn('至少选择一条数据');
+			return;
+		};
         let rows = [];
         rows.push(this.header);
         showDs.map((item,index) => {
@@ -254,10 +258,11 @@ export default class CostListData extends Component {
         jsonToExcel({},{rows:rows})
         .then(rst => {
             // console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
-            this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+            this.createLink('计价清单下载',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
 		}).catch(e => {
 			console.log(e);
 		})
+		debugger;
 	}
 
 	//下载
