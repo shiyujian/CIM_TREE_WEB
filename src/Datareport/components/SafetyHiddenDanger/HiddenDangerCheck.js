@@ -151,7 +151,7 @@ export default class HiddenDangerCheck extends Component {
                     result:item.result,
                     deadline:item.deadline,
                     editResult:item.editResult,
-                    resUnit:item.resUnit
+                    resUnit:item.resUnit.name
                 }
             })
         });
@@ -187,7 +187,6 @@ export default class HiddenDangerCheck extends Component {
         openPreview(filed);
     }
     onChange(e){
-        debugger
         this.setState({option:e.target.value})
     }
 	render() {
@@ -202,7 +201,7 @@ export default class HiddenDangerCheck extends Component {
                 width: '8%',
                 render: (text, record, index) => (
                     <span>
-                        {record.projectName}
+                        {record.project.name}
                     </span>
                 ),
             }, {
@@ -211,7 +210,7 @@ export default class HiddenDangerCheck extends Component {
                 width: '8%',
                 render: (text, record, index) => (
                     <span>
-                        {record.unit}
+                        {record.unit.name}
                     </span>
                 ),
             }, {

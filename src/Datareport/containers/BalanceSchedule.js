@@ -11,14 +11,14 @@ import {
 } from "_platform/components/layout";
 import { actions } from "../store/SumSpeedCost";
 import { actions as platformActions } from "_platform/store/global";
-import { Row, Col, Table, Input, Button, message } from "antd";
+import { Row, Col, Table, Input, Button, message, Progress } from "antd";
 import { getUser } from "_platform/auth";
 import SumSpeed from "../components/CostListData/SumSpeed";
 import SumSpeedDelete from "../components/CostListData/SumSpeedDelete";
 import SumSpeedChange from "../components/CostListData/SumSpeedChange";
 import SumSpeedExport from "../components/CostListData/SumSpeedExport";
 import "./quality.less";
-import { WORKFLOW_CODE } from "_platform/api.js";
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_SettlementProgress} from '_platform/api.js';
 import { getNextStates } from "_platform/components/Progress/util";
 
 var moment = require("moment");
@@ -44,8 +44,8 @@ export default class BalanceSchedule extends Component {
       dataSourceSelected: [],
       dataSource: [],
       cacheDataSource: [],
-      pagination:{},
-    };
+			percent: 0,
+        };
     this.columns = [
       {
         title: "序号",
@@ -84,37 +84,70 @@ export default class BalanceSchedule extends Component {
       {
         title: "备注",
         dataIndex: "remarks",
-        key:'Remarks'
+        key:'Remarks',
+        render: (text, record, index) => {
+          return record.remarks ? record.remarks:"—"
+        }
       }
     ];
+    this.header =['序号','项目/子项目','单位工程','工作节点目标','完成时间','支付金额（万元）','累计占比','备注'];
   }
-  async componentDidMount() {
-    const { actions: { getAllresult } } = this.props;
-    // let dataSource =[];
-    getAllresult().then(o => {
-      let dataSource = [];
-      console.log("o", o);
-      console.log("");
-      o.result.map((rst,key) => {
-        let temp = {
-          key:key+1,
-          code: rst.code,
-          project: rst.extra_params.project.name || rst.extra_params.project,
-          nodetarget: rst.extra_params.nodetarget,
-          completiontime: rst.extra_params.completiontime,
-          remarks: rst.extra_params.remarks,
-          ratio: rst.extra_params.ratio,
-          unit: rst.extra_params.unit.name || rst.extra_params.unit,
-          summoney: rst.extra_params.summoney,
-          deletecode: rst.code
-        };
-        dataSource.push(temp);
-        this.setState({ dataSource, showDat: dataSource ,pagination:{total:rst.length},loading:false});
-        // this.setState({totalData:rst.result,dataSource:arr,pagination:{total:rst.result.length},loading:false})
-      });
-    });
-  }
-
+  // async componentDidMount() {
+  //   const { actions: { getAllresult } } = this.props;
+  //   // let dataSource =[];
+  //   getAllresult().then(o => {
+  //     let dataSource = [];
+  //     console.log("o", o);
+  //     this.setState({percent:0})
+  //     o.result.map((rst,key) => {
+  //       let temp = {
+  //         key:key+1,
+  //         code: rst.code,
+  //         project: rst.extra_params.project.name || rst.extra_params.project,
+  //         nodetarget: rst.extra_params.nodetarget,
+  //         completiontime: rst.extra_params.completiontime,
+  //         remarks: rst.extra_params.remarks,
+  //         ratio: rst.extra_params.ratio,
+  //         unit: rst.extra_params.unit.name || rst.extra_params.unit,
+  //         summoney: rst.extra_params.summoney,
+  //         deletecode: rst.code
+  //       };
+  //       dataSource.push(temp);
+  //       this.setState({ dataSource, showDat: dataSource ,loading:false,percent:100});
+  //     });
+  //   });
+  // }
+  generateTableData(data) {
+    let dataSource = [];
+    console.log(data);
+   data.map((rst,key) => {
+     let datas = {
+      key:key+1,
+      code: rst.code,
+      project: rst.extra_params.project.name || rst.extra_params.project,
+      nodetarget: rst.extra_params.nodetarget,
+      completiontime: rst.extra_params.completiontime,
+      remarks: rst.extra_params.remarks,
+      ratio: rst.extra_params.ratio,
+      unit: rst.extra_params.unit.name || rst.extra_params.unit,
+      summoney: rst.extra_params.summoney,
+      deletecode: rst.code
+     }
+     dataSource.push(datas)
+   })
+   this.setState({
+     dataSource:dataSource,
+     showDat:dataSource
+   })
+ }
+ componentDidMount(){
+  const {actions:{ getAllresult }}=this.props;
+  this.setState({loading:true,percent:0})
+  getAllresult().then(rst=>{
+    this.setState({loading:false,percent:100})
+    this.generateTableData(rst.result)
+  })
+}
   //批量上传回调
   setData(data, participants) {
     const { actions: { createWorkflow, logWorkflowEvent } } = this.props;
@@ -274,53 +307,69 @@ export default class BalanceSchedule extends Component {
   }
   setAddVisible() {
     this.setState({ addvisible: true });
+
   }
   setchgVisible() {
-    this.setState({ changevisible: true });
+    
+    let {selectedRowKeys,dataSourceSelected,dataSource} =this.state;
+		if(this.state.selectedRowKeys && this.state.selectedRowKeys.length>0){
+			this.setState({ changevisible: true });
+		} else {
+			message.warning('至少选择一条数据')
+		}
   }
   setdleVisible() {
-    this.setState({ deletevisible: true });
+    
+    let {selectedRowKeys,dataSourceSelected,dataSource} =this.state;
+		if(this.state.selectedRowKeys && this.state.selectedRowKeys.length>0){
+			this.setState({ deletevisible: true });
+		} else {
+			message.warning('至少选择一条数据')
+		}
   }
+  //导出数据
   setexpVisible() {
-    console.log(11);
-    this.setState({ exportvisible: true });
+    let {selectedRowKeys,dataSourceSelected,dataSource} =this.state;
+		if(this.state.selectedRowKeys && this.state.selectedRowKeys.length>0){
+			// this.setState({ exportvisible: true });
+      const {actions:{jsonToExcel}} =this.props;
+      const {dataSourceSelected} = this.state;
+      let rows =[];
+      rows.push(this.header);
+      dataSourceSelected.map(o=>{
+        rows.push([o.key,o.project,o.unit,o.nodetarget,o.completiontime,o.summoney,o.ratio,o.remarks]);
+      })
+      jsonToExcel({},{rows:rows}).then(rst=>{
+        this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+      })
+		} else { 
+			message.warning('至少选择一条数据')
+		}
   }
+  // setexpVisible() {
+  //   if(this.state.dataSourceSelected.length <=0){
+	// 		message.warning('请先选择要导出的数据');
+	// 		return
+	// 	}
+	// 	const { actions:{jsonToExcel}} = this.props;
+	// 	const {dataSourceSelected} = this.state;
+	// 	console.log('this',this.state);
+	// 	let rows = [];
+	// 	rows.push(this.header);
+	// 	console.log('this',dataSourceSelected);
+	// 	dataSourceSelected.map(item =>{
+	// 		rows.push([o.key,o.project,o.unit,o.nodetarget,o.completiontime,o.summoney,o.ratio,o.remarks]);
+	// 	})
+	// 	console.log('rows',rows);
+	// 	jsonToExcel({},{rows:rows}).then(
+	// 		rst=>{
+	// 			this.createLink('name',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+	// 			console.log(rst,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+	// 		}
+	// 	)
+  // }
 
   // 搜索
-  // async onSearch(value) {
-  //   const { dataSource } = this.state;
-  //   if (!value) {
-  //     this.componentDidMount();
-  //     return;
-  //   }
-  //   const { actions: { getSearcher } } = this.props;
-  //   let deletecode = [];
-  //   dataSource.map(item => {
-  //     console.log("item:", item.code);
-  //     deletecode.push(item.code);
-  //     console.log("deletecode:", deletecode);
-  //   });
-  //   const code_Todir = deletecode;
-  //   //http://10.215.160.38:6544/service/construction/api/searcher/?keyword=rel_doooco_&obj_type=C_DOC
-  //   // const code_Todir = "rel_doooco_"+moment().format("YYYYMMDDHHmmss")
-  //   // console.log('code_Todir',code_Todir)
-  //   // let sunjects = code_Todir + "/?doc_code=BalanceSchedule&keys=project&values=" + value; // 项目/子项目名称
-  //   // console.log('sunjects:',sunjects)
-
-  //   // const code_Todir = "datareport_safetyspecial_05";
-  // 	let param1 = code_Todir + "/?doc_code=BalanceSchedule&keys=project&values=" + value;
-  //   let datas = await getSearcher({
-  //     keyword: param1
-  //   }).then(rst => {
-  //     if (rst.result.length <= 0) return [];
-  //     let dataSource = this.handleData(rst.result);
-  //     return dataSource;
-  //   });
-  //   this.setState({
-  //     dataSource: Object.assign(datas)
-  //   });
-  //   console.log("dataSource:", this.state.dataSource);
-  // }
   // onSearch(value) {
   //   if (!value.length) {
   //     this.setState({
@@ -346,35 +395,19 @@ export default class BalanceSchedule extends Component {
   //   }
   //   console.log("value:", value);
   // }
-  //表格分页回调
-	// handleChange = async(pagination, filters, sorter) => {
-	// 	const {actions:{getWorkPackageDetail,getRelDoc}} = this.props		
-	// 	this.setState({loading:true})
-	// 	const pager = { ...this.state.pagination };
-	// 	pager.current = pagination.current;
-	// 	this.setState({
-	// 	  pagination: pager,
-	// 	});
-	// 	let arr = this.state.dataSource
-	// 	if(arr[(pagination.current-1)*10].key+1){
-	// 		this.setState({loading:false})
-	// 		return
-	// 	}
-	// 	for(let index = (pagination.current-1)*10;index < pagination.current*10;index++){
-	// 		let wp = await getWorkPackageDetail({code:this.state.totalData[index].code})
-	// 		let rel_doc = wp.related_documents ? wp.related_documents.find(x => {
-	// 			return x.rel_type === 'many_sum_rspeed'
-	// 		}) : null
-	// 		if(rel_doc){
-	// 			let doc = await getRelDoc({code:rel_doc.code})
-	// 			arr[index] = {...doc.extra_params,key:index}			
-	// 		}else{
-	// 			let obj = await this.getInfo(wp)
-	// 			arr[index] = {...obj,key:index,file:{}}
-	// 		}
-	// 	}
-	// 	this.setState({dataSource:arr,loading:false})
-	// }
+  createLink = (name, url) => {    //下载
+    let link = document.createElement("a");
+    link.href = url;
+    link.setAttribute('download', this);
+    link.setAttribute('target', '_blank');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+  downloadT () {
+    console.log(DataReportTemplate_SettlementProgress)
+    this.createLink('结算进度下载',DataReportTemplate_SettlementProgress);
+  }
   render() {
     const { selectedRowKeys } = this.state;
     const rowSelection = {
@@ -385,7 +418,7 @@ export default class BalanceSchedule extends Component {
       <div style={{ overflow: "hidden", padding: 20 }}>
         <DynamicTitle title="结算进度" {...this.props} />
         <Row>
-          <Button style={{ margin: "10px 10px 10px 0px" }} type="default">
+          <Button onClick={this.downloadT.bind(this)} style={{ margin: "10px 10px 10px 0px" }} type="default">
             模板下载
           </Button>
           <Button
@@ -423,7 +456,7 @@ export default class BalanceSchedule extends Component {
             onSearch={ text => {
               let result = this.state.dataSource.filter(data => {
                 console.log(data)
-                return data.project.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0;
+                return data.project.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0 || data.nodetarget.indexOf(text) >= 0;
               })
               if( text === ''){
                 result = this.state.dataSource
@@ -442,6 +475,7 @@ export default class BalanceSchedule extends Component {
               onChange={this.handleChange}
               rowSelection={rowSelection}
               rowKey="key"
+              loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="exception" strokeWidth={5}/>,spinning:this.state.loading}}
             />
           </Col>
         </Row>
