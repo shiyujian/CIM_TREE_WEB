@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_SubdivisionUnitProjectAcceptance} from '_platform/api';
 import '../../containers/quality.less'
 import Preview from '_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
@@ -186,39 +186,16 @@ class JianyanModal extends Component {
     //根据附件名称 也就是wbs编码获取其他信息
     async getInfo(wp){
         let res = {};
-        const {actions:{getWorkPackageDetail}} = this.props
+        const {actions:{getTreeRootNode}} = this.props
         res.name = wp.name
         res.code = wp.code  
         res.pk = wp.pk
         res.obj_type = wp.obj_type
         res.related_documents = wp.related_documents        
         let dwcode = ""
-        let getUnitLoop = async(param) => {
-            let next = {};
-            switch (param.obj_type_hum){
-                case "分项工程":
-                    next = await getWorkPackageDetail({code:param.parent.code})
-                    await getUnitLoop(next)
-                    break;
-                case "子分部工程":
-                    next = await getWorkPackageDetail({code:param.parent.code})
-                    await getUnitLoop(next)
-                    break;
-                case "分部工程":
-                    next = await getWorkPackageDetail({code:param.parent.code})
-                    await getUnitLoop(next)
-                    break;
-                case "子单位工程":
-                    dwcode = param.parent.code
-                    break
-                case "单位工程":
-                    dwcode = param.code
-                    break
-                default:break;
-            } 
-        }
-        await getUnitLoop(wp)
-        let danwei = await getWorkPackageDetail({code:dwcode})
+        let rootNode = await getTreeRootNode({code:wp.code})
+		let project = rootNode.children[0]
+		let danwei = project.children[0]
         //let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
        // res.construct_unit = construct_unit
         res.unit = {
@@ -226,7 +203,7 @@ class JianyanModal extends Component {
             code:danwei.code,
             obj_type:danwei.obj_type
         }
-        res.project = danwei.parent
+        res.project = project
         return res
     }
     //下拉框选择人
@@ -412,7 +389,9 @@ class JianyanModal extends Component {
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
 				<div>
-                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
+                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">
+                        <a href={`${DataReportTemplate_SubdivisionUnitProjectAcceptance}`}>模板下载</a>
+                    </Button>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
 						dataSource={this.state.dataSource}
