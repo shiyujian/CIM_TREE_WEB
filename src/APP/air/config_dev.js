@@ -23,44 +23,38 @@
 window.config = {
 	/***********************公共资源服务**************************/
 	//基础服务域名
-	'DOMAIN': 'http://bimcd.ecidi.com',
-	'DOMAIN2':'http://10.215.4.36',
-	//基础服务端口
-	'API_PORT': '6544',
+	'DOMAIN': 'http://10.215.137.233:6544',
 
 	//静态文件存储服务IP
-	'STATIC_FILE_IP':'http://bimcd.ecidi.com',
+	'STATIC_FILE_IP':'http://10.215.137.233',
 	//静态文件存储服务预览端口
-	'STATIC_PREVIEW_PORT':'6540',
+	'STATIC_PREVIEW_PORT':'6510',
 	//静态文件存储服务上传端口
-	'STATIC_UPLOAD_PORT':'6541',
+	'STATIC_UPLOAD_PORT':'6511',
 	//静态文件存储服务下载端口
-	'STATIC_DOWNLOAD_PORT':'6542',
+	'STATIC_DOWNLOAD_PORT':'6512',
 	//静态文件存储服务访问用户和密码
-	'STATIC_FILE_USER':'qianhai',
-	'STATIC_FILE_PASSWORD':'qianhai',
+	'STATIC_FILE_USER':'bimair',
+	'STATIC_FILE_PASSWORD':'ecidi_szair',
 
-	//现场收发文接口的端口
-	'DOC_EXCHANGE_PORT': '6545',
+	//现场收发文接口的URL
+	'DOC_EXCHANGE_URL': 'http://10.215.137.233:8088',
 	//现场收发文接口验证用的用户名和密码
-	'DOC_EXCHANGE_USER_PASSWORD': 'bimqh:bimqh',
-	'CODE_API': 'http://bimdjd.ecidi.com:6556',
+	'DOC_EXCHANGE_USER_PASSWORD': 'bimair:bimair',
 
 	//node服务,验评表单转化Word,pdf转word
-	'NODE_FILE_EXCHANGE_PORT': '6546',
-	//'NODE_FILE_EXCHANGE_PORT': '6525',
-	'NODE_FILE_STATIC_API': 'http://10.215.160.45:6511',
+	'NODE_FILE_STATIC_URL': 'http://10.215.137.233:3000',
 	
 	//word在线预览地址
 	'previewWord_API': 'http://docs.ecidi.com:6500/view/url?url=',
 
 	//领导带班服务,安全监测动态加载模板
-	'Leader_Class_URL': 'http://10.215.160.38:6592',
+	'Leader_Class_URL': 'http://10.215.137.233:8080',
 
 	//FDBServer 上传FDB文件服务
 	'FDBServer_API': 'http://urban.ecidi.com:8045/api',
 	//WJH插件的下载地址
-	'WJH_CITY_MARKER':'http://bimcd.ecidi.com:6542/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
+	'WJH_CITY_MARKER':'http://10.215.137.233:6512/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
 	//三维展示里面的cep模型数据
 	'WJH_CEP':'http://urban.ecidi.com:8006/qh20171212/qhtdbx.cep', 
 
