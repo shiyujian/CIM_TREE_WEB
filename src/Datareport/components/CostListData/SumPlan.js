@@ -67,7 +67,6 @@ export default class SumPlan extends Component {
       });
       let name = Object.keys(info.file.response);
       let dataList = info.file.response[name[0]];
-      console.log('datalist',dataList)
       let dataSource = [];
       for (let i = 1; i < dataList.length; i++) {
         dataSource.push({
