@@ -11,7 +11,8 @@ import PriceModifyModal from '../components/CostListData/PriceModifyModal';
 import {getUser} from '_platform/auth';
 import './quality.less';
 import {getNextStates} from '_platform/components/Progress/util';
-import {WORKFLOW_CODE, NODE_FILE_EXCHANGE_API} from '_platform/api.js';
+import {WORKFLOW_CODE, NODE_FILE_EXCHANGE_API,DataReportTemplate_ValuationList} from '_platform/api.js';
+
 var moment = require('moment');
 const Search = Input.Search;
 @connect(
@@ -280,7 +281,7 @@ export default class CostListData extends Component {
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="计价清单" {...this.props}/>
 				<Row>
-					<Button style={{margin:'10px 10px 10px 0px'}} type="default">模板下载</Button>
+					<Button style={{margin:'10px 10px 10px 0px'}} type="default" onClick={() => this.createLink('downLoadTemplate', DataReportTemplate_ValuationList)}>模板下载</Button>
 					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
 					<Button className="btn" type="default" onClick={this.openModal.bind(this, "modifyModal")}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.openModal.bind(this, "rmModal")}>申请删除</Button>
