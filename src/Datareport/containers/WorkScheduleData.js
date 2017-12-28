@@ -59,9 +59,9 @@ export default class WorkScheduleData extends Component {
 						factovertime: single.extra_params.factovertime,
 						uploads: single.extra_params.uploads,
 						delcode: single.code,
-						wpcode: single.extra_params.unit.code,
-						obj_type: single.extra_params.unit.obj_type,
-						pk: single.extra_params.unit.pk,
+						wpcode: single.extra_params.unit.code ||single.extra_params.wpcode,
+						obj_type: single.extra_params.unit.obj_type ||single.extra_params.obj_type,
+						pk: single.extra_params.unit.pk||single.extra_params.pk,
 					}
 					dataSource.push(temp);
 					this.setState({ dataSource,showDat:dataSource });
