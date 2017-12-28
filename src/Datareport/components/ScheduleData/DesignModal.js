@@ -27,9 +27,9 @@ class DesignModal extends Component {
     componentDidMount() {
         const { actions: { getAllUsers, getProjectTree } } = this.props;
         getAllUsers().then(rst => {
-            let checkers = rst.map(o => {
+            let checkers = rst.map((o,index) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
             this.setState({ checkers })
@@ -74,6 +74,7 @@ class DesignModal extends Component {
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
                 dataSource.push({
+                    key:i,
                     code: dataList[i][0] ? dataList[i][0] : '',
                     volume: dataList[i][1] ? dataList[i][1] : '',
                     name: dataList[i][2] ? dataList[i][2] : '',
@@ -202,9 +203,7 @@ class DesignModal extends Component {
         const columns =
             [{
                 title: '序号',
-                render: (text, record, index) => {
-                    return index + 1
-                }
+                dataIndex:"key",
             }, {
                 title: '编码',
                 dataIndex: 'code',
@@ -264,7 +263,8 @@ class DesignModal extends Component {
                     bordered
                     pagination={{  //分页
                         pageSize: 10
-                    }} />
+                    }} 
+                    rowKey='key'/>
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col><Button style={{ margin: '10px 10px 10px 0px' }}>模板下载</Button></Col>
                     <Col>

@@ -96,6 +96,10 @@ export default class WorkChangeCheck extends Component {
                     factstarttime: item.factstarttime,
                     factovertime: item.factovertime,
                     uploads: item.uploads,
+                    delcode: item.delcode,
+                    wpcode: item.wpcode,
+                    obj_type: item.obj_type,
+                    pk: item.pk,
                 },
                 workpackages: [{
                     code: item.wpcode,
