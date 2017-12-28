@@ -7,7 +7,7 @@ import { ProjectSumExcalDelete } from '../components/CostListData';
 import { ProjectSumChange } from '../components/CostListData';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { Row, Col, Table, Input, Button,Popconfirm,message } from 'antd';
-import { WORKFLOW_CODE } from '_platform/api.js'
+import { WORKFLOW_CODE ,NODE_FILE_EXCHANGE_API,DataReportTemplate_ProjectVolumeSettlement} from '_platform/api.js'
 import { getNextStates } from '_platform/components/Progress/util';
 import { getUser } from '_platform/auth';
 import { actions } from '../store/WorkunitCost';
@@ -63,6 +63,7 @@ export default class WorkunitCost extends Component {
 		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
 				i++
+				console.log('single',single)
 				let temp = {
 					key:i,
 					code: item.code,
@@ -94,7 +95,20 @@ export default class WorkunitCost extends Component {
 	delatecancel() {
 		this.setState({ delatevisible: false })
 	}
-
+	//模板下载
+	DownloadExcal(){
+		// console.log(DataReportTemplate_ProjectVolumeSettlement)
+		this.createLink("工程量结算模板下载",DataReportTemplate_ProjectVolumeSettlement)
+	}
+	createLink = (name, url) => {
+		let link = document.createElement("a");
+		link.href=url;
+		link.setAttribute("download",this);
+		link.setAttribute("target","_blank");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
 	//发起变更模态框
 	projectfill() {
 		this.setState({ addvisible: true })
@@ -327,7 +341,7 @@ export default class WorkunitCost extends Component {
 			<div style={{ overflow: 'hidden', padding: 20 }}>
 				<DynamicTitle title="工程量结算" {...this.props} />
 				<Row>
-					<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
+					<Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.DownloadExcal.bind(this)}>模板下载</Button>
 					<Button className="btn" type="default" onClick={this.projectfill.bind(this)}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.setchgVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.setDeleteVisible.bind(this) }>申请删除</Button>

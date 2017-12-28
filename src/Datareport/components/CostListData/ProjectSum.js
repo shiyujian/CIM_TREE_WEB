@@ -103,7 +103,7 @@ export default class ProjectSum extends Component {
                 })
             }
            
-        //     debugger
+        
            Promise.all(arrAir).then((res) =>{
                res.map((o,index) => {
                     if(!o.name){
@@ -112,6 +112,7 @@ export default class ProjectSum extends Component {
                })
                this.setState({dataSource});  
            })
+           debugger
         this.setState({dataSource});  
         }
       
@@ -219,11 +220,11 @@ export default class ProjectSum extends Component {
     }
 
     //删除
-    delete(index) {
-        let { dataSource } = this.state
-        dataSource.splice(index, 1)
-        this.setState({ dataSource })
-    }
+    // delete(index) {
+    //     let { dataSource } = this.state
+    //     dataSource.splice(index, 1)
+    //     this.setState({ dataSource })
+    // }
 
     //预览
     handlePreview(index) {
