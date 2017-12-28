@@ -35,9 +35,11 @@ export default class ModCheck extends Component {
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
+        console.log("dataSource:",dataSource);
         let tempData = [...dataSource];
         this.setState({dataSource,tempData,wk})
         console.log("wk:",wk);
+
     }
 
     componentWillReceiveProps(props){
@@ -75,34 +77,7 @@ export default class ModCheck extends Component {
         let rst = await Promise.all(promises);
         console.log('rst',rst)
         dataSource.map((item, index) => {
-            console.log('item',item)
-            // data_list.push({
-            //     "code": "" + item.code,
-            //     "name":item.name,
-            //     "basic_params":{
-            //         "photo":item.signature.download_url,
-            //         "signature":item.signature.a_file
-            //     },
-            //     "extra_params": {
-            //         "depart": item.depart,
-            //         "email":item.email,
-            //         "job":item.job,
-            //         "性别":item.sex,
-            //         "电话":item.tel,
-            //     },
-            //     "obj_type":"C_PER",
-            //     "org":{
-            //         "code":item.depart,
-            //         "obj_type": "C_ORG",
-            //         "pk": rst[index].pk,
-            //         "rel_type": "member"
-            //     },
-            //     "title":"title",
-            //     "status": "A",
-            //     "version": "A",
-            //     "first_name":"",
-            //     "last_name":""
-            // })                    
+            console.log('item',item)                   
             data_list.push({
 
                 "code": "" + item.code,

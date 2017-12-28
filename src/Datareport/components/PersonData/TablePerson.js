@@ -2,14 +2,15 @@ import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon} from 'antd';
 import style from './TableOrg.css'
 import DelPer from './PersonExpurgate';
+import {DataReportTemplate_PersonInformation} from '_platform/api';
+
 const Search = Input.Search;
 export default class TablePerson extends Component{
 	constructor(props) {
 		super(props);
 		this.state = {
 			dataSource: [],
-			deleData: [],
-			modData: [],
+			selectData: [],
 			tempData:[],
 		}
 	}
@@ -17,7 +18,7 @@ export default class TablePerson extends Component{
         return (
             <div>
                 <div>
-                    <Button style={{marginRight:"10px"}}>模板下载</Button>
+                    <Button style={{marginRight:"10px"}} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button>
                     <Button className = {style.button} onClick = {this.send.bind(this)}>发送填报</Button>
                     <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
                     <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button>
@@ -43,8 +44,8 @@ export default class TablePerson extends Component{
 	//批量删除
 	expurgate() {
 		const { actions: { ExprugateVisible, setDeletePer } } = this.props;
-		if(this.state.deleData.length){
-			setDeletePer(this.state.deleData);
+		if(this.state.selectData.length){
+			setDeletePer(this.state.selectData);
 			ExprugateVisible(true);
 		}else{
 			message.warning("请先选中要删除的数据");
@@ -53,14 +54,26 @@ export default class TablePerson extends Component{
 	//批量变更
 	modify() {
 		const { actions: { ModifyVisible, setModifyPer } } = this.props;
-		if(this.state.modData.length) {
-			console.log('modData', this.state.modData)
-			setModifyPer(this.state.modData)
+		if(this.state.selectData.length) {
+			console.log('selectData', this.state.selectData)
+			setModifyPer(this.state.selectData)
 			ModifyVisible(true);
 		} else {
 			message.warning("请先选中要变更的数据");
 		}
 	}
+
+	//下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
 	async componentDidMount() {
 		const {actions: {getAllUsers}} = this.props;
 		let dataSource = await getAllUsers();
@@ -93,15 +106,13 @@ export default class TablePerson extends Component{
 		},
 		onSelect: (record, selected, selectedRows) => {
 			this.setState({
-				deleData:selectedRows,
-				modData: selectedRows
+				selectData:selectedRows,
 			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
 			console.log(selected, selectedRows, changeRows);
 			this.setState({
-				deleData:selectedRows,
-				modData: selectedRows
+				selectData:selectedRows,
 			})
 		},
 	};

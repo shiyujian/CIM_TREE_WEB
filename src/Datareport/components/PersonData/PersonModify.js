@@ -42,9 +42,14 @@ export default class PersonModify extends Component {
                 })
             }
         });
+        modifyPer.map(item => {
+        	item.code = item.account.person_code;
+        })
+        console.log("modifyPer",modifyPer);
         this.setState({
             dataSource:modifyPer
         })
+
     }
 
 	render() {
@@ -55,7 +60,7 @@ export default class PersonModify extends Component {
 			key: 'Index',
 		}, {
 			title: '人员编码',
-			dataIndex: 'account.person_code',
+			dataIndex: 'code',
 			key: 'Code',
 		}, {
 			title: '姓名',
@@ -176,7 +181,7 @@ export default class PersonModify extends Component {
             return;
         }
         this.props.setDataUpdate(this.state.dataSource, this.state.passer);
-
+        console.log('22222222',this.state.dataSource);
         ModifyVisible(false);
     }
 
