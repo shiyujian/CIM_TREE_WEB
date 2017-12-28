@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import createFetchActionWithHeaders from './fetchAction';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base} from '_platform/api';
+import {USER_API,SERVICE_API,WORKFLOW_API,FILE_API,base,NODE_FILE_EXCHANGE_API } from '_platform/api';
 
 
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
@@ -37,7 +37,8 @@ const getDocData = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, 
 const getExBySearch = createFetchAction(`${SERVICE_API}/searcher/?keyword=rel_doc_jsjh&obj_type=C_DOC`, [], 'GET');
 //批量删除
 const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
-
+// 数据导出
+const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -58,7 +59,8 @@ export const actions = {
 	getWorkDocumentByCode,
 	getDocData,
 	getExBySearch,
-	delDocList
+	delDocList,
+	jsonToExcel
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {
