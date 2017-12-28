@@ -95,7 +95,6 @@ export default class PriceList extends Component {
                         id: 'pricelist',
                         name: 'priceList'
                     }
-                    
                 })
             }
             this.setState({ dataSource });

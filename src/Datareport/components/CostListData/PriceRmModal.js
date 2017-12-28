@@ -42,7 +42,6 @@ export default class PriceRmModal extends Component {
         let check = JSON.parse(value);
         this.setState({check})
     }
-
 	//ok
 	onok(){
         if(!this.state.check){
@@ -69,10 +68,19 @@ export default class PriceRmModal extends Component {
 	render() {
         const columns = 
             [{
-                title:'编码',
+                title:'序号',
                 dataIndex:'code',
-                width: '10%'
+                render:(text,record,index) => {
+                    return record.key
+                }
             },{
+                title: "项目/子项目",
+                dataIndex: "subproject"
+              },
+              {
+                title: "单位工程",
+                dataIndex: "unitengineering"
+              },{
                 title:'清单项目编码',
                 dataIndex:'projectcoding',
                 width:"10%"

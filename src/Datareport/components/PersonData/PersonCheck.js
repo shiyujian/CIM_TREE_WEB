@@ -74,20 +74,49 @@ export default class PersonCheck extends Component {
         let rst = await Promise.all(promises);
         dataSource.map((item, index) => {
             console.log('item',item)
+            // data_list.push({
+            //     "code": "" + item.code,
+            //     "name":item.name,
+            //     "basic_params":{
+            //         "photo":item.signature.download_url,
+            //         "signature":item.signature.a_file
+            //     },
+            //     "extra_params": {
+            //         "depart": item.depart,
+            //         "email":item.email,
+            //         "job":item.job,
+            //         "性别":item.sex,
+            //         "电话":item.tel,
+            //     },
+            //     "obj_type":"C_PER",
+            //     "org":{
+            //         "code":item.depart,
+            //         "obj_type": "C_ORG",
+            //         "pk": rst[index].pk,
+            //         "rel_type": "member"
+            //     },
+            //     "title":"title",
+            //     "status": "A",
+            //     "version": "A",
+            //     "first_name":"",
+            //     "last_name":""
+            // })                    
             data_list.push({
+
                 "code": "" + item.code,
                 "name":item.name,
                 "basic_params":{
                     "photo":item.signature.download_url,
-                    "signature":item.signature.a_file
+                    "signature":item.signature.a_file,
+                    info: {
+                        "技术职称":item.job,
+                        "性别":item.sex,
+                        "电话":"" + item.tel,
+                        "email":"" + item.email,
+                    }
                 },
                 "extra_params": {
                     "depart": item.depart,
-                    "email":item.email,
-                    "job":item.job,
-                    "性别":item.sex,
-                    "电话":item.tel,
-                    "email":item.email
                 },
                 "obj_type":"C_PER",
                 "org":{
@@ -96,7 +125,7 @@ export default class PersonCheck extends Component {
                     "pk": rst[index].pk,
                     "rel_type": "member"
                 },
-                "title":"title",
+                "title":item.job,
                 "status": "A",
                 "version": "A",
                 "first_name":"",
@@ -112,6 +141,7 @@ export default class PersonCheck extends Component {
         })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
         .then((rst) => {
+            console.log('rst111',rst)
             let personId = rst.id;
             postAllUsersId({id:personId})
             .then((item) => {})
