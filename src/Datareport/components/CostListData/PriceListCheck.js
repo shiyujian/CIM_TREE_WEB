@@ -151,7 +151,6 @@ export default class PriceListCheck extends Component {
         });
         let rst = await addTagList({},{data_list:tagLists});
         
-        debugger;
         if(rst.result){
             notification.success({
                 message: '创建工程量项成功！',
@@ -241,7 +240,7 @@ export default class PriceListCheck extends Component {
 		return(
 			<Modal
                 title="计价清单信息上传表"
-                key={Math.random()}
+                key="priceListCheck"
 				width = {1280}
 				visible = {true}
                 maskClosable={false}
