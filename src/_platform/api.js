@@ -19,19 +19,18 @@
 */
 window.config = window.config || {};
 
-let DOMAIN, DOMAIN2, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP,NODE_FILE_STATIC_API;
+let DOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP,NODE_FILE_EXCHANGE_API;
 
 DOMAIN = window.config.DOMAIN;
 USER = window.config.STATIC_FILE_USER;
 PASSWORD = window.config.STATIC_FILE_PASSWORD;
-DOMAIN2 = window.config.DOMAIN2;
 STATIC_FILE_IP = window.config.STATIC_FILE_IP;
-NODE_FILE_STATIC_API = window.config.NODE_FILE_STATIC_API;
+NODE_FILE_EXCHANGE_API = window.config.NODE_FILE_STATIC_URL;
 
 /***********************公共资源服务**************************/
 export { DOMAIN, USER, PASSWORD, TREE_CODE };
 export const CODE_PROJECT = '前海BIM';
-export const base = `${DOMAIN}:${window.config.API_PORT}`;
+export const base = `${DOMAIN}`;
 export const EXCHANGE_API = `${DOMAIN}:${window.config.DOC_EXCHANGE_PORT}`;
 export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
 export const USER_API = `${base}/accounts/api`;
@@ -41,8 +40,7 @@ export const WORKFLOW_API = `${base}/service/workflow/api`;
 export const PDF_FILE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
 export const DOWNLOAD_FILE = `${STATIC_FILE_IP}:${window.config.STATIC_DOWNLOAD_PORT}`;
 export const CUS_TILEMAP = window.config.cus_tilemap;
-export const CODE_API = window.config.CODE_API;
-export const NODE_FILE_EXCHANGE_API = `${NODE_FILE_STATIC_API}:${window.config.NODE_FILE_EXCHANGE_PORT}`;
+export const CODE_API = window.config.DOC_EXCHANGE_URL;
 export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
 
 //FDBServer API
@@ -82,11 +80,7 @@ export const FOREST_API = `${window.config.FORESTDOMAIN}:${window.config.FORESTP
 //苗圃定位模板
 export const nurseryLocation_template = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('nurseryLocation.xlsx');
 
-
-
-
-
-export const SubItem_WordTemplate = `${window.config.NODE_FILE_STATIC_API}` + '/media/documents/meta/' + encodeURI('分项工程质量验收记录模板.docx')
+export const SubItem_WordTemplate = `${window.config.NODE_FILE_STATIC_URL}` + '/media/documents/meta/' + encodeURI('分项工程质量验收记录模板.docx')
 export const Fenbu_WordTemplate = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('分部子分部工程质量验收记录_ibqFgFg.docx')
 export const Danwei_WordTemplate = STATIC_DOWNLOAD_API + "/media/documents/2017/10/%E5%8D%95%E4%BD%8D%E5%AD%90%E5%8D%95%E4%BD%8D%E5%B7%A5%E7%A8%8B%E8%B4%A8%E9%87%8F%E9%AA%8C%E6%94%B6%E8%AE%B0%E5%BD%952.docx";
 //检验批
@@ -111,7 +105,7 @@ export const ESTIMATET = STATIC_DOWNLOAD_API + '/media/documents/meta/zjt-05_.xl
 export const CONSTRACTT = STATIC_DOWNLOAD_API + '/media/documents/meta/zjt-03_.xlsx';
 export const WORKT = STATIC_DOWNLOAD_API + '/media/documents/meta/template.xlsx';
 //造价管理模块api
-export const UPLOADFILE_API = DOMAIN + window.config.STATIC_UPLOAD_PORT + '/api/user/files/';
+export const UPLOADFILE_API = STATIC_FILE_IP + window.config.STATIC_UPLOAD_PORT + '/api/user/files/';
 //视频监控
 //三维全景
 //720云预览API
