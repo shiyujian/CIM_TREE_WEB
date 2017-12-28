@@ -155,6 +155,8 @@ export const DataReportTemplate_VideoMonitor = STATIC_DOWNLOAD_API + '/media/doc
 export const DataReportTemplate_ProjectInformation = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('项目信息数据填报模版.xlsx');
 export const DataReportTemplate_ImageInformation = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('影像信息数据填报模版.xlsx');
 export const DataReportTemplate_Organization = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('组织机构数据填报模版.xlsx');
+export const DataReportTemplate_QualityProblem = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('质量问题信息表模版.xlsx');
+
 /***********************临时资源服务**************************/
 
 /***********************静态常量**************************/
