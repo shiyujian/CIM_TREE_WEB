@@ -20,7 +20,6 @@ class EditableCell extends React.Component {
 
 	// 这里需要去判断
 	check = () => {
-		// debugger;
 		let value = this.state.value;
 		// console.log(value,"vip-value")
 		if(!value || value == undefined || value == null ){

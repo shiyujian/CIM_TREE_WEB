@@ -112,7 +112,7 @@ export default class PersonCheck extends Component {
                         "技术职称":item.job,
                         "性别":item.sex,
                         "电话":"" + item.tel,
-                        "email":"" + item.email,
+                        "邮箱":"" + item.email,
                     }
                 },
                 "extra_params": {

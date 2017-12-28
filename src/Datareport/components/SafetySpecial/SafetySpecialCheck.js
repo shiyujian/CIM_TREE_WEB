@@ -72,7 +72,7 @@ export default class SafetySpecialCheck extends Component {
 
     //通过
     async passon() {
-        console.log('vip-state', this.state);
+        // console.log('vip-state', this.state);
         const { dataSource, wk, topDir } = this.state;
         const { actions: { logWorkflowEvent, addDocList, getScheduleDir, postScheduleDir, getWorkpackagesByCode } } = this.props;
         //the unit in the dataSource array is same
@@ -82,8 +82,6 @@ export default class SafetySpecialCheck extends Component {
         let code = 'datareport_safetyspecial_05'; // 自定义编号
         //get workpackage by unit's code 
         let workpackage = await getWorkpackagesByCode({ code: unit.code }); // 获取施工包不太明白
-        console.log('vip-code', code);
-        console.log('vip-workpackage', workpackage);
 
         let postDirData = {
             "name": '安全专项目录树',
@@ -127,7 +125,6 @@ export default class SafetySpecialCheck extends Component {
         const docData = [];
         let i = 0;   //asure the code of every document only
         dataSource.map(item => {
-            debugger;
             i++;
             docData.push({
                 code: 'safetyspecial' + moment().format("YYYYMMDDHHmmss") + i,
@@ -179,9 +176,33 @@ export default class SafetySpecialCheck extends Component {
     }
     //不通过
     async reject() {
-        const { wk } = this.props
-        const { actions: { deleteWorkflow } } = this.props
-        await deleteWorkflow({ pk: wk.id })
+        const { wk, } = this.state;
+        const { actions: { logWorkflowEvent, } } = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null
+            }
+        );
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
+        // const { wk } = this.props
+        // const { actions: { deleteWorkflow } } = this.props
+        // await deleteWorkflow({ pk: wk.id })
     }
 
     //预览
@@ -278,7 +299,7 @@ export default class SafetySpecialCheck extends Component {
                 footer={null}
                 maskClosable={false}
                 onCancel={this.cancel.bind(this)}
-                >
+            >
                 <div>
                     <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}

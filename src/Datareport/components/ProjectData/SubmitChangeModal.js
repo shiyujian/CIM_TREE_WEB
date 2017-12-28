@@ -205,6 +205,21 @@ export default class SubmitChangeModal extends Component {
             // },
             key: 'Project',
         }, {
+            title: '项目投资',
+            render: (record) => {
+                let checkVal = (value) => {
+                    record.cost = value;
+                    return value;
+                }
+                return (
+                    <ECCB
+                        initCheckedValue={record.cost}
+                        checkVal={checkVal}
+                        value={record.cost} />
+                )
+            },
+            key: 'cost',
+        }, {
             title: '项目负责人',
             render: (record) => {
                 let checkVal =async (code) => {

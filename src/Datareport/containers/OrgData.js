@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {TableOrg, ToggleModal, OrgCheck, ToggleModalCJ, ToggleModalDel, ToggleModalUpdate} from '../components/OrgData'
 import {actions as platformActions} from '_platform/store/global';
+import {message} from "antd";
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
@@ -46,8 +47,8 @@ export default class OrgData extends Component {
 		}
 		createWorkflow({},postdata).then((rst) => {
 			let nextStates =  getNextStates(rst,rst.current[0].id);
-            logWorkflowEvent({pk:rst.id},
-                {
+            logWorkflowEvent(
+				{pk:rst.id},{
                     state:rst.current[0].id,
                     action:'提交',
                     note:'发起组织机构填报',
@@ -58,6 +59,11 @@ export default class OrgData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
 					attachment:null
+				}).then(rst => {
+					if (rst) {
+						console.log("rst:",rst);
+						message.success("流程发起成功");
+					}
 				});
 		});
 	}
@@ -99,6 +105,11 @@ export default class OrgData extends Component {
 						state: nextStates[0].to_state[0].id,
 					}],
 					attachment: null
+				}).then(rst => {
+					if (rst) {
+						console.log("rst:",rst);
+						message.success("流程发起成功");
+					}
 				});
 		});
 	}
@@ -140,6 +151,11 @@ export default class OrgData extends Component {
 						state: nextStates[0].to_state[0].id,
 					}],
 					attachment: null
+				}).then(rst => {
+					if (rst) {
+						console.log("rst:",rst);
+						message.success("流程发起成功");
+					}
 				});
 		});
 	}
@@ -181,6 +197,11 @@ export default class OrgData extends Component {
 						state: nextStates[0].to_state[0].id,
 					}],
 					attachment: null
+				}).then(rst => {
+					if (rst) {
+						console.log("rst:",rst);
+						message.success("流程发起成功");
+					}
 				});
 		});
 	}

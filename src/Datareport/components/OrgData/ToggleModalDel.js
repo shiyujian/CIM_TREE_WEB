@@ -49,7 +49,6 @@ export default class ToggleModalDel extends Component{
                         }
                     </Select>
                 </span> 
-                <Button type="primary" onClick = {this.onok.bind(this)}>提交</Button>
                <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
