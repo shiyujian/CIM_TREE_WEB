@@ -100,10 +100,12 @@ export default class PriceModifyCheck extends Component {
     async reject(){
         const {wk} = this.props
         const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        let res = await deleteWorkflow({pk:wk.id})
+        debugger;
        }
     //radio变化
     onChange(e){
+        console.log(e.target)
         this.setState({option:e.target.value})
     }
 
@@ -148,7 +150,7 @@ export default class PriceModifyCheck extends Component {
 		return(
 			<Modal
                 title="计价清单信息删除审批表"
-                key={Math.random()}
+                key='priceModalCheck'
 				width = {1280}
 				visible = {true}
                 maskClosable={false}

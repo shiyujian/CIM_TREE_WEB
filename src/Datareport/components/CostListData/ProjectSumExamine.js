@@ -204,7 +204,7 @@ export default class ProjectSumExamine extends Component {
         this.setState({ opinion: e.target.value })
     }
     cancel() {
-        console.log('关闭')
+      
         this.props.closeModal("cost_pro_ck_visible", false)
     }
     render() {

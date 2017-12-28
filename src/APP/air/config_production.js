@@ -18,62 +18,61 @@
 4.在src/_platform/API.js和src下所有源码当中,不能出现IP和端口固定的情况;
 */
 
-/********【生产环境配置】,如有新增配置，请保持dev\master\producation\stage同步**********/
+/********【开发环境配置】,如有新增配置，请保持dev\master\producation\stage同步**********/
 
 window.config = {
 	/***********************公共资源服务**************************/
 	//基础服务域名
-	'DOMAIN': 'http://192.168.192.10',
-	'DOMAIN2':'http://192.168.192.10',
-	//基础服务端口
-	'API_PORT': '7530',
+	'DOMAIN': 'http://10.215.137.233:6544',
 
 	//静态文件存储服务IP
-	'STATIC_FILE_IP':'http://192.168.192.10',
+	'STATIC_FILE_IP':'http://10.215.137.233',
 	//静态文件存储服务预览端口
-	'STATIC_PREVIEW_PORT':'7510',
+	'STATIC_PREVIEW_PORT':'6510',
 	//静态文件存储服务上传端口
-	'STATIC_UPLOAD_PORT':'7511',
+	'STATIC_UPLOAD_PORT':'6511',
 	//静态文件存储服务下载端口
-	'STATIC_DOWNLOAD_PORT':'7512',
+	'STATIC_DOWNLOAD_PORT':'6512',
 	//静态文件存储服务访问用户和密码
-	'STATIC_FILE_USER':'qianhai',
-	'STATIC_FILE_PASSWORD':'qianhai',
+	'STATIC_FILE_USER':'bimair',
+	'STATIC_FILE_PASSWORD':'ecidi_szair',
 
-	//现场收发文接口的端口
-	'DOC_EXCHANGE_PORT': '7532',
+	//现场收发文接口的URL
+	'DOC_EXCHANGE_URL': 'http://10.215.137.233:8088',
 	//现场收发文接口验证用的用户名和密码
-	'DOC_EXCHANGE_USER_PASSWORD': 'bimqh:bimqh',
-	'CODE_API': 'http://bimdjd.ecidi.com:6556',
-	//node服务,验评表单转化Word
-	'NODE_FILE_EXCHANGE_PORT': '7570',
+	'DOC_EXCHANGE_USER_PASSWORD': 'bimair:bimair',
+
+	//node服务,验评表单转化Word,pdf转word
+	'NODE_FILE_STATIC_URL': 'http://10.215.137.233:3000',
 	
 	//word在线预览地址
-	'previewWord_API': 'http://192.168.192.11:80/view/url?url=',
-	//下载文档--未转发过的地址
-	'Leader_Class_URL': 'http://10.215.160.38:6593',
-	
+	'previewWord_API': 'http://docs.ecidi.com:6500/view/url?url=',
+
+	//领导带班服务,安全监测动态加载模板
+	'Leader_Class_URL': 'http://10.215.137.233:8080',
+
+	//FDBServer 上传FDB文件服务
+	'FDBServer_API': 'http://urban.ecidi.com:8045/api',
 	//WJH插件的下载地址
-	'WJH_CITY_MARKER':'http://192.168.192.10:7512/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
+	'WJH_CITY_MARKER':'http://10.215.137.233:6512/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
 	//三维展示里面的cep模型数据
-	'WJH_CEP':'http://192.168.192.12:80/qianhai/qhtdbx.cep', 
+	'WJH_CEP':'http://urban.ecidi.com:8006/qh20171212/qhtdbx.cep', 
 
 	//地图瓦片地址
-	'cus_tilemap':'http://192.168.192.10:8100',
-	//天地图的WMSTileLayerUrl
+	'cus_tilemap':'http://bimqh.ecidi.com:6580',
 	'WMSTileLayerUrl':'http://t{s}.tianditu.cn/DataServer?T=cva_w&X={x}&Y={y}&L={z}',
 	'IMG_W':'http://t{s}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}',
 	'VEC_W':'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
+	//视频监控插件下载配置
+	'Video_PLUGIN_URL':'http://bimcd.ecidi.com:6542/media/documents/meta/WebComponentsKithas_rem_cfg.exe',
+
 	/***********************单模块资源服务**************************/
 	//720云
-	//'Video360_API' : 'http://720yun.com/t/59e24jfOcya',
-    'PANORAMAGRAM_LOC_CODE': 'PANORAMA_ROOT',//全景图位置树根节点编码值
+	'PANORAMAGRAM_LOC_CODE': 'PANORAMA_ROOT',//全景图位置树根节点编码值
 	'Video360_API': 'http://720yun.com/t/16fjzOmksu8?from=singlemessage&isappinstalled=0&pano_id=6700576',
 	'Video360_API2': 'http://720yun.com/t/16fjzOmksu8?from=singlemessage&isappinstalled=0&pano_id=6700576',
+
 	/***********************临时资源服务**************************/
-
-
-	/******************Leaflet Map ****************/
 	'initLeaflet': {
 		center: [22.516818, 113.868495],   //前海
 		zoomControl: false,
@@ -82,13 +81,17 @@ window.config = {
 		minZoom: 13,
 		maxBounds: [[22.564885, 113.827781], [22.468466, 113.931283]]
 	},
-
+	'fullExtent': {
+		minlat: 22.468466,
+		maxlat: 22.564885,
+		minlng: 113.827781,
+		maxlng: 113.931283
+	},
 	//个人考勤的上下班时间，如果当前的部门未配置的话拿此上下班时间，用[--]分开，此处必须配置
 	'IN_OFF_DUTY':'08:30:00--18:00:00',
-        	//现场收发文的短信模板NAME和CODE
+	//现场收发文的短信模板NAME和CODE
 	'DISPATCH_MSG':{
 		'NAME':'BIM系统',
 		'CODE':'SMS_100920102'
-    }
-	
+	}
 };

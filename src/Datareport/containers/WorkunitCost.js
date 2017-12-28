@@ -6,8 +6,8 @@ import { ProjectSumExamine } from '../components/CostListData';
 import { ProjectSumExcalDelete } from '../components/CostListData';
 import { ProjectSumChange } from '../components/CostListData';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
-import { Row, Col, Table, Input, Button,Popconfirm,message } from 'antd';
-import { WORKFLOW_CODE } from '_platform/api.js'
+import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress,Col } from 'antd';
+import { WORKFLOW_CODE ,NODE_FILE_EXCHANGE_API,DataReportTemplate_ProjectVolumeSettlement} from '_platform/api.js'
 import { getNextStates } from '_platform/components/Progress/util';
 import { getUser } from '_platform/auth';
 import { actions } from '../store/WorkunitCost';
@@ -40,9 +40,11 @@ export default class WorkunitCost extends Component {
 			againDataSource:[],
 
 		}
+	
 	}
 	async componentDidMount() {
 		const { actions: { getScheduleDir } } = this.props;
+		this.setState({loading:true,percent:0,num:0})
 		let topDir = await getScheduleDir({ code: 'the_only_main_code_costsumplans' });
 		if (topDir.obj_type) {
 			let dir = await getScheduleDir({ code: 'ck' });
@@ -55,6 +57,7 @@ export default class WorkunitCost extends Component {
 		}
 	}
 	async generateTableData(data) {
+		
 		const { actions: {
 			getDocument,
 	                 } } = this.props;
@@ -63,6 +66,7 @@ export default class WorkunitCost extends Component {
 		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
 				i++
+				
 				let temp = {
 					key:i,
 					code: item.code,
@@ -82,8 +86,9 @@ export default class WorkunitCost extends Component {
 		})
 		this.setState({ 
 			dataSource:dataSource,
-			showDs:dataSource
+			showDs:dataSource,
 		 });
+		 this.setState({loading:false,percent:100})
 		// debugger;
 	}
 	//点×取消
@@ -94,7 +99,20 @@ export default class WorkunitCost extends Component {
 	delatecancel() {
 		this.setState({ delatevisible: false })
 	}
-
+	//模板下载
+	DownloadExcal(){
+		// console.log(DataReportTemplate_ProjectVolumeSettlement)
+		this.createLink("工程量结算模板下载",DataReportTemplate_ProjectVolumeSettlement)
+	}
+	createLink = (name, url) => {
+		let link = document.createElement("a");
+		link.href=url;
+		link.setAttribute("download",this);
+		link.setAttribute("target","_blank");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
 	//发起变更模态框
 	projectfill() {
 		this.setState({ addvisible: true })
@@ -129,18 +147,26 @@ export default class WorkunitCost extends Component {
 		let {selectedRowKeys,dataSourceSelected,dataSource} = this.state;
 		if(this.state.selectedRowKeys && this.state.selectedRowKeys.length > 0){
 			const {actions:{jsonToExcel}}=this.props;
-			const {showDs} =this.state;
-			console.log('this.state',this.state)
+			const {dataSourceSelected} =this.state;
 			let rows =[];
 			rows.push(['序号','项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','单价','备注']);
-			showDs.map(o =>{
-				rows.push([o.key,o.subproject,o.projectcoding,o.projectname,o.company,o.number,o.total,o.remarks]);
+			dataSourceSelected.map(o =>{
+				rows.push([
+					o.key,
+					o.subproject,
+					o.unit,
+					o.projectcoding,
+					o.projectname,
+					o.company,
+					o.number,
+					o.total,
+					o.remarks
+				]);
 			})
-			jsonToExcel({},{rwos:rows}).then(rst =>{
-				this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.project);
+		
+			jsonToExcel({},{rows:rows}).then(rst =>{
+				this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
 			})
-
-			
 			return
 		}else{
 			message.warning('请选择数据');
@@ -327,7 +353,7 @@ export default class WorkunitCost extends Component {
 			<div style={{ overflow: 'hidden', padding: 20 }}>
 				<DynamicTitle title="工程量结算" {...this.props} />
 				<Row>
-					<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
+					<Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.DownloadExcal.bind(this)}>模板下载</Button>
 					<Button className="btn" type="default" onClick={this.projectfill.bind(this)}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.setchgVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.setDeleteVisible.bind(this) }>申请删除</Button>
@@ -352,7 +378,8 @@ export default class WorkunitCost extends Component {
 				</Row>
 				<Row >
 					<Col >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs}  />
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs} 
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}} />
 					</Col>
 				</Row>
 				{

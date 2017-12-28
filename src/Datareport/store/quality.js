@@ -38,6 +38,7 @@ const getRelDoc = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`,[]
 const getOrg = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`,[])
 //获取项目树
 const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/?depth=4`, []);
+const getTreeRootNode = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?root=false&reverse=true`, []);
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -58,8 +59,8 @@ export const actions = {
 	getResouce,
 	getRelDoc,
 	getOrg,
-	getProjectTree,
-	delDocList
+	delDocList,
+	getTreeRootNode
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

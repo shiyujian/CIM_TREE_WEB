@@ -6,6 +6,8 @@ import './index.less';
 
 export default class VedioTable extends Component{
 
+    page = 1//当前页数
+
     render(){
         const {dataSource=[],loading =false,storeSelectRows =null} = this.props;
         const rowSelection = storeSelectRows? this.rowSelect : null;
@@ -19,7 +21,8 @@ export default class VedioTable extends Component{
                 pagination={{
                     defaultPageSize: 10,
                     showQuickJumper: true,
-                    showTotal: showTotal
+                    showTotal: showTotal,
+                    onChange: (page)=>{this.page = page}
                 }}
                 rowSelection={rowSelection}
                 bordered
@@ -55,7 +58,7 @@ export default class VedioTable extends Component{
     }
     handleChange = (value,index,dataIndex)=>{
         const {storeData,dataSource} = this.props;
-        dataSource[index][dataIndex] = value;
+        dataSource[(this.page-1)*10 + index][dataIndex] = value;
         storeData(dataSource);
     }
 
@@ -106,7 +109,8 @@ export default class VedioTable extends Component{
         render: (text,record,index) => this.renderColumns(text,index,'modal')
     },{
         title: '摄像头上线时间',
-        dataIndex: 'uptime'
+        dataIndex: 'uptime',
+        render: (text,record,index) => this.renderColumns(text,index,'uptime')
     },{
         title: 'wbs编码',
         dataIndex: 'wbsCode',

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_SubdivisionUnitProjectAcceptance} from '_platform/api';
 import '../../containers/quality.less'
 import Preview from '_platform/components/layout/Preview';
 const {RangePicker} = DatePicker;
@@ -187,52 +187,25 @@ class JianyanpiModal extends Component {
     //根据附件名称 也就是wbs编码获取其他信息
     async getInfo(code){
         let res = {};
-        const {actions:{getWorkPackageDetail}} = this.props
+        const {actions:{getWorkPackageDetail,getTreeRootNode}} = this.props
         let jianyanpi = await getWorkPackageDetail({code:code})
         res.name = jianyanpi.name
         res.code = jianyanpi.code  
         res.pk = jianyanpi.pk
         res.obj_type = jianyanpi.obj_type
         res.related_documents = jianyanpi.related_documents
-        let fenxiang = await getWorkPackageDetail({code:jianyanpi.parent.code})
-        if(fenxiang.parent.obj_type_hum === "子分部工程"){
-            let zifenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let fenbu =  await getWorkPackageDetail({code:zifenbu.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
+        let rootNode = await getTreeRootNode({code:code})
+		let project = rootNode.children[0]
+		let danwei = project.children[0]
             // let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
             // res.construct_unit = construct_unit
-            res.unit = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
-            }
-            res.project = danwei.parent
-        }else{
-            let fenbu = await getWorkPackageDetail({code:fenxiang.parent.code})
-            let zidanwei = {},danwei = {};
-            if(fenbu.parent.obj_type_hum === "子单位工程"){
-                zidanwei = await getWorkPackageDetail({code:fenbu.parent.code})
-                danwei =  await getWorkPackageDetail({code:zidanwei.parent.code})
-                
-            }else{
-                danwei = await getWorkPackageDetail({code:fenbu.parent.code})
-            } 
-            // let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
-            // res.construct_unit = construct_unit
-            res.unit = {
-                name:danwei.name,
-                code:danwei.code,
-                obj_type:danwei.obj_type
-            }
-            res.project = danwei.parent
+        res.unit = {
+            name:danwei.name,
+            code:danwei.code,
+            obj_type:danwei.obj_type
         }
+        res.project = project
+        
         return res
     }
     //下拉框选择人
@@ -419,7 +392,9 @@ class JianyanpiModal extends Component {
 			maskClosable={true}
 			onCancel={this.props.oncancel}>
 				<div>
-                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
+                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">
+                        <a href={`${DataReportTemplate_SubdivisionUnitProjectAcceptance}`}>模板下载</a>
+                    </Button>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
 						dataSource={this.state.dataSource}

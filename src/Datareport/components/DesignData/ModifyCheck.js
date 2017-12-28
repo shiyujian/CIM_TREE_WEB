@@ -127,6 +127,18 @@ export default class ModifyCheck extends Component {
                 obj_type:"C_DOC",
                 status:'A',
                 profess_folder: {code: dir.code, obj_type: 'C_DIR'},
+                workpackages:[{
+                    pk: workpackage.pk,
+                    code: workpackage.code,
+                    obj_type: workpackage.obj_type,
+                    rel_type: 'designdata_wp_document', // 自定义，要确保唯一性
+                }],
+                related_projects:[{
+                    pk:item.project.pk,
+                    code:item.project.code,
+                    obj_type:'C_PJ',
+                    rel_type: 'designdata_pj_document'
+                }],
                 basic_params: {
                     files: [
                         {
