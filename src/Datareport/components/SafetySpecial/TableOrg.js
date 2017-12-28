@@ -292,7 +292,8 @@ export default class TableOrg extends Component {
 		jsonToExcel({}, { rows: rows })
 			.then(rst => {
 				console.log(rst);
-				this.createLink('项目信息导出表', NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
+				console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+				this.createLink(this,"安全专项导出信息",NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
 			})
 	}
 	//变更

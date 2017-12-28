@@ -76,7 +76,7 @@ export default class ChangeFile extends Component {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
 
-    beforeUploadPicFile(index, file) {
+    beforeUploadPicFile(index,record, file) {
         debugger;
         // 上传到静态服务器
         const fileName = file.name;
@@ -120,11 +120,14 @@ export default class ChangeFile extends Component {
     }
 
     //删除
-    delete(index) {
-        // debugger;
+    delete(record) {
         let { dataSource } = this.state;
-        dataSource.splice(index, 1);
-        this.setState({ dataSource });
+        this.setState({
+            ...this.state,
+            dataSource: dataSource.filter((item, i) => {
+                return item.index !== record.index;
+            })
+        });
     }
     //预览
     handlePreview(index) {
@@ -242,7 +245,7 @@ export default class ChangeFile extends Component {
                 title: '附件',
                 width: "10%",
                 render: (text, record, i) => {
-                    // debugger;
+                    debugger;
                     if (record.file.a_file) {
                         return (<span>
                             <a onClick={this.handlePreview.bind(this, i)}>预览</a>
@@ -259,7 +262,7 @@ export default class ChangeFile extends Component {
                     } else {
                         return (
                             <span>
-                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, i)}>
+                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, i,record)}>
                                     <Button>
                                         <Icon type="upload" />上传附件
                                 </Button>
@@ -277,7 +280,7 @@ export default class ChangeFile extends Component {
                             placement="leftTop"
                             title="确定删除吗？"
                             // onConfirm={this.delete.bind(this, index, record.i)}
-                            onConfirm={this.delete.bind(this, i)}
+                            onConfirm={this.delete.bind(this,record)}
                             okText="确认"
                             cancelText="取消">
                             <a>删除</a>

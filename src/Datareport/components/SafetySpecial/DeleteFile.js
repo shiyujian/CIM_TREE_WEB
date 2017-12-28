@@ -122,7 +122,7 @@ export default class DeleteFile extends Component {
                             placement="leftTop"
                             title="确定删除吗？"
                             // onConfirm={this.delete.bind(this, index, record.i)}
-                            onConfirm={this.delete.bind(this, index)}
+                            onConfirm={this.delete.bind(this, record)}
                             okText="确认"
                             cancelText="取消">
                             <a>删除</a>
@@ -196,11 +196,14 @@ export default class DeleteFile extends Component {
     }; // render
 
     //删除
-    delete(index) {
-        // debugger;
+    delete(record) {
         let { dataSource } = this.state;
-        dataSource.splice(index, 1);
-        this.setState({ dataSource });
+        this.setState({
+            ...this.state,
+            dataSource: dataSource.filter((item, i) => {
+                return item.index !== record.index;
+            })
+        });
     }
 
     onok() {
