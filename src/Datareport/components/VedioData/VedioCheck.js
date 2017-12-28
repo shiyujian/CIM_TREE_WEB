@@ -129,6 +129,9 @@ export default class VedioCheck extends Component {
             case "create":
                 this.createPassion(dataSource);
             break;
+            case "change":
+                this.changePassion(dataSource);
+            break;
             case "strike":
                 const {actions:{deleteDocument}} = this.props;
                 const all = dataSource.map(item => {
@@ -189,6 +192,27 @@ export default class VedioCheck extends Component {
             notification.error({message: '创建文档失败！',duration: 2});
         }
     }
+    changePassion = async (dataSource)=>{
+        const {actions:{putDocument}} = this.props;
+        const data_list = dataSource.map(item=>{
+            const extra = JSON.parse(JSON.stringify(item));
+            delete extra.code;
+            delete extra.index;
+            return {
+                code:item.code,
+                status:'A',
+                version: 'A',
+                extra_params:{...extra}
+            }
+        });
+
+        const {result} = await putDocument({},{data_list});
+        if(result){
+            notification.success({message: '修改文档成功！',duration: 2});
+        }else{
+            notification.error({message: '修改文档失败！',duration: 2});
+        }
+    }
 
     reject = async ()=>{    //不通过
         const {wk} = this.props
@@ -199,9 +223,11 @@ export default class VedioCheck extends Component {
 
 const modalTitle = {
     create: '视频监控数据录入审批表',
-    strike: '视频监控数据删除审核表'
+    strike: '视频监控数据删除审核表',
+    change: '视频监控数据修改审核表'
 }
 const modalName = {
     create: 'safety_vedioCheck_visible',
-    strike: 'safety_vedioDeleteCheck_visible'
+    strike: 'safety_vedioDeleteCheck_visible',
+    change: 'safety_vedioChangeCheck_visible'
 }

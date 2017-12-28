@@ -108,8 +108,10 @@ export default class Progress extends Component {
 			design_modifycheck_visbile,
 			design_expurgatecheck_visbile,
 			safety_vedioCheck_visible,
+			safety_vedioChangeCheck_visible,
 			safety_vedioDeleteCheck_visible,
 			safety_vedioInfoCheck_visible,
+			safety_vedioInfoChangeCheck_visible,
 			safety_vedioInfoDeleteCheck_visible,
 			dr_qua_defect_visible,
 			safety_doc_delete_visible,
@@ -336,12 +338,20 @@ export default class Progress extends Component {
 					<VedioCheck type={"create"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
+					safety_vedioChangeCheck_visible && 
+					<VedioCheck type={"change"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
 					safety_vedioDeleteCheck_visible &&
 					<VedioCheck type={"strike"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>					
 				}
 				{
 					safety_vedioInfoCheck_visible && 
 					<VedioInfoCheck type={"create"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					safety_vedioInfoChangeCheck_visible && 
+					<VedioInfoCheck type={"change"} wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
 				{
 					safety_vedioInfoDeleteCheck_visible && 
@@ -550,11 +560,17 @@ export default class Progress extends Component {
 			case "视频监控批量录入":
 				changeDatareportVisible({key:'safety_vedioCheck_visible',value:true})
 				break;
+			case '视频监控数据修改':
+				changeDatareportVisible({key:'safety_vedioChangeCheck_visible',value:true})
+				break;
 			case "视频监控数据删除":
 				changeDatareportVisible({key:'safety_vedioDeleteCheck_visible',value:true})				
 				break;
 			case "影像信息批量录入":
 				changeDatareportVisible({key:'safety_vedioInfoCheck_visible',value:true})
+				break;
+			case "影像信息数据修改":
+				changeDatareportVisible({key:'safety_vedioInfoChangeCheck_visible',value:true})
 				break;
 			case "影像信息数据删除":
 				changeDatareportVisible({key:'safety_vedioInfoDeleteCheck_visible',value:true})

@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import {Row, Col, Table, Upload, Button, Icon, Popconfirm} from 'antd';
+import {Row, Col, Table, Upload, Button, Icon, Popconfirm, Input} from 'antd';
 import './index.less';
 import {FILE_API} from '_platform/api';
 import {uploadFile} from './commonFunc';
 
 export default class VedioInfoTable extends Component{
+
+    page = 1;   //当前页数
     
     render(){
         const {dataSource=[], loading=false, storeSelectRows=null} = this.props;
@@ -23,7 +25,8 @@ export default class VedioInfoTable extends Component{
                 pagination={{
                     defaultPageSize: 10,
                     showQuickJumper: true,
-                    showTotal: showTotal
+                    showTotal: showTotal,
+                    onChange: (page)=>{this.page = page}
                 }}
                 rowSelection={rowSelection}
                 bordered
@@ -62,13 +65,36 @@ export default class VedioInfoTable extends Component{
     }
 
     fileRemove = async (index)=>{
-        const {dataSource, storeExcelData, actions:{deleteStaticFile}} = this.props,
-            {file:{ id }} = dataSource[index];
-        await deleteStaticFile({id:id});
-
+        const {dataSource, storeExcelData, edit=false} = this.props;
+        if(!edit){
+            const {actions:{deleteStaticFile}} = this.props,
+                {file:{ id }} = dataSource[index];
+            await deleteStaticFile({id:id});            
+        }
         let sourceData = JSON.parse(JSON.stringify(dataSource));
+        if(edit){
+            Object.assign(sourceData[index],{
+                deleteFile: sourceData[index].file
+            })
+        }
         delete sourceData[index].file;
         storeExcelData(sourceData);
+    }
+
+    renderColumns = (text,index,dataIndex)=>{
+        const {edit = false} = this.props;
+        return(
+            <EditableCell
+              editable={edit}
+              value={text}
+              onChange={value => this.handleChange(value,index,dataIndex)}
+            />
+        )
+    }
+    handleChange = (value,index,dataIndex)=>{
+        const {storeExcelData,dataSource} = this.props;
+        dataSource[(this.page-1)*10 + index][dataIndex] = value;
+        storeExcelData(dataSource);
     }
 
     columns = [{
@@ -113,7 +139,8 @@ export default class VedioInfoTable extends Component{
         }
     },{
         title: '拍摄时间',
-        dataIndex: 'ShootingDate'
+        dataIndex: 'ShootingDate',
+        render: (text,record,index) => this.renderColumns(text,index,'ShootingDate')
     }];
 
     operation = {
@@ -153,3 +180,12 @@ const popAttribute = {
     okText: "确认",
     cancelText: "取消"
 }
+
+const EditableCell = ({ editable, value, onChange }) => (
+    <div>
+      {editable
+        ? <Input style={{ margin: '-5px' }} value={value} onChange={e => onChange(e.target.value)} />
+        : value
+      }
+    </div>
+);

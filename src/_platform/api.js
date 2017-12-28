@@ -19,19 +19,18 @@
 */
 window.config = window.config || {};
 
-let DOMAIN, DOMAIN2, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP,NODE_FILE_STATIC_API;
+let DOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
 
 DOMAIN = window.config.DOMAIN;
 USER = window.config.STATIC_FILE_USER;
 PASSWORD = window.config.STATIC_FILE_PASSWORD;
-DOMAIN2 = window.config.DOMAIN2;
 STATIC_FILE_IP = window.config.STATIC_FILE_IP;
-NODE_FILE_STATIC_API = window.config.NODE_FILE_STATIC_API;
+
 
 /***********************公共资源服务**************************/
 export { DOMAIN, USER, PASSWORD, TREE_CODE };
 export const CODE_PROJECT = '前海BIM';
-export const base = `${DOMAIN}:${window.config.API_PORT}`;
+export const base = `${DOMAIN}`;
 export const EXCHANGE_API = `${DOMAIN}:${window.config.DOC_EXCHANGE_PORT}`;
 export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
 export const USER_API = `${base}/accounts/api`;
@@ -41,10 +40,9 @@ export const WORKFLOW_API = `${base}/service/workflow/api`;
 export const PDF_FILE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
 export const DOWNLOAD_FILE = `${STATIC_FILE_IP}:${window.config.STATIC_DOWNLOAD_PORT}`;
 export const CUS_TILEMAP = window.config.cus_tilemap;
-export const CODE_API = window.config.CODE_API;
-export const NODE_FILE_EXCHANGE_API = `${NODE_FILE_STATIC_API}:${window.config.NODE_FILE_EXCHANGE_PORT}`;
+export const CODE_API = window.config.DOC_EXCHANGE_URL;
 export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
-
+export const NODE_FILE_EXCHANGE_API = window.config.NODE_FILE_STATIC_URL;
 //FDBServer API
 export const FDBSERVICE_API = `${window.config.FDBServer_API}`;
 export const SAFETY_MONITOR = `${base}/service/appserver`;
@@ -82,11 +80,7 @@ export const FOREST_API = `${window.config.FORESTDOMAIN}:${window.config.FORESTP
 //苗圃定位模板
 export const nurseryLocation_template = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('nurseryLocation.xlsx');
 
-
-
-
-
-export const SubItem_WordTemplate = `${window.config.NODE_FILE_STATIC_API}` + '/media/documents/meta/' + encodeURI('分项工程质量验收记录模板.docx')
+export const SubItem_WordTemplate = `${window.config.NODE_FILE_STATIC_URL}` + '/media/documents/meta/' + encodeURI('分项工程质量验收记录模板.docx')
 export const Fenbu_WordTemplate = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('分部子分部工程质量验收记录_ibqFgFg.docx')
 export const Danwei_WordTemplate = STATIC_DOWNLOAD_API + "/media/documents/2017/10/%E5%8D%95%E4%BD%8D%E5%AD%90%E5%8D%95%E4%BD%8D%E5%B7%A5%E7%A8%8B%E8%B4%A8%E9%87%8F%E9%AA%8C%E6%94%B6%E8%AE%B0%E5%BD%952.docx";
 //检验批
@@ -111,7 +105,7 @@ export const ESTIMATET = STATIC_DOWNLOAD_API + '/media/documents/meta/zjt-05_.xl
 export const CONSTRACTT = STATIC_DOWNLOAD_API + '/media/documents/meta/zjt-03_.xlsx';
 export const WORKT = STATIC_DOWNLOAD_API + '/media/documents/meta/template.xlsx';
 //造价管理模块api
-export const UPLOADFILE_API = DOMAIN + window.config.STATIC_UPLOAD_PORT + '/api/user/files/';
+export const UPLOADFILE_API = STATIC_FILE_IP + window.config.STATIC_UPLOAD_PORT + '/api/user/files/';
 //视频监控
 //三维全景
 //720云预览API
@@ -133,6 +127,29 @@ export const DATASOURCEDIRTYPECODE = "dataresource_dir_type"
 //数据目录-项目
 export const DATASOURCEDIRITEMNAME = 'dataresourceDirItem'
 export const DATASOURCEDIRITEMCODE = "dataresource_dir_item"
+
+//数据报送模板下载
+export const DataReportTemplate_SafetyFile = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('安全文档数据填报模版.xlsx');
+export const DataReportTemplate_SafetyHiddenDanger = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('安全隐患数据填报模版.xlsx');
+export const DataReportTemplate_SafetySpecial = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('安全专项数据填报模版.xlsx');
+export const DataReportTemplate_ConstructionUnits = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('参建单位数据填报模版.xlsx');
+export const DataReportTemplate_UnitProject = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('单位工程数据填报模版.xlsx');
+export const DataReportTemplate_SubdivisionUnitProjectAcceptance = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('分部分项单位项目验收信息表.xlsx');
+export const DataReportTemplate_ProjectVolumeSettlement = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('工程量结算数据填报模版.xlsx');
+export const DataReportTemplate_ValuationList = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('计价清单数据填报模版.xlsx');
+export const DataReportTemplate_SettlementPlan = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('结算计划数据填报模版.xlsx');
+export const DataReportTemplate_SettlementProgress = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('结算进度数据填报模版.xlsx');
+export const DataReportTemplate_ModelType = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('模型类型附件数据填报模版.xlsx');
+export const DataReportTemplate_ModalInformation = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('模型信息数据填报模版.xlsx');
+export const DataReportTemplate_PersonInformation = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('人员信息数据填报模版.xlsx');
+export const DataReportTemplate_DesignProgress = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('设计进度数据填报模版.xlsx');
+export const DataReportTemplate_DesignInformation = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('设计信息数据填报模版.xlsx');
+export const DataReportTemplate_ConstructionProgress = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('施工进度数据填报模版.xlsx');
+export const DataReportTemplate_VideoMonitor = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('视频监控数据填报模版.xlsx');
+export const DataReportTemplate_ProjectInformation = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('项目信息数据填报模版.xlsx');
+export const DataReportTemplate_ImageInformation = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('影像信息数据填报模版.xlsx');
+export const DataReportTemplate_Organization = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('组织机构数据填报模版.xlsx');
+export const DataReportTemplate_QualityProblem = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('质量问题信息表模版.xlsx');
 
 /***********************临时资源服务**************************/
 

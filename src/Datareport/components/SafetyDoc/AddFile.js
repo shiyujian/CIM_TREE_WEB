@@ -61,25 +61,30 @@ export default class AddFile extends Component {
             return false;
         }
     }
-    uplodachange = (info) => {
-        //info.file.status/response
+    uplodachange = async (info) => {
+        const {actions:{getOrg}} = this.props;
         if (info && info.file && info.file.status === 'done') {
-            notification.success({
-                message: '上传成功！',
-                duration: 2
-            });
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
+                let judge = await getOrg({code:dataList[i][2]});
+                if(!judge.code){
+                    message.info("您的第"+ i +"条发布单位输入有误，请确认");
+                    return;
+                }
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
                     filename: dataList[i][1] ? dataList[i][1] : '',
-                    pubUnit: dataList[i][2] ? dataList[i][2] : '',
+                    pubUnit: {
+                        code:judge.code ? judge.code :dataList[i][2],
+                        name :judge.name ? judge.name : "",
+                        type: judge.type ? judge.type : ""
+                    },
                     type: dataList[i][3] ? dataList[i][3] : '',
                     doTime: dataList[i][4] ? dataList[i][4] : '',
                     remark: dataList[i][5] ? dataList[i][5] : '',
-                    upPeople:getUser().person_name,
+                    upPeople:getUser().username,
                     project:{
                         code:"",
                         name:"",
@@ -96,6 +101,10 @@ export default class AddFile extends Component {
                     
                 })
             }
+            notification.success({
+                message: '上传成功！',
+                duration: 2
+            });
             this.setState({ dataSource });
         }
     }
@@ -310,6 +319,34 @@ export default class AddFile extends Component {
         return false;
     }
 
+    tableDataChange1(index ,e ){
+		const { dataSource } = this.state;
+		dataSource[index]['pubUnit'] = {
+            name: '',
+            code: e.target.value,
+            type: ''
+        }
+	  	this.setState({dataSource});
+    }
+
+    //校验组织机构
+    fixOrg(index){
+        const {actions:{getOrg}} = this.props;
+        let {dataSource} = this.state;
+        getOrg({code:dataSource[index].pubUnit.code}).then(rst => {
+            if(rst.code){
+                dataSource[index]['pubUnit'] = {
+                    name: rst.name,
+                    code: rst.code,
+                    type: rst.obj_type
+                }
+                this.setState({dataSource});
+            }else{
+                message.info("输错了")
+            }
+        })
+    }
+
     render() {
         const columns = [
             {
@@ -324,6 +361,13 @@ export default class AddFile extends Component {
                 title:'发布单位',
                 dataIndex:'pubUnit',
                 width: '10%',
+                render: (text, record, index) => {
+                    if(record.pubUnit && record.pubUnit.name){
+                        return record.pubUnit.name
+                    }else{
+                        return (<Input style={{color:'red'}} value={record.pubUnit ? record.pubUnit.code : ''} onBlur={this.fixOrg.bind(this,index)} onChange={this.tableDataChange1.bind(this,index)}/>)
+                    }
+                },
             },{
                 title:'版本号',
                 dataIndex:'type',
@@ -401,7 +445,6 @@ export default class AddFile extends Component {
                     pagination={{ pageSize: 10 }}
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
-                    <Col><Button style={{ margin:'10px 10px 10px 0px' }}>模板下载</Button></Col>
                     <Col>
                         <Upload
                             onChange={this.uplodachange.bind(this)}

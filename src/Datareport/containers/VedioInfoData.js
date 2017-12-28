@@ -1,13 +1,15 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import {message} from 'antd';
 
 import {Main,Content, DynamicTitle} from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 
-import {InfoUploadModal,InfoDeleteModal,VedioInfoTable,MainHeader} from '../components/VedioData';
+import {InfoUploadModal,InfoChangeModal,InfoDeleteModal,VedioInfoTable,MainHeader} from '../components/VedioData';
 import { actions } from '../store/vedioData';
 import {addSerialNumber} from '../components/VedioData/commonFunc';
+import {DataReportTemplate_ImageInformation} from '_platform/api.js';
 
 @connect(
 	state => {
@@ -26,6 +28,7 @@ export default class VedioInfoData extends Component {
 		this.state={
 			loading:true,
 			uploadModal: false,
+			changeModal: false,
 			deleteModal: false,
 			dataSource: [],
 			selectRows: []
@@ -46,8 +49,8 @@ export default class VedioInfoData extends Component {
     }
 
 	render() {
-		const {uploadModal,deleteModal,dataSource,loading,selectRows} = this.state,
-			{actions:{jsonToExcel}} = this.props;
+		const {uploadModal,changeModal,deleteModal,dataSource,loading,selectRows} = this.state,
+			{actions,actions:{jsonToExcel}} = this.props;
 
 		return (<Main>
 			<DynamicTitle title="影像信息" {...this.props} />
@@ -57,6 +60,8 @@ export default class VedioInfoData extends Component {
 				 selectJudge={this.selectJudge}
 				 jsonToExcel={jsonToExcel}
 				 deriveData={this.deriveData}
+				 storeDateSource={this.storeDateSource}
+				 modalDown={DataReportTemplate_ImageInformation}
 				/>
 				<VedioInfoTable
 				dataSource={dataSource}
@@ -67,15 +72,22 @@ export default class VedioInfoData extends Component {
 			<InfoUploadModal
 			 key={`uploadModal${uploadModal}`}
 			 uploadModal={uploadModal}
-			 actions = {this.props.actions}
+			 actions = {actions}
 			 closeModal={this.closeModal}
+			/>
+			<InfoChangeModal
+			 key={`changeModal${changeModal}`}
+			 changeModal={changeModal}
+			 closeModal={this.closeModal}
+			 dataSource={selectRows}
+			 actions={actions}
 			/>
 			<InfoDeleteModal
 			 key={`deleteModal${deleteModal}`}
 			 deleteModal={deleteModal}
 			 closeModal={this.closeModal}
 			 dataSource={selectRows}
-			 actions = {this.props.actions}
+			 actions = {actions}
 			/>
 		</Main>)
 	}
@@ -131,5 +143,9 @@ export default class VedioInfoData extends Component {
 			const {index,projectName,enginner,ShootingDate,file:{name},code} = item;
 			return [index,projectName,enginner,ShootingDate,name,code]
 		})
+	}
+
+	storeDateSource = (dataSource)=>{
+		this.setState({dataSource});
 	}
 };

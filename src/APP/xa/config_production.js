@@ -24,13 +24,7 @@ window.config = {
 	
 	/***********************公共资源服务**************************/
 	//基础服务域名
-	'DOMAIN': 'http://192.168.3.33',
-	'DOMAIN2':'http://192.168.3.33',
-	//基础服务端口
-	'API_PORT': '6530',
-
-	'DNG_PORT': '6511', // DNG 端口
-	'USER': 'bimqh',
+	'DOMAIN': 'http://192.168.3.33:6530',
 
 	//静态文件存储服务IP
 	'STATIC_FILE_IP':'http://192.168.3.33',
@@ -45,14 +39,12 @@ window.config = {
 	'STATIC_FILE_PASSWORD':'ecidibim',
 	
 	//现场收发文接口的端口
-	'DOC_EXCHANGE_PORT': '6545',
+	'DOC_EXCHANGE_URL': 'http://192.168.3.33:6545',
 	//现场收发文接口验证用的用户名和密码
 	'DOC_EXCHANGE_USER_PASSWORD': 'bimqh:bimqh',
-	'CODE_API': 'http://192.168.3.33:6556',
+
 	//node服务,验评表单转化Word
-	'NODE_FILE_EXCHANGE_PORT': '6546',
-	//'NODE_FILE_EXCHANGE_PORT': '6525',
-	'NODE_FILE_STATIC_API': 'http://10.215.160.45:6511',
+	'NODE_FILE_STATIC_URL': 'http://10.215.160.45:6546',
 	
 	//word在线预览地址
 	'previewWord_API': 'http://192.168.3.94:9000/view/url?url=',

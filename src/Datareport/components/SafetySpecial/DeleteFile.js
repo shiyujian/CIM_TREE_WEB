@@ -9,7 +9,7 @@ export default class DeleteFile extends Component {
     constructor(props, state) {
         super(props);
         this.state = {
-            dataSource: [],
+            dataSource: this.props.subDataSource,
             deleteInfoNew: '',
             users: [],
             projects: [],
@@ -23,18 +23,18 @@ export default class DeleteFile extends Component {
         };
     }
     componentDidMount() {
-        console.log('vip-state', this.props);
-        const dataSource = this.props.subDataSource;
-        this.setState({
-            dataSource,
-        })
+        // console.log('vip-state', this.props);
+        // const dataSource = this.props.subDataSource;
+        // this.setState({
+        //     dataSource,
+        // })
 
         // 下拉框
         const { actions: { getAllUsers, getProjectTree } } = this.props;
         getAllUsers().then(rst => {
-            let checkers = rst.map(o => {
+            let checkers = rst.map((o, index) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
             this.setState({ checkers })
@@ -47,7 +47,7 @@ export default class DeleteFile extends Component {
     }
 
     paginationOnChange(e) {
-        console.log('vip-分页', e);
+        // console.log('vip-分页', e);
     }
     render() {
         const formItemLayout = {
@@ -104,7 +104,7 @@ export default class DeleteFile extends Component {
             ,
             {
                 title: '附件',
-			    width: '10%',
+                width: '10%',
                 render: (text, record) => {
                     return (<span>
                         <a onClick={this.handlePreview.bind(this, record.codeId, record.i)}>预览</a>
@@ -112,8 +112,8 @@ export default class DeleteFile extends Component {
                         <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                     </span>)
                 }
-                }
-            , 
+            }
+            ,
             {
                 title: '操作',
                 render: (text, record, index) => {
@@ -122,7 +122,7 @@ export default class DeleteFile extends Component {
                             placement="leftTop"
                             title="确定删除吗？"
                             // onConfirm={this.delete.bind(this, index, record.i)}
-                            onConfirm={this.delete.bind(this, index)}
+                            onConfirm={this.delete.bind(this, record)}
                             okText="确认"
                             cancelText="取消">
                             <a>删除</a>
@@ -196,11 +196,14 @@ export default class DeleteFile extends Component {
     }; // render
 
     //删除
-    delete(index) {
-        // debugger;
+    delete(record) {
         let { dataSource } = this.state;
-        dataSource.splice(index, 1);
-        this.setState({ dataSource });
+        this.setState({
+            ...this.state,
+            dataSource: dataSource.filter((item, i) => {
+                return item.index !== record.index;
+            })
+        });
     }
 
     onok() {

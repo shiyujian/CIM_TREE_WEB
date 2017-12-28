@@ -42,10 +42,7 @@ export default class WorkModal extends Component {
 	render() {
 		const columns = [{
 			title: '序号',
-			dataIndex: 'index',
-			render:(text,record,index) => {
-				return index+1
-			}
+			dataIndex: 'key',
 		}, {
 			title: 'WBS编码',
 			dataIndex: 'code'
@@ -146,7 +143,7 @@ export default class WorkModal extends Component {
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 					 bordered 
 					 columns={columns}
-					 rowKey='index' 
+					 rowKey='key' 
                      dataSource={this.state.dataSource}
 					/>
 					<Upload {...props}>
@@ -162,7 +159,6 @@ export default class WorkModal extends Component {
                             }
                         </Select>
                     </span> 
-                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
 				</div>
 				<div style={{marginTop:20}}>
                     注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
@@ -240,6 +236,7 @@ export default class WorkModal extends Component {
         data.splice(0,1);
         let res = data.map((item,index) => {
             return {
+                key:index+1,
                 code:item[0],
                 name:item[1],
                 construct_unit:item[2],

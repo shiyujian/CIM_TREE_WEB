@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_SafetySpecial } from '_platform/api';
 import Preview from '../../../_platform/components/layout/Preview';
+import index from 'antd/lib/icon';
 
 const Search = Input.Search;
 const FormItem = Form.Item;
@@ -43,8 +44,23 @@ export default class ToggleModal extends Component {
                     rowKey={(item, index) => index}
                 >
                 </Table>
+                <Row>
+                    {
+                        !this.state.dataSource.length ? <p></p>
+                            :
+                            (
+                                <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                                    [共：{this.state.dataSource.length}行]
+								</Col>
+                            )
+                    }
+                </Row>
                 <Row style={{ marginBottom: "30px" }} type="flex">
-                    <Col><Button style={{ margin: '10px 10px 10px 0px' }}>模板下载</Button></Col>
+                    <Col><Button
+                        style={{ margin: '10px 10px 10px 0px' }}
+                        onClick={this.DownloadFile.bind(this, "重大安全专项方案", DataReportTemplate_SafetySpecial)}
+
+                    >模板下载</Button></Col>
                     <Col>
                         <Upload
                             onChange={this.uplodachange.bind(this)}
@@ -72,6 +88,7 @@ export default class ToggleModal extends Component {
                         <span>
                             项目-单位工程：
                    <Cascader
+                                style={{ width: '300px' }}
                                 options={this.state.options}
                                 className='btn'
                                 loadData={this.loadData.bind(this)}
@@ -93,24 +110,31 @@ export default class ToggleModal extends Component {
         )
     }
 
+    // 下载模板
+    DownloadFile(name, url) {
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
     selectChecker(value) {
         let check = JSON.parse(value);
         this.setState({ check })
     }
-    // parseTime(time){
-    //     return new Data(time)
-    // }
 
     uplodachange(info) {
-        //info.file.status/response
         if (info && info.file && info.file.status === 'done') {
-            // notification.success({
-            //     message: '上传成功！',
-            //     duration: 2
-            // });
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
+            // 模板判断
+            if (dataList[0][1] !== "重大安全专项方案") {
+                message.error('Excel模板不相符，请下载最新模板！');
+                return;
+            }
             let dataSource = [];
             for (let i = 2; i < dataList.length; i++) {
                 dataSource.push({
@@ -125,7 +149,7 @@ export default class ToggleModal extends Component {
                     reviewPerson: dataList[i][8] ? dataList[i][8] : '',
                     remark: dataList[i][9] ? dataList[i][9] : '',
                     wbs: dataList[i][9] ? dataList[i][9] : '',
-                    // code: dataList[i][9] ? dataList[i][9] : '',
+                    fj: dataList[i][10] ? dataList[i][10] : '',
                     code: '05',
                     project: {
                         code: "",
@@ -146,8 +170,6 @@ export default class ToggleModal extends Component {
     }
 
     onSelectProject(value, selectedOptions) {
-        console.log('vip-value', value)
-        console.log('vip-selectedOptions', selectedOptions)
         let project = {};
         let unit = {};
         if (value.length === 2) {
@@ -233,8 +255,6 @@ export default class ToggleModal extends Component {
         }
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
         this.props.setData(this.state.dataSource, per);
-        console.log('vip-per', per);
-        console.log('vip-dataSource', this.state.dataSource);
 
         ModalVisible(false);
         notification.success({
@@ -250,9 +270,9 @@ export default class ToggleModal extends Component {
     componentDidMount() {
         const { actions: { getAllUsers, getProjectTree } } = this.props;
         getAllUsers().then(rst => {
-            let checkers = rst.map(o => {
+            let checkers = rst.map((o, index) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
             this.setState({ checkers })
@@ -313,19 +333,7 @@ export default class ToggleModal extends Component {
                 download_url: filedata.download_url,
                 mime_type: resp.mime_type
             };
-            let unitProject = {
-                name: unit.name,
-                code: unit.code,
-                obj_type: unit.obj_type
-            }
-            let projectt = {
-                name: project.name,
-                code: project.code,
-                obj_type: project.obj_type
-            }
             dataSource[index]['file'] = attachment;
-            dataSource[index]['unit'] = unitProject;
-            dataSource[index]['project'] = projectt;
             this.setState({ dataSource })
         });
         return false;
@@ -333,51 +341,42 @@ export default class ToggleModal extends Component {
 
 
     //附件删除
-    remove(index) {
+    remove(index, record) {
         const { actions: { deleteStaticFile } } = this.props
         let { dataSource } = this.state
-        let id = dataSource[index]['file'].id
+        // let id = dataSource[index]['file'].id
+        let file = {};
+        file = dataSource.filter((item, i) => {
+            return item.index === record.index;
+        })
+        let id = file.id
         deleteStaticFile({ id: id })
-        let rate = dataSource[index].rate
-        let level = dataSource[index].level
-        dataSource[index] = {
-            rate: rate,
-            level: level,
-            name: "",
-            project: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            unit: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            construct_unit: {
-                code: "",
-                name: "",
-                type: "",
-            },
-            file: {
-
-            }
-        }
+        dataSource[index]['file'] = {}
         this.setState({ dataSource })
     }
     //删除
-    delete(index) {
-        // debugger;
+    delete(index, record) {
         let { dataSource } = this.state;
-        dataSource.splice(index, 1);
-        this.setState({ dataSource });
+        // dataSource.splice(index, 1);
+        this.setState({
+            ...this.state,
+            dataSource: dataSource.filter((item, i) => {
+                return item.index !== record.index;
+            })
+        });
     }
 
     //预览
-    handlePreview(index) {
+    handlePreview(index, record) {
         // debugger;
         const { actions: { openPreview } } = this.props;
-        let f = this.state.dataSource[index].file
+        // let f = this.state.dataSource[index].file
+        let { dataSource } = this.state;
+        let ff = {}, f = {};
+        ff = dataSource.filter((item, i) => {
+            return item.codeId === codeId;
+        });
+        f = ff[0].file;
         let filed = {}
         filed.misc = f.misc;
         filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -409,7 +408,6 @@ export default class ToggleModal extends Component {
         let beginUnit = '';
         let i = 0;
         getProjectTree({ depth: 2 }).then(rst => {
-            console.log('vip-rst', rst);
             if (rst.status) {
                 let units = [];
                 rst.children.map(item => {
@@ -435,8 +433,11 @@ export default class ToggleModal extends Component {
     columns = [
         {
             title: '序号',
-            dataIndex: 'index',
+            dataIndex: 'index1',
             width: '5%',
+            render: (text, record, index1) => {
+                return record.index
+            }
         }
         ,
         // {
@@ -490,15 +491,15 @@ export default class ToggleModal extends Component {
         , {
             title: '附件',
             width: "15%",
-            render: (text, record, index) => {
+            render: (text, record, index1) => {
                 if (record.file.id) {
                     return (<span>
-                        <a onClick={this.handlePreview.bind(this, index)}>预览</a>
+                        <a onClick={this.handlePreview.bind(this, index1, record)}>预览</a>
                         <span className="ant-divider" />
                         <Popconfirm
                             placement="leftTop"
                             title="确定删除吗？"
-                            onConfirm={this.remove.bind(this, index)}
+                            onConfirm={this.remove.bind(this, index1, record)}
                             okText="确认"
                             cancelText="取消">
                             <a>删除</a>
@@ -507,7 +508,7 @@ export default class ToggleModal extends Component {
                 } else {
                     return (
                         <span>
-                            <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index)}>
+                            <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index1)}>
                                 <Button>
                                     <Icon type="upload" />上传附件
                             </Button>
@@ -518,12 +519,12 @@ export default class ToggleModal extends Component {
             }
         }, {
             title: '操作',
-            render: (text, record, index) => {
+            render: (text, record, index1) => {
                 return (
                     <Popconfirm
                         placement="leftTop"
                         title="确定删除吗？"
-                        onConfirm={this.delete.bind(this, index)}
+                        onConfirm={this.delete.bind(this, index1, record)}
                         okText="确认"
                         cancelText="取消">
                         <a>删除</a>

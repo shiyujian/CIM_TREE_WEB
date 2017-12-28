@@ -49,6 +49,14 @@ export default class AddFile extends Component {
     }
     beforeUpload = (info) => {
         if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
+            const {unit} = this.state;
+            if(!unit.code){
+                notification.warning({
+                    message: '先选择单位工程！',
+                    duration: 2
+                });
+                return false;
+            }
             return true;
         } else {
             notification.warning({
@@ -95,28 +103,44 @@ export default class AddFile extends Component {
         }
 		this.props.onok(this.state.dataSource,per);
     }
-    uplodachange = (info) => {
-        //info.file.status/response
+    uplodachange = async (info) => {
+        const {actions:{getOrg,getTreeRootNode}} = this.props;
+        const {unit} = this.state;
         if (info && info.file && info.file.status === 'done') {
-            notification.success({
-                message: '上传成功！',
-                duration: 2
-            });
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
+                let judge = await getOrg({code:dataList[i][2]});
+                if(!judge.code){
+                    message.info("您的第"+ i +"条责任单位输入有误，请确认");
+                    return;
+                }
+                let wbs = await getTreeRootNode({code:dataList[i][1]});
+                debugger
+                if(wbs && wbs.children[0] && wbs.children[0].children[0] && wbs.children[0].children[0].code){
+                    if(wbs.children[0].children[0].code !== unit.code){
+                        message.info("您的第"+ i +"条wbs编码输入有误，请确认");
+                    return;
+                    }
+                }else{
+                    return;
+                }
                 dataSource.push({
-                    resUnit: dataList[i][0] ? dataList[i][0] : '',
-                    type: dataList[i][1] ? dataList[i][1] : '',
-                    upTime: dataList[i][2] ? dataList[i][2] : '',
-                    checkTime: dataList[i][3] ? dataList[i][3] : '',
-                    editTime: dataList[i][4] ? dataList[i][4] : '',
-                    result: dataList[i][5] ? dataList[i][5] : '',
-                    deadline: dataList[i][6] ? dataList[i][6] : '',
-                    editResult: dataList[i][7] ? dataList[i][7] : '',
-                    code: dataList[i][7] ? dataList[i][7] : '',
-                    wbs: dataList[i][7] ? dataList[i][7] : '',
+                    code: dataList[i][0] ? dataList[i][0] : '',
+                    wbs: dataList[i][1] ? dataList[i][1] : '',
+                    resUnit: {
+                        code:judge.code ? judge.code :dataList[i][2],
+                        name :judge.name ? judge.name : "",
+                        type: judge.type ? judge.type : ""
+                    },
+                    type: dataList[i][3] ? dataList[i][3] : '',
+                    upTime: dataList[i][4] ? dataList[i][4] : '',
+                    checkTime: dataList[i][5] ? dataList[i][5] : '',
+                    editTime: dataList[i][6] ? dataList[i][6] : '',
+                    result: dataList[i][7] ? dataList[i][7] : '',
+                    deadline: dataList[i][8] ? dataList[i][8] : '',
+                    editResult: dataList[i][9] ? dataList[i][9] : '',
                     project:{
                         code:"",
                         name:"",
@@ -132,6 +156,10 @@ export default class AddFile extends Component {
                     }
                 })
             }
+            notification.success({
+                message: '上传成功！',
+                duration: 2
+            });
             this.setState({ dataSource });
         }
     }
@@ -310,6 +338,34 @@ export default class AddFile extends Component {
         return false;
     }
 
+    tableDataChange1(index ,e ){
+		const { dataSource } = this.state;
+		dataSource[index]['resUnit'] = {
+            name: '',
+            code: e.target.value,
+            type: ''
+        }
+	  	this.setState({dataSource});
+    }
+
+    //校验组织机构
+    fixOrg(index){
+        const {actions:{getOrg}} = this.props;
+        let {dataSource} = this.state;
+        getOrg({code:dataSource[index].resUnit.code}).then(rst => {
+            if(rst.code){
+                dataSource[index]['resUnit'] = {
+                    name: rst.name,
+                    code: rst.code,
+                    type: rst.obj_type
+                }
+                this.setState({dataSource});
+            }else{
+                message.info("输错了")
+            }
+        })
+    }
+
     render() {
         const columns = [
             {
@@ -324,6 +380,13 @@ export default class AddFile extends Component {
                 title: '责任单位',
                 dataIndex: 'resUnit',
                 width: '8%',
+                render: (text, record, index) => {
+                    if(record.resUnit && record.resUnit.name){
+                        return record.resUnit.name
+                    }else{
+                        return (<Input style={{color:'red'}} value={record.resUnit ? record.resUnit.code : ''} onBlur={this.fixOrg.bind(this,index)} onChange={this.tableDataChange1.bind(this,index)}/>)
+                    }
+                },
             }, {
                 title: '隐患类型',
                 dataIndex: 'type',
@@ -413,7 +476,6 @@ export default class AddFile extends Component {
                     pagination={{ pageSize: 10 }}
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
-                <Col><Button style={{ margin:'10px 10px 10px 0px' }}>模板下载</Button></Col>
                 <Col>
                     <Upload
                         onChange={this.uplodachange.bind(this)}

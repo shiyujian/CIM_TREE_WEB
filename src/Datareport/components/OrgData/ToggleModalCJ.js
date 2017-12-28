@@ -19,7 +19,8 @@ export default class ToggleModalCJ extends Component{
             defaultchecker: "",
             units:[],
             selectPro:[],
-            selectUnit:[]
+            selectUnit:[],
+            flag:''
         }
     }
     render(){
@@ -70,7 +71,6 @@ export default class ToggleModalCJ extends Component{
                         }
                     </Select>
                 </span> 
-                <Button type="primary" onClick = {this.onok.bind(this)}>提交</Button>
                <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
@@ -82,27 +82,45 @@ export default class ToggleModalCJ extends Component{
     }
      //处理上传excel的数据
      handleExcelData(data) {
-        const {actions:{getOrgReverse}} = this.props;
+        const {actions:{getOrgReverse, getCanjian}} = this.props;
         data.splice(0, 1);
-        let res = data.map((item, index) => {
-            return {
-                index: item[0],
-                // 组织机构类型
-                type:item[1],
-                code: item[2],
-                // 参建单位
-                canjian: item[3],
-                remarks: item[4]
-            }
-         })
-        this.setState({
-            dataSource:res
+        let res ;
+        data.map((item, index) => {
+            getCanjian({ code: item[1]}).then(rst => {
+                if (rst.code !== "code") {
+                    
+                }else{
+                    item[item.length] = "red"
+                    this.setState({
+                        flag:false
+                    })
+                }
+                res = data.map((item, index) => {
+                    return {
+                        index: item[0],
+                        // 组织机构类型
+                        type:item[1],
+                        code: item[2],
+                        // 参建单位
+                        canjian: item[3],
+                        remarks: item[4],
+                        color:item[5]
+                    }
+                })
+                this.setState({
+                    dataSource: res
+                })
+            })
         })
     }
     onok(){
         const { actions: { ModalVisibleCJ} } = this.props;
         if (!this.state.passer) {
             message.error('审批人未选择');
+            return;
+        }
+        if (this.state.flag === false) {
+            message.error('存在错误数据');
             return;
         }
         this.props.setDataCJ(this.state.dataSource, JSON.parse(this.state.passer));
@@ -209,8 +227,12 @@ export default class ToggleModalCJ extends Component{
         key: 'Code',
     }, {
         title: '机构类型',
-        dataIndex: 'type',
-        key: 'Type',
+        // dataIndex: 'type',
+        // key: 'Type',
+        render:(record) => {
+            console.log("record",record);
+            return (<span style={{color:record.color || ""}}>{record.type}</span>)
+        }
     }, {
         title: '参建单位名称',
         dataIndex: 'canjian',
@@ -239,8 +261,8 @@ export default class ToggleModalCJ extends Component{
                         })
                         this.setState({units})
                         console.log("this.state.units",this.state.units);
+                        this.forceUpdate();
                     });
-                    this.forceUpdate();
                 }} 
                 >
                     {ToggleModalCJ.lmyloop(this.state.projects)}

@@ -29,6 +29,11 @@ const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [],
 
 //导出数据
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
+
+//组织机构
+const getOrg = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`,[]);
+//根据子节点获取父节点
+const getTreeRootNode = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?root=false&reverse=true`, []);
 export const actions = {
     getScheduleDir,
     postScheduleDir,
@@ -41,7 +46,8 @@ export const actions = {
     getDocumentList,
     putDocument,
     searchDocument,
-    jsonToExcel
+    jsonToExcel,
+    getTreeRootNode
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress } from 'antd';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
+import {STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_DesignInformation} from '_platform/api';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
 export default class DesignTable extends Component {
@@ -10,6 +10,8 @@ export default class DesignTable extends Component {
 						'文档类型','专业','描述的WBS对象','描述的设计对象','上传人员'];
 		this.state = {
 			selectedRowKeys: [],
+			dataSource: [],
+			selectedDataSource: [],
 			alldatas:[],
 			showDs:[],
 			loading: false,
@@ -17,13 +19,16 @@ export default class DesignTable extends Component {
 		}
 	}
 	onSelectChange = (selectedRowKeys) => {
-		const {alldatas} = this.state;
+		const {alldatas,dataSource} = this.state;
 		const {actions: {changeModifyField,changeExpurgateField}} = this.props;
 		this.setState({selectedRowKeys});
 		let selectedDatas = [];
+		let selectedDataSource = [];
 		selectedRowKeys.forEach(key => {
-			selectedDatas.push(alldatas[key-1])
+			selectedDatas.push(alldatas[key-1]),
+			selectedDataSource.push(dataSource[key-1])
 		})
+		this.setState({selectedDataSource})
 		changeModifyField('selectedDatas',selectedDatas)
 		changeExpurgateField('selectedDatas',selectedDatas)
 	}
@@ -152,7 +157,7 @@ export default class DesignTable extends Component {
 		return (
 			<div >
 				<Row >
-					<Button style={{marginRight:10}} type="default">模板下载</Button>
+					<Button style={{marginRight:10}} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_DesignInformation}`)} type="default">模板下载</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleAddition.bind(this)} type="default" >发起填报</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleModify.bind(this)} type="default">申请变更</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleExpurgate.bind(this)} type="default">申请删除</Button>
@@ -181,6 +186,7 @@ export default class DesignTable extends Component {
 					<Table
 						bordered
 						columns={columns}
+						pagination={{pageSize:10,showSizeChanger:true,showQuickJumper:true}}
 						rowSelection={rowSelection}
 						dataSource={this.state.showDs}
 						rowKey="index"
@@ -251,10 +257,14 @@ export default class DesignTable extends Component {
     //数据导出
     getExcel(){
         const {actions:{jsonToExcel}} = this.props;
-        const {showDs} = this.state;
+        const {selectedDataSource} = this.state;
+        if(selectedDataSource.length === 0){
+        	message.warning('请先选择数据再导出')
+        	return
+        }
         let rows = [];
         rows.push(this.header);
-        showDs.map(item => {
+        this.addindex(selectedDataSource).map(item => {
             rows.push([item.num,item.code,item.filename,item.project.name,item.unit.name,item.stage,item.pubUnit,item.filetype,item.major,item.wbsObject,item.designObject,item.upPeople]);
         })
         jsonToExcel({},{rows:rows})

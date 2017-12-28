@@ -10,7 +10,7 @@ import { DesignModal, DesignDel, DesignChange } from '../components/ScheduleData
 import './quality.less';
 import { getNextStates } from '_platform/components/Progress/util';
 import moment from 'moment';
-import { WORKFLOW_CODE } from '_platform/api.js';
+import { WORKFLOW_CODE, NODE_FILE_EXCHANGE_API, DataReportTemplate_DesignProgress } from '_platform/api.js';
 import Preview from '../../_platform/components/layout/Preview';
 const Search = Input.Search;
 @connect(
@@ -27,7 +27,8 @@ export default class DesignScheduleData extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
-			totalData:null,
+			showDs: [],
+			totalData: null,
 			loading: false,
 			selectedRowKeys: [],
 			dataSourceSelected: [],
@@ -53,13 +54,15 @@ export default class DesignScheduleData extends Component {
 	}
 	async generateTableData(data) {
 		const { actions: { getDocument, } } = this.props;
+		const { loading } = this.state;
+		this.setState({ loading: true });
 		let dataSource = [];
 		let i = 0;
 		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
 				i++
 				let temp = {
-					key:i,
+					key: i,
 					code: single.extra_params.code,
 					volume: single.extra_params.volume,
 					name: single.extra_params.name,
@@ -72,15 +75,15 @@ export default class DesignScheduleData extends Component {
 					delcode: single.code,
 				}
 				dataSource.push(temp);
-				this.setState({ dataSource ,showDat:dataSource});
+				this.setState({ dataSource, showDat: dataSource, loading: false });
 			})
 		})
 	}
 	goCancel = () => {
 		this.setState({ setAddVisiable: false, setDeleteVisiable: false, setEditVisiable: false });
 	}
-	onSelectChange = (selectedRowKeys,selectedRows) => {
-        this.setState({selectedRowKeys,dataSourceSelected:selectedRows});
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
 	}
 	// 批量录入流程
 	setAddData = (data, participants) => {
@@ -203,7 +206,7 @@ export default class DesignScheduleData extends Component {
 		})
 	}
 	onBtnClick = (type) => {
-		const {selectedRowKeys} = this.state
+		const { selectedRowKeys } = this.state
 		if (type === "add") {
 			this.setState({ setAddVisiable: true });
 		} else if (type === "delete") {
@@ -220,6 +223,32 @@ export default class DesignScheduleData extends Component {
 			this.setState({ setEditVisiable: true });
 		}
 	}
+
+	//模板下载
+	createLink = (name, url) => {    //下载
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download', this);
+		link.setAttribute('target', '_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+	//数据导出
+	getExcel() {
+		const { actions: { jsonToExcel } } = this.props;
+		const { dataSourceSelected } = this.state;
+		let rows = [];
+		rows.push(["编码", "卷册", "名称", "项目/子项目", "单位工程", "专业", "实际供图时间", "设计单位", "上传人员"]);
+
+		dataSourceSelected.map(item => {
+			rows.push([item.code, item.volume, item.name, item.project, item.unit, item.major, item.factovertime, item.designunit, item.uploads]);
+		})
+		jsonToExcel({}, { rows: rows })
+			.then(rst => {
+				this.createLink(this, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
+			})
+	}
 	render() {
 		const { selectedRowKeys } = this.state;
 		const rowSelection = {
@@ -230,11 +259,11 @@ export default class DesignScheduleData extends Component {
 			<div style={{ overflow: 'hidden', padding: 20 }}>
 				<DynamicTitle title="设计进度" {...this.props} />
 				<Row>
-					<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
+					<Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.createLink.bind(this, 'muban', `${DataReportTemplate_DesignProgress}`)}>模板下载</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('add')}>发起填报</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('edit')}>申请变更</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('delete')}>申请删除</Button>
-					<Button className="btn" type="default">导出表格</Button>
+					<Button className="btn" type="default" onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search
 						className="btn"
 						style={{ width: "200px" }}
@@ -261,6 +290,7 @@ export default class DesignScheduleData extends Component {
 							style={{ height: 380, marginTop: 20 }}
 							pagination={{ pageSize: 10 }}
 							rowKey='key'
+							loading={this.state.loading}
 						/>
 
 					</Col>
@@ -283,43 +313,43 @@ export default class DesignScheduleData extends Component {
 	}
 	columns = [{
 		title: '序号',
-		dataIndex:"key",
-		key:"key"
+		dataIndex: "key",
+		key: "key"
 	}, {
 		title: '编码',
 		dataIndex: 'code',
-		key:'code',
+		key: 'code',
 	}, {
 		title: '卷册',
 		dataIndex: 'volume',
-		key:'volume',
+		key: 'volume',
 	}, {
 		title: '名称',
 		dataIndex: 'name',
-		key:'name',
+		key: 'name',
 	}, {
 		title: '项目/子项目',
 		dataIndex: 'project',
-		key:'project',
+		key: 'project',
 	}, {
 		title: '单位工程',
 		dataIndex: 'unit',
-		key:'unit',
+		key: 'unit',
 	}, {
 		title: '专业',
 		dataIndex: 'major',
-		key:'major',
+		key: 'major',
 	}, {
 		title: '实际供图时间',
 		dataIndex: 'factovertime',
-		key:'factovertime',
+		key: 'factovertime',
 	}, {
 		title: '设计单位',
 		dataIndex: 'designunit',
-		key:'designunit',
+		key: 'designunit',
 	}, {
 		title: '上传人员',
 		dataIndex: 'uploads',
-		key:'uploads',
+		key: 'uploads',
 	}];
 }

@@ -10,7 +10,7 @@ import { WorkModal, WorkChange, WorkDel } from '../components/ScheduleData';
 import './quality.less';
 import { getNextStates } from '_platform/components/Progress/util';
 import moment from 'moment';
-import { WORKFLOW_CODE } from '_platform/api.js';
+import { WORKFLOW_CODE, NODE_FILE_EXCHANGE_API, DataReportTemplate_ConstructionProgress } from '_platform/api.js';
 import Preview from '../../_platform/components/layout/Preview';
 const Search = Input.Search;
 @connect(
@@ -27,6 +27,7 @@ export default class WorkScheduleData extends Component {
 		super(props);
 		this.state = {
 			dataSource: [],
+			showDs: [],
 			totalData: null,
 			loading: false,
 			selectedRowKeys: [],
@@ -41,6 +42,8 @@ export default class WorkScheduleData extends Component {
             getWorkDataList,
         } } = this.props;
 		let dataSource = [];
+		const { loading } = this.state;
+		this.setState({ loading: true })
 		getWorkDataList()
 			.then(data => {
 				data.result.map((single, i) => {
@@ -59,12 +62,12 @@ export default class WorkScheduleData extends Component {
 						factovertime: single.extra_params.factovertime,
 						uploads: single.extra_params.uploads,
 						delcode: single.code,
-						wpcode: single.extra_params.unit.code,
-						obj_type: single.extra_params.unit.obj_type,
-						pk: single.extra_params.unit.pk,
+						wpcode: single.extra_params.unit.code || single.extra_params.wpcode,
+						obj_type: single.extra_params.unit.obj_type || single.extra_params.obj_type,
+						pk: single.extra_params.unit.pk || single.extra_params.pk,
 					}
 					dataSource.push(temp);
-					this.setState({ dataSource,showDat:dataSource });
+					this.setState({ dataSource, showDat: dataSource, loading: false });
 				})
 			})
 
@@ -222,6 +225,43 @@ export default class WorkScheduleData extends Component {
 			this.setState({ setEditVisiable: true });
 		}
 	}
+	//模板下载
+	createLink = (name, url) => {    //下载
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download', this);
+		link.setAttribute('target', '_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+	//数据导出
+	getExcel() {
+		const { actions: { jsonToExcel } } = this.props;
+		const { dataSourceSelected } = this.state;
+		let rows = [];
+		rows.push(["WBS编码", "任务名称", "项目/子项目", "单位工程", "实施单位", "施工图工程量", "实际工程量", "计划开始时间", "计划结束时间", "实际开始时间", "实际结束时间", "上传人员"]); 
+		dataSourceSelected.map(item => {
+			rows.push([
+				item.code,
+				item.name,
+				item.project,
+				item.unit,
+				item.construct_unit,
+				item.quantity,
+				item.factquantity,
+				item.planstarttime,
+				item.planovertime,
+				item.factstarttime,
+				item.factovertime,
+				item.uploads,
+			]);
+		})
+		jsonToExcel({}, { rows: rows })
+			.then(rst => {
+				this.createLink(this, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
+			})
+	}
 
 
 	render() {
@@ -234,11 +274,11 @@ export default class WorkScheduleData extends Component {
 			<div style={{ overflow: 'hidden', padding: 20 }}>
 				<DynamicTitle title="施工进度" {...this.props} />
 				<Row>
-					<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
+					<Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.createLink.bind(this, 'muban', `${DataReportTemplate_ConstructionProgress}`)}>模板下载</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('add')}>发起填报</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('edit')}>申请变更</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('delete')}>申请删除</Button>
-					<Button className="btn" type="default">导出表格</Button>
+					<Button className="btn" type="default" onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search
 						className="btn"
 						style={{ width: "200px" }}
@@ -265,6 +305,7 @@ export default class WorkScheduleData extends Component {
 							style={{ height: 380, marginTop: 20 }}
 							pagination={{ pageSize: 10 }}
 							rowKey='key'
+							loading={this.state.loading}
 						/>
 					</Col>
 				</Row>
