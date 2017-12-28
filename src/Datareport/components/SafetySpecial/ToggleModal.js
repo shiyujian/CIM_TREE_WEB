@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
-import {
-    UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API
-    ,
-    DataReportTemplate_SafetyFile
-} from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_SafetySpecial } from '_platform/api';
 import Preview from '../../../_platform/components/layout/Preview';
 import index from 'antd/lib/icon';
 
@@ -51,7 +47,7 @@ export default class ToggleModal extends Component {
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col><Button
                         style={{ margin: '10px 10px 10px 0px' }}
-                        onClick={this.DownloadFile.bind(this, "安全专项导入模板", DataReportTemplate_SafetyFile)}
+                        onClick={this.DownloadFile.bind(this, "重大安全专项方案", DataReportTemplate_SafetySpecial)}
 
                     >模板下载</Button></Col>
                     <Col>
@@ -124,7 +120,7 @@ export default class ToggleModal extends Component {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             // 模板判断
-            if(dataList[0][1]!=="重大安全专项方案"){
+            if (dataList[0][1] !== "重大安全专项方案") {
                 message.error('Excel模板不相符，请下载最新模板！');
                 return;
             }
