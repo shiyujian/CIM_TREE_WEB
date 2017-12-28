@@ -109,7 +109,7 @@ export default class SumSpeedExamineDelete extends Component {
         const columns = [
             {
               title: "序号",
-              dataIndex: "number",
+              dataIndex: "key",
               render: (text, record, index) => {
                 return index + 1;
               }

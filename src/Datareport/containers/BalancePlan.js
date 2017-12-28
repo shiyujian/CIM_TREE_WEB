@@ -299,6 +299,9 @@ export default class BanlancePlan extends Component {
 		}, {
 			title: '备注',
 			dataIndex: 'remarks',
+			render:(text,record,index)=>{
+			  return record.remarks ?record.remarks :'—'
+			}
 		}]
 		return (
 			<div>
@@ -326,7 +329,7 @@ export default class BanlancePlan extends Component {
 							placeholder="请输入搜索条件"
 							onSearch={ text => {
 								let result = this.state.dataSource.filter(data => {
-									return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0;
+									return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.nodetarget.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0;
 								})
 								if( text === ''){
 									result = this.state.dataSource

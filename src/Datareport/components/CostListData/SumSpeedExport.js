@@ -46,15 +46,16 @@ export default class SumSpeedExport extends Component {
         //     message.info("请选择审核人")
         //     return;
         // }
-        let {check} = this.state;
-        let per = {
-            id:check.id,
-            username:check.username,
-            person_name:check.account.person_name,
-            person_code:check.account.person_code,
-            organization:check.account.organization
-        }
-		this.props.onok(this.state.dataSource,per);
+        // let {check} = this.state;
+        // let per = {
+        //     id:check.id,
+        //     username:check.username,
+        //     person_name:check.account.person_name,
+        //     person_code:check.account.person_code,
+        //     organization:check.account.organization
+        // }
+        // this.props.onok(this.state.dataSource,per);
+        // console.log('export:',this.state.dataSource,per)
     }
 
    
