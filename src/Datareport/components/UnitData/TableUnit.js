@@ -3,7 +3,7 @@ import { Table, Button, Popconfirm, message, Input, Icon ,Spin} from 'antd';
 import style from './TableUnit.css';
 import DelModal from './DelModal'
 import ChangeUNIT from './SubmitChangeModal'
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_UnitProject} from '_platform/api.js';
 const Search = Input.Search;
 
 export default class TableUnit extends Component {
@@ -57,7 +57,7 @@ export default class TableUnit extends Component {
 			<Spin spinning = {this.state.spinning}>
 				<div>
 					<Button style={{ marginRight: "10px" }}
-					onClick = {this.createLink.bind(this)}
+					onClick = {this.createLink.bind(this,'单位工程模版',DataReportTemplate_UnitProject)}
 					className={style.button}>模板下载</Button>
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
 					<Button className={style.button}

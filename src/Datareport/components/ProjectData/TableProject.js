@@ -3,7 +3,7 @@ import { Table, Button, Popconfirm, message, Input, Icon, Spin } from 'antd';
 import style from './TableProject.css';
 import DelProj from './DelModal';
 import ChangeProj from './SubmitChangeModal'
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_ProjectInformation} from '_platform/api.js';
 const Search = Input.Search;
 export default class TableProject extends Component {
 	constructor(props) {
@@ -23,7 +23,9 @@ export default class TableProject extends Component {
 			<div>
 				<Spin spinning = {this.state.spinning}>
 					<div>
-						<Button style={{ marginRight: "10px" }}>模板下载</Button>
+						<Button 
+						onClick = {this.createLink.bind(this,'项目模版',DataReportTemplate_ProjectInformation)}
+						style={{ marginRight: "10px" }}>模板下载</Button>
 						<Button onClick={this.send.bind(this)} className={style.button}>发起填报</Button>
 						<Button className={style.button} onClick={() => {
 							if (this.state.selectedRows && this.state.selectedRows.length > 0) {
