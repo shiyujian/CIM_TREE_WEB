@@ -105,8 +105,6 @@ export default class ToggleModal extends Component {
 
     // 下载模板
     DownloadFile(name, url) {
-        debugger
-        console.log('vip-下载', );
         let link = document.createElement("a");
         link.href = url;
         link.setAttribute('download', this);
@@ -122,7 +120,6 @@ export default class ToggleModal extends Component {
     }
 
     uplodachange(info) {
-        debugger;
         if (info && info.file && info.file.status === 'done') {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
@@ -161,14 +158,11 @@ export default class ToggleModal extends Component {
                     }
                 })
             }
-            debugger;
             this.setState({ dataSource });
         }
     }
 
     onSelectProject(value, selectedOptions) {
-        console.log('vip-value', value)
-        console.log('vip-selectedOptions', selectedOptions)
         let project = {};
         let unit = {};
         if (value.length === 2) {
@@ -254,8 +248,6 @@ export default class ToggleModal extends Component {
         }
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
         this.props.setData(this.state.dataSource, per);
-        console.log('vip-per', per);
-        console.log('vip-dataSource', this.state.dataSource);
 
         ModalVisible(false);
         notification.success({
@@ -335,7 +327,6 @@ export default class ToggleModal extends Component {
                 mime_type: resp.mime_type
             };
             dataSource[index]['file'] = attachment;
-            debugger;
             this.setState({ dataSource })
         });
         return false;
@@ -344,7 +335,6 @@ export default class ToggleModal extends Component {
 
     //附件删除
     remove(index, record) {
-        debugger;
         const { actions: { deleteStaticFile } } = this.props
         let { dataSource } = this.state
         // let id = dataSource[index]['file'].id
@@ -359,8 +349,6 @@ export default class ToggleModal extends Component {
     }
     //删除
     delete(index, record) {
-
-        debugger;
         let { dataSource } = this.state;
         // dataSource.splice(index, 1);
         this.setState({
@@ -413,7 +401,6 @@ export default class ToggleModal extends Component {
         let beginUnit = '';
         let i = 0;
         getProjectTree({ depth: 2 }).then(rst => {
-            console.log('vip-rst', rst);
             if (rst.status) {
                 let units = [];
                 rst.children.map(item => {
@@ -498,7 +485,6 @@ export default class ToggleModal extends Component {
             title: '附件',
             width: "15%",
             render: (text, record, index1) => {
-                debugger
                 if (record.file.id) {
                     return (<span>
                         <a onClick={this.handlePreview.bind(this, index1, record)}>预览</a>
@@ -527,8 +513,6 @@ export default class ToggleModal extends Component {
         }, {
             title: '操作',
             render: (text, record, index1) => {
-                debugger;
-                // index=(record.index-1);
                 return (
                     <Popconfirm
                         placement="leftTop"

@@ -59,11 +59,10 @@ export default class ChangeFile extends Component {
         });
     }
     paginationOnChange(e) {
-        console.log('vip-分页', e);
+        // console.log('vip-分页', e);
     }
     //附件删除
     remove(index) {
-        debugger;
         const { actions: { deleteStaticFile } } = this.props
         let { dataSource } = this.state
         let id = dataSource[index]['file'].id
@@ -77,7 +76,6 @@ export default class ChangeFile extends Component {
     }
 
     beforeUploadPicFile(index,record, file) {
-        debugger;
         // 上传到静态服务器
         const fileName = file.name;
         let { dataSource, unit, project } = this.state;
@@ -245,7 +243,6 @@ export default class ChangeFile extends Component {
                 title: '附件',
                 width: "10%",
                 render: (text, record, i) => {
-                    debugger;
                     if (record.file.a_file) {
                         return (<span>
                             <a onClick={this.handlePreview.bind(this, i)}>预览</a>
@@ -366,7 +363,6 @@ export default class ChangeFile extends Component {
         const { dataSource } = this.state;
         return (value) => {
             if (key === "reviewTime" && value) {
-                // debugger;
                 const chooseTime = new Date(value._d);
                 value = chooseTime.getFullYear() + "年" + (chooseTime.getMonth() + 1) + "月" + chooseTime.getDate() + "日";
             }
@@ -410,7 +406,6 @@ export default class ChangeFile extends Component {
         for (let i = 0; i < this.state.dataSource.length; i++) {
             this.state.dataSource[i].changeInfo = changeInfo;
         }
-        // debugger;
         this.props.setChangeData(this.state.dataSource, per);
         notification.success({
             message: '变更已发起！',
@@ -425,8 +420,8 @@ export default class ChangeFile extends Component {
         this.setState({ check })
     }
     onSelectProject(value, selectedOptions) {
-        console.log('vip-value', value)
-        console.log('vip-selectedOptions', selectedOptions)
+        // console.log('vip-value', value)
+        // console.log('vip-selectedOptions', selectedOptions)
         let project = {};
         let unit = {};
         if (value.length === 2) {

@@ -21,7 +21,7 @@ export default class TableOrg extends Component {
 			newKey2: Math.random(),
 			newKey3: Math.random(),
 			selectedRowKeys: [],
-			loading: false,
+			loading: true,
 		}
 	}
 	async componentDidMount() {
@@ -40,9 +40,6 @@ export default class TableOrg extends Component {
 		}
 	}
 	async generateTableData(data) {
-		this.setState({
-			loading: true,
-		})
 		const { actions: { getDocument, } } = this.props;
 		let dataSource = [];
 		let promises = data.map((item, i) => {
@@ -261,7 +258,6 @@ export default class TableOrg extends Component {
 
 	//导出
 	BtnExport(e) {
-		debugger;
 		if (this.state.subDataSource.length <= 0) {
 			notification.warning({
 				message: '请选择数据！',
@@ -310,7 +306,6 @@ export default class TableOrg extends Component {
 
 	// 申请变更--并发起
 	setChangeData(data, participants) {
-		debugger;
 		this.setState({
 			newKey2: Math.random() + 2,
 			setChangeVisiable: false,

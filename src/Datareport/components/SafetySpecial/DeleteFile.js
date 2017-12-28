@@ -23,8 +23,8 @@ export default class DeleteFile extends Component {
         };
     }
     componentDidMount() {
-        console.log('vip-state', this.props);
-        const dataSource = this.props.subDataSource;
+        // console.log('vip-state', this.props);
+        // const dataSource = this.props.subDataSource;
         this.setState({
             dataSource,
         })
@@ -47,7 +47,7 @@ export default class DeleteFile extends Component {
     }
 
     paginationOnChange(e) {
-        console.log('vip-分页', e);
+        // console.log('vip-分页', e);
     }
     render() {
         const formItemLayout = {
