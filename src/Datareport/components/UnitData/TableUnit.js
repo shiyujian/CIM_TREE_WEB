@@ -56,7 +56,9 @@ export default class TableUnit extends Component {
 			<div>
 			<Spin spinning = {this.state.spinning}>
 				<div>
-					<Button style={{ marginRight: "10px" }} className={style.button}>模板下载</Button>
+					<Button style={{ marginRight: "10px" }}
+					onClick = {this.createLink.bind(this)}
+					className={style.button}>模板下载</Button>
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
 					<Button className={style.button}
 						onClick={() => {

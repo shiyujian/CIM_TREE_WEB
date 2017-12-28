@@ -145,10 +145,10 @@ export default class TableProject extends Component {
     }
 	getExcel(){
 		console.log(this.state.showDs);
-		let exhead = ['项目名称','项目编码','所属区域','项目规模','项目类型','项目地址','项目红线坐标','项目负责人','计划开工日期','计划竣工日期','简介','附件','项目图片'];
+		let exhead = ['项目名称','项目编码','所属区域','项目规模','项目类型','项目地址','项目红线坐标','项目投资','项目负责人','计划开工日期','计划竣工日期','简介','附件','项目图片'];
 		let rows = [exhead];
 		let excontent =this.state.showDs.map(data=>{
-			return [data.name,data.code,data.area||'',data.range||'',data.projType||'',data.address||'',data.extra_params.coordinate||'',
+			return [data.name,data.code,data.area||'',data.range||'',data.projType||'',data.address||'',data.extra_params.coordinate||'',data.cost,
 			data.response_persons[0]?data.response_persons[0].name:'',data.stime||'',data.etime||'',data.intro||'',data.file?data.file.name:'',data.pic?data.pic.name:''];
 		});
 		rows = rows.concat(excontent);
@@ -197,7 +197,11 @@ export default class TableProject extends Component {
 			return (<span>{record.extra_params.coordinate || ''}</span>);
 		},
 		key: 'Project',
-	}, {
+	},  {
+		title: '项目投资',
+		dataIndex: 'cost',
+		key: 'cost',
+	},{
 		title: '项目负责人',
 		render: (record) => {
 			return (<span>{record.response_persons[0] ? record.response_persons[0].name : ''}</span>);

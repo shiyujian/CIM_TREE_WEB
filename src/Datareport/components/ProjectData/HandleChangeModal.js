@@ -205,7 +205,11 @@ export default class HandelChangeProjModal extends Component {
 			return (<span>{record.coordinate||''}</span>);
 		},
 		key: 'Project',
-	}, {
+	},  {
+		title: '项目投资',
+		dataIndex: 'cost',
+		key: 'cost',
+	},{
 		title: '项目负责人',
 		render:(record)=>{
 			return (<span>{record.relPer?record.relPer.name:(record.response_persons[0]?record.response_persons[0].name:'')}</span>);
