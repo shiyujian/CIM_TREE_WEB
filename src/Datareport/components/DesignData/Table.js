@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress } from 'antd';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
+import {STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_DesignInformation} from '_platform/api';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
 export default class DesignTable extends Component {
@@ -152,7 +152,7 @@ export default class DesignTable extends Component {
 		return (
 			<div >
 				<Row >
-					<Button style={{marginRight:10}} type="default">模板下载</Button>
+					<Button style={{marginRight:10}} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_DesignInformation}`)} type="default">模板下载</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleAddition.bind(this)} type="default" >发起填报</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleModify.bind(this)} type="default">申请变更</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleExpurgate.bind(this)} type="default">申请删除</Button>
