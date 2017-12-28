@@ -243,8 +243,13 @@ export default class TableOrg extends Component {
 	}
 	//预览
 	handlePreview(codeId, i) {
+		let { dataSource } = this.state;
 		const { actions: { openPreview } } = this.props;
-		let f = this.state.dataSource[i].file
+		let ff = {},f={};
+        ff = dataSource.filter((item, i) => {
+            return item.codeId === codeId;
+		});
+		f = ff[0].file;
 		let filed = {}
 		filed.misc = f.misc;
 		filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');

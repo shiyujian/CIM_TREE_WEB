@@ -32,9 +32,9 @@ export default class DeleteFile extends Component {
         // 下拉框
         const { actions: { getAllUsers, getProjectTree } } = this.props;
         getAllUsers().then(rst => {
-            let checkers = rst.map(o => {
+            let checkers = rst.map((o, index) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
             this.setState({ checkers })
@@ -104,7 +104,7 @@ export default class DeleteFile extends Component {
             ,
             {
                 title: '附件',
-			    width: '10%',
+                width: '10%',
                 render: (text, record) => {
                     return (<span>
                         <a onClick={this.handlePreview.bind(this, record.codeId, record.i)}>预览</a>
@@ -112,8 +112,8 @@ export default class DeleteFile extends Component {
                         <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                     </span>)
                 }
-                }
-            , 
+            }
+            ,
             {
                 title: '操作',
                 render: (text, record, index) => {

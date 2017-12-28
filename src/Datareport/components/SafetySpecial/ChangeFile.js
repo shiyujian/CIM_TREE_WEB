@@ -25,18 +25,12 @@ export default class ChangeFile extends Component {
     }
 
     componentDidMount() {
-        // console.log('vip-state', this.props);
-        // const dataSource = this.props.subDataSource;
-        // this.setState({
-        //     dataSource,
-        // })
-
         // 下拉框
         const { actions: { getAllUsers, getProjectTree } } = this.props;
         getAllUsers().then(rst => {
-            let checkers = rst.map(o => {
+            let checkers = rst.map((o,index) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
             this.setState({ checkers })
@@ -74,31 +68,7 @@ export default class ChangeFile extends Component {
         let { dataSource } = this.state
         let id = dataSource[index]['file'].id
         deleteStaticFile({ id: id })
-        let rate = dataSource[index].rate
-        let level = dataSource[index].level
-        dataSource[index] = {
-            rate: rate,
-            level: level,
-            name: "",
-            project: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            unit: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            construct_unit: {
-                code: "",
-                name: "",
-                type: "",
-            },
-            file: {
-
-            }
-        }
+        dataSource[index]['file']={}
         this.setState({ dataSource })
     }
 
@@ -107,6 +77,7 @@ export default class ChangeFile extends Component {
     }
 
     beforeUploadPicFile(index, file) {
+        debugger;
         // 上传到静态服务器
         const fileName = file.name;
         let { dataSource, unit, project } = this.state;
@@ -141,19 +112,8 @@ export default class ChangeFile extends Component {
                 download_url: filedata.download_url,
                 mime_type: resp.mime_type
             };
-            let unitProject = {
-                name: unit.name,
-                code: unit.code,
-                obj_type: unit.obj_type
-            }
-            let projectt = {
-                name: project.name,
-                code: project.code,
-                obj_type: project.obj_type
-            }
+           
             dataSource[index]['file'] = attachment;
-            dataSource[index]['unit'] = unitProject;
-            dataSource[index]['project'] = projectt;
             this.setState({ dataSource })
         });
         return false;
