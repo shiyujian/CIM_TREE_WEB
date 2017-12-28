@@ -3,7 +3,7 @@ import { Table, Button, Popconfirm, message, Input, Icon, Spin } from 'antd';
 import style from './TableProject.css';
 import DelProj from './DelModal';
 import ChangeProj from './SubmitChangeModal'
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_ProjectInformation} from '_platform/api.js';
 const Search = Input.Search;
 export default class TableProject extends Component {
 	constructor(props) {
@@ -23,7 +23,9 @@ export default class TableProject extends Component {
 			<div>
 				<Spin spinning = {this.state.spinning}>
 					<div>
-						<Button style={{ marginRight: "10px" }}>模板下载</Button>
+						<Button 
+						onClick = {this.createLink.bind(this,'项目模版',DataReportTemplate_ProjectInformation)}
+						style={{ marginRight: "10px" }}>模板下载</Button>
 						<Button onClick={this.send.bind(this)} className={style.button}>发起填报</Button>
 						<Button className={style.button} onClick={() => {
 							if (this.state.selectedRows && this.state.selectedRows.length > 0) {
@@ -145,10 +147,10 @@ export default class TableProject extends Component {
     }
 	getExcel(){
 		console.log(this.state.showDs);
-		let exhead = ['项目名称','项目编码','所属区域','项目规模','项目类型','项目地址','项目红线坐标','项目负责人','计划开工日期','计划竣工日期','简介','附件','项目图片'];
+		let exhead = ['项目名称','项目编码','所属区域','项目规模','项目类型','项目地址','项目红线坐标','项目投资','项目负责人','计划开工日期','计划竣工日期','简介','附件','项目图片'];
 		let rows = [exhead];
 		let excontent =this.state.showDs.map(data=>{
-			return [data.name,data.code,data.area||'',data.range||'',data.projType||'',data.address||'',data.extra_params.coordinate||'',
+			return [data.name,data.code,data.area||'',data.range||'',data.projType||'',data.address||'',data.extra_params.coordinate||'',data.cost,
 			data.response_persons[0]?data.response_persons[0].name:'',data.stime||'',data.etime||'',data.intro||'',data.file?data.file.name:'',data.pic?data.pic.name:''];
 		});
 		rows = rows.concat(excontent);
@@ -197,7 +199,11 @@ export default class TableProject extends Component {
 			return (<span>{record.extra_params.coordinate || ''}</span>);
 		},
 		key: 'Project',
-	}, {
+	},  {
+		title: '项目投资',
+		dataIndex: 'cost',
+		key: 'cost',
+	},{
 		title: '项目负责人',
 		render: (record) => {
 			return (<span>{record.response_persons[0] ? record.response_persons[0].name : ''}</span>);

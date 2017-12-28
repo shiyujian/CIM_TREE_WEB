@@ -129,7 +129,7 @@ export default class Addition extends Component {
                     <Popconfirm
                         placement="leftTop"
                         title="确定删除吗？"
-                        onConfirm={this.delete.bind(this, record.index)}
+                        onConfirm={this.delete.bind(this, record.index-1)}
                         okText="确认"
                         cancelText="取消">
                         <a>删除</a>

@@ -36,6 +36,9 @@ const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code
 
 //导出数据
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
+
+//校验
+const getTreeRootNode = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?root=false&reverse=true`,[]);
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -57,7 +60,8 @@ export const actions = {
 	getScheduleDir,
 	delDocList,
 	putDocument,
-	jsonToExcel
+	jsonToExcel,
+	getTreeRootNode
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

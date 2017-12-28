@@ -32,7 +32,7 @@ export default class ToggleModal extends Component{
 		        if (info.file.status !== 'uploading') {
 		        }
 		        if (info.file.status === 'done') {
-		        	let importData = info.file.response.Sheet1;
+                    let importData = info.file.response.Sheet1;
                     jthis.handleExcelData(importData);
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
@@ -40,6 +40,7 @@ export default class ToggleModal extends Component{
 		        }
 		    },
         };
+        console.log("this.state.dataSource:",this.state.dataSource);
         return (
             <Modal
                 visible={visible}
@@ -71,7 +72,6 @@ export default class ToggleModal extends Component{
                         }
                     </Select>
                 </span> 
-                <Button type="primary" onClick = {this.onok.bind(this)}>提交</Button>
                <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
@@ -91,18 +91,19 @@ export default class ToggleModal extends Component{
         })
         let res;
         Promise.all(promises).then(rst => {
+            
             rst.map(item => {
-                type.push(item.children[0].name);
-                canjian.push(item.children[0].children[0].name);
+                type.push(item.children[0].name || "");
+                canjian.push(item.children[0].children[0].name || "");
             })
             res = data.map((item,index) => {
                 return {
                     index: item[0],
                     code: item[1],
                     // 组织机构类型
-                    type: type[index],
+                    type: type[index] || "" ,
                     // 参建单位
-                    canjian: canjian[index],
+                    canjian: canjian[index] || "",
                     // 部门
                     depart: item[2],
                     // 直属部门
@@ -110,6 +111,7 @@ export default class ToggleModal extends Component{
                     remarks: item[4]
                 }
             });
+            console.log("res:",res);
             this.setState({
                 dataSource:res
             })
