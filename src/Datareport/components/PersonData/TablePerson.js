@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon} from 'antd';
 import style from './TableOrg.css'
 import DelPer from './PersonExpurgate';
-import {DataReportTemplate_PersonInformation} from '_platform/api';
+import {DataReportTemplate_PersonInformation, NODE_FILE_EXCHANGE_API} from '_platform/api';
 
 const Search = Input.Search;
 export default class TablePerson extends Component{
@@ -22,7 +22,7 @@ export default class TablePerson extends Component{
                     <Button className = {style.button} onClick = {this.send.bind(this)}>发送填报</Button>
                     <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
                     <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button>
-                    <Button className = {style.button}>导出表格</Button>
+                    <Button className = {style.button} onClick={this.getExcel.bind(this)}>导出表格</Button>
                     <Search className = {style.button} onSearch = {this.searchOrg.bind(this)} style={{width:"200px"}} placeholder="输入搜索条件" />
                 </div>
                 <Table
@@ -61,6 +61,44 @@ export default class TablePerson extends Component{
 		} else {
 			message.warning("请先选中要变更的数据");
 		}
+	}
+
+	// 导出excel表格
+	getExcel(){
+		console.log("dfgfg:",this.state.excelData);
+		let exhead = ['人员编码','姓名','所在组织机构单位','所属部门','职务','性别','手机号码','邮箱'];
+		let rows = [exhead];
+		let getcoordinate = (param)=>{
+			if(typeof param !=='string'){
+				return'';
+			}
+			if((!param||param.length<=0)){
+				return ''
+			}else{
+				return param;
+			}
+		}
+		let excontent =this.state.excelData.map(data=>{
+			console.log('data',data)
+			return [
+				data.account.person_code || '', 
+				data.account.person_name || '', 
+				data.account.organization || '', 
+				data.account.org_code ||'', 
+				data.account.title ||'', 
+				data.account.gender || '',
+				data.account.person_telephone || '',
+				data.email ||''
+			];
+		});
+		rows = rows.concat(excontent);
+		const {actions:{jsonToExcel}} = this.props;
+		console.log(rows)
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            console.log(rst);
+            this.createLink('人员信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
 	}
 
 	//下载
@@ -107,6 +145,7 @@ export default class TablePerson extends Component{
 		onSelect: (record, selected, selectedRows) => {
 			this.setState({
 				selectData:selectedRows,
+				excelData:selectedRows
 			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
@@ -162,8 +201,5 @@ export default class TablePerson extends Component{
 		title: '二维码',
 		dataIndex: 'account.person_signature_url',
 		key: 'Signature'
-	}, {
-		title: '编辑',
-		dataIndex: 'edit',
 	}]
 }
