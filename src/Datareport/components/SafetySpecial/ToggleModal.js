@@ -126,7 +126,7 @@ export default class ToggleModal extends Component {
         this.setState({ check })
     }
 
-    uplodachange(info) {
+    async  uplodachange(info) {
         if (info && info.file && info.file.status === 'done') {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
@@ -135,37 +135,83 @@ export default class ToggleModal extends Component {
                 message.error('Excel模板不相符，请下载最新模板！');
                 return;
             }
+            // 代码 校验
+            const { actions: { checkoutData } } = this.props;
             let dataSource = [];
-            for (let i = 2; i < dataList.length; i++) {
-                dataSource.push({
-                    resUnit: dataList[i][0] ? dataList[i][0] : '',
-                    index: dataList[i][1] ? dataList[i][1] : '',
-                    projectName: dataList[i][2] ? dataList[i][2] : '',
-                    unitProject: dataList[i][3] ? dataList[i][3] : '',
-                    scenarioName: dataList[i][4] ? dataList[i][4] : '',
-                    organizationUnit: dataList[i][5] ? dataList[i][5] : '',
-                    reviewTime: dataList[i][6] ? dataList[i][6] : '',
-                    reviewComments: dataList[i][7] ? dataList[i][7] : '',
-                    reviewPerson: dataList[i][8] ? dataList[i][8] : '',
-                    remark: dataList[i][9] ? dataList[i][9] : '',
-                    wbs: dataList[i][9] ? dataList[i][9] : '',
-                    fj: dataList[i][10] ? dataList[i][10] : '',
-                    code: '05',
-                    project: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                    unit: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                    file: {
-                    }
-                })
-            }
-            this.setState({ dataSource });
+            // for (let i = 2; i < dataList.length; i++) {
+            //     let rst = await checkoutData({ code: dataList[i][4] });
+
+            //     dataSource.push({
+            //         resUnit: dataList[i][0] ? dataList[i][0] : '',
+            //         index: dataList[i][1] ? dataList[i][1] : '',
+            //         projectName: dataList[i][2] ? dataList[i][2] : '',
+            //         unitProject: dataList[i][3] ? dataList[i][3] : '',
+            //         scenarioName: dataList[i][4] ? dataList[i][4] : '',
+            //         organizationUnit: dataList[i][5] ? dataList[i][5] : '',
+            //         reviewTime: dataList[i][6] ? dataList[i][6] : '',
+            //         reviewComments: dataList[i][7] ? dataList[i][7] : '',
+            //         reviewPerson: dataList[i][8] ? dataList[i][8] : '',
+            //         remark: dataList[i][9] ? dataList[i][9] : '',
+            //         wbs: dataList[i][9] ? dataList[i][9] : '',
+            //         fj: dataList[i][10] ? dataList[i][10] : '',
+            //         code: 'JSDW_zgxa', // 编制单位
+            //         project: {
+            //             code: "",
+            //             name: "",
+            //             obj_type: ""
+            //         },
+            //         unit: {
+            //             code: "",
+            //             name: "",
+            //             obj_type: ""
+            //         },
+            //         file: {},
+            //         checkout: rst.code === dataList[i][4] ? true : false,
+            //     })
+            // }
+            // this.setState({ dataSource });
+            // console.log('vip-dataSource',dataSource);
+
+            dataList.map((item, i) => {
+
+                if (i > 1) {
+                    checkoutData({ code: item[5] }).then(rst => {
+                        dataSource.push({
+                            sign: i,
+                            resUnit: item[0] ? item[0] : '',
+                            index: item[1] ? item[1] : '',
+                            projectName: item[2] ? item[2] : '',
+                            unitProject: item[3] ? item[3] : '',
+                            scenarioName: item[4] ? item[4] : '',
+                            organizationUnit: item[5] ? item[5] : '',
+                            reviewTime: item[6] ? item[6] : '',
+                            reviewComments: item[7] ? item[7] : '',
+                            reviewPerson: item[8] ? item[8] : '',
+                            remark: item[9] ? item[9] : '',
+                            wbs: item[9] ? item[9] : '',
+                            fj: item[10] ? item[10] : '',
+                            code: 'JSDW_zgxa', // 编制单位
+                            project: {
+                                code: "",
+                                name: "",
+                                obj_type: ""
+                            },
+                            unit: {
+                                code: "",
+                                name: "",
+                                obj_type: ""
+                            },
+                            file: {},
+                            checkout: rst.code === item[5] ? true : false,
+                        })
+                        this.setState({ dataSource });
+                        // console.log('vip-dataSource',dataSource);
+
+                    })
+                }
+            })
+
+
         }
     }
 
@@ -466,15 +512,51 @@ export default class ToggleModal extends Component {
             title: '方案名称',
             dataIndex: 'scenarioName',
             width: '15%',
-        }, {
+        }
+        ,
+        {
             title: '编制单位',
             dataIndex: 'organizationUnit',
             width: '15%',
-        }, {
+            render: (text, record, index1) =>
+                (
+                    record.checkout ?
+                        <span
+                            onDoubleClick={(record) => {
+                                this.setState({
+                                    dataSource: this.state.dataSource.map((item, index) => {
+                                        if (item.sign === record.sign) {
+                                            return {
+                                                ...item,
+                                                checkout: false
+                                            }
+                                        } else {
+                                            return item
+                                        }
+                                    })
+                                })
+
+                            }}
+                        >{record.organizationUnit}</span>
+                        :
+                        <Input style={{ color: 'red' }}
+                            value={record.organizationUnit}
+                            onChange={(e) => { console.log(e.target.value) }}
+                            onBlur={(e) => {
+                                console.log('vip-失去光标校验开始', );
+                            }}
+
+                        />
+                ),
+        }
+        ,
+        {
             title: '评审时间',
             dataIndex: 'reviewTime',
             width: '10%',
-        }, {
+        }
+        ,
+        {
             title: '评审意见',
             dataIndex: 'reviewComments',
             width: '10%',
