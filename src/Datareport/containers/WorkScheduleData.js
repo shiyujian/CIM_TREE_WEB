@@ -10,7 +10,7 @@ import { WorkModal, WorkChange, WorkDel } from '../components/ScheduleData';
 import './quality.less';
 import { getNextStates } from '_platform/components/Progress/util';
 import moment from 'moment';
-import { WORKFLOW_CODE } from '_platform/api.js';
+import { WORKFLOW_CODE ,NODE_FILE_EXCHANGE_API,DataReportTemplate_ConstructionProgress} from '_platform/api.js';
 import Preview from '../../_platform/components/layout/Preview';
 const Search = Input.Search;
 @connect(
@@ -222,6 +222,16 @@ export default class WorkScheduleData extends Component {
 			this.setState({ setEditVisiable: true });
 		}
 	}
+	//模板下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
 
 	render() {
@@ -234,7 +244,7 @@ export default class WorkScheduleData extends Component {
 			<div style={{ overflow: 'hidden', padding: 20 }}>
 				<DynamicTitle title="施工进度" {...this.props} />
 				<Row>
-					<Button style={{ margin: '10px 10px 10px 0px' }} type="default">模板下载</Button>
+					<Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_ConstructionProgress}`)}>模板下载</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('add')}>发起填报</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('edit')}>申请变更</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('delete')}>申请删除</Button>
