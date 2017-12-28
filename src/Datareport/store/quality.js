@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import createFetchActionWithHeaders from './fetchAction';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base} from '_platform/api';
+import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base,NODE_FILE_EXCHANGE_API} from '_platform/api';
 
 
 const uploadStaticFile = createFetchAction(`${FILE_API}/api/user/files/`, [], 'POST');
@@ -39,6 +39,8 @@ const getOrg = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`,[])
 //获取项目树
 const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/?depth=4`, []);
 const getTreeRootNode = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?root=false&reverse=true`, []);
+//导出数据
+const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 export const actions = {
 	getProjectTree,
     uploadStaticFile,
@@ -60,7 +62,8 @@ export const actions = {
 	getRelDoc,
 	getOrg,
 	delDocList,
-	getTreeRootNode
+	getTreeRootNode,
+	jsonToExcel
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

@@ -4,14 +4,14 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/quality';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button,message,Spin} from 'antd';
+import {Row,Col,Table,Input,Button,message,Spin,Pagination} from 'antd';
 import {getUser} from '_platform/auth'
 import JianyanpiModal from '../components/Quality/JianyanpiModal'
 import './quality.less'
 import {WORKFLOW_CODE} from '_platform/api.js'
 import {getNextStates} from '_platform/components/Progress/util';
 import { getWorkflowDetail } from '../../Quality/store/defect';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_SubdivisionUnitProjectAcceptance} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_SubdivisionUnitProjectAcceptance,NODE_FILE_EXCHANGE_API} from '_platform/api';
 import Preview from '_platform/components/layout/Preview';
 import JianyanpiDelete from '../components/Quality/JianyanpiDelete'
 
@@ -32,7 +32,9 @@ export default class JianyanpiData extends Component {
 		this.state = {
 			addvisible:false,
 			dataSource:[],
-			pagination:{},
+			pagination:{
+				//onChange:this.pageSizeChange.bind(this)
+			},
 			loading:false,
 			totalData:null,
 			selectedRowKeys:[],
@@ -148,7 +150,10 @@ export default class JianyanpiData extends Component {
 					arr[index] = {...obj,key:index,file:{}}
 				}
 			}
-			this.setState({totalData:rst.result,dataSource:arr,pagination:{total:rst.result.length},loading:false})
+			this.setState({totalData:rst.result,dataSource:arr,pagination:{	showSizeChanger:true,
+				showQuickJumper:true,
+				total:rst.result.length
+				},loading:false})
 			// Promise.all(wpActions).then(wps => {
 			// 	wps.map(item => {
 			// 		let rel_doc = item.related_documents ? item.related_documents.find(x => {
@@ -202,7 +207,8 @@ export default class JianyanpiData extends Component {
 		  pagination: pager,
 		});
 		let arr = this.state.dataSource
-		for(let index = (pagination.current-1)*10;index < pagination.current*10 && index < this.state.dataSource.length;index++){
+		let pageSize = pagination.pageSize
+		for(let index = (pagination.current-1)*pageSize;index < pagination.current*pageSize && index < this.state.dataSource.length;index++){
 			if(arr[index].key+1){
 				arr[index].key = index
 				continue;
@@ -222,6 +228,35 @@ export default class JianyanpiData extends Component {
 		}
 		this.setState({dataSource:arr,loading:false})
 	}
+	// async pageSizeChange(page, pageSize){
+	// 	const {actions:{getWorkPackageDetail,getRelDoc}} = this.props		
+	// 	this.setState({loading:true})
+	// 	const pager = { ...this.state.pagination };
+	// 	pager.current = pagination.current;
+	// 	this.setState({
+	// 	  pagination: pager,
+	// 	});
+	// 	let arr = this.state.dataSource
+	// 	for(let index = (pagination.current-1)*10;index < pagination.current*10 && index < this.state.dataSource.length;index++){
+	// 		if(arr[index].key+1){
+	// 			arr[index].key = index
+	// 			continue;
+	// 		}
+	// 		let wp = await getWorkPackageDetail({code:this.state.totalData[index].code})
+	// 		let rel_doc = wp.related_documents ? wp.related_documents.find(x => {
+	// 			return x.rel_type === 'many_jyp_rel'
+	// 		}) : null
+	// 		if(rel_doc){
+	// 			let doc = await getRelDoc({code:rel_doc.code})
+	// 			arr[index] = {...doc.extra_params,key:index}	
+	// 			arr[index].related_documents = 	wp.related_documents			
+	// 		}else{
+	// 			let obj = await this.getInfo(wp)
+	// 			arr[index] = {...obj,key:index,file:{}}
+	// 		}
+	// 	}
+	// 	this.setState({dataSource:arr,loading:false})
+	// }
 	//批量上传回调
 	setData(data,participants){
 		if(this.state.targetData.length){
@@ -387,7 +422,7 @@ export default class JianyanpiData extends Component {
 					<Button className="btn" type="default" onClick={this.setAddVisible.bind(this)}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.setEditVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.setDelVisible.bind(this)}>申请删除</Button>
-					<Button className="btn" type="default">导出表格</Button>
+					<Button className="btn" type="default" onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
@@ -406,7 +441,7 @@ export default class JianyanpiData extends Component {
 							 onChange={this.handleChange}
 							 rowSelection={rowSelection}
 							/>
-						</Col>
+						</Col> 
 					</Row>
 					<Preview />
 				</Spin>
@@ -420,5 +455,36 @@ export default class JianyanpiData extends Component {
 				}
 			</div>
 		);
+	}
+	createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+	getExcel(){
+		let { selectedRowKeys } = this.state
+		if(selectedRowKeys.length === 0){
+			message.info("请选择导出数据")
+			return
+		}
+		let tableData = selectedRowKeys.map(i => {
+			return this.state.dataSource[i]
+		})
+		let exhead = ['序号','项目/子项目','单位工程','WBS编码','名称','检验合格率','质量等级','施工单位'];
+		let rows = [exhead];
+		let excontent =tableData.map((data,index)=>{
+			let con_name = data.construct_unit ? data.construct_unit.name : '暂无'
+			return [index,data.project.name,data.unit.name,data.code,data.name,data.rate,data.level,con_name,];
+		});
+		rows = rows.concat(excontent);
+		const {actions:{jsonToExcel}} = this.props;
+        jsonToExcel({},{rows:rows}).then(rst => {
+            console.log(rst);
+            this.createLink('检验信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
 	}
 }
