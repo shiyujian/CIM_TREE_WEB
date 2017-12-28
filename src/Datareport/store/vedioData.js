@@ -1,7 +1,7 @@
 import {handleActions, combineActions, createAction} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API,USER_API,WORKFLOW_API,FILE_API} from '_platform/api';
+import { SERVICE_API,USER_API,WORKFLOW_API,FILE_API,NODE_FILE_EXCHANGE_API} from '_platform/api';
 
 //获取项目树
 const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
@@ -23,6 +23,8 @@ const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
 //删除数据
 const deleteDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
+//导出数据
+const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 
 export const actions = {
 	getProjectTree,
@@ -36,7 +38,8 @@ export const actions = {
 	putDocList,
 	getScheduleDir,
 	postScheduleDir,
-	deleteDocument
+	deleteDocument,
+	jsonToExcel
 };
 
 export default handleActions({

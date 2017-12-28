@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import {Row, Col, Table, Icon, Popconfirm} from 'antd';
+import {Row, Col, Table, Icon, Popconfirm, Input} from 'antd';
 import './index.less';
 
 export default class VedioTable extends Component{
@@ -43,12 +43,29 @@ export default class VedioTable extends Component{
         }
     }
 
+    renderColumns = (text,index,dataIndex)=>{
+        const {edit = false} = this.props;
+        return(
+            <EditableCell
+              editable={edit}
+              value={text}
+              onChange={value => this.handleChange(value,index,dataIndex)}
+            />
+        )
+    }
+    handleChange = (value,index,dataIndex)=>{
+        const {storeData,dataSource} = this.props;
+        dataSource[index][dataIndex] = value;
+        storeData(dataSource);
+    }
+
     columns = [{
         title: '序号',
         dataIndex: 'index'
     },{
         title: '摄像头编码',
-        dataIndex: 'cameraId'
+        dataIndex: 'cameraId',
+        render: (text,record,index) => this.renderColumns(text,index,'cameraId')
     },{
         title: '项目/子项目名称',
         dataIndex: 'projectName'
@@ -57,34 +74,43 @@ export default class VedioTable extends Component{
         dataIndex: 'enginner'
     },{
         title: '摄像头名称',
-        dataIndex: 'cameraName'
+        dataIndex: 'cameraName',
+        render: (text,record,index) => this.renderColumns(text,index,'cameraName')
     },{
         title: 'IP',
-        dataIndex: "ip"
+        dataIndex: "ip",
+        render: (text,record,index) => this.renderColumns(text,index,'ip')
     },{
         title: '端口',
-        dataIndex: 'port'
+        dataIndex: 'port',
+        render: (text,record,index) => this.renderColumns(text,index,'port')
     },{
         title: '用户名',
-        dataIndex: 'username'
+        dataIndex: 'username',
+        render: (text,record,index) => this.renderColumns(text,index,'username')
     },{
         title: '密码',
-        dataIndex: 'password'
+        dataIndex: 'password',
+        render: (text,record,index) => this.renderColumns(text,index,'password')
     },{
         title: 'X坐标',
-        dataIndex: 'xAxes'
+        dataIndex: 'xAxes',
+        render: (text,record,index) => this.renderColumns(text,index,'xAxes')
     },{
         title: 'Y坐标',
-        dataIndex: 'yAxes'
+        dataIndex: 'yAxes',
+        render: (text,record,index) => this.renderColumns(text,index,'yAxes')
     },{
         title: '型号',
-        dataIndex: 'modal'
+        dataIndex: 'modal',
+        render: (text,record,index) => this.renderColumns(text,index,'modal')
     },{
         title: '摄像头上线时间',
         dataIndex: 'uptime'
     },{
         title: 'wbs编码',
-        dataIndex: 'wbsCode'
+        dataIndex: 'wbsCode',
+        render: (text,record,index) => this.renderColumns(text,index,'wbsCode')
     }];
 
     operation = {
@@ -111,3 +137,12 @@ VedioTable.PropTypes ={
 const showTotal = (total,range) =>{ //显示数据总量和当前数据顺序
     //console.log("showTotal",total,range);
 }
+
+const EditableCell = ({ editable, value, onChange }) => (
+    <div>
+      {editable
+        ? <Input style={{ margin: '-5px' }} value={value} onChange={e => onChange(e.target.value)} />
+        : value
+      }
+    </div>
+);

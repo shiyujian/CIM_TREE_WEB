@@ -63,6 +63,8 @@ export default class WorkChangeCheck extends Component {
         const {dataSource,wk,topDir} = this.state;
         const {actions:{
             logWorkflowEvent,
+            updateWpData,
+            putDocList,
         }} = this.props;
         
         // send workflow
@@ -73,23 +75,60 @@ export default class WorkChangeCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        // let code_list = "";
-        // dataSource.map(item=>{
-        //     item.delcode+=",";
-        //     code_list += item.delcode;
-        // })
-        // let rst = await delDocList({},{code_list});
-        // if(rst.result){
-        //     notification.success({
-        //         message: '删除文档成功！',
-        //         duration: 2
-        //     });
-        // }else{
-        //     notification.error({
-        //         message: '删除文档失败！',
-        //         duration: 2
-        //     });
-        // }
+        let editList = [];
+        let wplist = [];
+        dataSource.map(item => {
+            editList.push({
+                code:item.delcode,
+                obj_type:"C_DOC",
+                status:"A",
+                version:"A",
+                extra_params:{
+                    code: item.code,
+                    name: item.name,
+                    project:item.project,
+                    unit: item.unit,
+                    construct_unit: item.construct_unit,
+                    quantity: item.quantity,
+                    factquantity: item.factquantity,
+                    planstarttime: item.planstarttime,
+                    planovertime: item.planovertime,
+                    factstarttime: item.factstarttime,
+                    factovertime: item.factovertime,
+                    uploads: item.uploads,
+                },
+                workpackages: [{
+                    code: item.wpcode,
+                    obj_type: item.obj_type, //belong workpage
+                    pk: item.pk, //belong workpage
+                    rel_type: "dataport_processmessage_construction"
+                }],
+            });
+            //施工包批量
+            wplist.push({
+                code: item.wpcode,
+                extra_params: {
+                    planstarttime: item.planstarttime,
+                    planovertime: item.planovertime,
+                    factstarttime: item.factstarttime,
+                    factovertime: item.factovertime,
+                    check_status: 2
+                }
+            })
+        });
+        let rst = await putDocList({},{data_list:editList});
+        await updateWpData({}, { data_list: wplist });
+        if(rst.result){
+            notification.success({
+                message: '修改文档成功！',
+                duration: 2
+            });
+        }else{
+            notification.error({
+                message: '修改文档失败！',
+                duration: 2
+            });
+        }
     }
     //不通过
     async reject(){
@@ -142,7 +181,7 @@ export default class WorkChangeCheck extends Component {
             dataIndex: 'factovertime',
         }, {
             title: '变更人员',
-            dataIndex: 'editors',
+            dataIndex: 'uploads',
         },]
 		return (
             <Modal
@@ -158,9 +197,6 @@ export default class WorkChangeCheck extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    rowKey={(record)=>{
-                        return record.index
-                    }} 
                     />
                 <Row>
                     <Col span={2}>

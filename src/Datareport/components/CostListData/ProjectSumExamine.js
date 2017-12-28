@@ -84,12 +84,10 @@ export default class ProjectSumExamine extends Component {
             getQuantities,
             getSearcher
         } } = this.props;
-        // console.log('this.props',this.props)
-        //the unit in the dataSource array is same
+ 
         let unit = dataSource[0].unit;
         let project = dataSource[0].project;
         let code = 'ck';
-        //get workpackage by unit's code 
         let workpackage = await getWorkpackagesByCode({ code: unit.code });
 
         let postDirData = {
@@ -124,9 +122,11 @@ export default class ProjectSumExamine extends Component {
         const docData = [];
         let wplist = [];
         let i = 0;   //asure the code of every document only
+
         let jialist = await getSearcher({keyword:'priceListName'})
+        let pairMap = {};
         let pairs = jialist.result.map(item => {
-            return {
+            pairMap[item.extra_params.projectcoding] = {
                 projectcoding: item.extra_params.projectcoding,
                 rate: item.extra_params.rate
             }
@@ -155,35 +155,19 @@ export default class ProjectSumExamine extends Component {
 
             }) 
             //施工包批量
-            let myprojectcoding, mynumber;
-            for(var i  = 0; i < pairs.length; ++i) {
-                if(pairs[i].projectcoding === item.projectcoding ) {
-                    myprojectcoding = pairs[i].projectcoding;
-                    mynumber =  pairs[i].rate;
-                    break; 
-                }
-            }
+          
+
             wplist.push({
                 code: item.unit.code,
-                // extra_params: {
-                //     projectcoding:item.projectcoding,
-                //     number: item.number,
-                // }
-                extra_params: {
-                    projectcoding: myprojectcoding,
-                    number: mynumber,
-                }
+                extra_params: pairMap[item.projectcoding]
+               
             })
+        
         });
-        debugger
+ 
         let rst = await addDocList({}, { data_list: docData });
         await updateWpData({}, { data_list: wplist });
-        // wplist = wplist.filter(item => {
-        //     return !myprojectcoding && !mynumber
-        // })
-        // if(wplist.length) {
-            
-        // }
+        
         if (rst.result) {
             notification.success({
                 message: '创建文档成功！',

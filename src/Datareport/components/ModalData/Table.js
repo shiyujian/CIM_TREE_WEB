@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input } from 'antd';
+import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress } from 'antd';
 import { WORKFLOW_CODE, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api.js';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
@@ -8,18 +8,35 @@ export default class ModalTable extends Component {
 		super(props)
 		this.state = {
 			selectedRowKeys: [],
-			dataSourceSelected: [],
+			// dataSourceSelected: [],
+			
+			alldatas:[],
+			loading: false,
+			percent: 0,
 		}
 
 	}
+	// onSelectChange = (selectedRowKeys) => {
+	// 	const { dataSource } = this.state;
+	// 	let dataSourceSelected = [];
+	// 	for (let i = 0; i < selectedRowKeys.length; i++) {
+	// 		dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
+	// 	}
+	// 	this.setState({ selectedRowKeys,dataSourceSelected });
+	// 	console.log('aaaaa:',dataSourceSelected)
+	// }
+
 	onSelectChange = (selectedRowKeys) => {
-		const { dataSource } = this.state;
-		let dataSourceSelected = [];
-		for (let i = 0; i < selectedRowKeys.length; i++) {
-			dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
-		}
-		this.setState({ selectedRowKeys,dataSourceSelected });
-		console.log('aaaaa:',dataSourceSelected)
+		const {alldatas} = this.state;
+		const { actions: { changeModifyField,changeExpurgateField } } = this.props;
+		this.setState({ selectedRowKeys });
+		let selectedDatas = [];
+		selectedRowKeys.forEach(key => {
+			selectedDatas.push(alldatas[key-1])
+		})
+		console.log('selectedDatas',selectedDatas)
+		changeModifyField('selectedDatas',selectedDatas)
+		changeExpurgateField('selectedDatas',selectedDatas)
 	}
 
 	async componentDidMount() {
@@ -40,22 +57,40 @@ export default class ModalTable extends Component {
 			}
 		}
 	}
-
-	async generateTableData(data) {
-		const { actions: {
+	async generateTableData(data){
+        const {actions:{
             getDocument,
-        } } = this.props;
-		let dataSource = [];
-
-		data.map(item => {
-			
-			getDocument({ code: item.code }).then(single => {
-				
-				let temp = {
+        }} = this.props;
+        let dataSource = [];
+        let all = [];
+        let total = data.length;
+        this.setState({loading:true,percent:0,num:0})
+        data.forEach(item=>{
+            all.push(getDocument({code:item.code})
+            	.then(rst => {
+            		let {num} = this.state;
+                    num++;
+                    this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
+                    if(!rst) {
+                    	message.error(`数据获取失败`)
+		    			return []
+		    		} else {
+                    	return rst
+                    }
+            	}))
+        })
+        Promise.all(all)
+        .then(item => {
+			console.log('item',item)
+        	this.setState({loading:false})
+        	item.forEach((single,index) => {
+        		let temp = {
+					index:index+1,
+					
 					coding: single.extra_params.coding,
 					modelName: single.extra_params.filename,
-					project: single.extra_params.project,
-					unit: single.extra_params.unit,
+					project: single.extra_params.project.name,
+					unit: single.extra_params.unit.name,
 					submittingUnit: single.extra_params.submittingUnit,
 					modelDescription: single.extra_params.modelDescription,
 					// file:single.basic_params.files[0],
@@ -65,17 +100,21 @@ export default class ModalTable extends Component {
 					attributeTable: single.basic_params.files[2],
 					reportingTime: single.extra_params.reportingTime,
 					reportingName: single.extra_params.reportingName,
-					code:item.code
+					
 					// stage:single.extra_params.stage,
 					// upPeople:single.extra_params.upPeople,
 					// wbsObject:single.extra_params.wbsObject,
 					// designObject:single.extra_params.designObject,
 				}
-				dataSource.push(temp);
-				this.setState({ dataSource });
-			})
-		})
-	}
+                dataSource.push(temp);
+        	}) 
+            this.setState({dataSource,alldatas:item,showDs:dataSource});
+        })
+    }
+	
+
+	
+	
 
 	render() {
 		const { selectedRowKeys } = this.state;
@@ -86,10 +125,7 @@ export default class ModalTable extends Component {
 
 		const columns = [{
 			title: '序号',
-			dataIndex: 'numbers',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex: 'index',
 		}, {
 			title: '模型编码',
 			dataIndex: 'coding'
@@ -160,7 +196,19 @@ export default class ModalTable extends Component {
 					<Search
 						style={{ width: "200px", marginLeft: 10 }}
 						placeholder="输入搜索条件"
-						onSearch={value => console.log(value)}
+						onSearch={
+							(text) => {
+								let result = this.state.dataSource.filter(data=>{
+									return data.modelName.indexOf(text)>=0 || data.coding.indexOf(text)>=0;
+								});
+								console.log(result);
+								if(text === ''){
+									result = this.state.dataSource;
+								}
+								this.onSelectChange([])//清空选择项
+								this.setState({showDs:result});
+							}
+						}
 					/>
 				</Row>
 				{//<Button style={{ marginLeft: 10 }} type="primary" onClick={this.togglecheck.bind(this)}>审核</Button>
@@ -171,13 +219,16 @@ export default class ModalTable extends Component {
 						bordered
 						columns={columns}
 						rowSelection={rowSelection}
-						dataSource={this.state.dataSource}
-						rowKey="_id"
+						dataSource={this.state.showDs}
+						rowKey="index"
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 					/>
 				</Row>
 			</div>
 		);
 	}
+
+	
 	//预览
 	handlePreview(index) {
 		const { actions: { openPreview } } = this.props;
@@ -201,17 +252,23 @@ export default class ModalTable extends Component {
 		changeCheckField('visible', true)
 	}
 	toggleModify() {
-		const { actions: { changeModifyField,getdele } } = this.props;
-		console.log(this.props)
+		const {expurgate = {}, actions: { changeModifyField } } = this.props;
 		changeModifyField('visible', true)
-		getdele(this.state.dataSourceSelected)
+		changeModifyField('key', expurgate.key?expurgate.key+1:1)
+
+		
 	}
 	toggleExpurgate() {
-		const { actions: { changeExpurgateField,getdele } } = this.props;
-		console.log(this.props)
-		changeExpurgateField('visible', true)
-		getdele(this.state.dataSourceSelected)
+		const {expurgate = {}, actions: { changeExpurgateField } } = this.props;
+		
+			changeExpurgateField('visible', true)
+			changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
+		
 	}
+
+	// judge(arr) {
+	// 	return arr.every(item => item.extra_params.unit.pk === arr[0].extra_params.unit.pk)
+	// }
 }
 
 

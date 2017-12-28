@@ -21,8 +21,9 @@ export default class Modify extends Component {
 		this.state = {
 			checkers: [],//审核人下来框选项
 			check: null,//审核人
-			
-			
+			alldatas: [],
+			dataSource: [],
+			key: -1,
 		};
 	}
 
@@ -38,17 +39,43 @@ export default class Modify extends Component {
 		})
 	}
 
-	//table input 输入
-	tableDataChange(index, key, e) {
-		const { modify = {}, getall = [], actions:{getdele}} = this.props;
-		let dataSources = getall;
-		console.log('getall',getall)
-		dataSources[index][key] = e.target['value'];
-	  	getdele(dataSources);
-		// console.log('data:',dataSource)
-	
-	
+	componentWillReceiveProps(props) {
+		const { modify = {} } = props
+		if (modify.key !== this.state.key) {
+			let item = modify.selectedDatas
+			let dataSource = [];
+			item && item.forEach((single, index) => {
+				let temp = {
+					index: index + 1,
+					code: single.code,
+					coding: single.extra_params.coding,
+					modelName: single.extra_params.filename,
+					project: single.extra_params.project,
+					unit: single.extra_params.unit,
+					submittingUnit: single.extra_params.submittingUnit,
+					modelDescription: single.extra_params.modelDescription,
+					// file:single.basic_params.files[0],
+					modeType: single.extra_params.modeType,
+					fdbMode: single.basic_params.files[0],
+					tdbxMode: single.basic_params.files[1],
+					attributeTable: single.basic_params.files[2],
+					reportingTime: single.extra_params.reportingTime,
+					reportingName: single.extra_params.reportingName,
+				}
+				dataSource.push(temp);
+			})
+			this.setState({ dataSource, key: modify.key })
+		}
 	}
+
+
+	//下拉框选择变化
+	handleSelect(index, key, value) {
+		let { dataSource } = this.state;
+		dataSource[index][key] = value;
+		this.setState({ dataSource })
+	}
+
 
 	//下拉框选择人
 	selectChecker(value) {
@@ -56,13 +83,15 @@ export default class Modify extends Component {
 		this.setState({ check })
 	}
 
-
+	//table input 输入
+	tableDataChange(index, key, e) {
+		let { dataSource } = this.state;
+		dataSource[index][key] = e.target['value'];
+		this.setState({ dataSource });
+	}
 
 	onok() {
-		const { getall = [] } = this.props;
-		let dataSource = getall;
-		console.log('woshi:', getall)
-
+		let { dataSource } = this.state;
 		if (!this.state.check) {
 			message.info("请选择审核人")
 			return;
@@ -76,10 +105,11 @@ export default class Modify extends Component {
 			organization: check.account.organization
 		}
 		this.setChangeData(dataSource, per)
+		console.log('我是：', dataSource)
 	}
 
 	setChangeData = (data, participants) => {
-		const { actions: { createWorkflow, logWorkflowEvent, clearModifyField } } = this.props
+		const { modify = {}, actions: { createWorkflow, logWorkflowEvent, clearModifyField } } = this.props
 		let creator = {
 			id: getUser().id,
 			username: getUser().username,
@@ -114,56 +144,89 @@ export default class Modify extends Component {
 					attachment: null
 				}).then(() => {
 					message.success("成功")
-					clearModifyField()
+					clearModifyField('visible', false)
 				})
 		})
 	}
 
 
 	render() {
-		const { modify = {}, getall = [], actions: { changeModifyField } } = this.props;
-		let dataSource = getall;
+		const { modify = {}, actions: { changeModifyField } } = this.props;
+
 		const columns = [{
 			title: '序号',
-			dataIndex: 'numbers',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex: 'index',
+
 		}, {
 			title: '模型编码',
 			dataIndex: 'coding'
 		}, {
 			title: '项目/子项目名称',
-			dataIndex: 'project'
+			dataIndex: 'project.name'
 		}, {
 			title: '单位工程',
-			dataIndex: 'unit'
+			dataIndex: 'unit.name'
 		}, {
 			title: '模型名称',
-			dataIndex: 'modelName'
+			dataIndex: 'modelName',
+			render: (text, record, index) => (
+				<Input style={{ width: '120px' }} onChange={this.tableDataChange.bind(this, record.index - 1, 'modelName')} defaultValue={record.modelName} />
+			),
+
 		}, {
 			title: '提交单位',
 			dataIndex: 'submittingUnit',
 			render: (text, record, index) => (
-                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'submittingUnit')} value={getall.submittingUnit} />
-            ),
+				<Input style={{ width: '120px' }} onChange={this.tableDataChange.bind(this, record.index - 1, 'submittingUnit')} defaultValue={record.submittingUnit} />
+			),
 
 		}, {
 			title: '模型描述',
-			dataIndex: 'modelDescription'
+			dataIndex: 'modelDescription',
+			render: (text, record, index) => (
+				<Input style={{ width: '120px' }} onChange={this.tableDataChange.bind(this, record.index - 1, 'modelDescription')} defaultValue={record.modelDescription} />
+			),
 		}, {
 			title: '模型类型',
-			dataIndex: 'modeType'
+			dataIndex: 'modeType',
+			render: (text, record, index) => (
+				<Select style={{ width: '120px' }} onSelect={this.handleSelect.bind(this, record.index - 1, 'modeType')} value={record.modeType}>
+					<Option value="设计模型">设计模型</Option>
+					<Option value="施工模型">施工模型</Option>
+					<Option value="竣工模型">竣工模型</Option>
+				</Select>
+			),
+
 		}, {
 			title: 'fdb模型',
 			dataIndex: 'fdbMode',
-			// render: (text, record, index) => {
-			// 	return (<span>
-			// 		<a onClick={this.handlePreview.bind(this, index)}>预览</a>
-			// 		<span className="ant-divider" />
-			// 		<a href={`${STATIC_DOWNLOAD_API}${record.fdbMode.a_file}`}>下载</a>
-			// 	</span>)
-			// }
+			render: (text, record, index) => {
+				console.log('record', record)
+				if (record.fdbMode) {
+					return (<span>
+						<a onClick={this.handlePreview.bind(this, record.index - 1, 'fdbMode')}>预览</a>
+						<span className="ant-divider" />
+						<Popconfirm
+							placement="leftTop"
+							title="确定删除吗？"
+							onConfirm={this.remove.bind(this, record.index - 1, 'fdbMode')}
+							okText="确认"
+							cancelText="取消">
+							<a>删除</a>
+						</Popconfirm>
+					</span>)
+				} else {
+					return (
+						<span>
+							<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record.index - 1, 'fdbfile')}>
+								<Button>
+									<Icon type="upload" />上传附件
+							</Button>
+							</Upload>
+						</span>
+					)
+				}
+			}
 		}, {
 			title: 'tdbx模型',
 			dataIndex: 'tdbxMode',
@@ -209,11 +272,12 @@ export default class Modify extends Component {
 		return (
 			<Modal
 				title="模型信息更改表"
-				key={this.props.akey}
+				key={modify.key}
 				width={1280}
 				visible={modify.visible}
 				onCancel={this.cancel.bind(this)}
 				onOk={this.onok.bind(this)}
+
 			>
 
 				<Row>
@@ -221,7 +285,8 @@ export default class Modify extends Component {
 						bordered
 						className='foresttable'
 						columns={columns}
-						dataSource={getall}
+						rowKey='index'
+						dataSource={this.state.dataSource}
 					/>
 				</Row>
 				{/* <Row style={{ marginTop: '20px' }}>
@@ -246,6 +311,79 @@ export default class Modify extends Component {
 		)
 	}
 
+	//预览
+	handlePreview(index, name) {
+		const { actions: { openPreview } } = this.props;
+		const { dataSource } = this.state;
+
+		let f = dataSource[index][name]
+		console.log('this.stat', f)
+		let filed = {}
+		filed.misc = f.misc;
+		filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+		filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+		filed.name = f.name;
+		filed.mime_type = f.mime_type;
+		openPreview(filed);
+	}
+
+	 //附件删除、不删除文件
+	 remove(index,name){
+        let {dataSource} = this.state;
+        dataSource[index][name] = '';
+        this.setState({dataSource})
+    }
+
+	//附件上传
+	beforeUploadPicFile = (index, name, file) => {
+		
+		// 上传到静态服务器
+	   const fileName = file.name;
+	   console.log('file',fileName)
+	   let { dataSource, unit, project } = this.state;
+	   let temp = fileName.split(".")[0]
+	   const { actions: { uploadStaticFile } } = this.props;
+	   const formdata = new FormData();
+	   formdata.append('a_file', file);
+	   formdata.append('name', fileName);
+	   let myHeaders = new Headers();
+	   let myInit = {
+		   method: 'POST',
+		   headers: myHeaders,
+		   body: formdata
+	   };
+	   //uploadStaticFile({}, formdata)
+	   fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
+		   resp = await resp.json()
+		   console.log('uploadStaticFile: ', resp)
+		   if (!resp || !resp.id) {
+			   message.error('文件上传失败')
+			   return;
+		   };
+		   const filedata = resp;
+		   filedata.a_file = this.covertURLRelative(filedata.a_file);
+		   filedata.download_url = this.covertURLRelative(filedata.a_file);
+		   const attachment = {
+			   size: resp.size,
+			   id: filedata.id,
+			   name: resp.name,
+			   status: 'done',
+			   url: filedata.a_file,
+			   //thumbUrl: SOURCE_API + resp.a_file,
+			   a_file: filedata.a_file,
+			   download_url: filedata.download_url,
+			   mime_type: resp.mime_type
+		   };
+		   dataSource[index][name] = attachment;
+		  
+		   this.setState({ dataSource });
+	   });
+	   return false;
+   }
+   covertURLRelative = (originUrl) => {
+	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+}
+	
 	delete() {
 
 	}
@@ -261,6 +399,6 @@ export default class Modify extends Component {
 		const {
 			actions: { clearModifyField }
 		} = this.props;
-		clearModifyField();
+		clearModifyField('visible', false);
 	}
 }
