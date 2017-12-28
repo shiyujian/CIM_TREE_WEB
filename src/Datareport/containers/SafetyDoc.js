@@ -16,7 +16,7 @@ import {
 import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
 import {getUser} from '_platform/auth';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_SafetyFile} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyDoc/AddFile';
 import DeleteFile from '../components/SafetyDoc/DeleteFile';
@@ -48,6 +48,11 @@ class SafetyDoc extends Component {
         }
     }
     
+    download(){
+        let apiGet = `${DataReportTemplate_SafetyFile}`;
+        this.createLink(this,apiGet);
+    }
+    
     async componentDidMount(){
         const {actions:{
             getScheduleDir,
@@ -56,7 +61,6 @@ class SafetyDoc extends Component {
         let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
         if(topDir.obj_type){
             let dir = await getScheduleDir({code:'datareport_safetydoc_1112'});
-            debugger
             if(dir.obj_type){
                 if(dir.stored_documents.length>0){
                     this.generateTableData(dir.stored_documents);
@@ -345,7 +349,11 @@ class SafetyDoc extends Component {
             <DynamicTitle title="安全文档" {...this.props} />
 				<Content>
 				<Row style={{ marginBottom: "30px" }}>
-                    <Col span={15}>
+                    <Col>
+                        <Button 
+                        style={{ marginRight: "30px" }}
+                        onClick={()=>this.download()}
+                        >模板下载</Button>
                         <Button 
                         style={{ marginRight: "30px" }}
                         onClick={()=>this.onBtnClick("add")}
@@ -360,6 +368,7 @@ class SafetyDoc extends Component {
                         onClick={()=>this.getExcel()}
                         style={{ marginRight: "30px" }}>导出表格</Button>
                         <Search
+                            className="btn"
                             placeholder="请输入文件名称"
                             onSearch={this.onSearch.bind(this)}
                             style={{ width: 200, marginLeft: "20px" }}

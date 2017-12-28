@@ -9,6 +9,7 @@ import { actions as platformActions } from '_platform/store/global';
 import {InfoUploadModal,InfoChangeModal,InfoDeleteModal,VedioInfoTable,MainHeader} from '../components/VedioData';
 import { actions } from '../store/vedioData';
 import {addSerialNumber} from '../components/VedioData/commonFunc';
+import {DataReportTemplate_ImageInformation} from '_platform/api.js';
 
 @connect(
 	state => {
@@ -60,6 +61,7 @@ export default class VedioInfoData extends Component {
 				 jsonToExcel={jsonToExcel}
 				 deriveData={this.deriveData}
 				 storeDateSource={this.storeDateSource}
+				 modalDown={DataReportTemplate_ImageInformation}
 				/>
 				<VedioInfoTable
 				dataSource={dataSource}

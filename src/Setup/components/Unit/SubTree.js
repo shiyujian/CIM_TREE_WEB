@@ -22,6 +22,8 @@ export default class SubTree extends Component {
 	}
 	//选中项目
 	async onSelect(code,p2) {
+		console.log("p2:",p2)
+		console.log("code:",code)
 		if (code.length === 0) {
 			return;
 		}
@@ -176,36 +178,32 @@ export default class SubTree extends Component {
 	}
 
 	static loop(data = []) {
-	
+
 		return data.map((item) => {
-			// console.log(item)
-			// if (item.children && item.children.length) {
-				if(item.obj_type ==='C_WP_PTR'){
-				   return;
-				}
-				else{
-					return (
-						<TreeNode
-							data = {item}
-							key={`${item.code}--${item.name}--${item.obj_type}`}
-							title={`${item.code} ${item.name}`}
-							obj_type={`${item.obj_type}`}
-						 >
-							{
-								SubTree.loop(item.children)
-							}
-						</TreeNode>
-					)
-				}
-				
-			// }
-			
+			if (item.obj_type === 'C_WP_PTR') {
+				return;
+			}
+			else {
+				return (
+					<TreeNode
+						data={item}
+						key={`${item.code}--${item.name}--${item.obj_type}`}
+						title={`${item.code} ${item.name}`}
+						obj_type={`${item.obj_type}`}
+					>
+						{
+							SubTree.loop(item.children)
+						}
+					</TreeNode>
+				)
+			}
+
 			return <TreeNode
-				data = {item}
+				data={item}
 				key={`${item.code}--${item.name}--${item.obj_type}`}
 				title={`${item.code} ${item.name}`}
 				obj_type={`${item.obj_type}`}
-			 />;
+			/>;
 		});
 	};
 }

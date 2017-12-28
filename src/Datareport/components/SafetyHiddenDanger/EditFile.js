@@ -210,28 +210,10 @@ export default class EditFile extends Component {
                 title: 'WBS编码',
                 dataIndex: 'wbs',
                 width: '8%',
-                render: (text, record ,index) => (
-					<div>
-                        <EditableCell
-                            value={record.wbs}
-							editOnOff = { false }
-							onChange={ this.onCellChange( index , "wbs", record) }
-						/>
-					</div>
-				),
             }, {
                 title: '责任单位',
                 dataIndex: 'resUnit',
                 width: '8%',
-                render: (text, record ,index) => (
-					<div>
-                        <EditableCell
-                            value={record.resUnit}
-							editOnOff = { false }
-							onChange={ this.onCellChange( index , "resUnit", record) }
-						/>
-					</div>
-				),
             }, {
                 title: '隐患类型',
                 dataIndex: 'type',

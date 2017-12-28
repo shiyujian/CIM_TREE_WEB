@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Button, Popconfirm, message, Input } from 'antd';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API, DataReportTemplate_ConstructionUnits, DataReportTemplate_Organization} from '_platform/api.js';
 import style from './TableOrg.css'
 const Search = Input.Search;
 export default class TableOrg extends Component {
@@ -15,10 +15,11 @@ export default class TableOrg extends Component {
 	render() {
 		return (
 			<div>
-				<div>
-					<Button style={{ marginRight: "10px" }}>模板下载</Button>
-					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
-					<Button className={style.button} onClick={this.sendCJ.bind(this)}>发送参建单位</Button>
+				<div> 
+					<Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_Organization}`)} type="default">模板下载组织部门</Button>
+					<Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_ConstructionUnits}`)} type="default">模板下载参建单位</Button>
+					<Button className={style.button} onClick={this.sendCJ.bind(this)}>发送填报参建单位</Button>
+					<Button className={style.button} onClick={this.send.bind(this)}>发送填报组织部门</Button>
 					<Button className={style.button} onClick={this.update.bind(this)}>申请变更</Button>
 					<Button className={style.button} onClick={this.delete.bind(this)}>申请删除</Button>
 					<Button className={style.button} onClick={this.getExcel.bind(this)}>导出表格</Button>
@@ -119,6 +120,16 @@ export default class TableOrg extends Component {
 			message.warning("请先选中要删除的数据");
 		}
 	}
+	//下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 	async componentDidMount() {
 		let dataSource = [];
 		const { actions: { getOrgTree } } = this.props;
@@ -137,18 +148,21 @@ export default class TableOrg extends Component {
 	}
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
+			console.log("onChange",selectedRowKeys, selectedRows);
 			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
 		},
 		onSelect: (record, selected, selectedRows) => {
+			console.log("onSelect",record, selected, selectedRows);
 			this.setState({
 				selectData:selectedRows,
 				excelData:selectedRows
 			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
-			console.log(selected, selectedRows, changeRows);
+			console.log("onSelectAll",selected, selectedRows, changeRows);
 			this.setState({
-				selectData:selectedRows
+				selectData:selectedRows,
+				excelData:selectedRows
 			})
 		},
 	};

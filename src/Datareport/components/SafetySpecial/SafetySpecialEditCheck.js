@@ -71,7 +71,6 @@ export default class SafetySpecialEditCheck extends Component {
 
         const docData = [];
         dataSource.map(item => {
-            debugger;
             docData.push({
                 code: item.codeId,
                 name: item.file.name,
@@ -109,8 +108,6 @@ export default class SafetySpecialEditCheck extends Component {
                 }
             })
         })
-        console.log('vip-updateDocList', updateDocList);
-
         let rst = await updateDocList({}, { data_list: docData });
         await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
             {
@@ -137,9 +134,30 @@ export default class SafetySpecialEditCheck extends Component {
     }
     //不通过
     async reject() {
-        const { wk } = this.props
-        const { actions: { deleteWorkflow } } = this.props
-        await deleteWorkflow({ pk: wk.id })
+        const {  wk,  } = this.state;
+        const { actions: { logWorkflowEvent, } } = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null
+            }
+        );
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
     }
 
     //预览

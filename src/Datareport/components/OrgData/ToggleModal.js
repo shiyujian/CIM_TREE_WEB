@@ -19,7 +19,8 @@ export default class ToggleModal extends Component{
             defaultchecker: "",
             units:[],
             selectPro:[],
-            selectUnit:[]
+            selectUnit:[],
+            flag:""
         }
     }
     render(){
@@ -85,16 +86,24 @@ export default class ToggleModal extends Component{
     handleExcelData(data) {
         const {actions:{getOrgReverse}} = this.props;
         data.splice(0, 1);
-        let type = [], canjian = [];
+        console.log("data:",data);
+        let type = [], canjian = [], color = [];
         let promises = data.map(item => {
             return getOrgReverse({code:item[3]});
         })
         let res;
         Promise.all(promises).then(rst => {
-            
             rst.map(item => {
-                type.push(item.children[0].name || "");
-                canjian.push(item.children[0].children[0].name || "");
+                if (item.children.length === 0) {
+                    type.push(" ");
+                    canjian.push(" ");
+                    this.setState({
+                        flag:false
+                    })
+                }else{
+                    type.push(item.children[0].name || "");
+                    canjian.push(item.children[0].children[0].name || "");
+                }
             })
             res = data.map((item,index) => {
                 return {
@@ -108,7 +117,8 @@ export default class ToggleModal extends Component{
                     depart: item[2],
                     // 直属部门
                     direct: item[3],
-                    remarks: item[4]
+                    remarks: item[4],
+                    color
                 }
             });
             console.log("res:",res);
@@ -121,6 +131,10 @@ export default class ToggleModal extends Component{
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
         if (!this.state.passer) {
             message.error('审批人未选择');
+            return;
+        }
+        if (this.state.flag === false) {
+            message.error('存在错误数据');
             return;
         }
         console.log(this.state.selectPro);
@@ -153,12 +167,6 @@ export default class ToggleModal extends Component{
         });
         getProjects().then(rst => {
             if (rst.children.length) {
-                // let projects = rst.children.map(item => {
-                //     return (
-                //         // <Option value={JSON.stringify(item)}>{item.name}</Option>
-                //         <Option value={JSON.stringify(item)}>{item.name}</Option>
-                //     )
-                // })
                 let projects = rst.children;
                 this.setState({
                     projects,
@@ -241,8 +249,19 @@ export default class ToggleModal extends Component{
         key: 'depart',
     }, {
         title: '直属部门',
-        dataIndex: 'direct',
-        key: 'Direct',
+        // dataIndex: 'direct',
+        // key: 'Direct',
+        render:(record) => {
+            if (record.canjian === " " || record.direct === " ") {
+                return (
+                    <span style={{color:"red"}}>{record.direct}</span>
+                )
+            }else{
+                return (
+                    <span>{record.direct}</span>
+                )
+            }
+        }
     }, {
         title: '负责项目/子项目名称',
         width:"15%",
