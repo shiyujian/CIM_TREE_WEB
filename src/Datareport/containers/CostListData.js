@@ -277,7 +277,7 @@ export default class CostListData extends Component {
     }
 
 	render() {
-		const { selectedRowKeys } = this.state;
+		const { selectedRowKeys, dataSource } = this.state;
 		const rowSelection = {
 			selectedRowKeys,
 			onChange: this.onSelectChange,
@@ -302,9 +302,11 @@ export default class CostListData extends Component {
 					<Col >
 						<Table
 							columns={this.columns}
-							dataSource={this.state.dataSource}
+							dataSource={dataSource}
 							rowSelection={rowSelection}
+							pagination={{showQuickJumper:true,showSizeChanger:true,total:dataSource.length}} 
 							rowKey="key"/>
+							
 					</Col>
 				</Row>
 				{

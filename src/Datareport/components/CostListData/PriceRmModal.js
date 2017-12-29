@@ -133,7 +133,7 @@ export default class PriceRmModal extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    pagination={{ pageSize: 10 }}
+                    pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col>

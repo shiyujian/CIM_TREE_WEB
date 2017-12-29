@@ -26,28 +26,29 @@ export default class PriceList extends Component {
 
         const {actions:{getAllUsers,getWorkflowById,getProjectTree}} = this.props;
         getAllUsers().then(res => {
-            let checkers = res.map(o => {
+            let checkers = res.map((o,index) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option value={JSON.stringify(o)}  key={index+1}>{o.account.person_name}</Option>
                 )
             })
             this.setState({checkers})
         });
         getProjectTree({depth:1}).then(rst => {
             if (rst.status) {
-                let projects = rst.children.map(item => {
+                let projects = rst.children.map((item, key) => {
                     return (
                         {
                             value:JSON.stringify(item),
                             label:item.name,
-                            isLeaf:false
+                            isLeaf:false,
+                            key
                         }
                     )
                 })
                 this.setState({options:projects})
             }else{
                 //获取项目信息失败
-            }
+            };
         })
     }
 	beforeUpload = (info) => {
@@ -426,7 +427,7 @@ export default class PriceList extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    pagination={{ pageSize: 10 }}
+                    pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col><Button style={{ margin:'10px 10px 10px 0px' }}>模板下载</Button></Col>

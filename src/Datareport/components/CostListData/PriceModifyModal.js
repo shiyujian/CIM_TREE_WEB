@@ -102,6 +102,7 @@ export default class PriceModifyModal extends Component {
                             value={record.projectcoding}
                             editOnOff={false}
                             onChange={this.onCellChange(index, "projectcoding", record)}
+                            pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                         />
                     </div>
                 )
