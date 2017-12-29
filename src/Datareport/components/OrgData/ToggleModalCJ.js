@@ -259,9 +259,10 @@ export default class ToggleModalCJ extends Component{
                                 units.push(it);
                             })
                         })
-                        this.setState({units})
-                        console.log("this.state.units",this.state.units);
-                        this.forceUpdate();
+                        // this.setState({units})
+                        // console.log("this.state.units",this.state.units);
+                        record.selectUnits = units;
+                        this.forceUpdate(); 
                     });
                 }} 
                 >
@@ -282,7 +283,7 @@ export default class ToggleModalCJ extends Component{
                     record.selectUnit = selectUnit;
                     this.forceUpdate();
                 }} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
-                    {ToggleModalCJ.lmyloop(this.state.units)}
+                    {ToggleModalCJ.lmyloop(record.selectUnits)}
                  </TreeSelect>
             )
         }
