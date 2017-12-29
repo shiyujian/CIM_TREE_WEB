@@ -3,6 +3,7 @@ import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon,TreeSelec
 import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
 import { getUnit } from '../../store/orgdata';
 import { Promise } from 'es6-promise';
+import './TableOrg.less'
 const Search = Input.Search;
 const Option = Select.Option;
 const SHOW_PARENT = TreeSelect.SHOW_PARENT;
@@ -20,7 +21,9 @@ export default class ToggleModal extends Component{
             units:[],
             selectPro:[],
             selectUnit:[],
-            flag:""
+            flag:"",
+            repeatCodes:[],
+            flag_code:""
         }
     }
     render(){
@@ -82,14 +85,33 @@ export default class ToggleModal extends Component{
             </Modal>
         )
     }
+    //判断数据是否重复
+    isRepeat(arr){
+        var hash = {};
+        let repeatCode = [];
+        for(var i in arr){
+            if (hash[arr[i]]) {
+                repeatCode.push(arr[i])
+            }
+            hash[arr[i]] = true;
+        }
+        return repeatCode;
+    }
      //处理上传excel的数据
     handleExcelData(data) {
         const {actions:{getOrgReverse}} = this.props;
         data.splice(0, 1);
-        console.log("data:",data);
-        let type = [], canjian = [], color = [];
+        let type = [], canjian = [], color = [], codes = [];
         let promises = data.map(item => {
+            codes.push(item[1]);
             return getOrgReverse({code:item[3]});
+        })
+        let repeatCode = this.isRepeat(codes);
+        if (repeatCode.length > 1) {
+            this.setState({flag_code:false})
+        }
+        this.setState({
+            repeatCode
         })
         let res;
         Promise.all(promises).then(rst => {
@@ -132,12 +154,14 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
+        if (this.state.flag_code === false) {
+            message.error('存在重复的部门编码');
+            return;
+        }
         if (this.state.flag === false) {
             message.error('存在错误数据');
             return;
         }
-        console.log(this.state.selectPro);
-        console.log(this.state.selectUnit);
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisible(false);
     }
@@ -216,7 +240,6 @@ export default class ToggleModal extends Component{
                 })
             })
             this.setState({units})
-            console.log("this.state.units",this.state.units);
         })
     }
     onSelectUnit(value, node, extra){
@@ -226,14 +249,30 @@ export default class ToggleModal extends Component{
         })
         this.setState({selectUnit});
     }
+    // 删除数据
+    delete(index){
+        let dataSource = this.state.dataSource;
+        dataSource.splice(index,1);
+        this.setState({dataSource})
+    }
     columns = [{
         title: '序号',
         dataIndex: 'index',
         key: 'Index',
     }, {
         title: '组织机构编码',
-        dataIndex: 'code',
-        key: 'Code',
+        render:(text,record,index) => {
+            console.log("this.state.repeatCode:",this.state.repeatCode)
+            if (this.state.repeatCode.indexOf(record.code) != -1) {
+                return (
+                    <span style={{"color":"red"}}>{record.code}</span>
+                )
+            }else{
+                return (
+                    <span>{record.code}</span>
+                )
+            }
+        }
     }, {
         title: '组织机构类型',
         dataIndex: 'type',
@@ -266,7 +305,6 @@ export default class ToggleModal extends Component{
         width:"15%",
         height:"64px",
         render:(record) => {
-            console.log("project:",record);
             return (
                 <TreeSelect value={record.selectPro || ""} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
                 onSelect={(value,node,extra) => {
@@ -287,7 +325,7 @@ export default class ToggleModal extends Component{
                         // this.setState({units})
                         record.selectUnits = units;
                         this.forceUpdate();
-                        console.log("this.state.units",this.state.units);
+                        // console.log("this.state.units",this.state.units);
                     })
 
                 }} 
@@ -319,11 +357,20 @@ export default class ToggleModal extends Component{
         dataIndex: 'remarks',
         key: 'Remarks'
     }, {
-        title: '编辑',
-        render: (record) => (
+        title: '删除',
+        render: (text, record, index) => (
             <span>
-                <Icon style={{marginRight:"15px"}} type = "edit"/>
-                <Icon type = "delete"/>
+                {/* <Icon style={{marginRight:"15px"}} type = "edit"/> */}
+                {/* <span>|</span> */}
+                <Popconfirm 
+                    title="确认删除吗"
+                    onConfirm={this.delete.bind(this, index)}
+                    okText="是"
+                    onCancel="否"
+                >
+                    <Icon type = "delete" />
+                </Popconfirm>
+                
             </span>
         )
     }]

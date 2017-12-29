@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Button, Popconfirm, message, Input, Pagination, Spin } from 'antd';
 import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API, DataReportTemplate_ConstructionUnits, DataReportTemplate_Organization} from '_platform/api.js';
-import style from './TableOrg.css'
+import './TableOrg.less'
 const Search = Input.Search;
 export default class TableOrg extends Component {
 	constructor(props){
@@ -23,12 +23,12 @@ export default class TableOrg extends Component {
 				<div> 
 					<Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_Organization}`)} type="default">模板下载组织部门</Button>
 					<Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_ConstructionUnits}`)} type="default">模板下载参建单位</Button>
-					<Button className={style.button} onClick={this.sendCJ.bind(this)}>发送填报参建单位</Button>
-					<Button className={style.button} onClick={this.send.bind(this)}>发送填报组织部门</Button>
-					<Button className={style.button} onClick={this.update.bind(this)}>申请变更</Button>
-					<Button className={style.button} onClick={this.delete.bind(this)}>申请删除</Button>
-					<Button className={style.button} onClick={this.getExcel.bind(this)}>导出表格</Button>
-					<Search className={style.button} onSearch = {this.searchOrg.bind(this)} style={{ width: "200px" }} placeholder="输入搜索条件" />
+					<Button className="button" onClick={this.sendCJ.bind(this)}>发送填报参建单位</Button>
+					<Button className="button" onClick={this.send.bind(this)}>发送填报组织部门</Button>
+					<Button className="button" onClick={this.update.bind(this)}>申请变更</Button>
+					<Button className="button" onClick={this.delete.bind(this)}>申请删除</Button>
+					<Button className="button" onClick={this.getExcel.bind(this)}>导出表格</Button>
+					<Search className="button" onSearch = {this.searchOrg.bind(this)} style={{ width: "200px" }} placeholder="输入搜索条件" />
 				</div>
 				<Spin spinning = {this.state.spinning}>
 					<Table
@@ -59,7 +59,7 @@ export default class TableOrg extends Component {
 			return;
 		}
 		this.state.dataSource.map(item => {
-			if (item.name.indexOf(value) != -1) {
+			if (item.name.indexOf(value) != -1 || item.code.indexOf(value) != -1 || item.extra_params.org_type.indexOf(value) != -1 || item.extra_params.canjian != -1 || item.extra_params.direct !== -1){
 				searchData.push(item);
 			}
 			if (item.children && item.children.length > 0) {
