@@ -28,9 +28,9 @@ export default class PriceRmModal extends Component {
             dataSource: rmData
         })
         getAllUsers().then(res => {
-            let checkers = res.map(o => {
+            let checkers = res.map((o, key) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option value={JSON.stringify(o)} key={key}>{o.account.person_name}</Option>
                 )
             })
             this.setState({checkers})

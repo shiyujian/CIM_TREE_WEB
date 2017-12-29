@@ -262,7 +262,6 @@ export default class CostListData extends Component {
 		}).catch(e => {
 			console.log(e);
 		})
-		debugger;
 	}
 
 	//下载
