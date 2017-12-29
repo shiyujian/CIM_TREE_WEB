@@ -122,7 +122,7 @@ export default class PriceListCheck extends Component {
             i++;
             tagLists.push({
                 "name": 'priceListName' + moment().format("YYYYMMDDHHmmss")+i,
-                "code": 'priceListCode' + moment().format("YYYYMMDDHHmmss")+i,
+                "code": JSON.stringify(item.projectcoding),
                 "obj_type": "C_QTO",
                 "status": "A",
                 "version": "A",

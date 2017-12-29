@@ -5,6 +5,7 @@ import { Input, Form, Spin, Upload, Icon, Button, Modal,
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
+import EditableCell from '../EditableCell';
 const {Option} = Select
 
 export default class PriceList extends Component {
@@ -60,7 +61,8 @@ export default class PriceList extends Component {
             return false;
         }
     }
-    uplodachange = (info) => {
+    uplodachange = async(info) => {
+        let {actions: {verifyCode}} = this.props;
         //info.file.status/response
         if (info && info.file && info.file.status === 'done') {
             notification.success({
@@ -71,6 +73,8 @@ export default class PriceList extends Component {
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
+                let res = await verifyCode({code: dataList[i][1]});
+                dataList[i].flag = res !== 'object not found' ? true : false;
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
                     filename: dataList[i][0] ? dataList[i][0] : '',
@@ -80,6 +84,7 @@ export default class PriceList extends Component {
                     company: dataList[i][4] ? dataList[i][4] : '',
                     total: dataList[i][5] ? dataList[i][5] : '',
                     remarks: dataList[i][5] ? dataList[i][6] : '',
+                    flag: dataList[i].flag,
                     project:{
                         code:"",
                         name:"",
@@ -96,6 +101,11 @@ export default class PriceList extends Component {
                         name: 'priceList'
                     }
                 })
+            }
+            if(dataSource.some(item => {
+                return item.flag
+            })) {
+                message.warn("清单项目编码错误")
             }
             this.setState({ dataSource });
         }
@@ -172,6 +182,13 @@ export default class PriceList extends Component {
                     })
         if(temp){
             message.info(`有数据未上传附件`)
+            return
+        }
+        let flag = this.state.dataSource.some((o,index) => {
+            return o.flag
+        })
+        if(flag) {
+            message.info("清单项目清单编码错误");
             return
         }
         const {project,unit} =  this.state;
@@ -311,6 +328,30 @@ export default class PriceList extends Component {
         return false;
     }
     
+    onCellChange = (index, key, record) => {      //编辑某个单元格
+        const { dataSource } = this.state;
+        return (value) => {
+            dataSource[index][key] = value;
+            record[key] = value;
+        };
+    }
+    //验证编码
+    asyncVerify (index, key, record) {
+        const { dataSource } = this.state;
+        let {actions: {verifyCode}} = this.props;
+        return async (code) => {
+            let res = await verifyCode({code});
+            if(res === 'object not found') {
+                dataSource[index].flag = false;
+            }else {
+                message.warn("清单项目编码错误");
+                dataSource[index].flag = true;
+            }
+            this.setState({dataSource});
+        }
+        
+    }
+
 	render() {
         const columns = 
             [{
@@ -320,7 +361,21 @@ export default class PriceList extends Component {
             },{
                 title:'清单项目编码',
                 dataIndex:'projectcoding',
-                width:"10%"
+                width:"10%",
+                render: (text, record, index) => {
+                    if(record.flag){
+                        return <div style={{color:'red'}}>
+                                    <EditableCell
+                                        value={record.projectcoding}
+                                        editOnOff={false}
+                                        onChange={this.onCellChange.call(this,index, "projectcoding", record)}
+                                        asyncVerify={this.asyncVerify.call(this,index, "projectcoding", record)}
+                                    />
+                                </div>
+                    }else{
+                        return <span>{record.projectcoding}</span>
+                    }
+                }
             },{
                 title:'计价单项',
                 dataIndex:'valuation',
