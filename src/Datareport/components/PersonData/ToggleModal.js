@@ -45,7 +45,7 @@ export default class ToggleModal extends Component{
                 title: '人员编码',
                 // dataIndex: 'code',
                 // key: 'Code',
-                reder:(text, record, index) => {
+                render:(text, record, index) => {
                     console.log('record',record)
                     if(this.state.repeatCode.indexOf(record.code) != -1) {
                         return <span style={{color: 'red'}}>{record.code}</span>
@@ -312,6 +312,7 @@ export default class ToggleModal extends Component{
             }
             hash[arr[i]] = true;
         }
+        console.log('repeatCode',repeatCode)
         return repeatCode;
     }
     //处理上传excel的数据
@@ -323,6 +324,7 @@ export default class ToggleModal extends Component{
             codes.push(item[1])
             return getOrgReverse({code: item[3]});
         })
+        console.log('codes',codes)
         let repeatCode = this.isRepeat(codes);
         if(repeatCode.length > 1) {
             console.log(1111)

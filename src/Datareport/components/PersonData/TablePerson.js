@@ -139,14 +139,14 @@ export default class TablePerson extends Component{
 			if (rst.account.organization.indexOf(value) != -1) {
 				searchData.push(rst);
 			}
-			// if (rst.account.org_code.indexOf(value) !== -1) {
+			// if (typeof(rst.account.org_code) === null && rst.account.org_code.indexOf(value) !== -1) {
 			// 	console.log('value1',value)
 			// 	searchData.push(rst);
 			// }
-			// if (rst.account.person_code.indexOf(value) != -1) {
+			// if (typeof(rst.account.person_code) === null && rst.account.person_code.indexOf(value) != -1) {
 			// 	searchData.push(rst);
 			// }
-			// if (rst.account.person_name.indexOf(value) != -1) {
+			// if (typeof(rst.account.person_name) === null && rst.account.person_name.indexOf(value) != -1) {
 			// 	searchData.push(rst);
 			// }
 		})
