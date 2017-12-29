@@ -16,15 +16,15 @@ export default class Expurgate extends Component {
 		}
 	}
 	componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
-        getAllUsers().then(res => {
-            let checkers = res.map((o,index) => {
-                return (
-                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
-                )
-            })
-            this.setState({checkers})
-        })
+        // const {actions:{getAllUsers}} = this.props
+        // getAllUsers().then(res => {
+        //     let checkers = res.map((o,index) => {
+        //         return (
+        //             <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
+        //         )
+        //     })
+        //     this.setState({checkers})
+        // })
     }
 	componentWillReceiveProps(props){
         const {expurgate = {}} = props
@@ -55,7 +55,7 @@ export default class Expurgate extends Component {
    	}
 
 	render() {
-		const {expurgate = {}} = this.props;
+		const {expurgate = {},common ={}} = this.props;
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
@@ -130,7 +130,7 @@ export default class Expurgate extends Component {
                         审核人：
                         <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
                             {
-                                this.state.checkers
+                                common.checkers
                             }
                         </Select>
                     </span> 

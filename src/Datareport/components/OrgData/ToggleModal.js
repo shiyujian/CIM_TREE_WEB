@@ -118,7 +118,6 @@ export default class ToggleModal extends Component{
                     // 直属部门
                     direct: item[3],
                     remarks: item[4],
-                    color
                 }
             });
             console.log("res:",res);
@@ -267,8 +266,10 @@ export default class ToggleModal extends Component{
         width:"15%",
         height:"64px",
         render:(record) => {
+            console.log("project:",record);
             return (
-                <TreeSelect value={record.selectPro || ""} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
+                <TreeSelect value={record.selectPro || ""} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
+                onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
                     let units = [];
                     let selectPro = [];
@@ -283,10 +284,11 @@ export default class ToggleModal extends Component{
                                 units.push(it);
                             })
                         })
-                        this.setState({units})
+                        // this.setState({units})
+                        record.selectUnits = units;
+                        this.forceUpdate();
                         console.log("this.state.units",this.state.units);
                     })
-                    this.forceUpdate();
 
                 }} 
                 >
@@ -298,6 +300,7 @@ export default class ToggleModal extends Component{
         title: '负责单位工程名称',
         width:"15%",
         render:(record) => {
+            console.log("unit:",record);
             return (
                 <TreeSelect value={record.selectUnit || ""} onSelect={(value, node, extra) => {
                     let selectUnit = [];
@@ -305,8 +308,9 @@ export default class ToggleModal extends Component{
                         selectUnit.push(item.key);
                     })
                     record.selectUnit = selectUnit;
+                    this.forceUpdate();
                 }} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
-                    {ToggleModal.lmyloop(this.state.units)}
+                    {ToggleModal.lmyloop(record.selectUnits)}
                  </TreeSelect>
             )
         }

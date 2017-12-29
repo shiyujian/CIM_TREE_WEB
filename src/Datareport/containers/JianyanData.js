@@ -7,7 +7,7 @@ import {actions as platformActions} from '_platform/store/global';
 import {Row,Col,Table,Input,Button,message,Spin} from 'antd';
 import JianyanModal from '../components/Quality/JianyanModal'
 import {WORKFLOW_CODE} from '_platform/api.js'
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_SubdivisionUnitProjectAcceptance} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_SubdivisionUnitProjectAcceptance,NODE_FILE_STATIC_URL,NODE_FILE_EXCHANGE_API} from '_platform/api';
 import Preview from '_platform/components/layout/Preview';
 import JianyanpiDelete from '../components/Quality/JianyanpiDelete'
 import './quality.less'
@@ -144,7 +144,7 @@ export default class JianyanData extends Component {
 				arr[index] = {...obj,key:index,file:{}}
 			}
 		}
-		this.setState({totalData:arr,dataSource:arr,pagination:{total:arr.length},loading:false})
+		this.setState({totalData:arr,dataSource:arr,pagination:{total:arr.length,showSizeChanger:true,showQuickJumper:true,},loading:false})
 	}
 	//根据附件名称 也就是wbs编码获取其他信息
     async getInfo(wp){
@@ -179,7 +179,8 @@ export default class JianyanData extends Component {
 		  pagination: pager,
 		});
 		let arr = this.state.dataSource
-		for(let index = (pagination.current-1)*10;index < pagination.current*10 && index < this.state.dataSource.length;index++){
+		let pageSize = pagination.pageSize
+		for(let index = (pagination.current-1)*pageSize;index < pagination.current*pageSize && index < this.state.dataSource.length;index++){
 			if(arr[index].key+1){
 				arr[index].key = index
 				continue;
@@ -213,9 +214,6 @@ export default class JianyanData extends Component {
     }
 	//批量上传回调
 	setData(data,participants){
-		if(this.state.targetData.length){
-			this.setState({targetData:[],selectedRowKeys:[]})
-		}
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -251,15 +249,15 @@ export default class JianyanData extends Component {
                     }],
                     attachment:null}).then(() => {
 						this.setState({addvisible:false})	
+						if(this.state.targetData.length){
+							this.setState({targetData:[],selectedRowKeys:[]})
+						}
 						message.info("发起成功")					
 					})
 		})
 	}
 	//删除回调
 	delData(data,participants){
-		if(this.state.targetData.length){
-			this.setState({targetData:[],selectedRowKeys:[]})
-		}
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -294,7 +292,10 @@ export default class JianyanData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({deletevisible:false})	
+						this.setState({deletevisible:false})
+						if(this.state.targetData.length){
+							this.setState({targetData:[],selectedRowKeys:[]})
+						}	
 						message.info("发起成功")					
 					})
 		})
@@ -373,7 +374,7 @@ export default class JianyanData extends Component {
 					<Button className="btn" type="default" onClick={() => {this.setState({targetData:[],addvisible:true})}}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.setEditVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.setDelVisible.bind(this)}>申请删除</Button>
-					<Button className="btn" type="default">导出表格</Button>
+					<Button className="btn" type="default" onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
@@ -406,5 +407,36 @@ export default class JianyanData extends Component {
 				}
 			</div>
 		);
+	}
+	createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+	getExcel(){
+		let { selectedRowKeys } = this.state
+		if(selectedRowKeys.length === 0){
+			message.info("请选择导出数据")
+			return
+		}
+		let tableData = selectedRowKeys.map(i => {
+			return this.state.dataSource[i]
+		})
+		let exhead = ['序号','项目/子项目','单位工程','WBS编码','名称','检验合格率','质量等级','施工单位'];
+		let rows = [exhead];
+		let excontent =tableData.map((data,index)=>{
+			let con_name = data.construct_unit ? data.construct_unit.name : '暂无'
+			return [index,data.project.name,data.unit.name,data.code,data.name,data.rate,data.level,con_name,];
+		});
+		rows = rows.concat(excontent);
+		const {actions:{jsonToExcel}} = this.props;
+        jsonToExcel({},{rows:rows}).then(rst => {
+            console.log(rst);
+            this.createLink('检验信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
 	}
 }

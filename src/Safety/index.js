@@ -32,6 +32,7 @@ export default class Safety extends Component {
 					<Submenu {...this.props} menus={Safety.menus} defaultOpenKeys={Safety.defaultOpenKeys} />
 				</Aside>
 				<Main>
+				<Switch>
 					{Register && <Route path="/safety/accidentManagement/register" component={Register} />}
 					{Scheme && <Route exact path="/safety/safetyPlan/scheme" component={Scheme} />}
 					{Report && <Route path="/safety/accidentManagement/report" component={Report} />}
@@ -53,7 +54,6 @@ export default class Safety extends Component {
 					{ActionsRecord && <Route path="/safety/managementAndControl/actionsRecord" component={ActionsRecord} />}
 					{TechnicalDisclosure && <Route path="/safety/managementAndControl/technicalDisclosure" component={TechnicalDisclosure} />}
 					{FacilitiesAcceptance && <Route path="/safety/managementAndControl/facilitiesAcceptance" component={FacilitiesAcceptance} />}
-					{Dashboard && <Route path="/safety" component={Dashboard} />}
 					{SafetyCheck && <Route path="/safety/managementAndControl/safetyCheck" component={SafetyCheck} />}
 					{HiddenDanger && <Route path="/safety/managementAndControl/hiddenDanger" component={HiddenDanger} />}
 					{MonitorPlan && <Route path="/safety/safetyMonitor/plan" component={MonitorPlan} />}
@@ -62,8 +62,10 @@ export default class Safety extends Component {
 					{MonitorStations && <Route path="/safety/safetyMonitor/stations" component={MonitorStations} />}
 					{MonitorData && <Route path="/safety/safetyMonitor/monitoring" component={MonitorData} />}
 					{MonitorDataP && <Route path="/safety/safetyMonitor/survey" component={MonitorDataP} />}
+					{Dashboard && <Route path="/safety" component={Dashboard} />}
 					{/* {SafetyRules && <Route path="/safety/specialSolutionsAndMeasures/safetyRules" component={SafetyRules} />}
 					{Special && <Route path="/safety/specialSolutionsAndMeasures/special" component={Special} />} */}
+					</Switch>
 				</Main>
 			</Body>)
 	}

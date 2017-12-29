@@ -101,7 +101,7 @@ export default class ToggleModalUpdate extends Component{
         this.setState({dataSource:updateOrg})
         let units = [];
         updateOrg.map(item => {
-            item.extra_params.project.map(it => {
+            item.extra_params.project  &&  item.extra_params.project.map(it => {
                 getUnit({code:it.split("--")[0]}).then(rst => {
                     units.push(...rst.children);
                     this.setState({
@@ -156,8 +156,8 @@ export default class ToggleModalUpdate extends Component{
                             })
                         })
                         this.setState({units})
+                        this.forceUpdate();
                     })
-                    this.forceUpdate();
 
                 }} 
                 >

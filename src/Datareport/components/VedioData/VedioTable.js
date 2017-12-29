@@ -6,11 +6,18 @@ import './index.less';
 
 export default class VedioTable extends Component{
 
+    componentDidMount(){
+        const {fileDel=false} = this.props;
+        if(fileDel){
+            this.columns.push(this.operation);
+        }
+    }
+
     page = 1//当前页数
 
     render(){
-        const {dataSource=[],loading =false,storeSelectRows =null} = this.props;
-        const rowSelection = storeSelectRows? this.rowSelect : null;
+        const {dataSource=[],loading =false,storeSelectRows =null} = this.props,
+            rowSelection = storeSelectRows? this.rowSelect : null;
         return(<Row className="rowSpacing">
             <Col span={24}>
                 <Table
@@ -21,6 +28,7 @@ export default class VedioTable extends Component{
                 pagination={{
                     defaultPageSize: 10,
                     showQuickJumper: true,
+                    showSizeChanger: true,
                     showTotal: showTotal,
                     onChange: (page)=>{this.page = page}
                 }}

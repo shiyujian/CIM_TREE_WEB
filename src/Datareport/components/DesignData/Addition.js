@@ -12,7 +12,6 @@ export default class Addition extends Component {
 		this.state = {
 			units:[],
 			projecttrees: [],
-			checkers: [],
             project:{},
             unit:{},
             options:[],
@@ -20,14 +19,6 @@ export default class Addition extends Component {
 	}
 	componentDidMount(){
         const {actions:{getAllUsers,getProjectTree}} = this.props
-        getAllUsers().then(res => {
-            let checkers = res.map((o,index) => {
-                return (
-                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
-                )
-            })
-            this.setState({checkers})
-        })
         getProjectTree({depth:1})
         .then(res => {
             if(res.status){
@@ -47,7 +38,7 @@ export default class Addition extends Component {
         })
     }
 	render() {
-		const { addition = {}, actions: { changeAdditionField } } = this.props;
+		const { addition = {},common = {}, actions: { changeAdditionField } } = this.props;
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
@@ -185,7 +176,7 @@ export default class Addition extends Component {
                         审核人：
                         <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
                             {
-                                this.state.checkers
+                                common.checkers
                             }
                         </Select>
                     </span> 

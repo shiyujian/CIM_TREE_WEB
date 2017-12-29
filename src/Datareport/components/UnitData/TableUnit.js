@@ -39,6 +39,10 @@ export default class TableUnit extends Component {
 		this.setState({ units: units, showDs: units,spinning:false });
 	}
 	render() {
+		let painationInfo = {
+			showQuickJumper:true,
+			showSizeChanger:true,
+		}
 		let rowSelection = {
 			selectedRowKeys: this.state.selectedRowKeys || [],
 			onChange: (selectedRowKeys, selectedRows) => {
@@ -98,6 +102,7 @@ export default class TableUnit extends Component {
 					bordered={true}
 					rowSelection={rowSelection}
 					dataSource={this.state.showDs || []}
+					pagination={painationInfo}
 				>
 				</Table>
 				{
