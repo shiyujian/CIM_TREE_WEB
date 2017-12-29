@@ -22,6 +22,8 @@ const getSearcherDir = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{
 const updateDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT');
 // 导出
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
+// 校验 
+const checkoutData = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[]);
 
 export const actions = {
 	ModalVisible,
@@ -35,6 +37,7 @@ export const actions = {
 	getSearcherDir,
 	updateDocList,
 	jsonToExcel,
+	checkoutData,
 };
 
 export default handleActions({

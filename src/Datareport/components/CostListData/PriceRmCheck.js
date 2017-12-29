@@ -71,18 +71,18 @@ export default class PriceRmCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         let docList = []
         dataSource.map(item => docList.push(item.code))
         //prepare the data which will store in database
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         let rst = await removeDocList({},{code_list:docList.join(',')});
         
-        if(rst.result){
+        if(rst.result){ 
             notification.success({
                 message: '删除工程量项成功！',
                 duration: 2
             });
-        }else{
+        }else{  
             notification.error({
                 message: '删除工程量项失败！',
                 duration: 2
@@ -94,7 +94,7 @@ export default class PriceRmCheck extends Component {
         const {wk} = this.props
         const {actions:{deleteWorkflow}} = this.props
         await deleteWorkflow({pk:wk.id})
-       }
+    }
     //radio变化
     onChange(e){
         this.setState({option:e.target.value})
@@ -147,7 +147,9 @@ export default class PriceRmCheck extends Component {
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
-                    bordered />
+                    bordered
+                    pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}}    
+                />
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>

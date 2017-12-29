@@ -30,6 +30,7 @@ export default class WorkScheduleData extends Component {
 			showDs: [],
 			totalData: null,
 			loading: false,
+			pagination:{},
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			setAddVisiable: false,
@@ -53,7 +54,7 @@ export default class WorkScheduleData extends Component {
 						name: single.extra_params.name,
 						project: single.extra_params.project.name || single.extra_params.project,
 						unit: single.extra_params.unit.name || single.extra_params.unit,
-						construct_unit: single.extra_params.construct_unit,
+						construct_unit: single.extra_params.construct_unit.name||single.extra_params.construct_unit,
 						quantity: single.extra_params.quantity,
 						factquantity: single.extra_params.factquantity,
 						planstarttime: single.extra_params.planstarttime,
@@ -67,7 +68,7 @@ export default class WorkScheduleData extends Component {
 						pk: single.extra_params.unit.pk || single.extra_params.pk,
 					}
 					dataSource.push(temp);
-					this.setState({ dataSource, showDat: dataSource, loading: false });
+					this.setState({ dataSource, showDat: dataSource, loading: false ,});
 				})
 			})
 
@@ -303,7 +304,7 @@ export default class WorkScheduleData extends Component {
 							bordered
 							rowSelection={rowSelection}
 							style={{ height: 380, marginTop: 20 }}
-							pagination={{ pageSize: 10 }}
+							pagination={{showSizeChanger:true,showQuickJumper:true}}
 							rowKey='key'
 							loading={this.state.loading}
 						/>

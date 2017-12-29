@@ -27,9 +27,7 @@ export default class WorkChange extends Component {
 	componentWillMount(){
 		let dataSource = this.props.dataSourceSelected;
 		let newdataSource = [];
-		console.log("123",dataSource)
 		dataSource.map((item,key)=>{
-			console.log(item);
 			let newDatas = {
 				key:key+1,
 				code: item.code,
@@ -270,7 +268,7 @@ export default class WorkChange extends Component {
 					<Popconfirm
 						placement="leftTop"
 						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, index)}
+						onConfirm={this.delete.bind(this, record.key-1)}
 						okText="确认"
 						cancelText="取消">
 						<a>删除</a>

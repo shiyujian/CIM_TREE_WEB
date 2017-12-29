@@ -122,7 +122,7 @@ export default class PriceListCheck extends Component {
             i++;
             tagLists.push({
                 "name": 'priceListName' + moment().format("YYYYMMDDHHmmss")+i,
-                "code": 'priceListCode' + moment().format("YYYYMMDDHHmmss")+i,
+                "code": JSON.stringify(item.projectcoding),
                 "obj_type": "C_QTO",
                 "status": "A",
                 "version": "A",
@@ -251,7 +251,10 @@ export default class PriceListCheck extends Component {
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
-                    bordered />
+                    bordered 
+                    pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
+                    />
+                    
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>
