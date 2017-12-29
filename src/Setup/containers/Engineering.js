@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions as platformActions} from '_platform/store/global';
-import PkCodeTree from '../../Quality/components/PkCodeTree';
+import PkCodeTree from '../components/PkCodeTree';
 import reducer, {actions} from '../store/engineering';
 import Button from "antd/es/button/button";
 import {Table, DirAddition, Additon} from '../components/Engineering'
