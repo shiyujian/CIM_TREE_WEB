@@ -10,7 +10,7 @@ export default class ToggleModal extends Component{
             users: [],
             projects: [],
             org: [],
-            falg: true,
+            subErr: true,
         }
     }
     render(){
@@ -121,7 +121,7 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
-        if(this.state.falg === false) {
+        if(this.state.subErr === false) {
             message.error('部门不存在，无法提交');
             return;
         }
@@ -153,7 +153,7 @@ export default class ToggleModal extends Component{
                 if(item.children.length === 0) {
                     orgname.push('');
                     this.setState({
-                        falg: false
+                        subErr: false
                     })
                 }
                 else{
