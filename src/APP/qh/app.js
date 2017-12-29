@@ -31,6 +31,7 @@ export default class App extends Component {
 		const {default: Cost} = await import('../../Cost');
 		const {default: Safety} = await import('../../Safety');
 		const {default: DataReport} = await import('../../Datareport');
+
 		this.setState({
 			Home,
 			Login,
@@ -47,7 +48,8 @@ export default class App extends Component {
 			Video,
 			Cost,
 			Safety,
-			DataReport
+			DataReport,
+
 		});
 	}
 
@@ -68,7 +70,8 @@ export default class App extends Component {
 			Video,
 			Cost,
 			Safety,
-			DataReport
+			DataReport,
+			
 		} = this.state || {};
 		return (
 			<Provider store={store}>
@@ -93,6 +96,7 @@ export default class App extends Component {
 						{Video && <Route path="/video" component={Video}/>}
 						{Safety && <Route path="/safety" component={Safety}/>}
 						{DataReport && <Route path="/data" component={DataReport}/>}
+					
 						<Route path="/:module?" component={Footer}/>
 						{Preview && <Preview/>}
 					</div>
