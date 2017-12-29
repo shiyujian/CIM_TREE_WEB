@@ -109,7 +109,7 @@ export default class Modify extends Component {
 	}
 
 	setChangeData = (data, participants) => {
-		const { modify = {}, actions: { createWorkflow, logWorkflowEvent, clearModifyField } } = this.props
+		const { modify = {}, actions: { createWorkflow, logWorkflowEvent, changeModifyField } } = this.props
 		let creator = {
 			id: getUser().id,
 			username: getUser().username,
@@ -144,7 +144,7 @@ export default class Modify extends Component {
 					attachment: null
 				}).then(() => {
 					message.success("成功")
-					clearModifyField('visible', false)
+					changeModifyField('visible', false)
 				})
 		})
 	}
@@ -218,7 +218,7 @@ export default class Modify extends Component {
 				} else {
 					return (
 						<span>
-							<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record.index - 1, 'fdbfile')}>
+							<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record.index - 1, 'fdbMode')}>
 								<Button>
 									<Icon type="upload" />上传附件
 							</Button>
@@ -230,23 +230,63 @@ export default class Modify extends Component {
 		}, {
 			title: 'tdbx模型',
 			dataIndex: 'tdbxMode',
-			// render: (text, record, index) => {
-			// 	return (<span>
-			// 		<a onClick={this.handlePreview.bind(this, index)}>预览</a>
-			// 		<span className="ant-divider" />
-			// 		<a href={`${STATIC_DOWNLOAD_API}${record.tdbxMode.a_file}`}>下载</a>
-			// 	</span>)
-			// }
+			render: (text, record, index) => {
+				console.log('record', record)
+				if (record.tdbxMode) {
+					return (<span>
+						<a onClick={this.handlePreview.bind(this, record.index - 1, 'tdbxMode')}>预览</a>
+						<span className="ant-divider" />
+						<Popconfirm
+							placement="leftTop"
+							title="确定删除吗？"
+							onConfirm={this.remove.bind(this, record.index - 1, 'tdbxMode')}
+							okText="确认"
+							cancelText="取消">
+							<a>删除</a>
+						</Popconfirm>
+					</span>)
+				} else {
+					return (
+						<span>
+							<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record.index - 1, 'tdbxMode')}>
+								<Button>
+									<Icon type="upload" />上传附件
+							</Button>
+							</Upload>
+						</span>
+					)
+				}
+			}
 		}, {
 			title: '属性表',
 			dataIndex: 'attributeTable',
-			// render: (text, record, index) => {
-			// 	return (<span>
-			// 		<a onClick={this.handlePreview.bind(this, index)}>预览</a>
-			// 		<span className="ant-divider" />
-			// 		<a href={`${STATIC_DOWNLOAD_API}${record.attributeTable.a_file}`}>下载</a>
-			// 	</span>)
-			// }
+			render: (text, record, index) => {
+				console.log('record', record)
+				if (record.attributeTable) {
+					return (<span>
+						<a onClick={this.handlePreview.bind(this, record.index - 1, 'attributeTable')}>预览</a>
+						<span className="ant-divider" />
+						<Popconfirm
+							placement="leftTop"
+							title="确定删除吗？"
+							onConfirm={this.remove.bind(this, record.index - 1, 'attributeTable')}
+							okText="确认"
+							cancelText="取消">
+							<a>删除</a>
+						</Popconfirm>
+					</span>)
+				} else {
+					return (
+						<span>
+							<Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record.index - 1, 'attributeTable')}>
+								<Button>
+									<Icon type="upload" />上传附件
+							</Button>
+							</Upload>
+						</span>
+					)
+				}
+			}
 		}, {
 			title: '上报时间',
 			dataIndex: 'reportingTime'
@@ -260,7 +300,7 @@ export default class Modify extends Component {
 					<Popconfirm
 						placement="leftTop"
 						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, index)}
+						onConfirm={this.delete.bind(this, record.index - 1)}		
 						okText="确认"
 						cancelText="取消">
 						<a>删除</a>
@@ -327,66 +367,69 @@ export default class Modify extends Component {
 		openPreview(filed);
 	}
 
-	 //附件删除、不删除文件
-	 remove(index,name){
-        let {dataSource} = this.state;
-        dataSource[index][name] = '';
-        this.setState({dataSource})
-    }
+	//附件删除、不删除文件
+	remove(index, name) {
+		let { dataSource } = this.state;
+		dataSource[index][name] = '';
+		this.setState({ dataSource })
+	}
 
 	//附件上传
 	beforeUploadPicFile = (index, name, file) => {
-		
-		// 上传到静态服务器
-	   const fileName = file.name;
-	   console.log('file',fileName)
-	   let { dataSource, unit, project } = this.state;
-	   let temp = fileName.split(".")[0]
-	   const { actions: { uploadStaticFile } } = this.props;
-	   const formdata = new FormData();
-	   formdata.append('a_file', file);
-	   formdata.append('name', fileName);
-	   let myHeaders = new Headers();
-	   let myInit = {
-		   method: 'POST',
-		   headers: myHeaders,
-		   body: formdata
-	   };
-	   //uploadStaticFile({}, formdata)
-	   fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
-		   resp = await resp.json()
-		   console.log('uploadStaticFile: ', resp)
-		   if (!resp || !resp.id) {
-			   message.error('文件上传失败')
-			   return;
-		   };
-		   const filedata = resp;
-		   filedata.a_file = this.covertURLRelative(filedata.a_file);
-		   filedata.download_url = this.covertURLRelative(filedata.a_file);
-		   const attachment = {
-			   size: resp.size,
-			   id: filedata.id,
-			   name: resp.name,
-			   status: 'done',
-			   url: filedata.a_file,
-			   //thumbUrl: SOURCE_API + resp.a_file,
-			   a_file: filedata.a_file,
-			   download_url: filedata.download_url,
-			   mime_type: resp.mime_type
-		   };
-		   dataSource[index][name] = attachment;
-		  
-		   this.setState({ dataSource });
-	   });
-	   return false;
-   }
-   covertURLRelative = (originUrl) => {
-	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-}
-	
-	delete() {
 
+		// 上传到静态服务器
+		const fileName = file.name;
+		console.log('file', fileName)
+		let { dataSource, unit, project } = this.state;
+		let temp = fileName.split(".")[0]
+		const { actions: { uploadStaticFile } } = this.props;
+		const formdata = new FormData();
+		formdata.append('a_file', file);
+		formdata.append('name', fileName);
+		let myHeaders = new Headers();
+		let myInit = {
+			method: 'POST',
+			headers: myHeaders,
+			body: formdata
+		};
+		//uploadStaticFile({}, formdata)
+		fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
+			resp = await resp.json()
+			console.log('uploadStaticFile: ', resp)
+			if (!resp || !resp.id) {
+				message.error('文件上传失败')
+				return;
+			};
+			const filedata = resp;
+			filedata.a_file = this.covertURLRelative(filedata.a_file);
+			filedata.download_url = this.covertURLRelative(filedata.a_file);
+			const attachment = {
+				size: resp.size,
+				id: filedata.id,
+				name: resp.name,
+				status: 'done',
+				url: filedata.a_file,
+				//thumbUrl: SOURCE_API + resp.a_file,
+				a_file: filedata.a_file,
+				download_url: filedata.download_url,
+				mime_type: resp.mime_type
+			};
+			dataSource[index][name] = attachment;
+
+			this.setState({ dataSource });
+		});
+		return false;
 	}
+	covertURLRelative = (originUrl) => {
+		return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+	}
+
+	delete(index) {
+		let { dataSource } = this.state;
+		dataSource.splice(index, 1);
+		this.setState({ dataSource });
+	}
+
 
 	onChange = (e) => {
 		console.log('radio checked', e.target.value);
@@ -397,8 +440,8 @@ export default class Modify extends Component {
 
 	cancel() {
 		const {
-			actions: { clearModifyField }
+			actions: { changeModifyField }
 		} = this.props;
-		clearModifyField('visible', false);
+		changeModifyField('visible', false);
 	}
 }
