@@ -33,6 +33,8 @@ const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{key}}&
 const getStrictSearch = createFetchAction(`${SERVICE_API}/doc_searcher/{{dir_code}}/L001/?doc_code=G01&doc_name=N01&keys=key1,key2&values=value1,value2`,[],'GET');
 //导出数据
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
+//验证code
+const verifyCode = createFetchAction(`${SERVICE_API}/tags/code/{{code}}/`,[],'GET');
 
 export const actions = {
 	getProjectTree,
@@ -54,7 +56,8 @@ export const actions = {
 	getSearcher,
 	removeDocList,
 	putDocList,
-	jsonToExcel
+	jsonToExcel,
+	verifyCode
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_SafetySpecial } from '_platform/api';
-import Preview from '../../../_platform/components/layout/Preview';
+import EditableCell from './EditableCell';
 import index from 'antd/lib/icon';
 
 const Search = Input.Search;
@@ -21,6 +21,7 @@ export default class ToggleModal extends Component {
             unit: {},
             beginUnit: '',
             options: [],
+            asyncCheckout: true,
         }
     }
     render() {
@@ -87,7 +88,7 @@ export default class ToggleModal extends Component {
                     <Col>
                         <span>
                             项目-单位工程：
-                   <Cascader
+                            <Cascader
                                 style={{ width: '300px' }}
                                 options={this.state.options}
                                 className='btn'
@@ -99,12 +100,12 @@ export default class ToggleModal extends Component {
                         </span>
                     </Col>
                 </Row>
-                <Preview />
                 <Row style={{ marginBottom: "30px" }}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
-                    <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
-                    <p style={{ paddingLeft: "25px" }}>3、请将日期的Excel单元格设置为文本格式，且必须带年月日，如2017年1月1日</p>
-                    <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.</p>
+                    <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2；</p>
+                    <p style={{ paddingLeft: "25px" }}>3、请将日期的Excel单元格设置为文本格式，且必须带年月日，如2017年1月1日；</p>
+                    <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为Chrome,IE11；</p>
+                    <p style={{ paddingLeft: "25px" }}>5、编制单位会进行系统校验，若为<span style={{ color: "red" }}>红色</span>请修正提交。</p>
                 </Row>
             </Modal>
         )
@@ -126,7 +127,7 @@ export default class ToggleModal extends Component {
         this.setState({ check })
     }
 
-    uplodachange(info) {
+    async  uplodachange(info) {
         if (info && info.file && info.file.status === 'done') {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
@@ -135,37 +136,83 @@ export default class ToggleModal extends Component {
                 message.error('Excel模板不相符，请下载最新模板！');
                 return;
             }
+            // 代码 校验
+            const { actions: { checkoutData } } = this.props;
             let dataSource = [];
-            for (let i = 2; i < dataList.length; i++) {
-                dataSource.push({
-                    resUnit: dataList[i][0] ? dataList[i][0] : '',
-                    index: dataList[i][1] ? dataList[i][1] : '',
-                    projectName: dataList[i][2] ? dataList[i][2] : '',
-                    unitProject: dataList[i][3] ? dataList[i][3] : '',
-                    scenarioName: dataList[i][4] ? dataList[i][4] : '',
-                    organizationUnit: dataList[i][5] ? dataList[i][5] : '',
-                    reviewTime: dataList[i][6] ? dataList[i][6] : '',
-                    reviewComments: dataList[i][7] ? dataList[i][7] : '',
-                    reviewPerson: dataList[i][8] ? dataList[i][8] : '',
-                    remark: dataList[i][9] ? dataList[i][9] : '',
-                    wbs: dataList[i][9] ? dataList[i][9] : '',
-                    fj: dataList[i][10] ? dataList[i][10] : '',
-                    code: '05',
-                    project: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                    unit: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                    file: {
-                    }
-                })
-            }
-            this.setState({ dataSource });
+            // for (let i = 2; i < dataList.length; i++) {
+            //     let rst = await checkoutData({ code: dataList[i][4] });
+
+            //     dataSource.push({
+            //         resUnit: dataList[i][0] ? dataList[i][0] : '',
+            //         index: dataList[i][1] ? dataList[i][1] : '',
+            //         projectName: dataList[i][2] ? dataList[i][2] : '',
+            //         unitProject: dataList[i][3] ? dataList[i][3] : '',
+            //         scenarioName: dataList[i][4] ? dataList[i][4] : '',
+            //         organizationUnit: dataList[i][5] ? dataList[i][5] : '',
+            //         reviewTime: dataList[i][6] ? dataList[i][6] : '',
+            //         reviewComments: dataList[i][7] ? dataList[i][7] : '',
+            //         reviewPerson: dataList[i][8] ? dataList[i][8] : '',
+            //         remark: dataList[i][9] ? dataList[i][9] : '',
+            //         wbs: dataList[i][9] ? dataList[i][9] : '',
+            //         fj: dataList[i][10] ? dataList[i][10] : '',
+            //         code: 'JSDW_zgxa', // 编制单位
+            //         project: {
+            //             code: "",
+            //             name: "",
+            //             obj_type: ""
+            //         },
+            //         unit: {
+            //             code: "",
+            //             name: "",
+            //             obj_type: ""
+            //         },
+            //         file: {},
+            //         checkout: rst.code === dataList[i][4] ? true : false,
+            //     })
+            // }
+            // this.setState({ dataSource });
+            // console.log('vip-dataSource',dataSource);
+
+            dataList.map((item, i) => {
+
+                if (i > 1) {
+                    checkoutData({ code: item[5] }).then(rst => {
+                        dataSource.push({
+                            sign: i,
+                            resUnit: item[0] ? item[0] : '',
+                            index: item[1] ? item[1] : '',
+                            projectName: item[2] ? item[2] : '',
+                            unitProject: item[3] ? item[3] : '',
+                            scenarioName: item[4] ? item[4] : '',
+                            organizationUnit: item[5] ? item[5] : '',
+                            reviewTime: item[6] ? item[6] : '',
+                            reviewComments: item[7] ? item[7] : '',
+                            reviewPerson: item[8] ? item[8] : '',
+                            remark: item[9] ? item[9] : '',
+                            wbs: item[9] ? item[9] : '',
+                            fj: item[10] ? item[10] : '',
+                            code: 'JSDW_zgxa', // 编制单位
+                            project: {
+                                code: "",
+                                name: "",
+                                obj_type: ""
+                            },
+                            unit: {
+                                code: "",
+                                name: "",
+                                obj_type: ""
+                            },
+                            file: {},
+                            checkout: rst.code === item[5] ? true : false,
+                        })
+                        this.setState({ dataSource });
+                        // console.log('vip-dataSource',dataSource);
+
+                    })
+                }
+            })
+
+
         }
     }
 
@@ -221,13 +268,13 @@ export default class ToggleModal extends Component {
         });
     }
     onok() {
-        if (!this.state.check) {
-            message.error('审批人未选择');
-            return;
-        }
         if (this.state.dataSource.length === 0) {
             message.info("请上传excel")
             return
+        }
+        if (!this.state.check) {
+            message.error('审批人未选择');
+            return;
         }
         let temp = this.state.dataSource.some((o, index) => {
             return !o.file.id
@@ -239,6 +286,14 @@ export default class ToggleModal extends Component {
         const { project, unit } = this.state;
         if (!project.name) {
             message.info(`请选择项目和单位工程`);
+            return;
+        }
+       
+        const checkoutInfo = this.state.dataSource.find((item,index)=>{
+            return item.checkout===false;
+        })
+        if (checkoutInfo) {
+            message.info(`编制单位有误！`);
             return;
         }
         let { check } = this.state
@@ -385,6 +440,7 @@ export default class ToggleModal extends Component {
         filed.mime_type = f.mime_type;
         openPreview(filed);
     }
+
     beforeUpload(info) {
         if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
             return true;
@@ -396,6 +452,7 @@ export default class ToggleModal extends Component {
             return false;
         }
     }
+
     selectUnit(value) {
         let unit = JSON.parse(value);
         this.setState({ unit, beginUnit: value });
@@ -428,6 +485,69 @@ export default class ToggleModal extends Component {
                 //获取项目信息失败
             }
         });
+    }
+
+    async Checkout(value) {
+        let checkedValue = false;
+        const { actions: { checkoutData } } = this.props;
+        let rst = await checkoutData({ code:value });
+
+        if (rst && rst.code === value) {
+            checkedValue = true;
+        }
+        return checkedValue;
+    }
+    onCellChange = (index, key, record) => {
+        const { dataSource } = this.state;
+        return async (value,checkedValue) => {
+            // if (key === "organizationUnit" && value) {
+            //     // 修改后校验
+            // }
+            // let checkout = false;
+            // const { actions: { checkoutData } } = this.props;
+            // let rst = await checkoutData({ code: record.organizationUnit });
+
+            // if (rst && rst.code === record.organizationUnit) {
+            //     checkout = true;
+            // }
+            record[key] = value;
+            this.setState({
+                ...this.state,
+                dataSource: dataSource.map((item, index) => {
+                    if (item.sign === record.sign) {
+                        return {
+                            ...item,
+                            organizationUnit: value,
+                            checkout:checkedValue
+                        }
+                    } else {
+                        return item;
+                    }
+                })
+            })
+            // checkoutData({ code: record.organizationUnit }).then(rst => {
+            //     record[key] = value;
+            //     if (rst&&rst.code === record.organizationUnit) {
+            //         checkout = true;
+            //     }
+            //     // dataSource[index][key] = value;
+            //     // dataSource[index].checkout = checkout;
+            //     this.setState({
+            //         ...this.state,
+            //         dataSource: dataSource.map((item, index) => {
+            //             if (item.sign === record.sign) {
+            //                 return {
+            //                     ...item,
+            //                     organizationUnit: value,
+            //                     checkout
+            //                 }
+            //             } else {
+            //                 return item;
+            //             }
+            //         })
+            //     })
+            // })
+        };
     }
 
     columns = [
@@ -466,15 +586,48 @@ export default class ToggleModal extends Component {
             title: '方案名称',
             dataIndex: 'scenarioName',
             width: '15%',
-        }, {
+        }
+        ,
+        {
             title: '编制单位',
             dataIndex: 'organizationUnit',
             width: '15%',
-        }, {
+            render: (text, record, index1) => (
+                (
+                    record.checkout ?
+                        <div
+                        >
+                            <EditableCell
+                                editOnOff={false}
+                                value={record.organizationUnit}
+                                onChange={this.onCellChange(index1, "organizationUnit", record)}
+                                asyncCheckout={this.state.asyncCheckout}
+                                checkVal={this.Checkout.bind(this)}
+                                />
+                        </div>
+                        :
+                        <div
+                        style={{ color: "red" }}
+                        >
+                            <EditableCell
+                                editOnOff={false}
+                                value={record.organizationUnit}
+                                onChange={this.onCellChange(index1, "organizationUnit", record)}
+                                asyncCheckout={this.state.asyncCheckout}
+                                checkVal={this.Checkout.bind(this)}
+                            />
+                        </div>
+                )
+            ),
+        }
+        ,
+        {
             title: '评审时间',
             dataIndex: 'reviewTime',
             width: '10%',
-        }, {
+        }
+        ,
+        {
             title: '评审意见',
             dataIndex: 'reviewComments',
             width: '10%',

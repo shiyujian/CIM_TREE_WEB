@@ -19,6 +19,8 @@ export const getWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`,
 export const logWorkflowEvent = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/logevent/`, [], 'POST');
 //批量修改施工包
 const updateWpData = createFetchAction(`${SERVICE_API}/wpputlist/`,[],'PUT');
+//批量获取施工包
+const getdateWpData = createFetchAction(`${SERVICE_API}/wpputlist/code/{{code}}`,[]);
 // 获取所有施工进度数据
 export const getWorkDataList = createFetchAction(`${SERVICE_API}/searcher/?keyword=rel_doc_workdata&obj_type=C_DOC`, [], 'GET');
 
@@ -37,7 +39,8 @@ export const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`,[],'GET');
 //导出数据
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
-
+//得到组织机构
+const getOrg = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`,[])
 //校验
 const getTreeRootNode = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?root=false&reverse=true`,[]);
 export const actions = {
@@ -62,7 +65,9 @@ export const actions = {
 	getWorkDataList,
 	delDocList,
 	jsonToExcel,
-	getTreeRootNode
+	getTreeRootNode,
+	getOrg,
+	getdateWpData
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

@@ -19,15 +19,15 @@ export default class Modify extends Component {
 		}
 	}
 	componentDidMount(){
-        const {actions:{getAllUsers}} = this.props
-        getAllUsers().then(res => {
-            let checkers = res.map((o,index) => {
-                return (
-                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
-                )
-            })
-            this.setState({checkers})
-        })
+        // const {actions:{getAllUsers}} = this.props
+        // getAllUsers().then(res => {
+        //     let checkers = res.map((o,index) => {
+        //         return (
+        //             <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
+        //         )
+        //     })
+        //     this.setState({checkers})
+        // })
     }
 	componentWillReceiveProps(props){
         const {modify = {}} = props
@@ -57,7 +57,7 @@ export default class Modify extends Component {
    	}
 
 	render() {
-		const {modify = {}, actions: {changeModifyField}} = this.props;
+		const {modify = {},common ={}, actions: {changeModifyField}} = this.props;
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
@@ -177,7 +177,7 @@ export default class Modify extends Component {
                         审核人：
                         <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
                             {
-                                this.state.checkers
+                                common.checkers
                             }
                         </Select>
                     </span> 
