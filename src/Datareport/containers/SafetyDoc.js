@@ -382,7 +382,7 @@ class SafetyDoc extends Component {
                      bordered
                      rowSelection={rowSelection}
 					 style={{height:380,marginTop:20}}
-					 pagination = {{pageSize:10}} 
+					 pagination = {{showQuickJumper:true,showSizeChanger:true}} 
 					/>
                 </Content>
                 <Preview />
