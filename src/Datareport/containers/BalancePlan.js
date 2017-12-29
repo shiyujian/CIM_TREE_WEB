@@ -222,7 +222,6 @@ export default class BanlancePlan extends Component {
 
 	// 模板下载
 	getTemplate(){
-		console.log('moban1',DataReportTemplate_SettlementPlan);
 		this.createLink('结算计划模板',DataReportTemplate_SettlementPlan)
 	}
 
@@ -249,7 +248,6 @@ export default class BanlancePlan extends Component {
 		const {dataSourceSelected} = this.state;
 		let rows = [];
 		rows.push(["项目/子项目名称","单位工程","工作节点目标","完成时间","支付金额(万元)","累计占比","备注"]);
-		console.log('this',dataSourceSelected);
 		dataSourceSelected.map(item =>{
 			rows.push([
 				item.subproject,
@@ -261,15 +259,26 @@ export default class BanlancePlan extends Component {
 				item.remarks
 			])
 		})
-		console.log('rows',rows);
 		jsonToExcel({},{rows:rows}).then(
 			rst=>{
 				this.createLink('name',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
-				console.log(rst,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
 			}
 		)
 	}
+
+	// 分页
+	paginationOnChange(page,pageSize){
+		console.log('page',page,pageSize);
+	}
 	render() {
+		// 页面数据条数选择;
+		const paginationInfo = {
+			onChange: this.paginationOnChange.bind(this),
+			showSizeChanger: true,
+			pageSizeOptions: ['5', '10', '20', '30', '40', '50'],
+			showQuickJumper: true,
+		}
+		// 表格左侧选中数据
 		const { selectedRowKeys } = this.state;
 		const rowSelection = {
 			selectedRowKeys,
@@ -340,7 +349,7 @@ export default class BanlancePlan extends Component {
 						/>
 					</Row>
 					<div >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDat} 
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDat} pagination={paginationInfo}
 							loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}												
 						/>
 					</div>
