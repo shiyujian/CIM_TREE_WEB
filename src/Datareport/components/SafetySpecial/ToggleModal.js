@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_SafetySpecial } from '_platform/api';
 import EditableCell from './EditableCell';
-import index from 'antd/lib/icon';
+// import index from 'antd/lib/icon';
 
 const Search = Input.Search;
 const FormItem = Form.Item;
@@ -25,6 +25,13 @@ export default class ToggleModal extends Component {
         }
     }
     render() {
+        const paginationInfo = {
+            // onChange: this.paginationOnChange.bind(this),
+            showSizeChanger: true,
+            pageSizeOptions: ['5', '10', '20', '30', '40', '50'],
+            showQuickJumper: true,
+            // style: { float: "left", marginLeft: 70 },
+        }
         const { visible = false } = this.props;
         let jthis = this;
         return (
@@ -43,6 +50,7 @@ export default class ToggleModal extends Component {
                     bordered={true}
                     dataSource={this.state.dataSource}
                     rowKey={(item, index) => index}
+                    pagination={paginationInfo}
                 >
                 </Table>
                 <Row>
@@ -60,7 +68,6 @@ export default class ToggleModal extends Component {
                     <Col><Button
                         style={{ margin: '10px 10px 10px 0px' }}
                         onClick={this.DownloadFile.bind(this, "重大安全专项方案", DataReportTemplate_SafetySpecial)}
-
                     >模板下载</Button></Col>
                     <Col>
                         <Upload
@@ -141,7 +148,6 @@ export default class ToggleModal extends Component {
             let dataSource = [];
             // for (let i = 2; i < dataList.length; i++) {
             //     let rst = await checkoutData({ code: dataList[i][4] });
-
             //     dataSource.push({
             //         resUnit: dataList[i][0] ? dataList[i][0] : '',
             //         index: dataList[i][1] ? dataList[i][1] : '',
@@ -174,7 +180,6 @@ export default class ToggleModal extends Component {
             // console.log('vip-dataSource',dataSource);
 
             dataList.map((item, i) => {
-
                 if (i > 1) {
                     checkoutData({ code: item[5] }).then(rst => {
                         dataSource.push({
@@ -191,7 +196,7 @@ export default class ToggleModal extends Component {
                             remark: item[9] ? item[9] : '',
                             wbs: item[9] ? item[9] : '',
                             fj: item[10] ? item[10] : '',
-                            code: 'JSDW_zgxa', // 编制单位
+                            code: 'JSDW_zgxa', // 目前不知道填写什么
                             project: {
                                 code: "",
                                 name: "",
@@ -206,13 +211,9 @@ export default class ToggleModal extends Component {
                             checkout: rst.code === item[5] ? true : false,
                         })
                         this.setState({ dataSource });
-                        // console.log('vip-dataSource',dataSource);
-
                     })
                 }
             })
-
-
         }
     }
 
@@ -288,12 +289,12 @@ export default class ToggleModal extends Component {
             message.info(`请选择项目和单位工程`);
             return;
         }
-       
-        const checkoutInfo = this.state.dataSource.find((item,index)=>{
-            return item.checkout===false;
+
+        const checkoutInfo = this.state.dataSource.find((item, index) => {
+            return item.checkout === false;
         })
         if (checkoutInfo) {
-            message.info(`编制单位有误！`);
+            message.info(`编制单位有误,请修正！`);
             return;
         }
         let { check } = this.state
@@ -349,11 +350,13 @@ export default class ToggleModal extends Component {
             }
         });
     }
-
+    paginationOnChange(e) {
+        console.log('vip-分页', e);
+    }
     covertURLRelative(originUrl) {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
-    beforeUploadPicFile(index, file) {
+    beforeUploadPicFile(record, file) {
         // 上传到静态服务器
         const fileName = file.name;
         let { dataSource, unit, project } = this.state;
@@ -388,8 +391,20 @@ export default class ToggleModal extends Component {
                 download_url: filedata.download_url,
                 mime_type: resp.mime_type
             };
-            dataSource[index]['file'] = attachment;
-            this.setState({ dataSource })
+            // dataSource[index]['file'] = attachment;
+            this.setState({
+                ...this.state,
+                dataSource: dataSource.map((item, index) => {
+                    if (item.sign === record.sign) {
+                        return {
+                            ...item,
+                            file: attachment
+                        }
+                    } else {
+                        return item;
+                    }
+                })
+            })
         });
         return false;
     }
@@ -412,24 +427,23 @@ export default class ToggleModal extends Component {
     //删除
     delete(index, record) {
         let { dataSource } = this.state;
-        // dataSource.splice(index, 1);
         this.setState({
             ...this.state,
             dataSource: dataSource.filter((item, i) => {
-                return item.index !== record.index;
+                return item.sign !== record.sign;
             })
         });
     }
 
     //预览
     handlePreview(index, record) {
-        // debugger;
+        debugger;
         const { actions: { openPreview } } = this.props;
         // let f = this.state.dataSource[index].file
         let { dataSource } = this.state;
         let ff = {}, f = {};
         ff = dataSource.filter((item, i) => {
-            return item.codeId === codeId;
+            return item.sign === record.sign;
         });
         f = ff[0].file;
         let filed = {}
@@ -490,73 +504,45 @@ export default class ToggleModal extends Component {
     async Checkout(value) {
         let checkedValue = false;
         const { actions: { checkoutData } } = this.props;
-        let rst = await checkoutData({ code:value });
-
+        let rst = await checkoutData({ code: value });
         if (rst && rst.code === value) {
             checkedValue = true;
         }
         return checkedValue;
     }
+
     onCellChange = (index, key, record) => {
         const { dataSource } = this.state;
-        return async (value,checkedValue) => {
-            // if (key === "organizationUnit" && value) {
-            //     // 修改后校验
-            // }
-            // let checkout = false;
-            // const { actions: { checkoutData } } = this.props;
-            // let rst = await checkoutData({ code: record.organizationUnit });
-
-            // if (rst && rst.code === record.organizationUnit) {
-            //     checkout = true;
-            // }
-            record[key] = value;
-            this.setState({
-                ...this.state,
-                dataSource: dataSource.map((item, index) => {
-                    if (item.sign === record.sign) {
-                        return {
-                            ...item,
-                            organizationUnit: value,
-                            checkout:checkedValue
+        return (value, checkedValue) => {
+            const target = dataSource.find(item => item.sign === record.sign)
+            if (target) {
+                target[key] = value;
+                this.setState({
+                    ...this.state,
+                    dataSource: dataSource.map((item, index) => {
+                        if (item.sign === record.sign) {
+                            return {
+                                ...item,
+                                organizationUnit: value,
+                                checkout: checkedValue
+                            }
+                        } else {
+                            return item;
                         }
-                    } else {
-                        return item;
-                    }
+                    })
                 })
-            })
-            // checkoutData({ code: record.organizationUnit }).then(rst => {
-            //     record[key] = value;
-            //     if (rst&&rst.code === record.organizationUnit) {
-            //         checkout = true;
-            //     }
-            //     // dataSource[index][key] = value;
-            //     // dataSource[index].checkout = checkout;
-            //     this.setState({
-            //         ...this.state,
-            //         dataSource: dataSource.map((item, index) => {
-            //             if (item.sign === record.sign) {
-            //                 return {
-            //                     ...item,
-            //                     organizationUnit: value,
-            //                     checkout
-            //                 }
-            //             } else {
-            //                 return item;
-            //             }
-            //         })
-            //     })
-            // })
+            }
         };
     }
 
     columns = [
         {
             title: '序号',
-            dataIndex: 'index1',
+            dataIndex: 'index',
             width: '5%',
-            render: (text, record, index1) => {
-                return record.index
+            key: '0',
+            render: (text, record, index) => {
+                return record.sign-2
             }
         }
         ,
@@ -585,34 +571,38 @@ export default class ToggleModal extends Component {
         {
             title: '方案名称',
             dataIndex: 'scenarioName',
+            key: '1',
             width: '15%',
         }
         ,
         {
             title: '编制单位',
             dataIndex: 'organizationUnit',
+            key: '2',
             width: '15%',
-            render: (text, record, index1) => (
+            render: (text, record, index) => (
                 (
                     record.checkout ?
                         <div
                         >
                             <EditableCell
+                                record={record}
                                 editOnOff={false}
                                 value={record.organizationUnit}
-                                onChange={this.onCellChange(index1, "organizationUnit", record)}
+                                onChange={this.onCellChange(record.sign - 2, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
                                 checkVal={this.Checkout.bind(this)}
-                                />
+                            />
                         </div>
                         :
                         <div
-                        style={{ color: "red" }}
+                            style={{ color: "red" }}
                         >
                             <EditableCell
+                                record={record}
                                 editOnOff={false}
                                 value={record.organizationUnit}
-                                onChange={this.onCellChange(index1, "organizationUnit", record)}
+                                onChange={this.onCellChange(record.sign - 2, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
                                 checkVal={this.Checkout.bind(this)}
                             />
@@ -625,34 +615,39 @@ export default class ToggleModal extends Component {
             title: '评审时间',
             dataIndex: 'reviewTime',
             width: '10%',
+            key: '3',
         }
         ,
         {
             title: '评审意见',
             dataIndex: 'reviewComments',
             width: '10%',
-
+            key: '4',
         }, {
             title: '评审人员',
             dataIndex: 'reviewPerson',
             width: '10%',
+            key: '5',
         }, {
             title: '备注',
             dataIndex: 'remark',
             width: '15%',
+            key: '6',
         }
-        , {
+        ,
+        {
             title: '附件',
             width: "15%",
-            render: (text, record, index1) => {
+            key: '7',
+            render: (text, record, index) => {
                 if (record.file.id) {
                     return (<span>
-                        <a onClick={this.handlePreview.bind(this, index1, record)}>预览</a>
+                        <a onClick={this.handlePreview.bind(this, index, record)}>预览</a>
                         <span className="ant-divider" />
                         <Popconfirm
                             placement="leftTop"
                             title="确定删除吗？"
-                            onConfirm={this.remove.bind(this, index1, record)}
+                            onConfirm={this.remove.bind(this, index, record)}
                             okText="确认"
                             cancelText="取消">
                             <a>删除</a>
@@ -661,7 +656,9 @@ export default class ToggleModal extends Component {
                 } else {
                     return (
                         <span>
-                            <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index1)}>
+                            <Upload
+                                showUploadList={false}
+                                beforeUpload={this.beforeUploadPicFile.bind(this, record)}>
                                 <Button>
                                     <Icon type="upload" />上传附件
                             </Button>
@@ -670,14 +667,16 @@ export default class ToggleModal extends Component {
                     )
                 }
             }
-        }, {
+        },
+        {
             title: '操作',
-            render: (text, record, index1) => {
+            key: '8',
+            render: (text, record, index) => {
                 return (
                     <Popconfirm
                         placement="leftTop"
                         title="确定删除吗？"
-                        onConfirm={this.delete.bind(this, index1, record)}
+                        onConfirm={this.delete.bind(this, index, record)}
                         okText="确认"
                         cancelText="取消">
                         <a>删除</a>
