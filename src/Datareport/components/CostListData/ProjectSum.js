@@ -83,12 +83,28 @@ export default class ProjectSum extends Component {
                 dataSource.push({
                     key:i,
                     // code: dataList[i][0] ? dataList[i][0] : '',
-                    projectcoding: dataList[i][1] ? dataList[i][1] : '',
-                    projectname: dataList[i][2] ? dataList[i][2] : '',
-                    company: dataList[i][3] ? dataList[i][3] : '',
-                    number: dataList[i][4] ? dataList[i][4] : '',
-                    total: dataList[i][5] ? dataList[i][5] : '',
-                    remarks: dataList[i][6] ? dataList[i][6] : '',
+                    projectcoding:dataList[i][1] ? dataList[i][1] : '',
+                    projectname:{
+                       editable: false, 
+                       value:dataList[i][2] ? dataList[i][2] : '',
+                    },
+                    company:{
+                        editable: false,
+                        value:dataList[i][3] ? dataList[i][3] : ''
+                    } ,
+                    number:{
+                        editable: false,
+                        value: dataList[i][4] ? dataList[i][4] : '',
+                    } ,
+                    total: {
+                        editable: false,
+                        value:dataList[i][5] ? dataList[i][5] : ''
+                    },
+                    remarks:{
+                        editable: false,
+                        value:dataList[i][6] ? dataList[i][6] : ''
+                    },
+                    action:'normal',
                     project: {
                         code: "",
                         name: "",
@@ -209,11 +225,28 @@ export default class ProjectSum extends Component {
             person_code: check.account.person_code,
             organization: check.account.organization
         }
-        for (let i = 0; i < this.state.dataSource.length; i++) {
-            this.state.dataSource[i].project = project;
-            this.state.dataSource[i].unit = unit;
-        }
-        this.props.onok(this.state.dataSource, per);
+        // for (let i = 0; i < this.state.dataSource.length; i++) {
+        //     this.state.dataSource[i].project = project;
+        //     this.state.dataSource[i].unit = unit;
+        // }
+        console.log('信息上传成功')
+        let {dataSource} = this.state;
+        let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+                subproject: project,//项目/子项目
+                unit: unit,//单位工程
+                projectcoding: item.projectcoding,//项目编号
+                projectname: item.projectname.value,//项目名称
+                company: item.company.value,//计量单位
+                number: item.number.value,//数量
+                total: item.total.value,//单价
+                remarks: item.remarks.value,//备注
+            }
+            newdataSource.push(newDatas)
+        })
+        this.props.onok(newdataSource, per);
         notification.success({
             message: '信息上传成功！',
             duration: 2
@@ -237,6 +270,7 @@ export default class ProjectSum extends Component {
                 number: item.number,//数量
                 total: item.total,//单价
                 remarks: item.remarks,//备注
+                action:item.action
             }
             newdataSource.push(newDatas)
         })
@@ -313,9 +347,48 @@ export default class ProjectSum extends Component {
         });
         return false;
     }
-    //分页
-    edit () {
-
+    //编辑
+    edit (index) {
+        console.log('edit',1111)
+        const { dataSource } = this.state;
+        dataSource[index].action = 'edit';
+        Object.keys(dataSource[index]).forEach( v =>{
+          if (dataSource[index][v].hasOwnProperty('editable')) dataSource[index][v]['editable'] = true;      
+        })
+        this.setState({dataSource});
+        console.log('data',dataSource);
+    }
+    // 表格数据改变时
+    handeleChange(index,text,value){
+        const {dataSource} = this.state;
+        dataSource[index][text].value = value;
+        this.setState({dataSource});
+    }
+    //改变表格完成；
+    changeOk(index){
+        console.log('111111')
+        const { dataSource } = this.state;
+        dataSource[index].action = 'normal';
+        Object.keys(dataSource[index]).forEach( v =>{
+          if (dataSource[index][v].hasOwnProperty('editable')) dataSource[index][v]['editable'] = false;      
+        })
+        this.setState({dataSource});
+    }
+      // 处理表格渲染数据
+    renderColumns(index,text,data){
+        const { editable } = this.state.dataSource[index][text];
+        if( typeof editable === 'undefined'){
+        return data;
+        }
+        return (
+        <div>
+            {!editable ?(
+            <span>{data.value}</span>
+            ) :(
+            <Input value={data.value} onChange = {e => this.handeleChange(index,text,e.target.value)}/>
+            )}
+        </div>
+        )
     }
     render() {
       
@@ -335,26 +408,40 @@ export default class ProjectSum extends Component {
                 }
             }, {
                 title: '项目名称',
-			    dataIndex: 'projectname',
+                dataIndex: 'projectname',
+                render:(text,record,index) =>{
+                    return this.renderColumns(record.key-1,'projectname',text);
+                }
             },  {
                 title: '计量单位',
                 dataIndex: 'company',
+                render:(text,record,index) =>{
+                    return this.renderColumns(record.key-1,'company',text);
+                }
             },{
                 title: '数量',
                 dataIndex: 'number',
-                width: '10%',
+                render:(text,record,index) =>{
+                    return this.renderColumns(record.key-1,'number',text);
+                }
             },{
                 title: '单价',
                 dataIndex: 'total',
+                render:(text,record,index) =>{
+                    return this.renderColumns(record.key-1,'total',text);
+                }
             },{
                 title: '备注',
                 dataIndex: 'remarks',
+                render:(text,record,index) =>{
+                    return this.renderColumns(record.key-1,'remarks',text);
+                }
             }, 
             {
                 title: "操作",
-                dataIndex: "edit",
+               
                 render: (text, record, index) => {
-                    return (
+                    return record.action === 'normal' ? (
                       <div>
                         <a onClick={this.edit.bind(this,record.key-1)}><Icon style={{marginRight:"15px"}} type = "edit"/></a>
                         <Popconfirm
@@ -367,8 +454,10 @@ export default class ProjectSum extends Component {
                           <a><Icon type = "delete"/></a>
                         </Popconfirm>
                       </div>   
+                    ):(
+                        <a onClick={this.changeOk.bind(this,record.key-1)}>完成</a>
                     );
-                  } 
+                } 
             }
         ];
         return (
