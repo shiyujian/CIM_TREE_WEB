@@ -22,7 +22,8 @@ export default class PersonModify extends Component {
             defaultchecker: "",
             units:[],
             selectPro:[],
-            selectUnit:[]
+            selectUnit:[],
+            subErr: true,
         }
     }
 
@@ -53,7 +54,7 @@ export default class PersonModify extends Component {
     }
 
 	render() {
-		const {Modvisible, modifyPer, actions: {getOrgReverse}} = this.props;
+		const {Modvisible, actions: {getOrgReverse}} = this.props;
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
@@ -84,10 +85,16 @@ export default class PersonModify extends Component {
 	            return <Input value = {record.account.org_code || ""} onChange={ele => {
 	                record.account.org_code = ele.target.value
 	                getOrgReverse({code: record.account.org_code}).then(rst =>{
-	                	if(rst.children.length !== 0) {
-	                		record.account.organization = rst.children[0].name;
-	                	}else {
+	                	if(rst.children.length === 0) {
 	                		message.warning("您输入的部门不存在");
+	                		this.setState({
+	                			subErr: false
+	                		})
+	                	}else {
+	                		record.account.organization = rst.children[0].name;
+	                		this.setState({
+	                			subErr: true
+	                		})
 	                	}
 	                	this.forceUpdate();
 	                })
@@ -139,8 +146,14 @@ export default class PersonModify extends Component {
 	        }
 		}, {
 			title: '二维码',
-			dataIndex: 'account.person_signature_url',
-			key: 'Signature'
+			// dataIndex: 'account.person_signature_url',
+			// key: 'Signature'
+			render:(record) => {
+	            console.log("record:",record);
+	            return (
+	                <img style={{width:"60px"}} src = {record.account.relative_avatar_url} />
+	            )
+	        }
 		}]
 		
 		return (
@@ -183,9 +196,14 @@ export default class PersonModify extends Component {
 
 	onok() {
 		console.log('passer', this.state.passer)
+		console.log('subErr', this.state.subErr)
         const { actions: { ModifyVisible } } = this.props;
         if (!this.state.passer) {
             message.error('审批人未选择');
+            return;
+        }
+        if(this.state.subErr === false) {
+        	message.error('请输入正确的部门');
             return;
         }
         this.props.setDataUpdate(this.state.dataSource, this.state.passer);

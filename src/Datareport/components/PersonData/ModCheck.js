@@ -181,9 +181,9 @@ export default class ModCheck extends Component {
         }, {
             title: '二维码',
             render:(record) => {
-                console.log("record:",record);
+            console.log("record:",record);
                 return (
-                    <img style={{width:"60px"}} />
+                    <img style={{width:"60px"}} src = {record.account.relative_avatar_url} />
                 )
             }
         }];
