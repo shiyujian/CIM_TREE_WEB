@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress } from 'antd';
+import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress,Select } from 'antd';
 import {STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_DesignInformation} from '_platform/api';
 import Card from '_platform/components/panels/Card';
+const Option = Select.Option;
 const Search = Input.Search
 export default class DesignTable extends Component {
 	constructor(props) {
@@ -36,7 +37,17 @@ export default class DesignTable extends Component {
         const {actions:{
             getScheduleDir,
             postScheduleDir,
+            getAllUsers,
+            changeCommonField
         }} = this.props;
+        getAllUsers().then(res => {
+            let checkers = res.map((o,index) => {
+                return (
+                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                )
+            })
+            changeCommonField('checkers',checkers)
+        })
         let topDir = await getScheduleDir({code:'the_only_main_code_datareport'});
         if(topDir.obj_type){
             let dir = await getScheduleDir({code:'datareport_designdata'});
@@ -186,7 +197,7 @@ export default class DesignTable extends Component {
 					<Table
 						bordered
 						columns={columns}
-						pagination={{pageSize:10,showSizeChanger:true,showQuickJumper:true}}
+						pagination={{showSizeChanger:true,showQuickJumper:true}}
 						rowSelection={rowSelection}
 						dataSource={this.state.showDs}
 						rowKey="index"

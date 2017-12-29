@@ -9,6 +9,7 @@ const additionReducer = fieldFactory(ID, 'addition');
 const checkReducer = fieldFactory(ID, 'check');
 const modifyReducer = fieldFactory(ID, 'modify');
 const expurgateReducer = fieldFactory(ID, 'expurgate');
+const commonReducer = fieldFactory(ID, 'common');
 
 const getFieldsOK = createAction(`${ID}_GET_FIELD_OK`);
 
@@ -43,6 +44,7 @@ export const actions = {
 	...checkReducer,
 	...modifyReducer,
 	...expurgateReducer,
+	...commonReducer,
 	getProjectTree,
 	getProjectTreeDetail,
 	getWorkPackageDetailpk,
@@ -80,6 +82,10 @@ export default handleActions({
 	[combineActions(...actionsMap(expurgateReducer))]: (state, action) => ({
 		...state,
 		expurgate: expurgateReducer(state.expurgate, action),
+	}),
+	[combineActions(...actionsMap(commonReducer))]: (state, action) => ({
+		...state,
+		common: commonReducer(state.common, action),
 	}),
 	[getFieldsOK]: (state, {payload: {results = []} = {}}) => ({
 		...state,
