@@ -25,18 +25,12 @@ export default class ChangeFile extends Component {
     }
 
     componentDidMount() {
-        // console.log('vip-state', this.props);
-        // const dataSource = this.props.subDataSource;
-        // this.setState({
-        //     dataSource,
-        // })
-
         // 下拉框
         const { actions: { getAllUsers, getProjectTree } } = this.props;
         getAllUsers().then(rst => {
-            let checkers = rst.map(o => {
+            let checkers = rst.map((o,index) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
             })
             this.setState({ checkers })
@@ -65,40 +59,15 @@ export default class ChangeFile extends Component {
         });
     }
     paginationOnChange(e) {
-        console.log('vip-分页', e);
+        // console.log('vip-分页', e);
     }
     //附件删除
     remove(index) {
-        debugger;
         const { actions: { deleteStaticFile } } = this.props
         let { dataSource } = this.state
         let id = dataSource[index]['file'].id
         deleteStaticFile({ id: id })
-        let rate = dataSource[index].rate
-        let level = dataSource[index].level
-        dataSource[index] = {
-            rate: rate,
-            level: level,
-            name: "",
-            project: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            unit: {
-                code: "",
-                name: "",
-                obj_type: ""
-            },
-            construct_unit: {
-                code: "",
-                name: "",
-                type: "",
-            },
-            file: {
-
-            }
-        }
+        dataSource[index]['file']={}
         this.setState({ dataSource })
     }
 
@@ -106,7 +75,7 @@ export default class ChangeFile extends Component {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
 
-    beforeUploadPicFile(index, file) {
+    beforeUploadPicFile(index,record, file) {
         // 上传到静态服务器
         const fileName = file.name;
         let { dataSource, unit, project } = this.state;
@@ -141,30 +110,22 @@ export default class ChangeFile extends Component {
                 download_url: filedata.download_url,
                 mime_type: resp.mime_type
             };
-            let unitProject = {
-                name: unit.name,
-                code: unit.code,
-                obj_type: unit.obj_type
-            }
-            let projectt = {
-                name: project.name,
-                code: project.code,
-                obj_type: project.obj_type
-            }
+           
             dataSource[index]['file'] = attachment;
-            dataSource[index]['unit'] = unitProject;
-            dataSource[index]['project'] = projectt;
             this.setState({ dataSource })
         });
         return false;
     }
 
     //删除
-    delete(index) {
-        // debugger;
+    delete(record) {
         let { dataSource } = this.state;
-        dataSource.splice(index, 1);
-        this.setState({ dataSource });
+        this.setState({
+            ...this.state,
+            dataSource: dataSource.filter((item, i) => {
+                return item.index !== record.index;
+            })
+        });
     }
     //预览
     handlePreview(index) {
@@ -282,7 +243,6 @@ export default class ChangeFile extends Component {
                 title: '附件',
                 width: "10%",
                 render: (text, record, i) => {
-                    // debugger;
                     if (record.file.a_file) {
                         return (<span>
                             <a onClick={this.handlePreview.bind(this, i)}>预览</a>
@@ -299,7 +259,7 @@ export default class ChangeFile extends Component {
                     } else {
                         return (
                             <span>
-                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, i)}>
+                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, i,record)}>
                                     <Button>
                                         <Icon type="upload" />上传附件
                                 </Button>
@@ -317,7 +277,7 @@ export default class ChangeFile extends Component {
                             placement="leftTop"
                             title="确定删除吗？"
                             // onConfirm={this.delete.bind(this, index, record.i)}
-                            onConfirm={this.delete.bind(this, i)}
+                            onConfirm={this.delete.bind(this,record)}
                             okText="确认"
                             cancelText="取消">
                             <a>删除</a>
@@ -403,7 +363,6 @@ export default class ChangeFile extends Component {
         const { dataSource } = this.state;
         return (value) => {
             if (key === "reviewTime" && value) {
-                // debugger;
                 const chooseTime = new Date(value._d);
                 value = chooseTime.getFullYear() + "年" + (chooseTime.getMonth() + 1) + "月" + chooseTime.getDate() + "日";
             }
@@ -447,7 +406,6 @@ export default class ChangeFile extends Component {
         for (let i = 0; i < this.state.dataSource.length; i++) {
             this.state.dataSource[i].changeInfo = changeInfo;
         }
-        // debugger;
         this.props.setChangeData(this.state.dataSource, per);
         notification.success({
             message: '变更已发起！',
@@ -462,8 +420,8 @@ export default class ChangeFile extends Component {
         this.setState({ check })
     }
     onSelectProject(value, selectedOptions) {
-        console.log('vip-value', value)
-        console.log('vip-selectedOptions', selectedOptions)
+        // console.log('vip-value', value)
+        // console.log('vip-selectedOptions', selectedOptions)
         let project = {};
         let unit = {};
         if (value.length === 2) {

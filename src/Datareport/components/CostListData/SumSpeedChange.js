@@ -67,6 +67,10 @@ export default class SumSpeedChange extends Component {
             message.info("请选择审核人")
             return;
         }
+        if (this.state.dataSource.length === 0) {
+            message.info("请上传excel");
+            return;
+          }
         let {check} = this.state;
         let per = {
             id:check.id,
@@ -243,7 +247,7 @@ export default class SumSpeedChange extends Component {
                     <Col>
                         <span>
                             审核人：
-                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)} mode="combobox" placeholder="可搜索审查人">
+                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
                                 {
                                     this.state.checkers
                                 }

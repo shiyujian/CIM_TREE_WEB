@@ -53,7 +53,7 @@ export default class PersonModify extends Component {
     }
 
 	render() {
-		const {Modvisible, modifyPer} = this.props;
+		const {Modvisible, modifyPer, actions: {getOrgReverse}} = this.props;
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
@@ -78,12 +78,20 @@ export default class PersonModify extends Component {
 			key: 'Org',
 		}, {
 			title: '所属部门',
-			dataIndex: 'account.org_code',
+			// dataIndex: 'account.org_code',
 			key: 'Depart',
 			render:(text, record, index) =>{
 	            return <Input value = {record.account.org_code || ""} onChange={ele => {
 	                record.account.org_code = ele.target.value
-	                this.forceUpdate();
+	                getOrgReverse({code: record.account.org_code}).then(rst =>{
+	                	if(rst.children.length !== 0) {
+	                		record.account.organization = rst.children[0].name;
+	                	}else {
+	                		message.warning("您输入的部门不存在");
+	                	}
+	                	this.forceUpdate();
+	                })
+	                
 	            }}/>
 	        }
 		}, {

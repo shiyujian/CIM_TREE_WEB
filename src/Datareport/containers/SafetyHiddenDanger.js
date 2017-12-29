@@ -16,7 +16,7 @@ import {
 import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
 import {getUser} from '_platform/auth';
-import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_SafetyHiddenDanger} from '_platform/api.js';
 import { actions as platformActions } from '_platform/store/global';
 import AddFile from '../components/SafetyHiddenDanger/AddFile';
 import DeleteFile from '../components/SafetyHiddenDanger/DeleteFile';
@@ -234,6 +234,11 @@ class SafetyHiddenDanger extends Component {
 					})
 		})
     }
+    
+    download(){
+        let apiGet = `${DataReportTemplate_SafetyHiddenDanger}`;
+        this.createLink(this,apiGet);
+    }
 
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -362,7 +367,11 @@ class SafetyHiddenDanger extends Component {
                 <DynamicTitle title="安全隐患" {...this.props} />
                 <Content>
                     <Row style={{ marginBottom: "30px" }}>
-                        <Col span={15}>
+                        <Col>
+                            <Button 
+                            style={{ marginRight: "30px" }}
+                            onClick={()=>this.download()}
+                            >模板下载</Button>
                             <Button 
                             style={{ marginRight: "30px" }}
                             onClick={()=>this.onBtnClick("add")}
@@ -389,7 +398,7 @@ class SafetyHiddenDanger extends Component {
                         bordered
                         rowSelection={rowSelection}                        
                         style={{ height: 380, marginTop: 20 }}
-                        pagination={{ pageSize: 10 }}
+                        pagination = {{showQuickJumper:true,showSizeChanger:true}} 
                     />
                 </Content>
                 {

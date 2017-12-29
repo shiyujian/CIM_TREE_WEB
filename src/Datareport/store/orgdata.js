@@ -24,6 +24,7 @@ export const getOrgPk= createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/
 export const getOrgTree= createFetchAction(`${SERVICE_API}/org-tree/?depth=3`,[], "GET");
 export const deleteOrgList= createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "PUT"); 
 export const putOrgList = createFetchAction(`${SERVICE_API}/orgpostlist/`, [], "PUT");
+const getCanjian = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`);
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 
 export const actions = {
@@ -47,7 +48,8 @@ export const actions = {
 	ModalVisibleUpdate,
 	setUpdateOrg,
 	putOrgList,
-	jsonToExcel
+	jsonToExcel,
+	getCanjian
 };
 
 export default handleActions({
