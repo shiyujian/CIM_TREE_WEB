@@ -21,7 +21,7 @@ export default class ToggleModal extends Component {
             unit: {},
             beginUnit: '',
             options: [],
-            asyncCheckout:true,
+            asyncCheckout: true,
         }
     }
     render() {
@@ -268,13 +268,13 @@ export default class ToggleModal extends Component {
         });
     }
     onok() {
-        if (!this.state.check) {
-            message.error('审批人未选择');
-            return;
-        }
         if (this.state.dataSource.length === 0) {
             message.info("请上传excel")
             return
+        }
+        if (!this.state.check) {
+            message.error('审批人未选择');
+            return;
         }
         let temp = this.state.dataSource.some((o, index) => {
             return !o.file.id
@@ -286,6 +286,14 @@ export default class ToggleModal extends Component {
         const { project, unit } = this.state;
         if (!project.name) {
             message.info(`请选择项目和单位工程`);
+            return;
+        }
+       
+        const checkoutInfo = this.state.dataSource.find((item,index)=>{
+            return item.checkout===false;
+        })
+        if (checkoutInfo) {
+            message.info(`编制单位有误！`);
             return;
         }
         let { check } = this.state
@@ -479,19 +487,29 @@ export default class ToggleModal extends Component {
         });
     }
 
-    onCellChange =  (index, key, record) => {
+    async Checkout(value) {
+        let checkedValue = false;
+        const { actions: { checkoutData } } = this.props;
+        let rst = await checkoutData({ code:value });
+
+        if (rst && rst.code === value) {
+            checkedValue = true;
+        }
+        return checkedValue;
+    }
+    onCellChange = (index, key, record) => {
         const { dataSource } = this.state;
-        return async (value) => {
+        return async (value,checkedValue) => {
             // if (key === "organizationUnit" && value) {
             //     // 修改后校验
             // }
-            let checkout = false;
-            const { actions: { checkoutData } } = this.props;
-            let rst = await checkoutData({ code: record.organizationUnit });
+            // let checkout = false;
+            // const { actions: { checkoutData } } = this.props;
+            // let rst = await checkoutData({ code: record.organizationUnit });
 
-            if (rst&&rst.code === record.organizationUnit) {
-                checkout = true;
-            }
+            // if (rst && rst.code === record.organizationUnit) {
+            //     checkout = true;
+            // }
             record[key] = value;
             this.setState({
                 ...this.state,
@@ -500,7 +518,7 @@ export default class ToggleModal extends Component {
                         return {
                             ...item,
                             organizationUnit: value,
-                            checkout
+                            checkout:checkedValue
                         }
                     } else {
                         return item;
@@ -584,6 +602,7 @@ export default class ToggleModal extends Component {
                                 value={record.organizationUnit}
                                 onChange={this.onCellChange(index1, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
+                                checkVal={this.Checkout.bind(this)}
                                 />
                         </div>
                         :
@@ -595,6 +614,7 @@ export default class ToggleModal extends Component {
                                 value={record.organizationUnit}
                                 onChange={this.onCellChange(index1, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
+                                checkVal={this.Checkout.bind(this)}
                             />
                         </div>
                 )
