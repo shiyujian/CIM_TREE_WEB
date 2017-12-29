@@ -71,6 +71,7 @@ export default class SumPlan extends Component {
       for (let i = 1; i < dataList.length; i++) {
         dataSource.push({
           key:i,
+          // nodetarget:dataList[i][0] ? dataList[i][0] : "",          
           nodetarget:{
             editable: false,
             value:dataList[i][0] ? dataList[i][0] : ""
@@ -263,7 +264,7 @@ export default class SumPlan extends Component {
   renderColumns(index,text,data){
     const { editable } = this.state.dataSource[index][text];
     if( typeof editable === 'undefined'){
-      return text;
+      return data;
     }
     return (
       <div>
