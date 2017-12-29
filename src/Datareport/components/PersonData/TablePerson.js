@@ -136,7 +136,7 @@ export default class TablePerson extends Component{
 		let searchPer = this.state.dataSource
 		searchPer.map(rst => {
 			console.log("rst", rst)
-			if (rst.account.organization.indexOf(value) != -1) {
+			if (rst.account.organization.indexOf(value) != -1 || rst.account.person_name.indexOf(value) != -1) {
 				searchData.push(rst);
 			}
 			// if (typeof(rst.account.org_code) === null && rst.account.org_code.indexOf(value) !== -1) {
