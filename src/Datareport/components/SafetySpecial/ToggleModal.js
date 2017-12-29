@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_SafetySpecial } from '_platform/api';
-import Preview from '../../../_platform/components/layout/Preview';
+import EditableCell from './EditableCell';
 import index from 'antd/lib/icon';
 
 const Search = Input.Search;
@@ -21,6 +21,7 @@ export default class ToggleModal extends Component {
             unit: {},
             beginUnit: '',
             options: [],
+            asyncCheckout:true,
         }
     }
     render() {
@@ -87,7 +88,7 @@ export default class ToggleModal extends Component {
                     <Col>
                         <span>
                             项目-单位工程：
-                   <Cascader
+                            <Cascader
                                 style={{ width: '300px' }}
                                 options={this.state.options}
                                 className='btn'
@@ -99,12 +100,12 @@ export default class ToggleModal extends Component {
                         </span>
                     </Col>
                 </Row>
-                <Preview />
                 <Row style={{ marginBottom: "30px" }}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
-                    <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
-                    <p style={{ paddingLeft: "25px" }}>3、请将日期的Excel单元格设置为文本格式，且必须带年月日，如2017年1月1日</p>
-                    <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.</p>
+                    <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2；</p>
+                    <p style={{ paddingLeft: "25px" }}>3、请将日期的Excel单元格设置为文本格式，且必须带年月日，如2017年1月1日；</p>
+                    <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为Chrome,IE11；</p>
+                    <p style={{ paddingLeft: "25px" }}>5、编制单位会进行系统校验，若为<span style={{ color: "red" }}>红色</span>请修正提交。</p>
                 </Row>
             </Modal>
         )
@@ -431,6 +432,7 @@ export default class ToggleModal extends Component {
         filed.mime_type = f.mime_type;
         openPreview(filed);
     }
+
     beforeUpload(info) {
         if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
             return true;
@@ -442,6 +444,7 @@ export default class ToggleModal extends Component {
             return false;
         }
     }
+
     selectUnit(value) {
         let unit = JSON.parse(value);
         this.setState({ unit, beginUnit: value });
@@ -474,6 +477,59 @@ export default class ToggleModal extends Component {
                 //获取项目信息失败
             }
         });
+    }
+
+    onCellChange =  (index, key, record) => {
+        const { dataSource } = this.state;
+        return async (value) => {
+            // if (key === "organizationUnit" && value) {
+            //     // 修改后校验
+            // }
+            let checkout = false;
+            const { actions: { checkoutData } } = this.props;
+            let rst = await checkoutData({ code: record.organizationUnit });
+
+            if (rst&&rst.code === record.organizationUnit) {
+                checkout = true;
+            }
+            record[key] = value;
+            this.setState({
+                ...this.state,
+                dataSource: dataSource.map((item, index) => {
+                    if (item.sign === record.sign) {
+                        return {
+                            ...item,
+                            organizationUnit: value,
+                            checkout
+                        }
+                    } else {
+                        return item;
+                    }
+                })
+            })
+            // checkoutData({ code: record.organizationUnit }).then(rst => {
+            //     record[key] = value;
+            //     if (rst&&rst.code === record.organizationUnit) {
+            //         checkout = true;
+            //     }
+            //     // dataSource[index][key] = value;
+            //     // dataSource[index].checkout = checkout;
+            //     this.setState({
+            //         ...this.state,
+            //         dataSource: dataSource.map((item, index) => {
+            //             if (item.sign === record.sign) {
+            //                 return {
+            //                     ...item,
+            //                     organizationUnit: value,
+            //                     checkout
+            //                 }
+            //             } else {
+            //                 return item;
+            //             }
+            //         })
+            //     })
+            // })
+        };
     }
 
     columns = [
@@ -518,36 +574,31 @@ export default class ToggleModal extends Component {
             title: '编制单位',
             dataIndex: 'organizationUnit',
             width: '15%',
-            render: (text, record, index1) =>
+            render: (text, record, index1) => (
                 (
                     record.checkout ?
-                        <span
-                            onDoubleClick={(record) => {
-                                this.setState({
-                                    dataSource: this.state.dataSource.map((item, index) => {
-                                        if (item.sign === record.sign) {
-                                            return {
-                                                ...item,
-                                                checkout: false
-                                            }
-                                        } else {
-                                            return item
-                                        }
-                                    })
-                                })
-
-                            }}
-                        >{record.organizationUnit}</span>
+                        <div
+                        >
+                            <EditableCell
+                                editOnOff={false}
+                                value={record.organizationUnit}
+                                onChange={this.onCellChange(index1, "organizationUnit", record)}
+                                asyncCheckout={this.state.asyncCheckout}
+                                />
+                        </div>
                         :
-                        <Input style={{ color: 'red' }}
-                            value={record.organizationUnit}
-                            onChange={(e) => { console.log(e.target.value) }}
-                            onBlur={(e) => {
-                                console.log('vip-失去光标校验开始', );
-                            }}
-
-                        />
-                ),
+                        <div
+                        style={{ color: "red" }}
+                        >
+                            <EditableCell
+                                editOnOff={false}
+                                value={record.organizationUnit}
+                                onChange={this.onCellChange(index1, "organizationUnit", record)}
+                                asyncCheckout={this.state.asyncCheckout}
+                            />
+                        </div>
+                )
+            ),
         }
         ,
         {
