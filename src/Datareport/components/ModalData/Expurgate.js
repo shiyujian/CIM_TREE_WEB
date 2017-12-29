@@ -97,7 +97,7 @@ export default class Expurgate extends Component {
 	}
 
 	setDeleteData = (data, participants) => {
-		const { actions: { createWorkflow, logWorkflowEvent, clearExpurgateField } } = this.props
+		const { actions: { createWorkflow, logWorkflowEvent, changeExpurgateField } } = this.props
 		let creator = {
 			id: getUser().id,
 			username: getUser().username,
@@ -132,7 +132,7 @@ export default class Expurgate extends Component {
 					attachment: null
 				}).then(() => {
 					message.success("成功")
-					clearExpurgateField()
+					changeExpurgateField('visible',false);
 				})
 		})
 	}
@@ -208,7 +208,7 @@ export default class Expurgate extends Component {
 					<Popconfirm
 						placement="leftTop"
 						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, index)}
+						onConfirm={this.delete.bind(this, record.index-1)}
 						okText="确认"
 						cancelText="取消">
 						<a>删除</a>
@@ -270,8 +270,8 @@ export default class Expurgate extends Component {
 
 	cancel() {
 		const {
-			actions: { clearExpurgateField }
+			actions: { changeExpurgateField }
 		} = this.props;
-		clearExpurgateField();
-	}
+		changeExpurgateField('visible',false);
+ 	}	
 }

@@ -120,7 +120,7 @@ export default class ModalCheck extends Component {
         //prepare the data which will store in database
         const docData = [];
         let i=0;   //asure the code of every document only
-        dataSource.map(item=>{
+        dataSource.map(item=>{  //  加上关联
             i++;
             docData.push({
                 code:'modaldoc'+moment().format("YYYYMMDDHHmmss")+i,
@@ -156,7 +156,7 @@ export default class ModalCheck extends Component {
                 extra_params:{
                     coding:item.coding,
                     filename:item.modelName,
-                    submittingUnit:item.submittingUnit,
+                    submittingUnit:item.submittingUnit.name,
                     modelDescription:item.modelDescription,
                     modeType:item.modeType,
                     unit:item.unit,
@@ -205,13 +205,11 @@ export default class ModalCheck extends Component {
     cancel() {
     	this.props.closeModal("modal_check_visbile",false)
     }
-	render() {
+	render() {      //index有问题
         const columns = [
 			{
 				title: '序号',
-				render:(text,record,index) => {
-					return index+1
-				}
+			    dataIndex:'index'
 			},{
                 title: '模型编码',
 				dataIndex: 'coding'
@@ -220,7 +218,7 @@ export default class ModalCheck extends Component {
 			   dataIndex: 'modelName'
             },{
                title: '提交单位',
-				dataIndex: 'submittingUnit'
+				dataIndex: 'submittingUnit.name'
             },{
             	title: '模型描述',
 				dataIndex: 'modelDescription'
@@ -232,7 +230,7 @@ export default class ModalCheck extends Component {
 				dataIndex: 'fdbMode',
 				render:(text,record,index) => {
 	                return (<span>
-	                        <a onClick={this.handlePreview.bind(this,index,'fdbfile')}>预览</a>
+	                        <a onClick={this.handlePreview.bind(this,record.index-1,'fdbfile')}>预览</a>
 	                        <span className="ant-divider" />
 	                        <a href={`${STATIC_DOWNLOAD_API}${record.fdbfile.a_file}`}>下载</a>
 	                    </span>)
@@ -242,7 +240,7 @@ export default class ModalCheck extends Component {
 				dataIndex: 'tdbxMode',
 				render:(text,record,index) => {
 	                return (<span>
-	                        <a onClick={this.handlePreview.bind(this,index,'tdbxfile')}>预览</a>
+	                        <a onClick={this.handlePreview.bind(this,record.index-1,'tdbxfile')}>预览</a>
 	                        <span className="ant-divider" />
 	                        <a href={`${STATIC_DOWNLOAD_API}${record.tdbxfile.a_file}`}>下载</a>
 	                    </span>)
@@ -252,7 +250,7 @@ export default class ModalCheck extends Component {
 				dataIndex: 'attributeTable',
 				render:(text,record,index) => {
 	                return (<span>
-	                        <a onClick={this.handlePreview.bind(this,index,'attributefile')}>预览</a>
+	                        <a onClick={this.handlePreview.bind(this,record.index-1,'attributefile')}>预览</a>
 	                        <span className="ant-divider" />
 	                        <a href={`${STATIC_DOWNLOAD_API}${record.attributefile.a_file}`}>下载</a>
 	                    </span>)
@@ -278,7 +276,9 @@ export default class ModalCheck extends Component {
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered />
+                        bordered 
+                        rowKey='index' 
+                        />
                     <Row>
                         <Col span={2}>
                             <span>审查意见：</span>

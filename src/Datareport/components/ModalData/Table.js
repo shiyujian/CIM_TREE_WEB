@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress } from 'antd';
-import { WORKFLOW_CODE, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api.js';
+import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input, Progress } from 'antd';
+import { WORKFLOW_CODE, STATIC_DOWNLOAD_API, SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_ModalInformation } from '_platform/api.js';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
 export default class ModalTable extends Component {
@@ -9,34 +9,30 @@ export default class ModalTable extends Component {
 		this.state = {
 			selectedRowKeys: [],
 			// dataSourceSelected: [],
-			
-			alldatas:[],
+			selectedDataSource: [],
+			alldatas: [],
 			loading: false,
 			percent: 0,
 		}
 
 	}
-	// onSelectChange = (selectedRowKeys) => {
-	// 	const { dataSource } = this.state;
-	// 	let dataSourceSelected = [];
-	// 	for (let i = 0; i < selectedRowKeys.length; i++) {
-	// 		dataSourceSelected.push(dataSource[selectedRowKeys[i]]);
-	// 	}
-	// 	this.setState({ selectedRowKeys,dataSourceSelected });
-	// 	console.log('aaaaa:',dataSourceSelected)
-	// }
+	
 
 	onSelectChange = (selectedRowKeys) => {
-		const {alldatas} = this.state;
-		const { actions: { changeModifyField,changeExpurgateField } } = this.props;
+	
+		const { alldatas,dataSource } = this.state;
+		const { actions: { changeModifyField, changeExpurgateField } } = this.props;
 		this.setState({ selectedRowKeys });
 		let selectedDatas = [];
+		let selectedDataSource = [];
 		selectedRowKeys.forEach(key => {
-			selectedDatas.push(alldatas[key-1])
+			selectedDatas.push(alldatas[key - 1])
+			selectedDataSource.push(dataSource[key-1])
 		})
-		console.log('selectedDatas',selectedDatas)
-		changeModifyField('selectedDatas',selectedDatas)
-		changeExpurgateField('selectedDatas',selectedDatas)
+		this.setState({selectedDataSource})
+		console.log('selectedDatas', selectedDatas)
+		changeModifyField('selectedDatas', selectedDatas)
+		changeExpurgateField('selectedDatas', selectedDatas)
 	}
 
 	async componentDidMount() {
@@ -57,64 +53,64 @@ export default class ModalTable extends Component {
 			}
 		}
 	}
-	async generateTableData(data){
-        const {actions:{
+	async generateTableData(data) {
+		const { actions: {
             getDocument,
-        }} = this.props;
-        let dataSource = [];
-        let all = [];
-        let total = data.length;
-        this.setState({loading:true,percent:0,num:0})
-        data.forEach(item=>{
-            all.push(getDocument({code:item.code})
-            	.then(rst => {
-            		let {num} = this.state;
-                    num++;
-                    this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
-                    if(!rst) {
-                    	message.error(`数据获取失败`)
-		    			return []
-		    		} else {
-                    	return rst
-                    }
-            	}))
-        })
-        Promise.all(all)
-        .then(item => {
-			console.log('item',item)
-        	this.setState({loading:false})
-        	item.forEach((single,index) => {
-        		let temp = {
-					index:index+1,
-					
-					coding: single.extra_params.coding,
-					modelName: single.extra_params.filename,
-					project: single.extra_params.project.name,
-					unit: single.extra_params.unit.name,
-					submittingUnit: single.extra_params.submittingUnit,
-					modelDescription: single.extra_params.modelDescription,
-					// file:single.basic_params.files[0],
-					modeType: single.extra_params.modeType,
-					fdbMode: single.basic_params.files[0],
-					tdbxMode: single.basic_params.files[1],
-					attributeTable: single.basic_params.files[2],
-					reportingTime: single.extra_params.reportingTime,
-					reportingName: single.extra_params.reportingName,
-					
-					// stage:single.extra_params.stage,
-					// upPeople:single.extra_params.upPeople,
-					// wbsObject:single.extra_params.wbsObject,
-					// designObject:single.extra_params.designObject,
-				}
-                dataSource.push(temp);
-        	}) 
-            this.setState({dataSource,alldatas:item,showDs:dataSource});
-        })
-    }
-	
+        } } = this.props;
+		let dataSource = [];
+		let all = [];
+		let total = data.length;
+		this.setState({ loading: true, percent: 0, num: 0 })
+		data.forEach(item => {
+			all.push(getDocument({ code: item.code })
+				.then(rst => {
+					let { num } = this.state;
+					num++;
+					this.setState({ percent: parseFloat((num * 100 / total).toFixed(2)), num: num });
+					if (!rst) {
+						message.error(`数据获取失败`)
+						return []
+					} else {
+						return rst
+					}
+				}))
+		})
+		Promise.all(all)
+			.then(item => {
+				console.log('item', item)
+				this.setState({ loading: false })
+				item.forEach((single, index) => {
+					let temp = {
+						index: index + 1,
 
-	
-	
+						coding: single.extra_params.coding,
+						modelName: single.extra_params.filename,
+						project: single.extra_params.project.name,
+						unit: single.extra_params.unit.name,
+						submittingUnit: single.extra_params.submittingUnit,
+						modelDescription: single.extra_params.modelDescription,
+						// file:single.basic_params.files[0],
+						modeType: single.extra_params.modeType,
+						fdbMode: single.basic_params.files[0],
+						tdbxMode: single.basic_params.files[1],
+						attributeTable: single.basic_params.files[2],
+						reportingTime: single.extra_params.reportingTime,
+						reportingName: single.extra_params.reportingName,
+
+						// stage:single.extra_params.stage,
+						// upPeople:single.extra_params.upPeople,
+						// wbsObject:single.extra_params.wbsObject,
+						// designObject:single.extra_params.designObject,
+					}
+					dataSource.push(temp);
+				})
+				this.setState({ dataSource, alldatas: item, showDs: dataSource });
+			})
+	}
+
+
+
+
 
 	render() {
 		const { selectedRowKeys } = this.state;
@@ -152,7 +148,7 @@ export default class ModalTable extends Component {
 			dataIndex: 'fdbMode',
 			render: (text, record, index) => {
 				return (<span>
-					<a onClick={this.handlePreview.bind(this, index)}>预览</a>
+					<a onClick={this.handlePreview.bind(this, record.index-1)}>预览</a>
 					<span className="ant-divider" />
 					<a href={`${STATIC_DOWNLOAD_API}${record.fdbMode.a_file}`}>下载</a>
 				</span>)
@@ -162,7 +158,7 @@ export default class ModalTable extends Component {
 			dataIndex: 'tdbxMode',
 			render: (text, record, index) => {
 				return (<span>
-					<a onClick={this.handlePreview.bind(this, index)}>预览</a>
+					<a onClick={this.handlePreview.bind(this, record.index-1)}>预览</a>
 					<span className="ant-divider" />
 					<a href={`${STATIC_DOWNLOAD_API}${record.tdbxMode.a_file}`}>下载</a>
 				</span>)
@@ -172,7 +168,7 @@ export default class ModalTable extends Component {
 			dataIndex: 'attributeTable',
 			render: (text, record, index) => {
 				return (<span>
-					<a onClick={this.handlePreview.bind(this, index)}>预览</a>
+					<a onClick={this.handlePreview.bind(this, record.index-1)}>预览</a>
 					<span className="ant-divider" />
 					<a href={`${STATIC_DOWNLOAD_API}${record.attributeTable.a_file}`}>下载</a>
 				</span>)
@@ -188,25 +184,27 @@ export default class ModalTable extends Component {
 		return (
 			<div>
 				<Row >
-					<Button type="default" style={{ marginRight: 10 }}>模板下载</Button>
+					<Button type="default" onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_ModalInformation}`)} style={{ marginRight: 10 }}>模板下载</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleAddition.bind(this)} type="default" >发起填报</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleModify.bind(this)} type="default">申请变更</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleExpurgate.bind(this)} type="default">申请删除</Button>
-					<Button style={{ margin: '10px' }} type="default">导出表格</Button>
+					<Button style={{ margin: '10px' }} onClick={this.getExcel.bind(this)} type="default">导出表格</Button>
 					<Search
 						style={{ width: "200px", marginLeft: 10 }}
 						placeholder="输入搜索条件"
 						onSearch={
 							(text) => {
-								let result = this.state.dataSource.filter(data=>{
-									return data.modelName.indexOf(text)>=0 || data.coding.indexOf(text)>=0;
+								let result = this.state.dataSource.filter(data => {
+									console.log('data',data)
+									return data.modelName.indexOf(text) >= 0 || data.coding.indexOf(text) >= 0|| data.modeType.indexOf(text) >= 0|| data.modelDescription.indexOf(text) >= 0
+									|| data.reportingName.indexOf(text) >= 0 || data.submittingUnit.indexOf(text) >= 0;
 								});
 								console.log(result);
-								if(text === ''){
+								if (text === '') {
 									result = this.state.dataSource;
 								}
 								this.onSelectChange([])//清空选择项
-								this.setState({showDs:result});
+								this.setState({ showDs: result });
 							}
 						}
 					/>
@@ -215,20 +213,20 @@ export default class ModalTable extends Component {
 				}
 				<Row>
 					<Table
-						size="middle"
+						pagination={{pageSize:10,showSizeChanger:true,showQuickJumper:true}}
 						bordered
 						columns={columns}
 						rowSelection={rowSelection}
 						dataSource={this.state.showDs}
 						rowKey="index"
-						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
+						loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.state.loading }}
 					/>
 				</Row>
 			</div>
 		);
 	}
 
-	
+
 	//预览
 	handlePreview(index) {
 		const { actions: { openPreview } } = this.props;
@@ -242,33 +240,61 @@ export default class ModalTable extends Component {
 		openPreview(filed);
 	}
 	toggleAddition() {
-		const { actions: { changeAdditionField } } = this.props;
+		const { addtion = {}, actions: { changeAdditionField } } = this.props;
 		console.log('a', this.props)
 		changeAdditionField('visible', true)
 	}
-	toggleCheck() {
-		const { actions: { changeCheckField } } = this.props;
-		console.log(this.props)
-		changeCheckField('visible', true)
-	}
+	
 	toggleModify() {
-		const {expurgate = {}, actions: { changeModifyField } } = this.props;
+		const { modify = {}, actions: { changeModifyField } } = this.props;
 		changeModifyField('visible', true)
-		changeModifyField('key', expurgate.key?expurgate.key+1:1)
+		changeModifyField('key', modify.key ? modify.key + 1 : 1)
 
-		
+
 	}
 	toggleExpurgate() {
-		const {expurgate = {}, actions: { changeExpurgateField } } = this.props;
-		
-			changeExpurgateField('visible', true)
-			changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
-		
+		const { expurgate = {}, actions: { changeExpurgateField } } = this.props;
+
+		changeExpurgateField('visible', true)
+		changeExpurgateField('key', expurgate.key ? expurgate.key + 1 : 1)
+
 	}
 
-	// judge(arr) {
-	// 	return arr.every(item => item.extra_params.unit.pk === arr[0].extra_params.unit.pk)
-	// }
+
+	//数据导出
+	getExcel() {
+		const { actions: { jsonToExcel } } = this.props;
+		const {selectedDataSource} = this.state;
+		if(selectedDataSource.length === 0){
+        	message.warning('请先选择数据再导出')
+        	return
+        }
+		let rows = [];
+		rows.push(['序号','模型编码' ,'项目/子项目名称',	'单位工程',	'模型名称',	'提交单位',	'模型描述',	'模型类型', '上报时间', '上报人']);
+		selectedDataSource.map(item => {
+			console.log('测试数据',item)
+			rows.push([item.index, item.coding, item.project, item.unit,item.modelName,  item.submittingUnit, item.modelDescription, item.modeType, item.reportingTime, item.reportingName]);
+		})
+		jsonToExcel({}, { rows: rows })
+			.then(rst => {
+				
+				console.log(NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
+				this.createLink(this, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
+			})
+	}
+
+	//下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+	
 }
 
 
