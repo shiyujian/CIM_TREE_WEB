@@ -95,6 +95,7 @@ export default class SumSpeedExport extends Component {
             {
               title: "备注",
               dataIndex: "remarks",
+              width:"5%"
             },
           ];
         return (

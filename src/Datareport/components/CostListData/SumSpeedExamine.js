@@ -137,6 +137,7 @@ export default class SumSpeedExamine extends Component {
             {
               title: "序号",
               dataIndex: "key",
+              width:"5%",
               render: (text, record, index) => {
                 return index + 1;
               }
@@ -169,7 +170,8 @@ export default class SumSpeedExamine extends Component {
             },
             {
               title: "备注",
-              dataIndex: "remarks"
+              dataIndex: "remarks",
+              width:"5%"
             }
           ]
 		return (
