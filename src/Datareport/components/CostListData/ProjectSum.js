@@ -77,6 +77,7 @@ export default class ProjectSum extends Component {
             let dataSource = [];
             let arrAir=[];
             for (let i = 1; i < dataList.length; i++) {
+                console.log('dataList[i]1',dataList[i][1])
                 arrAir.push(getQuantitiesCode({code:dataList[i][1]}));
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
@@ -102,17 +103,19 @@ export default class ProjectSum extends Component {
 
                 })
             }
-           
-        
+
            Promise.all(arrAir).then((res) =>{
+               console.log('arrAir',arrAir)
+               console.log('res',res)
                res.map((o,index) => {
+                   console.log('o',o)
                     if(!o.name){
-                        dataSource[index]["projectcoding"]=dataList[1][1]
+                        dataSource[index]["projectcoding"]="xxx"
                     }
                })
-               this.setState({dataSource});  
+               this.setState({dataSource}); 
+               this.setState({arrAir});   
            })
-           debugger
         this.setState({dataSource});  
         }
       
@@ -176,6 +179,7 @@ export default class ProjectSum extends Component {
     }
 
     onok() {
+        console.log('this.state.arrAir',this.state.arrAir)
         if (!this.state.check) {
             message.info("请选择审核人")
             return
@@ -184,14 +188,21 @@ export default class ProjectSum extends Component {
             message.info("请上传excel")
             return
         }
-        let temp =this.state.dataSource.some((o,index) => {
-            // console.log('o',o.projectcoding)
-            return !o.flag
+        let showRed=this.state.arrAir;
+
+        let temp =Promise.all(showRed).then((res) =>{
+            console.log('res',res)
+            res.map((o,index) => {
+                console.log('o',o.code)
+                if(!o.code){
+                    message.info(`有数据不正确`)
+                    return
+                 }
+                 return !o.code
+            })
         })
-        if(temp){
-            message.info(`有数据不正确`)
-            return
-        }
+        console.log('temp',temp)
+        
        
 
         const { project, unit } = this.state;
@@ -306,7 +317,7 @@ export default class ProjectSum extends Component {
                 title: '清单项目编号',
                 dataIndex: 'projectcoding',
                 render: (text, record, index) => {
-                    if(record.flag){
+                    if(record.code){
                         return <span style={{color:'green'}}>{record.projectcoding ? record.projectcoding : ''}</span>
                     }else{
                         return <span style={{color:'red'}}>{record.projectcoding ? record.projectcoding : ''}</span>

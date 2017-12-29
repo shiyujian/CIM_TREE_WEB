@@ -123,6 +123,7 @@ export default class ProjectSumExamine extends Component {
         let wplist = [];
         let i = 0;   //asure the code of every document only
 
+        //关联计价清单数据
         let jialist = await getSearcher({keyword:'priceListName'})
         let pairMap = {};
         let pairs = jialist.result.map(item => {
@@ -131,7 +132,6 @@ export default class ProjectSumExamine extends Component {
                 rate: item.extra_params.rate
             }
         })
-       
         dataSource.map(item => {
             i++;
             docData.push({
@@ -156,7 +156,6 @@ export default class ProjectSumExamine extends Component {
             }) 
             //施工包批量
           
-
             wplist.push({
                 code: item.unit.code,
                 extra_params: pairMap[item.projectcoding]

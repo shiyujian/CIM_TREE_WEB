@@ -46,6 +46,10 @@ export default class SumSpeedDelete extends Component {
             message.info("请选择审核人")
             return;
         }
+        if (this.state.dataSource.length === 0) {
+            message.info("请上传excel");
+            return;
+          }
         let {check} = this.state;
         let per = {
             id:check.id,
@@ -68,7 +72,7 @@ export default class SumSpeedDelete extends Component {
         const columns =[
             {
               title: "序号",
-              dataIndex: "number",
+              dataIndex: "key",
               render: (text, record, index) => {
                 return index + 1;
               }
@@ -138,7 +142,7 @@ export default class SumSpeedDelete extends Component {
                     <Col>
                         <span>
                             审核人：
-                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)} mode="combobox" placeholder="可搜索审查人">
+                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
                                 {
                                     this.state.checkers
                                 }
