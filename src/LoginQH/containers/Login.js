@@ -220,7 +220,6 @@ class Login extends Component {
 							<p style={{fontSize:16,color:'white',marginTop:'10'}}>请使用手机客户端扫码登录</p>
 						</div>
 				}
-
 			</div>
 		);
 	}

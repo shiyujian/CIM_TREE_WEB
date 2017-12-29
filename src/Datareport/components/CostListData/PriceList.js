@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-
 import { Input, Form, Spin, Upload, Icon, Button, Modal,
     Cascader ,Select, Popconfirm,message, Table, Row, Col, notification, DatePicker } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import EditableCell from '../EditableCell';
+import {uniq} from 'lodash';
+
 const {Option} = Select
 
 export default class PriceList extends Component {
@@ -20,7 +21,8 @@ export default class PriceList extends Component {
             concatunit:{},
             options:[],
             unit:{},
-		};
+            alreadyChange: false
+        };
     }
     componentDidMount(){
 
@@ -100,16 +102,34 @@ export default class PriceList extends Component {
                     file:{
                         id: 'pricelist',
                         name: 'priceList'
-                    }
+                    },
+                    key: i
                 })
+                // if(uniq(dataSource.map(item=>code)).length)
             }
             if(dataSource.some(item => {
                 return item.flag
             })) {
                 message.warn("清单项目编码错误")
             }
+            dataSource = this.checkCodeRepeat(dataSource);
             this.setState({ dataSource });
         }
+    }
+
+    checkCodeRepeat(dataSource) {
+        let codearr = dataSource.map(data => data.projectcoding);
+        let repeatFlag = false;
+        for(var i = 0, l = codearr.length; i < l; ++i) {
+            if (codearr.indexOf(codearr[i]) !== i) {
+                if(!dataSource[i].flag) {
+                    dataSource[i].flag = true;
+                    repeatFlag = true;
+                }
+            }
+        }
+        repeatFlag && message.warn("清单项目编码重复");
+        return dataSource;
     }
 
     //下拉框选择人
@@ -330,23 +350,31 @@ export default class PriceList extends Component {
     }
     
     onCellChange = (index, key, record) => {      //编辑某个单元格
+        this.state.alreadyChange = true;
         const { dataSource } = this.state;
         return (value) => {
-            dataSource[index][key] = value;
+            dataSource[index-1][key] = value;
             record[key] = value;
         };
     }
     //验证编码
     asyncVerify (index, key, record) {
-        const { dataSource } = this.state;
         let {actions: {verifyCode}} = this.props;
         return async (code) => {
-            let res = await verifyCode({code});
-            if(res === 'object not found') {
-                dataSource[index].flag = false;
-            }else {
-                message.warn("清单项目编码错误");
-                dataSource[index].flag = true;
+            code = +code
+            const { dataSource } = this.state;
+            let codeArr = dataSource.map(data => data.projectcoding);
+            codeArr[index-1] = code;
+            if (codeArr.indexOf(code) !== codeArr.lastIndexOf(code)) {
+                message.warn("清单项目编码重复");
+            } else {
+                let res = await verifyCode({code});
+                if(res === 'object not found') {
+                    dataSource[index-1].flag = false;
+                }else {
+                    message.warn("清单项目编码错误");
+                    dataSource[index-1].flag = true;
+                }
             }
             this.setState({dataSource});
         }
@@ -365,14 +393,16 @@ export default class PriceList extends Component {
                 width:"10%",
                 render: (text, record, index) => {
                     if(record.flag){
-                        return <div style={{color:'red'}}>
-                                    <EditableCell
-                                        value={record.projectcoding}
-                                        editOnOff={false}
-                                        onChange={this.onCellChange.call(this,index, "projectcoding", record)}
-                                        asyncVerify={this.asyncVerify.call(this,index, "projectcoding", record)}
-                                    />
-                                </div>
+                        return (
+                            <div style={{color:'red'}}>
+                                <EditableCell
+                                    value={record.projectcoding}
+                                    editOnOff={false}
+                                    onChange={this.onCellChange.call(this, record.key, "projectcoding", record)}
+                                    asyncVerify={this.asyncVerify.call(this, record.key, "projectcoding", record)}
+                                />
+                            </div>
+                        )
                     }else{
                         return <span>{record.projectcoding}</span>
                     }
