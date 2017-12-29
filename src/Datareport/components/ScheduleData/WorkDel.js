@@ -22,6 +22,34 @@ export default class WorkDel extends Component {
 			options: [],
 		};
 	}
+
+	componentWillMount(){
+		let dataSource = this.props.dataSourceSelected;
+		let newdataSource = [];
+		dataSource.map((item,key)=>{
+			let newDatas = {
+				key:key+1,
+				code: item.code,
+				name: item.name,
+				project:item.project,
+				unit: item.unit,
+				construct_unit: item.construct_unit,
+				quantity: item.quantity,
+				factquantity: item.factquantity,
+				planstarttime: item.planstarttime,
+				planovertime: item.planovertime,
+				factstarttime: item.factstarttime,
+				factovertime: item.factovertime,
+				uploads: item.uploads,
+				delcode: item.delcode,
+				wpcode: item.wpcode,
+				obj_type: item.obj_type,
+				pk: item.pk,
+			}
+			newdataSource.push(newDatas);
+		})
+		this.setState({dataSource:newdataSource});
+	}
 	componentDidMount() {
 		const { actions: { getAllUsers } } = this.props;
 		getAllUsers().then(rst => {
@@ -58,16 +86,37 @@ export default class WorkDel extends Component {
 	delete(index) {
 		let { dataSource } = this.state;
 		dataSource.splice(index, 1);
-		this.setState({ dataSource });
+		let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+                key:key+1,
+				code: item.code,
+				name: item.name,
+				project:item.project,
+				unit: item.unit,
+				construct_unit: item.construct_unit,
+				quantity: item.quantity,
+				factquantity: item.factquantity,
+				planstarttime: item.planstarttime,
+				planovertime: item.planovertime,
+				factstarttime: item.factstarttime,
+				factovertime: item.factovertime,
+				uploads: item.uploads,
+				delcode: item.delcode,
+				wpcode: item.wpcode,
+				obj_type: item.obj_type,
+				pk: item.pk,
+            }
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource})  
 	}
 
 
 	render() {
 		const columns = [{
 			title: '序号',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex:"key",
 		}, {
 			title: 'WBS编码',
 			dataIndex: 'code',
@@ -111,7 +160,7 @@ export default class WorkDel extends Component {
 					<Popconfirm
 						placement="leftTop"
 						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, index)}
+						onConfirm={this.delete.bind(this, record.key-1)}
 						okText="确认"
 						cancelText="取消">
 						<a>删除</a>
@@ -133,6 +182,7 @@ export default class WorkDel extends Component {
 					dataSource={this.state.dataSource}
 					bordered
 					pagination={{ pageSize: 10 }}
+					rowKey="key"
 				/>
 				<Row style={{ marginBottom: "30px" }} type="flex">
 					<Col>

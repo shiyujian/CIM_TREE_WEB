@@ -130,18 +130,19 @@ export default class ProjectSumChange extends Component {
                
               },{
               title: "清单项目编号",
-              render: (record) => {
-                let checkVal = (value) => {
-                    record.projectcoding = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.projectcoding}
-                        checkVal={checkVal}
-                        value={record.projectcoding} />
-                )
-              },
+              dataIndex: 'projectcoding',
+            //   render: (record) => {
+            //     let checkVal = (value) => {
+            //         record.projectcoding = value;
+            //         return value;
+            //     }
+            //     return (
+            //         <ECCB
+            //             initCheckedValue={record.projectcoding}
+            //             checkVal={checkVal}
+            //             value={record.projectcoding} />
+            //     )
+            //   },
               key:'Projectcoding'
             }, {     
               title: "项目名称",
@@ -255,7 +256,7 @@ export default class ProjectSumChange extends Component {
                     <Col>
                         <span>
                             审核人：
-                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)} mode="combobox" placeholder="可搜索审查人">
+                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)} >
                                 {
                                     this.state.checkers
                                 }

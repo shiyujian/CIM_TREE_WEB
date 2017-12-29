@@ -307,8 +307,20 @@ export default class WorkunitCost extends Component {
         // }
         this.setState({selectedRowKeys,dataSourceSelected:selectedRows});
     }
+	//分页
+    paginationOnChange(page,pageSize){
+		console.log('page',page,pageSize);
+	}
 	
+
 	render() {
+		const paginationInfo = {
+			onChange: this.paginationOnChange.bind(this),
+			showSizeChanger: true,
+			pageSizeOptions: ['5', '10', '20', '30', '40', '50'],
+			showQuickJumper: true,
+		}
+
 		const { selectedRowKeys } = this.state;
 		const rowSelection = {
 			selectedRowKeys,
@@ -358,7 +370,6 @@ export default class WorkunitCost extends Component {
 					<Button className="btn" type="default" onClick={this.setchgVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.setDeleteVisible.bind(this) }>申请删除</Button>
 					<Button className="btn" type="default" onClick={this.setExportvisible.bind(this)}>导出表格</Button>
-				
 					<Search
 						className="btn"
 						style={{ width: "200px" }}
@@ -366,7 +377,8 @@ export default class WorkunitCost extends Component {
 						onSearch={(text) => {
 							let result = this.state.dataSource.filter(data => {
 								// console.log('data',data)
-								return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.projectname.indexOf(text) >= 0 || data.company.indexOf(text) >= 0 ;
+								
+								return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.projectname.indexOf(text) >= 0 || data.company.indexOf(text) >= 0 
 							});
 							// console.log(result);
 							if (text === '') {
@@ -379,7 +391,7 @@ export default class WorkunitCost extends Component {
 				<Row >
 					<Col >
 						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs} 
-						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}} />
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}} pagination={paginationInfo}/>
 					</Col>
 				</Row>
 				{

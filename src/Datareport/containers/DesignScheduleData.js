@@ -30,6 +30,7 @@ export default class DesignScheduleData extends Component {
 			showDs: [],
 			totalData: null,
 			loading: false,
+			pagination:{},
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			setAddVisiable: false,
@@ -288,7 +289,7 @@ export default class DesignScheduleData extends Component {
 							bordered
 							rowSelection={rowSelection}
 							style={{ height: 380, marginTop: 20 }}
-							pagination={{ pageSize: 10 }}
+							pagination={{showSizeChanger:true,showQuickJumper:true}}
 							rowKey='key'
 							loading={this.state.loading}
 						/>

@@ -27,9 +27,10 @@ class EditableCell extends React.Component {
 	}
 
 	check = () => {
+		let {asyncVerify} = this.props;
 		let value = this.state.value;
-		console.log(value,"value")
-			if (this.props.onChange) {
+		asyncVerify && asyncVerify(value);
+		if (this.props.onChange) {
 			this.props.onChange(this.state.value);
 		}
 		this.setState({ editable: false });
