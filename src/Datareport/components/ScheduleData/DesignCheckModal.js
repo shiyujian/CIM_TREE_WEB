@@ -132,6 +132,7 @@ export default class DesignCheckModal extends Component {
                 status: 'A',
                 profess_folder: { code: dir.code, obj_type: 'C_DIR' },
                 extra_params: {
+                    key:i,
                     code: item.code,
                     volume:item.volume,
                     name: item.name,
@@ -139,7 +140,7 @@ export default class DesignCheckModal extends Component {
                     factovertime: item.factovertime,
                     factquantity: item.factquantity,
                     uploads: item.uploads,
-                    designunit: item.designunit,
+                    designunit: item.designunit.name,
                     unit: item.unit.name,
                     project: item.project.name
                 },
@@ -172,9 +173,7 @@ export default class DesignCheckModal extends Component {
         const columns =
             [{
                 title: '序号',
-                render: (text, record, index) => {
-                    return index + 1
-                }
+                dataIndex:"key"
             }, {
                 title: '编码',
                 dataIndex: 'code',
@@ -193,6 +192,11 @@ export default class DesignCheckModal extends Component {
             }, {
                 title: '设计单位',
                 dataIndex: 'designunit',
+                render: (text, record, index) => (
+                    <span>
+                        {record.designunit.name}
+                    </span>
+                ),
             }, {
                 title: '上传人员',
                 dataIndex: 'uploads',
@@ -226,7 +230,8 @@ export default class DesignCheckModal extends Component {
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered />
+                        bordered 
+                        rowKey="key"/>
                     <Row>
                         <Col span={2}>
                             <span>审查意见：</span>

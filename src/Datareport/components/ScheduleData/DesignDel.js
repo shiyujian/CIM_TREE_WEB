@@ -22,6 +22,28 @@ export default class DesignDel extends Component {
 			options: [],
 		};
 	}
+	componentWillMount(){
+		let dataSource = this.props.dataSourceSelected;
+		let newdataSource = [];
+		dataSource.map((item,key)=>{
+			let newDatas = {
+				key:key+1,
+				code: item.code,
+				volume:item.volume,
+				name: item.name,
+				major: item.major,
+				factovertime: item.factovertime,
+				factquantity: item.factquantity,
+				uploads: item.uploads,
+				designunit: item.designunit,
+				unit: item.unit,
+				project: item.project,
+				delcode: item.delcode,
+			}
+			newdataSource.push(newDatas);
+		})
+		this.setState({dataSource:newdataSource});
+	}
 	componentDidMount() {
 		const { actions: { getAllUsers } } = this.props;
 		getAllUsers().then(rst => {
@@ -58,14 +80,30 @@ export default class DesignDel extends Component {
 	delete(index) {
 		let { dataSource } = this.state;
 		dataSource.splice(index, 1);
-		this.setState({ dataSource });
+		let newdataSource = [];
+        dataSource.map((item,key)=>{
+            let newDatas = {
+				key:key+1,
+				code: item.code,
+				volume:item.volume,
+				name: item.name,
+				major: item.major,
+				factovertime: item.factovertime,
+				factquantity: item.factquantity,
+				uploads: item.uploads,
+				designunit: item.designunit,
+				unit: item.unit,
+				project: item.project,
+				delcode: item.delcode,
+			}
+            newdataSource.push(newDatas)
+        })
+      this.setState({dataSource:newdataSource})  
 	}
 	render() {
 		const columns = [{
 			title: '序号',
-			render: (text, record, index) => {
-				return index + 1
-			}
+			dataIndex:"key",
 		}, {
 			title: '编码',
 			dataIndex: 'code',
@@ -100,7 +138,7 @@ export default class DesignDel extends Component {
 					<Popconfirm
 						placement="leftTop"
 						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, index)}
+						onConfirm={this.delete.bind(this, record.key-1)}
 						okText="确认"
 						cancelText="取消">
 						<a>删除</a>
@@ -123,6 +161,7 @@ export default class DesignDel extends Component {
 					dataSource={this.state.dataSource}
 					bordered
 					pagination={{ pageSize: 10 }}
+					rowKey="key"
 				/>
 				<Row style={{ marginBottom: "30px" }} type="flex">
 					<Col>

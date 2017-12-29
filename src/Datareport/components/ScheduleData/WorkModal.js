@@ -72,6 +72,13 @@ export default class WorkModal extends Component {
 		}, {
             title: '施工单位',
             dataIndex: 'construct_unit',
+            render: (text, record, index) => {
+                if(record.construct_unit && record.construct_unit.name){
+                    return <span>{record.construct_unit.name}</span>
+                }else{
+                    return (<Input style={{color:'red'}} value={record.construct_unit ? record.construct_unit.code : ''} onBlur={this.fixOrg.bind(this,index)} onChange={this.tableDataChange1.bind(this,index)}/>)
+                }
+            },
 		}, {
 			title: '施工图工程量',
             dataIndex: 'quantity',
@@ -115,13 +122,13 @@ export default class WorkModal extends Component {
 			headers: {
 			},
 			showUploadList: false,
-		    onChange(info) {
+            async onChange(info) {
 		        if (info.file.status !== 'uploading') {
 		        }
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
                     let {dataSource} = jthis.state
-                    dataSource = jthis.handleExcelData(importData)
+                    dataSource = await jthis.handleExcelData(importData)
                     jthis.setState({dataSource})
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
@@ -232,14 +239,30 @@ export default class WorkModal extends Component {
     }
 
     //处理上传excel的数据
-    handleExcelData(data){
+   async handleExcelData(data){
+        const {actions:{getOrg,getdateWpData}} = this.props;
         data.splice(0,1);
-        let res = data.map((item,index) => {
-            return {
-                key:index+1,
+        let res = [];
+        for(let i=0;i<data.length;i++){
+            let item = data[i]
+            let con = await getOrg({code:item[2]})
+            let wbscode = await getdateWpData({code:item[0]})
+            console.log("wbscode",wbscode);
+            if(!wbscode){
+                message.error("有WBS编码填写错误，请确认")
+            }
+            if(!con){
+                message.error("有实施单位填写错误，请确认")
+            }
+            res.push({
+                key:i+1,
                 code:item[0],
                 name:item[1],
-                construct_unit:item[2],
+                construct_unit:{
+                    code:con.code ? con.code :item[2],
+                    name :con.name ? con.name : "",
+                    type: con.type ? con.type : "" 
+                },
                 quantity:item[3],
                 factquantity:item[4],
                 planstarttime:item[5],
@@ -247,9 +270,36 @@ export default class WorkModal extends Component {
                 factstarttime:item[7],
                 factovertime:item[8],
                 uploads:getUser().username,
+            })
+        }
+        
+        return res
+    }
+    //校验组织机构
+    fixOrg(index){
+        const {actions:{getOrg}} = this.props;
+        let {dataSource} = this.state;
+        getOrg({code:dataSource[index].construct_unit.code}).then(rst => {
+            if(rst.code){
+                dataSource[index]['construct_unit'] = {
+                    name: rst.name,
+                    code: rst.code,
+                    type: rst.obj_type
+                }
+                this.setState({dataSource});
+            }else{
+                message.info("请确认后再次输入")
             }
         })
-        return res
+    }
+    tableDataChange1(index ,e ){
+		const { dataSource } = this.state;
+		dataSource[index]["construct_unit"] = {
+            name: '',
+            code: e.target.value,
+            type: ''
+        }
+	  	this.setState({dataSource});
     }
 
 	static layout = {

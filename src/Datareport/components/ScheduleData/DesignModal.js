@@ -64,38 +64,75 @@ class DesignModal extends Component {
     }
     uplodachange = (info) => {
         //info.file.status/response
+        const {actions:{getOrg}} = this.props;
         if (info && info.file && info.file.status === 'done') {
-            notification.success({
-                message: '上传成功！',
-                duration: 2
-            });
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
-                dataSource.push({
-                    key:i,
-                    code: dataList[i][0] ? dataList[i][0] : '',
-                    volume: dataList[i][1] ? dataList[i][1] : '',
-                    name: dataList[i][2] ? dataList[i][2] : '',
-                    major: dataList[i][3] ? dataList[i][3] : '',
-                    factovertime: dataList[i][4] ? dataList[i][4] : '',
-                    designunit: dataList[i][5] ? dataList[i][5] : '',
-                    uploads: getUser().username,
-                    project: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                    unit: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                })
+                getOrg({code:dataList[i][5]}).then(data=>{
+                    if(!data){
+                        message.info("您有设计单位输入有误，请确认");
+                    }
+                    dataSource.push({
+                        key:i,
+                        code: dataList[i][0] ? dataList[i][0] : '',
+                        volume: dataList[i][1] ? dataList[i][1] : '',
+                        name: dataList[i][2] ? dataList[i][2] : '',
+                        major: dataList[i][3] ? dataList[i][3] : '',
+                        factovertime: dataList[i][4] ? dataList[i][4] : '',
+                        designunit:{
+                            code:data.code ? data.code :dataList[i][5],
+                            name :data.name ? data.name : "",
+                            type: data.type ? data.type : ""
+                        },
+                        uploads: getUser().username,
+                        project: {
+                            code: "",
+                            name: "",
+                            obj_type: ""
+                        },
+                        unit: {
+                            code: "",
+                            name: "",
+                            obj_type: ""
+                        },
+                    })
+
+                    this.setState({ dataSource });
+                })             
             }
-            this.setState({ dataSource });
+            notification.success({
+                message: '上传成功！',
+                duration: 2
+            });
         }
+    }
+    //校验组织机构
+    fixOrg(index){
+        const {actions:{getOrg}} = this.props;
+        let {dataSource} = this.state;
+        getOrg({code:dataSource[index].designunit.code}).then(rst => {
+            if(rst.code){
+                dataSource[index]['designunit'] = {
+                    name: rst.name,
+                    code: rst.code,
+                    type: rst.obj_type
+                }
+                this.setState({dataSource});
+            }else{
+                message.info("请确认后再次输入")
+            }
+        })
+    }
+    tableDataChange1(index ,e ){
+		const { dataSource } = this.state;
+		dataSource[index]["designunit"] = {
+            name: '',
+            code: e.target.value,
+            type: ''
+        }
+	  	this.setState({dataSource});
     }
 
     //下拉框选择人
@@ -229,6 +266,14 @@ class DesignModal extends Component {
             }, {
                 title: '设计单位',
                 dataIndex: 'designunit',
+                render: (text, record, index) => {
+                    if(record.designunit && record.designunit.name){
+                        return <span>{record.designunit.name}</span>
+                    }else{
+                        return (<Input style={{color:'red'}} value={record.designunit ? record.designunit.code : ''} onBlur={this.fixOrg.bind(this,index)} onChange={this.tableDataChange1.bind(this,index)}/>)
+                    }
+                },
+
             }, {
                 title: '上传人员',
                 dataIndex: 'uploads',

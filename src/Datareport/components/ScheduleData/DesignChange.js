@@ -120,7 +120,8 @@ export default class DesignChange extends Component {
 	render() {
 		const columns = [{
 			title: '序号',
-			dataIndex:"key"
+			dataIndex:"key",
+			key: "key",
 		}, {
 			title: '编码',
 			dataIndex: 'code',
@@ -188,19 +189,7 @@ export default class DesignChange extends Component {
 			key:"factovertime"
 		}, {
 			title: '设计单位',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.designunit = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.designunit}
-                        checkVal={checkVal}
-                        value={record.designunit} />
-				)
-			},
-			key:"designunit"
+			dataIndex:"designunit",
 		}, {
 			title: '变更人员',
 			dataIndex: 'uploads',
@@ -214,7 +203,7 @@ export default class DesignChange extends Component {
 					<Popconfirm
 						placement="leftTop"
 						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, index)}
+						onConfirm={this.delete.bind(this, record.key-1)}
 						okText="确认"
 						cancelText="取消">
 						<a>删除</a>
@@ -222,7 +211,7 @@ export default class DesignChange extends Component {
 				)
 			}
 		}];
-
+		console.log("145",this.state.dataSource);
 		return (
 			<Modal
 				title="设计进度变更表"
