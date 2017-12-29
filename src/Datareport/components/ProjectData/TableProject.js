@@ -13,6 +13,10 @@ export default class TableProject extends Component {
 		}
 	}
 	render() {
+		let painationInfo = {
+			showQuickJumper:true,
+			showSizeChanger:true,
+		}
 		let rowSelection = {
 			selectedRowKeys: this.state.selectedRowKeys || [],
 			onChange: (selectedRowKeys, selectedRows) => {
@@ -65,6 +69,7 @@ export default class TableProject extends Component {
 						bordered={true}
 						rowSelection={rowSelection}
 						dataSource={this.state.showDs || []}
+						pagination={painationInfo}
 					>
 					</Table>
 					{

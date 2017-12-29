@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input } from 'antd';
+import { Table, Button, Popconfirm, message, Input, Pagination, Spin } from 'antd';
 import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API, DataReportTemplate_ConstructionUnits, DataReportTemplate_Organization} from '_platform/api.js';
 import style from './TableOrg.css'
 const Search = Input.Search;
@@ -10,9 +10,14 @@ export default class TableOrg extends Component {
 			dataSource: [],
 			selectData:[],
 			tempData:[],
+			spinning:true
 		}
 	}
 	render() {
+		let painationInfo = {
+			showQuickJumper:true,
+			showSizeChanger:true,
+		}
 		return (
 			<div>
 				<div> 
@@ -25,19 +30,34 @@ export default class TableOrg extends Component {
 					<Button className={style.button} onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search className={style.button} onSearch = {this.searchOrg.bind(this)} style={{ width: "200px" }} placeholder="输入搜索条件" />
 				</div>
-				<Table
-					columns={this.columns}
-					bordered={true}
-					rowSelection={this.rowSelection}
-					dataSource={this.state.tempData}
-					rowKey = "code"
-				>
-				</Table>
+				<Spin spinning = {this.state.spinning}>
+					<Table
+						columns={this.columns}
+						bordered={true}
+						rowSelection={this.rowSelection}
+						dataSource={this.state.tempData}
+						rowKey="code"
+						pagination={painationInfo}
+
+					>
+					</Table>
+				</Spin>
 			</div>
 		)
 	}
 	searchOrg(value){ 
 		let searchData = [];
+		if (value === "") {
+			searchData = [...this.state.dataSource];
+			searchData.map((item, index) => {
+				delete item.index;
+				item.index = index + 1;
+			})
+			this.setState({
+				tempData:searchData
+			})
+			return;
+		}
 		this.state.dataSource.map(item => {
 			if (item.name.indexOf(value) != -1) {
 				searchData.push(item);
@@ -143,6 +163,9 @@ export default class TableOrg extends Component {
 		console.log("dataSource:",dataSource);
 		dataSource.map((item, index) => {
 			item.index = index + 1
+		})
+		this.setState({
+			spinning:false
 		})
 		this.setState({dataSource,tempData:dataSource});
 	}
