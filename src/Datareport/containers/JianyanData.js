@@ -214,9 +214,6 @@ export default class JianyanData extends Component {
     }
 	//批量上传回调
 	setData(data,participants){
-		if(this.state.targetData.length){
-			this.setState({targetData:[],selectedRowKeys:[]})
-		}
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -252,15 +249,15 @@ export default class JianyanData extends Component {
                     }],
                     attachment:null}).then(() => {
 						this.setState({addvisible:false})	
+						if(this.state.targetData.length){
+							this.setState({targetData:[],selectedRowKeys:[]})
+						}
 						message.info("发起成功")					
 					})
 		})
 	}
 	//删除回调
 	delData(data,participants){
-		if(this.state.targetData.length){
-			this.setState({targetData:[],selectedRowKeys:[]})
-		}
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -295,7 +292,10 @@ export default class JianyanData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-						this.setState({deletevisible:false})	
+						this.setState({deletevisible:false})
+						if(this.state.targetData.length){
+							this.setState({targetData:[],selectedRowKeys:[]})
+						}	
 						message.info("发起成功")					
 					})
 		})
