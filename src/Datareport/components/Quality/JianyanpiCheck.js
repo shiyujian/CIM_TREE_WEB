@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/quality';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
@@ -249,7 +249,7 @@ export default class JianyanpiCheck extends Component {
                             </RadioGroup>
                         </Col>
                         <Col span={2} push={14}>
-                            <Button type='primary'>
+                            <Button type='primary' onClick={this.getExcel.bind(this)}>
                                 导出表格
                             </Button>
                         </Col>
@@ -267,4 +267,27 @@ export default class JianyanpiCheck extends Component {
             </Modal>
 		)
     }
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+	getExcel(){
+		let exhead = ['序号','项目/子项目','单位工程','WBS编码','名称','检验合格率','质量等级','施工单位'];
+		let rows = [exhead];
+		let excontent =this.state.dataSource.map((data,index)=>{
+			let con_name = data.construct_unit ? data.construct_unit.name : '暂无'
+			return [index+1,data.project.name,data.unit.name,data.code,data.name,data.rate||'',data.level||'',con_name,];
+		});
+		rows = rows.concat(excontent);
+		const {actions:{jsonToExcel}} = this.props;
+        jsonToExcel({},{rows:rows}).then(rst => {
+            console.log(rst);
+            this.createLink('检验信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
+	}
 }
