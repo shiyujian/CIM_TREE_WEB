@@ -42,8 +42,24 @@ export default class Addition extends Component {
 					dataIndex:'name',
 					key:rst.name
 				}
-			}
-			else if(rst.name === "专业"){
+			}else if(rst.name === "设计阶段"){
+				return {
+					title:rst.name,
+                    key:rst.name,
+					render: (doc,record,index) => {
+						const { designstage = []} = this.props;
+						return <Select placeholder="选择设计阶段" style={{width:130}}
+                                       onChange={this.changeDesignStage.bind(this, rst.code,record,index)}>
+							{
+								designstage.metalist.map((data, index) => {
+									return <Option key={index}
+                                                   value={data.name}>{data.name}</Option>;
+								})
+							}
+                        </Select>;
+					}
+				}
+			}else if(rst.name === "专业"){
 				return {
 					title:rst.name,
 					key:rst.name,
@@ -221,6 +237,17 @@ export default class Addition extends Component {
 		updoc[newname] = value;
 		updoc.state ='正常状态';
 		updoc.name = doc.name;
+		changeupdoc(updoc);
+		changeDocs(docs);
+	}
+
+	changeDesignStage(code,record,index,event){
+		const {
+			docs = [],
+			updoc ={},
+			actions: {changeDocs,changeupdoc}
+		} = this.props;
+		record.updoc[code] = event;
 		changeupdoc(updoc);
 		changeDocs(docs);
 	}
