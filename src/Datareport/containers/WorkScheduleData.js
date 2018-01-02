@@ -5,7 +5,7 @@ import { actions } from '../store/workdata';
 import { getUser } from '_platform/auth';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import { Row, Col, Table, Input, Button, message } from 'antd';
+import { Row, Col, Table, Input, Button, message, Progress } from 'antd';
 import { WorkModal, WorkChange, WorkDel } from '../components/ScheduleData';
 import './quality.less';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -43,8 +43,8 @@ export default class WorkScheduleData extends Component {
             getWorkDataList,
         } } = this.props;
 		let dataSource = [];
-		const { loading } = this.state;
-		this.setState({ loading: true })
+		this.setState({loading:true,percent:0,num:0})
+		this.setState({ loading: true, })
 		getWorkDataList()
 			.then(data => {
 				data.result.map((single, i) => {
@@ -68,9 +68,10 @@ export default class WorkScheduleData extends Component {
 						pk: single.extra_params.unit.pk || single.extra_params.pk,
 					}
 					dataSource.push(temp);
-					this.setState({ dataSource, showDat: dataSource, loading: false ,});
+					this.setState({ dataSource, showDat: dataSource, loading: false , percent:100});
 				})
 			})
+			this.setState({ loading: false });
 
 	}
 	goCancel = () => {
@@ -241,6 +242,10 @@ export default class WorkScheduleData extends Component {
 		const { actions: { jsonToExcel } } = this.props;
 		const { dataSourceSelected } = this.state;
 		let rows = [];
+		if(dataSourceSelected.length===0){
+			message.info("请先选择数据")
+			return;
+		}
 		rows.push(["WBS编码", "任务名称", "项目/子项目", "单位工程", "实施单位", "施工图工程量", "实际工程量", "计划开始时间", "计划结束时间", "实际开始时间", "实际结束时间", "上传人员"]); 
 		dataSourceSelected.map(item => {
 			rows.push([
@@ -306,7 +311,7 @@ export default class WorkScheduleData extends Component {
 							style={{ height: 380, marginTop: 20 }}
 							pagination={{showSizeChanger:true,showQuickJumper:true}}
 							rowKey='key'
-							loading={this.state.loading}
+							loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 						/>
 					</Col>
 				</Row>
