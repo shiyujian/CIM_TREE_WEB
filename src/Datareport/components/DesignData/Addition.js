@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Button, Table, Icon, Popconfirm, message, Select, Input, Row, Col, Upload,Cascader,notification} from 'antd';
 import {getNextStates} from '_platform/components/Progress/util';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,WORKFLOW_CODE} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,WORKFLOW_CODE,DataReportTemplate_DesignInformation} from '_platform/api';
 import {getUser} from '_platform/auth';
 const Option = Select.Option;
 var moment = require('moment');
@@ -169,16 +169,16 @@ export default class Addition extends Component {
              footer={null}
 			>
 				<div>
-					<Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 					 bordered 
 					 columns={columns}
 					 rowKey='index' 
 					 dataSource={addition.dataSource}
 					/>
+                    <Button style={{marginRight:10}} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_DesignInformation}`)} type="default">模板下载</Button>
 					<Upload {...props} beforeUpload={this.beforeUpload.bind(this)}>
 	                    <Button style={{margin:'10px 10px 10px 0px'}}>
-	                        <Icon type="upload" />上传附件
+	                        <Icon type="upload" />上传并预览
 	                    </Button>
 	                </Upload>
 					<span>
@@ -197,6 +197,7 @@ export default class Addition extends Component {
                         loadData={this.loadData.bind(this)}
                         onChange={this.onSelectProject.bind(this)}
                         changeOnSelect
+                        placeholder="请选择项目及子单位工程"
                       />
                     </span> 
                     <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
@@ -530,6 +531,16 @@ export default class Addition extends Component {
             arr[index].index = ++index
         })
         return arr
+    }
+        //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 	static layout = {
 		labelCol: { span: 6 },
