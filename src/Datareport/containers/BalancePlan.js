@@ -120,7 +120,7 @@ export default class BanlancePlan extends Component {
 					attachment: null
 				}).then(() => {
 					this.setState({ lanchReapt: false });
-					message.info('发起流程成功')					
+					message.success('发起流程成功')					
 				})
 		})
 
@@ -162,7 +162,7 @@ export default class BanlancePlan extends Component {
 					attachment: null
 				}).then(() => {
 					this.setState({ lanchdelate: false });
-					message.info('发起流程成功')
+					message.success('发起流程成功')
 				})
 		})
 
@@ -204,7 +204,7 @@ export default class BanlancePlan extends Component {
 					attachment: null
 				}).then(() => {
 					this.setState({ lanchChange: false });
-					message.info('发起流程成功')
+					message.success('发起流程成功')
 				})
 		})
 

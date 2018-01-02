@@ -139,8 +139,8 @@ export default class ToggleModal extends Component{
         ModalVisibleProject(false);
     }
     cancel() {
-        const { actions: { ModalVisibleProject } } = this.props;
-        ModalVisibleProject(false);
+        const { actions: { ModalVisibleUnit } } = this.props;
+        ModalVisibleUnit(false);
     }
     componentDidMount(){
         const {actions:{getAllUsers,getProjectAc}} = this.props

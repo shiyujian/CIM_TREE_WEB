@@ -12,7 +12,8 @@ import {
     Input,
     Popconfirm,
     notification,
-    Progress
+    Progress,
+    message
 } from 'antd';
 import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
@@ -151,6 +152,7 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setEditVisiable:false})						
 					})
 		})
@@ -190,6 +192,7 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setDeleteVisiable:false})						
 					})
 		})
@@ -229,11 +232,17 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setAddVisiable:false})						
 					})
 		})
 	}
 	onBtnClick = (type) =>{
+        const {dataSourceSelected} = this.state;
+        if(dataSourceSelected.length === 0){
+        	message.warning('请先选择数据');
+        	return;
+        }
         if(type==="add"){
             this.setState({setAddVisiable:true});
         }else if(type==="delete"){
@@ -420,11 +429,15 @@ class SafetyDoc extends Component {
     //数据导出
     getExcel(){
         const {actions:{jsonToExcel}} = this.props;
-        const {dataSource} = this.state;
+        const {dataSourceSelected} = this.state;
+        if(dataSourceSelected.length === 0){
+        	message.warning('请先选择数据再导出')
+        	return
+        }
         let rows = [];
         rows.push(this.header);
-        dataSource.map(item => {
-            rows.push([item.code,item.remark,item.doTime,item.filename.pubUnit,item.upPeople,item.type,item.file,item.unit,item.projectName]);
+        dataSourceSelected.map(item => {
+            rows.push([item.code,item.remark,item.doTime,item.filename,item.pubUnit,item.upPeople,item.type,item.unit,item.projectName]);
         })
         jsonToExcel({},{rows:rows})
         .then(rst => {

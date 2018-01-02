@@ -407,9 +407,9 @@ export default class BalanceSchedule extends Component {
 }
   downloadT () {
     console.log(DataReportTemplate_SettlementProgress)
-    // this.createLink(this,DataReportTemplate_SettlementProgress);
-    const url = "http://10.215.160.38:6542/media/documents/meta/%E7%BB%93%E7%AE%97%E8%BF%9B%E5%BA%A6%E6%95%B0%E6%8D%AE%E5%A1%AB%E6%8A%A5%E6%A8%A1%E6%9D%BF.xlsx";
-    this.createLink(this,url);
+    this.createLink(this,DataReportTemplate_SettlementProgress);
+    // const url = "http://10.215.160.38:6542/media/documents/meta/%E7%BB%93%E7%AE%97%E8%BF%9B%E5%BA%A6%E6%95%B0%E6%8D%AE%E5%A1%AB%E6%8A%A5%E6%A8%A1%E6%9D%BF.xlsx";
+    // this.createLink(this,url);
   }
   render() {
     const paginationInfo = {

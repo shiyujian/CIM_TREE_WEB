@@ -76,7 +76,7 @@ export default class Expurgate extends Component {
 			dataIndex: 'stage'
 		}, {
 			title: '提交单位',
-			dataIndex: 'pubUnit'
+			dataIndex: 'pubUnit.name'
 		}, {
 			title: '文档类型',
 			dataIndex: 'filetype'
