@@ -16,7 +16,7 @@ export const putDocListAc = createFetchAction(`${SERVICE_API}/documentlist/`, []
 export const getPersonByCode = createFetchAction(`${SERVICE_API}/persons/code/{{code}}/`, [],'GET');
 export const getProjectByCode = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/?all=true`, [],'GET');
 export const getDocByCode = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [],'GET');
-export const getDocByCodeList = createFetchAction(`${SERVICE_API}/documentgetlist/`, [],'POST');
+export const getDocByCodeList = createFetchAction(`${SERVICE_API}/documentgetlist/?key_type=code`, [],'GET');
 export const getDocByCodeSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{code}}&&obj_type=C_DOC`, [],'get');
 
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
