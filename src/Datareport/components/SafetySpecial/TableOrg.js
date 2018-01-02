@@ -41,45 +41,47 @@ export default class TableOrg extends Component {
 		}
 	}
 	async generateTableData(data) {
-		const { actions: { getDocument, } } = this.props;
+		const { actions: { getDocument,getDocumentList } } = this.props;
 		let dataSource = [];
 		let total = data.length
-		let promises = data.map((item, i) => {
+		let codeArray=[];
+		data.map((item, i) => {
 			this.setState({percent:parseFloat((i*100/total).toFixed(2))});
-			return getDocument({ code: item.code });
+			codeArray.push(item.code);
 		});
-		let projects = await Promise.all(promises);
-		promises = projects.map((single, i) => {
-			let temp = {
-				i: i + 1,
-				code: single.extra_params.code,
-				codeId: single.code,
-				filename: single.extra_params.filename,
-				index: single.extra_params.index,
-				organizationUnit: single.extra_params.organizationUnit,
-				project: single.extra_params.project,
-				projectName: single.extra_params.project.name,
-				remark: single.extra_params.remark,
-				resUnit: single.extra_params.resUnit,
-				reviewComments: single.extra_params.reviewComments,
-				reviewPerson: single.extra_params.reviewPerson,
-				reviewTime: single.extra_params.reviewTime,
-				scenarioName: single.extra_params.scenarioName,
-				unit: single.extra_params.unit,
-				unitProject: single.extra_params.unit.name,
-				file: single.basic_params.files[0],
-				checkout: true,
-			}
-			dataSource.push(temp);
-		});
-		// debugger;
-		this.setState({
-			...this.state,
-			dataSource,
-			loading: false,
-			percent: 100
-			// dataSource: dataSource.sort((x, y) => x.i - y.i)
-		});
+		let docArray = await getDocumentList({},{list:codeArray});
+		if(docArray.result){
+			docArray.result.map((single, i) => {
+				let temp = {
+					i: i + 1,
+					code: single.extra_params.code,
+					codeId: single.code,
+					filename: single.extra_params.filename,
+					index: single.extra_params.index,
+					organizationUnit: single.extra_params.organizationUnit,
+					project: single.extra_params.project,
+					projectName: single.extra_params.project.name,
+					remark: single.extra_params.remark,
+					resUnit: single.extra_params.resUnit,
+					reviewComments: single.extra_params.reviewComments,
+					reviewPerson: single.extra_params.reviewPerson,
+					reviewTime: single.extra_params.reviewTime,
+					scenarioName: single.extra_params.scenarioName,
+					unit: single.extra_params.unit,
+					unitProject: single.extra_params.unit.name,
+					file: single.basic_params.files[0],
+					checkout: true,
+				}
+				dataSource.push(temp);
+			});
+			// debugger;
+			this.setState({
+				...this.state,
+				dataSource,
+				loading: false,
+				percent: 100
+			});
+		}
 	}
 
 	paginationOnChange(e) {
