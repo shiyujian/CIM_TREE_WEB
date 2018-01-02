@@ -29,13 +29,16 @@ class EditableCell extends React.Component {
 			});
 			return;
 		} else {
-			if (this.props.onChange) {
-				if (this.props.asyncCheckout) {
-					let checkedValue = await this.props.checkVal(value);
-					this.props.onChange(this.state.value, checkedValue);
-				} else {
-					this.props.onChange(this.state.value);
-				}
+			if (this.props.onChange) { // 父组件传的
+				// if (this.props.asyncCheckout) {
+				// 	let checkedValue = await this.props.checkVal(value);
+				// 	this.props.onChange(this.state.value, checkedValue);
+				// } else {
+				// 	this.props.onChange(this.state.value);
+				// }
+				let { checkVal } = this.props;
+				checkVal && checkVal(value);
+				this.props.onChange(this.state.value);
 			}
 		}
 		this.setState({ editable: false });
