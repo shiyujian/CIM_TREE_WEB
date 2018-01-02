@@ -271,10 +271,7 @@ export default class ToggleModal extends Component{
         const {actions: {getOrgReverse}} = this.props;
         const { dataSource } = this.state;
         dataSource[index].depart = e.target.value;
-        // console.log('e',e.target.value)
-        // console.log('dataSource',dataSource)
         getOrgReverse({code:dataSource[index].depart}).then(rst => {
-            console.log('rst1111',rst)
             if(rst.children.length !== 0) {
                 dataSource[index]['account'] = {
                     org: rst.children[0].name
@@ -321,7 +318,6 @@ export default class ToggleModal extends Component{
             }
             hash[arr[i]] = true;
         }
-        console.log('repeatCode',repeatCode)
         return repeatCode;
     }
     //处理上传excel的数据
@@ -331,12 +327,10 @@ export default class ToggleModal extends Component{
         let codes = [];
         let promises = data.map(item => {
             codes.push(item[1])
-            return getOrgReverse({code: item[3]});
+            return getOrgReverse({code: item[2]});
         })
-        console.log('codes',codes)
         let repeatCode = this.isRepeat(codes);
         if(repeatCode.length > 1) {
-            console.log(1111)
             this.setState({flag_code: false})
         }
         this.setState({repeatCode})
@@ -355,15 +349,15 @@ export default class ToggleModal extends Component{
             })
             res = data.map((item, index) => {
                 return {
-                    index: item[0],
-                    code: item[1],
-                    name: item[2],
+                    index: index + 1,
+                    code: item[0],
+                    name: item[1],
                     org: orgname[index],
-                    depart: item[3],
-                    job: item[4],
-                    sex: item[5],
-                    tel: item[6],
-                    email: item[7],
+                    depart: item[2],
+                    job: item[3],
+                    sex: item[4],
+                    tel: item[5],
+                    email: item[6],
                 }
             })
             this.setState({
