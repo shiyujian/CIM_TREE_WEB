@@ -43,7 +43,9 @@ export default class TableOrg extends Component {
 	async generateTableData(data) {
 		const { actions: { getDocument, } } = this.props;
 		let dataSource = [];
+		let total = data.length
 		let promises = data.map((item, i) => {
+			this.setState({percent:parseFloat((i*100/total).toFixed(2))});
 			return getDocument({ code: item.code });
 		});
 		let projects = await Promise.all(promises);
