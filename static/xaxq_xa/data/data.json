@@ -1,0 +1,6 @@
+{"total":4,"rows":[
+	{"name":"树种","value":"柏树","group":"基础信息","editor":"text"},
+	{"name":"规格","value":"H3.0 ~ 4.0m","group":"基础信息","editor":"text"},
+	{"name":"年龄","value":"5","group":"基础信息","editor":"text"},
+	{"name":"价格","value":"1800","group":"基础信息","editor":"text"}
+]}

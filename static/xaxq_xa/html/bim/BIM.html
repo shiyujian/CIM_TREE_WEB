@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>BIM查询</title>
+    <!-- css -->
+    <style>
+        *{margin: 0; padding: 0;}
+        html,body{width: 100%; height: 100%; min-width: 200px;}
+        table.t_list {
+            width: 100%;
+            height: auto;
+            font-family: verdana,arial,sans-serif;
+            font-size:12px;
+            color:#333333;
+            border-width: 1px;
+            border-color: #95B8E7;
+            border-collapse: collapse;
+            word-break:break-all;
+            text-align: center;
+        }
+        table.t_list th {
+            border-width: 1px;
+            padding: 3px;
+            border-style: solid;
+            border-color: #95B8E7;
+            background-color: #dedede;
+        }
+        table.t_list td {
+            border-width: 1px;
+            padding: 3px;
+            border-style: solid;
+            border-color: #95B8E7;
+            background-color: #ffffff;
+        }
+    </style>
+    <link rel="stylesheet" href="../../js/easyui/themes/bootstrap/easyui.css" />
+    <link rel="stylesheet" href="../../js/easyui/themes/icon.css" />
+    <!-- js -->
+    <script type="text/javascript" src="../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../js/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../js/layer/layer.js"></script>
+    <script type="text/javascript" src="../../js_con8/cm.js"></script>
+
+	
+</head>
+<body style="overflow: hidden;">
+    <div id="ControlTitlebar" style="background:#f3f3f3; height:25px">
+        <div id="ButtonClose" style="float: right; width: 25px; height: 25px;" class="closebtn"></div>
+    </div>
+    <!-- 内容 -->
+    <div id="my_layout" class="easyui-layout" style="width:100%;height:100%;">
+        <div data-options="region:'center',border:false,iconCls:'icon-info'" title="BIM信息" style="padding:5px;">
+            <table class="t_list"></table>
+        </div>
+    </div>
+</body>
+<!-- js -->
+<script charset="UTF-8">
+    // debugger;
+    var plugin=external.parentWindow.__g;
+    var console=external.parentWindow.console;
+    var bimObj=external.parentWindow.bimObj;
+    var dataSourceFactory = external.parentWindow.dataSourceFactory;
+    $(function () {
+        SetBIMInfo();
+    });
+    function SetBIMInfo(){
+        var tableHtml;
+        var revit_obj=[];
+        var revit_fildName=[];
+        if(bimObj){
+            var fl=bimObj.fl;
+            var fid=bimObj.fid;
+            try{
+                
+                var fl_ds = dataSourceFactory.openDataSourceByString(fl.featureClassInfo.dataSourceConnectionString);
+                var fl_fds = fl_ds.openFeatureDataset(fl.featureClassInfo.dataSetName);
+                var fl_fc = fl_fds.openFeatureClass(fl.featureClassInfo.featureClassName);
+                var fl_row = fl_fc.getRow(fid);
+                var fields=fl_row.fields;
+                var BIMType="Revit";
+                if(fields.indexOf("Tags")>=0){
+                    BIMType="MicroStation";
+                }
+                tableHtml="<tr><th width='80px'>属性</th><th>值</th></tr>";
+                for (var i = 0; i < fl_row.fieldCount; i++) {
+                    var field = fields.get(i);
+                    if (field.fieldType != gviFieldType.gviFieldGeometry) {
+                        var name = field.name;
+                        var val;
+                        if (field.fieldType == gviFieldType.gviFieldBlob) {
+                            revit_obj.push(fl_row.getValue(i));
+                            revit_fildName.push(fields.get(i).name);
+                            val = BIMType;
+                        } else {
+                            val = fl_row.getValue(i);
+                        }
+                        tableHtml += "<tr><td>" + name + "</td><td>" + val + "</td></tr>";
+                    }
+                }
+                if(revit_obj.length>0){
+                    revit_obj.map(function(item,i){
+                        if(item){
+                            tableHtml += "<tr><th colspan='2'>BIM属性-"+revit_fildName[i]+"</th></tr>";
+                            var xml_group_map = [];
+                            var xml_val_map = {};
+                            //创建文档对象
+                            var xml = item.asString();
+                            xml = "<xml>" + xml.substring(xml.indexOf(">") + 1) + "</xml>";
+                            $(xml).find("Property").each(function () {     //查找所有Property节点并遍历
+                                var Property = $(this);
+                                var vaule = Property.text();                 //获取节点文本
+                                var Group_vaule = Property.attr("Group");  //获取节点的属性
+                                var Name_vaule = Property.attr("Name");  //获取节点的属性
+                                var group_index = xml_group_map.indexOf(Group_vaule);
+                                if (group_index < 0) {
+                                    group_index = xml_group_map.push(Group_vaule) - 1;
+                                }
+                                if (xml_val_map[Group_vaule]) {
+                                    var is_have = false;
+                                    xml_val_map[Group_vaule].map(function (val) {
+                                        if (val[0] == Name_vaule) {
+                                            is_have = true;
+                                        }
+                                    });
+                                    if (!is_have) {
+                                        xml_val_map[Group_vaule].push([[Name_vaule], [vaule]]);
+                                    }
+                                } else {
+                                    xml_val_map[Group_vaule] = [[[Name_vaule], [vaule]]];
+                                }
+                            });
+                            xml_group_map.map(function (group) {
+                                tableHtml += "<tr><td colspan='2' style='text-align: left; font-weight:bold;'>" + group + "</td></tr>";
+                                xml_val_map[group].map(function (item) {
+                                    tableHtml += "<tr><td>" + item[0] + "</td><td>" + item[1] + "</td></tr>";
+                                });
+                            });
+                            if(xml_group_map.length<1){
+                                tableHtml += "<tr><td colspan='2'>未查到数据</td></tr>";
+                            }
+                        }
+                    });
+                    
+                }
+                $(".t_list").html(tableHtml);
+
+                // 释放资源
+                fl_row = null;
+                fl_fc = null;
+                fl_fds = null;
+                fl_ds = null;
+                CollectGarbage();
+
+            }catch(e){
+                $(".t_list").html("<tr><td>未查到数据</td></tr>");
+                console.log("citymaker error:", "BIM属性查询出错");
+            }
+        }
+    }
+</script>
+</html>
