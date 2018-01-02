@@ -66,7 +66,7 @@ export default class SumPlanChangeCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("dr_qua_jsjh_change_visible",false);
-        message.info("操作成功");
+        message.success("操作成功");
     }
 
     //通过
@@ -95,7 +95,20 @@ export default class SumPlanChangeCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        await putDocList({},{data_list:doclist_c})
+        await putDocList({},{data_list:doclist_c}).then(rst =>{
+            console.log('rst',rst);
+            if(rst.result){
+                notification.success({
+                    message: '变更数据成功！',
+                    duration: 2
+                });
+            }else{
+                notification.error({
+                    message: '变更数据失败！',
+                    duration: 2
+                });
+            }
+        })
         
     }
     //不通过
