@@ -170,7 +170,7 @@ export default class ModifyCheck extends Component {
                 all.push(deleteStaticFile({id:origindataSource[index].basic_params.files[0].id})) //删除旧附件
             }
         });
-        Promise.all(all)
+        await Promise.all(all)
         .then(rst => {
             console.log(rst)
             message.success('修改文档成功！');
@@ -239,7 +239,7 @@ export default class ModifyCheck extends Component {
             dataIndex:'stage',
 		}, {
 			title:'提交单位',
-            dataIndex:'pubUnit',
+            dataIndex:'pubUnit.name',
 		}, {
 			title:'文档类型',
             dataIndex:'filetype',

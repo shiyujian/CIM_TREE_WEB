@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message,notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
@@ -55,7 +55,7 @@ export default class SumSpeedExamine extends Component {
             await this.reject();
         }
         this.props.closeModal("dr_qua_jsjh_visible",false)
-        message.info("操作成功")
+        message.success("操作成功")
     }
     //通过
     async passon(){
@@ -116,7 +116,9 @@ export default class SumSpeedExamine extends Component {
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
         // await updateWpData({},{data_list:wplist});
-        message.info('创建文档成功')
+        notification.success({
+            message:'创建文档成功'
+        })
     }
     //不通过
     async reject(){

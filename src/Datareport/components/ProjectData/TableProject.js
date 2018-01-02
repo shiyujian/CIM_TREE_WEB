@@ -184,60 +184,73 @@ export default class TableProject extends Component {
 		title: '序号',
 		dataIndex: 'index',
 		key: 'Index',
+		width:100
 	}, {
 		title: '项目/子项目名称',
 		dataIndex: 'name',
 		key: 'Name',
+		width:100
 	}, {
 		title: '所属项目',
 		render: (record) => {
 			return (<span>{this.state.projRoot ? this.state.projRoot.name : ''}</span>);
 		},
 		key: 'projRoot',
+		width:100
 	}, {
 		title: '所属区域',
 		dataIndex: 'area',
 		key: 'Area',
+		width:100
 	}, {
 		title: '项目规模',
 		dataIndex: 'range',
 		key: 'Range',
+		width:100
 	}, {
 		title: '项目类型',
 		dataIndex: 'projType',
 		key: 'ProjType',
+		width:100
 	}, {
 		title: '项目地址',
 		dataIndex: 'address',
 		key: 'Address',
+		width:100
 	}, {
 		title: '项目红线坐标',
 		render: (record) => {
 			return (<span>{record.extra_params.coordinate || ''}</span>);
 		},
 		key: 'Project',
+		width:100
 	}, {
 		title: '项目投资',
 		dataIndex: 'cost',
 		key: 'cost',
+		width:100
 	}, {
 		title: '项目负责人',
 		render: (record) => {
 			return (<span>{record.response_persons[0] ? record.response_persons[0].name : ''}</span>);
 		},
-		key: 'Remarks'
+		key: 'Remarks',
+		width:100
 	}, {
 		title: '计划开工日期',
 		dataIndex: 'stime',
-		key: 'Stime'
+		key: 'Stime',
+		width:100
 	}, {
 		title: '计划竣工日期',
 		dataIndex: 'etime',
-		key: 'Etime'
+		key: 'Etime',
+		width:100
 	}, {
 		title: '简介',
 		dataIndex: 'intro',
-		key: 'Intro'
+		key: 'Intro',
+		width:100
 	}, {
 		title: '附件',
 		key: 'oper',
@@ -245,7 +258,8 @@ export default class TableProject extends Component {
 			<span>
 				附件
 			</span>
-		)
+		),
+		width:100
 	}, {
 		title: '项目图片',
 		key: 'pic',
@@ -253,6 +267,7 @@ export default class TableProject extends Component {
 			<span>
 				图片
 					</span>
-		)
+		),
+		width:100
 	}]
 }

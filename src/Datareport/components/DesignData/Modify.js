@@ -86,9 +86,10 @@ export default class Modify extends Component {
             ),
 		}, {
 			title: '提交单位',
-			render: (text, record, index) => (
-                <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'pubUnit')} value={this.state.dataSource[record.index-1]['pubUnit']}/>
-            ),
+			dataIndex: 'pubUnit.name'
+			// render: (text, record, index) => (
+   //              <Input style={{width:'120px'}} onChange={this.tableDataChange.bind(this,record.index-1,'pubUnit')} value={this.state.dataSource[record.index-1]['pubUnit']}/>
+   //          ),
 		}, {
 			title: '文档类型',
 			render: (text, record, index) => (

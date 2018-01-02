@@ -82,7 +82,6 @@ export default class ModalTable extends Component {
 				item.forEach((single, index) => {
 					let temp = {
 						index: index + 1,
-
 						coding: single.extra_params.coding,
 						modelName: single.extra_params.filename,
 						project: single.extra_params.project.name,
