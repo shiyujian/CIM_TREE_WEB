@@ -174,6 +174,7 @@ module.exports = {
 			{from: '../static/supervisord.conf'},
 			
 			{from: '../static/1108', to: '1108/'},
+			{from: '../static/xaxq_xa', to: 'xaxq_xa/'},
 			{from: '../static/fonts', to: 'fonts/'},
 			{from: '../static/gooflow', to: 'gooflow/'},
 			{from: '../static/oajs', to: 'oajs/'},
