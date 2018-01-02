@@ -82,7 +82,6 @@ export default class ModalTable extends Component {
 				item.forEach((single, index) => {
 					let temp = {
 						index: index + 1,
-
 						coding: single.extra_params.coding,
 						modelName: single.extra_params.filename,
 						project: single.extra_params.project.name,
@@ -247,6 +246,11 @@ export default class ModalTable extends Component {
 	
 	toggleModify() {
 		const { modify = {}, actions: { changeModifyField } } = this.props;
+		const {selectedDataSource} = this.state;
+		if(selectedDataSource.length === 0){
+        	message.warning('请先选择数据再变更')
+        	return
+        }
 		changeModifyField('visible', true)
 		changeModifyField('key', modify.key ? modify.key + 1 : 1)
 
@@ -254,7 +258,11 @@ export default class ModalTable extends Component {
 	}
 	toggleExpurgate() {
 		const { expurgate = {}, actions: { changeExpurgateField } } = this.props;
-
+		const {selectedDataSource} = this.state;
+		if(selectedDataSource.length === 0){
+        	message.warning('请先选择数据再删除')
+        	return
+        }
 		changeExpurgateField('visible', true)
 		changeExpurgateField('key', expurgate.key ? expurgate.key + 1 : 1)
 
@@ -270,10 +278,10 @@ export default class ModalTable extends Component {
         	return
         }
 		let rows = [];
-		rows.push(['序号','模型编码' ,'项目/子项目名称',	'单位工程',	'模型名称',	'提交单位',	'模型描述',	'模型类型', '上报时间', '上报人']);
+		rows.push(['模型编码' ,'项目/子项目名称',	'单位工程',	'模型名称',	'提交单位',	'模型描述',	'模型类型', '上报时间', '上报人']);
 		selectedDataSource.map(item => {
 			console.log('测试数据',item)
-			rows.push([item.index, item.coding, item.project, item.unit,item.modelName,  item.submittingUnit, item.modelDescription, item.modeType, item.reportingTime, item.reportingName]);
+			rows.push([ item.coding, item.project, item.unit,item.modelName,  item.submittingUnit, item.modelDescription, item.modeType, item.reportingTime, item.reportingName]);
 		})
 		jsonToExcel({}, { rows: rows })
 			.then(rst => {

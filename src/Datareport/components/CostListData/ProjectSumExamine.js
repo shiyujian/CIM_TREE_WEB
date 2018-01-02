@@ -207,7 +207,7 @@ export default class ProjectSumExamine extends Component {
         this.props.closeModal("cost_pro_ck_visible", false)
     }
     render() {
-        console.log('this.state.data',this.state.dataSource);
+       
         const columns = [
             {
                 title: '序号',

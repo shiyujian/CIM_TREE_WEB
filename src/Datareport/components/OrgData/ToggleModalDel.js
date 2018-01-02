@@ -93,6 +93,12 @@ export default class ToggleModalDel extends Component{
             dataSource:deleteOrg
         })
     }
+    // 删除数据
+    delete(index){
+        let dataSource = this.state.dataSource;
+        dataSource.splice(index,1);
+        this.setState({dataSource})
+    }
     columns = [ {
 		title: '组织机构编码',
 		dataIndex: 'code',

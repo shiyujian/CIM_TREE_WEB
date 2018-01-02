@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress,Select } from 'antd';
-import {STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_DesignInformation} from '_platform/api';
+import {STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,} from '_platform/api';
 import Card from '_platform/components/panels/Card';
 const Option = Select.Option;
 const Search = Input.Search
@@ -136,7 +136,7 @@ export default class DesignTable extends Component {
 			dataIndex: 'stage'
 		}, {
 			title: '提交单位',
-			dataIndex: 'pubUnit'
+			dataIndex: 'pubUnit.name'
 		}, {
 			title: '文档类型',
 			dataIndex: 'filetype'
@@ -168,7 +168,7 @@ export default class DesignTable extends Component {
 		return (
 			<div >
 				<Row >
-					<Button style={{marginRight:10}} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_DesignInformation}`)} type="default">模板下载</Button>
+					
 					<Button style={{ margin: '10px' }} onClick={this.toggleAddition.bind(this)} type="default" >发起填报</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleModify.bind(this)} type="default">申请变更</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleExpurgate.bind(this)} type="default">申请删除</Button>
@@ -234,9 +234,9 @@ export default class DesignTable extends Component {
 		const {modify = {}, actions: { changeModifyField } } = this.props;
 		console.log(this.props,'modify.selectedDatas',modify.selectedDatas)
 		if(!(modify.selectedDatas&&modify.selectedDatas.length)){
-			message.warning('Nothing selected')
+			message.warning('请选择数据')
 		} else if(!this.judge(modify.selectedDatas)) {
-			message.warning('Different unit had been selected, check your selected lines please ')
+			message.warning('请选择相同的单位工程')
 		} else {
 			changeModifyField('visible', true)
 			changeModifyField('key', modify.key?modify.key+1:1)
@@ -246,7 +246,7 @@ export default class DesignTable extends Component {
 		const {expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		console.log(this.props)
 		if(!(expurgate.selectedDatas&&expurgate.selectedDatas.length)){
-			message.warning('Nothing selected')
+			message.warning('请选择数据')
 		} else {
 			changeExpurgateField('visible', true)
 			changeExpurgateField('key', expurgate.key?expurgate.key+1:1)

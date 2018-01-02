@@ -27,7 +27,18 @@ export default class ProjectSum extends Component {
     }
 
     componentDidMount() {
-        const { actions: { getAllUsers, getProjectTree ,getQuantitiesCode} } = this.props;
+        const { actions: { getAllUsers, getProjectTree ,getQuantitiesCode,getSearcherDoc} } = this.props;
+        let cacheData =  getSearcherDoc({keyword:"hfdsjhbsadfhb"}).then(res => {
+            // let cacheData = res.filter(item => item.extra_params.projectcoding);
+            let cacheArr = []
+            res.result.map(item => {
+                if(item.extra_params.projectcoding) {
+                    cacheArr.push(item.extra_params.projectcoding);
+                }
+            })
+            this.setState({cacheArr});
+        });
+        
         getAllUsers().then(rst => {
             let checkers = rst.map(o => {
                 return (
@@ -64,8 +75,10 @@ export default class ProjectSum extends Component {
             return false;
         }
     }
-    uplodachange = (info) => {
+    uplodachange = async (info) => {
         //info.file.status/response
+        let {cacheArr} = this.state;
+        let usedMark = false;
         const { actions: { getQuantitiesCode} } = this.props;
         if (info && info.file && info.file.status === 'done') {
             notification.success({
@@ -74,37 +87,39 @@ export default class ProjectSum extends Component {
             });
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
-           
             let dataSource = [];
-            let arrAir=[];
             for (let i = 1; i < dataList.length; i++) {
-               
-                arrAir.push(getQuantitiesCode({code:dataList[i][1]}));
+                let res = await getQuantitiesCode({code:dataList[i][0]});
+                let isUsed = cacheArr.indexOf(dataList[i][0]);
+                dataList[i].flag = res !== 'object not found' && isUsed == -1 ? true : false;
+                if(isUsed !== -1) {
+                    usedMark = true;
+                }
                 dataSource.push({
                     key:i,
-                    // code: dataList[i][0] ? dataList[i][0] : '',
-                    projectcoding:dataList[i][1] ? dataList[i][1] : '',
+                    projectcoding:dataList[i][0] ? dataList[i][0] : '',
                     projectname:{
                        editable: false, 
-                       value:dataList[i][2] ? dataList[i][2] : '',
+                       value:dataList[i][1] ? dataList[i][1] : '',
                     },
                     company:{
                         editable: false,
-                        value:dataList[i][3] ? dataList[i][3] : ''
+                        value:dataList[i][2] ? dataList[i][2] : ''
                     } ,
                     number:{
                         editable: false,
-                        value: dataList[i][4] ? dataList[i][4] : '',
+                        value: dataList[i][3] ? dataList[i][3] : '',
                     } ,
                     total: {
                         editable: false,
-                        value:dataList[i][5] ? dataList[i][5] : ''
+                        value:dataList[i][4] ? dataList[i][4] : ''
                     },
                     remarks:{
                         editable: false,
-                        value:dataList[i][6] ? dataList[i][6] : ''
+                        value:dataList[i][5] ? dataList[i][5] : ''
                     },
                     action:'normal',
+                    flag: dataList[i].flag,
                     project: {
                         code: "",
                         name: "",
@@ -120,24 +135,55 @@ export default class ProjectSum extends Component {
                     }
 
                 })
+                
             }
 
-           Promise.all(arrAir).then((res) =>{
-               res.map((o,index) => {
-                 
-                    if(!o.name){
-                        dataSource[index]["projectcoding"]=dataList[1][1];
-                        this.setState({changeRed:1})
-                    }
-               })
-               this.setState({dataSource}); 
-               this.setState({arrAir});   
-           })
-        // this.setState({dataSource});  
+         
+            // dataSource.map(item => {
+            //     if(cacheArr.indexOf(item.extra_params.projectcoding) && item.flag) {
+            //         item.flag = false;
+            //     };
+            //     return item;
+            // });
+
+            debugger;
+            if(dataSource.some(item => {
+                return !item.flag
+            })) {
+                message.warn("清单项目编码错误")
+            }
+
+            if(usedMark) {
+                message.warn("清单项目已经被使用")
+            }
+            // if(dataSource.some(item => {
+            //     if(item.flag === false){
+            //         message.warn("清单项目编号错误")
+            //     }
+            //     return item.flag
+            // }))
+            dataSource = this.checkCodeRepeat(dataSource);
+            this.setState({dataSource}); 
+            
+        }
+
+    }
+    checkCodeRepeat(dataSource) {
+        console.log('dataSource',dataSource)
+        let codearr = dataSource.map(data => data.projectcoding);
+        let repeatFlag = false;
+        for(var i = 0, l = codearr.length; i < l; ++i) {
+            if (codearr.indexOf(codearr[i]) !== i) {
+                if(dataSource[i].flag) {
+                    dataSource[i].flag = false;
+                    repeatFlag = true;
+                }
+            }
         }
       
+        repeatFlag && message.warn("清单项目编码重复");
+        return dataSource;
     }
-
     //下拉框选择人
     selectChecker(value) {
         let check = JSON.parse(value);
@@ -195,7 +241,7 @@ export default class ProjectSum extends Component {
         });
     }
 
-    async onok() {
+    onok() {
         if (!this.state.check) {
             message.info("请选择审核人")
             return
@@ -204,19 +250,22 @@ export default class ProjectSum extends Component {
             message.info("请上传excel")
             return
         }
-        let showRed=this.state.arrAir;
-        let temp = await Promise.all(showRed)
-        
-        if(temp[0]=="object not found"){
-            message.info(`项目清单编号不正确`);
+        let flag = this.state.dataSource.some((o,index) => {
+            return !o.flag
+        })
+
+        if(flag) {
+            message.info("清单项目编号错误");
             return
         }
+
         const { project, unit } = this.state;
         if (!project.name) {
             message.info(`请选择项目和单位工程`);
             return;
         }
 
+        
         let { check } = this.state
         let per = {
             id: check.id,
@@ -229,7 +278,7 @@ export default class ProjectSum extends Component {
         //     this.state.dataSource[i].project = project;
         //     this.state.dataSource[i].unit = unit;
         // }
-        console.log('信息上传成功')
+     
         let {dataSource} = this.state;
         let newdataSource = [];
         dataSource.map((item,key)=>{
@@ -391,7 +440,8 @@ export default class ProjectSum extends Component {
         )
     }
     render() {
-      
+        console.log('this.state.cacheArr',this.state.cacheArr)
+        let {dataSource} = this.state.dataSource;
         const columns = [
             {
                 title: '序号',
@@ -400,10 +450,16 @@ export default class ProjectSum extends Component {
                 title: '清单项目编号',
                 dataIndex: 'projectcoding',
                 render: (text, record, index) => {
-                    if(this.state.changeRed == 1){
-                        return <span style={{color:'red'}}>{record.projectcoding ? record.projectcoding : ''}</span>
+                    console.log('record.flag',record.flag)
+                    if(record.flag === false){
+                        
+                        return  (
+                            
+                                <span style={{color:'red'}}>{record.projectcoding}</span>
+                         
+                        )
                     }else{
-                        return <span style={{color:'green'}}>{record.projectcoding ? record.projectcoding : ''}</span>
+                        return <span style={{color:'green'}}>{record.projectcoding}</span>
                     }
                 }
             }, {
@@ -463,7 +519,6 @@ export default class ProjectSum extends Component {
         return (
             <Modal
                 title="工程量结算上传表"
-
                 visible={true}
                 width={1280}
                 onOk={this.onok.bind(this)}
@@ -508,6 +563,7 @@ export default class ProjectSum extends Component {
                                 className='btn'
                                 loadData={this.loadData.bind(this)}
                                 onChange={this.onSelectProject.bind(this)}
+                                placeholder="请选择"
                                 changeOnSelect
                             />
                         </span>

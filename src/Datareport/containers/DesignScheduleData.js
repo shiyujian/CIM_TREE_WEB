@@ -5,7 +5,7 @@ import { actions } from '../store/scheduledata';
 import { getUser } from '_platform/auth';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import { Row, Col, Table, Input, Button, message } from 'antd';
+import { Row, Col, Table, Input, Button, message, Progress } from 'antd';
 import { DesignModal, DesignDel, DesignChange } from '../components/ScheduleData';
 import './quality.less';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -43,6 +43,7 @@ export default class DesignScheduleData extends Component {
 			getScheduleDir,
 			postScheduleDir,
 		} } = this.props;
+		this.setState({loading:true,percent:0,num:0})
 		let topDir = await getScheduleDir({ code: 'the_only_main_code_datareport' });
 		if (topDir.obj_type) {
 			let dir = await getScheduleDir({ code: 'datareport_designdata_1111' });
@@ -76,9 +77,10 @@ export default class DesignScheduleData extends Component {
 					delcode: single.code,
 				}
 				dataSource.push(temp);
-				this.setState({ dataSource, showDat: dataSource, loading: false });
+				this.setState({ dataSource, showDat: dataSource, loading:false,percent:100 });
 			})
 		})
+		this.setState({loading:false});
 	}
 	goCancel = () => {
 		this.setState({ setAddVisiable: false, setDeleteVisiable: false, setEditVisiable: false });
@@ -241,7 +243,10 @@ export default class DesignScheduleData extends Component {
 		const { dataSourceSelected } = this.state;
 		let rows = [];
 		rows.push(["编码", "卷册", "名称", "项目/子项目", "单位工程", "专业", "实际供图时间", "设计单位", "上传人员"]);
-
+		if(dataSourceSelected.length===0){
+			message.info("请先选择数据")
+			return
+		}
 		dataSourceSelected.map(item => {
 			rows.push([item.code, item.volume, item.name, item.project, item.unit, item.major, item.factovertime, item.designunit, item.uploads]);
 		})
@@ -291,7 +296,7 @@ export default class DesignScheduleData extends Component {
 							style={{ height: 380, marginTop: 20 }}
 							pagination={{showSizeChanger:true,showQuickJumper:true}}
 							rowKey='key'
-							loading={this.state.loading}
+							loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 						/>
 
 					</Col>

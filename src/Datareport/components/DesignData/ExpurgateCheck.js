@@ -72,7 +72,7 @@ export default class ExpurgateCheck extends Component {
             all.push(deleteDocument({code:origindataSource[index].code}))   //删除文档对象
             all.push(deleteStaticFile({id:dataSource[index].file.id}))  //删除附件
         });
-        Promise.all(all)
+        await Promise.all(all)
         .then(rst => {
             console.log(rst)
             message.success('删除成功！');

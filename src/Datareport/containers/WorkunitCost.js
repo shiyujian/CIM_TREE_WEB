@@ -43,35 +43,32 @@ export default class WorkunitCost extends Component {
 	
 	}
 	async componentDidMount() {
+
 		const { actions: { getScheduleDir } } = this.props;
 		this.setState({loading:true,percent:0,num:0})
 		let topDir = await getScheduleDir({ code: 'the_only_main_code_costsumplans' });
 		if (topDir.obj_type) {
 			let dir = await getScheduleDir({ code: 'ck' });
-			// debugger
 			if (dir.obj_type) {
 				if (dir.stored_documents.length > 0) {
 					this.generateTableData(dir.stored_documents);
+				
 				}
 			}
 		}
 	}
 	async generateTableData(data) {
-		
-		const { actions: {
-			getDocument,
-	                 } } = this.props;
-		let dataSource = [];
+		const { actions: {getDocument}} = this.props;  
+		let dataSour = [];
 		let i=0;
 		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
 				i++
-				
 				let temp = {
 					key:i,
 					code: item.code,
-					subproject: single.extra_params.subproject,//项目/子项目
-					unit: single.extra_params.unit,//单位工程
+					subproject: single.extra_params.subproject || rst.extra_params.project,//项目/子项目
+					unit: single.extra_params.unit || rst.extra_params.unit,//单位工程
 					projectcoding: single.extra_params.projectcoding,//项目编号
 					projectname: single.extra_params.projectname,//项目名称
 					company: single.extra_params.company,//计量单位
@@ -80,16 +77,16 @@ export default class WorkunitCost extends Component {
 					remarks: single.extra_params.remarks,//备注
 
 				}
-				dataSource.push(temp);
-				
+				dataSour.push(temp);
+				this.setState({ 
+					dataSource:dataSour,
+					showDs:dataSour,
+					loading:false,
+					percent:100
+				});
 			})
 		})
-		this.setState({ 
-			dataSource:dataSource,
-			showDs:dataSource,
-		 });
-		 this.setState({loading:false,percent:100})
-		// debugger;
+		
 	}
 	//点×取消
 	oncancel() {
@@ -101,7 +98,6 @@ export default class WorkunitCost extends Component {
 	}
 	//模板下载
 	DownloadExcal(){
-		// console.log(DataReportTemplate_ProjectVolumeSettlement)
 		this.createLink("工程量结算模板下载",DataReportTemplate_ProjectVolumeSettlement)
 	}
 	createLink = (name, url) => {
@@ -149,10 +145,10 @@ export default class WorkunitCost extends Component {
 			const {actions:{jsonToExcel}}=this.props;
 			const {dataSourceSelected} =this.state;
 			let rows =[];
-			rows.push(['序号','项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','单价','备注']);
+			rows.push(['项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','单价','备注']);
 			dataSourceSelected.map(o =>{
 				rows.push([
-					o.key,
+					
 					o.subproject,
 					o.unit,
 					o.projectcoding,
@@ -314,6 +310,7 @@ export default class WorkunitCost extends Component {
 	
 
 	render() {
+		
 		const paginationInfo = {
 			onChange: this.paginationOnChange.bind(this),
 			showSizeChanger: true,
@@ -376,11 +373,8 @@ export default class WorkunitCost extends Component {
 						placeholder="输入搜索条件"
 						onSearch={(text) => {
 							let result = this.state.dataSource.filter(data => {
-								// console.log('data',data)
-								
-								return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.projectname.indexOf(text) >= 0 || data.company.indexOf(text) >= 0 
+								return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.projectname.indexOf(text) >= 0 || data.total.indexOf(text) >= 0 || data.projectcoding.indexOf(text) >= 0 
 							});
-							// console.log(result);
 							if (text === '') {
 								result = this.state.dataSource;
 							}
@@ -390,7 +384,7 @@ export default class WorkunitCost extends Component {
 				</Row>
 				<Row >
 					<Col >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs} 
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs } 
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}} pagination={paginationInfo}/>
 					</Col>
 				</Row>

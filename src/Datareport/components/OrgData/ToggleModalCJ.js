@@ -100,8 +100,8 @@ export default class ToggleModalCJ extends Component{
         data.splice(0, 1);
         let res ,codes = [];
         data.map((item, index) => {
-            codes.push(item[2]);
-            getCanjian({ code: item[1]}).then(rst => {
+            codes.push(item[1]);
+            getCanjian({ code: item[0]}).then(rst => {
                 if (rst.code !== "code") {
                     
                 }else{
@@ -112,14 +112,14 @@ export default class ToggleModalCJ extends Component{
                 }
                 res = data.map((item, index) => {
                     return {
-                        index: item[0],
+                        index: index + 1,
                         // 组织机构类型
-                        type:item[1],
-                        code: item[2],
+                        type:item[0],
+                        code: item[1],
                         // 参建单位
-                        canjian: item[3],
-                        remarks: item[4],
-                        color:item[5]
+                        canjian: item[2],
+                        remarks: item[3],
+                        color:item[4]
                     }
                 })
                 this.setState({
@@ -284,7 +284,7 @@ export default class ToggleModalCJ extends Component{
         height:"64px",
         render:(record) => {
             return (
-                <TreeSelect value={record.selectPro || "" } style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
+                <TreeSelect value={record.selectPro || "" } style={{ width: "90%" }} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
                  onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
                     let units = [];
@@ -341,8 +341,8 @@ export default class ToggleModalCJ extends Component{
                 <Popconfirm 
                     title="确认删除吗"
                     onConfirm={this.delete.bind(this, index)}
-                    okText="是"
-                    onCancel="否"
+                    okText="确认"
+                    onCancel="取消"
                 >
                     <Icon type = "delete" />
                 </Popconfirm>

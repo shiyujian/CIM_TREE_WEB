@@ -55,6 +55,14 @@ export default class Addition extends Component {
     }
     beforeUpload = (info) => {
         if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
+            const { unit } = this.state;
+            if (!unit.code) {
+                notification.warning({
+                    message: '先选择单位工程！',
+                    duration: 2
+                });
+                return false;
+            }
             return true;
         } else {
             notification.warning({
@@ -223,33 +231,37 @@ export default class Addition extends Component {
     }
 
 
-    uploadchange = (info) => {
+    uploadchange = async (info) => {
         const { actions: { getOrg, getTreeRootNode } } = this.props;
         const { unit } = this.state;
 
         if (info && info.file && info.file.status === 'done') {
-            notification.success({
-                message: '上传成功！',
-                duration: 2
-            });
+
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
                 console.log('this:', dataList[i][3])
-                let judge = getOrg({ code: dataList[i][3] });
+                let judge = await getOrg({ code: dataList[i][3] });
                 console.log('judge', judge)
                 // if(!judge.code){
                 //     message.info("您的第"+ i +"条提交单位名称输入有误，请重新确认");
                 //     return;
                 // }
 
-                let wbs = getTreeRootNode({ code: dataList[i][1] });
-                console.log('wbs', dataList[i][1])
+                let wbs = await getTreeRootNode({ code: dataList[i][1] });
+                console.log('wbs', wbs)
+                if (wbs && wbs.children[0] && wbs.children[0].children[0] && wbs.children[0].children[0].code) {
 
-
+                    if (wbs.children[0].children[0].code !== unit.code) {
+                        message.info("您的第" + i + "条编码输入有误，请确认");
+                        return;
+                    }
+                } else {
+                    return;
+                }
                 dataSource.push({
-                    index: dataList[i][0] ? dataList[i][0] : '',
+                    index: i,
                     coding: dataList[i][1] ? dataList[i][1] : '',
                     modelName: dataList[i][2] ? dataList[i][2] : '',
                     submittingUnit: {
@@ -283,7 +295,12 @@ export default class Addition extends Component {
 
 
                 })
+
             }
+            notification.success({
+                message: '上传成功！',
+                duration: 2
+            });
             this.setState({ dataSource });
         }
     }
@@ -608,6 +625,7 @@ export default class Addition extends Component {
                         <span>
                             项目-单位工程：
                         <Cascader
+                                placeholder={'请选择项目-单位工程'}
                                 options={this.state.options}
                                 className='btn'
                                 loadData={this.loadData.bind(this)}

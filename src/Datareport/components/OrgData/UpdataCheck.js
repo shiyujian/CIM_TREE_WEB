@@ -55,7 +55,7 @@ export default class UpdataCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        const {actions:{logWorkflowEvent, deleteOrg, getOrgPk,putOrgList,getProject,putProject,getUnitAc,putUnit}} = this.props
+        const {actions:{logWorkflowEvent, deleteOrg, getOrgPk,putOrgList,getProject,putProject,getUnitAc,putUnit,ModalVisibleUpdate}} = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -70,25 +70,26 @@ export default class UpdataCheck extends Component {
                 code:"" + item.code,
                 name:"" + item.name,
                 extra_params: {
-                    project: item.selectPro,
-                    unit: item.selectUnit
+                    project: item.extra_params.project,
+                    unit: item.extra_params.unit
                 },
                 version:'A'
             })
         })
         let res = await putOrgList({},{data_list: data_list});
         console.log("res:",res.result[0][0].pk);
+        console.log("data_list:",data_list);
         // return;
         dataSource.map((item, index) => {
-            if (item.selectPro.length !== 0) {
-                item.selectPro.map(it => {
+            if (item.extra_params.project.length !== 0) {
+                item.extra_params.project.map(it => {
                     let proCode = it.split("--")[0];
                     // 取出项目中所的orgs
                     getProject({code:proCode}).then(rstPro => {
                         let pro_orgs = rstPro.response_orgs;
                         let pk = res.result[index][0].pk
                         pro_orgs.push({
-                            code:item.code,
+                            code:""+item.code,
                             obj_type:"C_ORG",
                             pk:pk
                         });
@@ -101,14 +102,14 @@ export default class UpdataCheck extends Component {
                     });
                 }) 
             }
-            if (item.selectUnit.length !== 0) {
-                item.selectUnit.map(it => {
+            if (item.extra_params.unit.length !== 0) {
+                item.extra_params.unit.map(it => {
                     let unitCode = it.split("--")[0];
                     getUnitAc({code:unitCode}).then(rstUnit => {
                         let unit_orgs = rstUnit.response_orgs;
                         let pk = res.result[index][0].pk
                         unit_orgs.push({
-                            code:item.code,
+                            code:""+item.code,
                             obj_type:"C_ORG",
                             pk:pk
                         });
@@ -123,6 +124,7 @@ export default class UpdataCheck extends Component {
             }
         })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        ModalVisibleUpdate(false)
     }
     //不通过
     async reject(){
@@ -169,11 +171,11 @@ export default class UpdataCheck extends Component {
             key: 'Direct',
         }, {
             title: '负责项目/子项目名称',
-            dataIndex: 'selectPro',
+            dataIndex: 'extra_params.project',
             key: 'Project',
         },{
             title: '负责单位工程名称',
-            dataIndex: 'selectUnit',
+            dataIndex: 'extra_params.unit',
             key: 'Unit'
         },{
             title: '备注',

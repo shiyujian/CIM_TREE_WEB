@@ -373,7 +373,7 @@ class JianyanModal extends Component {
                     let {dataSource} = jthis.state
                     dataSource = await jthis.handleExcelData(importData)
                     jthis.setState({dataSource}) 
-		            message.success(`${info.file.name} file uploaded successfully`);
+		            message.success("上传成功");
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
 		        }
@@ -381,7 +381,7 @@ class JianyanModal extends Component {
 		};
 		return (
 			<Modal
-			title="分项、分部、单位检验信息上传表"
+			title="其他检验信息上传表"
             visible={true}
             width= {1280}
             key={this.props.visible}
@@ -389,9 +389,6 @@ class JianyanModal extends Component {
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
 				<div>
-                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">
-                        <a href={`${DataReportTemplate_SubdivisionUnitProjectAcceptance}`}>模板下载</a>
-                    </Button>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
 						dataSource={this.state.dataSource}

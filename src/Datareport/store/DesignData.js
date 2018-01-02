@@ -38,7 +38,8 @@ const putDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`,
 const deleteDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
 //导出数据
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
-
+//组织机构
+const getOrg = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`,[]);
 export const actions = {
 	...additionReducer,
 	...checkReducer,
@@ -63,7 +64,8 @@ export const actions = {
 	getDocument,
 	putDocument,
 	deleteDocument,
-	jsonToExcel
+	jsonToExcel,
+	getOrg
 };
 
 export default handleActions({

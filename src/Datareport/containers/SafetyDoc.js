@@ -12,6 +12,8 @@ import {
     Input,
     Popconfirm,
     notification,
+    Progress,
+    message
 } from 'antd';
 import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
@@ -45,6 +47,7 @@ class SafetyDoc extends Component {
             setAddVisiable:false,
             setEditVisiable:false,
             setDeleteVisiable:false,
+            loading:false,
         }
     }
     
@@ -78,10 +81,13 @@ class SafetyDoc extends Component {
         data.map(item =>{
             codeList.push(item.code);
         })
+        this.setState({loading:true});
         let docList = await getDocumentList({},{list:codeList});
         if(docList.result){
+            let i=0;
             docList.result.map((single)=>{
                 let temp = { 
+                    key:i,
                     code:single.extra_params.code,
                     remark:single.extra_params.remark,
                     doTime:single.extra_params.doTime,
@@ -94,10 +100,11 @@ class SafetyDoc extends Component {
                     projectName:single.extra_params.project,
                     docCode:single.code
                 }
+                i++;
                 dataSource.push(temp);
             });
         }
-        this.setState({dataSource});
+        this.setState({dataSource,loading:false});
     }
 
 	goCancel = () =>{
@@ -145,6 +152,7 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setEditVisiable:false})						
 					})
 		})
@@ -184,6 +192,7 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setDeleteVisiable:false})						
 					})
 		})
@@ -223,29 +232,33 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setAddVisiable:false})						
 					})
 		})
 	}
 	onBtnClick = (type) =>{
+        const {dataSourceSelected} = this.state;
+        if(dataSourceSelected.length === 0){
+        	message.warning('请先选择数据');
+        }
         if(type==="add"){
             this.setState({setAddVisiable:true});
-        }else if(type==="delete"){
+        }else if(type==="delete" && dataSourceSelected.length!== 0){
             this.setState({setDeleteVisiable:true});
-        }else if(type==="edit"){
+        }else if(type==="edit" && dataSourceSelected.length !== 0){
             this.setState({setEditVisiable:true});
         }
     }
     
-    handlePreview(index){
+    handlePreview(record){
         const {actions: {openPreview}} = this.props;
-        let f = this.state.dataSource[index].file
-        let filed = {}
-        filed.misc = f.misc;
-        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.name = f.name;
-        filed.mime_type = f.mime_type;
+        let filed = {};
+        filed.misc = record.file.misc;
+        filed.a_file = `${SOURCE_API}` + (record.file.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (record.file.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = record.file.name;
+        filed.mime_type = record.file.mime_type;
         openPreview(filed);
     }
 
@@ -337,7 +350,7 @@ class SafetyDoc extends Component {
                 width:'10%',
                 render:(text,record,index) => {
                     return (<span>
-                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <a onClick={this.handlePreview.bind(this,record)}>预览</a>
                             <span className="ant-divider" />
                             <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                         </span>)
@@ -381,7 +394,9 @@ class SafetyDoc extends Component {
 					 dataSource={this.state.dataSource}
                      bordered
                      rowSelection={rowSelection}
-					 style={{height:380,marginTop:20}}
+                     style={{height:180,marginTop:20}}
+                     loading={this.state.loading}
+                    //  pagination={{defaultPageSize:5}}
 					 pagination = {{showQuickJumper:true,showSizeChanger:true}} 
 					/>
                 </Content>
@@ -413,11 +428,15 @@ class SafetyDoc extends Component {
     //数据导出
     getExcel(){
         const {actions:{jsonToExcel}} = this.props;
-        const {dataSource} = this.state;
+        const {dataSourceSelected} = this.state;
+        if(dataSourceSelected.length === 0){
+        	message.warning('请先选择数据再导出')
+        	return
+        }
         let rows = [];
         rows.push(this.header);
-        dataSource.map(item => {
-            rows.push([item.code,item.remark,item.doTime,item.filename.pubUnit,item.upPeople,item.type,item.file,item.unit,item.projectName]);
+        dataSourceSelected.map(item => {
+            rows.push([item.code,item.remark,item.doTime,item.filename,item.pubUnit,item.upPeople,item.type,item.unit,item.projectName]);
         })
         jsonToExcel({},{rows:rows})
         .then(rst => {
