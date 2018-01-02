@@ -508,16 +508,10 @@ export default class ToggleModal extends Component {
      Checkout(ndex, key, record) {
         let checkedValue = false;
         const { actions: { checkoutData } } = this.props;
-        // let rst = await checkoutData({ code: value });
-        // if (rst && rst.code === value) {
-        //     checkedValue = true;
-        // }
-
         return async (value) => {
             const { dataSource } = this.state;
             const target = dataSource.find(item => item.sign === record.sign)
             if (target) {
-                // target[key] = value;
                 let rst = await checkoutData({ code: value });
                 if (rst && rst.code === value) {
                     checkedValue = true;
@@ -543,7 +537,7 @@ export default class ToggleModal extends Component {
     onCellChange = (index, key, record) => {
         const { dataSource } = this.state;
         return (value) => {
-            dataSource[index][key] = value;
+            // dataSource[index][key] = value;
             record[key] = value;
         };
         // return (value, checkedValue) => {
@@ -623,7 +617,7 @@ export default class ToggleModal extends Component {
                                 record={record}
                                 editOnOff={false}
                                 value={record.organizationUnit}
-                                onChange={this.onCellChange(record.sign - 2, "organizationUnit", record)}
+                                onChange={this.onCellChange.call(this,record.sign - 2, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
                                 checkVal={this.Checkout.call(this,record.sign - 2, "organizationUnit", record)}
                             />
@@ -636,7 +630,7 @@ export default class ToggleModal extends Component {
                                 record={record}
                                 editOnOff={false}
                                 value={record.organizationUnit}
-                                onChange={this.onCellChange(record.sign - 2, "organizationUnit", record)}
+                                onChange={this.onCellChange.call(this,record.sign - 2, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
                                 checkVal={this.Checkout.call(this,record.sign - 2, "organizationUnit", record)}
                             />
