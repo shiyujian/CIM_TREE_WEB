@@ -10,7 +10,8 @@ export default class TableUnit extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			deling: false
+			deling: false,
+			selectedRows:[]
 		}
 	}
 	async componentDidMount() {
@@ -158,7 +159,7 @@ export default class TableUnit extends Component {
 				return param;
 			}
 		}
-		let excontent =this.state.showDs.map(data=>{
+		let excontent =this.state.selectedRows.map(data=>{
 			return [data.code,data.name,data.fatherName,data.projType||'',data.stage||'',getcoordinate(data.coordinate)
 			,data.stime||'',data.etime||'',data.intro||'',data.rsp_orgName?data.rsp_orgName[0]:'',data.files?data.files[0].name:''];
 		});

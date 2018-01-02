@@ -21,6 +21,7 @@ export default class ChangeFile extends Component {
             unit: {},
             beginUnit: '',
             options: [],
+            asyncCheckout: true,
         };
     }
 
@@ -170,20 +171,45 @@ export default class ChangeFile extends Component {
                             value={record.scenarioName}
                             onChange={this.onCellChange(i, "scenarioName", record)}
                         />
-                    </div>
+                    </div>                   
                 ),
             }, {
                 title: '编制单位',
                 dataIndex: 'organizationUnit',
                 width: '10%',
                 render: (text, record, i) => (
-                    <div>
+                    // <div>
+                    //     <EditableCell
+                    //         editOnOff={false}
+                    //         value={record.organizationUnit}
+                    //         onChange={this.onCellChange(i, "organizationUnit", record)}
+                    //     />
+                    // </div>
+                    record.checkout ?
+                    <div
+                    >
                         <EditableCell
+                            record={record}
                             editOnOff={false}
                             value={record.organizationUnit}
-                            onChange={this.onCellChange(i, "organizationUnit", record)}
+                            onChange={this.onCellChangeOut.call(this,record.i, "organizationUnit", record)}
+                            asyncCheckout={this.state.asyncCheckout}
+                            checkVal={this.Checkout.call(this,record.i, "organizationUnit", record)}
                         />
                     </div>
+                    :
+                    <div
+                        style={{ color: "red" }}
+                    >
+                        <EditableCell
+                            record={record}
+                            editOnOff={false}
+                            value={record.organizationUnit}
+                            onChange={this.onCellChangeOut.call(this,record.i, "organizationUnit", record)}
+                            asyncCheckout={this.state.asyncCheckout}
+                            checkVal={this.Checkout.call(this,record.i, "organizationUnit", record)}
+                        />
+                    </div> 
                 ),
             }, {
                 title: '评审时间',
@@ -359,6 +385,54 @@ export default class ChangeFile extends Component {
             </Modal>
         )
     }; // render
+    // 编制单位校验
+    Checkout(ndex, key, record) {
+        let checkedValue = false;
+        const { actions: { checkoutData } } = this.props;
+        return async (value) => {
+            const { dataSource } = this.state;
+            const target = dataSource.find(item => item.i === record.i)
+            if (target) {
+                // target[key] = value;
+                let rst = await checkoutData({ code: value });
+                if (rst && rst.code === value) {
+                    checkedValue = true;
+                }
+                this.setState({
+                    ...this.state,
+                    dataSource: dataSource.map((item, index) => {
+                        if (item.i === record.i) {
+                            return {
+                                ...item,
+                                organizationUnit: value,
+                                checkout: checkedValue
+                            }
+                        } else {
+                            return item;
+                        }
+                    })
+                })
+            }
+        };
+    }
+    onCellChangeOut = (index, key, record) => {
+        const { dataSource } = this.state;
+        return (value) => {
+            // dataSource=dataSource.map((item, index) => {
+            //     if (item.i === record.i) {
+            //         return {
+            //             ...item,
+            //             organizationUnit: value,
+            //         }
+            //     } else {
+            //         return item;
+            //     }
+            // })
+            // dataSource[index][key] = value;
+            record[key] = value;
+        };
+    }
+
     onCellChange = (index, key, record) => {
         const { dataSource } = this.state;
         return (value) => {
@@ -390,6 +464,13 @@ export default class ChangeFile extends Component {
         //     message.info(`请选择项目和单位工程`);
         //     return;
         // }
+        const checkoutInfo = this.state.dataSource.find((item, index) => {
+            return item.checkout === false;
+        })
+        if (checkoutInfo) {
+            message.info(`编制单位有误,请修正！`);
+            return;
+        }
         if (!this.state.changeInfo) {
             message.info(`请填写变更原因`);
             return;

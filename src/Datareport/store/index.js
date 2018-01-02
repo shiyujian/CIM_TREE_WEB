@@ -94,7 +94,7 @@ export default handleActions({
 		...state,
 		SumSpeedCost: SumSpeedCostReducer(state.SumSpeedCost, action),
 	}),
-	//结算进度
+	//结算计划
 	[combineActions(...actionsMap(SumPlanCostActions))]: (state = {}, action) => ({
 		...state,
 		SumPlanCost: SumPlanCostReducer(state.SumPlanCost, action),
