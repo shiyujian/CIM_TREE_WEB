@@ -100,8 +100,8 @@ export default class ToggleModalCJ extends Component{
         data.splice(0, 1);
         let res ,codes = [];
         data.map((item, index) => {
-            codes.push(item[2]);
-            getCanjian({ code: item[1]}).then(rst => {
+            codes.push(item[1]);
+            getCanjian({ code: item[0]}).then(rst => {
                 if (rst.code !== "code") {
                     
                 }else{
