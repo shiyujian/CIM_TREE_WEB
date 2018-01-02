@@ -107,16 +107,16 @@ export default class SumSpeedExamine extends Component {
                 })
             }
             //施工包批量
-            wplist.push({
-                code:o.unit.code,
-                obj_type:o.unit.obj_type,
-                extra_params:{
-                }
-            })
+            // wplist.push({
+            //     code:o.unit.code,
+            //     obj_type:o.unit.obj_type,
+            //     extra_params:{
+            //     }
+            // })
         })
         await addDocList({},{data_list:doclist_a});
         await putDocList({},{data_list:doclist_p})
-        await updateWpData({},{data_list:wplist});
+        // await updateWpData({},{data_list:wplist});
        
     }
     //不通过

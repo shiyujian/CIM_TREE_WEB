@@ -11,7 +11,9 @@ import {
     Button,
     Input,
     Popconfirm,
-    notification
+    notification,
+    Progress,
+    message
 } from 'antd';
 import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
@@ -45,6 +47,7 @@ class SafetyHiddenDanger extends Component {
             setAddVisiable:false,
             setEditVisiable:false,
             setDeleteVisiable:false,
+            loading:false,
         }
     }
     goCancel = () =>{
@@ -76,10 +79,13 @@ class SafetyHiddenDanger extends Component {
         data.map(item =>{
             codeList.push(item.code);
         })
+        this.setState({loading:true})
         let docList = await getDocumentList({},{list:codeList});
         if(docList.result){
+            let i=0;
             docList.result.map((single)=>{
                 let temp = { 
+                    key:i,
                     code:single.extra_params.code,
                     wbs:single.extra_params.wbs,
                     type:single.extra_params.type,
@@ -95,10 +101,11 @@ class SafetyHiddenDanger extends Component {
                     editResult:single.extra_params.editResult,
                     docCode:single.code
                 }
+                i++;
                 dataSource.push(temp);
             });
         }
-        this.setState({dataSource});
+        this.setState({dataSource,loading:false});
     }
 
     setAddData = (data,participants) => {
@@ -135,6 +142,7 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setAddVisiable:false})						
 					})
 		})
@@ -174,12 +182,18 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setDeleteVisiable:false})						
 					})
 		})
     }
 
     onBtnClick = (type) =>{
+        const {dataSourceSelected} = this.state;
+        if(dataSourceSelected.length === 0){
+        	message.warning('请先选择数据');
+        	return;
+        }
         if(type==="add"){
             this.setState({setAddVisiable:true});
         }else if(type==="delete"){
@@ -230,6 +244,7 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setEditVisiable:false})						
 					})
 		})
@@ -240,15 +255,14 @@ class SafetyHiddenDanger extends Component {
         this.createLink(this,apiGet);
     }
 
-    handlePreview(index){
+    handlePreview(record){
         const {actions: {openPreview}} = this.props;
-        let f = this.state.dataSource[index].file
-        let filed = {}
-        filed.misc = f.misc;
-        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.name = f.name;
-        filed.mime_type = f.mime_type;
+        let filed = {};
+        filed.misc = record.file.misc;
+        filed.a_file = `${SOURCE_API}` + (record.file.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (record.file.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = record.file.name;
+        filed.mime_type = record.file.mime_type;
         openPreview(filed);
     }
 
@@ -355,7 +369,7 @@ class SafetyHiddenDanger extends Component {
                 width:'5%',
                 render:(text,record,index) => {
                     return (<span>
-                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <a onClick={this.handlePreview.bind(this,record)}>预览</a>
                             <span className="ant-divider" />
                             <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                         </span>)
@@ -396,6 +410,7 @@ class SafetyHiddenDanger extends Component {
                         columns={columns}
                         dataSource={this.state.dataSource}
                         bordered
+                        loading={this.state.loading}
                         rowSelection={rowSelection}                        
                         style={{ height: 380, marginTop: 20 }}
                         pagination = {{showQuickJumper:true,showSizeChanger:true}} 
@@ -428,10 +443,14 @@ class SafetyHiddenDanger extends Component {
     //数据导出
     getExcel(){
         const {actions:{jsonToExcel}} = this.props;
-        const {dataSource} = this.state;
+        const {dataSourceSelected} = this.state;
+        if(dataSourceSelected.length === 0){
+        	message.warning('请先选择数据再导出')
+        	return
+        }
         let rows = [];
         rows.push(this.header);
-        dataSource.map(item => {
+        dataSourceSelected.map(item => {
             rows.push([item.code,
                 item.wbs,
                 item.type,
