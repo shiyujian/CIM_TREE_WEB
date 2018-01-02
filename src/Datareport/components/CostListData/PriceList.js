@@ -380,7 +380,6 @@ export default class PriceList extends Component {
     }
 
     edit (index) {
-        console.log(index)
         const {dataSource} = this.state;
         dataSource[index].editable = true;
         this.setState({dataSource});
