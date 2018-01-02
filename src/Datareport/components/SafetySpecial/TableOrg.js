@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Table, Form, Button, Popconfirm, message, Input, notification, Modal } from 'antd';
+import { Progress, Row, Col, Table, Form, Button, Popconfirm, message, Input, notification, Modal } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, NODE_FILE_EXCHANGE_API } from '_platform/api';
 import ChangeFile from './ChangeFile';
 import DeleteFile from './DeleteFile';
@@ -22,6 +22,7 @@ export default class TableOrg extends Component {
 			newKey3: Math.random(),
 			selectedRowKeys: [],
 			loading: true,
+			percent: 0,
 		}
 	}
 	async componentDidMount() {
@@ -65,14 +66,16 @@ export default class TableOrg extends Component {
 				unit: single.extra_params.unit,
 				unitProject: single.extra_params.unit.name,
 				file: single.basic_params.files[0],
+				checkout: true,
 			}
 			dataSource.push(temp);
 		});
 		// debugger;
 		this.setState({
 			...this.state,
+			dataSource,
 			loading: false,
-			dataSource
+			percent: 100
 			// dataSource: dataSource.sort((x, y) => x.i - y.i)
 		});
 	}
@@ -143,6 +146,7 @@ export default class TableOrg extends Component {
 				unit: single.extra_params.unit,
 				unitProject: single.extra_params.unit.name,
 				file: single.basic_params.files[0],
+				checkout: true,
 			}
 			dataSource.push(temp);
 		})
@@ -201,7 +205,15 @@ export default class TableOrg extends Component {
 						pagination={paginationInfo}
 						rowSelection={rowSelection}
 						rowKey={(item, index) => index}
-						loading={this.state.loading}
+						// loading={this.state.loading}
+						loading={{
+							tip: <Progress
+								style={{ width: 200 }}
+								percent={this.state.percent}
+								status="active" strokeWidth={5}
+							/>
+							, spinning: this.state.loading
+						}}
 					/>
 				</Row>
 				<Row>
@@ -266,7 +278,7 @@ export default class TableOrg extends Component {
 			return;
 		}
 		let exhead1 = ['名称', '重大安全专项方案'];
-		let exhead2 = ['重大安全专项方案','序号', '项目/子项目名称', '单位工程', '方案名称', '编制单位', '评审时间', '评审意见', '评审人员', '备注', '附件'];
+		let exhead2 = ['重大安全专项方案', '序号', '项目/子项目名称', '单位工程', '方案名称', '编制单位', '评审时间', '评审意见', '评审人员', '备注', '附件'];
 		let rows = [];
 		rows.push(exhead1);
 		rows.push(exhead2);
@@ -291,7 +303,7 @@ export default class TableOrg extends Component {
 		// debugger;
 		jsonToExcel({}, { rows: rows })
 			.then(rst => {
-				let name = 	"安全专项导出信息"+moment(new Date()).format('YYYY-MM-DD-h:mm:ss-a')+'.xlsx';
+				let name = "安全专项导出信息" + moment(new Date()).format('YYYY-MM-DD-h:mm:ss-a') + '.xlsx';
 				this.createLink(name, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
 			})
 	}

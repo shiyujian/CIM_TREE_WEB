@@ -50,7 +50,9 @@ export default class ToggleModal extends Component {
                     bordered={true}
                     dataSource={this.state.dataSource}
                     rowKey={(item, index) => index}
-                    pagination={paginationInfo}
+                    // pagination={paginationInfo}
+                    pagination={false}
+                    scroll={{y:450}}
                 >
                 </Table>
                 <Row>
@@ -58,7 +60,10 @@ export default class ToggleModal extends Component {
                         !this.state.dataSource.length ? <p></p>
                             :
                             (
-                                <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                                <Col span={3} push={12} 
+                                // style={{ position: 'relative', top: -40, fontSize: 12 }}
+                                style={{ margin:"16px 0" }}
+                                >
                                     [共：{this.state.dataSource.length}行]
 								</Col>
                             )
@@ -409,7 +414,6 @@ export default class ToggleModal extends Component {
         return false;
     }
 
-
     //附件删除
     remove(index, record) {
         const { actions: { deleteStaticFile } } = this.props
@@ -417,7 +421,7 @@ export default class ToggleModal extends Component {
         // let id = dataSource[index]['file'].id
         let file = {};
         file = dataSource.filter((item, i) => {
-            return item.index === record.index;
+            return item.sign === record.sign;
         })
         let id = file.id
         deleteStaticFile({ id: id })
@@ -501,22 +505,23 @@ export default class ToggleModal extends Component {
         });
     }
 
-    async Checkout(value) {
+     Checkout(ndex, key, record) {
         let checkedValue = false;
         const { actions: { checkoutData } } = this.props;
-        let rst = await checkoutData({ code: value });
-        if (rst && rst.code === value) {
-            checkedValue = true;
-        }
-        return checkedValue;
-    }
+        // let rst = await checkoutData({ code: value });
+        // if (rst && rst.code === value) {
+        //     checkedValue = true;
+        // }
 
-    onCellChange = (index, key, record) => {
-        const { dataSource } = this.state;
-        return (value, checkedValue) => {
+        return async (value) => {
+            const { dataSource } = this.state;
             const target = dataSource.find(item => item.sign === record.sign)
             if (target) {
-                target[key] = value;
+                // target[key] = value;
+                let rst = await checkoutData({ code: value });
+                if (rst && rst.code === value) {
+                    checkedValue = true;
+                }
                 this.setState({
                     ...this.state,
                     dataSource: dataSource.map((item, index) => {
@@ -535,14 +540,43 @@ export default class ToggleModal extends Component {
         };
     }
 
+    onCellChange = (index, key, record) => {
+        const { dataSource } = this.state;
+        return (value) => {
+            dataSource[index][key] = value;
+            record[key] = value;
+        };
+        // return (value, checkedValue) => {
+        //     const { dataSource } = this.state;
+        //     const target = dataSource.find(item => item.sign === record.sign)
+        //     if (target) {
+        //         target[key] = value;
+        //         this.setState({
+        //             ...this.state,
+        //             dataSource: dataSource.map((item, index) => {
+        //                 if (item.sign === record.sign) {
+        //                     return {
+        //                         ...item,
+        //                         organizationUnit: value,
+        //                         checkout: checkedValue
+        //                     }
+        //                 } else {
+        //                     return item;
+        //                 }
+        //             })
+        //         })
+        //     }
+        // };
+    }
+
     columns = [
         {
             title: '序号',
-            dataIndex: 'index',
+            dataIndex: 'xx',
             width: '5%',
             key: '0',
             render: (text, record, index) => {
-                return record.sign-2
+                return index+1
             }
         }
         ,
@@ -591,7 +625,7 @@ export default class ToggleModal extends Component {
                                 value={record.organizationUnit}
                                 onChange={this.onCellChange(record.sign - 2, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
-                                checkVal={this.Checkout.bind(this)}
+                                checkVal={this.Checkout.call(this,record.sign - 2, "organizationUnit", record)}
                             />
                         </div>
                         :
@@ -604,7 +638,7 @@ export default class ToggleModal extends Component {
                                 value={record.organizationUnit}
                                 onChange={this.onCellChange(record.sign - 2, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
-                                checkVal={this.Checkout.bind(this)}
+                                checkVal={this.Checkout.call(this,record.sign - 2, "organizationUnit", record)}
                             />
                         </div>
                 )
