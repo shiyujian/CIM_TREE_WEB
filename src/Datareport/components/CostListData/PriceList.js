@@ -112,6 +112,7 @@ export default class PriceList extends Component {
                 message.warn("清单项目编码错误")
             }
             dataSource = this.checkCodeRepeat(dataSource);
+            debugger;
             this.setState({ dataSource, percent: 100, loading: false });
         }
     }
@@ -352,6 +353,9 @@ export default class PriceList extends Component {
         this.state.alreadyChange = true;
         const { dataSource } = this.state;
         return (value) => {
+            if(!isNaN(-value)) {
+                value = +value
+            }
             dataSource[index-1][key] = value;
             record[key] = value;
         };
@@ -374,6 +378,7 @@ export default class PriceList extends Component {
                     dataSource[index-1].flag = true;
                 }
             }
+            debugger;
             this.setState({dataSource});
         }
         
@@ -413,6 +418,7 @@ export default class PriceList extends Component {
                                     editOnOff={false}
                                     onChange={this.onCellChange.call(this, record.key, "projectcoding", record)}
                                     asyncVerify={this.asyncVerify.call(this, record.key, "projectcoding", record)}
+                                    propTypes="Number"
                                 />
                             </div>
                         )
@@ -555,7 +561,7 @@ export default class PriceList extends Component {
                             beforeUpload={this.beforeUpload.bind(this)}
                         >
                             <Button style={{ margin:'10px 10px 10px 0px' }}>
-                                <Icon type="upload" />上传并预览(文件名需为英文)
+                                <Icon type="upload" />上传并预览
                              </Button>
                         </Upload>
                     </Col>
@@ -578,6 +584,7 @@ export default class PriceList extends Component {
                             loadData={this.loadData.bind(this)}
                             onChange={this.onSelectProject.bind(this)}
                             changeOnSelect
+                            placeholder="请选择项目及子单位工程"
                         />
                     </span> 
                 </Col>
