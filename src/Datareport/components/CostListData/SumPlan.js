@@ -395,6 +395,7 @@ export default class SumPlan extends Component {
                 loadData={this.loadData.bind(this)}
                 onChange={this.onSelectProject.bind(this)}
                 changeOnSelect
+                placeholder ="请选择项目-单位工程"
               />
             </span>
           </Col>
