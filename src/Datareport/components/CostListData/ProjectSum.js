@@ -27,7 +27,19 @@ export default class ProjectSum extends Component {
     }
 
     componentDidMount() {
-        const { actions: { getAllUsers, getProjectTree ,getQuantitiesCode} } = this.props;
+        const { actions: { getAllUsers, getProjectTree ,getQuantitiesCode,getSearcherDoc} } = this.props;
+        let cacheData =  getSearcherDoc({keyword:"hfdsjhbsadfhb"}).then(res => {
+            // let cacheData = res.filter(item => item.extra_params.projectcoding);
+            let cacheArr = []
+            for(var i = 0, l = res.length; i < l; ++i) {
+                if(res[i].extra_params.projectcoding) {
+                    cacheArr.push(res[i].extra_params.projectcoding);
+                }
+            }
+            debugger;
+            this.setState({cacheArr});
+        });
+        
         getAllUsers().then(rst => {
             let checkers = rst.map(o => {
                 return (
@@ -411,6 +423,7 @@ export default class ProjectSum extends Component {
         )
     }
     render() {
+        console.log('this.state.cacheArr',this.state.cacheArr)
         let {dataSource} = this.state.dataSource;
         const columns = [
             {
