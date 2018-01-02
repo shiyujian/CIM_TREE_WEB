@@ -43,12 +43,13 @@ export default class PersonModify extends Component {
                 })
             }
         });
-        modifyPer.map(item => {
+        let modifyPersons = [...modifyPer]
+        modifyPersons.map(item => {
         	item.code = item.account.person_code;
         })
         console.log("modifyPer",modifyPer);
         this.setState({
-            dataSource:modifyPer
+            dataSource:modifyPersons
         })
 
     }
