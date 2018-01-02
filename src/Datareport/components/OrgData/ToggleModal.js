@@ -44,6 +44,7 @@ export default class ToggleModal extends Component{
 		        }
 		    },
         };
+        console.log("this.state.dataSource:",this.state.dataSource);
         return (
             <Modal
                 visible={visible}
@@ -102,8 +103,8 @@ export default class ToggleModal extends Component{
         const {actions:{getOrgReverse}} = this.props;
         let type = [], canjian = [], color = [], codes = [];
         let promises = data.map(item => {
-            codes.push(item[1]);
-            return getOrgReverse({code:item[3]});
+            codes.push(item[0]);
+            return getOrgReverse({code:item[2]});
         })
         let repeatCode = this.isRepeat(codes);
         if (repeatCode.length > 1) {
@@ -259,7 +260,6 @@ export default class ToggleModal extends Component{
     }
     // 处理数据删除之后的校验
     delData() {
-        
         const { actions: { getOrgReverse } } = this.props;
         let type = [], canjian = [], color = [], codes = [];
         let promises = data.map(item => {
@@ -302,6 +302,7 @@ export default class ToggleModal extends Component{
                     remarks: item.remarks,
                 }
             });
+            console.log("res:", res);
             this.setState({
                 dataSource: res
             })
@@ -314,6 +315,7 @@ export default class ToggleModal extends Component{
     }, {
         title: '组织机构编码',
         render:(text,record,index) => {
+            console.log("this.state.repeatCode:",this.state.repeatCode)
             if (this.state.repeatCode.indexOf(record.code) != -1) {
                 return (
                     <span style={{"color":"red"}}>{record.code}</span>
@@ -355,7 +357,7 @@ export default class ToggleModal extends Component{
         height:"64px",
         render:(record) => {
             return (
-                <TreeSelect placeholder="请选择项目" value={record.selectPro || ""} style={{ width: "90%" }} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
+                <TreeSelect placeholder="请选择项目" value={record.selectPro || ""} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
                 onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
                     let units = [];
