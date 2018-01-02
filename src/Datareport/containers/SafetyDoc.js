@@ -12,6 +12,7 @@ import {
     Input,
     Popconfirm,
     notification,
+    Progress
 } from 'antd';
 import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
@@ -45,6 +46,7 @@ class SafetyDoc extends Component {
             setAddVisiable:false,
             setEditVisiable:false,
             setDeleteVisiable:false,
+            loading:false,
         }
     }
     
@@ -78,10 +80,13 @@ class SafetyDoc extends Component {
         data.map(item =>{
             codeList.push(item.code);
         })
+        this.setState({loading:true});
         let docList = await getDocumentList({},{list:codeList});
         if(docList.result){
+            let i=0;
             docList.result.map((single)=>{
                 let temp = { 
+                    key:i,
                     code:single.extra_params.code,
                     remark:single.extra_params.remark,
                     doTime:single.extra_params.doTime,
@@ -94,10 +99,11 @@ class SafetyDoc extends Component {
                     projectName:single.extra_params.project,
                     docCode:single.code
                 }
+                i++;
                 dataSource.push(temp);
             });
         }
-        this.setState({dataSource});
+        this.setState({dataSource,loading:false});
     }
 
 	goCancel = () =>{
@@ -237,15 +243,14 @@ class SafetyDoc extends Component {
         }
     }
     
-    handlePreview(index){
+    handlePreview(record){
         const {actions: {openPreview}} = this.props;
-        let f = this.state.dataSource[index].file
-        let filed = {}
-        filed.misc = f.misc;
-        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.name = f.name;
-        filed.mime_type = f.mime_type;
+        let filed = {};
+        filed.misc = record.file.misc;
+        filed.a_file = `${SOURCE_API}` + (record.file.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (record.file.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = record.file.name;
+        filed.mime_type = record.file.mime_type;
         openPreview(filed);
     }
 
@@ -337,7 +342,7 @@ class SafetyDoc extends Component {
                 width:'10%',
                 render:(text,record,index) => {
                     return (<span>
-                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+                            <a onClick={this.handlePreview.bind(this,record)}>预览</a>
                             <span className="ant-divider" />
                             <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                         </span>)
@@ -381,7 +386,9 @@ class SafetyDoc extends Component {
 					 dataSource={this.state.dataSource}
                      bordered
                      rowSelection={rowSelection}
-					 style={{height:380,marginTop:20}}
+                     style={{height:180,marginTop:20}}
+                     loading={this.state.loading}
+                    //  pagination={{defaultPageSize:5}}
 					 pagination = {{showQuickJumper:true,showSizeChanger:true}} 
 					/>
                 </Content>
