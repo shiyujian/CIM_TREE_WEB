@@ -73,10 +73,11 @@ export default class Engineering extends Component {
 	}
 
 	componentDidMount() {
-		const {actions:{getTree,getprofessionlist,savenewshuzu, getDesignUnit,getProjectAc}} =this.props;
+		const {actions:{getTree,getprofessionlist,savenewshuzu, getDesignUnit,getProjectAc,getDesignStage}} =this.props;
 		getprofessionlist();
 		getDesignUnit();//获取设计单位列表
 		getProjectAc();
+		getDesignStage();
 		this.setState({loading:true});
 		getTree({code:Engicode},{depth:2}).then(({children}) => {
 			// let newshuzu = children;

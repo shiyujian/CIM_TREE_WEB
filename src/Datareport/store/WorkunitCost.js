@@ -31,6 +31,7 @@ const getQuantitiesCode= createFetchAction(`${SERVICE_API}/tags/code/{{code}}/`,
 
 //搜索
 const getSearcher = createFetchAction(`${SERVICE_API}/searcher/?keyword={{keyword}}&obj_type=C_QTO`, [], 'GET');
+const getSearcherDoc = createFetchAction(`${SERVICE_API}/searcher/?keyword={{keyword}}&obj_type=C_DOC`, [], 'GET');
 //删除
 const delDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'DELETE');
 const deleteWorkflow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/`, [], 'DELETE');
@@ -58,7 +59,8 @@ export const actions = {
 	delDocList,
 	deleteWorkflow,
 	putDocList,
-	jsonToExcel
+	jsonToExcel,
+	getSearcherDoc
 };
 export default handleActions({
 	// [getSubTreeOK]: (state, {payload}) =>  {

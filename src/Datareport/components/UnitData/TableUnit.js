@@ -32,10 +32,17 @@ export default class TableUnit extends Component {
 		units = units.map((unit, index) => {
 			unit.key = index;
 			unit.children = null;
+			unit.files = [];
 			if (docSet[unit.code + 'REL_DOC_DW_A']) {
 				return { ...unit, ...unit.extra_params, ...docSet[unit.code + 'REL_DOC_DW_A'].extra_params, ...docSet[unit.code + 'REL_DOC_DW_A'].basic_params }
 			}
 			return { ...unit, ...unit.extra_params };
+		});
+		units.map(unit => {
+
+			unit.file = unit.files.find(f => {
+				return f.misc === 'file';
+			});
 		});
 		this.setState({ units: units, showDs: units,spinning:false });
 	}
@@ -176,39 +183,48 @@ export default class TableUnit extends Component {
 		title: '单位工程编码',
 		dataIndex: 'code',
 		key: 'Code',
+		width:100
 	}, {
 		title: '单位工程名称',
 		dataIndex: 'name',
 		key: 'Name',
+		width:100
 	}, {
 		title: '所属项目名称',
 		dataIndex: 'fatherName',
 		key: 'fatherName',
+		width:100
 	},
 	{
 		title: '项目类型',
 		dataIndex: 'projType',
 		key: 'Type',
+		width:100
 	}, {
 		title: '项目阶段',
 		dataIndex: 'stage',
 		key: 'Stage',
+		width:100
 	}, {
 		title: '单位红线坐标',
 		dataIndex: 'coordinate',
-		key: 'coordinate'
+		key: 'coordinate',
+		width:100
 	}, {
 		title: '计划开工日期',
 		dataIndex: 'stime',
-		key: 'Stime'
+		key: 'Stime',
+		width:100
 	}, {
 		title: '计划竣工日期',
 		dataIndex: 'etime',
-		key: 'Etime'
+		key: 'Etime',
+		width:100
 	}, {
 		title: '单位工程简介',
 		dataIndex: 'intro',
-		key: 'Intro'
+		key: 'Intro',
+		width:100
 	}, {
 		title: '建设单位',
 		render: (record) => {
@@ -218,12 +234,14 @@ export default class TableUnit extends Component {
 			}
 			return (<span>{ogrname}</span>)
 		},
-		key: 'Org'
+		key: 'Org',
+		width:100
 	}, {
 		title: '附件',
 		key: 'file',
 		render: (record) => (
-			<a> {record.files ? record.files[0].name : '暂无'}</a>
-		)
+			<a> {record.file ? record.file.name : '暂无'}</a>
+		),
+		width:100
 	}]
 }

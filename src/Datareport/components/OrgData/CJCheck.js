@@ -103,7 +103,7 @@ export default class CJCheck extends Component {
                         let pro_orgs = rstPro.response_orgs;
                         let pk = res.result[index].pk
                         pro_orgs.push({
-                            code:item.code,
+                            code:""+item.code,
                             obj_type:"C_ORG",
                             pk:pk
                         });
