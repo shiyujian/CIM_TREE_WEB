@@ -47,7 +47,13 @@ export const getDesignUnit = createFetchAction(`${SERVICE_API}/org-tree/code/D/`
 export const getProjectAcOK = createAction('PROJECT获取项目列表');
 export const getProjectAc = createFetchAction(`${SERVICE_API}/project-tree/?depth=2`, [getProjectAcOK]);
 
+//设计阶段名称
+const getDesignStageOK =createAction(`${ID}_获取设计阶段名称`);
+const getDesignStage = createFetchAction(`${SERVICE_API}/metalist/designstage/`,[getDesignStageOK]);
+
 export const actions = {
+	getDesignStageOK,
+	getDesignStage,
     judgeFile,
     getTreeOK,
     getTree,
@@ -84,6 +90,10 @@ export const actions = {
 };
 
 export default handleActions({
+	[getDesignStageOK]:(state, {payload}) => ({
+		...state,
+		designstage:payload
+	}),
 	[judgeFile]:(state, {payload}) => ({
 		...state,
 		judgeFile:payload

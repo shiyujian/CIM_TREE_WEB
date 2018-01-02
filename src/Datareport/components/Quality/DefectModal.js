@@ -469,7 +469,7 @@ class DefectModal extends Component {
                     dataSource.map((o,i) => {
                         jthis.getFixed(i)
                     })
-		            message.success(`${info.file.name} file uploaded successfully`);
+		            message.success("上传成功");
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
 		        }
@@ -485,7 +485,6 @@ class DefectModal extends Component {
 			maskClosable={true}
 			onCancel={this.props.oncancel}>
 				<div>
-                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">模板下载</Button>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
                         dataSource={this.state.dataSource}

@@ -344,6 +344,7 @@ class DesignModal extends Component {
                                 loadData={this.loadData.bind(this)}
                                 onChange={this.onSelectProject.bind(this)}
                                 changeOnSelect
+                                placeholder='请选择'
                             />
                         </span>
                     </Col>

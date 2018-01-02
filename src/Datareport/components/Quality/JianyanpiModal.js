@@ -376,7 +376,7 @@ class JianyanpiModal extends Component {
                     let {dataSource} = jthis.state
                     dataSource = await jthis.handleExcelData(importData)
                     jthis.setState({dataSource}) 
-		            message.success(`${info.file.name} file uploaded successfully`);
+		            message.success("上传成功");
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
 		        }
@@ -392,9 +392,6 @@ class JianyanpiModal extends Component {
 			maskClosable={true}
 			onCancel={this.props.oncancel}>
 				<div>
-                    <Button style={{margin:'10px 10px 10px 0px'}} type="primary">
-                        <a href={`${DataReportTemplate_SubdivisionUnitProjectAcceptance}`}>模板下载</a>
-                    </Button>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
 						dataSource={this.state.dataSource}

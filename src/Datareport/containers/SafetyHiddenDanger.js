@@ -12,7 +12,8 @@ import {
     Input,
     Popconfirm,
     notification,
-    Progress
+    Progress,
+    message
 } from 'antd';
 import {actions as safetyAcitons} from '../store/safety';
 import {actions} from '../store/quality';
@@ -141,6 +142,7 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setAddVisiable:false})						
 					})
 		})
@@ -180,17 +182,22 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setDeleteVisiable:false})						
 					})
 		})
     }
 
     onBtnClick = (type) =>{
+        const {dataSourceSelected} = this.state;
+        if(dataSourceSelected.length === 0){
+        	message.warning('请先选择数据');
+        }
         if(type==="add"){
             this.setState({setAddVisiable:true});
-        }else if(type==="delete"){
+        }else if(type==="delete" && dataSourceSelected.length!== 0){
             this.setState({setDeleteVisiable:true});
-        }else if(type==="edit"){
+        }else if(type==="edit" && dataSourceSelected.length!== 0){
             this.setState({setEditVisiable:true});
         }
     }
@@ -236,6 +243,7 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
+                        message.warning('发起流程成功');
 						this.setState({setEditVisiable:false})						
 					})
 		})
@@ -360,7 +368,7 @@ class SafetyHiddenDanger extends Component {
                 width:'5%',
                 render:(text,record,index) => {
                     return (<span>
-                            <a onClick={this.handlePreview.bind(this,recoed)}>预览</a>
+                            <a onClick={this.handlePreview.bind(this,record)}>预览</a>
                             <span className="ant-divider" />
                             <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                         </span>)
@@ -434,10 +442,14 @@ class SafetyHiddenDanger extends Component {
     //数据导出
     getExcel(){
         const {actions:{jsonToExcel}} = this.props;
-        const {dataSource} = this.state;
+        const {dataSourceSelected} = this.state;
+        if(dataSourceSelected.length === 0){
+        	message.warning('请先选择数据再导出')
+        	return
+        }
         let rows = [];
         rows.push(this.header);
-        dataSource.map(item => {
+        dataSourceSelected.map(item => {
             rows.push([item.code,
                 item.wbs,
                 item.type,
