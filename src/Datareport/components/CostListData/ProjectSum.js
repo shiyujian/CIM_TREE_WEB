@@ -31,12 +31,11 @@ export default class ProjectSum extends Component {
         let cacheData =  getSearcherDoc({keyword:"hfdsjhbsadfhb"}).then(res => {
             // let cacheData = res.filter(item => item.extra_params.projectcoding);
             let cacheArr = []
-            for(var i = 0, l = res.length; i < l; ++i) {
-                if(res[i].extra_params.projectcoding) {
-                    cacheArr.push(res[i].extra_params.projectcoding);
+            res.result.map(item => {
+                if(item.extra_params.projectcoding) {
+                    cacheArr.push(item.extra_params.projectcoding);
                 }
-            }
-            debugger;
+            })
             this.setState({cacheArr});
         });
         
@@ -78,6 +77,8 @@ export default class ProjectSum extends Component {
     }
     uplodachange = async (info) => {
         //info.file.status/response
+        let {cacheArr} = this.state;
+        let usedMark = false;
         const { actions: { getQuantitiesCode} } = this.props;
         if (info && info.file && info.file.status === 'done') {
             notification.success({
@@ -86,13 +87,14 @@ export default class ProjectSum extends Component {
             });
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
-           
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
                 let res = await getQuantitiesCode({code:dataList[i][0]});
-                console.log('res',res)
-                dataList[i].flag = res === 'object not found' ? false : true;
-                console.log('dataList[i].flag',dataList[i].flag)
+                let isUsed = cacheArr.indexOf(dataList[i][0]);
+                dataList[i].flag = res !== 'object not found' && isUsed == -1 ? true : false;
+                if(isUsed !== -1) {
+                    usedMark = true;
+                }
                 dataSource.push({
                     key:i,
                     projectcoding:dataList[i][0] ? dataList[i][0] : '',
@@ -135,10 +137,24 @@ export default class ProjectSum extends Component {
                 })
                 
             }
+
+         
+            // dataSource.map(item => {
+            //     if(cacheArr.indexOf(item.extra_params.projectcoding) && item.flag) {
+            //         item.flag = false;
+            //     };
+            //     return item;
+            // });
+
+            debugger;
             if(dataSource.some(item => {
                 return !item.flag
             })) {
                 message.warn("清单项目编码错误")
+            }
+
+            if(usedMark) {
+                message.warn("清单项目已经被使用")
             }
             // if(dataSource.some(item => {
             //     if(item.flag === false){
@@ -148,6 +164,7 @@ export default class ProjectSum extends Component {
             // }))
             dataSource = this.checkCodeRepeat(dataSource);
             this.setState({dataSource}); 
+            
         }
 
     }
