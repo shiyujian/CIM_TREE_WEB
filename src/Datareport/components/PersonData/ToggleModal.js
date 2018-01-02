@@ -10,11 +10,12 @@ export default class ToggleModal extends Component{
             users: [],
             projects: [],
             org: [],
-            falg: true,
+            subErr: true,
+            flag_code: true,
         }
     }
     render(){
-        const {visible} = this.props;
+        const {visible, actions: {getOrgReverse}} = this.props;
         let jthis = this;
         const props = {
             action: `${SERVICE_API}/excel/upload-api/`,
@@ -36,6 +37,135 @@ export default class ToggleModal extends Component{
                 }
             },
         };
+        const columns = [{
+                title: '序号',
+                dataIndex: 'index',
+                key: 'Index',
+            }, {
+                title: '人员编码',
+                // dataIndex: 'code',
+                // key: 'Code',
+                render:(text, record, index) => {
+                    console.log('record',record)
+                    if(this.state.repeatCode.indexOf(record.code) != -1) {
+                        return <span style={{color: 'red'}}>{record.code}</span>
+                    }else {
+                        return <span>{record.code}</span>
+                    }
+                }
+            }, {
+                title: '姓名',
+                dataIndex: 'record.name',
+                key: 'Name',
+                render:(text, record, index) =>{
+                    console.log('record',record)
+                    return <Input value = {record.name || ""} onChange={ele => {
+                        record.name = ele.target.value
+                        this.forceUpdate();
+                    }}/>
+                }
+            }, {
+                title: '所在组织机构单位',
+                dataIndex: 'org',
+                key: 'Org',
+            }, {
+                title: '所属部门',
+                // dataIndex: 'account.org_code',
+                key: 'Depart',
+                render:(text, record, index) =>{
+                    return <Input 
+                        value = {record.depart || ""} 
+                        onChange={ele => {
+                            record.depart = ele.target.value
+                            getOrgReverse({code: record.depart}).then(rst =>{
+                                console.log('rst',rst)
+                                if(rst.children.length === 0) {
+                                    message.warning("您输入的部门不存在");
+                                    this.setState({
+                                        subErr: false
+                                    })
+                                }else {
+                                    record.org = rst.children[0].name;
+                                    this.setState({
+                                        subErr: true
+                                    })
+                                }
+                                this.forceUpdate();
+                            })
+                            
+                        }}
+                    //     onChange={this.tableDataChange.bind(this,index)}
+                    //     onBlur={this.fixOrg.bind(this,index)}
+                    />
+                }
+            }, {
+                title: '职务',
+                dataIndex: 'record.job',
+                key: 'Job',
+                render:(text, record, index) =>{
+                    return <Input value = {record.job || ""} onChange={ele => {
+                        record.job = ele.target.value
+                        this.forceUpdate();
+                    }}/>
+                }
+            }, {
+                title: '性别',
+                dataIndex: 'record.sex',
+                key: 'Sex',
+                render:(text, record, index) =>{
+                    return <Select value = {record.sex} onChange={ele => {
+                        record.sex = ele
+                        this.forceUpdate();
+                    }}>
+                        <Option value="男">男</Option>
+                        <Option value="女">女</Option>
+                    </Select>
+                }
+            }, {
+                title: '手机号码',
+                dataIndex: 'record.tel',
+                key: 'Tel',
+                render:(text, record, index) =>{
+                    return <Input value = {record.tel || ""} onChange={ele => {
+                        record.tel = ele.target.value
+                        this.forceUpdate();
+                    }}/>
+                }
+            }, {
+                title: '邮箱',
+                dataIndex: 'record.email',
+                key: 'Email',
+                render:(text, record, index) =>{
+                    return <Input value = {record.email || ""} onChange={ele => {
+                        record.email = ele.target.value
+                        this.forceUpdate();
+                    }}/>
+                }
+            }, {
+            title:'二维码',
+            key:'signature',
+            render:(record) => (
+                <Upload
+                    beforeUpload={this.beforeUploadPic.bind(this, record)}
+                >
+                    <a>{record.signature ? record.signature.name : '点击上传'}</a>
+                </Upload>
+            )
+          },{
+            title:'操作',
+            dataIndex:'edit',
+            render:(text,record,index) => (
+                <Popconfirm
+                    placement="leftTop"
+                    title="确定删除吗？"
+                    onConfirm={this.delete.bind(this, record.index - 1)}
+                    okText="确认"
+                    cancelText="取消"
+                >
+                    <a>删除</a>
+                </Popconfirm>
+            )
+        }]
         return (
             <Modal
                 visible={visible}
@@ -47,7 +177,7 @@ export default class ToggleModal extends Component{
                 <div>
                     <Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
-                        columns={this.columns}
+                        columns={columns}
                         dataSource = {this.state.dataSource}
                         bordered />
                     <Upload {...props}>
@@ -121,8 +251,12 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
-        if(this.state.falg === false) {
+        if(this.state.subErr === false) {
             message.error('部门不存在，无法提交');
+            return;
+        }
+        if(this.state.flag_code === false) {
+            message.error('您有重复的人员编码');
             return;
         }
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
@@ -132,28 +266,78 @@ export default class ToggleModal extends Component{
         const { actions: { ModalVisible } } = this.props;
         ModalVisible(false);
     }
-    onChange() {
 
-    }
+    // tableDataChange(index ,e ){
+    //     const { dataSource } = this.state;
+    //     dataSource[index]['depart'] = {
+    //         name: '',
+    //         code: e.target.value,
+    //         type: ''
+    //     }
+    //     this.setState({dataSource});
+    // }
+    // //校验部门
+    // fixOrg(index){
+    //     const {actions: {getOrgReverse}} = this.props;
+    //     let {dataSource} = this.state
+    //     console.log('dataSource',dataSource)
+    //     getOrgReverse({code:dataSource[index].depart}).then(rst => {
+    //         console.log('rst',rst)
+    //         if(rst.code){
+    //             dataSource[index]['construct_unit'] = {
+    //                 name: rst.name,
+    //                 code: rst.code,
+    //                 type: rst.obj_type
+    //             }
+    //             this.setState({dataSource})
+    //         }else{
+    //             message.info("输错了")
+    //         }
+    //     })
+    // }
     //删除
-    delete(){
-        
+    delete(index){
+        let dataSource = this.state.dataSource;
+        dataSource.splice(index,1);
+        this.setState({dataSource});
     }
-     //处理上传excel的数据
-     handleExcelData(data) {
+
+    //判断数据重复
+    isRepeat(arr) {
+        var hash = {};
+        let repeatCode = [];
+        for(var i in arr) {
+            if(hash[arr[i]]) {
+                repeatCode.push(arr[i])
+            }
+            hash[arr[i]] = true;
+        }
+        console.log('repeatCode',repeatCode)
+        return repeatCode;
+    }
+    //处理上传excel的数据
+    handleExcelData(data) {
         const {actions: {getOrgReverse}} = this.props;
         data.splice(0, 1);
+        let codes = [];
         let promises = data.map(item => {
+            codes.push(item[1])
             return getOrgReverse({code: item[3]});
         })
+        console.log('codes',codes)
+        let repeatCode = this.isRepeat(codes);
+        if(repeatCode.length > 1) {
+            console.log(1111)
+            this.setState({flag_code: false})
+        }
+        this.setState({repeatCode})
         let res, orgname = [];
         Promise.all(promises).then(rst => {
             rst.map(item => {
-                console.log('item',item)
                 if(item.children.length === 0) {
                     orgname.push('');
                     this.setState({
-                        falg: false
+                        subErr: false
                     })
                 }
                 else{
@@ -192,72 +376,5 @@ export default class ToggleModal extends Component{
             }
         });
     }
-    columns = [ {
-        title: '人员编码',
-        dataIndex: 'code',
-        key: 'Code',
-      }, {
-        title: '姓名',
-        dataIndex: 'name',
-        key: 'Name',
-      },{
-        title: '所在组织机构单位',
-        dataIndex: 'org',
-        key: 'Org',
-      },{
-         title: '所属部门',
-         // dataIndex :'depart',
-         // key: 'Depart',
-         render: (record) => {
-            if (record.org === '') {
-                return <span style={{color: 'red'}}>
-                    {record.depart}
-                </span>
-            } else {
-                return <span>
-                    {record.depart}
-                </span>
-            }
-         }
-      },{
-        title: '职务',
-        dataIndex :'job',
-        key: 'Job',
-      },{
-        title: '性别',
-        dataIndex :'sex',
-        key:'Sex'
-      },{
-        title: '手机号码',
-        dataIndex :'tel',
-        key:'Tel'
-      },{
-        title: '邮箱',
-        dataIndex :'email',
-        key:'Email'
-      },{
-        title:'二维码',
-        key:'signature',
-        render:(record) => (
-            <Upload
-                beforeUpload={this.beforeUploadPic.bind(this, record)}
-            >
-                <a>{record.signature ? record.signature.name : '点击上传'}</a>
-            </Upload>
-        )
-      },{
-        title:'编辑',
-        dataIndex:'edit',
-        render:(record) => (
-            <Popconfirm
-                placement="leftTop"
-                title="确定删除吗？"
-                onConfirm={this.delete.bind(this)}
-                okText="确认"
-                cancelText="取消"
-            >
-                <a>删除</a>
-            </Popconfirm>
-        )
-    }]
+    
 }

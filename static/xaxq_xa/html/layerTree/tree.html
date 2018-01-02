@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <link rel="stylesheet" href="../../js/easyui/themes/bootstrap/easyui.css" />
+	<link rel="stylesheet" href="../../js/easyui/themes/icon.css" />
+    <link rel="stylesheet" href="zTreeStyle.css" type="text/css" />
+
+    <script type="text/javascript" src="../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../js/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="jquery.ztree.all.js"></script>
+    <script type="text/javascript" src="jquery.ztree.exhide.min.js"></script>
+
+
+    <script type="text/javascript" src="../../js/easyui/extend/easyui_extend.js"></script>
+    <script type="text/javascript" src="../../js_con8/cm.js"></script>
+    <style type="text/css">
+        *
+        {
+            margin: 0;
+            padding: 0;
+        }
+        html, body
+        {
+            width: 100%;
+            height: 100%;
+            min-width: 160px;
+        }
+        /*初始遮盖*/
+        .cover
+        {
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            overflow: hidden;
+            z-index: 9999999;
+            background-color: white;
+            filter: alpha(Opacity=50);
+            -moz-opacity: 0.5;
+            opacity: 0.5;
+        }
+        .cover div
+        {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin: -120px 0 0 -166px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ControlTitlebar" style="background:#f3f3f3; height:25px">
+		<div id="ButtonClose" style="float: right; width: 25px; height: 25px;" class="closebtn" onclick="closeWindow()"></div>
+	</div>
+    <div class="easyui-tabs" style="width: 100%; height: 100%;">
+        <div title="图层树">
+            <!-- 遮罩层 -->
+            <div class="cover">
+                <div>
+                    <img src="../../images/loading.gif" height="240" width="333" /></div>
+            </div>
+            <!-- 内容 -->
+            <div id="my_layout" class="easyui-layout" style="width: 100%; height: 100%;">
+                <div data-options="region:'north',collapsible:false" style="overflow: hidden; padding: 5px;
+                    height: 35px;">
+                    <input class="easyui-searchbox" data-options="prompt:'请输入节点名称',searcher:searchClick"
+                        style="width: 100%">
+                </div>
+                <div data-options="region:'center'" style="padding: 1px;">
+                    <div class="ztree" id='tree'>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div title="工程树">
+            <div class="ztree" id='tree1'>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //图层树
+            loadProjectTree();
+            //创建工程树
+            createProjectTree();
+            $(".cover").hide();
+        });
+
+        var __g = external.parentWindow.__g;
+        var projectTree = external.parentWindow.projectTree;
+        var objectManager = external.parentWindow.objectManager;
+        var camera = external.parentWindow.camera;
+        var zTreeObj_tc; //图层树
+        var searchNodes;
+        //图层树
+        function loadProjectTree() {
+            var parentDoc = external;
+            var sss = projectTree.traverse();
+            sss = sss.replace(/ /g, '');
+            sss = sss.replace(/\/n/g, '');
+            sss = sss.replace(/visibility/g, 'checked');
+            sss = sss.replace(/\n/g, '');
+            sss = sss.replace(/\"/g, "'");
+            sss = sss.replace(/:0}/g, ":false}");
+            sss = sss.replace(/:1}/g, ":true}");
+            sss = sss.replace(/:2}/g, ":false}");
+            sss = sss.replace(/,'checked'/g, ",'state':'closed','checked'");
+            var jsondata = eval('(' + sss + ')');
+            zTreeNodes = jsondata.children;
+
+            var setting = {
+                check: {
+                    enable: true,
+                    chkboxType: { "Y" : "ps", "N" : "ps" }
+                },
+                callback: {
+                    onCheck: zTreeOnCheck,
+                    onDblClick: zTreeOnDblClick
+                },
+                data: {
+                    simpleData: {
+                        enable: true
+                    }
+                },
+                view: {
+                    fontCss: getFontCss
+                }
+            }
+            zTreeObj_tc = $.fn.zTree.init($("#tree"), setting, zTreeNodes);
+        }
+        function zTreeOnCheck(event, treeId, node) {
+            if (node.checked) {
+                projectTree.setVisibility(node.id, 255);
+            }
+            else {
+                projectTree.setVisibility(node.id, 0);
+            }
+        }
+
+        function zTreeOnDblClick(event, treeId, node) {
+            if (!node) return;
+            if (!projectTree.isGroup(node.id) || node.id == 1) {
+                if (node.id == 1) {
+                    __g.terrain.flyTo(gviTerrainActionCode.gviJumpToTerrain);
+                }
+                else {
+                    switch (objectManager.getObjectById(node.id).type) {
+                        case gviObjectType.gviObjectFeatureLayer:
+                            camera.flyToObject(node.id, gviActionCode.gviActionFlyTo);
+                            break;
+                        case gviObjectType.gviObject3DTileLayer:
+                            camera.flyToObject(node.id, gviActionCode.gviActionFlyTo);
+                            break;
+                        case gviObjectType.gviObjectRenderModelPoint:
+                            camera.flyToObject(node.id, gviActionCode.gviActionFlyTo);
+                            break;
+                        case gviObjectType.gviObjectPresentation:
+                            objectManager.getObjectById(node.id).play(0);
+                            break;
+                        case gviObjectType.gviObjectTerrainLocation:
+                            var camposition = objectManager.getObjectById(node.id).position;
+                            var camPnt = __g.geometryFactory.createPoint(gviVertexAttribute.gviVertexAttributeZ);
+                            camPnt.setCoords(camposition.x, camposition.y, camposition.altitude, 0, 0);
+                            var cameulerAngle = __g.new_EulerAngle;
+                            cameulerAngle.set(camposition.heading, camposition.tilt, camposition.roll);
+                            camera.lookAt2(camPnt, camposition.distance, cameulerAngle);
+                            //camera.flyTime = 0;
+                            break;
+                        case gviObjectType.gviObjectClipPlaneOperation:
+                            objectManager.getObjectById(node.id).execute();
+                            break;
+                    }
+                }
+            } else if(projectTree.isGroup(node.id)){
+                // 节点为组
+                if(Array.isArray(node.children) && node.children.length > 0) {
+                    return zTreeOnDblClick(event, treeId, node.children[0]);
+                }
+            }
+        }
+        // 设置节点文字样式
+        function getFontCss(treeId, treeNode) {
+            return (!!treeNode.highlight) ? { color: "#A60000", "font-weight": "bold"} : { color: "#333", "font-weight": "normal" };
+        }
+        // 搜索
+        function searchClick(value) {
+            $(".cover").show();
+            if (searchNodes) {
+                nodesHighlight(searchNodes, false);
+                searchNodes = null;
+            }
+            if (value.length < 1) {
+                alert("请输入搜索节点名称");
+                $(".cover").hide();
+                return;
+            }
+            {
+                searchNodes = zTreeObj_tc.getNodesByParamFuzzy("name", value);
+                if (searchNodes) {
+                    nodesHighlight(searchNodes, true);
+                }
+            }
+            $(".cover").hide();
+        }
+        // 改变node样式
+        function nodesHighlight(nodes, isHighlight) {
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].highlight = isHighlight;
+                zTreeObj_tc.updateNode(nodes[i]);
+                if (isHighlight) {
+                    if (i == 0) {
+                        zTreeObj_tc.selectNode(nodes[i]);
+                    } else {
+                        zTreeObj_tc.selectNode(nodes[i], true);
+                    }
+                }
+            }
+        }
+        
+        /////////////////////////////
+        // 工程树设置
+        /////////////////////////////
+        var projectTreeObj; //工程树
+        function createProjectTree() {
+            var projectSetting = {
+                callback: {
+                    onDblClick: projectTreeOnDblClick
+                },
+                data: {
+                    simpleData: {
+                        enable: true
+                    }
+                }
+            }
+            $.getJSON('../../data/ProjectTree.json', function (jsonData) {
+                projectTreeObj = $.fn.zTree.init($("#tree1"), projectSetting, jsonData);
+            });
+        }
+        // 点击节点事件
+        function projectTreeOnDblClick(event, treeId, node) {
+            __g.featureManager.unhighlightAll();
+            if (!node) return;
+            if (!node.isParent) {
+                if (node.type && node.type == 2) {
+                    var pos = __g.new_Vector3;
+                    var ang = __g.new_EulerAngle;
+                    pos.set(node['X'], node['Y'], node['高度']);
+                    ang.heading = node['水平角'];
+                    ang.tilt = node['俯仰角'];
+                    // __g.camera.lookAt(pos, 600, ang);
+                    __g.camera.setCamera(pos, ang, gviSetCameraFlags.gviSetCameraNoFlags);
+                } else {
+                    var guid = getGuid(node.path);
+                    var fid = node.oid;
+                    var fl = null;
+                    var obj = __g.objectManager.getObjectById(guid);
+                    if (!obj) {
+                        return;
+                    }
+                    if (obj.type == gviObjectType.gviObjectFeatureLayer) {
+                        fl = obj;
+                    }
+                    if (fl) {
+                        fl.highlightFeature(fid, 0xffff0000);
+                        var fl_conn = fl.featureClassInfo.dataSourceConnectionString;
+                        var fl_ds = __g.dataSourceFactory.openDataSourceByString(fl_conn);
+                        var fl_fds = fl_ds.openFeatureDataset(fl.featureClassInfo.dataSetName);
+                        var fl_fc = fl_fds.openFeatureClass(fl.featureClassInfo.featureClassName);
+                        var fl_row = fl_fc.getRow(fid);
+                        {
+                            var geo_index = fl_row.fieldIndex(fl.geometryFieldName);
+                            var geo = fl_row.getValue(geo_index);
+                            __g.camera.lookAtEnvelope(geo.envelope);
+                            geo = null;
+                        }
+                        fl_row = null;
+                        fl_fc = null;
+                        fl_fds = null;
+                        fl_ds = null;
+                        CollectGarbage();
+                    } else {
+                        external.parentWindow.console.log("CityMakerError:", "fl未获取到");
+                    }
+                }
+            }
+        }
+        // 根据路径返回guid
+        function getGuid(path) {
+            var guid = __g.projectTree.findItem(path);
+            if (guid != "00000000-0000-0000-0000-000000000000") {
+                return guid;
+            } else {
+                external.parentWindow.console.log("citymaker error:", "定位路径未找到");
+                return "00000000-0000-0000-0000-000000000000";
+            }
+        }
+
+        //关闭窗口
+        function closeWindow(){
+            if(external && external.parentWindow && external.parentWindow.islayerTreeShow){
+               external.parentWindow.islayerTreeShow = false;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-
 import { Input, Form, Spin, Upload, Icon, Button, Modal,
-    Cascader ,Select, Popconfirm,message, Table, Row, Col, notification, DatePicker } from 'antd';
+    Cascader ,Select, Popconfirm,message, Table, Row, Col, notification, DatePicker} from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import EditableCell from '../EditableCell';
+
 const {Option} = Select
 
 export default class PriceList extends Component {
@@ -20,34 +20,36 @@ export default class PriceList extends Component {
             concatunit:{},
             options:[],
             unit:{},
-		};
+            alreadyChange: false
+        };
     }
     componentDidMount(){
 
         const {actions:{getAllUsers,getWorkflowById,getProjectTree}} = this.props;
         getAllUsers().then(res => {
-            let checkers = res.map(o => {
+            let checkers = res.map((o,index) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option value={JSON.stringify(o)}  key={index+1}>{o.account.person_name}</Option>
                 )
             })
             this.setState({checkers})
         });
         getProjectTree({depth:1}).then(rst => {
             if (rst.status) {
-                let projects = rst.children.map(item => {
+                let projects = rst.children.map((item, key) => {
                     return (
                         {
                             value:JSON.stringify(item),
                             label:item.name,
-                            isLeaf:false
+                            isLeaf:false,
+                            key
                         }
                     )
                 })
                 this.setState({options:projects})
             }else{
                 //获取项目信息失败
-            }
+            };
         })
     }
 	beforeUpload = (info) => {
@@ -99,16 +101,34 @@ export default class PriceList extends Component {
                     file:{
                         id: 'pricelist',
                         name: 'priceList'
-                    }
+                    },
+                    key: i
                 })
+                // if(uniq(dataSource.map(item=>code)).length)
             }
             if(dataSource.some(item => {
                 return item.flag
             })) {
                 message.warn("清单项目编码错误")
             }
-            this.setState({ dataSource });
+            dataSource = this.checkCodeRepeat(dataSource);
+            this.setState({ dataSource, percent: 100, loading: false });
         }
+    }
+
+    checkCodeRepeat(dataSource) {
+        let codearr = dataSource.map(data => data.projectcoding);
+        let repeatFlag = false;
+        for(var i = 0, l = codearr.length; i < l; ++i) {
+            if (codearr.indexOf(codearr[i]) !== i) {
+                if(!dataSource[i].flag) {
+                    dataSource[i].flag = true;
+                    repeatFlag = true;
+                }
+            }
+        }
+        repeatFlag && message.warn("清单项目编码重复");
+        return dataSource;
     }
 
     //下拉框选择人
@@ -329,30 +349,51 @@ export default class PriceList extends Component {
     }
     
     onCellChange = (index, key, record) => {      //编辑某个单元格
+        this.state.alreadyChange = true;
         const { dataSource } = this.state;
         return (value) => {
-            dataSource[index][key] = value;
+            dataSource[index-1][key] = value;
             record[key] = value;
         };
     }
     //验证编码
     asyncVerify (index, key, record) {
-        const { dataSource } = this.state;
         let {actions: {verifyCode}} = this.props;
         return async (code) => {
-            let res = await verifyCode({code});
-            if(res === 'object not found') {
-                dataSource[index].flag = false;
-            }else {
-                message.warn("清单项目编码错误");
-                dataSource[index].flag = true;
+            const { dataSource } = this.state;
+            let codeArr = dataSource.map(data => data[key]+'');
+            codeArr[index-1] = code+'';
+            if (codeArr.indexOf(code) !== codeArr.lastIndexOf(code)) {
+                message.warn("清单项目编码重复");
+            } else {
+                let res = await verifyCode({code});
+                if(res === 'object not found') {
+                    dataSource[index-1].flag = false;
+                }else {
+                    message.warn("清单项目编码错误");
+                    dataSource[index-1].flag = true;
+                }
             }
             this.setState({dataSource});
         }
         
     }
 
+    edit (index) {
+        console.log(index)
+        const {dataSource} = this.state;
+        dataSource[index].editable = true;
+        this.setState({dataSource});
+    }
+
+    editOk (index, record) {
+        let {dataSource} = this.state;
+        dataSource[index].editable = false;
+        this.setState({dataSource});
+    }
+
 	render() {
+        let {dataSource} = this.state.dataSource;
         const columns = 
             [{
                 title:'编码',
@@ -363,54 +404,130 @@ export default class PriceList extends Component {
                 dataIndex:'projectcoding',
                 width:"10%",
                 render: (text, record, index) => {
-                    if(record.flag){
-                        return <div style={{color:'red'}}>
-                                    <EditableCell
-                                        value={record.projectcoding}
-                                        editOnOff={false}
-                                        onChange={this.onCellChange.call(this,index, "projectcoding", record)}
-                                        asyncVerify={this.asyncVerify.call(this,index, "projectcoding", record)}
-                                    />
-                                </div>
+                    let {dataSource} = this.state;
+                    let editable = dataSource[record.key - 1].editable;
+                    if(record.flag || editable){
+                        return (
+                            <div style={{color:record.flag?'red':'green'}}>
+                                <EditableCell
+                                    value={record.projectcoding}
+                                    editOnOff={false}
+                                    onChange={this.onCellChange.call(this, record.key, "projectcoding", record)}
+                                    asyncVerify={this.asyncVerify.call(this, record.key, "projectcoding", record)}
+                                />
+                            </div>
+                        )
                     }else{
-                        return <span>{record.projectcoding}</span>
+                        return <span style={{color:"green"}}>{record.projectcoding}</span>
                     }
                 }
             },{
                 title:'计价单项',
                 dataIndex:'valuation',
                 width:"10%",
+                render: (text, record, index) => {
+                    let {dataSource} = this.state;
+                    let editable = dataSource[record.key - 1].editable;
+                    if(editable) {
+                        return <EditableCell
+                            value={record.projectcoding}
+                            editOnOff={false}
+                            onChange={this.onCellChange.call(this, record.key, "valuation", record)}
+                        />
+                    } else {
+                        return <span>{record.valuation}</span>
+                    }
+                }
             },{
                 title:'工程内容/规格编号',
                 dataIndex:'rate',
                 width:"12%",
+                render: (text, record, index) => {
+                    let {dataSource} = this.state;
+                    let editable = dataSource[record.key - 1].editable;
+                    if(editable) {
+                        return <EditableCell
+                            value={record.rate}
+                            editOnOff={false}
+                            onChange={this.onCellChange.call(this, record.key, "rate", record)}
+                        />
+                    } else {
+                        return <span>{record.rate}</span>
+                    }
+                }
             },{
                 title:'计价单位',
                 dataIndex:'company',
                 width:"10%",
+                render: (text, record, index) => {
+                    let {dataSource} = this.state;
+                    let editable = dataSource[record.key - 1].editable;
+                    if(editable) {
+                        return <EditableCell
+                            value={record.company}
+                            editOnOff={false}
+                            onChange={this.onCellChange.call(this, record.key, "company", record)}
+                        />
+                    } else {
+                        return <span>{record.company}</span>
+                    }
+                }
             },{
                 title:'结合单价（元）',
                 dataIndex:'total',
                 width:"10%",
+                render: (text, record, index) => {
+                    let {dataSource} = this.state;
+                    let editable = dataSource[record.key - 1].editable;
+                    if(editable) {
+                        return <EditableCell
+                            value={record.total}
+                            editOnOff={false}
+                            onChange={this.onCellChange.call(this, record.key, "total", record)}
+                        />
+                    } else {
+                        return <span>{record.total}</span>
+                    }
+                }
             },{
                 title:'备注',
                 dataIndex:'remarks',
                 width:"10%",
+                render: (text, record, index) => {
+                    let {dataSource} = this.state;
+                    let editable = dataSource[record.key - 1].editable;
+                    if(editable) {
+                        return <EditableCell
+                            value={record.remarks}
+                            editOnOff={false}
+                            onChange={this.onCellChange.call(this, record.key, "remarks", record)}
+                        />
+                    } else {
+                        return <span>{record.remarks}</span>
+                    }
+                }
             },{
-                title:'编辑',
+                title:'操作',
                 width:"10%",
                 dataIndex:'edit',
                 render:(text,record,index) => {
-                    return  (
-                        <Popconfirm
-                            placement="leftTop"
-                            title="确定删除吗？"
-                            onConfirm={this.delete.bind(this, index)}
-                            okText="确认"
-                            cancelText="取消">
-                            <a>删除</a>
-                        </Popconfirm>
-                    )
+                    let {dataSource} = this.state;
+                    let editable = dataSource[record.key - 1].editable;
+                    return !editable ? (
+                        <div>
+                            <a href="javascript:;" onClick={this.edit.bind(this,record.key-1)}><Icon style={{marginRight:"15px"}} type = "edit"/></a>
+                            <Popconfirm
+                                placement="leftTop"
+                                title="确定删除吗？"
+                                onConfirm={this.delete.bind(this, index)}
+                                okText="确认"
+                                cancelText="取消">
+                                <a><Icon type = "delete"/></a>
+                            </Popconfirm>
+                        </div>
+                    ): (
+                        <a href="javascript:;" onClick={this.editOk.bind(this,record.key-1)}>完成</a>
+                      );
                 }
             }];
 		return (
@@ -426,7 +543,7 @@ export default class PriceList extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    pagination={{ pageSize: 10 }}
+                    pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col><Button style={{ margin:'10px 10px 10px 0px' }}>模板下载</Button></Col>

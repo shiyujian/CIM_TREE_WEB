@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/CostListData';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button,message,Popconfirm} from 'antd';
+import {Row,Col,Table,Input,Button,message,Popconfirm,Progress} from 'antd';
 import PriceList from '../components/CostListData/PriceList';
 import PriceRmModal from '../components/CostListData/PriceRmModal';
 import PriceModifyModal from '../components/CostListData/PriceModifyModal';
@@ -38,7 +38,9 @@ export default class CostListData extends Component {
 			dataSource: [],
 			cacheDataSource: [],
 			selectedRows: [],
-			showDs: []
+			showDs: [],
+            percent: 0,
+            loading: false
 		};
 		this.columns = [{
 				title:'序号',
@@ -84,6 +86,10 @@ export default class CostListData extends Component {
 		}} = this.props;
 		
 		let dataSource = [];
+		this.setState({
+			loading: true,
+			percent: 50
+		})
 		let data = await getSearcher({key:"priceListName"});
 		data.result.map((item,index)=>{
 			let temp = {
@@ -101,7 +107,7 @@ export default class CostListData extends Component {
 			}
 			dataSource.push(temp);
 		});
-		this.setState({dataSource, cacheDataSource: dataSource, showDs: dataSource});
+		this.setState({dataSource, cacheDataSource: dataSource, showDs: dataSource, loading: false, percent: 100});
 	}
 
 	//流程发起
@@ -262,7 +268,6 @@ export default class CostListData extends Component {
 		}).catch(e => {
 			console.log(e);
 		})
-		debugger;
 	}
 
 	//下载
@@ -277,7 +282,7 @@ export default class CostListData extends Component {
     }
 
 	render() {
-		const { selectedRowKeys } = this.state;
+		const { selectedRowKeys, dataSource } = this.state;
 		const rowSelection = {
 			selectedRowKeys,
 			onChange: this.onSelectChange,
@@ -302,9 +307,18 @@ export default class CostListData extends Component {
 					<Col >
 						<Table
 							columns={this.columns}
-							dataSource={this.state.dataSource}
+							dataSource={dataSource}
 							rowSelection={rowSelection}
-							rowKey="key"/>
+							pagination={{showQuickJumper:true,showSizeChanger:true,total:dataSource.length}} 
+							rowKey="key"
+							loading={{
+								tip: <Progress
+									style={{ width: 200 }}
+									percent={this.state.percent}
+									status="active" strokeWidth={5}
+								/>
+								, spinning: this.state.loading
+							}}/>
 					</Col>
 				</Row>
 				{

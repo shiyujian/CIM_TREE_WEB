@@ -11,7 +11,7 @@ import {
 } from "_platform/components/layout";
 import { actions } from "../store/SumSpeedCost";
 import { actions as platformActions } from "_platform/store/global";
-import { Row, Col, Table, Input, Button, message, Progress } from "antd";
+import { Row, Col, Table, Input, Button, message, Progress,pagination } from "antd";
 import { getUser } from "_platform/auth";
 import SumSpeed from "../components/CostListData/SumSpeed";
 import SumSpeedDelete from "../components/CostListData/SumSpeedDelete";
@@ -50,6 +50,7 @@ export default class BalanceSchedule extends Component {
       {
         title: "序号",
         dataIndex: "key",
+        width:"5%"
       },
       {
         title: "项目/子项目",
@@ -90,7 +91,7 @@ export default class BalanceSchedule extends Component {
         }
       }
     ];
-    this.header =['序号','项目/子项目','单位工程','工作节点目标','完成时间','支付金额（万元）','累计占比','备注'];
+    this.header =['项目/子项目','单位工程','工作节点目标','完成时间','支付金额（万元）','累计占比','备注'];
   }
   // async componentDidMount() {
   //   const { actions: { getAllresult } } = this.props;
@@ -119,7 +120,7 @@ export default class BalanceSchedule extends Component {
   // }
   generateTableData(data) {
     let dataSource = [];
-    console.log(data);
+    // console.log(data);
    data.map((rst,key) => {
      let datas = {
       key:key+1,
@@ -337,7 +338,7 @@ export default class BalanceSchedule extends Component {
       let rows =[];
       rows.push(this.header);
       dataSourceSelected.map(o=>{
-        rows.push([o.key,o.project,o.unit,o.nodetarget,o.completiontime,o.summoney,o.ratio,o.remarks]);
+        rows.push([o.project,o.unit,o.nodetarget,o.completiontime,o.summoney,o.ratio,o.remarks]);
       })
       jsonToExcel({},{rows:rows}).then(rst=>{
         this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
@@ -406,9 +407,16 @@ export default class BalanceSchedule extends Component {
 }
   downloadT () {
     console.log(DataReportTemplate_SettlementProgress)
-    this.createLink('结算进度下载',DataReportTemplate_SettlementProgress);
+    // this.createLink(this,DataReportTemplate_SettlementProgress);
+    const url = "http://10.215.160.38:6542/media/documents/meta/%E7%BB%93%E7%AE%97%E8%BF%9B%E5%BA%A6%E6%95%B0%E6%8D%AE%E5%A1%AB%E6%8A%A5%E6%A8%A1%E6%9D%BF.xlsx";
+    this.createLink(this,url);
   }
   render() {
+    const paginationInfo = {
+			showSizeChanger: true,
+			pageSizeOptions: ['5', '10', '20', '30', '40', '50'],
+			showQuickJumper: true,
+		}
     const { selectedRowKeys } = this.state;
     const rowSelection = {
       selectedRowKeys,
@@ -476,7 +484,8 @@ export default class BalanceSchedule extends Component {
               rowSelection={rowSelection}
               rowKey="key"
               loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="exception" strokeWidth={5}/>,spinning:this.state.loading}}
-            />
+              pagination={paginationInfo}
+              />
           </Col>
         </Row>
         {this.state.addvisible && (

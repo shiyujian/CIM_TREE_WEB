@@ -133,8 +133,7 @@ class Login extends Component {
 			return true
 		}
 	}
-
-
+	
 	render() {
 		const {getFieldDecorator} = this.props.form;
 		const{
@@ -204,7 +203,7 @@ class Login extends Component {
 										valuePropName: 'checked',
 										initialValue: false,
 									})(
-										<Checkbox onChange={this.loginRememberChange.bind(this)}>记住密码</Checkbox>,
+										<Checkbox onChange={this.loginRememberChange.bind(this)}>记住密码</Checkbox>	
 									)}
 								</FormItem>
 								<Button type="primary" htmlType="submit"

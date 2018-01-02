@@ -2,7 +2,7 @@ import {handleActions, combineActions, createAction} from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base} from '_platform/api';
+import {USER_API, SERVICE_API,WORKFLOW_API,FILE_API,base,NODE_FILE_EXCHANGE_API} from '_platform/api';
 
 export const ID = 'DATA_MODALDATA';
 
@@ -49,6 +49,14 @@ const getdele = createAction(`${ID}_GET_dele`);
 const getWorkpackagesByCode = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`, [], 'GET');
 const putDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [], 'PUT');
 
+//导出数据
+const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
+
+//组织机构
+const getOrg = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`,[]);
+//根据子节点获取父节点
+const getTreeRootNode = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?root=false&reverse=true`, []);
+
 export const actions = {
 	...additionReducer,
 	...checkReducer,
@@ -76,7 +84,10 @@ export const actions = {
 	getdele,
 	delDocList,
 	getWorkpackagesByCode,
-	putDocument
+	putDocument,
+	jsonToExcel,
+	getOrg,
+	getTreeRootNode
 	
 };
 

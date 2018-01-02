@@ -24,7 +24,6 @@ export default class PersonData extends Component {
 	setData(data,participants){
 		console.log("data:",data);
 		console.log("participants:",participants);
-		return;
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,

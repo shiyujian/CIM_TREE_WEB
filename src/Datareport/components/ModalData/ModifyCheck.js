@@ -177,7 +177,8 @@ export default class ModifyCheck extends Component {
                     reportingName:item.reportingName,
                 }
             }
-            all.push(putDocument({ code: dataSource[index].code }, newdata))
+            all.push(putDocument({ code: dataSource[index].code }, newdata))    
+            //删除旧附件 todo
         });
         Promise.all(all)
             .then(rst => {
@@ -196,24 +197,36 @@ export default class ModifyCheck extends Component {
     onChange(e) {
         this.setState({ option: e.target.value })
     }
+
+     //预览
+     handlePreview(index,name){
+        const {actions: {openPreview}} = this.props;
+        let f = this.state.dataSource[index][name]
+        let filed = {}
+        filed.misc = f.misc;
+        filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (f.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = f.name;
+        filed.mime_type = f.mime_type;
+        openPreview(filed);
+    }
+
     render() {
 
 
         const columns = [{
             title: '序号',
             dataIndex: 'index',
-            render: (text, record, index) => {
-                return index + 1
-            }
+           
         }, {
             title: '模型编码',
             dataIndex: 'coding'
         }, {
             title: '项目/子项目名称',
-            dataIndex: 'project'
+            dataIndex: 'project.name'
         }, {
             title: '单位工程',
-            dataIndex: 'unit'
+            dataIndex: 'unit.name'
         }, {
             title: '模型名称',
             dataIndex: 'modelName'
@@ -229,14 +242,36 @@ export default class ModifyCheck extends Component {
         }, {
             title: 'fdb模型',
             dataIndex: 'fdbMode',
+            render:(text,record,index) => {
+                return (<span>
+                        <a onClick={this.handlePreview.bind(this,record.index-1,'fdbMode')}>预览</a>
+                        <span className="ant-divider" />
+                        <a href={`${STATIC_DOWNLOAD_API}${record.fdbMode.a_file}`}>下载</a>
+                    </span>)
+            }
 
         }, {
             title: 'tdbx模型',
             dataIndex: 'tdbxMode',
+            render:(text,record,index) => {
+                return (<span>
+                        <a onClick={this.handlePreview.bind(this,record.index-1,'tdbxMode')}>预览</a>
+                        <span className="ant-divider" />
+                        <a href={`${STATIC_DOWNLOAD_API}${record.tdbxMode.a_file}`}>下载</a>
+                    </span>)
+            }
 
         }, {
             title: '属性表',
             dataIndex: 'attributeTable',
+            render:(text,record,index) => {
+                return (<span>
+                        <a onClick={this.handlePreview.bind(this,record.index-1,'attributeTable')}>预览</a>
+                        <span className="ant-divider" />
+                        <a href={`${STATIC_DOWNLOAD_API}${record.attributeTable.a_file}`}>下载</a>
+                    </span>)
+            }
+
 
         }, {
             title: '上报时间',
@@ -260,6 +295,7 @@ export default class ModifyCheck extends Component {
                 <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
+
                     bordered />
                 <Row>
                     <Col span={2}>

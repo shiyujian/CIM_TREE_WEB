@@ -251,7 +251,10 @@ export default class PriceListCheck extends Component {
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
-                    bordered />
+                    bordered 
+                    pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
+                    />
+                    
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>

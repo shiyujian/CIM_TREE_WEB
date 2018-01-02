@@ -26,9 +26,9 @@ export default class PriceModifyModal extends Component {
 
         const {actions:{getAllUsers,getWorkflowById,getProjectTree}} = this.props;
         getAllUsers().then(res => {
-            let checkers = res.map(o => {
+            let checkers = res.map((o,key) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option value={JSON.stringify(o)} key={key}>{o.account.person_name}</Option>
                 )
             })
             this.setState({checkers})
@@ -95,16 +95,7 @@ export default class PriceModifyModal extends Component {
               {
                 title:'清单项目编码',
                 dataIndex:'projectcoding',
-                width:"10%",
-                render: (text, record, index) => (
-                    <div>
-                        <EditableCell
-                            value={record.projectcoding}
-                            editOnOff={false}
-                            onChange={this.onCellChange(index, "projectcoding", record)}
-                        />
-                    </div>
-                )
+                width:"10%"
               },
               {
                 title:'计价单项',

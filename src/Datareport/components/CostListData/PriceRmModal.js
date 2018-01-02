@@ -28,9 +28,9 @@ export default class PriceRmModal extends Component {
             dataSource: rmData
         })
         getAllUsers().then(res => {
-            let checkers = res.map(o => {
+            let checkers = res.map((o, key) => {
                 return (
-                    <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+                    <Option value={JSON.stringify(o)} key={key}>{o.account.person_name}</Option>
                 )
             })
             this.setState({checkers})
@@ -133,7 +133,7 @@ export default class PriceRmModal extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    pagination={{ pageSize: 10 }}
+                    pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col>

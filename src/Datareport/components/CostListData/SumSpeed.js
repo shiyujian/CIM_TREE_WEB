@@ -90,11 +90,28 @@ export default class SumSpeed extends Component {
       let dataSource = [];
       for (let i = 1; i < dataList.length; i++) {
         dataSource.push({
-          nodetarget: dataList[i][0] ? dataList[i][0] : "",
-          completiontime: dataList[i][1] ? dataList[i][1] : "",
-          summoney: dataList[i][2] ? dataList[i][2] : "",
-          ratio: dataList[i][3] ? dataList[i][3] : "",
-          remarks: dataList[i][4] ? dataList[i][4] : "",
+          key:i,
+          nodetarget:{
+            editable: false,
+            value:dataList[i][0] ? dataList[i][0] : ""
+          },
+          completiontime:{
+            editable: false,
+            value:dataList[i][1] ? dataList[i][1] : ""
+          },
+          summoney:{
+            editable: false,
+            value:dataList[i][2] ? dataList[i][2] : ""
+          },
+          ratio:{
+            editable: false,
+            value:dataList[i][3] ? dataList[i][3] : ""
+          },
+          remarks:{
+            editable: false,
+            value:dataList[i][4] ? dataList[i][4] : ""
+          },
+          action:'normal',
           project: {
             code: "",
             name: "",
@@ -169,96 +186,117 @@ export default class SumSpeed extends Component {
     });
   };
 
-  onok() {
-    if (!this.state.check) {
-      message.info("请选择审核人");
-      return;
-    }
-    if (this.state.dataSource.length === 0) {
-      message.info("请上传excel");
-      return;
-    }
-    // let temp = this.state.dataSource.some((o,index) => {
-    //                 return !o.file.id
-    //             })
-    // if(temp){
-    //     message.info(`有数据未上传附件`)
-    //     return
-    // }
-    const { project, unit } = this.state;
-    if (!project.name) {
-      message.info(`请选择项目和单位工程`);
-      return;
-    }
-
-    let { check } = this.state;
-    let per = {
-      id: check.id,
-      username: check.username,
-      person_name: check.account.person_name,
-      person_code: check.account.person_code,
-      organization: check.account.organization
-    };
-    for (let i = 0; i < this.state.dataSource.length; i++) {
-      this.state.dataSource[i].project = project;
-      this.state.dataSource[i].unit = unit;
-    }
-    this.props.onok(this.state.dataSource, per);
-    notification.success({
-      message: "信息上传成功！",
-      duration: 2
-    });
-  }
-
+  onok() { 
+        if (!this.state.check) {
+          message.info("请选择审核人");
+          return;
+        }
+        if (this.state.dataSource.length === 0) {
+          message.info("请上传excel");
+          return;
+        }
+        const { project, unit } = this.state;
+        if (!project.name) {
+          message.info(`请选择项目和单位工程`);
+          return;
+        }
+        let { check } = this.state;
+        let per = {
+          id: check.id,
+          username: check.username,
+          person_name: check.account.person_name,
+          person_code: check.account.person_code,
+          organization: check.account.organization
+        };
+        // for (let i = 0; i < this.state.dataSource.length; i++) {
+        //   this.state.dataSource[i].project = project;
+        //   this.state.dataSource[i].unit = unit;
+        // }
+        let {dataSource} = this.state;
+        let newdataSource = [];
+        dataSource.map( item =>{
+          newdataSource.push({
+            project:project,
+            unit:unit,
+            nodetarget:item.nodetarget.value,
+            completiontime:item.completiontime.value,
+            summoney:item.summoney.value,
+            ratio:item.ratio.value,
+            remarks:item.remarks.value
+          })
+        })
+        this.props.onok(newdataSource, per);
+        notification.success({
+            message: '信息上传成功！',
+            duration: 2
+        });
+      }
   //删除
   delete(index) {
     let { dataSource } = this.state;
     dataSource.splice(index, 1);
-    this.setState({ dataSource });
+    let dataSources = [];
+    dataSource.map((item,key)=>{
+      dataSources.push({
+        key:key+1,
+        project:item.project,
+        unit:item.unit,
+        nodetarget:item.nodetarget,
+        completiontime:item.completiontime,
+        summoney:item.summoney,
+        ratio:item.ratio,
+        remarks:item.remarks,
+        action:item.action
+      })
+    })
+    this.setState({ dataSource:dataSources });
   }
-  remove(index) {
-    const { actions: { deleteStaticFile } } = this.props;
-    let { dataSource } = this.state;
-    let id = dataSource[index]["file"].id;
-    deleteStaticFile({ id: id });
-    let nodetarget = dataSource[index].nodetarget;
-    let completiontime = dataSource[index].completiontime;
-    let remarks = dataSource[index].remarks;
-    let summoney = dataSource[index].summoney;
-    let unit = dataSource[index].unit;
-    let ratio = dataSource[index].ratio;
-    dataSource[index] = {
-      project: "",
-      unit: unit,
-      nodetarget: nodetarget,
-      completiontime: completiontime,
-      remarks: remarks,
-      summoney: summoney,
-      ratio: ratio,
-      project: {
-        code: "",
-        name: "",
-        obj_type: ""
-      },
-      unit: {
-        code: "",
-        name: "",
-        obj_type: ""
-      },
-      construct_unit: {
-        code: "",
-        name: "",
-        type: ""
-      },
-      file: {}
-    };
-    this.setState({ dataSource });
+  // 编辑
+  edit(index){
+    const {dataSource} = this.state;
+    dataSource[index].action = 'edit';
+    Object.keys(dataSource[index]).forEach(v=>{
+      if (dataSource[index][v].hasOwnProperty('editable')) dataSource[index][v]['editable'] = true;
+    })
+    this.setState({dataSource});
+  }
+  //确认编辑
+  exitEdit(index){
+    const { dataSource } = this.state;
+    dataSource[index].action = 'normal';
+    Object.keys(dataSource[index]).forEach( v =>{
+      if (dataSource[index][v].hasOwnProperty('editable')) dataSource[index][v]['editable'] = false;      
+    })
+    this.setState({dataSource});
+  }
+  // 表格数据改变时
+  handeleChange(index,text,value){
+    const {dataSource} = this.state;
+    dataSource[index][text].value = value;
+    this.setState({dataSource});
+  }
+  // 处理表格渲染数据
+  renderColumns(index,text,data){
+    const { editable } = this.state.dataSource[index][text];
+    if( typeof editable === 'undefined'){
+      return text;
+    }
+    return (
+      <div>
+        {!editable ?(
+          <span>{data.value}</span>
+        ) :(
+          <Input value={data.value} onChange = {e => this.handeleChange(index,text,e.target.value)}/>
+        )}
+      </div>
+    )
   }
   render() {
     const columns = [
       {
         title: "序号",
         dataIndex: "key",
+        width:"5%",
         render: (text, record, index) => {
           return index + 1;
         }
@@ -266,44 +304,63 @@ export default class SumSpeed extends Component {
       {
         title: "工作节点目标",
         dataIndex: "nodetarget",
-        key:"Nodetarget"
-
+        key:"Nodetarget",
+        render:(text,record,index) =>{
+          return this.renderColumns(record.key-1,'nodetarget',text);
+        }
       },
       {
         title: "完成时间",
         dataIndex: "completiontime",
-        key:'Completiontime'
+        key:'Completiontime',
+        render:(text,record,index) =>{
+          return this.renderColumns(record.key-1,'completiontime',text);
+        }
       },
       {
         title: "支付金额（万元）",
         dataIndex: "summoney",
-        key:'Summoney'
+        key:'Summoney',
+        render:(text,record,index) =>{
+          return this.renderColumns(record.key-1,'summoney',text);
+        }
       },
       {
         title: "累计占比",
         dataIndex: "ratio",
-        key:'Ratio'
+        key:'Ratio',
+        render:(text,record,index) =>{
+          return this.renderColumns(record.key-1,'ratio',text);
+        }
       },
       {
         title: "备注",
         dataIndex: "remarks",
-        key:'Remarks'
+        key:'Remarks',
+        render:(text,record,index) =>{
+          return this.renderColumns(record.key-1,'remarks',text);
+        }
       },
       {
         title: "编辑",
         dataIndex: "edit",
         key:'Edit',
-        render: (text, record, index) => {
-          return (
-            <Popconfirm
-              placement="leftTop"
-              title="确定删除吗？"
-              onConfirm={this.delete.bind(this, index)}
-              okText="确认"
-              cancelText="取消"
-            >
-              <a>删除</a>
-            </Popconfirm>
+       render: (text, record, index) => {
+          return record.action === 'normal' ? (
+            <div>
+              <a href="javascript:;" onClick={this.edit.bind(this,record.key-1)}><Icon style={{marginRight:"15px"}} type = "edit"/></a>
+              <Popconfirm
+                placement="leftTop"
+                title="确定删除吗？"
+                onConfirm={this.delete.bind(this,record.key-1)}
+                okText="确认"
+                cancelText="取消"
+              >
+                <a href="javascript:;"><Icon type = "delete"/></a>
+              </Popconfirm>
+            </div>   
+          ) : (
+            <a href="javascript:;" onClick={this.exitEdit.bind(this,record.key-1)}>完成</a>
           );
         }
       }

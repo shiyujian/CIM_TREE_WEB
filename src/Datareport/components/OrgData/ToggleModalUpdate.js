@@ -3,6 +3,7 @@ import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon,TreeSelec
 import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
 import { getUnit } from '../../store/orgdata';
 import { Promise } from 'es6-promise';
+import './TableOrg.less'
 const Search = Input.Search;
 const Option = Select.Option;
 const SHOW_PARENT = TreeSelect.SHOW_PARENT;

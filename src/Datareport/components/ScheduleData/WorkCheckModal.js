@@ -172,8 +172,13 @@ export default class WorkCheckModal extends Component {
                     </span>
                 ),
             }, {
-                title: '施工单位',
+                title: '实施单位',
                 dataIndex: 'construct_unit',
+                render: (text, record, index) => (
+                    <span>
+                        {record.construct_unit.name}
+                    </span>
+                ),
             }, {
                 title: '施工图工程量',
                 dataIndex: 'quantity',

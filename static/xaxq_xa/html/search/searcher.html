@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>property</title>
+    <!-- css -->
+    <style>
+        *{margin: 0; padding: 0;}
+        html,body{width: 100%; height: 100%; min-width: 200px;}
+    </style>
+    <link rel="stylesheet" href="../../js/easyui/themes/bootstrap/easyui.css" />
+    <link rel="stylesheet" href="../../js/easyui/css/font-awesome.css" />
+    <!-- js -->
+    <script type="text/javascript" src="../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../js/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../js/easyui/plugins/datagrid-groupview.js"></script>
+    <script type="text/javascript" src="../../js/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="../../js/HashTable.js"></script>
+    <script type="text/javascript" src="../../js/layer/layer.js"></script>
+    <script type="text/javascript" src="../../js_con8/cm.js"></script>
+    <script type="text/javascript" src="./searcherConfig.js"></script>
+
+    
+</head>
+<body style="overflow: hidden;">
+    <!-- 内容 -->
+    <div id="ButtonClose" style="float: right; width: 25px; height: 25px;" class="closebtn" onclick="closeWin()"></div>
+    <div id="my_layout" class="easyui-layout" style="width:100%;height:100%;">
+        <div data-options="region:'north',border:false,collapsible:false,iconCls:'fa fa-search'" title="搜索" style="overflow: hidden; padding:5px;height: 150px;">
+            <input id="searcherBox" class="easyui-searchbox" data-options="prompt:'请输入关键字',searcher:searchClick" style="width:100%">
+            <select id="datasetCombo" class="easyui-combobox" name="state" label="数据集:" labelPosition="top" style="width:100%;margin:5px;">
+                <!-- <optgroup label="测绘数据">
+                    <option value="">倾斜摄影</option>
+                    <option value="">正射影像</option>
+                    <option value="">地形图</option>
+                    <option value="">DEM</option>
+                </optgroup>
+                <optgroup label="地质数据">
+                    <option value="">钻孔模型</option>
+                    <option value="">地质模型</option>
+                </optgroup>
+                <optgroup label="建管数据">
+                    <option value="">项目模型</option>
+                    <option value="">地质模型</option>
+                </optgroup>
+                <optgroup label="社会数据">
+                    <option value="">钻孔模型</option>
+                    <option value="">地质模型</option>
+                </optgroup> -->
+            </select>
+            <div style="padding:5px 0;">
+                <!-- <a class="easyui-linkbutton" data-options="iconCls:'icon-edit'" onclick="pointSelect()">点选</a> -->
+                <a class="easyui-linkbutton" style="font-size:14px" data-options="iconCls:'fa fa-square-o'" onclick="polygonSelect()">多边形</a>
+                <a class="easyui-linkbutton" style="font-size:14px" data-options="iconCls:'fa fa-trash-o'" onclick="clearResults()">清除</a>
+            </div>
+        </div>
+        <div data-options="region:'center',border:false,iconCls:'fa fa-info'" title="信息表" style="padding:5px;">
+            
+                <!-- <table id="dg" title="结果列表" style="width:100%;height:300px" data-options="
+                    rownumbers:true,
+                    singleSelect:true,
+                    autoRowHeight:false,
+                    pagination:true,
+                    pageSize:10">
+                    <thead>
+                        <tr>
+                            <th field="name" width="80">Name</th>
+                            <th field="amount" width="80" align="right">Amount</th>
+                            <th field="price" width="80" align="right">Price</th>
+                        </tr>
+                    </thead>
+                </table> -->
+            <table id="dg" class="easyui-datagrid" title="结果列表" style="width:100%;height:50%"
+                data-options="
+                    singleSelect:true,
+                    collapsible:true,
+                    rownumbers:true,
+                    fitColumns:true,
+                    view:groupview,
+                    groupField:'groupid',
+                    groupFormatter:function(value,rows){
+                        return value + '(共' + rows.length + ')';
+                    },
+                    pagination:true,
+                    pageSize:10
+                ">
+                <thead>
+                    <tr>
+                        <th field="oid" width="80">ID</th>
+                        <th field="name" width="80" align="right">名称</th>
+                        <th field="type" width="80" align="right">类型</th>
+                    </tr>
+                </thead>
+            </table>
+            <table id="pg" class="easyui-propertygrid" style="width:100%;height:50%" title="属性表"  data-options="collapsible:true">
+            </table>
+        </div>
+    </div>
+</body>
+<!-- js -->
+
+<script type="text/javascript">
+
+    // var configData;
+
+    $.ajaxSettings.async = false;
+
+    // $.getJSON('../../data/searcherConfig.json', function(data){
+        
+    //     configData = data;
+
+    // });// getJson
+
+        var selectedColor = 0xaa0000ff;  // 批量要素
+        var selectedFocusColor = 0xaaff0000; // 当前选择的要素0xffff0000
+
+        var __g = external.parentWindow.__g;
+        var __rootId = external.parentWindow.__rootId;
+        var _projectTree = external.parentWindow.projectTree;
+        var highlightHelper = external.parentWindow.highlightHelper;
+        var objectManager = external.parentWindow.objectManager;
+        var geometryFactory = external.parentWindow.geometryFactory;
+        var Config = external.parentWindow.Config;
+        var console = external.parentWindow.console;
+
+        var keyword = ""; // 查询输入的字符
+        var currDataSet = null;
+        var lastDataSet = null; // 上一次 选中的数据集合
+
+
+        //初始化 数据集选择列表
+        var comboMenu = []
+        for(var i = 0; i < configData.length; i++){
+            //console.log("configData[i].name",configData[i].name);
+            comboMenu.push({
+                name: configData[i].name,
+                label: configData[i].name,
+                value: i,
+            });
+        }
+        $('#datasetCombo').combobox({
+            valueField: 'value',
+            textField: 'label',
+            data:comboMenu,
+            onSelect: function(record) {
+                console.log("record", record);
+                if(lastDataSet){
+                    closeLayerInCep(lastDataSet.layersInCep);
+                }
+                // 数据集 选择
+                currDataSet = configData[record.value];
+                openLayerInCep(currDataSet.layersInCep);
+                lastDataSet = currDataSet;
+                //fly2Pos(currDataSet.position);
+            }
+        });
+        // if(comboMenu.length > 0) {
+        //     $('#datasetCombo').combobox({
+        //         select: 0
+        //     });
+        //     currDataSet = configData[0];
+        //     // fly2Pos(currDataSet.position);
+        // }
+        
+
+        //初始化 searcherBox
+        $('#searcherBox').searchbox({
+            onChange: function(newValue,oldValue) {
+                keyword = newValue;
+                console.log("keyword", keyword);
+            }
+        });
+
+        // 关键字查询
+        function searchClick(value){
+            if(!currDataSet) {
+                alert("未选择查询的数据集");
+                return;
+            }
+
+            var fcs = getFCS(currDataSet.connectStrArray);
+            _currFCS = fcs;
+            //console.log(fcs);
+            _currResultGeoFieldName = currDataSet.geoField;
+            var resultList = getResult(fcs, keyword, currDataSet.keyField, null, currDataSet.geoField, currDataSet.fields);
+            //console.log(resultList);
+            showResultList(resultList);
+               
+            
+        }
+        
+        // 点选查询
+        function pointSelect() {
+
+        }
+
+        // 多边形查询
+        var isSelectMore = false;
+        var _tempGeometry;
+        var _tempRenderGeometry;
+        var _selectMoreObj={area:0,count:0}
+        var _currFCS; // 当前数据集中的 FeatureClass Set
+        var _currResultGeoFieldName; // 当前查询结果的GeometryFieldName
+        function polygonSelect() {
+
+            highlightHelper.setRegion(null);
+            if(_tempRenderGeometry){
+                objectManager.deleteObject(_tempRenderGeometry.guid);
+                _tempRenderGeometry = null;
+            }
+
+            if(isSelectMore){//取消
+                isSelectMore=false;
+                __g.interactMode = gviInteractMode.gviInteractNormal;
+            }else{//添加多边形
+                __g.interactMode = gviInteractMode.gviInteractEdit;
+                isSelectMore=true;
+                var surfaceSymbol = __g.new_SurfaceSymbol;
+                surfaceSymbol.color = 0x770000FF;
+                this._tempGeometry = geometryFactory.createGeometry(gviGeometryType.gviGeometryPolygon, gviVertexAttribute.gviVertexAttributeZ);
+                this._tempRenderGeometry = objectManager.createRenderPolygon(this._tempGeometry, surfaceSymbol, __rootId);
+                this._tempRenderGeometry.heightStyle = gviHeightStyle.gviHeightOnEverything;
+                this._tempRenderGeometry.maxVisibleDistance = 300000000;
+                __g.objectEditor.startEditRenderGeometry(this._tempRenderGeometry, gviGeoEditType.gviGeoEditCreator);
+            }
+        }
+
+        // 查询 结果
+        var onObjectEditing = function(geometry) {
+            //console.log("html onObjectEditing");
+            _tempGeometry = geometry;
+        }
+
+        var onObjectEditFinish = function() {
+            //console.log("html onObjectEditFinish");
+
+            if(!currDataSet) {
+                alert("未选择查询的数据集");
+            }
+
+            if (_tempGeometry && _tempGeometry.isValid && currDataSet) {
+               var fcs = getFCS(currDataSet.connectStrArray);
+               _currFCS = fcs;
+               //console.log(fcs);
+               _currResultGeoFieldName = currDataSet.geoField;
+               var resultList = getResult(fcs, keyword, currDataSet.keyField, _tempGeometry, currDataSet.geoField, currDataSet.fields);
+               //console.log(resultList);
+               showResultList(resultList);
+               
+            }
+            __g.interactMode = gviInteractMode.gviInteractNormal;
+            isSelectMore = false;
+            if(_tempRenderGeometry){
+                objectManager.deleteObject(_tempRenderGeometry.guid);
+                _tempRenderGeometry = null;
+            }
+        }
+
+        
+        //console.log("external.parentWindow.____events: ", external.parentWindow.____events);
+        var ___events2 = external.parentWindow.____events;
+        if(___events2) {
+            ___events2["onObjectEditing"] = onObjectEditing;
+            ___events2["onObjectEditFinish"] = onObjectEditFinish;
+            __g.callback = ___events2;
+        }
+
+        // 结果列表
+        function showResultList(list) {
+            // console.log("list",list);
+            
+            //var datasource = { total: list.length, rows: list };
+            //$("#dg").datagrid('loadData', datasource).datagrid('clientPaging');
+
+            //还原 loadFilter函数
+            var state = $("#dg").data('datagrid');
+            var opts = state.options;
+            opts.loadFilter = function(data) {
+                return data;
+            }
+            //设置新的 数据
+            $('#dg').datagrid({data:list}).datagrid('clientPaging');
+           
+        }
+
+        function itemClick() {
+
+        }
+
+
+        // external.parentWindow.onObjectEditFinish.wCallBack = onObjectEditFinish;
+        // //console.log("onObjectEditing.wCallBack",onObjectEditing);
+        // //console.log("onObjectEditFinish.wCallBack",onObjectEditFinish);
+
+        // 渲染 结果列表
+        (function($){
+                function pagerFilter(data){
+                    console.log("pagerFilter");
+                    console.log("pagerFilter datalength", data.length);
+                    if ($.isArray(data)){    // is array
+                        data = {
+                            total: data.length,
+                            rows: data
+                        }
+                    }
+                    var target = this;
+                    var dg = $(target);
+                    var state = dg.data('datagrid');
+                    var opts = dg.datagrid('options');
+                    if (!state.allRows){
+                        state.allRows = (data.rows);
+                    }
+                    if (!opts.remoteSort && opts.sortName){
+                        var names = opts.sortName.split(',');
+                        var orders = opts.sortOrder.split(',');
+                        state.allRows.sort(function(r1,r2){
+                            var r = 0;
+                            for(var i=0; i<names.length; i++){
+                                var sn = names[i];
+                                var so = orders[i];
+                                var col = $(target).datagrid('getColumnOption', sn);
+                                var sortFunc = col.sorter || function(a,b){
+                                    return a==b ? 0 : (a>b?1:-1);
+                                };
+                                r = sortFunc(r1[sn], r2[sn]) * (so=='asc'?1:-1);
+                                if (r != 0){
+                                    return r;
+                                }
+                            }
+                            return r;
+                        });
+                    }
+                    var start = (opts.pageNumber-1)*parseInt(opts.pageSize);
+                    var end = start + parseInt(opts.pageSize);
+                    data.rows = state.allRows.slice(start, end);
+                    return data;
+                }
+    
+                var loadDataMethod = $.fn.datagrid.methods.loadData;
+                var deleteRowMethod = $.fn.datagrid.methods.deleteRow;
+                $.extend($.fn.datagrid.methods, {
+                    clientPaging: function(jq){
+                        console.log("clientPaging");
+                        return jq.each(function(){
+                            var dg = $(this);
+                            var state = dg.data('datagrid');
+                            var opts = state.options;
+                            opts.loadFilter = pagerFilter;
+                            var onBeforeLoad = opts.onBeforeLoad;
+                            opts.onBeforeLoad = function(param){
+                                console.log("onBeforeLoad");
+                                state.allRows = null;
+                                return onBeforeLoad.call(this, param);
+                            }
+                            var pager = dg.datagrid('getPager');
+                            pager.pagination({
+                                onSelectPage:function(pageNum, pageSize){
+                                    opts.pageNumber = pageNum;
+                                    opts.pageSize = pageSize;
+                                    pager.pagination('refresh',{
+                                        pageNumber:pageNum,
+                                        pageSize:pageSize
+                                    });
+                                    dg.datagrid('loadData',state.allRows);
+                                }
+                            });
+                            $(this).datagrid('loadData', state.data);
+                            if (opts.url){
+                                $(this).datagrid('reload');
+                            }
+                        });
+                    },
+                    loadData: function(jq, data){
+                        console.log("loadData");
+                        console.log("loadData datalength", data.length);
+                        jq.each(function(){
+                            $(this).data('datagrid').allRows = null;
+                        });
+                        return loadDataMethod.call($.fn.datagrid.methods, jq, data);
+                    },
+                    deleteRow: function(jq, index){
+                        console.log("deleteRow");
+                        return jq.each(function(){
+                            var row = $(this).datagrid('getRows')[index];
+                            deleteRowMethod.call($.fn.datagrid.methods, $(this), index);
+                            var state = $(this).data('datagrid');
+                            if (state.options.loadFilter == pagerFilter){
+                                for(var i=0; i<state.allRows.length; i++){
+                                    if (state.allRows[i] == row){
+                                        state.allRows.splice(i,1);
+                                        break;
+                                    }
+                                }
+                                $(this).datagrid('loadData', state.allRows);
+                            }
+                        });
+                    },
+                    getAllRows: function(jq){
+                        return jq.data('datagrid').allRows;
+                    }
+                });
+        })(jQuery);
+    
+        function getData(){
+            var rows = [];
+            for(var i=1; i<=80; i++){
+                var amount = Math.floor(Math.random()*1000);
+                var price = Math.floor(Math.random()*1000);
+                rows.push({
+                    groupid: 'NO.1',
+                    inv: 'Inv No '+i,
+                    date: $.fn.datebox.defaults.formatter(new Date()),
+                    name: 'Name '+i,
+                    amount: amount,
+                    price: price,
+                });
+            }
+            return rows;
+        }
+            
+        // $(function(){
+        //     $('#dg').datagrid({data:getData()}).datagrid('clientPaging');
+        // });
+
+        // 根据Symbol 设置GeometryRender Color
+        function setGeometrySymbolColor(guid, color){
+        var render = __g.objectManager.getObjectById(guid);
+            var symbol = render.symbol;
+            if(symbol){
+            if(render.type==265){
+            symbol.fillColor=color;
+            }else{
+                symbol.color = color;
+                }
+                render.symbol = symbol;
+            }
+        }
+        // 结果列表 选择行
+        var lastSelectRowData = null;
+        $('#dg').datagrid({
+            onClickRow: function clickListRow(rowIndex, rowData) {
+                console.log('clickListRow');
+                
+
+                if(_currFCS) {
+                    
+                    //还原上次高亮的要素
+                    if(lastSelectRowData) {
+                        //绘制出来的结果
+                        if(lastSelectRowData.renderID){
+                            setGeometrySymbolColor(lastSelectRowData.renderID, selectedColor);
+                        } else {
+                            // 直接改变要素图层
+                            var fc = _currFCS.getValue(lastSelectRowData.groupid);
+                            __g.featureManager.highlightFeature(fc, lastSelectRowData.oid, selectedColor);
+                        }
+                            
+                    }
+                    lastSelectRowData = rowData;
+
+                    //绘制出来的结果
+                    var fc = _currFCS.getValue(rowData.groupid);
+                    if(rowData.renderID) {
+                        console.log("rowData.renderID", rowData.renderID);
+                        setGeometrySymbolColor(rowData.renderID, selectedFocusColor);
+                    } else {
+                        //直接渲染要素
+                        __g.featureManager.highlightFeature(fc, rowData.oid, selectedFocusColor);
+                    }
+                        
+                    var newProp = getFCRow(fc,rowData.oid);
+                    // var keys = Object.keys(newProp);
+                    // var rows = [];
+                    // for(var i = 0; i < keys.length; i++ ){
+                    //     var key = keys[i];
+                    //     rows.push({
+                    //         name:key,
+                    //         value:newProp[key]
+                    //     });
+                    // }
+                    $('#pg').propertygrid({
+                        showGroup: true,
+                        scrollbarSize: 0,
+                        columns:  [[
+                            {field:'name',title:'名称',width:80,sortable:true},
+                            {field:'value',title:'值',width:80,resizable:false}
+                        ]],
+                        data:newProp
+                    });
+                }
+                
+            },
+            onDblClickRow: function(rowIndex, rowData){
+                // $(this).datagrid('beginEdit', index);
+                console.log('onDblClickCell');
+                if(_currFCS) {
+                    var fc = _currFCS.getValue(rowData.groupid);
+                    var geoObject = getGeometryByOID(fc, rowData.oid, _currResultGeoFieldName);
+                    fly2Model(geoObject);
+                }
+            }
+        });
+
+        //连接字符串转FC对象
+        function getFCS(fcStrings) {
+            //var fcStrings = ["ConnType=FireBird2; DataBase=C:\Users\Administrator\Desktop\1010101.FDB;FeatureDataset=项目1;FeatureClass=墙",
+            //                          "ConnType=FireBird2; DataBase=C:\Users\Administrator\Desktop\1010101.FDB;FeatureDataset=项目1;FeatureClass=墙"];
+            var FCS = new HashTable();
+            var dataSrouceFactory = __g.dataSourceFactory;
+            for (var i = 0; i < fcStrings.length; i++) {
+                var fcString = fcStrings[i];
+                var conns = fcString.split(';');
+                var fckv = conns[conns.length - 1];
+                var setkv = conns[conns.length - 2];
+                var fcName = fckv.split('=')[1];
+                var setName = setkv.split('=')[1];
+                var conn = "";
+                for (var j = 0; j < conns.length - 2; j++) {
+                    conn += conns[j] + ";";
+                }
+                conn = conn.substring(0, conn.length - 1);
+                try{
+                    //console.log("conn",conn);
+                    var ds = dataSrouceFactory.openDataSourceByString(conn);
+                    //console.log("ds",ds);
+                    var set = ds.openFeatureDataset(setName);
+                    //console.log("set",set);
+                    var fc = set.openFeatureClass(fcName);
+                    //console.log("fc",fc);
+                    var displayName = fc.aliasName == "" ? fc.name + i : fc.aliasName + i;
+                    FCS.add(displayName, fc);
+                } catch(e){
+                    console.log('getFCS error: ', e);
+                }
+                
+            }
+            return FCS;
+        }
+        //综合查询
+        var tempResultGroup;
+        function getResult(FCS, keyword, whereCluseField, geometry, geometryField, fields) {
+            var filter = null;
+            // console.log("geometry",geometry);
+            if (geometry) {
+                filter = __g.new_SpatialFilter;
+                filter.geometry = geometry;
+                filter.spatialRel = gviSpatialRel.gviSpatialRelEnvelope;
+                filter.geometryField = geometryField;
+            }
+            else {
+                filter = __g.new_QueryFilter;
+            }
+            if(keyword) {
+                filter.whereClause = whereCluseField + " Like '%" + keyword + "%'";
+            }
+            filter.resultBeginIndex = 0;
+            filter.resultLimit =200;
+
+            clearResults();
+
+            tempResultGroup = _projectTree.createGroup('tempGeometry','22222222-2222-2222-2222-222222222222');
+            console.log("tempResultGroup ",tempResultGroup);
+
+            var array = new Array();
+            try{
+                for (var i = 0; i < FCS.getKeys().length; i++) {
+                    var fcName = FCS.getKeys()[i];
+                    var fc = FCS.getValue(fcName);
+                    var fcFields = fc.getFields();
+
+                    var indexArray = new Array();
+                    for (var j = 0; j < fields.length; j++) {
+                        var field = fields[j];
+                        var index = fcFields.indexOf(field);
+                        indexArray.push(index);
+                    }
+                    var cursor = fc.search(filter, true);
+                    // var rowBufferCol = __g.new_RowBufferCollection;
+
+                    // 存储当前选中的要素的oid
+                    var selectGuids = []; 
+
+                    if (cursor) {
+                        var  indexGeometry = cursor.findField(geometryField);
+                        // console.log("indexGeometry ",indexGeometry);
+                        
+                        var indexOid = cursor.findField('oid');
+
+                        var row = null;
+                        while ((row = cursor.nextRow())) {
+                            var obj = {};
+                            obj.groupid = fcName;
+                            for (var j = 0; j < indexArray.length; j++) {
+                                var index = indexArray[j];
+                                var v = row.getValue(index);
+                                //console.log("fieldsName",fields[j]);
+                                obj[fields[j]] = v ;
+                            }
+                            
+                            if(indexGeometry !== -1 ){ //&& !isExistCepLayer(currDataSet)) {
+                                var geo = row.getValue(indexGeometry);
+
+                                // show results
+                                var renderObj = showResultsFeatures(geo, selectedColor, tempResultGroup);
+
+                                // 将渲染对象的GUID存入obj中
+                                if(renderObj){
+                                    //设置最大可视距离
+                                    renderObj.maxVisibleDistance = 9000000;
+                                    obj.renderID = renderObj.guid;
+                                }
+                                    
+                            }
+
+                            array.push(obj);
+                            // rowBufferCol.add(row);
+
+                            var oid = row.getValue(indexOid);
+                            selectGuids.push(oid);
+                        }
+                    }
+
+                    //如果是模型
+                    if(currDataSet.type == 'ModelPoint' || isExistCepLayer(currDataSet)){
+                        // 高亮模型
+                        __g.featureManager.highlightFeatures(fc, selectGuids, selectedColor);
+                    }
+                }
+                // console.log("_projectTree highlightGroup", _projectTree.highlightGroup);
+                // _projectTree.highlightGroup(tempResultGroup, 0xddff0000);
+            }catch(e){
+                console.log("search error", e);
+            }
+          
+
+            
+
+            return array;
+        }
+
+        // 在三维场景中显示查询的结果
+        var _tempResultFeatureLayer;
+        function showResultsFeatures(geo,color,group){
+            // console.log("geometry type ",geo.geometryType);
+            if(!geo || !group) {
+                return null;
+            }
+            var symbol = null;
+            switch(geo.geometryType){
+                case gviGeometryType.gviGeometryPoint : 
+                    symbol =  __g.new_SimplePointSymbol;
+                    symbol.fillColor = color;
+                    return objectManager.createRenderPoint(geo,symbol,group);
+
+                case gviGeometryType.gviGeometryPOI:
+                    return objectManager.createRenderPOI(geo);
+
+                case gviGeometryType.gviGeometryModelPoint :
+                    break;
+
+                case gviGeometryType.gviGeometryLine : 
+                    break;
+
+                case gviGeometryType.gviGeometryPolyline :
+                    symbol =  __g.new_CurveSymbol;
+                    symbol.color = color;
+                    return objectManager.createRenderPolyline(geo,symbol,group);
+
+                case gviGeometryType.gviGeometryMultiPolyline :
+                    symbol =  __g.new_CurveSymbol;
+                    symbol.color = color;
+                    return objectManager.createRenderMultiPolyline(geo,symbol,group);
+
+                case gviGeometryType.gviGeometryPolygon : 
+                    symbol =  __g.new_SurfaceSymbol;
+                    symbol.color = color;
+                    var tempPolygon = objectManager.createRenderPolygon(geo,symbol,group);
+                    tempPolygon.depthTestMode = gviDepthTestMode.gviDepthTestDisable;
+                    tempPolygon.heightStyle = gviHeightStyle.gviHeightOnEverything;
+                    return tempPolygon;
+
+                case gviGeometryType.gviGeometryMultiPolygon :
+                    symbol =  __g.new_SurfaceSymbol;
+                    symbol.color = color;
+                    return objectManager.createRenderMultiPolygon(geo,symbol,group);
+
+                default: break;
+            }
+            return null;
+        }
+
+        //
+        //获取FeatureLayer oid详细数据
+        function getFCRow(fc, oid) {
+            var row = fc.getRow(oid);
+            var fields = fc.getFields();
+            var array = [];
+            for (var i = 0; i < fields.count; i++) {
+
+                var field = fields.get(i);
+                if (field.fieldType == gviFieldType.gviFieldGeometry){
+
+                } else if (field.fieldType == gviFieldType.gviFieldBlob) {
+                    if (field.name == "Tags" || field.name == "Properties"){
+
+                        var obj = {};
+                        var binaryBuffer = row.getValue(i);
+                        // console.log("binaryBuffer", binaryBuffer);
+                        if(!binaryBuffer) {
+                           continue;
+                        }
+
+                        var propertiesXML = binaryBuffer.asString();
+                        //解析BIM属性
+                        propertiesXML = "<xml>" + propertiesXML.substring(propertiesXML.indexOf(">") + 1) + "</xml>";
+                        // console.log("propertiesXML", propertiesXML);
+                        var xmlDoc = $.parseXML(propertiesXML);
+                        $(xmlDoc).find("Property").each(function () {     //查找所有Property节点并遍历
+                            
+                            var Property = $(this);
+                            // console.log("Property", Property);
+                            var vaule = Property.text();                 //获取节点文本
+                            var Group_vaule = Property.attr("Group");  //获取节点的属性
+                            var Name_vaule = Property.attr("Name");  //获取节点的属性
+                            var obj = {};
+                            obj.name = Name_vaule;
+                            obj.value = vaule;
+                            obj.group = Group_vaule;
+                            // console.log("Property obj", obj);
+                            array.push(obj);
+                        });
+                    }
+                } else {
+                    //console.log(" ====== ");
+                    var obj = {};
+                    var displayName = (field.alias == "" ? field.name : field.alias);
+                    obj.name = displayName;
+                    obj.value = row.getValue(i);
+                    obj.group = "基础";
+                    array.push(obj);
+                    //console.log(" FeatureLayer Row object", obj );
+                }
+
+            }
+            //console.log(" FeatureLayer Row", array );
+            return array;
+        }
+
+        //获取FeatureClass Table中 oid对应的Geometry
+        function getGeometryByOID(fc, oid, geoFieldName){
+            var row = fc.getRow(oid);
+            var geoFieldIndex = row.fieldIndex(geoFieldName);
+            var geoValue = row.getValue(geoFieldIndex);
+            return geoValue;
+        }
+
+
+        // 图层定位，相机定位
+        // Camera Move to , pos = "position": "x,y,z,h,t,r",
+        function fly2Pos(pos) {
+            if(!pos) {
+                return;
+            }
+            var posArray = pos.split(',');
+            if(posArray.length < 6) {
+                console.log("pos 参数错误");
+                return;
+            }
+            var x = parseFloat(posArray[0]);
+            var y = parseFloat(posArray[1]);
+            var z = parseFloat(posArray[2]);
+            var h = parseFloat(posArray[3]);
+            var t = parseFloat(posArray[4]);
+            var r = parseFloat(posArray[5]);
+
+            var vector3 = __g.new_Vector3;
+            var eulerAngle = __g.new_EulerAngle;
+            
+            vector3.set(x, y, z);
+            eulerAngle.set(h, t, r);
+            __g.camera.setCamera(vector3, eulerAngle, gviSetCameraFlags.gviSetCameraNoFlags);
+        }
+
+        //相机跳转到具体的 物体
+        function fly2Model(geoObject) {
+            var envelop = geoObject.envelope;
+            var max=envelop.width;
+            if(envelop.height>max)
+                max=envelop.height;
+            if(envelop.depth)
+                max = envelop.depth;
+            
+            if(geoObject.geometryType === gviGeometryType.gviGeometryPoint)max=100;
+
+            var angle = __g.new_EulerAngle;
+            angle.heading=0;
+            angle.tilt = -90;
+            console.log("distance", max);
+            __g.camera.lookAt(envelop.center,max*5,angle);
+            //__g.camera.lookAtEnvelope(envelop);
+        }
+        
+
+        // 打开选择的图层
+        function toggleLayerInCep(paths,openOrClose) {
+            if(!Array.isArray(paths)){
+                console.log("图层路径错误，不为数组");
+                return false;
+            }
+
+            for(var i = 0; i < paths.length; i++) {
+                var projectTree = __g.projectTree;
+                if(!projectTree) {
+                    console.log("projectTree 错误");
+                    return false;
+                }
+                var layerPath = paths[i];
+                var guid = projectTree.findItem(layerPath);
+                var visibleFlag = projectTree.getVisibility(guid);
+                // if(visibleFlag !== 1) {
+                //     projectTree.setVisibility(guid, gviViewportMask.gviViewAllNormalView);
+                // } else {
+                //     projectTree.setVisibility(guid, gviViewportMask.gviViewNone);
+                // }
+                openOrClose ? projectTree.setVisibility(guid, gviViewportMask.gviViewAllNormalView) : projectTree.setVisibility(guid, gviViewportMask.gviViewNone);
+            }
+            return true;
+        }
+        function openLayerInCep(paths) {
+            return toggleLayerInCep(paths,true);
+        }
+
+        // 关闭
+        function closeLayerInCep(paths){
+            return toggleLayerInCep(paths,false);
+        }
+
+        // 清除查询结果
+        function clearResults() {
+            if(tempResultGroup) {
+                _projectTree.deleteItem(tempResultGroup);
+            }
+            lastSelectRowData = null;
+            __g.featureManager.unhighlightAll();
+    
+            var state = $("#dg").data('datagrid');
+            var opts = state.options;
+            opts.loadFilter = function(data) {
+                return data;
+            }
+            //设置新的 数据
+            $('#dg').datagrid({data:[]}).datagrid('clientPaging');
+
+            $('#pg').propertygrid({
+                data:[]
+            });
+        }
+
+        // 关闭窗口
+        function closeWin(){
+            console.log("close QueryWindow");
+            
+            //清除查询结果
+            clearResults();
+
+            //还原打开的cep图层
+            if(lastDataSet){
+                closeLayerInCep(lastDataSet.layersInCep);
+            }
+            lastDataSet = null;
+
+            //将查询按钮复原
+            external.parentWindow.isSpatialQuery = false;
+        }
+
+        //是否存在CEP 图层
+        function isExistCepLayer(currDataSet){
+            if(currDataSet && Array.isArray(currDataSet.layersInCep)){
+                return currDataSet.layersInCep.length > 0;
+            }
+            return false;
+        }
+
+
+</script>
+</html>
