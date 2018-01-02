@@ -251,6 +251,14 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
+        let temp = this.state.dataSource.some((o,index) => {
+            console.log('o',o)
+            return o.org === ''
+        })
+        if(temp) {
+            message.info('部门不存在，无法提交')
+            return
+        }
         // if(this.state.subErr === false) {
         //     message.error('部门不存在，无法提交');
         //     return;
