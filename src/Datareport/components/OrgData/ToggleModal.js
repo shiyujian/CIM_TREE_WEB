@@ -99,12 +99,12 @@ export default class ToggleModal extends Component{
     }
      //处理上传excel的数据
     handleExcelData(data) {
-        const {actions:{getOrgReverse}} = this.props;
         data.splice(0, 1);
+        const {actions:{getOrgReverse}} = this.props;
         let type = [], canjian = [], color = [], codes = [];
         let promises = data.map(item => {
-            codes.push(item[1]);
-            return getOrgReverse({code:item[3]});
+            codes.push(item[0]);
+            return getOrgReverse({code:item[2]});
         })
         let repeatCode = this.isRepeat(codes);
         if (repeatCode.length > 1) {
@@ -129,17 +129,17 @@ export default class ToggleModal extends Component{
             })
             res = data.map((item,index) => {
                 return {
-                    index: item[0],
-                    code: item[1],
+                    index: index + 1,
+                    code: item[0],
                     // 组织机构类型
                     type: type[index] || "" ,
                     // 参建单位
                     canjian: canjian[index] || "",
                     // 部门
-                    depart: item[2],
+                    depart: item[1],
                     // 直属部门
-                    direct: item[3],
-                    remarks: item[4],
+                    direct: item[2],
+                    remarks: item[3],
                 }
             });
             console.log("res:",res);
@@ -148,6 +148,7 @@ export default class ToggleModal extends Component{
             })
         })
     }
+    
     onok(){
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
         if (!this.state.passer) {
@@ -253,7 +254,59 @@ export default class ToggleModal extends Component{
     delete(index){
         let dataSource = this.state.dataSource;
         dataSource.splice(index,1);
+        this.setState({flag_code:true, flag:true})
+        this.delData.bind(this, dataSource);
         this.setState({dataSource})
+    }
+    // 处理数据删除之后的校验
+    delData() {
+        const { actions: { getOrgReverse } } = this.props;
+        let type = [], canjian = [], color = [], codes = [];
+        let promises = data.map(item => {
+            codes.push(item.direct);
+            return getOrgReverse({ code: item.code });
+        })
+        let repeatCode = this.isRepeat(codes);
+        if (repeatCode.length > 1) {
+            this.setState({ flag_code: false })
+        }
+        this.setState({
+            repeatCode
+        })
+        let res;
+        Promise.all(promises).then(rst => {
+            rst.map(item => {
+                if (item.children.length === 0) {
+                    type.push(" ");
+                    canjian.push(" ");
+                    this.setState({
+                        flag: false
+                    })
+                } else {
+                    type.push(item.children[0].name || "");
+                    canjian.push(item.children[0].children[0].name || "");
+                }
+            })
+            res = data.map((item, index) => {
+                return {
+                    index: item.index,
+                    code: item.code,
+                    // 组织机构类型
+                    type: type[index] || "",
+                    // 参建单位
+                    canjian: canjian[index] || "",
+                    // 部门
+                    depart: item.depart,
+                    // 直属部门
+                    direct: item.direct,
+                    remarks: item.remarks,
+                }
+            });
+            console.log("res:", res);
+            this.setState({
+                dataSource: res
+            })
+        })
     }
     columns = [{
         title: '序号',
@@ -287,8 +340,6 @@ export default class ToggleModal extends Component{
         key: 'depart',
     }, {
         title: '直属部门',
-        // dataIndex: 'direct',
-        // key: 'Direct',
         render:(record) => {
             if (record.canjian === " " || record.direct === " ") {
                 return (
@@ -306,7 +357,7 @@ export default class ToggleModal extends Component{
         height:"64px",
         render:(record) => {
             return (
-                <TreeSelect value={record.selectPro || ""} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
+                <TreeSelect placeholder="请选择项目" value={record.selectPro || ""} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
                 onSelect={(value,node,extra) => {
                     const {actions:{getUnit}} = this.props;
                     let units = [];
@@ -338,9 +389,8 @@ export default class ToggleModal extends Component{
         title: '负责单位工程名称',
         width:"15%",
         render:(record) => {
-            console.log("unit:",record);
             return (
-                <TreeSelect value={record.selectUnit || ""} onSelect={(value, node, extra) => {
+                <TreeSelect placeholder="请选择单位工程" value={record.selectUnit || ""} onSelect={(value, node, extra) => {
                     let selectUnit = [];
                     extra.checkedNodes.map(item => {
                         selectUnit.push(item.key);
@@ -365,8 +415,8 @@ export default class ToggleModal extends Component{
                 <Popconfirm 
                     title="确认删除吗"
                     onConfirm={this.delete.bind(this, index)}
-                    okText="是"
-                    onCancel="否"
+                    okText="确认"
+                    onCancel="取消"
                 >
                     <Icon type = "delete" />
                 </Popconfirm>

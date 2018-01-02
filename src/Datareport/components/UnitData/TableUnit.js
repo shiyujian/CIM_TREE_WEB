@@ -32,10 +32,17 @@ export default class TableUnit extends Component {
 		units = units.map((unit, index) => {
 			unit.key = index;
 			unit.children = null;
+			unit.files = [];
 			if (docSet[unit.code + 'REL_DOC_DW_A']) {
 				return { ...unit, ...unit.extra_params, ...docSet[unit.code + 'REL_DOC_DW_A'].extra_params, ...docSet[unit.code + 'REL_DOC_DW_A'].basic_params }
 			}
 			return { ...unit, ...unit.extra_params };
+		});
+		units.map(unit => {
+
+			unit.file = unit.files.find(f => {
+				return f.misc === 'file';
+			});
 		});
 		this.setState({ units: units, showDs: units,spinning:false });
 	}
@@ -233,7 +240,7 @@ export default class TableUnit extends Component {
 		title: '附件',
 		key: 'file',
 		render: (record) => (
-			<a> {record.files ? record.files[0].name : '暂无'}</a>
+			<a> {record.file ? record.file.name : '暂无'}</a>
 		),
 		width:100
 	}]

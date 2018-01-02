@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Pagination, Spin } from 'antd';
+import { Table, Button, Popconfirm, message, Input, Pagination, Spin, Progress } from 'antd';
 import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API, DataReportTemplate_ConstructionUnits, DataReportTemplate_Organization} from '_platform/api.js';
 import './TableOrg.less'
 const Search = Input.Search;
@@ -10,7 +10,8 @@ export default class TableOrg extends Component {
 			dataSource: [],
 			selectData:[],
 			tempData:[],
-			spinning:true
+			spinning:true,
+			percent:0,
 		}
 	}
 	render() {
@@ -23,14 +24,13 @@ export default class TableOrg extends Component {
 				<div> 
 					<Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_Organization}`)} type="default">模板下载组织部门</Button>
 					<Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_ConstructionUnits}`)} type="default">模板下载参建单位</Button>
-					<Button className="button" onClick={this.sendCJ.bind(this)}>发送填报参建单位</Button>
-					<Button className="button" onClick={this.send.bind(this)}>发送填报组织部门</Button>
+					<Button className="button" onClick={this.sendCJ.bind(this)}>新增参建单位</Button>
+					<Button className="button" onClick={this.send.bind(this)}>新增部门</Button>
 					<Button className="button" onClick={this.update.bind(this)}>申请变更</Button>
 					<Button className="button" onClick={this.delete.bind(this)}>申请删除</Button>
 					<Button className="button" onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search className="button" onSearch = {this.searchOrg.bind(this)} style={{ width: "200px" }} placeholder="输入搜索条件" />
 				</div>
-				<Spin spinning = {this.state.spinning}>
 					<Table
 						columns={this.columns}
 						bordered={true}
@@ -38,10 +38,9 @@ export default class TableOrg extends Component {
 						dataSource={this.state.tempData}
 						rowKey="code"
 						pagination={painationInfo}
-
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.spinning}}	
 					>
 					</Table>
-				</Spin>
 			</div>
 		)
 	}
@@ -59,11 +58,7 @@ export default class TableOrg extends Component {
 			return;
 		}
 		this.state.dataSource.map(item => {
-			console.log("item:",item);
-			if (item.name.indexOf(value) != -1 
-				|| item.code.indexOf(value) != -1 
-				// || (typeof(item.extra_params.org_type) !== undefined && item.extra_params.org_type.indexOf(value) != -1)
-			){
+			if (item.name.indexOf(value) != -1 || item.code.indexOf(value) != -1){
 				searchData.push(item);
 			}
 			if (item.children && item.children.length > 0) {
@@ -74,12 +69,11 @@ export default class TableOrg extends Component {
 				})
 			}
 		})
-		searchData.map((item, index)=> {
+		console.log("searchdata:",searchData);
+		searchData.map((item, index) => {
 			item.index = index + 1;
 		})
-		this.setState({
-			tempData:searchData
-		})
+		this.setState({tempData:searchData}) 
 	}
 	update(){
 		const { actions: { ModalVisibleUpdate, setUpdateOrg } } = this.props;
@@ -92,7 +86,10 @@ export default class TableOrg extends Component {
 	}
 	// 导出excel表格
 	getExcel(){
-		console.log("dfgfg:",this.state.excelData);
+		if (this.state.excelData.length === 0) {
+			message.warn("请先选中要导出的数据");
+			return;
+		}
 		let exhead = ['组织机构编码','组织机构类型','参建单位名称','组织机构部门','直属部门','负责项目/子项目名称','负责单位工程名称','备注'];
 		let rows = [exhead];
 		let getcoordinate = (param)=>{
@@ -111,10 +108,7 @@ export default class TableOrg extends Component {
 		});
 		rows = rows.concat(excontent);
 		const {actions:{jsonToExcel}} = this.props;
-		console.log(rows)
-        jsonToExcel({},{rows:rows})
-        .then(rst => {
-            console.log(rst);
+        jsonToExcel({},{rows:rows}).then(rst => {
             this.createLink('单位工程信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
         })
 	}
@@ -169,7 +163,8 @@ export default class TableOrg extends Component {
 			item.index = index + 1
 		})
 		this.setState({
-			spinning:false
+			spinning:false,
+			percent:100
 		})
 		this.setState({dataSource,tempData:dataSource});
 	}

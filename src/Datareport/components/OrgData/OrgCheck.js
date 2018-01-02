@@ -55,6 +55,7 @@ export default class OrgCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
+        console.log("dataSource:",dataSource); 
         const {actions:{logWorkflowEvent, updateWpData, addDocList, putDocList, postOrgList, getOrgRoot, putUnit, putProject, getProject, getUnitAc, getUnit, getOrgPk}} = this.props
         let executor = {};
         let person = getUser();
@@ -62,7 +63,6 @@ export default class OrgCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
@@ -72,6 +72,7 @@ export default class OrgCheck extends Component {
         });
         let rst = await Promise.all(promises);
         dataSource.map((o, index) => {
+            console.log("o.direct:"+o.direct)
             data_list.push({
                 code: "" + o.code,
                 name: o.depart,
@@ -87,13 +88,14 @@ export default class OrgCheck extends Component {
                     remarks: o.remarks
                 },
                 parent: {
-                    code: o.direct,
+                    code: ""+o.direct,
                     pk: rst[index].pk,
                     obj_type: "C_ORG"
                 }
             })
         })
-        postOrgList({}, { data_list: data_list }).then(res => {
+        console.log("datalist:",data_list);
+        await postOrgList({}, { data_list: data_list }).then(res => {
             dataSource.map((item, index) => {
                 if (item.selectPro.length !== 0) {
                     item.selectPro.map(it => {
@@ -103,7 +105,7 @@ export default class OrgCheck extends Component {
                             let pro_orgs = rstPro.response_orgs;
                             let pk = res.result[index].pk
                             pro_orgs.push({
-                                code:item.code,
+                                code:""+item.code,
                                 obj_type:"C_ORG",
                                 pk:pk
                             });
@@ -123,7 +125,7 @@ export default class OrgCheck extends Component {
                             let unit_orgs = rstUnit.response_orgs;
                             let pk = res.result[index].pk
                             unit_orgs.push({
-                                code:item.code,
+                                code:""+item.code,
                                 obj_type:"C_ORG",
                                 pk:pk
                             });
@@ -138,6 +140,8 @@ export default class OrgCheck extends Component {
                 }
             })
         });
+        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        this.props.closeModal("dr_base_org_visible",false)
     }
     //不通过
     async reject(){
@@ -203,11 +207,11 @@ export default class OrgCheck extends Component {
 		return (
             <Modal
 			title="组织机构信息审批表"
-			key={Math.random()}
+			// key={Math.random()}
             visible={true}
             width= {1280}
             footer={null}
-            onCancel = {this.props.closeModal.bind(this,"dr_base_person_visible",false)}
+            onCancel = {this.props.closeModal.bind(this,"dr_base_org_visible",false)}
 			maskClosable={false}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
