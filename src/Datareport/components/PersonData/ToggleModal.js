@@ -46,7 +46,7 @@ export default class ToggleModal extends Component{
                 // dataIndex: 'code',
                 // key: 'Code',
                 render:(text, record, index) => {
-                    console.log('record',record)
+                    // console.log('record',record)
                     if(this.state.repeatCode.indexOf(record.code) != -1) {
                         return <span style={{color: 'red'}}>{record.code}</span>
                     }else {
@@ -58,45 +58,45 @@ export default class ToggleModal extends Component{
                 dataIndex: 'record.name',
                 key: 'Name',
                 render:(text, record, index) =>{
-                    console.log('record',record)
-                    return <Input value = {record.name || ""} onChange={ele => {
+                    // console.log('record',record)
+                    return <Input style={{width: '60px'}} value = {record.name || ""} onChange={ele => {
                         record.name = ele.target.value
                         this.forceUpdate();
                     }}/>
                 }
             }, {
                 title: '所在组织机构单位',
-                dataIndex: 'org',
+                dataIndex: 'record.org',
                 key: 'Org',
+                render:(text, record, index) =>{
+                    // console.log('record',record)
+                    if(record.account) {
+                        return record.org = record.account.org
+                    }else {
+                        return record.org = record.org
+                    }
+                }
             }, {
                 title: '所属部门',
                 // dataIndex: 'account.org_code',
                 key: 'Depart',
                 render:(text, record, index) =>{
-                    return <Input 
-                        value = {record.depart || ""} 
-                        onChange={ele => {
-                            record.depart = ele.target.value
-                            getOrgReverse({code: record.depart}).then(rst =>{
-                                console.log('rst',rst)
-                                if(rst.children.length === 0) {
-                                    message.warning("您输入的部门不存在");
-                                    this.setState({
-                                        subErr: false
-                                    })
-                                }else {
-                                    record.org = rst.children[0].name;
-                                    this.setState({
-                                        subErr: true
-                                    })
-                                }
-                                this.forceUpdate();
-                            })
-                            
-                        }}
-                    //     onChange={this.tableDataChange.bind(this,index)}
-                    //     onBlur={this.fixOrg.bind(this,index)}
-                    />
+                    console.log('1111',record)
+                    if(record.org) {
+                        return <Input
+                            style={{width: '60px'}} 
+                            value = {record.depart || ""}
+                            onChange={this.tableDataChange.bind(this,index)}
+                            onBlur={this.fixOrg.bind(this,index)}
+                        />
+                    }else {
+                        return <Input
+                            style={{width: '60px', color: 'red'}} 
+                            value = {record.depart || ""}
+                            onChange={this.tableDataChange.bind(this,index)}
+                            onBlur={this.fixOrg.bind(this,index)}
+                        />
+                    }
                 }
             }, {
                 title: '职务',
@@ -142,29 +142,29 @@ export default class ToggleModal extends Component{
                     }}/>
                 }
             }, {
-            title:'二维码',
-            key:'signature',
-            render:(record) => (
-                <Upload
-                    beforeUpload={this.beforeUploadPic.bind(this, record)}
-                >
-                    <a>{record.signature ? record.signature.name : '点击上传'}</a>
-                </Upload>
-            )
-          },{
-            title:'操作',
-            dataIndex:'edit',
-            render:(text,record,index) => (
-                <Popconfirm
-                    placement="leftTop"
-                    title="确定删除吗？"
-                    onConfirm={this.delete.bind(this, record.index - 1)}
-                    okText="确认"
-                    cancelText="取消"
-                >
-                    <a>删除</a>
-                </Popconfirm>
-            )
+                title:'二维码',
+                key:'signature',
+                render:(record) => (
+                    <Upload
+                        beforeUpload={this.beforeUploadPic.bind(this, record)}
+                    >
+                        <a>{record.signature ? record.signature.name : '点击上传'}</a>
+                    </Upload>
+                )
+            },{
+                title:'操作',
+                dataIndex:'edit',
+                render:(text,record,index) => (
+                    <Popconfirm
+                        placement="leftTop"
+                        title="确定删除吗？"
+                        onConfirm={this.delete.bind(this, record.index - 1)}
+                        okText="确认"
+                        cancelText="取消"
+                    >
+                        <a>删除</a>
+                    </Popconfirm>
+                )
         }]
         return (
             <Modal
@@ -251,10 +251,10 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
-        if(this.state.subErr === false) {
-            message.error('部门不存在，无法提交');
-            return;
-        }
+        // if(this.state.subErr === false) {
+        //     message.error('部门不存在，无法提交');
+        //     return;
+        // }
         if(this.state.flag_code === false) {
             message.error('您有重复的人员编码');
             return;
@@ -267,34 +267,43 @@ export default class ToggleModal extends Component{
         ModalVisible(false);
     }
 
-    // tableDataChange(index ,e ){
-    //     const { dataSource } = this.state;
-    //     dataSource[index]['depart'] = {
-    //         name: '',
-    //         code: e.target.value,
-    //         type: ''
-    //     }
-    //     this.setState({dataSource});
-    // }
-    // //校验部门
-    // fixOrg(index){
-    //     const {actions: {getOrgReverse}} = this.props;
-    //     let {dataSource} = this.state
-    //     console.log('dataSource',dataSource)
-    //     getOrgReverse({code:dataSource[index].depart}).then(rst => {
-    //         console.log('rst',rst)
-    //         if(rst.code){
-    //             dataSource[index]['construct_unit'] = {
-    //                 name: rst.name,
-    //                 code: rst.code,
-    //                 type: rst.obj_type
-    //             }
-    //             this.setState({dataSource})
-    //         }else{
-    //             message.info("输错了")
-    //         }
-    //     })
-    // }
+    tableDataChange(index ,e ){
+        const {actions: {getOrgReverse}} = this.props;
+        const { dataSource } = this.state;
+        dataSource[index].depart = e.target.value;
+        // console.log('e',e.target.value)
+        // console.log('dataSource',dataSource)
+        getOrgReverse({code:dataSource[index].depart}).then(rst => {
+            console.log('rst1111',rst)
+            if(rst.children.length !== 0) {
+                dataSource[index]['account'] = {
+                    org: rst.children[0].name
+                }
+            }else {
+                dataSource[index]['account'] = {
+                    org: ''
+                }
+            }
+            this.setState({dataSource});
+        })
+    }
+    //校验部门
+    fixOrg(index){
+        const {actions: {getOrgReverse}} = this.props;
+        let {dataSource} = this.state
+        // console.log('dataSource1111',dataSource)
+        getOrgReverse({code:dataSource[index].depart}).then(rst => {
+            // console.log('rst',rst)
+            if(rst.children.length !== 0){
+                dataSource[index]['account'] = {
+                    org: rst.children[0].name
+                }
+                this.setState({dataSource})
+            }else{
+                message.info("部门不存在")
+            }
+        })
+    }
     //删除
     delete(index){
         let dataSource = this.state.dataSource;
