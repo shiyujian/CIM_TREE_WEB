@@ -323,8 +323,8 @@ export default class SumPlan extends Component {
           return record.action === 'normal' ? (
             <div>
             {/* 编辑按钮 */}
-                <a onClick={this.change.bind(this,record.key-1)}>编辑</a>
-              &nbsp;&nbsp;&nbsp;
+                <a onClick={this.change.bind(this,record.key-1)}><Icon type = "edit"/></a>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <Popconfirm
                   placement="leftTop"
                   title="确定删除吗？"
@@ -332,7 +332,7 @@ export default class SumPlan extends Component {
                   okText="确认"
                   cancelText="取消"
                 >
-                  <a>删除</a>
+                  <a><Icon type="delete" /></a>
             </Popconfirm>
             </div>
             

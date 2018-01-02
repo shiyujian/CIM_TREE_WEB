@@ -59,7 +59,14 @@ export default class Addition extends Component {
             ),
 		}, {
 			title: '提交单位',
-			dataIndex: 'pubUnit'
+            render: (text, record, index) => {
+
+                if (record.pubUnit && record.pubUnit.name) {
+                    return record.pubUnit.name
+                } else {
+                    return (<Input style={{ color: 'red' }} value={record.pubUnit ? record.pubUnit.code : ''} onBlur={this.fixOrg.bind(this, record.index - 1)} onChange={this.tableDataChange1.bind(this, record.index - 1)} />)
+                }
+            },
 		}, {
 			title: '文档类型',
 			render: (text, record, index) => (
@@ -88,7 +95,7 @@ export default class Addition extends Component {
         }, {
             title:'附件',
 			render:(text,record,index) => {
-				if(record.file.id){
+				if(record.file&&record.file.id){
                     return (<span>
                             <a onClick={this.handlePreview.bind(this,record.index-1)}>预览</a>
                             <span className="ant-divider" />
@@ -135,14 +142,16 @@ export default class Addition extends Component {
 			headers: {
 			},
 			showUploadList: false,
-		    onChange(info) {
+		    onChange: async (info)=>{
 		        if (info.file.status !== 'uploading') {
 		            console.log(info.file, info.fileList);
 		        }
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
                     console.log(importData);
-                    changeAdditionField('dataSource',jthis.handleExcelData(importData))
+                    let abc = await jthis.handleExcelData(importData)
+                    console.log('111111111',abc)
+                    changeAdditionField('dataSource', abc)
 		            message.success(`${info.file.name} file uploaded successfully`);
 		        } else if (info.file.status === 'error') {
 		            message.error(`${info.file.name}解析失败，请检查输入`);
@@ -201,6 +210,34 @@ export default class Addition extends Component {
 			</Modal>
 		);
 	}
+    tableDataChange1(index, e) {
+        const {addition, actions: { getOrg,changeAdditionField } } = this.props;
+        let {dataSource} = addition;
+        dataSource[index]['pubUnit'] = {
+            name: '',
+            code: e.target.value,
+            type: ''
+        }
+        changeAdditionField('dataSource',dataSource)
+    }
+    //校验组织机构
+    fixOrg(index) {
+        const {addition, actions: { getOrg,changeAdditionField } } = this.props;
+        let {dataSource} = addition;
+        console.log('qqqq', dataSource[index].pubUnit)
+        getOrg({ code: dataSource[index].pubUnit.code }).then(rst => {
+            if (rst.code) {
+                dataSource[index]['pubUnit'] = {
+                    name: rst.name,
+                    code: rst.code,
+                    type: rst.obj_type
+                }
+                changeAdditionField('dataSource',dataSource)
+            } else {
+                message.info("提交单位错误,请重新输入")
+            }
+        })
+    }
     beforeUpload(info){
         if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
             return true;
@@ -386,6 +423,13 @@ export default class Addition extends Component {
             message.info(`有数据未上传附件`)
             return
         }
+        let temp1 = dataSource.some((o,index) => {
+            return !o.pubUnit.name
+        })
+        if(temp1){
+            message.info(`有数据未填写正确的提交单位`)
+            return
+        }
         const {project,unit} =  this.state;
         if(!project.name){
             message.info(`请选择项目和单位工程`);
@@ -448,14 +492,21 @@ export default class Addition extends Component {
 	}
 
     //处理上传excel的数据
-    handleExcelData(data){
+    async handleExcelData(data){
+        const { actions: { getOrg } } = this.props;
         data.splice(0,1);
-        let res = data.map((item,index) => {
+        let res = data.map(async (item,index) => {
+            let judge = await getOrg({ code: item[2] });
+            console.log('judge', judge)
             return {
                 code:item[0],
                 name:'',
                 stage:item[1],
-                pubUnit:item[2],
+                pubUnit: {
+                        code: judge.code ? judge.code : item[2],
+                        name: judge.name ? judge.name : "",
+                        type: judge.type ? judge.type : ""
+                    },
                 filetype:item[3],
                 major:item[4],
                 wbsObject:item[5],
@@ -464,7 +515,8 @@ export default class Addition extends Component {
                 upPeople:getUser().username,
             }
         })
-        return this.addindex(res)
+        let ret = this.addindex(await Promise.all(res));
+        return ret;
     }
 
 	cancel() {
