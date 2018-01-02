@@ -8,90 +8,90 @@ export default class Warning extends Component {
 
     componentDidMount() {
         const myChart = echarts.init(document.getElementById('resultCountBar1'));
-        var posList = [
-            'left', 'right', 'top', 'bottom',
-            'inside',
-            'insideTop', 'insideLeft', 'insideRight', 'insideBottom',
-            'insideTopLeft', 'insideTopRight', 'insideBottomLeft', 'insideBottomRight'
-        ];
+        // var posList = [
+        //     'left', 'right', 'top', 'bottom',
+        //     'inside',
+        //     'insideTop', 'insideLeft', 'insideRight', 'insideBottom',
+        //     'insideTopLeft', 'insideTopRight', 'insideBottomLeft', 'insideBottomRight'
+        // ];
         
-        let configParameters = {
-            rotate: {
-                min: -90,
-                max: 90
-            },
-            align: {
-                options: {
-                    left: 'left',
-                    center: 'center',
-                    right: 'right'
-                }
-            },
-            verticalAlign: {
-                options: {
-                    top: 'top',
-                    middle: 'middle',
-                    bottom: 'bottom'
-                }
-            },
-            position: {
-                options: echarts.util.reduce(posList, function (map, pos) {
-                    map[pos] = pos;
-                    return map;
-                }, {})
-            },
-            distance: {
-                min: 0,
-                max: 100
-            }
-        };
+        // let configParameters = {
+        //     rotate: {
+        //         min: -90,
+        //         max: 90
+        //     },
+        //     align: {
+        //         options: {
+        //             left: 'left',
+        //             center: 'center',
+        //             right: 'right'
+        //         }
+        //     },
+        //     verticalAlign: {
+        //         options: {
+        //             top: 'top',
+        //             middle: 'middle',
+        //             bottom: 'bottom'
+        //         }
+        //     },
+        //     position: {
+        //         options: echarts.util.reduce(posList, function (map, pos) {
+        //             map[pos] = pos;
+        //             return map;
+        //         }, {})
+        //     },
+        //     distance: {
+        //         min: 0,
+        //         max: 100
+        //     }
+        // };
         
-        let config = {
-            rotate: 90,
-            align: 'left',
-            verticalAlign: 'middle',
-            position: 'insideBottom',
-            distance: 15,
-            onChange: function () {
-                var labelOption = {
-                    normal: {
-                        rotate: app.config.rotate,
-                        align: app.config.align,
-                        verticalAlign: app.config.verticalAlign,
-                        position: app.config.position,
-                        distance: app.config.distance
-                    }
-                };
-                myChart.setOption({
-                    series: [{
-                        label: labelOption
-                    }, {
-                        label: labelOption
-                    }, {
-                        label: labelOption
-                    }, {
-                        label: labelOption
-                    }]
-                });
-            }
-        };
-        var labelOption = {
-            normal: {
-                show: true,
-                position: config.position,
-                distance: config.distance,
-                align: config.align,
-                verticalAlign: config.verticalAlign,
-                rotate: config.rotate,
-                formatter: '{c}  {name|{a}}',
-                fontSize: 16,
-                rich: {
-                    name: {
-                        textBorderColor: '#fff'
-                    }
-                }
-            }
-        };
+        // let config = {
+        //     rotate: 90,
+        //     align: 'left',
+        //     verticalAlign: 'middle',
+        //     position: 'insideBottom',
+        //     distance: 15,
+        //     onChange: function () {
+        //         var labelOption = {
+        //             normal: {
+        //                 rotate: app.config.rotate,
+        //                 align: app.config.align,
+        //                 verticalAlign: app.config.verticalAlign,
+        //                 position: app.config.position,
+        //                 distance: app.config.distance
+        //             }
+        //         };
+        //         myChart.setOption({
+        //             series: [{
+        //                 label: labelOption
+        //             }, {
+        //                 label: labelOption
+        //             }, {
+        //                 label: labelOption
+        //             }, {
+        //                 label: labelOption
+        //             }]
+        //         });
+        //     }
+        // };
+        // var labelOption = {
+        //     normal: {
+        //         show: true,
+        //         position: config.position,
+        //         distance: config.distance,
+        //         align: config.align,
+        //         verticalAlign: config.verticalAlign,
+        //         rotate: config.rotate,
+        //         formatter: '{c}  {name|{a}}',
+        //         fontSize: 16,
+        //         rich: {
+        //             name: {
+        //                 textBorderColor: '#fff'
+        //             }
+        //         }
+        //     }
+        // };
         const option = {
             title : {
                 text: '设计成果提交历史统计',
@@ -136,8 +136,7 @@ export default class Warning extends Component {
                 {
                     name: '按期交付',
                     type: 'bar',
-                    barGap: 0,
-                    barWidth:14,
+                    barWidth:'23%',
                     itemStyle:{
                         normal:{
                             show:true,
@@ -150,7 +149,7 @@ export default class Warning extends Component {
                 {
                     name: '提前交付',
                     type: 'bar',
-                    barWidth:14,
+                    barWidth:'23%',
                     itemStyle:{
                         normal:{
                             show:true,
@@ -163,7 +162,7 @@ export default class Warning extends Component {
                 {
                     name: '逾期交付',
                     type: 'bar',
-                    barWidth:14,
+                    barWidth:'23%',
                     itemStyle:{
                         normal:{
                             show:true,
