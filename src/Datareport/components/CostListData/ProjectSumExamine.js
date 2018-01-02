@@ -143,7 +143,7 @@ export default class ProjectSumExamine extends Component {
 
                 extra_params: {
                     code: item.code,
-                    subproject: item.project.name,//项目/子项目
+                    subproject: item.subproject.name,//项目/子项目
                     unit: item.unit.name,//单位工程
                     projectcoding: item.projectcoding,//项目编号
                     projectname: item.projectname,//项目名称
@@ -207,17 +207,18 @@ export default class ProjectSumExamine extends Component {
         this.props.closeModal("cost_pro_ck_visible", false)
     }
     render() {
+        console.log('this.state.data',this.state.dataSource);
         const columns = [
             {
                 title: '序号',
-                dataIndex: 'code',
+                dataIndex: 'key',
             }, {
                 title: '项目/子项目',
                 dataIndex: 'subproject',
                 width: '10%',
                 render: (text, record, index) => (
                     <span>
-                        {record.project.name}
+                        {record.subproject.name}
                     </span>
                 ),
             }, {

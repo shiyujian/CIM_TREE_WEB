@@ -83,6 +83,8 @@ export default class ExpurgateCheck extends Component {
        
 
         let rst = await delDocList({}, { code_list: docCode });
+        //删除旧附件 todo
+
         if (rst.result) {
             notification.success({
                 message: '删除文档成功！',
@@ -104,13 +106,11 @@ export default class ExpurgateCheck extends Component {
     onChange(e) {
         this.setState({ option: e.target.value })
     }
-    render() {
+    render() {  
         const columns = [{
             title: '序号',
             dataIndex: 'index',
-            render: (text, record, index) => {
-                return index + 1
-            }
+           
         }, {
             title: '模型编码',
             dataIndex: 'coding'
@@ -166,7 +166,10 @@ export default class ExpurgateCheck extends Component {
                 <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
-                    bordered />
+                    bordered 
+                    rowKey='index'
+                    />
+
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>

@@ -211,6 +211,8 @@ export default class SumSpeedChange extends Component {
             key:'Remarks',
             },{
                 title: "编辑",
+                dataIndex: "edit",
+                width:"5%",
                 render: (text, record, index) => {
                   return (
                     <Popconfirm

@@ -296,6 +296,7 @@ export default class SumSpeed extends Component {
       {
         title: "序号",
         dataIndex: "key",
+        width:"5%",
         render: (text, record, index) => {
           return index + 1;
         }

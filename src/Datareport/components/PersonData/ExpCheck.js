@@ -137,8 +137,14 @@ export default class ExpCheck extends Component {
             key: 'Email'
         }, {
             title: '二维码',
-            dataIndex: 'account.person_signature_url',
-            key: 'Signature'
+            // dataIndex: 'account.person_signature_url',
+            // key: 'Signature'
+            render:(record) => {
+                console.log("record:",record);
+                return (
+                    <img style={{width:"60px"}} src = {record.account.relative_avatar_url} />
+                )
+            }
         }]
         return (
             <Modal

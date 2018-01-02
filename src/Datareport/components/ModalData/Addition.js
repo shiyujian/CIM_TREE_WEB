@@ -64,48 +64,6 @@ export default class Addition extends Component {
             return false;
         }
     }
-    uplodachange = (info) => {
-        //info.file.status/response
-        if (info && info.file && info.file.status === 'done') {
-            notification.success({
-                message: '上传成功！',
-                duration: 2
-            });
-            let name = Object.keys(info.file.response);
-            let dataList = info.file.response[name[0]];
-            let dataSource = [];
-            for (let i = 1; i < dataList.length; i++) {
-               
-                dataSource.push({
-                    coding: dataList[i][1] ? dataList[i][1] : '',
-                    modelName: dataList[i][2] ? dataList[i][2] : '',
-                    submittingUnit: dataList[i][3] ? dataList[i][3] : '',
-                    modelDescription: dataList[i][4] ? dataList[i][4] : '',
-                    modeType: dataList[i][5] ? dataList[i][5] : '',
-                    tdbxMode: dataList[i][7] ? dataList[i][7] : '',
-                    attributeTable: dataList[i][8] ? dataList[i][8] : '',
-                    reportingTime: moment().format("l"),
-                    reportingName: dataList[i][10] ? dataList[i][10] : '',
-
-                    project: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                    unit: {
-                        code: "",
-                        name: "",
-                        obj_type: ""
-                    },
-                    ftbfile: '',
-                    tdbxfile: '',
-                    attributefile: '',
-
-                })
-            }
-            this.setState({ dataSource });
-        }
-    }
 
     //下拉框选择人
     selectChecker(value) {
@@ -120,11 +78,13 @@ export default class Addition extends Component {
             let temp1 = JSON.parse(value[0]);
             let temp2 = JSON.parse(value[1]);
             project = {
+                pk: temp1.name,
                 name: temp1.name,
                 code: temp1.code,
                 obj_type: temp1.obj_type
             }
             unit = {
+                pk: temp2.pk,
                 name: temp2.name,
                 code: temp2.code,
                 obj_type: temp2.obj_type
@@ -163,9 +123,32 @@ export default class Addition extends Component {
             }
         });
     }
-
+    //提交
     onok() {
-        
+        let fdb = this.state.dataSource.some((o, index) => {
+            return !o.fdbfile.id
+        })
+        if (fdb) {
+            message.info(`有fdb模型未上传附件`)
+            return
+        }
+
+        let tdb = this.state.dataSource.some((o, index) => {
+            return !o.tdbxfile.id
+        })
+        if (tdb) {
+            message.info(`有tdbx模型未上传附件`)
+            return
+        }
+
+        let attr = this.state.dataSource.some((o, index) => {
+            return !o.attributefile.id
+        })
+        if (attr) {
+            message.info(`有属性表未上传附件`)
+            return
+        }
+
         if (!this.state.check) {
             message.info("请选择审核人")
             return
@@ -174,13 +157,8 @@ export default class Addition extends Component {
             message.info("请上传excel")
             return
         }
-        // let temp = this.state.dataSource.some((o,index) => {
-        //                 return !o.file.id
-        //             })
-        // if(temp){
-        //     message.info(`有数据未上传附件`)
-        //     return
-        // }
+
+
         const { project, unit } = this.state;
         if (!project.name) {
             message.info(`请选择项目和单位工程`);
@@ -203,7 +181,7 @@ export default class Addition extends Component {
     }
     //批量上传回调
     setData(data, participants) {
-        
+
         const { actions: { createWorkflow, logWorkflowEvent, clearAdditionField } } = this.props
         let creator = {
             id: getUser().id,
@@ -243,6 +221,73 @@ export default class Addition extends Component {
                 })
         })
     }
+
+
+    uploadchange = (info) => {
+        const { actions: { getOrg, getTreeRootNode } } = this.props;
+        const { unit } = this.state;
+
+        if (info && info.file && info.file.status === 'done') {
+            notification.success({
+                message: '上传成功！',
+                duration: 2
+            });
+            let name = Object.keys(info.file.response);
+            let dataList = info.file.response[name[0]];
+            let dataSource = [];
+            for (let i = 1; i < dataList.length; i++) {
+                console.log('this:', dataList[i][3])
+                let judge = getOrg({ code: dataList[i][3] });
+                console.log('judge', judge)
+                // if(!judge.code){
+                //     message.info("您的第"+ i +"条提交单位名称输入有误，请重新确认");
+                //     return;
+                // }
+
+                let wbs = getTreeRootNode({ code: dataList[i][1] });
+                console.log('wbs', dataList[i][1])
+
+
+                dataSource.push({
+                    index: dataList[i][0] ? dataList[i][0] : '',
+                    coding: dataList[i][1] ? dataList[i][1] : '',
+                    modelName: dataList[i][2] ? dataList[i][2] : '',
+                    submittingUnit: {
+                        code: judge.code ? judge.code : dataList[i][3],
+                        name: judge.name ? judge.name : "",
+                        type: judge.type ? judge.type : ""
+                    },
+                    modelDescription: dataList[i][4] ? dataList[i][4] : '',
+                    modeType: dataList[i][5] ? dataList[i][5] : '',
+
+
+                    reportingTime: moment().format("l"),
+                    reportingName: dataList[i][10] ? dataList[i][10] : '',
+
+                    project: {
+                        pk: '',
+                        code: "",
+                        name: "",
+                        obj_type: ""
+                    },
+                    unit: {
+                        pk: '',
+                        code: "",
+                        name: "",
+                        obj_type: ""
+                    },
+
+                    fdbfile: '',
+                    tdbxfile: '',
+                    attributefile: '',
+
+
+                })
+            }
+            this.setState({ dataSource });
+        }
+    }
+
     //删除
     delete(index) {
         let { dataSource } = this.state
@@ -262,25 +307,24 @@ export default class Addition extends Component {
         filed.mime_type = f.mime_type;
         openPreview(filed);
     }
-
+    //附件删除
     remove(index, name) {
-        console.log('index',index,'name',name)
+        console.log('index', index, 'name', name)
         const { actions: { deleteStaticFile } } = this.props
         let { dataSource } = this.state
-        console.log('data',this.state)
+        console.log('data', this.state)
         let id = dataSource[index][name].id
         deleteStaticFile({ id: id })
-       
+
         dataSource[index][name] = {}
         this.setState(dataSource)
 
     }
 
-    covertURLRelative = (originUrl) => {
-        return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-    }
+
+    //附件上传
     beforeUploadPicFile = (index, name, file) => {
-         // 上传到静态服务器
+        // 上传到静态服务器
         const fileName = file.name;
         let { dataSource, unit, project } = this.state;
         let temp = fileName.split(".")[0]
@@ -316,10 +360,15 @@ export default class Addition extends Component {
                 download_url: filedata.download_url,
                 mime_type: resp.mime_type
             };
+
             dataSource[index][name] = attachment;
+
             this.setState({ dataSource });
         });
         return false;
+    }
+    covertURLRelative = (originUrl) => {
+        return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
 
     //下拉框选择
@@ -329,21 +378,50 @@ export default class Addition extends Component {
         // console.log('value', value)
         this.setState({ dataSource });
     }
+    //取消
     cancel() {
         const {
 			actions: { clearAdditionField }
 		} = this.props;
         clearAdditionField();
     }
+
+    //校验单位工程
+    fixOrg(index) {
+        const { actions: { getOrg } } = this.props;
+        let { dataSource } = this.state;
+        console.log('qqqq', dataSource[index].submittingUnit)
+        getOrg({ code: dataSource[index].submittingUnit.code }).then(rst => {
+            if (rst.code) {
+                dataSource[index]['submittingUnit'] = {
+                    name: rst.name,
+                    code: rst.code,
+                    type: rst.obj_type
+                }
+                this.setState({ dataSource });
+            } else {
+                message.info("提交单位错误,请重新输入")
+            }
+        })
+    }
+
+
+    tableDataChange1(index, e) {
+        const { dataSource } = this.state;
+        dataSource[index]['submittingUnit'] = {
+            name: '',
+            code: e.target.value,
+            type: ''
+        }
+        this.setState({ dataSource });
+    }
     render() {
         const { addition = {}, actions: { changeAdditionField } } = this.props;
         const columns = [
             {
                 title: '序号',
-                dataIndex:'index',
-                render: (text, record, index) => {
-                    return index + 1
-                }
+                dataIndex: 'index',
+
             }, {
                 title: '模型编码',
                 dataIndex: 'coding'
@@ -352,7 +430,16 @@ export default class Addition extends Component {
                 dataIndex: 'modelName'
             }, {
                 title: '提交单位',
-                dataIndex: 'submittingUnit'
+                dataIndex: 'submittingUnit',
+                render: (text, record, index) => {
+
+                    if (record.submittingUnit && record.submittingUnit.name) {
+                        return record.submittingUnit.name
+                    } else {
+                        return (<Input style={{ color: 'red' }} value={record.submittingUnit ? record.submittingUnit.code : ''} onBlur={this.fixOrg.bind(this, record.index - 1)} onChange={this.tableDataChange1.bind(this, record.index - 1)} />)
+                    }
+                },
+
             }, {
                 title: '模型描述',
                 dataIndex: 'modelDescription'
@@ -360,7 +447,7 @@ export default class Addition extends Component {
                 title: '模型类型',
                 dataIndex: 'modeType',
                 render: (text, record, index) => (
-                    <Select style={{ width: '120px' }} onSelect={this.handleSelect.bind(this, index, 'modeType')} value={this.state.dataSource[index]['modeType']}>
+                    <Select style={{ width: '120px' }} onSelect={this.handleSelect.bind(this, record.index - 1, 'modeType')} value={record.modeType}>
                         <Option value="设计模型">设计模型</Option>
                         <Option value="施工模型">施工模型</Option>
                         <Option value="竣工模型">竣工模型</Option>
@@ -372,12 +459,12 @@ export default class Addition extends Component {
                 render: (text, record, index) => {
                     if (record.fdbfile && record.fdbfile.id) {
                         return (<span>
-                            <a onClick={this.handlePreview.bind(this, index, 'fdbfile')}>预览</a>
+                            <a onClick={this.handlePreview.bind(this, record.index - 1, 'fdbfile')}>预览</a>
                             <span className="ant-divider" />
                             <Popconfirm
                                 placement="leftTop"
                                 title="确定删除吗？"
-                                onConfirm={this.remove.bind(this, index, 'fdbfile')}
+                                onConfirm={this.remove.bind(this, record.index - 1, 'fdbfile')}
                                 okText="确认"
                                 cancelText="取消">
                                 <a>删除</a>
@@ -386,7 +473,7 @@ export default class Addition extends Component {
                     } else {
                         return (
                             <span>
-                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index, 'fdbfile')}>
+                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record.index - 1, 'fdbfile')}>
                                     <Button>
                                         <Icon type="upload" />上传附件
 	                            </Button>
@@ -401,12 +488,12 @@ export default class Addition extends Component {
                 render: (text, record, index) => {
                     if (record.tdbxfile && record.tdbxfile.id) {
                         return (<span>
-                            <a onClick={this.handlePreview.bind(this, index, 'tdbxfile')}>预览</a>
+                            <a onClick={this.handlePreview.bind(this, record.index - 1, 'tdbxfile')}>预览</a>
                             <span className="ant-divider" />
                             <Popconfirm
                                 placement="leftTop"
                                 title="确定删除吗？"
-                                onConfirm={this.remove.bind(this, index, 'tdbxfile')}
+                                onConfirm={this.remove.bind(this, record.index - 1, 'tdbxfile')}
                                 okText="确认"
                                 cancelText="取消">
                                 <a>删除</a>
@@ -415,7 +502,7 @@ export default class Addition extends Component {
                     } else {
                         return (
                             <span>
-                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index, 'tdbxfile')}>
+                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record.index - 1, 'tdbxfile')}>
                                     <Button>
                                         <Icon type="upload" />上传附件
 	                            </Button>
@@ -430,12 +517,12 @@ export default class Addition extends Component {
                 render: (text, record, index) => {
                     if (record.attributefile && record.attributefile.id) {
                         return (<span>
-                            <a onClick={this.handlePreview.bind(this, index, 'attributefile')}>预览</a>
+                            <a onClick={this.handlePreview.bind(this, record.index - 1, 'attributefile')}>预览</a>
                             <span className="ant-divider" />
                             <Popconfirm
                                 placement="leftTop"
                                 title="确定删除吗？"
-                                onConfirm={this.remove.bind(this, index, 'attributefile')}
+                                onConfirm={this.remove.bind(this, record.index - 1, 'attributefile')}
                                 okText="确认"
                                 cancelText="取消">
                                 <a>删除</a>
@@ -444,7 +531,7 @@ export default class Addition extends Component {
                     } else {
                         return (
                             <span>
-                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, index, 'attributefile')}>
+                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, record.index - 1, 'attributefile')}>
                                     <Button>
                                         <Icon type="upload" />上传附件
 	                            </Button>
@@ -466,7 +553,7 @@ export default class Addition extends Component {
                         <Popconfirm
                             placement="leftTop"
                             title="确定删除吗？"
-                            onConfirm={this.delete.bind(this, index)}
+                            onConfirm={this.delete.bind(this, record.index - 1)}
                             okText="确认"
                             cancelText="取消">
                             <a>删除</a>
@@ -490,13 +577,13 @@ export default class Addition extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    pagination={{ pageSize: 10 }}
+                    rowKey='index'
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
-                    <Col><Button style={{ margin: '10px 10px 10px 0px' }}>模板下载</Button></Col>
+                    {/* <Col><Button style={{ margin: '10px 10px 10px 0px' }}>模板下载</Button></Col> */}
                     <Col>
                         <Upload
-                            onChange={this.uplodachange.bind(this)}
+                            onChange={this.uploadchange.bind(this)}
                             name='file'
                             showUploadList={false}
                             action={`${SERVICE_API}/excel/upload-api/`}

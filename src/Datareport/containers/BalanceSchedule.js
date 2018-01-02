@@ -50,6 +50,7 @@ export default class BalanceSchedule extends Component {
       {
         title: "序号",
         dataIndex: "key",
+        width:"5%"
       },
       {
         title: "项目/子项目",

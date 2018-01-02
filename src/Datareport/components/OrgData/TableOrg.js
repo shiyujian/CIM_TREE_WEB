@@ -59,12 +59,16 @@ export default class TableOrg extends Component {
 			return;
 		}
 		this.state.dataSource.map(item => {
-			if (item.name.indexOf(value) != -1 || item.code.indexOf(value) != -1 || item.extra_params.org_type.indexOf(value) != -1 || item.extra_params.canjian != -1 || item.extra_params.direct !== -1){
+			console.log("item:",item);
+			if (item.name.indexOf(value) != -1 
+				|| item.code.indexOf(value) != -1 
+				// || (typeof(item.extra_params.org_type) !== undefined && item.extra_params.org_type.indexOf(value) != -1)
+			){
 				searchData.push(item);
 			}
 			if (item.children && item.children.length > 0) {
 				item.children.map(it => {
-					if (it.name.indexOf(value) != -1) {
+					if (it.name.indexOf(value) != -1 || it.code.indexOf(value) != -1) {
 						searchData.push(it);
 					}
 				})
