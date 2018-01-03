@@ -147,8 +147,7 @@ export default class WorkunitCost extends Component {
 			let rows =[];
 			rows.push(['项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','单价','备注']);
 			dataSourceSelected.map(o =>{
-				rows.push([
-					
+				rows.push([		
 					o.subproject,
 					o.unit,
 					o.projectcoding,

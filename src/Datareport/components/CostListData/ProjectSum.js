@@ -145,8 +145,6 @@ export default class ProjectSum extends Component {
             //     };
             //     return item;
             // });
-
-            debugger;
             if(dataSource.some(item => {
                 return !item.flag
             })) {
@@ -156,12 +154,6 @@ export default class ProjectSum extends Component {
             if(usedMark) {
                 message.warn("清单项目已经被使用")
             }
-            // if(dataSource.some(item => {
-            //     if(item.flag === false){
-            //         message.warn("清单项目编号错误")
-            //     }
-            //     return item.flag
-            // }))
             dataSource = this.checkCodeRepeat(dataSource);
             this.setState({dataSource}); 
             
@@ -169,7 +161,6 @@ export default class ProjectSum extends Component {
 
     }
     checkCodeRepeat(dataSource) {
-        console.log('dataSource',dataSource)
         let codearr = dataSource.map(data => data.projectcoding);
         let repeatFlag = false;
         for(var i = 0, l = codearr.length; i < l; ++i) {
@@ -263,9 +254,7 @@ export default class ProjectSum extends Component {
         if (!project.name) {
             message.info(`请选择项目和单位工程`);
             return;
-        }
-
-        
+        }      
         let { check } = this.state
         let per = {
             id: check.id,
@@ -452,12 +441,7 @@ export default class ProjectSum extends Component {
                 render: (text, record, index) => {
                     console.log('record.flag',record.flag)
                     if(record.flag === false){
-                        
-                        return  (
-                            
-                                <span style={{color:'red'}}>{record.projectcoding}</span>
-                         
-                        )
+                        return (<span style={{color:'red'}}>{record.projectcoding}</span>)    
                     }else{
                         return <span style={{color:'green'}}>{record.projectcoding}</span>
                     }
@@ -494,8 +478,7 @@ export default class ProjectSum extends Component {
                 }
             }, 
             {
-                title: "操作",
-               
+                title: "操作", 
                 render: (text, record, index) => {
                     return record.action === 'normal' ? (
                       <div>
