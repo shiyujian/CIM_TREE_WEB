@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import './Footer.less';
 import copyright from './copyright.png';
+import {loadFooterYear,loadFooterCompany} from 'APP/api';
+
 export default class Footer extends Component {
 	render() {
 		const {match: {params: {module = ''} = {}} = {}} = this.props;
@@ -10,10 +12,10 @@ export default class Footer extends Component {
 		}
 		return (
 			<footer className="footer">
-				<span>&copy;2017</span>
+				<span>&copy;{loadFooterYear}</span>
 				<span>
 					<a>
-						中国雄安建设投资集团有限公司
+						{loadFooterCompany}
 						{/* <img src={copyright}/> */}
 					</a>
 				</span>
