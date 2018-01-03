@@ -149,6 +149,7 @@ export default class PriceRmModal extends Component {
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
+                    rowKey={record => record.key}
                 />
                 <Row >
                     {

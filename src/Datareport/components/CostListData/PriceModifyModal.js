@@ -209,6 +209,7 @@ export default class PriceModifyModal extends Component {
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{ pageSize: 10 }}
+                    rowKey={record => record.key}
                 />
                 <Row >
                     {

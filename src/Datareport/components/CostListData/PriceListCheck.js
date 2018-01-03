@@ -300,6 +300,7 @@ export default class PriceListCheck extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered 
+                    rowKey={record => record.key}
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                     />
                 <Row >

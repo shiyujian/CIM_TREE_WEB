@@ -310,7 +310,7 @@ export default class CostListData extends Component {
 							dataSource={dataSource}
 							rowSelection={rowSelection}
 							pagination={{showQuickJumper:true,showSizeChanger:true,total:dataSource.length}} 
-							rowKey="key"
+							rowKey={record => record.key}
 							loading={{
 								tip: <Progress
 									style={{ width: 200 }}
