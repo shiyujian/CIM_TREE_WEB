@@ -54,7 +54,6 @@ export default class BanlancePlan extends Component {
 	}
 	 generateTableData(data) {
 		 let dataSour = [];
-		 console.log(data);
 		data.map((item,key) => {
 			let datas = {
 				key:key+1,
@@ -334,11 +333,11 @@ export default class BanlancePlan extends Component {
 						<Button className="btn" type="default" onClick={this.getExcel.bind(this)} >导出表格</Button>
 						<Search
 							className="btn"
-							style={{ width: "200px" }}
-							placeholder="请输入搜索条件"
+							style={{ width: "260px" }}
+							placeholder="请输入单位工程或工作节点目标"
 							onSearch={ text => {
 								let result = this.state.dataSource.filter(data => {
-									return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.nodetarget.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0;
+									return data.subproject.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.nodetarget.indexOf(text) >= 0 ;
 								})
 								if( text === ''){
 									result = this.state.dataSource

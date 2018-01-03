@@ -260,10 +260,8 @@ export default class Addition extends Component {
                 } else {
                     return;
                 }
-
-
                 dataSource.push({
-                    index: dataList[i][0] ? dataList[i][0] : '',
+                    index: i,
                     coding: dataList[i][1] ? dataList[i][1] : '',
                     modelName: dataList[i][2] ? dataList[i][2] : '',
                     submittingUnit: {
@@ -627,6 +625,7 @@ export default class Addition extends Component {
                         <span>
                             项目-单位工程：
                         <Cascader
+                                placeholder={'请选择项目-单位工程'}
                                 options={this.state.options}
                                 className='btn'
                                 loadData={this.loadData.bind(this)}

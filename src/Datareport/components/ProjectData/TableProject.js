@@ -255,18 +255,22 @@ export default class TableProject extends Component {
 		title: '附件',
 		key: 'oper',
 		render: (record) => (
-			<span>
-				附件
-			</span>
+			<a onClick  = {
+				()=>{
+					record.file && this.createLink(record.file.name,STATIC_DOWNLOAD_API+record.file.download_url);
+				}
+			}> {record.file?record.file.name:'暂无'}</a>
 		),
 		width:100
 	}, {
 		title: '项目图片',
 		key: 'pic',
 		render: (record) => (
-			<span>
-				图片
-					</span>
+			<a  onClick  = {
+				()=>{
+					record.pic && this.createLink(record.pic.name,STATIC_DOWNLOAD_API+record.pic.download_url);
+				}
+			}> {record.pic?record.pic.name:'暂无'}</a>
 		),
 		width:100
 	}]

@@ -104,16 +104,17 @@ export default class ProjectSumChange extends Component {
             }
             newdataSource.push(newDatas)
         })
+        // console.log('newdataSource',newdataSource)
       this.setState({dataSource:newdataSource})   
     }
     //输入
-    // tableDataChange(index, key ,e ){
-    //     const { dataSource } = this.state;
-    //     console.log(dataSource)
-	// 	dataSource[index][key] = e.target['value'];
-    //       this.setState({dataSource});
-    //       console.log('dataSource:',dataSource)
-    // }
+    tableDataChange(index, key ,e ){
+        const { dataSource } = this.state;
+        // console.log(dataSource)
+		dataSource[index][key] = e.target['value'];
+        this.setState({dataSource});
+        // console.log('dataSource:',dataSource)
+    }
 
     render() {
         const columns =[
@@ -146,79 +147,99 @@ export default class ProjectSumChange extends Component {
               key:'Projectcoding'
             }, {     
               title: "项目名称",
-              render: (record) => {
-                let checkVal = (value) => {
-                    record.projectname = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.projectname}
-                        checkVal={checkVal}
-                        value={record.projectname} />
-                )
-              },
-              key:"Projectname"
+              dataIndex: 'projectname',
+              render:(text,record,index)=>(
+                <Input value={this.state.dataSource[record.key-1]['projectname']} onChange={this.tableDataChange.bind(this,record.key-1,'projectname')}/>
+              )
+            //   render: (record) => {
+            //     let checkVal = (value) => {
+            //         record.projectname = value;
+            //         return value;
+            //     }
+            //     return (
+            //         <ECCB
+            //             initCheckedValue={record.projectname}
+            //             checkVal={checkVal}
+            //             value={record.projectname} />
+            //     )
+            //   },
+            //   key:"Projectname"
             },{
-              title: "计量单位",         
-              render: (record) => {
-                let checkVal = (value) => {
-                    record.company= value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.company}
-                        checkVal={checkVal}
-                        value={record.company} />
-                )
-              },
-              key:"Company"
+              title: "计量单位", 
+              dataIndex: 'company',  
+              render:(text,record,index)=>(
+                <Input value={this.state.dataSource[record.key-1]['company']} onChange={this.tableDataChange.bind(this,record.key-1,'company')}/>
+              )  
+            //   render: (record) => {
+            //     let checkVal = (value) => {
+            //         record.company= value;
+            //         return value;
+            //     }
+            //     return (
+            //         <ECCB
+            //             initCheckedValue={record.company}
+            //             checkVal={checkVal}
+            //             value={record.company} />
+            //     )
+            //   },
+            //   key:"Company"
             }, {        
               title: "数量",
-              render: (record) => {
-                let checkVal = (value) => {
-                    record.number = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.number}
-                        checkVal={checkVal}
-                        value={record.number} />
-                )
-              },
-              key:"Number"
+              dataIndex: 'number', 
+              render:(text,record,index)=>(
+                <Input value={this.state.dataSource[record.key-1]['number']} onChange={this.tableDataChange.bind(this,record.key-1,'number')}/>
+              ) 
+            //   render: (record) => {
+            //     let checkVal = (value) => {
+            //         record.number = value;
+            //         return value;
+            //     }
+            //     return (
+            //         <ECCB
+            //             initCheckedValue={record.number}
+            //             checkVal={checkVal}
+            //             value={record.number} />
+            //     )
+            //   },
+            //   key:"Number"
             },{
-                title: "单价",               
-                render: (record) => {
-                    let checkVal = (value) => {
-                        record.total = value;
-                        return value;
-                    }
-                    return (
-                        <ECCB
-                            initCheckedValue={record.total}
-                            checkVal={checkVal}
-                            value={record.total} />
-                    )
-                  },
-                  key:"Total"
+                title: "综合单价(元)",
+                dataIndex: 'total',
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[record.key-1]['total']} onChange={this.tableDataChange.bind(this,record.key-1,'total')}/>
+                )                 
+                // render: (record) => {
+                //     let checkVal = (value) => {
+                //         record.total = value;
+                //         return value;
+                //     }
+                //     return (
+                //         <ECCB
+                //             initCheckedValue={record.total}
+                //             checkVal={checkVal}
+                //             value={record.total} />
+                //     )
+                //   },
+                //   key:"Total"
               },{
               title: "备注",
-              render: (record) => {
-                let checkVal = (value) => {
-                    record.remarks = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.remarks}
-                        checkVal={checkVal}
-                        value={record.remarks} />
-                )
-              },
-              key:"Remarks"
+              dataIndex: 'remarks',
+              render:(text,record,index)=>(
+                <Input value={this.state.dataSource[record.key-1]['remarks']} onChange={this.tableDataChange.bind(this,record.key-1,'remarks')}/>
+              )  
+            //   render: (record) => {
+            //     let checkVal = (value) => {
+            //         record.remarks = value;
+            //         return value;
+            //     }
+            //     return (
+            //         <ECCB
+            //             initCheckedValue={record.remarks}
+            //             checkVal={checkVal}
+            //             value={record.remarks} />
+            //     )
+            //   },
+            //   key:"Remarks"
             },{
                 title: "操作",
                 render: (text, record, index) => {
