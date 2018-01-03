@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,DataReportTemplate_PersonInformation} from '_platform/api';
 const Search = Input.Search;
 export default class ToggleModal extends Component{
     constructor(props){
@@ -12,6 +12,7 @@ export default class ToggleModal extends Component{
             org: [],
             subErr: true,
             flag_code: true,
+            repeatCode:[],
         }
     }
     render(){
@@ -47,6 +48,7 @@ export default class ToggleModal extends Component{
                 // key: 'Code',
                 render:(text, record, index) => {
                     // console.log('record',record)
+                    // console.log("this.state.repeatCode:",this.state.repeatCode)
                     if(this.state.repeatCode.indexOf(record.code) != -1) {
                         return <span style={{color: 'red'}}>{record.code}</span>
                     }else {
@@ -81,7 +83,6 @@ export default class ToggleModal extends Component{
                 // dataIndex: 'account.org_code',
                 key: 'Depart',
                 render:(text, record, index) =>{
-                    console.log('1111',record)
                     if(record.org) {
                         return <Input
                             style={{width: '60px'}} 
@@ -175,11 +176,11 @@ export default class ToggleModal extends Component{
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
                 <div>
-                    <Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource = {this.state.dataSource}
                         bordered />
+                    <Button style={{ margin: '10px 10px 10px 0px' }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button>
                     <Upload {...props}>
                         <Button style={{ margin: '10px 10px 10px 0px' }}>
                             <Icon type="upload" />上传附件
@@ -243,6 +244,10 @@ export default class ToggleModal extends Component{
         let ok = this.state.dataSource.some(ele => {
             return !ele.signature;
         });
+        let temp = this.state.dataSource.some((o,index) => {
+            console.log('o',o)
+            return o.org === ''
+        });
         if(ok){
             message.error('有附件未上传');
             return;
@@ -251,10 +256,6 @@ export default class ToggleModal extends Component{
             message.error('审批人未选择');
             return;
         }
-        let temp = this.state.dataSource.some((o,index) => {
-            console.log('o',o)
-            return o.org === ''
-        })
         if(temp) {
             message.info('部门不存在，无法提交')
             return
@@ -273,6 +274,17 @@ export default class ToggleModal extends Component{
     cancel() {
         const { actions: { ModalVisible } } = this.props;
         ModalVisible(false);
+    }
+
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     tableDataChange(index ,e ){
@@ -311,13 +323,17 @@ export default class ToggleModal extends Component{
     }
     //删除
     delete(index){
+        console.log('index',index)
         let dataSource = this.state.dataSource;
         dataSource.splice(index,1);
-        this.setState({dataSource});
+        this.setState({flag_code:true, subErr:true})
+        this.delData(dataSource);
+        this.setState({dataSource})
     }
 
     //判断数据重复
     isRepeat(arr) {
+        console.log('arr',arr)
         var hash = {};
         let repeatCode = [];
         for(var i in arr) {
@@ -328,13 +344,60 @@ export default class ToggleModal extends Component{
         }
         return repeatCode;
     }
+    // 处理数据删除之后的校验
+    delData(data) {
+        console.log('data',data)
+        const {actions: {getOrgReverse}} = this.props;
+        // data.splice(0, 1);
+        let codes = [];
+        let promises = data.map(item => {
+            console.log('item',item)
+            codes.push(item.code)
+            return getOrgReverse({code: item.depart});
+        })
+        let repeatCode = this.isRepeat(codes);
+        if(repeatCode.length > 1) {
+            this.setState({flag_code: false})
+        }
+        this.setState({repeatCode})
+        let res, orgname = [];
+        Promise.all(promises).then(rst => {
+            rst.map(item => {
+                if(item.children.length === 0) {
+                    orgname.push('');
+                    this.setState({
+                        subErr: false
+                    })
+                }
+                else{
+                    orgname.push(item.children[0].name);
+                }
+            })
+            res = data.map((item, index) => {
+                return {
+                    index: index + 1,
+                    code: item.code,
+                    name: item.name,
+                    org: orgname[index],
+                    depart: item.depart,
+                    job: item.job,
+                    sex: item.sex,
+                    tel: item.tel,
+                    email: item.email,
+                }
+            })
+            this.setState({
+                dataSource:res
+            })
+        })
+    }
     //处理上传excel的数据
     handleExcelData(data) {
         const {actions: {getOrgReverse}} = this.props;
         data.splice(0, 1);
         let codes = [];
         let promises = data.map(item => {
-            codes.push(item[1])
+            codes.push(item[0])
             return getOrgReverse({code: item[2]});
         })
         let repeatCode = this.isRepeat(codes);

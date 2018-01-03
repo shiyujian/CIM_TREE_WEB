@@ -216,8 +216,8 @@ export default class PersonCheck extends Component {
         }];
 		return (
             <Modal
-			title="人员信息审批表"
-			key={Math.random()}
+			// title="人员信息审批表"
+			// key={Math.random()}
             visible={true}
             width= {1280}
             footer={null}
@@ -238,11 +238,6 @@ export default class PersonCheck extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
                         </Col>
                         <Col span={2} push={14}>
                             <Button type='primary' onClick={this.submit.bind(this)}>

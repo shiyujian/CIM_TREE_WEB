@@ -9,6 +9,7 @@ import {getUser} from '_platform/auth'
 import {getNextStates} from '_platform/components/Progress/util';
 import {actions as action2} from '../store/quality';
 import {WORKFLOW_CODE} from '_platform/api'
+import {message} from "antd";
 var moment = require('moment');
 
 @connect(
@@ -22,8 +23,6 @@ var moment = require('moment');
 )
 export default class PersonData extends Component {
 	setData(data,participants){
-		console.log("data:",data);
-		console.log("participants:",participants);
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -44,7 +43,6 @@ export default class PersonData extends Component {
 			status:"2"
 		}
 		createWorkflow({},postdata).then((rst) => {
-			console.log("rst",rst);
 			let nextStates =  getNextStates(rst,rst.current[0].id);
             logWorkflowEvent({pk:rst.id},
                 {
@@ -58,14 +56,17 @@ export default class PersonData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
 					attachment:null
+				}).then(rst => {
+					if (rst) {
+						message.success("流程发起成功");
+					}else {
+						message.error("流程发起失败")
+					}
 				});
 		});
 	}
 	// 删除流程
-	setDataDel(data,participants){
-		console.log("data:",data);
-		console.log("participants:",participants);
-		// return; 
+	setDataDel(data,participants,description){
 		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
 			id: getUser().id,
@@ -76,7 +77,7 @@ export default class PersonData extends Component {
 		let postdata = {
 			name: "人员信息批量删除",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "人员信息批量删除",
+			description: description,
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -91,7 +92,7 @@ export default class PersonData extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起人员信息删除',
+					note: description,
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -99,15 +100,18 @@ export default class PersonData extends Component {
 						state: nextStates[0].to_state[0].id,
 					}],
 					attachment: null
+				}).then(rst => {
+					if (rst) {
+						message.success("流程发起成功");
+					}else {
+						message.error("流程发起失败")
+					}
 				});
 		});
 	}
 
 	// 更新流程
-	setDataUpdate(data,participants){
-		console.log("data:",data);
-		console.log("participants:",participants);
-		// return; 
+	setDataUpdate(data,participants,description){
 		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
 			id: getUser().id,
@@ -118,7 +122,7 @@ export default class PersonData extends Component {
 		let postdata = {
 			name: "人员信息批量更改",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "人员信息批量更改",
+			description: description,
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -133,7 +137,7 @@ export default class PersonData extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起人员信息更改',
+					note: description,
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -141,6 +145,12 @@ export default class PersonData extends Component {
 						state: nextStates[0].to_state[0].id,
 					}],
 					attachment: null
+				}).then(rst => {
+					if (rst) {
+						message.success("流程发起成功");
+					}else {
+						message.error("流程发起失败")
+					}
 				});
 		});
 	}
