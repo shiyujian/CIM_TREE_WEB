@@ -288,7 +288,6 @@ export default class PriceListCheck extends Component {
         }]
 		return(
 			<Modal
-                title="计价清单信息上传表"
                 key="priceListCheck"
 				width = {1280}
 				visible = {true}
@@ -301,8 +300,17 @@ export default class PriceListCheck extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered 
+                    rowKey={record => record.key}
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                     />
+                <Row >
+                    {
+                        this.state.dataSource.length && 
+                        <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                            [共：{this.state.dataSource.length}行]
+                        </Col>
+                    }
+                </Row>
                     
                 <Row>
                     <Col span={2}>

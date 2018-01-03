@@ -40,7 +40,7 @@ export default class ModifyCheck extends Component {
         const { wk } = this.props
 
         let dataSources = JSON.parse(wk.subject[0].data)
-        console.log('dataSources', dataSources)
+      
         let dataSource = [];
         dataSources.map(item => {
             dataSource.push(item)
@@ -94,7 +94,7 @@ export default class ModifyCheck extends Component {
         } } = this.props;
        
         let unit = dataSource[0].unit;
-        console.log('data',unit)
+      
         
         let project = dataSource[0].project;
         let code = 'datareport_modaldatadoc';
@@ -133,7 +133,7 @@ export default class ModifyCheck extends Component {
         const docData = [];   //asure the code of every document only
         let all = [];
         dataSource.forEach((item, index) => {
-            console.log('item',item)
+         
             let newdata = {
                 name: item.fdbMode.name,
                 obj_type: "C_DOC",
@@ -182,7 +182,7 @@ export default class ModifyCheck extends Component {
         });
         Promise.all(all)
             .then(rst => {
-                console.log('rst',rst)
+               
                 message.success('修改文档成功！');
             })
 
@@ -307,11 +307,7 @@ export default class ModifyCheck extends Component {
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
-                        <Button type='primary'>
-                            导出表格
-                        </Button>
-                    </Col>
+                   
                     <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交

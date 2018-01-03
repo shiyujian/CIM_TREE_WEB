@@ -75,17 +75,17 @@ export default class PriceList extends Component {
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
-                let res = await verifyCode({code: dataList[i][1]});
+                let res = await verifyCode({code: dataList[i][0]});
                 dataList[i].flag = res !== 'object not found' ? true : false;
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
                     filename: dataList[i][0] ? dataList[i][0] : '',
-                    projectcoding: dataList[i][1] ? dataList[i][1] : '',
-                    valuation: dataList[i][2] ? dataList[i][2] : '',
-                    rate: dataList[i][3] ? dataList[i][3] : '',
-                    company: dataList[i][4] ? dataList[i][4] : '',
-                    total: dataList[i][5] ? dataList[i][5] : '',
-                    remarks: dataList[i][5] ? dataList[i][6] : '',
+                    projectcoding: dataList[i][0] ? dataList[i][0] : '',
+                    valuation: dataList[i][1] ? dataList[i][1] : '',
+                    rate: dataList[i][2] ? dataList[i][2] : '',
+                    company: dataList[i][3] ? dataList[i][3] : '',
+                    total: dataList[i][4] ? dataList[i][4] : '',
+                    remarks: dataList[i][5] ? dataList[i][5] : '',
                     flag: dataList[i].flag,
                     project:{
                         code:"",
@@ -98,10 +98,6 @@ export default class PriceList extends Component {
                         obj_type:"",
                         pk: ""
                     },
-                    file:{
-                        id: 'pricelist',
-                        name: 'priceList'
-                    },
                     key: i
                 })
                 // if(uniq(dataSource.map(item=>code)).length)
@@ -112,7 +108,6 @@ export default class PriceList extends Component {
                 message.warn("清单项目编码错误")
             }
             dataSource = this.checkCodeRepeat(dataSource);
-            debugger;
             this.setState({ dataSource, percent: 100, loading: false });
         }
     }
@@ -190,19 +185,16 @@ export default class PriceList extends Component {
     }
 	//ok
 	onok(){
+        if(!this.state.dataSource.length) {
+            message.info("数据不能为空");
+            return
+        }
         if(!this.state.check){
             message.info("请选择审核人")
             return
         }
         if(this.state.dataSource.length === 0){
             message.info("请上传excel")
-            return
-        }
-        let temp = this.state.dataSource.some((o,index) => {
-                        return !o.file.id
-                    })
-        if(temp){
-            message.info(`有数据未上传附件`)
             return
         }
         let flag = this.state.dataSource.some((o,index) => {
@@ -233,8 +225,8 @@ export default class PriceList extends Component {
     }
     //删除
     delete(index){
-        let {dataSource} = this.state
-        dataSource.splice(index,1)
+        let {dataSource} = this.state;
+        dataSource = dataSource.filter(item => item.key != index);
         this.setState({dataSource})
     }
 
@@ -457,7 +449,7 @@ export default class PriceList extends Component {
             },{
                 title:'工程内容/规格编号',
                 dataIndex:'rate',
-                width:"12%",
+                width:"30%",
                 render: (text, record, index) => {
                     let {dataSource} = this.state;
                     let editable = dataSource[record.key - 1].editable;
@@ -542,7 +534,7 @@ export default class PriceList extends Component {
                             <Popconfirm
                                 placement="leftTop"
                                 title="确定删除吗？"
-                                onConfirm={this.delete.bind(this, index)}
+                                onConfirm={this.delete.bind(this, record.key)}
                                 okText="确认"
                                 cancelText="取消">
                                 <a><Icon type = "delete"/></a>
@@ -555,19 +547,28 @@ export default class PriceList extends Component {
             }];
 		return (
 			<Modal
-			title="计价清单信息上传表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+                <div>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结果预览</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                 />
+                <Row >
+                    {
+                        this.state.dataSource.length && 
+                        <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                            [共：{this.state.dataSource.length}行]
+                        </Col>
+                    }
+                </Row>
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col><Button style={{ margin:'10px 10px 10px 0px' }}  onClick={() => this.createLink('downLoadTemplate', DataReportTemplate_ValuationList)}>模板下载</Button></Col>
                     <Col>
@@ -614,6 +615,7 @@ export default class PriceList extends Component {
                     <p style={{ paddingLeft: "25px" }}>3、日期必须带年月日，如2017年1月1日</p>
                     <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.</p>
                 </Row>
+                </div>
             </Modal>
         )
     }
