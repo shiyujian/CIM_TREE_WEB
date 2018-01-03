@@ -462,7 +462,7 @@ export default class ProjectSum extends Component {
                     return this.renderColumns(record.key-1,'number',text);
                 }
             },{
-                title: '单价',
+                title: '综合单价(元)',
                 dataIndex: 'total',
                 render:(text,record,index) =>{
                     return this.renderColumns(record.key-1,'total',text);
