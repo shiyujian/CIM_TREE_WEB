@@ -19,6 +19,7 @@ export default class PriceRmModal extends Component {
             concatunit:{},
             options:[],
             unit:{},
+            deleteInfoNew:''
 		};
     }
     componentDidMount(){
@@ -44,10 +45,19 @@ export default class PriceRmModal extends Component {
     }
 	//ok
 	onok(){
+        let {dataSource} = this.state;
         if(!this.state.check){
             message.info("请选择审核人")
             return
         }
+
+        if (!this.state.deleteInfoNew.length) {
+            message.info(`请填写删除原因`);
+            return;
+        }
+
+        dataSource[0].deleteInfoNew = this.state.deleteInfoNew.trim();
+
 		let {check} = this.state
         let per = {
             id:check.id,
@@ -56,13 +66,19 @@ export default class PriceRmModal extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.onok(this.state.dataSource,per)
+		this.props.onok(dataSource,per)
     }
     //删除
     delete(index){
         let {dataSource} = this.state
         dataSource.splice(index,1)
         this.setState({dataSource})
+    }
+
+    onChangeText(e) {
+        this.setState({
+            deleteInfoNew: e.target.value
+        });
     }
 
 	render() {
@@ -122,7 +138,6 @@ export default class PriceRmModal extends Component {
               }];
 		return (
 			<Modal
-			title="计价清单信息删除表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
@@ -135,6 +150,17 @@ export default class PriceRmModal extends Component {
                     bordered
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                 />
+                <Row >
+                    {
+                        !this.state.dataSource.length ? <p></p>
+                            :
+                            (
+                                <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                                    [共：{this.state.dataSource.length}行]
+								</Col>
+                            )
+                    }
+                </Row>
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col>
                         <span>
@@ -146,6 +172,15 @@ export default class PriceRmModal extends Component {
                             </Select>
                         </span> 
                     </Col>
+                </Row>
+                <Row style={{ marginBottom: 16 }}>
+                    <Input
+                        type="textarea"
+                        onChange={this.onChangeText.bind(this)}
+                        autosize={{ minRows: 5, maxRow: 6 }}
+                        placeholder="请填写删除原因"
+                        style={{ marginBottom: 40 }}
+                    />
                 </Row>
                 <Preview />
             </Modal>

@@ -555,7 +555,6 @@ export default class PriceList extends Component {
             }];
 		return (
 			<Modal
-			title="计价清单信息上传表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
@@ -568,6 +567,14 @@ export default class PriceList extends Component {
                     bordered
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                 />
+                <Row >
+                    {
+                        this.state.dataSource.length && 
+                        <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                            [共：{this.state.dataSource.length}行]
+                        </Col>
+                    }
+                </Row>
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col><Button style={{ margin:'10px 10px 10px 0px' }}  onClick={() => this.createLink('downLoadTemplate', DataReportTemplate_ValuationList)}>模板下载</Button></Col>
                     <Col>

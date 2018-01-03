@@ -321,6 +321,17 @@ export default class CostListData extends Component {
 							}}/>
 					</Col>
 				</Row>
+				<Row >
+                    {
+                        !this.state.dataSource.length ? <p></p>
+                            :
+                            (
+                                <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                                    [共：{this.state.dataSource.length}行]
+								</Col>
+                            )
+                    }
+                </Row>
 				{
 					this.state.addvisible &&
 					<PriceList {...this.props} oncancel={() => {this.setState({addvisible:false})}} onok={this.setData.bind(this)}/>

@@ -20,6 +20,7 @@ export default class PriceModifyModal extends Component {
             concatunit:{},
             options:[],
             unit:{},
+            changeInfo:''
 		};
     }
     componentDidMount(){
@@ -44,11 +45,18 @@ export default class PriceModifyModal extends Component {
     
 	//ok
 	onok(){
+        let {dataSource} = this.state;
         if(!this.state.check){
             message.info("请选择审核人")
             return
         }
-       
+
+        if (!this.state.changeInfo.length) {
+            message.info(`请填写变更原因`);
+            return;
+        }
+
+        dataSource[0].changeInfo = this.state.changeInfo.trim();
 		let {check} = this.state
         let per = {
             id:check.id,
@@ -57,9 +65,9 @@ export default class PriceModifyModal extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.onok(this.state.dataSource,per)
+		this.props.onok(dataSource,per)
     }
-    删除
+
     delete(index){
         let {dataSource} = this.state
         dataSource.splice(index,1)
@@ -73,6 +81,12 @@ export default class PriceModifyModal extends Component {
             dataSource[index][key] = value;
             record[key] = value;
         };
+    }
+
+    onChangeText(e) {
+        this.setState({
+            changeInfo: e.target.value
+        });
     }
 
 	render() {
@@ -169,7 +183,6 @@ export default class PriceModifyModal extends Component {
               }];
 		return (
 			<Modal
-			title="计价清单信息变更表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
@@ -182,6 +195,14 @@ export default class PriceModifyModal extends Component {
                     bordered
                     pagination={{ pageSize: 10 }}
                 />
+                <Row >
+                    {
+                        this.state.dataSource.length && 
+                        <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                            [共：{this.state.dataSource.length}行]
+                        </Col>
+                    }
+                </Row>
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col>
                         <span>
@@ -193,6 +214,15 @@ export default class PriceModifyModal extends Component {
                             </Select>
                         </span> 
                     </Col>
+                </Row>
+                <Row>
+                    <Input
+                        type="textarea"
+                        onChange={this.onChangeText.bind(this)}
+                        autosize={{ minRows: 5, maxRow: 6 }}
+                        placeholder="请填写变更原因"
+                        style={{ marginBottom: 40 }}
+                    />
                 </Row>
                 <Preview />
             </Modal>
