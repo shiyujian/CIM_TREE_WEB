@@ -79,7 +79,10 @@ export default class TableOrg extends Component {
 		if(this.state.selectData.length){
 			let newArr = [];
 			this.state.selectData.map(item => {
-				newArr.push(item);
+				let newItem  = {...item};
+				newItem.extra_params = {...newItem.extra_params};
+				newArr.push(newItem);
+
 			})
 			setUpdateOrg(newArr);
 			ModalVisibleUpdate(true)
