@@ -46,6 +46,11 @@ export default class PriceRmModal extends Component {
 	//ok
 	onok(){
         let {dataSource} = this.state;
+        if(!dataSource.length) {
+            message.info("数据不能为空")
+            return
+        }
+
         if(!this.state.check){
             message.info("请选择审核人")
             return
@@ -144,11 +149,14 @@ export default class PriceRmModal extends Component {
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+            <div>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结果预览</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
+                    rowKey={record => record.key}
                 />
                 <Row >
                     {
@@ -183,6 +191,7 @@ export default class PriceRmModal extends Component {
                     />
                 </Row>
                 <Preview />
+                </div>
             </Modal>
         )
     }

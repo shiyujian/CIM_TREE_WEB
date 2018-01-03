@@ -4,7 +4,7 @@ import {
     Input, Form, Spin, Upload, Icon, Button, Modal,
     Cascader, Select, Popconfirm, message, Table, Row, Col, notification
 } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, WORKFLOW_CODE } from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, WORKFLOW_CODE, DataReportTemplate_ModalInformation } from '_platform/api';
 import '../../containers/quality.less';
 import { getUser } from '_platform/auth';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -234,23 +234,20 @@ export default class Addition extends Component {
     uploadchange = async (info) => {
         const { actions: { getOrg, getTreeRootNode } } = this.props;
         const { unit } = this.state;
-
         if (info && info.file && info.file.status === 'done') {
-
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
-                console.log('this:', dataList[i][3])
                 let judge = await getOrg({ code: dataList[i][3] });
-                console.log('judge', judge)
+
                 // if(!judge.code){
                 //     message.info("您的第"+ i +"条提交单位名称输入有误，请重新确认");
                 //     return;
                 // }
 
                 let wbs = await getTreeRootNode({ code: dataList[i][1] });
-                console.log('wbs', wbs)
+
                 if (wbs && wbs.children[0] && wbs.children[0].children[0] && wbs.children[0].children[0].code) {
 
                     if (wbs.children[0].children[0].code !== unit.code) {
@@ -308,7 +305,10 @@ export default class Addition extends Component {
     //删除
     delete(index) {
         let { dataSource } = this.state
-        dataSource.splice(index, 1)
+        dataSource.splice(index, 1);
+        dataSource.map((item, index) => {
+            item.index = index + 1
+        })
         this.setState({ dataSource })
     }
 
@@ -332,7 +332,6 @@ export default class Addition extends Component {
         console.log('data', this.state)
         let id = dataSource[index][name].id
         deleteStaticFile({ id: id })
-
         dataSource[index][name] = {}
         this.setState(dataSource)
 
@@ -358,7 +357,6 @@ export default class Addition extends Component {
         //uploadStaticFile({}, formdata)
         fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
             resp = await resp.json()
-            console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
                 message.error('文件上传失败')
                 return;
@@ -392,7 +390,6 @@ export default class Addition extends Component {
     handleSelect(index, key, value) {
         const { dataSource } = this.state;
         dataSource[index][key] = value;
-        // console.log('value', value)
         this.setState({ dataSource });
     }
     //取消
@@ -432,6 +429,20 @@ export default class Addition extends Component {
         }
         this.setState({ dataSource });
     }
+
+
+
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     render() {
         const { addition = {}, actions: { changeAdditionField } } = this.props;
         const columns = [
@@ -573,7 +584,7 @@ export default class Addition extends Component {
                             onConfirm={this.delete.bind(this, record.index - 1)}
                             okText="确认"
                             cancelText="取消">
-                            <a>删除</a>
+                            <a><Icon type='delete' /></a>
                         </Popconfirm>
                     )
                 }
@@ -582,7 +593,6 @@ export default class Addition extends Component {
         // console.log('shu:', addition.visible)
         return (
             <Modal
-                title="模型信息上传表"
                 key={this.props.akey}
                 visible={addition.visible}
                 width={1280}
@@ -590,6 +600,7 @@ export default class Addition extends Component {
                 maskClosable={false}
                 onCancel={this.cancel.bind(this)}
             >
+                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果预览</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -598,6 +609,11 @@ export default class Addition extends Component {
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     {/* <Col><Button style={{ margin: '10px 10px 10px 0px' }}>模板下载</Button></Col> */}
+                    <Button
+                        type="default"
+                        style={{ margin: '10px 10px 10px 0px' }}
+                        onClick={this.createLink.bind(this, 'muban', `${DataReportTemplate_ModalInformation}`)}>模板下载
+                    </Button>
                     <Col>
                         <Upload
                             onChange={this.uploadchange.bind(this)}

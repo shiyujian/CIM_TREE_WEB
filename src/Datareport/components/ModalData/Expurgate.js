@@ -43,10 +43,10 @@ export default class Expurgate extends Component {
 		const { expurgate = {} } = props
 		if (expurgate.key !== this.state.key) {
 			let item = expurgate.selectedDatas
-			console.log('item',item)
+		
 			let dataSource = [];
 			item && item.forEach((single, index) => {
-				console.log('sin',single)
+			
 				let temp = {
 					code: single.code,
 				    index: index + 1,
@@ -68,7 +68,7 @@ export default class Expurgate extends Component {
 				dataSource.push(temp);
 			})
 			this.setState({ dataSource, key: expurgate.key })
-			console.log(expurgate, dataSource)
+		
 		}
 	}
 
@@ -98,6 +98,7 @@ export default class Expurgate extends Component {
 
 	setDeleteData = (data, participants) => {
 		const { actions: { createWorkflow, logWorkflowEvent, changeExpurgateField } } = this.props
+		const {description = ''} = this.state;
 		let creator = {
 			id: getUser().id,
 			username: getUser().username,
@@ -107,7 +108,7 @@ export default class Expurgate extends Component {
 		let postdata = {
 			name: "模型信息批量删除",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "模型信息批量删除",
+			description: description,
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -122,7 +123,7 @@ export default class Expurgate extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起删除',
+					note: description,
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -211,7 +212,7 @@ export default class Expurgate extends Component {
 						onConfirm={this.delete.bind(this, record.index-1)}
 						okText="确认"
 						cancelText="取消">
-						<a>删除</a>
+						  <a><Icon type='delete'/></a>
 					</Popconfirm>
 				)
 			}
@@ -219,12 +220,13 @@ export default class Expurgate extends Component {
 
 		return (
 			<Modal
-				title="模型信息删除表"
+				
 				width={1280}
 				visible={expurgate.visible}
 				onCancel={this.cancel.bind(this)}
 				onOk={this.onok.bind(this)}
 			>
+			 	<h1 style={{textAlign:'center',marginBottom:20}}>结果预览</h1>
 				<Row>
 					<Table
 						bordered
@@ -247,22 +249,41 @@ export default class Expurgate extends Component {
 						</span>
 					</Col>
 				</Row>
+
+				<Row style={{marginBottom: '20px'}}>
+					<Col span={2}>
+						<span>删除原因：</span>
+					</Col>
+			    </Row>
+			    <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea rows={2} onChange={this.description.bind(this)}/>
+				    </Col>
+			    </Row>
 				
 			</Modal>
 		)
 	}
 
+	
+	description(e) {
+		this.setState({description:e.target.value})
+	}
+
 	//删除
 	delete(index){
         let {dataSource} = this.state;
-        dataSource.splice(index,1);
+		dataSource.splice(index,1);
+		dataSource.map((item,index)=>{
+			item.index = index + 1
+		})
         this.setState({dataSource});
     }
 
 
 
 	onChange = (e) => {
-		console.log('radio checked', e.target.value);
+	
 		this.setState({
 			value: e.target.value,
 		});
