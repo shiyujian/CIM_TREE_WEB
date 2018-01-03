@@ -193,7 +193,7 @@ export default class BalanceSchedule extends Component {
         }
       ).then(() => {
         this.setState({ addvisible: false });
-        // message.info("发起成功")
+        message.success("发起成功")
       });
     });
   }
@@ -241,7 +241,7 @@ export default class BalanceSchedule extends Component {
         }
       ).then(() => {
         this.setState({ changevisible: false });
-        message.info("发起流程成功");
+        message.success("发起流程成功");
       });
     });
   }
@@ -288,7 +288,7 @@ export default class BalanceSchedule extends Component {
         }
       ).then(() => {
         this.setState({ deletevisible: false });
-        message.info("发起成功");
+        message.success("发起成功");
       });
     });
   };
@@ -459,12 +459,11 @@ export default class BalanceSchedule extends Component {
           </Button>
           <Search
             className="btn"
-            style={{ width: "200px" }}
-            placeholder="输入搜索条件"
+            style={{ width: "260px" }}
+            placeholder="请输入单位工程或工作节点目标"
             onSearch={ text => {
               let result = this.state.dataSource.filter(data => {
-                console.log(data)
-                return data.project.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.completiontime.indexOf(text) >= 0 || data.remarks.indexOf(text) >= 0 || data.nodetarget.indexOf(text) >= 0;
+                return data.project.indexOf(text) >= 0 || data.unit.indexOf(text) >= 0 || data.nodetarget.indexOf(text) >= 0;
               })
               if( text === ''){
                 result = this.state.dataSource

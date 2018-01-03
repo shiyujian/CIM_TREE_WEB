@@ -24,6 +24,7 @@ export default class PersonModify extends Component {
             selectPro:[],
             selectUnit:[],
             subErr: true,
+            description: '',
         }
     }
 
@@ -89,35 +90,36 @@ export default class PersonModify extends Component {
             }
 		}, {
 			title: '所属部门',
-			// dataIndex: 'account.org_code',
+			dataIndex: 'account.org_code',
 			key: 'Depart',
 			render:(text, record, index) =>{
-                    console.log('recorddepart',record)
-                    if(record.orgname) {
-                    	if(record.orgname.org !== '') {
-	                        return <Input
-	                            style={{width: '60px'}} 
-	                            value = {record.depart || ""}
-	                            onChange={this.tableDataChange.bind(this,index)}
-	                            onBlur={this.fixOrg.bind(this,index)}
-	                        />
-                    	}else {
-	                        return <Input
-	                            style={{width: '60px', color: 'red'}} 
-	                            value = {record.depart || ""}
-	                            onChange={this.tableDataChange.bind(this,index)}
-	                            onBlur={this.fixOrg.bind(this,index)}
-	                        />
-                    	}
-                    }else {
-                    	return <Input
+                console.log('recorddepart',record)
+                if(record.orgname) {
+                	record.account.org_code = record.depart
+                	if(record.orgname.org !== '') {
+                        return <Input
                             style={{width: '60px'}} 
                             value = {record.account.org_code || ""}
                             onChange={this.tableDataChange.bind(this,index)}
                             onBlur={this.fixOrg.bind(this,index)}
                         />
-                    }
+                	}else {
+                        return <Input
+                            style={{width: '60px', color: 'red'}} 
+                            value = {record.account.org_code || ""}
+                            onChange={this.tableDataChange.bind(this,index)}
+                            onBlur={this.fixOrg.bind(this,index)}
+                        />
+                	}
+                }else {
+                	return <Input
+                        style={{width: '60px'}} 
+                        value = {record.account.org_code || ""}
+                        onChange={this.tableDataChange.bind(this,index)}
+                        onBlur={this.fixOrg.bind(this,index)}
+                    />
                 }
+            }
 		}, {
 			title: '职务',
 			dataIndex: 'account.title',
@@ -176,11 +178,11 @@ export default class PersonModify extends Component {
 		return (
             <Modal
                 onCancel={this.cancel.bind(this)}
-                title="项目变更申请表"
                 visible={Modvisible}
                 width={1280}
                 footer={null}
                 maskClosable={false}>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
                 <Table
                     columns={columns}
                     bordered={true}
@@ -198,10 +200,24 @@ export default class PersonModify extends Component {
 
                 </span>
                 <Button onClick = {this.onok.bind(this)} type='primary' >
-                    提交
+                    确认变更
                 </Button>
+                <Row style={{marginBottom: '10px'}}>
+					<Col span={2}>
+						<span>变更原因：</span>
+					</Col>
+			    </Row>
+			    <Row style={{margin: '10px 0'}}>
+				    <Col>
+				    	<TextArea rows={2} onChange={this.description.bind(this)}/>
+				    </Col>
+			    </Row>
             </Modal>
         )
+	}
+
+	description(e) {
+		this.setState({description:e.target.value})
 	}
 
 	onChange = (e) => {
@@ -212,9 +228,17 @@ export default class PersonModify extends Component {
 	}
 
 	onok() {
-		console.log('passer', this.state.passer)
-		console.log('subErr', this.state.subErr)
         const { actions: { ModifyVisible } } = this.props;
+        let temp = this.state.dataSource.some((o,index) => {
+            console.log('o',o)
+            if(o.orgname) {
+            	return o.orgname.org === ''
+            }
+        });
+        if(temp) {
+            message.info('部门不存在，无法提交')
+            return
+        }
         if (!this.state.passer) {
             message.error('审批人未选择');
             return;
@@ -223,7 +247,7 @@ export default class PersonModify extends Component {
         // 	message.error('请输入正确的部门');
         //     return;
         // }
-        this.props.setDataUpdate(this.state.dataSource, this.state.passer);
+        this.props.setDataUpdate(this.state.dataSource, this.state.passer, this.state.description);
         ModifyVisible(false);
     }
 

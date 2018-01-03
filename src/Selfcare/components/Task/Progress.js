@@ -472,6 +472,7 @@ export default class Progress extends Component {
 	closeModal(key,value){
 		const {actions:{changeDatareportVisible}} = this.props
 		changeDatareportVisible({key,value});
+		window.location.reload();
 	}
 	async openModal(name,id){
 		const {actions:{changeDatareportVisible,getWorkflowById}} = this.props

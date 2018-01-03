@@ -240,7 +240,11 @@ export default class TableUnit extends Component {
 		title: '附件',
 		key: 'file',
 		render: (record) => (
-			<a> {record.file ? record.file.name : '暂无'}</a>
+			<a  onClick  = {
+				()=>{
+					record.file && this.createLink(record.file.name,STATIC_DOWNLOAD_API+record.file.download_url);
+				}
+			}> {record.file ? record.file.name : '暂无'}</a>
 		),
 		width:100
 	}]

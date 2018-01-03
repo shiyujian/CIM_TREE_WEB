@@ -52,7 +52,7 @@ export default class SumSpeedExamineDelete extends Component {
             await this.reject();
         }
         this.props.closeModal("cost_sum_delete_visible",false);
-        message.info("操作成功");
+        message.success("操作成功");
     }
 
     //通过
@@ -74,9 +74,7 @@ export default class SumSpeedExamineDelete extends Component {
         
         let deletecode = [];
         dataSource.map(item=>{
-            console.log('item:',item.code)
             deletecode.push(item.code)
-            console.log("deletecode:",deletecode)
         })
         
         let rst = await delDocList({},{code_list:deletecode.join(',')});

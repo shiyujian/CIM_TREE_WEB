@@ -69,16 +69,22 @@ export default class TableOrg extends Component {
 				})
 			}
 		})
-		console.log("searchdata:",searchData);
 		searchData.map((item, index) => {
 			item.index = index + 1;
 		})
-		this.setState({tempData:searchData}) 
+		this.setState({tempData:searchData}); 
 	}
 	update(){
 		const { actions: { ModalVisibleUpdate, setUpdateOrg } } = this.props;
 		if(this.state.selectData.length){
-			setUpdateOrg(this.state.selectData);
+			let newArr = [];
+			this.state.selectData.map(item => {
+				let newItem  = {...item};
+				newItem.extra_params = {...newItem.extra_params};
+				newArr.push(newItem);
+
+			});
+			setUpdateOrg(newArr);
 			ModalVisibleUpdate(true)
 		}else{
 			message.warning("请先选中要变更的数据");
@@ -158,7 +164,6 @@ export default class TableOrg extends Component {
 				})
 			}
 		})
-		console.log("dataSource:",dataSource);
 		dataSource.map((item, index) => {
 			item.index = index + 1
 		})
@@ -170,18 +175,14 @@ export default class TableOrg extends Component {
 	}
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
-			console.log("onChange",selectedRowKeys, selectedRows);
-			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
 		},
 		onSelect: (record, selected, selectedRows) => {
-			console.log("onSelect",record, selected, selectedRows);
 			this.setState({
 				selectData:selectedRows,
 				excelData:selectedRows
 			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
-			console.log("onSelectAll",selected, selectedRows, changeRows);
 			this.setState({
 				selectData:selectedRows,
 				excelData:selectedRows

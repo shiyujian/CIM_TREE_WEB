@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon,Spin,Progress} from 'antd';
 import style from './TableOrg.css'
 import DelPer from './PersonExpurgate';
-import {DataReportTemplate_PersonInformation, NODE_FILE_EXCHANGE_API} from '_platform/api';
+import {DataReportTemplate_PersonInformation, NODE_FILE_EXCHANGE_API, STATIC_DOWNLOAD_API} from '_platform/api';
 
 const Search = Input.Search;
 export default class TablePerson extends Component{
@@ -20,8 +20,8 @@ export default class TablePerson extends Component{
         return (
             <div>
                 <div>
-                    <Button style={{marginRight:"10px"}} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button>
-                    <Button className = {style.button} onClick = {this.send.bind(this)}>发送填报</Button>
+                    {/*<Button style={{marginRight:"10px"}} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button>*/}
+                    <Button style={{marginRight:"10px"}} onClick = {this.send.bind(this)}>发送填报</Button>
                     <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
                     <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button>
                     <Button className = {style.button} onClick={this.getExcel.bind(this)}>导出表格</Button>
@@ -60,7 +60,13 @@ export default class TablePerson extends Component{
 		const { actions: { ModifyVisible, setModifyPer } } = this.props;
 		if(this.state.selectData.length) {
 			console.log('selectData', this.state.selectData)
-			setModifyPer(this.state.selectData)
+			let dataList = [];
+			this.state.selectData.map(item => {
+				let newList = {...item}
+				newList.account = {...newList.account}
+				dataList.push(newList)
+			})
+			setModifyPer(dataList)
 			ModifyVisible(true);
 		} else {
 			message.warning("请先选中要变更的数据");
@@ -236,9 +242,9 @@ export default class TablePerson extends Component{
 		// dataIndex: 'account.person_signature_url',
 		// key: 'Signature',
 		render:(record) => {
-			// console.log('record',record)
+			console.log('record',record)
             return (
-                <img style={{width:"60px"}} src = {record.account.relative_avatar_url} />
+                <img style={{width:"60px"}}/>
             )
         }
 	}]

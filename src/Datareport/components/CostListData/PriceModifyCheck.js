@@ -98,11 +98,32 @@ export default class PriceModifyCheck extends Component {
     }
     //不通过
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        let res = await deleteWorkflow({pk:wk.id})
+        const { wk } = this.state;
+        const { actions: { logWorkflowEvent, } } = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null
+            }
+        );
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
         debugger;
-       }
+    }
     //radio变化
     onChange(e){
         console.log(e.target)
@@ -149,7 +170,6 @@ export default class PriceModifyCheck extends Component {
         }]
 		return(
 			<Modal
-                title="计价清单信息删除审批表"
                 key='priceModalCheck'
 				width = {1280}
 				visible = {true}
@@ -163,8 +183,17 @@ export default class PriceModifyCheck extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered 
+                    rowKey={record => record.key}
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                     />
+                <Row >
+                    {
+                        this.state.dataSource.length && 
+                        <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                            [共：{this.state.dataSource.length}行]
+                        </Col>
+                    }
+                </Row>
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>
@@ -188,7 +217,15 @@ export default class PriceModifyCheck extends Component {
                     </Col>
                 </Row>
                 {
-                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                    this.state.dataSource[0] && this.state.dataSource[0].changeInfo && <Row>
+                        <Col span={4}>
+                            申请变更原因:{this.state.dataSource[0].changeInfo}
+                            <br/>
+                        </Col>
+                    </Row>
+                }
+                {
+                this.state.wk && <WorkflowHistory wk={this.state.wk}/>
                 }
             </div>
 			</Modal>
