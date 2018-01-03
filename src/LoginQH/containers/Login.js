@@ -27,6 +27,7 @@ class Login extends Component {
 		this.state = {
 			isPwd: true,
 			loginState:true,
+			forgectState:false,
 			token:null,
 			QRUrl:'',
 			userMessage:null
@@ -140,6 +141,7 @@ class Login extends Component {
 			QRUrl,
 			token,
 			loginState,
+			forgectState,
 			userMessage
 		}=this.state
 		// const loginTitle = require('../../_layouts/logo.png');
@@ -203,7 +205,9 @@ class Login extends Component {
 										valuePropName: 'checked',
 										initialValue: false,
 									})(
-										<Checkbox onChange={this.loginRememberChange.bind(this)}>记住密码</Checkbox>	
+										<div>
+										<Checkbox onChange={this.loginRememberChange.bind(this)}>记住密码</Checkbox>
+										</div>	
 									)}
 								</FormItem>
 								<Button type="primary" htmlType="submit"
@@ -233,11 +237,11 @@ class Login extends Component {
 	}
 
 	loginChange(e){
-		console.log(e.target.value)
 		const {actions: {getToken}} = this.props;
 		if(e.target.value === 'account'){
 			this.setState({
 				loginState:true,
+				// forgectState:false,
 				QRUrl:'',
 				token:null,
 				userMessage:null
@@ -257,10 +261,20 @@ class Login extends Component {
 			})
 			this.setState({
 				loginState:false,
+				// forgectState:false,
 			})
 		}
 	}
-
+	//忘记密码
+	// ForgetPassword(){
+	// 	this.setState({
+	// 		forgectState:true,
+	// 		loginState:false,
+	// 		QRUrl:'',
+	// 		token:null,
+	// 		userMessage:null
+	// 	})
+	// }
 	handleClick(e) {
 		e.preventDefault();
 		this.setState({
