@@ -88,7 +88,7 @@ export default class CostListData extends Component {
 		let dataSource = [];
 		this.setState({
 			loading: true,
-			percent: 50
+			percent: 98
 		})
 		let data = await getSearcher({key:"priceListName"});
 		data.result.map((item,index)=>{

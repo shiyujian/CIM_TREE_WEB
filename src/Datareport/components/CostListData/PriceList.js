@@ -418,7 +418,6 @@ export default class PriceList extends Component {
                                     editOnOff={false}
                                     onChange={this.onCellChange.call(this, record.key, "projectcoding", record)}
                                     asyncVerify={this.asyncVerify.call(this, record.key, "projectcoding", record)}
-                                    propTypes="Number"
                                 />
                             </div>
                         )
