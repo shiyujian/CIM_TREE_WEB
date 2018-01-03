@@ -24,7 +24,6 @@ export default class ToggleModalUpdate extends Component{
         }
     }
     render(){
-        console.log("dataSource:",this.state.dataSource);
         const {visibleUpdate} = this.props;
         return (
             <Modal
@@ -141,7 +140,9 @@ export default class ToggleModalUpdate extends Component{
         width:"15%",
         height:"64px",
         render:(text, record, index) => {
-            record.selectUnits = this.state.units;
+            if (this.state.units.length !== 0) {
+                record.selectUnits = this.state.units;
+            }
             return (
                 <TreeSelect value={record.extra_params.project} style={{ width: "90%" }} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
                     onSelect={(value, node, extra) => {
@@ -153,14 +154,18 @@ export default class ToggleModalUpdate extends Component{
                             return getUnit({ code: item.key.split("--")[0] });
                         })
                         record.extra_params.project = selectPro;
+                        this.forceUpdate();
                         Promise.all(promises).then(rst => {
                             rst.map(item => {
                                 item.children.map(it => {
                                     units.push(it);
                                 })
                             })
-                            record.selectUnits = units;
-                            this.forceUpdate();
+                            record.selectUnits = [];
+                            units.map(item => {
+                                record.selectUnits.push(item);
+                                this.forceUpdate();
+                            })
                         })
 
                     }} 
