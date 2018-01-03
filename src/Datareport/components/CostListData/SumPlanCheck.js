@@ -55,7 +55,9 @@ export default class SumSpeedExamine extends Component {
             await this.reject();
         }
         this.props.closeModal("dr_qua_jsjh_visible",false)
-        message.success("操作成功")
+        notification.success({
+            message:'操作成功'
+        })
     }
     //通过
     async passon(){
@@ -194,7 +196,6 @@ export default class SumSpeedExamine extends Component {
           ]
 		return (
             <Modal
-			title="结算计划信息审批表"
             visible={true}
             width= {1280}
             footer={null}
@@ -202,7 +203,7 @@ export default class SumSpeedExamine extends Component {
 			maskClosable={false}
             >
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>填报审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
@@ -211,17 +212,17 @@ export default class SumSpeedExamine extends Component {
                         <Col span={2}>
                             <span>审查意见：</span>
                         </Col>
-                        <Col span={4}>
+                        <Col span={6}>
                             <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={2} push={14}>
+                        {/* <Col span={2} push={14}>
                             <Button type='primary'>
                                 导出表格
                             </Button>
-                        </Col>
+                        </Col> */}
                         <Col span={2} push={14}>
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交

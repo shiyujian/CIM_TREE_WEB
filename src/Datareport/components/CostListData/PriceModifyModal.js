@@ -208,6 +208,8 @@ export default class PriceModifyModal extends Component {
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+            <div>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结果预览</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -245,6 +247,7 @@ export default class PriceModifyModal extends Component {
                     />
                 </Row>
                 <Preview />
+                </div>
             </Modal>
         )
     }
