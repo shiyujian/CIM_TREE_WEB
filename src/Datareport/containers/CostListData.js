@@ -88,7 +88,7 @@ export default class CostListData extends Component {
 		let dataSource = [];
 		this.setState({
 			loading: true,
-			percent: 50
+			percent: 98
 		})
 		let data = await getSearcher({key:"priceListName"});
 		data.result.map((item,index)=>{
@@ -291,7 +291,7 @@ export default class CostListData extends Component {
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="计价清单" {...this.props}/>
 				<Row>
-					<Button style={{margin:'10px 10px 10px 0px'}} type="default" onClick={() => this.createLink('downLoadTemplate', DataReportTemplate_ValuationList)}>模板下载</Button>
+					{/* <Button style={{margin:'10px 10px 10px 0px'}} type="default" onClick={() => this.createLink('downLoadTemplate', DataReportTemplate_ValuationList)}>模板下载</Button> */}
 					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
 					<Button className="btn" type="default" onClick={this.openModal.bind(this, "modifyModal")}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.openModal.bind(this, "rmModal")}>申请删除</Button>
@@ -321,6 +321,17 @@ export default class CostListData extends Component {
 							}}/>
 					</Col>
 				</Row>
+				<Row >
+                    {
+                        !this.state.dataSource.length ? <p></p>
+                            :
+                            (
+                                <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                                    [共：{this.state.dataSource.length}行]
+								</Col>
+                            )
+                    }
+                </Row>
 				{
 					this.state.addvisible &&
 					<PriceList {...this.props} oncancel={() => {this.setState({addvisible:false})}} onok={this.setData.bind(this)}/>

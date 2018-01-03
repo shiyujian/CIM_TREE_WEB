@@ -58,7 +58,7 @@ export default class DeleteFile extends Component {
             {
                 title: '序号',
                 dataIndex: 'i',
-                width: '5%',
+                width: '3%',
 
             },
             {
@@ -99,7 +99,7 @@ export default class DeleteFile extends Component {
             {
                 title: '备注',
                 dataIndex: 'remark',
-                width: '15%',
+                width: '10%',
             }
             ,
             {

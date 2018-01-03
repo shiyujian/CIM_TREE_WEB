@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/CostListData';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message,notification} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API, NODE_FILE_EXCHANGE_API} from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
@@ -25,7 +25,9 @@ const { TextArea } = Input;
 export default class PriceListCheck extends Component {
 
 	constructor(props) {
-		super(props);
+        super(props);
+        this.header = ['序号','项目/子项目','单位工程','清单项目编号','计价单项',
+						'工程内容/规格编号','计量单位','结合单价(元)','备注'];
 		this.state = {
 			wk:null,
             dataSource:[],
@@ -165,10 +167,31 @@ export default class PriceListCheck extends Component {
     }
     //不通过
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
-       }
+        const { wk } = this.state;
+        const { actions: { logWorkflowEvent, } } = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null
+            }
+        );
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
+    }
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -186,11 +209,37 @@ export default class PriceListCheck extends Component {
         this.setState({option:e.target.value})
     }
 
-    //删除
-    delete(index) {
-        let { dataSource } = this.state
-        dataSource.splice(index, 1)
-        this.setState({ dataSource })
+    getExcel () {
+        const {actions:{jsonToExcel}} = this.props;
+		const showDs = this.state.dataSource;
+		if(!showDs.length) {
+			message.warn('至少需要一条数据');
+			return;
+		};
+        let rows = [];
+        rows.push(this.header);
+        showDs.map((item,index) => {
+            rows.push([index+1,item.project.name,item.project.code,item.projectcoding,item.valuation,item.rate,item.company,item.total,item.remarks]);
+        })
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            // console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+            this.createLink('计价清单下载',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+		}).catch(e => {
+			console.log(e);
+        })
+        debugger;
+    }
+
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
 	render() {
@@ -239,7 +288,6 @@ export default class PriceListCheck extends Component {
         }]
 		return(
 			<Modal
-                title="计价清单信息上传表"
                 key="priceListCheck"
 				width = {1280}
 				visible = {true}
@@ -254,6 +302,14 @@ export default class PriceListCheck extends Component {
                     bordered 
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                     />
+                <Row >
+                    {
+                        this.state.dataSource.length && 
+                        <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                            [共：{this.state.dataSource.length}行]
+                        </Col>
+                    }
+                </Row>
                     
                 <Row>
                     <Col span={2}>
@@ -266,7 +322,7 @@ export default class PriceListCheck extends Component {
                         </RadioGroup>
                     </Col>
                     <Col span={2} push={14}>
-                        <Button type='primary'>
+                        <Button type='primary' onClick={this.getExcel.bind(this)}>
                             导出表格
                         </Button>
                     </Col>
