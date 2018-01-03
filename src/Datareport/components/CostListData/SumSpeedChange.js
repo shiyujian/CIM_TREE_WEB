@@ -308,14 +308,9 @@ export default class SumSpeedChange extends Component {
                         </span> 
                     </Col>
                 </Row>
-                <Row style={{marginBottom: '20px'}}>
-					<Col span={2}>
-						<span>变更原因：</span>
-					</Col>
-			    </Row>
 			    <Row style={{margin: '20px 0'}}>
 				    <Col>
-				    	<TextArea rows={2} onChange={this.description.bind(this)}/>
+				    	<TextArea rows={2} onChange={this.description.bind(this)} placeholder='请输入变更原因' />
 				    </Col>
 			    </Row>
             </Modal>
