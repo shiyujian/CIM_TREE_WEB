@@ -144,7 +144,7 @@ export default class ToggleModalCJ extends Component{
             return;
         }
         if (this.state.flag === false) {
-            message.error('存在错误数据');
+            message.error('不存在该直属部门');
             return;
         }
         if (this.state.flag_code === false) {
@@ -190,7 +190,6 @@ export default class ToggleModalCJ extends Component{
                     projects,
                     defaultPro: rst.children[0].name
                 })
-                console.log("this.state.projects",this.state.projects);
             }
         })
     }
@@ -249,7 +248,38 @@ export default class ToggleModalCJ extends Component{
     delete(index){
         let dataSource = this.state.dataSource;
         dataSource.splice(index,1);
+        this.setState({flag_code:true, flag:true})
+        this.delData(dataSource);
         this.setState({dataSource})
+    }
+    async delData(data) {
+        const {actions:{getOrgReverse, getCanjian}} = this.props;
+        let res ,codes = [];
+        await data.map((item, index) => {
+            codes.push(item.code);
+            getCanjian({ code: item.type }).then(rst => {
+                if (rst.code === "code") {
+                    item.color = "red"
+                    this.setState({
+                        flag: false
+                    })
+                }
+            })
+        })
+        data.map((item, index) => {
+            item.index = index + 1;
+        })
+        console.log("data1:",data);
+        let repeatCode = this.isRepeat(codes);
+        if (repeatCode.length > 1) {
+            this.setState({
+                flag_code:false
+            })
+        }
+        this.setState({
+            repeatCode,
+            dataSource:data
+        })
     }
     columns = [{
         title: '序号',
@@ -257,8 +287,6 @@ export default class ToggleModalCJ extends Component{
         key: 'Index',
     }, {
         title: '参建单位编码',
-        // dataIndex: 'code',
-        // key: 'Code',
         render:(text,record,index) => {
             if (this.state.repeatCode.indexOf(record.code) !== -1 ) {
                 return <span style={{"color":"red"}}>{record.code}</span>
@@ -268,10 +296,7 @@ export default class ToggleModalCJ extends Component{
         }
     }, {
         title: '机构类型',
-        // dataIndex: 'type',
-        // key: 'Type',
         render:(record) => {
-            console.log("record",record);
             return (<span style={{color:record.color || ""}}>{record.type}</span>)
         }
     }, {
@@ -300,8 +325,6 @@ export default class ToggleModalCJ extends Component{
                                 units.push(it);
                             })
                         })
-                        // this.setState({units})
-                        // console.log("this.state.units",this.state.units);
                         record.selectUnits = units;
                         this.forceUpdate(); 
                     });

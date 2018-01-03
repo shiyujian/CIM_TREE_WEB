@@ -474,6 +474,7 @@ export default class AddFile extends Component {
                         <Cascader
                         options={this.state.options}
                         className='btn'
+                        placeholder='请选择项目及单位工程'
                         loadData={this.loadData.bind(this)}
                         onChange={this.onSelectProject.bind(this)}
                         changeOnSelect

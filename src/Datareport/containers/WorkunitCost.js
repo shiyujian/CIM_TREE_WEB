@@ -45,7 +45,7 @@ export default class WorkunitCost extends Component {
 	async componentDidMount() {
 
 		const { actions: { getScheduleDir } } = this.props;
-		this.setState({loading:true,percent:0,num:0})
+		
 		let topDir = await getScheduleDir({ code: 'the_only_main_code_costsumplans' });
 		if (topDir.obj_type) {
 			let dir = await getScheduleDir({ code: 'ck' });
@@ -57,37 +57,87 @@ export default class WorkunitCost extends Component {
 			}
 		}
 	}
-	async generateTableData(data) {
-		const { actions: {getDocument}} = this.props;  
+	generateTableData(data){
+		const { actions: {getDocument}} = this.props; 
 		let dataSour = [];
-		let i=0;
-		data.map((item) => {
-			getDocument({ code: item.code }).then(single => {
-				i++
-				let temp = {
-					key:i,
-					code: item.code,
-					subproject: single.extra_params.subproject || rst.extra_params.project,//项目/子项目
-					unit: single.extra_params.unit || rst.extra_params.unit,//单位工程
-					projectcoding: single.extra_params.projectcoding,//项目编号
-					projectname: single.extra_params.projectname,//项目名称
-					company: single.extra_params.company,//计量单位
-					number: single.extra_params.number,//数量
-					total: single.extra_params.total,//单价
-					remarks: single.extra_params.remarks,//备注
-
-				}
-				dataSour.push(temp);
-				this.setState({ 
-					dataSource:dataSour,
-					showDs:dataSour,
-					loading:false,
-					percent:100
-				});
-			})
+		let all = [];
+		this.setState({loading:true,percent:0,num:0});
+		let total = data.length;
+		data.forEach(item=> {
+            all.push(getDocument({code:item.code}).then(rst => {
+            		let {num} = this.state;
+                    num++;
+                    this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
+                    if(!rst) {
+                    	message.error(`数据获取失败`)
+		    			return {}
+		    		} else {
+                    	return rst
+                    }
+            	}))
 		})
-		
+		Promise.all(all).then(item =>{
+			this.setState({loading:false,percent:100});
+			try {
+				let i= 0;
+				item.forEach((single,index) => {
+					i++;
+	        		let temp = {
+	        			// index:index+1,
+						// num:index+1,
+						key:i,
+	                    code: item.code,
+						subproject: single.extra_params.subproject || rst.extra_params.project,//项目/子项目
+						unit: single.extra_params.unit || rst.extra_params.unit,//单位工程
+						projectcoding: single.extra_params.projectcoding,//项目编号
+						projectname: single.extra_params.projectname,//项目名称
+						company: single.extra_params.company,//计量单位
+						number: single.extra_params.number,//数量
+						total: single.extra_params.total,//单价
+						remarks: single.extra_params.remarks,//备注
+	                }
+	                dataSour.push(temp);
+        		}) 
+        	} catch(e){
+        		message.error(`数据获取失败`)
+			}
+			this.setState({ 
+				dataSource:dataSour,
+				showDs:dataSour,
+			});
+		})
+
 	}
+	// async generateTableData(data) {
+	// 	const { actions: {getDocument}} = this.props;  
+	// 	let dataSour = [];
+	// 	let i=0;
+	// 	data.map((item) => {
+	// 		getDocument({ code: item.code }).then(single => {
+	// 			i++
+	// 			let temp = {
+					// key:i,
+					// code: item.code,
+					// subproject: single.extra_params.subproject || rst.extra_params.project,//项目/子项目
+					// unit: single.extra_params.unit || rst.extra_params.unit,//单位工程
+					// projectcoding: single.extra_params.projectcoding,//项目编号
+					// projectname: single.extra_params.projectname,//项目名称
+					// company: single.extra_params.company,//计量单位
+					// number: single.extra_params.number,//数量
+					// total: single.extra_params.total,//单价
+					// remarks: single.extra_params.remarks,//备注
+	// 			}
+	// 			dataSour.push(temp);
+				// this.setState({ 
+				// 	dataSource:dataSour,
+				// 	showDs:dataSour,
+				// 	loading:false,
+				// 	percent:100
+				// });
+	// 		})
+	// 	})
+		
+	// }
 	//点×取消
 	oncancel() {
 		this.setState({ addvisible: false });
@@ -145,10 +195,9 @@ export default class WorkunitCost extends Component {
 			const {actions:{jsonToExcel}}=this.props;
 			const {dataSourceSelected} =this.state;
 			let rows =[];
-			rows.push(['项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','单价','备注']);
+			rows.push(['项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','综合单价(元)','备注']);
 			dataSourceSelected.map(o =>{
-				rows.push([
-					
+				rows.push([		
 					o.subproject,
 					o.unit,
 					o.projectcoding,
@@ -350,7 +399,7 @@ export default class WorkunitCost extends Component {
 			dataIndex: 'number',
 			key:'Number'
 		}, {
-			title: '单价',
+			title: '综合单价(元)',
 			dataIndex: 'total',
 			key:'Total'
 		}, {
