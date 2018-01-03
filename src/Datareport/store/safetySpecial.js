@@ -24,6 +24,8 @@ const updateDocList = createFetchAction(`${SERVICE_API}/documentlist/`,[],'PUT')
 const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
 // 校验 
 const checkoutData = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[]);
+// Document批量获取
+const getDocumentList = createFetchAction(`${SERVICE_API}/documentgetlist/?key_type=code`,[],'GET');
 
 export const actions = {
 	ModalVisible,
@@ -38,6 +40,7 @@ export const actions = {
 	updateDocList,
 	jsonToExcel,
 	checkoutData,
+	getDocumentList,
 };
 
 export default handleActions({

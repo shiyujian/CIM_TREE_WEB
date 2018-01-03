@@ -24,6 +24,7 @@ export default class ToggleModalUpdate extends Component{
         }
     }
     render(){
+        console.log("dataSource:",this.state.dataSource);
         const {visibleUpdate} = this.props;
         return (
             <Modal
@@ -140,27 +141,29 @@ export default class ToggleModalUpdate extends Component{
         width:"15%",
         height:"64px",
         render:(text, record, index) => {
+            record.selectUnits = this.state.units;
             return (
-                <TreeSelect value={record.selectPro || record.extra_params.project} style={{ width: "90%" }} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL} onSelect={(value,node,extra) => {
-                    const {actions:{getUnit}} = this.props;
-                    let units = [];
-                    let selectPro = [];
-                    let promises = extra.checkedNodes.map(item => {
-                        selectPro.push(item.key);
-                        return getUnit({code:item.key.split("--")[0]});
-                    })
-                    record.selectPro = selectPro;
-                    Promise.all(promises).then(rst => {
-                        rst.map(item => {
-                            item.children.map(it => {
-                                units.push(it);
-                            })
+                <TreeSelect value={record.extra_params.project} style={{ width: "90%" }} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
+                    onSelect={(value, node, extra) => {
+                        const { actions: { getUnit } } = this.props;
+                        let units = [];
+                        let selectPro = [];
+                        let promises = extra.checkedNodes.map(item => {
+                            selectPro.push(item.key);
+                            return getUnit({ code: item.key.split("--")[0] });
                         })
-                        this.setState({units})
-                        this.forceUpdate();
-                    })
+                        record.extra_params.project = selectPro;
+                        Promise.all(promises).then(rst => {
+                            rst.map(item => {
+                                item.children.map(it => {
+                                    units.push(it);
+                                })
+                            })
+                            record.selectUnits = units;
+                            this.forceUpdate();
+                        })
 
-                }} 
+                    }} 
                 >
                     {ToggleModalUpdate.lmyloop(this.state.projects)}
                 </TreeSelect>
@@ -170,21 +173,20 @@ export default class ToggleModalUpdate extends Component{
         title: '负责单位工程名称',
         width:"15%",
 		render:(text, record, index) => {
-            console.log("dfggdfg:",this.state.units);
             return (
-                <TreeSelect value={record.selectUnit || record.extra_params.unit} onSelect={(value, node, extra) => {
+                <TreeSelect value={record.extra_params.unit} onSelect={(value, node, extra) => {
                     let selectUnit = [];
                     extra.checkedNodes.map(item => {
                         selectUnit.push(item.key);
                     }); 
-                    record.selectUnit = selectUnit;
+                    record.extra_params.unit = selectUnit;
                     this.forceUpdate();
                 }} style={{width:"90%"}} allowClear={true} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}>
                     {
-                        ToggleModalUpdate.lmyloop(this.state.units) 
+                        ToggleModalUpdate.lmyloop(record.selectUnits) 
                     }
                  </TreeSelect>
-            )
+            ) 
         }
 	},{
 		title: '备注',

@@ -43,12 +43,13 @@ export default class PersonModify extends Component {
                 })
             }
         });
-        modifyPer.map(item => {
+        let modifyPersons = [...modifyPer]
+        modifyPersons.map(item => {
         	item.code = item.account.person_code;
         })
         console.log("modifyPer",modifyPer);
         this.setState({
-            dataSource:modifyPer
+            dataSource:modifyPersons
         })
 
     }
@@ -68,6 +69,7 @@ export default class PersonModify extends Component {
 			dataIndex: 'account.person_name',
 			key: 'Name',
 			render:(text, record, index) =>{
+				console.log('recordname',record)
 	            return <Input value = {record.account.person_name || ""} onChange={ele => {
 	                record.account.person_name = ele.target.value
 	                this.forceUpdate();
@@ -75,32 +77,47 @@ export default class PersonModify extends Component {
 	        }
 		}, {
 			title: '所在组织机构单位',
-			dataIndex: 'account.organization',
-			key: 'Org',
+			dataIndex: 'record.account.organization',
+            key: 'Org',
+            render:(text, record, index) =>{
+                console.log('recordorg',record)
+                if(record.orgname) {
+                    return record.account.organization = record.orgname.org
+                }else {
+                    return record.account.organization = record.account.organization
+                }
+            }
 		}, {
 			title: '所属部门',
 			// dataIndex: 'account.org_code',
 			key: 'Depart',
 			render:(text, record, index) =>{
-	            return <Input value = {record.account.org_code || ""} onChange={ele => {
-	                record.account.org_code = ele.target.value
-	                getOrgReverse({code: record.account.org_code}).then(rst =>{
-	                	if(rst.children.length === 0) {
-	                		message.warning("您输入的部门不存在");
-	                		this.setState({
-	                			subErr: false
-	                		})
-	                	}else {
-	                		record.account.organization = rst.children[0].name;
-	                		this.setState({
-	                			subErr: true
-	                		})
-	                	}
-	                	this.forceUpdate();
-	                })
-	                
-	            }}/>
-	        }
+                    console.log('recorddepart',record)
+                    if(record.orgname) {
+                    	if(record.orgname.org !== '') {
+	                        return <Input
+	                            style={{width: '60px'}} 
+	                            value = {record.depart || ""}
+	                            onChange={this.tableDataChange.bind(this,index)}
+	                            onBlur={this.fixOrg.bind(this,index)}
+	                        />
+                    	}else {
+	                        return <Input
+	                            style={{width: '60px', color: 'red'}} 
+	                            value = {record.depart || ""}
+	                            onChange={this.tableDataChange.bind(this,index)}
+	                            onBlur={this.fixOrg.bind(this,index)}
+	                        />
+                    	}
+                    }else {
+                    	return <Input
+                            style={{width: '60px'}} 
+                            value = {record.account.org_code || ""}
+                            onChange={this.tableDataChange.bind(this,index)}
+                            onBlur={this.fixOrg.bind(this,index)}
+                        />
+                    }
+                }
 		}, {
 			title: '职务',
 			dataIndex: 'account.title',
@@ -202,13 +219,50 @@ export default class PersonModify extends Component {
             message.error('审批人未选择');
             return;
         }
-        if(this.state.subErr === false) {
-        	message.error('请输入正确的部门');
-            return;
-        }
+        // if(this.state.subErr === false) {
+        // 	message.error('请输入正确的部门');
+        //     return;
+        // }
         this.props.setDataUpdate(this.state.dataSource, this.state.passer);
-        console.log('22222222',this.state.dataSource);
         ModifyVisible(false);
+    }
+
+    tableDataChange(index ,e ){
+        const {actions: {getOrgReverse}} = this.props;
+        const { dataSource } = this.state;
+        dataSource[index].depart = e.target.value;
+        // console.log('e',e.target.value)
+        console.log('dataSource',dataSource)
+        getOrgReverse({code:dataSource[index].depart}).then(rst => {
+            console.log('rst',rst)
+            if(rst.children.length !== 0) {
+                dataSource[index]['orgname'] = {
+                    org: rst.children[0].name
+                }
+            }else {
+                dataSource[index]['orgname'] = {
+                    org: ''
+                }
+            }
+            this.setState({dataSource});
+        })
+    }
+    //校验部门
+    fixOrg(index){
+        const {actions: {getOrgReverse}} = this.props;
+        let {dataSource} = this.state
+        console.log('dataSource1111',dataSource)
+        getOrgReverse({code:dataSource[index].depart}).then(rst => {
+            console.log('rst1111',rst)
+            if(rst.children.length !== 0){
+                dataSource[index]['orgname'] = {
+                    org: rst.children[0].name
+                }
+                this.setState({dataSource})
+            }else{
+                message.info("部门不存在")
+            }
+        })
     }
 
 	//删除

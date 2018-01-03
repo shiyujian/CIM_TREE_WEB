@@ -145,10 +145,9 @@ export default class WorkunitCost extends Component {
 			const {actions:{jsonToExcel}}=this.props;
 			const {dataSourceSelected} =this.state;
 			let rows =[];
-			rows.push(['序号','项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','单价','备注']);
+			rows.push(['项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','单价','备注']);
 			dataSourceSelected.map(o =>{
-				rows.push([
-					o.key,
+				rows.push([		
 					o.subproject,
 					o.unit,
 					o.projectcoding,
