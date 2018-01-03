@@ -87,7 +87,7 @@ export default class TableOrg extends Component {
 		// console.log('vip-分页', e);
 	}
 	onSelectChange(selectedRowKeys, selectedRows) {
-		// debugger;
+		debugger;
 		this.state.subDataSource = selectedRows;
 		// console.log('selectedRowKeys changed: ', selectedRowKeys);
 		this.setState({ selectedRowKeys });
@@ -383,7 +383,7 @@ export default class TableOrg extends Component {
 	//删除
 	BtnDelete(e) {
 		if (this.state.subDataSource.length <= 0) {
-			notification.warn({
+			notification.warning({
 				message: '请选择数据！',
 				duration: 2
 			})

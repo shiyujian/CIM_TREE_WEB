@@ -52,7 +52,7 @@ export default class ProjectSumExcalDeleteCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("dr_qua_cckk_delate_visible",false);
-        message.info("操作成功");
+        notification.success({message:"操作成功",duration: 2});
     }
 
     //通过
@@ -108,8 +108,7 @@ export default class ProjectSumExcalDeleteCheck extends Component {
         const columns = [
             {
                 title: "序号",
-                dataIndex: "code",
-                width: "10%",
+                dataIndex: "key",
                 render:(text,record,index)=>{
                   return index+1
                 }
@@ -141,14 +140,12 @@ export default class ProjectSumExcalDeleteCheck extends Component {
           ]
 		return (
             <Modal
-			title="工程量结算信息删除审批表"
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}
             onCancel={this.cancel.bind(this)}>
-      
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>删除审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -163,12 +160,8 @@ export default class ProjectSumExcalDeleteCheck extends Component {
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
-                        <Button type='primary'>
-                            导出表格
-                        </Button>
-                    </Col>
-                    <Col span={2} push={14}>
+                    
+                    <Col span={6} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
                         </Button>

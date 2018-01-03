@@ -1,17 +1,10 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import {
-  Main,
-  Aside,
-  Body,
-  Sidebar,
-  Content,
-  DynamicTitle
-} from "_platform/components/layout";
+import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from "_platform/components/layout";
 import { actions } from "../store/SumSpeedCost";
 import { actions as platformActions } from "_platform/store/global";
-import { Row, Col, Table, Input, Button, message, Progress,pagination } from "antd";
+import { Row, Col, Table, Input, Button, message, Progress,pagination, notification } from "antd";
 import { getUser } from "_platform/auth";
 import SumSpeed from "../components/CostListData/SumSpeed";
 import SumSpeedDelete from "../components/CostListData/SumSpeedDelete";
@@ -193,12 +186,14 @@ export default class BalanceSchedule extends Component {
         }
       ).then(() => {
         this.setState({ addvisible: false });
-        message.success("发起成功")
+        notification.success({
+          message:'发起流程成功'
+      })
       });
     });
   }
   //变更流程
-  setChangeData(data, participants) {
+  setChangeData(data, participants,opinion) {
     const { actions: { createWorkflow, logWorkflowEvent } } = this.props;
     let creator = {
       id: getUser().id,
@@ -209,7 +204,7 @@ export default class BalanceSchedule extends Component {
     let postdata = {
       name: "结算进度信息变更",
       code: WORKFLOW_CODE["数据报送流程"],
-      description: "结算进度信息变更",
+      description: opinion,
       subject: [
         {
           data: JSON.stringify(data)
@@ -228,7 +223,7 @@ export default class BalanceSchedule extends Component {
         {
           state: rst.current[0].id,
           action: "提交",
-          note: "发起填报",
+          note: opinion,
           executor: creator,
           next_states: [
             {
@@ -241,12 +236,14 @@ export default class BalanceSchedule extends Component {
         }
       ).then(() => {
         this.setState({ changevisible: false });
-        message.success("发起流程成功");
+        notification.success({
+          message:'发起流程成功'
+      })
       });
     });
   }
   //删除流程
-  setDeleteData = (data, participants) => {
+  setDeleteData = (data, participants, opinion) => {
     const { actions: { createWorkflow, logWorkflowEvent } } = this.props;
     let creator = {
       id: getUser().id,
@@ -257,7 +254,7 @@ export default class BalanceSchedule extends Component {
     let postdata = {
       name: "结算进度信息批量删除",
       code: WORKFLOW_CODE["数据报送流程"],
-      description: "结算进度信息批量删除",
+      description: opinion,
       subject: [
         {
           data: JSON.stringify(data)
@@ -275,7 +272,7 @@ export default class BalanceSchedule extends Component {
         {
           state: rst.current[0].id,
           action: "提交",
-          note: "发起填报",
+          note: opinion,
           executor: creator,
           next_states: [
             {
@@ -288,7 +285,9 @@ export default class BalanceSchedule extends Component {
         }
       ).then(() => {
         this.setState({ deletevisible: false });
-        message.success("发起成功");
+        notification.success({
+          message:'发起流程成功'
+      })
       });
     });
   };
@@ -316,7 +315,9 @@ export default class BalanceSchedule extends Component {
 		if(this.state.selectedRowKeys && this.state.selectedRowKeys.length>0){
 			this.setState({ changevisible: true });
 		} else {
-			message.warning('至少选择一条数据')
+			notification.warning({
+				message:'请先选择数据'
+			})
 		}
   }
   setdleVisible() {
@@ -325,7 +326,9 @@ export default class BalanceSchedule extends Component {
 		if(this.state.selectedRowKeys && this.state.selectedRowKeys.length>0){
 			this.setState({ deletevisible: true });
 		} else {
-			message.warning('至少选择一条数据')
+			notification.warning({
+				message:'请先选择数据'
+			})
 		}
   }
   //导出数据
@@ -344,7 +347,9 @@ export default class BalanceSchedule extends Component {
         this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
       })
 		} else { 
-			message.warning('至少选择一条数据')
+			notification.warning({
+				message:'请先选择数据'
+			})
 		}
   }
   // setexpVisible() {
@@ -405,12 +410,12 @@ export default class BalanceSchedule extends Component {
     link.click();
     document.body.removeChild(link);
 }
-  downloadT () {
-    console.log(DataReportTemplate_SettlementProgress)
-    this.createLink(this,DataReportTemplate_SettlementProgress);
-    // const url = "http://10.215.160.38:6542/media/documents/meta/%E7%BB%93%E7%AE%97%E8%BF%9B%E5%BA%A6%E6%95%B0%E6%8D%AE%E5%A1%AB%E6%8A%A5%E6%A8%A1%E6%9D%BF.xlsx";
-    // this.createLink(this,url);
-  }
+  // downloadT () {
+  //   console.log(DataReportTemplate_SettlementProgress)
+  //   this.createLink(this,DataReportTemplate_SettlementProgress);
+  //   // const url = "http://10.215.160.38:6542/media/documents/meta/%E7%BB%93%E7%AE%97%E8%BF%9B%E5%BA%A6%E6%95%B0%E6%8D%AE%E5%A1%AB%E6%8A%A5%E6%A8%A1%E6%9D%BF.xlsx";
+  //   // this.createLink(this,url);
+  // }
   render() {
     const paginationInfo = {
 			showSizeChanger: true,
@@ -426,9 +431,9 @@ export default class BalanceSchedule extends Component {
       <div style={{ overflow: "hidden", padding: 20 }}>
         <DynamicTitle title="结算进度" {...this.props} />
         <Row>
-          <Button onClick={this.downloadT.bind(this)} style={{ margin: "10px 10px 10px 0px" }} type="default">
+          {/* <Button onClick={this.downloadT.bind(this)} style={{ margin: "10px 10px 10px 0px" }} type="default">
             模板下载
-          </Button>
+          </Button> */}
           <Button
             className="btn"
             type="default"
@@ -482,7 +487,7 @@ export default class BalanceSchedule extends Component {
               onChange={this.handleChange}
               rowSelection={rowSelection}
               rowKey="key"
-              loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="exception" strokeWidth={5}/>,spinning:this.state.loading}}
+              loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
               pagination={paginationInfo}
               />
           </Col>
