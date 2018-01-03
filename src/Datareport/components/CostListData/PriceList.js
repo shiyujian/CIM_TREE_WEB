@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Form, Spin, Upload, Icon, Button, Modal,
     Cascader ,Select, Popconfirm,message, Table, Row, Col, notification, DatePicker} from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_ValuationList} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import EditableCell from '../EditableCell';
@@ -209,7 +209,7 @@ export default class PriceList extends Component {
             return o.flag
         })
         if(flag) {
-            message.info("清单项目清单编码错误");
+            message.info("清单项目编码错误");
             return
         }
         const {project,unit} =  this.state;
@@ -378,7 +378,6 @@ export default class PriceList extends Component {
                     dataSource[index-1].flag = true;
                 }
             }
-            debugger;
             this.setState({dataSource});
         }
         
@@ -396,13 +395,26 @@ export default class PriceList extends Component {
         this.setState({dataSource});
     }
 
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
 	render() {
         let {dataSource} = this.state.dataSource;
         const columns = 
             [{
-                title:'编码',
+                title:'序号',
                 dataIndex:'code',
-                width: '10%'
+                render:(text,record,index) => {
+                    return record.key
+                }
             },{
                 title:'清单项目编码',
                 dataIndex:'projectcoding',
@@ -511,6 +523,13 @@ export default class PriceList extends Component {
                     }
                 }
             },{
+                title:'状态',
+                dataIndex:'status',
+                width:"10%",
+                render: (text, record, index) => {
+                    return <span>待提交</span>
+                }
+            },{
                 title:'操作',
                 width:"10%",
                 dataIndex:'edit',
@@ -550,7 +569,7 @@ export default class PriceList extends Component {
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
-                    <Col><Button style={{ margin:'10px 10px 10px 0px' }}>模板下载</Button></Col>
+                    <Col><Button style={{ margin:'10px 10px 10px 0px' }}  onClick={() => this.createLink('downLoadTemplate', DataReportTemplate_ValuationList)}>模板下载</Button></Col>
                     <Col>
                         <Upload
                             onChange={this.uplodachange.bind(this)}
