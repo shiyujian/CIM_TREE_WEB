@@ -105,13 +105,13 @@ export default class ModCheck extends Component {
                 "last_name": "",              
             })                    
         })
-        console.log('data_list',data_list)
-        putPersonList({},{data_list:data_list}).then(rst => {
-            console.log('rst', rst)
-            if (rst.result.length) {
-                message.success("审核成功");
-            }
-        })
+        // console.log('data_list',data_list)
+        // putPersonList({},{data_list:data_list}).then(rst => {
+        //     console.log('rst', rst)
+        //     if (rst.result.length) {
+        //         message.success("审核成功");
+        //     }
+        // })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
         .then((rst) => {
             console.log('rst111',rst)
@@ -190,7 +190,7 @@ export default class ModCheck extends Component {
         return (
             <Modal
             title="人员信息审批表"
-            key={Math.random()}
+            // key={Math.random()}
             visible={true}
             width= {1280}
             footer={null}

@@ -92,32 +92,32 @@ export default class PersonModify extends Component {
 			// dataIndex: 'account.org_code',
 			key: 'Depart',
 			render:(text, record, index) =>{
-                    console.log('recorddepart',record)
-                    if(record.orgname) {
-                    	if(record.orgname.org !== '') {
-	                        return <Input
-	                            style={{width: '60px'}} 
-	                            value = {record.depart || ""}
-	                            onChange={this.tableDataChange.bind(this,index)}
-	                            onBlur={this.fixOrg.bind(this,index)}
-	                        />
-                    	}else {
-	                        return <Input
-	                            style={{width: '60px', color: 'red'}} 
-	                            value = {record.depart || ""}
-	                            onChange={this.tableDataChange.bind(this,index)}
-	                            onBlur={this.fixOrg.bind(this,index)}
-	                        />
-                    	}
-                    }else {
-                    	return <Input
+                console.log('recorddepart',record)
+                if(record.orgname) {
+                	if(record.orgname.org !== '') {
+                        return <Input
                             style={{width: '60px'}} 
-                            value = {record.account.org_code || ""}
+                            value = {record.depart || ""}
                             onChange={this.tableDataChange.bind(this,index)}
                             onBlur={this.fixOrg.bind(this,index)}
                         />
-                    }
+                	}else {
+                        return <Input
+                            style={{width: '60px', color: 'red'}} 
+                            value = {record.depart || ""}
+                            onChange={this.tableDataChange.bind(this,index)}
+                            onBlur={this.fixOrg.bind(this,index)}
+                        />
+                	}
+                }else {
+                	return <Input
+                        style={{width: '60px'}} 
+                        value = {record.account.org_code || ""}
+                        onChange={this.tableDataChange.bind(this,index)}
+                        onBlur={this.fixOrg.bind(this,index)}
+                    />
                 }
+            }
 		}, {
 			title: '职务',
 			dataIndex: 'account.title',
@@ -212,9 +212,17 @@ export default class PersonModify extends Component {
 	}
 
 	onok() {
-		console.log('passer', this.state.passer)
-		console.log('subErr', this.state.subErr)
         const { actions: { ModifyVisible } } = this.props;
+        let temp = this.state.dataSource.some((o,index) => {
+            console.log('o',o)
+            if(o.orgname) {
+            	return o.orgname.org === ''
+            }
+        });
+        if(temp) {
+            message.info('部门不存在，无法提交')
+            return
+        }
         if (!this.state.passer) {
             message.error('审批人未选择');
             return;
