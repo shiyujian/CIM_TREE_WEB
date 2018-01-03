@@ -44,7 +44,6 @@ export default class ToggleModal extends Component{
 		        }
 		    },
         };
-        console.log("this.state.dataSource:",this.state.dataSource);
         return (
             <Modal
                 visible={visible}
@@ -142,7 +141,6 @@ export default class ToggleModal extends Component{
                     remarks: item[3],
                 }
             });
-            console.log("res:",res);
             this.setState({
                 dataSource:res
             })
@@ -160,7 +158,7 @@ export default class ToggleModal extends Component{
             return;
         }
         if (this.state.flag === false) {
-            message.error('存在错误数据');
+            message.error('不存在该参建单位');
             return;
         }
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
@@ -196,7 +194,6 @@ export default class ToggleModal extends Component{
                     projects,
                     defaultPro: rst.children[0].name
                 })
-                console.log("this.state.projects",this.state.projects);
             }
         })
     }
@@ -252,19 +249,20 @@ export default class ToggleModal extends Component{
     }
     // 删除数据
     delete(index){
+        console.log("index:",index);
         let dataSource = this.state.dataSource;
         dataSource.splice(index,1);
         this.setState({flag_code:true, flag:true})
-        this.delData.bind(this, dataSource);
+        this.delData(dataSource);
         this.setState({dataSource})
     }
     // 处理数据删除之后的校验
-    delData() {
+    delData(data) {
         const { actions: { getOrgReverse } } = this.props;
         let type = [], canjian = [], color = [], codes = [];
         let promises = data.map(item => {
-            codes.push(item.direct);
-            return getOrgReverse({ code: item.code });
+            codes.push(item.code);
+            return getOrgReverse({ code: item.direct });
         })
         let repeatCode = this.isRepeat(codes);
         if (repeatCode.length > 1) {
@@ -289,7 +287,7 @@ export default class ToggleModal extends Component{
             })
             res = data.map((item, index) => {
                 return {
-                    index: item.index,
+                    index: index + 1,
                     code: item.code,
                     // 组织机构类型
                     type: type[index] || "",
@@ -300,9 +298,10 @@ export default class ToggleModal extends Component{
                     // 直属部门
                     direct: item.direct,
                     remarks: item.remarks,
+                    selectPro: item.selectPro,
+                    selectUnit: item.selectUnit,
                 }
             });
-            console.log("res:", res);
             this.setState({
                 dataSource: res
             })
@@ -315,7 +314,6 @@ export default class ToggleModal extends Component{
     }, {
         title: '组织机构编码',
         render:(text,record,index) => {
-            console.log("this.state.repeatCode:",this.state.repeatCode)
             if (this.state.repeatCode.indexOf(record.code) != -1) {
                 return (
                     <span style={{"color":"red"}}>{record.code}</span>
@@ -373,10 +371,8 @@ export default class ToggleModal extends Component{
                                 units.push(it);
                             })
                         })
-                        // this.setState({units})
                         record.selectUnits = units;
                         this.forceUpdate();
-                        // console.log("this.state.units",this.state.units);
                     })
 
                 }} 
@@ -414,7 +410,7 @@ export default class ToggleModal extends Component{
                 {/* <span>|</span> */}
                 <Popconfirm 
                     title="确认删除吗"
-                    onConfirm={this.delete.bind(this, index)}
+                    onConfirm={this.delete.bind(this, record.index - 1)}
                     okText="确认"
                     onCancel="取消"
                 >
