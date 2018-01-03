@@ -4,6 +4,8 @@ import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader ,Select, Popco
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
+const moment = require('moment');
+const { TextArea } = Input;
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -18,6 +20,7 @@ export default class SumPlanChange extends Component {
             project:{},
             unit:{},
             options:[],
+            opinion:''//变更意见
         };
     }
     componentWillMount(){
@@ -61,7 +64,9 @@ export default class SumPlanChange extends Component {
 
     onok(){
         if(!this.state.check){
-            message.info("请选择审核人")
+            notification.warning({
+				message:'请选择审核人'
+			})
             return;
         }
         let {check} = this.state;
@@ -71,8 +76,9 @@ export default class SumPlanChange extends Component {
             person_name:check.account.person_name,
             person_code:check.account.person_code,
             organization:check.account.organization
-        }
-		this.props.onok(this.state.dataSource,per);
+        };
+        let {opinion} = this.state;
+		this.props.onok(this.state.dataSource,per,opinion);
     }
 
     //删除
@@ -98,12 +104,25 @@ export default class SumPlanChange extends Component {
     }
 
     //table input 输入
-    tableDataChange(index, key ,e ){    
+    tableDataChange(index, key ,e ){
 		const { dataSource } = this.state;
 		dataSource[index][key] = e.target['value'];
 	  	this.setState({dataSource});
     }
-
+    // 正则时间匹配
+    dataChange(e){
+        let data = moment(e.target.value).format('YYYY-MM-DD');
+        if(data.match(/^((?:19|20)\d\d)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/)){
+        }else{
+            notification.warning({
+				message:'请检查输入日期格式是否为YYYY-MM-DD'
+			})
+        }
+    }
+    //审核意见
+    description(e) {
+        this.setState({opinion:e.target.value});
+	}
     render() {
         const columns = [
             {
@@ -130,7 +149,7 @@ export default class SumPlanChange extends Component {
                 title: "完成时间",
                 dataIndex: "completiontime",
                 render:(text,record,index)=>(
-                    <Input value={this.state.dataSource[record.key-1]['completiontime']} onChange={this.tableDataChange.bind(this,record.key-1,'completiontime')}/>
+                    <Input value={this.state.dataSource[record.key-1]['completiontime']} onChange={this.tableDataChange.bind(this,record.key-1,'completiontime')} onBlur={this.dataChange.bind(this)} />
                 )
               },
               {
@@ -165,7 +184,7 @@ export default class SumPlanChange extends Component {
                       okText="确认"
                       cancelText="取消"
                     >
-                      <a>删除</a>
+                      <a><Icon type="delete" /></a>
                     </Popconfirm>
                   );
                 }
@@ -173,12 +192,12 @@ export default class SumPlanChange extends Component {
         ];
         return (
             <Modal
-			title="结算计划变更表"
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>申请变更</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -197,7 +216,11 @@ export default class SumPlanChange extends Component {
                         </span> 
                     </Col>
                 </Row>
-                <Preview />
+			    <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea rows={2} onChange={this.description.bind(this)} placeholder='请输入变更原因' />
+				    </Col>
+			    </Row>
             </Modal>
         )
     }

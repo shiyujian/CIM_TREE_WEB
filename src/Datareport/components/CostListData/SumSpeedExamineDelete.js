@@ -52,7 +52,9 @@ export default class SumSpeedExamineDelete extends Component {
             await this.reject();
         }
         this.props.closeModal("cost_sum_delete_visible",false);
-        message.success("操作成功");
+        notification.success({
+            message:'操作成功'
+        })
     }
 
     //通过
@@ -145,14 +147,13 @@ export default class SumSpeedExamineDelete extends Component {
           ]
 		return (
             <Modal
-			title="结算进度信息删除审批表"
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}
             onCancel={this.cancel.bind(this)}
             >
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度删除审核</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>删除审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -163,17 +164,17 @@ export default class SumSpeedExamineDelete extends Component {
                     <Col span={2}>
                         <span>审查意见：</span>
                     </Col>
-                    <Col span={4}>
+                    <Col span={6}>
                         <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
                             <Radio value={1}>通过</Radio>
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
+                    {/* <Col span={2} push={14}>
                         <Button type='primary'>
                             导出表格
                         </Button>
-                    </Col>
+                    </Col> */}
                     <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
