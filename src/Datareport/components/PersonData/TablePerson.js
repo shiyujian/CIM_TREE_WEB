@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Icon,Spin,Progress} from 'antd';
+import {Table,Button,Popconfirm,Notification,Input,Icon,Spin,Progress} from 'antd';
 import style from './TableOrg.css'
 import DelPer from './PersonExpurgate';
 import {DataReportTemplate_PersonInformation, NODE_FILE_EXCHANGE_API, STATIC_DOWNLOAD_API} from '_platform/api';
@@ -52,14 +52,15 @@ export default class TablePerson extends Component{
 			setDeletePer(this.state.selectData);
 			ExprugateVisible(true);
 		}else{
-			message.warning("请先选中要删除的数据");
+			Notification.warning({
+				message: "请先选择数据"
+			});
 		}
 	}
 	//批量变更
 	modify() {
 		const { actions: { ModifyVisible, setModifyPer } } = this.props;
 		if(this.state.selectData.length) {
-			console.log('selectData', this.state.selectData)
 			let dataList = [];
 			this.state.selectData.map(item => {
 				let newList = {...item}
@@ -69,13 +70,14 @@ export default class TablePerson extends Component{
 			setModifyPer(dataList)
 			ModifyVisible(true);
 		} else {
-			message.warning("请先选中要变更的数据");
+			Notification.warning({
+				message: "请先选择数据"
+			});
 		}
 	}
 
 	// 导出excel表格
 	getExcel(){
-		console.log("dfgfg:",this.state.excelData);
 		if(this.state.excelData !== undefined) {
 			let exhead = ['人员编码','姓名','所在组织机构单位','所属部门','职务','性别','手机号码','邮箱'];
 			let rows = [exhead];
@@ -90,28 +92,27 @@ export default class TablePerson extends Component{
 				}
 			}
 			let excontent =this.state.excelData.map(data=>{
-				console.log('data',data)
 				return [
 					data.account.person_code || '', 
 					data.account.person_name || '', 
 					data.account.organization || '', 
-					data.account.org_code ||'', 
-					data.account.title ||'', 
+					data.account.org_code || '', 
+					data.account.title || '', 
 					data.account.gender || '',
 					data.account.person_telephone || '',
-					data.email ||''
+					data.email || ''
 				];
 			});
 			rows = rows.concat(excontent);
 			const {actions:{jsonToExcel}} = this.props;
-			console.log(rows)
 	        jsonToExcel({},{rows:rows})
 	        .then(rst => {
-	            console.log(rst);
 	            this.createLink('人员信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
 	        })
 		}else {
-			message.warning("请先选中要导出的数据");
+			Notification.warning({
+				message: "请先选择数据"
+			});
 			return;
 		}
 	}
@@ -138,24 +139,16 @@ export default class TablePerson extends Component{
 	}
 
 	searchOrg(value){
-		console.log('value',value)
 		let searchData = [];
 		let searchPer = this.state.dataSource
 		searchPer.map(rst => {
-			console.log("rst", rst)
-			if (rst.account.organization.indexOf(value) != -1 || rst.account.person_name.indexOf(value) != -1 || rst.account.person_code.indexOf(value) != -1) {
+			if (
+					rst.account.organization.indexOf(value) != -1 || 
+					rst.account.person_name.indexOf(value) != -1 || 
+					rst.account.person_code.indexOf(value) != -1
+				) {
 				searchData.push(rst);
 			}
-			// if (typeof(rst.account.org_code) === null && rst.account.org_code.indexOf(value) !== -1) {
-			// 	console.log('value1',value)
-			// 	searchData.push(rst);
-			// }
-			// if (typeof(rst.account.person_code) === null && rst.account.person_code.indexOf(value) != -1) {
-			// 	searchData.push(rst);
-			// }
-			// if (typeof(rst.account.person_name) === null && rst.account.person_name.indexOf(value) != -1) {
-			// 	searchData.push(rst);
-			// }
 		})
 		searchData.map((item, index)=> {
 			item.index = index + 1;
@@ -176,7 +169,6 @@ export default class TablePerson extends Component{
 			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
-			console.log(selected, selectedRows, changeRows);
 			this.setState({
 				selectData:selectedRows,
 				excelData:selectedRows
@@ -242,10 +234,11 @@ export default class TablePerson extends Component{
 		// dataIndex: 'account.person_signature_url',
 		// key: 'Signature',
 		render:(record) => {
-			console.log('record',record)
-            return (
-                <img style={{width:"60px"}}/>
-            )
+            if(record.account.relative_signature_url !== '') {
+            	return <img style={{width: 60}} src={record.account.relative_signature_url}/>
+            }else {
+            	return <span>暂无</span>
+            }
         }
 	}]
 }
