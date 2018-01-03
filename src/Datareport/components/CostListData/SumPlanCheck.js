@@ -86,7 +86,7 @@ export default class SumSpeedExamine extends Component {
                     }
                 })
             }else{
-                console.log('o',o)
+                // console.log('o',o)
                 doclist_a.push({
                     code: "rel_doc_jsjh_" + moment().format("YYYYMMDDHHmmss") + i,
                     name:`rel_doc_jsjh_${o.unit.pk}`,

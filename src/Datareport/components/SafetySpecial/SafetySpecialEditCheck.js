@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions as platformActions } from '_platform/store/global';
 import { notification, Input, Col, Card, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, NODE_FILE_EXCHANGE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import { getUser } from '_platform/auth';
 import { actions } from '../../store/safety';
@@ -18,7 +18,7 @@ const { TextArea } = Input;
         return { platform, ...safetyspecial }
     },
     dispatch => ({
-        actions: bindActionCreators({ ...platformActions, ...actions ,...action2}, dispatch)
+        actions: bindActionCreators({ ...platformActions, ...actions, ...action2 }, dispatch)
     })
 )
 export default class SafetySpecialEditCheck extends Component {
@@ -30,18 +30,22 @@ export default class SafetySpecialEditCheck extends Component {
             dataSource: [],
             option: 1,
             topDir: {},
+            subDataSource: [],
+            selectedRowKeys: [],
         };
     }
     async componentDidMount() {
         const { wk } = this.props
-        let dataSource = JSON.parse(wk.subject[0].data)
+        let dataSource = JSON.parse(wk.subject[0].data).sort((a, b) => {
+            return a.index > b.index
+        })
         this.setState({ dataSource, wk })
     }
-    componentWillReceiveProps(props) {
-        const { wk } = props
-        let dataSource = JSON.parse(wk.subject[0].data)
-        this.setState({ dataSource, wk })
-    }
+    // componentWillReceiveProps(props) {
+    //     const { wk } = props
+    //     let dataSource = JSON.parse(wk.subject[0].data)
+    //     this.setState({ dataSource, wk })
+    // }
     cancel() {
         this.props.closeModal("Safety_Special_edit_visible", false)
     }
@@ -134,7 +138,7 @@ export default class SafetySpecialEditCheck extends Component {
     }
     //不通过
     async reject() {
-        const {  wk,  } = this.state;
+        const { wk, } = this.state;
         const { actions: { logWorkflowEvent, } } = this.props;
         let executor = {};
         let person = getUser();
@@ -207,23 +211,27 @@ export default class SafetySpecialEditCheck extends Component {
                         {record.unit.name}
                     </span>
                 ),
-            }, {
+            },
+            {
                 title: '方案名称 ',
                 dataIndex: 'scenarioName',
                 width: '10%',
-            }, {
-                title: '发布单位',
-                dataIndex: 'pubUnit',
+            }, 
+            {
+                title: '编制单位',
+                dataIndex: 'organizationUnit',
                 width: '10%',
-            }, {
-                title: '评审意见',
-                dataIndex: 'reviewComments',
-                width: '10%',
-            }, {
+            }, 
+            {
                 title: '评审时间',
                 dataIndex: 'reviewTime',
                 width: '10%',
             },
+            {
+                title: '评审意见',
+                dataIndex: 'reviewComments',
+                width: '10%',
+            }, 
             {
                 title: '附件',
                 width: "10%",
@@ -246,6 +254,14 @@ export default class SafetySpecialEditCheck extends Component {
                 width: '10%',
             },
         ];
+        const { selectedRowKeys } = this.state;
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onSelectChange.bind(this),
+            getCheckboxProps: record => ({
+                disabled: record.name === 'Disabled User',
+            }),
+        };
         return (
             <Modal
                 title="安全专项变更审批表"
@@ -261,7 +277,9 @@ export default class SafetySpecialEditCheck extends Component {
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered />
+                        bordered
+                        rowSelection={rowSelection}
+                    />
                     <Row>
                         <Col span={2}>
                             <span>审查意见：</span>
@@ -275,9 +293,12 @@ export default class SafetySpecialEditCheck extends Component {
                             </RadioGroup>
                         </Col>
                         <Col span={2} push={14}>
-                            <Button type='primary'>
+                            <Button
+                                onClick={this.BtnExport.bind(this)}
+                                type='primary'
+                            >
                                 导出表格
-                            </Button>
+                    </Button>
                         </Col>
                         <Col span={2} push={14}>
                             <Button type='primary' onClick={this.submit.bind(this)}>
@@ -300,5 +321,58 @@ export default class SafetySpecialEditCheck extends Component {
                 </div>
             </Modal>
         )
+    }
+    onSelectChange(selectedRowKeys, selectedRows) {
+        // debugger;
+        this.state.subDataSource = selectedRows;
+        this.setState({ selectedRowKeys });
+    }
+    //导出
+    BtnExport(e) {
+        if (this.state.subDataSource.length <= 0) {
+            notification.warning({
+                message: '请选择数据！',
+                duration: 2
+            })
+            return;
+        }
+        let exhead1 = ['名称', '重大安全专项方案'];
+        let exhead2 = ['重大安全专项方案', '序号', '项目/子项目名称', '单位工程', '方案名称', '编制单位', '评审时间', '评审意见', '评审人员', '备注', '附件'];
+        let rows = [];
+        rows.push(exhead1);
+        rows.push(exhead2);
+        let excontent = this.state.subDataSource.map(data => {
+            let item = [
+                '重大安全专项方案',
+                data.i,
+                data.projectName,
+                data.unitProject,
+                data.scenarioName,
+                data.organizationUnit,
+                data.reviewTime,
+                data.reviewComments,
+                data.reviewPerson,
+                data.remark,
+                data.filename
+            ];
+            rows.push(item);
+        });
+        const { actions: { jsonToExcel } } = this.props;
+        console.log(rows)
+        // debugger;
+        jsonToExcel({}, { rows: rows })
+            .then(rst => {
+                let name = "安全专项导出信息" + moment(new Date()).format('YYYY-MM-DD-h:mm:ss-a') + '.xlsx';
+                this.createLink(name, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
+            })
+    }
+    createLink(name, url) {    //导出
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }

@@ -193,7 +193,7 @@ export default class BalanceSchedule extends Component {
         }
       ).then(() => {
         this.setState({ addvisible: false });
-        // message.info("发起成功")
+        message.success("发起成功")
       });
     });
   }
@@ -241,7 +241,7 @@ export default class BalanceSchedule extends Component {
         }
       ).then(() => {
         this.setState({ changevisible: false });
-        message.info("发起流程成功");
+        message.success("发起流程成功");
       });
     });
   }
@@ -288,7 +288,7 @@ export default class BalanceSchedule extends Component {
         }
       ).then(() => {
         this.setState({ deletevisible: false });
-        message.info("发起成功");
+        message.success("发起成功");
       });
     });
   };

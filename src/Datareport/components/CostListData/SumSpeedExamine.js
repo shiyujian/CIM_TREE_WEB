@@ -56,7 +56,7 @@ export default class SumSpeedExamine extends Component {
             await this.reject();
         }
         this.props.closeModal("cost_sum_spd_visible",false)
-        message.info("操作成功")
+        message.success("操作成功")
     }
     //通过
     async passon(){
