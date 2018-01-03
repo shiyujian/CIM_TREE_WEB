@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions} from '../../store/ModalData';
 import {actions as platformActions} from '_platform/store/global';
-import { Modal, Input, Form, Button, message, Table, Radio, Row, Col,DatePicker,Select } from 'antd';
+import { Modal, Input, Form, Button, message, Table, Radio, Row, Col,DatePicker,Select,notification } from 'antd';
 import WorkflowHistory from '../WorkflowHistory'
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import {getUser} from '_platform/auth';
@@ -79,7 +79,7 @@ export default class ModifyCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("modify_check_visbile", false);
-        message.info("操作成功");
+        notification.info({message:"操作成功"});
     }
 
     //通过
@@ -183,7 +183,7 @@ export default class ModifyCheck extends Component {
         Promise.all(all)
             .then(rst => {
                
-                message.success('修改文档成功！');
+                notification.success({message:'修改文档成功！'});
             })
 
     }
@@ -291,7 +291,7 @@ export default class ModifyCheck extends Component {
                 onCancel={this.cancel.bind(this)}
 
             >
-                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>变更审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}

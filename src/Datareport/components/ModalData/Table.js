@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input, Progress } from 'antd';
+import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input, Progress,notification } from 'antd';
 import { WORKFLOW_CODE, STATIC_DOWNLOAD_API, SOURCE_API,NODE_FILE_EXCHANGE_API,DataReportTemplate_ModalInformation } from '_platform/api.js';
 import Card from '_platform/components/panels/Card';
 const Search = Input.Search
@@ -68,7 +68,7 @@ export default class ModalTable extends Component {
 					num++;
 					this.setState({ percent: parseFloat((num * 100 / total).toFixed(2)), num: num });
 					if (!rst) {
-						message.error(`数据获取失败`)
+						notification.error({message:'数据获取失败'})
 						return []
 					} else {
 						return rst
@@ -248,7 +248,7 @@ export default class ModalTable extends Component {
 		const { modify = {}, actions: { changeModifyField } } = this.props;
 		const {selectedDataSource} = this.state;
 		if(selectedDataSource.length === 0){
-        	message.warning('请先选择数据再变更')
+        	notification.warning({message:'请先选择数据!'})
         	return
         }
 		changeModifyField('visible', true)
@@ -260,7 +260,7 @@ export default class ModalTable extends Component {
 		const { expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		const {selectedDataSource} = this.state;
 		if(selectedDataSource.length === 0){
-        	message.warning('请先选择数据再删除')
+        	notification.warning({message:'请先选择数据!'})
         	return
         }
 		changeExpurgateField('visible', true)
@@ -274,7 +274,7 @@ export default class ModalTable extends Component {
 		const { actions: { jsonToExcel } } = this.props;
 		const {selectedDataSource} = this.state;
 		if(selectedDataSource.length === 0){
-        	message.warning('请先选择数据再导出')
+        	notification.warning({message:'请先选择数据!'})
         	return
         }
 		let rows = [];

@@ -54,7 +54,7 @@ export default class ExpurgateCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("expurgate_check_visbile", false);
-        message.info("操作成功");
+        notification.info({message:"操作成功!"});
     }
 
     //通过
@@ -88,12 +88,12 @@ export default class ExpurgateCheck extends Component {
         if (rst.result) {
             notification.success({
                 message: '删除文档成功！',
-                duration: 2
+               
             });
         } else {
             notification.error({
                 message: '删除文档失败！',
-                duration: 2
+               
             });
         }
     }
@@ -116,10 +116,10 @@ export default class ExpurgateCheck extends Component {
             dataIndex: 'coding'
         }, {
             title: '项目/子项目名称',
-            dataIndex: 'project.name'
+            dataIndex: 'project'
         }, {
             title: '单位工程',
-            dataIndex: 'unit.name'
+            dataIndex: 'unit'
         }, {
             title: '模型名称',
             dataIndex: 'modelName'
@@ -162,7 +162,7 @@ export default class ExpurgateCheck extends Component {
                 onCancel={this.cancel.bind(this)}
 
             >
-                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>删除审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}

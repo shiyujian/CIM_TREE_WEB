@@ -93,7 +93,7 @@ export default class Modify extends Component {
 	onok() {
 		let { dataSource } = this.state;
 		if (!this.state.check) {
-			message.info("请选择审核人")
+			notification.info({message:"请选择审核人"})
 			return;
 		}
 		let { check } = this.state;
@@ -144,7 +144,7 @@ export default class Modify extends Component {
 					}],
 					attachment: null
 				}).then(() => {
-					message.success("成功")
+					notification.success({message:"成功"})
 					changeModifyField('visible', false)
 				})
 		})
@@ -320,7 +320,7 @@ export default class Modify extends Component {
 				onOk={this.onok.bind(this)}
 
 			>
-				 <h1 style={{textAlign:'center',marginBottom:20}}>结果预览</h1>
+				 <h1 style={{textAlign:'center',marginBottom:20}}>申请变更</h1>
 				<Row>
 					<Table
 						bordered
@@ -409,7 +409,7 @@ export default class Modify extends Component {
 			resp = await resp.json()
 			
 			if (!resp || !resp.id) {
-				message.error('文件上传失败')
+				notification.error({message:'文件上传失败'})
 				return;
 			};
 			const filedata = resp;

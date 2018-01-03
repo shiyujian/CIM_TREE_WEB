@@ -52,8 +52,8 @@ export default class Expurgate extends Component {
 				    index: index + 1,
 					coding: single.extra_params.coding,
 					modelName: single.extra_params.filename,
-					project: single.extra_params.project,
-					unit: single.extra_params.unit,
+					project: single.extra_params.project.name,
+					unit: single.extra_params.unit.name,
 					submittingUnit: single.extra_params.submittingUnit,
 					modelDescription: single.extra_params.modelDescription,
 					// file:single.basic_params.files[0],
@@ -82,7 +82,7 @@ export default class Expurgate extends Component {
 		let {dataSource} = this.state;
 	
 		if (!this.state.check) {
-			message.info("请选择审核人")
+			notification.info({message:"请选择审核人!"})
 			return;
 		}
 		let { check } = this.state;
@@ -132,7 +132,7 @@ export default class Expurgate extends Component {
 					}],
 					attachment: null
 				}).then(() => {
-					message.success("成功")
+					notification.success({message:"成功"})
 					changeExpurgateField('visible',false);
 				})
 		})
@@ -226,7 +226,7 @@ export default class Expurgate extends Component {
 				onCancel={this.cancel.bind(this)}
 				onOk={this.onok.bind(this)}
 			>
-			 	<h1 style={{textAlign:'center',marginBottom:20}}>结果预览</h1>
+			 	<h1 style={{textAlign:'center',marginBottom:20}}>申请删除</h1>
 				<Row>
 					<Table
 						bordered

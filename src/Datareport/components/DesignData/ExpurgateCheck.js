@@ -169,7 +169,7 @@ export default class ExpurgateCheck extends Component {
         }]
 		return (
             <Modal
-			title="检验批信息审批表"
+			
             visible={true}
             width= {1280}
 			footer={null}
@@ -177,9 +177,9 @@ export default class ExpurgateCheck extends Component {
 			onCancel={this.cancel.bind(this)}
 			>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>删除审核</h1>
                     <Table 
-                     style={{ marginTop: '10px', marginBottom:'10px' }}
+                     
                      columns={columns}
                      dataSource={this.state.dataSource}
                      bordered 
