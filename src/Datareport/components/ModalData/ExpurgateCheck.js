@@ -35,9 +35,9 @@ export default class ExpurgateCheck extends Component {
     }
     async componentDidMount() {
         const { wk } = this.props
-        console.log('wk',this.props)
+       
         let dataSources = JSON.parse(wk.subject[0].data)
-        console.log('asdfxsfdgg:',dataSources)
+       
         let dataSource = [];
         dataSources.map(item => {
             dataSource.push(item)
@@ -79,7 +79,7 @@ export default class ExpurgateCheck extends Component {
         dataSource.map(item=>{
             docCode.push(item.code);
         })
-        console.log('doc:',docCode)
+        
        
 
         let rst = await delDocList({}, { code_list: docCode });
@@ -116,10 +116,10 @@ export default class ExpurgateCheck extends Component {
             dataIndex: 'coding'
         }, {
             title: '项目/子项目名称',
-            dataIndex: 'project'
+            dataIndex: 'project.name'
         }, {
             title: '单位工程',
-            dataIndex: 'unit'
+            dataIndex: 'unit.name'
         }, {
             title: '模型名称',
             dataIndex: 'modelName'
@@ -180,11 +180,7 @@ export default class ExpurgateCheck extends Component {
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
-                        <Button type='primary'>
-                            导出表格
-                        </Button>
-                    </Col>
+                   
                     <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交

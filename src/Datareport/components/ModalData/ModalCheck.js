@@ -205,7 +205,7 @@ export default class ModalCheck extends Component {
     cancel() {
     	this.props.closeModal("modal_check_visbile",false)
     }
-	render() {      //index有问题
+	render() {     
         const columns = [
 			{
 				title: '序号',
@@ -289,11 +289,7 @@ export default class ModalCheck extends Component {
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
+                       
                         <Col span={2} push={14}>
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
