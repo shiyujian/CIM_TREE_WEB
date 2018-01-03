@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/persondata';
 import {actions as actions2} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,Notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,USER_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
@@ -37,7 +37,6 @@ export default class PersonCheck extends Component {
         let dataSource = JSON.parse(wk.subject[0].data)
         let tempData = [...dataSource];
         this.setState({dataSource,tempData,wk})
-        console.log("oijiioj:",dataSource);
     }
 
     componentWillReceiveProps(props){
@@ -54,7 +53,9 @@ export default class PersonCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("dr_base_person_visible",false)
-        message.info("操作成功")
+        Notification.success({
+            message: "操作成功"
+        })
     }
     //通过
     async passon(){
@@ -72,42 +73,13 @@ export default class PersonCheck extends Component {
             return getOrgCode({code: o.depart})
         })
         let rst = await Promise.all(promises);
-        dataSource.map((item, index) => {
-            console.log('item',item)
-            // data_list.push({
-            //     "code": "" + item.code,
-            //     "name":item.name,
-            //     "basic_params":{
-            //         "photo":item.signature.download_url,
-            //         "signature":item.signature.a_file
-            //     },
-            //     "extra_params": {
-            //         "depart": item.depart,
-            //         "email":item.email,
-            //         "job":item.job,
-            //         "性别":item.sex,
-            //         "电话":item.tel,
-            //     },
-            //     "obj_type":"C_PER",
-            //     "org":{
-            //         "code":item.depart,
-            //         "obj_type": "C_ORG",
-            //         "pk": rst[index].pk,
-            //         "rel_type": "member"
-            //     },
-            //     "title":"title",
-            //     "status": "A",
-            //     "version": "A",
-            //     "first_name":"",
-            //     "last_name":""
-            // })                    
+        dataSource.map((item, index) => {               
             data_list.push({
-
                 "code": "" + item.code,
                 "name":item.name,
                 "basic_params":{
-                    "photo":item.signature.download_url,
-                    "signature":item.signature.a_file,
+                    "photo":item.signature ? item.signature.download_url : '',
+                    "signature":item.signature ? item.signature.a_file : '',
                     info: {
                         "技术职称":item.job,
                         "性别":item.sex,
@@ -132,16 +104,13 @@ export default class PersonCheck extends Component {
                 "last_name":""
             })                    
         })
-        console.log('data_list',data_list)
         postPersonList({},{data_list:data_list}).then(rst => {
-            console.log('rst', rst)
             if (rst.result.length) {
-                message.success("审核成功");
+                // Notification.success("审核成功");
             }
         })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
         .then((rst) => {
-            console.log('rst111',rst)
             let personId = rst.id;
             postAllUsersId({id:personId})
             .then((item) => {})
@@ -170,9 +139,7 @@ export default class PersonCheck extends Component {
         this.setState({opinion:e.target.value})
     }
 	render() {
-        console.log("thissd;ljfidg:",this.state.tempData);
         const {wk} = this.props;
-        console.log("wk",wk);
         const columns = [{
             title: '人员编码',
             dataIndex: 'code',
@@ -208,23 +175,21 @@ export default class PersonCheck extends Component {
         }, {
             title: '二维码',
             render:(record) => {
-                console.log("record:",record);
-                return (
-                    <img style={{width:"60px"}} src = {record.signature.preview_url} />
-                )
+                if(record.account.relative_signature_url !== '') {
+                    return <img style={{width: 60}} src={record.account.relative_signature_url}/>
+                }else {
+                    return <span>暂无</span>
+                }
             }
         }];
 		return (
             <Modal
-			// title="人员信息审批表"
-			// key={Math.random()}
             visible={true}
             width= {1280}
-            footer={null}
-            onCancel = {() => this.props.closeModal("dr_base_person_visible",false)}
-			maskClosable={false}>
+            onOk={this.submit.bind(this)}
+            onCancel = {() => this.props.closeModal("dr_base_person_visible",false)}>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>填报审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.tempData}
@@ -240,9 +205,6 @@ export default class PersonCheck extends Component {
                             </RadioGroup>
                         </Col>
                         <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
                             <Preview />
                         </Col>
                     </Row>

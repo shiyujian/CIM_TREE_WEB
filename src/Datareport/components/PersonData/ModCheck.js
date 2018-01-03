@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/persondata';
 import {actions as actions2} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,Notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,USER_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
@@ -35,10 +35,8 @@ export default class ModCheck extends Component {
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        console.log("dataSource:",dataSource);
         let tempData = [...dataSource];
         this.setState({dataSource,tempData,wk})
-        console.log("wk:",wk);
 
     }
 
@@ -56,7 +54,9 @@ export default class ModCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("person_modcheck_visible",false)
-        message.info("操作成功")
+        Notification.success({
+            message: "操作成功"
+        })
     }
     //通过
     async passon(){
@@ -71,15 +71,11 @@ export default class ModCheck extends Component {
         let data_list = [];
         
         let promises = JSON.parse(wk.subject[0].data).map((o) => {
-            console.log('o',o)
             return getOrgCode({code: o.account.org_code})
         })
         let rst = await Promise.all(promises);
-        console.log('rst',rst)
-        dataSource.map((item, index) => {
-            console.log('item',item)                   
+        dataSource.map((item, index) => {                 
             data_list.push({
-
                 "code": "" + item.code,
                 "name":item.account.person_name,
                 "basic_params":{
@@ -105,16 +101,13 @@ export default class ModCheck extends Component {
                 "last_name": "",              
             })                    
         })
-        console.log('data_list',data_list)
         putPersonList({},{data_list:data_list}).then(rst => {
-            console.log('rst', rst)
             // if (rst.result.length) {
-            //     message.success("审核成功");
+            //     Notification.success("审核成功");
             // }
         })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null})
         .then((rst) => {
-            console.log('rst111',rst)
             let personId = rst.id;
             postAllUsersId({id:personId})
             .then((item) => {})
@@ -143,9 +136,7 @@ export default class ModCheck extends Component {
         this.setState({opinion:e.target.value})
     }
     render() {
-        console.log("thissd;ljfidg:",this.state.tempData);
         const {wk} = this.props;
-        console.log("wk",wk);
         const columns = [{
             title: '人员编码',
             dataIndex: 'code',
@@ -181,10 +172,11 @@ export default class ModCheck extends Component {
         }, {
             title: '二维码',
             render:(record) => {
-            console.log("record:",record);
-                return (
-                    <img style={{width:"60px"}} src = {record.account.relative_avatar_url} />
-                )
+                if(record.account.relative_signature_url !== '') {
+                    return <img style={{width: 60}} src={record.account.relative_signature_url}/>
+                }else {
+                    return <span>暂无</span>
+                }
             }
         }];
         return (
@@ -192,11 +184,10 @@ export default class ModCheck extends Component {
             // key={Math.random()}
             visible={true}
             width= {1280}
-            footer={null}
-            onCancel = {() => this.props.closeModal("person_modcheck_visible",false)}
-            maskClosable={false}>
+            onOk={this.submit.bind(this)}
+            onCancel = {() => this.props.closeModal("person_modcheck_visible",false)}>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>变更审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.tempData}

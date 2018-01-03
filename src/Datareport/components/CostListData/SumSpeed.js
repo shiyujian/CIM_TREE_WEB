@@ -22,10 +22,12 @@ import {
   SERVICE_API,
   FILE_API,
   STATIC_DOWNLOAD_API,
-  SOURCE_API
+  SOURCE_API,
+  DataReportTemplate_SettlementProgress
 } from "_platform/api";
 import "../../containers/quality.less";
 import Preview from "../../../_platform/components/layout/Preview";
+const moment = require('moment');
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -188,16 +190,22 @@ export default class SumSpeed extends Component {
 
   onok() { 
         if (!this.state.check) {
-          message.info("请选择审核人");
+          notification.warning({
+            message:'请选择审核人'
+          })
           return;
         }
         if (this.state.dataSource.length === 0) {
-          message.info("请上传excel");
+          notification.warning({
+            message:'请上传Excel表'
+          })
           return;
         }
         const { project, unit } = this.state;
         if (!project.name) {
-          message.info(`请选择项目和单位工程`);
+          notification.warning({
+            message:'请选择项目和单位工程'
+          })
           return;
         }
         let { check } = this.state;
@@ -286,10 +294,37 @@ export default class SumSpeed extends Component {
         {!editable ?(
           <span>{data.value}</span>
         ) :(
-          <Input value={data.value} onChange = {e => this.handeleChange(index,text,e.target.value)}/>
+          text === 'completiontime' ? <Input value={data.value} onChange = {e => this.handeleChange(index,text,e.target.value)} onBlur={this.dataChange}/>
+          : <Input value={data.value} onChange = {e => this.handeleChange(index,text,e.target.value)}/>
         )}
       </div>
     )
+  }
+  // 正则时间匹配
+  dataChange(e){
+    let data = moment(e.target.value).format('YYYY-MM-DD');
+    if(data.match(/^((?:19|20)\d\d)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/)){
+    }else{
+        notification.warning({
+          message:'请检查输入日期格式是否为YYYY-MM-DD'
+        })
+    }
+  }
+  createLink = (name, url) => {    //下载
+    let link = document.createElement("a");
+    link.href = url;
+    link.setAttribute('download', this);
+    link.setAttribute('target', '_blank');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+// 模板下载
+  downloadT () {
+    console.log(DataReportTemplate_SettlementProgress)
+    this.createLink(this,DataReportTemplate_SettlementProgress);
+    // const url = "http://10.215.160.38:6542/media/documents/meta/%E7%BB%93%E7%AE%97%E8%BF%9B%E5%BA%A6%E6%95%B0%E6%8D%AE%E5%A1%AB%E6%8A%A5%E6%A8%A1%E6%9D%BF.xlsx";
+    // this.createLink(this,url);
   }
   render() {
     const columns = [
@@ -367,14 +402,13 @@ export default class SumSpeed extends Component {
     ];
     return (
       <Modal
-        title="结算进度上传流程表"
         visible={true}
         width={1280}
         onOk={this.onok.bind(this)}
         maskClosable={false}
         onCancel={this.props.oncancel}
       >
-      <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度发起流程</h1>
+      <h1 style ={{textAlign:'center',marginBottom:20}}>发起填报</h1>
         <Table
           columns={columns}
           dataSource={this.state.dataSource}
@@ -382,9 +416,9 @@ export default class SumSpeed extends Component {
           pagination={{ pageSize: 10 }}
         />
         <Row style={{ marginBottom: "30px" }} type="flex">
-          {/* <Col>
-            <Button style={{ margin: "10px 10px 10px 0px" }}>模板下载</Button>
-          </Col> */}
+          <Col>
+            <Button style={{ margin: "10px 10px 10px 0px" }} onClick={this.downloadT.bind(this)}>模板下载</Button>
+          </Col>
           <Col>
             <Upload
               onChange={this.uplodachange.bind(this)}

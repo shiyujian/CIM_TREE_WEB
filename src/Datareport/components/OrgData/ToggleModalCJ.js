@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon,TreeSelect} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
+import {Table,Button,Popconfirm,notification,Input,Modal,Upload,Select,Icon,TreeSelect} from 'antd';
+import {UPLOAD_API,SERVICE_API,FILE_API,DataReportTemplate_ConstructionUnits} from '_platform/api';
 import { getUnit } from '../../store/orgdata';
 import { Promise } from 'es6-promise';
 import './TableOrg.less'
@@ -37,9 +37,13 @@ export default class ToggleModalCJ extends Component{
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
                     jthis.handleExcelData(importData);
-		            message.success(`${info.file.name} file uploaded successfully`);
+		            notification.success({
+                        message:`${info.file.name} 上传成功`
+                    });
 		        } else if (info.file.status === 'error') {
-		            message.error(`${info.file.name}解析失败，请检查输入`);
+		            notification.error({
+                        message:`${info.file.name}解析失败，请检查输入`
+                    });
 		        }
 		    },
         };
@@ -50,7 +54,7 @@ export default class ToggleModalCJ extends Component{
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>新增参建单位</h1>
                 <Table 
                     style = {{"textAlign":"center"}}
                     columns={this.columns}
@@ -58,9 +62,10 @@ export default class ToggleModalCJ extends Component{
                     dataSource = {this.state.dataSource}
                 >
                 </Table>
+                <Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_ConstructionUnits}`)} type="default">模板下载</Button>
                 <Upload {...props}>
                     <Button style={{ margin: '10px 10px 10px 0px' }}>
-                        <Icon type="upload" />上传附件
+                        <Icon type="upload" />上传并预览
                      </Button>
                 </Upload>
                 <span>
@@ -81,6 +86,15 @@ export default class ToggleModalCJ extends Component{
                </div>
             </Modal>
         )
+    }
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
     //判断数据是否重复
     isRepeat(arr){
@@ -140,15 +154,21 @@ export default class ToggleModalCJ extends Component{
     onok(){
         const { actions: { ModalVisibleCJ} } = this.props;
         if (!this.state.passer) {
-            message.error('审批人未选择');
+            notification.warning({
+                message:'审批人未选择'
+            });
             return;
         }
         if (this.state.flag === false) {
-            message.error('不存在该直属部门');
+            notification.warning({
+                message:'不存在该直属部门'
+            });
             return;
         }
         if (this.state.flag_code === false) {
-            message.error('存在重复的参建单位编码');
+            notification.warning({
+                message:'存在重复的参建单位编码'
+            });
             return;
         }
         this.props.setDataCJ(this.state.dataSource, JSON.parse(this.state.passer));
@@ -179,12 +199,6 @@ export default class ToggleModalCJ extends Component{
         });
         getProjects().then(rst => {
             if (rst.children.length) {
-                // let projects = rst.children.map(item => {
-                //     return (
-                //         // <Option value={JSON.stringify(item)}>{item.name}</Option>
-                //         <Option value={JSON.stringify(item)}>{item.name}</Option>
-                //     )
-                // })
                 let projects = rst.children;
                 this.setState({
                     projects,
@@ -269,7 +283,6 @@ export default class ToggleModalCJ extends Component{
         data.map((item, index) => {
             item.index = index + 1;
         })
-        console.log("data1:",data);
         let repeatCode = this.isRepeat(codes);
         if (repeatCode.length > 1) {
             this.setState({
@@ -367,7 +380,7 @@ export default class ToggleModalCJ extends Component{
                     okText="确认"
                     onCancel="取消"
                 >
-                    <Icon type = "delete" />
+                    <a><Icon type = "delete" /></a>
                 </Popconfirm>
                 
             </span>
