@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from 'antd';
+import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, Table, Row, Col, notification } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_SafetySpecial } from '_platform/api';
 import EditableCell from './EditableCell';
-// import index from 'antd/lib/icon';
 
 const Search = Input.Search;
 const FormItem = Form.Item;
@@ -44,7 +43,7 @@ export default class ToggleModal extends Component {
                 onCancel={this.cancel.bind(this)}
                 maskClosable={false}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
                 <Table
                     columns={this.columns}
                     bordered={true}
@@ -52,7 +51,7 @@ export default class ToggleModal extends Component {
                     rowKey={(item, index) => index}
                     // pagination={paginationInfo}
                     pagination={false}
-                    scroll={{y:450}}
+                    scroll={{ y: 450 }}
                 >
                 </Table>
                 <Row>
@@ -60,9 +59,9 @@ export default class ToggleModal extends Component {
                         !this.state.dataSource.length ? <p></p>
                             :
                             (
-                                <Col span={3} push={12} 
-                                // style={{ position: 'relative', top: -40, fontSize: 12 }}
-                                style={{ margin:"16px 0" }}
+                                <Col span={3} push={12}
+                                    // style={{ position: 'relative', top: -40, fontSize: 12 }}
+                                    style={{ margin: "16px 0" }}
                                 >
                                     [共：{this.state.dataSource.length}行]
 								</Col>
@@ -145,7 +144,10 @@ export default class ToggleModal extends Component {
             let dataList = info.file.response[name[0]];
             // 模板判断
             if (dataList[0][1] !== "重大安全专项方案") {
-                message.error('Excel模板不相符，请下载最新模板！');
+                notification.warning({
+                    message: 'Excel模板不相符，请下载最新模板！',
+                    duration: 2
+                });
                 return;
             }
             // 代码 校验
@@ -275,23 +277,36 @@ export default class ToggleModal extends Component {
     }
     onok() {
         if (this.state.dataSource.length === 0) {
-            message.info("请上传excel")
+            notification.warning({
+                message: '请上传excel',
+                duration: 2
+            });
             return
         }
         if (!this.state.check) {
-            message.error('审批人未选择');
+            notification.warning({
+                message: '审批人未选择',
+                duration: 2
+            });
             return;
         }
         let temp = this.state.dataSource.some((o, index) => {
             return !o.file.id
         })
         if (temp) {
-            message.info(`有数据未上传附件`)
+            notification.warning({
+                message: '有数据未上传附件',
+                duration: 2
+            });
+
             return
         }
         const { project, unit } = this.state;
         if (!project.name) {
-            message.info(`请选择项目和单位工程`);
+            notification.warning({
+                message: '请选择项目和单位工程',
+                duration: 2
+            });
             return;
         }
 
@@ -299,7 +314,10 @@ export default class ToggleModal extends Component {
             return item.checkout === false;
         })
         if (checkoutInfo) {
-            message.info(`编制单位有误,请修正！`);
+            notification.warning({
+                message: '编制单位有误,请修正！',
+                duration: 2
+            });
             return;
         }
         let { check } = this.state
@@ -339,6 +357,7 @@ export default class ToggleModal extends Component {
             this.setState({ checkers })
         })
         getProjectTree({ depth: 1 }).then(rst => {
+            debugger;
             if (rst.status) {
                 let projects = rst.children.map(item => {
                     return (
@@ -379,8 +398,10 @@ export default class ToggleModal extends Component {
         fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
             resp = await resp.json()
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
-                return;
+                notification.warning({
+                    message: '文件上传失败',
+                    duration: 2
+                });
             };
             const filedata = resp;
             filedata.a_file = this.covertURLRelative(filedata.a_file);
@@ -505,7 +526,7 @@ export default class ToggleModal extends Component {
         });
     }
 
-     Checkout(ndex, key, record) {
+    Checkout(ndex, key, record) {
         let checkedValue = false;
         const { actions: { checkoutData } } = this.props;
         return async (value) => {
@@ -537,30 +558,8 @@ export default class ToggleModal extends Component {
     onCellChange = (index, key, record) => {
         const { dataSource } = this.state;
         return (value) => {
-            // dataSource[index][key] = value;
             record[key] = value;
         };
-        // return (value, checkedValue) => {
-        //     const { dataSource } = this.state;
-        //     const target = dataSource.find(item => item.sign === record.sign)
-        //     if (target) {
-        //         target[key] = value;
-        //         this.setState({
-        //             ...this.state,
-        //             dataSource: dataSource.map((item, index) => {
-        //                 if (item.sign === record.sign) {
-        //                     return {
-        //                         ...item,
-        //                         organizationUnit: value,
-        //                         checkout: checkedValue
-        //                     }
-        //                 } else {
-        //                     return item;
-        //                 }
-        //             })
-        //         })
-        //     }
-        // };
     }
 
     columns = [
@@ -570,7 +569,7 @@ export default class ToggleModal extends Component {
             width: '5%',
             key: '0',
             render: (text, record, index) => {
-                return index+1
+                return index + 1
             }
         }
         ,
@@ -617,9 +616,9 @@ export default class ToggleModal extends Component {
                                 record={record}
                                 editOnOff={false}
                                 value={record.organizationUnit}
-                                onChange={this.onCellChange.call(this,record.sign - 2, "organizationUnit", record)}
+                                onChange={this.onCellChange.call(this, record.sign - 2, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
-                                checkVal={this.Checkout.call(this,record.sign - 2, "organizationUnit", record)}
+                                checkVal={this.Checkout.call(this, record.sign - 2, "organizationUnit", record)}
                             />
                         </div>
                         :
@@ -630,9 +629,9 @@ export default class ToggleModal extends Component {
                                 record={record}
                                 editOnOff={false}
                                 value={record.organizationUnit}
-                                onChange={this.onCellChange.call(this,record.sign - 2, "organizationUnit", record)}
+                                onChange={this.onCellChange.call(this, record.sign - 2, "organizationUnit", record)}
                                 asyncCheckout={this.state.asyncCheckout}
-                                checkVal={this.Checkout.call(this,record.sign - 2, "organizationUnit", record)}
+                                checkVal={this.Checkout.call(this, record.sign - 2, "organizationUnit", record)}
                             />
                         </div>
                 )
@@ -678,7 +677,7 @@ export default class ToggleModal extends Component {
                             onConfirm={this.remove.bind(this, index, record)}
                             okText="确认"
                             cancelText="取消">
-                            <a>删除</a>
+                            <a><Icon type='delete'/></a>
                         </Popconfirm>
                     </span>)
                 } else {
@@ -707,7 +706,7 @@ export default class ToggleModal extends Component {
                         onConfirm={this.delete.bind(this, index, record)}
                         okText="确认"
                         cancelText="取消">
-                        <a>删除</a>
+                        <a><Icon type='delete'/></a>
                     </Popconfirm>
                 )
             }
