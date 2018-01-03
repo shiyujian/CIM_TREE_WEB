@@ -203,7 +203,7 @@ export default class ProjectSumChange extends Component {
             //   },
             //   key:"Number"
             },{
-                title: "单价",
+                title: "综合单价(元)",
                 dataIndex: 'total',
                 render:(text,record,index)=>(
                     <Input value={this.state.dataSource[record.key-1]['total']} onChange={this.tableDataChange.bind(this,record.key-1,'total')}/>
