@@ -46,6 +46,11 @@ export default class PriceRmModal extends Component {
 	//ok
 	onok(){
         let {dataSource} = this.state;
+        if(!dataSource.length) {
+            message.info("数据不能为空")
+            return
+        }
+        
         if(!this.state.check){
             message.info("请选择审核人")
             return

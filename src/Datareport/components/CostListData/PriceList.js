@@ -80,12 +80,12 @@ export default class PriceList extends Component {
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
                     filename: dataList[i][0] ? dataList[i][0] : '',
-                    projectcoding: dataList[i][1] ? dataList[i][1] : '',
-                    valuation: dataList[i][2] ? dataList[i][2] : '',
-                    rate: dataList[i][3] ? dataList[i][3] : '',
-                    company: dataList[i][4] ? dataList[i][4] : '',
-                    total: dataList[i][5] ? dataList[i][5] : '',
-                    remarks: dataList[i][5] ? dataList[i][6] : '',
+                    projectcoding: dataList[i][0] ? dataList[i][0] : '',
+                    valuation: dataList[i][1] ? dataList[i][1] : '',
+                    rate: dataList[i][2] ? dataList[i][2] : '',
+                    company: dataList[i][3] ? dataList[i][3] : '',
+                    total: dataList[i][4] ? dataList[i][4] : '',
+                    remarks: dataList[i][5] ? dataList[i][5] : '',
                     flag: dataList[i].flag,
                     project:{
                         code:"",
@@ -97,10 +97,6 @@ export default class PriceList extends Component {
                         name:"",
                         obj_type:"",
                         pk: ""
-                    },
-                    file:{
-                        id: 'pricelist',
-                        name: 'priceList'
                     },
                     key: i
                 })
@@ -189,19 +185,16 @@ export default class PriceList extends Component {
     }
 	//ok
 	onok(){
+        if(!this.state.dataSource.length) {
+            message.info("数据不能为空");
+            return
+        }
         if(!this.state.check){
             message.info("请选择审核人")
             return
         }
         if(this.state.dataSource.length === 0){
             message.info("请上传excel")
-            return
-        }
-        let temp = this.state.dataSource.some((o,index) => {
-                        return !o.file.id
-                    })
-        if(temp){
-            message.info(`有数据未上传附件`)
             return
         }
         let flag = this.state.dataSource.some((o,index) => {
@@ -232,8 +225,8 @@ export default class PriceList extends Component {
     }
     //删除
     delete(index){
-        let {dataSource} = this.state
-        dataSource.splice(index,1)
+        let {dataSource} = this.state;
+        dataSource = dataSource.filter(item => item.key != index);
         this.setState({dataSource})
     }
 
@@ -456,7 +449,7 @@ export default class PriceList extends Component {
             },{
                 title:'工程内容/规格编号',
                 dataIndex:'rate',
-                width:"12%",
+                width:"30%",
                 render: (text, record, index) => {
                     let {dataSource} = this.state;
                     let editable = dataSource[record.key - 1].editable;
@@ -541,7 +534,7 @@ export default class PriceList extends Component {
                             <Popconfirm
                                 placement="leftTop"
                                 title="确定删除吗？"
-                                onConfirm={this.delete.bind(this, index)}
+                                onConfirm={this.delete.bind(this, record.key)}
                                 okText="确认"
                                 cancelText="取消">
                                 <a><Icon type = "delete"/></a>
