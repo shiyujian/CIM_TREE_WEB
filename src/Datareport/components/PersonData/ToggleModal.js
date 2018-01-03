@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
+import {Table,Button,Popconfirm,Notification,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
+import {UPLOAD_API,SERVICE_API,FILE_API,DataReportTemplate_PersonInformation} from '_platform/api';
 const Search = Input.Search;
 export default class ToggleModal extends Component{
     constructor(props){
@@ -12,6 +12,7 @@ export default class ToggleModal extends Component{
             org: [],
             subErr: true,
             flag_code: true,
+            repeatCode:[],
         }
     }
     render(){
@@ -31,9 +32,13 @@ export default class ToggleModal extends Component{
                     jthis.setState({
                         dataSource
                     })
-                    message.success(`${info.file.name} file uploaded successfully`);
+                    Notification.success({
+                        message: `${info.file.name}上传成功`
+                    });
                 } else if (info.file.status === 'error') {
-                    message.error(`${info.file.name}解析失败，请检查输入`);
+                    Notification.error({
+                        message: `${info.file.name}解析失败，请检查输入`
+                    });
                 }
             },
         };
@@ -46,7 +51,6 @@ export default class ToggleModal extends Component{
                 // dataIndex: 'code',
                 // key: 'Code',
                 render:(text, record, index) => {
-                    // console.log('record',record)
                     if(this.state.repeatCode.indexOf(record.code) != -1) {
                         return <span style={{color: 'red'}}>{record.code}</span>
                     }else {
@@ -58,7 +62,6 @@ export default class ToggleModal extends Component{
                 dataIndex: 'record.name',
                 key: 'Name',
                 render:(text, record, index) =>{
-                    // console.log('record',record)
                     return <Input style={{width: '60px'}} value = {record.name || ""} onChange={ele => {
                         record.name = ele.target.value
                         this.forceUpdate();
@@ -69,7 +72,6 @@ export default class ToggleModal extends Component{
                 dataIndex: 'record.org',
                 key: 'Org',
                 render:(text, record, index) =>{
-                    // console.log('record',record)
                     if(record.account) {
                         return record.org = record.account.org
                     }else {
@@ -81,7 +83,6 @@ export default class ToggleModal extends Component{
                 // dataIndex: 'account.org_code',
                 key: 'Depart',
                 render:(text, record, index) =>{
-                    console.log('1111',record)
                     if(record.org) {
                         return <Input
                             style={{width: '60px'}} 
@@ -113,7 +114,7 @@ export default class ToggleModal extends Component{
                 dataIndex: 'record.sex',
                 key: 'Sex',
                 render:(text, record, index) =>{
-                    return <Select value = {record.sex} onChange={ele => {
+                    return <Select style={{width: 42}} value = {record.sex} onChange={ele => {
                         record.sex = ele
                         this.forceUpdate();
                     }}>
@@ -162,7 +163,7 @@ export default class ToggleModal extends Component{
                         okText="确认"
                         cancelText="取消"
                     >
-                        <a>删除</a>
+                        <a><Icon type = 'delete'/></a>
                     </Popconfirm>
                 )
         }]
@@ -173,16 +174,16 @@ export default class ToggleModal extends Component{
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
                 <div>
-                    <Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource = {this.state.dataSource}
                         bordered />
+                    <Button style={{ margin: '10px 10px 10px 0px' }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button>
                     <Upload {...props}>
                         <Button style={{ margin: '10px 10px 10px 0px' }}>
-                            <Icon type="upload" />上传附件
+                            <Icon type="upload" />上传并附件
                         </Button>
                     </Upload>
                     <span>
@@ -195,7 +196,6 @@ export default class ToggleModal extends Component{
                             }
                         </Select>
                     </span>
-                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
                 </div>
                 <div style={{ marginTop: 20 }}>
                     注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
@@ -217,8 +217,13 @@ export default class ToggleModal extends Component{
     }
     beforeUploadPic(record,file){
         const fileName = file.name;
-		// 上传到静态服务器
-		const { actions:{uploadStaticFile} } = this.props;
+        // const isJPG = file.type ? 'image/jpeg, image/png';
+        // if (!isJPG) {
+        //     Notification.error('图片');
+        //     return false;
+        // }
+        // 上传到静态服务器
+        const { actions:{uploadStaticFile} } = this.props;
 		const formdata = new FormData();
 		formdata.append('a_file', file);
         formdata.append('name', fileName);
@@ -238,33 +243,26 @@ export default class ToggleModal extends Component{
         return false;
     }
     onok() {
-        console.log("datasource",this.state.dataSource);
         const { actions: { ModalVisible } } = this.props;
-        let ok = this.state.dataSource.some(ele => {
-            return !ele.signature;
+        let temp = this.state.dataSource.some((o,index) => {
+            return o.org === ''
         });
-        if(ok){
-            message.error('有附件未上传');
-            return;
-        };
         if (!this.state.passer) {
-            message.error('审批人未选择');
+            Notification.warning({
+                message: '审批人未选择'
+            });
             return;
         }
-        let temp = this.state.dataSource.some((o,index) => {
-            console.log('o',o)
-            return o.org === ''
-        })
         if(temp) {
-            message.info('部门不存在，无法提交')
+            Notification.warning({
+                message: '部门不存在，无法提交'
+            })
             return
         }
-        // if(this.state.subErr === false) {
-        //     message.error('部门不存在，无法提交');
-        //     return;
-        // }
         if(this.state.flag_code === false) {
-            message.error('您有重复的人员编码');
+            Notification.warning({
+                message: '人员编码有重复'
+            });
             return;
         }
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
@@ -273,6 +271,17 @@ export default class ToggleModal extends Component{
     cancel() {
         const { actions: { ModalVisible } } = this.props;
         ModalVisible(false);
+    }
+
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     tableDataChange(index ,e ){
@@ -295,17 +304,15 @@ export default class ToggleModal extends Component{
     //校验部门
     fixOrg(index){
         const {actions: {getOrgReverse}} = this.props;
-        let {dataSource} = this.state
-        // console.log('dataSource1111',dataSource)
+        const {dataSource} = this.state
         getOrgReverse({code:dataSource[index].depart}).then(rst => {
-            // console.log('rst',rst)
             if(rst.children.length !== 0){
                 dataSource[index]['account'] = {
                     org: rst.children[0].name
                 }
                 this.setState({dataSource})
             }else{
-                message.info("部门不存在")
+                Notification.warning("部门不存在")
             }
         })
     }
@@ -313,7 +320,9 @@ export default class ToggleModal extends Component{
     delete(index){
         let dataSource = this.state.dataSource;
         dataSource.splice(index,1);
-        this.setState({dataSource});
+        this.setState({flag_code:true, subErr:true})
+        this.delData(dataSource);
+        this.setState({dataSource})
     }
 
     //判断数据重复
@@ -328,13 +337,57 @@ export default class ToggleModal extends Component{
         }
         return repeatCode;
     }
+    // 处理数据删除之后的校验
+    delData(data) {
+        const {actions: {getOrgReverse}} = this.props;
+        let codes = [];
+        let promises = data.map(item => {
+            codes.push(item.code)
+            return getOrgReverse({code: item.depart});
+        })
+        let repeatCode = this.isRepeat(codes);
+        if(repeatCode.length > 1) {
+            this.setState({flag_code: false})
+        }
+        this.setState({repeatCode})
+        let res, orgname = [];
+        Promise.all(promises).then(rst => {
+            rst.map(item => {
+                if(item.children.length === 0) {
+                    orgname.push('');
+                    this.setState({
+                        subErr: false
+                    })
+                }
+                else{
+                    orgname.push(item.children[0].name);
+                }
+            })
+            res = data.map((item, index) => {
+                return {
+                    index: index + 1,
+                    code: item.code || '',
+                    name: item.name || '',
+                    org: orgname[index] || '',
+                    depart: item.depart || '',
+                    job: item.job || '',
+                    sex: item.sex || '',
+                    tel: item.tel || '',
+                    email: item.email || '',
+                }
+            })
+            this.setState({
+                dataSource:res
+            })
+        })
+    }
     //处理上传excel的数据
     handleExcelData(data) {
         const {actions: {getOrgReverse}} = this.props;
         data.splice(0, 1);
         let codes = [];
         let promises = data.map(item => {
-            codes.push(item[1])
+            codes.push(item[0])
             return getOrgReverse({code: item[2]});
         })
         let repeatCode = this.isRepeat(codes);
@@ -358,14 +411,14 @@ export default class ToggleModal extends Component{
             res = data.map((item, index) => {
                 return {
                     index: index + 1,
-                    code: item[0],
-                    name: item[1],
-                    org: orgname[index],
-                    depart: item[2],
-                    job: item[3],
-                    sex: item[4],
-                    tel: item[5],
-                    email: item[6],
+                    code: item[0] || '',
+                    name: item[1] || '',
+                    org: orgname[index] || '',
+                    depart: item[2] || '',
+                    job: item[3] || '',
+                    sex: item[4] || '',
+                    tel: item[5] || '',
+                    email: item[6] || '',
                 }
             })
             this.setState({

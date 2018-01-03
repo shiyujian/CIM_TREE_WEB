@@ -30,7 +30,7 @@ export default class ModalTable extends Component {
 			selectedDataSource.push(dataSource[key-1])
 		})
 		this.setState({selectedDataSource})
-		console.log('selectedDatas', selectedDatas)
+	
 		changeModifyField('selectedDatas', selectedDatas)
 		changeExpurgateField('selectedDatas', selectedDatas)
 	}
@@ -40,7 +40,7 @@ export default class ModalTable extends Component {
             getScheduleDir,
 			postScheduleDir,
 		} } = this.props;
-		// console.log('a',this.props)
+		
 		let topDir = await getScheduleDir({ code: 'the_only_main_code_ModalCheck' });
 
 		if (topDir.obj_type) {
@@ -77,7 +77,7 @@ export default class ModalTable extends Component {
 		})
 		Promise.all(all)
 			.then(item => {
-				console.log('item', item)
+				
 				this.setState({ loading: false })
 				item.forEach((single, index) => {
 					let temp = {
@@ -183,8 +183,8 @@ export default class ModalTable extends Component {
 		return (
 			<div>
 				<Row >
-					<Button type="default" onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_ModalInformation}`)} style={{ marginRight: 10 }}>模板下载</Button>
-					<Button style={{ margin: '10px' }} onClick={this.toggleAddition.bind(this)} type="default" >发起填报</Button>
+					
+					<Button style={{ margin: '10px 10px 10px 0' }} onClick={this.toggleAddition.bind(this)} type="default" >发起填报</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleModify.bind(this)} type="default">申请变更</Button>
 					<Button style={{ margin: '10px' }} onClick={this.toggleExpurgate.bind(this)} type="default">申请删除</Button>
 					<Button style={{ margin: '10px' }} onClick={this.getExcel.bind(this)} type="default">导出表格</Button>
@@ -194,11 +194,11 @@ export default class ModalTable extends Component {
 						onSearch={
 							(text) => {
 								let result = this.state.dataSource.filter(data => {
-									console.log('data',data)
+									
 									return data.modelName.indexOf(text) >= 0 || data.coding.indexOf(text) >= 0|| data.modeType.indexOf(text) >= 0|| data.modelDescription.indexOf(text) >= 0
 									|| data.reportingName.indexOf(text) >= 0 || data.submittingUnit.indexOf(text) >= 0;
 								});
-								console.log(result);
+							
 								if (text === '') {
 									result = this.state.dataSource;
 								}
@@ -240,7 +240,7 @@ export default class ModalTable extends Component {
 	}
 	toggleAddition() {
 		const { addtion = {}, actions: { changeAdditionField } } = this.props;
-		console.log('a', this.props)
+	
 		changeAdditionField('visible', true)
 	}
 	
@@ -280,13 +280,11 @@ export default class ModalTable extends Component {
 		let rows = [];
 		rows.push(['模型编码' ,'项目/子项目名称',	'单位工程',	'模型名称',	'提交单位',	'模型描述',	'模型类型', '上报时间', '上报人']);
 		selectedDataSource.map(item => {
-			console.log('测试数据',item)
+		
 			rows.push([ item.coding, item.project, item.unit,item.modelName,  item.submittingUnit, item.modelDescription, item.modeType, item.reportingTime, item.reportingName]);
 		})
 		jsonToExcel({}, { rows: rows })
 			.then(rst => {
-				
-				console.log(NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
 				this.createLink(this, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
 			})
 	}

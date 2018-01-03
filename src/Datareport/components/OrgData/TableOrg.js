@@ -71,7 +71,7 @@ export default class TableOrg extends Component {
 		searchData.map((item, index) => {
 			item.index = index + 1;
 		})
-		this.setState({tempData:searchData}) 
+		this.setState({tempData:searchData}); 
 	}
 	update(){
 		const { actions: { ModalVisibleUpdate, setUpdateOrg } } = this.props;
@@ -82,7 +82,7 @@ export default class TableOrg extends Component {
 				newItem.extra_params = {...newItem.extra_params};
 				newArr.push(newItem);
 
-			})
+			});
 			setUpdateOrg(newArr);
 			ModalVisibleUpdate(true)
 		}else{

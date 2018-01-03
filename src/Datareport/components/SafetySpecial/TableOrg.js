@@ -3,7 +3,6 @@ import { Progress, Row, Col, Table, Form, Button, Popconfirm, message, Input, no
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, NODE_FILE_EXCHANGE_API } from '_platform/api';
 import ChangeFile from './ChangeFile';
 import DeleteFile from './DeleteFile';
-import style from './TableOrg.css';
 import { getNextStates } from '_platform/components/Progress/util';
 import { getUser } from '_platform/auth';
 import { WORKFLOW_CODE } from '_platform/api'
