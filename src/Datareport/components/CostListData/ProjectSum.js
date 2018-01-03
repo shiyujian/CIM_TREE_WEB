@@ -429,8 +429,6 @@ export default class ProjectSum extends Component {
         )
     }
     render() {
-        console.log('this.state.cacheArr',this.state.cacheArr)
-        let {dataSource} = this.state.dataSource;
         const columns = [
             {
                 title: '序号',
@@ -439,7 +437,6 @@ export default class ProjectSum extends Component {
                 title: '清单项目编号',
                 dataIndex: 'projectcoding',
                 render: (text, record, index) => {
-                    console.log('record.flag',record.flag)
                     if(record.flag === false){
                         return (<span style={{color:'red'}}>{record.projectcoding}</span>)    
                     }else{
