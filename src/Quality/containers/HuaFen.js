@@ -74,7 +74,13 @@ export default class HuaFen extends Component {
 									let {delJYP} = jthis.props.cellActions;
 									delJYP({pk:p1.pk}).then(rst=>{
 										console.log('delete',rst);
-										jthis.selectFenxiang(jthis.state.targetFenxiang.pk);
+										jthis.setState({loading:true});
+										setTimeout(
+											()=>{
+												jthis.selectFenxiang(jthis.state.targetFenxiang.pk);
+											}
+										,500);
+										
 									});
 								},
 								onCancel(){}
@@ -362,9 +368,12 @@ export default class HuaFen extends Component {
 			version:'A',
 			name:newName
 		}).then(rst=>{
-			this.selectFenxiang(this.state.targetFenxiang.pk);
+			setTimeout(()=>{				
+				this.setState({editing:false});
+				this.selectFenxiang(this.state.targetFenxiang.pk);
+			},500);
 		});
-		this.setState({editing:false});
+		
 	}
 	render() {
 		const {table: {editing = false} = {}} = this.props;
