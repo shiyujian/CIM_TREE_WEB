@@ -239,15 +239,14 @@ class SafetyDoc extends Component {
 	}
 	onBtnClick = (type) =>{
         const {dataSourceSelected} = this.state;
-        if(dataSourceSelected.length === 0){
-        	message.warning('请先选择数据');
-        }
         if(type==="add"){
             this.setState({setAddVisiable:true});
         }else if(type==="delete" && dataSourceSelected.length!== 0){
             this.setState({setDeleteVisiable:true});
         }else if(type==="edit" && dataSourceSelected.length !== 0){
             this.setState({setEditVisiable:true});
+        }else if(type!=="add" && dataSourceSelected.length===0){
+            message.warning('请先选择数据');
         }
     }
     
