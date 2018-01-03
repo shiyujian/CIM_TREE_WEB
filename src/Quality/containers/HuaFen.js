@@ -104,7 +104,7 @@ export default class HuaFen extends Component {
 		let zifenbus = [];
 		let {getUnitTreeByPk} = this.props.cellActions;
 		getUnitTreeByPk({pk:fenbu}).then(rst=>{
-			console.log(rst);
+			this.setState({selectedfenbu:rst,selectedzifenbu:null,targetFenxiang:null,jianyanpis:[]});
 			if(rst.children.length>0){
 				if(rst.children[0].obj_type ==='C_WP_PTR_S'){
 					zifenbus = rst.children;
@@ -121,6 +121,7 @@ export default class HuaFen extends Component {
 		let {getUnitTreeByPk} = this.props.cellActions;
 		let fenxiangs = [];
 		getUnitTreeByPk({pk:zifenbu}).then(rst=>{
+			this.setState({selectedzifenbu:rst,targetFenxiang:null,jianyanpis:[]});
 			console.log(rst);
 			if(rst.children.length>0){
 				this.setState({fenxiangs:rst.children});
@@ -163,25 +164,8 @@ export default class HuaFen extends Component {
 						fenbus.push(item);
 					}
 				}
-			})
-			/*if(rst.children.length>0){
-				
-				if(rst.children[0].obj_type === "C_WP_UNT_S"){
-
-					rst.children.forEach(ele=>{
-						fenbus = fenbus.concat(ele.children);
-					});
-				}else{
-					if(rst.children[0].obj_type === "C_WP_PTR"){
-						fenbus = fenbus.concat(rst.children);
-					}else{
-						message.info('请选择单位或者子单位工程');
-					}
-				}
-			}*/
-			//  document.querySelectorAll('.mySelect').forEach(ele=>{
-			//  	ele.value = '';
-			//  });
+			});
+			this.setState({selectedzifenbu:null,selectedfenbu:null,targetFenxiang:null,jianyanpis:[]});
 			this.setState({fenbus:fenbus,fenxiangs:[],zifenbus:[]});
 			this.setState({loading:false});
 			console.log('fenbus',fenbus);
@@ -399,16 +383,19 @@ export default class HuaFen extends Component {
 					<Spin spinning = {this.state.loading}>
 						<span>选择分部分项：</span>
 						<Select
+							value = {this.state.selectedfenbu?this.state.selectedfenbu.pk:''}
 							onSelect={this.selectFenbu.bind(this)}
 							className='mySelect' placeholder='分部'>
 							{this.getOptions(this.state.fenbus)}
 						</Select>
 						<Select
+							value = {this.state.selectedzifenbu?this.state.selectedzifenbu.pk:''}
 							onSelect={this.selectZifenbu.bind(this)}
 							className='mySelect' placeholder='子分部'>
 							{this.getOptions(this.state.zifenbus)}
 						</Select>
 						<Select
+							value = {this.state.targetFenxiang?this.state.targetFenxiang.pk:''}
 							onSelect={this.selectFenxiang.bind(this)}
 							className='mySelect' placeholder='分项'>
 							{this.getOptions(fenxiangs)}
