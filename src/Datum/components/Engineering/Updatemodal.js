@@ -42,8 +42,24 @@ export default class Addition extends Component {
 					dataIndex:'name',
 					key:rst.name
 				}
-			}
-			else if(rst.name === "专业"){
+			}else if(rst.name === "设计阶段"){
+				return {
+					title:rst.name,
+                    key:rst.name,
+					render: (doc,record,index) => {
+						const { designstage = []} = this.props;
+						return <Select placeholder="选择设计阶段" style={{width:130}}
+                                       onChange={this.changeDesignStage.bind(this, rst.code,record,index)}>
+							{
+								designstage.metalist.map((data, index) => {
+									return <Option key={index}
+                                                   value={data.name}>{data.name}</Option>;
+								})
+							}
+                        </Select>;
+					}
+				}
+			}else if(rst.name === "专业"){
 				return {
 					title:rst.name,
 					key:rst.name,
@@ -87,12 +103,30 @@ export default class Addition extends Component {
 					}
 				}
 			}
+			// else if(rst.name === "设计单位"){
+			// 	return{
+			// 		title:rst.name,
+			// 		key:rst.name,
+			// 		render: (doc,record,index) => {
+			// 			return <Input onChange={this.unit.bind(this, rst.code,record,index)}/>;
+			// 		}
+			// 	}
+			// }
 			else if(rst.name === "设计单位"){
 				return{
 					title:rst.name,
 					key:rst.name,
 					render: (doc,record,index) => {
-						return <Input onChange={this.unit.bind(this, rst.code,record,index)}/>;
+						const { designUnitList = [] } = this.props;
+						return <Select placeholder="选择设计单位" style={{ width: 210 }}
+										onChange={this.unit.bind(this, rst.code,record,index)}>
+							{
+								designUnitList.map((data, index) => {
+									return <Option key={index}
+										value={data.name}>{data.name}</Option>;
+								})
+							}
+						</Select>;
 					}
 				}
 			}
@@ -225,6 +259,17 @@ export default class Addition extends Component {
 		changeDocs(docs);
 	}
 
+	changeDesignStage(code,record,index,event){
+		const {
+			docs = [],
+			updoc ={},
+			actions: {changeDocs,changeupdoc}
+		} = this.props;
+		record.updoc[code] = event;
+		changeupdoc(updoc);
+		changeDocs(docs);
+	}
+
 	changeprofessionlist(code,doc,record,event) {
 		const {
 			docs = [],
@@ -276,16 +321,13 @@ export default class Addition extends Component {
 		changeDocs(docs);
 	}
 
-	unit(code,doc,record,event){
+	unit(code,record,index,event){
 		const {
 			docs = [],
 			updoc ={},
 			actions: {changeDocs,changeupdoc}
 		} = this.props;
-		let value = event.target.value;
-		doc.updoc.designUnit = {
-			name:value
-		};
+		record.updoc[code] = event;
 		changeupdoc(updoc);
 		changeDocs(docs);
 	}

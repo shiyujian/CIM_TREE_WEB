@@ -27,7 +27,18 @@ export default class ProjectSum extends Component {
     }
 
     componentDidMount() {
-        const { actions: { getAllUsers, getProjectTree ,getQuantitiesCode} } = this.props;
+        const { actions: { getAllUsers, getProjectTree ,getQuantitiesCode,getSearcherDoc} } = this.props;
+        let cacheData =  getSearcherDoc({keyword:"hfdsjhbsadfhb"}).then(res => {
+            // let cacheData = res.filter(item => item.extra_params.projectcoding);
+            let cacheArr = []
+            res.result.map(item => {
+                if(item.extra_params.projectcoding) {
+                    cacheArr.push(item.extra_params.projectcoding);
+                }
+            })
+            this.setState({cacheArr});
+        });
+        
         getAllUsers().then(rst => {
             let checkers = rst.map(o => {
                 return (
@@ -66,6 +77,8 @@ export default class ProjectSum extends Component {
     }
     uplodachange = async (info) => {
         //info.file.status/response
+        let {cacheArr} = this.state;
+        let usedMark = false;
         const { actions: { getQuantitiesCode} } = this.props;
         if (info && info.file && info.file.status === 'done') {
             notification.success({
@@ -74,13 +87,14 @@ export default class ProjectSum extends Component {
             });
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
-           
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
                 let res = await getQuantitiesCode({code:dataList[i][0]});
-                console.log('res',res)
-                dataList[i].flag = res === 'object not found' ? false : true;
-                console.log('dataList[i].flag',dataList[i].flag)
+                let isUsed = cacheArr.indexOf(dataList[i][0]);
+                dataList[i].flag = res !== 'object not found' && isUsed == -1 ? true : false;
+                if(isUsed !== -1) {
+                    usedMark = true;
+                }
                 dataSource.push({
                     key:i,
                     projectcoding:dataList[i][0] ? dataList[i][0] : '',
@@ -123,24 +137,30 @@ export default class ProjectSum extends Component {
                 })
                 
             }
+
+         
+            // dataSource.map(item => {
+            //     if(cacheArr.indexOf(item.extra_params.projectcoding) && item.flag) {
+            //         item.flag = false;
+            //     };
+            //     return item;
+            // });
             if(dataSource.some(item => {
                 return !item.flag
             })) {
                 message.warn("清单项目编码错误")
             }
-            // if(dataSource.some(item => {
-            //     if(item.flag === false){
-            //         message.warn("清单项目编号错误")
-            //     }
-            //     return item.flag
-            // }))
+
+            if(usedMark) {
+                message.warn("清单项目已经被使用")
+            }
             dataSource = this.checkCodeRepeat(dataSource);
             this.setState({dataSource}); 
+            
         }
 
     }
     checkCodeRepeat(dataSource) {
-        console.log('dataSource',dataSource)
         let codearr = dataSource.map(data => data.projectcoding);
         let repeatFlag = false;
         for(var i = 0, l = codearr.length; i < l; ++i) {
@@ -234,9 +254,7 @@ export default class ProjectSum extends Component {
         if (!project.name) {
             message.info(`请选择项目和单位工程`);
             return;
-        }
-
-        
+        }      
         let { check } = this.state
         let per = {
             id: check.id,
@@ -411,6 +429,7 @@ export default class ProjectSum extends Component {
         )
     }
     render() {
+        console.log('this.state.cacheArr',this.state.cacheArr)
         let {dataSource} = this.state.dataSource;
         const columns = [
             {
@@ -422,12 +441,7 @@ export default class ProjectSum extends Component {
                 render: (text, record, index) => {
                     console.log('record.flag',record.flag)
                     if(record.flag === false){
-                        
-                        return  (
-                            
-                                <span style={{color:'red'}}>{record.projectcoding}</span>
-                         
-                        )
+                        return (<span style={{color:'red'}}>{record.projectcoding}</span>)    
                     }else{
                         return <span style={{color:'green'}}>{record.projectcoding}</span>
                     }
@@ -464,8 +478,7 @@ export default class ProjectSum extends Component {
                 }
             }, 
             {
-                title: "操作",
-               
+                title: "操作", 
                 render: (text, record, index) => {
                     return record.action === 'normal' ? (
                       <div>
