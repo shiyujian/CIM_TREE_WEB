@@ -52,7 +52,7 @@ export default class SumSpeedExamineChange extends Component {
             await this.reject();
         }
         this.props.closeModal("cost_sum_change_visible",false);
-        message.info("操作成功");
+        message.success("操作成功");
     }
 
     //通过
