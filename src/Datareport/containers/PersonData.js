@@ -9,7 +9,7 @@ import {getUser} from '_platform/auth'
 import {getNextStates} from '_platform/components/Progress/util';
 import {actions as action2} from '../store/quality';
 import {WORKFLOW_CODE} from '_platform/api'
-import {message} from "antd";
+import {Notification} from "antd";
 var moment = require('moment');
 
 @connect(
@@ -58,9 +58,13 @@ export default class PersonData extends Component {
 					attachment:null
 				}).then(rst => {
 					if (rst) {
-						message.success("流程发起成功");
+						Notification.success({
+							message: "流程发起成功"
+						});
 					}else {
-						message.error("流程发起失败")
+						Notification.error({
+							message: "流程发起失败"
+						})
 					}
 				});
 		});
@@ -102,9 +106,13 @@ export default class PersonData extends Component {
 					attachment: null
 				}).then(rst => {
 					if (rst) {
-						message.success("流程发起成功");
+						Notification.success({
+							message: "流程发起成功"
+						});
 					}else {
-						message.error("流程发起失败")
+						Notification.error({
+							message: "流程发起失败"
+						})
 					}
 				});
 		});
@@ -147,9 +155,13 @@ export default class PersonData extends Component {
 					attachment: null
 				}).then(rst => {
 					if (rst) {
-						message.success("流程发起成功");
+						Notification.success({
+							message: "流程发起成功"
+						});
 					}else {
-						message.error("流程发起失败")
+						Notification.error({
+							message: "流程发起失败"
+						})
 					}
 				});
 		});
@@ -159,9 +171,6 @@ export default class PersonData extends Component {
 		return (
 			<div>
 				<DynamicTitle title="人员信息" {...this.props} />
-				{/* <Sidebar>
-					<Tree {...this.props}/>
-				</Sidebar> */}
 				<Content>
 					<TablePerson {...this.props} />
 					{

@@ -75,7 +75,7 @@ export default class PriceList extends Component {
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
-                let res = await verifyCode({code: dataList[i][1]});
+                let res = await verifyCode({code: dataList[i][0]});
                 dataList[i].flag = res !== 'object not found' ? true : false;
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
@@ -553,6 +553,8 @@ export default class PriceList extends Component {
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+                <div>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>结果预览</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -613,6 +615,7 @@ export default class PriceList extends Component {
                     <p style={{ paddingLeft: "25px" }}>3、日期必须带年月日，如2017年1月1日</p>
                     <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.</p>
                 </Row>
+                </div>
             </Modal>
         )
     }

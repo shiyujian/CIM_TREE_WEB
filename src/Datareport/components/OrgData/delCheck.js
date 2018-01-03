@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/orgdata';
 import {actions as actions2} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
@@ -50,7 +50,9 @@ export default class DelCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("dr_base_del_visible",false)
-        message.info("操作成功")
+        notification.success({
+            message:"操作成功"
+        })
     }
     //通过
     async passon(){
@@ -138,15 +140,14 @@ export default class DelCheck extends Component {
         }]
 		return (
             <Modal
-			title="组织机构信息审批表"
-			// key={Math.random()}
             visible={true}
             width= {1280}
-            footer={null}
+            // footer={null}
+            onOk = {this.submit.bind(this)}
             onCancel = {this.props.closeModal.bind(this,"dr_base_del_visible",false)}
 			maskClosable={false}>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>删除审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
@@ -165,12 +166,6 @@ export default class DelCheck extends Component {
                             <Button type='primary'>
                                 导出表格
                             </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {

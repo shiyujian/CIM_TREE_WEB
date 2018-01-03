@@ -94,7 +94,10 @@ export default class ChangeFile extends Component {
         fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
             resp = await resp.json()
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                notification.warning({
+                    message: '文件上传失败',
+                    duration: 2
+                });
                 return;
             };
             const filedata = resp;
@@ -306,7 +309,7 @@ export default class ChangeFile extends Component {
                             onConfirm={this.delete.bind(this,record)}
                             okText="确认"
                             cancelText="取消">
-                            <a>删除</a>
+                            <a><Icon type='delete'/></a>
                         </Popconfirm>
                     )
                 }
@@ -328,7 +331,7 @@ export default class ChangeFile extends Component {
                 onCancel={this.cancel.bind(this)}
                 maskClosable={false}
             >
-                <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>变更申请页面</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>申请变更</h1>
                 <Row >
                     <Table
                         columns={columns}
@@ -449,14 +452,20 @@ export default class ChangeFile extends Component {
     }
     onok() {
         if (!this.state.check) {
-            message.error('审批人未选择');
+            notification.warning({
+                message: '审批人未选择',
+                duration: 2
+            });
             return;
         }
         let temp = this.state.dataSource.some((o, index) => {
             return !o.file.a_file
         })
         if (temp) {
-            message.info(`有数据未上传附件`)
+            notification.warning({
+                message: '有数据未上传附件',
+                duration: 2
+            });
             return
         }
         // const { project, unit } = this.state;
@@ -468,11 +477,17 @@ export default class ChangeFile extends Component {
             return item.checkout === false;
         })
         if (checkoutInfo) {
-            message.info(`编制单位有误,请修正！`);
+            notification.warning({
+                message: '编制单位有误,请修正！',
+                duration: 2
+            });
             return;
         }
         if (!this.state.changeInfo) {
-            message.info(`请填写变更原因`);
+            notification.warning({
+                message: '请填写变更原因',
+                duration: 2
+            });
             return;
         }
         let { check } = this.state

@@ -4,6 +4,7 @@ import { Input, Form, Spin, Upload, Icon, Button, Modal, Cascader ,Select, Popco
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
+const { TextArea } = Input;
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -18,6 +19,7 @@ export default class SumSpeedDelete extends Component {
             project:{},
             unit:{},
             options:[],
+            opinion:''//变更意见
         };
     }
     componentWillMount(){
@@ -61,11 +63,15 @@ export default class SumSpeedDelete extends Component {
 
     onok(){
         if(!this.state.check){
-            message.info("请选择审核人")
+            notification.warning({
+				message:'请选择审核人'
+			})
             return;
         }
         if (this.state.dataSource.length === 0) {
-            message.info("请上传excel");
+            notification.warning({
+				message:'请上传Excel表'
+			})
             return;
           }
         let {check} = this.state;
@@ -76,7 +82,8 @@ export default class SumSpeedDelete extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.onok(this.state.dataSource,per);
+        let {opinion} = this.state;
+		this.props.onok(this.state.dataSource,per,opinion);
     }
 
     //删除
@@ -100,7 +107,10 @@ export default class SumSpeedDelete extends Component {
         })
       this.setState({dataSource:newdataSource})
     }
-
+    //审核意见
+    description(e) {
+        this.setState({opinion:e.target.value});
+	}
     render() {
         const columns =[
             {
@@ -147,7 +157,7 @@ export default class SumSpeedDelete extends Component {
                     okText="确认"
                     cancelText="取消"
                   >
-                    <a>删除</a>
+                    <a><Icon type="delete" /></a>
                   </Popconfirm>
                 );
               }
@@ -155,14 +165,13 @@ export default class SumSpeedDelete extends Component {
           ];
         return (
             <Modal
-			title="结算进度删除流程表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
-            <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度删除流程</h1>
+            <h1 style ={{textAlign:'center',marginBottom:20}}>申请删除</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -181,7 +190,11 @@ export default class SumSpeedDelete extends Component {
                         </span> 
                     </Col>
                 </Row>
-                <Preview />
+			    <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea rows={2} onChange={this.description.bind(this)} placeholder='请输入删除原因' />
+				    </Col>
+			    </Row>
             </Modal>
         )
     }

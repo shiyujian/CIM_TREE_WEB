@@ -64,7 +64,7 @@ export default class DeleteFile extends Component {
             {
                 title: '项目/子项目名称',
                 dataIndex: 'projectName',
-                width: '15%',
+                width: '10%',
             },
             {
                 title: '单位工程',
@@ -125,7 +125,7 @@ export default class DeleteFile extends Component {
                             onConfirm={this.delete.bind(this, record)}
                             okText="确认"
                             cancelText="取消">
-                            <a>删除</a>
+                            <a><Icon type='delete'/></a>
                         </Popconfirm>
                     )
                 }
@@ -148,7 +148,7 @@ export default class DeleteFile extends Component {
                 onCancel={this.cancel.bind(this)}
                 maskClosable={false}
             >
-                <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>删除项目申请页面</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>申请删除</h1>
                 <Row >
                     <Table
                         columns={columns}
@@ -208,11 +208,17 @@ export default class DeleteFile extends Component {
 
     onok() {
         if (!this.state.check) {
-            message.error('审批人未选择');
+            notification.warning({
+                message: '审批人未选择',
+                duration: 2
+            });
             return;
         }
         if (!this.state.deleteInfoNew) {
-            message.info(`请填写删除原因`);
+            notification.warning({
+                message: '请填写删除原因',
+                duration: 2
+            });
             return;
         }
         let { check } = this.state

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Input, Form, Button, message, Table, Radio, Row, Col, Select } from 'antd';
+import { Modal, Input, Form, Button, Notification, Table, Radio, Row, Col, Select } from 'antd';
 import { CODE_PROJECT } from '_platform/api';
 import '../index.less'; 
 import {getUser} from '_platform/auth';
@@ -46,7 +46,6 @@ export default class PersonExpurgate extends Component {
         this.setState({
             dataSource:deletePer
         })
-        console.log('dataSource',this.setState)
     }
 
 	render() {
@@ -92,10 +91,11 @@ export default class PersonExpurgate extends Component {
 			// dataIndex: 'account.person_signature_url',
 			// key: 'Signature'
             render:(record) => {
-                console.log("record:",record);
-                return (
-                    <img style={{width:"60px"}} src = {record.account.relative_avatar_url} />
-                )
+                if(record.account.relative_signature_url !== '') {
+                    return <img style={{width: 60}} src={record.account.relative_signature_url}/>
+                }else {
+                    return <span>暂无</span>
+                }
             }
 		}]
 		
@@ -104,9 +104,8 @@ export default class PersonExpurgate extends Component {
                 onCancel={this.cancel.bind(this)}
                 visible={Exvisible}
                 width={1280}
-                footer={null}
-                maskClosable={false}>
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
+                onOk={this.onok.bind(this)}>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请删除</h1>
                 <Table
                     columns={columns}
                     bordered={true}
@@ -123,9 +122,6 @@ export default class PersonExpurgate extends Component {
                     </Select>
 
                 </span>
-                <Button onClick = {this.onok.bind(this)} type='primary' >
-                    确认删除
-                </Button>
                 <Row style={{marginBottom: '10px'}}>
                     <Col span={2}>
                         <span>删除原因：</span>
@@ -145,17 +141,17 @@ export default class PersonExpurgate extends Component {
     }
 
 	onChange = (e) => {
-	    console.log('radio checked', e.target.value);
 	    this.setState({
 	    	value: e.target.value,
 	    });
 	}
 
 	onok() {
-		console.log('passer', this.state.passer)
         const { actions: { ExprugateVisible } } = this.props;
         if (!this.state.passer) {
-            message.error('审批人未选择');
+            Notification.warning({
+                message:'审批人未选择'
+            });
             return;
         }
         this.props.setDataDel(this.state.dataSource, this.state.passer, this.state.description);

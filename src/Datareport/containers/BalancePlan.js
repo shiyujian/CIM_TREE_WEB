@@ -10,7 +10,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { DynamicTitle, Content } from '_platform/components/layout';
-import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio, bordered, message, Progress } from 'antd';
+import { Button, Input, Table, Modal, Select, Form, Upload, Icon, Row, Col, Radio, bordered, message, Progress, notification } from 'antd';
 import { WORKFLOW_CODE, NODE_FILE_EXCHANGE_API, DataReportTemplate_SettlementPlan} from '_platform/api.js';
 import { getUser } from '_platform/auth';
 import { actions } from '../store/SumPlanCost';
@@ -119,12 +119,14 @@ export default class BanlancePlan extends Component {
 					attachment: null
 				}).then(() => {
 					this.setState({ lanchReapt: false });
-					message.success('发起流程成功')					
+					notification.success({
+						message:'发起流程成功'
+					})			
 				})
 		})
 
 	}
-	delateOk(data, participants) {
+	delateOk(data, participants, opinion) {
 		//批量上传回调
 		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
@@ -136,7 +138,7 @@ export default class BanlancePlan extends Component {
 		let postdata = {
 			name: "结算计划信息删除",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "结算计划信息删除",
+			description: opinion,
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -151,7 +153,7 @@ export default class BanlancePlan extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起填报',
+					note: opinion,
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -161,12 +163,14 @@ export default class BanlancePlan extends Component {
 					attachment: null
 				}).then(() => {
 					this.setState({ lanchdelate: false });
-					message.success('发起流程成功')
+					notification.success({
+						message:'发起流程成功'
+					})
 				})
 		})
 
 	}
-	changeOk(data, participants) {
+	changeOk(data, participants,opinion) {
 		//批量上传回调
 		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
@@ -178,7 +182,7 @@ export default class BanlancePlan extends Component {
 		let postdata = {
 			name: "结算计划信息变更",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "结算计划信息变更",
+			description: opinion,
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -193,7 +197,7 @@ export default class BanlancePlan extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起填报',
+					note: opinion,
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -203,7 +207,9 @@ export default class BanlancePlan extends Component {
 					attachment: null
 				}).then(() => {
 					this.setState({ lanchChange: false });
-					message.success('发起流程成功')
+					notification.success({
+						message:'发起流程成功'
+					})
 				})
 		})
 
@@ -220,9 +226,9 @@ export default class BanlancePlan extends Component {
 
 
 	// 模板下载
-	getTemplate(){
-		this.createLink('结算计划模板',DataReportTemplate_SettlementPlan)
-	}
+	// getTemplate(){
+	// 	this.createLink('结算计划模板',DataReportTemplate_SettlementPlan)
+	// }
 
 	//文件下载;
 	createLink = (name,url) =>{
@@ -240,7 +246,9 @@ export default class BanlancePlan extends Component {
 	// 表格导出
 	getExcel(){
 		if(this.state.dataSourceSelected.length <=0){
-			message.warning('请先选择要导出的数据');
+			notification.warning({
+				message:'请先选择数据'
+			})
 			return
 		}
 		const { actions:{jsonToExcel}} = this.props;
@@ -316,17 +324,21 @@ export default class BanlancePlan extends Component {
 				<DynamicTitle title="结算计划" {...this.props} />
 				<Content>
 					<Row>
-						<Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.getTemplate.bind(this)}>模板下载</Button>
-						<Button className="btn" type="default" onClick={() => { this.setState({ lanchReapt: true }) }}>批量导入</Button>
+						{/* <Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.getTemplate.bind(this)}>模板下载</Button> */}
+						<Button className="btn" type="default" onClick={() => { this.setState({ lanchReapt: true }) }}>发起填报</Button>
 						<Button className="btn" type="default" onClick={() => { 
 							if(this.state.dataSourceSelected.length <=0){
-								message.warning('请选择要变更的数据');
+								notification.warning({
+									message:'请先选择数据'
+								})
 								return
 							}
 							this.setState({ lanchChange: true }) }}>申请变更</Button>
 						<Button className="btn" type="default" onClick={() => { 
 							if(this.state.dataSourceSelected.length <=0){
-								message.warning('请选择要删除的数据');
+								notification.warning({
+									message:'请先选择数据'
+								})
 								return
 							}
 							this.setState({ lanchdelate: true }) }}>申请删除</Button>
@@ -348,7 +360,7 @@ export default class BanlancePlan extends Component {
 						/>
 					</Row>
 					<div >
-						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDat} pagination={paginationInfo}
+						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDat} pagination={paginationInfo} bordered
 							loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}												
 						/>
 					</div>
