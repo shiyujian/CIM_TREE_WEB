@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Table,Button,Popconfirm,message,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,DataReportTemplate_PersonInformation} from '_platform/api';
 const Search = Input.Search;
 export default class ToggleModal extends Component{
     constructor(props){
@@ -176,11 +176,11 @@ export default class ToggleModal extends Component{
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
                 <div>
-                    <Button style={{ margin: '10px 10px 10px 0px' }} type="primary">模板下载</Button>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource = {this.state.dataSource}
                         bordered />
+                    <Button style={{ margin: '10px 10px 10px 0px' }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button>
                     <Upload {...props}>
                         <Button style={{ margin: '10px 10px 10px 0px' }}>
                             <Icon type="upload" />上传附件
@@ -274,6 +274,17 @@ export default class ToggleModal extends Component{
     cancel() {
         const { actions: { ModalVisible } } = this.props;
         ModalVisible(false);
+    }
+
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     tableDataChange(index ,e ){

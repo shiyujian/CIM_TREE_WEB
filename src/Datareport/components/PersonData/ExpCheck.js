@@ -148,7 +148,6 @@ export default class ExpCheck extends Component {
         }]
         return (
             <Modal
-            title="人员信息删除审批表"
             // key={Math.random()}
             visible={true}
             width= {1280}

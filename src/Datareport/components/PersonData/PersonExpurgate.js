@@ -22,7 +22,8 @@ export default class PersonExpurgate extends Component {
             defaultchecker: "",
             units:[],
             selectPro:[],
-            selectUnit:[]
+            selectUnit:[],
+            description: '',
         }
     }
 
@@ -101,11 +102,11 @@ export default class PersonExpurgate extends Component {
 		return (
             <Modal
                 onCancel={this.cancel.bind(this)}
-                title="项目删除申请表"
                 visible={Exvisible}
                 width={1280}
                 footer={null}
                 maskClosable={false}>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
                 <Table
                     columns={columns}
                     bordered={true}
@@ -123,11 +124,25 @@ export default class PersonExpurgate extends Component {
 
                 </span>
                 <Button onClick = {this.onok.bind(this)} type='primary' >
-                    提交
+                    确认删除
                 </Button>
+                <Row style={{marginBottom: '10px'}}>
+                    <Col span={2}>
+                        <span>删除原因：</span>
+                    </Col>
+                </Row>
+                <Row style={{margin: '10px 0'}}>
+                    <Col>
+                        <TextArea rows={2} onChange={this.description.bind(this)}/>
+                    </Col>
+                </Row>
             </Modal>
         )
 	}
+
+    description(e) {
+        this.setState({description:e.target.value})
+    }
 
 	onChange = (e) => {
 	    console.log('radio checked', e.target.value);
@@ -143,7 +158,7 @@ export default class PersonExpurgate extends Component {
             message.error('审批人未选择');
             return;
         }
-        this.props.setDataDel(this.state.dataSource, this.state.passer);
+        this.props.setDataDel(this.state.dataSource, this.state.passer, this.state.description);
 
         ExprugateVisible(false);
     }
