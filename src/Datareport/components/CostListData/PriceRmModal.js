@@ -70,8 +70,8 @@ export default class PriceRmModal extends Component {
     }
     //删除
     delete(index){
-        let {dataSource} = this.state
-        dataSource.splice(index,1)
+        let {dataSource} = this.state;
+        dataSource = dataSource.filter(item => item.key != index);
         this.setState({dataSource})
     }
 
@@ -127,11 +127,11 @@ export default class PriceRmModal extends Component {
                     <Popconfirm
                       placement="leftTop"
                       title="确定删除吗？"
-                      onConfirm={this.delete.bind(this, index)}
+                      onConfirm={this.delete.bind(this, record.key)}
                       okText="确认"
                       cancelText="取消"
                     >
-                      <a>删除</a>
+                       <a><Icon type = "delete"/></a>
                     </Popconfirm>
                   );
                 }

@@ -112,7 +112,6 @@ export default class PriceList extends Component {
                 message.warn("清单项目编码错误")
             }
             dataSource = this.checkCodeRepeat(dataSource);
-            debugger;
             this.setState({ dataSource, percent: 100, loading: false });
         }
     }
