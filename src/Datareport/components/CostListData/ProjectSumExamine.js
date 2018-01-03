@@ -241,9 +241,8 @@ export default class ProjectSumExamine extends Component {
             }, {
                 title: '数量',
                 dataIndex: 'number',
-                width: '10%',
             }, {
-                title: '单价',
+                title: '综合单价(元)',
                 dataIndex: 'total',
             }, {
                 title: '备注',

@@ -50,7 +50,7 @@ export default class SumPlanDelateCheck extends Component {
    //test
    test(){
     const {dataSource,wk,topDir} = this.state;
-    console.log('data',dataSource,wk,topDir)
+    // console.log('data',dataSource,wk,topDir)
     let delateArr = [];
     dataSource.map(item=>{
         delateArr.push(item.code)
@@ -66,7 +66,7 @@ export default class SumPlanDelateCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("dr_qua_jsjh_delate_visible",false);
-        message.info("操作成功");
+        message.success("操作成功");
     }
 
     //通过
@@ -91,7 +91,7 @@ export default class SumPlanDelateCheck extends Component {
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         
         await delDocList({},{code_list:delateArr.join(",")}).then(rst=>{
-            console.log(rst)
+            // console.log(rst)
             if(rst.result){
                 notification.success({
                     message: '删除文档成功！',
@@ -120,7 +120,7 @@ export default class SumPlanDelateCheck extends Component {
         this.setState({option:e.target.value})
     }
 	render() {
-        console.log(this.state.dataSource)
+        // console.log(this.state.dataSource)
         const columns = [
             {
               title: "序号",

@@ -146,70 +146,102 @@ export default class SumSpeedChange extends Component {
                 <Input value={this.state.dataSource[record.key-1]['nodetarget']} onChange={this.tableDataChange.bind(this,record.key-1,'nodetarget')}/>
             )
             },
+
+            // {
+            //   title: "完成时间",
+            //   render: (record) => {
+            //     let checkVal = (value) => {
+            //         record.completiontime = value;
+            //         return value;
+            //     }
+            //     return (
+            //         <ECCB
+            //             initCheckedValue={record.completiontime}
+            //             checkVal={checkVal}
+            //             value={record.completiontime} />
+            //     )
+            // },
+            // key:'Completiontime',
+            // },
+            // {
+            //   title: "支付金额（万元）",
+            //   render: (record) => {
+            //     let checkVal = (value) => {
+            //         record.summoney = value;
+            //         return value;
+            //     }
+            //     return (
+            //         <ECCB
+            //             initCheckedValue={record.summoney}
+            //             checkVal={checkVal}
+            //             value={record.summoney} />
+            //     )
+            // },
+            // key:'Summoney',
+            // },
+            // {
+            //   title: "累计占比",
+            //   render: (record) => {
+            //     let checkVal = (value) => {
+            //         record.ratio = value;
+            //         return value;
+            //     }
+            //     return (
+            //         <ECCB
+            //             initCheckedValue={record.ratio}
+            //             checkVal={checkVal}
+            //             value={record.ratio} />
+            //     )
+            // },
+            // key:'Ratio',
+            // },
+            // {
+            //   title: "备注",
+            //   render: (record) => {
+            //     let checkVal = (value) => {
+            //         record.remarks = value;
+            //         return value;
+            //     }
+            //     return (
+            //         <ECCB
+            //             initCheckedValue={record.remarks}
+            //             checkVal={checkVal}
+            //             value={record.remarks} />
+            //     )
+            // },
+            // key:'Remarks',
+            // },
+
+            // 使用input框进行编辑页面,不使用笔;
             {
-              title: "完成时间",
-              render: (record) => {
-                let checkVal = (value) => {
-                    record.completiontime = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.completiontime}
-                        checkVal={checkVal}
-                        value={record.completiontime} />
+                title: "完成时间",
+                dataIndex: "completiontime",
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[record.key-1]['completiontime']} onChange={this.tableDataChange.bind(this,record.key-1,'completiontime')}/>
                 )
-            },
-            key:'Completiontime',
-            },
+              },
+              {
+                title: "支付金额（万元）",
+                dataIndex: "summoney",
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[record.key-1]['summoney']} onChange={this.tableDataChange.bind(this,record.key-1,'summoney')}/>
+                )
+              },
+              {
+                title: "累计占比",
+                dataIndex: "ratio",
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[record.key-1]['ratio']} onChange={this.tableDataChange.bind(this,record.key-1,'ratio')}/>
+                )
+              },
+              {
+                title: "备注",
+                dataIndex: "remarks",
+                render:(text,record,index)=>(
+                    <Input value={this.state.dataSource[record.key-1]['remarks']} onChange={this.tableDataChange.bind(this,record.key-1,'remarks')}/>
+                )
+              },
             {
-              title: "支付金额（万元）",
-              render: (record) => {
-                let checkVal = (value) => {
-                    record.summoney = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.summoney}
-                        checkVal={checkVal}
-                        value={record.summoney} />
-                )
-            },
-            key:'Summoney',
-            },
-            {
-              title: "累计占比",
-              render: (record) => {
-                let checkVal = (value) => {
-                    record.ratio = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.ratio}
-                        checkVal={checkVal}
-                        value={record.ratio} />
-                )
-            },
-            key:'Ratio',
-            },
-            {
-              title: "备注",
-              render: (record) => {
-                let checkVal = (value) => {
-                    record.remarks = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.remarks}
-                        checkVal={checkVal}
-                        value={record.remarks} />
-                )
-            },
-            key:'Remarks',
-            },{
                 title: "编辑",
                 dataIndex: "edit",
                 width:"5%",

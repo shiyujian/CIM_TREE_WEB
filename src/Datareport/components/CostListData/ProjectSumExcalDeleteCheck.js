@@ -132,7 +132,7 @@ export default class ProjectSumExcalDeleteCheck extends Component {
                 title: '数量',
                 dataIndex: 'number',
             }, {
-                title: '单价',
+                title: '综合单价(元)',
                 dataIndex: 'total',
             }, {
                 title: '备注',

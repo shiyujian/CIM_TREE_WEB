@@ -26,9 +26,7 @@ export default class VedioInfoTable extends Component{
                 loading={loading}
                 dataSource={dataSource}
                 columns={this.columns}
-                rowKey={(record)=>{
-                    return record.index
-                }}
+                rowKey='index'
                 pagination={{
                     defaultPageSize: 10,
                     showQuickJumper: true,

@@ -5,6 +5,8 @@ import { SERVICE_API,USER_API,WORKFLOW_API,FILE_API,NODE_FILE_EXCHANGE_API} from
 
 //获取项目树
 const getProjectTree = createFetchAction(`${SERVICE_API}/project-tree/`, []);
+//根据子节点获取父节点
+const getTreeRootNode = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?root=false&reverse=true`, []);
 //获取审核人
 const getAllUsers = createFetchAction(`${USER_API}/users/`,[]);
 //发起流程
@@ -30,6 +32,7 @@ const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xls
 
 export const actions = {
 	getProjectTree,
+	getTreeRootNode,
 	getAllUsers,
 	createWorkflow,
 	logWorkflowEvent,

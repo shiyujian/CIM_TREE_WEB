@@ -56,7 +56,7 @@ export default class SumPlanChangeCheck extends Component {
         delateArr.push(item.code)
     });
 
-    console.log(delateArr.join(','));
+    // console.log(delateArr.join(','));
    }
    //提交
     async submit(){
