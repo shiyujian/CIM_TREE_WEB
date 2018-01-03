@@ -110,16 +110,16 @@ export default class UploadFooter extends Component{
                     return
                 }
         
-                let dataSource = data.map((result,index) =>{
+                let sourceData = data.map((result,index) =>{
                     let a = {};
                     dataIndex.forEach((record,index) => {
                         a[record] = result[index]
                     })
                     return a
                 })
-                dataSource.shift();
+                sourceData.shift();
                 
-                storeExcelData(dataSource);
+                storeExcelData(sourceData);
                 Object.assign(this,{
                     excelUpload: true
                 })
@@ -180,19 +180,36 @@ export default class UploadFooter extends Component{
         });
     }
 
-    onChange = (value)=>{
+    onChange = async (value)=>{
         if(value.length===2){
-            const {storeExcelData,dataSource} = this.props,
+            const {storeExcelData,dataSource,actions:{getTreeRootNode}} = this.props,
                 project = {
                     projectName: JSON.parse(value[0]).name,
                     enginner: JSON.parse(value[1]).name,
                     value: value
-                };
+                },
+                projectCode = JSON.parse(value[1]).code;
+            let wbs = [];
+
             const sourceData = dataSource.map(data=>{
+                wbs.push(data.wbsCode);
                 return Object.assign({},data,project)
             })
-            storeExcelData(sourceData)
-            this.project = true;
+            wbs = Array.from(new Set(wbs));
+
+            const all = wbs.map(rst=>getTreeRootNode({code:rst}) ),
+                check = await Promise.all(all);
+            let returnProjectCode = check.map(rst=>rst.children[0].children[0].code);
+            returnProjectCode = Array.from(new Set(returnProjectCode));
+
+            if(returnProjectCode.length>1){
+                message.error("wbs编码不属于同一个单位工程");
+            }else if(returnProjectCode[0] != projectCode){
+                message.error("wbs编码不属于本单位工程");
+            }else{
+                storeExcelData(sourceData)
+                this.project = true;
+            }      
         }
     }
 
