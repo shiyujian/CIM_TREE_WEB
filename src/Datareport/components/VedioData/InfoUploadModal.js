@@ -27,8 +27,9 @@ export default class InfoUploadModal extends Component{
              width={1280}
              visible={uploadModal}
              onCancel={()=>closeModal("uploadModal")}
+             footer={null}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
+                <h1 style={{ textAlign: "center"}}>发起填报</h1>
                 <VedioInfoTable
                  fileDel={true}
                  dataSource={dataSource}
