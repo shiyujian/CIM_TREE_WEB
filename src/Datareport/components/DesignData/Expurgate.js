@@ -50,7 +50,7 @@ export default class Expurgate extends Component {
 				dataSource.push(temp);
 			})
 			this.setState({ dataSource, key: expurgate.key })
-			console.log(expurgate, dataSource)
+			
 		}
 	}
 

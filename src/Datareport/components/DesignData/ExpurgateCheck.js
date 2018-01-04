@@ -48,7 +48,7 @@ export default class ExpurgateCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("design_expurgatecheck_visbile", false,'submit')
+        this.props.closeModal("design_expurgatecheck_visbile", false, 'submit')
         notification.info({ message: "操作成功" })
     }
     //通过
@@ -74,7 +74,7 @@ export default class ExpurgateCheck extends Component {
         });
         await Promise.all(all)
             .then(rst => {
-                console.log(rst)
+               
                 notification.success({ message: '删除成功！' });
             })
     }

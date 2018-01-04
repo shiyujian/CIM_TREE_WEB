@@ -252,7 +252,6 @@ export default class Modify extends Component {
 		};
 		fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
 			resp = await resp.json()
-			console.log('uploadStaticFile: ', resp)
 			if (!resp || !resp.id) {
 				notification.error({ message: '文件上传失败' })
 				return;
