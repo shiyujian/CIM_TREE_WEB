@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/orgdata';
 import {actions as actions2} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
@@ -49,7 +49,9 @@ export default class UpdataCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("dr_base_update_visible",false, "submit")
-        message.info("操作成功")
+        notification.success({
+            message:"操作成功"
+        })
     }
     //通过
     async passon(){
@@ -137,7 +139,7 @@ export default class UpdataCheck extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null,
             }

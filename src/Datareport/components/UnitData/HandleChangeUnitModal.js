@@ -48,10 +48,10 @@ export default class HandelChangeUnitModal extends Component {
     async submit() {
         if (this.state.opinion === 1) {
             await this.passon();
-            this.props.closeModal("dr_change_unit_visible", false, "submit");
         } else {
             await this.reject();
         }
+        this.props.closeModal("dr_change_unit_visible", false, "submit");
         notification.success({
             message:"操作成功"
         });
@@ -152,7 +152,7 @@ export default class HandelChangeUnitModal extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null,
             }
@@ -255,8 +255,8 @@ export default class HandelChangeUnitModal extends Component {
                 visible={true}
                 width={1280}
                 maskClosable={false}
-                onCancel = {this.props.closeModal("dr_change_unit_visible", false)}
-                onOk = {this.submit.bins(this)}
+                onCancel = {this.props.closeModal.bind(this,"dr_change_unit_visible", false)}
+                onOk = {this.submit.bind(this)}
                 >
         
                 <div>
