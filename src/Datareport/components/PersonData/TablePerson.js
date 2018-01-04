@@ -17,6 +17,7 @@ export default class TablePerson extends Component{
 		}
 	}
     render(){
+    	console.log('dataSource',this.state.tempData)
         return (
             <div>
                 <div>
@@ -129,14 +130,47 @@ export default class TablePerson extends Component{
     }
 
 	async componentDidMount() {
-		this.setState({loading:true,percent:0});
 		const {actions: {getAllUsers}} = this.props;
+		this.setState({loading:true,percent:0});
 		let dataSource = await getAllUsers();
 		dataSource.forEach((item, index) => {
 			dataSource[index].index = index + 1;
 		})
 		this.setState({dataSource, tempData: dataSource, loading:false, percent:100 })
 	}
+	// async componentDidMount() {
+	// 	const {actions: {getAllUsers}} = this.props;
+	// 	getAllUsers().then(rst => {
+	// 		this.generateTableData(rst)
+	// 	})
+	// }
+	// generateTableData(data) {
+	// 	let dataSour = [];
+	// 	let datalength = data.length;
+	// 	this.setState({loading: true, percent: 0, index: 0});
+	// 	data.map((item, index) => {
+	// 		let datas = {
+	// 			index: index + 1,
+	// 			code: item.account.person_code,
+	// 			name: item.account.person_name,
+	// 			org: item.account.organization,
+	// 			depart: item.account.org_code,
+	// 			job: item.account.title,
+	// 			sex: item.account.gender,
+	// 			tel: item.account.person_telephone,
+	// 			email: item.email,
+	// 		}
+	// 		this.setState({percent:parseFloat((index * 100 / datalength).toFixed(2))})
+	// 		dataSour.push(datas)
+	// 		console.log('dataSour',dataSour)
+	// 	})
+	// 	this.setState({
+	// 		dataSource:dataSour,
+	// 		tempData:dataSour,
+	// 		loading:false,
+	// 		percent:100
+	// 	})
+	// }
 
 	searchOrg(value){
 		let searchData = [];
@@ -235,7 +269,7 @@ export default class TablePerson extends Component{
 		// key: 'Signature',
 		render:(record) => {
             if(record.account.relative_signature_url !== '') {
-            	return <img style={{width: 60}} src={record.account.relative_signature_url}/>
+            	return <img style={{width: 60}} src={record.account.person_signature_url}/>
             }else {
             	return <span>暂无</span>
             }
