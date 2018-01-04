@@ -80,6 +80,7 @@ export default class VedioData extends Component {
 			 uploadModal={uploadModal}
 			 actions = {actions}
 			 closeModal={this.closeModal}
+			 modalDown={DataReportTemplate_VideoMonitor}
 			/>
 			<ChangeModal
 			 key={`changeModal${changeModal}`}

@@ -2,23 +2,24 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
-import {actions} from '../../store/quality';
+import {actions} from '../../store/SumPlanCost';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message,notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
 import moment from "moment";
+import './TableStyle.less';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
 @connect(
 	state => {
-		const { platform} = state;
-		return { platform}
+		const { datareport: { SumPlanCost = {} } = {}, platform } = state;
+		return { ...SumPlanCost, platform }
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...actions,...platformActions}, dispatch)
+		actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
 	})
 )
 export default class SumSpeedExamine extends Component {
@@ -54,7 +55,7 @@ export default class SumSpeedExamine extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_qua_jsjh_visible",false)
+        this.props.closeModal("dr_qua_jsjh_visible",false,'submit')
         notification.success({
             message:'操作成功'
         })
@@ -124,16 +125,27 @@ export default class SumSpeedExamine extends Component {
     }
     //不通过
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
-        // let executor = {};
-        // let person = getUser();
-        // executor.id = person.id;
-        // executor.username = person.username;
-        // executor.person_name = person.name;
-        // executor.person_code = person.code;
-        // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'退回',note:'滚',executor:executor,attachment:null});
+        const {wk} = this.state;
+        // const {actions:{deleteWorkflow}} = this.props
+        // await deleteWorkflow({pk:wk.id})
+        const { actions:{ logWorkflowEvent }} = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            },{
+                state:wk.current[0].id,
+                executor:executor,
+                action:'退回',
+                note:'不通过',
+                attachment:null
+            }
+        );
     }
     //预览
     handlePreview(index){

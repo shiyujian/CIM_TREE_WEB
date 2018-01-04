@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Icon ,Spin} from 'antd';
+import { Table, Button, Popconfirm, notification, Input, Icon ,Spin} from 'antd';
 import style from './TableUnit.css';
 import DelModal from './DelModal'
 import ChangeUNIT from './SubmitChangeModal'
@@ -68,9 +68,6 @@ export default class TableUnit extends Component {
 			<div>
 			<Spin spinning = {this.state.spinning}>
 				<div>
-					<Button style={{ marginRight: "10px" }}
-					onClick = {this.createLink.bind(this,'单位工程模版',DataReportTemplate_UnitProject)}
-					className={style.button}>模板下载</Button>
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
 					<Button className={style.button}
 						onClick={() => {
@@ -78,7 +75,9 @@ export default class TableUnit extends Component {
 								this.setState({ changing: true });
 								return;
 							}
-							message.warning('请至少选择一条');
+							notification.warning({
+								message:"请至少选择一条"
+							});
 						}
 						}
 					>申请变更</Button>
@@ -87,7 +86,9 @@ export default class TableUnit extends Component {
 							this.setState({ deling: true });
 							return;
 						}
-						message.warning('请至少选择一条');
+						notification.warning({
+							message:'请至少选择一条'
+						});
 					}} className={style.button}>申请删除</Button>
 					<Button onClick = {this.getExcel.bind(this)} className={style.button}>导出表格</Button>
 					<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容"
@@ -153,6 +154,12 @@ export default class TableUnit extends Component {
         document.body.removeChild(link);
     }
 	getExcel(){
+		if (this.state.selectedRows.length === 0) {
+			notification.warning({
+				message:'请至少选择一条'
+			});
+			return;
+		}
 		console.log(this.state.showDs);
 		let exhead = ['单位工程编码','单位工程名称','所属项目名称','项目类型','项目阶段','单位红线坐标','计划开工日期','计划竣工日期','简介','建设单位','附件'];
 		let rows = [exhead];

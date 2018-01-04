@@ -107,7 +107,7 @@ export default class VedioInfoCheck extends Component {
             await this.reject();
         }
         const {type} = this.props;
-        this.props.closeModal(modalName[type],false)    //selfcare use
+        this.props.closeModal(modalName[type],false,'submit')    //selfcare use
         notification.success({
             message: '操作成功！',
             duration: 2

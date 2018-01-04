@@ -49,7 +49,7 @@ export default class CostListData extends Component {
 					return record.key
 				}
 			},{
-				title:'项目/子项目',
+				title:'项目',
 				dataIndex:'subproject',
 			},{
 				title:'单位工程',
@@ -61,7 +61,7 @@ export default class CostListData extends Component {
 				title:'计价单项',
 				dataIndex:'valuation' 
 			},{
-				title:'工程内容/规格编号',
+				title:'工程内容/规格型号',
 				dataIndex:'rate'
 			},{
 				title:'计量单位',
@@ -310,14 +310,14 @@ export default class CostListData extends Component {
 				<DynamicTitle title="计价清单" {...this.props}/>
 				<Row>
 					{/* <Button style={{margin:'10px 10px 10px 0px'}} type="default" onClick={() => this.createLink('downLoadTemplate', DataReportTemplate_ValuationList)}>模板下载</Button> */}
-					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.openModal.bind(this, "modifyModal")}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.openModal.bind(this, "rmModal")}>申请删除</Button>
 					<Button className="btn" type="default" onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
-						placeholder="输入搜索条件"
+						placeholder="请输入内容"
 						onSearch={value => this.search(value)}
 						/>
 				</Row>

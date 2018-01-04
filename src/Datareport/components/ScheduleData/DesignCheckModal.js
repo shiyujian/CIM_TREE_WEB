@@ -71,7 +71,7 @@ export default class DesignCheckModal extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("dr_de_sj_visible", false);
+        this.props.closeModal("dr_de_sj_visible", false,'submit');
         notification.success({
             message: '操作成功！',
             duration: 2

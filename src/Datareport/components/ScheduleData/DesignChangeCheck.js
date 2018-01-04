@@ -51,7 +51,7 @@ export default class DesignChangeCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("scheduledata_doc_change_visible", false);
+        this.props.closeModal("scheduledata_doc_change_visible", false,'submit');
         notification.success({
             message: '操作成功！',
             duration: 2

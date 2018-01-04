@@ -9,6 +9,7 @@ import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,USER_API 
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
+import '../index.less';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -52,7 +53,7 @@ export default class ExpCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("person_expcheck_visible",false)
+        this.props.closeModal("person_expcheck_visible", false, 'submit')
         Notification.success({
             message: "操作成功"
         })
@@ -74,11 +75,36 @@ export default class ExpCheck extends Component {
         })
     }
     //不通过
+    // async reject(){
+    //     const {wk} = this.props
+    //     const {actions:{deleteWorkflow}} = this.props
+    //     await deleteWorkflow({pk:wk.id})
+    // }
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
-    }
+        const {wk} = this.state;
+        const {actions: {logWorkflowEvent}} = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        Notification.success({
+            message: "操作成功",
+            duration: 2
+        })
+    };
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -154,7 +180,9 @@ export default class ExpCheck extends Component {
             onCancel = {() => this.props.closeModal("person_expcheck_visible",false)}>
                 <div>
                     <h1 style ={{textAlign:'center',marginBottom:20}}>删除审核</h1>
-                    <Table style={{ marginTop: '10px', marginBottom:'10px' }}
+                    <Table 
+                        style={{ marginTop: '10px', marginBottom:'10px' }}
+                        className='foresttable'
                         columns={columns}
                         dataSource={this.state.tempData}
                         bordered />
@@ -167,11 +195,6 @@ export default class ExpCheck extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
                         </Col>
                         <Col span={2} push={14}>
                             <Preview />
