@@ -38,7 +38,6 @@ export default class ModifyCheck extends Component {
         const { wk } = this.props
         let dataSource = this.addindex(JSON.parse(wk.subject[0].data).changedata)
         let origindataSource = this.addindex(JSON.parse(wk.subject[0].data).origindata)
-        console.log('dataSource', dataSource, 'origindataSource', origindataSource)
         this.setState({ dataSource, origindataSource, wk });
         const { actions: {
             getScheduleDir,
@@ -61,7 +60,6 @@ export default class ModifyCheck extends Component {
         const { wk } = props
         let dataSource = this.addindex(JSON.parse(wk.subject[0].data).changedata)
         let origindataSource = this.addindex(JSON.parse(wk.subject[0].data).origindata)
-        console.log('dataSource', dataSource)
         this.setState({ dataSource, origindataSource, wk });
     }
     //提交
@@ -71,7 +69,7 @@ export default class ModifyCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("design_modifycheck_visbile", false,'submit')
+        this.props.closeModal("design_modifycheck_visbile", false, 'submit')
         notification.info({ message: "操作成功!" })
     }
     //通过
@@ -172,8 +170,7 @@ export default class ModifyCheck extends Component {
         });
         await Promise.all(all)
             .then(rst => {
-                console.log(rst)
-                notification.success({ message: '修改文档成功！' });
+               notification.success({ message: '修改文档成功！' });
             })
     }
     //不通过

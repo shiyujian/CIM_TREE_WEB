@@ -66,7 +66,7 @@ export default class Check extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("design_check_visbile", false,'submit')
+        this.props.closeModal("design_check_visbile", false, 'submit')
         notification.info({ message: "操作成功" })
     }
     //通过
