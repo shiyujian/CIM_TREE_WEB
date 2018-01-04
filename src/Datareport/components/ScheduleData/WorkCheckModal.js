@@ -62,7 +62,7 @@ export default class WorkCheckModal extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("dr_wor_sg_visible", false);
+        this.props.closeModal("dr_wor_sg_visible", false,'submit');
         notification.success({
             message: '操作成功！',
             duration: 2
