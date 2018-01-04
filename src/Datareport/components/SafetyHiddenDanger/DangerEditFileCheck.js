@@ -108,12 +108,12 @@ export default class DangerEditFileCheck extends Component {
         let rst = await putDocument({},{data_list:docData});
         if(rst.result){
             notification.success({
-                message: '删除文档成功！',
+                message: '修改文档成功！',
                 duration: 2
             });
         }else{
             notification.error({
-                message: '删除文档失败！',
+                message: '修改文档失败！',
                 duration: 2
             });
         }

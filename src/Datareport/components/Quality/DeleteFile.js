@@ -5,7 +5,6 @@ import { Input, Form, Spin, Upload, Icon, Button, Modal,
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
-const FormItem = Form.Item;
 const Option = Select.Option;
 
 export default class DeleteFile extends Component {
@@ -33,13 +32,6 @@ export default class DeleteFile extends Component {
             this.setState({checkers})
         })
     }
-
-    //删除
-    delete(index) {
-        let { dataSource } = this.state;
-        dataSource.splice(index, 1);
-        this.setState({ dataSource });
-    }
     
 
     //下拉框选择人
@@ -65,6 +57,13 @@ export default class DeleteFile extends Component {
 		this.props.onok(this.state.dataSource,per);
     }
 
+    //删除
+    delete(index) {
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
+    }
+
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -79,91 +78,71 @@ export default class DeleteFile extends Component {
     }
 
     render() {
-        const columns = [
-            {
-                title: '文档编码',
-                dataIndex: 'code',
-                width: '8%'
-            }, {
-                title: '项目名称',
-                dataIndex: 'project',
-                width: '8%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.projectName}
-                    </span>
-                ),
-            }, {
-                title: '单位工程',
-                dataIndex: 'unit',
-                width: '8%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.unit}
-                    </span>
-                ),
-            }, {
-                title: 'WBS编码',
-                dataIndex: 'wbs',
-                width: '8%',
-            }, {
-                title: '责任单位',
-                dataIndex: 'resUnit',
-                width: '8%',
-            }, {
-                title: '隐患类型',
-                dataIndex: 'type',
-                width: '5%',
-            }, {
-                title: '上报时间',
-                dataIndex: 'upTime',
-                width: '9%',
-            }, {
-                title: '核查时间',
-                dataIndex: 'checkTime',
-                width: '9%',
-            }, {
-                title: '整改时间',
-                dataIndex: 'editTime',
-                width: '9%',
-            }, {
-                title: '排查结果',
-                dataIndex: 'result',
-                width: '6%',
-            }, {
-                title: '整改期限',
-                dataIndex: 'deadline',
-                width: '8%',
-            }, {
-                title: '整改结果',
-                dataIndex: 'editResult',
-                width: '6%',
-            }, {
-                title:'附件',
-                width:"10%",
-                render:(text,record,index) => {
+        let columns = [{
+			title:'WBS编码',
+            dataIndex:'code',
+            width:'8%',
+		},{
+			title:'责任单位',
+            dataIndex:'respon_unit',
+            width:'8%',
+		},{
+			title:'事故类型',
+            dataIndex:'acc_type',
+            width:'7%',
+		},{
+			title:'上报时间',
+            dataIndex:'uploda_date',
+            width:'9%',
+		},{
+			title:'核查时间',
+            dataIndex:'check_date',
+            width:'9%',
+		},{
+			title:'整改时间',
+            dataIndex:'do_date',
+            width:'9%',
+		},{
+			title:'事故描述',
+            dataIndex:'descrip',
+            width:'10%',
+		},{
+			title:'排查结果',
+            dataIndex:'check_result',
+            width:'6%',
+		},{
+			title:'整改期限',
+            dataIndex:'deadline',
+            width:'6%',
+		},{
+			title:'整改结果',
+            dataIndex:'result',
+            width:'6%',
+		}, {
+            title:'附件',
+            width:'6%',
+			render:(text,record,index) => {
+				if(record.file.id){
                     return (<span>
                             <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                            <span className="ant-divider" />
-                            <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                        </span>)
+				        </span>)
                 }
-            }, {
-                title: '操作',
-                render: (text, record, index) => {
-                    return (
-                        <Popconfirm
-                            placement="leftTop"
-                            title="确定删除吗？"
-                            onConfirm={this.delete.bind(this, index)}
-                            okText="确认"
-                            cancelText="取消">
-                            <a>删除</a>
-                        </Popconfirm>
-                    )
-                }
+			}
+		}, {
+            title: '操作',
+            render: (text, record, index) => {
+                return (
+                    <Popconfirm
+                        placement="leftTop"
+                        title="确定删除吗？"
+                        onConfirm={this.delete.bind(this, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a>删除</a>
+                    </Popconfirm>
+                )
             }
-        ];
+        }];
         return (
             <Modal
 			title="安全隐患删除表"
