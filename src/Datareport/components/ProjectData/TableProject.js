@@ -167,6 +167,12 @@ export default class TableProject extends Component {
 		document.body.removeChild(link);
 	}
 	getExcel() {
+		if (this.state.selectedRows && this.state.selectedRows.length === 0) {
+			Notification.warning({
+				message: '请先选择数据'
+			});
+			return;
+		}
 		console.log(this.state.showDs);
 		let exhead = ['编码', '项目名称', '项目编码', '所属区域', '项目规模', '项目类型', '项目地址', '项目红线坐标', '项目投资', '项目负责人', '计划开工日期', '计划竣工日期', '简介', '附件', '项目图片'];
 		let rows = [exhead];
