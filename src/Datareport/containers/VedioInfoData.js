@@ -78,6 +78,7 @@ export default class VedioInfoData extends Component {
 			 uploadModal={uploadModal}
 			 actions = {actions}
 			 closeModal={this.closeModal}
+			 modalDown={DataReportTemplate_ImageInformation}
 			/>
 			<InfoChangeModal
 			 key={`changeModal${changeModal}`}

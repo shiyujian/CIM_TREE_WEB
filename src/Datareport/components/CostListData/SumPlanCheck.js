@@ -9,6 +9,7 @@ import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
 import moment from "moment";
+import './TableStyle.less';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -140,7 +141,7 @@ export default class SumSpeedExamine extends Component {
             },{
                 state:wk.current[0].id,
                 executor:executor,
-                action:'退回',
+                action:'拒绝',
                 note:'不通过',
                 attachment:null
             }

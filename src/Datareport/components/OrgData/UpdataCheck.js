@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/orgdata';
 import {actions as actions2} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
@@ -48,8 +48,10 @@ export default class UpdataCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_update_visible",false)
-        message.info("操作成功")
+        this.props.closeModal("dr_base_update_visible",false, "submit")
+        notification.success({
+            message:"操作成功"
+        })
     }
     //通过
     async passon(){
@@ -124,8 +126,28 @@ export default class UpdataCheck extends Component {
     //不通过
     async reject(){
         const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const {actions:{logWorkflowEvent}} = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '拒绝',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        notification.success({
+            message: "操作成功",
+            duration: 2
+        })
     }
     //预览
     handlePreview(index){

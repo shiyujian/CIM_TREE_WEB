@@ -55,7 +55,7 @@ export default class ToggleModalUpdate extends Component{
                 </span> 
                 <Row style={{margin: '20px 0'}}>
 				    <Col>
-				    	<TextArea placeholder="删除原因" rows={2} onChange={this.description.bind(this)}/>
+				    	<TextArea placeholder="变更原因" rows={2} onChange={this.description.bind(this)}/>
 				    </Col>
 			    </Row>
                <div style={{marginTop:"30px"}}>

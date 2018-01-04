@@ -18,7 +18,7 @@ export default class InfoDeleteUpload extends Component{
              onCancel={()=>closeModal("deleteModal")}
              footer={null}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请删除</h1>
+                <h1 style={{ textAlign: "center"}}>申请删除</h1>
                 <VedioInfoTable
                  dataSource={dataSource}
                 />

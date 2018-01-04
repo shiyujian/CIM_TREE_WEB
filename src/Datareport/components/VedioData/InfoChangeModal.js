@@ -32,7 +32,7 @@ export default class InfoChangeModal extends Component{
              onCancel={()=>closeModal("changeModal")}
              footer={null}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请变更</h1>
+                <h1 style={{ textAlign: "center"}}>申请变更</h1>
                 <VedioInfoTable
                  dataSource={dataSource}
                  storeExcelData={this.storeExcelData}

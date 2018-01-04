@@ -118,7 +118,6 @@ export default class PriceRmCheck extends Component {
             message: '操作成功！',
             duration: 2
         });
-        debugger;
     }
     //radio变化
     onChange(e){
