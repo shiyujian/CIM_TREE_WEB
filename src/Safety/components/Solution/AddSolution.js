@@ -11,7 +11,7 @@ export default class AddSolution extends Component {
 		this.state = {
 			options: [],
 			branch: {},
-			subentry:{},
+			subentry: {},
 
 		};
 	}
@@ -26,19 +26,28 @@ export default class AddSolution extends Component {
 		let code = this.props.state.project.code;
 		let dataSet = [];
 		debugger;
-		getPortions({ code: code }).then((rep) => {
-			console.log('vip-rep', rep);
-			if (rep.children) {
-				let projects = rep.children.map(item => {
-					return (
-						{
-							value: JSON.stringify(item),
-							label: item.obj_type_hum,
-							isLeaf: false
-						}
-					)
+		let branch = [];
+		let subBranch=[];
+		getPortions({ code: code }).then((rst) => {
+			console.log('vip-rst', rst);
+			if (rst.children) {
+				rst.children.map(item => {
+					if (rst.code === code) {  //当前选中项目
+						 subBranch = item.children.map(subItem => {
+							return (
+								{
+									value: JSON.stringify(subItem),
+									label: subItem.name,
+									isLeaf: false
+								}
+							)
+						})
+						// branch.push([...subBranch]);
+						// branch=Object.assign().push([...subBranch]);
+						branch=[...branch,...subBranch];
+					}
 				})
-				this.setState({ options: projects });
+				this.setState({ options:branch });
 			} else {
 				//没有对应的信息，使用默认的 -- 需求查找不到返回空
 				// let options= [
@@ -225,31 +234,31 @@ export default class AddSolution extends Component {
 		)
 	}
 	onSelectProject(value, selectedOptions) {
+		if(!value)return;
 		debugger;
 		console.log('vip-value', value);
 		console.log('vip-selectedOptions', selectedOptions);
 
 		let branch = {}; //分部 外层Chilren
 		let subentry = {}; // 分项 内层Chilren
+		let temp1 = JSON.parse(value[0]);
+		branch = {
+			name: temp1.name,
+			code: temp1.code,
+			obj_type: temp1.obj_type,
+			obj_type_hum: temp1.obj_type_hum,
+		}
 		if (value.length === 2) {
-			let temp1 = JSON.parse(value[0]);
 			let temp2 = JSON.parse(value[1]);
-			branch = {
-				name: temp1.name,
-				code: temp1.code,
-				obj_type: temp1.obj_type,
-				obj_type_hum: temp1.obj_type_hum,
-			}
 			subentry = {
 				name: temp2.name,
 				code: temp2.code,
 				obj_type: temp1.obj_type,
 				obj_type_hum: temp1.obj_type_hum,
 			}
-			this.setState({ branch, subentry });
-			return;
 		}
-		this.setState({ branch: {}, subentry: {} });
+		this.setState({ branch, subentry });
+		// this.setState({ branch: {}, subentry: {} });
 	}
 
 	loadData(selectedOptions) {
@@ -264,14 +273,18 @@ export default class AddSolution extends Component {
 			if (rst.status) {
 				let units = [];
 				rst.children.map(item => {
-					if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
-						units = item.children.map(unit => {
-							return (
-								{
-									value: JSON.stringify(unit),
-									label: unit.name
-								}
-							)
+					if (item && item.code === this.props.state.project.code) {
+						item.children.map(subItem => {
+							if (subItem && subItem.code === JSON.parse(targetOption.value).code) {  //当前选中项目
+								units = subItem.children.map(unit => {
+									return (
+										{
+											value: JSON.stringify(unit),
+											label: unit.name
+										}
+									)
+								})
+							}
 						})
 					}
 				})
