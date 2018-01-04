@@ -153,9 +153,12 @@ export default class ToggleModal extends Component{
                     // 直属部门
                     direct: item[2],
                     remarks: item[3],
+                    selectPro:[], 
+                    selectUnit:[],
                     editing:false
                 }
             });
+            console.log("red:",res);
             this.setState({
                 dataSource:res
             })

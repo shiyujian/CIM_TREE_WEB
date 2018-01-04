@@ -133,7 +133,9 @@ export default class ToggleModalCJ extends Component{
                         // 参建单位
                         canjian: item[2],
                         remarks: item[3],
-                        color:item[4]
+                        color:item[4],
+                        selectPro:[],
+                        selectUnit:[]
                     }
                 })
                 this.setState({

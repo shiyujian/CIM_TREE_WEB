@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {TableOrg, ToggleModal, OrgCheck, ToggleModalCJ, ToggleModalDel, ToggleModalUpdate} from '../components/OrgData'
 import {actions as platformActions} from '_platform/store/global';
-import {message} from "antd";
+import {notification} from "antd";
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
@@ -62,7 +62,9 @@ export default class OrgData extends Component {
 				}).then(rst => {
 					if (rst) {
 						console.log("rst:",rst);
-						message.success("流程发起成功");
+						notification.success({
+							message:"流程发起成功"
+						});
 					}
 				});
 		});
@@ -108,7 +110,9 @@ export default class OrgData extends Component {
 				}).then(rst => {
 					if (rst) {
 						console.log("rst:",rst);
-						message.success("流程发起成功");
+						notification.success({
+							message:"流程发起成功"
+						});
 					}
 				});
 		});
@@ -153,7 +157,9 @@ export default class OrgData extends Component {
 					attachment: null
 				}).then(rst => {
 					if (rst) {
-						message.success("流程发起成功");
+						notification.success({
+							message:"流程发起成功"
+						});
 					}
 				});
 		});
@@ -199,7 +205,9 @@ export default class OrgData extends Component {
 				}).then(rst => {
 					if (rst) {
 						console.log("rst:",rst);
-						message.success("流程发起成功");
+						notification.success({
+							message:"流程发起成功"
+						});
 					}
 				});
 		});

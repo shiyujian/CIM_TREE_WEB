@@ -48,7 +48,7 @@ export default class UpdataCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_update_visible",false)
+        this.props.closeModal("dr_base_update_visible",false, "submit")
         message.info("操作成功")
     }
     //通过
@@ -124,8 +124,28 @@ export default class UpdataCheck extends Component {
     //不通过
     async reject(){
         const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const {actions:{logWorkflowEvent}} = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        notification.success({
+            message: "操作成功",
+            duration: 2
+        })
     }
     //预览
     handlePreview(index){
