@@ -35,8 +35,9 @@ export default class ChangeModal extends Component{
                 <h1 style={{ textAlign: "center"}}>申请变更</h1>
                 <VedioTable
                  dataSource={dataSource}
-                 storeData={this.storeData}
+                 storeExcelData={this.storeData}
                  edit={true}
+                 fileDel={true}
                 />
                 <ChangeFooter
                  onOk={this.onOk}
