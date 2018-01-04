@@ -16,14 +16,12 @@ export default class VedioUpload extends Component{
 
     render(){
         const {dataSource} = this.state;
-        const {actions, uploadModal, closeModal} = this.props;
-
+        const {actions, uploadModal, closeModal,modalDown} = this.props;
         return(
             <Modal
              width={1280}
              visible={uploadModal}
              onCancel={()=>closeModal("uploadModal")}
-             footer={null}
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
                 <VedioTable
@@ -32,6 +30,7 @@ export default class VedioUpload extends Component{
                  fileDel={true}
                 />
                 <UploadFooter
+                modalDown = {modalDown}
                  dataSource={dataSource}
                  storeExcelData= {this.storeExcelData}
                  excelTitle= {excelTitle}

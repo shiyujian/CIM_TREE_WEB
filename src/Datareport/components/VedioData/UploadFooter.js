@@ -5,7 +5,7 @@ import {Button, Row, Col, Select, Upload, Input, message, Icon, Cascader, notifi
 import VedioTable from './VedioTable';
 import './index.less';
 const Option = Select.Option;
-import { SERVICE_API} from '_platform/api';
+import { SERVICE_API,NODE_FILE_EXCHANGE_API} from '_platform/api';
 import {getAllUsers} from './commonFunc';
 
 export default class UploadFooter extends Component{
@@ -47,7 +47,7 @@ export default class UploadFooter extends Component{
         return(<div>
             <Row className="rowSpacing">
                 <Col span={24}>
-                    <Button onClick={modalDownload}  className="spacing" >模板下载</Button>
+                    <Button onClick={this.modalDownload}  className="spacing" >模板下载</Button>
                     <Upload className="spacing" {...this.uploadProps}>
                         <Button>
                             <Icon type="upload"/>上传并预览
@@ -65,8 +65,7 @@ export default class UploadFooter extends Component{
                         onChange={this.onChange}
                         placeholder={"请选择项目-单位工程"}
                         changeOnSelect
-                    />
-                    <Button onClick={this.onSubmit} type="primary" className="spacing" >提交</Button>               
+                    />           
                 </Col>
             </Row>
             <Row className="rowSpacing">
@@ -240,6 +239,22 @@ export default class UploadFooter extends Component{
             }      
         }
     }
+    modalDownload = ()=>{
+        // const downloadLink = '';
+        const {modalDown} = this.props;
+        
+        this.createLink(this,modalDown);
+        //window.open(downloadLink);
+    }
+     createLink = (name, url) => {    //下载未应用
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
 }
 
@@ -248,11 +263,8 @@ UploadFooter.PropTypes ={
     dataIndex: PropTypes.array.isRequired,
     getAllUsers: PropTypes.func.isRequired
 }
+ 
 
-const modalDownload = ()=>{
-    const downloadLink = '';
-    //window.open(downloadLink);
-}
 
 const projectReturn = (data={})=>{
     const {name,code,obj_type} = data;
