@@ -45,7 +45,7 @@ export default class VedioTable extends Component{
     deleteData = (index)=>{
         const {dataSource = [],storeExcelData} = this.props;
         let data = JSON.parse(JSON.stringify(dataSource));
-        data.splice(index,1);
+        data.splice((this.page-1)*10+index, 1);
         storeExcelData(data);
     }
 
@@ -68,9 +68,9 @@ export default class VedioTable extends Component{
         )
     }
     handleChange = (value,index,dataIndex)=>{
-        const {storeData,dataSource} = this.props;
+        const {storeExcelData,dataSource} = this.props;
         dataSource[(this.page-1)*10 + index][dataIndex] = value;
-        storeData(dataSource);
+        storeExcelData(dataSource);
     }
 
     columns = [{
