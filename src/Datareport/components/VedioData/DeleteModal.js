@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Modal, message} from 'antd';
+import {Modal, message, notification} from 'antd';
 
 import VedioTable from './VedioTable';
 import ChangeFooter from './ChangeFooter';
@@ -14,11 +14,11 @@ export default class DeleteUpload extends Component{
         return(
             <Modal
              width={1280}
-             title={"视频监控删除"}
              visible={deleteModal}
              onCancel={()=>closeModal("deleteModal")}
              footer={null}
             >
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请删除</h1>
                 <VedioTable
                  dataSource={dataSource}
                 />
@@ -34,7 +34,10 @@ export default class DeleteUpload extends Component{
             name = '视频监控数据删除';
 
         await launchProcess({dataSource,selectUser,name,description},{createWorkflow,logWorkflowEvent});
-        message.success("发起删除流程成功");
+        notification.success({
+            message: '发起删除流程成功！',
+            duration: 2
+        });
         closeModal("deleteModal");
     }
 

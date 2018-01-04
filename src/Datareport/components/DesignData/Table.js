@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress,Select } from 'antd';
+import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress,Select,notification } from 'antd';
 import {STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API,} from '_platform/api';
 import Card from '_platform/components/panels/Card';
 const Option = Select.Option;
@@ -73,7 +73,7 @@ export default class DesignTable extends Component {
                     num++;
                     this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
                     if(!rst) {
-                    	message.error(`数据获取失败`)
+                    	notification.error({message:`数据获取失败!`})
 		    			return {}
 		    		} else {
                     	return rst
@@ -104,7 +104,7 @@ export default class DesignTable extends Component {
 	                dataSource.push(temp);
         		}) 
         	} catch(e){
-        		message.error(`数据获取失败`)
+        		notification.error({message:`数据获取失败!`})
         	}
             this.setState({dataSource,alldatas:item,showDs:dataSource});
         })
@@ -175,7 +175,7 @@ export default class DesignTable extends Component {
 					<Button style={{ margin: '10px' }} onClick={this.getExcel.bind(this)} type="default">导出表格</Button>
 					<Search
 						style={{ width: "200px", marginLeft: 10 }}
-						placeholder="输入搜索条件"
+						placeholder="请搜索文档编码或文档名称"
 						onSearch={
 							(text) => {
 								let result = this.state.dataSource.filter(data=>{
@@ -234,9 +234,9 @@ export default class DesignTable extends Component {
 		const {modify = {}, actions: { changeModifyField } } = this.props;
 		console.log(this.props,'modify.selectedDatas',modify.selectedDatas)
 		if(!(modify.selectedDatas&&modify.selectedDatas.length)){
-			message.warning('请选择数据')
+			notification.warning({message:'请先选择数据!'})
 		} else if(!this.judge(modify.selectedDatas)) {
-			message.warning('请选择相同的单位工程')
+			notification.warning({message:'请选择相同的单位工程!'})
 		} else {
 			changeModifyField('visible', true)
 			changeModifyField('key', modify.key?modify.key+1:1)
@@ -246,7 +246,7 @@ export default class DesignTable extends Component {
 		const {expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		console.log(this.props)
 		if(!(expurgate.selectedDatas&&expurgate.selectedDatas.length)){
-			message.warning('请选择数据')
+			notification.warning({message:'请先选择数据!'})
 		} else {
 			changeExpurgateField('visible', true)
 			changeExpurgateField('key', expurgate.key?expurgate.key+1:1)
@@ -270,7 +270,7 @@ export default class DesignTable extends Component {
         const {actions:{jsonToExcel}} = this.props;
         const {selectedDataSource} = this.state;
         if(selectedDataSource.length === 0){
-        	message.warning('请先选择数据再导出')
+        	notification.warning({message:'请先选择数据!'})
         	return
         }
         let rows = [];

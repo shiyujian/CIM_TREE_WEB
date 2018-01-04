@@ -42,8 +42,7 @@ export default class BalanceSchedule extends Component {
     this.columns = [
       {
         title: "序号",
-        dataIndex: "key",
-        width:"5%"
+        dataIndex: "key"
       },
       {
         title: "项目/子项目",

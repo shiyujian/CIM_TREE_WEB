@@ -55,14 +55,13 @@ export default class VedioCheck extends Component {
 
 		return (
             <Modal
-			title={modalTitle[type]}
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}
             >
                 <Row type='flex' justify='center' >
-                    <p className="titleFont">结果审核</p>
+                    <h1 style={{ textAlign: "center", marginBottom: "20px" }}>{modalTitle[type]}</h1>
                 </Row>
                 <VedioTable
                  dataSource={dataSource}
@@ -107,7 +106,7 @@ export default class VedioCheck extends Component {
             await this.reject();
         }
         const {type} = this.props;
-        this.props.closeModal(modalName[type],false)    //selfcare use
+        this.props.closeModal(modalName[type],false,'submit')    //selfcare use
         message.info("操作成功"); 
     }
     
@@ -120,11 +119,6 @@ export default class VedioCheck extends Component {
 
         // send workflow
         await throughProcess(wk,{logWorkflowEvent});
-        
-        /* const  {id,username,name:person_name,code:person_code} = getUser(),
-            executor = {id,username,person_name,person_code};
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor,attachment:null}); */
-
         switch(type){
             case "create":
                 this.createPassion(dataSource);
@@ -138,8 +132,10 @@ export default class VedioCheck extends Component {
                     return deleteDocument({code:item.code})
                 });
                 Promise.all(all).then(rst => {
-                    console.log(rst)
-                    message.success('删除文档成功！');
+                    notification.success({
+                        message: '删除文档成功！',
+                        duration: 2
+                    });
                 })
             break;
         }
@@ -214,17 +210,39 @@ export default class VedioCheck extends Component {
         }
     }
 
-    reject = async ()=>{    //不通过
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+    //不通过
+    async reject() {
+        const { wk } = this.props
+        const { actions: { deleteWorkflow } } = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            },
+            {
+                state:wk.current[0].id,
+                executor:executor,
+                action:"退回",
+                note:"不通过",
+                attachment:null
+            }
+        );
+        notification.success({
+            message:"操作成功!",
+            duration:2
+        })
     }
 }
 
 const modalTitle = {
-    create: '视频监控数据录入审批表',
-    strike: '视频监控数据删除审核表',
-    change: '视频监控数据修改审核表'
+    create: '填报审核',
+    strike: '删除审核',
+    change: '变更审核'
 }
 const modalName = {
     create: 'safety_vedioCheck_visible',

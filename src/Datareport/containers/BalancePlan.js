@@ -54,6 +54,7 @@ export default class BanlancePlan extends Component {
 	}
 	 generateTableData(data) {
 		 let dataSour = [];
+		 let datalength = data.length;
 		data.map((item,key) => {
 			let datas = {
 				key:key+1,
@@ -66,11 +67,14 @@ export default class BanlancePlan extends Component {
 				remarks: item.extra_params.remarks,
 				code:item.code
 			}
+			this.setState({percent:parseFloat((key*100/datalength).toFixed(2))})
 			dataSour.push(datas)
 		})
 		this.setState({
 			dataSource:dataSour,
-			showDat:dataSour
+			showDat:dataSour,
+			loading:false,
+			percent:100
 		})
 	}
 
@@ -78,7 +82,6 @@ export default class BanlancePlan extends Component {
 		const {actions:{ getExBySearch }}=this.props;
 		this.setState({loading:true,percent:0})
 		getExBySearch().then(rst=>{
-			this.setState({loading:false,percent:100})
 			this.generateTableData(rst.result)
 		})
 	}

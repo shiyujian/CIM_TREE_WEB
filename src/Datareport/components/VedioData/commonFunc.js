@@ -1,5 +1,5 @@
 import React from 'react';
-import {message, Select} from 'antd';
+import {message, Select, notification} from 'antd';
 const Option = Select.Option;
 import {getUser} from '_platform/auth';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -70,7 +70,10 @@ export const uploadFile = async (file)=>{   //上传文件返回文件的部分�
 
     const resp = await (await fetch(`${FILE_API}/api/user/files/`,myInit)).json();
     if (!resp || !resp.id) {
-        message.error('文件上传失败')
+        notification.error({
+            message: '文件上传失败！',
+            duration: 2
+        });
         return;
     };
     let filedata = resp;

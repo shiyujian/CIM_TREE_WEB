@@ -152,9 +152,9 @@ export default class Addition extends Component {
                     let abc = await jthis.handleExcelData(importData)
                     console.log('111111111',abc)
                     changeAdditionField('dataSource', abc)
-		            message.success(`${info.file.name} file uploaded successfully`);
+		            notification.success({message:'成功！'});
 		        } else if (info.file.status === 'error') {
-		            message.error(`${info.file.name}解析失败，请检查输入`);
+		            notification.error({message:`${info.file.name}解析失败，请检查输入`});
 		        }
 		    },
 		};
@@ -235,7 +235,7 @@ export default class Addition extends Component {
                 }
                 changeAdditionField('dataSource',dataSource)
             } else {
-                message.info("提交单位错误,请重新输入")
+                notification.info({message:"提交单位错误,请重新输入!"})
             }
         })
     }
@@ -337,7 +337,7 @@ export default class Addition extends Component {
             resp = await resp.json()
             console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                notification.error({message:'文件上传失败'})
                 return;
             };
             const filedata = resp;
@@ -410,30 +410,30 @@ export default class Addition extends Component {
 		const { addition,actions:{changeAdditionField} } = this.props;
         let {dataSource} = addition;
         if(!this.state.check){
-            message.info("请选择审核人")
+            notification.info({message:"请选择审核人!"})
             return
         }
         if(dataSource.length === 0){
-            message.info("请上传excel")
+            notification.info({message:"请上传excel!"})
             return
         }
         let temp = dataSource.some((o,index) => {
             return !o.file.id
         })
         if(temp){
-            message.info(`有数据未上传附件`)
+            notification.info({message:`有数据未上传附件!`})
             return
         }
         let temp1 = dataSource.some((o,index) => {
             return !o.pubUnit.name
         })
         if(temp1){
-            message.info(`有数据未填写正确的提交单位`)
+            notification.info({message:`有数据未填写正确的提交单位!`})
             return
         }
         const {project,unit} =  this.state;
         if(!project.name){
-            message.info(`请选择项目和单位工程`);
+            notification.info({message:`请选择项目和单位工程!`});
             return;
         }
         let {check} = this.state
@@ -486,7 +486,7 @@ export default class Addition extends Component {
                 }],
                 attachment:null
             }).then(() => {
-                message.success("成功")
+                notification.success({message:"成功!"})
 				clearAdditionField();
 			})
 		})
