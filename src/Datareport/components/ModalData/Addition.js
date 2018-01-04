@@ -138,7 +138,7 @@ export default class Addition extends Component {
         })
         if (fdb) {
             notification.info({
-                message:'有fdb模型未上传附件!'
+                message: '有fdb模型未上传附件!'
             })
             return
         }
@@ -148,7 +148,7 @@ export default class Addition extends Component {
         })
         if (tdb) {
             notification.info({
-                message:'有tdbx模型未上传附件'
+                message: '有tdbx模型未上传附件'
             })
             return
         }
@@ -158,22 +158,22 @@ export default class Addition extends Component {
         })
         if (attr) {
             notification.info({
-                message:'有属性表未上传附件'
+                message: '有属性表未上传附件'
             })
             return
         }
 
         if (!this.state.check) {
             notification.info({
-                message:"请选择审核人"
+                message: "请选择审核人"
             })
             return
         }
         if (this.state.dataSource.length === 0) {
             notification.info({
-                message:"请上传excel"
+                message: "请上传excel"
             })
-                
+
             return
         }
 
@@ -181,7 +181,7 @@ export default class Addition extends Component {
         const { project, unit } = this.state;
         if (!project.name) {
             notification.info({
-                message:'请选择项目和单位工程'
+                message: '请选择项目和单位工程'
             });
             return;
         }
@@ -237,7 +237,7 @@ export default class Addition extends Component {
                     }],
                     attachment: null
                 }).then(() => {
-                    notification.success({message:"成功"})
+                    notification.success({ message: "成功" })
                     clearAdditionField();
                 })
         })
@@ -264,7 +264,7 @@ export default class Addition extends Component {
                 if (wbs && wbs.children[0] && wbs.children[0].children[0] && wbs.children[0].children[0].code) {
 
                     if (wbs.children[0].children[0].code !== unit.code) {
-                        notification.info({message:"您的第" + i + "条编码输入有误，请确认!"});
+                        notification.info({ message: "您的第" + i + "条编码输入有误，请确认!" });
                         return;
                     }
                 } else {
@@ -339,10 +339,8 @@ export default class Addition extends Component {
     }
     //附件删除
     remove(index, name) {
-        console.log('index', index, 'name', name)
         const { actions: { deleteStaticFile } } = this.props
         let { dataSource } = this.state
-        console.log('data', this.state)
         let id = dataSource[index][name].id
         deleteStaticFile({ id: id })
         dataSource[index][name] = {}
@@ -371,7 +369,7 @@ export default class Addition extends Component {
         fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
             resp = await resp.json()
             if (!resp || !resp.id) {
-                notification.error({message:'文件上传失败'})
+                notification.error({ message: '文件上传失败' })
                 return;
             };
             const filedata = resp;
@@ -417,7 +415,6 @@ export default class Addition extends Component {
     fixOrg(index) {
         const { actions: { getOrg } } = this.props;
         let { dataSource } = this.state;
-        console.log('qqqq', dataSource[index].submittingUnit)
         getOrg({ code: dataSource[index].submittingUnit.code }).then(rst => {
             if (rst.code) {
                 dataSource[index]['submittingUnit'] = {
@@ -427,7 +424,7 @@ export default class Addition extends Component {
                 }
                 this.setState({ dataSource });
             } else {
-                notification.info({message:"提交单位错误,请重新输入"})
+                notification.info({ message: "提交单位错误,请重新输入" })
             }
         })
     }
@@ -603,7 +600,7 @@ export default class Addition extends Component {
                 }
             }
         ];
-        // console.log('shu:', addition.visible)
+       
         return (
             <Modal
                 key={this.props.akey}

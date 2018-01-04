@@ -197,7 +197,7 @@ export default class Addition extends Component {
                             loadData={this.loadData.bind(this)}
                             onChange={this.onSelectProject.bind(this)}
                             changeOnSelect
-                            placeholder="请选择项目及子单位工程"
+                            placeholder="请选择项目-单位工程"
                         />
                     </span>
                     {/* <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button> */}
