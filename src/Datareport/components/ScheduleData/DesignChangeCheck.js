@@ -6,7 +6,7 @@ import { Input, Col, Card, Table, Row, Button, DatePicker, Radio, Select, notifi
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import { getUser } from '_platform/auth';
-import { actions } from '../../store/scheduledata';
+import { actions, logWorkflowEvent } from '../../store/scheduledata';
 import Preview from '../../../_platform/components/layout/Preview';
 import moment from 'moment';
 
@@ -52,7 +52,10 @@ export default class DesignChangeCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("scheduledata_doc_change_visible", false);
-        message.info("操作成功");
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
     }
     // 点x消失
     oncancel() {
@@ -90,6 +93,7 @@ export default class DesignChangeCheck extends Component {
                     factquantity: item.factquantity,
                     uploads: item.uploads,
                     designunit: item.designunit,
+                    remarks:item.remarks,
                     unit: item.unit,
                     project: item.project
                 }
@@ -112,7 +116,28 @@ export default class DesignChangeCheck extends Component {
     async reject() {
         const { wk } = this.props
         const { actions: { deleteWorkflow } } = this.props
-        await deleteWorkflow({ pk: wk.id })
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            },
+            {
+                state:wk.current[0].id,
+                executor:executor,
+                action:"退回",
+                note:"不通过",
+                attachment:null
+            }
+        );
+        notification.success({
+            message:"操作成功!",
+            duration:2
+        })
     }
     onChange(e) {
         this.setState({ opinion: e.target.value })
@@ -150,17 +175,19 @@ export default class DesignChangeCheck extends Component {
         }, {
             title: '变更人员',
             dataIndex: 'uploads',
+        },{
+            title:'备注',
+            dataIndex:'remarks'
         }];
         return (
             <Modal
-                title="设计变更审批表"
                 visible={true}
                 width={1280}
                 footer={null}
                 maskClosable={false}
                 onCancel={this.oncancel.bind(this)}
             >
-                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>变更审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -177,17 +204,20 @@ export default class DesignChangeCheck extends Component {
                         </RadioGroup>
                     </Col>
                     <Col span={2} push={14}>
-                        <Button type='primary'>
-                            导出表格
-                        </Button>
-                    </Col>
-                    <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
                         </Button>
                         <Preview />
                     </Col>
                 </Row>
+                {
+                    this.state.dataSource[0] && this.state.dataSource[0].changeInfo && <Row>
+                        <Col span={4}>
+                            申请变更原因:{this.state.dataSource[0].changeInfo}
+                            <br/>
+                        </Col>
+                    </Row>
+                }
                 {
                     this.state.wk && <WorkflowHistory wk={this.state.wk} />
                 }
