@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/CostListData';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button,message,Popconfirm,Progress} from 'antd';
+import {Row,Col,Table,Input,Button,message,Popconfirm,Progress,notification} from 'antd';
 import PriceList from '../components/CostListData/PriceList';
 import PriceRmModal from '../components/CostListData/PriceRmModal';
 import PriceModifyModal from '../components/CostListData/PriceModifyModal';
@@ -128,9 +128,15 @@ export default class CostListData extends Component {
 				attachment:null
 			}).then(() => {
 				this.setState({addvisible:false}),
-				message.info("发起成功");						
+				notification.success({
+					message:'发起成功',
+					duration: 2
+				});					
 			}).catch(() => {
-				message.info("发起失败")
+				notification.error({
+					message:'发起失败',
+					duration: 2
+				});
 			})
 			cb();
 		})
@@ -217,7 +223,10 @@ export default class CostListData extends Component {
 				this.setState({dataSource});
 				return;
 			}else {
-				message.warn("请输入查询字段");
+				notification.warning({
+					message:'请输入查询字段',
+					duration: 2
+				})
 				return;
 			}
 		}
@@ -235,13 +244,19 @@ export default class CostListData extends Component {
 				dataSource: res
 			});
 		}else{
-			message.info("请换一个字段")
+			notification.warning({
+				message:'请换一个字段',
+				duration: 2
+			});
 		}
 	}
 
 	openModal (type) {
 		if(!this.state.selectedRows.length) {
-			message.warn("请选择数据");
+			notification.warning({
+				message:'请选择数据',
+				duration: 2
+			});
 			return;
 		}
 		this.setState({
@@ -253,7 +268,10 @@ export default class CostListData extends Component {
 		const {actions:{jsonToExcel}} = this.props;
 		const showDs = this.state.selectedRows;
 		if(!showDs.length) {
-			message.warn('至少选择一条数据');
+			notification.warning({
+				message:'至少选择一条数据',
+				duration: 2
+			});
 			return;
 		};
         let rows = [];

@@ -51,8 +51,11 @@ export default class PriceRmCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_pri_rm_visible",false)
-        message.info("操作成功")
+        this.props.closeModal("cost_pri_rm_visible",false);
+        notification.success({
+            message:'操作成功',
+            duration: 2
+        });
     }
 
     //通过
@@ -126,7 +129,10 @@ export default class PriceRmCheck extends Component {
 		const {actions:{jsonToExcel}} = this.props;
 		const showDs = this.state.dataSource;
 		if(!showDs.length) {
-			message.warn('至少选择一条数据');
+            notification.warning({
+                message:'至少选择一条数据',
+                duration: 2
+            });
 			return;
 		};
         let rows = [];
