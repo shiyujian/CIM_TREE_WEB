@@ -59,6 +59,8 @@ import UpdataCheck from 'Datareport/components/OrgData/UpdataCheck';
 import HandelChangeUnitModal from 'Datareport/components/UnitData/HandleChangeUnitModal';
 import HandelChangeProjModal from 'Datareport/components/ProjectData/HandleChangeModal';
 import ModCheck from 'Datareport/components/PersonData/ModCheck';
+import DefectDeleteCheck from 'Datareport/components/Quality/DefectDeleteCheck';
+import DefectEditCheck from 'Datareport/components/Quality/DefectEditCheck';
 
 const FormItem = Form.Item;
 @connect(
@@ -141,7 +143,9 @@ export default class Progress extends Component {
 			dr_base_update_visible,
 			dr_change_unit_visible,
 			dr_change_proj_visible,
-			person_modcheck_visible
+			person_modcheck_visible,
+			defect_delete_visible,
+			defect_edit_visible
 		} = this.props;
 		const { actions = [] } = state;
 		const { workflow: { code } = {}, id, name, subject = [] } = task;
@@ -464,6 +468,14 @@ export default class Progress extends Component {
 					person_modcheck_visible && 
 					<ModCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
 				}
+				{
+					defect_delete_visible && 
+					<DefectDeleteCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
+				{
+					defect_edit_visible && 
+					<DefectEditCheck wk={this.state.wk} closeModal={this.closeModal.bind(this)}/>
+				}
 			</div>
 		);
 	}
@@ -480,7 +492,6 @@ export default class Progress extends Component {
 	async openModal(name,id){
 		const {actions:{changeDatareportVisible,getWorkflowById}} = this.props
 		let wk = await getWorkflowById({pk:id});
-		console.log('wk',wk);
 		this.setState({wk})
 		switch (name){
 			case "检验批验收信息批量录入":
@@ -656,6 +667,12 @@ export default class Progress extends Component {
 				break;
 			case "人员信息批量更改":
 				changeDatareportVisible({key:'person_modcheck_visible',value:true})
+				break;
+			case "质量缺陷信息批量删除":
+				changeDatareportVisible({key:'defect_delete_visible',value:true})
+				break;
+			case "质量缺陷信息批量变更":
+				changeDatareportVisible({key:'defect_edit_visible',value:true})
 				break;
 			default:break;
 		}
