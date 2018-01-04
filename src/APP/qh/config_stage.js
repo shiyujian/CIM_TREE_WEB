@@ -56,7 +56,7 @@ window.config = {
 	//WJH插件的下载地址
 	'WJH_CITY_MARKER':'http://10.215.160.38:6542/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
 	//三维展示里面的cep模型数据
-	'WJH_CEP':'http://10.215.160.37:8006/qh20171212/qhtdbx.cep', 
+	'WJH_CEP':'http://10.215.160.37:8006/qhtdbx20171212/qhtdbx.cep', 
 
 	//地图瓦片地址
 	'cus_tilemap':'http://10.215.160.39:6580',

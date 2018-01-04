@@ -130,6 +130,7 @@ export default class TableUnit extends Component {
 						onCancel={() => {
 							this.setState({ deling: false });
 						}}
+						dataSource = {this.state.selectedRows}
 						actions={this.props.actions}
 					/>
 				}
@@ -154,6 +155,12 @@ export default class TableUnit extends Component {
         document.body.removeChild(link);
     }
 	getExcel(){
+		if (this.state.selectedRows.length === 0) {
+			notification.warning({
+				message:'请至少选择一条'
+			});
+			return;
+		}
 		console.log(this.state.showDs);
 		let exhead = ['单位工程编码','单位工程名称','所属项目名称','项目类型','项目阶段','单位红线坐标','计划开工日期','计划竣工日期','简介','建设单位','附件'];
 		let rows = [exhead];
@@ -167,9 +174,10 @@ export default class TableUnit extends Component {
 				return param;
 			}
 		}
+		console.log("this.state.selectedRows:",this.state.selectedRows);
 		let excontent =this.state.selectedRows.map(data=>{
 			return [data.code,data.name,data.fatherName,data.projType||'',data.stage||'',getcoordinate(data.coordinate)
-			,data.stime||'',data.etime||'',data.intro||'',data.rsp_orgName?data.rsp_orgName[0]:'',data.files?data.files[0].name:''];
+			,data.stime||'',data.etime||'',data.intro||'',data.rsp_orgName?data.rsp_orgName[0]:'',data.file?data.file.name:''];
 		});
 		rows = rows.concat(excontent);
 		const {actions:{jsonToExcel}} = this.props;

@@ -8,6 +8,7 @@ import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/compo
 import { actions } from '../store/ProjectData';
 import {getUser} from '_platform/auth'
 import {getNextStates} from '_platform/components/Progress/util';
+import {Notification} from "antd";
 
 var moment = require('moment');
 @connect(
@@ -57,6 +58,16 @@ export default class ProjectData extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
 					attachment:null
+				}).then(rst => {
+					if (rst) {
+						Notification.success({
+							message: "流程发起成功"
+						});
+					}else {
+						Notification.error({
+							message: "流程发起失败"
+						})
+					}
 				});
 		});
 	}

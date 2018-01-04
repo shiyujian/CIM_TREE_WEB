@@ -152,7 +152,7 @@ export default class DelModal extends Component {
           title:'附件',
           key:'file',
           render:(record) => (
-                <a> {record.files?record.files[0].name:'暂无'}</a>
+                <a> {record.file?record.file.name:'暂无'}</a>
           )
       }]
 }

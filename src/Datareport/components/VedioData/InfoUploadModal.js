@@ -20,14 +20,13 @@ export default class InfoUploadModal extends Component{
 
     render(){
         const {dataSource} = this.state;
-        const {uploadModal, closeModal, actions} = this.props;
+        const {uploadModal, closeModal, actions,modalDown} = this.props;
 
         return(
             <Modal
              width={1280}
              visible={uploadModal}
              onCancel={()=>closeModal("uploadModal")}
-             footer={null}
             >
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
                 <VedioInfoTable
@@ -37,6 +36,7 @@ export default class InfoUploadModal extends Component{
                  actions={this.props.actions}
                 />
                 <UploadFooter
+                modalDown = {modalDown}
                  dataSource={dataSource}
                  storeExcelData= {this.storeExcelData}
                  excelTitle= {excelTitle}

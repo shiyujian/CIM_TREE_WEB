@@ -137,8 +137,7 @@ export default class SumSpeedChange extends Component {
         const columns =[
             {
               title: "序号",
-              dataIndex: "key",
-              width:"5%",
+              dataIndex: "key"
             },{
                 title: "项目/子项目",
                 dataIndex: "project",
@@ -264,7 +263,6 @@ export default class SumSpeedChange extends Component {
             {
                 title: "编辑",
                 dataIndex: "edit",
-                width:"5%",
                 render: (text, record, index) => {
                   return (
                     <Popconfirm

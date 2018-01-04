@@ -123,7 +123,7 @@ export default class HandelDelModal extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null,
             }
@@ -221,7 +221,7 @@ export default class HandelDelModal extends Component {
           title:'附件',
           key:'file',
           render:(record) => (
-                <a> {record.files?record.files[0].name:'暂无'}</a>
+                <a> {record.file?record.file.name:'暂无'}</a>
           )
       }];
       let projname = this.state.project?this.state.project.name:'';
