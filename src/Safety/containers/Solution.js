@@ -348,7 +348,8 @@ class Solution extends Component {
                 if(rst.code){
                     if(rst.extra_params && rst.extra_params.unit){
                         for(let i=0;i<rst.extra_params.unit.length;i++){
-                            if(rst.extra_params.unit[i].type==="施工单位/C"){
+                            // if(rst.extra_params.unit[i].type==="施工单位/C"){
+                            if(rst.extra_params.unit[i].type==="施工单位"){
                                 this.setState({construct:rst.extra_params.unit[i]});
                             }
                         }

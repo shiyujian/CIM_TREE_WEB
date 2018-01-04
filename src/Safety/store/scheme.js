@@ -11,9 +11,9 @@ const setUploadFile = createAction('${ID}_获取上传的文件数据');
 
 
 //获取树
-export const getTreeOK = createAction('${ID}_获取项目结构树');              //
+export const getTreeOK = createAction('${ID}_获取项目结构树');             
 export const getTree =
-	createFetchAction(`${SERVICE_API}/project-tree/?depth=3`, [getTreeOK]);//  getTree 调用时会调用 getTreeOK
+	createFetchAction(`${SERVICE_API}/project-tree/?depth=3`, [getTreeOK]); 
 
 const getProjects =
 	createFetchAction(`${SERVICE_API}/projects/code/{{code}}/`, [], 'GET');
@@ -38,8 +38,6 @@ export const setDocument =
 //删除document对象
 const delDocument =
 	createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
-
-
 //文档目录树相关
 const getScheduleDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/`,[],'GET');
 const postScheduleDir = createFetchAction(`${SERVICE_API}/directories/`,[],'POST');
@@ -48,6 +46,10 @@ const getDocumentByCode = createFetchAction(`${SERVICE_API}/doc_searcher/dir_cod
 const getDocumentByContent = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/?doc_name={{name}}`,[],'GET');
 //获取施工单位
 const getWorkpackagesByCode = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/`, [], 'GET');
+
+// 获取分部分项
+export const getPortions = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?depth=3`, []);
+
 export const actions = {
 	setUploadFile,
 	getTreeOK,
@@ -63,7 +65,8 @@ export const actions = {
 	postScheduleDir,
 	getDocumentByCode,
 	getDocumentByContent,
-	getWorkpackagesByCode
+	getWorkpackagesByCode,
+	getPortions,
 };
 
 export default handleActions({
