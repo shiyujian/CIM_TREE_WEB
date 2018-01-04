@@ -584,7 +584,7 @@ export default class PriceList extends Component {
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
                 <div>
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果预览</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>发起填报</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

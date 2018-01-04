@@ -254,7 +254,7 @@ export default class CostListData extends Component {
 	openModal (type) {
 		if(!this.state.selectedRows.length) {
 			notification.warning({
-				message:'请选择数据',
+				message:'请先选择数据',
 				duration: 2
 			});
 			return;
@@ -269,7 +269,7 @@ export default class CostListData extends Component {
 		const showDs = this.state.selectedRows;
 		if(!showDs.length) {
 			notification.warning({
-				message:'至少选择一条数据',
+				message:'请先选择数据',
 				duration: 2
 			});
 			return;

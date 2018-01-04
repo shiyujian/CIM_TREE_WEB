@@ -159,7 +159,7 @@ export default class PriceRmModal extends Component {
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
             <div>
-                <h1 style ={{textAlign:'center',marginBottom:20}}>预览</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>申请删除</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
