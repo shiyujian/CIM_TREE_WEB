@@ -32,7 +32,7 @@ export default class ToggleModal extends Component{
                     });
                     let {getOrgByCode} = jthis.props.actions;
                     notification.success({
-                        message:`${info.file.name} file uploaded successfully`
+                        message:`${info.file.name} 文件上传成功`
                     });
                     let orgCodes = Object.keys(orgset);
                     let promises= orgCodes.map(code=>{

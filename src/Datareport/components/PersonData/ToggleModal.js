@@ -18,6 +18,7 @@ export default class ToggleModal extends Component{
     render(){
         const {visible, actions: {getOrgReverse}} = this.props;
         let jthis = this;
+        let accept = 'image/jpg, image/jpeg, image/png';
         const props = {
             action: `${SERVICE_API}/excel/upload-api/`,
             headers: {
@@ -148,6 +149,7 @@ export default class ToggleModal extends Component{
                 render:(record) => (
                     <Upload
                         beforeUpload={this.beforeUploadPic.bind(this, record)}
+                        accept={accept}
                     >
                         <a>{record.signature ? record.signature.name : '点击上传'}</a>
                     </Upload>
@@ -215,24 +217,30 @@ export default class ToggleModal extends Component{
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
+
     beforeUploadPic(record,file){
+        console.log('file',file)
         const fileName = file.name;
-        // const isJPG = file.type ? 'image/jpeg, image/png';
-        // if (!isJPG) {
-        //     Notification.error('图片');
-        //     return false;
-        // }
+        const imageType = 'image/jpg, image/jpeg, image/png';
+        const isJPG = imageType.indexOf(file.type) >= 0;
+        if (!isJPG) {
+            Notification.warning({
+                message: '请上传图片'
+            });
+            return false;
+        }
         // 上传到静态服务器
         const { actions:{uploadStaticFile} } = this.props;
 		const formdata = new FormData();
 		formdata.append('a_file', file);
         formdata.append('name', fileName);
         let myHeaders = new Headers();
-        let myInit = { method: 'POST',
-                       headers: myHeaders,
-                       body: formdata
-                     };
-                     //uploadStaticFile({}, formdata)
+        let myInit = { 
+            method: 'POST',
+            headers: myHeaders,
+            body: formdata
+        };
+        //uploadStaticFile({}, formdata)
         fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
             let loadedFile = await resp.json();
             loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);

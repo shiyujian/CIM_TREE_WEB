@@ -9,6 +9,7 @@ import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
 import moment from "moment";
+import './TableStyle.less';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -157,7 +158,6 @@ export default class SumSpeedExamine extends Component {
             {
               title: "序号",
               dataIndex: "key",
-              width:"5%",
               render: (text, record, index) => {
                 return index + 1;
               }
@@ -190,8 +190,7 @@ export default class SumSpeedExamine extends Component {
             },
             {
               title: "备注",
-              dataIndex: "remarks",
-              width:"5%"
+              dataIndex: "remarks"
             }
           ]
 		return (
