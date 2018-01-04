@@ -3,7 +3,6 @@ import { Progress, Row, Col, Table, Form, Button, Popconfirm, message, Input, no
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, NODE_FILE_EXCHANGE_API } from '_platform/api';
 import ChangeFile from './ChangeFile';
 import DeleteFile from './DeleteFile';
-import style from './TableOrg.css';
 import { getNextStates } from '_platform/components/Progress/util';
 import { getUser } from '_platform/auth';
 import { WORKFLOW_CODE } from '_platform/api'
@@ -41,16 +40,16 @@ export default class TableOrg extends Component {
 		}
 	}
 	async generateTableData(data) {
-		const { actions: { getDocument,getDocumentList } } = this.props;
+		const { actions: { getDocument, getDocumentList } } = this.props;
 		let dataSource = [];
 		let total = data.length
-		let codeArray=[];
+		let codeArray = [];
 		data.map((item, i) => {
-			this.setState({percent:parseFloat((i*100/total).toFixed(2))});
+			this.setState({ percent: parseFloat((i * 100 / total).toFixed(2)) });
 			codeArray.push(item.code);
 		});
-		let docArray = await getDocumentList({},{list:codeArray});
-		if(docArray.result){
+		let docArray = await getDocumentList({}, { list: codeArray });
+		if (docArray.result) {
 			docArray.result.map((single, i) => {
 				let temp = {
 					i: i + 1,
@@ -87,11 +86,12 @@ export default class TableOrg extends Component {
 	paginationOnChange(e) {
 		// console.log('vip-分页', e);
 	}
-	onSelectChange(selectedRowKeys, selectedRows) {
-		// debugger;
-		this.state.subDataSource = selectedRows;
-		// console.log('selectedRowKeys changed: ', selectedRowKeys);
-		this.setState({ selectedRowKeys });
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+		debugger;
+		this.setState({
+			selectedRowKeys,
+			subDataSource: selectedRows
+		});
 	}
 
 	// 搜索
@@ -163,15 +163,11 @@ export default class TableOrg extends Component {
 			showSizeChanger: true,
 			pageSizeOptions: ['5', '10', '20', '30', '40', '50'],
 			showQuickJumper: true,
-			// style: { float: "left", marginLeft: 70 },
 		}
 		const { selectedRowKeys } = this.state;
 		const rowSelection = {
 			selectedRowKeys,
-			onChange: this.onSelectChange.bind(this),
-			getCheckboxProps: record => ({
-				disabled: record.name === 'Disabled User',
-			}),
+			onChange: this.onSelectChange,
 		};
 		return (
 			<Row>
@@ -208,7 +204,7 @@ export default class TableOrg extends Component {
 						bordered
 						pagination={paginationInfo}
 						rowSelection={rowSelection}
-						rowKey={(item, index) => index}
+						rowKey={record => record.i}
 						// loading={this.state.loading}
 						loading={{
 							tip: <Progress
@@ -384,7 +380,7 @@ export default class TableOrg extends Component {
 	//删除
 	BtnDelete(e) {
 		if (this.state.subDataSource.length <= 0) {
-			notification.warn({
+			notification.warning({
 				message: '请选择数据！',
 				duration: 2
 			})

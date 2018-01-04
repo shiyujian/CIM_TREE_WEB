@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Input, Form, Button, message, Table, Radio, Row, Col, Select } from 'antd';
+import { Modal, Input, Form, Button, Notification, Table, Radio, Row, Col, Select } from 'antd';
 import { CODE_PROJECT } from '_platform/api';
 import '../index.less'; 
 import {getUser} from '_platform/auth';
@@ -24,6 +24,7 @@ export default class PersonModify extends Component {
             selectPro:[],
             selectUnit:[],
             subErr: true,
+            description: '',
         }
     }
 
@@ -47,7 +48,6 @@ export default class PersonModify extends Component {
         modifyPersons.map(item => {
         	item.code = item.account.person_code;
         })
-        console.log("modifyPer",modifyPer);
         this.setState({
             dataSource:modifyPersons
         })
@@ -69,7 +69,6 @@ export default class PersonModify extends Component {
 			dataIndex: 'account.person_name',
 			key: 'Name',
 			render:(text, record, index) =>{
-				console.log('recordname',record)
 	            return <Input value = {record.account.person_name || ""} onChange={ele => {
 	                record.account.person_name = ele.target.value
 	                this.forceUpdate();
@@ -80,7 +79,6 @@ export default class PersonModify extends Component {
 			dataIndex: 'record.account.organization',
             key: 'Org',
             render:(text, record, index) =>{
-                console.log('recordorg',record)
                 if(record.orgname) {
                     return record.account.organization = record.orgname.org
                 }else {
@@ -89,35 +87,35 @@ export default class PersonModify extends Component {
             }
 		}, {
 			title: '所属部门',
-			// dataIndex: 'account.org_code',
+			dataIndex: 'account.org_code',
 			key: 'Depart',
 			render:(text, record, index) =>{
-                    console.log('recorddepart',record)
-                    if(record.orgname) {
-                    	if(record.orgname.org !== '') {
-	                        return <Input
-	                            style={{width: '60px'}} 
-	                            value = {record.depart || ""}
-	                            onChange={this.tableDataChange.bind(this,index)}
-	                            onBlur={this.fixOrg.bind(this,index)}
-	                        />
-                    	}else {
-	                        return <Input
-	                            style={{width: '60px', color: 'red'}} 
-	                            value = {record.depart || ""}
-	                            onChange={this.tableDataChange.bind(this,index)}
-	                            onBlur={this.fixOrg.bind(this,index)}
-	                        />
-                    	}
-                    }else {
-                    	return <Input
+                if(record.orgname) {
+                	record.account.org_code = record.depart
+                	if(record.orgname.org !== '') {
+                        return <Input
                             style={{width: '60px'}} 
                             value = {record.account.org_code || ""}
                             onChange={this.tableDataChange.bind(this,index)}
                             onBlur={this.fixOrg.bind(this,index)}
                         />
-                    }
+                	}else {
+                        return <Input
+                            style={{width: '60px', color: 'red'}} 
+                            value = {record.account.org_code || ""}
+                            onChange={this.tableDataChange.bind(this,index)}
+                            onBlur={this.fixOrg.bind(this,index)}
+                        />
+                	}
+                }else {
+                	return <Input
+                        style={{width: '60px'}} 
+                        value = {record.account.org_code || ""}
+                        onChange={this.tableDataChange.bind(this,index)}
+                        onBlur={this.fixOrg.bind(this,index)}
+                    />
                 }
+            }
 		}, {
 			title: '职务',
 			dataIndex: 'account.title',
@@ -133,7 +131,7 @@ export default class PersonModify extends Component {
 			dataIndex: 'account.gender',
 			key: 'Sex',
 			render:(text, record, index) =>{
-	            return <Select value = {record.account.gender} onChange={ele => {
+	            return <Select style={{width: 42}} value = {record.account.gender} onChange={ele => {
 	                record.account.gender = ele
 	                this.forceUpdate();
 	            }}>
@@ -166,21 +164,22 @@ export default class PersonModify extends Component {
 			// dataIndex: 'account.person_signature_url',
 			// key: 'Signature'
 			render:(record) => {
-	            console.log("record:",record);
-	            return (
-	                <img style={{width:"60px"}} src = {record.account.relative_avatar_url} />
-	            )
+	            if(record.account.relative_signature_url !== '') {
+                    return <img style={{width: 60}} src={record.account.relative_signature_url}/>
+                }else {
+                    return <span>暂无</span>
+                }
 	        }
 		}]
 		
 		return (
             <Modal
                 onCancel={this.cancel.bind(this)}
-                title="项目变更申请表"
                 visible={Modvisible}
                 width={1280}
-                footer={null}
-                maskClosable={false}>
+                onOk={this.onok.bind(this)}
+            >
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请变更</h1>
                 <Table
                     columns={columns}
                     bordered={true}
@@ -197,33 +196,41 @@ export default class PersonModify extends Component {
                     </Select>
 
                 </span>
-                <Button onClick = {this.onok.bind(this)} type='primary' >
-                    提交
-                </Button>
+		    	<TextArea rows={2} style={{margin: '10px 0'}} onChange={this.description.bind(this)} placeholder='请输入变更原因'/>
             </Modal>
         )
 	}
 
+	description(e) {
+		this.setState({description:e.target.value})
+	}
+
 	onChange = (e) => {
-	    console.log('radio checked', e.target.value);
 	    this.setState({
 	    	value: e.target.value,
 	    });
 	}
 
 	onok() {
-		console.log('passer', this.state.passer)
-		console.log('subErr', this.state.subErr)
         const { actions: { ModifyVisible } } = this.props;
+        let temp = this.state.dataSource.some((o,index) => {
+            if(o.orgname) {
+            	return o.orgname.org === ''
+            }
+        });
+        if(temp) {
+            Notification.Warning({
+                message: '部门不存在，无法提交'
+            })
+            return
+        }
         if (!this.state.passer) {
-            message.error('审批人未选择');
+            Notification.Warning({
+                message: '审批人未选择'
+            });
             return;
         }
-        // if(this.state.subErr === false) {
-        // 	message.error('请输入正确的部门');
-        //     return;
-        // }
-        this.props.setDataUpdate(this.state.dataSource, this.state.passer);
+        this.props.setDataUpdate(this.state.dataSource, this.state.passer, this.state.description);
         ModifyVisible(false);
     }
 
@@ -231,10 +238,7 @@ export default class PersonModify extends Component {
         const {actions: {getOrgReverse}} = this.props;
         const { dataSource } = this.state;
         dataSource[index].depart = e.target.value;
-        // console.log('e',e.target.value)
-        console.log('dataSource',dataSource)
         getOrgReverse({code:dataSource[index].depart}).then(rst => {
-            console.log('rst',rst)
             if(rst.children.length !== 0) {
                 dataSource[index]['orgname'] = {
                     org: rst.children[0].name
@@ -251,16 +255,14 @@ export default class PersonModify extends Component {
     fixOrg(index){
         const {actions: {getOrgReverse}} = this.props;
         let {dataSource} = this.state
-        console.log('dataSource1111',dataSource)
         getOrgReverse({code:dataSource[index].depart}).then(rst => {
-            console.log('rst1111',rst)
             if(rst.children.length !== 0){
                 dataSource[index]['orgname'] = {
                     org: rst.children[0].name
                 }
                 this.setState({dataSource})
             }else{
-                message.info("部门不存在")
+                Notification.Warning("部门不存在")
             }
         })
     }

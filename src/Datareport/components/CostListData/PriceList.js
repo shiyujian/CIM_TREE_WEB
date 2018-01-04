@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Form, Spin, Upload, Icon, Button, Modal,
     Cascader ,Select, Popconfirm,message, Table, Row, Col, notification, DatePicker} from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_ValuationList} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import EditableCell from '../EditableCell';
@@ -75,17 +75,17 @@ export default class PriceList extends Component {
             let dataList = info.file.response[name[0]];
             let dataSource = [];
             for (let i = 1; i < dataList.length; i++) {
-                let res = await verifyCode({code: dataList[i][1]});
+                let res = await verifyCode({code: dataList[i][0]});
                 dataList[i].flag = res !== 'object not found' ? true : false;
                 dataSource.push({
                     code: dataList[i][0] ? dataList[i][0] : '',
                     filename: dataList[i][0] ? dataList[i][0] : '',
-                    projectcoding: dataList[i][1] ? dataList[i][1] : '',
-                    valuation: dataList[i][2] ? dataList[i][2] : '',
-                    rate: dataList[i][3] ? dataList[i][3] : '',
-                    company: dataList[i][4] ? dataList[i][4] : '',
-                    total: dataList[i][5] ? dataList[i][5] : '',
-                    remarks: dataList[i][5] ? dataList[i][6] : '',
+                    projectcoding: dataList[i][0] ? dataList[i][0] : '',
+                    valuation: dataList[i][1] ? dataList[i][1] : '',
+                    rate: dataList[i][2] ? dataList[i][2] : '',
+                    company: dataList[i][3] ? dataList[i][3] : '',
+                    total: dataList[i][4] ? dataList[i][4] : '',
+                    remarks: dataList[i][5] ? dataList[i][5] : '',
                     flag: dataList[i].flag,
                     project:{
                         code:"",
@@ -98,10 +98,6 @@ export default class PriceList extends Component {
                         obj_type:"",
                         pk: ""
                     },
-                    file:{
-                        id: 'pricelist',
-                        name: 'priceList'
-                    },
                     key: i
                 })
                 // if(uniq(dataSource.map(item=>code)).length)
@@ -109,10 +105,12 @@ export default class PriceList extends Component {
             if(dataSource.some(item => {
                 return item.flag
             })) {
-                message.warn("清单项目编码错误")
+                notification.warning({
+                    message:'清单项目编码错误',
+                    duration: 2
+				});
             }
             dataSource = this.checkCodeRepeat(dataSource);
-            debugger;
             this.setState({ dataSource, percent: 100, loading: false });
         }
     }
@@ -128,7 +126,10 @@ export default class PriceList extends Component {
                 }
             }
         }
-        repeatFlag && message.warn("清单项目编码重复");
+        repeatFlag && notification.warning({
+            message:'清单项目编码重复',
+            duration: 2
+        });
         return dataSource;
     }
 
@@ -190,31 +191,43 @@ export default class PriceList extends Component {
     }
 	//ok
 	onok(){
+        if(!this.state.dataSource.length) {
+            notification.warning({
+                message:'数据不能为空',
+                duration: 2
+            });
+            return
+        }
         if(!this.state.check){
-            message.info("请选择审核人")
+            notification.warning({
+                message:'请选择审核人',
+                duration: 2
+            });
             return
         }
         if(this.state.dataSource.length === 0){
-            message.info("请上传excel")
-            return
-        }
-        let temp = this.state.dataSource.some((o,index) => {
-                        return !o.file.id
-                    })
-        if(temp){
-            message.info(`有数据未上传附件`)
+            notification.warning({
+                message:'请上传excel',
+                duration: 2
+            });
             return
         }
         let flag = this.state.dataSource.some((o,index) => {
             return o.flag
         })
         if(flag) {
-            message.info("清单项目清单编码错误");
+            notification.warning({
+                message:'清单项目编码错误',
+                duration: 2
+            });
             return
         }
         const {project,unit} =  this.state;
         if(!project.name){
-            message.info(`请选择项目和单位工程`);
+            notification.warning({
+                message:'请选择项目和单位工程',
+                duration: 2
+            });
             return;
         }
 		let {check} = this.state
@@ -233,8 +246,8 @@ export default class PriceList extends Component {
     }
     //删除
     delete(index){
-        let {dataSource} = this.state
-        dataSource.splice(index,1)
+        let {dataSource} = this.state;
+        dataSource = dataSource.filter(item => item.key != index);
         this.setState({dataSource})
     }
 
@@ -314,7 +327,10 @@ export default class PriceList extends Component {
         fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
             resp = await resp.json()
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                notification.error({
+                    message:'文件上传失败',
+                    duration: 2
+                });
                 return;
             };
             const filedata = resp;
@@ -368,17 +384,22 @@ export default class PriceList extends Component {
             let codeArr = dataSource.map(data => data[key]+'');
             codeArr[index-1] = code+'';
             if (codeArr.indexOf(code) !== codeArr.lastIndexOf(code)) {
-                message.warn("清单项目编码重复");
+                notification.warning({
+                    message:'清单项目编码重复',
+                    duration: 2
+                });
             } else {
                 let res = await verifyCode({code});
                 if(res === 'object not found') {
                     dataSource[index-1].flag = false;
                 }else {
-                    message.warn("清单项目编码错误");
+                    notification.warning({
+                        message:'清单项目编码错误',
+                        duration: 2
+                    });
                     dataSource[index-1].flag = true;
                 }
             }
-            debugger;
             this.setState({dataSource});
         }
         
@@ -396,13 +417,26 @@ export default class PriceList extends Component {
         this.setState({dataSource});
     }
 
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
 	render() {
         let {dataSource} = this.state.dataSource;
         const columns = 
             [{
-                title:'编码',
+                title:'序号',
                 dataIndex:'code',
-                width: '10%'
+                render:(text,record,index) => {
+                    return record.key
+                }
             },{
                 title:'清单项目编码',
                 dataIndex:'projectcoding',
@@ -418,7 +452,6 @@ export default class PriceList extends Component {
                                     editOnOff={false}
                                     onChange={this.onCellChange.call(this, record.key, "projectcoding", record)}
                                     asyncVerify={this.asyncVerify.call(this, record.key, "projectcoding", record)}
-                                    propTypes="Number"
                                 />
                             </div>
                         )
@@ -446,7 +479,7 @@ export default class PriceList extends Component {
             },{
                 title:'工程内容/规格编号',
                 dataIndex:'rate',
-                width:"12%",
+                width:"30%",
                 render: (text, record, index) => {
                     let {dataSource} = this.state;
                     let editable = dataSource[record.key - 1].editable;
@@ -512,6 +545,13 @@ export default class PriceList extends Component {
                     }
                 }
             },{
+                title:'状态',
+                dataIndex:'status',
+                width:"10%",
+                render: (text, record, index) => {
+                    return <span>待提交</span>
+                }
+            },{
                 title:'操作',
                 width:"10%",
                 dataIndex:'edit',
@@ -524,7 +564,7 @@ export default class PriceList extends Component {
                             <Popconfirm
                                 placement="leftTop"
                                 title="确定删除吗？"
-                                onConfirm={this.delete.bind(this, index)}
+                                onConfirm={this.delete.bind(this, record.key)}
                                 okText="确认"
                                 cancelText="取消">
                                 <a><Icon type = "delete"/></a>
@@ -537,21 +577,30 @@ export default class PriceList extends Component {
             }];
 		return (
 			<Modal
-			title="计价清单信息上传表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+                <div>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>发起填报</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}} 
                 />
+                <Row >
+                    {
+                        this.state.dataSource.length && 
+                        <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                            [共：{this.state.dataSource.length}行]
+                        </Col>
+                    }
+                </Row>
                 <Row style={{ marginBottom: "30px" }} type="flex">
-                    <Col><Button style={{ margin:'10px 10px 10px 0px' }}>模板下载</Button></Col>
+                    <Col><Button style={{ margin:'10px 10px 10px 0px' }}  onClick={() => this.createLink('downLoadTemplate', DataReportTemplate_ValuationList)}>模板下载</Button></Col>
                     <Col>
                         <Upload
                             onChange={this.uplodachange.bind(this)}
@@ -596,6 +645,7 @@ export default class PriceList extends Component {
                     <p style={{ paddingLeft: "25px" }}>3、日期必须带年月日，如2017年1月1日</p>
                     <p style={{ paddingLeft: "25px" }}>4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.</p>
                 </Row>
+                </div>
             </Modal>
         )
     }

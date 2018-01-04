@@ -35,9 +35,9 @@ export default class ExpurgateCheck extends Component {
     }
     async componentDidMount() {
         const { wk } = this.props
-        console.log('wk',this.props)
+
         let dataSources = JSON.parse(wk.subject[0].data)
-        console.log('asdfxsfdgg:',dataSources)
+
         let dataSource = [];
         dataSources.map(item => {
             dataSource.push(item)
@@ -53,14 +53,14 @@ export default class ExpurgateCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("expurgate_check_visbile", false);
-        message.info("操作成功");
+        this.props.closeModal("expurgate_check_visbile", false,'submit');
+        notification.info({ message: "操作成功!" });
     }
 
     //通过
     async passon() {
         const { dataSource, wk, topDir } = this.state;
-        
+
         const { actions: {
             logWorkflowEvent,
             delDocList
@@ -74,13 +74,13 @@ export default class ExpurgateCheck extends Component {
         executor.person_name = person.name;
         executor.person_code = person.code;
         await logWorkflowEvent({ pk: wk.id }, { state: wk.current[0].id, action: '通过', note: '同意', executor: executor, attachment: null });
-         
+
         const docCode = [];
-        dataSource.map(item=>{
+        dataSource.map(item => {
             docCode.push(item.code);
         })
-        console.log('doc:',docCode)
-       
+
+
 
         let rst = await delDocList({}, { code_list: docCode });
         //删除旧附件 todo
@@ -88,29 +88,59 @@ export default class ExpurgateCheck extends Component {
         if (rst.result) {
             notification.success({
                 message: '删除文档成功！',
-                duration: 2
+
             });
         } else {
             notification.error({
                 message: '删除文档失败！',
-                duration: 2
+
             });
         }
     }
     //不通过
+    // async reject() {
+    //     const { wk } = this.props
+    //     const { actions: { deleteWorkflow } } = this.props
+    //     await deleteWorkflow({ pk: wk.id })
+    // }
+
+
+    //不通过
     async reject() {
-        const { wk } = this.props
-        const { actions: { deleteWorkflow } } = this.props
-        await deleteWorkflow({ pk: wk.id })
+        const { wk, } = this.state;
+        const { actions: { logWorkflowEvent, } } = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null
+            }
+        );
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
     }
+
     onChange(e) {
         this.setState({ option: e.target.value })
     }
-    render() {  
+    render() {
         const columns = [{
             title: '序号',
             dataIndex: 'index',
-           
+
         }, {
             title: '模型编码',
             dataIndex: 'coding'
@@ -162,13 +192,13 @@ export default class ExpurgateCheck extends Component {
                 onCancel={this.cancel.bind(this)}
 
             >
-                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>删除审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
-                    bordered 
+                    bordered
                     rowKey='index'
-                    />
+                />
 
                 <Row>
                     <Col span={2}>
@@ -180,11 +210,7 @@ export default class ExpurgateCheck extends Component {
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
-                        <Button type='primary'>
-                            导出表格
-                        </Button>
-                    </Col>
+
                     <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交

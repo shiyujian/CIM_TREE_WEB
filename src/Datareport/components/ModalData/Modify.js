@@ -11,8 +11,8 @@ import '../index.less';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
-// const RadioGroup = Radio.Group;
-// const { TextArea } = Input;
+const RadioGroup = Radio.Group;
+const { TextArea } = Input;
 
 export default class Modify extends Component {
 
@@ -93,7 +93,7 @@ export default class Modify extends Component {
 	onok() {
 		let { dataSource } = this.state;
 		if (!this.state.check) {
-			message.info("请选择审核人")
+			notification.info({ message: "请选择审核人" })
 			return;
 		}
 		let { check } = this.state;
@@ -105,11 +105,12 @@ export default class Modify extends Component {
 			organization: check.account.organization
 		}
 		this.setChangeData(dataSource, per)
-		console.log('我是：', dataSource)
+
 	}
 
 	setChangeData = (data, participants) => {
 		const { modify = {}, actions: { createWorkflow, logWorkflowEvent, changeModifyField } } = this.props
+		const { description = '' } = this.state;
 		let creator = {
 			id: getUser().id,
 			username: getUser().username,
@@ -119,7 +120,7 @@ export default class Modify extends Component {
 		let postdata = {
 			name: "模型信息批量更改",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "模型信息批量更改",
+			description: description,
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -134,7 +135,7 @@ export default class Modify extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起更改',
+					note: description,
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -143,7 +144,7 @@ export default class Modify extends Component {
 					}],
 					attachment: null
 				}).then(() => {
-					message.success("成功")
+					notification.success({ message: "成功" })
 					changeModifyField('visible', false)
 				})
 		})
@@ -176,9 +177,9 @@ export default class Modify extends Component {
 		}, {
 			title: '提交单位',
 			dataIndex: 'submittingUnit',
-			render: (text, record, index) => (
-				<Input style={{ width: '120px' }} onChange={this.tableDataChange.bind(this, record.index - 1, 'submittingUnit')} defaultValue={record.submittingUnit} />
-			),
+			// render: (text, record, index) => (
+			// 	<Input style={{ width: '120px' }} onChange={this.tableDataChange.bind(this, record.index - 1, 'submittingUnit')} defaultValue={record.submittingUnit} />
+			// ),
 
 		}, {
 			title: '模型描述',
@@ -201,7 +202,7 @@ export default class Modify extends Component {
 			title: 'fdb模型',
 			dataIndex: 'fdbMode',
 			render: (text, record, index) => {
-				console.log('record', record)
+
 				if (record.fdbMode) {
 					return (<span>
 						<a onClick={this.handlePreview.bind(this, record.index - 1, 'fdbMode')}>预览</a>
@@ -231,7 +232,7 @@ export default class Modify extends Component {
 			title: 'tdbx模型',
 			dataIndex: 'tdbxMode',
 			render: (text, record, index) => {
-				console.log('record', record)
+
 				if (record.tdbxMode) {
 					return (<span>
 						<a onClick={this.handlePreview.bind(this, record.index - 1, 'tdbxMode')}>预览</a>
@@ -261,7 +262,7 @@ export default class Modify extends Component {
 			title: '属性表',
 			dataIndex: 'attributeTable',
 			render: (text, record, index) => {
-				console.log('record', record)
+
 				if (record.attributeTable) {
 					return (<span>
 						<a onClick={this.handlePreview.bind(this, record.index - 1, 'attributeTable')}>预览</a>
@@ -300,10 +301,10 @@ export default class Modify extends Component {
 					<Popconfirm
 						placement="leftTop"
 						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, record.index - 1)}		
+						onConfirm={this.delete.bind(this, record.index - 1)}
 						okText="确认"
 						cancelText="取消">
-						<a>删除</a>
+						<a><Icon type='delete' /></a>
 					</Popconfirm>
 				)
 			}
@@ -311,7 +312,7 @@ export default class Modify extends Component {
 
 		return (
 			<Modal
-				title="模型信息更改表"
+
 				key={modify.key}
 				width={1280}
 				visible={modify.visible}
@@ -319,7 +320,7 @@ export default class Modify extends Component {
 				onOk={this.onok.bind(this)}
 
 			>
-
+				<h1 style={{ textAlign: 'center', marginBottom: 20 }}>申请变更</h1>
 				<Row>
 					<Table
 						bordered
@@ -329,11 +330,7 @@ export default class Modify extends Component {
 						dataSource={this.state.dataSource}
 					/>
 				</Row>
-				{/* <Row style={{ marginTop: '20px' }}>
-					<Col span={2} push={22}>
-						<Button type="default">确认变更</Button>
-					</Col>
-				</Row> */}
+
 				<Row style={{ marginBottom: "30px" }} type="flex">
 					<Col>
 						<span>
@@ -347,8 +344,22 @@ export default class Modify extends Component {
 					</Col>
 				</Row>
 
+				<Row>
+					<Input
+						type="textarea"
+						onChange={this.description.bind(this)}
+						autosize={{ minRows: 5, maxRow: 6 }}
+						placeholder="请填写变更原因"
+						style={{ marginBottom: 40 }}
+					/>
+				</Row>
+
 			</Modal>
 		)
+	}
+
+	description(e) {
+		this.setState({ description: e.target.value })
 	}
 
 	//预览
@@ -357,7 +368,7 @@ export default class Modify extends Component {
 		const { dataSource } = this.state;
 
 		let f = dataSource[index][name]
-		console.log('this.stat', f)
+
 		let filed = {}
 		filed.misc = f.misc;
 		filed.a_file = `${SOURCE_API}` + (f.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -379,7 +390,7 @@ export default class Modify extends Component {
 
 		// 上传到静态服务器
 		const fileName = file.name;
-		console.log('file', fileName)
+
 		let { dataSource, unit, project } = this.state;
 		let temp = fileName.split(".")[0]
 		const { actions: { uploadStaticFile } } = this.props;
@@ -395,9 +406,9 @@ export default class Modify extends Component {
 		//uploadStaticFile({}, formdata)
 		fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
 			resp = await resp.json()
-			console.log('uploadStaticFile: ', resp)
+
 			if (!resp || !resp.id) {
-				message.error('文件上传失败')
+				notification.error({ message: '文件上传失败' })
 				return;
 			};
 			const filedata = resp;
@@ -427,12 +438,15 @@ export default class Modify extends Component {
 	delete(index) {
 		let { dataSource } = this.state;
 		dataSource.splice(index, 1);
+		dataSource.map((item, index) => {
+			item.index = index + 1
+		})
 		this.setState({ dataSource });
 	}
 
 
 	onChange = (e) => {
-		console.log('radio checked', e.target.value);
+
 		this.setState({
 			value: e.target.value,
 		});

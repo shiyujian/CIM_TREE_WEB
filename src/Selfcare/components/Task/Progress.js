@@ -469,10 +469,14 @@ export default class Progress extends Component {
 	}
 
 	//关闭数据报送模态框
-	closeModal(key,value){
+	closeModal(key,value,res){
 		const {actions:{changeDatareportVisible}} = this.props
 		changeDatareportVisible({key,value});
+		if(res){
+			window.location.reload();
+		}
 	}
+	
 	async openModal(name,id){
 		const {actions:{changeDatareportVisible,getWorkflowById}} = this.props
 		let wk = await getWorkflowById({pk:id});

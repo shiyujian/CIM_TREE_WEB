@@ -52,7 +52,7 @@ export default class ProjectSumChangeChock extends Component {
             await this.reject();
         }
         this.props.closeModal("cost_sum_cckk_visible", false);
-        message.info("操作成功");
+        notification.success({message:"操作成功", duration: 2});
     }
 
     //通过
@@ -64,6 +64,7 @@ export default class ProjectSumChangeChock extends Component {
         }} = this.props;
         let doclist_c = [];
         dataSource.map(item=>{
+            // console.log('item',item)
             doclist_c.push({
                 code:item.code,
                 obj_type: "C_DOC",
@@ -88,12 +89,13 @@ export default class ProjectSumChangeChock extends Component {
         const {wk} = this.props
         const {actions:{deleteWorkflow}} = this.props
         await deleteWorkflow({pk:wk.id})
+        notification.error({message:"操作失败", duration: 2});
     }
     onChange(e){
         this.setState({option:e.target.value})
     }
     cancel() {
-        this.props.closeModal("cost_pri_modify_visible", false);
+        this.props.closeModal("cost_sum_cckk_visible", false);
       }
 	render() {
         const columns = [
@@ -122,7 +124,7 @@ export default class ProjectSumChangeChock extends Component {
                 title: '数量',
                 dataIndex: 'number',
             }, {
-                title: '单价',
+                title: '综合单价(元)',
                 dataIndex: 'total',
             }, {
                 title: '备注',
@@ -131,14 +133,13 @@ export default class ProjectSumChangeChock extends Component {
           ]
 		return (
             <Modal
-			title="工程量结算信息变更审批表"
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}
             onCancel={this.cancel.bind(this)}
             >
-                <h1 style ={{textAlign:'center',marginBottom:20}}>工程量结算变更审核</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>变更审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -155,12 +156,8 @@ export default class ProjectSumChangeChock extends Component {
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
-                        <Button type='primary'>
-                            导出表格
-                        </Button>
-                    </Col>
-                    <Col span={2} push={14}>
+                    
+                    <Col span={6} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
                         </Button>

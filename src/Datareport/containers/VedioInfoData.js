@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {message} from 'antd';
+import {message,Progress,notification} from 'antd';
 
 import {Main,Content, DynamicTitle} from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
@@ -31,8 +31,12 @@ export default class VedioInfoData extends Component {
 			changeModal: false,
 			deleteModal: false,
 			dataSource: [],
-			selectRows: []
+			selectRows: [],
+			percent: 0
 		}
+		Object.assign(this,{
+			num: 0
+		})
 	}
 
 	async componentDidMount(){
@@ -49,7 +53,7 @@ export default class VedioInfoData extends Component {
     }
 
 	render() {
-		const {uploadModal,changeModal,deleteModal,dataSource,loading,selectRows} = this.state,
+		const {uploadModal,changeModal,deleteModal,dataSource,loading,selectRows,percent} = this.state,
 			{actions,actions:{jsonToExcel}} = this.props;
 
 		return (<Main>
@@ -65,7 +69,7 @@ export default class VedioInfoData extends Component {
 				/>
 				<VedioInfoTable
 				dataSource={dataSource}
-				loading={loading} 
+				loading={{tip:<Progress style={{width:200}} percent={percent} status="active" strokeWidth={5}/>,spinning:loading}}
 				storeSelectRows={this.storeSelectRows}
 				/>
 			</Content>
@@ -74,6 +78,7 @@ export default class VedioInfoData extends Component {
 			 uploadModal={uploadModal}
 			 actions = {actions}
 			 closeModal={this.closeModal}
+			 modalDown={DataReportTemplate_ImageInformation}
 			/>
 			<InfoChangeModal
 			 key={`changeModal${changeModal}`}
@@ -106,16 +111,39 @@ export default class VedioInfoData extends Component {
 	generateTableData = (data)=>{
         const {actions:{
             getDocument,
-        }} = this.props;
+		}} = this.props;
+		const total = data.length;
+		this.num = 0;
 		const all = data.map(item=>{
-			return getDocument({code:item.code})
+			return getDocument({code:item.code}).then(rst=>{
+				this.num++;
+				this.setState({percent: parseFloat( (this.num*100/total).toFixed(2) ) })
+				if(!rst) {
+					notification.error({
+						message: '数据获取失败！',
+						duration: 2
+					});
+					return {}
+				}else{
+					return rst
+				}
+			})
 		})
 		Promise.all(all).then(item =>{
-			const dataSource = item.map((response,index)=>{
-				let {extra_params:{projectName,enginner,ShootingDate,file},code} = response;
-				return {index:index+1,
-					projectName,enginner,ShootingDate,file,code}
-			})
+			let dataSource = [];
+			try{
+				dataSource = item.map((response,index)=>{
+					let {extra_params:{projectName,enginner,ShootingDate,file},code} = response;
+					return {index:index+1,
+						projectName,enginner,ShootingDate,file,code}
+				})
+			}catch(e){
+				notification.error({
+                    message: '数据获取失败！',
+                    duration: 2
+                });
+			}
+			
 			this.setState({dataSource,loading:false});
 		})
 	}
@@ -127,11 +155,17 @@ export default class VedioInfoData extends Component {
 	selectJudge = ()=>{
 		const {selectRows} = this.state;
 		if(selectRows.length == 0){
-			message.error("请选择数据");
+			notification.warning({
+				message: '请先选择数据！',
+				duration: 2
+			});
 			return false
 		}
 		if(!selectRows.every((data)=> data.enginner == selectRows[0].enginner )){
-			message.error("请选择相同单位工程下的数据");
+			notification.warning({
+				message: '请选择相同单位工程下的数据！',
+				duration: 2
+			});
 			return false
 		}
 		return true

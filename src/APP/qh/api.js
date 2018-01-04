@@ -12,6 +12,10 @@ import headLogo from './logo_head.png';
 
 export const qh_headLogo = headLogo;
 
+export const qh_footerYear = '2018';
+
+export const qh_footerCompany = '华东工程数字技术有限公司';
+
 export const qh_menus = [{
 	key: 'home',
 	id: 'HOME',

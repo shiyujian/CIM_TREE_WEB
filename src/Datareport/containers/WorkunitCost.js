@@ -6,7 +6,7 @@ import { ProjectSumExamine } from '../components/CostListData';
 import { ProjectSumExcalDelete } from '../components/CostListData';
 import { ProjectSumChange } from '../components/CostListData';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
-import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress,Col } from 'antd';
+import { Button, Table, Icon, Popconfirm, message, Modal, Row, Input,Progress,Col,notification } from 'antd';
 import { WORKFLOW_CODE ,NODE_FILE_EXCHANGE_API,DataReportTemplate_ProjectVolumeSettlement} from '_platform/api.js'
 import { getNextStates } from '_platform/components/Progress/util';
 import { getUser } from '_platform/auth';
@@ -45,7 +45,7 @@ export default class WorkunitCost extends Component {
 	async componentDidMount() {
 
 		const { actions: { getScheduleDir } } = this.props;
-		this.setState({loading:true,percent:0,num:0})
+		
 		let topDir = await getScheduleDir({ code: 'the_only_main_code_costsumplans' });
 		if (topDir.obj_type) {
 			let dir = await getScheduleDir({ code: 'ck' });
@@ -57,37 +57,89 @@ export default class WorkunitCost extends Component {
 			}
 		}
 	}
-	async generateTableData(data) {
-		const { actions: {getDocument}} = this.props;  
+	generateTableData(data){
+		const { actions: {getDocument}} = this.props; 
 		let dataSour = [];
-		let i=0;
-		data.map((item) => {
-			getDocument({ code: item.code }).then(single => {
-				i++
-				let temp = {
-					key:i,
-					code: item.code,
-					subproject: single.extra_params.subproject || rst.extra_params.project,//项目/子项目
-					unit: single.extra_params.unit || rst.extra_params.unit,//单位工程
-					projectcoding: single.extra_params.projectcoding,//项目编号
-					projectname: single.extra_params.projectname,//项目名称
-					company: single.extra_params.company,//计量单位
-					number: single.extra_params.number,//数量
-					total: single.extra_params.total,//单价
-					remarks: single.extra_params.remarks,//备注
-
-				}
-				dataSour.push(temp);
-				this.setState({ 
-					dataSource:dataSour,
-					showDs:dataSour,
-					loading:false,
-					percent:100
-				});
-			})
+		let all = [];
+		this.setState({loading:true,percent:0,num:0});
+		let total = data.length;
+		data.forEach(item=> {
+            all.push(getDocument({code:item.code}).then(rst => {
+            		let {num} = this.state;
+                    num++;
+                    this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
+                    if(!rst) {
+                    	notification.error({message:`数据获取失败`,duration: 2})
+		    			return {}
+		    		} else {
+                    	return rst
+                    }
+            	}))
 		})
-		
+		Promise.all(all).then(item =>{
+			// console.log('item111',item)
+			this.setState({loading:false,percent:100});
+			try {
+				let i= 0;
+				item.forEach((single,index) => {
+					// console.log('single',single)
+					i++;
+	        		let temp = {
+	        			// index:index+1,
+						// num:index+1,
+						key:i,
+	                    code:single.code,
+						subproject: single.extra_params.subproject || rst.extra_params.project,//项目/子项目
+						unit: single.extra_params.unit || rst.extra_params.unit,//单位工程
+						projectcoding: single.extra_params.projectcoding,//项目编号
+						projectname: single.extra_params.projectname,//项目名称
+						company: single.extra_params.company,//计量单位
+						number: single.extra_params.number,//数量
+						total: single.extra_params.total,//单价
+						remarks: single.extra_params.remarks,//备注
+	                }
+	                dataSour.push(temp);
+        		}) 
+        	} catch(e){
+        		notification.error({message:`数据获取失败`,duration: 2})
+			}
+			this.setState({ 
+				dataSource:dataSour,
+				showDs:dataSour,
+			});
+		})
+
 	}
+	// async generateTableData(data) {
+	// 	const { actions: {getDocument}} = this.props;  
+	// 	let dataSour = [];
+	// 	let i=0;
+	// 	data.map((item) => {
+	// 		getDocument({ code: item.code }).then(single => {
+	// 			i++
+	// 			let temp = {
+	// 				key:i,
+	// 				code: item.code,
+	// 				subproject: single.extra_params.subproject || rst.extra_params.project,//项目/子项目
+	// 				unit: single.extra_params.unit || rst.extra_params.unit,//单位工程
+	// 				projectcoding: single.extra_params.projectcoding,//项目编号
+	// 				projectname: single.extra_params.projectname,//项目名称
+	// 				company: single.extra_params.company,//计量单位
+	// 				number: single.extra_params.number,//数量
+	// 				total: single.extra_params.total,//单价
+	// 				remarks: single.extra_params.remarks,//备注
+	// 			}
+	// 			dataSour.push(temp);
+	// 			this.setState({ 
+	// 				dataSource:dataSour,
+	// 				showDs:dataSour,
+	// 				loading:false,
+	// 				percent:100
+	// 			});
+	// 		})
+	// 	})
+		
+	// }
 	//点×取消
 	oncancel() {
 		this.setState({ addvisible: false });
@@ -96,19 +148,7 @@ export default class WorkunitCost extends Component {
 	delatecancel() {
 		this.setState({ delatevisible: false })
 	}
-	//模板下载
-	DownloadExcal(){
-		this.createLink("工程量结算模板下载",DataReportTemplate_ProjectVolumeSettlement)
-	}
-	createLink = (name, url) => {
-		let link = document.createElement("a");
-		link.href=url;
-		link.setAttribute("download",this);
-		link.setAttribute("target","_blank");
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	}
+
 	//发起变更模态框
 	projectfill() {
 		this.setState({ addvisible: true })
@@ -134,7 +174,7 @@ export default class WorkunitCost extends Component {
 			this.setState({ delatevisible: true });
 			return;
 		}else{
-			message.warning('请选择数据');
+			notification.warning({message:'请先选择数据',duration: 2});
 		}
 		
 	}
@@ -145,7 +185,7 @@ export default class WorkunitCost extends Component {
 			const {actions:{jsonToExcel}}=this.props;
 			const {dataSourceSelected} =this.state;
 			let rows =[];
-			rows.push(['项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','单价','备注']);
+			rows.push(['项目/子项目','单位工程','清单项目编号','项目名称','计量单位','数量','综合单价(元)','备注']);
 			dataSourceSelected.map(o =>{
 				rows.push([		
 					o.subproject,
@@ -164,10 +204,18 @@ export default class WorkunitCost extends Component {
 			})
 			return
 		}else{
-			message.warning('请选择数据');
+			notification.warning({message:'请先选择数据',duration: 2});
 		}
 	}
-
+	createLink = (name, url) => {
+		let link = document.createElement("a");
+		link.href=url;
+		link.setAttribute("download",this);
+		link.setAttribute("target","_blank");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
 	//上传回调
 	setData(data, participants) {
 		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
@@ -209,7 +257,7 @@ export default class WorkunitCost extends Component {
 		})
 	}
 	//工程量结算信息删除
-	delateData(data, participants) {
+	delateData(data, participants, changeText) {
 		const { actions: { createWorkflow, logWorkflowEvent } } = this.props
 		let creator = {
 			id: getUser().id,
@@ -220,7 +268,7 @@ export default class WorkunitCost extends Component {
 		let postdata = {
 			name: "工程量结算信息删除",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "工程量结算信息删除",
+			description: changeText,
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -235,7 +283,7 @@ export default class WorkunitCost extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起填报',
+					note: changeText,
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -251,7 +299,7 @@ export default class WorkunitCost extends Component {
 	}
 
 	//变更流程
-	setChangeData(data,participants){
+	setChangeData(data,participants,changeInfo){
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -262,7 +310,7 @@ export default class WorkunitCost extends Component {
 		let postdata = {
 			name:"工程量结算信息变更",
 			code:WORKFLOW_CODE["数据报送流程"],
-			description:"工程量结算信息变更",
+			description:changeInfo,
 			subject:[{
 				data:JSON.stringify(data)
 			}],
@@ -278,7 +326,7 @@ export default class WorkunitCost extends Component {
                 {
                     state:rst.current[0].id,
                     action:'提交',
-                    note:'发起填报',
+                    note:changeInfo,
                     executor:creator,
                     next_states:[{
                         participants:[participants],
@@ -287,7 +335,7 @@ export default class WorkunitCost extends Component {
                     }],
                     attachment:null}).then(() => {
 						this.setState({changevisible:false})	
-						// message.info("发起成功")					
+						notification.success({message:"发起成功",duration: 2})					
 					})
 		})
 	}
@@ -304,7 +352,7 @@ export default class WorkunitCost extends Component {
     }
 	//分页
     paginationOnChange(page,pageSize){
-		console.log('page',page,pageSize);
+		// console.log('page',page,pageSize);
 	}
 	
 
@@ -329,13 +377,16 @@ export default class WorkunitCost extends Component {
 		}, {
 			title: '项目/子项目',
 			dataIndex: 'subproject',
+			key:'subproject',
+			sorter:(a,b) =>b.subprojectg - a.subproject
 		}, {
 			title: '单位工程',
 			dataIndex: 'unit',
 		}, {
 			title: '清单项目编号',
 			dataIndex: 'projectcoding',
-			key:'Projectcoding'
+			key:'projectcoding',
+			sorter:(a,b) =>b.projectcoding - a.projectcoding 
 		}, {
 			title: '项目名称',
 			dataIndex: 'projectname',
@@ -349,7 +400,7 @@ export default class WorkunitCost extends Component {
 			dataIndex: 'number',
 			key:'Number'
 		}, {
-			title: '单价',
+			title: '综合单价(元)',
 			dataIndex: 'total',
 			key:'Total'
 		}, {
@@ -361,7 +412,6 @@ export default class WorkunitCost extends Component {
 			<div style={{ overflow: 'hidden', padding: 20 }}>
 				<DynamicTitle title="工程量结算" {...this.props} />
 				<Row>
-					<Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.DownloadExcal.bind(this)}>模板下载</Button>
 					<Button className="btn" type="default" onClick={this.projectfill.bind(this)}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.setchgVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.setDeleteVisible.bind(this) }>申请删除</Button>

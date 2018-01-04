@@ -34,7 +34,6 @@ export default class UpdataCheck extends Component {
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        console.log("dataSource:",dataSource);
         this.setState({dataSource,wk})
     }
     componentWillReceiveProps(props){
@@ -49,7 +48,7 @@ export default class UpdataCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_update_visible",false)
+        this.props.closeModal("dr_base_update_visible",false, "submit")
         message.info("操作成功")
     }
     //通过
@@ -62,7 +61,6 @@ export default class UpdataCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        console.log("dataSource",dataSource);
         // return;
         let data_list = [];
         dataSource.map((item, index) => {
@@ -77,9 +75,6 @@ export default class UpdataCheck extends Component {
             })
         })
         let res = await putOrgList({},{data_list: data_list});
-        console.log("res:",res.result[0][0].pk);
-        console.log("data_list:",data_list);
-        // return;
         dataSource.map((item, index) => {
             if (item.extra_params.project.length !== 0) {
                 item.extra_params.project.map(it => {
@@ -124,13 +119,33 @@ export default class UpdataCheck extends Component {
             }
         })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        ModalVisibleUpdate(false)
+        this.props.closeModal("dr_base_update_visible",false)
     }
     //不通过
     async reject(){
         const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const {actions:{logWorkflowEvent}} = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        notification.success({
+            message: "操作成功",
+            duration: 2
+        })
     }
     //预览
     handlePreview(index){
@@ -171,12 +186,26 @@ export default class UpdataCheck extends Component {
             key: 'Direct',
         }, {
             title: '负责项目/子项目名称',
-            dataIndex: 'extra_params.project',
-            key: 'Project',
+            render:(text, record, index) => {
+                let nodes = [];
+                if (record.extra_params.project) {
+                    record.extra_params.project.map(item => {
+                        nodes.push(<p>{item}</p>);
+                    })
+                }
+                return nodes;
+            }
         },{
             title: '负责单位工程名称',
-            dataIndex: 'extra_params.unit',
-            key: 'Unit'
+            render:(text, record, index) => {
+                let nodes = [];
+                if (record.extra_params.unit) {
+                    record.extra_params.unit.map(item => {
+                        nodes.push(<p>{item}</p>);
+                    })
+                }
+                return nodes;
+            }
         },{
             title: '备注',
             dataIndex: 'extra_params.remarks',
@@ -184,15 +213,14 @@ export default class UpdataCheck extends Component {
         }]
 		return (
             <Modal
-			title="组织机构信息审批表"
-			// key={Math.random()}
+            // footer={null}
+            onOk = {this.submit.bind(this)}
             visible={true}
             width= {1280}
-            footer={null}
             onCancel = {this.props.closeModal.bind(this,"dr_base_update_visible",false)}
 			maskClosable={false}>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>变更审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
@@ -206,17 +234,6 @@ export default class UpdataCheck extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {

@@ -12,6 +12,7 @@ export default class TableOrg extends Component {
 			tempData:[],
 			spinning:true,
 			percent:0,
+			excelData: []
 		}
 	}
 	render() {
@@ -22,8 +23,6 @@ export default class TableOrg extends Component {
 		return (
 			<div>
 				<div> 
-					<Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_Organization}`)} type="default">模板下载组织部门</Button>
-					<Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_ConstructionUnits}`)} type="default">模板下载参建单位</Button>
 					<Button className="button" onClick={this.sendCJ.bind(this)}>新增参建单位</Button>
 					<Button className="button" onClick={this.send.bind(this)}>新增部门</Button>
 					<Button className="button" onClick={this.update.bind(this)}>申请变更</Button>
@@ -69,16 +68,22 @@ export default class TableOrg extends Component {
 				})
 			}
 		})
-		console.log("searchdata:",searchData);
 		searchData.map((item, index) => {
 			item.index = index + 1;
 		})
-		this.setState({tempData:searchData}) 
+		this.setState({tempData:searchData}); 
 	}
 	update(){
 		const { actions: { ModalVisibleUpdate, setUpdateOrg } } = this.props;
 		if(this.state.selectData.length){
-			setUpdateOrg(this.state.selectData);
+			let newArr = [];
+			this.state.selectData.map(item => {
+				let newItem  = {...item};
+				newItem.extra_params = {...newItem.extra_params};
+				newArr.push(newItem);
+
+			});
+			setUpdateOrg(newArr);
 			ModalVisibleUpdate(true)
 		}else{
 			message.warning("请先选中要变更的数据");
@@ -112,15 +117,7 @@ export default class TableOrg extends Component {
             this.createLink('单位工程信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
         })
 	}
-	createLink = (name, url) => {    //下载
-        let link = document.createElement("a");
-        link.href = url;
-        link.setAttribute('download', name);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+	
 	send() {
 		const { actions: { ModalVisible } } = this.props;
 		ModalVisible(true);
@@ -158,7 +155,6 @@ export default class TableOrg extends Component {
 				})
 			}
 		})
-		console.log("dataSource:",dataSource);
 		dataSource.map((item, index) => {
 			item.index = index + 1
 		})
@@ -170,18 +166,14 @@ export default class TableOrg extends Component {
 	}
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
-			console.log("onChange",selectedRowKeys, selectedRows);
-			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
 		},
 		onSelect: (record, selected, selectedRows) => {
-			console.log("onSelect",record, selected, selectedRows);
 			this.setState({
 				selectData:selectedRows,
 				excelData:selectedRows
 			})
 		},
 		onSelectAll: (selected, selectedRows, changeRows) => {
-			console.log("onSelectAll",selected, selectedRows, changeRows);
 			this.setState({
 				selectData:selectedRows,
 				excelData:selectedRows
@@ -197,19 +189,19 @@ export default class TableOrg extends Component {
 		dataIndex: 'index',
 		key: 'Index',
 	}, {
-		title: '组织机构编码',
+		title: '编码',
 		dataIndex: 'code',
 		key: 'Code',
 	}, {
-		title: '组织机构类型',
+		title: '机构类型',
 		dataIndex: 'extra_params.org_type',
 		key: 'Type',
 	}, {
-		title: '参建单位名称',
+		title: '参建单位',
         dataIndex: 'extra_params.canjian',
         key: 'Canjian',
 	}, {
-		title: '组织机构部门',
+		title: '部门',
 		dataIndex: 'name',
 		key: 'Name',
 	}, {
@@ -217,13 +209,27 @@ export default class TableOrg extends Component {
 		dataIndex: 'extra_params.direct',
 		key: 'Direct',
 	}, {
-		title: '负责项目/子项目名称',
-		dataIndex: 'extra_params.project',
-		key: 'Project',
+		title: '负责项目/子项目',
+		render:(text, record, index) => {
+			let nodes = [];
+			if (record.extra_params.project) {
+				record.extra_params.project.map(item => {
+					nodes.push(<p>{item}</p>);
+				})
+			}
+			return nodes;
+		}
 	},{
 		title: '负责单位工程名称',
-		dataIndex: 'extra_params.unit',
-		key: 'Unit'
+		render:(text, record, index) => {
+			let nodes = [];
+			if (record.extra_params.unit) {
+				record.extra_params.unit.map(item => {
+					nodes.push(<p>{item}</p>);
+				})
+			}
+			return nodes;
+		}
 	},{
 		title: '备注',
 		dataIndex: 'extra_params.remarks',

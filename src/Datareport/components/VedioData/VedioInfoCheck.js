@@ -62,7 +62,7 @@ export default class VedioInfoCheck extends Component {
 			maskClosable={false}
             >
                 <Row type='flex' justify='center' >
-                    <p className="titleFont">结果审核</p>
+                    <h1 style={{ textAlign: "center", marginBottom: "20px" }}>{modalTitle[type]}</h1>
                 </Row>
                 <VedioInfoTable
                  dataSource={dataSource}
@@ -107,22 +107,18 @@ export default class VedioInfoCheck extends Component {
             await this.reject();
         }
         const {type} = this.props;
-        this.props.closeModal(modalName[type],false)    //selfcare use
-        message.info("操作成功");        
+        this.props.closeModal(modalName[type],false,'submit')    //selfcare use
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });       
     }
 
     passon = async ()=>{ //通过
         const {wk,type} = this.props,
             dataSource = JSON.parse(wk.subject[0].data),
             {actions:{logWorkflowEvent}} = this.props;
-
-        // send workflow
         await throughProcess(wk,{logWorkflowEvent});
-
-        /* const  {id,username,name:person_name,code:person_code} = getUser(),
-            executor = {id,username,person_name,person_code};
-        await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor,attachment:null}); */
-
         switch(type){
             case 'create':
                 this.createPassion(dataSource);
@@ -139,7 +135,10 @@ export default class VedioInfoCheck extends Component {
                 });
                 Promise.all(fileAll);
                 Promise.all(all).then(rst => {
-                    message.success('删除文档成功！');
+                    notification.success({
+                        message: '删除文档成功！',
+                        duration: 2
+                    });
                 })
                 break;
         }
@@ -174,10 +173,7 @@ export default class VedioInfoCheck extends Component {
             dir = await postScheduleDir({},postDirData);
         }
 
-        const docData = dataSource.map(item =>{ //prepare the data which will store in database
-            /* const {projectName,ShootingDate,file} = item,
-                {a_file,name,download_url,mime_type} = file,
-                extra_params = {projectName,ShootingDate,file:{name}}; */
+        const docData = dataSource.map(item =>{ 
             const {file:{a_file,name,download_url,mime_type}} = item
             const code = 'vedioinfoData'+moment().format("YYYYMMDDHHmmss")+item.index;  //makesure code is unique
             delete item.index;
@@ -242,17 +238,39 @@ export default class VedioInfoCheck extends Component {
         }
     }
 
-    reject = async ()=>{    //不通过
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+    //不通过
+    async reject() {
+        const { wk } = this.props
+        const { actions: { deleteWorkflow } } = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            },
+            {
+                state:wk.current[0].id,
+                executor:executor,
+                action:"退回",
+                note:"不通过",
+                attachment:null
+            }
+        );
+        notification.success({
+            message:"操作成功!",
+            duration:2
+        })
     }
 }
 
 const modalTitle = {
-    create: '影像信息数据录入审批表',
-    strike: '影像信息数据删除审核表',
-    change: '影像信息数据删除审核表'
+    create: '填报审核',
+    strike: '删除审核',
+    change: '变更审核'
 }
 const modalName = {
     create: 'safety_vedioInfoCheck_visible',

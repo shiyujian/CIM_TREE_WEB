@@ -7,7 +7,10 @@ import './index.less';
 export default class VedioTable extends Component{
 
     componentDidMount(){
-        const {fileDel=false} = this.props;
+        const {fileDel=false,preview=false} = this.props;
+        if(preview){
+            this.columns.push(this.preview);
+        }
         if(fileDel){
             this.columns.push(this.operation);
         }
@@ -125,6 +128,15 @@ export default class VedioTable extends Component{
         render: (text,record,index) => this.renderColumns(text,index,'wbsCode')
     }];
 
+    preview = {
+        title: '预览',
+        render: (text,record,index)=>{
+            return (
+                <Icon type="eye" style={{cursor:"pointer"}} />
+            )
+        }
+    }
+
     operation = {
         title: '操作',
         render: (text, record, index)=>{
@@ -135,7 +147,7 @@ export default class VedioTable extends Component{
                  onConfirm={()=>{ this.deleteData(index) }}
                  okText="确认"
                  cancelText="取消">
-                    <a>删除</a>
+                    <a><Icon type="delete" /></a>
                 </Popconfirm>
             )
         }

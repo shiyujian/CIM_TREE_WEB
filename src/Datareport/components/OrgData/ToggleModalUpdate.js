@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon,TreeSelect} from 'antd';
+import {Table,Button,Popconfirm,notification,Input,Modal,Upload,Select,Icon,TreeSelect,Row, Col} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
 import { getUnit } from '../../store/orgdata';
 import { Promise } from 'es6-promise';
 import './TableOrg.less'
 const Search = Input.Search;
+const { TextArea } = Input
 const Option = Select.Option;
 const SHOW_PARENT = TreeSelect.SHOW_PARENT;
 const TreeNode = TreeSelect.TreeNode;
@@ -20,11 +21,11 @@ export default class ToggleModalUpdate extends Component{
             defaultchecker: "",
             units:[],
             selectPro:[],
-            selectUnit:[]
+            selectUnit:[],
+            description:""
         }
     }
     render(){
-        console.log("dataSource:",this.state.dataSource);
         const {visibleUpdate} = this.props;
         return (
             <Modal
@@ -33,7 +34,7 @@ export default class ToggleModalUpdate extends Component{
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请变更</h1>
                 <Table 
                     style = {{"textAlign":"center"}}
                     columns={this.columns}
@@ -52,6 +53,11 @@ export default class ToggleModalUpdate extends Component{
                         }
                     </Select>
                 </span> 
+                <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea placeholder="删除原因" rows={2} onChange={this.description.bind(this)}/>
+				    </Col>
+			    </Row>
                <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
@@ -61,14 +67,19 @@ export default class ToggleModalUpdate extends Component{
             </Modal>
         )
     }
+    description(e) {
+		this.setState({description:e.target.value})
+	}
      //处理上传excel的数据
     onok(){
         const { actions: { ModalVisibleUpdate} } = this.props;
         if (!this.state.passer) {
-            message.error('审批人未选择');
+            notification.warning({
+                message:"审批人未选择"
+            });
             return;
         }
-        this.props.setDataUpdate(this.state.dataSource, JSON.parse(this.state.passer));
+        this.props.setDataUpdate(this.state.dataSource, JSON.parse(this.state.passer), this.state.description);
         ModalVisibleUpdate(false);
     }
     cancel() {
@@ -141,7 +152,9 @@ export default class ToggleModalUpdate extends Component{
         width:"15%",
         height:"64px",
         render:(text, record, index) => {
-            record.selectUnits = this.state.units;
+            if (this.state.units.length !== 0) {
+                record.selectUnits = this.state.units;
+            }
             return (
                 <TreeSelect value={record.extra_params.project} style={{ width: "90%" }} multiple={true} treeCheckable={true} showCheckedStrategy={TreeSelect.SHOW_ALL}
                     onSelect={(value, node, extra) => {
@@ -153,14 +166,18 @@ export default class ToggleModalUpdate extends Component{
                             return getUnit({ code: item.key.split("--")[0] });
                         })
                         record.extra_params.project = selectPro;
+                        this.forceUpdate();
                         Promise.all(promises).then(rst => {
                             rst.map(item => {
                                 item.children.map(it => {
                                     units.push(it);
                                 })
                             })
-                            record.selectUnits = units;
-                            this.forceUpdate();
+                            record.selectUnits = [];
+                            units.map(item => {
+                                record.selectUnits.push(item);
+                                this.forceUpdate();
+                            })
                         })
 
                     }} 

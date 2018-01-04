@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/CostListData';
 import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message,notification} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API, NODE_FILE_EXCHANGE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
@@ -51,8 +51,11 @@ export default class PriceRmCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_pri_rm_visible",false)
-        message.info("操作成功")
+        this.props.closeModal("cost_pri_rm_visible",false, 'submit');
+        notification.success({
+            message:'操作成功',
+            duration: 2
+        });
     }
 
     //通过
@@ -91,14 +94,75 @@ export default class PriceRmCheck extends Component {
     }
     //不通过
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const { wk } = this.state;
+        const { actions: { logWorkflowEvent, } } = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null
+            }
+        );
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
     }
     //radio变化
     onChange(e){
         this.setState({option:e.target.value})
     }
+
+    getExcel () {
+		const {actions:{jsonToExcel}} = this.props;
+		const showDs = this.state.dataSource;
+		if(!showDs.length) {
+            notification.warning({
+                message:'至少选择一条数据',
+                duration: 2
+            });
+			return;
+		};
+        let rows = [];
+        rows.push(this.header);
+        showDs.map((item,index) => {
+            rows.push([index+1,item.subproject,item.unitengineering,item.projectcoding,item.valuation,item.rate,item.company,item.total,item.remarks]);
+        })
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            // console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+            this.createLink('计价清单下载',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+		}).catch(e => {
+			console.log(e);
+		})
+	}
+
+	//下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    cancel() {
+        this.props.closeModal("cost_pri_rm_visible", false)
+    }
+
 
 	render() {
       const  columns = 
@@ -135,12 +199,12 @@ export default class PriceRmCheck extends Component {
         }]
 		return(
 			<Modal
-                title="计价清单信息删除审批表"
                 key="priceRmCheck"
 				width = {1280}
 				visible = {true}
                 maskClosable={false}
                 footer = {null}
+                onCancel={this.cancel.bind(this)}
 			>
 				<div>
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
@@ -149,7 +213,16 @@ export default class PriceRmCheck extends Component {
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{showQuickJumper:true,showSizeChanger:true,total:this.state.dataSource.length}}    
+                    rowKey={record => record.key}
                 />
+                <Row >
+                    {
+                        this.state.dataSource.length && 
+                        <Col span={3} push={12} style={{ position: 'relative', top: -40, fontSize: 12 }}>
+                            [共：{this.state.dataSource.length}行]
+                        </Col>
+                    }
+                </Row>
                 <Row>
                     <Col span={2}>
                         <span>审查意见：</span>
@@ -160,12 +233,12 @@ export default class PriceRmCheck extends Component {
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
-                        <Button type='primary'>
+                    {/* <Col span={2} push={14}>
+                        <Button type='primary' onClick={this.getExcel.bind(this)}>
                             导出表格
                         </Button>
-                    </Col>
-                    <Col span={2} push={14}>
+                    </Col> */}
+                    <Col span={2} push={16}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
                         </Button>
@@ -173,7 +246,15 @@ export default class PriceRmCheck extends Component {
                     </Col>
                 </Row>
                 {
-                    this.state.wk && <WorkflowHistory wk={this.state.wk}/>
+                    this.state.dataSource[0] && this.state.dataSource[0].deleteInfoNew && <Row>
+                        <Col span={4} style={{padding: "10px 0"}}>
+                            申请删除原因 ：<span style={{"marginLeft":"20px"}}>{this.state.dataSource[0].deleteInfoNew}</span>
+                            <br/>
+                        </Col>
+                    </Row>
+                }
+                {
+                this.state.wk && <WorkflowHistory wk={this.state.wk}/>
                 }
             </div>
 			</Modal>

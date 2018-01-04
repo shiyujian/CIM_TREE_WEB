@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon,TreeSelect} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
+import {Table,Button,Popconfirm,Input,Modal,Upload,Select,Icon,TreeSelect, Row, Col, notification} from 'antd';
+import {UPLOAD_API,SERVICE_API,FILE_API,DataReportTemplate_Organization} from '_platform/api';
 import { getUnit } from '../../store/orgdata';
 import { Promise } from 'es6-promise';
 import './TableOrg.less'
@@ -9,21 +9,21 @@ const Option = Select.Option;
 const SHOW_PARENT = TreeSelect.SHOW_PARENT;
 const TreeNode = TreeSelect.TreeNode;
 export default class ToggleModal extends Component{
-    constructor(props){
+    constructor(props){ 
         super(props);
         this.state = {
             dataSource: [],
-            users: [],
+            users: [], 
             projects: [],
-            checkers: [],
+            checkers: [], 
             defaultPro: "",
             defaultchecker: "",
             units:[],
-            selectPro:[],
+            selectPro:[], 
             selectUnit:[],
-            flag:"",
             repeatCodes:[],
-            flag_code:""
+            flag_code:"",
+            editing:false
         }
     }
     render(){
@@ -38,13 +38,16 @@ export default class ToggleModal extends Component{
 		        if (info.file.status === 'done') {
                     let importData = info.file.response.Sheet1;
                     jthis.handleExcelData(importData);
-		            message.success(`${info.file.name} file uploaded successfully`);
+		            notification.success({
+                        message:`${info.file.name}上传成功`
+                    });
 		        } else if (info.file.status === 'error') {
-		            message.error(`${info.file.name}解析失败，请检查输入`);
+		            notification.warning({
+                        message:`${info.file.name}解析失败，请检查输入`
+                    });
 		        }
 		    },
         };
-        console.log("this.state.dataSource:",this.state.dataSource);
         return (
             <Modal
                 visible={visible}
@@ -52,7 +55,7 @@ export default class ToggleModal extends Component{
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>新增部门</h1>
                 <Table 
                     style = {{"textAlign":"center"}}
                     columns={this.columns}
@@ -61,9 +64,10 @@ export default class ToggleModal extends Component{
                     rowKey="index"
                 >
                 </Table>
+                <Button style={{ marginRight: "10px" }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_Organization}`)} type="default">模板下载</Button>
                 <Upload {...props}>
                     <Button style={{ margin: '10px 10px 10px 0px' }}>
-                        <Icon type="upload" />上传附件
+                        <Icon type="upload" />上传并预览
                      </Button>
                 </Upload>
                 <span>
@@ -84,6 +88,15 @@ export default class ToggleModal extends Component{
                </div>
             </Modal>
         )
+    }
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
     //判断数据是否重复
     isRepeat(arr){
@@ -140,9 +153,12 @@ export default class ToggleModal extends Component{
                     // 直属部门
                     direct: item[2],
                     remarks: item[3],
+                    selectPro:[], 
+                    selectUnit:[],
+                    editing:false
                 }
             });
-            console.log("res:",res);
+            console.log("red:",res);
             this.setState({
                 dataSource:res
             })
@@ -152,16 +168,25 @@ export default class ToggleModal extends Component{
     onok(){
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
         if (!this.state.passer) {
-            message.error('审批人未选择');
+            notification.warning({
+                message:"审批人未选择"
+            })
             return;
         }
         if (this.state.flag_code === false) {
-            message.error('存在重复的部门编码');
+            notification.warning({
+                message:"存在重复的部门编码"
+            })
             return;
         }
-        if (this.state.flag === false) {
-            message.error('存在错误数据');
-            return;
+        let arr = this.state.dataSource;
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i].type === " ") {
+                notification.warning({
+                    message:"该直属部门不存在"
+                })
+                return ;
+            }
         }
         this.props.setData(this.state.dataSource, JSON.parse(this.state.passer));
         ModalVisible(false);
@@ -196,7 +221,6 @@ export default class ToggleModal extends Component{
                     projects,
                     defaultPro: rst.children[0].name
                 })
-                console.log("this.state.projects",this.state.projects);
             }
         })
     }
@@ -252,19 +276,20 @@ export default class ToggleModal extends Component{
     }
     // 删除数据
     delete(index){
+        console.log("index:",index);
         let dataSource = this.state.dataSource;
         dataSource.splice(index,1);
         this.setState({flag_code:true, flag:true})
-        this.delData.bind(this, dataSource);
+        this.delData(dataSource);
         this.setState({dataSource})
     }
     // 处理数据删除之后的校验
-    delData() {
+    delData(data) {
         const { actions: { getOrgReverse } } = this.props;
         let type = [], canjian = [], color = [], codes = [];
         let promises = data.map(item => {
-            codes.push(item.direct);
-            return getOrgReverse({ code: item.code });
+            codes.push(item.code);
+            return getOrgReverse({ code: item.direct });
         })
         let repeatCode = this.isRepeat(codes);
         if (repeatCode.length > 1) {
@@ -279,9 +304,6 @@ export default class ToggleModal extends Component{
                 if (item.children.length === 0) {
                     type.push(" ");
                     canjian.push(" ");
-                    this.setState({
-                        flag: false
-                    })
                 } else {
                     type.push(item.children[0].name || "");
                     canjian.push(item.children[0].children[0].name || "");
@@ -289,7 +311,7 @@ export default class ToggleModal extends Component{
             })
             res = data.map((item, index) => {
                 return {
-                    index: item.index,
+                    index: index + 1,
                     code: item.code,
                     // 组织机构类型
                     type: type[index] || "",
@@ -300,13 +322,44 @@ export default class ToggleModal extends Component{
                     // 直属部门
                     direct: item.direct,
                     remarks: item.remarks,
+                    selectPro: item.selectPro,
+                    selectUnit: item.selectUnit,
                 }
             });
-            console.log("res:", res);
             this.setState({
                 dataSource: res
             })
         })
+    }
+    validateDirect(record,e){
+        const {actions:{getOrgReverse}} = this.props;
+        record.direct = e.target.value;
+        getOrgReverse({code:record.direct}).then(rst => {
+           if (rst.children.length !== 0) {
+               record.type = rst.children[0].name;
+               record.canjian = rst.children[0].children[0].name;
+               this.forceUpdate();
+           }else{
+                record.type = " ";
+                record.canjian = " ";
+           }
+        })
+
+    }
+    validateCode(record,e){
+        let codes = [];
+        record.code = e.target.value;
+        this.forceUpdate();
+        this.state.dataSource.map(item => {
+            codes.push(item.code);
+        })
+        let repeatCode = this.isRepeat(codes);
+        if (repeatCode.length > 1) {
+            this.setState({ flag_code: false })
+        }else{
+            this.setState({ flag_code: true })
+        }
+        this.setState({repeatCode});
     }
     columns = [{
         title: '序号',
@@ -315,7 +368,21 @@ export default class ToggleModal extends Component{
     }, {
         title: '组织机构编码',
         render:(text,record,index) => {
-            console.log("this.state.repeatCode:",this.state.repeatCode)
+            if (record.editing === true) {
+                if (this.state.repeatCode.indexOf(record.code) != -1) {
+                    return (
+                        <Input style={{"color":"red"}} value = {record.code} 
+                        onChange = {this.validateCode.bind(this,record)}
+                        />
+                    )
+                }else{
+                    return (
+                        <Input value = {record.code} 
+                        onChange = {this.validateCode.bind(this,record)}
+                        />
+                    )
+                }
+            }
             if (this.state.repeatCode.indexOf(record.code) != -1) {
                 return (
                     <span style={{"color":"red"}}>{record.code}</span>
@@ -336,11 +403,49 @@ export default class ToggleModal extends Component{
         key: 'Canjian',
     }, {
         title: '组织机构部门',
-        dataIndex: 'depart',
-        key: 'depart',
+        // dataIndex: 'depart',
+        // key: 'depart',
+        render:(text,record,index) => {
+            if (record.editing === true) {
+                return (
+                    <Input value = {record.depart} onChange = {(e) => {
+                        record.depart = e.target.value;
+                        this.forceUpdate();
+                    }}/>
+                )
+            }else{
+                return (
+                    <span>{record.depart}</span>
+                )
+            }
+        }
     }, {
         title: '直属部门',
         render:(record) => {
+            if (record.editing === true) {
+                if (record.canjian === " " || record.direct === " ") {
+                    return (
+                        <Input style={{"color":"red"}} value = {record.direct} 
+                        // onChange = {(e) => {
+                        //     record.direct = e.target.value;
+                        //     this.forceUpdate();
+
+                        // }}
+                        onChange = {this.validateDirect.bind(this,record)}
+                        />
+                    )
+                }else{
+                    return (
+                        <Input value = {record.direct}
+                        //  onChange = {(e) => {
+                        //     record.direct = e.target.value;
+                        //     this.forceUpdate();
+                        // }}
+                        onChange = {this.validateDirect.bind(this,record)}
+                        />
+                    )
+                }
+            }
             if (record.canjian === " " || record.direct === " ") {
                 return (
                     <span style={{color:"red"}}>{record.direct}</span>
@@ -373,10 +478,8 @@ export default class ToggleModal extends Component{
                                 units.push(it);
                             })
                         })
-                        // this.setState({units})
                         record.selectUnits = units;
                         this.forceUpdate();
-                        // console.log("this.state.units",this.state.units);
                     })
 
                 }} 
@@ -404,24 +507,52 @@ export default class ToggleModal extends Component{
         }
     }, {
         title: '备注',
-        dataIndex: 'remarks',
-        key: 'Remarks'
+        // dataIndex: 'remarks',
+        // key: 'Remarks'
+        width:"8%",
+        render:(text, record, index) => {
+            if (record.editing === true) {
+                return (
+                    <Input value = {record.remarks} onChange = {(e) => {
+                        record.remarks = e.target.value;
+                        this.forceUpdate();
+                    }}/>
+                )
+            }else{
+                return (
+                    <span>{record.remarks}</span>
+                )
+            }
+        }
     }, {
-        title: '删除',
-        render: (text, record, index) => (
-            <span>
-                {/* <Icon style={{marginRight:"15px"}} type = "edit"/> */}
-                {/* <span>|</span> */}
-                <Popconfirm 
-                    title="确认删除吗"
-                    onConfirm={this.delete.bind(this, index)}
-                    okText="确认"
-                    onCancel="取消"
-                >
-                    <Icon type = "delete" />
-                </Popconfirm>
-                
-            </span>
-        )
+        title: '操作',
+        width:"7%",
+        render: (text, record, index) => {
+            return <span>
+                        {record.editing ||
+                            <span>
+                                <a><Icon type="edit" onClick={(e) => {
+                                    record.editing = true
+                                    this.forceUpdate();
+                                 }} /></a>
+                                <Popconfirm
+                                    title="确认删除吗"
+                                    onConfirm={this.delete.bind(this, record.index - 1)}
+                                    okText="确认"
+                                    onCancel="取消"
+                                >
+                                    <span style={{ "margin": "7px" }}>|</span>
+                                    <a><Icon type="delete" /></a>
+                                </Popconfirm>
+                            </span>
+                        }
+                        {record.editing &&
+                            <a onClick={(e) => {
+                                record.editing = false
+                                this.forceUpdate();
+                            }}>完成</a>
+                        }
+                </span>
+    }
     }]
 }

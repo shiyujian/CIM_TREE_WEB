@@ -4,7 +4,7 @@ import {
     Input, Form, Spin, Upload, Icon, Button, Modal,
     Cascader, Select, Popconfirm, message, Table, Row, Col, notification
 } from 'antd';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API,DataReportTemplate_ProjectVolumeSettlement } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import { Promise } from 'es6-promise';
@@ -28,17 +28,6 @@ export default class ProjectSum extends Component {
 
     componentDidMount() {
         const { actions: { getAllUsers, getProjectTree ,getQuantitiesCode,getSearcherDoc} } = this.props;
-        let cacheData =  getSearcherDoc({keyword:"hfdsjhbsadfhb"}).then(res => {
-            // let cacheData = res.filter(item => item.extra_params.projectcoding);
-            let cacheArr = []
-            res.result.map(item => {
-                if(item.extra_params.projectcoding) {
-                    cacheArr.push(item.extra_params.projectcoding);
-                }
-            })
-            this.setState({cacheArr});
-        });
-        
         getAllUsers().then(rst => {
             let checkers = rst.map(o => {
                 return (
@@ -63,6 +52,18 @@ export default class ProjectSum extends Component {
                 //获取项目信息失败
             }
         });
+        let cacheData =  getSearcherDoc({keyword:"hfdsjhbsadfhb"}).then(res => {
+            // let cacheData = res.filter(item => item.extra_params.projectcoding);
+            let cacheArr = []
+            res.result.map(item => {
+                if(item.extra_params.projectcoding) {
+                    cacheArr.push(item.extra_params.projectcoding);
+                }
+            })
+            this.setState({cacheArr});
+        });
+        
+     
     }
     beforeUpload = (info) => {
         if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
@@ -138,7 +139,6 @@ export default class ProjectSum extends Component {
                 
             }
 
-         
             // dataSource.map(item => {
             //     if(cacheArr.indexOf(item.extra_params.projectcoding) && item.flag) {
             //         item.flag = false;
@@ -148,11 +148,17 @@ export default class ProjectSum extends Component {
             if(dataSource.some(item => {
                 return !item.flag
             })) {
-                message.warn("清单项目编码错误")
+                notification.warning({
+                    message: "清单项目编号错误",
+                    duration: 2
+                })
             }
 
             if(usedMark) {
-                message.warn("清单项目已经被使用")
+                notification.warning({
+                    message:"清单项目编号已经被使用",
+                    duration: 2
+                })
             }
             dataSource = this.checkCodeRepeat(dataSource);
             this.setState({dataSource}); 
@@ -172,7 +178,10 @@ export default class ProjectSum extends Component {
             }
         }
       
-        repeatFlag && message.warn("清单项目编码重复");
+        repeatFlag && notification.warning({
+            message:  "清单项目编号重复",
+            duration: 2
+        });
         return dataSource;
     }
     //下拉框选择人
@@ -234,11 +243,14 @@ export default class ProjectSum extends Component {
 
     onok() {
         if (!this.state.check) {
-            message.info("请选择审核人")
+            notification.warning({
+                message: "请选择审核人",
+                duration: 2
+            })
             return
         }
         if (this.state.dataSource.length === 0) {
-            message.info("请上传excel")
+            notification.warning({message:"请上传excel",duration: 2})
             return
         }
         let flag = this.state.dataSource.some((o,index) => {
@@ -246,13 +258,13 @@ export default class ProjectSum extends Component {
         })
 
         if(flag) {
-            message.info("清单项目编号错误");
+            notification.warning({message:"清单项目编号错误",duration: 2});
             return
         }
 
         const { project, unit } = this.state;
         if (!project.name) {
-            message.info(`请选择项目和单位工程`);
+            notification.warning({message:`请选择项目和单位工程`,duration: 2});
             return;
         }      
         let { check } = this.state
@@ -290,7 +302,19 @@ export default class ProjectSum extends Component {
             duration: 2
         });
     }
-
+	//模板下载
+	DownloadExcal(){
+		this.createLink("工程量结算模板下载",DataReportTemplate_ProjectVolumeSettlement)
+	}
+	createLink = (name, url) => {
+		let link = document.createElement("a");
+		link.href=url;
+		link.setAttribute("download",this);
+		link.setAttribute("target","_blank");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
     //删除
     delete(index) {
         let { dataSource } = this.state
@@ -351,7 +375,7 @@ export default class ProjectSum extends Component {
             resp = await resp.json()
             console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                notification.error({message:'文件上传失败',duration: 2})
                 return;
             };
             const filedata = resp;
@@ -387,14 +411,13 @@ export default class ProjectSum extends Component {
     }
     //编辑
     edit (index) {
-        console.log('edit',1111)
         const { dataSource } = this.state;
         dataSource[index].action = 'edit';
         Object.keys(dataSource[index]).forEach( v =>{
           if (dataSource[index][v].hasOwnProperty('editable')) dataSource[index][v]['editable'] = true;      
         })
         this.setState({dataSource});
-        console.log('data',dataSource);
+
     }
     // 表格数据改变时
     handeleChange(index,text,value){
@@ -404,7 +427,7 @@ export default class ProjectSum extends Component {
     }
     //改变表格完成；
     changeOk(index){
-        console.log('111111')
+      
         const { dataSource } = this.state;
         dataSource[index].action = 'normal';
         Object.keys(dataSource[index]).forEach( v =>{
@@ -429,8 +452,6 @@ export default class ProjectSum extends Component {
         )
     }
     render() {
-        console.log('this.state.cacheArr',this.state.cacheArr)
-        let {dataSource} = this.state.dataSource;
         const columns = [
             {
                 title: '序号',
@@ -439,7 +460,6 @@ export default class ProjectSum extends Component {
                 title: '清单项目编号',
                 dataIndex: 'projectcoding',
                 render: (text, record, index) => {
-                    console.log('record.flag',record.flag)
                     if(record.flag === false){
                         return (<span style={{color:'red'}}>{record.projectcoding}</span>)    
                     }else{
@@ -465,7 +485,7 @@ export default class ProjectSum extends Component {
                     return this.renderColumns(record.key-1,'number',text);
                 }
             },{
-                title: '单价',
+                title: '综合单价(元)',
                 dataIndex: 'total',
                 render:(text,record,index) =>{
                     return this.renderColumns(record.key-1,'total',text);
@@ -501,12 +521,12 @@ export default class ProjectSum extends Component {
         ];
         return (
             <Modal
-                title="工程量结算上传表"
                 visible={true}
                 width={1280}
                 onOk={this.onok.bind(this)}
                 maskClosable={false}
                 onCancel={this.props.oncancel}>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>发起填报</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -514,7 +534,7 @@ export default class ProjectSum extends Component {
                     
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
-                    <Col><Button style={{ margin: '10px 10px 10px 0px' }}>模板下载</Button></Col>
+                    <Col><Button style={{ margin: '10px 10px 10px 0px' }} onClick={this.DownloadExcal.bind(this)}>模板下载</Button></Col>
                     <Col>
                         <Upload
                             onChange={this.uplodachange.bind(this)}

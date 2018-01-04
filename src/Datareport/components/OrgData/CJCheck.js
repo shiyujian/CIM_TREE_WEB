@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/orgdata';
 import {actions as actions2} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
@@ -49,8 +49,10 @@ export default class CJCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_cj_visible",false)
-        message.info("操作成功")
+        notification.success({
+            message:"操作成功"
+        })
+        this.props.closeModal("dr_base_cj_visible",false, "submit")
     }
     //通过
     async passon(){
@@ -139,8 +141,28 @@ export default class CJCheck extends Component {
     //不通过
     async reject(){
         const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const {actions:{logWorkflowEvent}} = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        notification.success({
+            message: "操作成功",
+            duration: 2
+        })
     }
     //预览
     handlePreview(index){
@@ -190,26 +212,16 @@ export default class CJCheck extends Component {
             title: '备注',
             dataIndex: 'remarks',
             key: 'Remarks'
-        }, {
-            title: '编辑',
-            render: (record) => (
-                <span>
-                    <Icon style={{marginRight:"15px"}} type = "edit"/>
-                    <Icon type = "delete"/>
-                </span>
-            )
         }]
 		return (
             <Modal
-			title="组织机构信息审批表"
-			key={Math.random()}
             visible={true}
             width= {1280}
-            footer={null}
             onCancel = {this.props.closeModal.bind(this,"dr_base_cj_visible",false)}
+            onOk = {this.submit.bind(this)}
 			maskClosable={false}>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>新增参建单位审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
@@ -223,17 +235,6 @@ export default class CJCheck extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {

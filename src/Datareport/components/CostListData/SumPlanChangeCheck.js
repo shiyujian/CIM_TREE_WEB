@@ -56,7 +56,7 @@ export default class SumPlanChangeCheck extends Component {
         delateArr.push(item.code)
     });
 
-    console.log(delateArr.join(','));
+    // console.log(delateArr.join(','));
    }
    //提交
     async submit(){
@@ -65,8 +65,10 @@ export default class SumPlanChangeCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_qua_jsjh_change_visible",false);
-        message.success("操作成功");
+        this.props.closeModal("dr_qua_jsjh_change_visible",false,'submit');
+        notification.success({
+            message:'操作成功'
+        })
     }
 
     //通过
@@ -113,9 +115,27 @@ export default class SumPlanChangeCheck extends Component {
     }
     //不通过
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const {wk} = this.state;
+        // const {actions:{deleteWorkflow}} = this.props
+        // await deleteWorkflow({pk:wk.id})
+        const { actions:{ logWorkflowEvent }} = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            },{
+                state:wk.current[0].id,
+                executor:executor,
+                action:'退回',
+                note:'不通过',
+                attachment:null
+            }
+        );
     }
     //取消
     cancel() {
@@ -165,13 +185,12 @@ export default class SumPlanChangeCheck extends Component {
           ]
 		return (
             <Modal
-			title="结算计划信息变更审批表"
             visible={true}
             width= {1280}
             footer={null}
             onCancel={this.cancel.bind(this)}
 			maskClosable={false}>
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>变更审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -180,17 +199,17 @@ export default class SumPlanChangeCheck extends Component {
                     <Col span={2}>
                         <span>审查意见：</span>
                     </Col>
-                    <Col span={4}>
+                    <Col span={6}>
                         <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
                             <Radio value={1}>通过</Radio>
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
+                    {/* <Col span={2} push={14}>
                         <Button type='primary' onClick = {this.test.bind(this)}>
                             导出表格
                         </Button>
-                    </Col>
+                    </Col> */}
                     <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交

@@ -68,7 +68,7 @@ export default class ProjectSumExamine extends Component {
             await this.reject();
         }
         this.props.closeModal("cost_pro_ck_visible", false);
-        message.info("操作成功");
+        notification.success({message:"操作成功",duration: 2});
     }
 
     //通过
@@ -215,7 +215,6 @@ export default class ProjectSumExamine extends Component {
             }, {
                 title: '项目/子项目',
                 dataIndex: 'subproject',
-                width: '10%',
                 render: (text, record, index) => (
                     <span>
                         {record.subproject.name}
@@ -241,9 +240,8 @@ export default class ProjectSumExamine extends Component {
             }, {
                 title: '数量',
                 dataIndex: 'number',
-                width: '10%',
             }, {
-                title: '单价',
+                title: '综合单价(元)',
                 dataIndex: 'total',
             }, {
                 title: '备注',
@@ -252,7 +250,6 @@ export default class ProjectSumExamine extends Component {
         ];
         return (
             <Modal
-			title="工程量结算信息审批表"
             visible={true}
             width= {1280}
 			footer={null}
@@ -260,7 +257,7 @@ export default class ProjectSumExamine extends Component {
             onCancel={this.cancel.bind(this)}
             >
                 <div>
-                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>填报审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
@@ -275,12 +272,8 @@ export default class ProjectSumExamine extends Component {
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
+                    
+                        <Col span={6} push={14}>
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>
