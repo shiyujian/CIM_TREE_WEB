@@ -14,7 +14,7 @@ export default class GeneralTable extends Component {
         };
     }
     render() {
-	    const {newkey = [],Doc =[]} = this.props;
+	    const {newkey = [],tableSrc =[]} = this.props;
 
 	    const columns = newkey.map(rst=>{
 		    if(rst.name === "文件名" ||rst.name === "卷册名" ||rst.name === "事件" ||rst.name ==="名称"){
@@ -58,7 +58,7 @@ export default class GeneralTable extends Component {
         return (
         	<div>
 				<Table rowSelection={this.rowSelection}
-					   dataSource={Doc}
+					   dataSource={tableSrc}
 					   columns={columns}
 					   bordered rowKey="code"/>
 				<Modal  title="图片预览"
@@ -79,7 +79,6 @@ export default class GeneralTable extends Component {
     rowSelection = {
         onChange: (selectedRowKeys,selectedRows) => {
             const {actions: {selectDocuments}} = this.props;
-            console.log('select',selectedRows);
             selectDocuments(selectedRows);
         }
     };
@@ -87,7 +86,6 @@ export default class GeneralTable extends Component {
 	genDownload = (text)=>{
 		return(
 			text.map((rst) =>{
-				console.log(11111,rst);
 				return (
 					<div>
 						<a onClick={this.previewFile.bind(this,rst)}>{rst.name}</a>

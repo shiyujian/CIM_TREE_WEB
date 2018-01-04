@@ -174,6 +174,7 @@ export default class TableUnit extends Component {
 				return param;
 			}
 		}
+		console.log("this.state.selectedRows:",this.state.selectedRows);
 		let excontent =this.state.selectedRows.map(data=>{
 			return [data.code,data.name,data.fatherName,data.projType||'',data.stage||'',getcoordinate(data.coordinate)
 			,data.stime||'',data.etime||'',data.intro||'',data.rsp_orgName?data.rsp_orgName[0]:'',data.file?data.file.name:''];

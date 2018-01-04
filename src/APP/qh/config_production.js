@@ -38,7 +38,7 @@ window.config = {
 	'STATIC_FILE_PASSWORD':'qianhai',
 
 	//现场收发文接口的端口
-	'DOC_EXCHANGE_URL': 'http://bimdjd.ecidi.com:6556',
+	'DOC_EXCHANGE_URL': 'http://10.215.160.41:6556',
 	//现场收发文接口验证用的用户名和密码
 	'DOC_EXCHANGE_USER_PASSWORD': 'bimqh:bimqh',
 
