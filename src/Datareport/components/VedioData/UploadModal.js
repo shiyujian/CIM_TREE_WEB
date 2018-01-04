@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Modal, Row, Col, message} from 'antd';
+import {Modal, Row, Col, message, notification} from 'antd';
 
 import VedioTable from './VedioTable';
 import UploadFooter from './UploadFooter';
@@ -16,25 +16,21 @@ export default class VedioUpload extends Component{
 
     render(){
         const {dataSource} = this.state;
-        const {actions, uploadModal, closeModal} = this.props;
-
+        const {actions, uploadModal, closeModal,modalDown} = this.props;
         return(
             <Modal
              width={1280}
-             title={"视频监控上传"}
              visible={uploadModal}
              onCancel={()=>closeModal("uploadModal")}
-             footer={null}
             >
-                {/* <Row type='flex' justify='center' >
-                    <p className="titleFont">结果预览</p>
-                </Row> */}
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
                 <VedioTable
                  dataSource={dataSource}
                  storeExcelData={this.storeExcelData}
                  fileDel={true}
                 />
                 <UploadFooter
+                modalDown = {modalDown}
                  dataSource={dataSource}
                  storeExcelData= {this.storeExcelData}
                  excelTitle= {excelTitle}
@@ -57,7 +53,10 @@ export default class VedioUpload extends Component{
             name = '视频监控批量录入';
 
         await launchProcess({dataSource,selectUser,name},{createWorkflow,logWorkflowEvent});
-        message.success("上传数据成功");
+        notification.success({
+            message: '上传数据成功！',
+            duration: 2
+        });
         closeModal("uploadModal");
     }
 }

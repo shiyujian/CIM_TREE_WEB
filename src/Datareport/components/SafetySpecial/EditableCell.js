@@ -23,7 +23,7 @@ class EditableCell extends React.Component {
 		let value = this.state.value;
 		// console.log(value,"vip-value")
 		if (!value || value == undefined || value == null) {
-			notification.error({
+			notification.warning({
 				message: '不能为空！',
 				duration: 2,
 			});

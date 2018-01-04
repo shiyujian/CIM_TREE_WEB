@@ -47,16 +47,25 @@ export default class PriceModifyModal extends Component {
 	onok(){
         let {dataSource} = this.state;
         if(!dataSource.length) {
-            message.info("数据不能为空")
+            notification.warning({
+                message:'数据不能为空',
+                duration: 2
+            });
             return
         }
         if(!this.state.check){
-            message.info("请选择审核人")
+            notification.warning({
+                message:'请选择审核人',
+                duration: 2
+            });
             return
         }
 
         if (!this.state.changeInfo.length) {
-            message.info(`请填写变更原因`);
+            notification.warning({
+                message:'请填写变更原因',
+                duration: 2
+            });
             return;
         }
 
@@ -209,7 +218,7 @@ export default class PriceModifyModal extends Component {
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
             <div>
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果预览</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>申请变更</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

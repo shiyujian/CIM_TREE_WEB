@@ -3,9 +3,10 @@ import React, { Component } from "react";
 import {
   Input, Form, Spin, Upload, Icon, Button, Modal, Cascader, Select, Popconfirm, message, Table, Row, Col, notification } from "antd";
 import {
-  UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from "_platform/api";
+  UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_SettlementPlan} from "_platform/api";
 import "../../containers/quality.less";
 import Preview from "../../../_platform/components/layout/Preview";
+const moment = require('moment');
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -172,16 +173,22 @@ export default class SumPlan extends Component {
   onok() {
 
     if (!this.state.check) {
-      message.info("请选择审核人");
+      notification.warning({
+				message:'请选择审核人'
+			})
       return;
     }
     if (this.state.dataSource.length === 0) {
-      message.info("请上传excel");
+      notification.warning({
+				message:'请上传Excel表'
+			})
       return;
     }
     const { project, unit } = this.state;
     if (!project.name) {
-      message.info(`请选择项目和单位工程`);
+      notification.warning({
+				message:'请选择项目和单位工程'
+			})
       return;
     }
     let { check } = this.state;
@@ -260,6 +267,16 @@ export default class SumPlan extends Component {
     dataSource[index][text].value = value;
     this.setState({dataSource});
   }
+  // 正则时间匹配
+  dataChange(e){
+    let data = moment(e.target.value).format('YYYY-MM-DD');
+    if(data.match(/^((?:19|20)\d\d)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/)){
+    }else{
+        notification.warning({
+          message:'请检查输入日期格式是否为YYYY-MM-DD'
+        })
+    }
+  }
   // 处理表格渲染数据
   renderColumns(index,text,data){
     const { editable } = this.state.dataSource[index][text];
@@ -271,11 +288,28 @@ export default class SumPlan extends Component {
         {!editable ?(
           <span>{data.value}</span>
         ) :(
-          <Input value={data.value} onChange = {e => this.handeleChange(index,text,e.target.value)}/>
+          text === 'completiontime' ? <Input value={data.value} onChange = {e => this.handeleChange(index,text,e.target.value)} onBlur={this.dataChange}/>
+           : <Input value={data.value} onChange = {e => this.handeleChange(index,text,e.target.value)}/>
+          
         )}
       </div>
     )
   }
+  // 模板下载
+	getTemplate(){
+		this.createLink('结算计划模板',DataReportTemplate_SettlementPlan)
+	}
+
+	//文件下载;
+	createLink = (name,url) =>{
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download',this);
+		link.setAttribute('target','_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
   render() {
     const columns = [
       {
@@ -344,23 +378,23 @@ export default class SumPlan extends Component {
     ];
     return (
       <Modal
-        title="结算计划文档上传表"
         visible={true}
         width={1280}
         onOk={this.onok.bind(this)}
         maskClosable={false}
         onCancel={this.props.oncancel}
       >
+      <h1 style ={{textAlign:'center',marginBottom:20}}>发起填报</h1>
         <Table
           columns={columns}
           dataSource={this.state.dataSource}
-          // bordered
+          bordered
           pagination={{ pageSize: 10 }}
         />
         <Row style={{ marginBottom: "30px" }} type="flex">
-          {/* <Col>
-            <Button style={{ margin: "10px 10px 10px 0px" }}>模板下载</Button>
-          </Col> */}
+          <Col>
+            <Button style={{ margin: "10px 10px 10px 0px" }} onClick={this.getTemplate.bind(this)}>模板下载</Button>
+          </Col>
           <Col>
             <Upload
               onChange={this.uplodachange.bind(this)}
@@ -370,7 +404,7 @@ export default class SumPlan extends Component {
               beforeUpload={this.beforeUpload.bind(this)}
             >
               <Button style={{ margin: "10px 10px 10px 0px" }}>
-                <Icon type="upload" />上传并预览(文件名需为英文)
+                <Icon type="upload" />上传并预览
               </Button>
             </Upload>
           </Col>

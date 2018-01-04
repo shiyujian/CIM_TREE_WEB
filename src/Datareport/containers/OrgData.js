@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {TableOrg, ToggleModal, OrgCheck, ToggleModalCJ, ToggleModalDel, ToggleModalUpdate} from '../components/OrgData'
 import {actions as platformActions} from '_platform/store/global';
-import {message} from "antd";
+import {notification} from "antd";
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
@@ -62,7 +62,9 @@ export default class OrgData extends Component {
 				}).then(rst => {
 					if (rst) {
 						console.log("rst:",rst);
-						message.success("流程发起成功");
+						notification.success({
+							message:"流程发起成功"
+						});
 					}
 				});
 		});
@@ -108,13 +110,15 @@ export default class OrgData extends Component {
 				}).then(rst => {
 					if (rst) {
 						console.log("rst:",rst);
-						message.success("流程发起成功");
+						notification.success({
+							message:"流程发起成功"
+						});
 					}
 				});
 		});
 	}
 	// 删除流程
-	setDataDel(data,participants){
+	setDataDel(data,participants,description){
 		console.log("data:",data);
 		console.log("participants:",participants);
 		// return; 
@@ -128,7 +132,7 @@ export default class OrgData extends Component {
 		let postdata = {
 			name: "组织机构信息批量删除",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "组织机构信息批量删除",
+			description: description,
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -143,7 +147,7 @@ export default class OrgData extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起组织机构信息删除',
+					note: description,
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -153,14 +157,15 @@ export default class OrgData extends Component {
 					attachment: null
 				}).then(rst => {
 					if (rst) {
-						console.log("rst:",rst);
-						message.success("流程发起成功");
+						notification.success({
+							message:"流程发起成功"
+						});
 					}
 				});
 		});
 	}
 	// 更新流程
-	setDataUpdate(data,participants){
+	setDataUpdate(data,participants,description){
 		console.log("data:",data);
 		console.log("participants:",participants);
 		// return; 
@@ -174,7 +179,7 @@ export default class OrgData extends Component {
 		let postdata = {
 			name: "组织机构信息批量更改",
 			code: WORKFLOW_CODE["数据报送流程"],
-			description: "组织机构信息批量更改",
+			description: description,
 			subject: [{
 				data: JSON.stringify(data)
 			}],
@@ -189,7 +194,7 @@ export default class OrgData extends Component {
 				{
 					state: rst.current[0].id,
 					action: '提交',
-					note: '发起组织机构信息更改',
+					note: description,
 					executor: creator,
 					next_states: [{
 						participants: [participants],
@@ -200,7 +205,9 @@ export default class OrgData extends Component {
 				}).then(rst => {
 					if (rst) {
 						console.log("rst:",rst);
-						message.success("流程发起成功");
+						notification.success({
+							message:"流程发起成功"
+						});
 					}
 				});
 		});

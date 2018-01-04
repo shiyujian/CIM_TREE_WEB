@@ -62,8 +62,11 @@ export default class WorkCheckModal extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("dr_wor_sg_visible", false);
-        message.info("操作成功");
+        this.props.closeModal("dr_wor_sg_visible", false,'submit');
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
     }
 
     //通过
@@ -130,14 +133,38 @@ export default class WorkCheckModal extends Component {
         await addDocList({}, { data_list: doclist_a });
         await putDocList({}, { data_list: doclist_p });
         await updateWpData({}, { data_list: wplist });
-        message.success("批量上传数据成功");
+        notification.success({
+            message: '填报审核成功！',
+            duration: 2
+        });
     }
-    //不通过
-    async reject() {
-        const { wk } = this.props
-        const { actions: { deleteWorkflow } } = this.props
-        await deleteWorkflow({ pk: wk.id })
-    }
+   //不通过
+   async reject() {
+    const { wk } = this.props
+    const { actions: { deleteWorkflow } } = this.props
+    let executor = {};
+    let person = getUser();
+    executor.id = person.id;
+    executor.username = person.username;
+    executor.person_name = person.name;
+    executor.person_code = person.code;
+    await logWorkflowEvent(
+        {
+            pk:wk.id
+        },
+        {
+            state:wk.current[0].id,
+            executor:executor,
+            action:"退回",
+            note:"不通过",
+            attachment:null
+        }
+    );
+    notification.success({
+        message:"操作成功!",
+        duration:2
+    })
+}
 
     onChange(e) {
         this.setState({ opinion: e.target.value });
@@ -203,14 +230,13 @@ export default class WorkCheckModal extends Component {
             },]
         return (
             <Modal
-                title="施工进度审批表"
                 visible={true}
                 width={1280}
                 footer={null}
                 maskClosable={false}
                 onCancel={this.oncancel.bind(this)}>
                 <div>
-                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>填报审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
@@ -225,11 +251,6 @@ export default class WorkCheckModal extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
                         </Col>
                         <Col span={2} push={14}>
                             <Button type='primary' onClick={this.submit.bind(this)}>

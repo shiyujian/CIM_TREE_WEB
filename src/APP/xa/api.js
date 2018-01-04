@@ -12,6 +12,10 @@ import headLogo from './logo_head.png';
 
 export const xa_headLogo = headLogo;
 
+export const xa_footerYear = '2018';
+
+export const xa_footerCompany = '中国雄安建设管理有限公司';
+
 export const xa_menus = [{
 	key: 'home',
 	id: 'HOME',

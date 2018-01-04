@@ -57,7 +57,6 @@ export default class SafetySpecialEditCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("Safety_Special_edit_visible", false);
-        message.info("操作成功")
     }
 
     //通过
@@ -216,12 +215,12 @@ export default class SafetySpecialEditCheck extends Component {
                 title: '方案名称 ',
                 dataIndex: 'scenarioName',
                 width: '10%',
-            }, 
+            },
             {
                 title: '编制单位',
                 dataIndex: 'organizationUnit',
                 width: '10%',
-            }, 
+            },
             {
                 title: '评审时间',
                 dataIndex: 'reviewTime',
@@ -231,7 +230,7 @@ export default class SafetySpecialEditCheck extends Component {
                 title: '评审意见',
                 dataIndex: 'reviewComments',
                 width: '10%',
-            }, 
+            },
             {
                 title: '附件',
                 width: "10%",
@@ -306,15 +305,27 @@ export default class SafetySpecialEditCheck extends Component {
                             </Button>
                         </Col>
                     </Row>
-                    {/* {
-                        this.state.dataSource[0].deleteInfo ? <Row>
-                            <Col span={4}>
-                                申请删除原因：{this.state.dataSource[0].changeInfo}
-                            </Col>
-                        </Row>
+                    {
+                        this.state.dataSource[0] && this.state.dataSource[0].changeInfo ?
+                            <Row>
+                                {/* <Col
+                                    style={{ fontSize: 16 }}
+                                    span={2}
+                                    push={4}
+                                >
+                                    <span>变更原因 ：</span>
+                                </Col> */}
+                                <Col
+                                    span={14}
+                                    push={6}
+                                >
+                                <span  style={{ fontSize: 16 }} >变更原因 ：</span>
+                                    {this.state.dataSource[0].changeInfo}
+                                </Col>
+                            </Row>
                             :
                             ""
-                    } */}
+                    }
                     {
                         this.state.wk && <WorkflowHistory wk={this.state.wk} />
                     }

@@ -241,9 +241,9 @@ export default class SafetySpecialDeleteCheck extends Component {
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered 
+                        bordered
                         rowSelection={rowSelection}
-                        />
+                    />
                     <Row>
                         <Col span={2}>
                             <span>审查意见：</span>
@@ -272,11 +272,23 @@ export default class SafetySpecialDeleteCheck extends Component {
                         </Col>
                     </Row>
                     {
-                        this.state.dataSource[0] && this.state.dataSource[0].deleteInfoNew ? <Row>
-                            <Col span={4}> push={12}
-                                申请删除原因：{this.state.dataSource[0].deleteInfoNew}
-                            </Col>
-                        </Row>
+                        this.state.dataSource[0] && this.state.dataSource[0].deleteInfoNew ?
+                            <Row>
+                                {/* <Col
+                                    style={{ fontSize: 16 }}
+                                    span={2}
+                                    push={4}
+                                >
+                                    <span>删除原因 ：</span>
+                                </Col> */}
+                                <Col
+                                    span={14}
+                                    push={6}
+                                >
+                                 <span style={{ fontSize: 16 }} >删除原因 ：</span>
+                                    {this.state.dataSource[0].deleteInfoNew}
+                                </Col>
+                            </Row>
                             :
                             ""
                     }

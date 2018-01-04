@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Button, Row, Col, Select, Upload, Input, message, Icon, Cascader} from 'antd';
+import {Button, Row, Col, Select, Upload, Input, message, Icon, Cascader, notification} from 'antd';
 
 import VedioTable from './VedioTable';
 import './index.less';
 const Option = Select.Option;
-import { SERVICE_API} from '_platform/api';
+import { SERVICE_API,NODE_FILE_EXCHANGE_API} from '_platform/api';
 import {getAllUsers} from './commonFunc';
 
 export default class UploadFooter extends Component{
@@ -47,14 +47,12 @@ export default class UploadFooter extends Component{
         return(<div>
             <Row className="rowSpacing">
                 <Col span={24}>
-                    <Button onClick={modalDownload} type="primary" className="spacing" >模板下载</Button>
+                    <Button onClick={this.modalDownload}  className="spacing" >模板下载</Button>
                     <Upload className="spacing" {...this.uploadProps}>
                         <Button>
-                            <Icon type="upload"/>上传附件
+                            <Icon type="upload"/>上传并预览
                         </Button>
                     </Upload>
-                    {/* <Input style={{width: 300}} className="inlineBlock" disabled value="F:\XA\项目基础信息导入表.xlxs"/>
-                    <Button className="spacing">上传并预览</Button> */}
                     <div className="inlineBlock">审核人: </div>
                     <Select onSelect={this.selectCheckUser} className="select" defaultValue={"请选择"} >
                         {checkUsers}
@@ -67,8 +65,7 @@ export default class UploadFooter extends Component{
                         onChange={this.onChange}
                         placeholder={"请选择项目-单位工程"}
                         changeOnSelect
-                    />
-                    <Button onClick={this.onSubmit} type="primary" className="spacing" >提交</Button>               
+                    />           
                 </Col>
             </Row>
             <Row className="rowSpacing">
@@ -90,7 +87,10 @@ export default class UploadFooter extends Component{
             if(acceptFile.indexOf(info.type) >-1){
                 return true
             }else{
-                message.error("只能上传Excel类型的文件!");
+                notification.error({
+                    message: '只能上传Excel类型的文件！',
+                    duration: 2
+                });
                 return false
             }
         },
@@ -101,12 +101,18 @@ export default class UploadFooter extends Component{
                     key = Object.keys(excelData);
 
                 if(key.length != 1){
-                    message.error("Excel只允许有一个sheet");
+                    notification.error({
+                        message: 'Excel只允许有一个sheet！',
+                        duration: 2
+                    });
                     return
                 }
                 const data = excelData[key[0]];
                 if(data[0].length != [...( new Set( [...data[0],...excelTitle] ) )].length ){
-                    message.error("请使用下载的模板");
+                    notification.error({
+                        message: '请使用下载的模板！',
+                        duration: 2
+                    });
                     return
                 }
         
@@ -123,9 +129,15 @@ export default class UploadFooter extends Component{
                 Object.assign(this,{
                     excelUpload: true
                 })
-                message.success(`${name} 上传成功`);
+                notification.success({
+                    message: `${name}上传成功！`,
+                    duration: 2
+                });
             } else if (info.file.status === 'error') {
-                message.error(`${info.file.name} 上传失败`);
+                notification.error({
+                    message: `${info.file.name} 上传失败!`,
+                    duration: 2
+                });
             }
         }
     }
@@ -138,15 +150,24 @@ export default class UploadFooter extends Component{
         const {excelUpload, selectUser,project} = this,
             {onOk} = this.props;
         if(!excelUpload){
-            message.error("请上传附件！");
+            notification.error({
+                message: '请上传附件！',
+                duration: 2
+            });
             return
         }
         if(!selectUser){
-            message.error("请选择审核人！");
+            notification.error({
+                message: '请选择审核人！',
+                duration: 2
+            });
             return
         }
         if(!project){
-            message.error("请选择项目-单位工程！");
+            notification.error({
+                message: '请选择项目-单位工程！',
+                duration: 2
+            });
             return
         }
         
@@ -203,14 +224,36 @@ export default class UploadFooter extends Component{
             returnProjectCode = Array.from(new Set(returnProjectCode));
 
             if(returnProjectCode.length>1){
-                message.error("wbs编码不属于同一个单位工程");
+                notification.error({
+                    message: 'wbs编码不属于同一个单位工程！',
+                    duration: 2
+                });
             }else if(returnProjectCode[0] != projectCode){
-                message.error("wbs编码不属于本单位工程");
+                notification.error({
+                    message: 'wbs编码不属于本单位工程！',
+                    duration: 2
+                });
             }else{
                 storeExcelData(sourceData)
                 this.project = true;
             }      
         }
+    }
+    modalDownload = ()=>{
+        // const downloadLink = '';
+        const {modalDown} = this.props;
+        
+        this.createLink(this,modalDown);
+        //window.open(downloadLink);
+    }
+     createLink = (name, url) => {    //下载未应用
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
 }
@@ -220,11 +263,8 @@ UploadFooter.PropTypes ={
     dataIndex: PropTypes.array.isRequired,
     getAllUsers: PropTypes.func.isRequired
 }
+ 
 
-const modalDownload = ()=>{
-    const downloadLink = '';
-    //window.open(downloadLink);
-}
 
 const projectReturn = (data={})=>{
     const {name,code,obj_type} = data;

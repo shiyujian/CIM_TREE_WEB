@@ -51,8 +51,11 @@ export default class PriceModifyCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_pri_modify_visible",false)
-        message.info("操作成功")
+        this.props.closeModal("cost_pri_modify_visible",false, 'submit');
+        notification.success({
+            message:'操作成功',
+            duration: 2
+        });
     }
 
     //通过
@@ -131,8 +134,9 @@ export default class PriceModifyCheck extends Component {
     }
 
     cancel() {
-        this.props.closeModal("cost_sum_cckk_visible", false);
+        this.props.closeModal("cost_pri_modify_visible", false)
     }
+
 
 	render() {
       const  columns = 
@@ -204,12 +208,12 @@ export default class PriceModifyCheck extends Component {
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
+                    {/* <Col span={2} push={14}>
                         <Button type='primary'>
                             导出表格
                         </Button>
-                    </Col>
-                    <Col span={2} push={14}>
+                    </Col> */}
+                    <Col span={2} push={16}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
                         </Button>
@@ -218,8 +222,8 @@ export default class PriceModifyCheck extends Component {
                 </Row>
                 {
                     this.state.dataSource[0] && this.state.dataSource[0].changeInfo && <Row>
-                        <Col span={4}>
-                            申请变更原因:{this.state.dataSource[0].changeInfo}
+                        <Col span={4} style={{padding: "10px 0"}}>
+                            申请变更原因 ：<span style={{"marginLeft":"20px"}}>{this.state.dataSource[0].changeInfo}</span>
                             <br/>
                         </Col>
                     </Row>

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Modal,Upload,Select,Icon,TreeSelect} from 'antd';
+import {Table,Button,Popconfirm,notification,Input,Modal,Upload,Select,Icon,TreeSelect,Row,Col} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
 import { getUnit } from '../../store/orgdata';
 import { Promise } from 'es6-promise';
@@ -7,6 +7,7 @@ import './TableOrg.less'
 const Search = Input.Search;
 const Option = Select.Option;
 const SHOW_PARENT = TreeSelect.SHOW_PARENT;
+const { TextArea } = Input
 const TreeNode = TreeSelect.TreeNode;
 export default class ToggleModalDel extends Component{
     constructor(props){
@@ -20,7 +21,8 @@ export default class ToggleModalDel extends Component{
             defaultchecker: "",
             units:[],
             selectPro:[],
-            selectUnit:[]
+            selectUnit:[],
+            description:""
         }
     }
     render(){
@@ -32,7 +34,7 @@ export default class ToggleModalDel extends Component{
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请删除</h1>
                 <Table 
                     style = {{"textAlign":"center"}}
                     columns={this.columns}
@@ -50,6 +52,11 @@ export default class ToggleModalDel extends Component{
                         }
                     </Select>
                 </span> 
+                <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea placeholder="删除原因" rows={2} onChange={this.description.bind(this)}/>
+				    </Col>
+			    </Row>
                <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
@@ -59,14 +66,19 @@ export default class ToggleModalDel extends Component{
             </Modal>
         )
     }
+    description(e) {
+		this.setState({description:e.target.value})
+	}
      //处理上传excel的数据
     onok(){
         const { actions: { ModalVisibleDel} } = this.props;
         if (!this.state.passer) {
-            message.error('审批人未选择');
+            notification.warning({
+                message:"审批人未选择"
+            });
             return;
         }
-        this.props.setDataDel(this.state.dataSource, JSON.parse(this.state.passer));
+        this.props.setDataDel(this.state.dataSource, JSON.parse(this.state.passer), this.state.description);
         ModalVisibleDel(false);
     }
     cancel() {

@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/orgdata';
 import {actions as actions2} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
@@ -49,8 +49,10 @@ export default class OrgCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_org_visible",false)
-        message.info("操作成功")
+        this.props.closeModal("dr_base_org_visible",false,"submit")
+        notification.success({
+            message:"操作成功"
+        })
     }
     //通过
     async passon(){
@@ -141,14 +143,34 @@ export default class OrgCheck extends Component {
             })
         });
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
-        this.props.closeModal("dr_base_org_visible",false)
     }
     //不通过
     async reject(){
         const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
-    }
+        const {actions:{logWorkflowEvent}} = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        notification.success({
+            message: "操作成功",
+            duration: 2
+        })
+    };
+
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -193,12 +215,26 @@ export default class OrgCheck extends Component {
             key: 'Direct',
         }, {
             title: '负责项目/子项目名称',
-            dataIndex: 'selectPro',
-            key: 'SelectPro',
+            render:(text, record, index) => {
+                let nodes = [];
+                if (record.selectPro) {
+                    record.selectPro.map(item => {
+                        nodes.push(<p>{item}</p>);
+                    })
+                }
+                return nodes;
+            }
         }, {
             title: '负责单位工程名称',
-            dataIndex: 'selectUnit',
-            key: 'SelectUnit'
+            render:(text, record, index) => {
+                let nodes = [];
+                if (record.SelectUnit) {
+                    record.SelectUnit.map(item => {
+                        nodes.push(<p>{item}</p>);
+                    })
+                }
+                return nodes;
+            }
         }, {
             title: '备注',
             dataIndex: 'remarks',
@@ -206,15 +242,13 @@ export default class OrgCheck extends Component {
         }]
 		return (
             <Modal
-			title="组织机构信息审批表"
-			// key={Math.random()}
             visible={true}
+            onOk = {this.submit.bind(this)}
             width= {1280}
-            footer={null}
             onCancel = {this.props.closeModal.bind(this,"dr_base_org_visible",false)}
 			maskClosable={false}>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>新增部门审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
@@ -228,17 +262,6 @@ export default class OrgCheck extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {

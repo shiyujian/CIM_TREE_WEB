@@ -72,7 +72,6 @@ export default class SafetySpecialCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("Safety_Special_check_visible", false);
-        message.info("操作成功")
     }
 
     //通过

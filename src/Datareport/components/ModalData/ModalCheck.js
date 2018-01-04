@@ -67,8 +67,8 @@ export default class ModalCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("modal_check_visbile",false);
-        message.info("操作成功");
+        this.props.closeModal("modal_check_visbile",false,'submit');
+        notification.info({message:"操作成功"});
     }
 
     //通过
@@ -170,20 +170,48 @@ export default class ModalCheck extends Component {
         if(rst.result){
             notification.success({
                 message: '创建文档成功！',
-                duration: 2
+                
             });
         }else{
             notification.error({
                 message: '创建文档失败！',
-                duration: 2
+               
             });
         }
     }
     //不通过
-    async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+    // async reject(){
+    //     const {wk} = this.props
+    //     const {actions:{deleteWorkflow}} = this.props
+    //     await deleteWorkflow({pk:wk.id})
+    // }
+
+      //不通过
+      async reject() {
+        const { wk, } = this.state;
+        const { actions: { logWorkflowEvent, } } = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null
+            }
+        );
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
     }
 
     //预览
@@ -272,7 +300,7 @@ export default class ModalCheck extends Component {
 			onCancel={this.cancel.bind(this)}
 			>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>填报审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}

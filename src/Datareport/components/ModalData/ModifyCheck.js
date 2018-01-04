@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions} from '../../store/ModalData';
 import {actions as platformActions} from '_platform/store/global';
-import { Modal, Input, Form, Button, message, Table, Radio, Row, Col,DatePicker,Select } from 'antd';
+import { Modal, Input, Form, Button, message, Table, Radio, Row, Col,DatePicker,Select,notification } from 'antd';
 import WorkflowHistory from '../WorkflowHistory'
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import {getUser} from '_platform/auth';
@@ -78,8 +78,8 @@ export default class ModifyCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("modify_check_visbile", false);
-        message.info("操作成功");
+        this.props.closeModal("modify_check_visbile", false,'submit');
+        notification.info({message:"操作成功"});
     }
 
     //通过
@@ -183,17 +183,46 @@ export default class ModifyCheck extends Component {
         Promise.all(all)
             .then(rst => {
                
-                message.success('修改文档成功！');
+                notification.success({message:'修改文档成功！'});
             })
 
     }
    
-    //不通过
-    async reject() {
-        const { wk } = this.props
-        const { actions: { deleteWorkflow } } = this.props
-        await deleteWorkflow({ pk: wk.id })
+    // //不通过
+    // async reject() {
+    //     const { wk } = this.props
+    //     const { actions: { deleteWorkflow } } = this.props
+    //     await deleteWorkflow({ pk: wk.id })
+    // }
+
+      //不通过
+      async reject() {
+        const { wk, } = this.state;
+        const { actions: { logWorkflowEvent, } } = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null
+            }
+        );
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
     }
+
     onChange(e) {
         this.setState({ option: e.target.value })
     }
@@ -291,7 +320,7 @@ export default class ModifyCheck extends Component {
                 onCancel={this.cancel.bind(this)}
 
             >
-                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>变更审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}

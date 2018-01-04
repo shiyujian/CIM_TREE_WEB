@@ -51,8 +51,10 @@ export default class SumSpeedExamineChange extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_sum_change_visible",false);
-        message.success("操作成功");
+        this.props.closeModal("cost_sum_change_visible",false,'submit');
+        notification.success({
+            message:'操作成功'
+        })
     }
 
     //通过
@@ -87,9 +89,27 @@ export default class SumSpeedExamineChange extends Component {
     }
     //不通过
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const {wk} = this.state;
+        // const {actions:{deleteWorkflow}} = this.props
+        // await deleteWorkflow({pk:wk.id})
+        const { actions:{ logWorkflowEvent }} = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            },{
+                state:wk.current[0].id,
+                executor:executor,
+                action:'退回',
+                note:'不通过',
+                attachment:null
+            }
+        );
     }
     onChange(e){
         this.setState({option:e.target.value})
@@ -102,7 +122,6 @@ export default class SumSpeedExamineChange extends Component {
             {
               title: "序号",
               dataIndex: "key",
-              width:"5%",
               render: (text, record, index) => {
                 return index + 1;
               }
@@ -132,19 +151,17 @@ export default class SumSpeedExamineChange extends Component {
             },
             {
               title: "备注",
-              dataIndex: "remarks",
-              width:"5%"
+              dataIndex: "remarks"
             },]
 		return (
             <Modal
-			title="结算进度信息变更审批表"
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}
             onCancel={this.cancel.bind(this)}
             >
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结算进度变更审核</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>变更审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -155,17 +172,17 @@ export default class SumSpeedExamineChange extends Component {
                     <Col span={2}>
                         <span>审查意见：</span>
                     </Col>
-                    <Col span={4}>
+                    <Col span={6}>
                         <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
                             <Radio value={1}>通过</Radio>
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
+                    {/* <Col span={2} push={14}>
                         <Button type='primary'>
                             导出表格
                         </Button>
-                    </Col>
+                    </Col> */}
                     <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
