@@ -51,7 +51,7 @@ export default class PriceRmCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_pri_rm_visible",false);
+        this.props.closeModal("cost_pri_rm_visible",false, 'submit');
         notification.success({
             message:'操作成功',
             duration: 2
@@ -118,7 +118,6 @@ export default class PriceRmCheck extends Component {
             message: '操作成功！',
             duration: 2
         });
-        debugger;
     }
     //radio变化
     onChange(e){
@@ -160,6 +159,11 @@ export default class PriceRmCheck extends Component {
         document.body.removeChild(link);
     }
 
+    cancel() {
+        this.props.closeModal("cost_pri_rm_visible", false)
+    }
+
+
 	render() {
       const  columns = 
         [{
@@ -200,6 +204,7 @@ export default class PriceRmCheck extends Component {
 				visible = {true}
                 maskClosable={false}
                 footer = {null}
+                onCancel={this.cancel.bind(this)}
 			>
 				<div>
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
@@ -228,12 +233,12 @@ export default class PriceRmCheck extends Component {
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
+                    {/* <Col span={2} push={14}>
                         <Button type='primary' onClick={this.getExcel.bind(this)}>
                             导出表格
                         </Button>
-                    </Col>
-                    <Col span={2} push={14}>
+                    </Col> */}
+                    <Col span={2} push={16}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
                         </Button>
@@ -242,8 +247,8 @@ export default class PriceRmCheck extends Component {
                 </Row>
                 {
                     this.state.dataSource[0] && this.state.dataSource[0].deleteInfoNew && <Row>
-                        <Col span={4}>
-                            申请删除原因:{this.state.dataSource[0].deleteInfoNew}
+                        <Col span={4} style={{padding: "10px 0"}}>
+                            申请删除原因 ：<span style={{"marginLeft":"20px"}}>{this.state.dataSource[0].deleteInfoNew}</span>
                             <br/>
                         </Col>
                     </Row>

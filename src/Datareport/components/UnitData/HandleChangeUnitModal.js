@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { actions as platformActions } from '_platform/store/global';
 import { actions } from '../../store/UnitData';
 import { actions as actions2 } from '../../store/quality';
-import { Input, Col, Card, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, message } from 'antd';
+import { Input, Col, Card, Table, Row, Button, DatePicker, Radio, Select, Popconfirm, Modal, Upload, Icon, notification } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
@@ -48,11 +48,13 @@ export default class HandelChangeUnitModal extends Component {
     async submit() {
         if (this.state.opinion === 1) {
             await this.passon();
-            this.props.closeModal("dr_change_unit_visible", false);
         } else {
             await this.reject();
         }
-        message.info("操作成功");
+        this.props.closeModal("dr_change_unit_visible", false, "submit");
+        notification.success({
+            message:"操作成功"
+        });
     }
     //通过
     async passon() {
@@ -136,9 +138,28 @@ export default class HandelChangeUnitModal extends Component {
     }
     //不通过
     async reject() {
-        const { wk } = this.props
-        const { actions: { deleteWorkflow } } = this.props
-        await deleteWorkflow({ pk: wk.id })
+        const {wk} = this.props
+        const {actions:{logWorkflowEvent}} = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '拒绝',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        notification.success({
+            message: "操作成功",
+        })
     }
     //预览
     handlePreview(index) {
@@ -231,13 +252,15 @@ export default class HandelChangeUnitModal extends Component {
         let projname = this.state.project ? this.state.project.name : '';
         return (
             <Modal
-                title="单位工程删除审批表"
                 visible={true}
                 width={1280}
-                footer={null}
-                maskClosable={false}>
+                maskClosable={false}
+                onCancel = {this.props.closeModal.bind(this,"dr_change_unit_visible", false)}
+                onOk = {this.submit.bind(this)}
+                >
+        
                 <div>
-                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>变更审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource || []}
@@ -256,17 +279,6 @@ export default class HandelChangeUnitModal extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
-                            <Preview />
                         </Col>
                     </Row>
                     {

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
+import {Table,Button,Popconfirm,notification,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
 import {getUser} from '_platform/auth';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -72,11 +72,19 @@ export default class DelModal extends Component {
         return (
             <Modal
                 onCancel={this.props.onCancel}
-                title="单位工程删除申请表"
+                onOk = {()=>{
+                    if(!this.state.passer){
+                        notification.warning({
+                            message:"请选择审核人"
+                        })
+                        return;
+                    }
+                    this.delWF();
+                }}
                 visible={true}
                 width={1280}
-                footer={null}
                 maskClosable={false}>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>申请删除</h1>
                 <Table
                     columns={this.columns}
                     bordered={true}
@@ -93,19 +101,6 @@ export default class DelModal extends Component {
                     </Select>
 
                 </span>
-                <Button
-                onClick = {
-                    ()=>{
-                        if(!this.state.passer){
-                            message.error('未选择审核人');
-                            return;
-                        }
-                        this.delWF();
-                    }
-                }
-                type='primary' >
-                    提交
-                </Button>
             </Modal>
         )
     }
@@ -157,7 +152,7 @@ export default class DelModal extends Component {
           title:'附件',
           key:'file',
           render:(record) => (
-                <a> {record.files?record.files[0].name:'暂无'}</a>
+                <a> {record.file?record.file.name:'暂无'}</a>
           )
       }]
 }

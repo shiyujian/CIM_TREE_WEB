@@ -19,14 +19,13 @@ export default class Filter extends Component {
 
     render() {
         const {actions: {toggleAddition},Doc = []} = this.props;
-        console.log(66666,Doc);
         return (
             <Form style={{marginBottom: 24}}>
                 <Row gutter={24}>
                     <Col span={14}>
                         <FormItem>
                             <Search placeholder="输入内容"
-                                    onSearch={this.query.bind(this)}/>
+                                    onSearch={this.search.bind(this)}/>
                         </FormItem>
                     </Col>
                 </Row>
@@ -51,13 +50,16 @@ export default class Filter extends Component {
         );
     }
 
-    query(value){
-        console.log(value);
-        const {actions:{getdocument},currentcode={}} =this.props;
-        let search = {
-	        doc_name:value
-        };
-	    getdocument({code:currentcode.code},search);
+    // query(value){
+    //     console.log(value);
+    //     const {actions:{getdocument},currentcode={}} =this.props;
+    //     let search = {
+	//         doc_name:value
+    //     };
+	//     getdocument({code:currentcode.code},search);
+    // }
+    search(value){
+        this.props.query(value);
     }
 
     createLink = (name, url) => {    //下载
@@ -83,7 +85,6 @@ export default class Filter extends Component {
                 files.push(cot.download_url)
             })
         });
-        console.log('files',files);
         files.map(down =>{
             let down_load = STATIC_DOWNLOAD_API + "/media"+down.split('/media')[1];
             this.createLink(this,down_load);

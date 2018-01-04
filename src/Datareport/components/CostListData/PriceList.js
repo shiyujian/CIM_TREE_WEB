@@ -380,6 +380,14 @@ export default class PriceList extends Component {
     asyncVerify (index, key, record) {
         let {actions: {verifyCode}} = this.props;
         return async (code) => {
+            code = code.trim();
+            if(!code.length){
+                notification.warning({
+                    message:'编码不能为空',
+                    duration: 2
+                });
+                return;
+            }
             const { dataSource } = this.state;
             let codeArr = dataSource.map(data => data[key]+'');
             codeArr[index-1] = code+'';

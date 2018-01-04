@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Icon, Modal, Upload, Select, Divider } from 'antd';
+import { Table, Button, Popconfirm, notification, Input, Icon, Modal, Upload, Select, Divider, Row, Col } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API } from '_platform/api';
 import { getUser } from '_platform/auth';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -7,6 +7,8 @@ import { WORKFLOW_CODE } from '_platform/api';
 import ECCB from '../EditCellWithCallBack';
 var moment = require('moment');
 const Search = Input.Search;
+const TextArea = Input.TextArea;
+
 const { Option } = Select
 export default class SubmitChangeUnitModal extends Component {
     constructor(props) {
@@ -20,7 +22,8 @@ export default class SubmitChangeUnitModal extends Component {
         });
         console.log(ds);
         this.state = {
-            dataSource: ds
+            dataSource: ds,
+            description:""
         };
     }
     componentDidMount() {
@@ -48,7 +51,7 @@ export default class SubmitChangeUnitModal extends Component {
         let postdata = {
             name: "单位工程批量变更申请",
             code: WORKFLOW_CODE["数据报送流程"],
-            description: "单位工程批量变更申请",
+            description: this.state.description,
             subject: [{
                 data: JSON.stringify(this.state.dataSource)
             }],
@@ -63,7 +66,7 @@ export default class SubmitChangeUnitModal extends Component {
                 {
                     state: rst.current[0].id,
                     action: '提交',
-                    note: '单位工程批量变更申请',
+                    note: this.state.description,
                     executor: creator,
                     next_states: [{
                         participants: [this.state.passer],
@@ -74,16 +77,40 @@ export default class SubmitChangeUnitModal extends Component {
                 });
         });
         this.props.onCancel();
+        notification.success({
+            message:"流程发起成功"
+        })
     }
+    description(e) {
+		this.setState({description:e.target.value})
+	}
     render() {
         return (
             <Modal
                 onCancel={this.props.onCancel}
-                title="单位工程批量变更申请"
                 visible={true}
                 width={1280}
-                footer={null}
+                // footer={null}
+                onOk = {() => {
+                    if (!this.state.passer) {
+                        notification.warning({
+                            message:"请选择审核人"
+                        })
+                        return;
+                    }
+                    let err = this.state.dataSource.some(data => {
+                        return data.error;
+                    });
+                    if (err) {
+                        notification.warning({
+                            message:"表格数据有错误"
+                        })
+                        return;
+                    }
+                    this.submit();
+                }}
                 maskClosable={false}>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>申请变更</h1>
                 <Table
                     columns={this.columns}
                     bordered={true}
@@ -99,20 +126,11 @@ export default class SubmitChangeUnitModal extends Component {
                         }
                     </Select>
                 </span>
-                <Button onClick={() => {
-                    if (!this.state.passer) {
-                        message.error('未选择审核人');
-                        return;
-                    }
-                    let err = this.state.dataSource.some(data => {
-                        return data.error;
-                    });
-                    if (err) {
-                        message.error('表格数据有错误');
-                        return;
-                    }
-                    this.submit();
-                }} type="primary" >提交</Button>
+                <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea placeholder="变更原因" rows={2} onChange={this.description.bind(this)}/>
+				    </Col>
+			    </Row>
             </Modal>
         )
     }

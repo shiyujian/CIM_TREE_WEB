@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Select, Button, Input, message} from 'antd';
+import {Select, Button, Input, notification} from 'antd';
 import './index.less';
 import {getAllUsers} from './commonFunc';
 const TextArea = Input.TextArea;
@@ -49,7 +49,10 @@ export default class ChangeFooter extends Component{
     onSubmit = ()=>{
         const {selectUser,description} = this;
         if(!selectUser){
-            message.error("请选择审核人！");
+            notification.warning({
+                message: '请选择审核人！',
+                duration: 2
+            });
             return
         }
         
