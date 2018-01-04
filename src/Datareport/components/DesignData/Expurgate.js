@@ -106,16 +106,14 @@ export default class Expurgate extends Component {
 			 key={expurgate.key}
 			 width = {1280}
 			 visible = {expurgate.visible}
-			 title="设计信息申请删除表"
+			 onOk={this.onok.bind(this)}
 			 maskClosable={false}
 			 onCancel = {this.cancel.bind(this)}
-			 footer={null}
+			
 			>
-				<Row style={{margin: '20px 0', textAlign: 'center'}}>
-					<h2>申请表删除页面</h2>
-				</Row>
+				<h1 style={{ textAlign: 'center', marginBottom: 20 }}>申请删除</h1>
 				<Row>
-					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
+					<Table 
 					 bordered 
 					 columns={columns}
 					 rowKey='index' 
@@ -134,7 +132,7 @@ export default class Expurgate extends Component {
                             }
                         </Select>
                     </span> 
-						<Button type="default" onClick={this.onok.bind(this)}>提交申请</Button>
+						{/* <Button type="default" onClick={this.onok.bind(this)}>提交申请</Button> */}
 					</Col>
 				</Row>
 				<Row style={{marginBottom: '20px'}}>

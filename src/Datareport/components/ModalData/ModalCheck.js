@@ -68,7 +68,7 @@ export default class ModalCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("modal_check_visbile",false);
-        message.info("操作成功");
+        notification.info({message:"操作成功"});
     }
 
     //通过
@@ -170,12 +170,12 @@ export default class ModalCheck extends Component {
         if(rst.result){
             notification.success({
                 message: '创建文档成功！',
-                duration: 2
+                
             });
         }else{
             notification.error({
                 message: '创建文档失败！',
-                duration: 2
+               
             });
         }
     }
@@ -272,7 +272,7 @@ export default class ModalCheck extends Component {
 			onCancel={this.cancel.bind(this)}
 			>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>填报审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}

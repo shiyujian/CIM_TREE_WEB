@@ -262,16 +262,15 @@ export default class Check extends Component {
         }]
 		return (
             <Modal
-			title="检验批信息审批表"
-            visible={true}
+			visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}
 			onCancel={this.cancel.bind(this)}
 			>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
-                    <Table style={{ marginTop: '10px', marginBottom:'10px' }}
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>填报审核</h1>
+                    <Table 
                         columns={columns}
                         dataSource={this.state.dataSource}
                         bordered />

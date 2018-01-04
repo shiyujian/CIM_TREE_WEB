@@ -58,16 +58,16 @@ export default class Addition extends Component {
             const { unit } = this.state;
             if (!unit.code) {
                 notification.warning({
-                    message: '先选择单位工程！',
-                    duration: 2
+                    message: '先选择单位工程！'
+                    // duration: 2
                 });
                 return false;
             }
             return true;
         } else {
             notification.warning({
-                message: '只能上传Excel文件！',
-                duration: 2
+                message: '只能上传Excel文件！'
+                // duration: 2
             });
             return false;
         }
@@ -137,7 +137,9 @@ export default class Addition extends Component {
             return !o.fdbfile.id
         })
         if (fdb) {
-            message.info(`有fdb模型未上传附件`)
+            notification.info({
+                message:'有fdb模型未上传附件!'
+            })
             return
         }
 
@@ -145,7 +147,9 @@ export default class Addition extends Component {
             return !o.tdbxfile.id
         })
         if (tdb) {
-            message.info(`有tdbx模型未上传附件`)
+            notification.info({
+                message:'有tdbx模型未上传附件'
+            })
             return
         }
 
@@ -153,23 +157,32 @@ export default class Addition extends Component {
             return !o.attributefile.id
         })
         if (attr) {
-            message.info(`有属性表未上传附件`)
+            notification.info({
+                message:'有属性表未上传附件'
+            })
             return
         }
 
         if (!this.state.check) {
-            message.info("请选择审核人")
+            notification.info({
+                message:"请选择审核人"
+            })
             return
         }
         if (this.state.dataSource.length === 0) {
-            message.info("请上传excel")
+            notification.info({
+                message:"请上传excel"
+            })
+                
             return
         }
 
 
         const { project, unit } = this.state;
         if (!project.name) {
-            message.info(`请选择项目和单位工程`);
+            notification.info({
+                message:'请选择项目和单位工程'
+            });
             return;
         }
 
@@ -224,7 +237,7 @@ export default class Addition extends Component {
                     }],
                     attachment: null
                 }).then(() => {
-                    message.success("成功")
+                    notification.success({message:"成功"})
                     clearAdditionField();
                 })
         })
@@ -251,7 +264,7 @@ export default class Addition extends Component {
                 if (wbs && wbs.children[0] && wbs.children[0].children[0] && wbs.children[0].children[0].code) {
 
                     if (wbs.children[0].children[0].code !== unit.code) {
-                        message.info("您的第" + i + "条编码输入有误，请确认");
+                        notification.info({message:"您的第" + i + "条编码输入有误，请确认!"});
                         return;
                     }
                 } else {
@@ -358,7 +371,7 @@ export default class Addition extends Component {
         fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
             resp = await resp.json()
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                notification.error({message:'文件上传失败'})
                 return;
             };
             const filedata = resp;
@@ -414,7 +427,7 @@ export default class Addition extends Component {
                 }
                 this.setState({ dataSource });
             } else {
-                message.info("提交单位错误,请重新输入")
+                notification.info({message:"提交单位错误,请重新输入"})
             }
         })
     }
@@ -600,7 +613,7 @@ export default class Addition extends Component {
                 maskClosable={false}
                 onCancel={this.cancel.bind(this)}
             >
-                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果预览</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>发起填报</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

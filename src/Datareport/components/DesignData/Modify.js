@@ -154,16 +154,13 @@ export default class Modify extends Component {
 			 key={modify.key}
 			 width = {1280}
 			 visible = {modify.visible}
-			 title="设计信息申请变更表"
+			 onOk={this.onok.bind(this)}
 			 maskClosable={false}
 			 onCancel = {this.cancel.bind(this)}
-			 footer={null}
-			>
-				<Row style={{margin: '20px 0', textAlign: 'center'}}>
-					<h2>申请表变更页面</h2>
-				</Row>
+			 >
+				<h1 style={{ textAlign: 'center', marginBottom: 20 }}>申请变更</h1>
 				<Row>
-					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
+					<Table 
 					 bordered 
 					 columns={columns}
 					 rowKey='index' 
@@ -182,7 +179,7 @@ export default class Modify extends Component {
                             }
                         </Select>
                     </span> 
-						<Button type="default" onClick={this.onok.bind(this)}>确认变更</Button>
+					
 					</Col>
 				</Row>
 				<Row style={{marginBottom: '20px'}}>

@@ -130,7 +130,7 @@ export default class Addition extends Component {
                         onConfirm={this.delete.bind(this, record.index-1)}
                         okText="确认"
                         cancelText="取消">
-                        <a>删除</a>
+                        <a><Icon type='delete' /></a>
                     </Popconfirm>
                 )
             }
@@ -161,15 +161,15 @@ export default class Addition extends Component {
 		return (
 			<Modal
 			 key={addition.key}
-			 title="设计信息上传表"
 			 width={1280}
 			 visible={addition.visible}
 			 maskClosable={false}
 			 onCancel={this.cancel.bind(this)}
-             footer={null}
+             onOk={this.onok.bind(this)}
 			>
+                <h1 style={{ textAlign: 'center', marginBottom: 20 }}>发起填报</h1>
 				<div>
-					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
+					<Table 
 					 bordered 
 					 columns={columns}
 					 rowKey='index' 
@@ -200,7 +200,7 @@ export default class Addition extends Component {
                         placeholder="请选择项目及子单位工程"
                       />
                     </span> 
-                    <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button>
+                    {/* <Button className="btn" type="primary" onClick={this.onok.bind(this)}>提交</Button> */}
 				</div>
 				<div style={{marginTop:20}}>
                     注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
