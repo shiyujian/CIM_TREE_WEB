@@ -72,7 +72,10 @@ export default class DesignCheckModal extends Component {
             await this.reject();
         }
         this.props.closeModal("dr_de_sj_visible", false);
-        message.info("操作成功");
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
     }
 
     //通过
@@ -132,15 +135,16 @@ export default class DesignCheckModal extends Component {
                 status: 'A',
                 profess_folder: { code: dir.code, obj_type: 'C_DIR' },
                 extra_params: {
-                    key:i,
+                    key: i,
                     code: item.code,
-                    volume:item.volume,
+                    volume: item.volume,
                     name: item.name,
                     major: item.major,
                     factovertime: item.factovertime,
                     factquantity: item.factquantity,
                     uploads: item.uploads,
                     designunit: item.designunit.name,
+                    remarks: item.remarks,
                     unit: item.unit.name,
                     project: item.project.name
                 },
@@ -163,7 +167,28 @@ export default class DesignCheckModal extends Component {
     async reject() {
         const { wk } = this.props
         const { actions: { deleteWorkflow } } = this.props
-        await deleteWorkflow({ pk: wk.id })
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            },
+            {
+                state:wk.current[0].id,
+                executor:executor,
+                action:"退回",
+                note:"不通过",
+                attachment:null
+            }
+        );
+        notification.success({
+            message:"操作成功!",
+            duration:2
+        })
     }
 
     onChange(e) {
@@ -173,7 +198,7 @@ export default class DesignCheckModal extends Component {
         const columns =
             [{
                 title: '序号',
-                dataIndex:"key"
+                dataIndex: "key"
             }, {
                 title: '编码',
                 dataIndex: 'code',
@@ -216,22 +241,24 @@ export default class DesignCheckModal extends Component {
                         {record.unit.name}
                     </span>
                 ),
-            },]
+            }, {
+                title:'备注',
+                dataIndex:'remarks',
+            }]
         return (
             <Modal
-                title="设计进度审批表"
                 visible={true}
                 width={1280}
                 footer={null}
                 maskClosable={false}
                 onCancel={this.oncancel.bind(this)}>
                 <div>
-                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>填报审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered 
-                        rowKey="key"/>
+                        bordered
+                        rowKey="key" />
                     <Row>
                         <Col span={2}>
                             <span>审查意见：</span>
@@ -241,11 +268,6 @@ export default class DesignCheckModal extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
                         </Col>
                         <Col span={2} push={14}>
                             <Button type='primary' onClick={this.submit.bind(this)}>

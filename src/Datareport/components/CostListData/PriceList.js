@@ -105,7 +105,10 @@ export default class PriceList extends Component {
             if(dataSource.some(item => {
                 return item.flag
             })) {
-                message.warn("清单项目编码错误")
+                notification.warning({
+                    message:'清单项目编码错误',
+                    duration: 2
+				});
             }
             dataSource = this.checkCodeRepeat(dataSource);
             this.setState({ dataSource, percent: 100, loading: false });
@@ -123,7 +126,10 @@ export default class PriceList extends Component {
                 }
             }
         }
-        repeatFlag && message.warn("清单项目编码重复");
+        repeatFlag && notification.warning({
+            message:'清单项目编码重复',
+            duration: 2
+        });
         return dataSource;
     }
 
@@ -186,27 +192,42 @@ export default class PriceList extends Component {
 	//ok
 	onok(){
         if(!this.state.dataSource.length) {
-            message.info("数据不能为空");
+            notification.warning({
+                message:'数据不能为空',
+                duration: 2
+            });
             return
         }
         if(!this.state.check){
-            message.info("请选择审核人")
+            notification.warning({
+                message:'请选择审核人',
+                duration: 2
+            });
             return
         }
         if(this.state.dataSource.length === 0){
-            message.info("请上传excel")
+            notification.warning({
+                message:'请上传excel',
+                duration: 2
+            });
             return
         }
         let flag = this.state.dataSource.some((o,index) => {
             return o.flag
         })
         if(flag) {
-            message.info("清单项目编码错误");
+            notification.warning({
+                message:'清单项目编码错误',
+                duration: 2
+            });
             return
         }
         const {project,unit} =  this.state;
         if(!project.name){
-            message.info(`请选择项目和单位工程`);
+            notification.warning({
+                message:'请选择项目和单位工程',
+                duration: 2
+            });
             return;
         }
 		let {check} = this.state
@@ -306,7 +327,10 @@ export default class PriceList extends Component {
         fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
             resp = await resp.json()
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                notification.error({
+                    message:'文件上传失败',
+                    duration: 2
+                });
                 return;
             };
             const filedata = resp;
@@ -360,13 +384,19 @@ export default class PriceList extends Component {
             let codeArr = dataSource.map(data => data[key]+'');
             codeArr[index-1] = code+'';
             if (codeArr.indexOf(code) !== codeArr.lastIndexOf(code)) {
-                message.warn("清单项目编码重复");
+                notification.warning({
+                    message:'清单项目编码重复',
+                    duration: 2
+                });
             } else {
                 let res = await verifyCode({code});
                 if(res === 'object not found') {
                     dataSource[index-1].flag = false;
                 }else {
-                    message.warn("清单项目编码错误");
+                    notification.warning({
+                        message:'清单项目编码错误',
+                        duration: 2
+                    });
                     dataSource[index-1].flag = true;
                 }
             }
@@ -554,7 +584,7 @@ export default class PriceList extends Component {
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
                 <div>
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果预览</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>发起填报</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

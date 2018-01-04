@@ -157,7 +157,7 @@ export default class VedioInfoTable extends Component{
                 {...popAttribute}
                 onConfirm={()=>{ this.deleteData(index) }}
                 >
-                    <a>删除</a>
+                    <a><Icon type="delete" /></a>
                 </Popconfirm>
             )
         }
