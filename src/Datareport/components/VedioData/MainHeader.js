@@ -34,7 +34,6 @@ export default class MainHeader extends Component{
         const {jsonToExcel,deriveData} = this.props;
         jsonToExcel({},{rows:deriveData()}).then(rst => {
             const url = `${NODE_FILE_EXCHANGE_API}/api/download/${rst.filename}`
-            //window.open(url)
             createLink(this,url);
         })
     }

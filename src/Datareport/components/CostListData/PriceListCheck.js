@@ -69,8 +69,11 @@ export default class PriceListCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_pri_ck_visible",false)
-        message.info("操作成功")
+        this.props.closeModal("cost_pri_ck_visible",false);
+        notification.success({
+            message:'操作成功',
+            duration: 2
+        });
     }
 
     //通过

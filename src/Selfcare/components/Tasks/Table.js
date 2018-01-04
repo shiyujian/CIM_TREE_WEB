@@ -59,7 +59,7 @@ export default class TaskTable extends Component {
 			title: '流转状态',
 			dataIndex: 'status',
 		}, {
-			title: '查看',
+			title: '操作',
 			render: (item) => {
 				const { id, state: { id: stateId = '' } = {} } = item;
 				return <Link to={`/selfcare/task/${id}?state_id=${stateId}`}>查看</Link>;
