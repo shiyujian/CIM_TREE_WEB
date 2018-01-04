@@ -154,6 +154,12 @@ export default class TableUnit extends Component {
         document.body.removeChild(link);
     }
 	getExcel(){
+		if (this.state.selectedRows.length === 0) {
+			notification.warning({
+				message:'请至少选择一条'
+			});
+			return;
+		}
 		console.log(this.state.showDs);
 		let exhead = ['单位工程编码','单位工程名称','所属项目名称','项目类型','项目阶段','单位红线坐标','计划开工日期','计划竣工日期','简介','建设单位','附件'];
 		let rows = [exhead];

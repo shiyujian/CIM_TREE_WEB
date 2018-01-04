@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Pagination, Spin, Progress } from 'antd';
+import { Table, Button, Popconfirm, notification, Input, Pagination, Spin, Progress } from 'antd';
 import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API, DataReportTemplate_ConstructionUnits, DataReportTemplate_Organization} from '_platform/api.js';
 import './TableOrg.less'
 const Search = Input.Search;
@@ -86,13 +86,17 @@ export default class TableOrg extends Component {
 			setUpdateOrg(newArr);
 			ModalVisibleUpdate(true)
 		}else{
-			message.warning("请先选中要变更的数据");
+			notification.warning({
+				message:"请先选中要变更的数据"
+			});
 		}
 	}
 	// 导出excel表格
 	getExcel(){
 		if (this.state.excelData.length === 0) {
-			message.warn("请先选中要导出的数据");
+			notification.warn({
+				message:"请先选中要导出的数据"
+			});
 			return;
 		}
 		let exhead = ['组织机构编码','组织机构类型','参建单位名称','组织机构部门','直属部门','负责项目/子项目名称','负责单位工程名称','备注'];
@@ -132,7 +136,9 @@ export default class TableOrg extends Component {
 			setDeleteOrg(this.state.selectData);
 			ModalVisibleDel(true);
 		}else{
-			message.warning("请先选中要删除的数据");
+			notification.warning({
+				message:"请先选中要删除的数据"
+			});
 		}
 	}
 	//下载
