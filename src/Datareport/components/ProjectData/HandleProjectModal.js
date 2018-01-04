@@ -58,9 +58,8 @@ export default class HPModal extends Component{
         this.setState({dataSource,wk,perSet});
     }
     async submit(){
-
-        if(this.state.radioValue !==1){
-            return;
+        if(this.state.opinion !==1){
+            await this.reject();
         }
         let {postProjectAc ,getProjectAc,postProjectListAc,postDocListAc} = this.props.actions;
         let projRoot = await getProjectAc();
@@ -206,6 +205,7 @@ export default class HPModal extends Component{
             message: "操作成功",
             duration: 2
         })
+        this.props.closeModal("dr_xm_xx_visible",false)
     };
     render(){ 
 

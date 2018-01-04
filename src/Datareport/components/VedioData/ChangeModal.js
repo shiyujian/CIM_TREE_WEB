@@ -30,15 +30,17 @@ export default class ChangeModal extends Component{
              width={1280}
              visible={changeModal}
              onCancel={()=>closeModal("changeModal")}
-             onOk={this.onOk.bind(this)}
+             footer={null}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请变更</h1>
+                <h1 style={{ textAlign: "center"}}>申请变更</h1>
                 <VedioTable
                  dataSource={dataSource}
                  storeData={this.storeData}
                  edit={true}
                 />
-                <ChangeFooter/>
+                <ChangeFooter
+                 onOk={this.onOk}
+                />
             </Modal>
         )
     }

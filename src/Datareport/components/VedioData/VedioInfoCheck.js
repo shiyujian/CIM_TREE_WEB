@@ -62,7 +62,7 @@ export default class VedioInfoCheck extends Component {
 			maskClosable={false}
             >
                 <Row type='flex' justify='center' >
-                    <h1 style={{ textAlign: "center", marginBottom: "20px" }}>{modalTitle[type]}</h1>
+                    <h1 style={{ textAlign: "center"}}>{modalTitle[type]}</h1>
                 </Row>
                 <VedioInfoTable
                  dataSource={dataSource}
