@@ -19,7 +19,6 @@ export default class MainHeader extends Component{
         return(
             <Row>
                 <Col span={24}>
-                    {/* <Button className="spacing" onClick={this.modalDownload} >模板下载</Button> */}
                     <Button className="spacing" onClick={()=>showModal("uploadModal")}>发起填报</Button>
                     <Button className="spacing" onClick={()=>{selectJudge() && showModal("changeModal")} }>申请变更</Button>
                     <Button className="spacing" onClick={()=>{selectJudge() && showModal("deleteModal")} }>申请删除</Button>

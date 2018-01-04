@@ -74,7 +74,6 @@ export default class ExpurgateCheck extends Component {
         });
         await Promise.all(all)
             .then(rst => {
-               
                 notification.success({ message: '删除成功！' });
             })
     }
@@ -102,7 +101,7 @@ export default class ExpurgateCheck extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null
             }

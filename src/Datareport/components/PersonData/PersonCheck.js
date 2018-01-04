@@ -133,7 +133,7 @@ export default class PersonCheck extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null,
             }
@@ -196,8 +196,9 @@ export default class PersonCheck extends Component {
         }, {
             title: '二维码',
             render:(record) => {
-                if(record.account.relative_signature_url !== '') {
-                    return <img style={{width: 60}} src={record.account.relative_signature_url}/>
+                console.log('record',record)
+                if(record.signature) {
+                    return <img style={{width: 60}} src={record.preview_url}/>
                 }else {
                     return <span>暂无</span>
                 }

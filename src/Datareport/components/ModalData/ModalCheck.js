@@ -203,7 +203,7 @@ export default class ModalCheck extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null
             }
