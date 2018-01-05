@@ -253,7 +253,7 @@ export default class Modify extends Component {
 		fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
 			resp = await resp.json()
 			if (!resp || !resp.id) {
-				notification.error({ message: '文件上传失败' })
+				notification.error({ message: '文件上传失败！' })
 				return;
 			};
 			const filedata = resp;
@@ -291,14 +291,14 @@ export default class Modify extends Component {
 	onok() {
 		let { dataSource } = this.state;
 		if (!this.state.check) {
-			notification.info({ message: "请选择审核人!" })
+			notification.info({ message: "请选择审核人！" })
 			return
 		}
 		let temp = dataSource.some((o, index) => {
 			return !o.file.id
 		})
 		if (temp) {
-			notification.info({ message: `有数据未上传附件` })
+			notification.info({ message: `有数据未上传附件！` })
 			return
 		}
 		let { check } = this.state
@@ -348,7 +348,7 @@ export default class Modify extends Component {
 					}],
 					attachment: null
 				}).then(() => {
-					notification.success({ message: "成功!" })
+					notification.success({ message: "成功" })
 					changeModifyField('visible', false);
 				})
 		})

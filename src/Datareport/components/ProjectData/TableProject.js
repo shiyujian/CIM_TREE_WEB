@@ -38,7 +38,7 @@ export default class TableProject extends Component {
 								return;
 							}
 							Notification.warning({
-								message: '请先选择数据'
+								message: '请先选择数据！'
 							});
 						}
 						}>申请变更</Button>
@@ -48,7 +48,7 @@ export default class TableProject extends Component {
 								return;
 							}
 							Notification.warning({
-								message: '请先选择数据'
+								message: '请先选择数据！'
 							});
 						}
 						}>申请删除</Button>
@@ -169,7 +169,7 @@ export default class TableProject extends Component {
 	getExcel() {
 		if (this.state.selectedRows && this.state.selectedRows.length === 0) {
 			Notification.warning({
-				message: '请先选择数据'
+				message: '请先选择数据！'
 			});
 			return;
 		}

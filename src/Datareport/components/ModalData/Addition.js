@@ -138,7 +138,7 @@ export default class Addition extends Component {
         })
         if (fdb) {
             notification.info({
-                message: '有fdb模型未上传附件!'
+                message: '有fdb模型未上传附件！'
             })
             return
         }
@@ -148,7 +148,7 @@ export default class Addition extends Component {
         })
         if (tdb) {
             notification.info({
-                message: '有tdbx模型未上传附件'
+                message: '有tdbx模型未上传附件！'
             })
             return
         }
@@ -158,20 +158,20 @@ export default class Addition extends Component {
         })
         if (attr) {
             notification.info({
-                message: '有属性表未上传附件'
+                message: '有属性表未上传附件！'
             })
             return
         }
 
         if (!this.state.check) {
             notification.info({
-                message: "请选择审核人"
+                message: "请选择审核人！"
             })
             return
         }
         if (this.state.dataSource.length === 0) {
             notification.info({
-                message: "请上传excel"
+                message: "请上传excel！"
             })
 
             return
@@ -181,7 +181,7 @@ export default class Addition extends Component {
         const { project, unit } = this.state;
         if (!project.name) {
             notification.info({
-                message: '请选择项目和单位工程'
+                message: '请选择项目和单位工程！'
             });
             return;
         }
@@ -264,7 +264,7 @@ export default class Addition extends Component {
                 if (wbs && wbs.children[0] && wbs.children[0].children[0] && wbs.children[0].children[0].code) {
 
                     if (wbs.children[0].children[0].code !== unit.code) {
-                        notification.info({ message: "您的第" + i + "条编码输入有误，请确认!" });
+                        notification.info({ message: "您的第" + i + "条编码输入有误，请确认！" });
                         return;
                     }
                 } else {
@@ -308,7 +308,7 @@ export default class Addition extends Component {
 
             }
             notification.success({
-                message: '上传成功！',
+                message: '上传成功',
                 duration: 2
             });
             this.setState({ dataSource });
@@ -369,7 +369,7 @@ export default class Addition extends Component {
         fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
             resp = await resp.json()
             if (!resp || !resp.id) {
-                notification.error({ message: '文件上传失败' })
+                notification.error({ message: '文件上传失败！' })
                 return;
             };
             const filedata = resp;
@@ -424,7 +424,7 @@ export default class Addition extends Component {
                 }
                 this.setState({ dataSource });
             } else {
-                notification.info({ message: "提交单位错误,请重新输入" })
+                notification.info({ message: "提交单位错误,请重新输入！" })
             }
         })
     }

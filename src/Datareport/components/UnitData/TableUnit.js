@@ -76,7 +76,7 @@ export default class TableUnit extends Component {
 								return;
 							}
 							notification.warning({
-								message:"请先选择数据"
+								message:"请先选择数据！"
 							});
 						}
 						}
@@ -87,11 +87,11 @@ export default class TableUnit extends Component {
 							return;
 						}
 						notification.warning({
-							message:'请先选择数据'
+							message:'请先选择数据！'
 						});
 					}} className={style.button}>申请删除</Button>
 					<Button onClick = {this.getExcel.bind(this)} className={style.button}>导出表格</Button>
-					<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容"
+					<Search className={style.button} style={{ width: "200px" }} placeholder="请单位工程编码或者名称"
 						onSearch={
 							(text) => {
 								let result = this.state.units.filter(data => {
@@ -157,7 +157,7 @@ export default class TableUnit extends Component {
 	getExcel(){
 		if (this.state.selectedRows && this.state.selectedRows.length === 0) {
 			notification.warning({
-				message:'请先选择数据'
+				message:'请先选择数据！'
 			});
 			return;
 		}
