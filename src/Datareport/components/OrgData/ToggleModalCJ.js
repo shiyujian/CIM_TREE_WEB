@@ -135,7 +135,8 @@ export default class ToggleModalCJ extends Component{
                         remarks: item[3],
                         color:item[4],
                         selectPro:[],
-                        selectUnit:[]
+                        selectUnit:[],
+                        editing:false
                     }
                 })
                 this.setState({
@@ -161,11 +162,20 @@ export default class ToggleModalCJ extends Component{
             });
             return;
         }
-        if (this.state.flag === false) {
-            notification.warning({
-                message:'不存在该直属部门'
-            });
-            return;
+        // if (this.state.flag === false) {
+        //     notification.warning({
+        //         message:'不存在该直属部门'
+        //     });
+        //     return;
+        // }
+        let arr = this.state.dataSource;
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i].color === "red") {
+                notification.warning({
+                    message: '不存在该机构类型'
+                });
+                return;
+            }
         }
         if (this.state.flag_code === false) {
             notification.warning({
@@ -295,6 +305,34 @@ export default class ToggleModalCJ extends Component{
             dataSource:data
         })
     }
+    changeType(record,e){
+        record.type = e.target.value;
+        const {actions:{getOrgReverse}} = this.props;
+        getOrgReverse({code:record.type}).then(rst => {
+            console.log("rst:",rst);
+            if (rst.code === "code") {
+                record.color = "red"
+            }else{
+                record.color = ""
+            }
+            this.forceUpdate();
+        })
+    }
+    changeCode(record,e){
+        record.code = e.target.value;
+        this.forceUpdate();
+        let codes = [];
+        this.state.dataSource.map(item => {
+            codes.push(item.code);
+        })
+        let repeatCode = this.isRepeat(codes);
+        if (repeatCode.length > 1) {
+            this.setState({ flag_code: false })
+        }else{
+            this.setState({ flag_code: true })
+        }
+        this.setState({repeatCode});
+    }
     columns = [{
         title: '序号',
         dataIndex: 'index',
@@ -302,6 +340,13 @@ export default class ToggleModalCJ extends Component{
     }, {
         title: '参建单位编码',
         render:(text,record,index) => {
+            if (record.editing === true) {
+                if (this.state.repeatCode.indexOf(record.code) !== -1 ) {
+                    return <Input value = {record.code} style={{"color":"red"}} onChange = {this.changeCode.bind(this,record)}/>
+                }else{
+                    return <Input value = {record.code} onChange = {this.changeCode.bind(this,record)}/>
+                }
+            }
             if (this.state.repeatCode.indexOf(record.code) !== -1 ) {
                 return <span style={{"color":"red"}}>{record.code}</span>
             }else{
@@ -311,12 +356,30 @@ export default class ToggleModalCJ extends Component{
     }, {
         title: '机构类型',
         render:(record) => {
-            return (<span style={{color:record.color || ""}}>{record.type}</span>)
+            if (record.editing) {
+                if (record.color === "red") {
+                    return <Input value={record.type} style={{"color":"red"}} onChange = {this.changeType.bind(this,record)}/>
+                }else{
+                    return <Input value={record.type} onChange={this.changeType.bind(this,record)}/>
+                }
+            }else{
+                return (<span style={{color:record.color || ""}}>{record.type}</span>)
+            }
         }
     }, {
         title: '参建单位名称',
-        dataIndex: 'canjian',
-        key: 'Canjian',
+        // dataIndex: 'canjian',
+        // key: 'Canjian',
+        render:(text, record, indexe) => {
+            if (record.editing) {
+                return <Input value={record.canjian} onChange={(e) => {
+                    record.canjian = e.target.value;
+                    this.forceUpdate();
+                }}/>
+            }else{
+                return <span>{record.canjian}</span>
+            }
+        }
     },{
         title: '负责项目/子项目名称',
         width:"15%",
@@ -367,24 +430,61 @@ export default class ToggleModalCJ extends Component{
         }
     }, {
         title: '备注',
-        dataIndex: 'remarks',
-        key: 'Remarks'
+        // dataIndex: 'remarks',
+        // key: 'Remarks'
+        render:(text, record, index) => {
+            if (record.editing) {
+                return <Input value={record.remarks} onChange={(e) => {
+                    record.remarks = e.target.value;
+                    this.forceUpdate();
+                }}/>
+            }else{
+                return <span>{record.remarks}</span>
+            }
+        }
     }, {
-        title: '删除',
-        render: (text, record, index) => (
-            <span>
-                {/* <Icon style={{marginRight:"15px"}} type = "edit"/> */}
-                {/* <span>|</span> */}
-                <Popconfirm 
-                    title="确认删除吗"
-                    onConfirm={this.delete.bind(this, index)}
-                    okText="确认"
-                    onCancel="取消"
-                >
-                    <a><Icon type = "delete" /></a>
-                </Popconfirm>
+        title: '操作',
+        // render: (text, record, index) => (
+        //     <span>
+        //         {/* <Icon style={{marginRight:"15px"}} type = "edit"/> */}
+        //         {/* <span>|</span> */}
+        //         <Popconfirm 
+        //             title="确认删除吗"
+        //             onConfirm={this.delete.bind(this, index)}
+        //             okText="确认"
+        //             onCancel="取消"
+        //         >
+        //             <a><Icon type = "delete" /></a>
+        //         </Popconfirm>
                 
-            </span>
-        )
+        //     </span>
+        // )
+        render: (text, record, index) => {
+            return <span>
+                        {record.editing ||
+                            <span>
+                                <a><Icon type="edit" onClick={(e) => {
+                                    record.editing = true
+                                    this.forceUpdate();
+                                 }} /></a>
+                                <Popconfirm
+                                    title="确认删除吗"
+                                    onConfirm={this.delete.bind(this, record.index - 1)}
+                                    okText="确认"
+                                    onCancel="取消"
+                                >
+                                    <span style={{ "margin": "7px" }}>|</span>
+                                    <a><Icon type="delete" /></a>
+                                </Popconfirm>
+                            </span>
+                        }
+                        {record.editing &&
+                            <a onClick={(e) => {
+                                record.editing = false
+                                this.forceUpdate();
+                            }}>完成</a>
+                        }
+                </span>
+    }
     }]
 }

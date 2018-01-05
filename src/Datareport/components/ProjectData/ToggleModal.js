@@ -63,7 +63,7 @@ export default class ToggleModal extends Component{
                 </Button>
                 <Upload {...props}>
                     <Button style={{ margin: '10px 10px 10px 0px' }}>
-                        <Icon type="upload" />上传附件
+                        <Icon type="upload" />上传并预览
                      </Button>
                 </Upload>
                 <span>
