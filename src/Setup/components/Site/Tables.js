@@ -7,9 +7,7 @@ export default class Tables extends Component {
 
 	render() {
 		const tableList = this.props.tableList||[];
-		// console.log("this.props",this.props);
 		_tmpList=tableList;
-		// console.log("tableList",tableList);
 		let arrList= Tables.dataLoop(_tmpList); 
 		console.log('arrList',arrList)
 		return (
@@ -20,22 +18,21 @@ export default class Tables extends Component {
 		);
 	}
 	//过滤掉工程部位数据
-	static dataLoop(data){
-			data.map((item)=>{
-				const {obj_type, children = []} = item;
-				if(children && children.length && (obj_type === 'C_WP_PTR' || obj_type === 'C_WP_PTR_S' || obj_type === "C_LOC_PJ")){
-					item.children=children.filter(itm=>itm.obj_type !== 'C_WP_ITM');
-					children.filter(itm=>itm.obj_type !== 'C_WP_ITM').map((itm,idx)=>{
-						if(itm.children && itm.children.length){
-							children[idx].children=itm.children.filter(itm=>itm.obj_type !== 'C_WP_ITM')
-						}
-					})
-				}else{
-					Tables.dataLoop(children);
-				}
-			});
-			return data
-
+	static dataLoop(data) {
+		data.map((item) => {
+			const { obj_type, children = [] } = item;
+			if (children && children.length && (obj_type === 'C_WP_PTR' || obj_type === 'C_WP_PTR_S' || obj_type === "C_LOC_PJ")) {
+				item.children = children.filter(itm => itm.obj_type !== 'C_WP_ITM');
+				children.filter(itm => itm.obj_type !== 'C_WP_ITM').map((itm, idx) => {
+					if (itm.children && itm.children.length) {
+						children[idx].children = itm.children.filter(itm => itm.obj_type !== 'C_WP_ITM')
+					}
+				})
+			} else {
+				Tables.dataLoop(children);
+			}
+		});
+		return data
 	}
 
 	columns = [
