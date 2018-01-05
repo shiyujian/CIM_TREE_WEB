@@ -35,9 +35,7 @@ export default class HandelChangeProjModal extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props;
-        console.log(wk);
         let data = JSON.parse(wk.subject[0].data);
-        console.log(data);
         this.setState({dataSource:data,wk});
     }
     componentWillReceiveProps(props){
@@ -83,7 +81,6 @@ export default class HandelChangeProjModal extends Component {
             return rst;
         });
         let docList = this.state.dataSource.map(data=>{
-            console.log('data',data)
             let rst = {
                 code:data.related_documents[0].code,
                 version:'A',
@@ -108,12 +105,10 @@ export default class HandelChangeProjModal extends Component {
         let rst = await putProjectListAc({},{data_list:dataList});
         let docRst = await putDocListAc({},{data_list:docList});
         if(rst && rst.result && rst.result.length>0){
-            console.log(rst);
             await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         }
     }
     beforeUpload(record,file){
-        console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
@@ -179,7 +174,6 @@ export default class HandelChangeProjModal extends Component {
         this.setState({opinion:e.target.value})
     }
     beforeUpload(record,file){
-        console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
