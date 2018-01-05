@@ -51,10 +51,10 @@ class SafetyDoc extends Component {
         }
     }
     
-    download(){
-        let apiGet = `${DataReportTemplate_SafetyFile}`;
-        this.createLink(this,apiGet);
-    }
+    // download(){
+    //     let apiGet = `${DataReportTemplate_SafetyFile}`;
+    //     this.createLink(this,apiGet);
+    // }
     
     async componentDidMount(){
         const {actions:{
@@ -67,6 +67,7 @@ class SafetyDoc extends Component {
             if(dir.obj_type){
                 if(dir.stored_documents.length>0){
                     this.generateTableData(dir.stored_documents);
+                    this.setState({loading:true,percent:0,num:0});
                 }
             }
         }
@@ -95,7 +96,7 @@ class SafetyDoc extends Component {
                     pubUnit:single.extra_params.pubUnit,
                     upPeople:single.extra_params.upPeople,
                     type:single.extra_params.type,
-                    file:single.basic_params.files[0],
+                    file:single.basic_params.files[0], 
                     unit:single.extra_params.unit,
                     projectName:single.extra_params.project,
                     docCode:single.code
@@ -104,7 +105,7 @@ class SafetyDoc extends Component {
                 dataSource.push(temp);
             });
         }
-        this.setState({dataSource,loading:false});
+        this.setState({dataSource,loading:false,percent:100});
     }
 
 	goCancel = () =>{
@@ -152,7 +153,9 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-                        message.warning('发起流程成功');
+                        notification.success({
+                            message:'发起流程成功'
+                        })
 						this.setState({setEditVisiable:false})						
 					})
 		})
@@ -192,7 +195,9 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-                        message.warning('发起流程成功');
+                        notification.success({
+                            message:'发起流程成功'
+                        })
 						this.setState({setDeleteVisiable:false})						
 					})
 		})
@@ -232,7 +237,9 @@ class SafetyDoc extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-                        message.warning('发起流程成功');
+                        notification.success({
+                            message:'发起流程成功'
+                        })
 						this.setState({setAddVisiable:false})						
 					})
 		})
@@ -246,7 +253,9 @@ class SafetyDoc extends Component {
         }else if(type==="edit" && dataSourceSelected.length !== 0){
             this.setState({setEditVisiable:true});
         }else if(type!=="add" && dataSourceSelected.length===0){
-            message.warning('请先选择数据');
+            notification.warning({
+                message:'请先选择数据！'
+            })
         }
     }
     
@@ -311,7 +320,10 @@ class SafetyDoc extends Component {
             {
                 title:'文档编码',
                 dataIndex:'code',
-                width: '10%'
+                width: '10%',
+                render:(text,record,index)=>{
+                    return record.code ?record.code :'—'
+                }
             },{
                 title:'项目名称',
                 dataIndex:'projectName',
@@ -332,18 +344,30 @@ class SafetyDoc extends Component {
                 title:'版本号',
                 dataIndex:'type',
                 width: '10%',
+                render:(text,record,index)=>{
+                    return record.type ?record.type :'—'
+                }
             },{
                 title:'实施日期',
                 dataIndex:'doTime',
                 width: '10%',
+                render:(text,record,index)=>{
+                    return record.doTime ?record.doTime :'—'
+                }
             },{
                 title:'备注',
                 dataIndex:'remark',
                 width: '10%',
+                render:(text,record,index)=>{
+                    return record.remark ?record.remark :'—'
+                }
             },{
                 title:'提交人',
                 dataIndex:'upPeople',
                 width: '10%',
+                render:(text,record,index)=>{
+                    return record.upPeople ?record.upPeople :'—'
+                }
             }, {
                 title:'附件',
                 width:'10%',
@@ -362,10 +386,10 @@ class SafetyDoc extends Component {
 				<Content>
 				<Row style={{ marginBottom: "30px" }}>
                     <Col>
-                        <Button 
+                        {/* <Button 
                         style={{ marginRight: "30px" }}
                         onClick={()=>this.download()}
-                        >模板下载</Button>
+                        >模板下载</Button> */}
                         <Button 
                         style={{ marginRight: "30px" }}
                         onClick={()=>this.onBtnClick("add")}
@@ -394,7 +418,7 @@ class SafetyDoc extends Component {
                      bordered
                      rowSelection={rowSelection}
                      style={{height:180,marginTop:20}}
-                     loading={this.state.loading}
+                     loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
                     //  pagination={{defaultPageSize:5}}
 					 pagination = {{showQuickJumper:true,showSizeChanger:true}} 
 					/>
@@ -429,13 +453,15 @@ class SafetyDoc extends Component {
         const {actions:{jsonToExcel}} = this.props;
         const {dataSourceSelected} = this.state;
         if(dataSourceSelected.length === 0){
-        	message.warning('请先选择数据再导出')
+        	notification.warning({
+                message:'请先选择数据！'
+            })
         	return
         }
         let rows = [];
-        rows.push(this.header);
+        rows.push(["文档编码","项目名称","单位工程","文件名称","发布单位","版本号","实施日期","备注","提交人"]);
         dataSourceSelected.map(item => {
-            rows.push([item.code,item.remark,item.doTime,item.filename,item.pubUnit,item.upPeople,item.type,item.unit,item.projectName]);
+            rows.push([item.code,item.projectName,item.unit,item.filename,item.pubUnit,item.type,item.doTime,item.remark,item.upPeople]);
         })
         jsonToExcel({},{rows:rows})
         .then(rst => {
