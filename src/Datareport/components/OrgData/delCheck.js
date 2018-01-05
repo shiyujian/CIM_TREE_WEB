@@ -34,7 +34,6 @@ export default class DelCheck extends Component {
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        console.log("dataSource:",dataSource);
         this.setState({dataSource,wk})
     }
     componentWillReceiveProps(props){
@@ -64,7 +63,6 @@ export default class DelCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        console.log("dataSource",dataSource);
         let data_list = [];
         dataSource.map((item, index) => {
             data_list.push({
@@ -78,7 +76,6 @@ export default class DelCheck extends Component {
             })
         })
         deleteOrgList({},{data_list: data_list}).then(rst => {
-            console.log("rst:",rst);
         })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
     }

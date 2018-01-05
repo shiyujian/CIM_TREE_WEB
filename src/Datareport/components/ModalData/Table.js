@@ -248,7 +248,7 @@ export default class ModalTable extends Component {
 		const { modify = {}, actions: { changeModifyField } } = this.props;
 		const {selectedDataSource} = this.state;
 		if(selectedDataSource.length === 0){
-        	notification.warning({message:'请先选择数据!'})
+        	notification.warning({message:'请先选择数据！'})
         	return
         }
 		changeModifyField('visible', true)
@@ -260,7 +260,7 @@ export default class ModalTable extends Component {
 		const { expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		const {selectedDataSource} = this.state;
 		if(selectedDataSource.length === 0){
-        	notification.warning({message:'请先选择数据!'})
+        	notification.warning({message:'请先选择数据！'})
         	return
         }
 		changeExpurgateField('visible', true)
@@ -274,7 +274,7 @@ export default class ModalTable extends Component {
 		const { actions: { jsonToExcel } } = this.props;
 		const {selectedDataSource} = this.state;
 		if(selectedDataSource.length === 0){
-        	notification.warning({message:'请先选择数据!'})
+        	notification.warning({message:'请先选择数据！'})
         	return
         }
 		let rows = [];
