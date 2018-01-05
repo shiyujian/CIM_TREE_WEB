@@ -109,7 +109,7 @@ export default class AddFile extends Component {
                 if (rst && rst.children[0] && rst.children[0].children[0] && rst.children[0].children[0].code) {
                     if (rst.children[0].children[0].code !== unit.code) {
                         notification.error({
-                            message: '您输入的wbs编码有误！',
+                            message: '您输入的wbs编码与选择的单位工程不匹配！',
                             duration: 2,
                         });
                         return;
@@ -149,7 +149,7 @@ export default class AddFile extends Component {
             if (repeatCode.length > 1) {
                 this.setState({ iswbs: false })
                 notification.error({
-                    message: '您输入的wbs编码有误！',
+                    message: '您输入的wbs编码重复！',
                     duration: 2
                 });
             }
@@ -289,7 +289,7 @@ export default class AddFile extends Component {
         }
         if (this.state.iswbs === false) {
             notification.error({
-                message: '您输入的wbs编码有误！',
+                message: '您输入的wbs编码有重复！',
                 duration: 2
             });
             return;
@@ -480,7 +480,7 @@ export default class AddFile extends Component {
                     <Col>
                         <span>
                             审核人：
-                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)} placeholder='请选择审核人'>
                                 {
                                     this.state.checkers
                                 }

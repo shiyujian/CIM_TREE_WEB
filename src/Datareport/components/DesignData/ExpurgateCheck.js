@@ -49,7 +49,7 @@ export default class ExpurgateCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("design_expurgatecheck_visbile", false, 'submit')
-        notification.info({ message: "操作成功" })
+        notification.info({ message: "操作成功！" })
     }
     //通过
     async passon() {
@@ -74,7 +74,7 @@ export default class ExpurgateCheck extends Component {
         });
         await Promise.all(all)
             .then(rst => {
-                notification.success({ message: '删除成功！' });
+                notification.success({ message: '删除成功' });
             })
     }
     //不通过
@@ -107,7 +107,7 @@ export default class ExpurgateCheck extends Component {
             }
         );
         notification.success({
-            message: '操作成功！',
+            message: '操作成功',
             duration: 2
         });
     }

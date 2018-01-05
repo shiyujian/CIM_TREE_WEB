@@ -48,7 +48,6 @@ export default class DesignScheduleData extends Component {
 		if (topDir.obj_type) {
 			let dir = await getScheduleDir({ code: 'datareport_designdata_1111' });
 			if (dir.obj_type) {
-				this.setState({loading:true,percent:0,num:0})
 				if (dir.stored_documents.length > 0) {
 					this.generateTableData(dir.stored_documents);
 				}
@@ -60,7 +59,7 @@ export default class DesignScheduleData extends Component {
 		const { loading } = this.state;
 		let dataSource = [];
 		let i = 0;
-		
+		this.setState({loading:true,percent:0,num:0})
 		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
 				i++

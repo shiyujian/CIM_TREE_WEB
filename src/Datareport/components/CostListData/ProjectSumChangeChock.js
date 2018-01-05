@@ -86,10 +86,22 @@ export default class ProjectSumChangeChock extends Component {
     }
     //不通过
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
-        notification.error({message:"操作失败", duration: 2});
+        const {wk} = this.props;
+        const {actions:{deleteWorkflow,logWorkflowEvent}} = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent(
+            {pk:wk.id},{state:wk.current[0].id,action:'拒绝',note:'不通过',executor:executor,attachment:null}
+        )
+        notification.success({
+            message: '删除文档成功！',
+            duration: 2
+        });
     }
     onChange(e){
         this.setState({option:e.target.value})
@@ -101,36 +113,45 @@ export default class ProjectSumChangeChock extends Component {
         const columns = [
             {
               title: "序号",
-              dataIndex: "index",
+              dataIndex: "key",
+              key:'key',
               render: (text, record, index) => {
                 return index + 1;
               }
             },{
                 title: '项目/子项目',
                 dataIndex: 'subproject',
+                key:'subproject'
             }, {
                 title: '单位工程',
                 dataIndex: 'unit',
+                key:'unit'
             }, {
                 title: '清单项目编号',
                 dataIndex: 'projectcoding',
+                key:'projectcoding',
             }, {
                 title: '项目名称',
                 dataIndex: 'projectname',
+                key:'projectname',
             }, {
                 title: '计量单位',
                 dataIndex: 'company',
+                key:'company'
             }, {
                 title: '数量',
                 dataIndex: 'number',
+                key:'number'
             }, {
                 title: '综合单价(元)',
                 dataIndex: 'total',
+                key:'total'
             }, {
                 title: '备注',
                 dataIndex: 'remarks',
+                key:'remarks'
             }
-          ]
+        ]
 		return (
             <Modal
             visible={true}

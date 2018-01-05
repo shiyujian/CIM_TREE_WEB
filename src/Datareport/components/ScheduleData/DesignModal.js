@@ -23,6 +23,7 @@ class DesignModal extends Component {
             unit: {},
             options: [],
             isdesignunit: "",
+            isRepeatcode: "",
         };
     }
     componentDidMount() {
@@ -63,13 +64,28 @@ class DesignModal extends Component {
             return false;
         }
     }
+
+    //判断数据是否重复
+    isRepeat(arr) {
+        var hash = {};
+        let repeatCode = [];
+        for (var i in arr) {
+            if (hash[arr[i]]) {
+                repeatCode.push(arr[i])
+            }
+            hash[arr[i]] = true;
+        }
+        return repeatCode;
+    }
     uplodachange = async (info) => {
         const { actions: { getOrg } } = this.props;
         if (info && info.file && info.file.status === 'done') {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
+            let codes = [];
             for (let i = 1; i < dataList.length; i++) {
+                codes.push(dataList[i][0]);
                 let data = await getOrg({ code: dataList[i][5] });
                 if (!data.code) {
                     notification.error({
@@ -104,7 +120,15 @@ class DesignModal extends Component {
                     },
                 })
             }
-            this.setState({ dataSource });
+            let repeatCode = this.isRepeat(codes);
+            if (repeatCode.length > 1) {
+                this.setState({ isRepeatcode: false })
+                notification.error({
+                    message: '您输入的编码有重复！',
+                    duration: 2
+                });
+            }
+            this.setState({ repeatCode, dataSource });
             notification.success({
                 message: '上传成功！',
                 duration: 2
@@ -245,6 +269,13 @@ class DesignModal extends Component {
             });
             return;
         }
+        if (this.state.isRepeatcode === false) {
+            notification.error({
+                message: '您输入的编码有重复！',
+                duration: 2
+            });
+            return;
+        }
 
         let { check } = this.state
         let per = {
@@ -288,6 +319,18 @@ class DesignModal extends Component {
                 title: '编码',
                 dataIndex: 'code',
                 key: "code",
+                render: (text, record, index) => {
+
+                    if (this.state.repeatCode.indexOf(record.code) != -1) {
+                        return (
+                            <span style={{ "color": "red" }}>{record.code}</span>
+                        )
+                    } else {
+                        return (
+                            <span>{record.code}</span>
+                        )
+                    }
+                }
             }, {
                 title: '卷册',
                 dataIndex: 'volume',
@@ -410,7 +453,7 @@ class DesignModal extends Component {
                     <Col>
                         <span>
                             审核人：
-                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)} placeholder='请选择审核人'>
                                 {
                                     this.state.checkers
                                 }

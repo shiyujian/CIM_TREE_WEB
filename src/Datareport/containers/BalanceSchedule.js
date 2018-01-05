@@ -315,7 +315,7 @@ export default class BalanceSchedule extends Component {
 			this.setState({ changevisible: true });
 		} else {
 			notification.warning({
-				message:'请先选择数据'
+				message:'请先选择数据！'
 			})
 		}
   }
@@ -326,7 +326,7 @@ export default class BalanceSchedule extends Component {
 			this.setState({ deletevisible: true });
 		} else {
 			notification.warning({
-				message:'请先选择数据'
+				message:'请先选择数据！'
 			})
 		}
   }
@@ -347,7 +347,7 @@ export default class BalanceSchedule extends Component {
       })
 		} else { 
 			notification.warning({
-				message:'请先选择数据'
+				message:'请先选择数据！'
 			})
 		}
   }

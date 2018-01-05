@@ -57,7 +57,6 @@ export default class OrgCheck extends Component {
     //通过
     async passon(){
         const {dataSource,wk} = this.state
-        console.log("dataSource:",dataSource); 
         const {actions:{logWorkflowEvent, updateWpData, addDocList, putDocList, postOrgList, getOrgRoot, putUnit, putProject, getProject, getUnitAc, getUnit, getOrgPk}} = this.props
         let executor = {};
         let person = getUser();
@@ -74,7 +73,6 @@ export default class OrgCheck extends Component {
         });
         let rst = await Promise.all(promises);
         dataSource.map((o, index) => {
-            console.log("o.direct:"+o.direct)
             data_list.push({
                 code: "" + o.code,
                 name: o.depart,
@@ -96,7 +94,6 @@ export default class OrgCheck extends Component {
                 }
             })
         })
-        console.log("datalist:",data_list);
         await postOrgList({}, { data_list: data_list }).then(res => {
             dataSource.map((item, index) => {
                 if (item.selectPro.length !== 0) {
@@ -115,7 +112,6 @@ export default class OrgCheck extends Component {
                                 version: "A",
                                 response_orgs: pro_orgs
                             }).then(rst => {
-                                console.log("rst:", rst);
                             }) 
                         });
                     }) 
@@ -135,7 +131,6 @@ export default class OrgCheck extends Component {
                                 version: "A",
                                 response_orgs: unit_orgs
                             }).then(rst => {
-                                console.log("rst:", rst);
                             }) 
                         })
                     })
