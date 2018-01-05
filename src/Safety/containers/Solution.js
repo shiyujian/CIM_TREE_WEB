@@ -78,7 +78,7 @@ class Solution extends Component {
             }
             getScheduleDir(getDirData).then((rst) => {
                 if (rst && rst.obj_type) {
-                    console.log('存在目录', rst)
+                    // console.log('vip-存在目录', rst);
                     this.setState({
                         totalDir: {
                             pk: rst.pk,
@@ -87,9 +87,9 @@ class Solution extends Component {
                         }
                     })
                 } else {
-                    console.log('不存在目录', rst)
+                    // console.log('vip-不存在目录', rst)
                     postScheduleDir({}, postDirData).then((value) => {
-                        console.log('创建目录', value)
+                        // console.log('vip-创建目录', value)
                         this.setState({
                             totalDir: {
                                 pk: value.pk,
@@ -105,7 +105,7 @@ class Solution extends Component {
 
     onViewClick(record, index) {
         const { actions: { openPreview } } = this.props;
-        debugger
+        // debugger
         let filed = {};
         filed.misc = record.attachment.misc;
         filed.a_file = `${SOURCE_API}` + (record.attachment.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -177,7 +177,7 @@ class Solution extends Component {
             "extra_params": {},
             "parent": { "pk": totalDir.pk, "code": totalDir.code, "obj_type": totalDir.obj_type }
         }
-        debugger; // 
+        // debugger; // 
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 getScheduleDir({ code: code }).then((rst) => {
@@ -363,7 +363,7 @@ class Solution extends Component {
         } else {
             return;
         }
-        debugger
+        // debugger
         let code = "safety_solution_dir_" + project.code;
         let dataSet = [];
         getDocumentByCode({ code: code }).then((rep) => {
@@ -468,7 +468,10 @@ class Solution extends Component {
                 <DynamicTitle title="专项方案" {...this.props} />
                 <Sidebar>
                     <div style={{ overflow: 'hidden' }} className="project-tree">
-                        <ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)} />
+                        <ProjectUnitWrapper 
+                        {...this.props} 
+                        onSelect={this.onSelect.bind(this)} 
+                        />
                     </div>
                 </Sidebar>
                 <Content>

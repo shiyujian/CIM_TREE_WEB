@@ -10,7 +10,7 @@ import DefectModal from '../components/Quality/DefectModal';
 import EditFile from '../components/Quality/EditFile';
 import DeleteFile from '../components/Quality/DeleteFile';
 import './quality.less'
-import {WORKFLOW_CODE} from '_platform/api.js';
+import {WORKFLOW_CODE,STATIC_DOWNLOAD_API,SOURCE_API,NODE_FILE_EXCHANGE_API} from '_platform/api.js';
 import {getNextStates} from '_platform/components/Progress/util';
 const Search = Input.Search;
 var moment = require('moment');
@@ -295,8 +295,8 @@ export default class Defect extends Component {
             searchDocument,
         }} = this.props;
         const param = {
-            docCode:'hiddenDanger',
-            keys:'wbs',
+            docCode:'quality_defect',
+            keys:'code',
             values:value
         }
         let result = await searchDocument(param);
@@ -349,10 +349,6 @@ export default class Defect extends Component {
                         <Col>
                             <Button 
                             style={{ marginRight: "30px" }}
-                            onClick={()=>this.download()}
-                            >模板下载</Button>
-                            <Button 
-                            style={{ marginRight: "30px" }}
                             onClick={()=>this.onBtnClick("add")}
                             >发起填报</Button>
                             <Button 
@@ -397,4 +393,48 @@ export default class Defect extends Component {
 			</div>
 		);
 	}
+	//下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    //数据导出
+    getExcel(){
+        const {actions:{jsonToExcel}} = this.props;
+        const {dataSourceSelected} = this.state;
+        if(dataSourceSelected.length === 0){
+        	notification.warning({
+				message: '请先选择数据',
+				duration: 2
+			});
+        	return
+        }
+        let rows = [];
+        rows.push(this.header);
+        dataSourceSelected.map(item => {
+            rows.push([item.code,
+                item.projectName,
+                item.unit,
+                item.code,
+                item.respon_unit,
+                item.acc_type,
+                item.uploda_date,
+                item.check_date,
+                item.do_date,
+                item.descrip,
+                item.check_result,
+                item.deadline,
+                item.result]);
+        })
+        jsonToExcel({},{rows:rows})
+        .then(rst => {
+            console.log(NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+            this.createLink(this,NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
+        })
+    }
 }

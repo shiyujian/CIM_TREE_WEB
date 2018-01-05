@@ -15,11 +15,6 @@ export default class UploadFooter extends Component{
             checkUsers: [],
             options: []
         }
-        Object.assign(this,{    //不需要从新render的数据
-            excelUpload: false,
-            selectUser: null,
-            project: false
-        })
     }
 
     async componentDidMount(){
@@ -60,7 +55,6 @@ export default class UploadFooter extends Component{
                     <div className="inlineBlock">项目-单位工程：</div>
                     <Cascader
                         options={options}
-                        //className='btn'
                         loadData={this.loadData}
                         onChange={this.onChange}
                         placeholder={"请选择项目-单位工程"}
@@ -126,9 +120,6 @@ export default class UploadFooter extends Component{
                 sourceData.shift();
                 
                 storeExcelData(sourceData);
-                Object.assign(this,{
-                    excelUpload: true
-                })
                 notification.success({
                     message: `${name}上传成功！`,
                     duration: 2
@@ -143,35 +134,8 @@ export default class UploadFooter extends Component{
     }
 
     selectCheckUser = (value)=>{
-        this.selectUser = JSON.parse(value);
-    }
-
-    onSubmit = ()=>{
-        const {excelUpload, selectUser,project} = this,
-            {onOk} = this.props;
-        if(!excelUpload){
-            notification.error({
-                message: '请上传附件！',
-                duration: 2
-            });
-            return
-        }
-        if(!selectUser){
-            notification.error({
-                message: '请选择审核人！',
-                duration: 2
-            });
-            return
-        }
-        if(!project){
-            notification.error({
-                message: '请选择项目-单位工程！',
-                duration: 2
-            });
-            return
-        }
-        
-        onOk(selectUser);
+        const {storeState} = this.props;
+        storeState({selectUser:JSON.parse(value)});
     }
 
     loadData = (selectedOptions)=>{
@@ -203,58 +167,52 @@ export default class UploadFooter extends Component{
 
     onChange = async (value)=>{
         if(value.length===2){
-            const {storeExcelData,dataSource,actions:{getTreeRootNode}} = this.props,
+            const {storeExcelData,storeState,dataSource,check=true,actions:{getTreeRootNode}} = this.props,
                 project = {
                     projectName: JSON.parse(value[0]).name,
                     enginner: JSON.parse(value[1]).name,
                     value: value
                 },
-                projectCode = JSON.parse(value[1]).code;
+                projectCode = JSON.parse(value[1]).code;    
             let wbs = [];
-
             const sourceData = dataSource.map(data=>{
                 wbs.push(data.wbsCode);
                 return Object.assign({},data,project)
             })
             wbs = Array.from(new Set(wbs));
 
-            const all = wbs.map(rst=>getTreeRootNode({code:rst}) ),
-                check = await Promise.all(all);
-            let returnProjectCode = check.map(rst=>rst.children[0].children[0].code);
-            returnProjectCode = Array.from(new Set(returnProjectCode));
-
-            if(returnProjectCode.length>1){
-                notification.error({
-                    message: 'wbs编码不属于同一个单位工程！',
-                    duration: 2
-                });
-            }else if(returnProjectCode[0] != projectCode){
-                notification.error({
-                    message: 'wbs编码不属于本单位工程！',
-                    duration: 2
-                });
-            }else{
+            if(!check){
                 storeExcelData(sourceData)
-                this.project = true;
-            }      
+                storeState({project:true});
+            }else{
+                const all = wbs.map(rst=>getTreeRootNode({code:rst}) ),
+                    check = await Promise.all(all);
+                let returnProjectCode = check.map(rst=>rst.children[0].children[0].code);
+                returnProjectCode = Array.from(new Set(returnProjectCode));
+
+                if(returnProjectCode.length>1){
+                    notification.error({
+                        message: 'wbs编码不属于同一个单位工程！',
+                        duration: 2
+                    });
+                }else if(returnProjectCode[0] != projectCode){
+                    notification.error({
+                        message: 'wbs编码不属于本单位工程！',
+                        duration: 2
+                    });
+                }else{
+                    storeExcelData(sourceData)
+                    storeState({project:true});
+                }
+            }
+    
         }
     }
     modalDownload = ()=>{
-        // const downloadLink = '';
         const {modalDown} = this.props;
-        
-        this.createLink(this,modalDown);
-        //window.open(downloadLink);
+        createLink(this,modalDown);
     }
-     createLink = (name, url) => {    //下载未应用
-        let link = document.createElement("a");
-        link.href = url;
-        link.setAttribute('download', this);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+    
 
 }
 
@@ -272,3 +230,13 @@ const projectReturn = (data={})=>{
 }
 
 const acceptFile = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+
+const createLink = (name, url) => {    //下载未应用
+    let link = document.createElement("a");
+    link.href = url;
+    link.setAttribute('download', this);
+    link.setAttribute('target', '_blank');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
