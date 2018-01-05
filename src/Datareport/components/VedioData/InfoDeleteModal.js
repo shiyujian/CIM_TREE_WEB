@@ -8,8 +8,23 @@ import {launchProcess} from './commonFunc';
 
 export default class InfoDeleteUpload extends Component{
 
+    constructor(props){
+        super(props);
+        this.state={
+            dataSource: []
+        }
+    }
+
+    componentDidMount(){
+        const {dataSource} = this.props,
+            sourceData = JSON.parse(JSON.stringify(dataSource));
+
+        this.setState({dataSource:sourceData})
+    }
+    
     render(){
-        const {deleteModal, closeModal, dataSource} = this.props;
+        const {deleteModal, closeModal} = this.props,
+            {dataSource} = this.state;
 
         return(
             <Modal
@@ -21,6 +36,9 @@ export default class InfoDeleteUpload extends Component{
                 <h1 style={{ textAlign: "center"}}>申请删除</h1>
                 <VedioInfoTable
                  dataSource={dataSource}
+                 storeExcelData={this.storeExcelData}
+                 fileDel={true}
+                 allowDel={false}
                 />
                 <ChangeFooter
                  onOk={this.onOk}
@@ -39,6 +57,10 @@ export default class InfoDeleteUpload extends Component{
             duration: 2
         });
         closeModal("deleteModal");
+    }
+
+    storeExcelData = (dataSource)=>{
+        this.setState({dataSource});
     }
 
 }

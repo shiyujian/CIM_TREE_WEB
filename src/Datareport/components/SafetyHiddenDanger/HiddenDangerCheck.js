@@ -68,7 +68,10 @@ export default class HiddenDangerCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("safety_hidden_check_visible",false);
-        message.info("操作成功");
+        notification.error({
+            message: '操作成功！',
+            duration: 2
+        });
     }
 
     //通过

@@ -58,13 +58,6 @@ export default class DeleteFile extends Component {
 		this.props.onok(this.state.dataSource,per);
     }
 
-    //删除
-    delete(index){
-        let {dataSource} = this.state;
-        dataSource.splice(index,1);
-        this.setState({dataSource});
-    }
-
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
