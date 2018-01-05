@@ -72,10 +72,10 @@ export default class ProjectSumChange extends Component {
             notification.warning({message: "请选择审核人", duration: 2})
             return;
         }
-        if (!this.state.changeInfo.length) {
-            notification.warning({message:`请填写变更原因`,duration: 2});
-            return;
-        }
+        // if (!this.state.changeInfo.length) {
+        //     notification.warning({message:`请填写变更原因`,duration: 2});
+        //     return;
+        // }
         // dataSource[0].changeInfo = this.state.changeInfo.trim();
         let {check} = this.state;
         let per = {
@@ -136,27 +136,30 @@ export default class ProjectSumChange extends Component {
             {
               title: "序号",
               dataIndex: "key",
+              key:'key',
             },{
                 title: "项目/子项目",
                 dataIndex: "subproject",
+                key:'subproject'
             },{
                 title: "单位工程",
                 dataIndex: "unit",
-               
+                key:'init'
               },{
               title: "清单项目编号",
               dataIndex: 'projectcoding',
-
-              key:'Projectcoding'
+              key:'projectcoding'
             }, {     
               title: "项目名称",
               dataIndex: 'projectname',
+              key:'projectname',
               render:(text,record,index)=>(
                 <Input value={this.state.dataSource[record.key-1]['projectname']} onChange={this.tableDataChange.bind(this,record.key-1,'projectname')}/>
               )
             },{
               title: "计量单位", 
               dataIndex: 'company',  
+              key:'company',
               render:(text,record,index)=>(
                 <Input value={this.state.dataSource[record.key-1]['company']} onChange={this.tableDataChange.bind(this,record.key-1,'company')}/>
               )  
@@ -164,6 +167,7 @@ export default class ProjectSumChange extends Component {
             }, {        
               title: "数量",
               dataIndex: 'number', 
+              key:'number',
               render:(text,record,index)=>(
                 <Input value={this.state.dataSource[record.key-1]['number']} onChange={this.tableDataChange.bind(this,record.key-1,'number')}/>
               ) 
@@ -171,6 +175,7 @@ export default class ProjectSumChange extends Component {
             },{
                 title: "综合单价(元)",
                 dataIndex: 'total',
+                key:'total',
                 render:(text,record,index)=>(
                     <Input value={this.state.dataSource[record.key-1]['total']} onChange={this.tableDataChange.bind(this,record.key-1,'total')}/>
                 )                 
@@ -178,12 +183,14 @@ export default class ProjectSumChange extends Component {
               },{
               title: "备注",
               dataIndex: 'remarks',
+              key:'remarks',
               render:(text,record,index)=>(
                 <Input value={this.state.dataSource[record.key-1]['remarks']} onChange={this.tableDataChange.bind(this,record.key-1,'remarks')}/>
               )  
 
             },{
                 title: "操作",
+                key:'edit',
                 render: (text, record, index) => {
                   return (
                     <Popconfirm
@@ -214,6 +221,7 @@ export default class ProjectSumChange extends Component {
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{ pageSize: 10 }}
+                    rowKey="key"
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col>

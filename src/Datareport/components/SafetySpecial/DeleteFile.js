@@ -214,13 +214,13 @@ export default class DeleteFile extends Component {
             });
             return;
         }
-        if (!this.state.deleteInfoNew) {
-            notification.warning({
-                message: '请填写删除原因',
-                duration: 2
-            });
-            return;
-        }
+        // if (!this.state.deleteInfoNew) {
+        //     notification.warning({
+        //         message: '请填写删除原因',
+        //         duration: 2
+        //     });
+        //     return;
+        // }
         let { check } = this.state
         let per = {
             id: check.id,

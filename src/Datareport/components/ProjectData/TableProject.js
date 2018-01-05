@@ -38,7 +38,7 @@ export default class TableProject extends Component {
 								return;
 							}
 							Notification.warning({
-								message: '请先选择数据'
+								message: '请先选择数据！'
 							});
 						}
 						}>申请变更</Button>
@@ -48,7 +48,7 @@ export default class TableProject extends Component {
 								return;
 							}
 							Notification.warning({
-								message: '请先选择数据'
+								message: '请先选择数据！'
 							});
 						}
 						}>申请删除</Button>
@@ -59,7 +59,6 @@ export default class TableProject extends Component {
 									let result = this.state.dataSource.filter(data => {
 										return data.name.indexOf(text) >= 0 || data.code.indexOf(text) >= 0;
 									});
-									console.log(result);
 									if (text === '') {
 										result = this.state.dataSource;
 									}
@@ -154,7 +153,6 @@ export default class TableProject extends Component {
 				return f.misc === "pic";
 			});
 		});
-		console.log(projects);
 		this.setState({ dataSource: projects, projRoot, showDs: projects, spinning: false });
 	}
 	createLink = (name, url) => {    //下载
@@ -169,11 +167,10 @@ export default class TableProject extends Component {
 	getExcel() {
 		if (this.state.selectedRows && this.state.selectedRows.length === 0) {
 			Notification.warning({
-				message: '请先选择数据'
+				message: '请先选择数据！'
 			});
 			return;
 		}
-		console.log(this.state.showDs);
 		let exhead = ['编码', '项目名称', '项目编码', '所属区域', '项目规模', '项目类型', '项目地址', '项目红线坐标', '项目投资', '项目负责人', '计划开工日期', '计划竣工日期', '简介', '附件', '项目图片'];
 		let rows = [exhead];
 		let excontent = this.state.selectedRows.map(data => {
@@ -182,10 +179,8 @@ export default class TableProject extends Component {
 		});
 		rows = rows.concat(excontent);
 		const { actions: { jsonToExcel } } = this.props;
-		console.log(rows)
 		jsonToExcel({}, { rows: rows })
 			.then(rst => {
-				console.log(rst);
 				this.createLink('项目信息导出表', NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
 			})
 	}

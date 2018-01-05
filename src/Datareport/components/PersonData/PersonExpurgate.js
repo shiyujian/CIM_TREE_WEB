@@ -141,7 +141,7 @@ export default class PersonExpurgate extends Component {
         const { actions: { ExprugateVisible } } = this.props;
         if (!this.state.passer) {
             Notification.warning({
-                message:'审批人未选择'
+                message:'审批人未选择！'
             });
             return;
         }

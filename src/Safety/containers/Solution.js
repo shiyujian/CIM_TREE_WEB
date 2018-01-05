@@ -78,7 +78,7 @@ class Solution extends Component {
             }
             getScheduleDir(getDirData).then((rst) => {
                 if (rst && rst.obj_type) {
-                    console.log('存在目录', rst)
+                    // console.log('vip-存在目录', rst);
                     this.setState({
                         totalDir: {
                             pk: rst.pk,
@@ -87,9 +87,9 @@ class Solution extends Component {
                         }
                     })
                 } else {
-                    console.log('不存在目录', rst)
+                    // console.log('vip-不存在目录', rst)
                     postScheduleDir({}, postDirData).then((value) => {
-                        console.log('创建目录', value)
+                        // console.log('vip-创建目录', value)
                         this.setState({
                             totalDir: {
                                 pk: value.pk,
@@ -105,7 +105,7 @@ class Solution extends Component {
 
     onViewClick(record, index) {
         const { actions: { openPreview } } = this.props;
-        debugger
+        // debugger
         let filed = {};
         filed.misc = record.attachment.misc;
         filed.a_file = `${SOURCE_API}` + (record.attachment.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -150,7 +150,7 @@ class Solution extends Component {
 
         const {
             actions: {
-                getProjects,
+            getProjects,
             setProjects,
             getWorkpackages,
             postDocument,
@@ -177,6 +177,7 @@ class Solution extends Component {
             "extra_params": {},
             "parent": { "pk": totalDir.pk, "code": totalDir.code, "obj_type": totalDir.obj_type }
         }
+        // debugger; // 
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 getScheduleDir({ code: code }).then((rst) => {
@@ -213,18 +214,20 @@ class Solution extends Component {
                         }
                         postDocument({}, projectData).then((result) => {
                             if (result.obj_type) {
-                                notification.warning({
-                                    message: '创建文档成功！',
+                                notification.success({
+                                    message: '更新文档成功！',
                                     duration: 2
                                 });
                                 let dataSet = [];
                                 getDocumentByCode({ code: code }).then((rep) => {
                                     for (let i = 0; i < rep.result.length; i++) {
                                         let data = {};
+                                        data.i = i;
                                         data.projectName = rep.result[i].extra_params.projectName;
                                         data.solution = rep.result[i].extra_params.solution;
                                         data.constructionUnit = rep.result[i].extra_params.constructionUnit;
-                                        data.portion = rep.result[i].extra_params.portion;
+                                        // data.portion = rep.result[i].extra_params.portion;
+                                        data.portion = JSON.parse(rep.result[i].extra_params.portion[0]).name;
                                         data.attachment = rep.result[i].basic_params.files[0];
                                         data.code = rep.result[i].code;
                                         dataSet.push(data);
@@ -269,7 +272,7 @@ class Solution extends Component {
                                 }
                                 postDocument({}, projectData).then((result) => {
                                     if (result.obj_type) {
-                                        notification.warning({
+                                        notification.success({
                                             message: '创建文档成功！',
                                             duration: 2
                                         });
@@ -277,10 +280,12 @@ class Solution extends Component {
                                         getDocumentByCode({ code: code }).then((rep) => {
                                             for (let i = 0; i < rep.result.length; i++) {
                                                 let data = {};
+                                                data.i = i;
                                                 data.projectName = rep.result[i].extra_params.projectName;
                                                 data.solution = rep.result[i].extra_params.solution;
                                                 data.constructionUnit = rep.result[i].extra_params.constructionUnit;
-                                                data.portion = rep.result[i].extra_params.portion;
+                                                // data.portion = rep.result[i].extra_params.portion;
+                                                data.portion = JSON.parse(rep.result[i].extra_params.portion[0]).name;
                                                 data.attachment = rep.result[i].basic_params.files[0];
                                                 data.code = rep.result[i].code;
                                                 dataSet.push(data);
@@ -358,16 +363,18 @@ class Solution extends Component {
         } else {
             return;
         }
-        debugger
+        // debugger
         let code = "safety_solution_dir_" + project.code;
         let dataSet = [];
         getDocumentByCode({ code: code }).then((rep) => {
             for (let i = 0; i < rep.result.length; i++) {
                 let data = {};
+                data.i = i;
                 data.projectName = rep.result[i].extra_params.projectName;
                 data.solution = rep.result[i].extra_params.solution;
                 data.constructionUnit = rep.result[i].extra_params.constructionUnit;
-                data.portion = rep.result[i].extra_params.portion;
+                // data.portion = rep.result[i].extra_params.portion;
+                data.portion = JSON.parse(rep.result[i].extra_params.portion[0]).name;
                 data.attachment = rep.result[i].basic_params.files[0];
                 data.code = rep.result[i].code;
                 dataSet.push(data);
@@ -388,10 +395,12 @@ class Solution extends Component {
         getDocumentByContent({ code: code, name: value }).then((rep) => {
             for (let i = 0; i < rep.result.length; i++) {
                 let data = {};
+                data.i = i;
                 data.projectName = rep.result[i].extra_params.projectName;
                 data.solution = rep.result[i].extra_params.solution;
                 data.constructionUnit = rep.result[i].extra_params.constructionUnit;
-                data.portion = rep.result[i].extra_params.portion;
+                // data.portion = rep.result[i].extra_params.portion;
+                data.portion = JSON.parse(rep.result[i].extra_params.portion[0]).name;
                 data.attachment = rep.result[i].basic_params.files[0];
                 data.code = rep.result[i].code;
                 dataSet.push(data);
@@ -459,7 +468,10 @@ class Solution extends Component {
                 <DynamicTitle title="专项方案" {...this.props} />
                 <Sidebar>
                     <div style={{ overflow: 'hidden' }} className="project-tree">
-                        <ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)} />
+                        <ProjectUnitWrapper 
+                        {...this.props} 
+                        onSelect={this.onSelect.bind(this)} 
+                        />
                     </div>
                 </Sidebar>
                 <Content>
@@ -483,6 +495,7 @@ class Solution extends Component {
                         //rowSelection={rowSelection}
                         dataSource={dataSet}
                         bordered
+                        rowKey={record => record.i}
                         style={{ height: 380, marginTop: 40 }}
                         pagination={{ pageSize: 10 }}
                     />
