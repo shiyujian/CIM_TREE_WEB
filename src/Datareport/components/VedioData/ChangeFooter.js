@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Select, Button, Input, notification} from 'antd';
+import {Select, Button, Input} from 'antd';
 import './index.less';
 import {getAllUsers} from './commonFunc';
 const TextArea = Input.TextArea;
@@ -10,10 +10,6 @@ export default class ChangeFooter extends Component{
         this.state={
             checkUsers: []
         };
-        Object.assign(this,{
-            selectUser: null,
-            description: null
-        })
     }
 
     async componentDidMount(){
@@ -29,7 +25,6 @@ export default class ChangeFooter extends Component{
                 <Select onSelect={this.selectCheckUser} className="select" defaultValue={"请选择"} >
                     {checkUsers}
                 </Select>
-                <Button onClick={this.onSubmit} type="primary" className="spacing" >提交</Button>
             </div>
             <div>
                 <div className="inlineBlock">备注: </div>
@@ -39,24 +34,12 @@ export default class ChangeFooter extends Component{
     }
 
     selectCheckUser = (value)=>{
-        this.selectUser = JSON.parse(value);
+        const {storeState} = this.props;
+        storeState({selectUser:JSON.parse(value)});
     }
 
     onChange = (e)=> {
-        this.description = e.target.value
+        const {storeState} = this.props;
+        storeState({description:e.target.value});
 	}
-
-    onSubmit = ()=>{
-        const {selectUser,description} = this;
-        if(!selectUser){
-            notification.warning({
-                message: '请选择审核人！',
-                duration: 2
-            });
-            return
-        }
-        
-        const {onOk} = this.props;
-        onOk(selectUser,description);
-    }
 }

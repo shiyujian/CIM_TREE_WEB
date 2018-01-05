@@ -9,7 +9,6 @@ import { actions as platformActions } from '_platform/store/global';
 import {UploadModal,ChangeModal,DeleteModal,VedioTable,MainHeader} from '../components/VedioData';
 import { actions } from '../store/vedioData';
 import {addSerialNumber} from '../components/VedioData/commonFunc';
-import {DataReportTemplate_VideoMonitor} from '_platform/api.js';
 
 @connect(
 	state => {
@@ -66,13 +65,12 @@ export default class VedioData extends Component {
 				 jsonToExcel={jsonToExcel}
 				 deriveData={this.deriveData}
 				 onSearch={this.onSearch}
-				 modalDown={DataReportTemplate_VideoMonitor}
 				/>
 				<VedioTable
-				dataSource={dataSource}
-				loading={{tip:<Progress style={{width:200}} percent={percent} status="active" strokeWidth={5}/>,spinning:loading}}
-				storeSelectRows={this.storeSelectRows}
-				preview={true}
+				 dataSource={dataSource}
+				 loading={{tip:<Progress style={{width:200}} percent={percent} status="active" strokeWidth={5}/>,spinning:loading}}
+				 storeSelectRows={this.storeSelectRows}
+				 preview={true}
 				/>
 			</Content>
 			<UploadModal
@@ -80,7 +78,6 @@ export default class VedioData extends Component {
 			 uploadModal={uploadModal}
 			 actions = {actions}
 			 closeModal={this.closeModal}
-			 modalDown={DataReportTemplate_VideoMonitor}
 			/>
 			<ChangeModal
 			 key={`changeModal${changeModal}`}

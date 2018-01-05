@@ -72,10 +72,10 @@ export default class ProjectSumChange extends Component {
             notification.warning({message: "请选择审核人", duration: 2})
             return;
         }
-        if (!this.state.changeInfo.length) {
-            notification.warning({message:`请填写变更原因`,duration: 2});
-            return;
-        }
+        // if (!this.state.changeInfo.length) {
+        //     notification.warning({message:`请填写变更原因`,duration: 2});
+        //     return;
+        // }
         // dataSource[0].changeInfo = this.state.changeInfo.trim();
         let {check} = this.state;
         let per = {

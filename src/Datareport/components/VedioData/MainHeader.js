@@ -36,11 +36,6 @@ export default class MainHeader extends Component{
             createLink(this,url);
         })
     }
-
-    modalDownload = ()=>{
-        const {modalDown} = this.props;
-        createLink(this,modalDown);
-    }
 }
 
 MainHeader.PropTypes ={

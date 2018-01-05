@@ -68,10 +68,10 @@ export default class ProjectSumExcalDelete extends Component {
             notification.warning({message:"请选择审核人",duration: 2})
             return;
         }
-        if (!this.state.changeText.length) {
-            notification.warning({message:`请填写删除原因`,duration: 2});
-            return;
-        }
+        // if (!this.state.changeText.length) {
+        //     notification.warning({message:`请填写删除原因`,duration: 2});
+        //     return;
+        // }
         let {check} = this.state;
         let per = {
             id:check.id,
