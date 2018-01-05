@@ -153,6 +153,8 @@ export default class ToggleModal extends Component{
                     // 直属部门
                     direct: item[2],
                     remarks: item[3],
+                    selectPro:[], 
+                    selectUnit:[],
                     editing:false
                 }
             });
@@ -273,7 +275,6 @@ export default class ToggleModal extends Component{
     }
     // 删除数据
     delete(index){
-        console.log("index:",index);
         let dataSource = this.state.dataSource;
         dataSource.splice(index,1);
         this.setState({flag_code:true, flag:true})

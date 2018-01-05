@@ -122,16 +122,7 @@ export default class PersonExpurgate extends Component {
                     </Select>
 
                 </span>
-                <Row style={{marginBottom: '10px'}}>
-                    <Col span={2}>
-                        <span>删除原因：</span>
-                    </Col>
-                </Row>
-                <Row style={{margin: '10px 0'}}>
-                    <Col>
-                        <TextArea rows={2} onChange={this.description.bind(this)}/>
-                    </Col>
-                </Row>
+                <TextArea rows={2} style={{margin: '10px 0'}} onChange={this.description.bind(this)}  placeholder='请输入删除原因'/>
             </Modal>
         )
 	}
@@ -150,7 +141,7 @@ export default class PersonExpurgate extends Component {
         const { actions: { ExprugateVisible } } = this.props;
         if (!this.state.passer) {
             Notification.warning({
-                message:'审批人未选择'
+                message:'审批人未选择！'
             });
             return;
         }

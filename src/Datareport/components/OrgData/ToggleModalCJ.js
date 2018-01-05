@@ -133,7 +133,9 @@ export default class ToggleModalCJ extends Component{
                         // 参建单位
                         canjian: item[2],
                         remarks: item[3],
-                        color:item[4]
+                        color:item[4],
+                        selectPro:[],
+                        selectUnit:[]
                     }
                 })
                 this.setState({
@@ -248,7 +250,6 @@ export default class ToggleModalCJ extends Component{
                 })
             })
             this.setState({units})
-            console.log("this.state.units",this.state.units);
         })
     }
     onSelectUnit(value, node, extra){

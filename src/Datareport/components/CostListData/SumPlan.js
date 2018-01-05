@@ -217,10 +217,6 @@ export default class SumPlan extends Component {
       })
     })
     this.props.onok(newdataSource, per);
-    notification.success({
-        message: '信息上传成功！',
-        duration: 2
-    });
   }
 
   //删除

@@ -29,7 +29,7 @@ export default class ChangeFile extends Component {
         // 下拉框
         const { actions: { getAllUsers, getProjectTree } } = this.props;
         getAllUsers().then(rst => {
-            let checkers = rst.map((o,index) => {
+            let checkers = rst.map((o, index) => {
                 return (
                     <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
@@ -68,7 +68,7 @@ export default class ChangeFile extends Component {
         let { dataSource } = this.state
         let id = dataSource[index]['file'].id
         deleteStaticFile({ id: id })
-        dataSource[index]['file']={}
+        dataSource[index]['file'] = {}
         this.setState({ dataSource })
     }
 
@@ -76,7 +76,7 @@ export default class ChangeFile extends Component {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
 
-    beforeUploadPicFile(index,record, file) {
+    beforeUploadPicFile(index, record, file) {
         // 上传到静态服务器
         const fileName = file.name;
         let { dataSource, unit, project } = this.state;
@@ -114,7 +114,7 @@ export default class ChangeFile extends Component {
                 download_url: filedata.download_url,
                 mime_type: resp.mime_type
             };
-           
+
             dataSource[index]['file'] = attachment;
             this.setState({ dataSource })
         });
@@ -174,7 +174,7 @@ export default class ChangeFile extends Component {
                             value={record.scenarioName}
                             onChange={this.onCellChange(i, "scenarioName", record)}
                         />
-                    </div>                   
+                    </div>
                 ),
             }, {
                 title: '编制单位',
@@ -189,30 +189,30 @@ export default class ChangeFile extends Component {
                     //     />
                     // </div>
                     record.checkout ?
-                    <div
-                    >
-                        <EditableCell
-                            record={record}
-                            editOnOff={false}
-                            value={record.organizationUnit}
-                            onChange={this.onCellChangeOut.call(this,record.i, "organizationUnit", record)}
-                            asyncCheckout={this.state.asyncCheckout}
-                            checkVal={this.Checkout.call(this,record.i, "organizationUnit", record)}
-                        />
-                    </div>
-                    :
-                    <div
-                        style={{ color: "red" }}
-                    >
-                        <EditableCell
-                            record={record}
-                            editOnOff={false}
-                            value={record.organizationUnit}
-                            onChange={this.onCellChangeOut.call(this,record.i, "organizationUnit", record)}
-                            asyncCheckout={this.state.asyncCheckout}
-                            checkVal={this.Checkout.call(this,record.i, "organizationUnit", record)}
-                        />
-                    </div> 
+                        <div
+                        >
+                            <EditableCell
+                                record={record}
+                                editOnOff={false}
+                                value={record.organizationUnit}
+                                onChange={this.onCellChangeOut.call(this, record.i, "organizationUnit", record)}
+                                asyncCheckout={this.state.asyncCheckout}
+                                checkVal={this.Checkout.call(this, record.i, "organizationUnit", record)}
+                            />
+                        </div>
+                        :
+                        <div
+                            style={{ color: "red" }}
+                        >
+                            <EditableCell
+                                record={record}
+                                editOnOff={false}
+                                value={record.organizationUnit}
+                                onChange={this.onCellChangeOut.call(this, record.i, "organizationUnit", record)}
+                                asyncCheckout={this.state.asyncCheckout}
+                                checkVal={this.Checkout.call(this, record.i, "organizationUnit", record)}
+                            />
+                        </div>
                 ),
             }, {
                 title: '评审时间',
@@ -288,7 +288,7 @@ export default class ChangeFile extends Component {
                     } else {
                         return (
                             <span>
-                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, i,record)}>
+                                <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this, i, record)}>
                                     <Button>
                                         <Icon type="upload" />上传附件
                                 </Button>
@@ -306,10 +306,10 @@ export default class ChangeFile extends Component {
                             placement="leftTop"
                             title="确定删除吗？"
                             // onConfirm={this.delete.bind(this, index, record.i)}
-                            onConfirm={this.delete.bind(this,record)}
+                            onConfirm={this.delete.bind(this, record)}
                             okText="确认"
                             cancelText="取消">
-                            <a><Icon type='delete'/></a>
+                            <a><Icon type='delete' /></a>
                         </Popconfirm>
                     )
                 }
@@ -393,46 +393,67 @@ export default class ChangeFile extends Component {
         let checkedValue = false;
         const { actions: { checkoutData } } = this.props;
         return async (value) => {
-            const { dataSource } = this.state;
-            const target = dataSource.find(item => item.i === record.i)
-            if (target) {
-                // target[key] = value;
-                let rst = await checkoutData({ code: value });
-                if (rst && rst.code === value) {
-                    checkedValue = true;
-                }
-                this.setState({
-                    ...this.state,
-                    dataSource: dataSource.map((item, index) => {
-                        if (item.i === record.i) {
-                            return {
-                                ...item,
-                                organizationUnit: value,
-                                checkout: checkedValue
-                            }
-                        } else {
-                            return item;
+            if (value) {
+                const { dataSource } = this.state;
+                const target = dataSource.find(item => item.i === record.i)
+                if (target) {
+                    // target[key] = value;
+                    // let rst = await checkoutData({ code: value });
+                    checkoutData({ code: value }).then(rst => {
+                        if (rst && rst.code === value) {
+                            checkedValue = true;
                         }
+                        this.setState({
+                            ...this.state,
+                            dataSource: dataSource.map((item, index) => {
+                                if (item.i === record.i) {
+                                    return {
+                                        ...item,
+                                        organizationUnit: value,
+                                        checkout: checkedValue
+                                    }
+                                } else {
+                                    return item;
+                                }
+                            })
+                        })
                     })
-                })
+                }
             }
         };
     }
     onCellChangeOut = (index, key, record) => {
-        const { dataSource } = this.state;
+        let checkedValue = false;
+        const { actions: { checkoutData } } = this.props;
         return (value) => {
-            // dataSource=dataSource.map((item, index) => {
-            //     if (item.i === record.i) {
-            //         return {
-            //             ...item,
-            //             organizationUnit: value,
-            //         }
-            //     } else {
-            //         return item;
-            //     }
-            // })
-            // dataSource[index][key] = value;
-            record[key] = value;
+            // 再次校验
+            if (value) {
+                const { dataSource } = this.state;
+                const target = dataSource.find(item => item.i === record.i)
+                if (target) {
+                    checkoutData({ code: value }).then(rst => {
+                        if (rst && rst.code === value) {
+                            checkedValue = true;
+                        }
+                        this.setState({
+                            ...this.state,
+                            dataSource: dataSource.map((item, index) => {
+                                if (item.i === record.i) {
+                                    return {
+                                        ...item,
+                                        organizationUnit: value,
+                                        checkout: checkedValue
+                                    }
+                                } else {
+                                    return item;
+                                }
+                            })
+                        })
+                    })
+                }
+                // dataSource[record.i][key] = value;
+                record[key] = value;
+            }
         };
     }
 

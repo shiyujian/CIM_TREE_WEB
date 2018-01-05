@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Modal, message} from 'antd';
+import {Modal, message, notification} from 'antd';
 
 import VedioTable from './VedioTable';
 import ChangeFooter from './ChangeFooter';
@@ -28,15 +28,16 @@ export default class ChangeModal extends Component{
         return(
             <Modal
              width={1280}
-             title={"视频监控修改"}
              visible={changeModal}
              onCancel={()=>closeModal("changeModal")}
              footer={null}
             >
+                <h1 style={{ textAlign: "center"}}>申请变更</h1>
                 <VedioTable
                  dataSource={dataSource}
-                 storeData={this.storeData}
+                 storeExcelData={this.storeData}
                  edit={true}
+                 fileDel={true}
                 />
                 <ChangeFooter
                  onOk={this.onOk}
@@ -51,7 +52,10 @@ export default class ChangeModal extends Component{
             name = '视频监控数据修改';
 
         await launchProcess({dataSource,selectUser,name,description},{createWorkflow,logWorkflowEvent});
-        message.success("发起修改数据流程成功");
+        notification.success({
+            message: '发起修改数据流程成功！',
+            duration: 2
+        });
         closeModal("changeModal");
     }
 

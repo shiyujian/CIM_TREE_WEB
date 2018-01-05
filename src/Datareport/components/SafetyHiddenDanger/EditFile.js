@@ -137,6 +137,13 @@ export default class EditFile extends Component {
         }
         this.setState({dataSource});
     }
+
+    //删除
+    delete(index) {
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
+    }
     beforeUploadPicFile  = (index,file) => {
         // 上传到静态服务器
         const fileName = file.name;
@@ -191,6 +198,12 @@ export default class EditFile extends Component {
         return false;
     }
 
+    onDateChange = (index,dateString,str) =>{
+        const {dataSource} = this.state;
+        dataSource[index][str] = dateString;
+        this.setState({dataSource});
+    }
+
     render() {
         const columns = [
             {
@@ -232,7 +245,8 @@ export default class EditFile extends Component {
                 render: (text, record ,index) => (
 					<div>
                         <DatePicker
-                         defaultValue={moment(record.upTime)} />
+                        onChange={(date,dateString)=>{this.onDateChange(record,dateString,'upTime')}} 
+                        defaultValue={moment(record.upTime)} />
 					</div>
 				),
             }, {
@@ -242,6 +256,7 @@ export default class EditFile extends Component {
                 render: (text, record ,index) => (
 					<div>
                         <DatePicker
+                        onChange={(date,dateString)=>{this.onDateChange(record,dateString,'checkTime')}}
                          defaultValue={moment(record.checkTime)} />
 					</div>
 				),
@@ -252,6 +267,7 @@ export default class EditFile extends Component {
                 render: (text, record ,index) => (
 					<div>
                         <DatePicker
+                        onChange={(date,dateString)=>{this.onDateChange(record,dateString,'editTime')}}
                          defaultValue={moment(record.editTime)} />
 					</div>
 				),
@@ -297,6 +313,20 @@ export default class EditFile extends Component {
                             <span className="ant-divider" />
                             <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                         </span>)
+                }
+            }, {
+                title: '操作',
+                render: (text, record, index) => {
+                    return (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+                            onConfirm={this.delete.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
                 }
             }
         ];

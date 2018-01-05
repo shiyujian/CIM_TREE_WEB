@@ -14,7 +14,7 @@ class EditableCell extends React.Component {
 	}
 
 	handleChange = (e) => {
-		const value = e.target.value;
+		const value = e.target.value.replace(/\s+/g,"");
 		this.setState({ value });
 	}
 
@@ -38,7 +38,8 @@ class EditableCell extends React.Component {
 				// }
 				let { checkVal } = this.props;
 				checkVal && checkVal(value);
-				this.props.onChange(this.state.value);
+				let value = this.state.value.replace(/\s+/g,"");
+				this.props.onChange(value);
 			}
 		}
 		this.setState({ editable: false });

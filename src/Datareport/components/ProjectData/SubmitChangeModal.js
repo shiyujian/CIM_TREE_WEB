@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Icon, Modal, Upload, Select, Divider } from 'antd';
+import { Table, Button, Popconfirm, Notification, Input, Icon, Modal, Upload, Select, Divider } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API } from '_platform/api';
 import { getUser } from '_platform/auth';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -7,7 +7,8 @@ import { WORKFLOW_CODE } from '_platform/api';
 import ECCB from '../EditCellWithCallBack';
 var moment = require('moment');
 const Search = Input.Search;
-const { Option } = Select
+const { Option } = Select;
+const { TextArea } = Input;
 export default class SubmitChangeModal extends Component {
     constructor(props) {
         super(props);
@@ -24,7 +25,6 @@ export default class SubmitChangeModal extends Component {
             });
             return rst;
         });
-        console.log(ds);
         this.state = {
             dataSource: ds
         };
@@ -32,7 +32,6 @@ export default class SubmitChangeModal extends Component {
     componentDidMount(){
         const {actions:{getAllUsers}} = this.props
         getAllUsers().then(res => {
-            console.log(res);
             let set = {};
             let checkers = res.map(o => {
                 set[o.id] = o;
@@ -45,6 +44,22 @@ export default class SubmitChangeModal extends Component {
     }
     submit(){
         const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
+        const {description = ''} = this.state;
+        if(!this.state.passer){
+            Notification.warning({
+                message: '未选择审核人'
+            });
+            return;
+        }
+        let err = this.state.dataSource.some(data=>{
+            return data.error;
+        });
+        if(err){
+            Notification.error({
+                message: '表格数据有错误'
+            });
+            return;
+        }
 		let creator = {
 			id:getUser().id,
 			username:getUser().username,
@@ -54,7 +69,7 @@ export default class SubmitChangeModal extends Component {
 		let postdata = {
 			name:"项目批量变更申请",
 			code:WORKFLOW_CODE["数据报送流程"],
-			description:"项目批量变更申请",
+			description:description,
 			subject:[{
 				data:JSON.stringify(this.state.dataSource)
 			}],
@@ -69,7 +84,7 @@ export default class SubmitChangeModal extends Component {
                 {
                     state:rst.current[0].id,
                     action:'提交',
-                    note:'发起项目填报',
+                    note:description,
                     executor:creator,
                     next_states:[{
                         participants:[this.state.passer],
@@ -77,19 +92,32 @@ export default class SubmitChangeModal extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
 					attachment:null
-				});
+				}).then(rst => {
+                    if (rst) {
+                        Notification.success({
+                            message: "流程发起成功"
+                        });
+                    }else {
+                        Notification.error({
+                            message: "流程发起失败"
+                        })
+                    }
+                });
         });
         this.props.onCancel();
+    }
+    description(e) {
+        this.setState({description:e.target.value})
     }
     render() {
         return (
             <Modal
                 onCancel={this.props.onCancel}
-                title="项目变更申请表"
                 visible={true}
                 width={1280}
-                footer={null}
-                maskClosable={false}>
+                onOk={this.submit.bind(this)}
+            >
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请变更</h1>
                 <Table
                     columns={this.columns}
                     bordered={true}
@@ -105,20 +133,27 @@ export default class SubmitChangeModal extends Component {
                         }
                     </Select>
                 </span>
-                <Button onClick = {()=>{
-                    if(!this.state.passer){
-                        message.error('未选择审核人');
-                        return;
-                    }
-                    let err = this.state.dataSource.some(data=>{
-                        return data.error;
-                    });
-                    if(err){
-                        message.error('表格数据有错误');
-                        return;
-                    }
-                    this.submit();
-                }} type="primary" >提交</Button>
+                <TextArea rows={2} style={{margin: '10px 0'}} onChange={this.description.bind(this)}  placeholder='请输入变更原因'/>
+                {
+                // <Button onClick = {()=>{
+                //     if(!this.state.passer){
+                //         Notification.warning({
+                //             message: '未选择审核人'
+                //         });
+                //         return;
+                //     }
+                //     let err = this.state.dataSource.some(data=>{
+                //         return data.error;
+                //     });
+                //     if(err){
+                //         Notification.error({
+                //             message: '表格数据有错误'
+                //         });
+                //         return;
+                //     }
+                //     this.submit();
+                // }} type="primary" >提交</Button>
+                }
             </Modal>
         )
     }
@@ -127,6 +162,10 @@ export default class SubmitChangeModal extends Component {
             title: '项目/子项目名称',
             dataIndex: 'name',
             key: 'Name',
+        }, {
+            title: '编码',
+            dataIndex: 'code',
+            key: 'Code',
         }, {
             title: '所属区域',
             render: (record) => {
@@ -338,7 +377,6 @@ export default class SubmitChangeModal extends Component {
         return false;
     }
     beforeUpload(record, file) {
-        console.log(record, file);
         const fileName = file.name;
         // 上传到静态服务器
         const { actions: { uploadStaticFile } } = this.props;

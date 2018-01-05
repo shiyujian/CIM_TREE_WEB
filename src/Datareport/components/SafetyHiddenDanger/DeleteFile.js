@@ -33,6 +33,13 @@ export default class DeleteFile extends Component {
             this.setState({checkers})
         })
     }
+
+    //删除
+    delete(index) {
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
+    }
     
 
     //下拉框选择人
@@ -56,13 +63,6 @@ export default class DeleteFile extends Component {
             organization:check.account.organization
         }
 		this.props.onok(this.state.dataSource,per);
-    }
-
-    //删除
-    delete(index){
-        let {dataSource} = this.state;
-        dataSource.splice(index,1);
-        this.setState({dataSource});
     }
 
     //预览
@@ -147,6 +147,20 @@ export default class DeleteFile extends Component {
                             <span className="ant-divider" />
                             <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                         </span>)
+                }
+            }, {
+                title: '操作',
+                render: (text, record, index) => {
+                    return (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+                            onConfirm={this.delete.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
                 }
             }
         ];

@@ -51,8 +51,11 @@ export default class WorkDeleteCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("workdata_doc_delete_visible",false);
-        message.info("操作成功");
+        this.props.closeModal("workdata_doc_delete_visible",false,'submit');
+        notification.success({
+            message: '操作成功！',
+            duration: 2
+        });
     }
     // 点x消失
     oncancel() {
@@ -92,12 +95,33 @@ export default class WorkDeleteCheck extends Component {
             });
         }
     }
-    //不通过
-    async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
-    }
+   //不通过
+   async reject() {
+    const { wk } = this.props
+    const { actions: { logWorkflowEvent } } = this.props
+    let executor = {};
+    let person = getUser();
+    executor.id = person.id;
+    executor.username = person.username;
+    executor.person_name = person.name;
+    executor.person_code = person.code;
+    await logWorkflowEvent(
+        {
+            pk:wk.id
+        },
+        {
+            state:wk.current[0].id,
+            executor:executor,
+            action:"拒绝",
+            note:"不通过",
+            attachment:null
+        }
+    );
+    notification.success({
+        message:"操作成功!",
+        duration:2
+    })
+}
     onChange(e){
         this.setState({opinion:e.target.value})
     }
@@ -121,7 +145,7 @@ export default class WorkDeleteCheck extends Component {
             title: '单位工程',
             dataIndex: 'unit',
         }, {
-            title: '施工单位',
+            title: '实施单位',
             dataIndex: 'construct_unit',
         }, {
             title: '施工图工程量',
@@ -147,14 +171,13 @@ export default class WorkDeleteCheck extends Component {
         },]
 		return (
             <Modal
-			title="施工进度删除审批表"
             visible={true}
             width= {1280}
 			footer={null}
 			maskClosable={false}
             onCancel={this.oncancel.bind(this)}
             >
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>删除审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -171,17 +194,20 @@ export default class WorkDeleteCheck extends Component {
                         </RadioGroup>
                     </Col>
                     <Col span={2} push={14}>
-                        <Button type='primary'>
-                            导出表格
-                        </Button>
-                    </Col>
-                    <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
                         </Button>
                         <Preview />
                     </Col>
                 </Row>
+                {
+                    this.state.dataSource[0] && this.state.dataSource[0].deleteInfo && <Row>
+                        <Col span={4}>
+                            申请变更原因:{this.state.dataSource[0].deleteInfo}
+                            <br/>
+                        </Col>
+                    </Row>
+                }
                 {
                     this.state.wk && <WorkflowHistory wk={this.state.wk}/>
                 }

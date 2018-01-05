@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/CostListData';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button,message,Popconfirm,Progress} from 'antd';
+import {Row,Col,Table,Input,Button,message,Popconfirm,Progress,notification} from 'antd';
 import PriceList from '../components/CostListData/PriceList';
 import PriceRmModal from '../components/CostListData/PriceRmModal';
 import PriceModifyModal from '../components/CostListData/PriceModifyModal';
@@ -49,7 +49,7 @@ export default class CostListData extends Component {
 					return record.key
 				}
 			},{
-				title:'项目/子项目',
+				title:'项目',
 				dataIndex:'subproject',
 			},{
 				title:'单位工程',
@@ -61,7 +61,7 @@ export default class CostListData extends Component {
 				title:'计价单项',
 				dataIndex:'valuation' 
 			},{
-				title:'工程内容/规格编号',
+				title:'工程内容/规格型号',
 				dataIndex:'rate'
 			},{
 				title:'计量单位',
@@ -128,9 +128,15 @@ export default class CostListData extends Component {
 				attachment:null
 			}).then(() => {
 				this.setState({addvisible:false}),
-				message.info("发起成功");						
+				notification.success({
+					message:'发起成功',
+					duration: 2
+				});					
 			}).catch(() => {
-				message.info("发起失败")
+				notification.error({
+					message:'发起失败',
+					duration: 2
+				});
 			})
 			cb();
 		})
@@ -217,7 +223,10 @@ export default class CostListData extends Component {
 				this.setState({dataSource});
 				return;
 			}else {
-				message.warn("请输入查询字段");
+				notification.warning({
+					message:'请输入查询字段',
+					duration: 2
+				})
 				return;
 			}
 		}
@@ -235,13 +244,19 @@ export default class CostListData extends Component {
 				dataSource: res
 			});
 		}else{
-			message.info("请换一个字段")
+			notification.warning({
+				message:'请换一个字段',
+				duration: 2
+			});
 		}
 	}
 
 	openModal (type) {
 		if(!this.state.selectedRows.length) {
-			message.warn("请选择数据");
+			notification.warning({
+				message:'请先选择数据',
+				duration: 2
+			});
 			return;
 		}
 		this.setState({
@@ -253,7 +268,10 @@ export default class CostListData extends Component {
 		const {actions:{jsonToExcel}} = this.props;
 		const showDs = this.state.selectedRows;
 		if(!showDs.length) {
-			message.warn('至少选择一条数据');
+			notification.warning({
+				message:'请先选择数据',
+				duration: 2
+			});
 			return;
 		};
         let rows = [];
@@ -292,14 +310,14 @@ export default class CostListData extends Component {
 				<DynamicTitle title="计价清单" {...this.props}/>
 				<Row>
 					{/* <Button style={{margin:'10px 10px 10px 0px'}} type="default" onClick={() => this.createLink('downLoadTemplate', DataReportTemplate_ValuationList)}>模板下载</Button> */}
-					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>批量导入</Button>
+					<Button className="btn" type="default" onClick={() => {this.setState({addvisible:true})}}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.openModal.bind(this, "modifyModal")}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.openModal.bind(this, "rmModal")}>申请删除</Button>
 					<Button className="btn" type="default" onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search 
 						className="btn"
 						style={{width:"200px"}}
-						placeholder="输入搜索条件"
+						placeholder="请输入内容"
 						onSearch={value => this.search(value)}
 						/>
 				</Row>
