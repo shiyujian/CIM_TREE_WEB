@@ -250,7 +250,6 @@ export default class ToggleModalCJ extends Component{
                 })
             })
             this.setState({units})
-            console.log("this.state.units",this.state.units);
         })
     }
     onSelectUnit(value, node, extra){

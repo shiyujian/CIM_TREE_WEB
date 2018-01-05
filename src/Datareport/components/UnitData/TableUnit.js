@@ -55,13 +55,10 @@ export default class TableUnit extends Component {
 			selectedRowKeys: this.state.selectedRowKeys || [],
 			onChange: (selectedRowKeys, selectedRows) => {
 				this.setState({ selectedRowKeys: selectedRowKeys, selectedRows });
-				console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
 			},
 			onSelect: (record, selected, selectedRows) => {
-				console.log(record, selected, selectedRows);
 			},
 			onSelectAll: (selected, selectedRows, changeRows) => {
-				console.log(selected, selectedRows, changeRows);
 			},
 		};
 		return (
@@ -97,7 +94,6 @@ export default class TableUnit extends Component {
 								let result = this.state.units.filter(data => {
 									return data.name.indexOf(text) >= 0 || data.code.indexOf(text) >= 0;
 								});
-								console.log(result);
 								if (text === '') {
 									result = this.state.units;
 								}
@@ -140,7 +136,6 @@ export default class TableUnit extends Component {
 	}
 	send() {
 		const { actions: { ModalVisibleUnit, postWorkpackages, postWorkpackagesOK }, postWorkpackagesOKp } = this.props;
-		console.log(postWorkpackagesOKp)
 		ModalVisibleUnit(true);
 
 	}
@@ -161,7 +156,6 @@ export default class TableUnit extends Component {
 			});
 			return;
 		}
-		console.log(this.state.showDs);
 		let exhead = ['单位工程编码','单位工程名称','所属项目名称','项目类型','项目阶段','单位红线坐标','计划开工日期','计划竣工日期','简介','建设单位','附件'];
 		let rows = [exhead];
 		let getcoordinate = (param)=>{
@@ -174,17 +168,14 @@ export default class TableUnit extends Component {
 				return param;
 			}
 		}
-		console.log("this.state.selectedRows:",this.state.selectedRows);
 		let excontent =this.state.selectedRows.map(data=>{
 			return [data.code,data.name,data.fatherName,data.projType||'',data.stage||'',getcoordinate(data.coordinate)
 			,data.stime||'',data.etime||'',data.intro||'',data.rsp_orgName?data.rsp_orgName[0]:'',data.file?data.file.name:''];
 		});
 		rows = rows.concat(excontent);
 		const {actions:{jsonToExcel}} = this.props;
-		console.log(rows)
         jsonToExcel({},{rows:rows})
         .then(rst => {
-            console.log(rst);
             this.createLink('单位工程信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
         })
 	}
