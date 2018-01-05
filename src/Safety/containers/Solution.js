@@ -150,7 +150,7 @@ class Solution extends Component {
 
         const {
             actions: {
-                getProjects,
+            getProjects,
             setProjects,
             getWorkpackages,
             postDocument,
@@ -177,6 +177,7 @@ class Solution extends Component {
             "extra_params": {},
             "parent": { "pk": totalDir.pk, "code": totalDir.code, "obj_type": totalDir.obj_type }
         }
+        debugger; // 
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 getScheduleDir({ code: code }).then((rst) => {
@@ -213,18 +214,20 @@ class Solution extends Component {
                         }
                         postDocument({}, projectData).then((result) => {
                             if (result.obj_type) {
-                                notification.warning({
-                                    message: '创建文档成功！',
+                                notification.success({
+                                    message: '更新文档成功！',
                                     duration: 2
                                 });
                                 let dataSet = [];
                                 getDocumentByCode({ code: code }).then((rep) => {
                                     for (let i = 0; i < rep.result.length; i++) {
                                         let data = {};
+                                        data.i = i;
                                         data.projectName = rep.result[i].extra_params.projectName;
                                         data.solution = rep.result[i].extra_params.solution;
                                         data.constructionUnit = rep.result[i].extra_params.constructionUnit;
-                                        data.portion = rep.result[i].extra_params.portion;
+                                        // data.portion = rep.result[i].extra_params.portion;
+                                        data.portion = JSON.parse(rep.result[i].extra_params.portion[0]).name;
                                         data.attachment = rep.result[i].basic_params.files[0];
                                         data.code = rep.result[i].code;
                                         dataSet.push(data);
@@ -269,7 +272,7 @@ class Solution extends Component {
                                 }
                                 postDocument({}, projectData).then((result) => {
                                     if (result.obj_type) {
-                                        notification.warning({
+                                        notification.success({
                                             message: '创建文档成功！',
                                             duration: 2
                                         });
@@ -277,10 +280,12 @@ class Solution extends Component {
                                         getDocumentByCode({ code: code }).then((rep) => {
                                             for (let i = 0; i < rep.result.length; i++) {
                                                 let data = {};
+                                                data.i = i;
                                                 data.projectName = rep.result[i].extra_params.projectName;
                                                 data.solution = rep.result[i].extra_params.solution;
                                                 data.constructionUnit = rep.result[i].extra_params.constructionUnit;
-                                                data.portion = rep.result[i].extra_params.portion;
+                                                // data.portion = rep.result[i].extra_params.portion;
+                                                data.portion = JSON.parse(rep.result[i].extra_params.portion[0]).name;
                                                 data.attachment = rep.result[i].basic_params.files[0];
                                                 data.code = rep.result[i].code;
                                                 dataSet.push(data);
@@ -364,10 +369,12 @@ class Solution extends Component {
         getDocumentByCode({ code: code }).then((rep) => {
             for (let i = 0; i < rep.result.length; i++) {
                 let data = {};
+                data.i = i;
                 data.projectName = rep.result[i].extra_params.projectName;
                 data.solution = rep.result[i].extra_params.solution;
                 data.constructionUnit = rep.result[i].extra_params.constructionUnit;
-                data.portion = rep.result[i].extra_params.portion;
+                // data.portion = rep.result[i].extra_params.portion;
+                data.portion = JSON.parse(rep.result[i].extra_params.portion[0]).name;
                 data.attachment = rep.result[i].basic_params.files[0];
                 data.code = rep.result[i].code;
                 dataSet.push(data);
@@ -388,10 +395,12 @@ class Solution extends Component {
         getDocumentByContent({ code: code, name: value }).then((rep) => {
             for (let i = 0; i < rep.result.length; i++) {
                 let data = {};
+                data.i = i;
                 data.projectName = rep.result[i].extra_params.projectName;
                 data.solution = rep.result[i].extra_params.solution;
                 data.constructionUnit = rep.result[i].extra_params.constructionUnit;
-                data.portion = rep.result[i].extra_params.portion;
+                // data.portion = rep.result[i].extra_params.portion;
+                data.portion = JSON.parse(rep.result[i].extra_params.portion[0]).name;
                 data.attachment = rep.result[i].basic_params.files[0];
                 data.code = rep.result[i].code;
                 dataSet.push(data);
@@ -483,6 +492,7 @@ class Solution extends Component {
                         //rowSelection={rowSelection}
                         dataSource={dataSet}
                         bordered
+                        rowKey={record => record.i}
                         style={{ height: 380, marginTop: 40 }}
                         pagination={{ pageSize: 10 }}
                     />

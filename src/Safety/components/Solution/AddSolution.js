@@ -25,7 +25,7 @@ export default class AddSolution extends Component {
         } = this.props.props;
 		let code = this.props.state.project.code;
 		let dataSet = [];
-		debugger;
+		// debugger;
 		let branch = [];
 		let subBranch=[];
 		getPortions({ code: code }).then((rst) => {
@@ -42,8 +42,6 @@ export default class AddSolution extends Component {
 								}
 							)
 						})
-						// branch.push([...subBranch]);
-						// branch=Object.assign().push([...subBranch]);
 						branch=[...branch,...subBranch];
 					}
 				})
@@ -175,14 +173,14 @@ export default class AddSolution extends Component {
 						<Input type="text" />
 						)}
 				</FormItem>
-				<FormItem {...formItemLayout} label="工程名称">
+				<FormItem {...formItemLayout} label="工程名称" hasFeedback>
 					{getFieldDecorator('projectName', {
 						initialValue: this.props.state.unitProject.name,
 						rules: [
 							{ required: true, message: '未获取到工程名称！' },
 						]
 					})(
-						<Input type="text" disabled />
+						<Input type="text" disabled placeholder="未获取到工程名称！" />
 						)}
 				</FormItem>
 				<FormItem {...formItemLayout} label="施工单位" hasFeedback>
@@ -192,7 +190,7 @@ export default class AddSolution extends Component {
 							{ required: true, message: '该单位工程无施工单位，请联系管理员！' },
 						]
 					})(
-						<Input type="text" disabled placeholder="未获取到施工单位" />
+						<Input type="text" disabled placeholder="未获取到施工单位！" />
 						)}
 				</FormItem>
 				<FormItem {...formItemLayout} label="分部分项">
@@ -204,7 +202,6 @@ export default class AddSolution extends Component {
 						, {})
 						(
 						<Cascader
-							// style={{ width: '300px' }}
 							options={this.state.options}
 							className='btn'
 							loadData={this.loadData.bind(this)}
