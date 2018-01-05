@@ -349,7 +349,7 @@ export default class WorkunitCost extends Component {
 			title: '项目/子项目',
 			dataIndex: 'subproject',
 			key:'subproject',
-			sorter:(a,b) =>a.subprojectg - b.subproject
+			// sorter:(a,b) =>a.subprojectg - b.subproject
 		}, {
 			title: '单位工程',
 			dataIndex: 'unit',
@@ -357,7 +357,7 @@ export default class WorkunitCost extends Component {
 			title: '清单项目编号',
 			dataIndex: 'projectcoding',
 			key:'projectcoding',
-			sorter:(a,b) =>a.projectcoding - b.projectcoding 
+			// sorter:(a,b) =>a.projectcoding - b.projectcoding 
 		}, {
 			title: '项目名称',
 			dataIndex: 'projectname',

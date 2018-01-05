@@ -145,7 +145,7 @@ export default class ProjectSumChange extends Component {
                 title: "单位工程",
                 dataIndex: "unit",
                 key:'init'
-              },{
+            },{
               title: "清单项目编号",
               dataIndex: 'projectcoding',
               key:'projectcoding'
