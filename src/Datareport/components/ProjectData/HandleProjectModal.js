@@ -120,7 +120,7 @@ export default class HPModal extends Component{
                 Notification.success({
                     message: '操作成功'
                 });
-                this.props.closeModal('dr_xm_xx_visible',false,'submit');
+                // this.props.closeModal('dr_xm_xx_visible',false,'submit');
             }
         }
     }

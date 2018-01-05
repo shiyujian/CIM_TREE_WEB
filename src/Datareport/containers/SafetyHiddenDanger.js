@@ -105,7 +105,7 @@ class SafetyHiddenDanger extends Component {
                 dataSource.push(temp);
             });
         }
-        this.setState({dataSource,loading:false});
+        this.setState({dataSource,loading:false,percent:100});
     }
 
     setAddData = (data,participants) => {
@@ -142,7 +142,9 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-                        message.warning('发起流程成功');
+                        notification.success({
+                            message:'发起流程成功'
+                        })
 						this.setState({setAddVisiable:false})						
 					})
 		})
@@ -182,7 +184,9 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-                        message.warning('发起流程成功');
+                        notification.success({
+                            message:'发起流程成功'
+                        })
 						this.setState({setDeleteVisiable:false})						
 					})
 		})
@@ -197,7 +201,9 @@ class SafetyHiddenDanger extends Component {
         }else if(type==="edit" && dataSourceSelected.length!== 0){
             this.setState({setEditVisiable:true});
         }else if(type!=="add" && dataSourceSelected.length===0){
-            message.warning('请先选择数据');
+            notification.warning({
+                message:'请先选择数据！'
+            })
         }
     }
     onSelectChange = (selectedRowKeys) => {
@@ -242,16 +248,18 @@ class SafetyHiddenDanger extends Component {
                         state:nextStates[0].to_state[0].id,
                     }],
                     attachment:null}).then(() => {
-                        message.warning('发起流程成功');
+                        notification.success({
+                            message:'发起流程成功'
+                        })
 						this.setState({setEditVisiable:false})						
 					})
 		})
     }
     
-    download(){
-        let apiGet = `${DataReportTemplate_SafetyHiddenDanger}`;
-        this.createLink(this,apiGet);
-    }
+    // download(){
+    //     let apiGet = `${DataReportTemplate_SafetyHiddenDanger}`;
+    //     this.createLink(this,apiGet);
+    // }
 
     handlePreview(record){
         const {actions: {openPreview}} = this.props;
@@ -334,6 +342,9 @@ class SafetyHiddenDanger extends Component {
                 title: '责任单位',
                 dataIndex: 'resUnit',
                 width: '8%',
+                render:(text,record,index)=>{
+                    return record.resUnit ?record.resUnit :'—'
+                }
             }, {
                 title: '隐患类型',
                 dataIndex: 'type',
@@ -380,10 +391,10 @@ class SafetyHiddenDanger extends Component {
                 <Content>
                     <Row style={{ marginBottom: "30px" }}>
                         <Col>
-                            <Button 
+                            {/* <Button 
                             style={{ marginRight: "30px" }}
                             onClick={()=>this.download()}
-                            >模板下载</Button>
+                            >模板下载</Button> */}
                             <Button 
                             style={{ marginRight: "30px" }}
                             onClick={()=>this.onBtnClick("add")}
@@ -408,10 +419,10 @@ class SafetyHiddenDanger extends Component {
                         columns={columns}
                         dataSource={this.state.dataSource}
                         bordered
-                        loading={this.state.loading}
                         rowSelection={rowSelection}                        
                         style={{ height: 380, marginTop: 20 }}
-                        pagination = {{showQuickJumper:true,showSizeChanger:true}} 
+                        pagination = {{showQuickJumper:true,showSizeChanger:true}}
+                        loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
                     />
                 </Content>
                 {
@@ -443,24 +454,28 @@ class SafetyHiddenDanger extends Component {
         const {actions:{jsonToExcel}} = this.props;
         const {dataSourceSelected} = this.state;
         if(dataSourceSelected.length === 0){
-        	message.warning('请先选择数据再导出')
+        	notification.warning({
+                message:'请先选择数据！'
+            })
         	return
         }
         let rows = [];
-        rows.push(this.header);
+        rows.push(["编码","项目名称","单位工程","WBS","责任单位","隐患类型","上报时间","核查时间","整改时间","排查结果","整改期限","整改结果"]);
         dataSourceSelected.map(item => {
-            rows.push([item.code,
+            rows.push([
+                item.code,
+                item.projectName,
+                item.unit,
                 item.wbs,
+                item.resUnit,
                 item.type,
                 item.upTime,
                 item.checkTime,
                 item.editTime,
                 item.result,
-                item.unit,
-                item.projectName,
-                item.resUnit,
                 item.deadline,
-                item.editResult]);
+                item.editResult
+            ]);
         })
         jsonToExcel({},{rows:rows})
         .then(rst => {

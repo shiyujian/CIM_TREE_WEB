@@ -162,12 +162,6 @@ export default class ToggleModalCJ extends Component{
             });
             return;
         }
-        // if (this.state.flag === false) {
-        //     notification.warning({
-        //         message:'不存在该直属部门'
-        //     });
-        //     return;
-        // }
         let arr = this.state.dataSource;
         for (let i = 0; i < arr.length; i++) {
             if (arr[i].color === "red") {

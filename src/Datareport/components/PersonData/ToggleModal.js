@@ -189,22 +189,24 @@ export default class ToggleModal extends Component{
                 }
             }, {
                 title:'二维码',
-                key:'signature',
                 render:(record) => {
-                    <Upload
-                        beforeUpload={this.beforeUploadPic.bind(this, record)}
-                        accept={accept}
-                    >
-                        <a>{record.signature ? record.signature.name : '点击上传'}</a>
-                    </Upload>
+                    return (
+                        <Upload
+                            beforeUpload={this.beforeUploadPic.bind(this, record)}
+                            accept={accept}
+                        >
+                            <a>{record.signature ? record.signature.name : '点击上传'}</a>
+                        </Upload>
+                    )
                 }
             },{
                 title:'操作',
-                dataIndex:'edit',
+                width:"7%",
                 render:(text,record,index) => {
-                    console.log('record',record)
                     return <span>
-                        {record.editing ||
+                        {
+                            record.editing 
+                            ||
                             <span>
                                 <a><Icon type="edit" onClick={(e) => {
                                     record.editing = true
@@ -221,7 +223,9 @@ export default class ToggleModal extends Component{
                                 </Popconfirm>
                             </span>
                         }
-                        {record.editing &&
+                        {
+                            record.editing 
+                            &&
                             <a onClick={(e) => {
                                 record.editing = false
                                 this.forceUpdate();
@@ -275,7 +279,7 @@ export default class ToggleModal extends Component{
     selectChecker(){
 
     }
-    
+
     validateCode(record,e){
         let codes = [];
         record.code = e.target.value;
@@ -291,7 +295,7 @@ export default class ToggleModal extends Component{
         }
         this.setState({repeatCode});
     }
-    
+
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }

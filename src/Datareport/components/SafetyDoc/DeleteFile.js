@@ -44,7 +44,9 @@ export default class DeleteFile extends Component {
 
     onok(){
         if(!this.state.check){
-            message.info("请选择审核人")
+            notification.warning({
+				message:'请选择审核人'
+			})
             return;
         }
         let {check} = this.state;
@@ -57,7 +59,12 @@ export default class DeleteFile extends Component {
         }
 		this.props.onok(this.state.dataSource,per);
     }
-
+    //删除
+    delete(index){
+        let {dataSource} = this.state;
+        dataSource.splice(index,1);
+      this.setState({dataSource}) 
+    }
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -127,13 +134,13 @@ export default class DeleteFile extends Component {
         ];
         return (
             <Modal
-			title="安全文档删除表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+            <h1 style ={{textAlign:'center',marginBottom:20}}>申请删除</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
