@@ -37,7 +37,7 @@ export default class InfoUploadModal extends Component{
                  actions={this.props.actions}
                 />
                 <UploadFooter
-                modalDown = {modalDown}
+                 modalDown = {modalDown}
                  dataSource={dataSource}
                  storeExcelData= {this.storeExcelData}
                  excelTitle= {excelTitle}

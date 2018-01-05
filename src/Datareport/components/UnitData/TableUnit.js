@@ -76,7 +76,7 @@ export default class TableUnit extends Component {
 								return;
 							}
 							notification.warning({
-								message:"请至少选择一条"
+								message:"请先选择数据"
 							});
 						}
 						}
@@ -87,7 +87,7 @@ export default class TableUnit extends Component {
 							return;
 						}
 						notification.warning({
-							message:'请至少选择一条'
+							message:'请先选择数据'
 						});
 					}} className={style.button}>申请删除</Button>
 					<Button onClick = {this.getExcel.bind(this)} className={style.button}>导出表格</Button>
@@ -155,9 +155,9 @@ export default class TableUnit extends Component {
         document.body.removeChild(link);
     }
 	getExcel(){
-		if (this.state.selectedRows.length === 0) {
+		if (this.state.selectedRows && this.state.selectedRows.length === 0) {
 			notification.warning({
-				message:'请至少选择一条'
+				message:'请先选择数据'
 			});
 			return;
 		}

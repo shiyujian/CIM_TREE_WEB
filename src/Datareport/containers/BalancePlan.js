@@ -250,7 +250,7 @@ export default class BanlancePlan extends Component {
 	getExcel(){
 		if(this.state.dataSourceSelected.length <=0){
 			notification.warning({
-				message:'请先选择数据'
+				message:'请先选择数据！'
 			})
 			return
 		}
@@ -332,7 +332,7 @@ export default class BanlancePlan extends Component {
 						<Button className="btn" type="default" onClick={() => { 
 							if(this.state.dataSourceSelected.length <=0){
 								notification.warning({
-									message:'请先选择数据'
+									message:'请先选择数据！'
 								})
 								return
 							}
@@ -340,7 +340,7 @@ export default class BanlancePlan extends Component {
 						<Button className="btn" type="default" onClick={() => { 
 							if(this.state.dataSourceSelected.length <=0){
 								notification.warning({
-									message:'请先选择数据'
+									message:'请先选择数据！'
 								})
 								return
 							}

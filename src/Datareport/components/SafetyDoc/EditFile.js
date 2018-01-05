@@ -190,6 +190,11 @@ export default class EditFile extends Component {
         });
         return false;
     }
+    onDateChange = (index,dateString,str) =>{
+        const {dataSource} = this.state;
+        dataSource[index][str] = dateString;
+        this.setState({dataSource});
+    }
 
     render() {
         const columns = [
@@ -243,6 +248,7 @@ export default class EditFile extends Component {
                 render: (text, record, index) => (
                     <div>
                         <DatePicker
+                            onChange={(date,dateString)=>{this.onDateChange(record,dateString,'doTime')}}
                             defaultValue={moment(record.doTime)} />
                     </div>
                 ),

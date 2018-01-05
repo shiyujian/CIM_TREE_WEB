@@ -8,8 +8,23 @@ import {launchProcess} from './commonFunc';
 
 export default class DeleteUpload extends Component{
 
+    constructor(props){
+        super(props);
+        this.state={
+            dataSource: []
+        }
+    }
+
+    componentDidMount(){
+        const {dataSource} = this.props,
+            sourceData = JSON.parse(JSON.stringify(dataSource));
+
+        this.setState({dataSource:sourceData})
+    }
+
     render(){
-        const {deleteModal, closeModal, dataSource} = this.props;
+        const {deleteModal, closeModal} = this.props,
+            {dataSource} = this.state;
 
         return(
             <Modal
@@ -21,6 +36,8 @@ export default class DeleteUpload extends Component{
                 <h1 style={{ textAlign: "center"}}>申请删除</h1>
                 <VedioTable
                  dataSource={dataSource}
+                 storeExcelData={this.storeData}
+                 fileDel={true}
                 />
                 <ChangeFooter
                  onOk={this.onOk}
@@ -39,6 +56,10 @@ export default class DeleteUpload extends Component{
             duration: 2
         });
         closeModal("deleteModal");
+    }
+
+    storeData = (dataSource)=>{
+        this.setState({dataSource});
     }
 
 }

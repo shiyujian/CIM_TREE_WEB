@@ -87,7 +87,7 @@ export default class TableOrg extends Component {
 			ModalVisibleUpdate(true)
 		}else{
 			notification.warning({
-				message:"请先选中要变更的数据"
+				message:"请先选择数据"
 			});
 		}
 	}
@@ -95,7 +95,7 @@ export default class TableOrg extends Component {
 	getExcel(){
 		if (this.state.excelData.length === 0) {
 			notification.warn({
-				message:"请先选中要导出的数据"
+				message:"请先选择数据"
 			});
 			return;
 		}
@@ -137,7 +137,7 @@ export default class TableOrg extends Component {
 			ModalVisibleDel(true);
 		}else{
 			notification.warning({
-				message:"请先选中要删除的数据"
+				message:"请先选择数据"
 			});
 		}
 	}

@@ -46,28 +46,28 @@ class Solution extends Component {
             dataSet: [],
             newKey: Math.random(),
             projectName: '',
-            roots:{},
-            totalDir:null,
-            project:{},
-            unitProject:{},
-            construct:{}
+            roots: {},
+            totalDir: null,
+            project: {},
+            unitProject: {},
+            construct: {}
         }
     }
 
-    componentDidMount(){
-        const { 
-            actions: { 
+    componentDidMount() {
+        const {
+            actions: {
                 getProjectTree,
-                getScheduleDir,
-                postScheduleDir
-            } 
+            getScheduleDir,
+            postScheduleDir
+            }
         } = this.props;
-        getProjectTree({},{depth:1}).then((rst)=>{
-            this.setState({roots:rst});
+        getProjectTree({}, { depth: 1 }).then((rst) => {
+            this.setState({ roots: rst });
             let name = rst.name;
-            let code = "safety_solution_dir_"+rst.code;
+            let code = "safety_solution_dir_" + rst.code;
             let getDirData = {
-                code:code
+                code: code
             }
             let postDirData = {
                 "name": name,
@@ -76,25 +76,25 @@ class Solution extends Component {
                 "status": "A",
                 "extra_params": {}
             }
-            getScheduleDir(getDirData).then( (rst)=>{
-                if(rst && rst.obj_type){
-                    console.log('存在目录',rst)
+            getScheduleDir(getDirData).then((rst) => {
+                if (rst && rst.obj_type) {
+                    console.log('存在目录', rst)
                     this.setState({
-                        totalDir:{
-                            pk:rst.pk,
-                            code:rst.code,
-                            obj_type:rst.obj_type
+                        totalDir: {
+                            pk: rst.pk,
+                            code: rst.code,
+                            obj_type: rst.obj_type
                         }
                     })
-                }else{
-                    console.log('不存在目录',rst)
-                    postScheduleDir({},postDirData).then((value)=>{
-                        console.log('创建目录',value)
+                } else {
+                    console.log('不存在目录', rst)
+                    postScheduleDir({}, postDirData).then((value) => {
+                        console.log('创建目录', value)
                         this.setState({
-                            totalDir:{
-                                pk:value.pk,
-                                code:value.code,
-                                obj_type:value.obj_type
+                            totalDir: {
+                                pk: value.pk,
+                                code: value.code,
+                                obj_type: value.obj_type
                             }
                         })
                     })
@@ -115,16 +115,16 @@ class Solution extends Component {
         openPreview(filed);
     }
 
-    delete(record,index){
+    delete(record, index) {
         let datas = this.state.dataSet;
-        const { 
-            actions: { 
+        const {
+            actions: {
                 delDocument
-            } 
+            }
         } = this.props;
-        delDocument({code:record.code});
-        datas.splice(index,1);
-        this.setState({dataSet:datas});
+        delDocument({ code: record.code });
+        datas.splice(index, 1);
+        this.setState({ dataSet: datas });
     }
     createLink = (name, url) => {    //下载
         let link = document.createElement("a");
@@ -138,7 +138,7 @@ class Solution extends Component {
 
     onDownClick(record, index) {
         let apiGet = `${STATIC_DOWNLOAD_API}` + (record.attachment.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        this.createLink(this,apiGet);
+        this.createLink(this, apiGet);
     }
 
     goCancel() {
@@ -146,27 +146,27 @@ class Solution extends Component {
     }
 
     setAddData() {
-        const {totalDir,project,unitProject} = this.state;
+        const { totalDir, project, unitProject } = this.state;
 
-        const { 
-            actions: { 
-                getProjects, 
-                setProjects, 
-                getWorkpackages, 
-                postDocument,
-                getDocument,
-                setDocument,
-                delDocument,
-                getScheduleDir,
-                postScheduleDir,
-                getDocumentByCode
-            } 
+        const {
+            actions: {
+                getProjects,
+            setProjects,
+            getWorkpackages,
+            postDocument,
+            getDocument,
+            setDocument,
+            delDocument,
+            getScheduleDir,
+            postScheduleDir,
+            getDocumentByCode
+            }
         } = this.props;
         let name = project.name;
-        let code = "safety_solution_dir_"+project.code;
+        let code = "safety_solution_dir_" + project.code;
 
         let getDirData = {
-            code:code,
+            code: code,
         }
         //创建目录
         let postDirData = {
@@ -175,51 +175,51 @@ class Solution extends Component {
             "obj_type": "C_DIR",
             "status": "A",
             "extra_params": {},
-            "parent": {"pk":totalDir.pk,"code":totalDir.code,"obj_type":totalDir.obj_type}
+            "parent": { "pk": totalDir.pk, "code": totalDir.code, "obj_type": totalDir.obj_type }
         }
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                getScheduleDir({code:code}).then((rst)=>{
-                    if(rst&&rst.obj_type){    //存在当前目录
+                getScheduleDir({ code: code }).then((rst) => {
+                    if (rst && rst.obj_type) {    //存在当前目录
                         let projectData = {
-                            "code": "safetytestfile"+moment().format("YYYYMMDDHHmmss"),
+                            "code": "safetytestfile" + moment().format("YYYYMMDDHHmmss"),
                             "name": values.solution,
                             "obj_type": "C_DOC",
-                            "workpackages":[{
-                                "pk":rst.pk,
+                            "workpackages": [{
+                                "pk": rst.pk,
                                 "code": rst.code,
                                 "obj_type": rst.obj_type
                             }],
                             "extra_params": {
                                 "solution": values.solution,
-                                "projectName":values.projectName,
-                                "constructionUnit":values.constructionUnit,
-                                "portion":values.portion,
+                                "projectName": values.projectName,
+                                "constructionUnit": values.constructionUnit,
+                                "portion": values.portion,
                             },
-                            "profess_folder": {"code": code, "obj_type":"C_DIR"},
+                            "profess_folder": { "code": code, "obj_type": "C_DIR" },
                             "basic_params": {
                                 "files": [
                                     {
-                                      "a_file": values.attachment[0].a_file,
-                                      "name": values.attachment[0].name,
-                                      "download_url": values.attachment[0].download_url,
-                                      "misc": "file",
-                                      "mime_type": values.attachment[0].mime_type
+                                        "a_file": values.attachment[0].a_file,
+                                        "name": values.attachment[0].name,
+                                        "download_url": values.attachment[0].download_url,
+                                        "misc": "file",
+                                        "mime_type": values.attachment[0].mime_type
                                     },
                                 ]
-                              },
+                            },
                             "status": "A",
                             "version": "A"
                         }
-                        postDocument({}, projectData).then((result)=>{
-                            if(result.obj_type){
+                        postDocument({}, projectData).then((result) => {
+                            if (result.obj_type) {
                                 notification.warning({
                                     message: '创建文档成功！',
                                     duration: 2
                                 });
                                 let dataSet = [];
-                                getDocumentByCode({code:code}).then((rep)=>{
-                                    for(let i=0;i<rep.result.length;i++){
+                                getDocumentByCode({ code: code }).then((rep) => {
+                                    for (let i = 0; i < rep.result.length; i++) {
                                         let data = {};
                                         data.projectName = rep.result[i].extra_params.projectName;
                                         data.solution = rep.result[i].extra_params.solution;
@@ -229,53 +229,53 @@ class Solution extends Component {
                                         data.code = rep.result[i].code;
                                         dataSet.push(data);
                                     }
-                                    this.setState({dataSet});
+                                    this.setState({ dataSet });
                                 });
                             }
                         });
-                        this.setState({setAddVisiable:false});
-                    }else{
-                        postScheduleDir({},postDirData).then((value) =>{   //创建目录
-                            if(value && value.code){   //创建目录成功
+                        this.setState({ setAddVisiable: false });
+                    } else {
+                        postScheduleDir({}, postDirData).then((value) => {   //创建目录
+                            if (value && value.code) {   //创建目录成功
                                 let projectData = {
-                                    "code": "safetytestfile"+moment().format("YYYYMMDDHHmmss"),
+                                    "code": "safetytestfile" + moment().format("YYYYMMDDHHmmss"),
                                     "name": values.solution,
                                     "obj_type": "C_DOC",
-                                    "workpackages":[{
-                                        "pk":rst.pk,
+                                    "workpackages": [{
+                                        "pk": rst.pk,
                                         "code": rst.code,
                                         "obj_type": rst.obj_type
                                     }],
                                     "extra_params": {
                                         "solution": values.solution,
-                                        "projectName":values.projectName,
-                                        "constructionUnit":values.constructionUnit,
-                                        "portion":values.portion,
+                                        "projectName": values.projectName,
+                                        "constructionUnit": values.constructionUnit,
+                                        "portion": values.portion,
                                     },
-                                    "profess_folder": {"code": code, "obj_type":"C_DIR"},
+                                    "profess_folder": { "code": code, "obj_type": "C_DIR" },
                                     "basic_params": {
                                         "files": [
                                             {
-                                              "a_file": values.attachment[0].a_file,
-                                              "name": values.attachment[0].name,
-                                              "download_url": values.attachment[0].download_url,
-                                              "misc": "file",
-                                              "mime_type": values.attachment[0].mime_type
+                                                "a_file": values.attachment[0].a_file,
+                                                "name": values.attachment[0].name,
+                                                "download_url": values.attachment[0].download_url,
+                                                "misc": "file",
+                                                "mime_type": values.attachment[0].mime_type
                                             },
                                         ]
-                                      },
+                                    },
                                     "status": "A",
                                     "version": "A"
                                 }
-                                postDocument({}, projectData).then((result)=>{
-                                    if(result.obj_type){
+                                postDocument({}, projectData).then((result) => {
+                                    if (result.obj_type) {
                                         notification.warning({
                                             message: '创建文档成功！',
                                             duration: 2
                                         });
                                         let dataSet = [];
-                                        getDocumentByCode({code:code}).then((rep)=>{
-                                            for(let i=0;i<rep.result.length;i++){
+                                        getDocumentByCode({ code: code }).then((rep) => {
+                                            for (let i = 0; i < rep.result.length; i++) {
                                                 let data = {};
                                                 data.projectName = rep.result[i].extra_params.projectName;
                                                 data.solution = rep.result[i].extra_params.solution;
@@ -285,12 +285,12 @@ class Solution extends Component {
                                                 data.code = rep.result[i].code;
                                                 dataSet.push(data);
                                             }
-                                            this.setState({dataSet});
+                                            this.setState({ dataSet });
                                         });
                                     }
                                 });
-                                this.setState({setAddVisiable:false});
-                            }else{
+                                this.setState({ setAddVisiable: false });
+                            } else {
                                 notification.warning({
                                     message: '未成功创建文件目录，请重试！',
                                     duration: 2
@@ -306,8 +306,8 @@ class Solution extends Component {
         this.setState({ selectedRowKeys });
     }
     onAddClick = () => {
-        const {unitProject} = this.state;
-        if(!unitProject.name){
+        const { unitProject } = this.state;
+        if (!unitProject.name) {
             notification.warning({
                 message: '请选择一个节点信息！',
                 duration: 2
@@ -328,41 +328,41 @@ class Solution extends Component {
         this.setState({ dataSet: array });
     }
 
-    onSelect(project, unitProject){
-        const { 
-            actions: { 
-                getProjects, 
-                setProjects, 
-                getWorkpackages, 
-                postDocument,
-                getDocument,
-                setDocument,
-                delDocument,
-                getDocumentByCode,
-                getWorkpackagesByCode
-            } 
+    onSelect(project, unitProject) {
+        const {
+            actions: {
+                getProjects,
+            setProjects,
+            getWorkpackages,
+            postDocument,
+            getDocument,
+            setDocument,
+            delDocument,
+            getDocumentByCode,
+            getWorkpackagesByCode
+            }
         } = this.props;
-        if(unitProject){
-            this.setState({project,unitProject});
-            getWorkpackagesByCode({code:unitProject.code}).then(rst =>{
-                if(rst.code){
-                    if(rst.extra_params && rst.extra_params.unit){
-                        for(let i=0;i<rst.extra_params.unit.length;i++){
-                            if(rst.extra_params.unit[i].type==="施工单位/C"){
-                                this.setState({construct:rst.extra_params.unit[i]});
+        if (unitProject) {
+            this.setState({ project, unitProject });
+            getWorkpackagesByCode({ code: unitProject.code }).then(rst => {
+                if (rst.code) {
+                    if (rst.extra_params && rst.extra_params.unit) {
+                        for (let i = 0; i < rst.extra_params.unit.length; i++) {
+                            if (rst.extra_params.unit[i].type === "施工单位/C" || rst.extra_params.unit[i].type === "施工单位") {
+                                this.setState({ construct: rst.extra_params.unit[i] });
                             }
                         }
                     }
                 }
             });
-        }else{
+        } else {
             return;
         }
         debugger
-        let code = "safety_solution_dir_"+project.code;
+        let code = "safety_solution_dir_" + project.code;
         let dataSet = [];
-        getDocumentByCode({code:code}).then((rep)=>{
-            for(let i=0;i<rep.result.length;i++){
+        getDocumentByCode({ code: code }).then((rep) => {
+            for (let i = 0; i < rep.result.length; i++) {
                 let data = {};
                 data.projectName = rep.result[i].extra_params.projectName;
                 data.solution = rep.result[i].extra_params.solution;
@@ -372,21 +372,21 @@ class Solution extends Component {
                 data.code = rep.result[i].code;
                 dataSet.push(data);
             }
-            this.setState({dataSet});
+            this.setState({ dataSet });
         });
     }
 
-    onSearch = (value) =>{
-        const {project} = this.state;
-        let code = "safety_solution_dir_"+project.code;
-        const { 
-            actions: { 
+    onSearch = (value) => {
+        const { project } = this.state;
+        let code = "safety_solution_dir_" + project.code;
+        const {
+            actions: {
                 getDocumentByContent
-            } 
+            }
         } = this.props;
         let dataSet = [];
-        getDocumentByContent({code:code,name:value}).then((rep)=>{
-            for(let i=0;i<rep.result.length;i++){
+        getDocumentByContent({ code: code, name: value }).then((rep) => {
+            for (let i = 0; i < rep.result.length; i++) {
                 let data = {};
                 data.projectName = rep.result[i].extra_params.projectName;
                 data.solution = rep.result[i].extra_params.solution;
@@ -396,7 +396,7 @@ class Solution extends Component {
                 data.code = rep.result[i].code;
                 dataSet.push(data);
             }
-            this.setState({dataSet});
+            this.setState({ dataSet });
         });
     }
 
@@ -438,13 +438,13 @@ class Solution extends Component {
                         <a href="javascript:;" onClick={this.onDownClick.bind(this, record, index)}>下载</a>
                         <span className="ant-divider" />
                         <Popconfirm
-						 placement="rightTop"
-						 title="确定删除吗？"
-						 onConfirm={this.delete.bind(this, record, index)}
-						 okText="确认"
-						 cancelText="取消">
-						<a>删除</a>
-					</Popconfirm>
+                            placement="rightTop"
+                            title="确定删除吗？"
+                            onConfirm={this.delete.bind(this, record, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
                     </div>
                 }
             }
@@ -458,8 +458,8 @@ class Solution extends Component {
             <div className={styles.riskevaluation}>
                 <DynamicTitle title="专项方案" {...this.props} />
                 <Sidebar>
-                    <div style={{overflow:'hidden'}} className="project-tree">
-                        <ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)}/>
+                    <div style={{ overflow: 'hidden' }} className="project-tree">
+                        <ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)} />
                     </div>
                 </Sidebar>
                 <Content>
