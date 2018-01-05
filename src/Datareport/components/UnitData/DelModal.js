@@ -57,7 +57,6 @@ export default class DelModal extends Component {
     componentDidMount(){
         const {actions:{getAllUsers,getProjectAc}} = this.props
         getAllUsers().then(res => {
-            console.log(res);
             let set = {};
             let checkers = res.map(o => {
                 set[o.id] = o;

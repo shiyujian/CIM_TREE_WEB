@@ -94,7 +94,6 @@ export default class UpdataCheck extends Component {
                             version: "A",
                             response_orgs: pro_orgs
                         }).then(rst => {
-                            console.log("rst:", rst);
                         }) 
                     });
                 }) 
@@ -114,7 +113,6 @@ export default class UpdataCheck extends Component {
                             version: "A",
                             response_orgs: unit_orgs
                         }).then(rst => {
-                            console.log("rst:", rst);
                         }) 
                     })
                 })

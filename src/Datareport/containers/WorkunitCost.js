@@ -110,36 +110,7 @@ export default class WorkunitCost extends Component {
 		})
 
 	}
-	// async generateTableData(data) {
-	// 	const { actions: {getDocument}} = this.props;  
-	// 	let dataSour = [];
-	// 	let i=0;
-	// 	data.map((item) => {
-	// 		getDocument({ code: item.code }).then(single => {
-	// 			i++
-	// 			let temp = {
-	// 				key:i,
-	// 				code: item.code,
-	// 				subproject: single.extra_params.subproject || rst.extra_params.project,//项目/子项目
-	// 				unit: single.extra_params.unit || rst.extra_params.unit,//单位工程
-	// 				projectcoding: single.extra_params.projectcoding,//项目编号
-	// 				projectname: single.extra_params.projectname,//项目名称
-	// 				company: single.extra_params.company,//计量单位
-	// 				number: single.extra_params.number,//数量
-	// 				total: single.extra_params.total,//单价
-	// 				remarks: single.extra_params.remarks,//备注
-	// 			}
-	// 			dataSour.push(temp);
-	// 			this.setState({ 
-	// 				dataSource:dataSour,
-	// 				showDs:dataSour,
-	// 				loading:false,
-	// 				percent:100
-	// 			});
-	// 		})
-	// 	})
-		
-	// }
+	
 	//点×取消
 	oncancel() {
 		this.setState({ addvisible: false });
@@ -161,7 +132,7 @@ export default class WorkunitCost extends Component {
 			this.setState({changevisible:true});
 			return;
 		}else{
-			message.warning('请选择数据');
+			notification.warning({message:'请先选择数据',duration: 2});
 		}
 	}
 	//申请删除
@@ -378,7 +349,7 @@ export default class WorkunitCost extends Component {
 			title: '项目/子项目',
 			dataIndex: 'subproject',
 			key:'subproject',
-			sorter:(a,b) =>b.subprojectg - a.subproject
+			sorter:(a,b) =>a.subprojectg - b.subproject
 		}, {
 			title: '单位工程',
 			dataIndex: 'unit',
@@ -386,27 +357,27 @@ export default class WorkunitCost extends Component {
 			title: '清单项目编号',
 			dataIndex: 'projectcoding',
 			key:'projectcoding',
-			sorter:(a,b) =>b.projectcoding - a.projectcoding 
+			sorter:(a,b) =>a.projectcoding - b.projectcoding 
 		}, {
 			title: '项目名称',
 			dataIndex: 'projectname',
-			key:'Projectname'
+			key:'projectname'
 		}, {
 			title: '计量单位',
 			dataIndex: 'company',
-			key:'Company'
+			key:'company'
 		}, {
 			title: '数量',
 			dataIndex: 'number',
-			key:'Number'
+			key:'number'
 		}, {
 			title: '综合单价(元)',
 			dataIndex: 'total',
-			key:'Total'
+			key:'total'
 		}, {
 			title: '备注',
 			dataIndex: 'remarks',
-			key:'Remarks'
+			key:'remarks'
 		}];
 		return (
 			<div style={{ overflow: 'hidden', padding: 20 }}>
@@ -434,12 +405,12 @@ export default class WorkunitCost extends Component {
 				<Row >
 					<Col >
 						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs } 
-						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}} pagination={paginationInfo}/>
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}} pagination={paginationInfo} bordered rowKey="key"/>
 					</Col>
 				</Row>
 				{
 					this.state.addvisible &&
-					<ProjectSum {...this.props} oncancel={this.oncancel.bind(this)} onok={this.setData.bind(this)} rowKey="key" />
+					<ProjectSum {...this.props} oncancel={this.oncancel.bind(this)} onok={this.setData.bind(this)}  />
 				}
 				{
 					this.state.delatevisible &&

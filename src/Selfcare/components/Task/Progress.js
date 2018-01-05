@@ -482,10 +482,10 @@ export default class Progress extends Component {
 
 	//关闭数据报送模态框
 	closeModal(key,value,res){
-		const {actions:{changeDatareportVisible}} = this.props
+		const {actions:{changeDatareportVisible,getTask},task: { id } = {}} = this.props
 		changeDatareportVisible({key,value});
 		if(res){
-			window.location.reload();
+			getTask({ task_id: id });
 		}
 	}
 	

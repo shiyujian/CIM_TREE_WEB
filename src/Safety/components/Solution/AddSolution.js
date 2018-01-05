@@ -17,7 +17,7 @@ export default class AddSolution extends Component {
 	}
 
 	componentDidMount() {
-		console.log('vip-props', this.props);
+		// console.log('vip-props', this.props);
 		const {
             actions: {
                 getPortions,
@@ -25,11 +25,11 @@ export default class AddSolution extends Component {
         } = this.props.props;
 		let code = this.props.state.project.code;
 		let dataSet = [];
-		debugger;
+		// debugger;
 		let branch = [];
 		let subBranch=[];
 		getPortions({ code: code }).then((rst) => {
-			console.log('vip-rst', rst);
+			// console.log('vip-rst', rst);
 			if (rst.children) {
 				rst.children.map(item => {
 					if (rst.code === code) {  //当前选中项目
@@ -42,8 +42,6 @@ export default class AddSolution extends Component {
 								}
 							)
 						})
-						// branch.push([...subBranch]);
-						// branch=Object.assign().push([...subBranch]);
 						branch=[...branch,...subBranch];
 					}
 				})
@@ -121,7 +119,7 @@ export default class AddSolution extends Component {
 
 	beforeUploadPicFile = (file) => {
 		const fileName = file.name;
-		debugger
+		// debugger
 		// 上传图片到静态服务器
 		const { actions: { uploadStaticFile, deleteStaticFile } } = this.props.props;
 
@@ -130,7 +128,7 @@ export default class AddSolution extends Component {
 		formdata.append('name', fileName);
 
 		uploadStaticFile({}, formdata).then(resp => {
-			console.log('uploadStaticFile: ', resp)
+			// console.log('vip-uploadStaticFile: ', resp)
 			if (!resp || !resp.id) {
 				message.error('文件上传失败')
 				return;
@@ -175,14 +173,14 @@ export default class AddSolution extends Component {
 						<Input type="text" />
 						)}
 				</FormItem>
-				<FormItem {...formItemLayout} label="工程名称">
+				<FormItem {...formItemLayout} label="工程名称" hasFeedback>
 					{getFieldDecorator('projectName', {
 						initialValue: this.props.state.unitProject.name,
 						rules: [
 							{ required: true, message: '未获取到工程名称！' },
 						]
 					})(
-						<Input type="text" disabled />
+						<Input type="text" disabled placeholder="未获取到工程名称！" />
 						)}
 				</FormItem>
 				<FormItem {...formItemLayout} label="施工单位" hasFeedback>
@@ -192,7 +190,7 @@ export default class AddSolution extends Component {
 							{ required: true, message: '该单位工程无施工单位，请联系管理员！' },
 						]
 					})(
-						<Input type="text" disabled placeholder="未获取到施工单位" />
+						<Input type="text" disabled placeholder="未获取到施工单位！" />
 						)}
 				</FormItem>
 				<FormItem {...formItemLayout} label="分部分项">
@@ -204,7 +202,6 @@ export default class AddSolution extends Component {
 						, {})
 						(
 						<Cascader
-							// style={{ width: '300px' }}
 							options={this.state.options}
 							className='btn'
 							loadData={this.loadData.bind(this)}
@@ -235,10 +232,8 @@ export default class AddSolution extends Component {
 	}
 	onSelectProject(value, selectedOptions) {
 		if(!value)return;
-		debugger;
-		console.log('vip-value', value);
-		console.log('vip-selectedOptions', selectedOptions);
-
+		// console.log('vip-value', value);
+		// console.log('vip-selectedOptions', selectedOptions);
 		let branch = {}; //分部 外层Chilren
 		let subentry = {}; // 分项 内层Chilren
 		let temp1 = JSON.parse(value[0]);
@@ -258,11 +253,9 @@ export default class AddSolution extends Component {
 			}
 		}
 		this.setState({ branch, subentry });
-		// this.setState({ branch: {}, subentry: {} });
 	}
 
 	loadData(selectedOptions) {
-		debugger;
 		const { actions: { getPortions } } = this.props.props;
 		const targetOption = selectedOptions[selectedOptions.length - 1];
 		targetOption.loading = true;
