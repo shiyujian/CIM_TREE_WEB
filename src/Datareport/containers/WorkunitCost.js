@@ -405,7 +405,7 @@ export default class WorkunitCost extends Component {
 				<Row >
 					<Col >
 						<Table rowSelection={rowSelection} columns={columns} dataSource={this.state.showDs } 
-						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}} pagination={paginationInfo}  rowKey="key"/>
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}} pagination={paginationInfo} bordered rowKey="key"/>
 					</Col>
 				</Row>
 				{
