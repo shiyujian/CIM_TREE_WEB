@@ -138,20 +138,20 @@ export default class DeleteFile extends Component {
                         onConfirm={this.delete.bind(this, index)}
                         okText="确认"
                         cancelText="取消">
-                        <a>删除</a>
+                        <a><Icon type='delete' /></a>
                     </Popconfirm>
                 )
             }
         }];
         return (
             <Modal
-			title="安全隐患删除表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
-			onCancel={this.props.oncancel}>
+            onCancel={this.props.oncancel}>
+            <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>申请删除</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

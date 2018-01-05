@@ -343,6 +343,7 @@ export default class WorkScheduleData extends Component {
 		title: '序号',
 		dataIndex: "key",
 		key: "key",
+		width:"5%",
 	}, {
 		title: 'WBS编码',
 		dataIndex: 'code',

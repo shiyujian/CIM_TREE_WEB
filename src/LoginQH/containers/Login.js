@@ -401,7 +401,6 @@ class Login extends Component {
 
 	loginFunc(data, loginType, values) {
 		const {actions: {login, getTasks}, history: {replace}} = this.props;
-		console.log('this.props',this.props)
 		clearUser();
 		clearUser();
 		clearUser();
