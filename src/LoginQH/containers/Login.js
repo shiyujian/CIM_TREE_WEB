@@ -343,7 +343,8 @@ class Login extends Component {
 		this.props.form.validateFieldsAndScroll((err,values) =>{
 			if(!err){
 				console.log('values',values)
-				let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
+				// let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
+				let partn=/^1[0-9]{10}$/;
 				let phonenumber =values.phone;
 				console.log(phonenumber)
 				if(!partn.exec(phonenumber)){
