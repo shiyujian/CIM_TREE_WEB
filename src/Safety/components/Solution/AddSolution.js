@@ -17,7 +17,7 @@ export default class AddSolution extends Component {
 	}
 
 	componentDidMount() {
-		console.log('vip-props', this.props);
+		// console.log('vip-props', this.props);
 		const {
             actions: {
                 getPortions,
@@ -29,7 +29,7 @@ export default class AddSolution extends Component {
 		let branch = [];
 		let subBranch=[];
 		getPortions({ code: code }).then((rst) => {
-			console.log('vip-rst', rst);
+			// console.log('vip-rst', rst);
 			if (rst.children) {
 				rst.children.map(item => {
 					if (rst.code === code) {  //当前选中项目
@@ -119,7 +119,7 @@ export default class AddSolution extends Component {
 
 	beforeUploadPicFile = (file) => {
 		const fileName = file.name;
-		debugger
+		// debugger
 		// 上传图片到静态服务器
 		const { actions: { uploadStaticFile, deleteStaticFile } } = this.props.props;
 
@@ -128,7 +128,7 @@ export default class AddSolution extends Component {
 		formdata.append('name', fileName);
 
 		uploadStaticFile({}, formdata).then(resp => {
-			console.log('uploadStaticFile: ', resp)
+			// console.log('vip-uploadStaticFile: ', resp)
 			if (!resp || !resp.id) {
 				message.error('文件上传失败')
 				return;
@@ -232,10 +232,8 @@ export default class AddSolution extends Component {
 	}
 	onSelectProject(value, selectedOptions) {
 		if(!value)return;
-		debugger;
-		console.log('vip-value', value);
-		console.log('vip-selectedOptions', selectedOptions);
-
+		// console.log('vip-value', value);
+		// console.log('vip-selectedOptions', selectedOptions);
 		let branch = {}; //分部 外层Chilren
 		let subentry = {}; // 分项 内层Chilren
 		let temp1 = JSON.parse(value[0]);
@@ -255,11 +253,9 @@ export default class AddSolution extends Component {
 			}
 		}
 		this.setState({ branch, subentry });
-		// this.setState({ branch: {}, subentry: {} });
 	}
 
 	loadData(selectedOptions) {
-		debugger;
 		const { actions: { getPortions } } = this.props.props;
 		const targetOption = selectedOptions[selectedOptions.length - 1];
 		targetOption.loading = true;

@@ -9,7 +9,10 @@ import {uploadFile} from './commonFunc';
 export default class VedioInfoTable extends Component{
 
     componentDidMount(){
-        const {fileDel=false} = this.props;
+        const {fileDel=false,enginner=true} = this.props;
+        if(!enginner){
+            this.columns.splice(1,2);
+        }
         if(fileDel){
             this.columns.push(this.operation);
         }
