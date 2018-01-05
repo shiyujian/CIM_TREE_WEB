@@ -504,13 +504,13 @@ export default class ChangeFile extends Component {
             });
             return;
         }
-        if (!this.state.changeInfo) {
-            notification.warning({
-                message: '请填写变更原因',
-                duration: 2
-            });
-            return;
-        }
+        // if (!this.state.changeInfo) {
+        //     notification.warning({
+        //         message: '请填写变更原因',
+        //         duration: 2
+        //     });
+        //     return;
+        // }
         let { check } = this.state
         let per = {
             id: check.id,
