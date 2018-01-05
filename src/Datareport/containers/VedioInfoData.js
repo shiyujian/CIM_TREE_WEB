@@ -149,7 +149,7 @@ export default class VedioInfoData extends Component {
 		this.setState({selectRows});
 	}
 
-	selectJudge = ()=>{
+	selectJudge = (same=true)=>{
 		const {selectRows} = this.state;
 		if(selectRows.length == 0){
 			notification.warning({
@@ -158,19 +158,21 @@ export default class VedioInfoData extends Component {
 			});
 			return false
 		}
-		if(!selectRows.every((data)=> data.enginner == selectRows[0].enginner )){
-			notification.warning({
-				message: '请选择相同单位工程下的数据！',
-				duration: 2
-			});
-			return false
+		if(same){
+			if(!selectRows.every((data)=> data.enginner == selectRows[0].enginner )){
+				notification.warning({
+					message: '请选择相同单位工程下的数据！',
+					duration: 2
+				});
+				return false
+			}
 		}
 		return true
 	}
 
 	deriveData = ()=>{
-		const {dataSource} = this.state;
-		return dataSource.map(item=>{
+		const {selectRows} = this.state;
+		return selectRows.map(item=>{
 			const {index,projectName,enginner,ShootingDate,file:{name},code} = item;
 			return [index,projectName,enginner,ShootingDate,name,code]
 		})
