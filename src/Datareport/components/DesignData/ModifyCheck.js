@@ -170,7 +170,7 @@ export default class ModifyCheck extends Component {
         });
         await Promise.all(all)
             .then(rst => {
-               notification.success({ message: '修改文档成功！' });
+               notification.success({ message: '修改文档成功' });
             })
     }
     //不通过
@@ -203,7 +203,7 @@ export default class ModifyCheck extends Component {
             }
         );
         notification.success({
-            message: '操作成功！',
+            message: '操作成功',
             duration: 2
         });
     }
