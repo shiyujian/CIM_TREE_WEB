@@ -785,7 +785,6 @@ export default class Lmap extends Component {
 	/*在地图上添加marker和polygan*/
 	createMarker(geo, oldMarker) {
 		var me = this;
-		debugger
 		if (geo.properties.type != 'area') {
 			if (!oldMarker) {
 				if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {
