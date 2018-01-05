@@ -68,7 +68,7 @@ export default class ModalCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("modal_check_visbile",false,'submit');
-        notification.info({message:"操作成功"});
+        notification.info({message:"操作成功！"});
     }
 
     //通过
@@ -169,7 +169,7 @@ export default class ModalCheck extends Component {
         let rst = await addDocList({},{data_list:docData});
         if(rst.result){
             notification.success({
-                message: '创建文档成功！',
+                message: '创建文档成功',
                 
             });
         }else{
@@ -209,7 +209,7 @@ export default class ModalCheck extends Component {
             }
         );
         notification.success({
-            message: '操作成功！',
+            message: '操作成功',
             duration: 2
         });
     }

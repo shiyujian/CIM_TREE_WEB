@@ -40,7 +40,6 @@ export default class ToggleModal extends Component{
 		        }
 		    },
         };
-        console.log(this.state.dataSource);
         return (
             <Modal
                 visible={visible}
@@ -125,7 +124,6 @@ export default class ToggleModal extends Component{
     componentDidMount(){
         const {actions:{getAllUsers}} = this.props
         getAllUsers().then(res => {
-            console.log(res);
             let set = {};
             let checkers = res.map(o => {
                 set[o.id] = o;
@@ -162,7 +160,6 @@ export default class ToggleModal extends Component{
         return false;
     }
     beforeUpload(record,file){
-        console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;

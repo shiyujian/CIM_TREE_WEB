@@ -152,12 +152,10 @@ export default class HPModal extends Component{
         });
         let rst = await putProjectListAc({},{data_list:dataList});
         if(rst && rst.result && rst.result.length>0){
-            console.log(rst);
             await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         }
     }
     beforeUpload(record,file){
-        console.log(record,file);
         const fileName = file.name;
         // 上传到静态服务器
         const { actions:{uploadStaticFile} } = this.props;
