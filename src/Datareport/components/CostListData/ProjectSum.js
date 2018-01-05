@@ -452,13 +452,16 @@ export default class ProjectSum extends Component {
         )
     }
     render() {
+      
         const columns = [
             {
                 title: '序号',
                 dataIndex: 'key',
+                key:'key',
             }, {
                 title: '清单项目编号',
                 dataIndex: 'projectcoding',
+                key:'projectcoding',
                 render: (text, record, index) => {
                     if(record.flag === false){
                         return (<span style={{color:'red'}}>{record.projectcoding}</span>)    
@@ -469,36 +472,42 @@ export default class ProjectSum extends Component {
             }, {
                 title: '项目名称',
                 dataIndex: 'projectname',
+                key:'projectname',
                 render:(text,record,index) =>{
                     return this.renderColumns(record.key-1,'projectname',text);
                 }
             },  {
                 title: '计量单位',
                 dataIndex: 'company',
+                key:'company',
                 render:(text,record,index) =>{
                     return this.renderColumns(record.key-1,'company',text);
                 }
             },{
                 title: '数量',
                 dataIndex: 'number',
+                key:'number',
                 render:(text,record,index) =>{
                     return this.renderColumns(record.key-1,'number',text);
                 }
             },{
                 title: '综合单价(元)',
                 dataIndex: 'total',
+                key:'total',
                 render:(text,record,index) =>{
                     return this.renderColumns(record.key-1,'total',text);
                 }
             },{
                 title: '备注',
                 dataIndex: 'remarks',
+                key:'remarks',
                 render:(text,record,index) =>{
                     return this.renderColumns(record.key-1,'remarks',text);
                 }
             }, 
             {
                 title: "操作", 
+                key:'edit',
                 render: (text, record, index) => {
                     return record.action === 'normal' ? (
                       <div>
@@ -531,7 +540,7 @@ export default class ProjectSum extends Component {
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
-                    
+                    rowKey="key"
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col><Button style={{ margin: '10px 10px 10px 0px' }} onClick={this.DownloadExcal.bind(this)}>模板下载</Button></Col>
@@ -566,7 +575,7 @@ export default class ProjectSum extends Component {
                                 className='btn'
                                 loadData={this.loadData.bind(this)}
                                 onChange={this.onSelectProject.bind(this)}
-                                placeholder="请选择"
+                                placeholder="请选择项目和单位工程"
                                 changeOnSelect
                             />
                         </span>

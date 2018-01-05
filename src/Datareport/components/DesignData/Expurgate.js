@@ -174,7 +174,7 @@ export default class Expurgate extends Component {
 	onok() {
 		let { dataSource } = this.state;
 		if (!this.state.check) {
-			notification.info({ message: "请选择审核人" })
+			notification.info({ message: "请选择审核人！" })
 			return
 		}
 		let { check } = this.state
@@ -224,7 +224,7 @@ export default class Expurgate extends Component {
 					}],
 					attachment: null
 				}).then(() => {
-					notification.success({ message: "成功!" })
+					notification.success({ message: "成功" })
 					changeExpurgateField('visible', false);
 				})
 		})

@@ -82,7 +82,7 @@ export default class Expurgate extends Component {
 		let { dataSource } = this.state;
 
 		if (!this.state.check) {
-			notification.info({ message: "请选择审核人!" })
+			notification.info({ message: "请选择审核人！" })
 			return;
 		}
 		let { check } = this.state;

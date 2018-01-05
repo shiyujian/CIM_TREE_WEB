@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { Input, Form, Spin, Upload, Icon, Button, 
     Cascader,Modal,Popconfirm,Select, message, Table, Row, Col, notification } from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_SafetyHiddenDanger} from '_platform/api';
 import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -69,23 +69,31 @@ export default class AddFile extends Component {
 
     onok(){
         if(!this.state.check){
-            message.info("请选择审核人")
+            notification.warning({
+                message:'请选择审核人'
+            })
             return
         }
         if(this.state.dataSource.length === 0){
-            message.info("请上传excel")
+            notification.warning({
+                message:'请上传Excel'
+            })
             return
         }
         let temp = this.state.dataSource.some((o,index) => {
                         return !o.file.id
                     })
         if(temp){
-            message.info(`有数据未上传附件`);
+            notification.warning({
+                message:'有数据未上传附件'
+            })
             return;
         }
         const {project,unit} =  this.state;
         if(!project.name){
-            message.info(`请选择项目和单位工程`);
+            notification.warning({
+                message:'请选择项目和单位工程'
+            })
             return;
         }
 
@@ -113,14 +121,17 @@ export default class AddFile extends Component {
             for (let i = 1; i < dataList.length; i++) {
                 let judge = await getOrg({code:dataList[i][2]});
                 if(!judge.code){
-                    message.info("您的第"+ i +"条责任单位输入有误，请确认");
+                    notification.warning({
+                        message:"您的第"+ i +"条责任单位输入有误，请确认"
+                    })
                     return;
                 }
                 let wbs = await getTreeRootNode({code:dataList[i][1]});
-                debugger
                 if(wbs && wbs.children[0] && wbs.children[0].children[0] && wbs.children[0].children[0].code){
                     if(wbs.children[0].children[0].code !== unit.code){
-                        message.info("您的第"+ i +"条wbs编码输入有误，请确认");
+                        notification.warning({
+                            message:"您的第"+ i +"条wbs编码输入有误，请确认"
+                        })
                     return;
                     }
                 }else{
@@ -303,7 +314,9 @@ export default class AddFile extends Component {
             resp = await resp.json()
             console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                notification.error({
+                    message:'文件上传失败'
+                })
                 return;
             };
             const filedata = resp;
@@ -361,11 +374,27 @@ export default class AddFile extends Component {
                 }
                 this.setState({dataSource});
             }else{
-                message.info("输错了")
+                notification.warning({
+                    message:'输错了'
+                })
             }
         })
     }
-
+    // 模板下载
+    download(){
+        let apiGet = `${DataReportTemplate_SafetyHiddenDanger}`;
+        this.createLink(this,apiGet);
+    }
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
     render() {
         const columns = [
             {
@@ -462,13 +491,13 @@ export default class AddFile extends Component {
         ];
         return (
             <Modal
-			title="安全隐患上传表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+            <h1 style ={{textAlign:'center',marginBottom:20}}>发起填报</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -476,6 +505,12 @@ export default class AddFile extends Component {
                     pagination={{ pageSize: 10 }}
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
+                <Col>
+                        <Button 
+                            style={{ margin:'10px 10px 10px 0px' }}
+                            onClick={()=>this.download()}
+                            >模板下载</Button>
+                </Col>
                 <Col>
                     <Upload
                         onChange={this.uplodachange.bind(this)}

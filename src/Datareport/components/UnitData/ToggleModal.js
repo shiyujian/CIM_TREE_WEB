@@ -25,7 +25,6 @@ export default class ToggleModal extends Component{
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
                     let dataSource = jthis.handleExcelData(importData);
-                    console.log(dataSource);
                     let orgset =  {};
                     dataSource.forEach(ele=>{
                         orgset[ele.org] = null;
@@ -60,7 +59,6 @@ export default class ToggleModal extends Component{
 		        }
 		    },
         };
-        console.log(this.state.dataSource);
         return (
             <Modal
                 visible={visible}
@@ -104,7 +102,6 @@ export default class ToggleModal extends Component{
                     }
                 </Select>
             </span>
-                <Button type="primary" >提交</Button>
                <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
@@ -170,7 +167,6 @@ export default class ToggleModal extends Component{
     componentDidMount(){
         const {actions:{getAllUsers,getProjectAc}} = this.props
         getAllUsers().then(res => {
-            console.log(res);
             let set = {};
             let checkers = res.map(o => {
                 set[o.id] = o;
@@ -188,7 +184,6 @@ export default class ToggleModal extends Component{
                     <Option value={o.code}>{o.name}</Option>
                 )
             });
-            console.log(projcheckers);
             this.setState({projcheckers,projSet:set});
         });
     }
@@ -218,7 +213,6 @@ export default class ToggleModal extends Component{
         return false;
     }
     beforeUpload(record,file){
-        console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
