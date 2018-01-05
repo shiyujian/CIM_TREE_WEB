@@ -158,7 +158,7 @@ export default class ToggleModalCJ extends Component{
         const { actions: { ModalVisibleCJ} } = this.props;
         if (!this.state.passer) {
             notification.warning({
-                message:'审批人未选择'
+                message:'审批人未选择！'
             });
             return;
         }
@@ -172,14 +172,14 @@ export default class ToggleModalCJ extends Component{
         for (let i = 0; i < arr.length; i++) {
             if (arr[i].color === "red") {
                 notification.warning({
-                    message: '不存在该机构类型'
+                    message: '不存在该机构类型！'
                 });
                 return;
             }
         }
         if (this.state.flag_code === false) {
             notification.warning({
-                message:'存在重复的参建单位编码'
+                message:'存在重复的参建单位编码！'
             });
             return;
         }
