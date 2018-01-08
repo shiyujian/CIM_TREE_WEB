@@ -7,9 +7,21 @@ const FormItem = Form.Item;
 export default class Info extends Component {
 
 	render() {
-		const {projectList = [], instanceDetail = [], selectProject} = this.props;
+		const {projectList = [], instanceDetail = [], selectProject, actions:{getDocuments,getProject}} = this.props;
 		let projectInfo = projectList.filter(project => project.code === (!selectProject ? '' : selectProject.split('--')[0]))[0] || {};
-
+		//判断是不是空对象
+		if (JSON.stringify(projectInfo) != "{}") {
+			getProject({code:projectInfo.code}).then(rst => {
+				if (rst.related_documents.length > 0) {
+					getDocuments({code:projectInfo.code +"REL_DOC_A"}).then(rst => {
+						projectInfo.projectInfo.extra_params.desc = rst.extra_params.intro;
+						projectInfo.extra_params.images = rst.basic_params.files[1];
+						projectInfo.extra_params.file_info = rst.basic_params.files[0];
+						this.forceUpdate();                    
+					})
+				}
+			})
+		}
 		console.log("projectInfo:",projectInfo);
 		return (
 			<Row gutter={24} style={{marginBottom: 20}}>

@@ -51,6 +51,8 @@ export const getDirRootAc = createFetchAction(`${SERVICE_API}/dir-tree/code/${wi
 export const postDirAc = createFetchAction(`${SERVICE_API}/directories/`, [],'POST');
 //删除文档目录
 export const delDirAc = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?this=true`, [],'DELETE');
+export const getDocuments = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [],'GET');
+export const getProject = createFetchAction(`${SERVICE_API}/projects/code/{{code}}/?all=true`, [],'GET');
 // console.log('window',window)
 export const actions = {
 	getProjectAcOK,
@@ -78,7 +80,9 @@ export const actions = {
 	getLocationAcOk,
 	getLocationAc,
 	postLocationAc,
-	deleteLocationAc
+	deleteLocationAc,
+	getDocuments,
+	getProject
 };
 
 export default handleActions({
