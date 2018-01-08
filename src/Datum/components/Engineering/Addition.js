@@ -358,8 +358,15 @@ export default class Addition extends Component {
 			actions: {toggleAddition, postDocument, getdocument,changeDocs}
 		} = this.props;
 		let tag = false;
+		if(docs.length == 0){
+			notification.error({
+				message: '请先上传文件',
+				duration: 2
+			});
+			return
+		}
 		for(let i=0; i<docs.length; i++){
-			let flag = (docs[i].updoc.juance == undefined || docs[i].updoc.keyword_17 == undefined || docs[i].updoc.projectPrincipal.person_name == undefined ||
+			let flag = (docs[i].updoc.keyword_19 == undefined || docs[i].updoc.juance == undefined || docs[i].updoc.keyword_17 == undefined || docs[i].updoc.projectPrincipal.person_name == undefined ||
 				docs[i].updoc.professionPrincipal.person_name == undefined || docs[i].updoc.profession == undefined || docs[i].updoc.archivingTime == undefined || 
 				docs[i].updoc.version == undefined);
 			if(flag){

@@ -30,8 +30,6 @@ export default class Summary extends Component {
             path:'/summary',
 		}];
 
-
-	// static defaultOpenKeys = ['engineering', 'Org', 'Document','event']
 }
 
 

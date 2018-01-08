@@ -22,11 +22,31 @@ export default class SubTree extends Component {
 	}
 	//选中项目
 	onSelect(code) {
+		const {actions:{getDocuments,getProject}} = this.props;
 		if (code.length === 0) {
 			return
 		}
+		let projectInfo = {};
 		const {projectList=[],actions: {setSelectProjectAc,getInstanceAc}} = this.props;
+		console.log("code:",code);
+		getProject({code:code[0].split('--')[0]}).then(rst => {
+			getDocuments({code: code[0].split('--')[0]+"REL_DOC_A"}).then(rst1 => {
+				if (rst1 && rst1.code) {
+					projectInfo.code = code[0].split('--')[0]
+					projectInfo.extra_params.desc = rst1.extra_params.intro;
+					projectInfo.extra_params.images = rst1.basic_params.files[1];
+					projectInfo.extra_params.file_info = rst1.basic_params.files[0];
+				}else{
+					projectInfo.code = code[0].split('--')[0]
+					projectInfo.extra_params.desc = rst.extra_params.desc;
+					projectInfo.extra_params.images = rst.extra_params.images
+					projectInfo.extra_params.file_info = rst.extra_params.file_info;
+				}
+				console.log("projectInfo:",projectInfo);
+			})
+		})
 		setSelectProjectAc(code[0]);
+
 	}
 	//
 	addProject() {
