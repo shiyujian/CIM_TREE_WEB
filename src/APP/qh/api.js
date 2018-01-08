@@ -6,7 +6,7 @@
 * This source code is licensed under the GPL-2.0 license found in the
 * LICENSE file in the root directory of this source tree.
 */
-import React, {Component} from 'react';
+import React from 'react';
 import {Icon} from 'react-fa';
 import headLogo from './logo_head.png';
 
@@ -99,6 +99,12 @@ export const qh_menus = [{
 	title: '数据报送',
 	path: '/data',
 	icon: <Icon name="gear"/>
+},{
+	key: 'summary',
+	id: 'SUMMARY',
+	title: '汇总分析',
+	path: '/summary',
+	icon: <Icon name="area-chart"/>
 }];
 
 export const qh_ignoreModules = ['login'];
