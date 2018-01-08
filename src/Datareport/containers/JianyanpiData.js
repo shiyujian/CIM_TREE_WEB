@@ -394,7 +394,8 @@ export default class JianyanpiData extends Component {
 		let dataSource = totalData.filter(o => {
 			return (o.name.indexOf(value) > -1) || (o.code.indexOf(value) > -1)
 		})
-		for(let index = 0;dataSource.length>0 && index < 10;index++){
+		debugger
+		for(let index = 0;dataSource.length>0 && index < 10 && index < dataSource.length;index++){
 			if(dataSource[index].key+1){
 				dataSource[index].key = index
 				continue;
