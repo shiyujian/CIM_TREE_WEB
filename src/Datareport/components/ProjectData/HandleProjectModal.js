@@ -58,10 +58,17 @@ export default class HPModal extends Component{
         this.setState({dataSource,wk,perSet});
     }
     async submit(){
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        const {wk} = this.state;
         if(this.state.opinion !==1){
             await this.reject();
         }
-        let {postProjectAc ,getProjectAc,postProjectListAc,postDocListAc} = this.props.actions;
+        let {postProjectAc ,getProjectAc,postProjectListAc,postDocListAc,logWorkflowEvent} = this.props.actions;
         let projRoot = await getProjectAc();
         let doclist = this.state.dataSource.map(data=>{
             data.pic.misc = 'pic';
@@ -120,6 +127,7 @@ export default class HPModal extends Component{
                 Notification.success({
                     message: '操作成功'
                 });
+                await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
                 this.props.closeModal('dr_xm_xx_visible',false,'submit');
             }
         }

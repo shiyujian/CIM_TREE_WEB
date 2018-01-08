@@ -11,6 +11,7 @@ import {getNextStates} from '_platform/components/Progress/util';
 var moment = require('moment');
 import {getUser} from '_platform/auth';
 import {WORKFLOW_CODE} from '_platform/api'
+import { Button } from 'antd';
 @connect(
 	state => {
 		const {platform,datareport:{unitdata}} = state;
@@ -62,6 +63,7 @@ export default class UnitData extends Component {
 		this.props.actions.ModalVisibleUnit(false);
 	}
 	render() {
+		console.log(this.props);
 		const {visible} = this.props;
 		return (
 			<div>
@@ -72,6 +74,15 @@ export default class UnitData extends Component {
 						visible && <ToggleModal {...this.props} setData = {this.setData.bind(this)}/>
 					}
 				</Content>
+				{
+					// <Button onClick={
+					// 	() => {
+					// 		this.props.history.push(this.props.location.pathname);
+					// 	}
+					// }>
+					// 	sdf
+					// </Button>
+				}
 			</div>
 			)
 	}
