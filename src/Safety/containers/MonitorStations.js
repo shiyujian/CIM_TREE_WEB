@@ -63,7 +63,8 @@ class MonitorStation extends Component {
             nodeArray:[],       //监测点列表
             setAddVisiable:false,
             setEditVisiable:false,
-            depthArray:[]
+            depthArray:[],
+            loading:true,
         }
     }
 
@@ -89,6 +90,9 @@ class MonitorStation extends Component {
                         break;
                     }
                 }
+                this.setState({
+                    loading:false,
+                })
                 getMonitorType({},{unit:unitProject.code}).then((rst)=>{
                     if(rst.results){
                         let typeArray = [];
@@ -101,7 +105,8 @@ class MonitorStation extends Component {
                 getMonitorNodes({},{unit:unitProject.code}).then((rst)=>{
                     if(rst.results){
                         let nodeArray = [];
-                        rst.results.map((item)=>{
+                        rst.results.map((item,i)=>{
+                            item.i=i;
                             item.id = item._id;
                             item.x = item.coord.x;
                             item.y = item.coord.y;
@@ -394,6 +399,7 @@ class MonitorStation extends Component {
     }
 
     onSelect = (project,unitProject)=>{
+        debugger;
         const { 
             actions: { 
                 getMonitorType,
@@ -405,7 +411,8 @@ class MonitorStation extends Component {
         }else{
             return;
         }
-        getMonitorType({},{unit:unitProject.code}).then((rst)=>{
+        // getMonitorType({},{unit:unitProject.code}).then((rst)=>{
+        getMonitorType({}).then((rst)=>{ // 数据少时测试用
             if(rst.results.length!==0){
                 let typeArray = [];
                 rst.results.map((item)=>{
@@ -416,7 +423,8 @@ class MonitorStation extends Component {
                 this.setState({typeArray:[],currentTypeValue:''});
             }
         });
-        getMonitorNodes({},{unit:unitProject.code}).then((rst)=>{
+        // getMonitorNodes({},{unit:unitProject.code}).then((rst)=>{
+        getMonitorNodes({}).then((rst)=>{ // 数据少时测试用
             if(rst.results){
                 let nodeArray = [];
                 rst.results.map((item)=>{
@@ -556,14 +564,18 @@ class MonitorStation extends Component {
         ];
         let array = [];
         for(let i=0;i<typeArray.length;i++){
-            array.push(<Option value={`${typeArray[i]._id}-${typeArray[i].name}-${typeArray[i].has_depth}`}>{typeArray[i].name}</Option>);
+            array.push(<Option key={i} value={`${typeArray[i]._id}-${typeArray[i].name}-${typeArray[i].has_depth}`}>{typeArray[i].name}</Option>);
         }
                     
         return (
             <div className={styles.riskevaluation}>
                 <DynamicTitle title="监测点" {...this.props}/>
                 <Sidebar>
-                    <div style={{overflow:'hidden'}} className="project-tree">
+                    <div 
+                    style={{overflow:'hidden'}} 
+                    className="project-tree"
+                    loading={this.state.loading}
+                    >
                         <ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)}/>
                     </div>
                 </Sidebar>
