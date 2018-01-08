@@ -137,6 +137,7 @@ class Login extends Component {
 	}
 	
 	render() {
+		// console.log('this.props',this.props)
 		const {getFieldDecorator} = this.props.form;
 		const{
 			QRUrl,
@@ -252,7 +253,7 @@ class Login extends Component {
 										</div>,
 									)}
 								</FormItem>
-								<Button type="primary"  onClick={this.cancel.bind(this)} style={{width:'44%',height:'45px',marginTop:50,marginLeft:10,fontSize:18}}>取消</Button>	
+								<Button type="primary"  onClick={this.cancel.bind(this)} style={{width:'44%',height:'45px',marginTop:50,marginLeft:10,fontSize:18}}>返回</Button>	
 								<Button type="primary" htmlType="submit" style={{width:'44%',height:'45px',marginTop:50,marginLeft:30,fontSize:18}}>确定</Button>
 							</Form>
 							
@@ -340,17 +341,45 @@ class Login extends Component {
 	//	忘记密码确定
 	sureSubmit(e){
 		e.preventDefault();
+		const {actions: {forgect}} = this.props;
 		this.props.form.validateFieldsAndScroll((err,values) =>{
 			if(!err){
 				console.log('values',values)
 				// let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
 				let partn=/^1[0-9]{10}$/;
 				let phonenumber =values.phone;
-				console.log(phonenumber)
 				if(!partn.exec(phonenumber)){
 					notification.error({
 						message:  '手机号输入错误！',
 						duration: 2,
+					})
+				}else{
+					const data = {
+						username: values.nickname	
+					};
+					forgect({}, data).then(rst => {
+						console.log('rst',rst)
+						if(rst.errornum === "400004"){
+							notification.error({
+								message:  '输入的用户未绑定手机，请联系管理员找回密码！',
+								duration: 2,
+							})
+						}else if(rst.errornum === "400002"){
+							notification.error({
+								message:  '输入的用户不存在！',
+								duration: 2,
+							})
+						}else if(rst.errornum === "400003"){
+							notification.error({
+								message:  '找不到与用户关联的人员！',
+								duration: 2,
+							})
+						}else if(rst.errornum === "400005"){
+							notification.error({
+								message:  '短信发送失败！',
+								duration: 2,
+							})
+						}
 					})
 				}
 			}
