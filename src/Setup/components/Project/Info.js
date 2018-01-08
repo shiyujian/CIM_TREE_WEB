@@ -16,7 +16,8 @@ export default class Info extends Component {
 					getDocuments({code:projectInfo.code +"REL_DOC_A"}).then(rst => {
 						projectInfo.projectInfo.extra_params.desc = rst.extra_params.intro;
 						projectInfo.extra_params.images = rst.basic_params.files[1];
-						projectInfo.extra_params.file_info = rst.basic_params.files[0];
+						// projectInfo.extra_params.images = rst.basic_params.files[1];
+						
 						this.forceUpdate();                    
 					})
 				}
