@@ -55,7 +55,6 @@ export default class UploadFooter extends Component{
                     <div className="inlineBlock">项目-单位工程：</div>
                     <Cascader
                         options={options}
-                        //className='btn'
                         loadData={this.loadData}
                         onChange={this.onChange}
                         placeholder={"请选择项目-单位工程"}

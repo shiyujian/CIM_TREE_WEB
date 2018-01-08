@@ -17,7 +17,6 @@ export default class TablePerson extends Component{
 		}
 	}
     render(){
-    	console.log('dataSource',this.state.tempData)
         return (
             <div>
                 <div>

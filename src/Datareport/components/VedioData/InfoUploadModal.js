@@ -42,6 +42,7 @@ export default class InfoUploadModal extends Component{
                  dataSource={dataSource}
                  storeExcelData={this.storeExcelData}
                  actions={this.props.actions}
+                 enginner={false}
                 />
                 <UploadFooter
                  modalDown = {DataReportTemplate_ImageInformation}

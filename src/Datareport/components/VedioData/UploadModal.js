@@ -36,6 +36,7 @@ export default class VedioUpload extends Component{
                  dataSource={dataSource}
                  storeExcelData={this.storeExcelData}
                  fileDel={true}
+                 enginner={false}
                 />
                 <UploadFooter
                  modalDown = {DataReportTemplate_VideoMonitor}

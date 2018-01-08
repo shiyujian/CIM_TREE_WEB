@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,Notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '_platform/components/layout/Preview';
@@ -28,6 +28,7 @@ export default class JianyanpiDelete extends Component {
             dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人,
+            deleteInfoNew:'',
 		};
     }
     componentDidMount(){
@@ -51,7 +52,9 @@ export default class JianyanpiDelete extends Component {
     //ok
 	onok(){
         if(!this.state.check){
-            message.info("请选择审核人")
+            Notification.warning({
+                message: '请选择审核人'
+            });	
             return
         }
         let {check} = this.state
@@ -62,13 +65,13 @@ export default class JianyanpiDelete extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.onok(this.state.dataSource,per)
+		this.props.onok(this.state.dataSource,per,this.state.deleteInfoNew);
     }
-//下拉框选择人
-selectChecker(value){
-    let check = JSON.parse(value)
-    this.setState({check})
-}
+    //下拉框选择人
+    selectChecker(value){
+        let check = JSON.parse(value)
+        this.setState({check})
+    }
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -80,6 +83,12 @@ selectChecker(value){
         filed.name = f.name;
         filed.mime_type = f.mime_type;
         openPreview(filed);
+    }
+    //
+    onChangeText(e) {
+        this.setState({
+            deleteInfoNew: e.target.value
+        });
     }
 	render() {
         let columns = 
@@ -161,7 +170,6 @@ selectChecker(value){
         }]
 		return (
             <Modal
-			title="检验信息删除"
             visible={true}
             width= {1280}
             key={this.props.visible}
@@ -169,7 +177,7 @@ selectChecker(value){
             onOk={() => this.onok()}
 			maskClosable={true}>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>检验信息删除</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>申请删除</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
@@ -184,12 +192,21 @@ selectChecker(value){
                         </Select>
                     </span> 
                     </div>
-                    <div style={{marginTop:20}}>
+                    <Row style={{ marginBottom: 16 }}>
+                        <Input
+                            type="textarea"
+                            onChange={this.onChangeText.bind(this)}
+                            autosize={{ minRows: 5, maxRow: 6 }}
+                            placeholder="请填写删除原因"
+                            style={{ marginBottom: 40 }}
+                        />
+                    </Row>
+                    {/* <div style={{marginTop:20}}>
                         注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
                         &emsp;&emsp; 2、数值用半角阿拉伯数字，如：1.2<br />
                         &emsp;&emsp; 3、日期必须带年月日，如2017年1月1日<br />
                         &emsp;&emsp; 4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.<br />
-                    </div>
+                    </div> */}
                 </div>
             </Modal>
 		)

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,Notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_SubdivisionUnitProjectAcceptance} from '_platform/api';
 import '../../containers/quality.less'
 import Preview from '_platform/components/layout/Preview';
@@ -16,7 +16,8 @@ class JianyanModal extends Component {
             dataSource:[],
             checkers:[],//审核人下来框选项
             check:null,//审核人
-            editing:false
+            editing:false,
+            changeInfo:'',
 		};
     }
     componentDidMount(){
@@ -64,18 +65,24 @@ class JianyanModal extends Component {
 	//ok
 	onok(){
         if(!this.state.check){
-            message.info("请选择审核人")
+            Notification.warning({
+                message: '请选择审核人'
+            });
             return
         }
         if(this.state.dataSource.length === 0){
-            message.info("请上传excel")
+            Notification.warning({
+                message: '请上传excel'
+            });
             return
         }
         let temp = this.state.dataSource.some((o,index) => {
                         return !(o.file.id  && o.level && o.rate && o.construct_unit && o.construct_unit.type)
                     })
         if(temp){
-            message.info(`有数据数据不正确`)
+            Notification.warning({
+                message: '存在非法数据'
+            });
             return
         }
         let {check} = this.state
@@ -86,7 +93,7 @@ class JianyanModal extends Component {
             person_code:check.account.person_code,
             organization:check.account.organization
         }
-		this.props.onok(this.state.dataSource,per)
+		this.props.onok(this.state.dataSource,per,this.state.changeInfo)
     }
     covertURLRelative = (originUrl) => {
     	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -101,7 +108,9 @@ class JianyanModal extends Component {
             if(dataSource.some(o => {
                 return o.code === temp
              })){
-                 message.info("该检验批已经上传过了")
+                 Notification.warning({
+                    message: '该检验批已经上传'
+                });
                  return false
              }
         }
@@ -109,11 +118,15 @@ class JianyanModal extends Component {
 		const { actions:{uploadStaticFile,getWorkPackageDetail} } = this.props;
         let workpackage = await getWorkPackageDetail({code:temp})
         if(!workpackage.name){
-            message.info("编码值错误")
+            Notification.warning({
+                message: '编码值错误'
+            });
             return
         }
         if(workpackage.obj_type_hum === "单元工程"){
-            message.info("请到检验批上传页面上传检验批附件")
+            Notification.warning({
+                message: '请到检验批上传页面上传检验批附件'
+            });
             return
         }
 		const formdata = new FormData();
@@ -129,7 +142,9 @@ class JianyanModal extends Component {
             resp = await resp.json()
             console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                Notification.warning({
+                    message: '文件上传失败'
+                });
                 return;
             };
             const filedata = resp;
@@ -242,7 +257,9 @@ class JianyanModal extends Component {
                 }
                 this.setState({dataSource})
             }else{
-                message.info("输错了")
+                Notification.warning({
+                    message: `输入错误`
+                });
             }
         })
     }
@@ -373,9 +390,13 @@ class JianyanModal extends Component {
                     let {dataSource} = jthis.state
                     dataSource = await jthis.handleExcelData(importData)
                     jthis.setState({dataSource}) 
-		            message.success("上传成功");
+                    Notification.success({
+                        message: '上传成功'
+                    });
 		        } else if (info.file.status === 'error') {
-		            message.error(`${info.file.name}解析失败，请检查输入`);
+                    Notification.warning({
+                        message: `${info.file.name}解析失败，请检查输入`
+                    });
 		        }
 		    },
 		};
@@ -395,29 +416,55 @@ class JianyanModal extends Component {
 						bordered 
                         pagination={false}
                         scroll={{y:500}}/>
-                    <Upload {...props}>
-                        <Button style={{margin:'10px 10px 10px 0px',display:visible}}>
-                            <Icon type="upload" />上传附件
-                        </Button>
-                    </Upload>
-                    <span>
-                        审核人：
-                        <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
-                            {
-                                this.state.checkers
-                            }
-                        </Select>
-                    </span> 
+                    <Row>
+                        {
+                            this.props.startReportOrNot?
+                                <Button style={{margin:'10px 10px 10px 0px'}} type="default">
+                                    <a href={`${DataReportTemplate_SubdivisionUnitProjectAcceptance}`}>模板下载</a>
+                                </Button>:null
+                        }
+                        <Upload {...props}>
+                            <Button style={{margin:'10px 10px 10px 0px',display:visible}}>
+                                <Icon type="upload" />上传并预览
+                            </Button>
+                        </Upload>
+                        <span>
+                            审核人：
+                            <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
+                                {
+                                    this.state.checkers
+                                }
+                            </Select>
+                        </span>
+                    </Row>
+                    <Row>
+                    {
+                        this.props.startReportOrNot?
+                            <div style={{marginTop:20}}>
+                                注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
+                                &emsp;&emsp; 2、数值用半角阿拉伯数字，如：1.2<br />
+                                &emsp;&emsp; 3、日期必须带年月日，如2017年1月1日<br />
+                                &emsp;&emsp; 4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.<br />
+                            </div>:
+                            <Input
+                                type="textarea"
+                                onChange={this.onChangeText.bind(this)}
+                                autosize={{ minRows: 5, maxRow: 6 }}
+                                placeholder="请填写变更原因"
+                                style={{ marginBottom: 40 }}
+                            />
+                    }
+                    </Row>
                     <Preview />
 				</div>
-                <div style={{marginTop:20}}>
-                    注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
-                    &emsp;&emsp; 2、数值用半角阿拉伯数字，如：1.2<br />
-                    &emsp;&emsp; 3、日期必须带年月日，如2017年1月1日<br />
-                    &emsp;&emsp; 4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.<br />
-                </div>
 			</Modal>
 		)
+    }
+    //
+    onChangeText(e) {
+        this.setState({
+            changeInfo: e.target.value
+        });
     }
     //处理上传excel的数据
     async handleExcelData(data){

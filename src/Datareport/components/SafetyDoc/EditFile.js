@@ -48,14 +48,18 @@ export default class EditFile extends Component {
 
     onok() {
         if (!this.state.check) {
-            message.info("请选择审核人")
+            notification.warning({
+				message:'请选择审核人'
+			})
             return;
         }
         let temp = this.state.dataSource.some((o, index) => {
             return !o.file.a_file
         })
         if (temp) {
-            message.info(`有数据未上传附件`);
+            notification.warning({
+				message:'有数据未上传附件'
+			})
             return;
         }
         let { check } = this.state;
@@ -156,7 +160,9 @@ export default class EditFile extends Component {
             resp = await resp.json()
             console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                notification.error({
+                    message:'文件上传失败'
+                })
                 return;
             };
             const filedata = resp;
@@ -316,13 +322,13 @@ export default class EditFile extends Component {
         ];
         return (
             <Modal
-                title="安全文档变更表"
                 key={this.props.akey}
                 visible={true}
                 width={1280}
                 onOk={this.onok.bind(this)}
                 maskClosable={false}
                 onCancel={this.props.oncancel}>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>申请变更</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

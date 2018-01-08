@@ -7,7 +7,10 @@ import './index.less';
 export default class VedioTable extends Component{
 
     componentDidMount(){
-        const {fileDel=false,preview=false} = this.props;
+        const {fileDel=false,preview=false,enginner=true} = this.props;
+        if(!enginner){
+            this.columns.splice(2,2);
+        }
         if(preview){
             this.columns.push(this.preview);
         }

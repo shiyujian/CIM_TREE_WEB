@@ -75,8 +75,8 @@ class ToggleModal extends Component {
 							"desc":values["desc"],
 							"major":values["major"],
 							"purpose":values["purpose"],
+							"version":values["version"],
 						},
-						"version":values["version"],
 					}
 					postLocationAc({}, postLoc)
 						.then(rst => {
