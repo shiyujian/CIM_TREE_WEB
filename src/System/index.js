@@ -63,6 +63,7 @@ export default class System extends Component {
 			id: 'SYSTEM.ROLE',
 			name: '角色设置',
 			path: '/system',
+			exact: true,
 			icon: <Icon name="users"/>,
 		}, {
 			key: 'Permission',
