@@ -9,7 +9,8 @@ export default class Info extends Component {
 	render() {
 		const {projectList = [], instanceDetail = [], selectProject} = this.props;
 		let projectInfo = projectList.filter(project => project.code === (!selectProject ? '' : selectProject.split('--')[0]))[0] || {};
-		console.log(projectInfo)
+
+		console.log("projectInfo:",projectInfo);
 		return (
 			<Row gutter={24} style={{marginBottom: 20}}>
 				{

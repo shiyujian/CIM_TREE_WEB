@@ -99,6 +99,12 @@ export const qh_menus = [{
 	title: '数据报送',
 	path: '/data',
 	icon: <Icon name="gear"/>
+},{
+	key: 'summary',
+	id: 'SUMMARY',
+	title: '汇总分析',
+	path: '/summary',
+	icon: <Icon name="area-chart"/>
 }];
 
 export const qh_ignoreModules = ['login'];
