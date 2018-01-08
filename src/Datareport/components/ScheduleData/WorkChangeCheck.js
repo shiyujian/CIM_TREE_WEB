@@ -140,7 +140,7 @@ export default class WorkChangeCheck extends Component {
     //不通过
     async reject() {
         const { wk } = this.props
-        const { actions: { deleteWorkflow } } = this.props
+        const { actions: { logWorkflowEvent } } = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;
@@ -154,7 +154,7 @@ export default class WorkChangeCheck extends Component {
             {
                 state:wk.current[0].id,
                 executor:executor,
-                action:"退回",
+                action:"拒绝",
                 note:"不通过",
                 attachment:null
             }
@@ -187,7 +187,7 @@ export default class WorkChangeCheck extends Component {
             title: '单位工程',
             dataIndex: 'unit',
         }, {
-            title: '施工单位',
+            title: '实施单位',
             dataIndex: 'construct_unit',
         }, {
             title: '施工图工程量',

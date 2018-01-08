@@ -196,7 +196,6 @@ export default class PersonCheck extends Component {
         }, {
             title: '二维码',
             render:(record) => {
-                console.log('record',record)
                 if(record.signature) {
                     return <img style={{width: 60}} src={record.preview_url}/>
                 }else {

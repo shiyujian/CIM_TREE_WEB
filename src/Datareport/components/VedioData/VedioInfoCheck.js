@@ -55,7 +55,6 @@ export default class VedioInfoCheck extends Component {
 
 		return (
             <Modal
-			title={modalTitle[type]}
             visible={true}
             width= {1280}
 			footer={null}
@@ -74,13 +73,8 @@ export default class VedioInfoCheck extends Component {
                     <Col span={4}>
                         <RadioGroup onChange={this.onChange} value={this.state.option}>
                             <Radio value={1}>通过</Radio>
-                            <Radio value={2}>不通过</Radio>
+                            <Radio value={2}>拒绝</Radio>
                         </RadioGroup>
-                    </Col>
-                    <Col span={2} push={14}>
-                        <Button type='primary'>
-                            导出表格
-                        </Button>
                     </Col>
                     <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
@@ -241,7 +235,7 @@ export default class VedioInfoCheck extends Component {
     //不通过
     async reject() {
         const { wk } = this.props
-        const { actions: { deleteWorkflow } } = this.props
+        const { actions: { deleteWorkflow,logWorkflowEvent } } = this.props
         let executor = {};
         let person = getUser();
         executor.id = person.id;

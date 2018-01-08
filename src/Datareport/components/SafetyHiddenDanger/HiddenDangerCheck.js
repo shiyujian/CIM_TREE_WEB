@@ -35,7 +35,6 @@ export default class HiddenDangerCheck extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props;
-        debugger
         let dataSource = JSON.parse(wk.subject[0].data);
         this.setState({dataSource,wk});
         const {actions:{
@@ -67,10 +66,14 @@ export default class HiddenDangerCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("safety_hidden_check_visible",false);
-        message.info("操作成功");
+        this.props.closeModal("safety_hidden_check_visible",false,'submit');
+        notification.success({
+            message:'操作成功'
+        })
     }
-
+    cancel() {
+        this.props.closeModal("safety_hidden_check_visible", false);
+      }
     //通过
     async passon(){
         const {dataSource,wk,topDir} = this.state;
@@ -81,7 +84,6 @@ export default class HiddenDangerCheck extends Component {
             postScheduleDir,
             getWorkpackagesByCode
         }} = this.props;
-        debugger
         //the unit in the dataSource array is same
         let unit = dataSource[0].unit;
         let project = dataSource[0].project;
@@ -171,8 +173,26 @@ export default class HiddenDangerCheck extends Component {
     //不通过
     async reject(){
         const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        // const {actions:{deleteWorkflow}} = this.props
+        // await deleteWorkflow({pk:wk.id})
+        const { actions:{ logWorkflowEvent }} = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            },{
+                state:wk.current[0].id,
+                executor:executor,
+                action:'拒绝',
+                note:'不通过',
+                attachment:null
+            }
+        );
     }
     //预览
     handlePreview(index){
@@ -263,12 +283,12 @@ export default class HiddenDangerCheck extends Component {
         ];
 		return (
             <Modal
-			title="安全隐患审批表"
             visible={true}
             width= {1280}
-			footer={null}
+            footer={null}
+            onCancel={this.cancel.bind(this)}
 			maskClosable={false}>
-                <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
+                <h1 style ={{textAlign:'center',marginBottom:20}}>填报审核</h1>
                 <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                     columns={columns}
                     dataSource={this.state.dataSource}
@@ -277,17 +297,17 @@ export default class HiddenDangerCheck extends Component {
                     <Col span={2}>
                         <span>审查意见：</span>
                     </Col>
-                    <Col span={4}>
+                    <Col span={6}>
                         <RadioGroup onChange={this.onChange.bind(this)} value={this.state.option}>
                             <Radio value={1}>通过</Radio>
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
+                    {/* <Col span={2} push={14}>
                         <Button type='primary'>
                             导出表格
                         </Button>
-                    </Col>
+                    </Col> */}
                     <Col span={2} push={14}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交

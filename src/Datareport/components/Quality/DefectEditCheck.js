@@ -52,7 +52,7 @@ export default class DefectEditCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("defect_edit_visible",false);
-        notification.error({
+        notification.success({
             message: '操作成功！',
             duration: 2
         });
@@ -92,31 +92,31 @@ export default class DefectEditCheck extends Component {
                         },
                     ]
                   },
-                extra_params:{
-                    code:item.code,
-                    wbs:item.wbs,
-                    type:item.type,
-                    upTime:item.upTime,
-                    checkTime:item.checkTime,
-                    editTime:item.editTime,
-                    unit:item.unit,
-                    project:item.projectName,
-                    result:item.result,
-                    deadline:item.deadline,
-                    editResult:item.editResult,
-                    resUnit:item.resUnit
+                extra_params: {
+                    code: item.code,
+                    acc_type: item.acc_type,
+                    uploda_date: item.uploda_date,
+                    check_date: item.check_date,
+                    do_date: item.do_date,
+                    descrip: item.descrip,
+                    check_result: item.check_result,
+                    deadline: item.deadline,
+                    result: item.result,
+                    project: item.project,
+                    respon_unit: item.respon_unit,
+                    unit: item.unit
                 }
             })
         });
         let rst = await putDocument({},{data_list:docData});
         if(rst.result){
             notification.success({
-                message: '删除文档成功！',
+                message: '修改文档成功！',
                 duration: 2
             });
         }else{
             notification.error({
-                message: '删除文档失败！',
+                message: '修改文档失败！',
                 duration: 2
             });
         }
@@ -144,77 +144,57 @@ export default class DefectEditCheck extends Component {
         this.setState({option:e.target.value})
     }
 	render() {
-        const columns = [
-            {
-                title: '文档编码',
-                dataIndex: 'code',
-                width: '8%'
-            }, {
-                title: '项目名称',
-                dataIndex: 'project',
-                width: '8%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.projectName}
-                    </span>
-                ),
-            }, {
-                title: '单位工程',
-                dataIndex: 'unit',
-                width: '8%',
-                render: (text, record, index) => (
-                    <span>
-                        {record.unit}
-                    </span>
-                ),
-            }, {
-                title: 'WBS编码',
-                dataIndex: 'wbs',
-                width: '8%',
-            }, {
-                title: '责任单位',
-                dataIndex: 'resUnit',
-                width: '8%',
-            }, {
-                title: '隐患类型',
-                dataIndex: 'type',
-                width: '5%',
-            }, {
-                title: '上报时间',
-                dataIndex: 'upTime',
-                width: '9%',
-            }, {
-                title: '核查时间',
-                dataIndex: 'checkTime',
-                width: '9%',
-            }, {
-                title: '整改时间',
-                dataIndex: 'editTime',
-                width: '9%',
-            }, {
-                title: '排查结果',
-                dataIndex: 'result',
-                width: '6%',
-            }, {
-                title: '整改期限',
-                dataIndex: 'deadline',
-                width: '8%',
-            }, {
-                title: '整改结果',
-                dataIndex: 'editResult',
-                width: '6%',
-            }, {
-                title:'附件',
-                width:"10%",
-                render:(text,record,index) => {
+        let columns = [{
+			title:'WBS编码',
+            dataIndex:'code',
+            width:'8%',
+		},{
+			title:'责任单位',
+            dataIndex:'respon_unit',
+            width:'8%',
+		},{
+			title:'事故类型',
+            dataIndex:'acc_type',
+            width:'7%',
+		},{
+			title:'上报时间',
+            dataIndex:'uploda_date',
+            width:'9%',
+		},{
+			title:'核查时间',
+            dataIndex:'check_date',
+            width:'9%',
+		},{
+			title:'整改时间',
+            dataIndex:'do_date',
+            width:'9%',
+		},{
+			title:'事故描述',
+            dataIndex:'descrip',
+            width:'10%',
+		},{
+			title:'排查结果',
+            dataIndex:'check_result',
+            width:'6%',
+		},{
+			title:'整改期限',
+            dataIndex:'deadline',
+            width:'6%',
+		},{
+			title:'整改结果',
+            dataIndex:'result',
+            width:'6%',
+		}, {
+            title:'附件',
+            width:'6%',
+			render:(text,record,index) => {
+				if(record.file.id){
                     return (<span>
                             <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                            <span className="ant-divider" />
-                            <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                        </span>)
+				        </span>)
                 }
-            }
-        ];
+			}
+		}];
 		return (
             <Modal
 			title="安全隐患删除审批表"

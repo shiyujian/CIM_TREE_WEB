@@ -11,13 +11,13 @@ export default class AddSolution extends Component {
 		this.state = {
 			options: [],
 			branch: {},
-			subentry:{},
+			subentry: {},
 
 		};
 	}
 
 	componentDidMount() {
-		console.log('vip-props', this.props);
+		// console.log('vip-props', this.props);
 		const {
             actions: {
                 getPortions,
@@ -25,20 +25,27 @@ export default class AddSolution extends Component {
         } = this.props.props;
 		let code = this.props.state.project.code;
 		let dataSet = [];
-		debugger;
-		getPortions({ code: code }).then((rep) => {
-			console.log('vip-rep', rep);
-			if (rep.children) {
-				let projects = rep.children.map(item => {
-					return (
-						{
-							value: JSON.stringify(item),
-							label: item.obj_type_hum,
-							isLeaf: false
-						}
-					)
+		// debugger;
+		let branch = [];
+		let subBranch=[];
+		getPortions({ code: code }).then((rst) => {
+			// console.log('vip-rst', rst);
+			if (rst.children) {
+				rst.children.map(item => {
+					if (rst.code === code) {  //当前选中项目
+						 subBranch = item.children.map(subItem => {
+							return (
+								{
+									value: JSON.stringify(subItem),
+									label: subItem.name,
+									isLeaf: false
+								}
+							)
+						})
+						branch=[...branch,...subBranch];
+					}
 				})
-				this.setState({ options: projects });
+				this.setState({ options:branch });
 			} else {
 				//没有对应的信息，使用默认的 -- 需求查找不到返回空
 				// let options= [
@@ -112,7 +119,7 @@ export default class AddSolution extends Component {
 
 	beforeUploadPicFile = (file) => {
 		const fileName = file.name;
-		debugger
+		// debugger
 		// 上传图片到静态服务器
 		const { actions: { uploadStaticFile, deleteStaticFile } } = this.props.props;
 
@@ -121,7 +128,7 @@ export default class AddSolution extends Component {
 		formdata.append('name', fileName);
 
 		uploadStaticFile({}, formdata).then(resp => {
-			console.log('uploadStaticFile: ', resp)
+			// console.log('vip-uploadStaticFile: ', resp)
 			if (!resp || !resp.id) {
 				message.error('文件上传失败')
 				return;
@@ -166,14 +173,14 @@ export default class AddSolution extends Component {
 						<Input type="text" />
 						)}
 				</FormItem>
-				<FormItem {...formItemLayout} label="工程名称">
+				<FormItem {...formItemLayout} label="工程名称" hasFeedback>
 					{getFieldDecorator('projectName', {
 						initialValue: this.props.state.unitProject.name,
 						rules: [
 							{ required: true, message: '未获取到工程名称！' },
 						]
 					})(
-						<Input type="text" disabled />
+						<Input type="text" disabled placeholder="未获取到工程名称！" />
 						)}
 				</FormItem>
 				<FormItem {...formItemLayout} label="施工单位" hasFeedback>
@@ -183,7 +190,7 @@ export default class AddSolution extends Component {
 							{ required: true, message: '该单位工程无施工单位，请联系管理员！' },
 						]
 					})(
-						<Input type="text" disabled placeholder="未获取到施工单位" />
+						<Input type="text" disabled placeholder="未获取到施工单位！" />
 						)}
 				</FormItem>
 				<FormItem {...formItemLayout} label="分部分项">
@@ -195,7 +202,6 @@ export default class AddSolution extends Component {
 						, {})
 						(
 						<Cascader
-							// style={{ width: '300px' }}
 							options={this.state.options}
 							className='btn'
 							loadData={this.loadData.bind(this)}
@@ -225,35 +231,31 @@ export default class AddSolution extends Component {
 		)
 	}
 	onSelectProject(value, selectedOptions) {
-		debugger;
-		console.log('vip-value', value);
-		console.log('vip-selectedOptions', selectedOptions);
-
+		if(!value)return;
+		// console.log('vip-value', value);
+		// console.log('vip-selectedOptions', selectedOptions);
 		let branch = {}; //分部 外层Chilren
 		let subentry = {}; // 分项 内层Chilren
+		let temp1 = JSON.parse(value[0]);
+		branch = {
+			name: temp1.name,
+			code: temp1.code,
+			obj_type: temp1.obj_type,
+			obj_type_hum: temp1.obj_type_hum,
+		}
 		if (value.length === 2) {
-			let temp1 = JSON.parse(value[0]);
 			let temp2 = JSON.parse(value[1]);
-			branch = {
-				name: temp1.name,
-				code: temp1.code,
-				obj_type: temp1.obj_type,
-				obj_type_hum: temp1.obj_type_hum,
-			}
 			subentry = {
 				name: temp2.name,
 				code: temp2.code,
 				obj_type: temp1.obj_type,
 				obj_type_hum: temp1.obj_type_hum,
 			}
-			this.setState({ branch, subentry });
-			return;
 		}
-		this.setState({ branch: {}, subentry: {} });
+		this.setState({ branch, subentry });
 	}
 
 	loadData(selectedOptions) {
-		debugger;
 		const { actions: { getPortions } } = this.props.props;
 		const targetOption = selectedOptions[selectedOptions.length - 1];
 		targetOption.loading = true;
@@ -264,14 +266,18 @@ export default class AddSolution extends Component {
 			if (rst.status) {
 				let units = [];
 				rst.children.map(item => {
-					if (item.code === JSON.parse(targetOption.value).code) {  //当前选中项目
-						units = item.children.map(unit => {
-							return (
-								{
-									value: JSON.stringify(unit),
-									label: unit.name
-								}
-							)
+					if (item && item.code === this.props.state.project.code) {
+						item.children.map(subItem => {
+							if (subItem && subItem.code === JSON.parse(targetOption.value).code) {  //当前选中项目
+								units = subItem.children.map(unit => {
+									return (
+										{
+											value: JSON.stringify(unit),
+											label: unit.name
+										}
+									)
+								})
+							}
 						})
 					}
 				})

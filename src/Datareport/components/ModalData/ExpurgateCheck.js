@@ -54,7 +54,7 @@ export default class ExpurgateCheck extends Component {
             await this.reject();
         }
         this.props.closeModal("expurgate_check_visbile", false,'submit');
-        notification.info({ message: "操作成功!" });
+        notification.info({ message: "操作成功！" });
     }
 
     //通过
@@ -87,7 +87,7 @@ export default class ExpurgateCheck extends Component {
 
         if (rst.result) {
             notification.success({
-                message: '删除文档成功！',
+                message: '删除文档成功',
 
             });
         } else {
@@ -128,7 +128,7 @@ export default class ExpurgateCheck extends Component {
             }
         );
         notification.success({
-            message: '操作成功！',
+            message: '操作成功',
             duration: 2
         });
     }

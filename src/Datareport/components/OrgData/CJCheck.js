@@ -34,7 +34,6 @@ export default class CJCheck extends Component {
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        console.log("dataSource:",dataSource);
         this.setState({dataSource,wk})
     }
     componentWillReceiveProps(props){
@@ -68,13 +67,11 @@ export default class CJCheck extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        console.log("dataSource",dataSource);
         let data_list = [];
         let promises = dataSource.map((o) => {
             return getOrgPk({code:o.type})
         });
         let rst = await Promise.all(promises);
-        console.log("rst:",rst);
         dataSource.map((o, index) => {
             data_list.push({
                 code: "" + o.code,
@@ -95,7 +92,6 @@ export default class CJCheck extends Component {
                 }
             })
         })
-        console.log("data_list:", data_list);
         postOrgList({}, { data_list: data_list }).then(res => {
             dataSource.map((item, index) => {
                 item.selectPro.map(it => {
@@ -113,7 +109,6 @@ export default class CJCheck extends Component {
                             version: "A",
                             response_orgs: pro_orgs
                         }).then(rst => {
-                            console.log("rst:", rst);
                         }) 
                     });
                 }) 
@@ -131,7 +126,6 @@ export default class CJCheck extends Component {
                             version: "A",
                             response_orgs: unit_orgs
                         }).then(rst => {
-                            console.log("rst:", rst);
                         }) 
                     })
                 })

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../store/DesignData';
 import { actions as platformActions } from '_platform/store/global';
-import { Modal, Input, Form, Button, message, Table, Radio, Row, Col, DatePicker, Select } from 'antd';
+import { Modal, Input, Form, Button, message, Table, Radio, Row, Col, DatePicker, Select,notification } from 'antd';
 import WorkflowHistory from '../WorkflowHistory'
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import { getUser } from '_platform/auth';
@@ -67,7 +67,7 @@ export default class Check extends Component {
             await this.reject();
         }
         this.props.closeModal("design_check_visbile", false, 'submit')
-        notification.info({ message: "操作成功" })
+        notification.info({ message: "操作成功！" })
     }
     //通过
     async passon() {
@@ -166,7 +166,7 @@ export default class Check extends Component {
         });
         let rst = await addDocList({}, { data_list: docData });
         if (rst.result) {
-            notification.success({ message: '创建文档成功！' });
+            notification.success({ message: '创建文档成功' });
         } else {
             notification.error({ message: '创建文档失败！' });
         }
@@ -201,7 +201,7 @@ export default class Check extends Component {
             }
         );
         notification.success({
-            message: '操作成功！',
+            message: '操作成功',
             duration: 2
         });
     }

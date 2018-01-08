@@ -9,7 +9,10 @@ import {uploadFile} from './commonFunc';
 export default class VedioInfoTable extends Component{
 
     componentDidMount(){
-        const {fileDel=false} = this.props;
+        const {fileDel=false,enginner=true} = this.props;
+        if(!enginner){
+            this.columns.splice(1,2);
+        }
         if(fileDel){
             this.columns.push(this.operation);
         }
@@ -42,7 +45,10 @@ export default class VedioInfoTable extends Component{
     }
 
     deleteData = (index)=>{
-        this.fileRemove(index);
+        const {allowDel=true} = this.props;
+        if(allowDel){
+            this.fileRemove(index);
+        }
         const {dataSource = [],storeExcelData} = this.props;
         let data = JSON.parse(JSON.stringify(dataSource));
         data.splice(index,1);
@@ -116,12 +122,13 @@ export default class VedioInfoTable extends Component{
         title: '影像上传',
         dataIndex: 'file',
         render: (text, record, index)=>{
-            let revert = null,fileIndex = record.index-1;
+            let revert = null,fileIndex = record.index-1,
+                {fileDel, allowDel=true} = this.props;
             if(text&&text.name){
                 revert = (<div>
                     <div className="inlineBlockNospacing">{text.name} </div>
                     {
-                        this.props.fileDel &&
+                        fileDel && allowDel &&
                         <Popconfirm
                         {...popAttribute}
                         onConfirm={()=>{ this.fileRemove(fileIndex) }}
@@ -155,7 +162,7 @@ export default class VedioInfoTable extends Component{
             return (
                 <Popconfirm
                 {...popAttribute}
-                onConfirm={()=>{ this.deleteData(index) }}
+                onConfirm={()=>{ this.deleteData((this.page-1)*10 + index) }}
                 >
                     <a><Icon type="delete" /></a>
                 </Popconfirm>

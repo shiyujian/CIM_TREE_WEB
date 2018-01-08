@@ -7,7 +7,6 @@ import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import EditableCell from '../EditableCell' ;
 import moment from 'moment';
-const FormItem = Form.Item;
 const Option = Select.Option;
 
 export default class EditFile extends Component {
@@ -62,23 +61,10 @@ export default class EditFile extends Component {
         filed.mime_type = f.mime_type;
         openPreview(filed);
     }
-    onSelectChange = (value,index,str) =>{
-        const {dataSource} = this.state;
-        dataSource[index][str] = value;
-    }
 
-    onCellChange = ( index, key ,record ) => {      //编辑某个单元格
-        const {dataSource} = this.state;
-        return (value) => {
-        	dataSource[index][key] = value;
-			record[key] = value;
-        };
-    }
     onok(){
         if(!this.state.check){
-            notification.warning({
-				message:'请选择审核人'
-			})
+            message.info("请选择审核人")
             return
         }
         
@@ -86,9 +72,7 @@ export default class EditFile extends Component {
                         return !o.file.a_file
                     })
         if(temp){
-            notification.warning({
-				message:'有数据未上传附件'
-			})
+            message.info(`有数据未上传附件`);
             return;
         }
 
@@ -141,13 +125,6 @@ export default class EditFile extends Component {
         }
         this.setState({dataSource});
     }
-
-    //删除
-    delete(index) {
-        let { dataSource } = this.state;
-        dataSource.splice(index, 1);
-        this.setState({ dataSource });
-    }
     beforeUploadPicFile  = (index,file) => {
         // 上传到静态服务器
         const fileName = file.name;
@@ -167,9 +144,7 @@ export default class EditFile extends Component {
             resp = await resp.json()
             console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
-                notification.error({
-                    message:'文件上传失败'
-                })
+                message.error('文件上传失败')
                 return;
             };
             const filedata = resp;
@@ -204,138 +179,139 @@ export default class EditFile extends Component {
         return false;
     }
 
-    onDateChange = (index,dateString,str) =>{
-        const {dataSource} = this.state;
-        dataSource[index][str] = dateString;
-        this.setState({dataSource});
+    //table input 输入
+    tableDataChange(index, key ,e ){
+		const { dataSource } = this.state;
+		dataSource[index][key] = e.target['value'];
+	  	this.setState({dataSource});
+    }
+    //下拉框选择变化
+    handleSelect(index,key,value){
+        const { dataSource } = this.state;
+		dataSource[index][key] = value;
+	  	this.setState({dataSource});
+    }
+
+    //删除
+    delete(index) {
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
     }
 
     render() {
-        const columns = [
-            {
-                title: '文档编码',
-                dataIndex: 'code',
-                width: '8%',
-                render: (text, record ,index) => (
-					<div>
-                        <EditableCell
-                            value={record.code}
-							editOnOff = { false }
-							onChange={ this.onCellChange( index , "code", record) }
-						/>
-					</div>
-				),
-            }, {
-                title: 'WBS编码',
-                dataIndex: 'wbs',
-                width: '8%',
-            }, {
-                title: '责任单位',
-                dataIndex: 'resUnit',
-                width: '8%',
-            }, {
-                title: '隐患类型',
-                dataIndex: 'type',
-                width: '5%',
-                render: (text, record ,index) => (
-					<Select defaultValue={record.type} style={{ width: 120 }} onChange={(value)=>this.onSelectChange(value,index,"type")}>
-                        <Option value="重大安全隐患">重大安全隐患</Option>
-                        <Option value="较大安全隐患">较大安全隐患</Option>
-                        <Option value="一般安全隐患">一般安全隐患</Option>
-                    </Select>
-				),
-            }, {
-                title: '上报时间',
-                dataIndex: 'upTime',
-                width: '10%',
-                render: (text, record ,index) => (
-					<div>
-                        <DatePicker
-                        onChange={(date,dateString)=>{this.onDateChange(record,dateString,'upTime')}} 
-                        defaultValue={moment(record.upTime)} />
-					</div>
-				),
-            }, {
-                title: '核查时间',
-                dataIndex: 'checkTime',
-                width: '10%',
-                render: (text, record ,index) => (
-					<div>
-                        <DatePicker
-                        onChange={(date,dateString)=>{this.onDateChange(record,dateString,'checkTime')}}
-                         defaultValue={moment(record.checkTime)} />
-					</div>
-				),
-            }, {
-                title: '整改时间',
-                dataIndex: 'editTime',
-                width: '10%',
-                render: (text, record ,index) => (
-					<div>
-                        <DatePicker
-                        onChange={(date,dateString)=>{this.onDateChange(record,dateString,'editTime')}}
-                         defaultValue={moment(record.editTime)} />
-					</div>
-				),
-            }, {
-                title: '排查结果',
-                dataIndex: 'result',
-                width: '6%',
-                render: (text, record ,index) => (
-					<Select defaultValue={record.result} style={{ width: 120 }} onChange={(value)=>this.onSelectChange(value,index,"type")}>
-                        <Option value="不合格">不合格</Option>
-                        <Option value="及格">及格</Option>
-                        <Option value="良好">良好</Option>
-                        <Option value="优秀">优秀</Option>
-                    </Select>
-				),
-            }, {
-                title: '整改期限',
-                dataIndex: 'deadline',
-                width: '10%',
-                render: (text, record ,index) => (
-					<div>
-                        <DatePicker
-                         defaultValue={moment(record.deadline)} />
-					</div>
-				),
-            }, {
-                title: '整改结果',
-                dataIndex: 'editResult',
-                width: '6%',
-                render: (text, record ,index) => (
-					<Select defaultValue={record.editResult} style={{ width: 120 }} onChange={(value)=>this.onSelectChange(value,index,"type")}>
-                        <Option value="通过">通过</Option>
-                        <Option value="待整改">待整改</Option>
-                        <Option value="失败">失败</Option>
-                    </Select>
-				),
-            }, {
-                title:'附件',
-                width:"10%",
-                render:(text,record,index) => {
+        let columns = [{
+			title:'WBS编码',
+            dataIndex:'code',
+            width:'8%',
+		},{
+			title:'责任单位',
+            dataIndex:'respon_unit',
+            width:'8%',
+		},{
+			title:'事故类型',
+            dataIndex:'acc_type',
+            width:'7%',
+            render: (text, record, index) => (
+                <Select style={{width:'80px'}} onSelect={this.handleSelect.bind(this,index,'acc_type')} value={this.state.dataSource[index]['acc_type']}>
+                    <Option value="一般质量事故">一般质量事故</Option>
+                    <Option value="严重质量事故">严重质量事故</Option>
+                    <Option value="重大质量事故">重大质量事故</Option>
+                </Select>
+            ),
+		},{
+			title:'上报时间',
+            dataIndex:'uploda_date',
+            width:'9%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['uploda_date']} onChange={this.tableDataChange.bind(this,index,'uploda_date')}/>
+            ),
+		},{
+			title:'核查时间',
+            dataIndex:'check_date',
+            width:'9%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['check_date']} onChange={this.tableDataChange.bind(this,index,'check_date')}/>
+            ),
+		},{
+			title:'整改时间',
+            dataIndex:'do_date',
+            width:'9%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['do_date']} onChange={this.tableDataChange.bind(this,index,'do_date')}/>
+            ),
+		},{
+			title:'事故描述',
+            dataIndex:'descrip',
+            width:'10%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['descrip']} onChange={this.tableDataChange.bind(this,index,'descrip')}/>
+            ),
+		},{
+			title:'排查结果',
+            dataIndex:'check_result',
+            width:'6%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['check_result']} onChange={this.tableDataChange.bind(this,index,'check_result')}/>
+            ),
+		},{
+			title:'整改期限',
+            dataIndex:'deadline',
+            width:'6%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['deadline']} onChange={this.tableDataChange.bind(this,index,'deadline')}/>
+            ),
+		},{
+			title:'整改结果',
+            dataIndex:'result',
+            width:'6%',
+            render: (text, record, index) => (
+                <Input value={this.state.dataSource[index]['result']} onChange={this.tableDataChange.bind(this,index,'result')}/>
+            ),
+		}, {
+            title:'附件',
+            width:'6%',
+			render:(text,record,index) => {
+				if(record.file.id){
                     return (<span>
                             <a onClick={this.handlePreview.bind(this,index)}>预览</a>
                             <span className="ant-divider" />
-                            <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
-                        </span>)
-                }
-            }, {
-                title: '操作',
-                render: (text, record, index) => {
+                            <Popconfirm
+                                placement="leftTop"
+                                title="确定删除吗？"
+                                onConfirm={this.remove.bind(this, index)}
+                                okText="确认"
+                                cancelText="取消">
+                                <a>删除</a>
+                            </Popconfirm>
+				        </span>)
+                }else{
                     return (
-                        <Popconfirm
-                            placement="leftTop"
-                            title="确定删除吗？"
-                            onConfirm={this.delete.bind(this, index)}
-                            okText="确认"
-                            cancelText="取消">
-                            <a>删除</a>
-                        </Popconfirm>
+                        <span>
+                        <Upload showUploadList={false} beforeUpload={this.beforeUploadPicFile.bind(this,index)}>
+                            <Button>
+                                <Icon type="upload" />上传附件
+                            </Button>
+                        </Upload>
+                    </span>
                     )
                 }
+			}
+		}, {
+            title: '操作',
+            render: (text, record, index) => {
+                return (
+                    <Popconfirm
+                        placement="leftTop"
+                        title="确定删除吗？"
+                        onConfirm={this.delete.bind(this, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a><Icon type='delete' /></a>
+                    </Popconfirm>
+                )
             }
-        ];
+        }];
         return (
             <Modal
 			key={this.props.akey}
@@ -343,8 +319,8 @@ export default class EditFile extends Component {
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
-			onCancel={this.props.oncancel}>
-            <h1 style ={{textAlign:'center',marginBottom:20}}>申请变更</h1>
+            onCancel={this.props.oncancel}>
+            <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>申请变更</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

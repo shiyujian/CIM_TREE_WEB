@@ -5,7 +5,6 @@ import { Input, Form, Spin, Upload, Icon, Button, Modal,
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
-const FormItem = Form.Item;
 const Option = Select.Option;
 
 export default class DeleteFile extends Component {
@@ -44,9 +43,7 @@ export default class DeleteFile extends Component {
 
     onok(){
         if(!this.state.check){
-            notification.warning({
-				message:'请选择审核人'
-			})
+            message.info("请选择审核人")
             return;
         }
         let {check} = this.state;
@@ -59,12 +56,14 @@ export default class DeleteFile extends Component {
         }
 		this.props.onok(this.state.dataSource,per);
     }
+
     //删除
-    delete(index){
-        let {dataSource} = this.state;
-        dataSource.splice(index,1);
-      this.setState({dataSource}) 
+    delete(index) {
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
     }
+
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -79,59 +78,71 @@ export default class DeleteFile extends Component {
     }
 
     render() {
-        const columns = [
-            {
-                title:'文档编码',
-                dataIndex:'code',
-                width: '10%'
-            },{
-                title:'文件名称',
-                dataIndex:'filename',
-                width: '10%',
-            },{
-                title:'发布单位',
-                dataIndex:'pubUnit',
-                width: '10%',
-            },{
-                title:'版本号',
-                dataIndex:'type',
-                width: '10%',
-            },{
-                title:'实施日期',
-                dataIndex:'doTime',
-                width: '10%',
-            },{
-                title:'备注',
-                dataIndex:'remark',
-                width: '10%',
-            },{
-                title:'提交人',
-                dataIndex:'upPeople',
-                width: '10%',
-            }, {
-                title:'附件',
-                width:'10%',
-                render:(text,record,index) => {
+        let columns = [{
+			title:'WBS编码',
+            dataIndex:'code',
+            width:'8%',
+		},{
+			title:'责任单位',
+            dataIndex:'respon_unit',
+            width:'8%',
+		},{
+			title:'事故类型',
+            dataIndex:'acc_type',
+            width:'7%',
+		},{
+			title:'上报时间',
+            dataIndex:'uploda_date',
+            width:'9%',
+		},{
+			title:'核查时间',
+            dataIndex:'check_date',
+            width:'9%',
+		},{
+			title:'整改时间',
+            dataIndex:'do_date',
+            width:'9%',
+		},{
+			title:'事故描述',
+            dataIndex:'descrip',
+            width:'10%',
+		},{
+			title:'排查结果',
+            dataIndex:'check_result',
+            width:'6%',
+		},{
+			title:'整改期限',
+            dataIndex:'deadline',
+            width:'6%',
+		},{
+			title:'整改结果',
+            dataIndex:'result',
+            width:'6%',
+		}, {
+            title:'附件',
+            width:'6%',
+			render:(text,record,index) => {
+				if(record.file.id){
                     return (<span>
-                                <a onClick={this.handlePreview.bind(this,index)}>预览</a>
-                            </span>)
+                            <a onClick={this.handlePreview.bind(this,index)}>预览</a>
+				        </span>)
                 }
-            },{
-                title:'操作',
-                render:(text,record,index) => {
-                    return  (
-                        <Popconfirm
-                            placement="leftTop"
-                            title="确定删除吗？"
-                            onConfirm={this.delete.bind(this, index)}
-                            okText="确认"
-                            cancelText="取消">
-                            <a>删除</a>
-                        </Popconfirm>
-                    )
-                }
+			}
+		}, {
+            title: '操作',
+            render: (text, record, index) => {
+                return (
+                    <Popconfirm
+                        placement="leftTop"
+                        title="确定删除吗？"
+                        onConfirm={this.delete.bind(this, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a><Icon type='delete' /></a>
+                    </Popconfirm>
+                )
             }
-        ];
+        }];
         return (
             <Modal
 			key={this.props.akey}
@@ -139,8 +150,8 @@ export default class DeleteFile extends Component {
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
-			onCancel={this.props.oncancel}>
-            <h1 style ={{textAlign:'center',marginBottom:20}}>申请删除</h1>
+            onCancel={this.props.oncancel}>
+            <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>申请删除</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

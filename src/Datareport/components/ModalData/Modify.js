@@ -93,7 +93,7 @@ export default class Modify extends Component {
 	onok() {
 		let { dataSource } = this.state;
 		if (!this.state.check) {
-			notification.info({ message: "请选择审核人" })
+			notification.info({ message: "请选择审核人！" })
 			return;
 		}
 		let { check } = this.state;
@@ -408,7 +408,7 @@ export default class Modify extends Component {
 			resp = await resp.json()
 
 			if (!resp || !resp.id) {
-				notification.error({ message: '文件上传失败' })
+				notification.error({ message: '文件上传失败！' })
 				return;
 			};
 			const filedata = resp;

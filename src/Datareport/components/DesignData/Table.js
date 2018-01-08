@@ -104,7 +104,7 @@ export default class DesignTable extends Component {
 						dataSource.push(temp);
 					})
 				} catch (e) {
-					notification.error({ message: `数据获取失败!` })
+					notification.error({ message: `数据获取失败！` })
 				}
 				this.setState({ dataSource, alldatas: item, showDs: dataSource });
 			})
@@ -234,9 +234,9 @@ export default class DesignTable extends Component {
 		const { modify = {}, actions: { changeModifyField } } = this.props;
 		
 		if (!(modify.selectedDatas && modify.selectedDatas.length)) {
-			notification.warning({ message: '请先选择数据!' })
+			notification.warning({ message: '请先选择数据！' })
 		} else if (!this.judge(modify.selectedDatas)) {
-			notification.warning({ message: '请选择相同的单位工程!' })
+			notification.warning({ message: '请选择相同的单位工程！' })
 		} else {
 			changeModifyField('visible', true)
 			changeModifyField('key', modify.key ? modify.key + 1 : 1)
@@ -246,7 +246,7 @@ export default class DesignTable extends Component {
 		const { expurgate = {}, actions: { changeExpurgateField } } = this.props;
 		
 		if (!(expurgate.selectedDatas && expurgate.selectedDatas.length)) {
-			notification.warning({ message: '请先选择数据!' })
+			notification.warning({ message: '请先选择数据！' })
 		} else {
 			changeExpurgateField('visible', true)
 			changeExpurgateField('key', expurgate.key ? expurgate.key + 1 : 1)
@@ -270,7 +270,7 @@ export default class DesignTable extends Component {
 		const { actions: { jsonToExcel } } = this.props;
 		const { selectedDataSource } = this.state;
 		if (selectedDataSource.length === 0) {
-			notification.warning({ message: '请先选择数据!' })
+			notification.warning({ message: '请先选择数据！' })
 			return
 		}
 		let rows = [];
