@@ -255,14 +255,12 @@ async  tianbao(jianyanpi,p2){
                 if(!ele.extra_params.check_status){
                     ele.extra_params.check_status = 0;
                 }
-                if(ele.extra_params.check_status === 0 || ele.extra_params.check_status === 1 ||ele.extra_params.check_status ===  2){
                     jianyanpis.push(ele);
-                }
             });
             console.log('jyps',jianyanpis);
             this.setState({ jianyanpis: jianyanpis});
             this.setState({loading:false});
-        })
+        });
     }
     treeNodeClk(code) {
         let [pk, type,] = code[0].split('--');
@@ -556,43 +554,43 @@ async  tianbao(jianyanpi,p2){
         const { table: { editing = false } = {} } = this.props;
        //this.state.jianyanpis
        //this.columns
-        let ds=[];
-        let columns =[];
+        let ds=this.state.jianyanpis||[];
+        let columns =this.columnsa;
 
-        if(this.state.jianyanpiType==='b'){
-            columns = this.columnsa;
-            this.state.jianyanpis.forEach(ele=>{
-                if(ele.extra_params.check_status === 1&&!(ele.extra_params.toJianLi === 1)){
-                    ele.tianbaoStatus = getStatus('1');
-                    ele.percent =Math.floor(ele.extra_params.qualified_rate*100)+'%';
-                    ds.push(ele);
-                }
-            });
-        }else if(this.state.jianyanpiType === 'c'){
-            this.state.jianyanpis.forEach(ele=>{
-                columns = this.columnsb;
-                if(ele.extra_params.check_status === 2){
-                    ele.tianbaoStatus = getStatus('2');
-                    if(ele.extra_params.check_time){
-                        ele.tianbaoTime = ele.extra_params.check_time;
-                    }else{
-                        ele.tianbaoTime = '未定义'
-                    }
-                    ele.percent =Math.floor(ele.extra_params.qualified_rate*100)+'%';
-                    ds.push(ele);
-                }
-            });
-        }else if(this.state.jianyanpiType === 'a'){
-            columns = this.columnsc;
-            this.state.jianyanpis.forEach(ele=>{
-                if(!ele.extra_params.check_status||ele.extra_params.check_status === 0){
-                    ele.tianbaoStatus = getStatus('0');
-                    ele.percent =Math.floor(ele.extra_params.qualified_rate*100)+'%';
-                    ds.push(ele);
-                }
-            });
-        }
-        console.log('datasource',ds)
+        // if(this.state.jianyanpiType==='b'){
+        //     columns = this.columnsa;
+        //     this.state.jianyanpis.forEach(ele=>{
+        //         if(ele.extra_params.check_status === 1&&!(ele.extra_params.toJianLi === 1)){
+        //             ele.tianbaoStatus = getStatus('1');
+        //             ele.percent =Math.floor(ele.extra_params.qualified_rate*100)+'%';
+        //             ds.push(ele);
+        //         }
+        //     });
+        // }else if(this.state.jianyanpiType === 'c'){
+        //     this.state.jianyanpis.forEach(ele=>{
+        //         columns = this.columnsb;
+        //         if(ele.extra_params.check_status === 2){
+        //             ele.tianbaoStatus = getStatus('2');
+        //             if(ele.extra_params.check_time){
+        //                 ele.tianbaoTime = ele.extra_params.check_time;
+        //             }else{
+        //                 ele.tianbaoTime = '未定义'
+        //             }
+        //             ele.percent =Math.floor(ele.extra_params.qualified_rate*100)+'%';
+        //             ds.push(ele);
+        //         }
+        //     });
+        // }else if(this.state.jianyanpiType === 'a'){
+        //     columns = this.columnsc;
+        //     this.state.jianyanpis.forEach(ele=>{
+        //         if(!ele.extra_params.check_status||ele.extra_params.check_status === 0){
+        //             ele.tianbaoStatus = getStatus('0');
+        //             ele.percent =Math.floor(ele.extra_params.qualified_rate*100)+'%';
+        //             ds.push(ele);
+        //         }
+        //     });
+        // }
+        console.log('datasource',ds);
         return (
             <Main>
                 <DynamicTitle title={"检验批填报"} {...this.props} />
