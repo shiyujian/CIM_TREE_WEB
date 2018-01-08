@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../store/DesignData';
 import { actions as platformActions } from '_platform/store/global';
-import { Modal, Input, Form, Button, message, Table, Radio, Row, Col, DatePicker, Select } from 'antd';
+import { Modal, Input, Form, Button, message, Table, Radio, Row, Col, DatePicker, Select,notification } from 'antd';
 import WorkflowHistory from '../WorkflowHistory'
 import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import { getUser } from '_platform/auth';
