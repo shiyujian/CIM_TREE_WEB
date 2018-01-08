@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message,Cascader,notification} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_QualityProblem} from '_platform/api';
 import '../../containers/quality.less'
 import Preview from '_platform/components/layout/Preview';
 const RadioGroup = Radio.Group;
@@ -456,7 +456,7 @@ class DefectModal extends Component {
                         onConfirm={this.delete.bind(this, index)}
                         okText="确认"
                         cancelText="取消">
-                        <a>删除</a>
+                        <a><Icon type='delete' /></a>
                     </Popconfirm>
                 )
             }
@@ -490,19 +490,20 @@ class DefectModal extends Component {
 		};
 		return (
 			<Modal
-			title="质量问题上传表"
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={true}
 			onCancel={this.props.oncancel}>
-				<div>
+                <div>
+                <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>发起填报</h1>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
                         dataSource={this.state.dataSource}
                         pagination={false}
                         scroll={{y:500}}
-						bordered />
+                        bordered />
+                        <Button style={{ marginRight: 10 }} onClick={this.createLink.bind(this, 'muban', `${DataReportTemplate_QualityProblem}`)} type="default">模板下载</Button>
                     <Upload
                      onChange={this.handleExcelData.bind(this)}
                      showUploadList={false}
@@ -602,6 +603,16 @@ class DefectModal extends Component {
             });
             this.setState({ dataSource });
         }
+    }
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }
 export default DefectModal

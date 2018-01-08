@@ -82,14 +82,6 @@ export default class WorkDel extends Component {
 			});
 			return;
 		}
-		if (!this.state.deleteInfo.length) {
-            notification.warning({
-				message: '请填写删除原因！',
-				duration: 2
-			});
-            return;
-        }
-
         dataSource[0].deleteInfo = this.state.deleteInfo.trim();
 		let { check } = this.state;
 		let per = {
@@ -206,7 +198,7 @@ export default class WorkDel extends Component {
 					<Col>
 						<span>
 							审核人：
-                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)} placeholder='请选择审核人'>
 								{
 									this.state.checkers
 								}
@@ -221,7 +213,7 @@ export default class WorkDel extends Component {
 			    </Row>
 			    <Row style={{margin: '20px 0'}}>
 				    <Col>
-				    	<TextArea rows={2} style={{ resize: "none"}} onChange={this.onChangeText.bind(this)}/>
+				    	<TextArea rows={2} onChange={this.onChangeText.bind(this)}/>
 				    </Col>
 			    </Row>
 				<Preview />

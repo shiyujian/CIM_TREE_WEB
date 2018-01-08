@@ -13,6 +13,10 @@ export default class InfoDeleteUpload extends Component{
         this.state={
             dataSource: []
         }
+        Object.assign(this,{
+            selectUser: null,
+            description: null,
+        })
     }
 
     componentDidMount(){
@@ -31,7 +35,7 @@ export default class InfoDeleteUpload extends Component{
              width={1280}
              visible={deleteModal}
              onCancel={()=>closeModal("deleteModal")}
-             footer={null}
+             onOk={this.onOk}
             >
                 <h1 style={{ textAlign: "center"}}>申请删除</h1>
                 <VedioInfoTable
@@ -41,16 +45,24 @@ export default class InfoDeleteUpload extends Component{
                  allowDel={false}
                 />
                 <ChangeFooter
-                 onOk={this.onOk}
+                 storeState={this.storeState}
                 />
             </Modal>
         )
     }
 
-    onOk = async (selectUser,description)=>{
+    onOk = async ()=>{
+        const {selectUser,description} = this;
+        if(!selectUser){
+            notification.warning({
+                message: '请选择审核人！',
+                duration: 2
+            });
+            return
+        }
+
         const {dataSource, closeModal, actions:{ createWorkflow, logWorkflowEvent }} = this.props,
             name = '影像信息数据删除';
-
         await launchProcess({dataSource,selectUser,name,description},{createWorkflow,logWorkflowEvent});
         notification.success({
             message: '申请删除流程成功！',
@@ -62,7 +74,9 @@ export default class InfoDeleteUpload extends Component{
     storeExcelData = (dataSource)=>{
         this.setState({dataSource});
     }
-
+    storeState = (data={})=>{
+        Object.assign(this,data);
+    }
 }
 
 InfoDeleteUpload.PropTypes ={

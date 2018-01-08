@@ -68,10 +68,10 @@ export default class ProjectSumExcalDelete extends Component {
             notification.warning({message:"请选择审核人",duration: 2})
             return;
         }
-        if (!this.state.changeText.length) {
-            notification.warning({message:`请填写删除原因`,duration: 2});
-            return;
-        }
+        // if (!this.state.changeText.length) {
+        //     notification.warning({message:`请填写删除原因`,duration: 2});
+        //     return;
+        // }
         let {check} = this.state;
         let per = {
             id:check.id,
@@ -123,34 +123,42 @@ export default class ProjectSumExcalDelete extends Component {
             {
                 title: "序号",
                 dataIndex: "key",
-                width: "10%",
-                
+                key:'key'
               },{
                 title: '项目/子项目',
                 dataIndex: 'subproject',
+                key:'subproject'
             }, {
                 title: '单位工程',
                 dataIndex: 'unit',
+                key:'unit'
             }, {
                 title: '清单项目编号',
                 dataIndex: 'projectcoding',
+                key:'projectcoding'
             }, {
                 title: '项目名称',
                 dataIndex: 'projectname',
+                key:'projectname'
             }, {
                 title: '计量单位',
                 dataIndex: 'company',
+                key:'company'
             }, {
                 title: '数量',
                 dataIndex: 'number',
+                key:'number'
             }, {
                 title: '综合单价(元)',
                 dataIndex: 'total',
+                key:'total'
             }, {
                 title: '备注',
                 dataIndex: 'remarks',
+                key:'remarks'
             }, {
                 title: "操作",
+                key:'edit',
                 render: (text, record, index) => {
                   return (
                     <Popconfirm
@@ -179,6 +187,7 @@ export default class ProjectSumExcalDelete extends Component {
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{ pageSize: 10 }}
+                    rowKey="key"
                 />
                 <Row style={{ marginBottom: "30px" }} type="flex">
                     <Col>

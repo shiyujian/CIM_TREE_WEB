@@ -17,7 +17,6 @@ export default class TablePerson extends Component{
 		}
 	}
     render(){
-    	console.log('dataSource',this.state.tempData)
         return (
             <div>
                 <div>
@@ -54,7 +53,7 @@ export default class TablePerson extends Component{
 			ExprugateVisible(true);
 		}else{
 			Notification.warning({
-				message: "请先选择数据"
+				message: "请先选择数据！"
 			});
 		}
 	}
@@ -72,7 +71,7 @@ export default class TablePerson extends Component{
 			ModifyVisible(true);
 		} else {
 			Notification.warning({
-				message: "请先选择数据"
+				message: "请先选择数据！"
 			});
 		}
 	}
@@ -112,7 +111,7 @@ export default class TablePerson extends Component{
 	        })
 		}else {
 			Notification.warning({
-				message: "请先选择数据"
+				message: "请先选择数据！"
 			});
 			return;
 		}

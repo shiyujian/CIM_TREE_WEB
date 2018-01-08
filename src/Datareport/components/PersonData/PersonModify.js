@@ -220,13 +220,13 @@ export default class PersonModify extends Component {
         });
         if(temp) {
             Notification.Warning({
-                message: '部门不存在，无法提交'
+                message: '部门不存在！'
             })
             return
         }
         if (!this.state.passer) {
             Notification.Warning({
-                message: '审批人未选择'
+                message: '审批人未选择！'
             });
             return;
         }
@@ -262,7 +262,7 @@ export default class PersonModify extends Component {
                 }
                 this.setState({dataSource})
             }else{
-                Notification.Warning("部门不存在")
+                Notification.Warning("部门不存在！")
             }
         })
     }
