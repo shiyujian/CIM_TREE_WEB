@@ -69,9 +69,10 @@ export default class News extends Component {
 	componentDidMount() {
 		const {actions: {getDatumList,setnewdoc}} = this.props;
 		getDatumList().then(rst =>{
+			console.log('rst',rst)
 			const a =[];
 			rst.result.map(item=>{
-				if(item.extra_params.state !== "作废"){
+				if(item.extra_params.state && item.extra_params.state !== "作废"){
 					a.push(item)
 				}
 			});
