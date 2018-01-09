@@ -163,16 +163,6 @@ class Login extends Component {
 		let level = 'H';
 		let bgColor = "#FFFFFF";
 		let fgColor = "#000000";
-		const formItemLayout = {
-			labelCol:{
-				xs :{span:24},
-				sm :{span:8},
-			},
-			wrapperCol :{
-				xs :{span:24},
-				sm :{span:16},
-			}
-		}
 
 		return (
 			<div className="login-wrap">
@@ -344,7 +334,7 @@ class Login extends Component {
 		const {actions: {forgect}} = this.props;
 		this.props.form.validateFieldsAndScroll((err,values) =>{
 			if(!err){
-				console.log('values',values)
+				// console.log('values',values)
 				// let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
 				let partn=/^1[0-9]{10}$/;
 				let phonenumber =values.phone;
@@ -378,6 +368,15 @@ class Login extends Component {
 							notification.error({
 								message:  '短信发送失败！',
 								duration: 2,
+							})
+						}else{
+							this.setState({
+								appDownload:false,
+								forgectState:false,
+								loginState:true,
+								QRUrl:'',
+								token:null,
+								userMessage:null
 							})
 						}
 					})
