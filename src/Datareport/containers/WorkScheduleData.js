@@ -57,6 +57,7 @@ export default class WorkScheduleData extends Component {
 						construct_unit: single.extra_params.construct_unit.name||single.extra_params.construct_unit,
 						quantity: single.extra_params.quantity,
 						factquantity: single.extra_params.factquantity,
+						opvalue:single.extra_params.opvalue,
 						planstarttime: single.extra_params.planstarttime,
 						planovertime: single.extra_params.planovertime,
 						factstarttime: single.extra_params.factstarttime,
@@ -246,7 +247,7 @@ export default class WorkScheduleData extends Component {
 			});
 			return;
 		}
-		rows.push(["WBS编码", "任务名称", "项目/子项目", "单位工程", "实施单位", "施工图工程量", "实际工程量", "计划开始时间", "计划结束时间", "实际开始时间", "实际结束时间", "上传人员"]); 
+		rows.push(["WBS编码", "任务名称", "项目/子项目", "单位工程", "实施单位", "施工图工程量", "实际工程量","产值(万元)", "计划开始时间", "计划结束时间", "实际开始时间", "实际结束时间", "上传人员"]); 
 		dataSourceSelected.map(item => {
 			rows.push([
 				item.code,
@@ -256,6 +257,7 @@ export default class WorkScheduleData extends Component {
 				item.construct_unit,
 				item.quantity,
 				item.factquantity,
+				item.opvalue,
 				item.planstarttime,
 				item.planovertime,
 				item.factstarttime,
@@ -372,6 +374,10 @@ export default class WorkScheduleData extends Component {
 		title: '实际工程量',
 		dataIndex: 'factquantity',
 		key: "factquantity",
+	}, {
+		title: '产值(万元)',
+		dataIndex: 'opvalue',
+		key: "opvalue",
 	}, {
 		title: '计划开始时间',
 		dataIndex: 'planstarttime',

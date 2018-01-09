@@ -128,10 +128,11 @@ export default class AddFile extends Component {
                     },
                     quantity: dataList[i][3] ? dataList[i][3] : '',
                     factquantity: dataList[i][4] ? dataList[i][4] : '',
-                    planstarttime: dataList[i][5] ? dataList[i][5] : '',
-                    planovertime: dataList[i][6] ? dataList[i][6] : '',
-                    factstarttime: dataList[i][7] ? dataList[i][7] : '',
-                    factovertime: dataList[i][8] ? dataList[i][8] : '',
+                    opvalue: dataList[i][5] ? dataList[i][5] : '',
+                    planstarttime: dataList[i][6] ? dataList[i][6] : '',
+                    planovertime: dataList[i][7] ? dataList[i][7] : '',
+                    factstarttime: dataList[i][8] ? dataList[i][8] : '',
+                    factovertime: dataList[i][9] ? dataList[i][9] : '',
                     uploads: getUser().username,
                     project: {
                         code: "",
@@ -385,6 +386,16 @@ export default class AddFile extends Component {
                 render: (text, record, index) => {
                     return <Input value={record.factquantity || ""} onChange={ele => {
                         record.factquantity = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                }
+            }, {
+                title: '产值(万元)',
+                dataIndex: 'opvalue',
+                key: "opvalue",
+                render: (text, record, index) => {
+                    return <Input value={record.opvalue || ""} onChange={ele => {
+                        record.opvaluey = ele.target.value
                         this.forceUpdate();
                     }} />
                 }
