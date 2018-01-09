@@ -39,6 +39,7 @@ export default class WorkChange extends Component {
 				construct_unit: item.construct_unit,
 				quantity: item.quantity,
 				factquantity: item.factquantity,
+				opvalue:item.opvalue,
 				planstarttime: item.planstarttime,
 				planovertime: item.planovertime,
 				factstarttime: item.factstarttime,
@@ -113,6 +114,7 @@ export default class WorkChange extends Component {
 				construct_unit: item.construct_unit,
 				quantity: item.quantity,
 				factquantity: item.factquantity,
+				opvalue:item.opvalue,
 				planstarttime: item.planstarttime,
 				planovertime: item.planovertime,
 				factstarttime: item.factstarttime,
@@ -171,6 +173,12 @@ export default class WorkChange extends Component {
 			dataIndex:"factquantity",
 			render:(text,record,index)=>(
 				<Input value={this.state.dataSource[record.key-1]['factquantity']} onChange={this.tableDataChange.bind(this,record.key-1,'factquantity')}/>
+			)
+		}, {
+			title: '产值(万元)',
+			dataIndex:"opvalue",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['opvalue']} onChange={this.tableDataChange.bind(this,record.key-1,'opvalue')}/>
 			)
 		}, {
 			title: '计划开始时间',

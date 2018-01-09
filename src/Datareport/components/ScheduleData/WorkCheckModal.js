@@ -213,6 +213,9 @@ export default class WorkCheckModal extends Component {
                 title: '实际工程量',
                 dataIndex: 'factquantity',
             }, {
+                title: '产值(万元)',
+                dataIndex: 'opvalue',
+            }, {
                 title: '计划开始时间',
                 dataIndex: 'planstarttime',
             }, {
