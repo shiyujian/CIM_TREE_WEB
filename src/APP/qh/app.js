@@ -18,6 +18,7 @@ export default class App extends Component {
 		const {default: Home} = await import('../../Home');
 		const {default: Login} = await import('../../LoginQH');
 		const {default: Dashboard} = await import('../../Dashboard');
+		const {default: Forest} = await import('../../Forest');
 		const {default: Overall} = await import('../../Overall');
 		const {default: Datum} = await import('../../Datum');
 		const {default: Design} = await import('../../Design');
@@ -37,6 +38,7 @@ export default class App extends Component {
 			Home,
 			Login,
 			Dashboard,
+			Forest,
 			Overall,
 			Datum,
 			Design,
@@ -59,6 +61,7 @@ export default class App extends Component {
 			Home,
 			Login,
 			Dashboard,
+			Forest,
 			Overall,
 			Datum,
 			Design,
@@ -84,6 +87,7 @@ export default class App extends Component {
 						{Home && <Route exact path="/" component={Home}/>}
 						{Login && <Route path="/login" component={Login}/>}
 						{Dashboard && <Route path="/dashboard" component={Dashboard}/>}
+						{Forest && <Route path="/forest" component={Forest}/>}
 						{Overall && <Route path="/overall" component={Overall}/>}
 						{Datum && <Route path="/datum/:category?" component={Datum}/>}
 						{Design && <Route path="/design" component={Design}/>}
