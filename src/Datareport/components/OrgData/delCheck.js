@@ -34,7 +34,6 @@ export default class DelCheck extends Component {
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        console.log("dataSource:",dataSource);
         this.setState({dataSource,wk})
     }
     componentWillReceiveProps(props){
@@ -49,7 +48,7 @@ export default class DelCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_del_visible",false)
+        this.props.closeModal("dr_base_del_visible",false,"submit")
         notification.success({
             message:"操作成功"
         })
@@ -64,7 +63,6 @@ export default class DelCheck extends Component {
         executor.username = person.username;
         executor.person_name = person.name;
         executor.person_code = person.code;
-        console.log("dataSource",dataSource);
         let data_list = [];
         dataSource.map((item, index) => {
             data_list.push({
@@ -78,15 +76,34 @@ export default class DelCheck extends Component {
             })
         })
         deleteOrgList({},{data_list: data_list}).then(rst => {
-            console.log("rst:",rst);
         })
         await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
     }
     //不通过
     async reject(){
         const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const {actions:{logWorkflowEvent}} = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '拒绝',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        notification.success({
+            message: "操作成功",
+            duration: 2
+        })
     }
     //预览
     handlePreview(index){
@@ -161,11 +178,6 @@ export default class DelCheck extends Component {
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
                         </Col>
                     </Row>
                     {

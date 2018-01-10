@@ -56,7 +56,7 @@ export default class SafetySpecialDeleteCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("Safety_Special_delete_visible", false);
+        this.props.closeModal("Safety_Special_delete_visible", false, 'submit');
         message.info("操作成功")
     }
 
@@ -116,7 +116,7 @@ export default class SafetySpecialDeleteCheck extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null
             }
@@ -228,7 +228,6 @@ export default class SafetySpecialDeleteCheck extends Component {
         };
         return (
             <Modal
-                title="安全信息审批表"
                 visible={true}
                 width={1280}
                 footer={null}
@@ -237,13 +236,13 @@ export default class SafetySpecialDeleteCheck extends Component {
             >
 
                 <div>
-                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>删除审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
-                        bordered 
-                        rowSelection={rowSelection}
-                        />
+                        bordered
+                    // rowSelection={rowSelection}
+                    />
                     <Row>
                         <Col span={2}>
                             <span>审查意见：</span>
@@ -256,15 +255,15 @@ export default class SafetySpecialDeleteCheck extends Component {
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={2} push={14}>
+                        {/* <Col span={2} push={14}>
                             <Button
                                 onClick={this.BtnExport.bind(this)}
                                 type='primary'
                             >
                                 导出表格
                             </Button>
-                        </Col>
-                        <Col span={2} push={14}>
+                        </Col> */}
+                        <Col span={2} push={16}>
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>
@@ -272,11 +271,41 @@ export default class SafetySpecialDeleteCheck extends Component {
                         </Col>
                     </Row>
                     {
-                        this.state.dataSource[0] && this.state.dataSource[0].deleteInfoNew ? <Row>
-                            <Col span={4}> push={12}
-                                申请删除原因：{this.state.dataSource[0].deleteInfoNew}
-                            </Col>
-                        </Row>
+                        this.state.dataSource[0] && this.state.dataSource[0].deleteInfoNew ?
+                            // <Row>
+                            //     {/* <Col
+                            //         style={{ fontSize: 16 }}
+                            //         span={2}
+                            //         push={4}
+                            //     >
+                            //         <span>删除原因 ：</span>
+                            //     </Col> */}
+                            //     <Col
+                            //         span={14}
+                            //         push={6}
+                            //     >
+                            //      <span style={{ fontSize: 16 }} >删除原因 ：</span>
+                            //         {this.state.dataSource[0].deleteInfoNew}
+                            //     </Col>
+                            // </Row>
+                            <Row style={{ marginBottom: 16 }}>
+                                <Col style={{ marginBottom: 10 }}>
+                                    <span
+                                        // style={{ fontSize: 16 }}
+                                    >
+                                        删除原因 ：
+                                    </span>
+                                </Col>
+                                <Col>
+                                    <Input
+                                        type="textarea"
+                                        autosize={{ minRows: 5, maxRow: 6 }}
+                                        // style={{ marginBottom: 40 }}
+                                        value={this.state.dataSource[0].deleteInfoNew}
+                                        disabled={true}
+                                    />
+                                </Col>
+                            </Row>
                             :
                             ""
                     }

@@ -4,12 +4,13 @@ import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions} from '../../store/UnitData';
 import {actions as actions2} from '../../store/quality';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,Notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
 import {actions as projactions} from '../../store/ProjectData';
+import '../index.less';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const Option = Select.Option
@@ -34,9 +35,7 @@ export default class HandelChangeProjModal extends Component {
     }
     async componentDidMount(){
         const {wk} = this.props;
-        console.log(wk);
         let data = JSON.parse(wk.subject[0].data);
-        console.log(data);
         this.setState({dataSource:data,wk});
     }
     componentWillReceiveProps(props){
@@ -48,11 +47,13 @@ export default class HandelChangeProjModal extends Component {
     async submit(){
         if(this.state.opinion === 1){
             await this.passon();        
-            this.props.closeModal("dr_change_proj_visible",false);
         }else{
             await this.reject();
         }
-        message.info("操作成功");
+        this.props.closeModal("dr_change_proj_visible",false,'submit');
+        Notification.success({
+            message: "操作成功"
+        });
     }
     //通过
     async passon(){
@@ -104,12 +105,10 @@ export default class HandelChangeProjModal extends Component {
         let rst = await putProjectListAc({},{data_list:dataList});
         let docRst = await putDocListAc({},{data_list:docList});
         if(rst && rst.result && rst.result.length>0){
-            console.log(rst);
-            // await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+            await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
         }
     }
     beforeUpload(record,file){
-        console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
@@ -134,10 +133,30 @@ export default class HandelChangeProjModal extends Component {
     }
     //不通过
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
-    }
+        const {wk} = this.state;
+        const {actions: {logWorkflowEvent}} = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        Notification.success({
+            message: "操作成功",
+            duration: 2
+        })
+    };
     //预览
     handlePreview(index){
         const {actions: {openPreview}} = this.props;
@@ -155,7 +174,6 @@ export default class HandelChangeProjModal extends Component {
         this.setState({opinion:e.target.value})
     }
     beforeUpload(record,file){
-        console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
@@ -180,6 +198,10 @@ export default class HandelChangeProjModal extends Component {
     }
 	render() {
      const  columns =  [{
+        title: '编码',
+        dataIndex: 'code',
+        key: 'Code',
+    }, {
 		title: '项目/子项目名称',
 		dataIndex: 'name',
 		key: 'Name',
@@ -243,14 +265,15 @@ export default class HandelChangeProjModal extends Component {
       let projname = this.state.project?this.state.project.name:'';
 		return (
             <Modal
-			title="项目变更审批表"
             visible={true}
             width= {1280}
-			footer={null}
-			maskClosable={false}>
+            onOk={this.submit.bind(this)}
+            onCancel = {() => this.props.closeModal("dr_change_proj_visible",false)}>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
-                    <Table style={{ marginTop: '10px', marginBottom:'10px' }}
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>变更审核</h1>
+                    <Table 
+                        style={{ marginTop: '10px', marginBottom:'10px' }}
+                        className='foresttable'
                         columns={columns}
                         dataSource={this.state.dataSource||[]}
                         bordered />
@@ -265,14 +288,6 @@ export default class HandelChangeProjModal extends Component {
                             </RadioGroup>
                         </Col>
                         <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                            </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                            </Button>
                             <Preview />
                         </Col>
                     </Row>

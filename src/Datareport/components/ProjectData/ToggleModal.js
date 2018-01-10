@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
+import {Table,Button,Popconfirm,Notification,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
+import {UPLOAD_API,SERVICE_API,FILE_API,DataReportTemplate_ProjectInformation} from '_platform/api';
 const Search = Input.Search;
 const {Option} = Select
 export default class ToggleModal extends Component{
@@ -24,7 +24,9 @@ export default class ToggleModal extends Component{
 		        if (info.file.status === 'done') {
 		        	let importData = info.file.response.Sheet1;
                     let dataSource = jthis.handleExcelData(importData);
-                    message.success(`${info.file.name} file uploaded successfully`);
+                    Notification.success({
+                        message: `${info.file.name}上传成功`
+                    });
                     let perSet = {};
                     let {getPersonByCode} = jthis.props.actions;
                     for(let i=0;i< dataSource.length;i++){
@@ -32,11 +34,12 @@ export default class ToggleModal extends Component{
                     }
                     jthis.setState({perSet,dataSource});
 		        } else if (info.file.status === 'error') {
-		            message.error(`${info.file.name}解析失败，请检查输入`);
+		            Notification.error({
+                        message: `${info.file.name}解析失败，请检查输入`
+                    });
 		        }
 		    },
         };
-        console.log(this.state.dataSource);
         return (
             <Modal
                 visible={visible}
@@ -44,7 +47,7 @@ export default class ToggleModal extends Component{
                 onOk={this.ok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>结果预览</h1>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
                 <Table 
                     style = {{"textAlign":"center"}}
                     columns={this.columns}
@@ -52,9 +55,15 @@ export default class ToggleModal extends Component{
                     dataSource = {this.state.dataSource}
                 >
                 </Table>
+                <Button
+                    onClick={this.createLink.bind(this, '项目模版', DataReportTemplate_ProjectInformation)}
+                    style={{ marginRight: "10px" }}
+                >
+                    模板下载
+                </Button>
                 <Upload {...props}>
                     <Button style={{ margin: '10px 10px 10px 0px' }}>
-                        <Icon type="upload" />上传附件
+                        <Icon type="upload" />上传并预览
                      </Button>
                 </Upload>
                 <span>
@@ -67,7 +76,6 @@ export default class ToggleModal extends Component{
                         }
                     </Select>
                 </span>
-                <Button type="primary" >提交</Button>
                <div style={{marginTop:"30px"}}>
                     <p><span>注：</span>1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；</p>
                     <p style={{ paddingLeft: "25px" }}>2、数值用半角阿拉伯数字，如：1.2</p>
@@ -83,15 +91,28 @@ export default class ToggleModal extends Component{
             return !ele.file;
         });
         if(ok){
-            message.error('有附件未上传');
+            Notification.warning({
+                message: '有附件未上传'
+            });
             return;
         };
         if(!this.state.passer){
-            message.error('审批人未选择');
+            Notification.warning({
+                message: '审批人未选择'
+            });
             return;
         }        
         this.props.setData(this.state.dataSource,JSON.parse(this.state.passer));
         ModalVisibleProject(false);
+    }
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
     cancel() {
         const { actions: { ModalVisibleProject } } = this.props;
@@ -103,7 +124,6 @@ export default class ToggleModal extends Component{
     componentDidMount(){
         const {actions:{getAllUsers}} = this.props
         getAllUsers().then(res => {
-            console.log(res);
             let set = {};
             let checkers = res.map(o => {
                 set[o.id] = o;
@@ -140,7 +160,6 @@ export default class ToggleModal extends Component{
         return false;
     }
     beforeUpload(record,file){
-        console.log(record,file);
         const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
@@ -168,7 +187,7 @@ export default class ToggleModal extends Component{
         dataIndex: 'index',
         key: 'Index',
       },{
-        title: '项目编码',
+        title: '编码',
         render:(record)=>{
             let color = 'red';
             if(record.file && record.pic){

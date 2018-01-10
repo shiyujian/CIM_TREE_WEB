@@ -7,7 +7,10 @@ import './index.less';
 export default class VedioTable extends Component{
 
     componentDidMount(){
-        const {fileDel=false,preview=false} = this.props;
+        const {fileDel=false,preview=false,enginner=true} = this.props;
+        if(!enginner){
+            this.columns.splice(2,2);
+        }
         if(preview){
             this.columns.push(this.preview);
         }
@@ -45,7 +48,7 @@ export default class VedioTable extends Component{
     deleteData = (index)=>{
         const {dataSource = [],storeExcelData} = this.props;
         let data = JSON.parse(JSON.stringify(dataSource));
-        data.splice(index,1);
+        data.splice((this.page-1)*10+index, 1);
         storeExcelData(data);
     }
 
@@ -68,9 +71,9 @@ export default class VedioTable extends Component{
         )
     }
     handleChange = (value,index,dataIndex)=>{
-        const {storeData,dataSource} = this.props;
+        const {storeExcelData,dataSource} = this.props;
         dataSource[(this.page-1)*10 + index][dataIndex] = value;
-        storeData(dataSource);
+        storeExcelData(dataSource);
     }
 
     columns = [{
@@ -147,7 +150,7 @@ export default class VedioTable extends Component{
                  onConfirm={()=>{ this.deleteData(index) }}
                  okText="确认"
                  cancelText="取消">
-                    <a>删除</a>
+                    <a><Icon type="delete" /></a>
                 </Popconfirm>
             )
         }

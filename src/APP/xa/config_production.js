@@ -69,7 +69,7 @@ window.config = {
 	//智慧森林
 	//智慧森林域名
 	//'FORESTDOMAIN':"http://120.24.215.190",//阿里云
-	'FORESTDOMAIN':"http://bim1.ecidi.com",//院内
+	'FORESTDOMAIN':"http://10.215.160.45",//院内
 	// 'FORESTDOMAIN':"http://192.168.3.33",
 	//智慧森林端口
 	//'FORESTPORT':"227",//阿里云
@@ -112,7 +112,7 @@ window.config = {
 	},
 
 	//综合管理系统登录操作
-	'ZHLoginServletCMD':'http://xaweb.simulate.com:8080/eccms/servlet/LoginServlet.cmd',
+	'ZHLoginServletCMD':'http://130.130.0.206:8080/eccms/servlet/LoginServlet.cmd',
 
 	//综合展示360全景部署
 	'dashboardVideo360API':'http://192.168.3.94/QJ/容城',

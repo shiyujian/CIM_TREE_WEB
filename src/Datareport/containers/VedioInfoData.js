@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {message,Progress} from 'antd';
+import {message,Progress,notification} from 'antd';
 
 import {Main,Content, DynamicTitle} from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
@@ -9,7 +9,6 @@ import { actions as platformActions } from '_platform/store/global';
 import {InfoUploadModal,InfoChangeModal,InfoDeleteModal,VedioInfoTable,MainHeader} from '../components/VedioData';
 import { actions } from '../store/vedioData';
 import {addSerialNumber} from '../components/VedioData/commonFunc';
-import {DataReportTemplate_ImageInformation} from '_platform/api.js';
 
 @connect(
 	state => {
@@ -65,7 +64,6 @@ export default class VedioInfoData extends Component {
 				 jsonToExcel={jsonToExcel}
 				 deriveData={this.deriveData}
 				 storeDateSource={this.storeDateSource}
-				 modalDown={DataReportTemplate_ImageInformation}
 				/>
 				<VedioInfoTable
 				dataSource={dataSource}
@@ -118,7 +116,10 @@ export default class VedioInfoData extends Component {
 				this.num++;
 				this.setState({percent: parseFloat( (this.num*100/total).toFixed(2) ) })
 				if(!rst) {
-					message.error(`数据获取失败`)
+					notification.error({
+						message: '数据获取失败！',
+						duration: 2
+					});
 					return {}
 				}else{
 					return rst
@@ -134,7 +135,10 @@ export default class VedioInfoData extends Component {
 						projectName,enginner,ShootingDate,file,code}
 				})
 			}catch(e){
-				message.error(`数据获取失败`);
+				notification.error({
+                    message: '数据获取失败！',
+                    duration: 2
+                });
 			}
 			
 			this.setState({dataSource,loading:false});
@@ -145,22 +149,30 @@ export default class VedioInfoData extends Component {
 		this.setState({selectRows});
 	}
 
-	selectJudge = ()=>{
+	selectJudge = (same=true)=>{
 		const {selectRows} = this.state;
 		if(selectRows.length == 0){
-			message.error("请选择数据");
+			notification.warning({
+				message: '请先选择数据！',
+				duration: 2
+			});
 			return false
 		}
-		if(!selectRows.every((data)=> data.enginner == selectRows[0].enginner )){
-			message.error("请选择相同单位工程下的数据");
-			return false
+		if(same){
+			if(!selectRows.every((data)=> data.enginner == selectRows[0].enginner )){
+				notification.warning({
+					message: '请选择相同单位工程下的数据！',
+					duration: 2
+				});
+				return false
+			}
 		}
 		return true
 	}
 
 	deriveData = ()=>{
-		const {dataSource} = this.state;
-		return dataSource.map(item=>{
+		const {selectRows} = this.state;
+		return selectRows.map(item=>{
 			const {index,projectName,enginner,ShootingDate,file:{name},code} = item;
 			return [index,projectName,enginner,ShootingDate,name,code]
 		})

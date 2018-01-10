@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions} from '../store/quality';
 import {actions as platformActions} from '_platform/store/global';
-import {Row,Col,Table,Input,Button,message,Spin,Pagination} from 'antd';
+import {Row,Col,Table,Input,Button,Notification,Spin,Pagination} from 'antd';
 import {getUser} from '_platform/auth'
 import JianyanpiModal from '../components/Quality/JianyanpiModal'
 import './quality.less'
@@ -40,6 +40,7 @@ export default class JianyanpiData extends Component {
 			selectedRowKeys:[],
 			targetData:[],
 			deletevisible:false,
+			startReportOrNot:true
 		};
 		this.columns = [{
             title:'序号',
@@ -184,9 +185,8 @@ export default class JianyanpiData extends Component {
         res.obj_type = wp.obj_type
         let dwcode = ""
 		let rootNode = await getTreeRootNode({code:wp.code})
-		let project = rootNode.children[0]
-		let danwei = project.children[0]
-		console.log(rootNode.children.length + "................."+project.children.length)
+		let project = (rootNode && rootNode.children.length>0) ? rootNode.children[0]:0;
+		let danwei = (project && project.children.length>0) ? project.children[0]:0;
         // let construct_unit = danwei.extra_params.unit.find(i => i.type === "施工单位")
         // res.construct_unit = construct_unit
         res.unit = {
@@ -258,7 +258,7 @@ export default class JianyanpiData extends Component {
 	// 	this.setState({dataSource:arr,loading:false})
 	// }
 	//批量上传回调
-	setData(data,participants){
+	setData(data,participants,desc=''){
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -269,7 +269,7 @@ export default class JianyanpiData extends Component {
 		let postdata = {
 			name:"检验批验收信息批量录入",
 			code:WORKFLOW_CODE["数据报送流程"],
-			description:"检验批验收信息批量录入",
+			description:desc,
 			subject:[{
 				data:JSON.stringify(data)
 			}],
@@ -297,12 +297,14 @@ export default class JianyanpiData extends Component {
 						if(this.state.targetData.length){
 							this.setState({targetData:[],selectedRowKeys:[]})
 						}
-						message.info("发起成功")					
+						Notification.success({
+							message: '发起成功'
+						});					
 					})
 		})
 	}
 	//删除回调
-	delData(data,participants){
+	delData(data,participants,desc=''){
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
 		let creator = {
 			id:getUser().id,
@@ -313,7 +315,7 @@ export default class JianyanpiData extends Component {
 		let postdata = {
 			name:"检验验收信息批量删除",
 			code:WORKFLOW_CODE["数据报送流程"],
-			description:"检验验收信息批量删除",
+			description:desc,
 			subject:[{
 				data:JSON.stringify(data)
 			}],
@@ -341,7 +343,9 @@ export default class JianyanpiData extends Component {
 						if(this.state.targetData.length){
 							this.setState({targetData:[],selectedRowKeys:[]})
 						}	
-						message.info("发起成功")					
+						Notification.success({
+							message: '发起成功'
+						});					
 					})
 		})
 	}
@@ -349,23 +353,27 @@ export default class JianyanpiData extends Component {
 		this.setState({addvisible:false,deletevisible:false,targetData:[]})
 	}
 	setAddVisible(){
-		this.setState({targetData:[],addvisible:true})		
+		this.setState({targetData:[],addvisible:true,startReportOrNot:true})		
 	}
 	setEditVisible(){
 		let {selectedRowKeys,targetData,dataSource} = this.state
 		if(selectedRowKeys.length === 0){
-			message.info('请先选择数据')
+			Notification.warning({
+				message: '请先选择数据！'
+			});
 			return
 		}
 		selectedRowKeys.map(i => {
 			targetData.push({...dataSource[i]})
 		})
-		this.setState({targetData,addvisible:true})
+		this.setState({targetData,addvisible:true,startReportOrNot:false})
 	}
 	setDelVisible(){
 		let {selectedRowKeys,targetData,dataSource} = this.state
 		if(selectedRowKeys.length === 0){
-			message.info('请先选择数据')
+			Notification.warning({
+				message: '请先选择数据！'
+			});
 			return
 		}
 		selectedRowKeys.map(i => {
@@ -386,7 +394,8 @@ export default class JianyanpiData extends Component {
 		let dataSource = totalData.filter(o => {
 			return (o.name.indexOf(value) > -1) || (o.code.indexOf(value) > -1)
 		})
-		for(let index = 0;index < 10;index++){
+		debugger
+		for(let index = 0;dataSource.length>0 && index < 10 && index < dataSource.length;index++){
 			if(dataSource[index].key+1){
 				dataSource[index].key = index
 				continue;
@@ -416,9 +425,6 @@ export default class JianyanpiData extends Component {
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="检验批信息" {...this.props}/>
 				<Row>
-					<Button style={{margin:'10px 10px 10px 0px'}} type="default">
-						<a href={`${DataReportTemplate_SubdivisionUnitProjectAcceptance}`}>模板下载</a>
-					</Button>
 					<Button className="btn" type="default" onClick={this.setAddVisible.bind(this)}>发起填报</Button>
 					<Button className="btn" type="default" onClick={this.setEditVisible.bind(this)}>申请变更</Button>
 					<Button className="btn" type="default" onClick={this.setDelVisible.bind(this)}>申请删除</Button>
@@ -447,7 +453,7 @@ export default class JianyanpiData extends Component {
 				</Spin>
 				{
 					this.state.addvisible &&
-					<JianyanpiModal {...this.props} editData={this.state.targetData} oncancel={this.oncancel.bind(this)} visible={this.state.addvisible} onok={this.setData.bind(this)}/>
+					<JianyanpiModal {...this.props} editData={this.state.targetData} startReportOrNot={this.state.startReportOrNot} oncancel={this.oncancel.bind(this)} visible={this.state.addvisible} onok={this.setData.bind(this)}/>
 				}
 				{
 					this.state.deletevisible &&
@@ -468,7 +474,9 @@ export default class JianyanpiData extends Component {
 	getExcel(){
 		let { selectedRowKeys } = this.state
 		if(selectedRowKeys.length === 0){
-			message.info("请选择导出数据")
+			Notification.warning({
+				message: '请先选择数据！'
+			});
 			return
 		}
 		let tableData = selectedRowKeys.map(i => {

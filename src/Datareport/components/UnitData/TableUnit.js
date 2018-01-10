@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Icon ,Spin} from 'antd';
+import { Table, Button, Popconfirm, notification, Input, Icon ,Spin} from 'antd';
 import style from './TableUnit.css';
 import DelModal from './DelModal'
 import ChangeUNIT from './SubmitChangeModal'
@@ -55,22 +55,16 @@ export default class TableUnit extends Component {
 			selectedRowKeys: this.state.selectedRowKeys || [],
 			onChange: (selectedRowKeys, selectedRows) => {
 				this.setState({ selectedRowKeys: selectedRowKeys, selectedRows });
-				console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
 			},
 			onSelect: (record, selected, selectedRows) => {
-				console.log(record, selected, selectedRows);
 			},
 			onSelectAll: (selected, selectedRows, changeRows) => {
-				console.log(selected, selectedRows, changeRows);
 			},
 		};
 		return (
 			<div>
 			<Spin spinning = {this.state.spinning}>
 				<div>
-					<Button style={{ marginRight: "10px" }}
-					onClick = {this.createLink.bind(this,'单位工程模版',DataReportTemplate_UnitProject)}
-					className={style.button}>模板下载</Button>
 					<Button className={style.button} onClick={this.send.bind(this)}>发送填报</Button>
 					<Button className={style.button}
 						onClick={() => {
@@ -78,7 +72,9 @@ export default class TableUnit extends Component {
 								this.setState({ changing: true });
 								return;
 							}
-							message.warning('请至少选择一条');
+							notification.warning({
+								message:"请先选择数据！"
+							});
 						}
 						}
 					>申请变更</Button>
@@ -87,16 +83,17 @@ export default class TableUnit extends Component {
 							this.setState({ deling: true });
 							return;
 						}
-						message.warning('请至少选择一条');
+						notification.warning({
+							message:'请先选择数据！'
+						});
 					}} className={style.button}>申请删除</Button>
 					<Button onClick = {this.getExcel.bind(this)} className={style.button}>导出表格</Button>
-					<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容"
+					<Search className={style.button} style={{ width: "200px" }} placeholder="请单位工程编码或者名称"
 						onSearch={
 							(text) => {
 								let result = this.state.units.filter(data => {
 									return data.name.indexOf(text) >= 0 || data.code.indexOf(text) >= 0;
 								});
-								console.log(result);
 								if (text === '') {
 									result = this.state.units;
 								}
@@ -129,6 +126,7 @@ export default class TableUnit extends Component {
 						onCancel={() => {
 							this.setState({ deling: false });
 						}}
+						dataSource = {this.state.selectedRows}
 						actions={this.props.actions}
 					/>
 				}
@@ -138,7 +136,6 @@ export default class TableUnit extends Component {
 	}
 	send() {
 		const { actions: { ModalVisibleUnit, postWorkpackages, postWorkpackagesOK }, postWorkpackagesOKp } = this.props;
-		console.log(postWorkpackagesOKp)
 		ModalVisibleUnit(true);
 
 	}
@@ -153,7 +150,12 @@ export default class TableUnit extends Component {
         document.body.removeChild(link);
     }
 	getExcel(){
-		console.log(this.state.showDs);
+		if (this.state.selectedRows && this.state.selectedRows.length === 0) {
+			notification.warning({
+				message:'请先选择数据！'
+			});
+			return;
+		}
 		let exhead = ['单位工程编码','单位工程名称','所属项目名称','项目类型','项目阶段','单位红线坐标','计划开工日期','计划竣工日期','简介','建设单位','附件'];
 		let rows = [exhead];
 		let getcoordinate = (param)=>{
@@ -168,14 +170,12 @@ export default class TableUnit extends Component {
 		}
 		let excontent =this.state.selectedRows.map(data=>{
 			return [data.code,data.name,data.fatherName,data.projType||'',data.stage||'',getcoordinate(data.coordinate)
-			,data.stime||'',data.etime||'',data.intro||'',data.rsp_orgName?data.rsp_orgName[0]:'',data.files?data.files[0].name:''];
+			,data.stime||'',data.etime||'',data.intro||'',data.rsp_orgName?data.rsp_orgName[0]:'',data.file?data.file.name:''];
 		});
 		rows = rows.concat(excontent);
 		const {actions:{jsonToExcel}} = this.props;
-		console.log(rows)
         jsonToExcel({},{rows:rows})
         .then(rst => {
-            console.log(rst);
             this.createLink('单位工程信息导出表',NODE_FILE_EXCHANGE_API+'/api/download/'+rst.filename);
         })
 	}

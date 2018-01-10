@@ -11,7 +11,7 @@ import { getUser } from '_platform/auth';
 import ECCB from '../EditCellWithCallBack';
 const FormItem = Form.Item;
 const Option = Select.Option;
-
+const TextArea = Input.TextArea;
 export default class DesignChange extends Component {
 	constructor(props) {
 		super(props);
@@ -22,6 +22,7 @@ export default class DesignChange extends Component {
 			project: {},
 			unit: {},
 			options: [],
+			changeInfo:"",
 		};
 	}
 	componentWillMount(){
@@ -38,6 +39,7 @@ export default class DesignChange extends Component {
 				factquantity: item.factquantity,
 				uploads: item.uploads,
 				designunit: item.designunit,
+				remarks:item.remarks,
 				unit: item.unit,
 				project: item.project,
 				delcode: item.delcode,
@@ -62,11 +64,21 @@ export default class DesignChange extends Component {
 		let check = JSON.parse(value);
 		this.setState({ check })
 	}
+	onChangeText(e) {
+        this.setState({
+            changeInfo: e.target.value
+        });
+    }
 	onok() {
+		let {dataSource} = this.state;
 		if (!this.state.check) {
-			message.info("请选择审核人")
+			notification.warning({
+				message: '请选择审核人！',
+				duration: 2
+			});
 			return;
 		}
+		dataSource[0].changeInfo = this.state.changeInfo.trim();
 		let { check } = this.state;
 		let per = {
 			id: check.id,
@@ -95,12 +107,14 @@ export default class DesignChange extends Component {
 				factquantity: item.factquantity,
 				uploads: item.uploads,
 				designunit: item.designunit,
+				remarks:item.remarks,
 				unit: item.unit,
 				project: item.project,
 				delcode: item.delcode,
 			}
             newdataSource.push(newDatas)
-        })
+		})
+		this.forceUpdate();
       this.setState({dataSource:newdataSource})  
 	}
 	//table input 输入
@@ -127,34 +141,16 @@ export default class DesignChange extends Component {
 			dataIndex: 'code',
 		}, {
 			title: '卷册',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.volume = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.volume}
-                        checkVal={checkVal}
-                        value={record.volume} />
-				)
-			},
-			key:"volume"
+			dataIndex:"volume",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['volume']} onChange={this.tableDataChange.bind(this,record.key-1,'volume')}/>
+			)
 		}, {
 			title: '名称',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.name = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.name}
-                        checkVal={checkVal}
-                        value={record.name} />
-				)
-			},
-			key:"Name"
+			dataIndex:"name",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['name']} onChange={this.tableDataChange.bind(this,record.key-1,'name')}/>
+			)
 		}, {
 			title: '项目/子项目',
 			dataIndex: 'project',
@@ -174,19 +170,10 @@ export default class DesignChange extends Component {
 
 		}, {
 			title: '实际供图时间',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.factovertime = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.factovertime}
-                        checkVal={checkVal}
-                        value={record.factovertime} />
-				)
-			},
-			key:"factovertime"
+			dataIndex:'factovertime',
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['factovertime']} onChange={this.tableDataChange.bind(this,record.key-1,'factovertime')}/>
+			)
 		}, {
 			title: '设计单位',
 			dataIndex:"designunit",
@@ -197,6 +184,12 @@ export default class DesignChange extends Component {
 				return <Input value={this.state.dataSource[index]['uploads'] = getUser().username} onChange={this.tableDataChange.bind(this, index, 'uploads')} />
 			}
 		}, {
+			title:"备注",
+			dataIndex:"remarks",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['remarks']} onChange={this.tableDataChange.bind(this,record.key-1,'remarks')}/>
+			)
+		},{
 			title: '操作',
 			render: (text, record, index) => {
 				return (
@@ -206,20 +199,19 @@ export default class DesignChange extends Component {
 						onConfirm={this.delete.bind(this, record.key-1)}
 						okText="确认"
 						cancelText="取消">
-						<a>删除</a>
+						<a><Icon type = "delete"/></a>
 					</Popconfirm>
 				)
 			}
 		}];
-		console.log("145",this.state.dataSource);
 		return (
 			<Modal
-				title="设计进度变更表"
 				visible={true}
 				width={1280}
 				onOk={this.onok.bind(this)}
 				maskClosable={false}
 				onCancel={this.props.oncancel}>
+				<h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请变更</h1>
 				<Table
 					columns={columns}
 					dataSource={this.state.dataSource}
@@ -231,7 +223,7 @@ export default class DesignChange extends Component {
 					<Col>
 						<span>
 							审核人：
-                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)} placeholder='请选择审核人'>
 								{
 									this.state.checkers
 								}
@@ -239,6 +231,16 @@ export default class DesignChange extends Component {
 						</span>
 					</Col>
 				</Row>
+				<Row style={{marginBottom: '20px'}}>
+					<Col span={2}>
+						<span>变更原因：</span>
+					</Col>
+			    </Row>
+			    <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea rows={2}  onChange={this.onChangeText.bind(this)}/>
+				    </Col>
+			    </Row>
 				<Preview />
 			</Modal>
 		)

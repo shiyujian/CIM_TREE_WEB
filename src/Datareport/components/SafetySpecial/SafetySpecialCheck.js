@@ -71,7 +71,7 @@ export default class SafetySpecialCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("Safety_Special_check_visible", false);
+        this.props.closeModal("Safety_Special_check_visible", false,'submit');
     }
 
     //通过
@@ -188,7 +188,7 @@ export default class SafetySpecialCheck extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null
             }
@@ -303,7 +303,6 @@ export default class SafetySpecialCheck extends Component {
         };
         return (
             <Modal
-                title="安全信息审批表"
                 visible={true}
                 width={1280}
                 footer={null}
@@ -311,12 +310,12 @@ export default class SafetySpecialCheck extends Component {
                 onCancel={this.cancel.bind(this)}
             >
                 <div>
-                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>填报审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
                         bordered
-                        rowSelection={rowSelection}
+                        // rowSelection={rowSelection}
                     />
                     <Row>
                         <Col span={2}>
@@ -330,15 +329,15 @@ export default class SafetySpecialCheck extends Component {
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={2} push={14}>
+                        {/* <Col span={2} push={14}>
                             <Button
                                 onClick={this.BtnExport.bind(this)}
                                 type='primary'
                             >
                                 导出表格
                             </Button>
-                        </Col>
-                        <Col span={2} push={14}>
+                        </Col> */}
+                        <Col span={2} push={16}>
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>

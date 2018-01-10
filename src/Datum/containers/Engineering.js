@@ -26,7 +26,8 @@ export default class Engineering extends Component {
 	static propTypes = {};
 	state = {
 		loading:false,
-		loadingLeaf:false
+		loadingLeaf:false,
+		tableSrc:[]
     }
 
 	render() {
@@ -59,8 +60,8 @@ export default class Engineering extends Component {
 	                	tablevisible == false?
 			                null:
 			                <div>
-				                <Filter {...this.props}/>
-			                    <Table {...this.props}/>
+				                <Filter {...this.props} query = {this.query.bind(this)}/>
+			                    <Table {...this.props} {...this.state}/>
 				                <Addition {...this.props}/>
 				                <Updatemodal {...this.props}/>
 			                </div>
@@ -151,6 +152,7 @@ export default class Engineering extends Component {
 	onSelectdir(value = [],node){
 		const {actions:{getdocument,settablevisible,getkey,setnewkey,setcurrentcode,setkeycode,judgeFile},newdirtree=[]} = this.props;
 		const [code] = value;
+		const {tableSrc = []} = this.state;
 		setkeycode(code);
 		let fileType = node.node.props.title;
 		judgeFile(fileType);
@@ -167,7 +169,9 @@ export default class Engineering extends Component {
 				newdirtree[0].children.map(rst => {
 					if(valuecode.indexOf(rst.code) !== -1){
 						settablevisible(true);
-						getdocument({code: valuecode});
+						getdocument({code: valuecode}).then(rst => {
+							this.setState({tableSrc:rst.result});
+						});
 						getkey({code:rst.code}).then(rst=>{
 							setnewkey(rst.extra_params);
 						})
@@ -185,4 +189,21 @@ export default class Engineering extends Component {
 		settablevisible(false);
 		setnewdirtree({});
 	}
+
+	query(value){
+		const {tableSrc = []} = this.state;
+		const {Doc = []} =this.props;
+		let docArr = [];
+		if(value){
+			Doc.map(item => {
+				if(item.extra_params.keyword_19.indexOf(value) != -1 || item.name.indexOf(value) != -1 || 
+				item.extra_params.juance.indexOf(value) != -1 || item.extra_params.keyword_17.indexOf(value) != -1){
+					docArr.push(item);
+				}
+			})
+			this.setState({tableSrc:docArr});
+		}else{
+			this.setState({tableSrc:Doc});
+		}
+    }
 }

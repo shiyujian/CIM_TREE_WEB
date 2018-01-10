@@ -21,6 +21,7 @@ export default class ToggleModal extends Component {
             beginUnit: '',
             options: [],
             asyncCheckout: true,
+            loading: false,
         }
     }
     render() {
@@ -48,10 +49,11 @@ export default class ToggleModal extends Component {
                     columns={this.columns}
                     bordered={true}
                     dataSource={this.state.dataSource}
-                    rowKey={(item, index) => index}
+                    rowKey={record => record.sign}
                     // pagination={paginationInfo}
                     pagination={false}
                     scroll={{ y: 450 }}
+                    loading={this.state.loading}
                 >
                 </Table>
                 <Row>
@@ -139,6 +141,7 @@ export default class ToggleModal extends Component {
     }
 
     async  uplodachange(info) {
+        this.setState({ loading: true })
         if (info && info.file && info.file.status === 'done') {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
@@ -148,6 +151,7 @@ export default class ToggleModal extends Component {
                     message: 'Excel模板不相符，请下载最新模板！',
                     duration: 2
                 });
+                this.setState({ loading: false })
                 return;
             }
             // 代码 校验
@@ -217,7 +221,10 @@ export default class ToggleModal extends Component {
                             file: {},
                             checkout: rst.code === item[5] ? true : false,
                         })
-                        this.setState({ dataSource });
+                        this.setState({
+                            dataSource,
+                            loading: false
+                        });
                     })
                 }
             })
@@ -530,35 +537,62 @@ export default class ToggleModal extends Component {
         let checkedValue = false;
         const { actions: { checkoutData } } = this.props;
         return async (value) => {
-            const { dataSource } = this.state;
-            const target = dataSource.find(item => item.sign === record.sign)
-            if (target) {
-                let rst = await checkoutData({ code: value });
-                if (rst && rst.code === value) {
-                    checkedValue = true;
-                }
-                this.setState({
-                    ...this.state,
-                    dataSource: dataSource.map((item, index) => {
-                        if (item.sign === record.sign) {
-                            return {
-                                ...item,
-                                organizationUnit: value,
-                                checkout: checkedValue
+            if (value) {
+                const { dataSource } = this.state;
+                const target = dataSource.find(item => item.sign === record.sign)
+                if (target) {
+                    let rst = await checkoutData({ code: value });
+                    if (rst && rst.code === value) {
+                        checkedValue = true;
+                    }
+                    this.setState({
+                        ...this.state,
+                        dataSource: dataSource.map((item, index) => {
+                            if (item.sign === record.sign) {
+                                return {
+                                    ...item,
+                                    organizationUnit: value,
+                                    checkout: checkedValue
+                                }
+                            } else {
+                                return item;
                             }
-                        } else {
-                            return item;
-                        }
+                        })
                     })
-                })
+                }
             }
         };
     }
 
     onCellChange = (index, key, record) => {
-        const { dataSource } = this.state;
-        return (value) => {
-            record[key] = value;
+        let checkedValue = false;
+        const { actions: { checkoutData } } = this.props;
+        return async (value) => {
+            if (value) {
+                const { dataSource } = this.state;
+                const target = dataSource.find(item => item.sign === record.sign)
+                if (target) {
+                    let rst = await checkoutData({ code: value });
+                    if (rst && rst.code === value) {
+                        checkedValue = true;
+                    }
+                    this.setState({
+                        ...this.state,
+                        dataSource: dataSource.map((item, index) => {
+                            if (item.sign === record.sign) {
+                                return {
+                                    ...item,
+                                    organizationUnit: value,
+                                    checkout: checkedValue
+                                }
+                            } else {
+                                return item;
+                            }
+                        })
+                    });
+                    record[key] = value;
+                }
+            }
         };
     }
 
@@ -677,7 +711,7 @@ export default class ToggleModal extends Component {
                             onConfirm={this.remove.bind(this, index, record)}
                             okText="确认"
                             cancelText="取消">
-                            <a><Icon type='delete'/></a>
+                            <a><Icon type='delete' /></a>
                         </Popconfirm>
                     </span>)
                 } else {
@@ -706,7 +740,7 @@ export default class ToggleModal extends Component {
                         onConfirm={this.delete.bind(this, index, record)}
                         okText="确认"
                         cancelText="取消">
-                        <a><Icon type='delete'/></a>
+                        <a><Icon type='delete' /></a>
                     </Popconfirm>
                 )
             }

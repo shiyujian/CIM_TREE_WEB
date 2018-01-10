@@ -38,7 +38,7 @@ window.config = {
 	'STATIC_FILE_PASSWORD':'qianhai',
 
 	//现场收发文接口的端口
-	'DOC_EXCHANGE_URL': 'http://bimdjd.ecidi.com:6556',
+	'DOC_EXCHANGE_URL': 'http://10.215.160.41:6556',
 	//现场收发文接口验证用的用户名和密码
 	'DOC_EXCHANGE_USER_PASSWORD': 'bimqh:bimqh',
 
@@ -83,10 +83,9 @@ window.config = {
 
 	//个人考勤的上下班时间，如果当前的部门未配置的话拿此上下班时间，用[--]分开，此处必须配置
 	'IN_OFF_DUTY':'08:30:00--18:00:00',
-        	//现场收发文的短信模板NAME和CODE
+	//现场收发文的短信模板NAME和CODE
 	'DISPATCH_MSG':{
 		'NAME':'BIM系统',
 		'CODE':'SMS_100920102'
     }
-	
 };

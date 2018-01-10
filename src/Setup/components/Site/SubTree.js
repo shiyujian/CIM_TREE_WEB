@@ -22,10 +22,15 @@ export default class SubTree extends Component {
 		rst = [];
 		let tableList=[SubTree.checkLoop(wbsProjectList, code[0].split('--')[0])];
 		setTableDataAc(tableList)
-		let canCreate = node.node.props.obj_type === "C_WP_PTR" ? true : false;
+		let canCreate;
+		if (node.node.props.obj_type === "C_WP_PTR" || node.node.props.obj_type === "C_WP_PTR_S") {
+			canCreate = true;
+		}else{
+			canCreate = false;
+		}
 		setCreate(canCreate);
-		// 点击的是分部
-		if (node.node.props.obj_type === "C_WP_PTR") {
+		// 点击的是分部或者是子分部，显示下面的工程部位
+		if (node.node.props.obj_type === "C_WP_PTR" || node.node.props.obj_type === "C_WP_PTR_S") {
 			// 获取locations
 			tableList = [];
 			getSectionAc({code:code[0].split('--')[0]}).then(rst => {
@@ -119,10 +124,10 @@ export default class SubTree extends Component {
 
 		);
 	}
-	//过滤掉子分部数据【itm=>itm.obj_type !== 'C_WP_PTR_S'】
+	//过滤掉分项的数据[obj_type === "C_WP_ITM"]
 	static loop(data = []) {
 		return data.map((item) => {
-			if (item.obj_type === "C_WP_PTR_S" || item.obj_type === "C_WP_ITM") {
+			if (item.obj_type === "C_WP_ITM") {
 				return ;
 			}
 			if (item.children && item.children.length) {

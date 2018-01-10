@@ -56,7 +56,7 @@ export default class SafetySpecialEditCheck extends Component {
         } else {
             await this.reject();
         }
-        this.props.closeModal("Safety_Special_edit_visible", false);
+        this.props.closeModal("Safety_Special_edit_visible", false, 'submit');
     }
 
     //通过
@@ -152,7 +152,7 @@ export default class SafetySpecialEditCheck extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null
             }
@@ -215,12 +215,12 @@ export default class SafetySpecialEditCheck extends Component {
                 title: '方案名称 ',
                 dataIndex: 'scenarioName',
                 width: '10%',
-            }, 
+            },
             {
                 title: '编制单位',
                 dataIndex: 'organizationUnit',
                 width: '10%',
-            }, 
+            },
             {
                 title: '评审时间',
                 dataIndex: 'reviewTime',
@@ -230,7 +230,7 @@ export default class SafetySpecialEditCheck extends Component {
                 title: '评审意见',
                 dataIndex: 'reviewComments',
                 width: '10%',
-            }, 
+            },
             {
                 title: '附件',
                 width: "10%",
@@ -263,7 +263,6 @@ export default class SafetySpecialEditCheck extends Component {
         };
         return (
             <Modal
-                title="安全专项变更审批表"
                 visible={true}
                 width={1280}
                 footer={null}
@@ -272,12 +271,12 @@ export default class SafetySpecialEditCheck extends Component {
             >
 
                 <div>
-                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
+                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>变更审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}
                         bordered
-                        rowSelection={rowSelection}
+                    // rowSelection={rowSelection}
                     />
                     <Row>
                         <Col span={2}>
@@ -291,29 +290,59 @@ export default class SafetySpecialEditCheck extends Component {
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
-                        <Col span={2} push={14}>
+                        {/* <Col span={2} push={14}>
                             <Button
                                 onClick={this.BtnExport.bind(this)}
                                 type='primary'
                             >
                                 导出表格
-                    </Button>
-                        </Col>
-                        <Col span={2} push={14}>
+                            </Button>
+                        </Col> */}
+                        <Col span={2} push={16}>
                             <Button type='primary' onClick={this.submit.bind(this)}>
                                 确认提交
                             </Button>
                         </Col>
                     </Row>
-                    {/* {
-                        this.state.dataSource[0].deleteInfo ? <Row>
-                            <Col span={4}>
-                                申请删除原因：{this.state.dataSource[0].changeInfo}
-                            </Col>
-                        </Row>
+                    {
+                        this.state.dataSource[0] && this.state.dataSource[0].changeInfo ?
+                            // <Row>
+                            //     {/* <Col
+                            //         style={{ fontSize: 16 }}
+                            //         span={2}
+                            //         push={4}
+                            //     >
+                            //         <span>变更原因 ：</span>
+                            //     </Col> */}
+                            //     <Col
+                            //         span={14}
+                            //         push={6}
+                            //     >
+                            //         <span style={{ fontSize: 16 }} >变更原因 ：</span>
+                            //         {this.state.dataSource[0].changeInfo}
+                            //     </Col>
+                            // </Row>
+                            <Row style={{ marginBottom: 16 }}>
+                                <Col style={{ marginBottom: 10 }}>
+                                    <span
+                                    // tyle={{ fontSize: 16 }} 
+                                    >
+                                        变更原因 ：
+                                    </span>
+                                </Col>
+                                <Col>
+                                    <Input
+                                        type="textarea"
+                                        autosize={{ minRows: 5, maxRow: 6 }}
+                                        // style={{ marginBottom: 40 }}
+                                        value={this.state.dataSource[0].changeInfo}
+                                        disabled={true}
+                                    />
+                                </Col>
+                            </Row>
                             :
                             ""
-                    } */}
+                    }
                     {
                         this.state.wk && <WorkflowHistory wk={this.state.wk} />
                     }

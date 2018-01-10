@@ -11,6 +11,7 @@ import { getUser } from '_platform/auth';
 import ECCB from '../EditCellWithCallBack';
 const FormItem = Form.Item;
 const Option = Select.Option;
+const TextArea = Input.TextArea;
 
 export default class WorkChange extends Component {
 	constructor(props) {
@@ -22,6 +23,7 @@ export default class WorkChange extends Component {
 			project: {},
 			unit: {},
 			options: [],
+			changeInfo:"",
 		};
 	}
 	componentWillMount(){
@@ -37,6 +39,7 @@ export default class WorkChange extends Component {
 				construct_unit: item.construct_unit,
 				quantity: item.quantity,
 				factquantity: item.factquantity,
+				opvalue:item.opvalue,
 				planstarttime: item.planstarttime,
 				planovertime: item.planovertime,
 				factstarttime: item.factstarttime,
@@ -69,11 +72,22 @@ export default class WorkChange extends Component {
 		let check = JSON.parse(value);
 		this.setState({ check })
 	}
+	onChangeText(e) {
+        this.setState({
+            changeInfo: e.target.value
+        });
+    }
 	onok() {
+		let {dataSource} = this.state;
 		if (!this.state.check) {
-			message.info("请选择审核人")
+			notification.warning({
+				message: '请选择审核人！',
+				duration: 2
+			});
 			return;
 		}
+
+        dataSource[0].changeInfo = this.state.changeInfo.trim();
 		let { check } = this.state;
 		let per = {
 			id: check.id,
@@ -100,6 +114,7 @@ export default class WorkChange extends Component {
 				construct_unit: item.construct_unit,
 				quantity: item.quantity,
 				factquantity: item.factquantity,
+				opvalue:item.opvalue,
 				planstarttime: item.planstarttime,
 				planovertime: item.planovertime,
 				factstarttime: item.factstarttime,
@@ -109,10 +124,13 @@ export default class WorkChange extends Component {
 				wpcode: item.wpcode,
 				obj_type: item.obj_type,
 				pk: item.pk,
-            }
-            newdataSource.push(newDatas)
-        })
-      this.setState({dataSource:newdataSource})  
+			}
+			
+			newdataSource.push(newDatas)
+			
+		})
+		
+	  this.setState({dataSource:newdataSource}) 
 	}
 	//table input 输入
 	tableDataChange(index, key, e) {
@@ -131,19 +149,10 @@ export default class WorkChange extends Component {
 			dataIndex: 'code',
 		}, {
 			title: '任务名称',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.name = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.name}
-                        checkVal={checkVal}
-                        value={record.name} />
-				)
-			},
-			key:"Name"
+			dataIndex:"name",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['name']} onChange={this.tableDataChange.bind(this,record.key-1,'name')}/>
+			)
 		}, {
 			title: '项目/子项目',
 			dataIndex: 'project',
@@ -152,109 +161,49 @@ export default class WorkChange extends Component {
 			dataIndex: 'unit',
 		}, {
 			title: '实施单位',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.construct_unit = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.construct_unit}
-                        checkVal={checkVal}
-                        value={record.construct_unit} />
-				)
-			},
-			key:"construct_unit"
+			dataIndex:"construct_unit",
 		}, {
 			title: '施工图工程量',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.quantity = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.quantity}
-                        checkVal={checkVal}
-                        value={record.quantity} />
-				)
-			},
-			key:"quantity"
+			dataIndex:"quantity",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['quantity']} onChange={this.tableDataChange.bind(this,record.key-1,'quantity')}/>
+			)
 		}, {
 			title: '实际工程量',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.factquantity = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.factquantity}
-                        checkVal={checkVal}
-                        value={record.factquantity} />
-				)
-			},
-			key:"factquantity"
+			dataIndex:"factquantity",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['factquantity']} onChange={this.tableDataChange.bind(this,record.key-1,'factquantity')}/>
+			)
+		}, {
+			title: '产值(万元)',
+			dataIndex:"opvalue",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['opvalue']} onChange={this.tableDataChange.bind(this,record.key-1,'opvalue')}/>
+			)
 		}, {
 			title: '计划开始时间',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.planstarttime = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.planstarttime}
-                        checkVal={checkVal}
-                        value={record.planstarttime} />
-				)
-			},
-			key:"planstarttime"
+			dataIndex:"planstarttime",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['planstarttime']} onChange={this.tableDataChange.bind(this,record.key-1,'planstarttime')}/>
+			)
 		}, {
 			title: '计划结束时间',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.planovertime = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.planovertime}
-                        checkVal={checkVal}
-                        value={record.planovertime} />
-				)
-			},
-			key:"planovertime"
+			dataIndex:"planovertime",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['planovertime']} onChange={this.tableDataChange.bind(this,record.key-1,'planovertime')}/>
+			)
 		}, {
 			title: '实际开始时间',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.factstarttime = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.factstarttime}
-                        checkVal={checkVal}
-                        value={record.factstarttime} />
-				)
-			},
-			key:"factstarttime"
+			dataIndex:"factstarttime",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['factstarttime']} onChange={this.tableDataChange.bind(this,record.key-1,'factstarttime')}/>
+			)
 		}, {
 			title: '实际结束时间',
-			render: (record) => {
-                let checkVal = (value) => {
-                    record.factovertime = value;
-                    return value;
-                }
-                return (
-                    <ECCB
-                        initCheckedValue={record.factovertime}
-                        checkVal={checkVal}
-                        value={record.factovertime} />
-				)
-			},
-			key:"factovertime"
+			dataIndex:"factovertime",
+			render:(text,record,index)=>(
+				<Input value={this.state.dataSource[record.key-1]['factovertime']} onChange={this.tableDataChange.bind(this,record.key-1,'factovertime')}/>
+			)
 		}, {
 			title: '变更人员',
 			dataIndex:"uploads",
@@ -271,7 +220,7 @@ export default class WorkChange extends Component {
 						onConfirm={this.delete.bind(this, record.key-1)}
 						okText="确认"
 						cancelText="取消">
-						<a>删除</a>
+						<a><Icon type = "delete"/></a>
 					</Popconfirm>
 				)
 			}
@@ -279,12 +228,12 @@ export default class WorkChange extends Component {
 
 		return (
 			<Modal
-				title="施工进度变更表"
 				visible={true}
 				width={1280}
 				onOk={this.onok.bind(this)}
 				maskClosable={false}
 				onCancel={this.props.oncancel}>
+				<h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请变更</h1>
 				<Table
 					columns={columns}
 					dataSource={this.state.dataSource}
@@ -296,7 +245,7 @@ export default class WorkChange extends Component {
 					<Col>
 						<span>
 							审核人：
-                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)} placeholder='请选择审核人'>
 								{
 									this.state.checkers
 								}
@@ -304,6 +253,16 @@ export default class WorkChange extends Component {
 						</span>
 					</Col>
 				</Row>
+				<Row style={{marginBottom: '20px'}}>
+					<Col span={2}>
+						<span>变更原因：</span>
+					</Col>
+			    </Row>
+			    <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea rows={2} onChange={this.onChangeText.bind(this)}/>
+				    </Col>
+			    </Row>
 				<Preview />
 			</Modal>
 		)

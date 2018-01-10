@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, message, Input, Icon, Spin } from 'antd';
+import { Table, Button, Popconfirm, Notification, Input, Icon, Spin } from 'antd';
 import style from './TableProject.css';
 import DelProj from './DelModal';
 import ChangeProj from './SubmitChangeModal'
@@ -28,16 +28,18 @@ export default class TableProject extends Component {
 			<div>
 				<Spin spinning={this.state.spinning}>
 					<div>
-						<Button
+						{/*<Button
 							onClick={this.createLink.bind(this, '项目模版', DataReportTemplate_ProjectInformation)}
-							style={{ marginRight: "10px" }}>模板下载</Button>
-						<Button onClick={this.send.bind(this)} className={style.button}>发起填报</Button>
+							style={{ marginRight: "10px" }}>模板下载</Button>*/}
+						<Button onClick={this.send.bind(this)} style={{ marginRight: "10px" }}>发起填报</Button>
 						<Button className={style.button} onClick={() => {
 							if (this.state.selectedRows && this.state.selectedRows.length > 0) {
 								this.setState({ changing: true });
 								return;
 							}
-							message.warning('请至少选择一条');
+							Notification.warning({
+								message: '请先选择数据！'
+							});
 						}
 						}>申请变更</Button>
 						<Button className={style.button} onClick={() => {
@@ -45,17 +47,18 @@ export default class TableProject extends Component {
 								this.setState({ deling: true });
 								return;
 							}
-							message.warning('请至少选择一条');
+							Notification.warning({
+								message: '请先选择数据！'
+							});
 						}
 						}>申请删除</Button>
 						<Button onClick={this.getExcel.bind(this)} className={style.button}>导出表格</Button>
-						<Search className={style.button} style={{ width: "200px" }} placeholder="请输入内容"
+						<Search className={style.button} style={{ width: "200px" }} placeholder="请输入编码或项目/子项目名称"
 							onSearch={
 								(text) => {
 									let result = this.state.dataSource.filter(data => {
 										return data.name.indexOf(text) >= 0 || data.code.indexOf(text) >= 0;
 									});
-									console.log(result);
 									if (text === '') {
 										result = this.state.dataSource;
 									}
@@ -150,7 +153,6 @@ export default class TableProject extends Component {
 				return f.misc === "pic";
 			});
 		});
-		console.log(projects);
 		this.setState({ dataSource: projects, projRoot, showDs: projects, spinning: false });
 	}
 	createLink = (name, url) => {    //下载
@@ -163,19 +165,22 @@ export default class TableProject extends Component {
 		document.body.removeChild(link);
 	}
 	getExcel() {
-		console.log(this.state.showDs);
-		let exhead = ['项目名称', '项目编码', '所属区域', '项目规模', '项目类型', '项目地址', '项目红线坐标', '项目投资', '项目负责人', '计划开工日期', '计划竣工日期', '简介', '附件', '项目图片'];
+		if (this.state.selectedRows && this.state.selectedRows.length === 0) {
+			Notification.warning({
+				message: '请先选择数据！'
+			});
+			return;
+		}
+		let exhead = ['编码', '项目名称', '项目编码', '所属区域', '项目规模', '项目类型', '项目地址', '项目红线坐标', '项目投资', '项目负责人', '计划开工日期', '计划竣工日期', '简介', '附件', '项目图片'];
 		let rows = [exhead];
 		let excontent = this.state.selectedRows.map(data => {
-			return [data.name, data.code, data.area || '', data.range || '', data.projType || '', data.address || '', data.extra_params.coordinate || '', data.cost,
+			return [data.code, data.name, data.code, data.area || '', data.range || '', data.projType || '', data.address || '', data.extra_params.coordinate || '', data.cost,
 			data.response_persons[0] ? data.response_persons[0].name : '', data.stime || '', data.etime || '', data.intro || '', data.file ? data.file.name : '', data.pic ? data.pic.name : ''];
 		});
 		rows = rows.concat(excontent);
 		const { actions: { jsonToExcel } } = this.props;
-		console.log(rows)
 		jsonToExcel({}, { rows: rows })
 			.then(rst => {
-				console.log(rst);
 				this.createLink('项目信息导出表', NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
 			})
 	}
@@ -184,6 +189,11 @@ export default class TableProject extends Component {
 		title: '序号',
 		dataIndex: 'index',
 		key: 'Index',
+		width:100
+	}, {
+		title: '编码',
+		dataIndex: 'code',
+		key: 'Code',
 		width:100
 	}, {
 		title: '项目/子项目名称',

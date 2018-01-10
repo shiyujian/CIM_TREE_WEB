@@ -25,7 +25,7 @@ export default class TablePerson extends Component{
                     <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
                     <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button>
                     <Button className = {style.button} onClick={this.getExcel.bind(this)}>导出表格</Button>
-                    <Search className = {style.button} onSearch = {this.searchOrg.bind(this)} style={{width:"200px"}} placeholder="输入搜索条件" />
+                    <Search className = {style.button} onSearch = {this.searchOrg.bind(this)} style={{width:"240px"}} placeholder="请输入人员编码或姓名或组织机构单位" />
                 </div>
                 <Table
                     columns = {this.columns}
@@ -53,7 +53,7 @@ export default class TablePerson extends Component{
 			ExprugateVisible(true);
 		}else{
 			Notification.warning({
-				message: "请先选择数据"
+				message: "请先选择数据！"
 			});
 		}
 	}
@@ -71,7 +71,7 @@ export default class TablePerson extends Component{
 			ModifyVisible(true);
 		} else {
 			Notification.warning({
-				message: "请先选择数据"
+				message: "请先选择数据！"
 			});
 		}
 	}
@@ -111,7 +111,7 @@ export default class TablePerson extends Component{
 	        })
 		}else {
 			Notification.warning({
-				message: "请先选择数据"
+				message: "请先选择数据！"
 			});
 			return;
 		}
@@ -129,14 +129,47 @@ export default class TablePerson extends Component{
     }
 
 	async componentDidMount() {
-		this.setState({loading:true,percent:0});
 		const {actions: {getAllUsers}} = this.props;
+		this.setState({loading:true,percent:0});
 		let dataSource = await getAllUsers();
 		dataSource.forEach((item, index) => {
 			dataSource[index].index = index + 1;
 		})
 		this.setState({dataSource, tempData: dataSource, loading:false, percent:100 })
 	}
+	// async componentDidMount() {
+	// 	const {actions: {getAllUsers}} = this.props;
+	// 	getAllUsers().then(rst => {
+	// 		this.generateTableData(rst)
+	// 	})
+	// }
+	// generateTableData(data) {
+	// 	let dataSour = [];
+	// 	let datalength = data.length;
+	// 	this.setState({loading: true, percent: 0, index: 0});
+	// 	data.map((item, index) => {
+	// 		let datas = {
+	// 			index: index + 1,
+	// 			code: item.account.person_code,
+	// 			name: item.account.person_name,
+	// 			org: item.account.organization,
+	// 			depart: item.account.org_code,
+	// 			job: item.account.title,
+	// 			sex: item.account.gender,
+	// 			tel: item.account.person_telephone,
+	// 			email: item.email,
+	// 		}
+	// 		this.setState({percent:parseFloat((index * 100 / datalength).toFixed(2))})
+	// 		dataSour.push(datas)
+	// 		console.log('dataSour',dataSour)
+	// 	})
+	// 	this.setState({
+	// 		dataSource:dataSour,
+	// 		tempData:dataSour,
+	// 		loading:false,
+	// 		percent:100
+	// 	})
+	// }
 
 	searchOrg(value){
 		let searchData = [];
@@ -235,7 +268,7 @@ export default class TablePerson extends Component{
 		// key: 'Signature',
 		render:(record) => {
             if(record.account.relative_signature_url !== '') {
-            	return <img style={{width: 60}} src={record.account.relative_signature_url}/>
+            	return <img style={{width: 60}} src={record.account.person_signature_url}/>
             }else {
             	return <span>暂无</span>
             }

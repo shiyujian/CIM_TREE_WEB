@@ -2,7 +2,7 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
 	Form, Input,Button, Row, Col, Modal, Upload,
-	Icon, message, Table,Select,DatePicker,Progress
+	Icon, Table,Select,DatePicker,Progress,notification
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
@@ -215,7 +215,10 @@ export default class Addition extends Component {
 			const valid = fileTypes.indexOf(file.type) >= 0;
             const errorMsg = fileTypes.indexOf('image') == -1 ? '只能上传 pdf、doc、docx 文件！':'只能上传 jpg、jpeg、png 文件！';
 			if (!valid) {
-				message.error(errorMsg);
+				notification.error({
+					message: errorMsg,
+					duration: 2
+				});
 			}
 			return valid;
 			this.setState({ progress: 0 });
@@ -354,35 +357,63 @@ export default class Addition extends Component {
 			docs = [],
 			actions: {toggleAddition, postDocument, getdocument,changeDocs}
 		} = this.props;
-		const promises = docs.map(doc => {
-			const response = doc.response;
-			let files=DeleteIpPort(doc);
-			return postDocument({}, {
-				code: `${currentcode.code}_${response.id}`,
-				name: doc.name,
-				obj_type: 'C_DOC',
-				profess_folder: {
-					code: currentcode.code, obj_type: 'C_DIR'
-				},
-				basic_params: {
-					files:[files]
-				},
-				extra_params: {
-					 ...doc.updoc,
-					submitTime: moment.utc().format()
-				}
+		let tag = false;
+		if(docs.length == 0){
+			notification.error({
+				message: '请先上传文件',
+				duration: 2
 			});
-		});
-		message.warning('新增文件中...');
-		Promise.all(promises).then(rst => {
-			message.success('新增文件成功！');
-			changeDocs([]);
-			toggleAddition(false);
-			getdocument({code: currentcode.code});
-		});
-        this.setState({
-            progress:0
-        })
+			return
+		}
+		for(let i=0; i<docs.length; i++){
+			let flag = (docs[i].updoc.keyword_19 == undefined || docs[i].updoc.juance == undefined || docs[i].updoc.keyword_17 == undefined || docs[i].updoc.projectPrincipal.person_name == undefined ||
+				docs[i].updoc.professionPrincipal.person_name == undefined || docs[i].updoc.profession == undefined || docs[i].updoc.archivingTime == undefined || 
+				docs[i].updoc.version == undefined);
+			if(flag){
+				notification.error({
+					message: '信息填写不完整',
+					duration: 2
+				});
+				tag = true
+				break;
+			}
+		}
+		if(!tag){
+			const promises = docs.map(doc => {
+				const response = doc.response;
+				let files=DeleteIpPort(doc);
+				return postDocument({}, {
+					code: `${currentcode.code}_${response.id}`,
+					name: doc.name,
+					obj_type: 'C_DOC',
+					profess_folder: {
+						code: currentcode.code, obj_type: 'C_DIR'
+					},
+					basic_params: {
+						files:[files]
+					},
+					extra_params: {
+						...doc.updoc,
+						submitTime: moment.utc().format()
+					}
+				});
+			});
+			notification.info({
+				message: '新增文件中...',
+				duration: 2
+			});
+			Promise.all(promises).then(rst => {
+				notification.success({
+					message: '新增文件成功！',
+					duration: 2
+				});
+				changeDocs([]);
+				toggleAddition(false);
+				getdocument({code: currentcode.code});
+			});
+			this.setState({
+				progress:0
+			})
+		}
 	}
-
 }

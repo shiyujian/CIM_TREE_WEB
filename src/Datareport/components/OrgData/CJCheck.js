@@ -34,7 +34,6 @@ export default class CJCheck extends Component {
     async componentDidMount(){
         const {wk} = this.props
         let dataSource = JSON.parse(wk.subject[0].data)
-        console.log("dataSource:",dataSource);
         this.setState({dataSource,wk})
     }
     componentWillReceiveProps(props){
@@ -49,10 +48,10 @@ export default class CJCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("dr_base_cj_visible",false)
         notification.success({
             message:"操作成功"
         })
+        this.props.closeModal("dr_base_cj_visible",false, "submit")
     }
     //通过
     async passon(){
@@ -68,13 +67,11 @@ export default class CJCheck extends Component {
         let doclist_a = [];
         let doclist_p = [];
         let wplist = [];
-        console.log("dataSource",dataSource);
         let data_list = [];
         let promises = dataSource.map((o) => {
             return getOrgPk({code:o.type})
         });
         let rst = await Promise.all(promises);
-        console.log("rst:",rst);
         dataSource.map((o, index) => {
             data_list.push({
                 code: "" + o.code,
@@ -95,7 +92,6 @@ export default class CJCheck extends Component {
                 }
             })
         })
-        console.log("data_list:", data_list);
         postOrgList({}, { data_list: data_list }).then(res => {
             dataSource.map((item, index) => {
                 item.selectPro.map(it => {
@@ -113,7 +109,6 @@ export default class CJCheck extends Component {
                             version: "A",
                             response_orgs: pro_orgs
                         }).then(rst => {
-                            console.log("rst:", rst);
                         }) 
                     });
                 }) 
@@ -131,7 +126,6 @@ export default class CJCheck extends Component {
                             version: "A",
                             response_orgs: unit_orgs
                         }).then(rst => {
-                            console.log("rst:", rst);
                         }) 
                     })
                 })
@@ -141,8 +135,28 @@ export default class CJCheck extends Component {
     //不通过
     async reject(){
         const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const {actions:{logWorkflowEvent}} = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '拒绝',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        notification.success({
+            message: "操作成功",
+            duration: 2
+        })
     }
     //预览
     handlePreview(index){
@@ -195,14 +209,13 @@ export default class CJCheck extends Component {
         }]
 		return (
             <Modal
-            footer={null}
             visible={true}
             width= {1280}
             onCancel = {this.props.closeModal.bind(this,"dr_base_cj_visible",false)}
             onOk = {this.submit.bind(this)}
 			maskClosable={false}>
                 <div>
-                    <h1 style ={{textAlign:'center',marginBottom:20}}>参建单位审核</h1>
+                    <h1 style ={{textAlign:'center',marginBottom:20}}>新增参建单位审核</h1>
                     <Table style={{ marginTop: '10px', marginBottom:'10px' }}
                         columns={columns}
                         dataSource={this.state.dataSource}

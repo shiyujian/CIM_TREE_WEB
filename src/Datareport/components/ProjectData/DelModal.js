@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table,Button,Popconfirm,message,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
+import {Table,Button,Popconfirm,Notification,Input,Icon,Modal,Upload,Select,Divider} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API} from '_platform/api';
 import {getUser} from '_platform/auth';
 import {getNextStates} from '_platform/components/Progress/util';
@@ -7,6 +7,7 @@ import {WORKFLOW_CODE} from '_platform/api'
 var moment = require('moment');
 const Search = Input.Search;
 const { Option } = Select
+const { TextArea } = Input;
 export default class DelModal extends Component {
     constructor(props) {
         super(props);
@@ -16,6 +17,13 @@ export default class DelModal extends Component {
     }
     delWF(){
         const {actions:{ createWorkflow, logWorkflowEvent }} = this.props;
+        const {description = ''} = this.state;
+        if(!this.state.passer){
+            Notification.warning({
+            	message: '未选择审核人'
+            });
+            return;
+        }
         let participants = this.state.passer;
 		let creator = {
 			id:getUser().id,
@@ -26,7 +34,7 @@ export default class DelModal extends Component {
 		let postdata = {
 			name:"项目批量删除申请",
 			code:WORKFLOW_CODE["数据报送流程"],
-			description:"项目批量删除申请",
+			description:description,
 			subject:[{
 				data:JSON.stringify(this.props.dataSource)
 			}],
@@ -41,7 +49,7 @@ export default class DelModal extends Component {
                 {
                     state:rst.current[0].id,
                     action:'提交',
-                    note:'发起项目批量删除申请',
+                    note:description,
                     executor:creator,
                     next_states:[{
                         participants:[participants],
@@ -51,13 +59,21 @@ export default class DelModal extends Component {
 					attachment:null
 				}).then(rst=>{
                     this.props.onCancel();
+                    if (rst) {
+						Notification.success({
+							message: "流程发起成功"
+						});
+					}else {
+						Notification.error({
+							message: "流程发起失败"
+						})
+					}
                 });
 		});
     }
     componentDidMount(){
         const {actions:{getAllUsers,getProjectAc}} = this.props
         getAllUsers().then(res => {
-            console.log(res);
             let set = {};
             let checkers = res.map(o => {
                 set[o.id] = o;
@@ -68,15 +84,17 @@ export default class DelModal extends Component {
             this.setState({ checkers, usersSet: set });
         });
     }
+    description(e) {
+		this.setState({description:e.target.value})
+	}
     render() {
         return (
             <Modal
                 onCancel={this.props.onCancel}
-                title="项目删除申请表"
                 visible={true}
                 width={1280}
-                footer={null}
-                maskClosable={false}>
+                onOk={this.delWF.bind(this)}>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请删除</h1>
                 <Table
                     columns={this.columns}
                     bordered={true}
@@ -91,21 +109,25 @@ export default class DelModal extends Component {
                             this.state.checkers || []
                         }
                     </Select>
-
                 </span>
-                <Button
-                onClick = {
-                    ()=>{
-                        if(!this.state.passer){
-                            message.error('未选择审核人');
-                            return;
-                        }
-                        this.delWF();
-                    }
+                <TextArea rows={2} style={{margin: '10px 0'}} onChange={this.description.bind(this)}  placeholder='请输入删除原因'/>
+                {
+            	// <Button
+             //        onClick = {
+             //            ()=>{
+             //                if(!this.state.passer){
+             //                    Notification.warning({
+             //                    	message: '未选择审核人'
+             //                    });
+             //                    return;
+             //                }
+             //                this.delWF();
+             //            }
+             //        }
+             //        type='primary' >
+             //            提交
+             //        </Button>
                 }
-                type='primary' >
-                    提交
-                </Button>
             </Modal>
         )
     }
@@ -114,6 +136,10 @@ export default class DelModal extends Component {
 		title: '序号',
 		dataIndex: 'index',
 		key: 'Index',
+	}, {
+		title: '编码',
+		dataIndex: 'code',
+		key: 'Code',
 	}, {
 		title: '项目/子项目名称',
 		dataIndex: 'name',

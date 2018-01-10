@@ -76,7 +76,9 @@ export default class EditFile extends Component {
     }
     onok(){
         if(!this.state.check){
-            message.info("请选择审核人")
+            notification.warning({
+				message:'请选择审核人'
+			})
             return
         }
         
@@ -84,7 +86,9 @@ export default class EditFile extends Component {
                         return !o.file.a_file
                     })
         if(temp){
-            message.info(`有数据未上传附件`);
+            notification.warning({
+				message:'有数据未上传附件'
+			})
             return;
         }
 
@@ -137,6 +141,13 @@ export default class EditFile extends Component {
         }
         this.setState({dataSource});
     }
+
+    //删除
+    delete(index) {
+        let { dataSource } = this.state;
+        dataSource.splice(index, 1);
+        this.setState({ dataSource });
+    }
     beforeUploadPicFile  = (index,file) => {
         // 上传到静态服务器
         const fileName = file.name;
@@ -156,7 +167,9 @@ export default class EditFile extends Component {
             resp = await resp.json()
             console.log('uploadStaticFile: ', resp)
             if (!resp || !resp.id) {
-                message.error('文件上传失败')
+                notification.error({
+                    message:'文件上传失败'
+                })
                 return;
             };
             const filedata = resp;
@@ -191,6 +204,12 @@ export default class EditFile extends Component {
         return false;
     }
 
+    onDateChange = (index,dateString,str) =>{
+        const {dataSource} = this.state;
+        dataSource[index][str] = dateString;
+        this.setState({dataSource});
+    }
+
     render() {
         const columns = [
             {
@@ -219,7 +238,7 @@ export default class EditFile extends Component {
                 dataIndex: 'type',
                 width: '5%',
                 render: (text, record ,index) => (
-					<Select defaultValue={record.type} style={{ width: 120 }} onChange={(value)=>onSelectChange(value,index,"type")}>
+					<Select defaultValue={record.type} style={{ width: 120 }} onChange={(value)=>this.onSelectChange(value,index,"type")}>
                         <Option value="重大安全隐患">重大安全隐患</Option>
                         <Option value="较大安全隐患">较大安全隐患</Option>
                         <Option value="一般安全隐患">一般安全隐患</Option>
@@ -232,7 +251,8 @@ export default class EditFile extends Component {
                 render: (text, record ,index) => (
 					<div>
                         <DatePicker
-                         defaultValue={moment(record.upTime)} />
+                        onChange={(date,dateString)=>{this.onDateChange(record,dateString,'upTime')}} 
+                        defaultValue={moment(record.upTime)} />
 					</div>
 				),
             }, {
@@ -242,6 +262,7 @@ export default class EditFile extends Component {
                 render: (text, record ,index) => (
 					<div>
                         <DatePicker
+                        onChange={(date,dateString)=>{this.onDateChange(record,dateString,'checkTime')}}
                          defaultValue={moment(record.checkTime)} />
 					</div>
 				),
@@ -252,6 +273,7 @@ export default class EditFile extends Component {
                 render: (text, record ,index) => (
 					<div>
                         <DatePicker
+                        onChange={(date,dateString)=>{this.onDateChange(record,dateString,'editTime')}}
                          defaultValue={moment(record.editTime)} />
 					</div>
 				),
@@ -260,7 +282,7 @@ export default class EditFile extends Component {
                 dataIndex: 'result',
                 width: '6%',
                 render: (text, record ,index) => (
-					<Select defaultValue={record.result} style={{ width: 120 }} onChange={(value)=>onSelectChange(value,index,"type")}>
+					<Select defaultValue={record.result} style={{ width: 120 }} onChange={(value)=>this.onSelectChange(value,index,"type")}>
                         <Option value="不合格">不合格</Option>
                         <Option value="及格">及格</Option>
                         <Option value="良好">良好</Option>
@@ -282,7 +304,7 @@ export default class EditFile extends Component {
                 dataIndex: 'editResult',
                 width: '6%',
                 render: (text, record ,index) => (
-					<Select defaultValue={record.editResult} style={{ width: 120 }} onChange={(value)=>onSelectChange(value,index,"type")}>
+					<Select defaultValue={record.editResult} style={{ width: 120 }} onChange={(value)=>this.onSelectChange(value,index,"type")}>
                         <Option value="通过">通过</Option>
                         <Option value="待整改">待整改</Option>
                         <Option value="失败">失败</Option>
@@ -298,17 +320,31 @@ export default class EditFile extends Component {
                             <a href={`${STATIC_DOWNLOAD_API}${record.file.a_file}`}>下载</a>
                         </span>)
                 }
+            }, {
+                title: '操作',
+                render: (text, record, index) => {
+                    return (
+                        <Popconfirm
+                            placement="leftTop"
+                            title="确定删除吗？"
+                            onConfirm={this.delete.bind(this, index)}
+                            okText="确认"
+                            cancelText="取消">
+                            <a>删除</a>
+                        </Popconfirm>
+                    )
+                }
             }
         ];
         return (
             <Modal
-			title="安全隐患变更表"
 			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={false}
 			onCancel={this.props.oncancel}>
+            <h1 style ={{textAlign:'center',marginBottom:20}}>申请变更</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}

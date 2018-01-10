@@ -3,11 +3,13 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {actions as projactions} from '../../store/ProjectData';
-import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message} from 'antd';
+import {Input,Col, Card,Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,Notification} from 'antd';
 import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API } from '_platform/api';
 import WorkflowHistory from '../WorkflowHistory';
 import Preview from '../../../_platform/components/layout/Preview';
 import {actions as action2} from '../../store/quality';
+import {getUser} from '_platform/auth';
+import '../index.less';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -26,7 +28,7 @@ export default class HPModal extends Component{
         this.state = {
             wk:null,
             dataSource:[],
-            radioValue:1
+            opinion:1,//1表示通过 2表示不通过
         }
     }
     async getPersonsList(dataSource){
@@ -54,13 +56,19 @@ export default class HPModal extends Component{
         let dataSource = JSON.parse(wk.subject[0].data);
         let perSet = await this.getPersonsList(dataSource);
         this.setState({dataSource,wk,perSet});
-   }
-async submit(){
-
-        if(this.state.radioValue !==1){
-            return;
+    }
+    async submit(){
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        const {wk} = this.state;
+        if(this.state.opinion !==1){
+            await this.reject();
         }
-        let {postProjectAc ,getProjectAc,postProjectListAc,postDocListAc} = this.props.actions;
+        let {postProjectAc ,getProjectAc,postProjectListAc,postDocListAc,logWorkflowEvent} = this.props.actions;
         let projRoot = await getProjectAc();
         let doclist = this.state.dataSource.map(data=>{
             data.pic.misc = 'pic';
@@ -116,11 +124,96 @@ async submit(){
             });
             let rst = await postProjectListAc({},{data_list:projList});
             if(rst.result &&rst.result.length>0){
-                message.info('创建成功');
-                this.props.closeModal('dr_xm_xx_visible',false);
+                Notification.success({
+                    message: '操作成功'
+                });
+                await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+                this.props.closeModal('dr_xm_xx_visible',false,'submit');
+                // this.props.closeModal('dr_xm_xx_visible',false,'submit');
             }
         }
     }
+    //radio变化
+    onChange(e){
+        this.setState({opinion:e.target.value})
+    }
+    //通过
+    async passon(){
+        const {dataSource,wk} = this.state
+        const {actions:{logWorkflowEvent,postDocListAc,putProjectListAc}} = this.props
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        let dataList = this.state.dataSource.map(data=>{
+
+            return {
+                code:data.code,
+                parent:{
+                    pk: data.pk,
+                    code:data.code,
+                    obj_type:data.obj_type
+                },
+                version:'A'
+            };
+        });
+        let rst = await putProjectListAc({},{data_list:dataList});
+        if(rst && rst.result && rst.result.length>0){
+            await logWorkflowEvent({pk:wk.id},{state:wk.current[0].id,action:'通过',note:'同意',executor:executor,attachment:null});
+        }
+    }
+    beforeUpload(record,file){
+        const fileName = file.name;
+        // 上传到静态服务器
+        const { actions:{uploadStaticFile} } = this.props;
+        const formdata = new FormData();
+        formdata.append('a_file', file);
+        formdata.append('name', fileName);
+        let myHeaders = new Headers();
+        let myInit = { method: 'POST',
+                       headers: myHeaders,
+                       body: formdata
+                     };
+                     //uploadStaticFile({}, formdata)
+        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
+            let loadedFile = await resp.json();
+            loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
+            loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
+            record.file = loadedFile;
+            record.code = file.name.substring(0,file.name.lastIndexOf('.'));
+            this.forceUpdate();
+        });
+        return false;
+    }
+    //不通过
+    async reject(){
+        const {wk} = this.state;
+        const {actions: {logWorkflowEvent}} = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '退回',
+                note: '不通过',
+                attachment: null,
+            }
+        );
+        Notification.success({
+            message: "操作成功",
+            duration: 2
+        })
+        this.props.closeModal("dr_xm_xx_visible",false)
+    };
     render(){ 
 
         const columns =
@@ -129,7 +222,7 @@ async submit(){
                 dataIndex: 'index',
                 key: 'Index',
             }, {
-                title: '项目编码',
+                title: '编码',
                 dataIndex: 'code',
                 key: 'Code',
             }, {
@@ -199,13 +292,15 @@ async submit(){
             }];
         return (
             <Modal
-                title="项目信息审批表"
                 visible={true}
                 width={1280}
-                footer={null}>
+                onOk={this.submit.bind(this)}
+                onCancel = {() => this.props.closeModal("dr_xm_xx_visible",false)}>
                 <div>
-                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>结果审核</h1>
-                    <Table style={{ marginTop: '10px', marginBottom: '10px' }}
+                    <h1 style={{ textAlign: 'center', marginBottom: 20 }}>填报审核</h1>
+                    <Table 
+                        style={{ marginTop: '10px', marginBottom: '10px' }}
+                        className='foresttable'
                         columns={columns}
                         dataSource={this.state.dataSource}
                         bordered />
@@ -214,24 +309,12 @@ async submit(){
                             <span>审查意见：</span>
                         </Col>
                         <Col span={4}>
-                            <RadioGroup 
-                             value = {this.state.radioValue||1}
-                             onChange={(event) => {
-                                this.setState({radioValue:event.target.value});
-                            }}>
+                            <RadioGroup onChange={this.onChange.bind(this)} value={this.state.opinion}>
                                 <Radio value={1}>通过</Radio>
                                 <Radio value={2}>不通过</Radio>
                             </RadioGroup>
                         </Col>
                         <Col span={2} push={14}>
-                            <Button type='primary'>
-                                导出表格
-                    </Button>
-                        </Col>
-                        <Col span={2} push={14}>
-                            <Button type='primary' onClick={this.submit.bind(this)}>
-                                确认提交
-                    </Button>
                             <Preview />
                         </Col>
                     </Row>

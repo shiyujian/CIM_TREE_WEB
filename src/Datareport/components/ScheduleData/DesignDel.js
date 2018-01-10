@@ -9,7 +9,7 @@ import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const Option = Select.Option;
-
+const TextArea = Input.TextArea;
 export default class DesignDel extends Component {
 	constructor(props) {
 		super(props);
@@ -20,36 +20,38 @@ export default class DesignDel extends Component {
 			project: {},
 			unit: {},
 			options: [],
+			deleteInfo:"",
 		};
 	}
-	componentWillMount(){
+	componentWillMount() {
 		let dataSource = this.props.dataSourceSelected;
 		let newdataSource = [];
-		dataSource.map((item,key)=>{
+		dataSource.map((item, key) => {
 			let newDatas = {
-				key:key+1,
+				key: key + 1,
 				code: item.code,
-				volume:item.volume,
+				volume: item.volume,
 				name: item.name,
 				major: item.major,
 				factovertime: item.factovertime,
 				factquantity: item.factquantity,
 				uploads: item.uploads,
 				designunit: item.designunit,
+				remarks:item.remarks,
 				unit: item.unit,
 				project: item.project,
 				delcode: item.delcode,
 			}
 			newdataSource.push(newDatas);
 		})
-		this.setState({dataSource:newdataSource});
+		this.setState({ dataSource: newdataSource });
 	}
 	componentDidMount() {
 		const { actions: { getAllUsers } } = this.props;
 		getAllUsers().then(rst => {
-			let checkers = rst.map(o => {
+			let checkers = rst.map((o,index) => {
 				return (
-					<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+					<Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
 				)
 			})
 			this.setState({ checkers })
@@ -60,11 +62,22 @@ export default class DesignDel extends Component {
 		let check = JSON.parse(value);
 		this.setState({ check })
 	}
+	onChangeText(e) {
+        this.setState({
+            deleteInfo: e.target.value
+        });
+    }
 	onok() {
+		let {dataSource} = this.state;
 		if (!this.state.check) {
-			message.info("请选择审核人")
+			notification.warning({
+				message: '请选择审核人！',
+				duration: 2
+			});
 			return;
 		}
+
+        dataSource[0].deleteInfo = this.state.deleteInfo.trim();
 		let { check } = this.state;
 		let per = {
 			id: check.id,
@@ -81,29 +94,30 @@ export default class DesignDel extends Component {
 		let { dataSource } = this.state;
 		dataSource.splice(index, 1);
 		let newdataSource = [];
-        dataSource.map((item,key)=>{
-            let newDatas = {
-				key:key+1,
+		dataSource.map((item, key) => {
+			let newDatas = {
+				key: key + 1,
 				code: item.code,
-				volume:item.volume,
+				volume: item.volume,
 				name: item.name,
 				major: item.major,
 				factovertime: item.factovertime,
 				factquantity: item.factquantity,
 				uploads: item.uploads,
 				designunit: item.designunit,
+				remarks:item.remarks,
 				unit: item.unit,
 				project: item.project,
 				delcode: item.delcode,
 			}
-            newdataSource.push(newDatas)
-        })
-      this.setState({dataSource:newdataSource})  
+			newdataSource.push(newDatas)
+		})
+		this.setState({ dataSource: newdataSource })
 	}
 	render() {
 		const columns = [{
 			title: '序号',
-			dataIndex:"key",
+			dataIndex: "key",
 		}, {
 			title: '编码',
 			dataIndex: 'code',
@@ -132,16 +146,19 @@ export default class DesignDel extends Component {
 			title: '上传人员',
 			dataIndex: 'uploads',
 		}, {
+			title: '备注',
+			dataIndex: 'remarks',
+		}, {
 			title: '操作',
 			render: (text, record, index) => {
 				return (
 					<Popconfirm
 						placement="leftTop"
 						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, record.key-1)}
+						onConfirm={this.delete.bind(this, record.key - 1)}
 						okText="确认"
 						cancelText="取消">
-						<a>删除</a>
+						<a><Icon type = "delete"/></a>
 					</Popconfirm>
 				)
 			}
@@ -149,13 +166,13 @@ export default class DesignDel extends Component {
 
 		return (
 			<Modal
-				title="设计进度删除表"
 				visible={true}
 				width={1280}
 				onOk={this.onok.bind(this)}
 				maskClosable={false}
 				onCancel={this.props.oncancel}
 			>
+				<h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请删除</h1>
 				<Table
 					columns={columns}
 					dataSource={this.state.dataSource}
@@ -167,7 +184,7 @@ export default class DesignDel extends Component {
 					<Col>
 						<span>
 							审核人：
-						<Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+						<Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)} placeholder='请选择审核人'>
 								{
 									this.state.checkers
 								}
@@ -175,6 +192,16 @@ export default class DesignDel extends Component {
 						</span>
 					</Col>
 				</Row>
+				<Row style={{marginBottom: '20px'}}>
+					<Col span={2}>
+						<span>删除原因：</span>
+					</Col>
+			    </Row>
+			    <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea rows={2} onChange={this.onChangeText.bind(this)}/>
+				    </Col>
+			    </Row>
 				<Preview />
 			</Modal>
 		)

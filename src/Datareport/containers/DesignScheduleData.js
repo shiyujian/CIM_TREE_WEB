@@ -5,7 +5,7 @@ import { actions } from '../store/scheduledata';
 import { getUser } from '_platform/auth';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import { Row, Col, Table, Input, Button, message, Progress } from 'antd';
+import { Row, Col, Table, Input, Button, message, Progress, notification } from 'antd';
 import { DesignModal, DesignDel, DesignChange } from '../components/ScheduleData';
 import './quality.less';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -43,7 +43,7 @@ export default class DesignScheduleData extends Component {
 			getScheduleDir,
 			postScheduleDir,
 		} } = this.props;
-		this.setState({loading:true,percent:0,num:0})
+		
 		let topDir = await getScheduleDir({ code: 'the_only_main_code_datareport' });
 		if (topDir.obj_type) {
 			let dir = await getScheduleDir({ code: 'datareport_designdata_1111' });
@@ -57,9 +57,9 @@ export default class DesignScheduleData extends Component {
 	async generateTableData(data) {
 		const { actions: { getDocument, } } = this.props;
 		const { loading } = this.state;
-		this.setState({ loading: true });
 		let dataSource = [];
 		let i = 0;
+		this.setState({loading:true,percent:0,num:0})
 		data.map((item) => {
 			getDocument({ code: item.code }).then(single => {
 				i++
@@ -73,14 +73,15 @@ export default class DesignScheduleData extends Component {
 					major: single.extra_params.major,
 					factovertime: single.extra_params.factovertime,
 					designunit: single.extra_params.designunit,
+					remarks:single.extra_params.remarks,
 					uploads: single.extra_params.uploads,
 					delcode: single.code,
 				}
 				dataSource.push(temp);
-				this.setState({ dataSource, showDat: dataSource, loading:false,percent:100 });
+				
 			})
 		})
-		this.setState({loading:false});
+		this.setState({ dataSource, showDat: dataSource, loading:false,percent:100 });
 	}
 	goCancel = () => {
 		this.setState({ setAddVisiable: false, setDeleteVisiable: false, setEditVisiable: false });
@@ -214,19 +215,45 @@ export default class DesignScheduleData extends Component {
 			this.setState({ setAddVisiable: true });
 		} else if (type === "delete") {
 			if (selectedRowKeys.length === 0) {
-				message.info('请先选择数据')
+				notification.warning({
+                    message: '请先选择数据！',
+                    duration: 2
+                });
 				return
 			}
 			this.setState({ setDeleteVisiable: true });
 		} else if (type === "edit") {
 			if (selectedRowKeys.length === 0) {
-				message.info('请先选择数据')
+				notification.warning({
+                    message: '请先选择数据！',
+                    duration: 2
+                });
 				return
 			}
 			this.setState({ setEditVisiable: true });
 		}
 	}
-
+	//数据导出
+	getExcel() {
+		const { actions: { jsonToExcel } } = this.props;
+		const { dataSourceSelected } = this.state;
+		let rows = [];
+		rows.push(["编码", "卷册", "名称", "项目/子项目", "单位工程", "专业", "实际供图时间", "设计单位", "上传人员","备注"]);
+		if(dataSourceSelected.length===0){
+			notification.warning({
+				message: '请先选择数据！',
+				duration: 2
+			});
+			return
+		}
+		dataSourceSelected.map(item => {
+			rows.push([item.code, item.volume, item.name, item.project, item.unit, item.major, item.factovertime, item.designunit, item.uploads,item.remarks]);
+		})
+		jsonToExcel({}, { rows: rows })
+			.then(rst => {
+				this.createLink(this, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
+			})
+	}
 	//模板下载
 	createLink = (name, url) => {    //下载
 		let link = document.createElement("a");
@@ -236,24 +263,6 @@ export default class DesignScheduleData extends Component {
 		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
-	}
-	//数据导出
-	getExcel() {
-		const { actions: { jsonToExcel } } = this.props;
-		const { dataSourceSelected } = this.state;
-		let rows = [];
-		rows.push(["编码", "卷册", "名称", "项目/子项目", "单位工程", "专业", "实际供图时间", "设计单位", "上传人员"]);
-		if(dataSourceSelected.length===0){
-			message.info("请先选择数据")
-			return
-		}
-		dataSourceSelected.map(item => {
-			rows.push([item.code, item.volume, item.name, item.project, item.unit, item.major, item.factovertime, item.designunit, item.uploads]);
-		})
-		jsonToExcel({}, { rows: rows })
-			.then(rst => {
-				this.createLink(this, NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
-			})
 	}
 	render() {
 		const { selectedRowKeys } = this.state;
@@ -265,7 +274,6 @@ export default class DesignScheduleData extends Component {
 			<div style={{ overflow: 'hidden', padding: 20 }}>
 				<DynamicTitle title="设计进度" {...this.props} />
 				<Row>
-					<Button style={{ margin: '10px 10px 10px 0px' }} type="default" onClick={this.createLink.bind(this, 'muban', `${DataReportTemplate_DesignProgress}`)}>模板下载</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('add')}>发起填报</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('edit')}>申请变更</Button>
 					<Button className="btn" type="default" onClick={() => this.onBtnClick('delete')}>申请删除</Button>
@@ -357,5 +365,9 @@ export default class DesignScheduleData extends Component {
 		title: '上传人员',
 		dataIndex: 'uploads',
 		key: 'uploads',
+	}, {
+		title: '备注',
+		dataIndex: 'remarks',
+		key: 'remarks',
 	}];
 }

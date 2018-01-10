@@ -4,8 +4,8 @@ import {
     Input, Form, Spin, Upload, Icon, Button, Modal,
     Cascader, Select, Popconfirm, message, Table, Row, Col, notification
 } from 'antd';
-import {getUser} from '_platform/auth';
-import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import { getUser } from '_platform/auth';
+import { UPLOAD_API, SERVICE_API, FILE_API, STATIC_DOWNLOAD_API, SOURCE_API, DataReportTemplate_DesignProgress } from '_platform/api';
 import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
@@ -22,12 +22,14 @@ class DesignModal extends Component {
             project: {},
             unit: {},
             options: [],
+            isdesignunit: "",
+            isRepeatcode: "",
         };
     }
     componentDidMount() {
         const { actions: { getAllUsers, getProjectTree } } = this.props;
         getAllUsers().then(rst => {
-            let checkers = rst.map((o,index) => {
+            let checkers = rst.map((o, index) => {
                 return (
                     <Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
                 )
@@ -62,46 +64,71 @@ class DesignModal extends Component {
             return false;
         }
     }
-    uplodachange = (info) => {
-        //info.file.status/response
-        const {actions:{getOrg}} = this.props;
+
+    //判断数据是否重复
+    isRepeat(arr) {
+        var hash = {};
+        let repeatCode = [];
+        for (var i in arr) {
+            if (hash[arr[i]]) {
+                repeatCode.push(arr[i])
+            }
+            hash[arr[i]] = true;
+        }
+        return repeatCode;
+    }
+    uplodachange = async (info) => {
+        const { actions: { getOrg } } = this.props;
         if (info && info.file && info.file.status === 'done') {
             let name = Object.keys(info.file.response);
             let dataList = info.file.response[name[0]];
             let dataSource = [];
+            let codes = [];
             for (let i = 1; i < dataList.length; i++) {
-                getOrg({code:dataList[i][5]}).then(data=>{
-                    if(!data){
-                        message.info("您有设计单位输入有误，请确认");
-                    }
-                    dataSource.push({
-                        key:i,
-                        code: dataList[i][0] ? dataList[i][0] : '',
-                        volume: dataList[i][1] ? dataList[i][1] : '',
-                        name: dataList[i][2] ? dataList[i][2] : '',
-                        major: dataList[i][3] ? dataList[i][3] : '',
-                        factovertime: dataList[i][4] ? dataList[i][4] : '',
-                        designunit:{
-                            code:data.code ? data.code :dataList[i][5],
-                            name :data.name ? data.name : "",
-                            type: data.type ? data.type : ""
-                        },
-                        uploads: getUser().username,
-                        project: {
-                            code: "",
-                            name: "",
-                            obj_type: ""
-                        },
-                        unit: {
-                            code: "",
-                            name: "",
-                            obj_type: ""
-                        },
-                    })
-
-                    this.setState({ dataSource });
-                })             
+                codes.push(dataList[i][0]);
+                let data = await getOrg({ code: dataList[i][5] });
+                if (!data.code) {
+                    notification.error({
+                        message: '您输入的设计单位有误！',
+                        duration: 2
+                    });
+                    this.setState({ isdesignunit: false })
+                }
+                dataSource.push({
+                    key: i,
+                    code: dataList[i][0] ? dataList[i][0] : '',
+                    volume: dataList[i][1] ? dataList[i][1] : '',
+                    name: dataList[i][2] ? dataList[i][2] : '',
+                    major: dataList[i][3] ? dataList[i][3] : '',
+                    factovertime: dataList[i][4] ? dataList[i][4] : '',
+                    designunit: {
+                        code: data.code ? data.code : dataList[i][5],
+                        name: data.name ? data.name : "",
+                        type: data.type ? data.type : ""
+                    },
+                    remarks: dataList[i][6] ? dataList[i][6] : '',
+                    uploads: getUser().username,
+                    project: {
+                        code: "",
+                        name: "",
+                        obj_type: ""
+                    },
+                    unit: {
+                        code: "",
+                        name: "",
+                        obj_type: "",
+                    },
+                })
             }
+            let repeatCode = this.isRepeat(codes);
+            if (repeatCode.length > 1) {
+                this.setState({ isRepeatcode: false })
+                notification.error({
+                    message: '您输入的编码有重复！',
+                    duration: 2
+                });
+            }
+            this.setState({ repeatCode, dataSource });
             notification.success({
                 message: '上传成功！',
                 duration: 2
@@ -109,30 +136,35 @@ class DesignModal extends Component {
         }
     }
     //校验组织机构
-    fixOrg(index){
-        const {actions:{getOrg}} = this.props;
-        let {dataSource} = this.state;
-        getOrg({code:dataSource[index].designunit.code}).then(rst => {
-            if(rst.code){
+    fixOrg(index) {
+        const { actions: { getOrg } } = this.props;
+        let { dataSource } = this.state;
+        getOrg({ code: dataSource[index].designunit.code }).then(rst => {
+            if (rst.code) {
                 dataSource[index]['designunit'] = {
                     name: rst.name,
                     code: rst.code,
                     type: rst.obj_type
                 }
-                this.setState({dataSource});
-            }else{
-                message.info("请确认后再次输入")
+                this.setState({ dataSource });
+                this.setState({ isdesignunit: true })
+            } else {
+                notification.warning({
+                    message: '请确认后再次输入！',
+                    duration: 2
+                });
+                this.setState({ isdesignunit: false })
             }
         })
     }
-    tableDataChange1(index ,e ){
-		const { dataSource } = this.state;
-		dataSource[index]["designunit"] = {
+    tableDataChange1(index, e) {
+        const { dataSource } = this.state;
+        dataSource[index]["designunit"] = {
             name: '',
             code: e.target.value,
             type: ''
         }
-	  	this.setState({dataSource});
+        this.setState({ dataSource });
     }
 
     //下拉框选择人
@@ -191,6 +223,16 @@ class DesignModal extends Component {
             }
         });
     }
+    //模板下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
     //下拉框选择变化
     handleSelect(index, key, value) {
         const { dataSource } = this.state;
@@ -199,16 +241,39 @@ class DesignModal extends Component {
     }
     onok() {
         if (!this.state.check) {
-            message.info("请选择审核人")
+            notification.warning({
+                message: '请选择审核人！',
+                duration: 2
+            });
             return
         }
         if (this.state.dataSource.length === 0) {
-            message.info("请上传excel")
+            notification.warning({
+                message: '请上传excel！',
+                duration: 2
+            });
             return
         }
         const { project, unit } = this.state;
         if (!project.name) {
-            message.info(`请选择项目和单位工程`);
+            notification.warning({
+                message: '请选择项目和单位工程！',
+                duration: 2
+            });
+            return;
+        }
+        if (this.state.isdesignunit === false) {
+            notification.error({
+                message: '您输入的设计单位有误！',
+                duration: 2
+            });
+            return;
+        }
+        if (this.state.isRepeatcode === false) {
+            notification.error({
+                message: '您输入的编码有重复！',
+                duration: 2
+            });
             return;
         }
 
@@ -218,7 +283,7 @@ class DesignModal extends Component {
             username: check.username,
             person_name: check.account.person_name,
             person_code: check.account.person_code,
-            organization: check.account.organization
+            organization: check.account.organization,
         }
         for (let i = 0; i < this.state.dataSource.length; i++) {
             this.state.dataSource[i].project = project;
@@ -226,12 +291,20 @@ class DesignModal extends Component {
         }
         this.props.onok(this.state.dataSource, per);
     }
-
+    //table input 输入
+    tableDataChange(index, key, e) {
+        const { dataSource } = this.state;
+        dataSource[index][key] = e.target['value'];
+        this.setState({ dataSource });
+    }
     //删除
     delete(index) {
-        let { dataSource } = this.state
-        dataSource.splice(index, 1)
-        this.setState({ dataSource })
+        let dataSource = this.state.dataSource;
+        dataSource.splice(index, 1);
+        dataSource.map((item, key) => {
+            item.key = key + 1;
+        })
+        this.setState({ dataSource });
     }
     covertURLRelative = (originUrl) => {
         return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
@@ -240,19 +313,50 @@ class DesignModal extends Component {
         const columns =
             [{
                 title: '序号',
-                dataIndex:"key",
+                dataIndex: "key",
+                key: "key",
             }, {
                 title: '编码',
                 dataIndex: 'code',
+                key: "code",
+                render: (text, record, index) => {
+
+                    if (this.state.repeatCode.indexOf(record.code) != -1) {
+                        return (
+                            <span style={{ "color": "red" }}>{record.code}</span>
+                        )
+                    } else {
+                        return (
+                            <span>{record.code}</span>
+                        )
+                    }
+                }
             }, {
                 title: '卷册',
                 dataIndex: 'volume',
+                key: "volume",
+                render: (text, record, index) => {
+                    // console.log('record',record)
+                    return <Input value={record.volume || ""} onChange={ele => {
+                        record.volume = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                }
             }, {
                 title: '名称',
                 dataIndex: 'name',
+                key: "name",
+                render: (text, record, index) => {
+                    // console.log('record',record)
+                    return <Input value={record.name || ""} onChange={ele => {
+                        record.name = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                }
             }, {
                 title: '专业',
                 dataIndex: 'major',
+                key: "major",
                 width: "140px",
                 render: (text, record, index) => (
                     <Select style={{ width: '120px' }} onSelect={this.handleSelect.bind(this, index, 'major')} value={this.state.dataSource[index]['major']}>
@@ -263,20 +367,41 @@ class DesignModal extends Component {
             }, {
                 title: '实际供图时间',
                 dataIndex: 'factovertime',
+                key: "factovertime",
+                render: (text, record, index) => {
+                    // console.log('record',record)
+                    return <Input value={record.factovertime || ""} onChange={ele => {
+                        record.factovertime = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                }
             }, {
                 title: '设计单位',
                 dataIndex: 'designunit',
+                key: "designunit",
                 render: (text, record, index) => {
-                    if(record.designunit && record.designunit.name){
+                    if (record.designunit && record.designunit.name) {
                         return <span>{record.designunit.name}</span>
-                    }else{
-                        return (<Input style={{color:'red'}} value={record.designunit ? record.designunit.code : ''} onBlur={this.fixOrg.bind(this,index)} onChange={this.tableDataChange1.bind(this,index)}/>)
+                    } else {
+                        return (<Input style={{ color: 'red' }} value={record.designunit ? record.designunit.code : ''} onBlur={this.fixOrg.bind(this, index)} onChange={this.tableDataChange1.bind(this, index)} />)
                     }
                 },
 
             }, {
                 title: '上传人员',
                 dataIndex: 'uploads',
+                key: "uploads",
+            }, {
+                title: '备注',
+                dataIndex: 'remarks',
+                key: "remarks",
+                render: (text, record, index) => {
+                    // console.log('record',record)
+                    return <Input value={record.remarks || ""} onChange={ele => {
+                        record.remarks = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                }
             }, {
                 title: '操作',
                 render: (text, record, index) => {
@@ -287,7 +412,7 @@ class DesignModal extends Component {
                             onConfirm={this.delete.bind(this, index)}
                             okText="确认"
                             cancelText="取消">
-                            <a>删除</a>
+                            <a><Icon type="delete" /></a>
                         </Popconfirm>
                     )
                 }
@@ -295,23 +420,23 @@ class DesignModal extends Component {
 
         return (
             <Modal
-                title="设计进度信息上传表"
                 key={this.props.akey}
                 visible={true}
                 width={1280}
                 onOk={this.onok.bind(this)}
                 maskClosable={false}
                 onCancel={this.props.oncancel}>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
                 <Table
                     columns={columns}
                     dataSource={this.state.dataSource}
                     bordered
                     pagination={{  //分页
                         pageSize: 10
-                    }} 
-                    rowKey='key'/>
+                    }}
+                    rowKey='key' />
                 <Row style={{ marginBottom: "30px" }} type="flex">
-                    <Col><Button style={{ margin: '10px 10px 10px 0px' }}>模板下载</Button></Col>
+                    <Col><Button style={{ margin: '10px 10px 10px 0px' }} onClick={this.createLink.bind(this, 'muban', `${DataReportTemplate_DesignProgress}`)}>模板下载</Button></Col>
                     <Col>
                         <Upload
                             onChange={this.uplodachange.bind(this)}
@@ -321,14 +446,14 @@ class DesignModal extends Component {
                             beforeUpload={this.beforeUpload.bind(this)}
                         >
                             <Button style={{ margin: '10px 10px 10px 0px' }}>
-                                <Icon type="upload" />上传并预览(文件名需为英文)
+                                <Icon type="upload" />上传并预览
                              </Button>
                         </Upload>
                     </Col>
                     <Col>
                         <span>
                             审核人：
-                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)} placeholder='请选择审核人'>
                                 {
                                     this.state.checkers
                                 }

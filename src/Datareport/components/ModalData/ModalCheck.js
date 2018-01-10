@@ -67,8 +67,8 @@ export default class ModalCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("modal_check_visbile",false);
-        notification.info({message:"操作成功"});
+        this.props.closeModal("modal_check_visbile",false,'submit');
+        notification.info({message:"操作成功！"});
     }
 
     //通过
@@ -169,7 +169,7 @@ export default class ModalCheck extends Component {
         let rst = await addDocList({},{data_list:docData});
         if(rst.result){
             notification.success({
-                message: '创建文档成功！',
+                message: '创建文档成功',
                 
             });
         }else{
@@ -180,10 +180,38 @@ export default class ModalCheck extends Component {
         }
     }
     //不通过
-    async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+    // async reject(){
+    //     const {wk} = this.props
+    //     const {actions:{deleteWorkflow}} = this.props
+    //     await deleteWorkflow({pk:wk.id})
+    // }
+
+      //不通过
+      async reject() {
+        const { wk, } = this.state;
+        const { actions: { logWorkflowEvent, } } = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+
+        await logWorkflowEvent( // step3: 提交填报 [post] /instance/{pk}/logevent/ 参数
+            {
+                pk: wk.id
+            }, {
+                state: wk.current[0].id,
+                executor: executor,
+                action: '拒绝',
+                note: '不通过',
+                attachment: null
+            }
+        );
+        notification.success({
+            message: '操作成功',
+            duration: 2
+        });
     }
 
     //预览

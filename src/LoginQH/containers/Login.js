@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as actions from '../store/login';
-import {Form, Icon, Input, Button, Checkbox, message, notification, Radio} from 'antd';
+import {Form, Icon, Input, Button, Checkbox, message, notification, Radio,Tooltip} from 'antd';
 import {setUser, clearUser, setPermissions, removePermissions} from '../../_platform/auth';
 import QRCode from '../components/QRCode';
 import {base,QRCODE_API} from '_platform/api';
@@ -28,6 +28,7 @@ class Login extends Component {
 			isPwd: true,
 			loginState:true,
 			forgectState:false,
+			appDownload:false,
 			token:null,
 			QRUrl:'',
 			userMessage:null
@@ -70,7 +71,7 @@ class Login extends Component {
 				token,
 				loginState
 			}=nextState;
-			console.log(nextState,'nextState');
+			
 			const {actions: {getLoginState}} = this.props;
 
 			me.intervalID = setInterval(function(){
@@ -136,16 +137,19 @@ class Login extends Component {
 	}
 	
 	render() {
+		// console.log('this.props',this.props)
 		const {getFieldDecorator} = this.props.form;
 		const{
 			QRUrl,
 			token,
 			loginState,
 			forgectState,
+			appDownload,
 			userMessage
 		}=this.state
 		// const loginTitle = require('../../_layouts/logo.png');
 		const loginTitle = require('./images/logo1.png');
+		const appImg=require('./images/app.png');
 		const pwdType = this.state.isPwd ? 'password' : 'text';
 		/// 密码输入框类型改变时图标变化
 		let chgTypeImg = require('./images/icon_eye1.png');
@@ -160,7 +164,6 @@ class Login extends Component {
 		let bgColor = "#FFFFFF";
 		let fgColor = "#000000";
 
-
 		return (
 			<div className="login-wrap">
 				<div className="img-box">
@@ -172,8 +175,8 @@ class Login extends Component {
 						<RadioButton value="code">扫码登录</RadioButton>
 					</RadioGroup>
 				</div>
-				{
-					loginState?
+				{	
+					loginState? !forgectState?
 						<div className="main-box">
 							<Form onSubmit={this.handleSubmit.bind(this)}
 								className='login-form' id="loginForm">
@@ -207,23 +210,60 @@ class Login extends Component {
 									})(
 										<div>
 										<Checkbox onChange={this.loginRememberChange.bind(this)}>记住密码</Checkbox>
+										<span className="forgetPassword" onClick={this.ForgetPassword.bind(this)}>忘记密码</span>
 										</div>	
 									)}
 								</FormItem>
 								<Button type="primary" htmlType="submit"
 										className="login-form-button">登录</Button>
 							</Form>
-						</div> :
-						<div className="picture-box">
-							<QRCode {...this.props}
-							size={size}
-							level={level}
-							bgColor={bgColor}
-							fgColor={fgColor}
-							value={QRUrl}/>
-							<p style={{fontSize:16,color:'white',marginTop:'10'}}>请使用手机客户端扫码登录</p>
-						</div>
+						</div>: 
+							<div className="main-box">
+							<h1 style ={{textAlign:'center',marginBottom:10,marginTop:20,color:'red'}}></h1>
+							<Form onSubmit={this.sureSubmit.bind(this)}
+								className='login-form' id="loginForm">
+								<FormItem>
+									{getFieldDecorator('nickname', {
+										rules: [{required: true, message: '请输入用户名'}],
+									})(
+										<Input addonBefore={<Icon type="user"/>} id="nickname"
+											placeholder="请输入用户名"/>,
+									)}
+								</FormItem>
+		
+								<FormItem>
+									{getFieldDecorator('phone', {
+										rules: [{required: true, message: '请输入手机号'}],
+									})(
+										<div>
+											<Input addonBefore={<Icon type="mobile"/>}
+												id='phoneNumber' 
+												placeholder="请输入手机号"
+												/>
+										</div>,
+									)}
+								</FormItem>
+								<Button type="primary"  onClick={this.cancel.bind(this)} style={{width:'44%',height:'45px',marginTop:50,marginLeft:10,fontSize:18}}>返回</Button>	
+								<Button type="primary" htmlType="submit" style={{width:'44%',height:'45px',marginTop:50,marginLeft:30,fontSize:18}}>确定</Button>
+							</Form>
+							
+						</div>:
+						 appDownload?<div className="imgbox">
+							             <a className="Imgtitle"><img src={appImg}/></a>
+										 <p onClick={this.backLogin.bind(this)} style={{fontSize:16,color:'white',marginTop:'10',color:'red',cursor:'pointer',textDecoration:'underline',textAlign:'center'}}>返回扫码登录</p>
+							         </div>:
+									 <div className="picture-box">
+										<QRCode {...this.props}
+										size={size}
+										level={level}
+										bgColor={bgColor}
+										fgColor={fgColor}
+										value={QRUrl}/>
+										<p style={{fontSize:16,color:'white',marginTop:'10'}}>请打开移动端"扫一扫"</p>
+										<p style={{fontSize:16,color:'white',marginTop:'10'}}>还没有移动端?<span onClick={this.nowDownload.bind(this)} style={{fontSize:16,color:'red',marginTop:'10',textDecoration:'underline',cursor:'pointer' }}>立即下载</span></p>
+									 </div>
 				}
+			
 			</div>
 		);
 	}
@@ -241,7 +281,8 @@ class Login extends Component {
 		if(e.target.value === 'account'){
 			this.setState({
 				loginState:true,
-				// forgectState:false,
+				forgectState:false,
+				appDownload:false,
 				QRUrl:'',
 				token:null,
 				userMessage:null
@@ -266,15 +307,105 @@ class Login extends Component {
 		}
 	}
 	//忘记密码
-	// ForgetPassword(){
-	// 	this.setState({
-	// 		forgectState:true,
-	// 		loginState:false,
-	// 		QRUrl:'',
-	// 		token:null,
-	// 		userMessage:null
-	// 	})
-	// }
+	ForgetPassword(){
+		this.setState({
+			forgectState:true,
+			loginState:true,
+			appDownload:false,
+			QRUrl:'',
+			token:null,
+			userMessage:null
+		})
+	}
+	//立即下载
+	nowDownload(){
+		this.setState({
+			appDownload:true,
+			forgectState:false,
+			loginState:false,
+			QRUrl:'',
+			token:null,
+			userMessage:null
+		})
+	}
+	//	忘记密码确定
+	sureSubmit(e){
+		e.preventDefault();
+		const {actions: {forgect}} = this.props;
+		this.props.form.validateFieldsAndScroll((err,values) =>{
+			if(!err){
+				// console.log('values',values)
+				// let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
+				let partn=/^1[0-9]{10}$/;
+				let phonenumber =values.phone;
+				if(!partn.exec(phonenumber)){
+					notification.error({
+						message:  '手机号输入错误！',
+						duration: 2,
+					})
+				}else{
+					const data = {
+						username: values.nickname	
+					};
+					forgect({}, data).then(rst => {
+						console.log('rst',rst)
+						if(rst.errornum === "400004"){
+							notification.error({
+								message:  '输入的用户未绑定手机，请联系管理员找回密码！',
+								duration: 2,
+							})
+						}else if(rst.errornum === "400002"){
+							notification.error({
+								message:  '输入的用户不存在！',
+								duration: 2,
+							})
+						}else if(rst.errornum === "400003"){
+							notification.error({
+								message:  '找不到与用户关联的人员！',
+								duration: 2,
+							})
+						}else if(rst.errornum === "400005"){
+							notification.error({
+								message:  '短信发送失败！',
+								duration: 2,
+							})
+						}else{
+							this.setState({
+								appDownload:false,
+								forgectState:false,
+								loginState:true,
+								QRUrl:'',
+								token:null,
+								userMessage:null
+							})
+						}
+					})
+				}
+			}
+		})
+		
+	}
+	cancel(){
+		this.setState({
+			appDownload:false,
+			forgectState:false,
+			loginState:true,
+			QRUrl:'',
+			token:null,
+			userMessage:null
+		})
+	}
+	//返回登录
+	backLogin(){
+		this.setState({
+			appDownload:false,
+			forgectState:false,
+			loginState:false,
+			QRUrl:'',
+			token:null,
+			userMessage:null
+		})
+	}
 	handleClick(e) {
 		e.preventDefault();
 		this.setState({
@@ -299,7 +430,6 @@ class Login extends Component {
 
 	loginFunc(data, loginType, values) {
 		const {actions: {login, getTasks}, history: {replace}} = this.props;
-		console.log('this.props',this.props)
 		clearUser();
 		clearUser();
 		clearUser();

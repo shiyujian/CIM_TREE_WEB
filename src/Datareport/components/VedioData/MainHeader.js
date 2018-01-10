@@ -19,11 +19,10 @@ export default class MainHeader extends Component{
         return(
             <Row>
                 <Col span={24}>
-                    <Button className="spacing" onClick={this.modalDownload} >模板下载</Button>
                     <Button className="spacing" onClick={()=>showModal("uploadModal")}>发起填报</Button>
                     <Button className="spacing" onClick={()=>{selectJudge() && showModal("changeModal")} }>申请变更</Button>
-                    <Button className="spacing" onClick={()=>{selectJudge() && showModal("deleteModal")} }>申请删除</Button>
-                    <Button className="spacing" onClick={this.getExcel}>导出表格</Button>
+                    <Button className="spacing" onClick={()=>{selectJudge(false) && showModal("deleteModal")} }>申请删除</Button>
+                    <Button className="spacing" onClick={()=>{selectJudge(false) && this.getExcel() }}>导出表格</Button>
                     {search}
                 </Col>
             </Row>
@@ -34,14 +33,8 @@ export default class MainHeader extends Component{
         const {jsonToExcel,deriveData} = this.props;
         jsonToExcel({},{rows:deriveData()}).then(rst => {
             const url = `${NODE_FILE_EXCHANGE_API}/api/download/${rst.filename}`
-            //window.open(url)
             createLink(this,url);
         })
-    }
-
-    modalDownload = ()=>{
-        const {modalDown} = this.props;
-        createLink(this,modalDown);
     }
 }
 

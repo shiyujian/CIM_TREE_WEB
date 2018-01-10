@@ -147,7 +147,6 @@ export default class SumSpeedDelete extends Component {
             {
               title: "编辑",
               dataIndex: "edit",
-              width:"5%",
               render: (text, record, index) => {
                 return (
                   <Popconfirm

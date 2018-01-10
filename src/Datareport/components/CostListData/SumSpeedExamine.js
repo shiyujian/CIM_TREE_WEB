@@ -9,6 +9,7 @@ import WorkflowHistory from '../WorkflowHistory'
 import Preview from '../../../_platform/components/layout/Preview';
 import {getUser} from '_platform/auth';
 import moment from "moment";
+import './TableStyle.less';
 const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
@@ -55,7 +56,7 @@ export default class SumSpeedExamine extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_sum_spd_visible",false)
+        this.props.closeModal("cost_sum_spd_visible",false,'submit')
         notification.success({
             message:'操作成功'
         })
@@ -123,9 +124,27 @@ export default class SumSpeedExamine extends Component {
     }
     //不通过
     async reject(){
-        const {wk} = this.props
-        const {actions:{deleteWorkflow}} = this.props
-        await deleteWorkflow({pk:wk.id})
+        const {wk} = this.state;
+        // const {actions:{deleteWorkflow}} = this.props
+        // await deleteWorkflow({pk:wk.id})
+        const { actions:{ logWorkflowEvent }} = this.props;
+        let executor = {};
+        let person = getUser();
+        executor.id = person.id;
+        executor.username = person.username;
+        executor.person_name = person.name;
+        executor.person_code = person.code;
+        await logWorkflowEvent(
+            {
+                pk:wk.id
+            },{
+                state:wk.current[0].id,
+                executor:executor,
+                action:'拒绝',
+                note:'不通过',
+                attachment:null
+            }
+        );
     }
     //radio变化
     onChange(e){
@@ -139,7 +158,6 @@ export default class SumSpeedExamine extends Component {
             {
               title: "序号",
               dataIndex: "key",
-              width:"5%",
               render: (text, record, index) => {
                 return index + 1;
               }
@@ -172,8 +190,7 @@ export default class SumSpeedExamine extends Component {
             },
             {
               title: "备注",
-              dataIndex: "remarks",
-              width:"5%"
+              dataIndex: "remarks"
             }
           ]
 		return (

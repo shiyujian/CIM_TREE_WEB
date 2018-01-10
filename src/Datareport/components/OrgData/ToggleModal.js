@@ -153,6 +153,8 @@ export default class ToggleModal extends Component{
                     // 直属部门
                     direct: item[2],
                     remarks: item[3],
+                    selectPro:[], 
+                    selectUnit:[],
                     editing:false
                 }
             });
@@ -166,13 +168,13 @@ export default class ToggleModal extends Component{
         const { actions: { ModalVisible, ModalVisibleOrg } } = this.props;
         if (!this.state.passer) {
             notification.warning({
-                message:"审批人未选择"
+                message:"审批人未选择！"
             })
             return;
         }
         if (this.state.flag_code === false) {
             notification.warning({
-                message:"存在重复的部门编码"
+                message:"存在重复的部门编码！"
             })
             return;
         }
@@ -180,7 +182,7 @@ export default class ToggleModal extends Component{
         for (let i = 0; i < arr.length; i++) {
             if (arr[i].type === " ") {
                 notification.warning({
-                    message:"该直属部门不存在"
+                    message:"该直属部门不存在！"
                 })
                 return ;
             }
@@ -273,7 +275,6 @@ export default class ToggleModal extends Component{
     }
     // 删除数据
     delete(index){
-        console.log("index:",index);
         let dataSource = this.state.dataSource;
         dataSource.splice(index,1);
         this.setState({flag_code:true, flag:true})

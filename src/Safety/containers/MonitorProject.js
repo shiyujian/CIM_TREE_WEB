@@ -55,7 +55,7 @@ class MonitorProject extends Component {
             project:{},
             unitProject:{},
             rst:{},
-            loading:false
+            loading:true
         }
     }
 
@@ -129,9 +129,15 @@ class MonitorProject extends Component {
                             single.optionArray = array;
                             dataSet.push(single);
                         }
-                        this.setState({dataSet});
+                        this.setState({dataSet
+                            ,                        
+                            loading:false
+                        });
                     }else{
-                        this.setState({dataSet});
+                        this.setState({dataSet
+                            ,                        
+                            loading:false
+                        });
                     }
                 }); 
             }
@@ -493,6 +499,15 @@ class MonitorProject extends Component {
         } = this.props;
         const {unitProject} = this.state;
         this.setState({loading:true});
+        
+        if(info.file.status==="error"){
+            notification.warning({
+                message: '上传失败,请使用最新模板！',
+                duration: 2
+            });
+            this.setState({loading:false});
+            return;
+        }
         if(info.file.status==="done"){
             let response = info.file.response;
             if(response.result==="succeed to create data in bulk"){
@@ -547,16 +562,23 @@ class MonitorProject extends Component {
                             single.optionArray = array;
                             dataSet.push(single);
                         }
-                        this.setState({dataSet});
+                        this.setState({dataSet
+                            ,                        
+                            loading:false
+                        });
                     }else{
-                        this.setState({dataSet});
+                        this.setState({dataSet
+                            ,                        
+                            loading:false
+                        });
                     }
                 }); 
             }else{
                 notification.warning({
-                    message: '上传失败！',
+                    message: '上传失败,请使用最新模板！',
                     duration: 2
                 });
+                this.setState({loading:false});
                 return;
             }
         }
@@ -699,6 +721,8 @@ class MonitorProject extends Component {
                      bordered
                      style={{height:380,marginTop:40}}
                      pagination = {{pageSize:10}} 
+                     rowKey={record => record.id}
+                     loading={this.state.loading}
                     />
                 </Content>
                 <Modal

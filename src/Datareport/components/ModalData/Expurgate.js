@@ -43,13 +43,13 @@ export default class Expurgate extends Component {
 		const { expurgate = {} } = props
 		if (expurgate.key !== this.state.key) {
 			let item = expurgate.selectedDatas
-		
+
 			let dataSource = [];
 			item && item.forEach((single, index) => {
-			
+
 				let temp = {
 					code: single.code,
-				    index: index + 1,
+					index: index + 1,
 					coding: single.extra_params.coding,
 					modelName: single.extra_params.filename,
 					project: single.extra_params.project.name,
@@ -63,12 +63,12 @@ export default class Expurgate extends Component {
 					attributeTable: single.basic_params.files[2],
 					reportingTime: single.extra_params.reportingTime,
 					reportingName: single.extra_params.reportingName,
-					
+
 				}
 				dataSource.push(temp);
 			})
 			this.setState({ dataSource, key: expurgate.key })
-		
+
 		}
 	}
 
@@ -79,10 +79,10 @@ export default class Expurgate extends Component {
 	}
 
 	onok() {
-		let {dataSource} = this.state;
-	
+		let { dataSource } = this.state;
+
 		if (!this.state.check) {
-			notification.info({message:"请选择审核人!"})
+			notification.info({ message: "请选择审核人！" })
 			return;
 		}
 		let { check } = this.state;
@@ -98,7 +98,7 @@ export default class Expurgate extends Component {
 
 	setDeleteData = (data, participants) => {
 		const { actions: { createWorkflow, logWorkflowEvent, changeExpurgateField } } = this.props
-		const {description = ''} = this.state;
+		const { description = '' } = this.state;
 		let creator = {
 			id: getUser().id,
 			username: getUser().username,
@@ -132,19 +132,19 @@ export default class Expurgate extends Component {
 					}],
 					attachment: null
 				}).then(() => {
-					notification.success({message:"成功"})
-					changeExpurgateField('visible',false);
+					notification.success({ message: "成功" })
+					changeExpurgateField('visible', false);
 				})
 		})
 	}
 
 	render() {
 
-		const {expurgate = {}} = this.props;
+		const { expurgate = {} } = this.props;
 		const columns = [{
 			title: '序号',
 			dataIndex: 'index',
-		
+
 		}, {
 			title: '模型编码',
 			dataIndex: 'coding'
@@ -209,10 +209,10 @@ export default class Expurgate extends Component {
 					<Popconfirm
 						placement="leftTop"
 						title="确定删除吗？"
-						onConfirm={this.delete.bind(this, record.index-1)}
+						onConfirm={this.delete.bind(this, record.index - 1)}
 						okText="确认"
 						cancelText="取消">
-						  <a><Icon type='delete'/></a>
+						<a><Icon type='delete' /></a>
 					</Popconfirm>
 				)
 			}
@@ -220,13 +220,13 @@ export default class Expurgate extends Component {
 
 		return (
 			<Modal
-				
+
 				width={1280}
 				visible={expurgate.visible}
 				onCancel={this.cancel.bind(this)}
 				onOk={this.onok.bind(this)}
 			>
-			 	<h1 style={{textAlign:'center',marginBottom:20}}>申请删除</h1>
+				<h1 style={{ textAlign: 'center', marginBottom: 20 }}>申请删除</h1>
 				<Row>
 					<Table
 						bordered
@@ -250,40 +250,39 @@ export default class Expurgate extends Component {
 					</Col>
 				</Row>
 
-				<Row style={{marginBottom: '20px'}}>
-					<Col span={2}>
-						<span>删除原因：</span>
-					</Col>
-			    </Row>
-			    <Row style={{margin: '20px 0'}}>
-				    <Col>
-				    	<TextArea rows={2} onChange={this.description.bind(this)}/>
-				    </Col>
-			    </Row>
-				
+				<Row style={{ marginBottom: 16 }}>
+					<Input
+						type="textarea"
+						onChange={this.description.bind(this)}
+						autosize={{ minRows: 5, maxRow: 6 }}
+						placeholder="请填写删除原因"
+						style={{ marginBottom: 40 }}
+					/>
+				</Row>
+
 			</Modal>
 		)
 	}
 
-	
+
 	description(e) {
-		this.setState({description:e.target.value})
+		this.setState({ description: e.target.value })
 	}
 
 	//删除
-	delete(index){
-        let {dataSource} = this.state;
-		dataSource.splice(index,1);
-		dataSource.map((item,index)=>{
+	delete(index) {
+		let { dataSource } = this.state;
+		dataSource.splice(index, 1);
+		dataSource.map((item, index) => {
 			item.index = index + 1
 		})
-        this.setState({dataSource});
-    }
+		this.setState({ dataSource });
+	}
 
 
 
 	onChange = (e) => {
-	
+
 		this.setState({
 			value: e.target.value,
 		});
@@ -293,6 +292,6 @@ export default class Expurgate extends Component {
 		const {
 			actions: { changeExpurgateField }
 		} = this.props;
-		changeExpurgateField('visible',false);
- 	}	
+		changeExpurgateField('visible', false);
+	}
 }

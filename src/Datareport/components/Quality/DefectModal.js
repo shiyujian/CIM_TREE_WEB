@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 
-import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message,Cascader} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api';
+import {Input, Table,Row,Button,DatePicker,Radio,Select,Popconfirm,Modal,Upload,Icon,message,Cascader,notification} from 'antd';
+import {UPLOAD_API,SERVICE_API,FILE_API,STATIC_DOWNLOAD_API,SOURCE_API,DataReportTemplate_QualityProblem} from '_platform/api';
 import '../../containers/quality.less'
 import Preview from '_platform/components/layout/Preview';
-const {RangePicker} = DatePicker;
 const RadioGroup = Radio.Group;
 const {Option} = Select
 
@@ -31,22 +30,22 @@ class DefectModal extends Component {
             })
             this.setState({checkers})
         })
-        // getProjectTree({depth:1}).then(rst =>{
-        //     if(rst.status){
-        //         let projects = rst.children.map(item=>{
-        //             return (
-        //                 {
-        //                     value:JSON.stringify(item),
-        //                     label:item.name,
-        //                     isLeaf:false
-        //                 }
-        //             )
-        //         })
-        //         this.setState({options:projects});
-        //     }else{
-        //         //获取项目信息失败
-        //     }
-        // });
+        getProjectTree({depth:1}).then(rst =>{
+            if(rst.status){
+                let projects = rst.children.map(item=>{
+                    return (
+                        {
+                            value:JSON.stringify(item),
+                            label:item.name,
+                            isLeaf:false
+                        }
+                    )
+                })
+                this.setState({options:projects});
+            }else{
+                //获取项目信息失败
+            }
+        });
     }
      // 也就是wbs编码获取其他信息
      async getInfo(wp){
@@ -117,26 +116,23 @@ class DefectModal extends Component {
             message.info("请上传excel")
             return
         }
-        let temp = this.state.dataSource.some((o,index) => {
-                        return !o.flag
-                    })
-        if(temp){
-            message.info(`有数据不正确`)
-            return
-        }
         if(this.state.dataSource.some((o,index) => {
             return !o.file.name
         })){
             message.info(`有数据未上传附件`)
             return
         }
-        let {check} = this.state
+        let {check,project,unit} = this.state;
         let per = {
             id:check.id,
             username:check.username,
             person_name:check.account.person_name,
             person_code:check.account.person_code,
             organization:check.account.organization
+        }
+        for(let i=0;i<this.state.dataSource.length;i++){
+            this.state.dataSource[i].project = project;
+            this.state.dataSource[i].unit = unit;
         }
 		this.props.onok(this.state.dataSource,per)
     }
@@ -145,11 +141,7 @@ class DefectModal extends Component {
     }
     //附件上传
 	beforeUploadPicFile  = (index,file) => {
-        let {dataSource} = this.state        
-        if(!dataSource[index].flag){
-            message.info("这条数据编码不对")
-            return false
-        }
+        let {dataSource} = this.state;        
 		const fileName = file.name;
 		// 上传到静态服务器
 		const { actions:{uploadStaticFile} } = this.props;
@@ -230,34 +222,55 @@ class DefectModal extends Component {
         }
         this.setState({dataSource})
     }
-    // loadData = (selectedOptions) =>{
-    //     const {actions:{getProjectTree}} = this.props;
-    //     const targetOption = selectedOptions[selectedOptions.length - 1];
-    //     targetOption.loading = true;
-    //     getProjectTree({depth:2}).then(rst =>{
-    //         if(rst.status){
-    //             let units = [];
-    //             rst.children.map(item=>{
-    //                 if(item.code===JSON.parse(targetOption.value).code){  //当前选中项目
-    //                     units = item.children.map(unit =>{
-    //                         return (
-    //                             {
-    //                                 value:JSON.stringify(unit),
-    //                                 label:unit.name
-    //                             }
-    //                         )
-    //                     })
-    //                 }
-    //             })
-    //             targetOption.loading = false;
-    //             targetOption.children = units;
-    //             this.setState({options:[...this.state.options]})
-    //         }else{
-    //             //获取项目信息失败
-    //         }
-    //     });
-    // }
-     //预览
+    loadData = (selectedOptions) =>{
+        const {actions:{getProjectTree}} = this.props;
+        const targetOption = selectedOptions[selectedOptions.length - 1];
+        targetOption.loading = true;
+        getProjectTree({depth:2}).then(rst =>{
+            if(rst.status){
+                let units = [];
+                rst.children.map(item=>{
+                    if(item.code===JSON.parse(targetOption.value).code){  //当前选中项目
+                        units = item.children.map(unit =>{
+                            return (
+                                {
+                                    value:JSON.stringify(unit),
+                                    label:unit.name
+                                }
+                            )
+                        })
+                    }
+                })
+                targetOption.loading = false;
+                targetOption.children = units;
+                this.setState({options:[...this.state.options]})
+            }else{
+                //获取项目信息失败
+            }
+        });
+    }
+
+    beforeUpload = (info) => {
+        debugger
+        if (info.name.indexOf("xls") !== -1 || info.name.indexOf("xlsx") !== -1) {
+            const {unit} = this.state;
+            if(!unit.code){
+                notification.warning({
+                    message: '先选择单位工程！',
+                    duration: 2
+                });
+                return false;
+            }
+            return true;
+        } else {
+            notification.warning({
+                message: '只能上传Excel文件！',
+                duration: 2
+            });
+            return false;
+        }
+    }
+    //  预览
      handlePreview(index){
         const {actions: {openPreview}} = this.props;
         let f = this.state.dataSource[index].file
@@ -275,73 +288,72 @@ class DefectModal extends Component {
         this.setState({check})
     }
     //级联下拉框选择
-    // onSelectProject = (value,selectedOptions) =>{
-    //     let project = {};
-    //     let unit = {};
-    //     if(value.length===2){
-    //         let temp1 = JSON.parse(value[0]);
-    //         let temp2 = JSON.parse(value[1]);
-    //         project = {
-    //             name:temp1.name,
-    //             code:temp1.code,
-    //             obj_type:temp1.obj_type
-    //         }
-    //         unit = {
-    //             name:temp2.name,
-    //             code:temp2.code,
-    //             obj_type:temp2.obj_type
-    //         }
-    //         this.setState({project,unit});
-    //         return;
-    //     }
-    //     //must choose all,otherwise make it null
-    //     this.setState({project:{},unit:{}});
-    // }
+    onSelectProject = (value,selectedOptions) =>{
+        let project = {};
+        let unit = {};
+        if(value.length===2){
+            let temp1 = JSON.parse(value[0]);
+            let temp2 = JSON.parse(value[1]);
+            project = {
+                name:temp1.name,
+                code:temp1.code,
+                obj_type:temp1.obj_type
+            }
+            unit = {
+                name:temp2.name,
+                code:temp2.code,
+                obj_type:temp2.obj_type
+            }
+            this.setState({project,unit});
+            return;
+        }
+        //must choose all,otherwise make it null
+        this.setState({project:{},unit:{}});
+    }
+
+    //校验组织机构
+    fixOrg(index){
+        const {actions:{getOrg}} = this.props;
+        let {dataSource} = this.state;
+        getOrg({code:dataSource[index].respon_unit.code}).then(rst => {
+            if(rst.code){
+                dataSource[index]['respon_unit'] = {
+                    name: rst.name,
+                    code: rst.code,
+                    type: rst.obj_type
+                }
+                this.setState({dataSource});
+            }else{
+                message.info("输错了")
+            }
+        })
+    }
+    tableDataChange1(index ,e ){
+		const { dataSource } = this.state;
+		dataSource[index]['respon_unit'] = {
+            name: '',
+            code: e.target.value,
+            type: ''
+        }
+	  	this.setState({dataSource});
+    }
 	render() {
         let columns = [{
-            title:'序号',
-            width:'4%',
-			render:(text,record,index) => {
-				return index+1
-			}
-		},{
-			title:'项目/子项目名称',
-            dataIndex:'project',
-            width:'7%',
-            render: (text, record, index) => {
-                if(record.flag){
-                    return <span style={{color:'green'}}>{record.project ? record.project.name : ''}</span>
-                }else{
-                    return <span style={{color:'red'}}>{record.project ? record.project.name : ''}</span>
-                }
-            },
-		},{
-			title:'单位工程',
-            dataIndex:'unit',
-            width:'7%',
-            render: (text, record, index) => {
-                if(record.flag){
-                    return (<span style={{color:'green'}}>{record.unit ? record.unit.name : ''}</span>)
-                }else{
-                    return (<span style={{color:'red'}}>{record.unit ? record.unit.name : ''}</span>)
-                }
-            },
-		},{
 			title:'WBS编码',
             dataIndex:'code',
-            width:'5%',
+            width:'8%',
             render: (text, record, index) => (
                 <Input onBlur={this.getFixed.bind(this,index)} value={this.state.dataSource[index]['code']} onChange={this.tableDataChange.bind(this,index,'code')}/>
             ),
 		},{
 			title:'责任单位',
             dataIndex:'respon_unit',
-            width:'7%',
+            width:'8%',
             render: (text, record, index) => {
-                if(record.flag){
-                    return <span style={{color:'green'}}>{record.respon_unit ? record.respon_unit.name : ''}</span>
+                if(record.respon_unit && record.respon_unit.name){
+                    return <span style={{color:'green'}}>{record.respon_unit.name}</span>
                 }else{
-                    return <span style={{color:'red'}}>{record.respon_unit ? record.respon_unit.name : ''}</span>
+                    return (<Input style={{color:'red'}} value={record.resUnit ? record.resUnit.code : ''} onBlur={this.fixOrg.bind(this,index)} onChange={this.tableDataChange1.bind(this,index)}/>)
                 }
             }
 		},{
@@ -358,55 +370,55 @@ class DefectModal extends Component {
 		},{
 			title:'上报时间',
             dataIndex:'uploda_date',
-            width:'7%',
+            width:'9%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['uploda_date']} onChange={this.tableDataChange.bind(this,index,'uploda_date')}/>
             ),
 		},{
 			title:'核查时间',
             dataIndex:'check_date',
-            width:'7%',
+            width:'9%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['check_date']} onChange={this.tableDataChange.bind(this,index,'check_date')}/>
             ),
 		},{
 			title:'整改时间',
             dataIndex:'do_date',
-            width:'7%',
+            width:'9%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['do_date']} onChange={this.tableDataChange.bind(this,index,'do_date')}/>
             ),
 		},{
 			title:'事故描述',
             dataIndex:'descrip',
-            width:'7%',
+            width:'10%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['descrip']} onChange={this.tableDataChange.bind(this,index,'descrip')}/>
             ),
 		},{
 			title:'排查结果',
             dataIndex:'check_result',
-            width:'7%',
+            width:'6%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['check_result']} onChange={this.tableDataChange.bind(this,index,'check_result')}/>
             ),
 		},{
 			title:'整改期限',
             dataIndex:'deadline',
-            width:'7%',
+            width:'6%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['deadline']} onChange={this.tableDataChange.bind(this,index,'deadline')}/>
             ),
 		},{
 			title:'整改结果',
             dataIndex:'result',
-            width:'7%',
+            width:'6%',
             render: (text, record, index) => (
                 <Input value={this.state.dataSource[index]['result']} onChange={this.tableDataChange.bind(this,index,'result')}/>
             ),
 		}, {
             title:'附件',
-            width:'10%',
+            width:'6%',
 			render:(text,record,index) => {
 				if(record.file.id){
                     return (<span>
@@ -444,7 +456,7 @@ class DefectModal extends Component {
                         onConfirm={this.delete.bind(this, index)}
                         okText="确认"
                         cancelText="取消">
-                        <a>删除</a>
+                        <a><Icon type='delete' /></a>
                     </Popconfirm>
                 )
             }
@@ -455,7 +467,8 @@ class DefectModal extends Component {
 			action: `${SERVICE_API}/excel/upload-api/` /*+ '?t_code=zjt-05'*/,
 			headers: {
 			},
-			showUploadList: false,
+            showUploadList: false,
+            beforeUpload:this.beforeUpload,
 		    async onChange(info) {
 		        if (info.file.status !== 'uploading') {
 		            console.log(info.file, info.fileList);
@@ -477,35 +490,40 @@ class DefectModal extends Component {
 		};
 		return (
 			<Modal
-			title="检验批信息上传表"
-			key={this.props.akey}
             visible={true}
             width= {1280}
 			onOk={this.onok.bind(this)}
 			maskClosable={true}
 			onCancel={this.props.oncancel}>
-				<div>
+                <div>
+                <h1 style={{ textAlign: 'center', marginBottom: "20px" }}>发起填报</h1>
 					<Table style={{ marginTop: '10px', marginBottom:'10px' }}
 						columns={columns}
                         dataSource={this.state.dataSource}
                         pagination={false}
                         scroll={{y:500}}
-						bordered />
-                    <Upload {...props}>
+                        bordered />
+                        <Button style={{ marginRight: 10 }} onClick={this.createLink.bind(this, 'muban', `${DataReportTemplate_QualityProblem}`)} type="default">模板下载</Button>
+                    <Upload
+                     onChange={this.handleExcelData.bind(this)}
+                     showUploadList={false}
+                     action={`${SERVICE_API}/excel/upload-api/`}
+                        beforeUpload={this.beforeUpload.bind(this)}>
                         <Button style={{margin:'10px 10px 10px 0px'}}>
-                            <Icon type="upload" />上传附件
+                            <Icon type="upload" />上传并预览
                         </Button>
                     </Upload>
-                    {/* <span>
+                    <span>
                         项目-单位工程：
                         <Cascader
                             options={this.state.options}
                             className='btn'
+                            placeholder='请选择项目及单位工程'
                             loadData={this.loadData.bind(this)}
                             onChange={this.onSelectProject.bind(this)}
                             changeOnSelect
                         />
-                    </span>  */}
+                    </span> 
                     <span>
                         审核人：
                         <Select style={{width:'200px'}} className="btn" onSelect={this.selectChecker.bind(this)}>
@@ -526,41 +544,75 @@ class DefectModal extends Component {
 		)
     }
     //处理上传excel的数据
-    handleExcelData(data){
-        data.splice(0,1);
-        const {actions:{getWorkPackageDetail}} = this.props
-        let res = data.map(item => {
-            return {
-                code:item[2],
-                acc_type:item[4],
-                uploda_date:item[5],
-                check_date:item[6],
-                do_date:item[7],
-                descrip:item[8],
-                check_result:item[9],
-                deadline:item[10],
-                result:item[11],
-                project:{
-                    code:"",
-                    name:item[0],
-                    obj_type:""
-                },
-                respon_unit:{
-                    code:"",
-                    name:item[3],
-                    obj_type:""
-                },
-                unit:{
-                    code:"",
-                    name:item[1],
-                    type:"",
-                },
-                file:{
-
-                },
+    handleExcelData = async (info)=>{
+        const {actions:{getOrg,getTreeRootNode}} = this.props;
+        const {unit} = this.state;
+        if (info && info.file && info.file.status === 'done') {
+            let name = Object.keys(info.file.response);
+            let dataList = info.file.response[name[0]];
+            let dataSource = [];
+            for(let i=1;i<dataList.length;i++){
+                let judge = await getOrg({code:dataList[i][1]});
+                if(!judge.code){
+                    message.info("您的第"+ i +"条责任单位输入有误，请确认");
+                    return;
+                }
+                let wbs = await getTreeRootNode({code:dataList[i][0]});
+                debugger
+                if(wbs && wbs.children[0] && wbs.children[0].children[0] && wbs.children[0].children[0].code){
+                    if(wbs.children[0].children[0].code !== unit.code){
+                        message.info("您的第"+ i +"条wbs编码输入有误，请确认");
+                    return;
+                    }
+                }else{
+                    return;
+                }
+                dataSource.push({
+                    code:dataList[i][0] ? dataList[i][0] : '',
+                    respon_unit:{
+                        code:judge.code ? judge.code :dataList[i][1],
+                        name :judge.name ? judge.name : "",
+                        type: judge.type ? judge.type : ""
+                    },
+                    acc_type:dataList[i][2] ? dataList[i][2] : '',
+                    uploda_date:dataList[i][3] ? dataList[i][3] : '',
+                    check_date:dataList[i][4] ? dataList[i][4] : '',
+                    do_date:dataList[i][5] ? dataList[i][5] : '',
+                    descrip:dataList[i][6] ? dataList[i][6] : '',
+                    check_result:dataList[i][7] ? dataList[i][7] : '',
+                    deadline:dataList[i][8] ? dataList[i][8] : '',
+                    result:dataList[i][9] ? dataList[i][9] : '',
+                    project:{
+                        code:"",
+                        name:"",
+                        obj_type:""
+                    },
+                    unit:{
+                        code:"",
+                        name:"",
+                        obj_type:""
+                    },
+                    file:{
+        
+                    },
+                })
             }
-        })
-        return res
+            notification.success({
+                message: '上传成功！',
+                duration: 2
+            });
+            this.setState({ dataSource });
+        }
+    }
+    //下载
+    createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }
 export default DefectModal

@@ -9,6 +9,7 @@ import '../../containers/quality.less';
 import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const Option = Select.Option;
+const TextArea = Input.TextArea;
 
 export default class WorkDel extends Component {
 	constructor(props) {
@@ -20,6 +21,7 @@ export default class WorkDel extends Component {
 			project: {},
 			unit: {},
 			options: [],
+			deleteInfo:"",
 		};
 	}
 
@@ -36,6 +38,7 @@ export default class WorkDel extends Component {
 				construct_unit: item.construct_unit,
 				quantity: item.quantity,
 				factquantity: item.factquantity,
+				opvalue: item.opvalue,
 				planstarttime: item.planstarttime,
 				planovertime: item.planovertime,
 				factstarttime: item.factstarttime,
@@ -53,9 +56,9 @@ export default class WorkDel extends Component {
 	componentDidMount() {
 		const { actions: { getAllUsers } } = this.props;
 		getAllUsers().then(rst => {
-			let checkers = rst.map(o => {
+			let checkers = rst.map((o,index) => {
 				return (
-					<Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
+					<Option key={index} value={JSON.stringify(o)}>{o.account.person_name}</Option>
 				)
 			})
 			this.setState({ checkers })
@@ -66,11 +69,21 @@ export default class WorkDel extends Component {
 		let check = JSON.parse(value);
 		this.setState({ check })
 	}
+	onChangeText(e) {
+        this.setState({
+            deleteInfo: e.target.value
+        });
+    }
 	onok() {
+		let {dataSource} = this.state;
 		if (!this.state.check) {
-			message.info("请选择审核人")
+			notification.warning({
+				message: '请选择审核人！',
+				duration: 2
+			});
 			return;
 		}
+        dataSource[0].deleteInfo = this.state.deleteInfo.trim();
 		let { check } = this.state;
 		let per = {
 			id: check.id,
@@ -97,6 +110,7 @@ export default class WorkDel extends Component {
 				construct_unit: item.construct_unit,
 				quantity: item.quantity,
 				factquantity: item.factquantity,
+				opvalue: item.opvalue,
 				planstarttime: item.planstarttime,
 				planovertime: item.planovertime,
 				factstarttime: item.factstarttime,
@@ -111,8 +125,6 @@ export default class WorkDel extends Component {
         })
       this.setState({dataSource:newdataSource})  
 	}
-
-
 	render() {
 		const columns = [{
 			title: '序号',
@@ -139,6 +151,9 @@ export default class WorkDel extends Component {
 			title: '实际工程量',
 			dataIndex: 'factquantity',
 		}, {
+			title: '产值(万元)',
+			dataIndex: 'opvalue',
+		}, {
 			title: '计划开始时间',
 			dataIndex: 'planstarttime',
 		}, {
@@ -163,7 +178,7 @@ export default class WorkDel extends Component {
 						onConfirm={this.delete.bind(this, record.key-1)}
 						okText="确认"
 						cancelText="取消">
-						<a>删除</a>
+						<a><Icon type = "delete"/></a>
 					</Popconfirm>
 				)
 			}
@@ -171,12 +186,12 @@ export default class WorkDel extends Component {
 
 		return (
 			<Modal
-				title="施工进度删除表"
 				visible={true}
 				width={1280}
 				onOk={this.onok.bind(this)}
 				maskClosable={false}
 				onCancel={this.props.oncancel}>
+				<h1 style={{ textAlign: "center", marginBottom: "20px" }}>申请删除</h1>
 				<Table
 					columns={columns}
 					dataSource={this.state.dataSource}
@@ -188,7 +203,7 @@ export default class WorkDel extends Component {
 					<Col>
 						<span>
 							审核人：
-                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)}>
+                            <Select style={{ width: '200px' }} className="btn" onSelect={this.selectChecker.bind(this)} placeholder='请选择审核人'>
 								{
 									this.state.checkers
 								}
@@ -196,6 +211,16 @@ export default class WorkDel extends Component {
 						</span>
 					</Col>
 				</Row>
+				<Row style={{marginBottom: '20px'}}>
+					<Col span={2}>
+						<span>删除原因：</span>
+					</Col>
+			    </Row>
+			    <Row style={{margin: '20px 0'}}>
+				    <Col>
+				    	<TextArea rows={2} onChange={this.onChangeText.bind(this)}/>
+				    </Col>
+			    </Row>
 				<Preview />
 			</Modal>
 		)

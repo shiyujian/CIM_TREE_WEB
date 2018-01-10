@@ -69,8 +69,15 @@ export default class PriceListCheck extends Component {
         }else{
             await this.reject();
         }
-        this.props.closeModal("cost_pri_ck_visible",false)
-        message.info("操作成功")
+        this.props.closeModal("cost_pri_ck_visible",false, 'submit');
+        notification.success({
+            message:'操作成功',
+            duration: 2
+        });
+    }
+
+    cancel() {
+        this.props.closeModal("cost_pri_ck_visible", false);
     }
 
     //通过
@@ -182,7 +189,7 @@ export default class PriceListCheck extends Component {
             }, {
                 state: wk.current[0].id,
                 executor: executor,
-                action: '退回',
+                action: '拒绝',
                 note: '不通过',
                 attachment: null
             }
@@ -293,6 +300,7 @@ export default class PriceListCheck extends Component {
 				visible = {true}
                 maskClosable={false}
                 footer = {null}
+                onCancel={this.cancel.bind(this)}
 			>
 				<div>
                 <h1 style ={{textAlign:'center',marginBottom:20}}>结果审核</h1>
@@ -322,12 +330,12 @@ export default class PriceListCheck extends Component {
                             <Radio value={2}>不通过</Radio>
                         </RadioGroup>
                     </Col>
-                    <Col span={2} push={14}>
+                    {/* <Col span={2} push={14}>
                         <Button type='primary' onClick={this.getExcel.bind(this)}>
                             导出表格
                         </Button>
-                    </Col>
-                    <Col span={2} push={14}>
+                    </Col> */}
+                    <Col span={2} push={16}>
                         <Button type='primary' onClick={this.submit.bind(this)}>
                             确认提交
                         </Button>
