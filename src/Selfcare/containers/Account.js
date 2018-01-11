@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {Content, DynamicTitle} from '_platform/components/layout';
+import {Content, DynamicTitle, Sidebar} from '_platform/components/layout';
 import {actions} from '../store/account';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-// import {} from '../components/Account';
+import {Tree, AccountTable} from '../components/Account';
 import {actions as platformActions} from '_platform/store/global';
 import {Spin} from 'antd';
 
@@ -23,9 +23,12 @@ export default class Account extends Component {
 		return (
 			<Content>
 				<DynamicTitle title="账号管理" {...this.props}/>
-				{/*<Info {...this.props}/>
-				<Detail {...this.props}/>
-				<Step {...this.props}/>*/}
+				<Sidebar>
+					<Tree {...this.props}/>
+				</Sidebar>
+				<Content>
+					<AccountTable {...this.props}/>
+				</Content>
 			</Content>
 		);
 	}

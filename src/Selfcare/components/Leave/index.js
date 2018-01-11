@@ -1,0 +1,1 @@
+export LeaveTable from './LeaveTable';
