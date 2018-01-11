@@ -24,7 +24,7 @@ export default class App extends Component {
 		const {default: Quality} = await import('../../Quality');
 		const {default: Schedule} = await import('../../Schedule');
 		const {default: System} = await import('../../System');
-		const {default: Setup} = await import('../../Setup');
+		// const {default: Setup} = await import('../../Setup');
 		const {default: Contractcare} = await import('../../Contractcare');
 		const {default: Drawingcare} = await import('../../Drawingcare');
 		const {default: Selfcare} = await import('../../Selfcare');
@@ -47,7 +47,7 @@ export default class App extends Component {
 			Drawingcare,
 			Selfcare,
 			System,
-			Setup,
+			// Setup,
 			ModelDown,
 			Video,
 			Cost,
@@ -71,7 +71,7 @@ export default class App extends Component {
 			Drawingcare,
 			Selfcare,
 			System,
-			Setup,
+			// Setup,
 			Preview,
 			ModelDown,
 			Video,
@@ -99,7 +99,7 @@ export default class App extends Component {
 						{Drawingcare && <Route path="/drawingcare" component={Drawingcare}/>}
 						{Selfcare && <Route path="/selfcare" component={Selfcare}/>}
 						{System && <Route path="/system" component={System}/>}
-						{Setup && <Route path="/setup" component={Setup}/>}
+						{/*Setup && <Route path="/setup" component={Setup}/>*/}
 						{ModelDown && <Route path="/ModelDown" component={ModelDown}/>}
 						{Cost && <Route path="/cost" component={Cost}/>}
 						{Video && <Route path="/video" component={Video}/>}

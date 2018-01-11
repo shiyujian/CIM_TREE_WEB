@@ -25,7 +25,7 @@ export default class App extends Component {
 		const {default: Quality} = await import('../../Quality');
 		const {default: Schedule} = await import('../../ScheduleQH');
 		const {default: System} = await import('../../System');
-		const {default: Setup} = await import('../../Setup');
+		// const {default: Setup} = await import('../../Setup');
 		const {default: Selfcare} = await import('../../Selfcare');
 		const {default: ModelDown} = await import('../../Down');
 		const {default: Video} = await import('../../Video');
@@ -33,6 +33,8 @@ export default class App extends Component {
 		const {default: Safety} = await import('../../Safety');
 		const {default: DataReport} = await import('../../Datareport');
 		const {default: Summary} = await import('../../Summary');
+		const {default: Receive} = await import('../../Receive');
+		const {default: Project} = await import('../../Project');
 
 		this.setState({
 			Home,
@@ -46,13 +48,15 @@ export default class App extends Component {
 			Schedule,
 			Selfcare,
 			System,
-			Setup,
+			// Setup,
 			ModelDown,
 			Video,
 			Cost,
 			Safety,
 			DataReport,
-			Summary
+			Summary,
+			Receive,
+			Project,
 		});
 	}
 
@@ -69,13 +73,15 @@ export default class App extends Component {
 			Schedule,
 			Selfcare,
 			System,
-			Setup,
+			// Setup,
 			ModelDown,
 			Video,
 			Cost,
 			Safety,
 			DataReport,
-			Summary
+			Summary,
+			Receive,
+			Project,
 		} = this.state || {};
 		return (
 			<Provider store={store}>
@@ -95,13 +101,15 @@ export default class App extends Component {
 						{Schedule && <Route path="/schedule" component={Schedule}/>}
 						{Selfcare && <Route path="/selfcare" component={Selfcare}/>}
 						{System && <Route path="/system" component={System}/>}
-						{Setup && <Route path="/setup" component={Setup}/>}
+						{/*Setup && <Route path="/setup" component={Setup}/>*/}
 						{ModelDown && <Route path="/ModelDown" component={ModelDown}/>}
 						{Cost && <Route path="/cost" component={Cost}/>}
 						{Video && <Route path="/video" component={Video}/>}
 						{Safety && <Route path="/safety" component={Safety}/>}
 						{DataReport && <Route path="/data" component={DataReport}/>}
 						{Summary && <Route path="/summary" component={Summary}/>}
+						{Receive && <Route path="/receive" component={Receive}/>}
+						{Project && <Route path="/project" component={Project}/>}
 					
 						<Route path="/:module?" component={Footer}/>
 						{Preview && <Preview/>}

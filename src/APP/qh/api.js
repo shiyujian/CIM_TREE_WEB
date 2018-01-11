@@ -40,15 +40,7 @@ export const qh_menus = [{
 	title: '资料管理',
 	path: '/datum',
 	icon: <Icon name="book"/>
-}, 
-// {
-// 	// key: 'design',
-// 	// id: 'DESIGN',
-// 	// title: '设计管理',
-// 	// path: '/design',
-// 	// icon: <Icon name="edit"/>,
-// }, 
-{
+}, {
 	key: 'quality',
 	id: 'QUALITY',
 	title: '质量管理',
@@ -66,25 +58,18 @@ export const qh_menus = [{
 	id: 'SAFETY',
 	path: '/safety',
 	icon: <Icon name="shield"/>,
-}, 
-// {
-// 	// key: 'cost',
-// 	// title: '造价管理',
-// 	// path: '/cost',
-// 	// icon: <Icon name="jpy"/>
-// }, {
-// 	// key: 'video',
-// 	// title: '三维全景',
-// 	// id: 'VIDEO',
-// 	// path: '/video/monitor',
-// 	// icon: <Icon name="video-camera"/>
-// }, 
-{
+}, {
 	key: 'forest',
 	id: 'FOREST',
 	title: '森林大数据',
 	path: '/forest/nursoverallinfo',
 	icon: <Icon name="tree"/>,
+}, {
+	key: 'receive',
+	id: 'RECEIVE',
+	title: '收发货管理',
+	path: '/receive',
+	icon: <Icon name="user"/>
 }, {
 	key: 'selfcare',
 	id: 'SELFCARE',
@@ -103,26 +88,6 @@ export const qh_menus = [{
 	title: '项目管理',
 	path: '/project',
 	icon: <Icon name="cogs"/>
-}
-// , {
-// 	// key: 'setup',
-// 	// id: 'SETUP',
-// 	// title: '系统管理',
-// 	// path: '/setup',
-// 	// icon: <Icon name="gear"/>
-// },{
-// 	// key: 'data',
-// 	// id: 'DATA',
-// 	// title: '数据报送',
-// 	// path: '/data',
-// 	// icon: <Icon name="gear"/>
-// },{
-// 	// key: 'summary',
-// 	// id: 'SUMMARY',
-// 	// title: '汇总分析',
-// 	// path: '/summary',
-// 	// icon: <Icon name="area-chart"/>
-// }
-];
+}];
 
 export const qh_ignoreModules = ['login'];

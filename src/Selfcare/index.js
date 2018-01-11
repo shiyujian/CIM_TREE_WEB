@@ -18,7 +18,7 @@ export default class Selfcare extends Component {
 	}
 
 	render() {
-		const {Tasks, Task, Query,Review} = this.state || {};
+		const {Tasks, Task, Query, Leave, Account} = this.state || {};
 		return (
 			<Body>
 			<Aside>
@@ -28,7 +28,8 @@ export default class Selfcare extends Component {
 				{Tasks && <Route exact path="/selfcare" component={Tasks}/>}
 				{Task && <Route exact path="/selfcare/task/:task_id" component={Task}/>}
 				{Query && <Route exact path="/selfcare/query" component={Query}/>}
-				{/* {Review && <Route exact path="/selfcare/review" component={Review}/>} */}
+				{Leave && <Route exact path="/selfcare/leave" component={Leave}/>}
+				{Account && <Route exact path="/selfcare/account" component={Account}/>}
 			</Main>
 			</Body>);
 	}
@@ -45,13 +46,17 @@ export default class Selfcare extends Component {
 		name: '个人考勤',
 		path: '/selfcare/query',
 		icon: <Icon name="shekel"/>
-	},
-	// {
-	// 	key: 'review',
-	// 	id: 'SELFCARE.REVIEW',
-	// 	name: '审批流程',
-	// 	path: '/selfcare/review',
-	// 	icon: <Icon name="shekel"/>
-	// }
-	];
+	}, {
+		key: 'leave',
+		id: 'SELFCARE.LEAVE',
+		name: '个人请假',
+		path: '/selfcare/leave',
+		icon: <Icon name="shekel"/>
+	}, {
+		key: 'account',
+		id: 'SELFCARE.ACCOUNT',
+		name: '账号管理',
+		path: '/selfcare/account',
+		icon: <Icon name="shekel"/>
+	}];
 }

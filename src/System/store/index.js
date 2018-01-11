@@ -17,6 +17,7 @@ import majorReducer, {actions as majorActions} from './major';
 import documentReducer, {actions as documentActions} from './document';
 import tagReducer, {actions as tagActions} from './tag';
 import quantitiesReducer, {actions as quantitiesActions} from './quantities';
+import personReducer, {actions as personActions} from './person';
 
 export default handleActions({
 	[combineActions(...actionsMap(quantitiesActions))]: (state = {}, action) => ({
@@ -91,5 +92,9 @@ export default handleActions({
 	[combineActions(...actionsMap(majorActions))]: (state = {}, action) => ({
 		...state,
 		major: majorReducer(state.major, action),
+	}),
+	[combineActions(...actionsMap(personActions))]: (state = {}, action) => ({
+		...state,
+		person: personReducer(state.person, action),
 	}),
 }, {});

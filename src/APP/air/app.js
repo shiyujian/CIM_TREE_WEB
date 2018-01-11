@@ -20,7 +20,7 @@ export default class App extends Component {
 		const {default: Datum} = await import('../../Datum');
 		const {default: Design} = await import('../../Design');
 		const {default: System} = await import('../../System');
-		const {default: Setup} = await import('../../Setup');
+		// const {default: Setup} = await import('../../Setup');
 		const {default: Selfcare} = await import('../../Selfcare');
 		const {default: ModelDown} = await import('../../Down');
 		this.setState({
@@ -30,7 +30,7 @@ export default class App extends Component {
 			Design,
 			Selfcare,
 			System,
-			Setup,
+			// Setup,
 			ModelDown
 		});
 	}
@@ -43,7 +43,7 @@ export default class App extends Component {
 			Design,
 			Selfcare,
 			System,
-			Setup,
+			// Setup,
 			ModelDown
 		} = this.state || {};
 		return (
@@ -59,7 +59,7 @@ export default class App extends Component {
 						{Design && <Route path="/design" component={Design}/>}
 						{Selfcare && <Route path="/selfcare" component={Selfcare}/>}
 						{System && <Route path="/system" component={System}/>}
-						{Setup && <Route path="/setup" component={Setup}/>}
+						{/*Setup && <Route path="/setup" component={Setup}/>*/}
 						{ModelDown && <Route path="/ModelDown" component={ModelDown}/>}
 						<Route path="/:module?" component={Footer}/>
 						{Preview && <Preview/>}

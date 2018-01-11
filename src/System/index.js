@@ -22,11 +22,11 @@ export default class System extends Component {
 		return (
 			<Body>
 			<Aside>
-				<Submenu {...this.props} menus={System.menus} defaultOpenKeys={System.defaultOpenKeys}/>
+				<Submenu {...this.props} menus={System.menus} />
 			</Aside>
 			<Main>
 				<ContainerRouters menus={System.menus} containers={this.state}/>
-				{Create && <Route path="/system/code/create" component={Create}/>}
+	
 			</Main>
 			</Body>);
 	}
@@ -72,60 +72,66 @@ export default class System extends Component {
 			path: '/system/permission',
 			icon: <Icon name="key"/>
 		}, {
-			key: 'Major',
-			id: 'SYSTEM.MAJOR',
-			name: '专业设置',
-			path: '/system/major',
-			icon: <Icon name="sign-in"/>
-		}, {
-			key: 'Project',
-			id: 'SYSTEM.PROJECT',
-			name: '项目设置',
-			path: '/system/project',
-			icon: <Icon name="sun-o"/>
-		}, {
-			key: 'Template',
-			id: 'SYSTEM.TEMPLATE',
-			name: '模版设置',
-			path: '/system/template',
-			icon: <Icon name="sort-amount-asc"/>
-		}, {
-			key: 'Icon',
-			id: 'SYSTEM.ICON',
-			name: '图标设置',
-			path: '/system/icon',
-			icon: <Icon name="terminal"/>
-		}, {
-			key: 'Workflow',
-			id: 'SYSTEM.WORKFLOW',
-			name: '流程设置',
-			path: '/system/workflow',
-			icon: <Icon name="object-group"/>
-		},{
-			key: 'Document',
-			id: 'SYSTEM.DOCUMENT',
-			name: '文档设置',
-			path: '/system/document',
-			icon: <Icon name="tablet"/>,
-		},
-		{
-			key: 'detailed',
-			name: '清单设置',
-			icon: <Icon name="book"/>,
-			children: [{
-				key: 'Tag',
-				id: 'SYSTEM.TAG',
-				name: '工程量项',
-				path: '/system/tag',
-				icon: <Icon name="signal"/>
-			},{
-				key: 'Quantities',
-				id: 'SYSTEM.QUANTITIES',
-				name: '分项工程量',
-				path: '/system/quantities',
-				icon: <Icon name="signal"/>
-			}]
-		}];
-
-	static defaultOpenKeys = ['user', 'system', 'code','detailed','home']
+			key: 'Person',
+			id: 'SETUP. ',
+			name: '用户管理',
+			path: '/system/person',
+			icon: <Icon name="users"/>
+		}
+		// {
+		// 	key: 'Major',
+		// 	id: 'SYSTEM.MAJOR',
+		// 	name: '专业设置',
+		// 	path: '/system/major',
+		// 	icon: <Icon name="sign-in"/>
+		// }, {
+		// 	key: 'Project',
+		// 	id: 'SYSTEM.PROJECT',
+		// 	name: '项目设置',
+		// 	path: '/system/project',
+		// 	icon: <Icon name="sun-o"/>
+		// }, {
+		// 	key: 'Template',
+		// 	id: 'SYSTEM.TEMPLATE',
+		// 	name: '模版设置',
+		// 	path: '/system/template',
+		// 	icon: <Icon name="sort-amount-asc"/>
+		// }, {
+		// 	key: 'Icon',
+		// 	id: 'SYSTEM.ICON',
+		// 	name: '图标设置',
+		// 	path: '/system/icon',
+		// 	icon: <Icon name="terminal"/>
+		// }, {
+		// 	key: 'Workflow',
+		// 	id: 'SYSTEM.WORKFLOW',
+		// 	name: '流程设置',
+		// 	path: '/system/workflow',
+		// 	icon: <Icon name="object-group"/>
+		// },{
+		// 	key: 'Document',
+		// 	id: 'SYSTEM.DOCUMENT',
+		// 	name: '文档设置',
+		// 	path: '/system/document',
+		// 	icon: <Icon name="tablet"/>,
+		// },
+		// {
+		// 	key: 'detailed',
+		// 	name: '清单设置',
+		// 	icon: <Icon name="book"/>,
+		// 	children: [{
+		// 		key: 'Tag',
+		// 		id: 'SYSTEM.TAG',
+		// 		name: '工程量项',
+		// 		path: '/system/tag',
+		// 		icon: <Icon name="signal"/>
+		// 	},{
+		// 		key: 'Quantities',
+		// 		id: 'SYSTEM.QUANTITIES',
+		// 		name: '分项工程量',
+		// 		path: '/system/quantities',
+		// 		icon: <Icon name="signal"/>
+		// 	}]
+		// }
+		];
 }
