@@ -146,31 +146,39 @@ export default class Schedule extends Component {
 	// 	icon: <Icon name="ship"/>
 	// }];
 
-	static menus = [{
-		key: 'schedule',
-		id: 'SCHEDULE.STATISTICS',
-		name: '进度分析',
-		path: '/schedule',
-		icon: <Icon name="thermometer-empty" />
-	}, {
-		key: 'dgnschedule',
-		id: 'SCHEDULE.DGNSCHEDULE',
+	static menus = [ {
+		key: 'stagereport',
+		id: 'SCHEDULE.STAGEREPORT',
 		name: '进度填报',
-		path: '/schedule/progress',
+		path: '/schedule/stagereport',
 		icon: <Icon name="suitcase" />
 	}, {
-		key: 'notice',
+		key: 'proprogress',
 		name: '项目进度',
-		id: 'SCHEDULE.NOTICE',
-		path: '/schedule/notice',
+		id: 'SCHEDULE.PROPROGRESS',
+		path: '/schedule/proprogress',
 		icon: <Icon name="warning" />,
 
 	}, {
-		key: 'history',
-		id: 'SCHEDULE.HISTORY',
-		name: '种植进度',
-		path: '/schedule/history',
+		key: 'entry',
+		id: 'SCHEDULE.ENTRY',
+		name: '苗木进场分析',
+		path: '/schedule/entry',
 		icon: <Icon name="ship" />
+	},{
+		key: 'plant',
+		name: '种植进度分析',
+		id: 'SCHEDULE.PLANT',
+		path: '/schedule/plant',
+		icon: <Icon name="warning" />,
+
+	},{
+		key: 'show',
+		name: '种植进度展示',
+		id: 'SCHEDULE.SHOW',
+		path: '/schedule/show',
+		icon: <Icon name="warning" />,
+
 	}];
 
 	static defaultOpenKeys = ['total', 'stage','notice']

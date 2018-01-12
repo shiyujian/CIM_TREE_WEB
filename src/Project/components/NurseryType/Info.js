@@ -1,40 +1,41 @@
-import React, {Component} from 'react';
-import {Row, Col, Form, Input, Button,Popconfirm} from 'antd';
-import {divIcon} from 'leaflet';
-import {Map, TileLayer, Marker, Polygon} from 'react-leaflet';
+import React, { Component } from 'react';
+import { Row, Col, Form, Input, Button, Popconfirm,} from 'antd';
+import { divIcon } from 'leaflet';
+import { Map, TileLayer, Marker, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import {STATIC_DOWNLOAD_API,DefaultZoomLevel} from '_platform/api';
+import { STATIC_DOWNLOAD_API, DefaultZoomLevel } from '_platform/api';
 import { CollapsePanel } from 'antd/lib/collapse/Collapse';
 
 const FormItem = Form.Item;
 const URL = window.config.VEC_W;
+const { TextArea } = Input
 
 class Info extends Component {
 	render() {
-		let {fieldList = [], relation = [], selectField ,form: {getFieldDecorator},
+		let { fieldList = [], relation = [], selectField, form: { getFieldDecorator },
 } = this.props;
 		let fieldInfo = fieldList.find(field => field.code === selectField) || {};
 		let areaInfo = this._getAreaInfo(relation, selectField) || {};
-		const {extra_params = {}} = fieldInfo;
-		const {file_info} = extra_params || {};
+		const { extra_params = {} } = fieldInfo;
+		const { file_info } = extra_params || {};
 		const leafletCenter = window.config.initLeaflet.center;
 		let arr = [];
-		for (let item in extra_params){
+		for (let item in extra_params) {
 			arr.push(item);
 		}
 		if (arr.length === 0) {
 			return (
 				<div>节点为空</div>
 			)
-		}else{
+		} else {
 			return (
-				<Row gutter={24} style={{marginBottom: 20}}>
+				<Row gutter={24} style={{ marginBottom: 20 }}>
 					{
 						fieldInfo.name ? (
 							<div>
 								<Row>
 									<Col span={24}>
-										<div style={{borderBottom: 'solid 1px #999', paddingBottom: 5, marginBottom: 20}}>
+										<div style={{ borderBottom: 'solid 1px #999', paddingBottom: 5, marginBottom: 20 }}>
 											<span style={{
 												fontSize: 16,
 												fontWeight: 'bold',
@@ -42,7 +43,7 @@ class Info extends Component {
 											}}>类型详情</span>
 											<Button onClick={this.editField.bind(this)}>编辑类型</Button>
 											<Popconfirm title="确定删除此单元吗?" onConfirm={this.delField.bind(this)} okText="确定" cancelText="取消">
-												<Button style={{marginLeft:10}}>删除类型</Button>
+												<Button style={{ marginLeft: 10 }}>删除类型</Button>
 											</Popconfirm>
 										</div>
 									</Col>
@@ -63,21 +64,21 @@ class Info extends Component {
 									<Row>
 										<Col span={12}>
 											<FormItem {...Info.layoutT} label="类型">
-												<Input readOnly value={fieldInfo.name}/>
+												<Input readOnly value={fieldInfo.name} />
 											</FormItem>
 										</Col>
 									</Row>
 									<Row>
-									<Col span={12}>
+										<Col span={12}>
 											<FormItem {...Info.layoutT} label="学名">
-												<Input readOnly value={areaInfo.name}/>
+												<Input readOnly value={areaInfo.name} />
 											</FormItem>
 										</Col>
 									</Row>
 									<Row>
 										<Col span={12}>
 											<FormItem {...Info.layoutT} label="编码">
-												<Input readOnly value={areaInfo.code}/>
+												<Input readOnly value={areaInfo.code} />
 											</FormItem>
 										</Col>
 									</Row>
@@ -94,12 +95,14 @@ class Info extends Component {
 										</div>
 									</FormItem> */}
 									<FormItem {...Info.layout} label="简介">
-										<Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
+										{/* <Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
 											 style={{position: 'relative', height: 320, width:530}}>
 											<TileLayer url={URL} subdomains={['7']}/>
 											<Polygon positions={this._getPoints(extra_params.coordinates.length === 0 ? [] : extra_params.coordinates)}/>
-										</Map>
+										</Map> */}
+										<TextArea style={{ position: 'relative', height: 320, width: 530, resize: 'none' }} />
 									</FormItem>
+
 								</Col>
 							</div>
 						) : null
@@ -107,7 +110,7 @@ class Info extends Component {
 				</Row>
 			);
 		}
-	}			
+	}
 
 	_getAreaInfo(list, code) {
 		let rst = null;
@@ -131,20 +134,21 @@ class Info extends Component {
 		const {
 			actions: {
 				deleteFieldAc,
-				getFieldAc,
-				setSelectFieldAc
+			getFieldAc,
+			setSelectFieldAc
 			},
 			selectField
 		} = this.props;
-		deleteFieldAc({code: selectField})
+		deleteFieldAc({ code: selectField })
 			.then(() => {
 				setSelectFieldAc(null)
 				getFieldAc();
 			})
 	}
 
+	
 	editField() {
-		const {actions: {toggleModalAc}} = this.props;
+		const { actions: { toggleModalAc } } = this.props;
 		toggleModalAc({
 			type: "EDIT",
 			visible: true
@@ -152,12 +156,12 @@ class Info extends Component {
 	}
 
 	static layout = {
-		labelCol: {span: 4},
-		wrapperCol: {span: 18},
+		labelCol: { span: 4 },
+		wrapperCol: { span: 18 },
 	};
 	static layoutT = {
-		labelCol: {span: 8},
-		wrapperCol: {span: 12},
+		labelCol: { span: 8 },
+		wrapperCol: { span: 12 },
 	};
 }
 export default Form.create()(Info)

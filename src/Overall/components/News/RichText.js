@@ -230,18 +230,18 @@ class RichText extends Component {
 		};
 
 		return (
-			<Modal
-				title={toggleData.type === 'NEWS' ? (
-					toggleData.status === 'ADD' ? '发布新闻' : '编辑新闻'
-				) : '发布新闻'}
-				wrapClassName='edit-box'
-				visible={toggleData.visible}
-				width="70%"
-				footer={null}
-				maskClosable={false}
-				onOk={this.modalClick.bind(this)}
-				onCancel={this.modalClick.bind(this)}
-			>
+			// <Modal
+			// 	title={toggleData.type === 'NEWS' ? (
+			// 		toggleData.status === 'ADD' ? '发布新闻' : '编辑新闻'
+			// 	) : '发布新闻'}
+			// 	wrapClassName='edit-box'
+			// 	visible={toggleData.visible}
+			// 	width="70%"
+			// 	footer={null}
+			// 	maskClosable={false}
+			// 	onOk={this.modalClick.bind(this)}
+			// 	onCancel={this.modalClick.bind(this)}
+			// >
 				<div>
 					<Form>
 						<Row>
@@ -275,7 +275,7 @@ class RichText extends Component {
 						</Col>
 					</Row>
 				</div>
-			</Modal>
+			//  </Modal>
 		);
 	}
 }
