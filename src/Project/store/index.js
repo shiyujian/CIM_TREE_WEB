@@ -16,7 +16,8 @@ import dangerReducer, {actions as dangerActions} from './danger';
 import hazardReducer, {actions as hazardActions} from './hazard';
 import defectsReducer, {actions as defectsActions} from './defects';
 // import accidentReducer, {actions as accidentActions} from './accident';
-
+import nurseryTypeRducer, {actions as nurseryTypeActions} from './nurseryType';
+import treeManageRducer, {actions as treeManageActions} from './treeManage';
 export default handleActions({
 	// [combineActions(...actionsMap(accidentActions))]: (state = {}, action) => ({
 	// 	...state,
@@ -81,5 +82,13 @@ export default handleActions({
 	[combineActions(...actionsMap(templateActions))]: (state = {}, action) => ({
 		...state,
 		template: templateReducer(state.template, action),
+	}),
+	[combineActions(...actionsMap(nurseryTypeActions))]: (state = {}, action) => ({
+		...state,
+		nurseryType: nurseryTypeRducer(state.nurseryType, action),
+	}),
+	[combineActions(...actionsMap(treeManageActions))]: (state = {}, action) => ({
+		...state,
+		treeManage: treeManageRducer(state.treeManage, action),
 	}),
 }, {});

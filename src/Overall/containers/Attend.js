@@ -93,7 +93,7 @@ export default class Attend extends Component {
 		const {unitTreeLoading} = this.state;
 		return (
 			<div>
-				<DynamicTitle title="人员考勤" {...this.props}/>
+				<DynamicTitle title="考勤管理" {...this.props}/>
 				<Sidebar>
 					<UnitTree {...this.props} loading={unitTreeLoading}/>
 				</Sidebar>

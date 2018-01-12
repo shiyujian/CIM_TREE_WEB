@@ -77,7 +77,14 @@ import {message} from 'antd'
         });
 	}
 	render() {
-		const {TianBaoJL,Item, Cell, Inspection, Evaluate, DanweiJLShow,Cells, Defect,HuaFen,DanweiJL,DanweiJLAsk,Monitoring,TianBao,TianBao2, Fenbu, Danwei, FenbuRecord,Query,FenbuPreview,Subitem,DanWeiAsk,FenbuCheck} = this.state || {};
+		const {
+			TianBaoJL,Item, Cell, Inspection, 
+			Evaluate, DanweiJLShow,Cells, Defect,
+			HuaFen,DanweiJL,DanweiJLAsk,Monitoring,
+			TianBao,TianBao2, Fenbu, Danwei, FenbuRecord,
+			Query,FenbuPreview,Subitem,DanWeiAsk,FenbuCheck,
+			Score,Search,Appraising} = this.state || {};
+
 		let dwys = this.state.dwysjl?DanweiJL:Danwei;
 		let jyptb = this.state.dwysjl?TianBaoJL:TianBao;
 		return (
@@ -105,6 +112,10 @@ import {message} from 'antd'
 				{DanweiJLAsk && <Route path="/quality/yanshou/danweijlask" component={DanweiJLAsk}/>}
 				{Subitem && <Route path="/quality/yanshou/subitem" component={Subitem}/>}
 				{FenbuCheck && <Route path="/quality/yanshou/fenbu/check" component={FenbuCheck}/>}
+				{Score && <Route path="/quality/score" component={Score}/>}
+				{Search && <Route path="/quality/score/search" component={Score}/>}
+				{Appraising && <Route path="/quality/appraising" component={Appraising}/>}
+
 			</Main>
 			</Body>);
 	}
@@ -166,17 +177,42 @@ const menus = [
 	{
 		key: 'tongji',
 		id: 'QUALITY.TONGJI',
-		name: '统计分析',
+		name: '质量分析',
 		path: '/quality',
 		icon: <Icon name="tasks" />
-	},
-	{
+	},{
+		key: 'score',
+		name: '质量评分',
+		path: '/quality/score',
+		icon: <Icon name="tasks" />,
+		children: [
+			{
+        		key: 'query',
+        		id: 'QUALITY.SCORE',
+				name: '质量管理检查记录',
+				path: '/quality/score/search',
+				icon: <Icon name="bullseye"/>
+			}]
+	},{
+		key: 'appraising',
+		id: 'QUALITY.APPRAISING',
+		name: '质量评优',
+		path: '/quality/appraising',
+		icon: <Icon name="tasks" />,
+		
+	},{
 		key: 'yanshou',
 		name: '质量验收',
 		path: '/quality/yanshou',
 		icon: <Icon name="check-square-o" />,
 		children: [
 			{
+        		key: 'tianbao',
+        		id: 'QUALITY.TIANBAO',
+				name: '进场材料填报',
+				path: '/quality/yanshou/tianbao',
+				icon: <Icon name="anchor"/>
+			},{
         		key: 'query',
         		id: 'QUALITY.QUERY',
 				name: '验收查询',
@@ -188,13 +224,7 @@ const menus = [
 				name: '检验批划分',
 				path: '/quality/yanshou/huafen',
 				icon: <Icon name="asterisk"/>
-			}, {
-        		key: 'tianbao',
-        		id: 'QUALITY.TIANBAO',
-				name: '检验批填报',
-				path: '/quality/yanshou/tianbao',
-				icon: <Icon name="anchor"/>
-			}, {
+			},  {
         		key: 'subitem',
         		id: 'QUALITY.SUBITEM',
 				name: '分项验收',
@@ -214,13 +244,14 @@ const menus = [
 				icon: <Icon name="crosshairs"/>
 			}
 		]
-	}, {
-		key: 'monitoring',
-		id: 'QUALITY.MONITORING',
-		name: '质量监控',
-		path: '/quality/monitoring',
-		icon: <Icon name="wpforms" />,
-    }, {
+	},{
+	// }, {
+	// 	key: 'monitoring',
+	// 	id: 'QUALITY.MONITORING',
+	// 	name: '质量监控',
+	// 	path: '/quality/monitoring',
+	// 	icon: <Icon name="wpforms" />,
+    // }, {
     	key: 'defect',
 		id: 'QUALITY.DEFECT',
     	name: '质量缺陷',

@@ -832,12 +832,13 @@ export default class Lmap extends Component {
 	}
 
 	options = [
+		{label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'},
 		{label: '现场人员', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access',},
-		{label: '安全监测', value: 'geojsonFeature_safety', IconUrl: require('./ImageIcon/camera.png'), IconName: 'shield',},
-		{label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning',},
-		{label: '360全景', value: 'geojsonFeature_360',IconUrl: require('./ImageIcon/360.png'), IconName: 'icon360',},
-		{label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera',},
-		{label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'}
+		// {label: '安全监测', value: 'geojsonFeature_safety', IconUrl: require('./ImageIcon/camera.png'), IconName: 'shield',},
+		// {label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning',},
+		// {label: '360全景', value: 'geojsonFeature_360',IconUrl: require('./ImageIcon/360.png'), IconName: 'icon360',},
+		// {label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera',},
+		
 	];
 	//切换伟景行
 	switchToDgn(){
@@ -1270,17 +1271,22 @@ export default class Lmap extends Component {
 						<li className={this.state.selectedMenu == '1' ? 'm-menu-item selected' : "m-menu-item"}
 						    onClick={this.show2DMap.bind(this)}>
 							<Icon name="map-o" size={'2x'}></Icon>
-							<p className="i-txt">现场信息</p>
+							<p className="i-txt">二维展示</p>
 						</li>
 						<li className={this.state.selectedMenu == '2' ? 'm-menu-item selected' : "m-menu-item"}
 						    onClick={this.setTrueForThree.bind(this)}>
 							<Icon name="university" size={'2x'}></Icon>
-							<p className="i-txt">规划信息</p>
+							<p className="i-txt">巡检路线</p>
 						</li>
 						<li className={this.state.selectedMenu == '3' ? 'm-menu-item selected' : "m-menu-item"}
 						    onClick={this.switchToDgn.bind(this)}>
 							<Icon name="caret-square-o-up" size={'2x'}></Icon>
-							<p className="i-txt">项目信息</p>
+							<p className="i-txt">安全隐患</p>
+						</li>
+						<li className={this.state.selectedMenu == '3' ? 'm-menu-item selected' : "m-menu-item"}
+						    onClick={this.switchToDgn.bind(this)}>
+							<Icon name="caret-square-o-up" size={'2x'}></Icon>
+							<p className="i-txt">工程影像</p>
 						</li>
 					</ul>
 				</div>
