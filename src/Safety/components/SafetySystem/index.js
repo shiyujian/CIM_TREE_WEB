@@ -1,0 +1,1 @@
+export SafetyTable from './SafetyTable';

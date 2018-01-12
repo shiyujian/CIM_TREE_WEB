@@ -74,7 +74,7 @@ export default class EducationRegister extends Component {
     render() {
         return (
             <div>
-                <DynamicTitle title="安全教育登记" {...this.props} />
+                <DynamicTitle title="安全教育" {...this.props} />
                 <Sidebar>
                     <WorkPackageTree {...this.props} onSelect={this.onTreeNodeClick.bind(this)}/>
                 </Sidebar>

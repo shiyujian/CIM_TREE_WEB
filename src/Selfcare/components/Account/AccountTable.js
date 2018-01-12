@@ -15,7 +15,7 @@ export default class AccountTable extends Component {
 					users.length > 0 
 					?
 					(<Row>
-						<Col>
+						<Col span={8}>
 							<Row>
 								<Col>
 									<FormItem {...AccountTable.layoutT} label="用户名">
@@ -53,8 +53,8 @@ export default class AccountTable extends Component {
 							</Row>
 							<Row>
 								<Col>
-									<FormItem {...AccountTable.layoutT} label="性别" value={users[0].gender}>
-										<Select style={{width: 42}}>
+									<FormItem {...AccountTable.layoutT} label="性别">
+										<Select style={{width: 42}} value={users[0].gender}>
 											<Option value="男">男</Option>
 		                            		<Option value="女">女</Option>
 										</Select>
@@ -90,16 +90,18 @@ export default class AccountTable extends Component {
 								</Col>
 							</Row>
 							<Row>
-								<Button type='primary' style={{marginRight: 20}}>
-									修改
-								</Button>
-								<Button type='primary'>
-									取消
-								</Button>
+								<Col span={7} push={1}>
+									<Button type='primary' style={{marginRight: 20}}>
+										修改
+									</Button>
+									<Button type='primary'>
+										取消
+									</Button>
+								</Col>
 							</Row>
 						</Col>
-						<Col>
-							
+						<Col span={14} pull={2}>
+							<img style={{width: 199, height: 258}} src={`http://10.215.160.38:6544${users[0].relative_signature_url}`}/>
 						</Col>
 					</Row>)
 					:
@@ -110,7 +112,7 @@ export default class AccountTable extends Component {
 	}
 
 	static layoutT = {
-		labelCol: {span: 2},
-		wrapperCol: {span: 12},
+		labelCol: {span: 4},
+		wrapperCol: {span: 4},
 	};
 }

@@ -21,7 +21,7 @@ export default class Account extends Component {
 
 	render() {
 		return (
-			<Content>
+			<div>
 				<DynamicTitle title="账号管理" {...this.props}/>
 				<Sidebar>
 					<Tree {...this.props}/>
@@ -29,7 +29,7 @@ export default class Account extends Component {
 				<Content>
 					<AccountTable {...this.props}/>
 				</Content>
-			</Content>
+			</div>
 		);
 	}
 };

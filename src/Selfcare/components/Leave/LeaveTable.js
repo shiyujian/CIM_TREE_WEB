@@ -16,7 +16,6 @@ export default class LeaveTable extends Component {
         	pagination: {},
         	loading: false,
         	size:12,
-        	exportsize: 100,
         	leftkeycode: '',
         	stime: moment().format('2017-11-23 00:00:00'),
 			etime: moment().format('2017-11-23 23:59:59'),
@@ -172,37 +171,8 @@ export default class LeaveTable extends Component {
 				</div>
 	}
 
-	emitEmpty1 = () => {
-	    this.setState({zzbm: ''});
-  	}
-
-  	emitEmpty2 = () => {
-	    this.setState({factory: ''});
-  	}
-
-	zzbmchange(value) {
-		this.setState({zzbm:value.target.value})
-	}
-
-	onsectionchange(value) {
-		const {sectionselect} = this.props;
-		const {treety} = this.state;
-		sectionselect(value || '',treety)
-		this.setState({section:value || '', treetype:'', treetypename:''})
-	}
-
 	ontypechange(value) {
 		this.setState({treety:value || ''})
-	}
-
-	ontreetypechange(value) {
-		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.name == value)
-		this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''})
-    }
-
-    factorychange(value) {
-		this.setState({factory: value.target.value})
 	}
 
 	standardchange(value) {
@@ -222,14 +192,6 @@ export default class LeaveTable extends Component {
         });
         this.qury(pagination.current)
     }
-
-	onImgClick(src) {
-		src = src.replace(/\/\//g,'/')
-		src =  `${FOREST_API}/${src}`
-		this.setState({src},() => {
-			this.setState({imgvisible:true,})
-		})
-	}
 
 	handleCancel(){
     	this.setState({imgvisible:false})
