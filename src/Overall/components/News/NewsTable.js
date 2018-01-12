@@ -135,23 +135,31 @@ export default class NewsTable extends Component {
 		return (
 			<Row>
 				<Col span={22} offset={1}>
-					<Tabs activeKey={newsTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
-						<div style={{marginBottom: '10px'}}>
-							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布新闻</Button>
-							{
-								(toggleData.visible && toggleData.type === 'NEWS') && <RichText {...this.props}/>
-							}
-						</div>}>
-						<TabPane tab="发布的新闻" key="1">
+					<Tabs activeKey={newsTabValue} onChange={this.subTabChange.bind(this)} >
+						{/* tabBarExtraContent={
+							<div style={{marginBottom: '10px'}}>
+								<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布新闻</Button>
+								{
+									(toggleData.visible && toggleData.type === 'NEWS') && <RichText {...this.props}/>
+								}
+							</div>} */}
+						<TabPane tab="新闻查询" key="1">
 							<Table dataSource={newsList}
 								   columns={this.columns}
+								   bordered
 								   rowKey="id"/>
 						</TabPane>
 						<TabPane tab="暂存的新闻" key="2">
 							<Table dataSource={draftNewsLis}
 								   columns={this.draftColumns}
+								   bordered
 								   rowKey="id"/>
 						</TabPane>
+
+						<TabPane tab="新闻发布" key="3">
+							<RichText {...this.props}/>
+						</TabPane>
+						
 					</Tabs>
 
 				</Col>

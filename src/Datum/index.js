@@ -4,6 +4,8 @@ import {Route} from 'react-router-dom';
 import {Main, Aside, Body} from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import {Icon} from 'react-fa';
+import Radio from 'antd/lib/radio/radio';
+import Redios from './containers/Redios';
 
 export default class DatumContainer extends Component {
 
@@ -17,7 +19,7 @@ export default class DatumContainer extends Component {
 	}
 
 	render() {
-		const {Datum, Engineering} = this.state || {};
+		const {Datum, Engineering,Radios} = this.state || {};
 		return (
 			<Body>
 			<Aside>
@@ -26,6 +28,7 @@ export default class DatumContainer extends Component {
 			<Main>
 				{Datum && <Route exact path="/datum" component={Datum}/>}
 				{Engineering && <Route path="/datum/engineering" component={Engineering}/>}
+				{Redios && <Route path="/datum/redios" component={Redios}/>}
 			</Main>
 			</Body>);
 	}
@@ -41,6 +44,12 @@ export default class DatumContainer extends Component {
 		id: 'DATUM.ENGINEERING',
 		path: '/datum/engineering',
 		name: '工程文档',
+		icon: <Icon name="file-word-o"/>
+	},{
+		key: 'redios',
+		id: 'DATUM.REDIO',
+		path: '/datum/redios',
+		name: '工程影像',
 		icon: <Icon name="file-word-o"/>
 	}];
 }

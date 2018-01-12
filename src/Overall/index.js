@@ -24,39 +24,41 @@ export default class Overall extends Component {
 				<Submenu {...this.props} menus={Overall.menus}/>
 			</Aside>
 			<Switch>
-				{Attend && <Route path="/overall/attend" component={Attend}/>}
+				
 				{News && <Route path="/overall/news" component={News}/>}
-				{News1 && <Route path="/overall/news1" component={News1}/>}
+				{/* {News1 && <Route path="/overall/news1" component={News1}/>} */}
 				{Dispatch && <Route path="/overall/dispatch" component={Dispatch}/>}
-				{Approval && <Route path="/overall/approval" component={Approval}/>}
+				{Attend && <Route path="/overall/attend" component={Attend}/>}
+				{/* {Approval && <Route path="/overall/approval" component={Approval}/>} */}
 				{/*Package && <Route exact path="/overall/:id?" component={Package}/>*/}
 			</Switch>
 			</Body>);
 	}
 
-	static menus = [{
-		key: 'attend',
-		id: 'MANAGE.CHECKIN',
-		path: '/overall/attend',
-		name: '人员考勤',
-		icon: <Icon name="user-o"/>,
-	}, {
+	static menus = [ {
 		key: 'news',
 		id: 'MANAGE.NEWS',
 		path: '/overall/news',
-		name: '新闻公告',
+		name: '新闻通知',
 		icon: <Icon name="calendar-check-o"/>
-	}, {
+	},{
 		key: 'dispatch',
 		id: 'MANAGE.SENDRECIEVE',
 		path: '/overall/dispatch',
 		name: '现场收发文',
 		icon: <Icon name="newspaper-o"/>,
-	}, {
-		key: 'approval',
-		id: 'MANAGE.APPROVAL',
-		path: '/overall/approval',
-		name: '项目报批',
-		icon: <Icon name="sliders"/>,
-	}];
+	},{
+		key: 'attend',
+		id: 'MANAGE.CHECKIN',
+		path: '/overall/attend',
+		name: '考勤管理',
+		icon: <Icon name="user-o"/>,
+	}]
+	// }, {
+	// 	key: 'approval',
+	// 	id: 'MANAGE.APPROVAL',
+	// 	path: '/overall/approval',
+	// 	name: '项目报批',
+	// 	icon: <Icon name="sliders"/>,
+	// }];
 }

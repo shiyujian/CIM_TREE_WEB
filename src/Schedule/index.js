@@ -1,51 +1,51 @@
-import {injectReducer} from '../store';
-import React, {Component} from 'react';
-import {Route} from 'react-router-dom';
-import {Main, Aside, Body} from '_platform/components/layout';
+import { injectReducer } from '../store';
+import React, { Component } from 'react';
+import { Route } from 'react-router-dom';
+import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
-import {Icon} from 'react-fa';
+import { Icon } from 'react-fa';
 
 export default class Schedule extends Component {
 
 	async componentDidMount() {
-		const {default: reducer} = await import('./store');
+		const { default: reducer } = await import('./store');
 		const Containers = await import('./containers');
 
 		injectReducer('schedule', reducer);
 		this.setState({
 			...Containers
-		})
+		}) 
 	}
 
 	render() {
-		const {Dashboard, TotalPlan, Stage, Notice, History, TotalReport, Approve, 
-			StartPlan, TotalApproval,DGN,ProgressCityMaker,Scheduler,Progress,DgnDetail} = this.state || {};
+		const { Dashboard, TotalPlan, Stage, Notice, History, TotalReport, Approve,
+			StartPlan, TotalApproval, DGN, ProgressCityMaker, Scheduler, Progress, DgnDetail } = this.state || {};
 		return (
 			<Body>
-			<Aside>
-				<Submenu {...this.props} menus={Schedule.menus} defaultOpenKeys={Schedule.defaultOpenKeys}/>
-			</Aside>
-			<Main>
-				{Dashboard && <Route exact path="/schedule" component={Dashboard}/>}
-				
-				{TotalPlan &&  <Route exact path="/schedule/totalplan" component={TotalPlan}/>}
-				{DgnDetail && <Route exact path="/schedule/dgndetail" component={DgnDetail}/>}
-				{StartPlan && <Route exact path="/schedule/startplan" component={StartPlan}/>}
-				{TotalReport && <Route path="/schedule/totalreport" component={TotalReport}/>}
-				{TotalApproval && <Route exact path="/schedule/totalapproval" component={TotalApproval}/>}
+				<Aside>
+					<Submenu {...this.props} menus={Schedule.menus} defaultOpenKeys={Schedule.defaultOpenKeys} />
+				</Aside>
+				<Main>
+					{Dashboard && <Route exact path="/schedule" component={Dashboard} />}
 
-				{Scheduler && <Route exact path="/schedule/reportsetting" component={Scheduler}/>}
-				{Stage && <Route exact path="/schedule/stagereport" component={Stage}/>}
-				{Approve && <Route exact path="/schedule/stageapproval" component={Approve}/>}
+					{TotalPlan && <Route exact path="/schedule/totalplan" component={TotalPlan} />}
+					{DgnDetail && <Route exact path="/schedule/dgndetail" component={DgnDetail} />}
+					{StartPlan && <Route exact path="/schedule/startplan" component={StartPlan} />}
+					{TotalReport && <Route path="/schedule/totalreport" component={TotalReport} />}
+					{TotalApproval && <Route exact path="/schedule/totalapproval" component={TotalApproval} />}
 
-				{ProgressCityMaker && <Route exact path="/schedule/progress" component={ProgressCityMaker}/>}
-				{DGN && <Route exact path="/schedule/dgn" component={DGN}/>}
+					{Scheduler && <Route exact path="/schedule/reportsetting" component={Scheduler} />}
+					{Stage && <Route exact path="/schedule/stagereport" component={Stage} />}
+					{Approve && <Route exact path="/schedule/stageapproval" component={Approve} />}
 
-				{Notice && <Route path="/schedule/reportmonitor" component={Notice}/>}
-				{Progress && <Route path="/schedule/noticemonitor" component={Progress}/>}
-				
-				{History && <Route path="/schedule/history" component={History}/>}
-			</Main>
+					{ProgressCityMaker && <Route exact path="/schedule/progress" component={ProgressCityMaker} />}
+					{DGN && <Route exact path="/schedule/dgn" component={DGN} />}
+
+					{Notice && <Route path="/schedule/reportmonitor" component={Notice} />}
+					{Progress && <Route path="/schedule/noticemonitor" component={Progress} />}
+
+					{History && <Route path="/schedule/history" component={History} />}
+				</Main>
 			</Body>);
 	}
 	static menus = [{
@@ -146,5 +146,7 @@ export default class Schedule extends Component {
 		icon: <Icon name="ship"/>
 	}];
 
-	static defaultOpenKeys = ['total', 'stage','notice']
+	
+
+	static defaultOpenKeys = ['total', 'stage', 'notice']
 };
