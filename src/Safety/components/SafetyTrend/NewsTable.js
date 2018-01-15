@@ -17,11 +17,11 @@ export default class NewsTable extends Component {
 	}
 
 	componentDidMount() {
-		const {actions: {getNewsList1, getDraftNewsList1}} = this.props;
-		getNewsList1({
+		const {actions: {getNewsList, getDraftNewsList}} = this.props;
+		getNewsList({
 			user_id: user_id
 		});
-		getDraftNewsList1({
+		getDraftNewsList({
 			user_id: user_id
 		})
 	}
@@ -29,25 +29,25 @@ export default class NewsTable extends Component {
 	//新闻操作按钮
 	clickNews(record, type) {
 		const {
-			actions: {deleteData1, getNewsList1, getDraftNewsList1, toggleModal1, patchData1},
-			newsTabValue1 = '1'
+			actions: {deleteData, getNewsList, getDraftNewsList, toggleModal, patchData},
+			newsTabValue = '1'
 		} = this.props;
 		if (type === 'DELETE') {
-			deleteData1({pk: record.id})
+			deleteData({pk: record.id})
 				.then(() => {
 					message.success('删除新闻成功！');
-					if (newsTabValue1 === '1') {
-						getNewsList1({
+					if (newsTabValue === '1') {
+						getNewsList({
 							user_id: user_id
 						});
 					} else {
-						getDraftNewsList1({
+						getDraftNewsList({
 							user_id: user_id
 						});
 					}
 				})
 		} else if (type === 'EDIT') {
-			toggleModal1({
+			toggleModal({
 				type: 'NEWS',
 				status: 'EDIT',
 				visible: true,
@@ -59,37 +59,37 @@ export default class NewsTable extends Component {
 				container: record.raw
 			})
 		} else if (type === 'BACK') {
-			let newData1 = {
+			let newData = {
 				"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 				"is_draft": true
 			};
-			patchData1({pk: record.id}, newData1)
+			patchData({pk: record.id}, newData)
 				.then(rst => {
 					if (rst.id) {
 						message.success('撤回成功，撤回的新闻在暂存的新闻中可查看');
 						//更新暂存的新闻列表数据
-						getNewsList1({
+						getNewsList({
 							user_id: user_id
 						});
-						getDraftNewsList1({
+						getDraftNewsList({
 							user_id: user_id
 						});
 					}
 				})
 		} else if (type === 'PUBLISH') {
-			let newData1 = {
+			let newData = {
 				"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 				"is_draft": false
 			};
-			patchData1({pk: record.id}, newData1)
+			patchData({pk: record.id}, newData)
 				.then(rst => {
 					if (rst.id) {
 						message.success('重新发布新闻成功！');
 						//更新暂存的新闻列表数据
-						getNewsList1({
+						getNewsList({
 							user_id: user_id
 						});
-						getDraftNewsList1({
+						getDraftNewsList({
 							user_id: user_id
 						});
 					}
@@ -100,9 +100,8 @@ export default class NewsTable extends Component {
 
 	//发布新闻
 	publishNewsClick() {
-		const {actions: {toggleModal1}} = this.props;
-		console.log("this.props",this.props);
-		toggleModal1({
+		const {actions: {toggleModal}} = this.props;
+		toggleModal({
 			type: 'NEWS',
 			status: 'ADD',
 			visible: true,
@@ -118,38 +117,38 @@ export default class NewsTable extends Component {
 	}
 
 	//新闻列表和暂存的新闻列表切换
-	subTabChange(newsTabValue1) {
-		const {actions: {setNewsTabActive1}} = this.props;
-		setNewsTabActive1(newsTabValue1);
+	subTabChange(newsTabValue) {
+		const {actions: {setNewsTabActive}} = this.props;
+		setNewsTabActive(newsTabValue);
 	}
 
 	render() {
 		const {
-			newsList1 = [],
-			draftNewsLis1 = [],
-			toggleData1: toggleData1 = {
+			newsList = [],
+			draftNewsLis = [],
+			toggleData: toggleData = {
 				type: 'NEWS',
 				visible: false,
 			},
-			newsTabValue1 = '1'
+			newsTabValue = '1'
 		} = this.props;
 		return (
 			<Row>
 				<Col span={22} offset={1}>
-					<Tabs activeKey={newsTabValue1} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
+					<Tabs activeKey={newsTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
 						<div style={{marginBottom: '10px'}}>
 							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布新闻</Button>
 							{
-								(toggleData1.visible && toggleData1.type === 'NEWS') && <RichText {...this.props}/>
+								(toggleData.visible && toggleData.type === 'NEWS') && <RichText {...this.props}/>
 							}
 						</div>}>
 						<TabPane tab="发布的新闻" key="1">
-							<Table dataSource={newsList1}
+							<Table dataSource={newsList}
 								   columns={this.columns}
 								   rowKey="id"/>
 						</TabPane>
 						<TabPane tab="暂存的新闻" key="2">
-							<Table dataSource={draftNewsLis1}
+							<Table dataSource={draftNewsLis}
 								   columns={this.draftColumns}
 								   rowKey="id"/>
 						</TabPane>

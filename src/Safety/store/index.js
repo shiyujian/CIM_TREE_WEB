@@ -9,6 +9,7 @@ import riskEvaluationReducer, {actions as riskEvaluationActions} from './riskEva
 import safetyTrendReducer, {actions as  safetyTrendActions} from './safetyTrend';
 import educationRegisterReducer, {actions as educationRegisterActions} from './educationRegister';
 import hiddenDangerReducer, {actions as hiddenDangerActions} from './hiddenDanger';
+import trendReducer, {actions as trendActions} from './trend';
 
 export default handleActions({
 	[combineActions(...actionsMap(safetySystemActions))]: (state = {}, action) => ({
@@ -42,5 +43,9 @@ export default handleActions({
 	[combineActions(...actionsMap(hiddenDangerActions))]: (state, action) => ({
 		...state,
 		hiddenDanger: hiddenDangerReducer(state.hiddenDanger, action)
+	}),
+	[combineActions(...actionsMap(trendActions))]: (state, action) => ({
+		...state,
+		trend: trendReducer(state.trend, action)
 	}),
 }, {});

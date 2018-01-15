@@ -4,93 +4,89 @@ import moment from 'moment';
 // import createFetchAction from 'fetch-action';
 import {base, SERVICE_API} from '_platform/api';
 
-
 //Tab切换状态
-export const setTabActive1 = createAction('safety设置当前选中的tab');
+export const setTabActive = createAction('xhy设置当前选中的tab');
 //新闻列表的Tab切换状态
-export const setNewsTabActive1 = createAction('safety列表的Tab切换状态');
+export const setNewsTabActive = createAction('xhy新闻列表的Tab切换状态');
 //公告列表的Tab切换状态
-export const setTipsTabActive1 = createAction('safety公告列表的Tab切换状态');
+export const setTipsTabActive = createAction('xhy公告列表的Tab切换状态');
 //发布或编辑新闻或公告的的modal
-export const toggleModal2 = createAction('safety发布或编辑新闻或公告的的modal11222222222222');
+export const toggleModal = createAction('xhy发布或编辑新闻或公告的的modal');
 //获取暂存的新闻列表
-export const getDraftNewsListOK1 = createAction('safety获取暂存的新闻列表');
-export const getDraftNewsList1 = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=%E6%96%B0%E9%97%BB&time=${moment().valueOf()}`, [getDraftNewsListOK1]);
+export const getDraftNewsListOK = createAction('xhy获取暂存的新闻列表');
+export const getDraftNewsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=%E6%96%B0%E9%97%BB&time=${moment().valueOf()}`, [getDraftNewsListOK]);
 //获取新闻列表
-export const getNewsListOK1 = createAction('safety获取新闻列表');
-export const getNewsList1 = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=%E6%96%B0%E9%97%BB&is_draft=false&time=${moment().valueOf()}`, [getNewsListOK1]);
+export const getNewsListOK = createAction('xhy获取新闻列表');
+export const getNewsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=%E6%96%B0%E9%97%BB&is_draft=false&time=${moment().valueOf()}`, [getNewsListOK]);
 //获取暂存的通知列表
-export const getDraftTipsListOK1 = createAction('safety获取暂存的通知列表');
-export const getDraftTipsList1 = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=%E5%85%AC%E5%91%8A&time=${moment().valueOf()}`, [getDraftTipsListOK1]);
+export const getDraftTipsListOK = createAction('xhy获取暂存的通知列表');
+export const getDraftTipsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=%E5%85%AC%E5%91%8A&time=${moment().valueOf()}`, [getDraftTipsListOK]);
 //获取通知列表
-export const getTipsListOK1 = createAction('safety获取通知列表');
-export const getTipsList1 = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=%E5%85%AC%E5%91%8A&is_draft=false&time=${moment().valueOf()}`, [getTipsListOK1]);
+export const getTipsListOK = createAction('xhy获取通知列表');
+export const getTipsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=%E5%85%AC%E5%91%8A&is_draft=false&time=${moment().valueOf()}`, [getTipsListOK]);
 //发布新闻或公告
-export const postData1 = createFetchAction(`${base}/main/api/post/`, [],'POST');
+export const postData = createFetchAction(`${base}/main/api/post/`, [],'POST');
 //编辑新闻或公告
-export const patchData1 = createFetchAction(`${base}/main/api/post/{{pk}}/`, [],'PATCH');
+export const patchData = createFetchAction(`${base}/main/api/post/{{pk}}/`, [],'PATCH');
 //删除新闻或公告
-export const deleteData1 = createFetchAction(`${base}/main/api/post/{{pk}}/`, [],'DELETE');
+export const deleteData = createFetchAction(`${base}/main/api/post/{{pk}}/`, [],'DELETE');
 
 //设置上传的文件列表
-export const postUploadFiles1 = createAction('safety设置上传的文件列表');
+export const postUploadFiles = createAction('xhy设置上传的文件列表');
 
 export const actions = {
-	setTabActive1,
-	setNewsTabActive1,
-	setTipsTabActive1,
-	toggleModal2,
-	getDraftNewsListOK1,
-	getDraftNewsList1,
-	getNewsListOK1,
-	getNewsList1,
-	getDraftTipsListOK1,
-	getDraftTipsList1,
-	getTipsListOK1,
-	getTipsList1,
-	postData1,
-	patchData1,
-	deleteData1,
-	postUploadFiles1,
+	setTabActive,
+	setNewsTabActive,
+	setTipsTabActive,
+	toggleModal,
+	getDraftNewsListOK,
+	getDraftNewsList,
+	getNewsListOK,
+	getNewsList,
+	getDraftTipsListOK,
+	getDraftTipsList,
+	getTipsListOK,
+	getTipsList,
+	postData,
+	patchData,
+	deleteData,
+	postUploadFiles,
 };
 export default handleActions({
-	[setTabActive1]: (state, {payload}) => ( {
+	[setTabActive]: (state, {payload}) => ( {
 		...state,
-		tabValue1: payload
+		tabValue: payload
 	}),
-	[setNewsTabActive1]: (state, {payload}) => ( {
+	[setNewsTabActive]: (state, {payload}) => ( {
 		...state,
-		newsTabValue1: payload
+		newsTabValue: payload
 	}),
-	[setTipsTabActive1]: (state, {payload}) => ( {
+	[setTipsTabActive]: (state, {payload}) => ( {
 		...state,
-		tipsTabValue1: payload
+		tipsTabValue: payload
 	}),
-	[toggleModal2]: (state, {payload}) => {
-		console.log("sadfsd");
-		return {
-			...state,
-			toggleData1: payload
-		}
-	},
-	[getDraftNewsListOK1]: (state, {payload}) => ( {
+	[toggleModal]: (state, {payload}) => ( {
 		...state,
-		draftNewsLis1: payload
+		toggleData: payload
 	}),
-	[getNewsListOK1]: (state, {payload}) => ( {
+	[getDraftNewsListOK]: (state, {payload}) => ( {
 		...state,
-		newsList1: payload
+		draftNewsLis: payload
 	}),
-	[getTipsListOK1]: (state, {payload}) => ( {
+	[getNewsListOK]: (state, {payload}) => ( {
 		...state,
-		tipsList1: payload
+		newsList: payload
 	}),
-	[getDraftTipsListOK1]: (state, {payload}) => ( {
+	[getTipsListOK]: (state, {payload}) => ( {
 		...state,
-		draftTipsList1: payload
+		tipsList: payload
 	}),
-	[postUploadFiles1]: (state, {payload}) => ( {
+	[getDraftTipsListOK]: (state, {payload}) => ( {
 		...state,
-		fileList1: payload
+		draftTipsList: payload
+	}),
+	[postUploadFiles]: (state, {payload}) => ( {
+		...state,
+		fileList: payload
 	}),
 }, {});

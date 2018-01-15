@@ -13,7 +13,6 @@ export default class Safety extends Component {
 	async componentDidMount() {
 		const {default: reducer} = await  import('./store');
 		const Containers = await  import('./containers');
-
 		injectReducer('safety', reducer);
 		this.setState({
 			...Containers
@@ -32,15 +31,14 @@ export default class Safety extends Component {
 			</Body>)
 	}
 
-	static menus = [
-	// {
-		// key: 'Safety',
-		// id: 'SAFETY',
-		// name: '安全动态',
-		// path: '/safety',
-		// icon: <Icon name="thermometer-empty"/>
-	// }, 
-	{
+	static menus = [{
+		key: 'Trend',
+		id: 'SAFETY',
+		exact:true,
+		name: '安全动态',
+		path: '/safety',
+		icon: <Icon name="thermometer-empty"/>
+	}, {
 		key: 'SafetySystem',
 		id: 'SAFETY.SYSTEM',
 		name: '安全体系',
@@ -50,6 +48,7 @@ export default class Safety extends Component {
 		key: 'HiddenDanger',
 		id: 'SAFETY.HIDDENDANGER',
 		name: '安全隐患',
+		exact:true,
 		path: '/safety/hiddenDanger',
 		icon: <Icon name="building-o"/>
 	}, {

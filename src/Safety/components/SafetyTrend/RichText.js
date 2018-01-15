@@ -55,7 +55,7 @@ class RichText extends Component {
 		editor.create();
 
 		const {
-			toggleData1: toggleData1 = {
+			toggleData: toggleData = {
 				type: 'NEWS',
 				status: 'ADD',
 				visible: false,
@@ -63,22 +63,22 @@ class RichText extends Component {
 			},
 			form: {setFieldsValue}
 		} = this.props;
-		if (toggleData1.type === 'NEWS' && toggleData1.status === 'EDIT') {
+		if (toggleData.type === 'NEWS' && toggleData.status === 'EDIT') {
 			this.setState({
-				content: toggleData1.editData.raw
+				content: toggleData.editData.raw
 			});
-			editor.txt.html(toggleData1.editData.raw)
-			setFieldsValue1({
-				'title': toggleData1.editData.title,
-				'abstract': toggleData1.editData.abstract
+			editor.txt.html(toggleData.editData.raw)
+			setFieldsValue({
+				'title': toggleData.editData.title,
+				'abstract': toggleData.editData.abstract
 			})
 		}
 	}
 
 	//modal显示与影藏
 	modalClick() {
-		const {actions: {toggleModal1}} = this.props;
-		toggleModal1({
+		const {actions: {toggleModal}} = this.props;
+		toggleModal({
 			type: null,
 			status: null,
 			visible: false,
@@ -88,8 +88,8 @@ class RichText extends Component {
 	//发布新闻
 	postData() {
 		const {
-			actions: {postData1, getNewsList1, patchData1, getDraftNewsList1},
-			form: {validateFields1},
+			actions: {postData, getNewsList, patchData, getDraftNewsList},
+			form: {validateFields},
 			toggleData: toggleData = {
 				type: 'NEWS',
 				status: 'ADD',
@@ -97,10 +97,10 @@ class RichText extends Component {
 				editData: null
 			}
 		} = this.props;
-		validateFields1((err, values) => {
+		validateFields((err, values) => {
 			if (!err) {
 				//判断是发布新闻还是更新新闻
-				if (toggleData1.status === 'ADD') {
+				if (toggleData.status === 'ADD') {
 					let newData = {
 						"title": values['title'],
 						"abstract": values['abstract'] || '',
@@ -114,35 +114,35 @@ class RichText extends Component {
 						"publisher": getUser().id,
 						"is_draft": false
 					};
-					postData1({}, newData)
+					postData({}, newData)
 						.then(rst => {
 							if (rst.id) {
 								this.modalClick();
 								message.success('发布新闻成功');
 								//更新新闻列表数据
-								getNewsList1({
+								getNewsList({
 									user_id: getUser().id
 								});
 							}
 						})
-				} else if (toggleData1.status === 'EDIT') {
-					let newData1 = {
+				} else if (toggleData.status === 'EDIT') {
+					let newData = {
 						"title": values['title'],
 						"abstract": values['abstract'] || '',
 						"raw": this.state.content,
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"is_draft": false
 					};
-					patchData1({pk: toggleData1.editData.id}, newData)
+					patchData({pk: toggleData.editData.id}, newData)
 						.then(rst => {
 							if (rst.id) {
 								this.modalClick();
 								message.success('编辑新闻成功');
 								//更新新闻列表数据
-								getNewsList1({
+								getNewsList({
 									user_id: getUser().id
 								});
-								getDraftNewsList1({
+								getDraftNewsList({
 									user_id: getUser().id
 								});
 							}
@@ -155,42 +155,42 @@ class RichText extends Component {
 	//暂存新闻
 	draftDataFunc() {
 		const {
-			actions: {postData1, patchData1, getNewsList1, getDraftNewsList1},
-			form: {validateFields1},
-			toggleData1: toggleData1 = {
+			actions: {postData, patchData, getNewsList, getDraftNewsList},
+			form: {validateFields},
+			toggleData: toggleData = {
 				status: 'ADD',
 				editData: null,
 			}
 		} = this.props;
 		//判断暂存的是新增的还是编辑的暂存
 		//编辑暂存的
-		if (toggleData1.status === 'EDIT') {
-			validateFields1((err, values) => {
-				let newData1 = {
+		if (toggleData.status === 'EDIT') {
+			validateFields((err, values) => {
+				let newData = {
 					"title": values['title'],
 					"abstract": values['abstract'] || '',
 					"raw": this.state.content,
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"is_draft": true
 				};
-				patchData1({pk: toggleData.editData.id}, newData)
+				patchData({pk: toggleData.editData.id}, newData)
 					.then(rst => {
 						if (rst.id) {
 							this.modalClick();
 							message.success('暂存成功');
 							//更新暂存的新闻列表数据
-							getNewsList1({
+							getNewsList({
 								user_id: getUser().id
 							});
-							getDraftNewsList1({
+							getDraftNewsList({
 								user_id: getUser().id
 							});
 						}
 					})
 			})
-		} else if (toggleData1.status === 'ADD') {
-			validateFields1((err, values) => {
-				let newData1 = {
+		} else if (toggleData.status === 'ADD') {
+			validateFields((err, values) => {
+				let newData = {
 					"title": values['title'] || '',
 					"abstract": values['abstract'] || '',
 					"raw": this.state.content || '',
@@ -199,13 +199,13 @@ class RichText extends Component {
 					"publisher": getUser().id,
 					"is_draft": true
 				};
-				postData1({}, newData)
+				postData({}, newData)
 					.then(rst => {
 						if (rst.id) {
 							this.modalClick();
 							message.success('暂存成功！');
 							//更新暂存的新闻列表数据
-							getDraftNewsList1({
+							getDraftNewsList({
 								user_id: getUser().id
 							});
 						}
@@ -216,8 +216,8 @@ class RichText extends Component {
 
 	render() {
 		const {
-			form: {getFieldDecorator1},
-			toggleData1: toggleData1 = {
+			form: {getFieldDecorator},
+			toggleData: toggleData = {
 				type: 'NEWS',
 				status: 'ADD',
 				visible: false,
@@ -231,11 +231,11 @@ class RichText extends Component {
 
 		return (
 			<Modal
-				title={toggleData1.type === 'NEWS' ? (
-					toggleData1.status === 'ADD' ? '发布新闻' : '编辑新闻'
+				title={toggleData.type === 'NEWS' ? (
+					toggleData.status === 'ADD' ? '发布新闻' : '编辑新闻'
 				) : '发布新闻'}
 				wrapClassName='edit-box'
-				visible={toggleData1.visible}
+				visible={toggleData.visible}
 				width="70%"
 				footer={null}
 				maskClosable={false}
@@ -247,7 +247,7 @@ class RichText extends Component {
 						<Row>
 							<Col span={5} offset={1}>
 								<FormItem {...formItemLayout} label="新闻标题">
-									{getFieldDecorator1('title', {
+									{getFieldDecorator('title', {
 										rules: [{required: true, message: '请输入新闻标题'}],
 										initialValue: ''
 									})(
@@ -257,7 +257,7 @@ class RichText extends Component {
 							</Col>
 							<Col span={5} offset={1}>
 								<FormItem {...formItemLayout} label="关键字">
-									{getFieldDecorator1('abstract', {})(
+									{getFieldDecorator('abstract', {})(
 										<Input type="text" placeholder="请输入关键字"/>
 									)}
 								</FormItem>

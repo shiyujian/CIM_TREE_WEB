@@ -7,3 +7,4 @@ export HiddenDanger from './HiddenDanger';
 export SafetySystem from './SafetySystem';
 export SafetyTrend from './SafetyTrend';
 export SafetyTrend1 from './SafetyTrend1';
+export Trend from './Trend';

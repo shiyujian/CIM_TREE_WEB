@@ -12,7 +12,7 @@ const TabPane = Tabs.TabPane;
 
 @connect(
 	state => {
-		const {safety: safetyTrend = {}, platform} = state || {};
+		const {safety: {safetyTrend = {}}, platform} = state || {};
 		return {...safetyTrend, platform};
 	},
 	dispatch => ({
@@ -21,28 +21,21 @@ const TabPane = Tabs.TabPane;
 )
 export default class SafetyTrend extends Component {
 	static propTypes = {};
-	componentDidMount(){
-		const {actions: {toggleModal2}} = this.props;
-		toggleModal2("aaaa");
-		console.log("this.props",this.props);
-	}
 
 	//新闻和通知的切换
-	tabChange(tabValue1) {
-		const {actions: {setTabActive1}} = this.props;
-		setTabActive1(tabValue1);
+	tabChange(tabValue) {
+		const {actions: {setTabActive}} = this.props;
+		setTabActive(tabValue);
 	}
 
 	render() {
-		console.log("this.props",this.props);
 		const {
-			tabValue1 = '1',
+			tabValue = '1',
 		} = this.props;
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>
-				<DynamicTitle title="安全动态管理" {...this.props}/>
-				{/*<Tabs activeKey={tabValue1} >*/}
-				<Tabs>
+				<DynamicTitle title="新闻公告" {...this.props}/>
+				<Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
 					<TabPane tab="新闻公告列表" key="1">
 						<NewsTable {...this.props}/>
 					</TabPane>

@@ -21,7 +21,7 @@ export default class Person extends Component {
 	render() {
 		return (
 			<div>
-				<DynamicTitle title="人员管理" {...this.props}/>
+				<DynamicTitle title="用户管理" {...this.props}/>
 				<Sidebar>
 					<Tree {...this.props}/>
 				</Sidebar>

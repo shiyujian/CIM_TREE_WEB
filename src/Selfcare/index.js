@@ -58,5 +58,6 @@ export default class Selfcare extends Component {
 		name: '账号管理',
 		path: '/selfcare/account',
 		icon: <Icon name="shekel"/>
-	}];
+	}
+	];
 }

@@ -21,7 +21,7 @@ export default class Role extends Component {
 	render() {
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>
-				<DynamicTitle title="角色管理" {...this.props}/>
+				<DynamicTitle title="角色设置" {...this.props}/>
 				<Table {...this.props}/>
 				<Member {...this.props}/>
 				<Addition {...this.props}/>

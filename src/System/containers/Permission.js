@@ -21,7 +21,7 @@ export default class Permission extends Component {
 		const {} = this.props;
 		return (
 			<div>
-				<DynamicTitle title="权限管理" {...this.props}/>
+				<DynamicTitle title="权限设置" {...this.props}/>
 				<Sidebar>
 					<Roles {...this.props}/>
 				</Sidebar>

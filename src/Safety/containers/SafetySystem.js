@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Select} from 'antd';
 import * as actions from '../store';
 import PkCodeTree from '../components/PkCodeTree.js';
-import {SafetyTable} from '../components/SafetySystem';
+import {SafetyTable, AddModal} from '../components/SafetySystem';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 const Option = Select.Option;
@@ -32,42 +32,6 @@ export default class SafetySystem extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree}} = this.props;
-        //地块树
-        try {
-            getTree({},{root:'true',paginate:false})
-            .then(rst => {
-                if(rst instanceof Array && rst.length > 0){
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
-                    getTree({},{parent:rst[0].attrs.no,paginate:false})
-                    .then(rst1 => {
-                        if(rst1 instanceof Array && rst1.length > 0){
-                            rst1.forEach((item,index) => {
-                                rst1[index].children = []
-                            })
-                            getNewTreeData(rst,rst[0].attrs.no,rst1)
-                            getTree({},{parent:rst1[0].attrs.no,paginate:false})
-                            .then(rst2 => {
-                                if(rst2 instanceof Array && rst2.length > 0){
-                                    getNewTreeData(rst,rst1[0].attrs.no,rst2)
-                                    this.setState({treeLists:rst},() => {
-                                        this.onSelect([rst2[0].attrs.no])
-                                    })
-                                } else {
-                                    this.setState({treeLists:rst})
-                                }
-                            })
-                        }else {
-                            this.setState({treeLists:rst})
-                        }
-                    })
-                }
-            })
-        } catch(e){
-            console.log(e)
-        }
         //类型
         let typeoption = [
             <Option key={'-1'} value={''}>全部</Option>,
@@ -88,7 +52,7 @@ export default class SafetySystem extends Component {
     }
 
     render() {
-        const {keycode} = this.props;
+        const {keycode, addVisible} = this.props;
         const {
             leftkeycode,
             treeLists,
@@ -125,6 +89,9 @@ export default class SafetySystem extends Component {
                              keycode={keycode}
                              resetinput={this.resetinput.bind(this)}
                             />
+                            {
+                                addVisible && <AddModal {...this.props}/>
+                            }
                         </Content>
                     </Main>
                 </Body>);

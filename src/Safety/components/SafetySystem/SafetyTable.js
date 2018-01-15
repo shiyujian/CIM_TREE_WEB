@@ -18,8 +18,6 @@ export default class SafetyTable extends Component {
         	size:12,
         	exportsize: 100,
         	leftkeycode: '',
-        	stime: moment().format('2017-11-23 00:00:00'),
-			etime: moment().format('2017-11-23 23:59:59'),
 			zzbm: '',
 			section: '',
     		treety: '',
@@ -47,16 +45,6 @@ export default class SafetyTable extends Component {
 		return (
 			<div>
 				{this.treeTable(tblData)}
-				<Modal
-					width={522}
-					title='详细信息'
-					style={{textAlign:'center'}}
-					visible={this.state.imgvisible}
-					onOk={this.handleCancel.bind(this)}
-					onCancel={this.handleCancel.bind(this)}
-				>
-					<img style={{width:"490px",height:"300px"}} src={this.state.src} alt="图片"/>
-				</Modal>
 			</div>
 		);
 	}
@@ -111,62 +99,73 @@ export default class SafetyTable extends Component {
 			dataIndex: 'nurseryname',
 		}];
 		header = <div >
-					<Row>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>工程名称：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={section} onChange={this.onsectionchange.bind(this)}>
-								{sectionoption}
-							</Select>
-						</Col>
-						<Col xl={4} lg={5} md={6} className='mrg10'>
-							<span>主题：</span>
-							<Input suffix={suffix2} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
-						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>文档类型：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={treety} onChange={this.ontypechange.bind(this)}>
-								{typeoption}
-							</Select>
-						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>流程状态：</span>
-							<Select allowClear className='forestcalcw4 mxw100' defaultValue='全部' value={isstandard} onChange={this.standardchange.bind(this)}>
-								{standardoption}
-							</Select>
-						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>编码：</span>
-							<Input suffix={suffix1} value={zzbm} className='forestcalcw2 mxw100' onChange={this.zzbmchange.bind(this)}/>
-						</Col>
-						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
-								查询
-							</Button>
-						</Col>
-						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.resetinput.bind(this)}>
-								重置
-							</Button>
-						</Col>
-					</Row>
-				</div> 
+			<Row>
+				<Col xl={3} lg={4} md={5} className='mrg10'>
+					<span>工程名称：</span>
+					<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={section} onChange={this.onsectionchange.bind(this)}>
+						{sectionoption}
+					</Select>
+				</Col>
+				<Col xl={4} lg={5} md={6} className='mrg10'>
+					<span>主题：</span>
+					<Input suffix={suffix2} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
+				</Col>
+				<Col xl={3} lg={4} md={5} className='mrg10'>
+					<span>文档类型：</span>
+					<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={treety} onChange={this.ontypechange.bind(this)}>
+						{typeoption}
+					</Select>
+				</Col>
+				<Col xl={3} lg={4} md={5} className='mrg10'>
+					<span>流程状态：</span>
+					<Select allowClear className='forestcalcw4 mxw100' defaultValue='全部' value={isstandard} onChange={this.standardchange.bind(this)}>
+						{standardoption}
+					</Select>
+				</Col>
+				<Col xl={3} lg={4} md={5} className='mrg10'>
+					<span>编码：</span>
+					<Input suffix={suffix1} value={zzbm} className='forestcalcw2 mxw100' onChange={this.zzbmchange.bind(this)}/>
+				</Col>
+				<Col span={2} className='mrg10'>
+					<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
+						查询
+					</Button>
+				</Col>
+				<Col span={2} className='mrg10'>
+					<Button type='primary' onClick={this.resetinput.bind(this)}>
+						重置
+					</Button>
+				</Col>
+			</Row>
+		</div> 
 		return <div>
-					<Row>
-						{header}
-					</Row>
-					<Row>
-						<Table bordered
-						 className='foresttable'
-						 columns={columns}
-						 rowKey='order'
-						 loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
-						 locale={{emptyText:'当天无信息'}}
-						 dataSource={details}
-						 onChange={this.handleTableChange.bind(this)}
-						 pagination={this.state.pagination}
-						/>
-					</Row>
-				</div>
+			<Row style={{marginBottom: 30}}>
+				{header}
+			</Row>
+			<Row>
+				<Col>
+					<Button style={{marginRight:"10px"}} onClick = {this.add.bind(this)}>新增</Button>
+					<Button style={{marginRight:"10px"}}>删除</Button>
+				</Col>
+			</Row>
+			<Row>
+				<Table bordered
+				 className='foresttable'
+				 columns={columns}
+				 rowKey='order'
+				 loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
+				 locale={{emptyText:'当天无信息'}}
+				 dataSource={details}
+				 onChange={this.handleTableChange.bind(this)}
+				 pagination={this.state.pagination}
+				/>
+			</Row>
+		</div>
+	}
+
+	add() {
+		const { actions: { AddVisible } } = this.props;
+		AddVisible(true);
 	}
 
 	emitEmpty1 = () => {
@@ -208,11 +207,6 @@ export default class SafetyTable extends Component {
 	standardchange(value) {
 		this.setState({isstandard:value || ''})
 	}
-
-	datepick(value){
-		this.setState({stime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
-		this.setState({etime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
-    }
 
 	handleTableChange(pagination){
         const pager = { ...this.state.pagination};
