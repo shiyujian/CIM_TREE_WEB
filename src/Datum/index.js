@@ -19,7 +19,7 @@ export default class DatumContainer extends Component {
 	}
 
 	render() {
-		const {Datum, Engineering,Radios} = this.state || {};
+		const {Datum, Engineering,Redios} = this.state || {};
 		return (
 			<Body>
 			<Aside>

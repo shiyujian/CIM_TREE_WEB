@@ -25,23 +25,23 @@ export default class Filter extends Component {
 				<Row gutter={24}>
 					<Col span ={24}>
 					{!this.props.isTreeSelected?
-						<Button style={{marginRight: 10}} disabled>添加文件</Button>:
-						<Button style={{marginRight: 10}} type="primary" onClick={toggleAddition.bind(this, true)}>添加文件</Button>
+						<Button style={{marginRight: 10}} disabled>新增</Button>:
+						<Button style={{marginRight: 10}} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
 					}
 					{/* </Col> */}
 					{/* <Col span ={2}> */}
-						{
+						{/* {
 							(Doc.length === 0 )?
-								<Button style={{marginRight: 10}} disabled>下载文件</Button>:
-								<Button style={{marginRight: 10}} type="primary" onClick={this.download.bind(this)}>下载文件</Button>
-						}
+								<Button style={{marginRight: 10}} disabled>下载</Button>:
+								<Button style={{marginRight: 10}} type="primary" onClick={this.download.bind(this)}>下载</Button>
+						} */}
 					{/* </Col> */}
 					{/* <Col span ={2}> */}
 						{
 							(Doc.length === 0 )?
-								<Button style={{marginRight: 10}} disabled>删除文件</Button>:
+								<Button style={{marginRight: 10}} disabled>删除</Button>:
 								<Popconfirm title="确定要删除文件吗？" onConfirm={this.confirm.bind(this)} onCancel={this.cancel.bind(this)} okText="Yes" cancelText="No">
-									<Button style={{marginRight: 10}} type="primary" onClick={this.delete.bind(this)}>删除文件</Button>
+									<Button style={{marginRight: 10}} type="primary" onClick={this.delete.bind(this)}>删除</Button>
 								</Popconfirm>
 						}
 					</Col>
@@ -107,22 +107,22 @@ export default class Filter extends Component {
         document.body.removeChild(link);
     }
 
-    download(){
-		const {selected=[],file =[],files=[],down_file=[]} = this.props;
-	    if(selected.length == 0){
-		    message.warning('没有选择无法下载');
-	    }
-		selected.map(rst =>{
-			file.push(rst.basic_params.files);
-		});
-		file.map(value => {
-			value.map(cot => {
-				files.push(cot.download_url)
-			})
-		});
-		files.map(down =>{
-			let down_load = STATIC_DOWNLOAD_API + "/media"+down.split('/media')[1];
-			this.createLink(this,down_load);
-		});
-	}
+    // download(){
+	// 	const {selected=[],file =[],files=[],down_file=[]} = this.props;
+	//     if(selected.length == 0){
+	// 	    message.warning('没有选择无法下载');
+	//     }
+	// 	selected.map(rst =>{
+	// 		file.push(rst.basic_params.files);
+	// 	});
+	// 	file.map(value => {
+	// 		value.map(cot => {
+	// 			files.push(cot.download_url)
+	// 		})
+	// 	});
+	// 	files.map(down =>{
+	// 		let down_load = STATIC_DOWNLOAD_API + "/media"+down.split('/media')[1];
+	// 		this.createLink(this,down_load);
+	// 	});
+	// }
 };
