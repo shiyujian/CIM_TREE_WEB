@@ -35,7 +35,7 @@ export default class Redios extends Component {
 		return (
             <Body>
             <Main>
-                <DynamicTitle title="工程文档" {...this.props}/>
+                <DynamicTitle title="工程影像" {...this.props}/>
                 <Sidebar>
 	                {
 		                stas == true?

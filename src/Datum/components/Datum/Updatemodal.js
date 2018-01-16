@@ -32,7 +32,7 @@ export default class Addition extends Component {
                     <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
         let footer = isUploading ? null : arr;
         return (
-            <Modal title="更新资料"
+            <Modal title="新增资料"
                    width={920} visible={updatevisible}
                    closable={false}
                    footer={footer}

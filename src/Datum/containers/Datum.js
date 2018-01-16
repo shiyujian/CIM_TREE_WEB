@@ -41,7 +41,7 @@ export default class Datum extends Component {
 		return (
 			<Body>
 			<Main>
-				<DynamicTitle title="制度规范" {...this.props}/>
+				<DynamicTitle title="制度标准" {...this.props}/>
 				<Sidebar>
 					<DatumTree treeData={list}
 								selectedKeys={keycode}

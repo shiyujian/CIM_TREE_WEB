@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import reducer, {actions} from '../store/engineering';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import {Filter, Table,Addition,Updatemodal,Tree} from '../components/Engineering'
+import {Filter, Table,Addition,Updatemodal1,Tree} from '../components/Engineering'
 import PkCodeOnTree from '../components/PkCodeOnTree';
 import PkCodeTree1 from '../components/PkCodeTree';
 import Preview from '_platform/components/layout/Preview';
@@ -63,7 +63,7 @@ export default class Engineering extends Component {
 				                <Filter {...this.props} query = {this.query.bind(this)}/>
 			                    <Table {...this.props} {...this.state}/>
 				                <Addition {...this.props}/>
-				                <Updatemodal {...this.props}/>
+				                <Updatemodal1 {...this.props}/>
 			                </div>
 	                }
                 </Content>
