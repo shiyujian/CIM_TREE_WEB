@@ -5,7 +5,7 @@ import {SERVICE_API} from '_platform/api';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
 
-export const ID = 'redios';
+export const ID = 'redios_redios';
 export const getTreeOK = createAction(`${ID}_工程施工包`);
 export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/`, [getTreeOK]);
 export const getdirtreeOK = createAction(`${ID}_剩余DIR包`);
@@ -50,6 +50,9 @@ export const getProjectAc = createFetchAction(`${SERVICE_API}/project-tree/?dept
 //设计阶段名称
 const getDesignStageOK =createAction(`${ID}_获取设计阶段名称`);
 const getDesignStage = createFetchAction(`${SERVICE_API}/metalist/designstage/`,[getDesignStageOK]);
+// 接收弹出框状态
+const getModalState =createAction(`${ID}接收弹出框状态`);
+
 
 export const actions = {
 	getDesignStageOK,
@@ -86,7 +89,8 @@ export const actions = {
 	getDesignUnitOK,
 	getDesignUnit,
 	getProjectAcOK,
-	getProjectAc
+	getProjectAc,
+	getModalState
 };
 
 export default handleActions({
@@ -186,5 +190,9 @@ export default handleActions({
 	[combineActions(...actionsMap(followReducer))]: (state, action) => ({
 		...state,
 		follow: followReducer(state.follow, action)
-	})
+	}),
+	[getModalState]: (state, {payload}) => ({
+		...state,
+		getModalVisible: payload
+	}),
 }, {});

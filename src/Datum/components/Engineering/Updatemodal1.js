@@ -1,28 +1,28 @@
 import React, { PropTypes, Component } from 'react';
 import { FILE_API } from '../../../_platform/api';
 import {
-	Form, Input, Button, Row, Col, Modal, Upload,
-	Icon, Table, Select, DatePicker, Progress, notification, Checkbox
+	Form, Input, Button, Row, Col, Modal, Upload, Progress,
+	Icon, message, Table, Select, DatePicker
 } from 'antd';
 import moment from 'moment';
 import { DeleteIpPort } from '../../../_platform/components/singleton/DeleteIpPort';
-import './Addition.less';
-
-const Dragger = Upload.Dragger;
-const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
-
+const Dragger = Upload.Dragger;
+const Option = Select.Option;
 let fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
-class Addition extends Component {
+class Updatemodal1 extends Component {
+
 	static propTypes = {};
+
+	// static layout = {
+	// 	labelCol: { span: 8 },
+	// 	wrapperCol: { span: 16 }
+	// };
+
 	static layout = {
-		labelCol: { span: 8 },
-		wrapperCol: { span: 16 }
-	};
-	static layout1 = {
-		labelCol: { span: 4 },
-		wrapperCol: { span: 20 }
+		labelCol: { span: 6 },
+		wrapperCol: { span: 18 },
 	};
 	state = {
 		progress: 0,
@@ -30,16 +30,16 @@ class Addition extends Component {
 	}
 
 	render() {
+
 		const {
 			platform: { users = [] },
 			form: { getFieldDecorator }
 		} = this.props;
 
-		const { additionVisible = false,
+		const { updatevisible = false,
 			docs = [],
 			newkey = [],
-			judgeFile = '',
-			newdirtree = []
+			judgeFile = ''
 		} = this.props;
 		let content = judgeFile.indexOf('照片') == -1 ? "支持 pdf、doc、docx 文件" : "支持 jpg、jpeg、png 文件";
 		fileTypes = judgeFile.indexOf('照片') == -1 ? 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword' : 'image/jpg,image/jpeg,image/png';
@@ -77,7 +77,7 @@ class Addition extends Component {
 					key: rst.name,
 					render: (doc, record, index) => {
 						const { professionlist = [] } = this.props;
-						return <Select placeholder="选择专业" style={{ width: 130 }}
+						return <Select placeholder="专业" style={{ width: 200 }}
 							onChange={this.changeprofessionlist.bind(this, rst.code, record, index)}>
 							{
 								professionlist.map((data, index) => {
@@ -93,7 +93,7 @@ class Addition extends Component {
 					title: rst.name,
 					key: rst.name,
 					render: (doc, record, index) => {
-						return <DatePicker style={{ width: 110 }} onChange={this.time.bind(this, rst.code, record, index)} />;
+						return <DatePicker onChange={this.time.bind(this, rst.code, record, index)} />;
 					}
 				}
 			}
@@ -115,6 +115,15 @@ class Addition extends Component {
 					}
 				}
 			}
+			// else if(rst.name === "设计单位"){
+			// 	return{
+			// 		title:rst.name,
+			// 		key:rst.name,
+			// 		render: (doc,record,index) => {
+			// 			return <Input onChange={this.unit.bind(this, rst.code,record,index)}/>;
+			// 		}
+			// 	}
+			// }
 			else if (rst.name === "设计单位") {
 				return {
 					title: rst.name,
@@ -130,7 +139,6 @@ class Addition extends Component {
 								})
 							}
 						</Select>;
-						/* return <Input onChange={this.unit.bind(this, rst.code,record,index)}/>; */
 					}
 				}
 			}
@@ -156,18 +164,17 @@ class Addition extends Component {
 		});
 
 		return (
-			<Modal title="新增文档"
-				width='70%' visible={additionVisible}
+			<Modal title="新增资料"
+				width={920} visible={updatevisible}
 				closable={false}
 				footer={footer}
 				maskClosable={false}>
-
 				<Form>
 					<Row>
-						<Col span={24}>
+						<Col span={20}>
 							<Row>
-								<Col span={8} >
-									<FormItem {...Addition.layout} label="单位工程">
+								<Col span={8}>
+									<FormItem {...Updatemodal1.layout} label="单位工程">
 										{
 											getFieldDecorator('workflow', {
 												rules: [
@@ -180,25 +187,23 @@ class Addition extends Component {
 									</FormItem>
 								</Col>
 								<Col span={16}>
-									<Row>
-										<FormItem className="box" {...Addition.layout1} label="主题" span={4} >
-											{
-												getFieldDecorator('workflowactivity', {
-													rules: [
-														{ required: false, message: '请输入任务名称' },
-													]
-												})
-													(<Input span={20} placeholder="请输入..." />)
-											}
-										</FormItem>
-									</Row>
+									<FormItem {...Updatemodal1.layout} label="主题">
+										{
+											getFieldDecorator('workflowactivity', {
+												rules: [
+													{ required: false, message: '请输入任务名称' },
+												]
+											})
+												(<Input placeholder="请输入..." />)
+										}
+									</FormItem>
 								</Col>
 
 
 							</Row>
 							<Row>
 								<Col span={8}>
-									<FormItem {...Addition.layout} label="文档类型">
+									<FormItem {...Updatemodal1.layout} label="文档类型">
 										{
 											getFieldDecorator('creator', )
 												(<Select
@@ -209,7 +214,7 @@ class Addition extends Component {
 									</FormItem>
 								</Col>
 								<Col span={8}>
-									<FormItem {...Addition.layout} label="收文单位">
+									<FormItem {...Updatemodal1.layout} label="收文单位">
 										{
 											getFieldDecorator('creator', )
 												(<Select placeholder="系统自带识别获取"
@@ -220,7 +225,7 @@ class Addition extends Component {
 									</FormItem>
 								</Col>
 								<Col span={8}>
-									<FormItem {...Addition.layout} label="编号">
+									<FormItem {...Updatemodal1.layout} label="编号">
 										{
 											getFieldDecorator('workflowactivity', {
 												rules: [
@@ -231,6 +236,19 @@ class Addition extends Component {
 										}
 									</FormItem>
 								</Col>
+							</Row>
+						</Col>
+						<Col span={3} offset={1}>
+							<Row>
+								<FormItem>
+									<Button
+										onClick={this.query}>查询</Button>
+								</FormItem>
+							</Row>
+							<Row>
+								<FormItem>
+									<Button onClick={this.clear}>清空</Button>
+								</FormItem>
 							</Row>
 						</Col>
 					</Row>
@@ -252,47 +270,15 @@ class Addition extends Component {
 							<Progress percent={progress} strokeWidth={5} />
 						</Col>
 					</Row>
-					<Row gutter={24} style={{ marginTop: 30 }}>
+					<Row gutter={24} style={{ marginTop: 35 }}>
 						<Col span={24}>
-							{/* <Table rowSelection={this.rowSelection}
-                                   columns={docCols}
-                                   dataSource={docs}
-                                   bordered rowKey="uid"/> */}
-							<Table
+							<Table rowSelection={this.rowSelection}
 								columns={docCols}
 								dataSource={docs}
 								bordered rowKey="uid" />
 						</Col>
 					</Row>
-					<Row span={24} style={{ marginTop: "40px" }}>
-						<Col span={8} style={{ float: "left", marginLeft: "15%" }}>
-							<FormItem {...Addition.layout} label="审核人" style={{ marginBottom: "0" }}>
-								{
-									getFieldDecorator('creator', )
-										(<Select
-										>
-										</Select>)
-								}
-							</FormItem>
-						</Col>
-						<Col span={4} style={{ float: "left", marginLeft: "15%" }}>
-							<FormItem style={{ marginBottom: "0" }}>
-								{getFieldDecorator('remember', {
-									valuePropName: 'checked',
-									initialValue: true,
-								})(
-									<Checkbox>短信通知</Checkbox>
-									)}
-							</FormItem>
-						</Col>
-
-						<Col span={4} style={{ float: "left", marginTop: "5px", marginLeft: "3%" }} >
-							<Button style={{ marginLeft: "16%" }}>取消</Button>
-							<Button>确定</Button>
-						</Col>
-					</Row>
 				</Form>
-
 			</Modal>
 		);
 	}
@@ -306,10 +292,9 @@ class Addition extends Component {
 
 	cancel() {
 		const {
-			actions: { toggleAddition, changeDocs },
+			actions: { updatevisible },
 		} = this.props;
-		toggleAddition(false);
-		changeDocs([]);
+		updatevisible(false);
 		this.setState({
 			progress: 0
 		})
@@ -322,17 +307,14 @@ class Addition extends Component {
 		data(file) {
 			return {
 				name: file.fileName,
-				a_file: file
+				a_file: file,
 			};
 		},
 		beforeUpload(file) {
 			const valid = fileTypes.indexOf(file.type) >= 0;
 			const errorMsg = fileTypes.indexOf('image') == -1 ? '只能上传 pdf、doc、docx 文件！' : '只能上传 jpg、jpeg、png 文件！';
 			if (!valid) {
-				notification.error({
-					message: errorMsg,
-					duration: 2
-				});
+				message.error(errorMsg);
 			}
 			return valid;
 			this.setState({ progress: 0 });
@@ -345,7 +327,6 @@ class Addition extends Component {
 			actions: { changeDocs }
 		} = this.props;
 		if (file.status === 'done') {
-			file.updoc = {};
 			changeDocs([...docs, file]);
 		}
 		this.setState({
@@ -359,50 +340,6 @@ class Addition extends Component {
 		}
 	}
 
-	proj(code, doc, record, event) {
-		const {
-			docs = [],
-			updoc = {},
-			actions: { changeDocs, changeupdoc }
-		} = this.props;
-		let value = event.target.value;
-		doc.updoc.projectPrincipal = {
-			person_name: value
-		};
-		changeupdoc(updoc);
-		changeDocs(docs);
-	}
-
-	prof(code, doc, record, event) {
-		const {
-			docs = [],
-			updoc = {},
-			actions: { changeDocs, changeupdoc }
-		} = this.props;
-		let value = event.target.value;
-		doc.updoc.professionPrincipal = {
-			person_name: value
-		};
-		changeupdoc(updoc);
-		changeDocs(docs);
-	}
-
-	unit(code, doc, record, event) {
-		const {
-			docs = [],
-			updoc = {},
-			actions: { changeDocs, changeupdoc }
-		} = this.props;
-		/* let value = event;
-		doc.updoc.designUnit = {
-			name:value
-		}; */
-
-		doc.updoc[code] = event;
-		changeupdoc(updoc);
-		changeDocs(docs);
-	}
-
 	company(code, doc, record, event) {
 		const {
 			docs = [],
@@ -411,10 +348,9 @@ class Addition extends Component {
 		} = this.props;
 		let newname = code;
 		let value = event.target.value;
-		doc.updoc[newname] = value;
-		doc.updoc.state = '正常状态';
-		doc.updoc.name = doc.name;
-		console.log(99, doc);
+		updoc[newname] = value;
+		updoc.state = '正常状态';
+		updoc.name = doc.name;
 		changeupdoc(updoc);
 		changeDocs(docs);
 	}
@@ -436,8 +372,9 @@ class Addition extends Component {
 			updoc = {},
 			actions: { changeDocs, changeupdoc }
 		} = this.props;
-		doc.updoc[code] = event;
+		updoc[code] = event;
 		changeupdoc(updoc);
+		console.log(666666, updoc);
 		changeDocs(docs);
 	}
 
@@ -447,8 +384,46 @@ class Addition extends Component {
 			updoc = {},
 			actions: { changeDocs, changeupdoc }
 		} = this.props;
-		// updoc[name] = data;
-		doc.updoc[name] = data;
+		updoc[name] = data;
+		changeupdoc(updoc);
+		changeDocs(docs);
+	}
+
+	proj(code, doc, record, event) {
+		const {
+			docs = [],
+			updoc = {},
+			actions: { changeDocs, changeupdoc }
+		} = this.props;
+		let value = event.target.value;
+		updoc.projectPrincipal = {
+			person_name: value
+		};
+		changeupdoc(updoc);
+		changeDocs(docs);
+	}
+
+	prof(code, doc, record, event) {
+		const {
+			docs = [],
+			updoc = {},
+			actions: { changeDocs, changeupdoc }
+		} = this.props;
+		let value = event.target.value;
+		updoc.professionPrincipal = {
+			person_name: value
+		};
+		changeupdoc(updoc);
+		changeDocs(docs);
+	}
+
+	unit(code, record, index, event) {
+		const {
+			docs = [],
+			updoc = {},
+			actions: { changeDocs, changeupdoc }
+		} = this.props;
+		record.updoc[code] = event;
 		changeupdoc(updoc);
 		changeDocs(docs);
 	}
@@ -469,66 +444,45 @@ class Addition extends Component {
 			currentcode = {},
 			updoc = {},
 			docs = [],
-			actions: { toggleAddition, postDocument, getdocument, changeDocs }
+			actions: { updatevisible, postDocument, getdocument, changeDocs }
 		} = this.props;
-		let tag = false;
-		if (docs.length == 0) {
-			notification.error({
-				message: '请先上传文件',
-				duration: 2
+		const promises = docs.map(doc => {
+			const response = doc.response;
+			let files = DeleteIpPort(doc);
+			return postDocument({}, {
+				code: `${currentcode.code}_${response.id}`,
+				name: doc.name,
+				obj_type: 'C_DOC',
+				profess_folder: {
+					code: currentcode.code, obj_type: 'C_DIR'
+				},
+				basic_params: {
+					files: [files]
+				},
+				extra_params: {
+					...updoc,
+					submitTime: moment.utc().format()
+				}
 			});
-			return
-		}
-		for (let i = 0; i < docs.length; i++) {
-			let flag = (docs[i].updoc.keyword_19 == undefined || docs[i].updoc.juance == undefined || docs[i].updoc.keyword_17 == undefined || docs[i].updoc.projectPrincipal.person_name == undefined ||
-				docs[i].updoc.professionPrincipal.person_name == undefined || docs[i].updoc.profession == undefined || docs[i].updoc.archivingTime == undefined ||
-				docs[i].updoc.version == undefined);
-			if (flag) {
-				notification.error({
-					message: '信息填写不完整',
-					duration: 2
-				});
-				tag = true
-				break;
-			}
-		}
-		if (!tag) {
-			const promises = docs.map(doc => {
-				const response = doc.response;
-				let files = DeleteIpPort(doc);
-				return postDocument({}, {
-					code: `${currentcode.code}_${response.id}`,
-					name: doc.name,
-					obj_type: 'C_DOC',
-					profess_folder: {
-						code: currentcode.code, obj_type: 'C_DIR'
-					},
-					basic_params: {
-						files: [files]
-					},
-					extra_params: {
-						...doc.updoc,
-						submitTime: moment.utc().format()
-					}
-				});
+		});
+		message.warning('新增文件中...');
+		Promise.all(promises).then(rst => {
+			const { oldfile = {}, currentcode = {}, actions: { putdocument } } = this.props;
+			message.success('新增文件成功！');
+			putdocument({ code: oldfile.code }, {
+				extra_params: {
+					state: '作废'
+				}
 			});
-			notification.info({
-				message: '新增文件中...',
-				duration: 2
-			});
-			Promise.all(promises).then(rst => {
-				notification.success({
-					message: '新增文件成功！',
-					duration: 2
-				});
-				changeDocs([]);
-				toggleAddition(false);
-				getdocument({ code: currentcode.code });
-			});
-			this.setState({
-				progress: 0
-			})
-		}
+			changeDocs([]);
+			updatevisible(false);
+			setTimeout(() => { getdocument({ code: currentcode.code }) }, 1000)
+		});
+		this.setState({
+			progress: 0
+		})
 	}
+
 }
-export default Addition = Form.create()(Addition);
+
+export default Updatemodal1 = Form.create()(Updatemodal1);

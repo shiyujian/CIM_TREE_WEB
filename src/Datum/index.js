@@ -4,9 +4,6 @@ import {Route} from 'react-router-dom';
 import {Main, Aside, Body} from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import {Icon} from 'react-fa';
-import Radio from 'antd/lib/radio/radio';
-import Redios from './containers/Redios';
-
 export default class DatumContainer extends Component {
 
 	async componentDidMount() {
@@ -45,11 +42,13 @@ export default class DatumContainer extends Component {
 		path: '/datum/engineering',
 		name: '工程文档',
 		icon: <Icon name="file-word-o"/>
-	},{
+	},
+	{
 		key: 'redios',
-		id: 'DATUM.REDIO',
+		id: 'DATUM.REDIOS',
 		path: '/datum/redios',
 		name: '工程影像',
 		icon: <Icon name="file-word-o"/>
-	}];
+	}
+];
 }

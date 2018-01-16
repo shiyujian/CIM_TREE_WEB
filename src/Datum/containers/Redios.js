@@ -1,21 +1,21 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import reducer, {actions} from '../store/engineering';
+import reducer, {actions} from '../store/redios';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import {Filter, Table,Addition,Updatemodal,Tree} from '../components/Redios'
+import {Filter, Table,Addition,Updatemodal,Tree,ImageInfo} from '../components/Redios'
 import PkCodeOnTree from '../components/PkCodeOnTree';
 import PkCodeTree1 from '../components/PkCodeTree';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import Button from "antd/es/button/button";
-export const Engicode = window.DeathCode.DATUM_ENGINEERING;
+export const Engicode = window.DeathCode.DATUM_REDIOS;
 
 @connect(
 	state => {
-		const {datum:{engineering = {}}, platform} = state || {};
-		return {...engineering, platform};
+		const {datum:{redios = {}}, platform} = state || {};
+		return {...redios, platform};
 	},
 	dispatch => ({
 		actions: bindActionCreators({...actions, ...platformActions,...previewActions}, dispatch)
@@ -32,12 +32,13 @@ export default class Redios extends Component {
 
 	render() {
 		const {newdirtree=[],stas = true,tablevisible = false, keycode,expandedKeys,tree=[],projectList=[]} = this.props;
+		console.log(this.props)
 		return (
             <Body>
             <Main>
                 <DynamicTitle title="工程影像" {...this.props}/>
                 <Sidebar>
-	                {
+	                {/* {
 		                stas == true?
 			                <PkCodeOnTree treeData={projectList}
 			                            selectedKeys={keycode}
@@ -53,9 +54,9 @@ export default class Redios extends Component {
 											{...this.state}
 				                />
 			                </div>
-	                }
+	                } */}
                 </Sidebar>
-                <Content>
+                {/* <Content>
 	                {
 	                	tablevisible == false?
 			                null:
@@ -66,6 +67,10 @@ export default class Redios extends Component {
 				                <Updatemodal {...this.props}/>
 			                </div>
 	                }
+				</Content> */}
+				<Content>
+					<ImageInfo {...this.props} />
+					<Updatemodal {...this.props}/>
                 </Content>
             </Main>
             <Preview/>
@@ -104,7 +109,7 @@ export default class Redios extends Component {
 			return
 		}
 		let valuecode = code.split("--")[1];
-		const level = Engineering.loop(tree, eventKey.split("--")[1]);
+		const level = Redios.loop(tree, eventKey.split("--")[1]);
 		setkeycode(code);
 		if(level !== "two" ){
 			return
@@ -139,7 +144,7 @@ export default class Redios extends Component {
 				rst = type;
 
 			} else {
-				const tmp = Engineering.loop(children, code, deep + 1);
+				const tmp = Redios.loop(children, code, deep + 1);
 				if (tmp) {
 					rst = tmp;
 				}

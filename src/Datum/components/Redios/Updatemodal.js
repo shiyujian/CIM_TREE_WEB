@@ -24,6 +24,9 @@ export default class Addition extends Component {
     }
 
 	render() {
+		const {actions: {getModalState}} = this.props;
+		const getModalVisible=this.props.getModalVisible
+		console.log(getModalVisible)
 		const{updatevisible = false,
 			docs = [],
 			newkey =[],
@@ -153,7 +156,7 @@ export default class Addition extends Component {
 
 		return (
 			<Modal title="更新资料"
-			       width={920} visible={updatevisible}
+			       width={920} visible={getModalVisible}
 			       closable={false}
                    footer={footer}
                    maskClosable={false}>
@@ -196,9 +199,9 @@ export default class Addition extends Component {
 
 	cancel() {
 		const {
-			actions: {updatevisible},
+			actions: {getModalState},
 		} = this.props;
-		updatevisible(false);
+		getModalState(false);
         this.setState({
             progress:0
         })
@@ -348,7 +351,7 @@ export default class Addition extends Component {
 			currentcode = {},
 			updoc = {},
 			docs = [],
-			actions: {updatevisible, postDocument, getdocument,changeDocs}
+			actions: {getModalState, postDocument, getdocument,changeDocs}
 		} = this.props;
 		const promises = docs.map(doc => {
 			const response = doc.response;
@@ -379,7 +382,7 @@ export default class Addition extends Component {
 				}
 			});
 			changeDocs([]);
-			updatevisible(false);
+			getModalState(false);
 			setTimeout(()=>{getdocument({code: currentcode.code})},1000)
 		});
         this.setState({

@@ -50,7 +50,6 @@ export const getProjectAc = createFetchAction(`${SERVICE_API}/project-tree/?dept
 //设计阶段名称
 const getDesignStageOK =createAction(`${ID}_获取设计阶段名称`);
 const getDesignStage = createFetchAction(`${SERVICE_API}/metalist/designstage/`,[getDesignStageOK]);
-
 export const actions = {
 	getDesignStageOK,
 	getDesignStage,

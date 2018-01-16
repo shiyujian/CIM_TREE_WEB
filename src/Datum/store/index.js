@@ -6,7 +6,8 @@ import dirFactory from '_platform/store/higher-order/dir';
 import fieldFactory from '_platform/store/service/field';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
-import engineerReducer, {actions as engineerActions} from './engineering';
+import engineeringReducer, {actions as engineeringActions} from './engineering';
+import rediosReducer, {actions as rediosActions} from './redios';
 
 const ID = 'datum_datum';
 const dirReducer = dirFactory(ID);
@@ -51,10 +52,14 @@ export const actions = {
 };
 
 export default handleActions({
-	[combineActions(...actionsMap(engineerActions))]: (state, action) => ({
+	[combineActions(...actionsMap(engineeringActions))]: (state, action) => ({
 			...state,
-			engineering: engineerReducer(state.engineering, action)
-	}),
+			engineering: engineeringReducer(state.engineering, action)
+    }),
+    [combineActions(...actionsMap(rediosActions))]: (state, action) => ({
+        ...state,
+        redios: rediosReducer(state.redios, action)
+    }),
 	[combineActions(...actionsMap(dirReducer))]: (state, action) => ({
         ...state,
         tree: dirReducer(state.tree, action)
