@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Form, Input, Button, Popconfirm } from 'antd';
+import { Row, Col, Form, Input, Button, Popconfirm, Table, Icon } from 'antd';
 import { divIcon } from 'leaflet';
 import { Map, TileLayer, Marker, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -8,6 +8,38 @@ import { CollapsePanel } from 'antd/lib/collapse/Collapse';
 
 const FormItem = Form.Item;
 const URL = window.config.VEC_W;
+
+const columns = [{
+	title: '序号',
+	dataIndex: 'name',
+	key: 'name',
+	render: text => <a href="#">{text}</a>,
+},{
+	title: '种树',
+	dataIndex: 'address',
+	key: 'address',
+},{
+	title: '数量（课）',
+	dataIndex: 'age',
+	key: 'age',
+}];
+
+const data = [{
+	key: '1',
+	name: '1',
+	age: 1234,
+	address: '中国垂丝海棠',
+}, {
+	key: '2',
+	name: '2',
+	age: 111,
+	address: '银杏',
+}, {
+	key: '3',
+	name: '3',
+	age: 32,
+	address: '11',
+}];
 
 class Info extends Component {
 	render() {
@@ -39,10 +71,10 @@ class Info extends Component {
 												fontSize: 16,
 												fontWeight: 'bold',
 												paddingRight: '1em'
-											}}>地块详情</span>
-											<Button onClick={this.editField.bind(this)}>编辑地块</Button>
+											}}>细班详情</span>
+											<Button onClick={this.editField.bind(this)}>细班编辑</Button>
 											<Popconfirm title="确定删除此单元吗?" onConfirm={this.delField.bind(this)} okText="确定" cancelText="取消">
-												<Button style={{ marginLeft: 10 }}>删除地块</Button>
+												<Button style={{ marginLeft: 10 }}>删除细班</Button>
 											</Popconfirm>
 										</div>
 									</Col>
@@ -50,33 +82,47 @@ class Info extends Component {
 								<Col span={24}>
 									<Row>
 										<Col span={12}>
-											<FormItem {...Info.layoutT} label="地块名称">
+											<FormItem {...Info.layoutT} label="细班名称">
 												<Input readOnly value={areaInfo.name} />
 											</FormItem>
 										</Col>
 										<Col span={12}>
-											<FormItem {...Info.layoutT} label="地块编码">
+											<FormItem {...Info.layoutT} label="细班编码">
 												<Input readOnly value={areaInfo.code} />
 											</FormItem>
 										</Col>
 									</Row>
 									<Row>
-										<FormItem {...Info.layout} label="地块文档">
-											<div>
-												<a href={`${STATIC_DOWNLOAD_API}${file_info.download_url}`}
-													target="_bank">
-													{file_info.name}
-												</a>
-											</div>
-										</FormItem>
-
+										<Col span={12}>
+											<FormItem {...Info.layoutT} label="所属小班">
+												<Input readOnly value={areaInfo.name} />
+											</FormItem>
+										</Col>
+										<Col span={12}>
+											<FormItem {...Info.layoutT} label="标段描述">
+												<div>
+													<a href={`${STATIC_DOWNLOAD_API}${file_info.download_url}`}
+														target="_bank">
+														{file_info.name}
+													</a>
+												</div>
+											</FormItem>
+										</Col>
 									</Row>
-									<FormItem {...Info.layout} label="地块坐标">
+									<Row>
+								
+										<FormItem {...Info.layout} label="所属小班">
+												<div>
+													<Table pagination={false} columns={columns} dataSource={data} />
+												</div>
+											</FormItem>
+									</Row>
+									<FormItem {...Info.layout} label="细班坐标">
 										<Input type="textarea" rows={4} readOnly
 											value={extra_params.coordinates.length === 0 ? [] : JSON.stringify(extra_params.coordinates)} />
 									</FormItem>
 
-									<FormItem {...Info.layout} label="地块地图">
+									<FormItem {...Info.layout} label="细班地图">
 										<Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
 											style={{ position: 'relative', height: 360, width: '100%' }}>
 											<TileLayer url={URL} subdomains={['7']} />
