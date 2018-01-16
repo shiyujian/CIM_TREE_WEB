@@ -39,10 +39,10 @@ class Info extends Component {
 												fontSize: 16,
 												fontWeight: 'bold',
 												paddingRight: '1em'
-											}}>地块详情</span>
-											<Button onClick={this.editField.bind(this)}>编辑地块</Button>
+											}}>区域详情</span>
+											<Button onClick={this.editField.bind(this)}>编辑区域</Button>
 											<Popconfirm title="确定删除此单元吗?" onConfirm={this.delField.bind(this)} okText="确定" cancelText="取消">
-												<Button style={{ marginLeft: 10 }}>删除地块</Button>
+												<Button style={{ marginLeft: 10 }}>删除区域</Button>
 											</Popconfirm>
 										</div>
 									</Col>
@@ -50,33 +50,39 @@ class Info extends Component {
 								<Col span={24}>
 									<Row>
 										<Col span={12}>
-											<FormItem {...Info.layoutT} label="地块名称">
+											<FormItem {...Info.layoutT} label="区域名称">
 												<Input readOnly value={areaInfo.name} />
 											</FormItem>
 										</Col>
 										<Col span={12}>
-											<FormItem {...Info.layoutT} label="地块编码">
+											<FormItem {...Info.layoutT} label="区域编码">
 												<Input readOnly value={areaInfo.code} />
 											</FormItem>
 										</Col>
 									</Row>
 									<Row>
-										<FormItem {...Info.layout} label="地块文档">
-											<div>
-												<a href={`${STATIC_DOWNLOAD_API}${file_info.download_url}`}
-													target="_bank">
-													{file_info.name}
-												</a>
-											</div>
-										</FormItem>
-
+										<Col span={12}>
+											<FormItem {...Info.layoutT} label="所属地块">
+												<Input readOnly value={areaInfo.name} />
+											</FormItem>
+										</Col>
+										<Col span={12}>
+											<FormItem {...Info.layoutT} label="区域描述">
+												<div>
+													<a href={`${STATIC_DOWNLOAD_API}${file_info.download_url}`}
+														target="_bank">
+														{file_info.name}
+													</a>
+												</div>
+											</FormItem>
+										</Col>
 									</Row>
-									<FormItem {...Info.layout} label="地块坐标">
+									<FormItem {...Info.layout} label="区域坐标">
 										<Input type="textarea" rows={4} readOnly
 											value={extra_params.coordinates.length === 0 ? [] : JSON.stringify(extra_params.coordinates)} />
 									</FormItem>
 
-									<FormItem {...Info.layout} label="地块地图">
+									<FormItem {...Info.layout} label="区域地图">
 										<Map center={leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
 											style={{ position: 'relative', height: 360, width: '100%' }}>
 											<TileLayer url={URL} subdomains={['7']} />

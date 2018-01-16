@@ -30,7 +30,7 @@ export default class SubTree extends Component {
 				<Row>
 					<Col span={24}>
 						<div style={{borderBottom: 'solid 1px #999', paddingBottom: 5, marginBottom: 20}}>
-							<Button onClick={this.addField.bind(this)}>新建地块</Button>
+							<Button onClick={this.addField.bind(this)}>新建标段</Button>
 						</div>
 					</Col>
 				</Row>
