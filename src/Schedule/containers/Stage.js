@@ -944,7 +944,9 @@ class Stage extends Component {
 				</Sidebar>
 				<Content>
 					<div style={{float:'left',width:285}}>
-						<Card>
+
+					
+						{/*<Card>
 							<Row>
 								<Button 
 								 type="primary" 
@@ -953,14 +955,14 @@ class Stage extends Component {
 								 size="large"
 								 onClick={()=>this.popScheduler()}
 								 >选择日程</Button>
-								 {/*<Popover placement="rightTop" content={content} trigger="hover">
+								 <Popover placement="rightTop" content={content} trigger="hover">
 		                            <Button 
 		                             type="primary" 
 		                             style={{marginLeft:12}}
 		                             size="large"
 		                             icon="paper-clip"
 		                             >颜色示例</Button>
-								</Popover>*/}
+								</Popover>
 							</Row>
 							<Row style={{marginTop:15}}>
 								<span style={{fontSize:16}}>{`项目：${item?(item.project?item.project.name:''):''}`}</span>
@@ -1043,7 +1045,7 @@ class Stage extends Component {
 									/>
 								}
 							</Row>
-						</Card>
+						</Card>*/}
 					</div>
 				</Content>
 				<Modal

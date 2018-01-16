@@ -7,7 +7,7 @@ import perReducer, {actions as perActions} from './per';
 import scheduleWorkflowReducer, {actions as scheduleWorkflowActions} from './scheduleWorkflow';
 import schedulerReducer, {actions as schedulerActions} from './scheduler';
 import dashboardReducer, {actions as dashboardActions} from './dashboard';
-
+import entryReducer, {actions as entryActions} from './entry';
 export default handleActions({
 	[combineActions(...actionsMap(showActions))]: (state, action) => ({
 			...state,
@@ -47,6 +47,12 @@ export default handleActions({
 		return {
 			...state,
 			dashboard: dashboardReducer(state.dashboard, action)
+		};
+	},
+	[combineActions(...actionsMap(entryActions))]: (state = {}, action) => {
+		return {
+			...state,
+			entry: entryReducer(state.entry, action)
 		};
 	}
 }, {});
