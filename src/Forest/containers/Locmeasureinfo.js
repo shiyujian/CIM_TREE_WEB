@@ -38,25 +38,28 @@ export default class Locmeasureinfo extends Component {
         const {actions: {getTree,gettreetype,getTreeList}} = this.props;
         //地块树
         try {
-            getTree({},{root:'true',paginate:false})
+            getTree({},{parent:'P009'})
             .then(rst => {
                 if(rst instanceof Array && rst.length > 0){
+                console.log('rst',rst)
                     rst.forEach((item,index) => {
                         rst[index].children = []
                     })
-                    getTree({},{parent:rst[0].attrs.no,paginate:false})
+                    getTree({},{parent:rst[0].No})
                     .then(rst1 => {
                         if(rst1 instanceof Array && rst1.length > 0){
+                        console.log('rst111111',rst1)
                             rst1.forEach((item,index) => {
                                 rst1[index].children = []
                             })
-                            getNewTreeData(rst,rst[0].attrs.no,rst1)
-                            getTree({},{parent:rst1[0].attrs.no,paginate:false})
+                            getNewTreeData(rst,rst[0].No,rst1)
+                            getTree({},{parent:rst1[0].No})
                             .then(rst2 => {
                                 if(rst2 instanceof Array && rst2.length > 0){
-                                    getNewTreeData(rst,rst1[0].attrs.no,rst2)
+                                console.log('rst22222222',rst2)
+                                    getNewTreeData(rst,rst1[0].No,rst2)
                                     this.setState({treeLists:rst},() => {
-                                        this.onSelect([rst2[0].attrs.no])
+                                        this.onSelect([rst2[0].No])
                                     })
                                 } else {
                                     this.setState({treeLists:rst})
@@ -312,8 +315,10 @@ export default class Locmeasureinfo extends Component {
 //连接树children
 function getNewTreeData(treeData, curKey, child) {
     const loop = (data) => {
+        console.log('data',data)
         data.forEach((item) => {
-            if (curKey == item.attrs.no) {
+            console.log('item',item)
+            if (curKey == item.No) {
                 item.children = child;
             }else{
                 if(item.children)

@@ -63,6 +63,17 @@ window.config = {
 	'IMG_W':'http://t{s}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}',
 	'VEC_W':'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
 	/***********************单模块资源服务**************************/
+	//智慧森林
+	//智慧森林域名
+	'FORESTDOMAIN':"http://120.24.210.86",//阿里云
+	// 'FORESTDOMAIN':"http://10.215.160.45",//院内
+	// 'FORESTDOMAIN':"http://192.168.3.33",
+	//智慧森林端口
+	'FORESTPORT':"227",//阿里云
+	// 'FORESTPORT':"6540",//院内
+	//苗圃定位模板
+	'nurseryLocation':"http://10.215.160.38:6540/media/documents/2017/11/nurseryLocation.xlsx",
+
 	//720云
 	//'Video360_API' : 'http://720yun.com/t/59e24jfOcya',
     'PANORAMAGRAM_LOC_CODE': 'PANORAMA_ROOT',//全景图位置树根节点编码值

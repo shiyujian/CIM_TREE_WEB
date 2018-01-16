@@ -13,7 +13,7 @@ export const changeNursery = createAction("传递nurseryName");
 
 
 /*****************************院内************************/
-export const getTree = createFetchAction(`${FOREST_API}/wpunits/`, [getTreeOK]); //    √
+export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
 export const gettreetype = createFetchAction(`${FOREST_API}/tree-types/`, []);
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/trees/analyse/`, []);
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys/`, []);
