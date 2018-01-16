@@ -19,7 +19,7 @@ export default class Schedule extends Component {
 
 	render() {
 		const {Dashboard, TotalPlan, Stage, Notice, History, TotalReport, Approve, 
-			StartPlan, TotalApproval,DGN,DgnSchedule,Scheduler,Progress,DgnDetail} = this.state || {};
+			StartPlan, TotalApproval,DGN,DgnSchedule,Scheduler,Progress,DgnDetail,Proprogress,Entry,Plant,Show} = this.state || {};
 		return (
 			<Body>
 			<Aside>
@@ -43,8 +43,12 @@ export default class Schedule extends Component {
 
 				{Notice && <Route path="/schedule/reportmonitor" component={Notice}/>}
 				{Progress && <Route path="/schedule/noticemonitor" component={Progress}/>}
-				
+				{Proprogress && <Route path="/schedule/proprogress" component={Proprogress}/>}
+				{Entry && <Route path="/schedule/entry" component={Entry}/>}
+				{Plant && <Route path="/schedule/plant" component={Plant}/>}
 				{History && <Route path="/schedule/history" component={History}/>}
+				{Show && <Route path="/schedule/show" component={Show}/>}
+
 			</Main>
 			</Body>);
 	}

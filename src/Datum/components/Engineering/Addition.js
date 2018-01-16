@@ -158,8 +158,8 @@ class Addition extends Component {
 		return (
 			<Modal title="新增文档"
 				width='70%' visible={additionVisible}
-				closable={false}
-				footer={footer}
+				closable={false} 
+				footer={null}
 				maskClosable={false}>
 
 				<Form>
@@ -287,8 +287,8 @@ class Addition extends Component {
 						</Col>
 
 						<Col span={4} style={{ float: "left", marginTop: "5px", marginLeft: "3%" }} >
-							<Button style={{ marginLeft: "16%" }}>取消</Button>
-							<Button>确定</Button>
+							<Button onClick={this.cancelT.bind(this)} style={{ marginLeft: "16%" }}>取消</Button>
+							<Button onClick={this.determine.bind(this)}>确定</Button>
 						</Col>
 					</Row>
 				</Form>
@@ -303,6 +303,16 @@ class Addition extends Component {
 			selectDocuments(selectedRowKeys);
 		}
 	};
+	cancelT(){
+		// const { actions: { toggleAddition }, Doc = [] } = this.props;
+		// const {actions:{additionVisible} } = this.props;
+		// this.setState({additionVisible:false});
+		this.cancel();
+		// additionVisible(false)
+	}
+	determine(){
+		this.cancel();
+	}
 
 	cancel() {
 		const {

@@ -139,7 +139,7 @@ export default class TotalReport extends Component {
 						</div>
 					</Sidebar>
 					<Content>
-						<ReportTable {...this.props} {...this.state}/>
+						{/*<ReportTable {...this.props} {...this.state}/>*/}
 					</Content>
 				</Spin>
 			</div>);

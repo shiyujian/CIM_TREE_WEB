@@ -15,3 +15,9 @@ export Defects from './Defects';
 export OrgType from './OrgType';
 export NurseryType from './NurseryType'
 export TreeManage from './TreeManage'
+export AreaManage from './AreaManage'
+export SectionManage from './SectionManage'
+export Smallclass from './Smallclass'
+export Thinclass from './Thinclass'
+export UnitManage from './UnitManage'
+export BranchManage from './BranchManage'

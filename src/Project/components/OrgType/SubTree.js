@@ -61,7 +61,7 @@ export default class SubTree extends Component {
 				<Row>
 					<Col span={24}>
 						<div style={{borderBottom: 'solid 1px #999', paddingBottom: 5, marginBottom: 20}}>
-							<Button onClick={this.addProject.bind(this)}>新建</Button>
+							<Button onClick={this.addProject.bind(this)}>新建组织机构类型</Button>
 						</div>
 					</Col>
 					<Col>

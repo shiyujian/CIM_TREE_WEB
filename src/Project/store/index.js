@@ -1,6 +1,11 @@
 import {handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import plotManageReducer, {actions as plotManageActions} from './plotManage';
+import areaManageReducer, {actions as areaManageActions} from './areaManage';
+import sectionManageReducer, {actions as sectionManageActions} from './sectionManage';
+import smallclassReducer, {actions as smallclassActions} from './smallclass';
+import thinclassReducer, {actions as thinclassActions} from './thinclass';
+
 import plotSetReducer, {actions as plotSetActions} from './plotSet';
 import areaSetReducer, {actions as areaSetActions} from './areaSet';
 import unitProReducer, {actions as unitProActions} from './unitPro';
@@ -15,6 +20,10 @@ import standardReducer, {actions as standardActions} from './standard';
 import keywordReducer, {actions as keywordActions} from './keyword';
 // import userReducer, {actions as userActions} from './user';
 import orgTypeReducer, {actions as orgTypeActions} from './orgType';
+import unitManageReducer, {actions as unitManageActions} from './unitManage';
+import branchManageReducer, {actions as branchManageActions} from './branchManage';
+
+
 import templateReducer, {actions as templateActions} from './template';
 import dictionariesReducer, {actions as dictionariesActions} from './dictionaries';
 import dangerReducer, {actions as dangerActions} from './danger';
@@ -47,6 +56,22 @@ export default handleActions({
 	[combineActions(...actionsMap(plotManageActions))]: (state = {}, action) => ({
 		...state,
 		plotManage: plotManageReducer(state.plotManage, action),
+	}),
+	[combineActions(...actionsMap(areaManageActions))]: (state = {}, action) => ({
+		...state,
+		areaManage: areaManageReducer(state.areaManage, action),
+	}),
+	[combineActions(...actionsMap(sectionManageActions))]: (state = {}, action) => ({
+		...state,
+		sectionManage: sectionManageReducer(state.sectionManage, action),
+	}),
+	[combineActions(...actionsMap(smallclassActions))]: (state = {}, action) => ({
+		...state,
+		smallclass: smallclassReducer(state.smallclass, action),
+	}),
+	[combineActions(...actionsMap(thinclassActions))]: (state = {}, action) => ({
+		...state,
+		thinclass: thinclassReducer(state.thinclass, action),
 	}),
 	[combineActions(...actionsMap(plotSetActions))]: (state = {}, action) => ({
 		...state,
@@ -104,6 +129,14 @@ export default handleActions({
 	[combineActions(...actionsMap(orgTypeActions))]: (state = {}, action) => ({
 		...state,
 		orgType: orgTypeReducer(state.orgType, action),
+	}),
+	[combineActions(...actionsMap(unitManageActions))]: (state = {}, action) => ({
+		...state,
+		unitManage: unitManageReducer(state.unitManage, action),
+	}),
+	[combineActions(...actionsMap(branchManageActions))]: (state = {}, action) => ({
+		...state,
+		branchManage: branchManageReducer(state.branchManage, action),
 	}),
 	[combineActions(...actionsMap(templateActions))]: (state = {}, action) => ({
 		...state,

@@ -2,7 +2,7 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table,DatePicker,Progress
+    Icon, message, Table,DatePicker,Progress,Select,
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
