@@ -2,6 +2,11 @@ import {handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import plotManageReducer, {actions as plotManageActions} from './plotManage';
 import plotSetReducer, {actions as plotSetActions} from './plotSet';
+import areaSetReducer, {actions as areaSetActions} from './areaSet';
+import unitProReducer, {actions as unitProActions} from './unitPro';
+import subunitProReducer, {actions as subunitProActions} from './subunitPro';
+import subProReducer, {actions as subProActions} from './subPro';
+import itemProReducer, {actions as itemProActions} from './itemPro';
 // import unitReducer, {actions as unitActions} from './unit';
 // import sectionReducer, {actions as sectionActions} from './section';
 // import siteReducer, {actions as sitenActions} from './site';
@@ -47,6 +52,27 @@ export default handleActions({
 		...state,
 		plotSet: plotSetReducer(state.plotSet, action),
 	}),
+	[combineActions(...actionsMap(areaSetActions))]: (state = {}, action) => ({
+		...state,
+		areaSet: areaSetReducer(state.areaSet, action),
+	}),
+	[combineActions(...actionsMap(unitProActions))]: (state = {}, action) => ({
+		...state,
+		unitPro: unitProReducer(state.unitPro, action),
+	}),
+	[combineActions(...actionsMap(subunitProActions))]: (state = {}, action) => ({
+		...state,
+		subunitPro: subunitProReducer(state.subunitPro, action),
+	}),
+	[combineActions(...actionsMap(subProActions))]: (state = {}, action) => ({
+		...state,
+		subPro: subProReducer(state.subPro, action),
+	}),
+	[combineActions(...actionsMap(itemProActions))]: (state = {}, action) => ({
+		...state,
+		itemPro: itemProReducer(state.itemPro, action),
+	}),
+
 	// [combineActions(...actionsMap(unitActions))]: (state = {}, action) => ({
 	// 	...state,
 	// 	unit: unitReducer(state.unit, action),

@@ -98,7 +98,7 @@ export default class Project extends Component {
 				path: '/project/subunitPro',
 				icon: <Icon name="money"/>
 			}, {
-				key: 'Subpro',
+				key: 'SubPro',
 				id: 'SUBPRO',
 				name: '分部工程',
 				path: '/project/subpro',
