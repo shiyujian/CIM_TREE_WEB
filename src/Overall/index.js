@@ -17,7 +17,7 @@ export default class Overall extends Component {
 	}
 
 	render() {
-		const {Package, News, News1, Attend, Dispatch, Approval} = this.state || {};
+		const {Package, News, News1, Attend, Dispatch, Approval,Receipt} = this.state || {};
 		return (
 			<Body>
 			<Aside>
@@ -27,7 +27,7 @@ export default class Overall extends Component {
 				
 				{News && <Route path="/overall/news" component={News}/>}
 				{/* {News1 && <Route path="/overall/news1" component={News1}/>} */}
-				{Dispatch && <Route path="/overall/dispatch" component={Dispatch}/>}
+				{Receipt && <Route path="/overall/receipt" component={Receipt}/>}
 				{Attend && <Route path="/overall/attend" component={Attend}/>}
 				{/* {Approval && <Route path="/overall/approval" component={Approval}/>} */}
 				{/*Package && <Route exact path="/overall/:id?" component={Package}/>*/}
@@ -42,9 +42,9 @@ export default class Overall extends Component {
 		name: '新闻通知',
 		icon: <Icon name="calendar-check-o"/>
 	},{
-		key: 'dispatch',
-		id: 'MANAGE.SENDRECIEVE',
-		path: '/overall/dispatch',
+		key: 'receipt',
+		id: 'MANAGE.RECEIPT',
+		path: '/overall/receipt',
 		name: '现场收发文',
 		icon: <Icon name="newspaper-o"/>,
 	},{

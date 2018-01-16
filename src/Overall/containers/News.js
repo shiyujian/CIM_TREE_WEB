@@ -35,6 +35,7 @@ export default class News extends Component {
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="新闻通知" {...this.props}/>
+				
 				<Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
 					<TabPane tab="新闻管理" key="1">
 						<NewsTable {...this.props}/>
@@ -43,6 +44,7 @@ export default class News extends Component {
 						<TipsTable {...this.props}/>
 					</TabPane>
 				</Tabs>
+				
 			</div>
 		);
 	}

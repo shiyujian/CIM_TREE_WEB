@@ -6,7 +6,7 @@ import moment from 'moment';
 import ToggleModal from './ToggleModal'
 import {STATIC_DOWNLOAD_API} from '../../../_platform/api';
 
-export default class SendPage extends Component {
+export default class SendPage1 extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
