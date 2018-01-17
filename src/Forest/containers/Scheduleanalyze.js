@@ -41,26 +41,38 @@ export default class Scheduleanalyze extends Component {
 
         //地块树
         try {
-            getTree({},{root:'true',paginate:false})
+            getTree({},{parent:'root'})
             .then(rst => {
                 if(rst instanceof Array && rst.length > 0){
                     rst.forEach((item,index) => {
                         rst[index].children = []
                     })
-                    getTree({},{parent:rst[0].attrs.no,paginate:false})
+                    getTree({},{parent:rst[0].No})
                     .then(rst1 => {
                         if(rst1 instanceof Array && rst1.length > 0){
                             rst1.forEach((item,index) => {
                                 rst1[index].children = []
                             })
-                            getNewTreeData(rst,rst[0].attrs.no,rst1)
-                            getTree({},{parent:rst1[0].attrs.no,paginate:false})
+                            getNewTreeData(rst,rst[0].No,rst1)
+                            getTree({},{parent:rst1[0].No})
                             .then(rst2 => {
                                 if(rst2 instanceof Array && rst2.length > 0){
-                                    getNewTreeData(rst,rst1[0].attrs.no,rst2)
+                                    getNewTreeData(rst,rst1[0].No,rst2)
                                     this.setState({treeLists:rst},() => {
-                                        this.onSelect([rst2[0].attrs.no])
+                                        this.onSelect([rst2[0].No])
                                     })
+                                    // getNewTreeData(rst,rst[0].No,rst2)
+                                    // getTree({},{parent:rst2[0].No})
+                                    // .then(rst3 => {
+                                    //     if(rst3 instanceof Array && rst3.length > 0){
+                                    //         getNewTreeData(rst,rst2[0].No,rst3)
+                                    //         this.setState({treeLists:rst},() => {
+                                    //             this.onSelect([rst3[0].No])
+                                    //         })
+                                    //     } else {
+                                    //         this.setState({treeLists:rst})
+                                    //     }
+                                    // })
                                 } else {
                                     this.setState({treeLists:rst})
                                 }
@@ -199,7 +211,7 @@ export default class Scheduleanalyze extends Component {
 function getNewTreeData(treeData, curKey, child) {
     const loop = (data) => {
         data.forEach((item) => {
-            if (curKey == item.attrs.no) {
+            if (curKey == item.No) {
                 item.children = child;
             }else{
                 if(item.children)

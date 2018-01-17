@@ -5,8 +5,10 @@ import {actions as platformActions} from '_platform/store/global';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Tabs} from 'antd';
-import NewsTable from '../components/SafetyTrend/NewsTable'
-import TipsTable from '../components/SafetyTrend/TipsTable'
+import BulletinTable from '../components/SafetyTrend/BulletinTable'
+import NoticeTable from '../components/SafetyTrend/NoticeTable'
+import StateTable from '../components/SafetyTrend/StateTable'
+import VideoTable from '../components/SafetyTrend/VideoTable'
 
 const TabPane = Tabs.TabPane;
 
@@ -36,11 +38,17 @@ export default class SafetyTrend extends Component {
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="新闻公告" {...this.props}/>
 				<Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
-					<TabPane tab="新闻公告列表" key="1">
-						<NewsTable {...this.props}/>
+					<TabPane tab="项目安全公告" key="1">
+						<NoticeTable {...this.props}/>
 					</TabPane>
-					<TabPane tab="通知公告列表" key="2">
-						<TipsTable {...this.props}/>
+					<TabPane tab="国内安全动态" key="2">
+						<StateTable {...this.props}/>
+					</TabPane>
+					<TabPane tab="安全事故快报" key="3">
+						<BulletinTable {...this.props}/>
+					</TabPane>
+					<TabPane tab="安全生产视频" key="4">
+						<VideoTable {...this.props}/>
 					</TabPane>
 				</Tabs>
 			</div>
