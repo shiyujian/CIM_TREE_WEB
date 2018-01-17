@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Table, Spin, Input, Select, Popover, Modal, Button,message } from 'antd';
+import { Table, Spin, Input, Select, Popover, Modal, Button, message } from 'antd';
 import { SOURCE_API, STATIC_DOWNLOAD_API } from '_platform/api';
 import moment from 'moment';
+import '../Datum/index.less'
 const Option = Select.Option;
+
 
 export default class GeneralTable extends Component {
 	constructor(props) {
@@ -43,11 +45,10 @@ export default class GeneralTable extends Component {
 									placement="right">
 									<a>预览</a>
 								</Popover>
-								<span className="ant-divider" />
-										<a style={{ marginRight: 10 }} type="primary" onClick={this.download.bind(this)}>下载</a>
-								
-								<span className="ant-divider" />
-								<a onClick={this.update.bind(this, record)}>查看流程卡</a>
+								<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this)}>下载</a>
+
+
+								<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>
 							</div>
 						);
 						return nodes;
@@ -62,6 +63,7 @@ export default class GeneralTable extends Component {
 			<div>
 				<Table rowSelection={this.rowSelection}
 					dataSource={tableSrc}
+					className='foresttable'
 					columns={columns}
 					bordered rowKey="code" />
 				<Modal title="图片预览"
