@@ -69,20 +69,36 @@ export default class Proprogress extends Component {
                 <Content>
                     <video src=" " controls="controls" width="600" height="600"></video>
                     <Row>
+                    <Col span={3}>
                     <Checkbox>常绿乔木</Checkbox>
+                    </Col>
+                     <Col span={21}>
                     <Progress percent={progress} strokeWidth={5}/>
+                    </Col>
                     </Row>
                     <Row>
+                     <Col span={3}>
                     <Checkbox>落叶乔木</Checkbox>
+                    </Col>
+                     <Col span={21}>
                     <Progress percent={progress} strokeWidth={5}/>
+                    </Col>
                     </Row>
                     <Row>
+                     <Col span={3}>
                     <Checkbox>亚乔木</Checkbox>
+                    </Col>
+                     <Col span={21}>
                     <Progress percent={progress} strokeWidth={5}/>
+                    </Col>
                     </Row>
                     <Row>
+                     <Col span={3}>
                     <Checkbox>灌木</Checkbox>
+                    </Col>
+                     <Col span={21}>
                     <Progress percent={progress} strokeWidth={5}/>
+                    </Col>
                     </Row>
                 </Content>
 			</div>);

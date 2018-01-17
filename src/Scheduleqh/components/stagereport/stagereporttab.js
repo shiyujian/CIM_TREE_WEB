@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 
 import {Row, Col,Input, Form, Spin,Icon,Button,Table,Modal,DatePicker,Progress,Upload,Select,Checkbox} from 'antd';
 // import {UPLOAD_API} from '_platform/api';
+import moment from 'moment';
+const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
 const FILE_API = "";
 const Dragger = Upload.Dragger;
@@ -14,6 +16,15 @@ export default class Stagereporttab extends Component {
 			addvisible:false,
 			editvisible:false,
 			departOptions:"",
+			data:{
+				stime1: moment().format(''),
+                etime1: moment().format(''),
+			},
+			selectedRowKeys:"",
+			stime1: moment().format(''),
+            etime1: moment().format(''),
+			tabledata:[{gongcheng:"qwd"
+		},{gongcheng:"qwd"},{gongcheng:"qwd"},{gongcheng:"qwd"},{gongcheng:"qwd"}]
 		};
 	}
     static layout = {
@@ -37,8 +48,8 @@ export default class Stagereporttab extends Component {
 		const columns = [
 			{
 				title:'单位工程',
-				dataIndex:'name',
-				key: 'name',
+				dataIndex:'gongcheng',
+				key: 'gongcheng',
 				width: '15%'
 			},{
 				title:'进度类型',
@@ -72,6 +83,42 @@ export default class Stagereporttab extends Component {
 				width: '8%',
 			}
 		];
+		const columns1 = [
+			{
+				title:'项目',
+				dataIndex:'gongcheng',
+				key: 'gongcheng',
+				width: '15%'
+			},{
+				title:'单位',
+				dataIndex:'type',
+				key: 'type',
+				width: '10%'
+			},{
+				title:'数量',
+				dataIndex:'company',
+				key: 'company',
+				width: '10%'
+			}
+		];
+		const columns2 = [
+			{
+				title:'名称',
+				dataIndex:'gongcheng',
+				key: 'gongcheng',
+				width: '15%'
+			},{
+				title:'备注',
+				dataIndex:'type',
+				key: 'type',
+				width: '10%'
+			},{
+				title:'操作',
+				dataIndex:'company',
+				key: 'company',
+				width: '10%'
+			}
+		];
 		return (
 			<div>
 			<Form>
@@ -79,47 +126,56 @@ export default class Stagereporttab extends Component {
 			<Col span={7}>
 				<FormItem {...formItemLayout} label="单位工程">
 					
-						<Input type="text" />
+						<Input type="text" onChange={this.search.bind(this,'gongcheng')} value={this.state.data.gongcheng}/>
 					
 				</FormItem>
 			</Col>
 			<Col span={7}>
 				<FormItem {...formItemLayout} label="编号">
 
-						<Input type="text" />
+						<Input type="text" onChange={this.search.bind(this,'number')} value={this.state.data.number}/>
 					
 				</FormItem>
 			</Col>	
 			<Col span={7}>
 				<FormItem {...formItemLayout} label="监理单位">
 				
-						<Input type="text" />
+						<Input type="text" onChange={this.search.bind(this,'jianli')} value={this.state.data.jianli}/>
 					
 				</FormItem>
 			</Col>
 			<Col span={3}>
-				<Button>清空</Button>
+				<Button onClick={this.clear.bind(this)}>清空</Button>
 			</Col>
 			</Row>
 			<Row>
 			<Col span={7}>
 				<FormItem {...formItemLayout} label="日期">
-				
-						<Input type="text" />
+				         <RangePicker 
+                             style={{verticalAlign:"middle"}} 
+                             Value={[moment(this.state.data.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.data.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
+                             showTime={{ format: 'HH:mm:ss' }}
+                             format={'YYYY/MM/DD HH:mm:ss'}
+                             onChange={this.datepick.bind(this)}
+                             onOk={this.datepickok.bind(this)}
+                            >
+                            </RangePicker>
+						{/*<Input type="text" onChange={this.search.bind(this,'data')} value={this.state.data.data}/>*/}
 					
 				</FormItem>
 			</Col>
+			<Col span={3}></Col>
 			<Col span={7}>
 				<FormItem {...formItemLayout} label="流程状态">
 				
-						<Input type="text" />
+						<Input type="text" onChange={this.search.bind(this,'status')} value={this.state.data.status}/>
 					
 				</FormItem>
 			</Col>
-			<Col span={7}>
+			<Col span={4}>
 			</Col>
 			<Col span={3}>
-				<Button>查询</Button>
+				<Button type="primary" onClick={this.query.bind(this)}>查询</Button>
 			</Col>
 			</Row>
 			</Form>
@@ -127,8 +183,10 @@ export default class Stagereporttab extends Component {
 			<Button>删除</Button>
 			<Table 
 					columns={columns} 
-					dataSource={dataSource}
+					dataSource={this.state.tabledata}
 					bordered
+					rowSelection={this.rowSelection}
+					pagination={{pageSize: 9}}
 					style={{marginTop:20}}
 					/>
 									<Modal title="新增文档"
@@ -140,14 +198,14 @@ export default class Stagereporttab extends Component {
 											<Col span={12}>
 												<FormItem {...formItemLayout} label="单位工程">
 													
-														<Input type="text" />
+														<Input type="text" onChange={this.search.bind(this,'gongcheng')}  />
 													
 												</FormItem>
 											</Col>
 											<Col span={12}>
 												<FormItem {...formItemLayout} label="编号">
 
-														<Input type="text" />
+														<Input type="text" onChange={this.search.bind(this,'number')}/>
 													
 												</FormItem>
 											</Col>
@@ -161,7 +219,7 @@ export default class Stagereporttab extends Component {
 												</FormItem>
 											</Col>
 											<Col span={12}>
-												<Button style={{backgroundColor:"0099FF"}}>模板下载</Button>
+												<Button type="primary">模板下载</Button>
 											</Col>
 											</Row>
 											<Row>
@@ -181,15 +239,15 @@ export default class Stagereporttab extends Component {
 											</Row>
 											<Row>
 												<Table 
-													columns={columns} 
+													columns={columns2} 
 													dataSource={dataSource}
 													bordered
 													style={{marginTop:20}}
 													/>
 											</Row>
-											<Row>
-												<Col span={12}>
-												<FormItem {...formItemLayout} label="审核人">
+											<Row style={{position:"relative"}}>
+												<Col span={12} style={{position:"absolute",top:"20px"}}>
+												<FormItem {...formItemLayout} label="审核人" >
 													<Select 
 								                          placeholder="请选择部门"
 								                          notFoundContent="暂无数据"
@@ -199,9 +257,9 @@ export default class Stagereporttab extends Component {
 								                    </Select>
 								                </FormItem>
 								                </Col>
-								                <Col span={12}>
-								                <FormItem {...formItemLayout}>
-													<Checkbox>短信通知</Checkbox>
+								                <Col span={12} style={{position:"absolute",top:"20px",left:"200px"}}>
+								                <FormItem {...formItemLayout} >
+													<Checkbox onChange={this.check.bind(this)}>短信通知</Checkbox>
 								                </FormItem>
 								                </Col>
 											</Row>
@@ -245,7 +303,7 @@ export default class Stagereporttab extends Component {
 					</Row>
 					<Row>
 						<Table 
-							columns={columns} 
+							columns={columns1} 
 							dataSource={dataSource}
 							bordered
 							style={{marginTop:20}}
@@ -255,8 +313,8 @@ export default class Stagereporttab extends Component {
 						<Button onClick={this.addtext.bind(this)}>添加</Button>
 						<Button>删除</Button>
 					</Row>
-					<Row>
-						<Col span={12}>
+					<Row style={{position:"relative"}}>
+						<Col span={12} style={{position:"absolute",top:"20px"}}>
 						<FormItem {...formItemLayout} label="审核人">
 							<Select 
 		                          placeholder="请选择部门"
@@ -267,7 +325,7 @@ export default class Stagereporttab extends Component {
 		                    </Select>
 		                </FormItem>
 		                </Col>
-		                <Col span={12}>
+		                <Col span={12} style={{position:"absolute",top:"20px",left:"200px"}}>
 		                <FormItem {...formItemLayout}>
 							<Checkbox>短信通知</Checkbox>
 		                </FormItem>
@@ -276,6 +334,53 @@ export default class Stagereporttab extends Component {
 	        </Modal>
 			</div>
 		)
+	}
+	rowSelection = {
+		onChange: (selectedRowKeys) => {
+			// this.selectedCodes = selectedRowKeys;
+			console.log(selectedRowKeys);
+			this.setState({
+				selectedRowKeys:selectedRowKeys,
+			})
+		}
+	};
+	datepick(e){
+        console.log(e);
+	}
+    datepickok(e){
+    	console.log(e);
+    	this.setState({
+       	  data: {
+	        	...this.state.data,
+	        	begin:e[0]?moment(e[0]).add(8, 'h').unix():'',
+	        	end:e[1]?moment(e[1]).add(8, 'h').unix():'',
+	        }
+
+       })
+    }
+    onDepartments(){}
+	search(key,e){
+       console.log(key,e.target.value);
+       this.setState({
+       	  data: {
+	        	...this.state.data,
+	        	[key]:e.target.value
+	        }
+
+       })
+	}
+	check(e){
+		console.log(e.target.checked);
+
+	}
+	query(){
+		console.log(this.state.data);
+
+	}
+	clear(){
+		this.setState({
+			data:{}
+		})
 	}
 	add(){
 		this.setState({
