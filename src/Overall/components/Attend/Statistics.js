@@ -1,21 +1,31 @@
-import React, {Component} from 'react';
-import {Row, Col} from 'antd';
+import React, { Component } from 'react';
+import { Row, Col, Form, DatePicker, Input, Select, Button, Popconfirm, Modal } from 'antd';
 import ReactEcharts from 'react-echarts';
-import {DatePicker} from 'antd';
+import NewsTable from './NewsTable.js'
+import Modals from './Modal.js'
+
+
 import moment from 'moment';
 moment.locale('zh-cn');
 
 moment.locale('zh-cn');
+const FormItem = Form.Item;
+const Option = Select.Option;
 
-const {RangePicker, MonthPicker} = DatePicker;
+const { RangePicker, MonthPicker } = DatePicker;
 const monthFormat = 'YYYY/MM';
-export default class Statistics extends Component {
+class Statistics extends Component {
+
+	static layout = {
+		labelCol: { span: 8 },
+		wrapperCol: { span: 16 },
+	};
 
 	static propTypes = {};
 
 	onStartChange(value) {
-		const {countTime, actions: {setCountTimeAc}} = this.props;
-		const {toyear, tomonth} = countTime;
+		const { countTime, actions: { setCountTimeAc } } = this.props;
+		const { toyear, tomonth } = countTime;
 		this.onChange('startValue', value);
 		this.setState({
 			openEndChose: true,
@@ -30,25 +40,25 @@ export default class Statistics extends Component {
 	}
 
 	onEndChange(value) {
-		const {countSelectedKey, countTime, actions: {setCountTimeAc, getCountInfoAc, setLoadingAc,setCountInfoAc,getCountInfoAcT}} = this.props;
-		const {fromyear, frommonth} = countTime;
+		const { countSelectedKey, countTime, actions: { setCountTimeAc, getCountInfoAc, setLoadingAc, setCountInfoAc, getCountInfoAcT } } = this.props;
+		const { fromyear, frommonth } = countTime;
 		this.onChange('endValue', value);
 		this.setState({
 			openEndChose: false,
 		});
-		let allMonth=this._getOptionsArr(countSelectedKey.split('--')[0],fromyear,frommonth,value.year(),value.month() + 1)
-		let allPromises=allMonth.map((item)=>{
+		let allMonth = this._getOptionsArr(countSelectedKey.split('--')[0], fromyear, frommonth, value.year(), value.month() + 1)
+		let allPromises = allMonth.map((item) => {
 			return getCountInfoAcT(item)
 		})
 		setLoadingAc(true);
-		Promise.all(allPromises).then(rst=>{
-			let allData=[]
-			rst.map((itm)=>{
-				allData=allData.concat(itm)
+		Promise.all(allPromises).then(rst => {
+			let allData = []
+			rst.map((itm) => {
+				allData = allData.concat(itm)
 			})
 			setCountInfoAc(allData)
 			setLoadingAc(false);
-		}).catch(()=>{
+		}).catch(() => {
 			setCountInfoAc([])
 			setLoadingAc(false);
 		})
@@ -62,34 +72,34 @@ export default class Statistics extends Component {
 
 	_getOptionsArr(code, fromyear, frommonth, toyear, tomonth) {
 		let arr = [];
-		let l_y=Number(toyear) - Number(fromyear);
-		let l_m=Number(tomonth) - Number(frommonth);
-		if(l_y === 0){ //同一年
-			for(let j = 0;j <= l_m;j++){
+		let l_y = Number(toyear) - Number(fromyear);
+		let l_m = Number(tomonth) - Number(frommonth);
+		if (l_y === 0) { //同一年
+			for (let j = 0; j <= l_m; j++) {
 				let obj = {
 					code: code,
 					fromyear: fromyear,
-					frommonth: frommonth+j,
+					frommonth: frommonth + j,
 					toyear: fromyear,
-					tomonth: frommonth+j,
+					tomonth: frommonth + j,
 				}
 				arr.push(obj)
 			}
-		}else{ //不同年
-			for(let i = 0;i <= l_y;i++){
-				if(Number(fromyear) + i === Number(fromyear)){ //开头年
-					for(let k = 0;k <= 12-Number(frommonth);k++){
+		} else { //不同年
+			for (let i = 0; i <= l_y; i++) {
+				if (Number(fromyear) + i === Number(fromyear)) { //开头年
+					for (let k = 0; k <= 12 - Number(frommonth); k++) {
 						let obj = {
 							code: code,
 							fromyear: Number(fromyear),
-							frommonth: Number(frommonth)+k,
+							frommonth: Number(frommonth) + k,
 							toyear: Number(fromyear),
-							tomonth: Number(frommonth)+k,
+							tomonth: Number(frommonth) + k,
 						}
 						arr.push(obj)
 					}
-				}else if(Number(fromyear) + i === Number(toyear)){ //结束年
-					for(let l = 1;l <= Number(tomonth);l++){
+				} else if (Number(fromyear) + i === Number(toyear)) { //结束年
+					for (let l = 1; l <= Number(tomonth); l++) {
 						let obj = {
 							code: code,
 							fromyear: Number(toyear),
@@ -99,8 +109,8 @@ export default class Statistics extends Component {
 						}
 						arr.push(obj)
 					}
-				}else{ //中间年
-					for(let m = 1;m <= 12;m++){
+				} else { //中间年
+					for (let m = 1; m <= 12; m++) {
 						let obj = {
 							code: code,
 							fromyear: Number(fromyear) + i,
@@ -125,12 +135,13 @@ export default class Statistics extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			visible: false,
 			openEndChose: false,
 			startValue: moment(),
 			endValue: moment(),
 		}
 	}
-	
+
 	onChange = (field, value) => {
 		this.setState({
 			[field]: value,
@@ -146,60 +157,72 @@ export default class Statistics extends Component {
 	};
 
 	render() {
-		const {countSelectedKey = '',countInfo = []} = this.props;
+		const { countSelectedKey = '', countInfo = [] } = this.props;
+		const {
+			platform: { users = [] },
+			form: { getFieldDecorator }
+		} = this.props;
 		return (
 			<div>
-				<Row>
-					<Col span={12}>
+				<Row span={12}>
+					{/* <Col span={12}>
 						当前选择的单位：{countSelectedKey.split('--')[1]}
+					</Col> */}
+					{/* <Col span={12}> */}
+
+					<Col span={8} style={{marginLeft:"20px",marginBottom:"0"}}>
+						<FormItem
+							label="统计时间"
+							{...Statistics.layout}
+						>
+							<Col span={11}>
+								<FormItem>
+									<DatePicker />
+								</FormItem>
+							</Col>
+							<Col span={2}>
+								<span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+									-
+  							</span>
+							</Col>
+							<Col span={11}>
+								<FormItem>
+									<DatePicker defaultvalue="" />
+								</FormItem>
+							</Col>
+						</FormItem>
+
 					</Col>
-					<Col span={12}>
-						统计时间：
-						<MonthPicker
-							disabledDate={this.disabledStartDate.bind(this)}
-							allowClear={false}
-							value={this.state.startValue}
-							// defaultValue={moment()}
-							placeholder="请选择开始月份"
-							onChange={this.onStartChange.bind(this)}/>
-						<MonthPicker
-							disabledDate={this.disabledEndDate.bind(this)}
-							allowClear={false}
-							value={this.state.endValue}
-							// defaultValue={moment()}
-							placeholder="请选择结束月份"
-							open={this.state.openEndChose}
-							onOpenChange={this.handleEndOpenChange.bind(this)}
-							onChange={this.onEndChange.bind(this)}/>
-						{/*<RangePicker*/}
-						{/*defaultValue={[moment(), moment()]}*/}
-						{/*onChange={this._timeChange.bind(this)}*/}
-						{/*format={monthFormat}*/}
-						{/*/>*/}
-					</Col>
+
+					{/*<RangePicker*/}
+					{/*defaultValue={[moment(), moment()]}*/}
+					{/*onChange={this._timeChange.bind(this)}*/}
+					{/*format={monthFormat}*/}
+					{/*/>*/}
+					{/* </Col> */}
 				</Row>
 				<Row>
 					{
 						countInfo.length &&
 						<Col span={12}>
-							{countSelectedKey.split('--')[1]}{this._getText()}进、离、驻场考勤情况
+							
 							<ReactEcharts
 								option={this._getOptions_1()}
-								style={{height: '400px', width: '100%'}}
+								style={{ height: '400px', width: '100%' }}
 							/>
 						</Col>
 					}
 					{
 						countInfo.length &&
 						<Col span={12}>
-							{countSelectedKey.split('--')[1]}{this._getText()}人员出勤情况
+							
 							<ReactEcharts
 								option={this._getOptions_2()}
-								style={{height: '400px', width: '100%'}}
+								style={{ height: '400px', width: '100%' }}
 							/>
 						</Col>
 					}
-					{
+					{/* {
 						countInfo.length &&
 						<Col span={24}>
 							{countSelectedKey.split('--')[1]}{this._getText()}整体考勤情况
@@ -208,16 +231,131 @@ export default class Statistics extends Component {
 								style={{height: '400px', width: '100%'}}
 							/>
 						</Col>
-					}
+					} */}
 				</Row>
+				<Form>
+
+					<Row span={24}>
+						<Col span={6}>
+							<FormItem
+								label="日期"
+								{...Statistics.layout}
+							>
+								<Col span={11}>
+									<FormItem>
+										<DatePicker />
+									</FormItem>
+								</Col>
+								<Col span={2}>
+									<span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+										-
+			  </span>
+								</Col>
+								<Col span={11}>
+									<FormItem>
+										<DatePicker defaultvalue="" />
+									</FormItem>
+								</Col>
+							</FormItem>
+						</Col>
+						<Col span={6}>
+							<FormItem {...Statistics.layout} label="工种">
+								{
+									getFieldDecorator('status', {
+										rules: [
+											{ required: false, message: '请输入任务类别' },
+										]
+									})
+										(<Select allowClear>
+											<Option value="0">编辑中</Option>
+											<Option value="1">已提交</Option>
+											<Option value="2">执行中</Option>
+											<Option value="3">已完成</Option>
+											<Option value="4">已废止</Option>
+											<Option value="5">异常</Option>
+										</Select>)
+								}
+							</FormItem>
+						</Col>
+						<Col span={6}>
+							<FormItem {...Statistics.layout} label="人员">
+								{
+									getFieldDecorator('workflowactivity', {
+										rules: [
+											{ required: false, message: '请输入任务名称' },
+										]
+									})
+										(<Input />)
+								}
+							</FormItem>
+						</Col>
+						<Col span={6}>
+							<FormItem {...Statistics.layout} label="状态">
+								{
+									getFieldDecorator('status', {
+										rules: [
+											{ required: false, message: '请输入任务类别' },
+										]
+									})
+										(<Select allowClear>
+											<Option value="0">编辑中</Option>
+											<Option value="1">已提交</Option>
+											<Option value="2">执行中</Option>
+											<Option value="3">已完成</Option>
+											<Option value="4">已废止</Option>
+											<Option value="5">异常</Option>
+										</Select>)
+								}
+							</FormItem>
+						</Col>
+					</Row>
+
+
+
+					<Row gutter={24}>
+						<Col span={24}>
+							<Button onClick={this.delete.bind(this)} style={{ marginRight: 10 }} type="primary" >新增进场</Button>
+							<Button style={{ marginRight: 10 }} type="primary" onClick={this.approach.bind(this)}>新增离场</Button>
+						</Col>
+					</Row>
+					<Row>
+						<NewsTable {...this.props} />
+					</Row>
+				</Form>
+				<Modal
+					title="新增进场"
+					width="200px"
+					visible={this.state.visible}
+					onOk={this.handleCancel.bind(this)}
+					onCancel={this.handleCancel.bind(this)}
+					footer={null}>
+					<div style={{ maxHeight: '800px', overflow: 'auto' }}
+						dangerouslySetInnerHTML={{ __html: this.state.container }} />
+				</Modal>
+				<Modals {...this.props} />
 			</div>
 		);
 	}
-
+	handleCancel() {
+		this.setState({
+			visible: false,
+			container: null,
+		})
+	}
+	delete() {
+		console.log(this.props)
+		const { actions: { setModal } } = this.props
+		setModal(true)
+	}
+	approach() {
+		this.setState({
+			visible: true
+		})
+	}
 	_getText() {
-		const {countTime} = this.props;
+		const { countTime } = this.props;
 		let text = "";
-		const {fromyear, frommonth, toyear, tomonth} = countTime;
+		const { fromyear, frommonth, toyear, tomonth } = countTime;
 		if (fromyear === toyear && frommonth === tomonth) {
 			text = fromyear + "年" + frommonth + "月"
 		} else {
@@ -227,7 +365,7 @@ export default class Statistics extends Component {
 	}
 
 	_timeChange(times) {
-		const {countSelectedKey, actions: {setCountTimeAc, getCountInfoAc, setLoadingAc}} = this.props;
+		const { countSelectedKey, actions: { setCountTimeAc, getCountInfoAc, setLoadingAc } } = this.props;
 		setCountTimeAc({
 			fromyear: times[0].year(),
 			frommonth: times[0].month() + 1,
@@ -247,7 +385,7 @@ export default class Statistics extends Component {
 	}
 
 	_getOptions_1() {
-		const {countInfo = []} = this.props;
+		const { countInfo = [] } = this.props;
 		let options = {
 			color: ['#5e9cd3', '#eb7d3c', '#a5a5a5', '#febf2d'],
 			tooltip: {
@@ -258,7 +396,7 @@ export default class Statistics extends Component {
 			},
 			toolbox: {
 				feature: {
-					saveAsImage: {show: true}
+					saveAsImage: { show: true }
 				}
 			},
 			legend: {
@@ -313,7 +451,7 @@ export default class Statistics extends Component {
 	}
 
 	_getOptions_2() {
-		const {countInfo = []} = this.props;
+		const { countInfo = [] } = this.props;
 		let options = {
 			color: ['#5e9cd3', '#eb7d3c', '#a5a5a5', '#febf2d'],
 			tooltip: {
@@ -324,7 +462,7 @@ export default class Statistics extends Component {
 			},
 			toolbox: {
 				feature: {
-					saveAsImage: {show: true}
+					saveAsImage: { show: true }
 				}
 			},
 			legend: {
@@ -366,64 +504,65 @@ export default class Statistics extends Component {
 		return options;
 	}
 
-	_getOptions_3() {
-		const {countInfo = []} = this.props;
-		let options = {
-			color: ['#5e9cd3', '#eb7d3c', '#a5a5a5', '#febf2d'],
-			tooltip: {
-				trigger: 'axis',
-				axisPointer: {
-					type: 'line'
-				}
-			},
-			toolbox: {
-				feature: {
-					saveAsImage: {show: true}
-				}
-			},
-			legend: {
-				data: ['早退率', '迟到率', '缺卡率']
-			},
-			xAxis: [
-				{
-					type: 'category',
-					data: [],
-					name: '月'
-				}
-			],
-			yAxis: [
-				{
-					type: 'value',
-					axisLabel: {
-						formatter: '{value} %'
-					},
-					max: '100'
-				}
-			],
-			series: [
-				{
-					name: '早退率',
-					type: 'line',
-					data: []
-				},
-				{
-					name: '迟到率',
-					type: 'line',
-					data: []
-				},
-				{
-					name: '缺卡率',
-					type: 'line',
-					data: []
-				}
-			]
-		};
-		countInfo.map((info) => {
-			options.xAxis[0].data.push(info.month);
-			options.series[0].data.push(info.earlyrate === -1 ? 0 : info.earlyrate * 100);
-			options.series[1].data.push(info.laterate === -1 ? 0 : info.laterate * 100);
-			options.series[2].data.push(info.uncheckrate === -1 ? 0 : info.uncheckrate * 100);
-		});
-		return options;
-	}
+	// _getOptions_3() {
+	// 	const {countInfo = []} = this.props;
+	// 	let options = {
+	// 		color: ['#5e9cd3', '#eb7d3c', '#a5a5a5', '#febf2d'],
+	// 		tooltip: {
+	// 			trigger: 'axis',
+	// 			axisPointer: {
+	// 				type: 'line'
+	// 			}
+	// 		},
+	// 		toolbox: {
+	// 			feature: {
+	// 				saveAsImage: {show: true}
+	// 			}
+	// 		},
+	// 		legend: {
+	// 			data: ['早退率', '迟到率', '缺卡率']
+	// 		},
+	// 		xAxis: [
+	// 			{
+	// 				type: 'category',
+	// 				data: [],
+	// 				name: '月'
+	// 			}
+	// 		],
+	// 		yAxis: [
+	// 			{
+	// 				type: 'value',
+	// 				axisLabel: {
+	// 					formatter: '{value} %'
+	// 				},
+	// 				max: '100'
+	// 			}
+	// 		],
+	// 		series: [
+	// 			{
+	// 				name: '早退率',
+	// 				type: 'line',
+	// 				data: []
+	// 			},
+	// 			{
+	// 				name: '迟到率',
+	// 				type: 'line',
+	// 				data: []
+	// 			},
+	// 			{
+	// 				name: '缺卡率',
+	// 				type: 'line',
+	// 				data: []
+	// 			}
+	// 		]
+	// 	};
+	// 	countInfo.map((info) => {
+	// 		options.xAxis[0].data.push(info.month);
+	// 		options.series[0].data.push(info.earlyrate === -1 ? 0 : info.earlyrate * 100);
+	// 		options.series[1].data.push(info.laterate === -1 ? 0 : info.laterate * 100);
+	// 		options.series[2].data.push(info.uncheckrate === -1 ? 0 : info.uncheckrate * 100);
+	// 	});
+	// 	return options;
+	// }
 }
+export default Statistics = Form.create()(Statistics);

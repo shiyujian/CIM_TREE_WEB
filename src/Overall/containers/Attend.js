@@ -100,11 +100,11 @@ export default class Attend extends Component {
 				<Content>
 					<Spin tip="数据加载中，请稍后..." spinning={loading}>
 						<Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
-							<TabPane tab="统计分析" key="1">
-								<Statistics {...this.props}/>
-							</TabPane>
-							<TabPane tab="考勤查询" key="2">
+							<TabPane tab="人员考勤" key="2">
 								<Lookout {...this.props}/>
+							</TabPane>
+							<TabPane tab="进离场管理" key="1">
+								<Statistics {...this.props}/>
 							</TabPane>
 						</Tabs>
 					</Spin>
