@@ -28,6 +28,9 @@ const getPersonsAc = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/?membe
 //设置统计查询的数据
 const getCountInfoAcT = createFetchAction(`${base}/main/api/staff-statistic2/?org_code={{code}}&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`, []);
 const setCountInfoAc = createAction('ATTEND设置统计查询的数据');
+// 控制新增进场弹框
+const setModal = createAction('setModal控制新增弹窗');
+
 export const actions = {
 	setTabActive,
 	getOrgTreeOK,
@@ -45,8 +48,13 @@ export const actions = {
 	getPersonsAc,
 	getCountInfoAcT,
 	setCountInfoAc,
+	setModal
 };
 export default handleActions({
+	[setModal]: (state, {payload}) => ( {
+		...state,
+		setModalvisible: payload
+	}),
 	[setTabActive]: (state, {payload}) => ( {
 		...state,
 		tabValue: payload

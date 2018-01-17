@@ -148,7 +148,7 @@ class NewsTable extends Component {
 			// selectedRowKeys,
 			onChange: this.onSelectChange,
 		};
-		console.log('woshi', this.props)
+		
 		const {
 			newsList = [],
 			draftNewsLis = [],
