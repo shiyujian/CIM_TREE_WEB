@@ -188,7 +188,7 @@ class RichText extends Component {
 			<div>
 				<Form>
 					<Row>
-						<Col span={5} offset={1}>
+						<Col span={8} offset={1}>
 							<FormItem {...formItemLayout} label="新闻标题">
 								{getFieldDecorator('title', {
 									rules: [{ required: true, message: '请输入新闻标题' }],
@@ -198,12 +198,15 @@ class RichText extends Component {
 									)}
 							</FormItem>
 						</Col>
-						<Col span={5} offset={1}>
-							<FormItem {...formItemLayout} label="关键字">
+						<Col span={8} offset={1}>
+							<FormItem {...formItemLayout} label="发布单位">
 								{getFieldDecorator('abstract', {})(
-									<Input type="text" placeholder="请输入关键字" />
+									<Input type="text" />
 								)}
 							</FormItem>
+						</Col>
+						<Col span={4} offset={1}>
+								<Button>上传</Button>
 						</Col>
 
 					</Row>
@@ -214,10 +217,10 @@ class RichText extends Component {
 					</Col>
 				</Row>
 				<Row style={{ marginTop: 20 }}>
-					<Col span={24} offset={8} >
+					<Col span={24} offset={10} >
 						<Button onClick={this.modalClick.bind(this)}>取消</Button>
-						<Button style={{ marginLeft: 10 }} onClick={this.postData.bind(this)}>提交</Button>
-						<Button style={{ marginLeft: 10 }} onClick={this.draftDataFunc.bind(this)}>暂存</Button>
+						<Button style={{ marginLeft: 20 }} onClick={this.postData.bind(this)}>提交</Button>
+						<Button style={{ marginLeft: 20 }} onClick={this.draftDataFunc.bind(this)}>暂存</Button>
 					</Col>
 				</Row>
 			</div>

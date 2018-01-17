@@ -1,16 +1,16 @@
-import React, {Component} from 'react';
-import {Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Progress} from 'antd';
+import React, { Component } from 'react';
+import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Progress } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import {getUser} from '../../../_platform/auth';
-import {base, STATIC_DOWNLOAD_API,SOURCE_API} from '../../../_platform/api';
+import { getUser } from '../../../_platform/auth';
+import { base, STATIC_DOWNLOAD_API, SOURCE_API } from '../../../_platform/api';
 import E from 'wangeditor'
 
 let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
-const {TextArea} = Input;
+const { TextArea } = Input;
 
 class SimpleText extends Component {
 	constructor(props) {
@@ -74,14 +74,14 @@ class SimpleText extends Component {
 		};
 		editor.create();
 		const {
-			actions:{postUploadFiles},
+			actions: { postUploadFiles },
 			toggleData: toggleData = {
 				type: 'TIPS',
 				status: 'ADD',
 				visible: false,
 				editData: null
 			},
-			form: {setFieldsValue}
+			form: { setFieldsValue }
 		} = this.props;
 		if (toggleData.type === 'TIPS' && toggleData.status === 'EDIT') {
 			postUploadFiles(toggleData.editData.attachment.fileList)
@@ -100,32 +100,32 @@ class SimpleText extends Component {
 		multiple: true,
 		showUploadList: false,
 		action: base + "/service/fileserver/api/user/files/",
-		beforeUpload: ()=>{
-			this.setState({progress:0});
+		beforeUpload: () => {
+			this.setState({ progress: 0 });
 		},
-		onChange:({file,event})=>{
+		onChange: ({ file, event }) => {
 			const status = file.status;
 			if (status === 'done') {
-				const {actions:{postUploadFiles},fileList=[]}=this.props;
-				let newFileList=fileList;
-				let newFile={
-					name:file.name,
-					down_file:STATIC_DOWNLOAD_API + "/media"+file.response.download_url.split('/media')[1]
+				const { actions: { postUploadFiles }, fileList = [] } = this.props;
+				let newFileList = fileList;
+				let newFile = {
+					name: file.name,
+					down_file: STATIC_DOWNLOAD_API + "/media" + file.response.download_url.split('/media')[1]
 				};
-				newFileList=newFileList.concat(newFile);
+				newFileList = newFileList.concat(newFile);
 				postUploadFiles(newFileList)
 			}
-			if(event){
-				let {percent} = event;
-				if(percent!==undefined)
-					this.setState({progress:parseFloat(percent.toFixed(1))});
+			if (event) {
+				let { percent } = event;
+				if (percent !== undefined)
+					this.setState({ progress: parseFloat(percent.toFixed(1)) });
 			}
 		},
 	};
 
 	//modal显示与影藏
 	modalClick() {
-		const {actions: {toggleModal,postUploadFiles}} = this.props;
+		const { actions: { toggleModal, postUploadFiles } } = this.props;
 		postUploadFiles([]);
 		toggleModal({
 			type: null,
@@ -137,15 +137,15 @@ class SimpleText extends Component {
 	//发布公告
 	postData() {
 		const {
-			actions: {postData, getTipsList, patchData, getDraftTipsList,postUploadFiles},
-			form: {validateFields},
+			actions: { postData, getTipsList, patchData, getDraftTipsList, postUploadFiles },
+			form: { validateFields },
 			toggleData: toggleData = {
 				type: 'TIPS',
 				status: 'ADD',
 				visible: false,
 				editData: null
 			},
-			fileList=[]
+			fileList = []
 		} = this.props;
 		validateFields((err, values) => {
 			if (!err) {
@@ -157,7 +157,7 @@ class SimpleText extends Component {
 						"raw": this.state.content,
 						"content": "",
 						"attachment": {
-							"fileList":fileList || [],
+							"fileList": fileList || [],
 						},
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -183,12 +183,12 @@ class SimpleText extends Component {
 						"title": values['title'],
 						"raw": this.state.content,
 						"attachment": {
-							"fileList":fileList || [],
+							"fileList": fileList || [],
 						},
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"is_draft": false
 					};
-					patchData({pk: toggleData.editData.id}, newData)
+					patchData({ pk: toggleData.editData.id }, newData)
 						.then(rst => {
 							if (rst.id) {
 								this.modalClick();
@@ -211,13 +211,13 @@ class SimpleText extends Component {
 	//暂存公告
 	draftDataFunc() {
 		const {
-			actions: {postData, patchData, getTipsList, getDraftTipsList},
-			form: {validateFields},
+			actions: { postData, patchData, getTipsList, getDraftTipsList },
+			form: { validateFields },
 			toggleData: toggleData = {
 				status: 'ADD',
 				editData: null,
 			},
-			fileList=[]
+			fileList = []
 		} = this.props;
 		//判断暂存的是新增的还是编辑的暂存
 		//编辑暂存的
@@ -227,12 +227,12 @@ class SimpleText extends Component {
 					"title": values['title'],
 					"raw": this.state.content,
 					"attachment": {
-						"fileList":fileList || [],
+						"fileList": fileList || [],
 					},
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"is_draft": true
 				};
-				patchData({pk: toggleData.editData.id}, newData)
+				patchData({ pk: toggleData.editData.id }, newData)
 					.then(rst => {
 						if (rst.id) {
 							this.modalClick();
@@ -254,7 +254,7 @@ class SimpleText extends Component {
 					"abstract": '',
 					"raw": this.state.content,
 					"attachment": {
-						"fileList":fileList || [],
+						"fileList": fileList || [],
 					},
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [2],
@@ -278,20 +278,20 @@ class SimpleText extends Component {
 
 	render() {
 		const {
-			form: {getFieldDecorator},
+			form: { getFieldDecorator },
 			toggleData: toggleData = {
 				type: 'TIPS',
 				status: 'ADD',
 				visible: false,
 			},
-			fileList=[]
+			fileList = []
 		} = this.props;
 
-		const {progress} = this.state;
+		const { progress } = this.state;
 
 		const formItemLayout = {
-			labelCol: {span: 8},
-			wrapperCol: {span: 16},
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
 		};
 		return (
 			// <Modal
@@ -305,54 +305,79 @@ class SimpleText extends Component {
 			// 	onOk={this.modalClick.bind(this)}
 			// 	onCancel={this.modalClick.bind(this)}
 			// >
-				<div>
-					<Form>
-						<Row>
-							<Col span={12} offset={1}>
-								<FormItem {...formItemLayout} label="公告标题">
-									{getFieldDecorator('title', {
-										rules: [{required: true, message: '请输入公告标题'}],
-										initialValue: ''
-									})(
-										<Input type="text" placeholder="公告标题"/>
+			<div>
+				<Form>
+					<Row span={22}>
+						<Col span={8} offset={1}>
+							<FormItem {...formItemLayout} label="主题">
+								{getFieldDecorator('title', {
+									rules: [{ required: true, message: '请输入公告标题' }],
+									initialValue: ''
+								})(
+									<Input type="text" />
 									)}
-								</FormItem>
-							</Col>
-							<Col span={10} offset={1}>
-								<Button onClick={this.draftDataFunc.bind(this)}>暂存</Button>
-								<Button onClick={this.postData.bind(this)}>发布</Button>
-								<Button onClick={this.modalClick.bind(this)}>取消</Button>
-							</Col>
-						</Row>
-						<Row>
-							<Col span={12} offset={1}>
-								<div ref="editorElem"></div>
-							</Col>
-							<Col span={10} offset={1}>
-								<Row>
-									<Col>
-										<Dragger {...this.uploadProps}>
-											<p className="ant-upload-drag-icon">
-												<Icon type="inbox"/>
-											</p>
-											<p className="ant-upload-text">
-												点击或者拖拽开始上传</p>
-										</Dragger>
-									</Col>
-									<Col>
-										<Progress percent={progress}/>
-									</Col>
-									<Col>
-										<Table columns={this.columns}
-											   dataSource={fileList}
-											   pagination={false}
-											   bordered rowKey="down_file"/>
-									</Col>
-								</Row>
-							</Col>
-						</Row>
-					</Form>
-				</div>
+							</FormItem>
+						</Col>
+						<Col span={6} offset={1}>
+							<FormItem {...formItemLayout} label="发布单位">
+								{getFieldDecorator('abstract', {})(
+									<Input type="text" />
+								)}
+							</FormItem>
+						</Col>
+						<Col span={4} offset={1}>
+							<FormItem {...formItemLayout} label="紧急程度">
+
+								<Input type="text" />
+
+							</FormItem>
+						</Col>
+						<Col span={2}>
+							<Dragger {...this.uploadProps}>
+								<Button >
+									<Icon type='upload' />上传
+								</Button>
+							</Dragger>
+						</Col>
+
+
+					</Row>
+					<Row>
+						<Col span={22} offset={1}>
+							<div ref="editorElem"></div>
+						</Col>
+						{/* <Col span={10} offset={1}>
+							<Row>
+								<Col>
+									<Dragger {...this.uploadProps}>
+										<p className="ant-upload-drag-icon">
+											<Icon type="inbox" />
+										</p>
+										<p className="ant-upload-text">
+											点击或者拖拽开始上传</p>
+									</Dragger>
+								</Col>
+								<Col>
+									<Progress percent={progress} />
+								</Col>
+								<Col>
+									<Table columns={this.columns}
+										dataSource={fileList}
+										pagination={false}
+										bordered rowKey="down_file" />
+								</Col>
+							</Row>
+						</Col> */}
+					</Row>
+					<Row style={{ marginTop: 20 }}>
+						<Col span={24} offset={10}>
+							<Button onClick={this.draftDataFunc.bind(this)}>暂存</Button>
+							<Button onClick={this.postData.bind(this)}>发布</Button>
+							<Button onClick={this.modalClick.bind(this)}>取消</Button>
+						</Col>
+					</Row>
+				</Form>
+			</div>
 			// </Modal>
 
 		);
@@ -371,8 +396,8 @@ class SimpleText extends Component {
 			},
 		}
 	];
-	removeFile(file){
-		const {actions:{postUploadFiles},fileList=[]}=this.props;
+	removeFile(file) {
+		const { actions: { postUploadFiles }, fileList = [] } = this.props;
 		let newFileList = fileList.filter(f => f.down_file !== file.down_file);
 		postUploadFiles(newFileList)
 	}

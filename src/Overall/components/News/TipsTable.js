@@ -242,6 +242,7 @@ export default class TipsTable extends Component {
 							<Table dataSource={tipsList}
 								columns={this.columns}
 								rowKey="id"
+								style={{marginTop:20}}
 							/>
 						</TabPane>
 						<TabPane tab="暂存的通知" key="2">
@@ -324,6 +325,7 @@ export default class TipsTable extends Component {
 							<Table dataSource={draftTipsList}
 								columns={this.draftColumns}
 								rowKey="id"
+								style={{marginTop:20}}
 							/>
 						</TabPane>
 						<TabPane tab="通知发布" key="3">
