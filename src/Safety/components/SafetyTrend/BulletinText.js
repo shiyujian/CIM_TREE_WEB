@@ -10,7 +10,7 @@ let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
 
-class RichText extends Component {
+class BulletinText extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -280,4 +280,4 @@ class RichText extends Component {
 	}
 }
 
-export default Form.create()(RichText)
+export default Form.create()(BulletinText)
