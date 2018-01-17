@@ -139,7 +139,23 @@ class NewsTable extends Component {
 		setNewsTabActive(newsTabValue);
 	}
 
+	clear() {
+		this.props.form.setFieldsValue({
+			workflowactivity: undefined,
+			worktime: undefined,
+			workunit: undefined,
+		
+		});
+	}
 
+	clear1() {
+		this.props.form.setFieldsValue({
+			workflow: undefined,
+			worktimes: undefined,
+			workunits: undefined,
+		
+		});
+	}
 
 
 
@@ -148,7 +164,7 @@ class NewsTable extends Component {
 			// selectedRowKeys,
 			onChange: this.onSelectChange,
 		};
-		
+
 		const {
 			newsList = [],
 			draftNewsLis = [],
@@ -186,56 +202,69 @@ class NewsTable extends Component {
 								<Col span={16}>
 									<Row>
 										<Col span={12} >
-											<Row>
-												<Col span={3}>
-													<span >主题</span>
-												</Col>
-												<Col >
-													<Input style={{ width: '70%' }} />
-												</Col>
-											</Row>
+											<FormItem {...formItemLayout} label="主题">
+												{
+													getFieldDecorator('workflowactivity', {
+														rules: [
+															{ required: false, message: '请输入主题' },
+														]
+													})
+														(<Input placeholder="请输入主题" />)
+												}
+											</FormItem>
 										</Col>
 										<Col span={12} >
-											<Row>
-												<Col span={3}>
-													<span>发布日期</span>
-												</Col>
-												<Col >
-													<RangePicker
-														style={{ verticalAlign: "middle", width: '70%' }}
-														defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
-														showTime={{ format: 'HH:mm:ss' }}
-														format={'YYYY/MM/DD HH:mm:ss'}
+											<FormItem {...formItemLayout} label="发布日期">
 
-													>
-													</RangePicker>
-												</Col>
-											</Row>
+												{
+													getFieldDecorator('worktime', {
+														rules: [
+															{ required: false, message: '请选择日期' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '70%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
 										</Col>
 									</Row>
 									<Row>
 										<Col span={12} style={{ marginTop: 20 }}>
-											<Row>
-												<Col span={3}>
-													<span >发布单位</span>
-												</Col>
-												<Col>
-													<Select style={{ width: '70%' }} >
-														<Option value="0">编辑中</Option>
-														<Option value="1">已提交</Option>
-														<Option value="2">执行中</Option>
-														<Option value="3">已完成</Option>
-														<Option value="4">已废止</Option>
-														<Option value="5">异常</Option>
-													</Select>
-												</Col>
-											</Row>
+											<FormItem {...formItemLayout} label="发布单位">
+												{
+													getFieldDecorator('workunit', {
+														rules: [
+															{ required: false, message: '发布单位' },
+														]
+													})
+														(<Select style={{ width: '100%' }} 
+														>
+															<Option value="0">编辑中</Option>
+															<Option value="1">已提交</Option>
+															<Option value="2">执行中</Option>
+															<Option value="3">已完成</Option>
+															<Option value="4">已废止</Option>
+															<Option value="5">异常</Option>
+														</Select>)
+												}
+
+
+											</FormItem>
+
 										</Col>
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search'>查找</Button>
-									<Button style={{ marginTop: 20 }} icon='reload'>清除</Button>
+									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear.bind(this)}>清除</Button>
 								</Col>
 							</Row>
 
@@ -256,56 +285,69 @@ class NewsTable extends Component {
 								<Col span={16}>
 									<Row>
 										<Col span={12} >
-											<Row>
-												<Col span={3}>
-													<span >主题</span>
-												</Col>
-												<Col >
-													<Input style={{ width: '70%' }} />
-												</Col>
-											</Row>
+											<FormItem {...formItemLayout} label="主题">
+												{
+													getFieldDecorator('workflow', {
+														rules: [
+															{ required: false, message: '请输入主题' },
+														]
+													})
+														(<Input placeholder="请输入主题" />)
+												}
+											</FormItem>
 										</Col>
 										<Col span={12} >
-											<Row>
-												<Col span={3}>
-													<span>发布日期</span>
-												</Col>
-												<Col >
-													<RangePicker
-														style={{ verticalAlign: "middle", width: '70%' }}
-														defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
-														showTime={{ format: 'HH:mm:ss' }}
-														format={'YYYY/MM/DD HH:mm:ss'}
+											<FormItem {...formItemLayout} label="发布日期">
 
-													>
-													</RangePicker>
-												</Col>
-											</Row>
+												{
+													getFieldDecorator('worktimes', {
+														rules: [
+															{ required: false, message: '请选择日期' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '70%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
 										</Col>
 									</Row>
 									<Row>
 										<Col span={12} style={{ marginTop: 20 }}>
-											<Row>
-												<Col span={3}>
-													<span >发布单位</span>
-												</Col>
-												<Col>
-													<Select style={{ width: '70%' }} >
-														<Option value="0">编辑中</Option>
-														<Option value="1">已提交</Option>
-														<Option value="2">执行中</Option>
-														<Option value="3">已完成</Option>
-														<Option value="4">已废止</Option>
-														<Option value="5">异常</Option>
-													</Select>
-												</Col>
-											</Row>
+											<FormItem {...formItemLayout} label="发布单位">
+												{
+													getFieldDecorator('workunits', {
+														rules: [
+															{ required: false, message: '发布单位' },
+														]
+													})
+														(<Select style={{ width: '100%' }}
+														>
+															<Option value="0">编辑中</Option>
+															<Option value="1">已提交</Option>
+															<Option value="2">执行中</Option>
+															<Option value="3">已完成</Option>
+															<Option value="4">已废止</Option>
+															<Option value="5">异常</Option>
+														</Select>)
+												}
+
+
+											</FormItem>
+
 										</Col>
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search'>查找</Button>
-									<Button style={{ marginTop: 20 }} icon='reload'>清除</Button>
+									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
 								</Col>
 							</Row>
 							<Table dataSource={draftNewsLis}
@@ -373,7 +415,7 @@ class NewsTable extends Component {
 						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
-						
+
 
 						{/* <a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp; */}
@@ -423,7 +465,7 @@ class NewsTable extends Component {
 						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
-					
+
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
 							cancelText="取消">
