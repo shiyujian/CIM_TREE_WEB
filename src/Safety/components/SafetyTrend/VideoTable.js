@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Table, Tabs, Button, Row, Col, message, Modal, Popconfirm} from 'antd';
-import SimpleText from './SimpleText';
+import VideoText from './VideoText';
 import moment from 'moment';
 import {getUser} from '../../../_platform/auth';
 
@@ -8,7 +8,7 @@ const TabPane = Tabs.TabPane;
 const user_id = getUser().id;
 
 
-export default class TipsTable extends Component {
+export default class VideoTable extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {}
@@ -28,13 +28,13 @@ export default class TipsTable extends Component {
 	clickTips(record, type) {
 		const {
 			actions: {deleteData, getTipsList, getDraftTipsList, toggleModal, patchData},
-			tipsTabValue = '1'
+			videoTabValue = '1'
 		} = this.props;
 		if (type === 'DELETE') {
 			deleteData({pk: record.id})
 				.then(() => {
 					message.success('删除公告成功！');
-					if (tipsTabValue === '1') {
+					if (videoTabValue === '1') {
 						getTipsList({
 							user_id: user_id
 						});
@@ -132,9 +132,9 @@ export default class TipsTable extends Component {
 	}
 
 	//公告列表和暂存的公告列表切换
-	subTabChange(tipsTabValue) {
-		const {actions: {setTipsTabActive}} = this.props;
-		setTipsTabActive(tipsTabValue);
+	subTabChange(videoTabValue) {
+		const {actions: {setVideoTabActive}} = this.props;
+		setVideoTabActive(videoTabValue);
 	}
 
 	render() {
@@ -145,12 +145,12 @@ export default class TipsTable extends Component {
 				type: 'TIPS',
 				visible: false,
 			},
-			tipsTabValue = '1'
+			videoTabValue = '1'
 		} = this.props;
 		return (
 			<Row>
 				<Col span={22} offset={1}>
-					<Tabs activeKey={tipsTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
+					<Tabs activeKey={videoTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
 						<div style={{marginBottom: '10px'}}>
 							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>发布公告</Button>
 							{

@@ -24,9 +24,8 @@ export default class Addition extends Component {
     }
 
 	render() {
-		const {actions: {getModalState}} = this.props;
-		const getModalVisible=this.props.getModalVisible
-		console.log(getModalVisible)
+		const {actions: {getModalUpdate}} = this.props;
+		const getModalVisible=this.props.getModalUpdateVisible
 		const{updatevisible = false,
 			docs = [],
 			newkey =[],
@@ -158,7 +157,9 @@ export default class Addition extends Component {
 			<Modal title="更新资料"
 			       width={920} visible={getModalVisible}
 			       closable={false}
-                   footer={footer}
+				   footer={footer}
+				   onCancel={this.cancelT.bind(this)}
+				   onOk={this.determine.bind(this)}				   
                    maskClosable={false}>
 				<Form>
 					<Row gutter={24}>
@@ -196,12 +197,18 @@ export default class Addition extends Component {
 			selectDocuments(selectedRowKeys);
 		}
 	};
+	cancelT(){
+		this.cancel();
+	}
+	determine(){
+		this.cancel();
+	}
 
 	cancel() {
 		const {
-			actions: {getModalState},
+			actions: {getModalUpdate},
 		} = this.props;
-		getModalState(false);
+		getModalUpdate(false);
         this.setState({
             progress:0
         })
@@ -351,7 +358,7 @@ export default class Addition extends Component {
 			currentcode = {},
 			updoc = {},
 			docs = [],
-			actions: {getModalState, postDocument, getdocument,changeDocs}
+			actions: {getModalUpdate, postDocument, getdocument,changeDocs}
 		} = this.props;
 		const promises = docs.map(doc => {
 			const response = doc.response;
@@ -382,7 +389,7 @@ export default class Addition extends Component {
 				}
 			});
 			changeDocs([]);
-			getModalState(false);
+			getModalUpdate(false);
 			setTimeout(()=>{getdocument({code: currentcode.code})},1000)
 		});
         this.setState({

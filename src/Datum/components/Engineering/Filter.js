@@ -36,12 +36,14 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="单位工程">
                                     {
-                                        getFieldDecorator('workflow', {
+                                        getFieldDecorator('UnitEngineering', {
                                             rules: [
-                                                { required: false, message: '请选择任务类型' },
+                                                { required: false, message: '请选择单位工程' },
                                             ]
                                         })
-                                            (<Select allowClear>
+                                            (<Select>
+                                                <Option value="0">编辑中</Option>
+                                                <Option value="1">已提交</Option>
                                             </Select>)
                                     }
                                 </FormItem>
@@ -49,9 +51,9 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="主题">
                                     {
-                                        getFieldDecorator('workflowactivity', {
+                                        getFieldDecorator('theme', {
                                             rules: [
-                                                { required: false, message: '请输入任务名称' },
+                                                { required: false, message: '请输入主题' },
                                             ]
                                         })
                                             (<Input placeholder="请输入..." />)
@@ -62,9 +64,9 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="编号">
                                     {
-                                        getFieldDecorator('workflowactivity', {
+                                        getFieldDecorator('numbers', {
                                             rules: [
-                                                { required: false, message: '请输入任务名称' },
+                                                { required: false, message: '请输入编号' },
                                             ]
                                         })
                                             (<Input />)
@@ -76,9 +78,10 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="文档类型">
                                     {
-                                        getFieldDecorator('creator', )
-                                            (<Select
-                                            >
+                                        getFieldDecorator('documentType', )
+                                            (<Select>
+                                                <Option value="0">编辑中</Option>
+                                                <Option value="1">已提交</Option>
                                             </Select>)
                                     }
 
@@ -109,12 +112,12 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="流程状态">
                                     {
-                                        getFieldDecorator('status', {
+                                        getFieldDecorator('processState', {
                                             rules: [
                                                 { required: false, message: '请输入任务类别' },
                                             ]
                                         })
-                                            (<Select allowClear>
+                                            (<Select>
                                                 <Option value="0">编辑中</Option>
                                                 <Option value="1">已提交</Option>
                                                 <Option value="2">执行中</Option>
@@ -136,7 +139,7 @@ class Filter extends Component {
                         </Row>
                         <Row>
                             <FormItem>
-                                <Button onClick={this.clear}>清空</Button>
+                                <Button onClick={this.clear.bind(this)}>清空</Button>
                             </FormItem>
                         </Row>
                     </Col>
@@ -168,7 +171,17 @@ class Filter extends Component {
         link.click();
         document.body.removeChild(link);
     }
-
+    clear(){
+        console.log(this.props.form)     
+        this.props.form.setFieldsValue({
+            theme:undefined,
+            UnitEngineering:undefined,
+            numbers:undefined,
+            documentType:undefined,
+            processState:undefined,
+			
+		})
+    }
 
     delete() {
         const { selected } = this.props;

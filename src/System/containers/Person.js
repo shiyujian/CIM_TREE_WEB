@@ -8,7 +8,7 @@ import {Tree, Filter, Table, Addition} from '../components/Person';
 
 @connect(
 	state => {
-		const {setup: {person = {}} = {}, platform} = state;
+		const {system: {person = {}} = {}, platform} = state;
 		return {...person, platform}
 	},
 	dispatch => ({

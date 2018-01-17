@@ -12,7 +12,7 @@ const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
 const { TextArea } = Input;
 
-class SimpleText extends Component {
+class Modals extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -294,17 +294,17 @@ class SimpleText extends Component {
 			wrapperCol: { span: 16 },
 		};
 		return (
-			// <Modal
-			// 	title={toggleData.type === 'TIPS' ? (
-			// 		toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
-			// 	) : '发布公告'}
-			// 	visible={toggleData.visible}
-			// 	footer={null}
-			// 	width="80%"
-			// 	maskClosable={false}
-			// 	onOk={this.modalClick.bind(this)}
-			// 	onCancel={this.modalClick.bind(this)}
-			// >
+			<Modal
+				title={toggleData.type === 'TIPS' ? (
+					toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
+				) : '发布公告'}
+				visible={toggleData.visible}
+				footer={null}
+				width="80%"
+				maskClosable={false}
+				onOk={this.modalClick.bind(this)}
+				onCancel={this.modalClick.bind(this)}
+			>
 			<div>
 				<Form>
 					<Row span={22}>
@@ -378,7 +378,7 @@ class SimpleText extends Component {
 					</Row>
 				</Form>
 			</div>
-			// </Modal>
+			</Modal>
 
 		);
 	}
@@ -403,4 +403,4 @@ class SimpleText extends Component {
 	}
 }
 
-export default Form.create()(SimpleText)
+export default Form.create()(Modals)

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Table, Tabs, Button, Row, Col, Modal, message, Popconfirm, Form, Input, DatePicker, Icon, Select } from 'antd';
 import SimpleText from './SimpleText';
+import Modals from './Modal';
+
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
 
@@ -152,14 +154,15 @@ export default class TipsTable extends Component {
 			tipsTabValue = '1'
 		} = this.props;
 		return (
-			// tabBarExtraContent={
-			// 	<div style={{marginBottom: '10px'}}>
-			// 		<Button type="primary" onClick={this.publishTipsClick.bind(this)}>发布公告</Button>
-			// 		{
-			// 			(toggleData.visible && toggleData.type === 'TIPS') && (<SimpleText {...this.props}/>)
-			// 		}
-			// 	</div>}
+			
 			<Row>
+				{
+				<div style={{marginBottom: '10px'}}>
+
+					{
+						(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props}/>)
+					}
+				</div>}
 				<Col span={22} offset={1}>
 					<Tabs activeKey={tipsTabValue} onChange={this.subTabChange.bind(this)} >
 						<TabPane tab="通知查询" key="1">
@@ -242,6 +245,7 @@ export default class TipsTable extends Component {
 							<Table dataSource={tipsList}
 								columns={this.columns}
 								rowKey="id"
+								style={{marginTop:20}}
 							/>
 						</TabPane>
 						<TabPane tab="暂存的通知" key="2">
@@ -324,6 +328,7 @@ export default class TipsTable extends Component {
 							<Table dataSource={draftTipsList}
 								columns={this.draftColumns}
 								rowKey="id"
+								style={{marginTop:20}}
 							/>
 						</TabPane>
 						<TabPane tab="通知发布" key="3">

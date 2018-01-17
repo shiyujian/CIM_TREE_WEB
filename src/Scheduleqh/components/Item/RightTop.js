@@ -1,17 +1,21 @@
 import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import {Select,Row,Col,Radio,Card} from 'antd';
+import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
-
+import moment from 'moment';
+const {RangePicker} = DatePicker;
 export default class Warning extends Component {
 
     static propTypes = {};
     constructor(props){
         super(props);
         this.state={
+            stime1: moment().format('2017-11-17 00:00:00'),
+            etime1: moment().format('2017-11-24 23:59:59'),
+            departOptions:"",
 
         }
     }
@@ -21,7 +25,7 @@ export default class Warning extends Component {
         const myChart = echarts.init(document.getElementById('rightop'));
 
         this.optionLine = {
-            tooltip: {
+           tooltip: {
                 trigger: 'axis',
                 axisPointer: {
                     type: 'cross',
@@ -30,15 +34,15 @@ export default class Warning extends Component {
                     }
                 }
             },
-            legend: {
-                data:['已检验批个数','优良率'],
-                left:'right'
+            // legend: {
+            //     data:['一标'],
+            //     left:'right'
                 
-            },
+            // },
             xAxis: [
                 {
                     type: 'category',
-                    data: ['分部一','分部二','分部三','分部四','分部五','分部六','分部七'],
+                    data: ['2017-11-13','2017-11-13','2017-11-13','2017-11-13','2017-11-13','2017-11-13','2017-11-13'],
                     axisPointer: {
                         type: 'shadow'
                     }
@@ -47,49 +51,28 @@ export default class Warning extends Component {
             yAxis: [
                 {
                     type: 'value',
-                    name: '已检验批（个）',
                     min: 0,
-                    max: 500,
-                    interval: 100,
+                    max: 50,
+                    interval: 5,
                     axisLabel: {
                         formatter: '{value} '
                     }
                 },
-                {
-                    type: 'value',
-                    name: '优良率（%）',
-                    min: 0,
-                    max: 100,
-                    interval: 20,
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                }
             ],
             series: [
+               
                 {
-                    name:'已检验批个数',
-                    type:'bar',
-                    data:[250, 360, 280, 230, 312, 240, 290],
-                    barWidth:'25%',
+                    name:'一标',
+                    type:'line',
+                    yAxisIndex: 0,
+                    data:[30,40,50,20,10,30,30],
                     itemStyle:{
                         normal:{
-                            color:'#02e5cd',
-                            barBorderRadius:[50,50,50,50]
+                            color:'black'
                         }
                     }
                 },
-                {
-                    name:'优良率',
-                    type:'line',
-                    yAxisIndex: 1,
-                    data:[82,85,79,83,90,89,95],
-                    itemStyle:{
-                        normal:{
-                            color:'#4786ff'
-                        }
-                    }
-                }
+              
             ]
         };
         myChart.setOption(this.optionLine,true);
@@ -100,10 +83,36 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <h2 style={{textAlign:'left',color:  '#74859f'}}>检验批验评统计</h2>
+                 <RangePicker 
+                             style={{verticalAlign:"middle"}} 
+                             defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
+                             showTime={{ format: 'HH:mm:ss' }}
+                             format={'YYYY/MM/DD HH:mm:ss'}
+                             onChange={this.datepick.bind(this)}
+                             onOk={this.datepickok.bind(this)}
+                            >
+                            </RangePicker>
                     <div id='rightop' style={{ width: '100%', height: '340px' }}></div>
+                    <Select 
+                          placeholder="请选择部门"
+                          notFoundContent="暂无数据"
+                          value=""
+                          onSelect={this.onDepartments.bind(this,'departments') }>
+                          {this.state.departOptions}
+                    </Select>
+                    <Select 
+                          placeholder="请选择部门"
+                          notFoundContent="暂无数据"
+                          value=""
+                          onSelect={this.onDepartments.bind(this,'departments') }>
+                          {this.state.departOptions}
+                    </Select>
+                    <span>强度分析</span>
                 </Card>
             </div>
         );
     }
+    datepick(){}
+    datepickok(){}
+    onDepartments(){}
 }
