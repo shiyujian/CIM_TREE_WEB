@@ -32,7 +32,6 @@ export default class Redios extends Component {
 
 	render() {
 		const {newdirtree=[],stas = true,tablevisible = false, keycode,expandedKeys,tree=[],projectList=[]} = this.props;
-		console.log(this.props)
 		return (
             <Body>
             <Main>

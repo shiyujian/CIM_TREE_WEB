@@ -37,9 +37,9 @@ export default class AddModal extends Component{
 
 		return (
 			<Modal
-				visible = {true}
+				visible = {addVisible}
 				width = {1200}
-				onCancel={this.cancel.bind(this)}
+				onCancel = {this.cancel.bind(this)}
 			>
 				<Table
 					bordered

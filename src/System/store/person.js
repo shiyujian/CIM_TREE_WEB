@@ -3,7 +3,7 @@ import {actionsMap} from '_platform/store/util';
 
 import fieldFactory from '_platform/store/service/field';
 
-export const ID = 'SETUP_USER';
+export const ID = 'SYSTEM_PERSON';
 
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');

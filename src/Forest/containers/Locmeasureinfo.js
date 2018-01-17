@@ -38,17 +38,15 @@ export default class Locmeasureinfo extends Component {
         const {actions: {getTree,gettreetype,getTreeList}} = this.props;
         //地块树
         try {
-            getTree({},{parent:'P009'})
+            getTree({},{parent:'root'})
             .then(rst => {
                 if(rst instanceof Array && rst.length > 0){
-                console.log('rst',rst)
                     rst.forEach((item,index) => {
                         rst[index].children = []
                     })
                     getTree({},{parent:rst[0].No})
                     .then(rst1 => {
                         if(rst1 instanceof Array && rst1.length > 0){
-                        console.log('rst111111',rst1)
                             rst1.forEach((item,index) => {
                                 rst1[index].children = []
                             })
@@ -56,11 +54,22 @@ export default class Locmeasureinfo extends Component {
                             getTree({},{parent:rst1[0].No})
                             .then(rst2 => {
                                 if(rst2 instanceof Array && rst2.length > 0){
-                                console.log('rst22222222',rst2)
                                     getNewTreeData(rst,rst1[0].No,rst2)
                                     this.setState({treeLists:rst},() => {
                                         this.onSelect([rst2[0].No])
                                     })
+                                    // getNewTreeData(rst,rst[0].No,rst2)
+                                    // getTree({},{parent:rst2[0].No})
+                                    // .then(rst3 => {
+                                    //     if(rst3 instanceof Array && rst3.length > 0){
+                                    //         getNewTreeData(rst,rst2[0].No,rst3)
+                                    //         this.setState({treeLists:rst},() => {
+                                    //             this.onSelect([rst3[0].No])
+                                    //         })
+                                    //     } else {
+                                    //         this.setState({treeLists:rst})
+                                    //     }
+                                    // })
                                 } else {
                                     this.setState({treeLists:rst})
                                 }

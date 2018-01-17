@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import {Table, Tabs, Button, Row, Col, Modal, message, Popconfirm} from 'antd';
-import RichText from './RichText';
+import StateText from './StateText';
 import moment from 'moment';
 import {getUser} from '../../../_platform/auth';
 
 const TabPane = Tabs.TabPane;
 const user_id = getUser().id;
 
-export default class NewsTable extends Component {
+export default class StateTable extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -20,7 +20,7 @@ export default class NewsTable extends Component {
 		const {actions: {getNewsList, getDraftNewsList}} = this.props;
 		getNewsList({
 			user_id: user_id
-		});
+		})
 		getDraftNewsList({
 			user_id: user_id
 		})
@@ -30,13 +30,13 @@ export default class NewsTable extends Component {
 	clickNews(record, type) {
 		const {
 			actions: {deleteData, getNewsList, getDraftNewsList, toggleModal, patchData},
-			newsTabValue = '1'
+			stateTabValue = '1'
 		} = this.props;
 		if (type === 'DELETE') {
 			deleteData({pk: record.id})
 				.then(() => {
 					message.success('删除新闻成功！');
-					if (newsTabValue === '1') {
+					if (stateTabValue === '1') {
 						getNewsList({
 							user_id: user_id
 						});
@@ -117,9 +117,9 @@ export default class NewsTable extends Component {
 	}
 
 	//新闻列表和暂存的新闻列表切换
-	subTabChange(newsTabValue) {
-		const {actions: {setNewsTabActive}} = this.props;
-		setNewsTabActive(newsTabValue);
+	subTabChange(stateTabValue) {
+		const {actions: {setStateTabActive}} = this.props;
+		setStateTabActive(stateTabValue);
 	}
 
 	render() {
@@ -130,12 +130,12 @@ export default class NewsTable extends Component {
 				type: 'NEWS',
 				visible: false,
 			},
-			newsTabValue = '1'
+			stateTabValue = '1'
 		} = this.props;
 		return (
 			<Row>
 				<Col span={22} offset={1}>
-					<Tabs activeKey={newsTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
+					<Tabs activeKey={stateTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
 						<div style={{marginBottom: '10px'}}>
 							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布新闻</Button>
 							{

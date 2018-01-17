@@ -5,17 +5,19 @@ import {connect} from 'react-redux';
 import ProjectUnitWrapper from '../components/ProjectUnitWrapper';
 import {actions as schedulerActions} from '../store/scheduler';
 import {bindActionCreators} from 'redux';
-import {Tabs,Table,Row,Col,Card} from 'antd';
+import {Tabs,Table,Row,Col,Card,DatePicker} from 'antd';
 import ProceeTable from '../components/ProceeTable'
 import LeftTop from '../components/Item/LeftTop'
 import LeftBottom from '../components/Item/LeftBottom'
 import RightBottom from '../components/Item/RightBottom'
 import RightTop from '../components/Item/RightTop'
+import moment from 'moment';
 // var echarts = require('echarts');
 // var myChart
 // var myChart3
 // var myChart2
 const TabPane = Tabs.TabPane;
+const {RangePicker} = DatePicker;
 @connect(
 	state => {
 		const {schedule:{scheduler = {}},platform} = state;
@@ -31,7 +33,9 @@ export default class Proprogress extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-            item:null
+            item:null,
+            stime1: moment().format('2017-11-17 00:00:00'),
+            etime1: moment().format('2017-11-24 23:59:59'),
 		};
     }
     
@@ -64,11 +68,10 @@ export default class Proprogress extends Component {
                 <Content>
                     <Row gutter={10} style={{margin: '10px 5px'}}>
 					<Col span={12}>
-					    <RightTop  {...this.props} {...this.state}/>
+					     <LeftTop  {...this.props} {...this.state}/>
 					</Col>
 					<Col span={12}>
-					    <LeftTop  {...this.props} {...this.state}/>
-						
+						<RightTop  {...this.props} {...this.state}/>
 					</Col>
 				</Row>
 				<Row gutter={10} style={{margin: '10px 5px'}}>
@@ -82,5 +85,7 @@ export default class Proprogress extends Component {
                 </Content>
 			</div>);
 	}
-
+datepick(){}
+datepickok(){}
 };
+

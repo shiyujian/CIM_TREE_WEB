@@ -50,9 +50,9 @@ export const getProjectAc = createFetchAction(`${SERVICE_API}/project-tree/?dept
 //设计阶段名称
 const getDesignStageOK =createAction(`${ID}_获取设计阶段名称`);
 const getDesignStage = createFetchAction(`${SERVICE_API}/metalist/designstage/`,[getDesignStageOK]);
-// 接收弹出框状态
-const getModalState =createAction(`${ID}接收弹出框状态`);
 
+// 操作更新弹出框状态
+const getModalUpdate =createAction(`${ID}操作更新弹出框状态`);
 
 export const actions = {
 	getDesignStageOK,
@@ -90,7 +90,7 @@ export const actions = {
 	getDesignUnit,
 	getProjectAcOK,
 	getProjectAc,
-	getModalState
+	getModalUpdate
 };
 
 export default handleActions({
@@ -191,8 +191,8 @@ export default handleActions({
 		...state,
 		follow: followReducer(state.follow, action)
 	}),
-	[getModalState]: (state, {payload}) => ({
+	[getModalUpdate]: (state, {payload}) => ({
 		...state,
-		getModalVisible: payload
+		getModalUpdateVisible: payload
 	}),
 }, {});

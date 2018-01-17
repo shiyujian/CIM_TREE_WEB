@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Table, Tabs, Button, Row, Col, Modal, message, Popconfirm, Form, Input, DatePicker, Icon, Select } from 'antd';
 import RichText from './RichText';
+import RichModal from './RichModal';
+
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
@@ -185,15 +187,15 @@ class NewsTable extends Component {
 
 		return (
 			<Row>
+				{
+					<div style={{ marginBottom: '10px' }}>
+						{
+							(toggleData.visible && toggleData.type === 'NEWS') && <RichModal {...this.props} />
+						}
+					</div>}
 				<Col span={22} offset={1}>
 					<Tabs activeKey={newsTabValue} onChange={this.subTabChange.bind(this)} >
-						{/* tabBarExtraContent={
-							<div style={{marginBottom: '10px'}}>
-								<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布新闻</Button>
-								{
-									(toggleData.visible && toggleData.type === 'NEWS') && <RichText {...this.props}/>
-								}
-							</div>} */}
+
 						<TabPane tab="新闻查询" key="1">
 							<Row >
 								<Col span={4}>

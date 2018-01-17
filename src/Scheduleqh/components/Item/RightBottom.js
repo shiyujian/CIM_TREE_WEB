@@ -1,18 +1,21 @@
 import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import {Select,Row,Col,Radio,Card} from 'antd';
+import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
-
+import moment from 'moment';
+const {RangePicker} = DatePicker;
 export default class Warning extends Component {
 
     static propTypes = {};
     constructor(props){
         super(props);
         this.state={
-
+            stime1: moment().format('2017-11-17 00:00:00'),
+            etime1: moment().format('2017-11-24 23:59:59'),
+            departOptions:"",
         }
     }
 
@@ -21,112 +24,49 @@ export default class Warning extends Component {
         const myChart = echarts.init(document.getElementById('rightbottom'));
 
         this.optionLine = {
-                    title: {
-                        text: '',
-                        x: 'left',
-                        textStyle: {
-                            fontWeight: 'normal',
-                            fontSize: '14'
-                        }
-                    },
-                    color: ['#4caf50', '#f44336'],
-                    // tooltip: {
-                    //     trigger: 'item',
-                    //     formatter: '{a} <br/>{b} : {c} ({d}%)'
-                    // },
-                    legend: {
-                        top: 20,
-                        left:'right',
-                        data:['已检验','待检验']
-                    },
-                    toolbox: {
-                        show: false,
-                        feature: {
-                            mark: {
-                                show: true
-                            },
-                            dataView: {
-                                show: true,
-                                readOnly: false
-                            },
-                            restore: {
-                                show: true
-                            }
-                        }
-                    },
-                    series: [{
-                        name: 'Line 1',
-                        type: 'pie',
-                        clockWise: true,
-                        radius: ['50%', '66%'],
-                        itemStyle: {
-                            normal: {
-                                label: {
-                                    show: false
-                                },
-                                labelLine: {
-                                    show: false
-                                }
-                            }
-                        },
-                        hoverAnimation: false,
-                
-                        data: [{
-                            value: 91,
-                            label: {
-                                normal: {
-                                    show: true,
-                                    formatter: '{d} %',
-                                    textStyle: {
-                                        fontSize: 20,
-                                        fontWeight: "bold",
-                                        color: '#0580f2',
-                                    },
-                                    position: "center"
-                                }
-                            },
-                            name: '已检验',
-                            itemStyle: {
-                                normal: {
-                                    color: { // 完成的圆环的颜色
-                                        colorStops: [{
-                                            offset: 0,
-                                            color: '#4786ff' // 100% 处的颜色
-                                        }]
-                                    },
-                                    label: {
-                                        show: false
-                                    },
-                                    labelLine: {
-                                        show: false
-                                    }
-                                },
-                                emphasis: {
-                                    color: '#00cefc' // 鼠标悬浮上去完成的圆环的颜色
-                                }
-                            }
-                        }, {
-                            value: 9,
-                            name: '待检验',
-                            itemStyle: {
-                                normal: {
-                                    color: { // 完成的圆环的颜色
-                                        colorStops: [{
-                                            offset: 0,
-                                            color: '#D5D8DD' // 100% 处的颜色
-                                        }]
-                                    },
-                                    label: {
-                                        show: false
-                                    },
-                                    labelLine: {
-                                        show: false
-                                    }
-                                }
-                            }
-                        }]
-                    }]
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
                 }
+            },
+            legend: {
+                data:['已检验批个数','优良率'],
+                left:'right'
+                
+            },
+            xAxis: [
+                {
+                    type: 'value',
+                    boundaryGap:[0,0.01],
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'category',
+                    boundaryGap:[0,0.01],
+                    data:[1,2,3,4,5,6,7,8],
+                },
+                
+            ],
+            series: [
+                {
+                    name:'已检验批个数',
+                    type:'bar',
+                    data:[250, 360, 280, 230, 312, 240, 290],
+                    barWidth:'25%',
+                    itemStyle:{
+                        normal:{
+                            color:'#02e5cd',
+                            barBorderRadius:[50,50,50,50]
+                        }
+                    }
+                }
+            ]
+        };
         myChart.setOption(this.optionLine,true);
     }
     
@@ -135,10 +75,37 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <h2 style={{textAlign:'left',color:  '#74859f'}}>检验批验评统计</h2>
+                   <DatePicker  
+                     style={{textAlign:"center"}} 
+                     showTime
+                     defaultValue={moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')} 
+                     format={'YYYY/MM/DD HH:mm:ss'}
+                     onChange={this.datepick.bind(this)}
+                     onOk={this.datepickok.bind(this)}
+                    >
+                    </DatePicker>
                     <div id='rightbottom' style={{ width: '100%', height: '340px' }}></div>
+                    <Select 
+                          style={{marginLeft:'150px'}}
+                          placeholder="请选择部门"
+                          notFoundContent="暂无数据"
+                          value=""
+                          onSelect={this.onDepartments.bind(this,'departments') }>
+                          {this.state.departOptions}
+                    </Select>
+                    <Select 
+                          placeholder="请选择部门"
+                          notFoundContent="暂无数据"
+                          value=""
+                          onSelect={this.onDepartments.bind(this,'departments') }>
+                          {this.state.departOptions}
+                    </Select>
+                    <span>进度分析</span>
                 </Card>
             </div>
         );
     }
+    datepick(){}
+    datepickok(){}
+    onDepartments(){}
 }
