@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Table, Spin,message } from 'antd';
+import { Table, Spin, message } from 'antd';
+import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
 import './index.less';
 export default class GeneralTable extends Component {
@@ -53,36 +54,51 @@ export default class GeneralTable extends Component {
 			key: 'extra_params.state'
 		}, {
 			title: '操作',
-			render: (record) => {
+			render: (record, index) => {
 				let nodes = [];
 				nodes.push(
 					<div>
 						<a onClick={this.previewFile.bind(this, record)}>预览</a>
-						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>					
-						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this)}>下载</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
+						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
 					</div>
 				);
 				return nodes;
 			}
 		}
 	];
-	download() {
+	createLink = (name, url) => {    //下载
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download', this);
+		link.setAttribute('target', '_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+	download(index, key, e) {
 		const { selected = [], file = [], files = [], down_file = [] } = this.props;
+
 		if (selected.length == 0) {
 			message.warning('没有选择无法下载');
 		}
-		selected.map(rst => {
-			file.push(rst.basic_params.files);
-		});
-		file.map(value => {
-			value.map(cot => {
-				files.push(cot.download_url)
-			})
-		});
-		files.map(down => {
-			let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-			this.createLink(this, down_load);
-		});
+		for (var j = 0; j < selected.length; j++) {
+			if (selected[j].code == index.code) {
+
+				selected.map(rst => {
+					file.push(rst.basic_params.files);
+				});
+				file.map(value => {
+					value.map(cot => {
+						files.push(cot.download_url)
+					})
+				});
+				files.map(down => {
+					let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
+					this.createLink(this, down_load);
+				});
+			}
+		}
 	}
 
 	previewFile(file) {

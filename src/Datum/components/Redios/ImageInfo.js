@@ -58,8 +58,8 @@ class ImageInfo extends Component {
   onChange(pagination, filters, sorter) {
 
   }
-  updateT(file){
-    const {actions: {getModalUpdate}} = this.props;
+  updateT(file) {
+    const { actions: { getModalUpdate } } = this.props;
     getModalUpdate(true)
   }
 
@@ -84,7 +84,7 @@ class ImageInfo extends Component {
         nodes.push(
           <div>
             <a >预览</a>
-            <a onClick={this.updateT.bind(this,record)} style={{ marginLeft: 10 }}>更新</a>					
+            <a onClick={this.updateT.bind(this, record)} style={{ marginLeft: 10 }}>更新</a>
           </div>
         );
         return nodes;
@@ -94,7 +94,7 @@ class ImageInfo extends Component {
 
     return (
 
-      <Form style={{ marginBottom: 24 }}>
+      <Form style={{ marginBottom: 24 ,marginLeft:50}}>
         <Row gutter={24}>
           <Col span={14}>
             <FormItem>

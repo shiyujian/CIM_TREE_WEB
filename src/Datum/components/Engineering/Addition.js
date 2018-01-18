@@ -54,23 +54,6 @@ class Addition extends Component {
 					dataIndex: 'name',
 					key: rst.name
 				}
-			} else if (rst.name === "设计阶段") {
-				return {
-					title: rst.name,
-					key: rst.name,
-					render: (doc, record, index) => {
-						const { designstage = [] } = this.props;
-						return <Select placeholder="选择设计阶段" style={{ width: 130 }}
-							onChange={this.changeDesignStage.bind(this, rst.code, record, index)}>
-							{
-								designstage.metalist.map((data, index) => {
-									return <Option key={index}
-										value={data.name}>{data.name}</Option>;
-								})
-							}
-						</Select>;
-					}
-				}
 			} else if (rst.name === "专业") {
 				return {
 					title: rst.name,
@@ -259,6 +242,7 @@ class Addition extends Component {
                                    dataSource={docs}
                                    bordered rowKey="uid"/> */}
 							<Table
+							 	rowSelection={this.rowSelection}
 								columns={docCols}
 								dataSource={docs}
 								bordered rowKey="uid" />
@@ -288,7 +272,7 @@ class Addition extends Component {
 
 						<Col span={4} style={{ float: "left", marginTop: "5px", marginLeft: "3%" }} >
 							<Button onClick={this.cancelT.bind(this)} style={{ marginLeft: "16%" }}>取消</Button>
-							<Button onClick={this.determine.bind(this)}>确定</Button>
+							<Button onClick={this.save.bind(this)}>确定</Button>
 						</Col>
 					</Row>
 				</Form>
@@ -490,8 +474,8 @@ class Addition extends Component {
 			return
 		}
 		for (let i = 0; i < docs.length; i++) {
-			let flag = (docs[i].updoc.keyword_19 == undefined || docs[i].updoc.juance == undefined || docs[i].updoc.keyword_17 == undefined || docs[i].updoc.projectPrincipal.person_name == undefined ||
-				docs[i].updoc.professionPrincipal.person_name == undefined || docs[i].updoc.profession == undefined || docs[i].updoc.archivingTime == undefined ||
+			let flag = (docs[i].updoc.keyword_19 == undefined || docs[i].updoc.juance == undefined || docs[i].updoc.keyword_17 == undefined  ||
+				 docs[i].updoc.profession == undefined || docs[i].updoc.archivingTime == undefined ||
 				docs[i].updoc.version == undefined);
 			if (flag) {
 				notification.error({
@@ -535,9 +519,12 @@ class Addition extends Component {
 				toggleAddition(false);
 				getdocument({ code: currentcode.code });
 			});
+			console.log(changeDocs)
+			console.log(this.props)
 			this.setState({
 				progress: 0
 			})
+			this.cancel();
 		}
 	}
 }
