@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Table, message,Popconfirm} from 'antd';
 import Button from "antd/es/button/button";
 import Card from '_platform/components/panels/Card';
+import '../index.less';
 export const Acccode = window.DeathCode.SYSTEM_ACC;
 export default class Tablelevel extends Component {
 
@@ -9,11 +10,12 @@ export default class Tablelevel extends Component {
 		const {newdocumentlist = []} = this.props;
 
 		return (
-			<Card title="文档类型设置" extra={<Button type="primary" ghost onClick={this.Add.bind(this, true)}>添加文档类别</Button>}>
-				<Table dataSource={newdocumentlist}
+				<Table
+						className='foresttable'
+						dataSource={newdocumentlist}
 				       columns={this.columns}
 				       bordered rowKey="code"/>
-			</Card>
+
 		);
 	}
 
