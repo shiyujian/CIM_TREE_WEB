@@ -3,6 +3,8 @@ import {
     Form, Input, Select, Button, DatePicker, Row, Col, message, Popconfirm
 } from 'antd';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { getUser } from '../../../_platform/auth';
+
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
@@ -16,6 +18,17 @@ class Filter extends Component {
 
 
     static propTypes = {};
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                console.log('Received values of form: ', values);
+                console.log(values)
+            }
+            console.log(values)
+            
+        });
+    }
 
     // static layout = {
     //     labelCol: {span: 1},
@@ -36,12 +49,14 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="单位工程">
                                     {
-                                        getFieldDecorator('workflow', {
+                                        getFieldDecorator('UnitEngineering', {
                                             rules: [
-                                                { required: false, message: '请选择任务类型' },
+                                                { required: false, message: '请选择单位工程' },
                                             ]
                                         })
-                                            (<Select allowClear>
+                                            (<Select>
+                                                <Option value="0">编辑中</Option>
+                                                <Option value="1">已提交</Option>
                                             </Select>)
                                     }
                                 </FormItem>
@@ -49,9 +64,9 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="主题">
                                     {
-                                        getFieldDecorator('workflowactivity', {
+                                        getFieldDecorator('theme', {
                                             rules: [
-                                                { required: false, message: '请输入任务名称' },
+                                                { required: false, message: '请输入主题' },
                                             ]
                                         })
                                             (<Input placeholder="请输入..." />)
@@ -62,9 +77,9 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="编号">
                                     {
-                                        getFieldDecorator('workflowactivity', {
+                                        getFieldDecorator('numbers', {
                                             rules: [
-                                                { required: false, message: '请输入任务名称' },
+                                                { required: false, message: '请输入编号' },
                                             ]
                                         })
                                             (<Input />)
@@ -76,9 +91,10 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="文档类型">
                                     {
-                                        getFieldDecorator('creator', )
-                                            (<Select
-                                            >
+                                        getFieldDecorator('documentType', )
+                                            (<Select>
+                                                <Option value="0">编辑中</Option>
+                                                <Option value="1">已提交</Option>
                                             </Select>)
                                     }
 
@@ -109,12 +125,12 @@ class Filter extends Component {
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label="流程状态">
                                     {
-                                        getFieldDecorator('status', {
+                                        getFieldDecorator('processState', {
                                             rules: [
                                                 { required: false, message: '请输入任务类别' },
                                             ]
                                         })
-                                            (<Select allowClear>
+                                            (<Select>
                                                 <Option value="0">编辑中</Option>
                                                 <Option value="1">已提交</Option>
                                                 <Option value="2">执行中</Option>
@@ -131,12 +147,12 @@ class Filter extends Component {
                         <Row>
                             <FormItem>
                                 <Button
-                                    onClick={this.query}>查询</Button>
+                                    onClick={this.query.bind(this)}>查询</Button>
                             </FormItem>
                         </Row>
                         <Row>
                             <FormItem>
-                                <Button onClick={this.clear}>清空</Button>
+                                <Button onClick={this.clear.bind(this)}>清空</Button>
                             </FormItem>
                         </Row>
                     </Col>
@@ -168,7 +184,28 @@ class Filter extends Component {
         link.click();
         document.body.removeChild(link);
     }
+    query(e) {
+        const {actions:{getdocument},currentcode} =this.props; 
 
+        console.log('get',getdocument)
+         this.props.form.validateFields(async (err, values) => {
+            let conditions = {
+                name: values.theme || "",
+            }
+            getdocument({code:currentcode.code},conditions);
+        })
+    }
+    clear() {
+        console.log(this.props.form)
+        this.props.form.setFieldsValue({
+            theme: undefined,
+            UnitEngineering: undefined,
+            numbers: undefined,
+            documentType: undefined,
+            processState: undefined,
+
+        })
+    }
 
     delete() {
         const { selected } = this.props;

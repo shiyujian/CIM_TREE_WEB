@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions as platformActions} from '_platform/store/global';
 import reducer, {actions} from '../store/receiveManagement';
-import {Table,Addition,Edite} from '../components/ReceiveManagement';
+import {Table,Addition,Edite,Filter} from '../components/ReceiveManagement';
 
 @connect(
 	state => {
@@ -26,6 +26,7 @@ export default class ReceiveManagement extends Component {
 				minHeight: '505px', 'overflowY': 'auto'
 			}}>
 				<DynamicTitle title="收货管理" {...this.props}/>
+				<Filter {...this.props} />
 				<Table {...this.props} />
 				<Addition {...this.props} />
 				<Edite {...this.props} />

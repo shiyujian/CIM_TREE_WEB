@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Table, Spin, Input, Select, Popover, Modal, Button,message } from 'antd';
+import { Table, Spin, Input, Select, Popover, Modal, Button, message } from 'antd';
 import { SOURCE_API, STATIC_DOWNLOAD_API } from '_platform/api';
 import moment from 'moment';
+import '../Datum/index.less'
 const Option = Select.Option;
+
 
 export default class GeneralTable extends Component {
 	constructor(props) {
@@ -14,8 +16,8 @@ export default class GeneralTable extends Component {
 		};
 	}
 	render() {
-		const { newkey = [], tableSrc = [] } = this.props;
-
+		const { newkey = [], Doc = [] } = this.props;
+		
 		const columns = newkey.map(rst => {
 			if (rst.name === "文件名" || rst.name === "卷册名" || rst.name === "事件" || rst.name === "名称") {
 				return {
@@ -34,7 +36,7 @@ export default class GeneralTable extends Component {
 				return {
 					title: '操作',
 					key: '操作',
-					render: (record) => {
+					render: (record,index) => {
 						let nodes = [];
 						nodes.push(
 							<div>
@@ -43,11 +45,10 @@ export default class GeneralTable extends Component {
 									placement="right">
 									<a>预览</a>
 								</Popover>
-								<span className="ant-divider" />
-										<a style={{ marginRight: 10 }} type="primary" onClick={this.download.bind(this)}>下载</a>
-								
-								<span className="ant-divider" />
-								<a onClick={this.update.bind(this, record)}>查看流程卡</a>
+								<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this,index)}>下载</a>
+								{/* <a href={`${STATIC_DOWNLOAD_API}`}>下载222</a> */}
+
+								<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>
 							</div>
 						);
 						return nodes;
@@ -61,7 +62,8 @@ export default class GeneralTable extends Component {
 		return (
 			<div>
 				<Table rowSelection={this.rowSelection}
-					dataSource={tableSrc}
+					dataSource={Doc}
+					className='foresttable'
 					columns={columns}
 					bordered rowKey="code" />
 				<Modal title="图片预览"
@@ -74,24 +76,39 @@ export default class GeneralTable extends Component {
 			</div>
 		);
 	}
-	download() {
+	download(index, key, e) {
 		const { selected = [], file = [], files = [], down_file = [] } = this.props;
+
 		if (selected.length == 0) {
 			message.warning('没有选择无法下载');
 		}
-		selected.map(rst => {
-			file.push(rst.basic_params.files);
-		});
-		file.map(value => {
-			value.map(cot => {
-				files.push(cot.download_url)
-			})
-		});
-		files.map(down => {
-			let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-			this.createLink(this, down_load);
-		});
+		for (var j = 0; j < selected.length; j++) {
+			if (selected[j].code == index.code) {
+
+				selected.map(rst => {
+					file.push(rst.basic_params.files);
+				});
+				file.map(value => {
+					value.map(cot => {
+						files.push(cot.download_url)
+					})
+				});
+				files.map(down => {
+					let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
+					this.createLink(this, down_load);
+				});
+			}
+		}
 	}
+	createLink = (name, url) => {    //下载
+        let link = document.createElement("a");
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 	cancel() {
 		this.setState({
 			visible: false

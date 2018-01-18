@@ -1,17 +1,20 @@
 import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import {Select,Row,Col,Radio,Card} from 'antd';
+import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
-
-export default class Warning extends Component {
+import moment from 'moment';
+const {RangePicker} = DatePicker;export default class Warning extends Component {
 
     static propTypes = {};
     constructor(props){
         super(props);
         this.state={
+            stime1: moment().format('2017-11-17 00:00:00'),
+            etime1: moment().format('2017-11-24 23:59:59'),
+            departOptions:"",
 
         }
     }
@@ -31,14 +34,14 @@ export default class Warning extends Component {
                 }
             },
             legend: {
-                data:['已检验批个数','优良率'],
+                data:['总数','一标','二标','三标','四标','五标'],
                 left:'right'
                 
             },
             xAxis: [
                 {
                     type: 'category',
-                    data: ['分部一','分部二','分部三','分部四','分部五','分部六','分部七'],
+                    data: ['2017-11-13','2017-11-13','2017-11-13','2017-11-13','2017-11-13','2017-11-13','2017-11-13'],
                     axisPointer: {
                         type: 'shadow'
                     }
@@ -47,10 +50,10 @@ export default class Warning extends Component {
             yAxis: [
                 {
                     type: 'value',
-                    name: '已检验批（个）',
+                    name: '长度（m）',
                     min: 0,
-                    max: 500,
-                    interval: 100,
+                    max: 180,
+                    interval: 20,
                     axisLabel: {
                         formatter: '{value} '
                     }
@@ -68,9 +71,9 @@ export default class Warning extends Component {
             ],
             series: [
                 {
-                    name:'已检验批个数',
+                    name:'总数',
                     type:'bar',
-                    data:[250, 360, 280, 230, 312, 240, 290],
+                    data:[82,85,79,83,90,89,95],
                     barWidth:'25%',
                     itemStyle:{
                         normal:{
@@ -80,13 +83,57 @@ export default class Warning extends Component {
                     }
                 },
                 {
-                    name:'优良率',
+                    name:'一标',
                     type:'line',
                     yAxisIndex: 1,
                     data:[82,85,79,83,90,89,95],
                     itemStyle:{
                         normal:{
-                            color:'#4786ff'
+                            color:'black'
+                        }
+                    }
+                },
+                {
+                    name:'二标',
+                    type:'line',
+                    yAxisIndex: 1,
+                    data:[42,45,49,43,42,45,49,43],
+                    itemStyle:{
+                        normal:{
+                            color:'orange'
+                        }
+                    }
+                },
+                {
+                    name:'三标',
+                    type:'line',
+                    yAxisIndex: 1,
+                    data:[72,75,79,63,52,75,79,73],
+                    itemStyle:{
+                        normal:{
+                            color:'yellow'
+                        }
+                    }
+                },
+                {
+                    name:'四标',
+                    type:'line',
+                    yAxisIndex: 1,
+                    data:[32,25,49,33,52,65,39,53],
+                    itemStyle:{
+                        normal:{
+                            color:'blue'
+                        }
+                    }
+                },
+                {
+                    name:'五标',
+                    type:'line',
+                    yAxisIndex: 1,
+                    data:[12,25,39,33,42,55,69,63],
+                    itemStyle:{
+                        normal:{
+                            color:'green'
                         }
                     }
                 }
@@ -99,11 +146,30 @@ export default class Warning extends Component {
     render() { //todo 累计完成工程量
         return (
             <div >
-                <Card>
-                    <h2 style={{textAlign:'left',color:  '#74859f'}}>检验批验评统计</h2>
+            <Card>
+                <RangePicker 
+                             style={{verticalAlign:"middle"}} 
+                             defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
+                             showTime={{ format: 'HH:mm:ss' }}
+                             format={'YYYY/MM/DD HH:mm:ss'}
+                             onChange={this.datepick.bind(this)}
+                             onOk={this.datepickok.bind(this)}
+                            >
+                            </RangePicker>
                     <div id='lefttop' style={{ width: '100%', height: '340px' }}></div>
+                    <Select 
+                          placeholder="请选择部门"
+                          notFoundContent="暂无数据"
+                          value=""
+                          onSelect={this.onDepartments.bind(this,'departments') }>
+                          {this.state.departOptions}
+                    </Select>
+                    <span>强度分析</span>
                 </Card>
             </div>
         );
     }
+    datepick(){}
+    datepickok(){}
+    onDepartments(){}
 }

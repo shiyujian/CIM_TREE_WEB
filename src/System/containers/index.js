@@ -2,6 +2,7 @@ export Project from './Project';
 export Org from './Org';
 export Role from './Role';
 export Permission from './Permission';
+export Permissionn from './Permissionn';
 export Template from './Template';
 export User from './User';
 export Video from './Video';

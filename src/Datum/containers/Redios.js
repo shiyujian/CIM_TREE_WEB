@@ -32,12 +32,10 @@ export default class Redios extends Component {
 
 	render() {
 		const {newdirtree=[],stas = true,tablevisible = false, keycode,expandedKeys,tree=[],projectList=[]} = this.props;
-		console.log(this.props)
 		return (
             <Body>
-            <Main>
                 <DynamicTitle title="工程影像" {...this.props}/>
-                <Sidebar>
+                {/* <Sidebar> */}
 	                {/* {
 		                stas == true?
 			                <PkCodeOnTree treeData={projectList}
@@ -55,7 +53,7 @@ export default class Redios extends Component {
 				                />
 			                </div>
 	                } */}
-                </Sidebar>
+                {/* </Sidebar> */}
                 {/* <Content>
 	                {
 	                	tablevisible == false?
@@ -68,11 +66,10 @@ export default class Redios extends Component {
 			                </div>
 	                }
 				</Content> */}
-				<Content>
-					<ImageInfo {...this.props} />
+				<Content >
+					<ImageInfo  {...this.props} />
 					<Updatemodal {...this.props}/>
                 </Content>
-            </Main>
             <Preview/>
             </Body>
 		)

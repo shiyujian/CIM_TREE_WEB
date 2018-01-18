@@ -1,17 +1,22 @@
 import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import {Select,Row,Col,Radio,Card} from 'antd';
+import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
-
+import moment from 'moment';
+const {RangePicker} = DatePicker;
 export default class Warning extends Component {
 
     static propTypes = {};
     constructor(props){
         super(props);
         this.state={
+            stime1: moment().format('2017-11-17 00:00:00'),
+            etime1: moment().format('2017-11-24 23:59:59'),
+            departOptions:"",
+            data:[20,100,100,80,60]
 
         }
     }
@@ -21,58 +26,72 @@ export default class Warning extends Component {
         const myChart = echarts.init(document.getElementById('AccumulativeCompletion'));
 
         this.optionLine = {
-            color: [ '#546d83'],
-            tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data:['Step Start', 'Step Middle', 'Step End']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            toolbox: {
-                feature: {
-                    // saveAsImage: {}
+            // backgroundColor: '#666',
+            title: {
+                text: '安全隐患数量',
+                textStyle: {
+                    color: '#fff',
+                    // color: '#000',
                 }
             },
-            xAxis: {
-                type: 'category',
-                data :['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-                splitLine: {show: false}
-                // textStyle : {
-                //     fontStyle : 'oblique'
-                // }
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
             },
-            yAxis: {
-                type: 'value',
-                min: 0,
-                max: 200,
-                interval: 40,
+            legend: {
+                orient: 'vertical',
+                right: 'right',
+                data: ['一般安全隐患', '较大安全事故', '重大安全事故', '一般安全事故', '重大安全隐患']
+                // data: ['-', '-', '-', '-', '-']
             },
             series: [
                 {
-                    // name:'Step Start',
-                    type:'line',
-                    // step: 'start',
-                    data:[38, 60, 42, 45, 38, 60, 50, 65, 40, 56, 49, 52],
-                    areaStyle: {
+                    name: '访问来源',
+                    type: 'pie',
+                    radius: '40%',
+                    // center: ['50%', '60%'],
+                    data: this.state.data,
+                    selectedMode: 'single'
+                    ,
+                    itemStyle: {
                         normal: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                offset: 0,
-                                color: '#8c9dab'
-                            }, {
-                                offset: 1,
-                                color: '#ffe'
-                            }])
+                            label: {
+                                show: true,
+                                // formatter: '{d}%'
+                            },
+                            labelLine: {
+                                show: true
+                            },
+                        },
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    label: {
+                        normal: {
+                            textStyle: {
+                                color: '#fff',
+                                // color: '#000',
+                                fontSize: '12px',
+                            }
+                        }
+                    },
+                    labelLine: {
+                        normal: {
+                            lineStyle: {
+                                color: '#fff',
+                                // color: '#000',
+                                fontSize: '12px',
+                            }
                         }
                     },
                 }
-            ]
+            ],
+            color: ['#0fbc7a', '#fca700', '#772fbf', '#11d0d8', '#0e8ed7']
         };
+
         
 
         myChart.setOption(this.optionLine,true);
@@ -83,11 +102,36 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
-                    <h2 style={{textAlign:'left',color:  '#74859f'}}>质量缺陷上报统计</h2>
+                    <DatePicker  
+                     style={{textAlign:"center"}} 
+                     showTime
+                     defaultValue={moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')} 
+                     format={'YYYY/MM/DD HH:mm:ss'}
+                     onChange={this.datepick.bind(this)}
+                     onOk={this.datepickok.bind(this)}
+                    >
+                    </DatePicker>
                     <div id='AccumulativeCompletion' style={{ width: '100%', height: '340px' }}></div>
-                    <label style={{display:'block',textAlign:'center',fontSize:14}}>2017</label>
+                    <Select 
+                          placeholder="请选择部门"
+                          notFoundContent="暂无数据"
+                          value=""
+                          onSelect={this.onDepartments.bind(this,'departments') }>
+                          {this.state.departOptions}
+                    </Select>
+                    <Select 
+                          placeholder="请选择部门"
+                          notFoundContent="暂无数据"
+                          value=""
+                          onSelect={this.onDepartments.bind(this,'departments') }>
+                          {this.state.departOptions}
+                    </Select>
+                    <span>强度分析</span>
                 </Card>
             </div>
         );
     }
+    datepick(){}
+    datepickok(){}
+    onDepartments(){}
 }
