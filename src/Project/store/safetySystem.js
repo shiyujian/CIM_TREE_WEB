@@ -4,7 +4,7 @@ import createFetchAction from 'fetch-action';
 import {SERVICE_API} from '_platform/api';
 import createFetchAction2 from './myfetchAction';
 
-export const ID = 'engineering';
+export const ID = 'safetysystem';
 export const getworkTreeOK = createAction(`${ID}_工程施工包`);
 export const getworkTree = createFetchAction(`${SERVICE_API}/project-tree/?depth=2`, [getworkTreeOK]);
 export const getdirtreeOK = createAction(`${ID}_文档目录树`);
