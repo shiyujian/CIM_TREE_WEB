@@ -9,6 +9,7 @@
 import {air_menus,air_ignoreModules,air_headLogo,air_footerYear,air_footerCompany} from './air/api';
 import {qh_menus,qh_ignoreModules,qh_headLogo,qh_footerYear,qh_footerCompany} from './qh/api';
 import {xa_menus,xa_ignoreModules,xa_headLogo,xa_footerYear,xa_footerCompany} from './xa/api';
+import {tree_menus,tree_ignoreModules,tree_headLogo,tree_footerYear,tree_footerCompany} from './tree/api';
 
 let static_menus = [];
 let static_ignoreModules = [];
@@ -39,6 +40,13 @@ if(__env__ == 'air'){
 	static_footerCompany = air_footerCompany;
 }
 
+if(__env__ == 'tree'){
+	static_menus = tree_menus;
+	static_ignoreModules = tree_ignoreModules;
+	static_headLogo = tree_headLogo;
+	static_footerYear = tree_footerYear;
+	static_footerCompany = tree_footerCompany;
+}
 export const loadMenus = static_menus;
 
 export const loadIgnoreModules  = static_ignoreModules;
