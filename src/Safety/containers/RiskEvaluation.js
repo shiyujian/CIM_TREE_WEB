@@ -266,7 +266,7 @@ class RiskEvaluation extends Component {
                     
 		return (
 			<div className={styles.riskevaluation}>
-				<DynamicTitle title="风险评价" {...this.props}/>
+				<DynamicTitle title="危险源风险评价" {...this.props}/>
 				<Sidebar>
                     <WorkPackageTree {...this.props}
                         onSelect={this.onSelect.bind(this)} />
