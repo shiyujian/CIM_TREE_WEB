@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions as platformActions} from '_platform/store/global';
 import reducer, {actions} from '../store/distributionManagement';
-import {Table,Addition,Edite} from '../components/DistributionManagement';
+import {Table,Addition,Edite,Filter} from '../components/DistributionManagement';
 
 @connect(
 	state => {
@@ -26,6 +26,7 @@ export default class DistributionManagement extends Component {
 				minHeight: '505px', 'overflowY': 'auto'
 			}}>
 				<DynamicTitle title="发放管理" {...this.props}/>
+				<Filter {...this.props} />				
 				<Table {...this.props} />
 				<Addition {...this.props} />
 				<Edite {...this.props} />

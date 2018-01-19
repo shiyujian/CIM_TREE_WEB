@@ -475,31 +475,31 @@ export default class LocmeasureTable extends Component {
 
     qury(page) {
     	const {
-    		// zzbm = '',
+    		zzbm = '',
     		section = '',
-    		// treety = '',
+    		treety = '',
     		treetype = '',
-    		// supervisorcheck = '',
-    		// checkstatus = '',
-    		// locationstatus = '',
-    		// role = '',
-    		// rolename = '',
-    		// stime = '',
-    		// etime = '',
+    		supervisorcheck = '',
+    		checkstatus = '',
+    		locationstatus = '',
+    		role = '',
+    		rolename = '',
+    		stime = '',
+    		etime = '',
     		size,
     	} = this.state;
     	const {actions: {getqueryTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		// zzbm,
+    		zzbm,
     		section,
-    		// treety,
+    		treety,
     		treetype,
-    		// supervisorcheck,
-    		// checkstatus,
-    		// locationstatus,
-    		// createtime_min:stime&&moment(stime).add(8, 'h').unix(),
-    		// createtime_max:etime&&moment(etime).add(8, 'h').unix(),
+    		supervisorcheck,
+    		checkstatus,
+    		locationstatus,
+    		createtime_min:stime&&moment(stime).add(8, 'h').unix(),
+    		createtime_max:etime&&moment(etime).add(8, 'h').unix(),
     		page,
     		size:size
     	}

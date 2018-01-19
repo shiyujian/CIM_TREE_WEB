@@ -138,7 +138,7 @@ export default class Enteranalyze extends Component {
     typeselect(value,keycode){
         const {actions:{setkeycode,getTreeList}} =this.props;
         //树种
-        getTreeList({},{field:'treetype',no:keycode,treety:value,paginate:false})
+        getTreeList({},{no:keycode,treety:value})
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -146,9 +146,10 @@ export default class Enteranalyze extends Component {
 
     //设置树种选项
     setTreeTypeOption(rst) {
+        console.log('rst',rst)
         if(rst instanceof Array){
             let treetypeoption = rst.map(item => {
-                return <Option key={item.name} value={item.name}>{item.name}</Option>
+                return <Option key={item.TreeTypeNo} value={item.TreeTypeNo}>{item.TreeTypeNo}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({treetypeoption,treetypelist:rst})
@@ -161,7 +162,7 @@ export default class Enteranalyze extends Component {
         const {actions:{getTreeList,gettreetype}} =this.props;
         this.setState({leftkeycode:keycode})
         //树种
-        gettreetype({},{no:keycode,paginate:false})
+        gettreetype({},{no:keycode})
         .then(rst => {
             this.setTreeTypeOption(rst)
         })

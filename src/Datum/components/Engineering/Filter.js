@@ -3,6 +3,8 @@ import {
     Form, Input, Select, Button, DatePicker, Row, Col, message, Popconfirm
 } from 'antd';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { getUser } from '../../../_platform/auth';
+
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
@@ -16,6 +18,17 @@ class Filter extends Component {
 
 
     static propTypes = {};
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                console.log('Received values of form: ', values);
+                console.log(values)
+            }
+            console.log(values)
+            
+        });
+    }
 
     // static layout = {
     //     labelCol: {span: 1},
@@ -134,7 +147,7 @@ class Filter extends Component {
                         <Row>
                             <FormItem>
                                 <Button
-                                    onClick={this.query}>查询</Button>
+                                    onClick={this.query.bind(this)}>查询</Button>
                             </FormItem>
                         </Row>
                         <Row>
@@ -171,16 +184,27 @@ class Filter extends Component {
         link.click();
         document.body.removeChild(link);
     }
-    clear(){
-        console.log(this.props.form)     
+    query(e) {
+        const {actions:{getdocument},currentcode} =this.props; 
+
+        console.log('get',getdocument)
+         this.props.form.validateFields(async (err, values) => {
+            let conditions = {
+                name: values.theme || "",
+            }
+            getdocument({code:currentcode.code},conditions);
+        })
+    }
+    clear() {
+        console.log(this.props.form)
         this.props.form.setFieldsValue({
-            theme:undefined,
-            UnitEngineering:undefined,
-            numbers:undefined,
-            documentType:undefined,
-            processState:undefined,
-			
-		})
+            theme: undefined,
+            UnitEngineering: undefined,
+            numbers: undefined,
+            documentType: undefined,
+            processState: undefined,
+
+        })
     }
 
     delete() {

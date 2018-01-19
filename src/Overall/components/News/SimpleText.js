@@ -25,6 +25,9 @@ class SimpleText extends Component {
 		const elem = this.refs.editorElem;
 		editor = new E(elem);
 		// 使用 onchange 函数监听内容的变化，并实时更新到 state 中
+		this.setState({
+			editor
+		})
 		editor.customConfig.onchange = html => {
 			this.setState({
 				content: html
@@ -148,63 +151,42 @@ class SimpleText extends Component {
 			fileList = []
 		} = this.props;
 		validateFields((err, values) => {
-			if (!err) {
-				//判断是发布公告还是更新公告
-				if (toggleData.status === 'ADD') {
-					let newData = {
-						"title": values['title'],
-						"abstract": '',
-						"raw": this.state.content,
-						"content": "",
-						"attachment": {
-							"fileList": fileList || [],
-						},
-						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-						"tags": [2],
-						"categories": [],
-						"publisher": getUser().id,
-						"is_draft": false
-					};
-					postData({}, newData)
-						.then(rst => {
-							if (rst.id) {
-								this.modalClick();
-								message.success('发布公告成功');
-								//更新公告列表数据
-								getTipsList({
-									user_id: getUser().id
-								});
-								postUploadFiles([]);
-							}
-						})
-				} else if (toggleData.status === 'EDIT') {
-					let newData = {
-						"title": values['title'],
-						"raw": this.state.content,
-						"attachment": {
-							"fileList": fileList || [],
-						},
-						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-						"is_draft": false
-					};
-					patchData({ pk: toggleData.editData.id }, newData)
-						.then(rst => {
-							if (rst.id) {
-								this.modalClick();
-								message.success('编辑公告成功');
-								//更新公告列表数据
-								getTipsList({
-									user_id: getUser().id
-								});
-								getDraftTipsList({
-									user_id: getUser().id
-								});
-								postUploadFiles([]);
-							}
-						})
-				}
+			if (toggleData.status === 'ADD') {
+				let newData = {
+					"title": values['title'],
+					"abstract": '',
+					"raw": this.state.content,
+					"content": "",
+					"attachment": {
+						"fileList": fileList || [],
+					},
+					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+					"tags": [2],
+					"categories": [],
+					"publisher": getUser().id,
+					"is_draft": false
+				};
+				postData({}, newData)
+					.then(rst => {
+						if (rst.id) {
+							this.props.form.setFieldsValue({
+								title: undefined,
+								abstract: undefined,
+								dagree:undefined
+							});
+							this.state.editor.txt.html('')
+							message.success('发布公告成功');
+							//更新公告列表数据
+
+							getTipsList({
+								user_id: getUser().id
+							});
+							postUploadFiles([]);
+						}
+					})
 			}
+
 		});
 	}
 
@@ -221,33 +203,7 @@ class SimpleText extends Component {
 		} = this.props;
 		//判断暂存的是新增的还是编辑的暂存
 		//编辑暂存的
-		if (toggleData.status === 'EDIT') {
-			validateFields((err, values) => {
-				let newData = {
-					"title": values['title'],
-					"raw": this.state.content,
-					"attachment": {
-						"fileList": fileList || [],
-					},
-					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-					"is_draft": true
-				};
-				patchData({ pk: toggleData.editData.id }, newData)
-					.then(rst => {
-						if (rst.id) {
-							this.modalClick();
-							message.success('暂存成功');
-							//更新暂存的公告列表数据
-							getTipsList({
-								user_id: getUser().id
-							});
-							getDraftTipsList({
-								user_id: getUser().id
-							});
-						}
-					})
-			})
-		} else if (toggleData.status === 'ADD') {
+		if (toggleData.status === 'ADD') {
 			validateFields((err, values) => {
 				let newData = {
 					"title": values['title'] || '',
@@ -264,7 +220,12 @@ class SimpleText extends Component {
 				postData({}, newData)
 					.then(rst => {
 						if (rst.id) {
-							this.modalClick();
+							this.props.form.setFieldsValue({
+								title: undefined,
+								abstract: undefined,
+								dagree:undefined
+							});
+							this.state.editor.txt.html('')
 							message.success('暂存成功！');
 							//更新暂存的公告列表数据
 							getDraftTipsList({
@@ -326,10 +287,10 @@ class SimpleText extends Component {
 							</FormItem>
 						</Col>
 						<Col span={4} offset={1}>
-							<FormItem {...formItemLayout} label="紧急程度">
-
-								<Input type="text" />
-
+							<FormItem {...formItemLayout} label="发布单位">
+								{getFieldDecorator('dagree', {})(
+									<Input type="text" />
+								)}
 							</FormItem>
 						</Col>
 						<Col span={2}>

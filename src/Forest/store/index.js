@@ -14,12 +14,12 @@ export const changeNursery = createAction(`${ID}传递nurseryName`);
 
 /*****************************院内************************/
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
-export const gettreetype = createFetchAction(`${FOREST_API}/tree-types/`, []);
+export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/trees/analyse/`, []);
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys/`, []);
 export const getqueryTree = createFetchAction(`${FOREST_API}/tree/queryTree`, []);
 export const getexportTree = createFetchAction(`${FOREST_API}/tree/xlsx/`, [],'POST');
-export const getTreeList = createFetchAction(`${FOREST_API}/trees/list/`, []);
+export const getTreeList = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
 export const getNurserysCount = createFetchAction(`${FOREST_API}/tree/nurserys/count/`, []);
 export const getNurserysCountFast = createFetchAction(`${FOREST_API}/tree/nurserys/count/fast/`, []);
 export const getNurserysProgress = createFetchAction(`${FOREST_API}/tree/nurserys/progress/`, []);

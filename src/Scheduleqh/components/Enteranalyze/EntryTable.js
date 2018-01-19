@@ -221,7 +221,7 @@ export default class EntryTable extends Component {
     search(index) {
         if(index === 1) {
             return <div>
-                <span>起苗时间：</span>
+                <span>截止时间：</span>
                 <RangePicker 
                  style={{verticalAlign:"middle"}} 
                  defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
