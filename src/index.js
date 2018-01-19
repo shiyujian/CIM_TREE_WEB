@@ -8,7 +8,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {QH, XA, Air} from './APP';
+import {QH, XA, Air,Tree} from './APP';
 import 'babel-polyfill';
 require('es6-promise').polyfill();
 
@@ -65,6 +65,20 @@ if(__env__ == 'air'){
 	if (module.hot) {
 		module.hot.accept('./APP/air/app', () => {
 			const NextApp = require('./APP/air/app').default;
+			ReactDOM.render(
+				<NextApp/>,
+				document.getElementById('root')
+			);
+		});
+	}
+}
+
+if(__env__ == 'tree'){
+	ReactDOM.render(<Tree/>, document.getElementById('root'));
+
+	if (module.hot) {
+		module.hot.accept('./APP/tree/app', () => {
+			const NextApp = require('./APP/tree/app').default;
 			ReactDOM.render(
 				<NextApp/>,
 				document.getElementById('root')

@@ -85,87 +85,135 @@ class RichModal extends Component {
         })
     }
 
-    //发布新闻
-    postData() {
-        const {
-			actions: { postData, getNewsList, patchData, getDraftNewsList },
-            form: { validateFields },
-            toggleData: toggleData = {
-                type: 'NEWS',
-                status: 'ADD',
-                visible: false,
-                editData: null
-            }
+   //发布新闻
+	postData() {
+		const {
+			actions: {postData, getNewsList, patchData, getDraftNewsList},
+			form: {validateFields},
+			toggleData: toggleData = {
+				type: 'NEWS',
+				status: 'ADD',
+				visible: false,
+				editData: null
+			}
 		} = this.props;
-        validateFields((err, values) => {
+		validateFields((err, values) => {
+			if (!err) {
+				//判断是发布新闻还是更新新闻
+				if (toggleData.status === 'ADD') {
+					let newData = {
+						"title": values['title'],
+						"abstract": values['abstract'] || '',
+						"raw": this.state.content,
+						"content": "",
+						"attachment": {},
+						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+						"tags": [1],
+						"categories": [],
+						"publisher": getUser().id,
+						"is_draft": false
+					};
+					postData({}, newData)
+						.then(rst => {
+							if (rst.id) {
+								this.modalClick();
+								message.success('发布新闻成功');
+								//更新新闻列表数据
+								getNewsList({
+									user_id: getUser().id
+								});
+							}
+						})
+				} else if (toggleData.status === 'EDIT') {
+					let newData = {
+						"title": values['title'],
+						"abstract": values['abstract'] || '',
+						"raw": this.state.content,
+						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+						"is_draft": false
+					};
+					patchData({pk: toggleData.editData.id}, newData)
+						.then(rst => {
+							if (rst.id) {
+								this.modalClick();
+								message.success('编辑新闻成功');
+								//更新新闻列表数据
+								getNewsList({
+									user_id: getUser().id
+								});
+								getDraftNewsList({
+									user_id: getUser().id
+								});
+							}
+						})
+				}
+			}
+		});
+	}
 
-
-            if (toggleData.status === 'ADD') {
-                let newData = {
-                    "title": values['title'],
-                    "abstract": values['abstract'] || '',
-                    "raw": this.state.content,
-                    "content": "",
-                    "attachment": {},
-                    "update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-                    "pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-                    "tags": [1],
-                    "categories": [],
-                    "publisher": getUser().id,
-                    "is_draft": false
-                };
-                postData({}, newData)
-                    .then(rst => {
-                        if (rst.id) {
-                            this.modalClick();
-                            message.success('发布新闻成功');
-                            //更新新闻列表数据
-                            getNewsList({
-                                user_id: getUser().id
-                            });
-                        }
-                    })
-            }
-
-        });
-    }
-
-    //暂存新闻
-    draftDataFunc() {
-        const {
-			actions: { postData, patchData, getNewsList, getDraftNewsList },
-            form: { validateFields },
-            toggleData: toggleData = {
-                status: 'ADD',
-                editData: null,
-            }
+	//暂存新闻
+	draftDataFunc() {
+		const {
+			actions: {postData, patchData, getNewsList, getDraftNewsList},
+			form: {validateFields},
+			toggleData: toggleData = {
+				status: 'ADD',
+				editData: null,
+			}
 		} = this.props;
+		//判断暂存的是新增的还是编辑的暂存
+		//编辑暂存的
+		if (toggleData.status === 'EDIT') {
+			validateFields((err, values) => {
+				let newData = {
+					"title": values['title'],
+					"abstract": values['abstract'] || '',
+					"raw": this.state.content,
+					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+					"is_draft": true
+				};
+				patchData({pk: toggleData.editData.id}, newData)
+					.then(rst => {
+						if (rst.id) {
+							this.modalClick();
+							message.success('暂存成功');
+							//更新暂存的新闻列表数据
+							getNewsList({
+								user_id: getUser().id
+							});
+							getDraftNewsList({
+								user_id: getUser().id
+							});
+						}
+					})
+			})
+		} else if (toggleData.status === 'ADD') {
+			validateFields((err, values) => {
+				let newData = {
+					"title": values['title'] || '',
+					"abstract": values['abstract'] || '',
+					"raw": this.state.content || '',
+					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+					"tags": [1],
+					"publisher": getUser().id,
+					"is_draft": true
+				};
+				postData({}, newData)
+					.then(rst => {
+						if (rst.id) {
+							this.modalClick();
+							message.success('暂存成功！');
+							//更新暂存的新闻列表数据
+							getDraftNewsList({
+								user_id: getUser().id
+							});
+						}
+					})
+			})
+		}
+	}
 
-        if (toggleData.status === 'ADD') {
-            validateFields((err, values) => {
-                let newData = {
-                    "title": values['title'] || '',
-                    "abstract": values['abstract'] || '',
-                    "raw": this.state.content || '',
-                    "pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-                    "tags": [1],
-                    "publisher": getUser().id,
-                    "is_draft": true
-                };
-                postData({}, newData)
-                    .then(rst => {
-                        if (rst.id) {
-                            this.modalClick();
-                            message.success('暂存成功！');
-                            //更新暂存的新闻列表数据
-                            getDraftNewsList({
-                                user_id: getUser().id
-                            });
-                        }
-                    })
-            })
-        }
-    }
     modalClick() {
 		const { actions: { toggleModal, postUploadFiles } } = this.props;
 		postUploadFiles([]);
@@ -198,12 +246,14 @@ class RichModal extends Component {
             visible={toggleData.visible}
             onOk={this.modalClick.bind(this)}
             onCancel={this.modalClick.bind(this)}
+            footer={null}
+            width="80%"
             >
                 <div>
                     <Form>
                         <Row>
                             <Col span={8} offset={1}>
-                                <FormItem {...formItemLayout} label="新闻标题">
+                                <FormItem {...formItemLayout} label="主题">
                                     {getFieldDecorator('title', {
                                         rules: [{ required: true, message: '请输入新闻标题' }],
                                         initialValue: ''
