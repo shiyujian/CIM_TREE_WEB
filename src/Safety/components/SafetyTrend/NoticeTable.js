@@ -154,7 +154,7 @@ export default class NoticeTable extends Component {
 						<div style={{marginBottom: '10px'}}>
 							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>发布公告</Button>
 							{
-								(toggleData.visible && toggleData.type === 'TIPS') && (<SimpleText {...this.props}/>)
+								(toggleData.visible && toggleData.type === 'TIPS') && (<NoticeText {...this.props}/>)
 							}
 						</div>}>
 						<TabPane tab="发布的公告" key="1">

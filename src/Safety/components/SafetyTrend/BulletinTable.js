@@ -139,7 +139,7 @@ export default class BulletinTable extends Component {
 						<div style={{marginBottom: '10px'}}>
 							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布安全事故快报</Button>
 							{
-								(toggleData.visible && toggleData.type === 'NEWS') && <RichText {...this.props}/>
+								(toggleData.visible && toggleData.type === 'NEWS') && <BulletinText {...this.props}/>
 							}
 						</div>}>
 						<TabPane tab="发布的安全事故快报" key="1">
