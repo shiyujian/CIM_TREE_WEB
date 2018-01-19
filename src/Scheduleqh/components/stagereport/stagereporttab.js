@@ -77,11 +77,19 @@ export default class Stagereporttab extends Component {
 				key: 'total',
 				width: '15%',
 			},{
-				title:'操作',
-				dataIndex:'finsh',
-				key: 'finsh',
-				width: '8%',
-			}
+			title: '操作',
+			render: (record) => {
+				let nodes = [];
+				nodes.push(
+					<div>
+						<a onClick={this.previewFile.bind(this, record)}>查看</a>
+						<a style={{ marginLeft: 10 }} onClick={this.download.bind(this, record)}>下载</a>					
+						<a style={{ marginLeft: 10 }} type="primary" onClick={this.look.bind(this)}>查看流程卡</a>
+					</div>
+				);
+				return nodes;
+			    }
+		    }
 		];
 		const columns1 = [
 			{
@@ -214,7 +222,7 @@ export default class Stagereporttab extends Component {
 											<Col span={12}>
 												<FormItem {...formItemLayout} label="监理单位">
 												
-														<Input type="text" />
+														<Input type="text" onChange={this.search.bind(this,'jianli')}/>
 													
 												</FormItem>
 											</Col>
@@ -273,14 +281,14 @@ export default class Stagereporttab extends Component {
 					<Col span={12}>
 						<FormItem {...formItemLayout} label="单位工程">
 							
-								<Input type="text" />
+								<Input type="text" onChange={this.search.bind(this,'gongcheng')} />
 							
 						</FormItem>
 					</Col>
 					<Col span={12}>
 						<FormItem {...formItemLayout} label="编号">
 
-								<Input type="text" />
+								<Input type="text" onChange={this.search.bind(this,'number')} />
 							
 						</FormItem>
 					</Col>
@@ -289,14 +297,23 @@ export default class Stagereporttab extends Component {
 					<Col span={12}>
 						<FormItem {...formItemLayout} label="监理单位">
 						
-								<Input type="text" />
+								<Input type="text" onChange={this.search.bind(this,'jianli')} />
 							
 						</FormItem>
 					</Col>
 					<Col span={12}>
 						<FormItem {...formItemLayout} label="日期">
+						        <RangePicker 
+	                             style={{verticalAlign:"middle"}} 
+	                             Value={[moment(this.state.data.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.data.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
+	                             showTime={{ format: 'HH:mm:ss' }}
+	                             format={'YYYY/MM/DD HH:mm:ss'}
+	                             onChange={this.datepick.bind(this)}
+	                             onOk={this.datepickok.bind(this)}
+	                            >
+	                            </RangePicker>
 						
-								<Input type="text" />
+								{/*<Input type="text" onChange={this.search.bind(this,'number')}/>*/}
 							
 						</FormItem>
 					</Col>
@@ -344,6 +361,15 @@ export default class Stagereporttab extends Component {
 			})
 		}
 	};
+	previewFile(){
+
+	}
+	download(){
+        console.log(this.props);
+	}
+	look(){
+
+	}
 	datepick(e){
         console.log(e);
 	}

@@ -83,6 +83,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
+                施工时间：
                  <RangePicker 
                              style={{verticalAlign:"middle"}} 
                              defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
@@ -96,16 +97,27 @@ export default class Warning extends Component {
                     <Select 
                           placeholder="请选择部门"
                           notFoundContent="暂无数据"
-                          value=""
+                           defaultValue="1"
                           onSelect={this.onDepartments.bind(this,'departments') }>
-                          {this.state.departOptions}
+                          <Option value="1">便道施工</Option>
+                          <Option value="2">给排水沟开挖</Option>
+                          <Option value="3">常绿  乔木</Option>
+                          <Option value="4">落叶  乔木</Option>
+                          <Option value="5">亚    乔木</Option>
+                          <Option value="6">灌      木</Option>
+                          <Option value="7">草      木</Option>
                     </Select>
                     <Select 
                           placeholder="请选择部门"
                           notFoundContent="暂无数据"
-                          value=""
+                         defaultValue="1"
                           onSelect={this.onDepartments.bind(this,'departments') }>
-                          {this.state.departOptions}
+                          <Option value="1">全部</Option>
+                          <Option value="2">一标</Option>
+                          <Option value="3">二标</Option>
+                          <Option value="4">三标</Option>
+                          <Option value="5">四标</Option>
+                          <Option value="6">五标</Option>
                     </Select>
                     <span>强度分析</span>
                 </Card>

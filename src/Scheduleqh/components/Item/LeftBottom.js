@@ -16,7 +16,14 @@ export default class Warning extends Component {
             stime1: moment().format('2017-11-17 00:00:00'),
             etime1: moment().format('2017-11-24 23:59:59'),
             departOptions:"",
-            data:[20,100,100,80,60]
+            data: [
+                { value: 50, name: '一般安全隐患', selected: true },
+                { value: 10, name: '较大安全事故' },
+                { value: 10, name: '重大安全事故' },
+                { value: 10, name: '一般安全事故' },
+                { value: 20, name: '重大安全隐患' },
+            ],
+
 
         }
     }
@@ -27,22 +34,22 @@ export default class Warning extends Component {
 
         this.optionLine = {
             // backgroundColor: '#666',
-            title: {
-                text: '安全隐患数量',
-                textStyle: {
-                    color: '#fff',
-                    // color: '#000',
-                }
-            },
+            // title: {
+            //     text: '安全隐患数量',
+            //     textStyle: {
+            //         color: '#000',
+            //         // color: '#000',
+            //     }
+            // },
             tooltip: {
                 trigger: 'item',
                 formatter: "{a} <br/>{b} : {c} ({d}%)"
             },
             legend: {
-                orient: 'vertical',
+                // orient: 'vertical',
                 right: 'right',
-                data: ['一般安全隐患', '较大安全事故', '重大安全事故', '一般安全事故', '重大安全隐患']
-                // data: ['-', '-', '-', '-', '-']
+                // data: ['一般安全隐患', '较大安全事故', '重大安全事故', '一般安全事故', '重大安全隐患']
+                data: ['-', '-', '-', '-', '-']
             },
             series: [
                 {
@@ -72,7 +79,7 @@ export default class Warning extends Component {
                     label: {
                         normal: {
                             textStyle: {
-                                color: '#fff',
+                                color: '#000',
                                 // color: '#000',
                                 fontSize: '12px',
                             }
@@ -81,7 +88,7 @@ export default class Warning extends Component {
                     labelLine: {
                         normal: {
                             lineStyle: {
-                                color: '#fff',
+                                color: '#000',
                                 // color: '#000',
                                 fontSize: '12px',
                             }
@@ -91,6 +98,7 @@ export default class Warning extends Component {
             ],
             color: ['#0fbc7a', '#fca700', '#772fbf', '#11d0d8', '#0e8ed7']
         };
+
 
         
 
@@ -102,6 +110,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
+                截止日期：
                     <DatePicker  
                      style={{textAlign:"center"}} 
                      showTime
@@ -115,16 +124,27 @@ export default class Warning extends Component {
                     <Select 
                           placeholder="请选择部门"
                           notFoundContent="暂无数据"
-                          value=""
+                          defaultValue="1"
                           onSelect={this.onDepartments.bind(this,'departments') }>
-                          {this.state.departOptions}
+                          <Option value="1">全部</Option>
+                          <Option value="2">一标</Option>
+                          <Option value="3">二标</Option>
+                          <Option value="4">三标</Option>
+                          <Option value="5">四标</Option>
+                          <Option value="6">五标</Option>
                     </Select>
                     <Select 
                           placeholder="请选择部门"
                           notFoundContent="暂无数据"
-                          value=""
+                          defaultValue="1"
                           onSelect={this.onDepartments.bind(this,'departments') }>
-                          {this.state.departOptions}
+                          <Option value="1">便道施工</Option>
+                          <Option value="2">给排水沟开挖</Option>
+                          <Option value="3">常绿乔木</Option>
+                          <Option value="4">落叶乔木</Option>
+                          <Option value="5">亚乔木</Option>
+                          <Option value="6">灌木</Option>
+                          <Option value="7">草木</Option>
                     </Select>
                     <span>强度分析</span>
                 </Card>
