@@ -4,29 +4,13 @@ import { MODULES, MODULES2} from '_platform/api';
 import Card from '_platform/components/panels/Card';
 import {getUser} from '_platform/auth';
 
-// const CheckboxGroup=Checkbox.Group;
-// const plainOptions = [
-// 	// {id: "HOME", name: "首页",children:  ['新闻通知','待办任务','进程信息统计','质量信息统计']},
-// 	{id: "HOME", name: "首页",children: [{name:'新闻通知'},{name:'待办任务'},{name:'进程信息统计'},{name:'质量信息统计'}]},
-// 	{id: "DISPLAY", name: "综合展示", children: ['二维展示','安全隐患','工程影响']},
-// 	{id: "MANAGE", name: "综合管理", children: ['二维展示','安全隐患','工程影响']},
-// 	{id: "DATUM", name: "资料管理", children: ['二维展示','安全隐患','工程影响']},
-// 	{id: "QUALITY", name: "质量管理", children: ['二维展示','安全隐患','工程影响']},
-// 	{id: "SCHEDULE", name: "进度管理", children: ['二维展示','安全隐患','工程影响']},
-// 	{id: "SAFETY", name: "安全管理", children: ['二维展示','安全隐患','工程影响']},
-// 	{id: "COST", name: "造价管理", children: ['二维展示','安全隐患','工程影响']},
-// 	{id: "SELFCARE", name: "个人中心", children: ['二维展示','数据录入','工程影响','苗木大数据分析']},
-// 	{id: "TREE", name: "森林大数据", children: ['苗木大数据','安全隐患','数据录入']},
-// 	{id: "ROLE", name: "角色设置", children: ['超级管理员','普通管理员']},
-// 	{id: "PROJECT", name: "项目管理", children: ['区域地块','工程管理','资料管理','安全管理']}
-// ];
+
 export default class PermissionTable extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			userLogin:"",
-			indeterminate:false,
-			editble:'return false',
+			indeterminate:false
 
 		}
 	}
