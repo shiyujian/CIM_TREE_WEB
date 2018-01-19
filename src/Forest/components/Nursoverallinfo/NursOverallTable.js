@@ -25,7 +25,7 @@ export default class NursOverallTable extends Component {
         	keycode: '-1',
         	stime: moment().format('2017-11-23 00:00:00'),
 			etime: moment().format('2017-11-23 23:59:59'),
-			zzbm: '',
+			sxm: '',
     		section: '',
     		treety: '',
     		treetype: '',
@@ -41,6 +41,12 @@ export default class NursOverallTable extends Component {
     		tqhd_max: '',
     		tqzj_min: '',
     		tqzj_max: '',
+    		gd: '',
+			xj: '',
+			gf: '',
+			dj: '',
+			tqhd: '',
+			tqzj: '',
     		supervisorcheck: '',
     		checkstatus: '',
     		locationstatus: '',
@@ -65,6 +71,7 @@ export default class NursOverallTable extends Component {
     }
 	render() {
 		const {tblData} = this.state;
+		console.log('tblData',tblData)
 		return (
 			<div>
 				{this.treeTable(tblData)}
@@ -82,6 +89,7 @@ export default class NursOverallTable extends Component {
 		);
 	}
 	treeTable(details) {
+		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -95,7 +103,7 @@ export default class NursOverallTable extends Component {
 			locationoption,
 		} = this.props;
 		const {
-			zzbm, 
+			sxm, 
 			factory, 
 			rolename,
 			section,
@@ -107,7 +115,7 @@ export default class NursOverallTable extends Component {
 			locationstatus,
 			role,
 		} = this.state;
-		const suffix = zzbm ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
+		const suffix = sxm ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
 		const suffix1 = factory ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		let columns = [];
@@ -117,16 +125,16 @@ export default class NursOverallTable extends Component {
 			dataIndex: 'order',
 		},{
 			title:"编码",
-			dataIndex: 'attrs.zzbm',
+			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
-			dataIndex: 'section',
+			dataIndex: 'Section',
 		},{
 			title:"位置",
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'treetype',
+			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"状态",
 			dataIndex: 'status',
@@ -141,7 +149,7 @@ export default class NursOverallTable extends Component {
 			}
 		},{
 			title:"供苗商",
-			dataIndex: 'factory',
+			dataIndex: 'Factory',
 		},{
 			title:"测量人",
 			render: (text,record) => {
@@ -290,7 +298,7 @@ export default class NursOverallTable extends Component {
 					<Row >
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>编码：</span>
-							<Input suffix={suffix} value={zzbm} className='forestcalcw2 mxw100' onChange={this.zzbmchange.bind(this)}/>
+							<Input suffix={suffix} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>标段：</span>
@@ -519,7 +527,7 @@ export default class NursOverallTable extends Component {
 	}
 
 	emitEmpty = () => {
-	    this.setState({zzbm: ''});
+	    this.setState({sxm: ''});
   	}
 
   	emitEmpty1 = () => {
@@ -530,8 +538,8 @@ export default class NursOverallTable extends Component {
 	    this.setState({rolename: ''});
   	}
 
-	zzbmchange(value) {
-		this.setState({zzbm:value.target.value})
+	sxmchange(value) {
+		this.setState({sxm:value.target.value})
 	}
 
 	onsectionchange(value) {
@@ -563,6 +571,7 @@ export default class NursOverallTable extends Component {
 	}
 
 	ontreetypechange(value) {
+		console.log('value',value)
 		const {treetypelist} = this.props;
 		let treetype = treetypelist.find(rst => rst.name == value)
 		this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''})
@@ -696,22 +705,16 @@ export default class NursOverallTable extends Component {
 
     qury(page) {
     	const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
     		treety = '',
     		treetype = '',
-    		gd_min = '',
-    		gd_max = '',
-    		xj_min = '',
-    		xj_max = '',
-    		gf_min = '',
-    		gf_max = '',
-    		dj_min = '',
-    		dj_max = '',
-    		tqhd_min = '',
-    		tqhd_max = '',
-    		tqzj_min = '',
-    		tqzj_max = '',
+    		gd = '',
+    		xj = '',
+    		gf = '',
+    		dj = '',
+    		tqhd = '',
+    		tqzj = '',
     		supervisorcheck = '',
     		checkstatus = '',
     		locationstatus = '',
@@ -725,22 +728,16 @@ export default class NursOverallTable extends Component {
     	const {actions: {getqueryTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
     		treety,
     		treetype,
-    		gd_min,
-    		gd_max,
-    		xj_min,
-    		xj_max,
-    		gf_min,
-    		gf_max,
-    		dj_min,
-    		dj_max,
-    		tqhd_min,
-    		tqhd_max,
-    		tqzj_min,
-    		tqzj_max,
+    		gd,
+    		xj,
+    		gf,
+    		dj,
+    		tqhd,
+    		tqzj,
     		supervisorcheck,
     		checkstatus,
     		locationstatus,
@@ -748,49 +745,53 @@ export default class NursOverallTable extends Component {
     		createtime_min:stime&&moment(stime).add(8, 'h').unix(),
     		createtime_max:etime&&moment(etime).add(8, 'h').unix(),
     		page,
-    		per_page:size
+    		size
     	}
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})
     	getqueryTree({},postdata)
     	.then(rst => {
+    		console.log('rst',rst)
     		this.setState({loading:false,percent:100})
     		if(!rst)
     			return
-    		let tblData = rst.results;
+    		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
-	    			const {attrs = {}} = plan;
+	    			console.log('plan',plan)
+	    			// const {attrs = {}} = plan;
+	    			// console.log('attrs',attrs)
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
+	    			// let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
+	    			let place = '';
 	    			tblData[i].place = place;
 	    			let status = '';
-					if(attrs.supervisorcheck == -1)
+					if(plan.supervisorcheck == -1)
 						status = "待审批"
-					else if(attrs.supervisorcheck == 0) 
+					else if(plan.supervisorcheck == 0) 
 						status = "审批未通过"
 					else {
-						if(attrs.checkstatus == 0)
+						if(plan.checkstatus == 0)
 							status = "抽检不通过"
-						else if(attrs.checkstatus == 1)
+						else if(plan.checkstatus == 1)
 							status = "抽检通过"
-						else if(attrs.checkstatus == 2)
+						else if(plan.checkstatus == 2)
 							status = "抽检不通过后修改"
 						else {
 							status = "审批通过"
 						}
 					}
 					tblData[i].status = status;
-					let locationstatus = !!attrs.locationtime ? '已定位' : '未定位';
+					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
-					let locationtime1 = !!attrs.locationtime ? moment(attrs.locationtime).format('YYYY-MM-DD') : '/';
-					let locationtime2 = !!attrs.locationtime ? moment(attrs.locationtime).format('HH:mm:ss') : '/';
+					let locationtime1 = !!plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
+					let locationtime2 = !!plan.LocationTime ? moment(plan.LocationTime).format('HH:mm:ss') : '/';
 					tblData[i].locationtime1 = locationtime1;
 					tblData[i].locationtime2 = locationtime2;
 	    		})
 		    	const pagination = { ...this.state.pagination };
-				pagination.total = rst.total;
+				pagination.total = rst.pageinfo.total;
 				pagination.pageSize = size;
 				this.setState({ tblData,pagination:pagination });	
 	    	}
@@ -799,7 +800,7 @@ export default class NursOverallTable extends Component {
 
 	exportexcel() {
 		const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
     		treety = '',
     		treetype = '',
@@ -828,7 +829,7 @@ export default class NursOverallTable extends Component {
     	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
     		treety,
     		treetype,
@@ -917,7 +918,7 @@ export default class NursOverallTable extends Component {
 							let bch = attrs.bch == 1 ? '有' : "无";
 		    				return [
 		    					++i,
-		    					attrs.zzbm || '/',
+		    					attrs.sxm || '/',
 		    					plan.section || '/',
 		    					place,
 		    					plan.treetype || '/',

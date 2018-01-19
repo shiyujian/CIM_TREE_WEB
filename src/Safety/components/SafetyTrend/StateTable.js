@@ -139,7 +139,7 @@ export default class StateTable extends Component {
 						<div style={{marginBottom: '10px'}}>
 							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布新闻</Button>
 							{
-								(toggleData.visible && toggleData.type === 'NEWS') && <RichText {...this.props}/>
+								(toggleData.visible && toggleData.type === 'NEWS') && <StateText {...this.props}/>
 							}
 						</div>}>
 						<TabPane tab="发布的新闻" key="1">
