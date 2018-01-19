@@ -34,10 +34,26 @@ export default class EntryTable extends Component {
             treetypename:'',
             treetypetitlename: '全部',
             treetype: '',
-            isOpen: [false,false,false]
+            isOpen: [false,false,false],
+            biaoduan:[],
+            shuzhi:[],
         }
     }
     componentWillReceiveProps(nextProps){
+
+      this.setState({
+        amount:this.props.account,
+        biaoduan:this.props.biaoduan,
+        shuzhi:this.props.shuzhi,
+      })
+
+
+
+
+
+
+
+
         if(nextProps.leftkeycode != this.state.leftkeycode) {
             this.setState({
                 leftkeycode: nextProps.leftkeycode,
@@ -317,6 +333,7 @@ export default class EntryTable extends Component {
     }
 
     ontypechange(value) {
+        console.log(value,"jjlkjl");
         const {typeselect,leftkeycode = ''} = this.props;
         typeselect(value || '',leftkeycode)
         this.setState({treety:value || ''}, () => {
@@ -389,14 +406,14 @@ export default class EntryTable extends Component {
                         xAxis: [
                             {
                                 type: 'category',
-                                data: rst['标段名称']
+                                data: this.state.biaoduan,
                             }
                         ],
                         series: [
                             {
                                 name: '进场总数',
                                 type: 'bar',
-                                data: rst['进场总数'],
+                                data: this.state.shuzhi,
                                 markPoint: {
                                     data: [
                                         {type: 'max', name: '最大值'},
