@@ -33,6 +33,7 @@ export default class Entry extends Component {
             treeLists: [],
             sectionoption: [],
             leftkeycode: '',
+            data:[],
         }
     }
 
@@ -164,9 +165,11 @@ export default class Entry extends Component {
         const {actions:{getTreeList,gettreetype}} =this.props;
         this.setState({leftkeycode:keycode})
         //树种
-        gettreetype({},{no:keycode,paginate:false})
+        gettreetype()
+        // gettreetype({},{no:keycode,paginate:false})
         .then(rst => {
             this.setTreeTypeOption(rst)
+            console.log(rst);
         })
     }
 
