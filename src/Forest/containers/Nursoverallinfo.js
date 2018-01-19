@@ -311,12 +311,13 @@ export default class Nursoverallinfo extends Component {
                     thinclassList.push(thins);
                 }
             })
+            thinclassList.substr(thinclassList.indexOf('班') + 1)
             console.log('thinclassList',thinclassList)
             let thinclassData = [...new Set(thinclassList)];
             thinclassData.sort();
             thinclassData.map(thin => {
                 thinclassOptions.push(<Option key={thin} value={thin}>{thin}</Option>)
-                console.log('thinclassOptions',thinclassOptions)
+                // console.log('thinclassOptions',thinclassOptions)
             })
             thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({thinclassoption: thinclassOptions})
