@@ -142,24 +142,74 @@ class NewsTable extends Component {
 	}
 
 	clear() {
+		const {
+			newsTabValue = '1'
+		} = this.props;
 		this.props.form.setFieldsValue({
-			workflowactivity: undefined,
+
+			title: undefined,
 			worktime: undefined,
 			workunit: undefined,
-		
+
 		});
 	}
 
 	clear1() {
+
 		this.props.form.setFieldsValue({
-			workflow: undefined,
+			title1: undefined,
 			worktimes: undefined,
 			workunits: undefined,
-		
+
 		});
 	}
+	query() {
+		const {
+			actions: { getNewsList },
+			filter = {}
+		} = this.props;
+		const user = getUser();
+		this.props.form.validateFields(async (err, values) => {
+			let conditions = {
+				// task: filter.type || "processing",
+				executor:user.id,
+				title: values.title || "",
+				// workflow:values.workflow || "",
+				// creator:values.creator || "",
+				// status:values.status || "",
+				// real_start_time_begin:"",
+				// real_start_time_end:"",
+			}
+			// if (values && values.startTime && values.startTime.length > 0) {
+			// 	conditions.real_start_time_begin = moment(values.startTime[0]).format('YYYY-MM-DD 00:00:00');
+			// 	conditions.real_start_time_end = moment(values.startTime[1]).format('YYYY-MM-DD 23:59:59');
+			// }
+			// for (const key in conditions) {
+			// 	if (!conditions[key] || conditions[key] == "") {
+			// 		delete conditions[key];
+			// 	}
+			// }
+			// setLoadingStatus(true);
+			await getNewsList({}, conditions);
+			// setLoadingStatus(false);
+		})
+	}
 
-
+	query1() {
+	
+		const {
+			actions: { getDraftNewsList },
+			filter = {}
+		} = this.props;
+		
+		this.props.form.validateFields(async (err, values) => {
+			let conditions = {
+				// task: filter.type || "processing",
+				title: values.title1 || "",
+			}
+			await getDraftNewsList({}, conditions);
+		})
+	}
 
 	render() {
 		const rowSelection = {
@@ -206,7 +256,7 @@ class NewsTable extends Component {
 										<Col span={12} >
 											<FormItem {...formItemLayout} label="主题">
 												{
-													getFieldDecorator('workflowactivity', {
+													getFieldDecorator('title', {
 														rules: [
 															{ required: false, message: '请输入主题' },
 														]
@@ -247,7 +297,7 @@ class NewsTable extends Component {
 															{ required: false, message: '发布单位' },
 														]
 													})
-														(<Select style={{ width: '100%' }} 
+														(<Select style={{ width: '100%' }}
 														>
 															<Option value="0">编辑中</Option>
 															<Option value="1">已提交</Option>
@@ -265,7 +315,7 @@ class NewsTable extends Component {
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
-									<Button icon='search'>查找</Button>
+									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
 									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear.bind(this)}>清除</Button>
 								</Col>
 							</Row>
@@ -289,7 +339,7 @@ class NewsTable extends Component {
 										<Col span={12} >
 											<FormItem {...formItemLayout} label="主题">
 												{
-													getFieldDecorator('workflow', {
+													getFieldDecorator('title1', {
 														rules: [
 															{ required: false, message: '请输入主题' },
 														]
@@ -348,7 +398,7 @@ class NewsTable extends Component {
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
-									<Button icon='search'>查找</Button>
+									<Button icon='search'  onClick={this.query1.bind(this)}>查找</Button>
 									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
 								</Col>
 							</Row>

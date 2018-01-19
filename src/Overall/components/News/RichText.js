@@ -20,12 +20,18 @@ class RichText extends Component {
 
 	componentDidMount() {
 		const elem = this.refs.editorElem;
+		
 		editor = new E(elem);
+		this.setState({
+			editor
+		})
+		
 		// 使用 onchange 函数监听内容的变化，并实时更新到 state 中
 		editor.customConfig.onchange = html => {
 			this.setState({
 				content: html
 			})
+			// editor.txt.html("kjnhjbyu")
 		};
 		editor.customConfig.zIndex = 900;
 		editor.customConfig.uploadImgTimeout = 15000;
@@ -65,7 +71,7 @@ class RichText extends Component {
 		} = this.props;
 		if (toggleData.type === 'NEWS' && toggleData.status === 'EDIT') {
 			this.setState({
-				content: toggleData.editData.raw
+				content: toggleData.editData.raw,
 			});
 			editor.txt.html(toggleData.editData.raw)
 			setFieldsValue({
@@ -87,6 +93,7 @@ class RichText extends Component {
 
 	//发布新闻
 	postData() {
+		console.log('11',11)
 		const {
 			actions: { postData, getNewsList, patchData, getDraftNewsList },
 			form: { validateFields },
@@ -98,35 +105,41 @@ class RichText extends Component {
 			}
 		} = this.props;
 		validateFields((err, values) => {
-			
-				
-				if (toggleData.status === 'ADD') {
-					let newData = {
-						"title": values['title'],
-						"abstract": values['abstract'] || '',
-						"raw": this.state.content,
-						"content": "",
-						"attachment": {},
-						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-						"tags": [1],
-						"categories": [],
-						"publisher": getUser().id,
-						"is_draft": false
-					};
-					postData({}, newData)
-						.then(rst => {
-							if (rst.id) {
-								this.modalClick();
-								message.success('发布新闻成功');
-								//更新新闻列表数据
-								getNewsList({
-									user_id: getUser().id
-								});
-							}
-						})
-				}
-			
+
+
+			if (toggleData.status === 'ADD') {
+				let newData = {
+					"title": values['title'],
+					"abstract": values['abstract'] || '',
+					"raw": this.state.content,
+					"content": "",
+					"attachment": {},
+					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+					"tags": [1],
+					"categories": [],
+					"publisher": getUser().id,
+					"is_draft": false
+				};
+				postData({}, newData)
+					.then(rst => {
+						
+						if (rst.id) {
+							// this.modalClick();
+							this.props.form.setFieldsValue({
+								title: undefined,
+								abstract: undefined,
+							});
+							this.state.editor.txt.html('')
+							message.success('发布新闻成功');
+							//更新新闻列表数据
+							getNewsList({
+								user_id: getUser().id
+							});
+						}
+					})
+			}
+
 		});
 	}
 
@@ -155,7 +168,12 @@ class RichText extends Component {
 				postData({}, newData)
 					.then(rst => {
 						if (rst.id) {
-							this.modalClick();
+							this.props.form.setFieldsValue({
+								title: undefined,
+								abstract: undefined,
+							});
+							this.state.editor.txt.html('')
+							// this.modalClick();
 							message.success('暂存成功！');
 							//更新暂存的新闻列表数据
 							getDraftNewsList({
@@ -184,17 +202,17 @@ class RichText extends Component {
 		};
 
 		return (
-		
+
 			<div>
 				<Form>
 					<Row>
 						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="新闻标题">
+							<FormItem {...formItemLayout} label="主题">
 								{getFieldDecorator('title', {
 									rules: [{ required: true, message: '请输入新闻标题' }],
 									initialValue: ''
 								})(
-									<Input type="text" placeholder="新闻标题" />
+									<Input type="text" placeholder="主题" />
 									)}
 							</FormItem>
 						</Col>
@@ -206,7 +224,7 @@ class RichText extends Component {
 							</FormItem>
 						</Col>
 						<Col span={4} offset={1}>
-								<Button>上传</Button>
+							<Button>上传</Button>
 						</Col>
 
 					</Row>
@@ -224,7 +242,7 @@ class RichText extends Component {
 					</Col>
 				</Row>
 			</div>
-		
+
 		);
 	}
 }

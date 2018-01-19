@@ -7,7 +7,7 @@ import {bindActionCreators} from 'redux';
 import {Tabs} from 'antd';
 import NewsTable from '../components/Receipt/NewsTable'
 import TipsTable from '../components/Receipt/TipsTable'
-import ProjectUnitWrapper from '../components/Receipt/ProjectUnitWrapper'
+import ProjectTree from '../components/Receipt/ProjectTree'
 
 const TabPane = Tabs.TabPane;
 
@@ -52,7 +52,7 @@ export default class Receipt extends Component {
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="现场收发文" {...this.props}/>
 				<Sidebar>
-					<ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)} />
+					<ProjectTree {...this.props} onSelect={this.onSelect.bind(this)} />
 				</Sidebar>
 				<Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
 					<TabPane tab="现场发文" key="1">
