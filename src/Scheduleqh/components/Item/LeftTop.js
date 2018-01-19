@@ -147,6 +147,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         return (
             <div >
             <Card>
+            施工时间：
                 <RangePicker 
                              style={{verticalAlign:"middle"}} 
                              defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
@@ -160,9 +161,15 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                     <Select 
                           placeholder="请选择部门"
                           notFoundContent="暂无数据"
-                          value=""
+                          defaultValue="1"
                           onSelect={this.onDepartments.bind(this,'departments') }>
-                          {this.state.departOptions}
+                          <Option value="1">便道施工</Option>
+                          <Option value="2">给排水沟开挖</Option>
+                          <Option value="3">常绿乔木</Option>
+                          <Option value="4">落叶乔木</Option>
+                          <Option value="5">亚乔木</Option>
+                          <Option value="6">灌木</Option>
+                          <Option value="7">草木</Option>
                     </Select>
                     <span>强度分析</span>
                 </Card>

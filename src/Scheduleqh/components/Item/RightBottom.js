@@ -33,11 +33,11 @@ export default class Warning extends Component {
                     }
                 }
             },
-            legend: {
-                data:['已检验批个数','优良率'],
-                left:'right'
+            // legend: {
+            //     data:['已检验批个数','优良率'],
+            //     left:'right'
                 
-            },
+            // },
             xAxis: [
                 {
                     type: 'value',
@@ -56,7 +56,7 @@ export default class Warning extends Component {
                 {
                     name:'已检验批个数',
                     type:'bar',
-                    data:[250, 360, 280, 230, 312, 240, 290],
+                    data:[250, 360, 280, 230, 312, 240, 290,300],
                     barWidth:'25%',
                     itemStyle:{
                         normal:{
@@ -75,6 +75,7 @@ export default class Warning extends Component {
         return (
             <div >
                 <Card>
+                截止日期：
                    <DatePicker  
                      style={{textAlign:"center"}} 
                      showTime
@@ -85,20 +86,31 @@ export default class Warning extends Component {
                     >
                     </DatePicker>
                     <div id='rightbottom' style={{ width: '100%', height: '340px' }}></div>
-                    <Select 
+                    {/*<Select 
                           style={{marginLeft:'150px'}}
                           placeholder="请选择部门"
                           notFoundContent="暂无数据"
-                          value=""
+                          defaultValue="1"
                           onSelect={this.onDepartments.bind(this,'departments') }>
-                          {this.state.departOptions}
-                    </Select>
+                          <Option value="1">便道施工</Option>
+                          <Option value="2">给排水沟开挖</Option>
+                          <Option value="3">常绿乔木</Option>
+                          <Option value="4">落叶乔木</Option>
+                          <Option value="5">亚乔木</Option>
+                          <Option value="6">灌木</Option>
+                          <Option value="7">草木</Option>
+                    </Select>*/}
                     <Select 
                           placeholder="请选择部门"
                           notFoundContent="暂无数据"
-                          value=""
+                          defaultValue="1"
                           onSelect={this.onDepartments.bind(this,'departments') }>
-                          {this.state.departOptions}
+                          <Option value="1">全部</Option>
+                          <Option value="2">一标</Option>
+                          <Option value="3">二标</Option>
+                          <Option value="4">三标</Option>
+                          <Option value="5">四标</Option>
+                          <Option value="6">五标</Option>
                     </Select>
                     <span>进度分析</span>
                 </Card>

@@ -306,19 +306,19 @@ export default class Nursoverallinfo extends Component {
             let thinclassList = [];
             let thinclassOptions = [];
             let thinclassoption = rst.map(item => {
-                console.log('item',item)
                 if(item.Name) {
                     let thins = item.Name;
                     thinclassList.push(thins);
                 }
             })
+            console.log('thinclassList',thinclassList)
             let thinclassData = [...new Set(thinclassList)];
             thinclassData.sort();
             thinclassData.map(thin => {
                 thinclassOptions.push(<Option key={thin} value={thin}>{thin}</Option>)
                 console.log('thinclassOptions',thinclassOptions)
             })
-            thinclassoption.unshift(<Option key={-1} value={''}>全部</Option>)
+            thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({thinclassoption: thinclassOptions})
         }
     }
@@ -373,14 +373,11 @@ export default class Nursoverallinfo extends Component {
                 return getTree({}, {parent: item.No})
             })
             Promise.all(promises).then(rest => {
-                // console.log('rstpromise',rest)
                 rest.map(items => {
-                    console.log('items',items)
                     items.map(i => {
                         thin.push(i);
                     })
                 })
-                console.log('thin',thin)
                 this.setThinClassOption(thin)
             })
         })
