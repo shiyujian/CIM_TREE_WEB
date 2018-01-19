@@ -71,7 +71,6 @@ export default class NursOverallTable extends Component {
     }
 	render() {
 		const {tblData} = this.state;
-		console.log('tblData',tblData)
 		return (
 			<div>
 				{this.treeTable(tblData)}
@@ -89,7 +88,6 @@ export default class NursOverallTable extends Component {
 		);
 	}
 	treeTable(details) {
-		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -571,10 +569,9 @@ export default class NursOverallTable extends Component {
 	}
 
 	ontreetypechange(value) {
-		console.log('value',value)
 		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.name == value)
-		this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''})
+		let treetype = treetypelist.find(rst => rst.TreeTypeNo == value)
+		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
     }
 
 	gdminchange(value) {
@@ -752,16 +749,12 @@ export default class NursOverallTable extends Component {
     	this.setState({loading:true,percent:0})
     	getqueryTree({},postdata)
     	.then(rst => {
-    		console.log('rst',rst)
     		this.setState({loading:false,percent:100})
     		if(!rst)
     			return
     		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
-	    			console.log('plan',plan)
-	    			// const {attrs = {}} = plan;
-	    			// console.log('attrs',attrs)
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			// let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
 	    			let place = '';

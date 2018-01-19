@@ -214,7 +214,7 @@ export default class Nursoverallinfo extends Component {
             })
         })
         //树种
-        getTreeList({},{field:'treetype',no:leftkeycode,section:value,treety,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -235,7 +235,6 @@ export default class Nursoverallinfo extends Component {
             Promise.all(promises).then(rest => {
                 rest.map(items => {
                     items.map(i => {
-                        console.log('i',i)
                         if(i.Name.indexOf(value) !== -1) {
                             let thinnames = {
                                 Name: i.Name,
@@ -248,7 +247,7 @@ export default class Nursoverallinfo extends Component {
             })
         })
         //树种
-        getTreeList({},{field:'treetype',no:value,treety,section,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -259,7 +258,7 @@ export default class Nursoverallinfo extends Component {
         const {actions:{setkeycode,getTreeList}} =this.props;
         setkeycode(value);
         //树种
-        getTreeList({},{field:'treetype',no:value,treety,section,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -270,7 +269,7 @@ export default class Nursoverallinfo extends Component {
         const {actions:{setkeycode,getTreeList}} =this.props;
         this.setState({treety:value})
         //树种
-        getTreeList({},{field:'treetype',no:keycode,treety:value,section,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -321,7 +320,6 @@ export default class Nursoverallinfo extends Component {
             smallclassData.sort();
             smallclassData.map(small => {
                 smallclassOptions.push(<Option key={small} value={small}>{small}</Option>)
-                // console.log('smallclassOptions',smallclassOptions)
             })
             smallclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({smallclassoption: smallclassOptions})
