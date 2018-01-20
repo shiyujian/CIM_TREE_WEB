@@ -23,7 +23,7 @@ export default class FaithinfoTable extends Component {
     		integrity: '',
     		percent:0,
     		visible: false,
-    		nurseryname: '',
+    		factory: '',
         }
     }
     componentDidMount() {
@@ -56,13 +56,13 @@ export default class FaithinfoTable extends Component {
 			keycode,
 		} = this.props;
 		const {
-			nurseryname,
+			factory,
 			section,
 			treety,
 			treetypename,
 		} = this.state;
 		//清除
-		const suffix = nurseryname ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
+		const suffix = factory ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
 		let columns = [];
 		let header = '';
 		columns = [{
@@ -71,22 +71,23 @@ export default class FaithinfoTable extends Component {
 			width: '5%',
 		},{
 			title:"供苗商",
-			dataIndex: 'nurseryname',
+			dataIndex: 'Factory',
 			width: '26%',
 		},{
 			title:"树种",
-			dataIndex: 'treetype',
+			dataIndex: 'TreeTypeName',
 			width: '52%',
 		},{
 			title:"总诚信度",
-			dataIndex: 'integrity',
+			dataIndex: 'Sincerity',
 			width: '8%',
 		},{
 			title:"详情",
 			render: (record) => {
+				// console.log('record',record)
 				return (
 					<div>
-						<a onClick = {this.showModal.bind(this,record.nurseryname)}>详情</a>
+						<a onClick = {this.showModal.bind(this,record.Factory)}>详情</a>
 					</div>
 				)
 			}
@@ -113,7 +114,7 @@ export default class FaithinfoTable extends Component {
 						</Col>
 						<Col xl={5} lg={6} md={7} className='mrg10'>
 							<span>供苗商：</span>
-							<Input suffix={suffix} value={nurseryname} className='forestcalcw3 mxw200' onChange={this.nurserynamechange.bind(this)}/>
+							<Input suffix={suffix} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
 						</Col>
 					</Row>
 					<Row >
@@ -153,13 +154,14 @@ export default class FaithinfoTable extends Component {
 	}
 
   	emitEmpty = () => {
-	    this.setState({nurseryname: ''});
+	    this.setState({factory: ''});
   	}
   	showModal(name){
+  		console.log('name',name)
   		this.setState({loading1: true})
     	const {actions:{changeModal1,getHonestyNew,getHonestyNewDetail,clearList, nurseryName}} = this.props;
     	getHonestyNewDetail({name:name}).then(rst => {
-    		// console.log("rst:",rst);
+    		console.log("rst:",rst);
     		this.setState({loading1: false})
     	})
     	clearList();
@@ -182,12 +184,12 @@ export default class FaithinfoTable extends Component {
 
 	ontreetypechange(value) {
 		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.name == value)
-		this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''})
+		let treetype = treetypelist.find(rst => rst.TreeTypeNo == value)
+		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
     }
 
-    nurserynamechange(value) {
-		this.setState({nurseryname: value.target.value})
+    factorychange(value) {
+		this.setState({factory: value.target.value})
 	}
 
 	handleTableChange(pagination){
@@ -213,7 +215,7 @@ export default class FaithinfoTable extends Component {
     		treety = '',
     		integrity = '',
     		treetype = '',
-    		nurseryname = '',
+    		factory = '',
     	} = this.state;
     	const {actions: {getHonestyNew},keycode = ''} = this.props;
     	let postdata = {
@@ -221,7 +223,7 @@ export default class FaithinfoTable extends Component {
     		treety,
     		integrity,
     		treetype,
-    		nurseryname,
+    		factory,
     	}
     	this.setState({loading:true,percent:0})
     	getHonestyNew({},postdata)
@@ -229,16 +231,17 @@ export default class FaithinfoTable extends Component {
     		this.setState({loading:false,percent:100})
     		if(!rst)
     			return
-    		let tblData = rst;
+    		let tblData = rst.content;
     		if(tblData instanceof Array) {
     			tblData.forEach((plan, i) => {
-    				let treetys = []
-    				if(plan.treetype.length > 1) {
-    					treetys = plan.treetype.join(" , ")
-    				}else {
-    					treetys = plan.treetype
-    				}
-    				tblData[i].treetype = treetys
+    				// console.log('plan',plan)
+    				// let treetys = []
+    				// if(plan.treetype.length > 1) {
+    				// 	treetys = plan.treetype.join(" , ")
+    				// }else {
+    				// 	treetys = plan.treetype
+    				// }
+    				// tblData[i].treetype = treetys
 	    			tblData[i].order = ++i
     			})
 				this.setState({ tblData});	
@@ -246,11 +249,11 @@ export default class FaithinfoTable extends Component {
     	})
     }
 
-	exportexcel() {
+    exportexcel() {
 		const {
     		treetype = '',
     		integrity = '',
-    		nurseryname = '',
+    		factory = '',
     		section = '',
     		treety = '',
 
@@ -259,42 +262,68 @@ export default class FaithinfoTable extends Component {
     	let postdata = {
     		treetype,
     		integrity,
-    		nurseryname,
+    		factory,
     		section,
     		treety,
     	}
     	this.setState({loading:true,percent:0})
-    	getHonestyNew({},postdata)
-    	.then(result => {
-            if(!result) {
-            	this.setState({loading:false,percent:100})
-    			return
-    		}
-    		if(result instanceof Array) {
-    			let data = result.map((plan, i) => {
-    				
-    				return [
-    					++i,
-    					plan.nurseryname || '/',
-    					plan.treetype.join() || '/',
-    					plan.integrity || '',
-    				]
-    			})
-	    		const postdata = {
-	    			keys: ["序号", "供苗商", "树种" , "总诚信度"],
-	    			values: data
-	    		}
-	    		getexportTree({},postdata)
-	    		.then(rst3 => {
-	    			this.setState({loading:false,percent:100})
-	    			let url = `${FOREST_API}/${rst3.file_path}`
-					this.createLink("excel_link", url);
-	    		})
-            } else {
-            	this.setState({loading:false,percent:100})
-            }
-    	})
+    	getexportTree({},postdata)
+		.then(rst3 => {
+			console.log('rst3',rst3)
+			this.setState({loading:false,percent:100})
+			window.location.href = `${FOREST_API}/${rst3}`
+		})
 	}
+
+	// exportexcel() {
+	// 	const {
+ //    		treetype = '',
+ //    		integrity = '',
+ //    		factory = '',
+ //    		section = '',
+ //    		treety = '',
+
+ //    	} = this.state;
+ //    	const {actions: {getHonestyNew,getexportTree},keycode = ''} = this.props;
+ //    	let postdata = {
+ //    		treetype,
+ //    		integrity,
+ //    		factory,
+ //    		section,
+ //    		treety,
+ //    	}
+ //    	this.setState({loading:true,percent:0})
+ //    	getHonestyNew({},postdata)
+ //    	.then(result => {
+ //            if(!result) {
+ //            	this.setState({loading:false,percent:100})
+ //    			return
+ //    		}
+ //    		if(result instanceof Array) {
+ //    			let data = result.map((plan, i) => {
+    				
+ //    				return [
+ //    					++i,
+ //    					plan.Factory || '/',
+ //    					plan.TreeTypeName || '/',
+ //    					plan.Sincerity || '',
+ //    				]
+ //    			})
+	//     		const postdata = {
+	//     			keys: ["序号", "供苗商", "树种" , "总诚信度"],
+	//     			values: data
+	//     		}
+	//     		getexportTree({},postdata)
+	//     		.then(rst3 => {
+	//     			console.log('rst3',rst3)
+	//     			this.setState({loading:false,percent:100})
+	//     			// window.location.href = 
+	//     		})
+ //            } else {
+ //            	this.setState({loading:false,percent:100})
+ //            }
+ //    	})
+	// }
 
 	createLink(name,url) {
         let link = document.createElement("a");

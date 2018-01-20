@@ -722,7 +722,7 @@ export default class NursOverallTable extends Component {
     		etime = '',
     		size,
     	} = this.state;
-    	const {actions: {getqueryTree},keycode = ''} = this.props;
+    	const {actions: {getNurserysTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
     		sxm,
@@ -747,7 +747,7 @@ export default class NursOverallTable extends Component {
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})
-    	getqueryTree({},postdata)
+    	getNurserysTree({},postdata)
     	.then(rst => {
     		this.setState({loading:false,percent:100})
     		if(!rst)
@@ -819,7 +819,7 @@ export default class NursOverallTable extends Component {
     		etime = '',
     		exportsize,
     	} = this.state;
-    	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
+    	const {actions: {getNurserysTree,getexportTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
     		sxm,
@@ -850,7 +850,7 @@ export default class NursOverallTable extends Component {
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})
-    	getqueryTree({},postdata)
+    	getNurserysTree({},postdata)
     	.then(result => {
     		let rst = result.results;
     		let total = result.pages;
@@ -860,7 +860,7 @@ export default class NursOverallTable extends Component {
     			for(let i=2; i<=total; i++)
                 {
                 	postdata.page = i;
-                    all.push(getqueryTree({},postdata)
+                    all.push(getNurserysTree({},postdata)
                         .then(rst1 => {
                             let {num} = this.state;
                             num++;
