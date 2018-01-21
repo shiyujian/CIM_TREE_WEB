@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
-import {Modal, Form, Input, Upload, Icon, Row, Col, Button, message, TreeSelect, Checkbox, Table,Progress} from 'antd';
-import {getUser} from '../../../_platform/auth';
-import {base, SOURCE_API} from '../../../_platform/api';
+import React, { Component } from 'react';
+import { Modal, Form, Input, Upload, Icon, Row, Col, Button, message, TreeSelect, Checkbox, Table, Progress } from 'antd';
+import { getUser } from '../../../_platform/auth';
+import { base, SOURCE_API } from '../../../_platform/api';
 import E from 'wangeditor'
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -25,7 +25,7 @@ class ToggleModal extends Component {
 			selectCopyUser: '', //抄送单位当前选中的人员
 			isSentMsg: false, //接收人员是否发短信
 			isCopyMsg: false, //接收人员是否发短信
-			progress:0,
+			progress: 0,
 		}
 	}
 
@@ -34,21 +34,21 @@ class ToggleModal extends Component {
 		multiple: false,
 		showUploadList: false,
 		action: base + "/service/fileserver/api/user/files/",
-		onChange: ({file,fileList,event}) => {
+		onChange: ({ file, fileList, event }) => {
 			const status = file.status;
 			if (status === 'done') {
-				const {actions: {postUploadFilesAc}} = this.props;
+				const { actions: { postUploadFilesAc } } = this.props;
 				let newFile = {
 					preview_url: '/media' + file.response.a_file.split('/media')[1],
 					download_url: '/media' + file.response.download_url.split('/media')[1],
 					a_file: '/media' + file.response.a_file.split('/media')[1]
 				};
-				postUploadFilesAc([{...file.response, ...newFile}])
+				postUploadFilesAc([{ ...file.response, ...newFile }])
 			}
-			if(event){
-				let {percent} = event;
-				if(percent!==undefined)
-					this.setState({progress:parseFloat(percent.toFixed(1))});
+			if (event) {
+				let { percent } = event;
+				if (percent !== undefined)
+					this.setState({ progress: parseFloat(percent.toFixed(1)) });
 			}
 		},
 	};
@@ -85,19 +85,46 @@ class ToggleModal extends Component {
 			}
 		};
 		editor.create();
+		const {
+			toggleData: toggleData = {
+			type: 'NEWS',
+			status: 'ADD',
+			visible: false,
+			editData: null
+		},
+			form: { setFieldsValue }
+		} = this.props;
+		if (toggleData.type === 'NEWS' && toggleData.status === 'EDIT') {
+			this.setState({
+				content: toggleData.editData.body_rich
+			});
+			editor.txt.html(toggleData.editData.body_rich)
+			setFieldsValue({
+				'title': toggleData.editData.title,
+				// 'abstract': toggleData.editData.abstract
+			})
+		}
+
+
 	}
 
 	closeModal() {
-		const {actions: {toggleModalAc, postUploadFilesAc}} = this.props;
+		const { actions: { toggleModalAc, postUploadFilesAc } } = this.props;
+
 		postUploadFilesAc([]);
-		toggleModalAc(false);
+		toggleModalAc({
+			type: null,
+			status: null,
+			visible: false,
+		});
+
 	}
 
 	//发送文件
 	_sendDoc() {
 		const {
-			actions: {postSentDocAc, getSentInfoAc, getCopyUsersAc, sentMessageAc},
-			form: {validateFields},
+			actions: { postSentDocAc, getSentInfoAc, getCopyUsersAc, sentMessageAc },
+			form: { validateFields },
 			fileList = []
 		} = this.props;
 		const {
@@ -162,15 +189,15 @@ class ToggleModal extends Component {
 							let promises_all = [];
 							if (isSentMsg) {
 								promises_one = sentUsers.map((org) => {
-									return getCopyUsersAc({code: org.split('--')[0]})
+									return getCopyUsersAc({ code: org.split('--')[0] })
 								})
 							}
 							if (isCopyMsg) {
 								promises_two = copyUsers.map((org) => {
-									return getCopyUsersAc({code: org.split('--')[0]})
+									return getCopyUsersAc({ code: org.split('--')[0] })
 								})
 							}
-							if(isSentMsg || isCopyMsg){
+							if (isSentMsg || isCopyMsg) {
 								promises_all = promises_one.concat(promises_two)
 								Promise.all(promises_all).then((rst) => {
 									let orgs_all = [];
@@ -200,7 +227,7 @@ class ToggleModal extends Component {
 								}).catch(() => {
 									this.closeModal();
 								});
-							}else{
+							} else {
 								this.closeModal();
 							}
 						}
@@ -221,21 +248,27 @@ class ToggleModal extends Component {
 
 	render() {
 		const {
-			form: {getFieldDecorator},
-			visible = false,
+			form: { getFieldDecorator },
+			toggleData: toggleData = {
+				type: 'NEWS',
+				status: 'ADD',
+				visible: false,
+			},
 			fileList = [],
 			orgList = [],
 		} = this.props;
 		const formItemLayout = {
-			labelCol: {span: 4},
-			wrapperCol: {span: 18},
+			labelCol: { span: 4 },
+			wrapperCol: { span: 18 },
 		};
-		let {progress} = this.state;
+		let { progress } = this.state;
 		return (
 			<Modal
-				title="发文"
+				title={toggleData.type === 'NEWS' ? (
+					toggleData.status === 'ADD' ? '发文' : '回文'
+				) : '发文'}
 				wrapClassName='edit-box'
-				visible={visible}
+				visible={toggleData.visible}
 				width="70%"
 				maskClosable={false}
 				onOk={this._sendDoc.bind(this)}
@@ -248,12 +281,12 @@ class ToggleModal extends Component {
 								<Row>
 									<FormItem {...formItemLayout} label="文件标题">
 										{getFieldDecorator('title', {
-											rules: [{required: true, message: '请输入文件标题'}],
+											rules: [{ required: true, message: '请输入文件标题' }],
 											initialValue: ''
 										})(
 											<Input type="text"
-												   placeholder="文件标题"/>
-										)}
+												placeholder="文件标题" />
+											)}
 									</FormItem>
 								</Row>
 								<Row>
@@ -261,10 +294,10 @@ class ToggleModal extends Component {
 										<div ref="editorElem"></div>
 									</Col>
 								</Row>
-								<Row style={{marginTop: '20px', marginBottom: '20px'}}>
+								<Row style={{ marginTop: '20px', marginBottom: '20px' }}>
 									<Col span={4}>
-										<div style={{textAlign: 'right', paddingRight: '8px'}}><i
-											style={{color: 'red'}}>*</i>&nbsp;附件上传:
+										<div style={{ textAlign: 'right', paddingRight: '8px' }}><i
+											style={{ color: 'red' }}>*</i>&nbsp;附件上传:
 										</div>
 									</Col>
 									<Col span={18}>
@@ -272,10 +305,10 @@ class ToggleModal extends Component {
 											<Col span={6}>
 												<Upload {...this.uploadProps}>
 													<Button>
-														<Icon type="upload"/>上传文档
+														<Icon type="upload" />上传文档
 													</Button>
 												</Upload>
-												<Progress percent={progress} strokeWidth={2}/>
+												<Progress percent={progress} strokeWidth={2} />
 											</Col>
 											<Col span={6}>
 												{
@@ -313,8 +346,8 @@ class ToggleModal extends Component {
 										<Row>
 											<Col span={20} offset={2}>
 												<Table dataSource={this._getUserFunc(this.state.sentUsers)}
-													   columns={this.columns}
-													   rowKey="code"/>
+													columns={this.columns}
+													rowKey="code" />
 											</Col>
 										</Row>
 									</Col>
@@ -342,8 +375,8 @@ class ToggleModal extends Component {
 										<Row>
 											<Col span={20} offset={4}>
 												<Table dataSource={this._getUserFunc(this.state.copyUsers)}
-													   columns={this.columnsT}
-													   rowKey="code"/>
+													columns={this.columnsT}
+													rowKey="code" />
 											</Col>
 										</Row>
 									</Col>
@@ -436,7 +469,7 @@ class ToggleModal extends Component {
 	];
 
 	_deleteSent(index) {
-		const {sentUsers} = this.state;
+		const { sentUsers } = this.state;
 		let newUsers = sentUsers;
 		newUsers.splice(index, 1);
 		this.setState({
@@ -445,7 +478,7 @@ class ToggleModal extends Component {
 	}
 
 	_deleteSentT(index) {
-		const {copyUsers} = this.state;
+		const { copyUsers } = this.state;
 		let newUsers = copyUsers;
 		newUsers.splice(index, 1);
 		this.setState({
@@ -483,9 +516,9 @@ class ToggleModal extends Component {
 			if (item.children && item.children.length) {
 				return (
 					<TreeNode key={`${item.code}--${item.name}`}
-							  value={`${item.code}--${item.name}`}
-							  title={`${item.name}`}
-							  disabled={ToggleModal._checkSentDisable(`${item.code}--${item.name}`, arr)}
+						value={`${item.code}--${item.name}`}
+						title={`${item.name}`}
+						disabled={ToggleModal._checkSentDisable(`${item.code}--${item.name}`, arr)}
 					>
 						{
 							ToggleModal.loop(item.children)
@@ -494,9 +527,9 @@ class ToggleModal extends Component {
 				);
 			}
 			return <TreeNode key={`${item.code}--${item.name}`}
-							 value={`${item.code}--${item.name}`}
-							 title={`${item.name}`}
-							 disabled={ToggleModal._checkSentDisable(`${item.code}--${item.name}`, arr)}
+				value={`${item.code}--${item.name}`}
+				title={`${item.name}`}
+				disabled={ToggleModal._checkSentDisable(`${item.code}--${item.name}`, arr)}
 			/>;
 		});
 	};
@@ -506,9 +539,9 @@ class ToggleModal extends Component {
 			if (item.children && item.children.length) {
 				return (
 					<TreeNode key={`${item.code}--${item.name}`}
-							  value={`${item.code}--${item.name}`}
-							  title={`${item.name}`}
-							  disabled={ToggleModal._checkSentDisableT(`${item.code}--${item.name}`, arr)}
+						value={`${item.code}--${item.name}`}
+						title={`${item.name}`}
+						disabled={ToggleModal._checkSentDisableT(`${item.code}--${item.name}`, arr)}
 					>
 						{
 							ToggleModal.loopT(item.children)
@@ -517,9 +550,9 @@ class ToggleModal extends Component {
 				);
 			}
 			return <TreeNode key={`${item.code}--${item.name}`}
-							 value={`${item.code}--${item.name}`}
-							 title={`${item.name}`}
-							 disabled={ToggleModal._checkSentDisableT(`${item.code}--${item.name}`, arr)}
+				value={`${item.code}--${item.name}`}
+				title={`${item.name}`}
+				disabled={ToggleModal._checkSentDisableT(`${item.code}--${item.name}`, arr)}
 			/>;
 		});
 	};

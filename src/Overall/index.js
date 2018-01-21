@@ -27,8 +27,8 @@ export default class Overall extends Component {
 				
 				{News && <Route path="/overall/news" component={News}/>}
 				{/* {News1 && <Route path="/overall/news1" component={News1}/>} */}
-				{Receipt && <Route path="/overall/receipt" component={Receipt}/>}
-				{/* {Dispatch && <Route path="/overall/dispatch" component={Dispatch}/>} */}
+				{/* {Receipt && <Route path="/overall/receipt" component={Receipt}/>} */}
+				{Dispatch && <Route path="/overall/dispatch" component={Dispatch}/>}
 				{Attend && <Route path="/overall/attend" component={Attend}/>}
 				{/* {Approval && <Route path="/overall/approval" component={Approval}/>} */}
 				{/*Package && <Route exact path="/overall/:id?" component={Package}/>*/}
@@ -43,9 +43,9 @@ export default class Overall extends Component {
 		name: '新闻通知',
 		icon: <Icon name="calendar-check-o"/>
 	},{
-		key: 'receipt',
-		id: 'MANAGE.RECEIPT',
-		path: '/overall/receipt',
+		key: 'dispatch',
+		id: 'MANAGE.DISPATCH',
+		path: '/overall/dispatch',
 		name: '现场收发文',
 		icon: <Icon name="newspaper-o"/>,
 	},{
