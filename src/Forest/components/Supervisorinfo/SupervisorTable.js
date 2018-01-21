@@ -18,15 +18,15 @@ export default class SupervisorTable extends Component {
         	size:10,
         	exportsize:100,
         	leftkeycode: '',
-        	stime: moment().format('2017-11-23 00:00:00'),
-			etime: moment().format('2017-11-23 23:59:59'),
-			zzbm: '',
+        	stime: moment().format('2017-11-25 00:00:00'),
+			etime: moment().format('2017-11-25 23:59:59'),
+			sxm: '',
     		section: '',
     		smallclass: '',
     		thinclass: '',
     		status: '',
     		supervisorcheck: '',
-    		role: 'supervisor',
+    		role: '',
     		rolename: '',
     		percent:0,
         }
@@ -62,6 +62,7 @@ export default class SupervisorTable extends Component {
 		);
 	}
 	treeTable(details) {
+		console.log('details', details)
 		const {
 			sectionoption,
 			smallclassoption,
@@ -71,14 +72,14 @@ export default class SupervisorTable extends Component {
 			statusoption,
 		} = this.props;
 		const {
-			zzbm, 
+			sxm, 
 			rolename,
 			section,
 			smallclass,
 			thinclass,
 			status,
 		} = this.state;
-		const suffix1 = zzbm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
+		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		let columns = [];
 		let header = '';
@@ -87,16 +88,16 @@ export default class SupervisorTable extends Component {
 			dataIndex: 'order',
 		},{
 			title:"编码",
-			dataIndex: 'attrs.zzbm',
+			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
-			dataIndex: 'section',
+			dataIndex: 'Section',
 		},{
 			title:"位置",
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'treetype',
+			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"监理人",
 			render: (text,record) => {
@@ -111,7 +112,7 @@ export default class SupervisorTable extends Component {
 			dataIndex: 'locationstatus',
 		},{
 			title:"状态信息",
-			dataIndex: 'attrs.supervisorinfo',
+			dataIndex: 'SupervisorInfo',
 		},{
 			title:"状态时间",
 			render: (text,record) => {
@@ -123,7 +124,7 @@ export default class SupervisorTable extends Component {
 					<Row>
 						<Col  xl={3} lg={4} md={5} className='mrg10'>
 							<span>编码：</span>
-							<Input suffix={suffix1} value={zzbm}  className='forestcalcw2 mxw100' onChange={this.zzbmchange.bind(this)}/>
+							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col s xl={3} lg={4} md={5} className='mrg10'>
 							<span>标段：</span>
@@ -207,15 +208,15 @@ export default class SupervisorTable extends Component {
 	}
 
 	emitEmpty1 = () => {
-	    this.setState({zzbm: ''});
+	    this.setState({sxm: ''});
   	}
 
   	emitEmpty2 = () => {
 	    this.setState({rolename: ''});
   	}
 
-	zzbmchange(value) {
-		this.setState({zzbm:value.target.value})
+	sxmchange(value) {
+		this.setState({sxm:value.target.value})
 	}
 
 	onsectionchange(value) {
@@ -294,9 +295,11 @@ export default class SupervisorTable extends Component {
 
     qury(page) {
     	const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
-    		supervisorcheck = '',
+    		// supervisorcheck = '',
+    		smallclass = '',
+    		thinclass = '',
     		role = '',
     		rolename = '',
     		stime = '',
@@ -306,47 +309,51 @@ export default class SupervisorTable extends Component {
     	const {actions: {getqueryTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
-    		supervisorcheck,
-    		stime:stime&&moment(stime).add(8, 'h').unix(),
-    		etime:etime&&moment(etime).add(8, 'h').unix(),
+    		smallclass,
+    		thinclass,
+    		// supervisorcheck,
+    		// stime:stime&&moment(stime).add(8, 'h').unix(),
+    		// etime:etime&&moment(etime).add(8, 'h').unix(),
     		page,
-    		per_page:size
+    		size
     	}
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})
     	getqueryTree({},postdata)
     	.then(rst => {
+    		console.log('rst',rst)
     		this.setState({loading:false,percent:100})
     		if(!rst)
     			return
-    		let tblData = rst.results;
+    		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
-	    			const {attrs = {}} = plan;
+	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
+	    			// let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
+	    			let place = '';
 	    			tblData[i].place = place;
 	    			let status = '';
-					if(attrs.supervisorcheck == -1)
+					if(plan.supervisorcheck == -1)
 						status = "待审批"
-					else if(attrs.supervisorcheck == 0) 
+					else if(plan.supervisorcheck == 0) 
 						status = "审批未通过"
 					else {
 						status = "审批通过"
 					}
 					tblData[i].status = status;
-					let locationstatus = !!attrs.locationtime ? '已定位' : '未定位';
+					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
-					let yssj1 = !!attrs.yssj ? moment(attrs.yssj).format('YYYY-MM-DD') : '/';
-					let yssj2 = !!attrs.yssj ? moment(attrs.yssj).format('HH:mm:ss') : '/';
+					let yssj1 = !!plan.YSSJ ? moment(plan.YSSJ).format('YYYY-MM-DD') : '/';
+					let yssj2 = !!plan.YSSJ ? moment(plan.YSSJ).format('HH:mm:ss') : '/';
 					tblData[i].yssj1 = yssj1;
 					tblData[i].yssj2 = yssj2;
 	    		})
 		    	const pagination = { ...this.state.pagination };
-				pagination.total = rst.total;
+				pagination.total = rst.pageinfo.total;
 				pagination.pageSize = size;
 				this.setState({ tblData,pagination:pagination });	
 	    	}
@@ -355,7 +362,7 @@ export default class SupervisorTable extends Component {
 
 	exportexcel() {
 		const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
     		supervisorcheck = '',
     		role = '',
@@ -367,7 +374,7 @@ export default class SupervisorTable extends Component {
     	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
     		supervisorcheck,
     		stime:stime&&moment(stime).add(8, 'h').unix(),
@@ -426,7 +433,7 @@ export default class SupervisorTable extends Component {
 							let yssj = !!attrs.yssj ? moment(attrs.yssj).format('YYYY-MM-DD HH:mm:ss') : '/';
 		    				return [
 		    					++i,
-		    					attrs.zzbm || '/',
+		    					attrs.sxm || '/',
 		    					plan.section || '/',
 		    					place,
 		    					plan.treetype || '/',

@@ -132,18 +132,38 @@ export default class Checkerinfo extends Component {
     }
     //标段选择, 重新获取: 小班、细班
     sectionselect(value) {
-        const {actions:{setkeycode,getTreeList}} =this.props;
+        const {actions:{setkeycode,getTreeList,getTree}} =this.props;
         const {leftkeycode} = this.state;
         setkeycode(leftkeycode)
         //小班
-        getTreeList({},{field:'smallclass',no:leftkeycode,section:value,paginate:false})
+         getTree({},{parent:leftkeycode})
         .then(rst => {
-            this.setSmallClassOption(rst)
+            let smallclasses = [];
+            rst.map((item, index) => {
+                if(rst[index].Section == value) {
+                    let smallname = {
+                        Name: rst[index].Name,
+                    }
+                    smallclasses.push(smallname)
+                }
+            })
+            this.setSmallClassOption(smallclasses)
         })
         //细班
-        getTreeList({},{field:'thinclass',no:leftkeycode,section:value,paginate:false})
-        .then(rst => {
-            this.setThinClassOption(rst)
+        getTree({},{parent:leftkeycode})
+        .then((rst, index) => {
+            let thin = [];
+            let promises = rst.map(item => {
+                return getTree({}, {parent: item.No})
+            })
+            Promise.all(promises).then(rest => {
+                rest.map(items => {
+                    items.map(i => {
+                        thin.push(i);
+                    })
+                })
+                this.setThinClassOption(thin)
+            })
         })
     }
 
@@ -151,10 +171,27 @@ export default class Checkerinfo extends Component {
     smallclassselect(value,section) {
         const {actions:{setkeycode,getTree,getTreeList}} =this.props;
         setkeycode(value);
+        const {leftkeycode} = this.state;
         //细班
-        getTreeList({},{field:'thinclass',no:value,section,paginate:false})
-        .then(rst => {
-            this.setThinClassOption(rst)
+        getTree({},{parent:leftkeycode})
+        .then((rst, index) => {
+            let thin = [];
+            let promises = rst.map(item => {
+                return getTree({}, {parent: item.No})
+            })
+            Promise.all(promises).then(rest => {
+                rest.map(items => {
+                    items.map(i => {
+                        if(i.Name.indexOf(value) !== -1) {
+                            let thinnames = {
+                                Name: i.Name,
+                            }
+                            thin.push(thinnames);
+                        }
+                    })
+                })
+                this.setThinClassOption(thin)
+            })
         })
     }
 
@@ -166,35 +203,63 @@ export default class Checkerinfo extends Component {
     
     //设置标段选项
     setSectionOption(rst){
-        if(rst instanceof Array){
-            let sectionoption = rst.map(item => {
-                return <Option key={item} value={item}>{item}</Option>
+         if(rst instanceof Array){
+            let sectionList = [];
+            let sectionOptions = [];
+            let sectionoption = rst.map((item, index) => {
+                if(item.Section) {
+                    let sections = item.Section;
+                    sectionList.push(sections);
+                }
             })
-            sectionoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({sectionoption})
+            let sectionData = [...new Set(sectionList)];
+            sectionData.sort();
+            sectionData.map(sec => {
+                sectionOptions.push(<Option key={sec} value={sec}>{sec}</Option>)
+            })
+            sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            this.setState({sectionoption: sectionOptions})
         }
     }
     //设置小班选项
     setSmallClassOption(rst){
         if(rst instanceof Array){
+            let smallclassList = [];
+            let smallclassOptions = [];
             let smallclassoption = rst.map(item => {
-                const {attrs} = item;
-                return <Option key={attrs.no} value={attrs.no}>{attrs.name}</Option>
+                if(item.Name) {
+                    let smalls = item.Name;
+                    smallclassList.push(smalls);
+                }
             })
-            smallclassoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({smallclassoption})
+            let smallclassData = [...new Set(smallclassList)];
+            smallclassData.sort();
+            smallclassData.map(small => {
+                smallclassOptions.push(<Option key={small} value={small}>{small}</Option>)
+            })
+            smallclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            this.setState({smallclassoption: smallclassOptions})
         }
     }
 
     // 设置细班选项
     setThinClassOption(rst){
         if(rst instanceof Array){
+            let thinclassList = [];
+            let thinclassOptions = [];
             let thinclassoption = rst.map(item => {
-                const {attrs} = item;
-                return <Option key={attrs.no} value={attrs.no}>{attrs.name}</Option>
+                if(item.Name) {
+                    let thins = item.Name;
+                    thinclassList.push(thins);
+                }
             })
-            thinclassoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({thinclassoption})
+            let thinclassData = [...new Set(thinclassList)];
+            thinclassData.sort();
+            thinclassData.map(thin => {
+                thinclassOptions.push(<Option key={thin} value={thin}>{thin}</Option>)
+            })
+            thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            this.setState({thinclassoption: thinclassOptions})
         }
     }
 
@@ -212,19 +277,32 @@ export default class Checkerinfo extends Component {
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
         
         //标段
-        getTreeList({},{field:'section',no:keycode,paginate:false})
+        getTree({},{parent:keycode})
         .then(rst => {
             this.setSectionOption(rst)
         })
+
         //小班
-        getTreeList({},{field:'smallclass',no:keycode,paginate:false})
+        getTree({},{parent:keycode})
         .then(rst => {
             this.setSmallClassOption(rst)
         })
+
         //细班
-        getTree({},{wptype:'子分部工程',no:keycode,paginate:false})
-        .then(rst => {
-            this.setThinClassOption(rst)
+        getTree({},{parent:keycode})
+        .then((rst, index) => {
+            let thin = [];
+            let promises = rst.map(item => {
+                return getTree({}, {parent: item.No})
+            })
+            Promise.all(promises).then(rest => {
+                rest.map(items => {
+                    items.map(i => {
+                        thin.push(i);
+                    })
+                })
+                this.setThinClassOption(thin)
+            })
         })
     }
     //树展开

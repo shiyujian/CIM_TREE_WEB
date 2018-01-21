@@ -20,7 +20,7 @@ export default class LocmeasureTable extends Component {
         	leftkeycode: '',
         	stime: moment().format('2017-11-23 00:00:00'),
 			etime: moment().format('2017-11-23 23:59:59'),
-			zzbm: '',
+			sxm: '',
     		section: '',
     		treety: '',
     		treetype: '',
@@ -67,6 +67,7 @@ export default class LocmeasureTable extends Component {
 		);
 	}
 	treeTable(details) {
+		console.log('details',details);
 		const {
 			treetypeoption,
 			sectionoption,
@@ -79,7 +80,7 @@ export default class LocmeasureTable extends Component {
 			locationoption,
 		} = this.props;
 		const {
-			zzbm, 
+			sxm, 
 			rolename,
 			section,
 			smallclass,
@@ -89,7 +90,7 @@ export default class LocmeasureTable extends Component {
 			status,
 			locationstatus,
 		} = this.state;
-		const suffix1 = zzbm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
+		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		let columns = [];
 		let header = '';
@@ -98,16 +99,16 @@ export default class LocmeasureTable extends Component {
 			dataIndex: 'order',
 		},{
 			title:"编码",
-			dataIndex: 'attrs.zzbm',
+			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
-			dataIndex: 'section',
+			dataIndex: 'Section',
 		},{
 			title:"位置",
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'treetype',
+			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"状态",
 			dataIndex: 'status',
@@ -254,7 +255,7 @@ export default class LocmeasureTable extends Component {
 					<Row >
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>编码：</span>
-							<Input suffix={suffix1} value={zzbm}  className='forestcalcw2 mxw100' onChange={this.zzbmchange.bind(this)}/>
+							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>标段：</span>
@@ -356,15 +357,15 @@ export default class LocmeasureTable extends Component {
 	}
 
 	emitEmpty1 = () => {
-	    this.setState({zzbm: ''});
+	    this.setState({sxm: ''});
   	}
 
   	emitEmpty2 = () => {
 	    this.setState({rolename: ''});
   	}
 
-	zzbmchange(value) {
-		this.setState({zzbm:value.target.value})
+	sxmchange(value) {
+		this.setState({sxm:value.target.value})
 	}
 
 	onsectionchange(value) {
@@ -397,8 +398,8 @@ export default class LocmeasureTable extends Component {
 
 	ontreetypechange(value) {
 		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.name == value)
-		this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''})
+		let treetype = treetypelist.find(rst => rst.TreeTypeNo == value)
+		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
     }
 
 	onstatuschange(value) {
@@ -475,7 +476,7 @@ export default class LocmeasureTable extends Component {
 
     qury(page) {
     	const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
     		treety = '',
     		treetype = '',
@@ -491,7 +492,7 @@ export default class LocmeasureTable extends Component {
     	const {actions: {getqueryTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
     		treety,
     		treetype,
@@ -511,31 +512,32 @@ export default class LocmeasureTable extends Component {
     		this.setState({loading:false,percent:100})
     		if(!rst)
     			return
-    		let tblData = rst.results;
+    		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
-	    			const {attrs = {}} = plan;
+	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
+	    			// let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
+	    			let place = '';
 	    			tblData[i].place = place;
 	    			let status = '';
-					if(attrs.supervisorcheck == -1)
+					if(plan.supervisorcheck == -1)
 						status = "待审批"
-					else if(attrs.supervisorcheck == 0) 
+					else if(plan.supervisorcheck == 0) 
 						status = "审批未通过"
 					else {
-						if(attrs.checkstatus == 0)
+						if(plan.checkstatus == 0)
 							status = "抽检不通过"
-						else if(attrs.checkstatus == 1)
+						else if(plan.checkstatus == 1)
 							status = "抽检通过"
-						else if(attrs.checkstatus == 2)
+						else if(plan.checkstatus == 2)
 							status = "抽检不通过后修改"
 						else {
 							status = "审批通过"
 						}
 					}
 					tblData[i].status = status;
-					let locationstatus = !!attrs.locationtime ? '已定位' : '未定位';
+					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
 					let createtime1 = !!plan.createtime ? moment(plan.createtime).utc().format('YYYY-MM-DD') : '/';
 					let createtime2 = !!plan.createtime ? moment(plan.createtime).utc().format('HH:mm:ss') : '/';
@@ -543,7 +545,7 @@ export default class LocmeasureTable extends Component {
 					tblData[i].createtime2 = createtime2;
 	    		})
 		    	const pagination = { ...this.state.pagination };
-				pagination.total = rst.total;
+				pagination.total = rst.pageinfo.total;
 				pagination.pageSize = size;
 				this.setState({ tblData,pagination:pagination });	
 	    	}
@@ -552,7 +554,7 @@ export default class LocmeasureTable extends Component {
 
 	exportexcel() {
 		const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
     		treety = '',
     		treetype = '',
@@ -568,7 +570,7 @@ export default class LocmeasureTable extends Component {
     	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
     		treety,
     		treetype,
@@ -644,7 +646,7 @@ export default class LocmeasureTable extends Component {
 							let bch = attrs.bch == 1 ? '有' : "无";
 		    				return [
 		    					++i,
-		    					attrs.zzbm || '/',
+		    					attrs.sxm || '/',
 		    					plan.section || '/',
 		    					place,
 		    					plan.treetype || '/',

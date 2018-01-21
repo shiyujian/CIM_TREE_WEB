@@ -198,12 +198,23 @@ export default class Nursoverallinfo extends Component {
             this.setSmallClassOption(smallclasses)
         })
         //细班
-        getTree({},{field:'thinclass',no:leftkeycode,section:value,paginate:false})
-        .then(rst => {
-            this.setThinClassOption(rst)
+        getTree({},{parent:leftkeycode})
+        .then((rst, index) => {
+            let thin = [];
+            let promises = rst.map(item => {
+                return getTree({}, {parent: item.No})
+            })
+            Promise.all(promises).then(rest => {
+                rest.map(items => {
+                    items.map(i => {
+                        thin.push(i);
+                    })
+                })
+                this.setThinClassOption(thin)
+            })
         })
         //树种
-        getTreeList({},{field:'treetype',no:leftkeycode,section:value,treety,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -213,13 +224,30 @@ export default class Nursoverallinfo extends Component {
     smallclassselect(value,treety,section) {
         const {actions:{setkeycode,getTree,getTreeList}} =this.props;
         setkeycode(value);
+        const {leftkeycode} = this.state;
         //细班
-        getTreeList({},{field:'thinclass',no:value,section,paginate:false})
-        .then(rst => {
-            this.setThinClassOption(rst)
+        getTree({},{parent:leftkeycode})
+        .then((rst, index) => {
+            let thin = [];
+            let promises = rst.map(item => {
+                return getTree({}, {parent: item.No})
+            })
+            Promise.all(promises).then(rest => {
+                rest.map(items => {
+                    items.map(i => {
+                        if(i.Name.indexOf(value) !== -1) {
+                            let thinnames = {
+                                Name: i.Name,
+                            }
+                            thin.push(thinnames);
+                        }
+                    })
+                })
+                this.setThinClassOption(thin)
+            })
         })
         //树种
-        getTreeList({},{field:'treetype',no:value,treety,section,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -230,7 +258,7 @@ export default class Nursoverallinfo extends Component {
         const {actions:{setkeycode,getTreeList}} =this.props;
         setkeycode(value);
         //树种
-        getTreeList({},{field:'treetype',no:value,treety,section,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -241,7 +269,7 @@ export default class Nursoverallinfo extends Component {
         const {actions:{setkeycode,getTreeList}} =this.props;
         this.setState({treety:value})
         //树种
-        getTreeList({},{field:'treetype',no:keycode,treety:value,section,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -292,7 +320,6 @@ export default class Nursoverallinfo extends Component {
             smallclassData.sort();
             smallclassData.map(small => {
                 smallclassOptions.push(<Option key={small} value={small}>{small}</Option>)
-                // console.log('smallclassOptions',smallclassOptions)
             })
             smallclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({smallclassoption: smallclassOptions})
@@ -301,7 +328,6 @@ export default class Nursoverallinfo extends Component {
 
     // 设置细班选项
     setThinClassOption(rst){
-        console.log('rst',rst)
         if(rst instanceof Array){
             let thinclassList = [];
             let thinclassOptions = [];
@@ -311,17 +337,43 @@ export default class Nursoverallinfo extends Component {
                     thinclassList.push(thins);
                 }
             })
-            console.log('thinclassList',thinclassList)
             let thinclassData = [...new Set(thinclassList)];
             thinclassData.sort();
             thinclassData.map(thin => {
                 thinclassOptions.push(<Option key={thin} value={thin}>{thin}</Option>)
-                console.log('thinclassOptions',thinclassOptions)
             })
             thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({thinclassoption: thinclassOptions})
         }
     }
+    //截取后的细班
+    // setThinClassOption(rst){
+    //     console.log('rst',rst)
+    //     if(rst instanceof Array){
+    //         let thinclassList = [];
+    //         let thinclassOptions = [];
+    //         let thinData = [];
+    //         let thinclassoption = rst.map(item => {
+    //             if(item.Name) {
+    //                 let thins = item.Name;
+    //                 thinclassList.push(thins);
+    //             }
+    //         })
+            
+    //         thinclassList.map(items => {
+    //             thinData.push(items.substr((items.indexOf('班') + 1)))
+    //         })
+    //         console.log('thinData',thinData)
+    //         let thinclassData = [...new Set(thinData)];
+    //         thinclassData.sort();
+    //         thinclassData.map(thin => {
+    //             thinclassOptions.push(<Option key={thin} value={thin}>{thin}</Option>)
+    //             // console.log('thinclassOptions',thinclassOptions)
+    //         })
+    //         thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+    //         this.setState({thinclassoption: thinclassOptions})
+    //     }
+    // }
 
     //重置
     resetinput(leftkeycode) {
@@ -348,22 +400,6 @@ export default class Nursoverallinfo extends Component {
         .then(rst => {
             this.setSmallClassOption(rst)
         })
-
-        //细班
-        // getTree({},{parent:keycode})
-        // .then((rst, index) => {
-        //     let thin = [];
-        //     let promises = rst.map(item => {
-        //         return getTree({}, {parent: item.No})
-        //     })
-        //     Promise.all(promises).then(rst => {
-        //         console.log('rstpromise',rst)
-        //         rest.map(items => {
-        //             thin.push(items)
-        //         })
-        //     })
-        //     this.setThinClassOption(thin)
-        // })
 
         //细班
         getTree({},{parent:keycode})

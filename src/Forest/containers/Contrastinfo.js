@@ -147,7 +147,7 @@ export default class Contrastinfo extends Component {
         const {leftkeycode} = this.state;
         setkeycode(leftkeycode)
         //树种
-        getTreeList({},{field:'treetype',no:leftkeycode,section:value,treety,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -157,7 +157,7 @@ export default class Contrastinfo extends Component {
     typeselect(value,keycode,section){
         const {actions:{setkeycode,getTreeList}} =this.props;
         //树种
-        getTreeList({},{field:'treetype',no:keycode,treety:value,section,paginate:false})
+        getTreeList()
         .then(rst => {
             this.setTreeTypeOption(rst)
         })
@@ -166,11 +166,21 @@ export default class Contrastinfo extends Component {
      //设置标段选项
     setSectionOption(rst){
         if(rst instanceof Array){
-            let sectionoption = rst.map(item => {
-                return <Option key={item} value={item}>{item}</Option>
+            let sectionList = [];
+            let sectionOptions = [];
+            let sectionoption = rst.map((item, index) => {
+                if(item.Section) {
+                    let sections = item.Section;
+                    sectionList.push(sections);
+                }
             })
-            sectionoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({sectionoption})
+            let sectionData = [...new Set(sectionList)];
+            sectionData.sort();
+            sectionData.map(sec => {
+                sectionOptions.push(<Option key={sec} value={sec}>{sec}</Option>)
+            })
+            sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            this.setState({sectionoption: sectionOptions})
         }
     }
 
@@ -200,14 +210,16 @@ export default class Contrastinfo extends Component {
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
         
         //标段
-        getTreeList({},{field:'section',no:keycode,paginate:false})
+        getTree({},{parent:keycode})
         .then(rst => {
             this.setSectionOption(rst)
         })
         //树种
-        gettreetype({},{no:keycode,paginate:false})
+        gettreetype()
         .then(rst => {
-            this.setTreeTypeOption(rst)
+            if(rst instanceof Array){
+                this.setTreeTypeOption(rst)
+            }
         })
     }
     //树展开

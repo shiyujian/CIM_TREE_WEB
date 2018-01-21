@@ -15,10 +15,11 @@ export const changeNursery = createAction(`${ID}传递nurseryName`);
 /*****************************院内************************/
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
-export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/trees/analyse/`, []);
+export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/tree/factoryAnalyse`, []);
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys/`, []);
+export const getNurserysTree = createFetchAction(`${FOREST_API}/tree/treenurserys`, []);
 export const getqueryTree = createFetchAction(`${FOREST_API}/tree/queryTree`, []);
-export const getexportTree = createFetchAction(`${FOREST_API}/tree/xlsx/`, [],'POST');
+export const getexportTree = createFetchAction(`${FOREST_API}/tree/exportFactoryAnalyseInfo`, []);
 export const getTreeList = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
 export const getNurserysCount = createFetchAction(`${FOREST_API}/tree/nurserys/count/`, []);
 export const getNurserysCountFast = createFetchAction(`${FOREST_API}/tree/nurserys/count/fast/`, []);
@@ -34,11 +35,11 @@ export const getCountSmall = createFetchAction(`${FOREST_API}/trees/count/small/
 export const getCountThin = createFetchAction(`${FOREST_API}/trees/count/thin/`, []);
 export const getHonesty = createFetchAction(`${FOREST_API}/trees/honesty/`, []);
 export const getHonestyNursery = createFetchAction(`${FOREST_API}/trees/honesty/nursery/`, []);
-export const getHonestyNew = createFetchAction(`${FOREST_API}/trees/honesty/new/fast/`, []);
+export const getHonestyNew = createFetchAction(`${FOREST_API}/tree/factoryAnalyseInfo`, []);
 export const getHonestyNewSort = createFetchAction(`${FOREST_API}/trees/honesty/new/fast/?sort=true`, []);
 export const postFile = createFetchAction(`${FOREST_API}/db/import_location/`, [], 'POST');
 export const getHonestyNewDetailOk = createAction(`${ID}存储返回的详情`);
-export const getHonestyNewDetail = createFetchAction(`${FOREST_API}/trees/honesty/new/?nurseryname={{name}}&detail=true`, [getHonestyNewDetailOk], 'GET');
+export const getHonestyNewDetail = createFetchAction(`${FOREST_API}/tree/factoryAnalyseDetailInfo?factory={{name}}`, [getHonestyNewDetailOk], 'GET');
 export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/honesty/new/?detail=true`, []);
 export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/trees/honesty/nursery/treetype/`, '');
 export const clearList = createAction(`${ID}清空列表`);
@@ -51,6 +52,7 @@ export const actions = {
 	getfactoryAnalyse,
 	getnurserys,
 	getqueryTree,
+	getNurserysTree,
 	getexportTree,
 	getTreeList,
 	getNurserysCount,

@@ -29,6 +29,7 @@ export default class FaithModal extends Component {
 
     componentWillReceiveProps(nextProps) {
         const {honestyList = []} = nextProps;
+        console.log('honestyList',honestyList)
         if(honestyList.length != 0){
             this.setState({
                 loading1:false
@@ -47,12 +48,11 @@ export default class FaithModal extends Component {
             honestyList = [],
             nurseryName =  ""
 		} = this.props;
+        console.log('this.props',this.props)
         let newList = [];
-        honestyList.map((item) => {
-            item.map((it,index)=>{
-                it.order = index + 1;
-                newList.push(it);
-            })
+        honestyList.map((item,index) => {
+                item.order = index + 1;
+                newList.push(item);
         })
 		return (
 			<Modal
@@ -92,13 +92,13 @@ export default class FaithModal extends Component {
 			dataIndex: 'order',
 		},{
 			title:"标段",
-			dataIndex: 'section',
+			dataIndex: 'Section',
 		},{
 			title:"树种",
-			dataIndex: 'treetype',
+			dataIndex: 'TreeTypeName',
 		},{
 			title:"诚信度",
-			dataIndex: 'integrity',
+			dataIndex: 'Sincerity',
 		}];
 
 	hideModal() {
