@@ -512,8 +512,8 @@ class NewsTable extends Component {
 			render: record => {
 				return (
 					<span>
-						{/* <a onClick={this.clickNews.bind(this, record, 'PUBLISH')}>发布</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp; */}
+						<a onClick={this.clickNews.bind(this, record, 'PUBLISH')}>发布</a>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
