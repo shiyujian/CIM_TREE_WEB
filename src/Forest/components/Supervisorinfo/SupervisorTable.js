@@ -333,9 +333,7 @@ export default class SupervisorTable extends Component {
 	    		tblData.forEach((plan, i) => {
 	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			// let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-	    			let place = '';
-	    			tblData[i].place = place;
+	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;	    			tblData[i].place = place;
 	    			let status = '';
 					if(plan.supervisorcheck == -1)
 						status = "待审批"
@@ -364,102 +362,32 @@ export default class SupervisorTable extends Component {
 		const {
     		sxm = '',
     		section = '',
-    		supervisorcheck = '',
+    		// supervisorcheck = '',
     		role = '',
     		rolename = '',
     		stime = '',
     		etime = '',
     		exportsize,
     	} = this.state;
-    	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
+    	const {actions: {getqueryTree,getexportTree4Supervisor},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
     		sxm,
     		section,
-    		supervisorcheck,
+    		// supervisorcheck,
     		stime:stime&&moment(stime).add(8, 'h').unix(),
     		etime:etime&&moment(etime).add(8, 'h').unix(),
     		page:1,
-    		per_page:exportsize
+    		size:exportsize
     	}
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})
-    	getqueryTree({},postdata)
-    	.then(result => {
-    		let rst = result.results;
-    		let total = result.pages;
-    		this.setState({percent:parseFloat((100/total).toFixed(2)),num:1});
-    		if(total !== undefined) {
-    			let all = [Promise.resolve(rst)];
-    			for(let i=2; i<=total; i++)
-                {
-                	postdata.page = i;
-                    all.push(getqueryTree({},postdata)
-                        .then(rst1 => {
-                            let {num} = this.state;
-                            num++;
-                            this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
-                            if(!rst1) {
-                            	message.error(`数据获取失败,丢失100条数据`)
-				    			return []
-				    		} else {
-                            	return rst1.results
-                            }
-                        }))
-                }
-    			Promise.all(all)
-                .then(rst2 => {
-                    if(!rst2) {
-                    	this.setState({loading:false})
-		    			return
-		    		}
-		    		let allData = rst2.reduce((a,b) => {
-                        return a.concat(b)
-                    })
-		    		if(allData instanceof Array) {
-		    			let data = allData.map((plan, i) => {
-		    				const {attrs = {}}= plan;
-		    				let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-		    				let status = '';
-							if(attrs.supervisorcheck == -1)
-								status = "待审批"
-							else if(attrs.supervisorcheck == 0) 
-								status = "审批未通过"
-							else {
-								status = "审批通过"
-							}
-							let locationstatus = !!attrs.locationtime ? '已定位' : '未定位';
-							let yssj = !!attrs.yssj ? moment(attrs.yssj).format('YYYY-MM-DD HH:mm:ss') : '/';
-		    				return [
-		    					++i,
-		    					attrs.sxm || '/',
-		    					plan.section || '/',
-		    					place,
-		    					plan.treetype || '/',
-		    					attrs.supervisor || '/',
-		    					status,
-		    					locationstatus,
-		    					attrs.supervisorinfo || '/',
-		    					yssj,
-		    				]
-		    			})
-			    		const postdata = {
-			    			keys: ["序号", "编码", "标段", "位置", "树种", "监理人", "状态", "定位", "状态信息", "状态时间"],
-			    			values: data
-			    		}
-			    		getexportTree({},postdata)
-			    		.then(rst3 => {
-			    			this.setState({loading:false})
-			    			let url = `${FOREST_API}/${rst3.file_path}`
-							this.createLink("excel_link", url);
-			    		})
-                    } else {
-                    	this.setState({loading:false})
-                    }
-    		    })
-    		}
-    	})
+    	getexportTree4Supervisor({},postdata)
+		.then(rst3 => {
+			this.setState({loading:false})
+			window.location.href = `${FOREST_API}/${rst3}`
+		})
 	}
 
 	createLink(name,url) {

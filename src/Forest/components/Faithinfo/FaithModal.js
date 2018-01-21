@@ -23,7 +23,7 @@ export default class FaithModal extends Component {
     		treetypename: '',
     		integrity: '',
     		percent:0,
-    		nurseryname: '',
+    		factory: '',
 		}
 	}
 
@@ -113,44 +113,20 @@ export default class FaithModal extends Component {
             integrity = '',
         } = this.state;
         const {
-            actions: {getHonestyNewDetailModal, getexportTree},
+            actions: {getHonestyNewDetailModal, getexportFactoryAnalyseDetailInfo},
             keycode = '',
             nurseryName = '',
         } = this.props;
         
         let postdata = {
-            nurseryname: nurseryName
+            factory: nurseryName
         }
         this.setState({loading:true,percent:0})
-        getHonestyNewDetailModal({}, postdata)
-        .then(result => {
-            if(!result) {
-                this.setState({loading:false,percent:100})
-                return
-            }
-            if(result instanceof Array) {
-                let data = result[0].map((plan, i) => {
-                    return [
-                        ++i,
-                        plan.section || '/',
-                        plan.treetype || '/',
-                        plan.integrity || '',
-                    ]
-                })
-                const postdata = {
-                    keys: ["序号", "标段", "树种" , "诚信度"],
-                    values: data
-                }
-                getexportTree({},postdata)
+        getexportFactoryAnalyseDetailInfo({},postdata)
                 .then(rst3 => {
                     this.setState({loading:false,percent:100})
-                    let url = `${FOREST_API}/${rst3.file_path}`
-                    this.createLink("excel_link", url);
+                    window.location.href = `${FOREST_API}/${rst3}`
                 })
-            } else {
-                this.setState({loading:false,percent:100})
-            }
-        })
     }
 
 	createLink(name,url) {

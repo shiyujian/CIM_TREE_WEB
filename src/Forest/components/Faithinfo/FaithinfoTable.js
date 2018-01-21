@@ -258,7 +258,7 @@ export default class FaithinfoTable extends Component {
     		treety = '',
 
     	} = this.state;
-    	const {actions: {getHonestyNew,getexportTree},keycode = ''} = this.props;
+    	const {actions: {getHonestyNew,getexportFactoryAnalyseInfo},keycode = ''} = this.props;
     	let postdata = {
     		treetype,
     		integrity,
@@ -267,11 +267,11 @@ export default class FaithinfoTable extends Component {
     		treety,
     	}
     	this.setState({loading:true,percent:0})
-    	getexportTree({},postdata)
+    	getexportFactoryAnalyseInfo({},postdata)
 		.then(rst3 => {
 			console.log('rst3',rst3)
-			this.setState({loading:false,percent:100})
 			window.location.href = `${FOREST_API}/${rst3}`
+			this.setState({loading:false,percent:100})
 		})
 	}
 

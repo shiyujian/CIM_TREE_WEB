@@ -37,12 +37,20 @@ export default class SendPage1 extends Component {
 	}
 	_sentDoc(){
 		const {actions:{toggleModalAc}}=this.props;
-		toggleModalAc(true)
+		toggleModalAc({
+			type: 'NEWS',
+			status: 'ADD',
+			visible: true,
+			editData: null
+		})
 	}
 	render() {
 		const {
 			sendInfo={},
-			visible=false,
+			toggleData: toggleData = {
+				type: 'NEWS',
+				visible: false,
+			},
 		} = this.props;
 		const {notifications=[]}=sendInfo;
 		const {showInfo = {}} = this.state;
@@ -58,7 +66,7 @@ export default class SendPage1 extends Component {
 						   rowKey="_id"
 					/>
 				</Col>
-				{visible && <ToggleModal {...this.props}/>}
+				{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props}/>}
 				<Modal
 					title="查看详情"
 					width="90%"
