@@ -20,7 +20,7 @@ export default class NursmeasureTable extends Component {
         	leftkeycode: '',
         	stime: moment().format('2017-11-23 00:00:00'),
 			etime: moment().format('2017-11-23 23:59:59'),
-			zzbm: '',
+			sxm: '',
     		section: '',
     		treety: '',
     		treetype: '',
@@ -67,6 +67,7 @@ export default class NursmeasureTable extends Component {
 		);
 	}
 	treeTable(details) {
+		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -76,7 +77,7 @@ export default class NursmeasureTable extends Component {
 			statusoption,
 		} = this.props;
 		const {
-			zzbm, 
+			sxm, 
 			rolename, 
 			factory, 
 			treeplace, 
@@ -87,7 +88,7 @@ export default class NursmeasureTable extends Component {
 			status,
 		} = this.state;
 		console.log('state', this.state)
-		const suffix1 = zzbm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
+		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		const suffix3 = factory ? <Icon type="close-circle" onClick={this.emitEmpty3} /> : null;
 		const suffix4 = treeplace ? <Icon type="close-circle" onClick={this.emitEmpty4} /> : null;
@@ -99,25 +100,25 @@ export default class NursmeasureTable extends Component {
 			dataIndex: 'order',
 		},{
 			title:"编码",
-			dataIndex: 'zzbm',
+			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
-			dataIndex: 'section',
+			dataIndex: 'BD',
 		},{
 			title:"树种",
-			dataIndex: 'treetype',
+			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"产地",
-			dataIndex: 'treeplace',
+			dataIndex: 'TreePlace',
 		},{
 			title:"供苗商",
-			dataIndex: 'factory',
+			dataIndex: 'Factory',
 		},{
 			title:"苗圃名称",
-			dataIndex: 'nurseryname',
+			dataIndex: 'NurseryName',
 		},{
 			title:"填报人",
-			dataIndex: 'inputer',
+			dataIndex: 'Inputer',
 		},{
 			title:"起苗时间",
 			render: (text,record) => {
@@ -130,9 +131,8 @@ export default class NursmeasureTable extends Component {
 		},{
 			title:<div><div>树高</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.gd != 0)
-					return <a disabled={!attrs.gdfj} onClick={this.onImgClick.bind(this,attrs.gdfj)}>{attrs.gd}</a>
+				if(record.GD != 0)
+					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
 				else {
 					return <span>/</span>
 				}
@@ -140,9 +140,8 @@ export default class NursmeasureTable extends Component {
 		},{
 			title:<div><div>胸径</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.xj != 0)
-					return <a disabled={!attrs.xjfj} onClick={this.onImgClick.bind(this,attrs.xjfj)}>{attrs.xj}</a>
+				if(record.XJ != 0)
+					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
 				else {
 					return <span>/</span>
 				}
@@ -150,9 +149,8 @@ export default class NursmeasureTable extends Component {
 		},{
 			title:<div><div>冠幅</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.gf != 0)
-					return <a disabled={!attrs.gffj} onClick={this.onImgClick.bind(this,attrs.gffj)}>{attrs.gf}</a>
+				if(record.GF != 0)
+					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
 				else {
 					return <span>/</span>
 				}
@@ -160,9 +158,8 @@ export default class NursmeasureTable extends Component {
 		},{
 			title:<div><div>地径</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.dj != 0)
-					return <a disabled={!attrs.djfj} onClick={this.onImgClick.bind(this,attrs.djfj)}>{attrs.dj}</a>
+				if(record.DJ != 0)
+					return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
 				else {
 					return <span>/</span>
 				}
@@ -171,9 +168,8 @@ export default class NursmeasureTable extends Component {
 			title:<div><div>土球高度</div><div>(cm)</div></div>,
 			dataIndex: 'tqhd',
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.tqhd != 0)
-					return <a disabled={!attrs.tqhdfj} onClick={this.onImgClick.bind(this,attrs.tqhdfj)}>{attrs.tqhd}</a>
+				if(record.TQHD != 0)
+					return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
 				else {
 					return <span>/</span>
 				}
@@ -182,9 +178,8 @@ export default class NursmeasureTable extends Component {
 			title:<div><div>土球直径</div><div>(cm)</div></div>,
 			dataIndex: 'tqzj',
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.tqzj != 0)
-					return <a disabled={!attrs.tqzjfj} onClick={this.onImgClick.bind(this,attrs.tqzjfj)}>{attrs.tqzj}</a>
+				if(record.TQZJ != 0)
+					return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
 				else {
 					return <span>/</span>
 				}
@@ -194,7 +189,7 @@ export default class NursmeasureTable extends Component {
 					<Row >
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>编码：</span>
-							<Input suffix={suffix1} value={zzbm}  className='forestcalcw2 mxw100' onChange={this.zzbmchange.bind(this)}/>
+							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>标段：</span>
@@ -298,7 +293,7 @@ export default class NursmeasureTable extends Component {
 	}
 
 	emitEmpty1 = () => {
-	    this.setState({zzbm: ''});
+	    this.setState({sxm: ''});
   	}
 
   	emitEmpty2 = () => {
@@ -317,8 +312,8 @@ export default class NursmeasureTable extends Component {
 	    this.setState({nurseryname: ''});
   	}
 
-	zzbmchange(value) {
-		this.setState({zzbm:value.target.value})
+	sxmchange(value) {
+		this.setState({sxm:value.target.value})
 	}
 
 	onsectionchange(value) {
@@ -425,7 +420,7 @@ export default class NursmeasureTable extends Component {
 
     qury(page) {
     	const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
     		treety = '',
     		treetype = '',
@@ -444,7 +439,7 @@ export default class NursmeasureTable extends Component {
     	const {actions: {getnurserys},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
     		treety,
     		treetype,
@@ -454,7 +449,7 @@ export default class NursmeasureTable extends Component {
     		liftime_min:stime&&moment(stime).add(8, 'h').unix(),
     		liftime_max:etime&&moment(etime).add(8, 'h').unix(),
     		page,
-    		per_page:size,
+    		size,
     		supervisorcheck,
     		checkstatus,
     		status,
@@ -467,7 +462,7 @@ export default class NursmeasureTable extends Component {
     		this.setState({loading:false,percent:100})
     		if(!rst)
     			return
-    		let tblData = rst.results;
+    		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
 	    			let status = plan.status;
@@ -483,11 +478,11 @@ export default class NursmeasureTable extends Component {
 	    				status = '未种植'
 	    			tblData[i].status = status;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			tblData[i].liftertime1 = !!plan.liftertime ? moment(plan.liftertime).utc().format('YYYY-MM-DD') : '/';
-					tblData[i].liftertime2 = !!plan.liftertime ? moment(plan.liftertime).utc().format('HH:mm:ss') : '/';
+	    			tblData[i].liftertime1 = !!plan.LifterTime ? moment(plan.LifterTime).utc().format('YYYY-MM-DD') : '/';
+					tblData[i].liftertime2 = !!plan.LifterTime ? moment(plan.LifterTime).utc().format('HH:mm:ss') : '/';
 	    		})
 		    	const pagination = { ...this.state.pagination };
-				pagination.total = rst.total;
+				pagination.total = rst.pageinfo.total;
 				pagination.pageSize = size;
 				this.setState({ tblData,pagination });	
 	    	}
@@ -496,7 +491,7 @@ export default class NursmeasureTable extends Component {
 
 	exportexcel() {
 		const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
     		treety = '',
     		treetype = '',
@@ -510,10 +505,10 @@ export default class NursmeasureTable extends Component {
     		exportsize,
     		status = '',
     	} = this.state;
-    	const {actions: {getnurserys,getexportTree},keycode = ''} = this.props;
+    	const {actions: {getnurserys,getexportNurserys},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
     		treety,
     		treetype,
@@ -523,94 +518,17 @@ export default class NursmeasureTable extends Component {
     		liftime_min:stime&&moment(stime).add(8, 'h').unix(),
     		liftime_max:etime&&moment(etime).add(8, 'h').unix(),
     		page: 1,
-    		per_page: exportsize,
+    		size: exportsize,
     		status,
     	}
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})
-    	getnurserys({},postdata)
-    	.then(result => {
-    		let rst = result.results;
-    		let total = result.pages;
-    		this.setState({percent:parseFloat((100/total).toFixed(2)),num:1});
-    		if(total !== undefined) {
-    			let all = [Promise.resolve(rst)];
-    			for(let i=2; i<=total; i++)
-                {
-                	postdata.page = i;
-                    all.push(getnurserys({},postdata)
-                        .then(rst1 => {
-                            let {num} = this.state;
-                            num++;
-                            this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
-                            if(!rst1) {
-                            	message.error(`数据获取失败,丢失100条数据`)
-				    			return []
-				    		} else {
-                            	return rst1.results
-                            }
-                        }))
-                }
-    			Promise.all(all)
-                .then(rst2 => {
-                    if(!rst2) {
-                    	this.setState({loading:false})
-		    			return
-		    		}
-		    		let allData = rst2.reduce((a,b) => {
-                        return a.concat(b)
-                    })
-		    		if(allData instanceof Array) {
-		    			let data = allData.map((plan, i) => {
-		    				const {attrs = {}}= plan;
-		    				let liftertime = !!plan.liftertime ? moment(plan.liftertime).utc().format('YYYY-MM-DD HH:mm:ss') : '/';
-		    				let status = plan.status;
-			    			if(postdata.status === '0') 
-			    				status = '已种植'
-			    			else if(postdata.status === '1')
-			    				status = '监理退回'
-			    			else if(postdata.status === '2')
-			    				status = '业主退回'
-			    			else if(postdata.status === '3')
-			    				status = '进场退回'
-			    			else
-			    				status = '未种植'
-		    				return [
-		    					++i,
-		    					plan.zzbm || '/',
-		    					plan.section || '/',
-		    					plan.treetype || '/',
-		    					plan.treeplace || '/',
-		    					plan.factory || '/',
-		    					plan.nurseryname || '/',
-		    					plan.inputer || '/',
-		    					liftertime,
-		    					plan.status = status,
-		    					attrs.gd || '/',
-		    					attrs.xj || '/',
-		    					attrs.gf || '/',
-		    					attrs.dj || '/',
-		    					attrs.tqhd || '/',
-		    					attrs.tqzj || '/',
-		    				]
-		    			})
-			    		const postdata1 = {
-			    			keys: ["序号", "编码", "标段", "树种", "产地","供苗商", "苗圃名称", "填报人","起苗时间","状态","树高（cm）", "胸径（cm）", "冠幅（cm）", "地径（cm）", "土球高度（cm）", "土球直径（cm）"],
-			    			values: data
-			    		}
-			    		getexportTree({},postdata1)
-			    		.then(rst3 => {
-			    			this.setState({loading:false})
-			    			let url = `${FOREST_API}/${rst3.file_path}`
-							this.createLink("excel_link", url);
-			    		})
-                    } else {
-                    	this.setState({loading:false})
-                    }
-    		    })
-    		}
-    	})
+    	getexportNurserys({},postdata)
+		.then(rst3 => {
+			window.location.href = `${FOREST_API}/${rst3}`
+			this.setState({loading:false})
+		})
 	}
 
 	createLink(name,url) {
