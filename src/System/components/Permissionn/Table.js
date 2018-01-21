@@ -1,17 +1,13 @@
 import React, {Component} from 'react';
-import {Table, Checkbox, Button, Switch,Row,Col} from 'antd';
+import {Table, Checkbox, Button, Switch} from 'antd';
 import { MODULES, MODULES2} from '_platform/api';
 import Card from '_platform/components/panels/Card';
 import {getUser} from '_platform/auth';
-
-
 export default class PermissionTable extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			userLogin:"",
-			indeterminate:false
-
+			userLogin:""
 		}
 	}
 	static propTypes = {};
@@ -33,102 +29,13 @@ export default class PermissionTable extends Component {
 		} = this.props;
 		return (
 			<div>
-				<Row>
-                   <Col span={24}>
-                    <p style={{marginLeft:'10'}}>权限设置</p>
-                    <div style={{borderBottom: 'solid 1px #999', paddingBottom: 5, marginBottom: 20}}>
-                    </div>
-                   </Col> 
-               </Row>
-               <Row>
-                   <Col span={24} style={{marginLeft:'60',width:'90%'}}>
-                    {
-                    	userPermi.map((item,index)=>{
-                    		const {table: {editing, permissions = []} = {}} = this.props;
-							const key = `appmeta.${item.id}.READ`;
-							// permissions里面是当前用户拥有的所有的权限
-							const value = permissions.some(permission => permission === key);
-                    		console.log('item.children',item.children)
-                    		return <div>
-								{
-									index%2==0?
-									<div style={{background:'#99FFFF',height:'100'}}>
-									  <div style={{paddingLeft:'20px',paddingTop:'2px'}}>
-								          <Checkbox
-								            indeterminate={this.state.indeterminate}
-								            checked={value}
-								            disabled={!editing}
-								            onChange={this.check.bind(this, key)}
-								          >
-								            {item.name}
-								          </Checkbox>
-							          </div>
-							          <br/>
-							          {
-								          	item.children && item.children.map((element)=>{
-								          		const {table: {editing, permissions = []} = {}} = this.props;
-												const key = `appmeta.${element.id}.READ`;
-												// permissions里面是当前用户拥有的所有的权限
-												const value = permissions.some(permission => permission === key);
-								          		return <div style={{paddingLeft:'40px',float:'left'}}>
-												          <Checkbox
-												            indeterminate={this.state.indeterminate}
-												            checked={value}
-												            disabled={!editing}
-												            onChange={this.check.bind(this, key)}
-												           >
-												            {element.name}
-												          </Checkbox>
-													   </div>
-								          	})
-							          }
-							        </div>
-							        :<div style={{height:'100'}}>
-									  <div style={{paddingLeft:'20px',paddingTop:'2px'}}>
-								          <Checkbox
-								            indeterminate={this.state.indeterminate}
-								            checked={value}
-								            disabled={!editing}
-								            onChange={this.check.bind(this, key)}
-								          >
-								            {item.name}
-								          </Checkbox>
-							          </div>
-							          <br/>
-							          {
-								          	item.children && item.children.map((element)=>{
-								          		const {table: {editing, permissions = []} = {}} = this.props;
-												const key = `appmeta.${element.id}.READ`;
-												// permissions里面是当前用户拥有的所有的权限
-												const value = permissions.some(permission => permission === key);
-								          		return <div style={{paddingLeft:'40px',float:'left'}}>
-												          <Checkbox
-												            indeterminate={this.state.indeterminate}
-												            checked={value}
-												            disabled={!editing}
-												            onChange={this.check.bind(this, key)}
-												           >
-												            {element.name}
-												          </Checkbox>
-													   </div>
-								          	})
-							          }
-							        </div>
-								}
-							</div>
-                    	}) 
-                    }
-                   </Col> 
-               </Row>
-                <Row>
-                   <Col span={24} style={{marginLeft:'60',marginTop:'10', width:'90%', textAlign:'center'}}>
-                   		<div >
-                   			<Button type="primary" onClick={changeTableField.bind(this, 'editing', true)} >修改</Button>
-                   			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						    <Button type="primary" ghost onClick={this.save.bind(this)} >保存</Button>
-                   		</div>
-                   </Col>
-                </Row>		
+				<Card title="权限详情" extra={
+					<div>
+						{editing || <Button type="primary" ghost onClick={changeTableField.bind(this, 'editing', true)}>编辑</Button>}
+						{editing && <Button type="primary" onClick={this.save.bind(this)}>保存</Button>}
+					</div>}>
+					<Table showLine columns={this.columns} dataSource={userPermi} bordered pagination={false} rowKey="id"/>
+				</Card>
 			</div>);
 	}
 	componentDidMount(){
@@ -188,6 +95,24 @@ export default class PermissionTable extends Component {
 		changeTableField('permissions', rst);
 	}
 
+	columns = [{
+		title: '模块',
+		dataIndex: 'name',
+		width: '50%',
+	}
+	, {
+		title: '是否可见',
+		width: '25%',
+		render: (item) => {
+			console.log('item',item)
+			const {table: {editing, permissions = []} = {}} = this.props;
+			const key = `appmeta.${item.id}.READ`;
+			// permissions里面是当前用户拥有的所有的权限
+			const value = permissions.some(permission => permission === key);
+			return <Switch checked={value} disabled={!editing} checkedChildren="开" unCheckedChildren="关" onChange={this.check.bind(this, key)}/>
+		}
+	}
+    ];
 	static loop = (MODULES, permissions = []) => {
 		return MODULES.map(module => {
 			const {children = []} = module || {};
@@ -197,4 +122,5 @@ export default class PermissionTable extends Component {
 			return module;
 		});
 	}
+
 }

@@ -2,6 +2,7 @@ import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import weeklyReducer, {actions as weeklyActions} from './weekly';
 import newsReducer, {actions as newsActions} from './news';
+import materialReducer, {actions as materialActions} from './material';
 import attendReducer, {actions as attendActions} from './attend';
 import packageReducer, {actions as packageActions} from './package';
 import docDispatchReducer, {actions as docDispatchActions} from './docdispatch';
@@ -17,6 +18,9 @@ export default handleActions({
 	},
 	[combineActions(...actionsMap(newsActions))]: (state, action) => {
 		return {...state, news: newsReducer(state.news, action)};
+	},
+	[combineActions(...actionsMap(materialActions))]: (state, action) => {
+		return {...state, material: materialReducer(state.material, action)};
 	},
 	[combineActions(...actionsMap(attendActions))]: (state, action) => {
 		return {...state, attend: attendReducer(state.attend, action)};

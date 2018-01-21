@@ -17,7 +17,7 @@ export default class Overall extends Component {
 	}
 
 	render() {
-		const {Package, News, News1, Attend, Dispatch, Approval,Receipt} = this.state || {};
+		const {Package, News, News1, Attend, Dispatch,Material,Form, Approval,Receipt} = this.state || {};
 		return (
 			<Body>
 			<Aside>
@@ -28,6 +28,8 @@ export default class Overall extends Component {
 				{News && <Route path="/overall/news" component={News}/>}
 				{/* {News1 && <Route path="/overall/news1" component={News1}/>} */}
 				{Receipt && <Route path="/overall/receipt" component={Receipt}/>}
+				{Material && <Route path="/overall/material" component={Material}/>}
+				{Form && <Route path="/overall/form" component={Form}/>}
 				{Attend && <Route path="/overall/attend" component={Attend}/>}
 				{/* {Approval && <Route path="/overall/approval" component={Approval}/>} */}
 				{/*Package && <Route exact path="/overall/:id?" component={Package}/>*/}
@@ -48,6 +50,19 @@ export default class Overall extends Component {
 		name: '现场收发文',
 		icon: <Icon name="newspaper-o"/>,
 	},{
+		key: 'material',
+		id: 'MANAGE.MATERAIL',
+		path: '/overall/material',
+		name: '物资管理',
+		icon: <Icon name="bars"/>,
+	},{
+		key: 'form',
+		id: 'MANAGE.FORM',
+		path: '/overall/form',
+		name: '表单管理',
+		icon: <Icon name="file-text"/>,
+	},
+	{
 		key: 'attend',
 		id: 'MANAGE.CHECKIN',
 		path: '/overall/attend',
