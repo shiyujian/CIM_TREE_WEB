@@ -1,92 +1,115 @@
-import {createAction, handleActions, combineActions} from 'redux-actions';
-import createFetchAction from './fetchAction';
-import moment from 'moment';
-// import createFetchAction from 'fetch-action';
-import {base, SERVICE_API} from '_platform/api';
-
+import {createAction, handleActions} from 'redux-actions';
+import createFetchAction from './dispatchFetchAction';
+import createFetchActionT from 'fetch-action';
+import {USER_API, SERVICE_API,EXCHANGE_API,CODE_API} from '_platform/api';
+const ID="RECEIPT"
 //Tab切换状态
-export const setTabActive = createAction('rece设置当前选中的tab');
+export const setTabActive = createAction(`${ID}设置当前选中的tab`);
 //新闻列表的Tab切换状态
-export const setNewsTabActive = createAction('rece新闻列表的Tab切换状态');
-//公告列表的Tab切换状态
-export const setTipsTabActive = createAction('rece公告列表的Tab切换状态');
-//发布或编辑新闻或公告的的modal
-export const toggleModal = createAction('rece发布或编辑新闻或公告的的modal');
-//获取暂存的新闻列表
-export const getDraftNewsListOK = createAction('rece获取暂存的新闻列表');
-export const getDraftNewsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=%E6%96%B0%E9%97%BB&time=${moment().valueOf()}`, [getDraftNewsListOK]);
-//获取新闻列表
-export const getNewsListOK = createAction('rece获取新闻列表');
-export const getNewsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=%E6%96%B0%E9%97%BB&is_draft=false&time=${moment().valueOf()}`, [getNewsListOK]);
-//获取暂存的通知列表
-export const getDraftTipsListOK = createAction('rece获取暂存的通知列表');
-export const getDraftTipsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=%E5%85%AC%E5%91%8A&time=${moment().valueOf()}`, [getDraftTipsListOK]);
-//获取通知列表
-export const getTipsListOK = createAction('rece获取通知列表');
-export const getTipsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=%E5%85%AC%E5%91%8A&is_draft=false&time=${moment().valueOf()}`, [getTipsListOK]);
-//发布新闻或公告
-export const postData = createFetchAction(`${base}/main/api/post/`, [],'POST');
-//编辑新闻或公告
-export const patchData = createFetchAction(`${base}/main/api/post/{{pk}}/`, [],'PATCH');
-//删除新闻或公告
-export const deleteData = createFetchAction(`${base}/main/api/post/{{pk}}/`, [],'DELETE');
+export const setNewsTabActive = createAction('RECEIPT新闻列表的Tab切换状态');
+//发送文件的modal
+export const toggleModalAc = createAction(`${ID}发送文件的modal`);
+//上传的文件列表
+export const postUploadFilesAc = createAction(`${ID}上传的文件列表`);
+//获取组织机构列表
+export const getOrgListAcOK = createAction(`${ID}获取组织机构列表`);
+export const getOrgListAc = createFetchActionT(`${SERVICE_API}/org-tree/?depth=3`, [getOrgListAcOK]);
+//获取接受单位的人员列表
+export const getUsersListAcOK = createAction(`${ID}获取接受单位的人员列表`);
+export const getUsersListAc = createFetchActionT(`${USER_API}/users/?org_code={{code}}`, [getUsersListAcOK]);
+//获取抄送的人员列表
+export const getCopyUsersAcOK = createAction(`${ID}获取抄送的人员列表`);
+export const getCopyUsersAc = createFetchActionT(`${USER_API}/users/?org_code={{code}}`, [getCopyUsersAcOK]);
+//获取收文列表
+export const getReceiveInfoAcOK = createAction(`${ID}获取收文列表`);
+export const getReceiveInfoAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/received/?user={{user}}&per_page=10000`, [getReceiveInfoAcOK]);
+//获取发送的列表
+export const getSentInfoAcOK = createAction(`${ID}获取发送的列表`);
+export const getSentInfoAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/sent/?user={{user}}&per_page=10000`, [getSentInfoAcOK]);
+//发送文件
+export const postSentDocAc = createFetchAction(`${CODE_API}/api/v1/file-notifications/creation/`, [],"POST");
+//删除的发送文件
+export const deleteSentDocAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, [],"DELETE");
+//获取收文的详情信息
+export const getReceiveDetailAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`, []);
+//获取发文的详情信息
+export const getSendDetailAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, []);
+//收文已阅
+export const patchReceiveDetailAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [],"PATCH");
+//删除的收文
+export const deleteReceiveDocAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [],"DELETE");
+//发送短信接口
+export const sentMessageAc = createFetchAction(`${EXCHANGE_API}/api/v1/sms/`, [],"POST");
 
-//设置上传的文件列表
-export const postUploadFiles = createAction('rece设置上传的文件列表');
+//发布或编辑新闻或公告的的modal
+export const toggleModal = createAction('RECEIPT发布或编辑新闻或公告的的modal');
 
 export const actions = {
 	setTabActive,
-	setNewsTabActive,
-	setTipsTabActive,
+	getReceiveInfoAcOK,
+	getReceiveInfoAc,
+	getSentInfoAcOK,
+	getSentInfoAc,
+	toggleModalAc,
+	postUploadFilesAc,
+	postSentDocAc,
+	deleteSentDocAc,
+	getReceiveDetailAc,
+	getSendDetailAc,
+	patchReceiveDetailAc,
+	deleteReceiveDocAc,
+	sentMessageAc,
+	getOrgListAcOK,
+	getOrgListAc,
+	getUsersListAcOK,
+	getUsersListAc,
+	getCopyUsersAcOK,
+	getCopyUsersAc,
+
 	toggleModal,
-	getDraftNewsListOK,
-	getDraftNewsList,
-	getNewsListOK,
-	getNewsList,
-	getDraftTipsListOK,
-	getDraftTipsList,
-	getTipsListOK,
-	getTipsList,
-	postData,
-	patchData,
-	deleteData,
-	postUploadFiles,
+	setNewsTabActive
 };
 export default handleActions({
 	[setTabActive]: (state, {payload}) => ( {
 		...state,
 		tabValue: payload
 	}),
-	[setNewsTabActive]: (state, {payload}) => ( {
+	[getOrgListAcOK]: (state, {payload}) => ( {
 		...state,
-		newsTabValue: payload
+		orgList: payload.children
 	}),
-	[setTipsTabActive]: (state, {payload}) => ( {
+	[getUsersListAcOK]: (state, {payload}) => ( {
 		...state,
-		tipsTabValue: payload
+		usersList: payload
 	}),
+	[getCopyUsersAcOK]: (state, {payload}) => ( {
+		...state,
+		copyUsersList: payload
+	}),
+	[toggleModalAc]: (state, {payload}) => ( {
+		...state,
+		visible: payload
+	}),
+	[getReceiveInfoAcOK]: (state, {payload}) => ( {
+		...state,
+		receiveInfo: payload
+	}),
+	[getSentInfoAcOK]: (state, {payload}) => ( {
+		...state,
+		sendInfo: payload
+	}),
+	[postUploadFilesAc]: (state, {payload}) => ( {
+		...state,
+		fileList: payload
+	}),
+
 	[toggleModal]: (state, {payload}) => ( {
 		...state,
 		toggleData: payload
 	}),
-	[getDraftNewsListOK]: (state, {payload}) => ( {
+	[setNewsTabActive]: (state, {payload}) => ( {
 		...state,
-		draftNewsLis: payload
-	}),
-	[getNewsListOK]: (state, {payload}) => ( {
-		...state,
-		newsList: payload
-	}),
-	[getTipsListOK]: (state, {payload}) => ( {
-		...state,
-		tipsList: payload
-	}),
-	[getDraftTipsListOK]: (state, {payload}) => ( {
-		...state,
-		draftTipsList: payload
-	}),
-	[postUploadFiles]: (state, {payload}) => ( {
-		...state,
-		fileList: payload
+		newsTabValue: payload
 	}),
 }, {});
+

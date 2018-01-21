@@ -136,7 +136,7 @@ export default handleActions({
 	}),
 	[toggleModalAc]: (state, { payload }) => ({
 		...state,
-		visible: payload
+		toggleData: payload
 	}),
 	[getReceiveInfoAcOK]: (state, { payload }) => ({
 		...state,

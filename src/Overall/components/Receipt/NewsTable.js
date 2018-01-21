@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Table, Tabs, Button, Row, Col, Modal, message, Popconfirm, Form, Input, DatePicker, Icon, Select } from 'antd';
-import RichText from './RichText';
+import ToggleModal from './ToggleModal';
+import RichModal from './RichModal';
+
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
@@ -30,28 +32,33 @@ class NewsTable extends Component {
 
 	componentDidMount() {
 
-		const { actions: { getNewsList, getDraftNewsList } } = this.props;
-		getNewsList({
+		// const { actions: { getNewsList, getDraftNewsList } } = this.props;
+		// getNewsList({
+		// 	user_id: user_id
+		// });
+		// getDraftNewsList({
+		// 	user_id: user_id
+		// })
+		const { actions: { getSentInfoAc } } = this.props;
+		getSentInfoAc({
+			// user: encodeURIComponent(getUser().org)
 			user_id: user_id
-		});
-		getDraftNewsList({
-			user_id: user_id
-		})
 
+		})
 	}
 
 	//新闻操作按钮
 	clickNews(record, type) {
 		const {
-			actions: { deleteData, getNewsList, getDraftNewsList, toggleModal, patchData },
+			actions: { deleteSentDocAc, getSentInfoAc, getDraftNewsList, toggleModal, patchData },
 			newsTabValue = '1'
 		} = this.props;
 		if (type === 'DELETE') {
-			deleteData({ pk: record.id })
+			deleteSentDocAc({ pk: record.id })
 				.then(() => {
 					message.success('删除新闻成功！');
 					if (newsTabValue === '1') {
-						getNewsList({
+						getSentInfoAc({
 							user_id: user_id
 						});
 					} else {
@@ -139,16 +146,82 @@ class NewsTable extends Component {
 		setNewsTabActive(newsTabValue);
 	}
 
+	clear() {
+		const {
+			newsTabValue = '1'
+		} = this.props;
+		this.props.form.setFieldsValue({
 
+			title: undefined,
+			worktime: undefined,
+			workunit: undefined,
 
+		});
+	}
 
+	clear1() {
+
+		this.props.form.setFieldsValue({
+			title1: undefined,
+			worktimes: undefined,
+			workunits: undefined,
+
+		});
+	}
+	query() {
+		const {
+			actions: { getNewsList },
+			filter = {}
+		} = this.props;
+		const user = getUser();
+		this.props.form.validateFields(async (err, values) => {
+			let conditions = {
+				// task: filter.type || "processing",
+				executor: user.id,
+				title: values.title || "",
+				// workflow:values.workflow || "",
+				// creator:values.creator || "",
+				// status:values.status || "",
+				// real_start_time_begin:"",
+				// real_start_time_end:"",
+			}
+			// if (values && values.startTime && values.startTime.length > 0) {
+			// 	conditions.real_start_time_begin = moment(values.startTime[0]).format('YYYY-MM-DD 00:00:00');
+			// 	conditions.real_start_time_end = moment(values.startTime[1]).format('YYYY-MM-DD 23:59:59');
+			// }
+			// for (const key in conditions) {
+			// 	if (!conditions[key] || conditions[key] == "") {
+			// 		delete conditions[key];
+			// 	}
+			// }
+			// setLoadingStatus(true);
+			await getNewsList({}, conditions);
+			// setLoadingStatus(false);
+		})
+	}
+
+	query1() {
+
+		const {
+			actions: { getDraftNewsList },
+			filter = {}
+		} = this.props;
+
+		this.props.form.validateFields(async (err, values) => {
+			let conditions = {
+				// task: filter.type || "processing",
+				title: values.title1 || "",
+			}
+			await getDraftNewsList({}, conditions);
+		})
+	}
 
 	render() {
 		const rowSelection = {
 			// selectedRowKeys,
 			onChange: this.onSelectChange,
 		};
-		console.log('woshi', this.props)
+
 		const {
 			newsList = [],
 			draftNewsLis = [],
@@ -169,16 +242,16 @@ class NewsTable extends Component {
 
 		return (
 			<Row>
+				{
+					<div style={{ marginBottom: '10px' }}>
+						{
+							(toggleData.visible && toggleData.type === 'NEWS') && <RichModal {...this.props} />
+						}
+					</div>}
 				<Col span={22} offset={1}>
 					<Tabs activeKey={newsTabValue} onChange={this.subTabChange.bind(this)} >
-						{/* tabBarExtraContent={
-							<div style={{marginBottom: '10px'}}>
-								<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布新闻</Button>
-								{
-									(toggleData.visible && toggleData.type === 'NEWS') && <RichText {...this.props}/>
-								}
-							</div>} */}
-						<TabPane tab="新闻查询" key="1">
+
+						<TabPane tab="发文查询" key="1">
 							<Row >
 								<Col span={4}>
 									<Icon type='exception' style={{ fontSize: 32 }} />
@@ -186,56 +259,69 @@ class NewsTable extends Component {
 								<Col span={16}>
 									<Row>
 										<Col span={12} >
-											<Row>
-												<Col span={3}>
-													<span >主题</span>
-												</Col>
-												<Col >
-													<Input style={{ width: '70%' }} />
-												</Col>
-											</Row>
+											<FormItem {...formItemLayout} label="主题">
+												{
+													getFieldDecorator('title', {
+														rules: [
+															{ required: false, message: '请输入主题' },
+														]
+													})
+														(<Input placeholder="请输入主题" />)
+												}
+											</FormItem>
 										</Col>
 										<Col span={12} >
-											<Row>
-												<Col span={3}>
-													<span>发布日期</span>
-												</Col>
-												<Col >
-													<RangePicker
-														style={{ verticalAlign: "middle", width: '70%' }}
-														defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
-														showTime={{ format: 'HH:mm:ss' }}
-														format={'YYYY/MM/DD HH:mm:ss'}
+											<FormItem {...formItemLayout} label="发布日期">
 
-													>
-													</RangePicker>
-												</Col>
-											</Row>
+												{
+													getFieldDecorator('worktime', {
+														rules: [
+															{ required: false, message: '请选择日期' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '70%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
 										</Col>
 									</Row>
 									<Row>
 										<Col span={12} style={{ marginTop: 20 }}>
-											<Row>
-												<Col span={3}>
-													<span >发布单位</span>
-												</Col>
-												<Col>
-													<Select style={{ width: '70%' }} >
-														<Option value="0">编辑中</Option>
-														<Option value="1">已提交</Option>
-														<Option value="2">执行中</Option>
-														<Option value="3">已完成</Option>
-														<Option value="4">已废止</Option>
-														<Option value="5">异常</Option>
-													</Select>
-												</Col>
-											</Row>
+											<FormItem {...formItemLayout} label="发布单位">
+												{
+													getFieldDecorator('workunit', {
+														rules: [
+															{ required: false, message: '发布单位' },
+														]
+													})
+														(<Select style={{ width: '100%' }}
+														>
+															<Option value="0">编辑中</Option>
+															<Option value="1">已提交</Option>
+															<Option value="2">执行中</Option>
+															<Option value="3">已完成</Option>
+															<Option value="4">已废止</Option>
+															<Option value="5">异常</Option>
+														</Select>)
+												}
+
+
+											</FormItem>
+
 										</Col>
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
-									<Button icon='search'>查找</Button>
-									<Button style={{ marginTop: 20 }} icon='reload'>清除</Button>
+									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
+									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear.bind(this)}>清除</Button>
 								</Col>
 							</Row>
 
@@ -248,7 +334,7 @@ class NewsTable extends Component {
 								bordered
 								rowKey="id" />
 						</TabPane>
-						<TabPane tab="暂存的新闻" key="2">
+						<TabPane tab="暂存的发文" key="2">
 							<Row >
 								<Col span={4}>
 									<Icon type='exception' style={{ fontSize: 32 }} />
@@ -256,56 +342,69 @@ class NewsTable extends Component {
 								<Col span={16}>
 									<Row>
 										<Col span={12} >
-											<Row>
-												<Col span={3}>
-													<span >主题</span>
-												</Col>
-												<Col >
-													<Input style={{ width: '70%' }} />
-												</Col>
-											</Row>
+											<FormItem {...formItemLayout} label="主题">
+												{
+													getFieldDecorator('title1', {
+														rules: [
+															{ required: false, message: '请输入主题' },
+														]
+													})
+														(<Input placeholder="请输入主题" />)
+												}
+											</FormItem>
 										</Col>
 										<Col span={12} >
-											<Row>
-												<Col span={3}>
-													<span>发布日期</span>
-												</Col>
-												<Col >
-													<RangePicker
-														style={{ verticalAlign: "middle", width: '70%' }}
-														defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
-														showTime={{ format: 'HH:mm:ss' }}
-														format={'YYYY/MM/DD HH:mm:ss'}
+											<FormItem {...formItemLayout} label="发布日期">
 
-													>
-													</RangePicker>
-												</Col>
-											</Row>
+												{
+													getFieldDecorator('worktimes', {
+														rules: [
+															{ required: false, message: '请选择日期' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '70%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
 										</Col>
 									</Row>
 									<Row>
 										<Col span={12} style={{ marginTop: 20 }}>
-											<Row>
-												<Col span={3}>
-													<span >发布单位</span>
-												</Col>
-												<Col>
-													<Select style={{ width: '70%' }} >
-														<Option value="0">编辑中</Option>
-														<Option value="1">已提交</Option>
-														<Option value="2">执行中</Option>
-														<Option value="3">已完成</Option>
-														<Option value="4">已废止</Option>
-														<Option value="5">异常</Option>
-													</Select>
-												</Col>
-											</Row>
+											<FormItem {...formItemLayout} label="发布单位">
+												{
+													getFieldDecorator('workunits', {
+														rules: [
+															{ required: false, message: '发布单位' },
+														]
+													})
+														(<Select style={{ width: '100%' }}
+														>
+															<Option value="0">编辑中</Option>
+															<Option value="1">已提交</Option>
+															<Option value="2">执行中</Option>
+															<Option value="3">已完成</Option>
+															<Option value="4">已废止</Option>
+															<Option value="5">异常</Option>
+														</Select>)
+												}
+
+
+											</FormItem>
+
 										</Col>
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
-									<Button icon='search'>查找</Button>
-									<Button style={{ marginTop: 20 }} icon='reload'>清除</Button>
+									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
+									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
 								</Col>
 							</Row>
 							<Table dataSource={draftNewsLis}
@@ -317,8 +416,8 @@ class NewsTable extends Component {
 								rowKey="id" />
 						</TabPane>
 
-						<TabPane tab="新闻发布" key="3">
-							<RichText {...this.props} />
+						<TabPane tab="发文发布" key="3">
+							<ToggleModal {...this.props} />
 						</TabPane>
 
 					</Tabs>
@@ -373,7 +472,7 @@ class NewsTable extends Component {
 						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
-						
+
 
 						{/* <a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp; */}
@@ -418,12 +517,12 @@ class NewsTable extends Component {
 			render: record => {
 				return (
 					<span>
-						{/* <a onClick={this.clickNews.bind(this, record, 'PUBLISH')}>发布</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp; */}
+						<a onClick={this.clickNews.bind(this, record, 'PUBLISH')}>发布</a>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
-					
+
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
 							cancelText="取消">

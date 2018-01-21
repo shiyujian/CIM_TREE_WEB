@@ -93,7 +93,7 @@ class RichText extends Component {
 
 	//发布新闻
 	postData() {
-		console.log('11',11)
+		
 		const {
 			actions: { postData, getNewsList, patchData, getDraftNewsList },
 			form: { validateFields },
@@ -223,9 +223,9 @@ class RichText extends Component {
 								)}
 							</FormItem>
 						</Col>
-						<Col span={4} offset={1}>
+						{/* <Col span={4} offset={1}>
 							<Button>上传</Button>
-						</Col>
+						</Col> */}
 
 					</Row>
 				</Form>
@@ -237,7 +237,7 @@ class RichText extends Component {
 				<Row style={{ marginTop: 20 }}>
 					<Col span={24} offset={10} >
 						<Button onClick={this.modalClick.bind(this)}>取消</Button>
-						<Button style={{ marginLeft: 20 }} onClick={this.postData.bind(this)}>提交</Button>
+						<Button type='primary' style={{ marginLeft: 20 }} onClick={this.postData.bind(this)} >提交</Button>
 						<Button style={{ marginLeft: 20 }} onClick={this.draftDataFunc.bind(this)}>暂存</Button>
 					</Col>
 				</Row>
