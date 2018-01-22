@@ -1,23 +1,55 @@
-import React, {Component} from 'react';
-import {Table, Row, Col, Modal,} from 'antd';
+import React, { Component } from 'react';
+import { Table, Row, Col, Modal } from 'antd';
 import Blade from '_platform/components/panels/Blade';
 import moment from 'moment';
-
+import $ from 'jquery';
+import { Icon } from 'react-fa';
 export default class Video extends Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			visible: false,
-			container: null
+			container: null,
+			video: ''
 		}
 	}
 
 	static propTypes = {};
-
+	componentWillReceiveProps(nextProps) {
+		console.log(nextProps)
+		// const {
+		// 	fileList = [],
+		// } = this.props;
+		// console.log(this.props)		
+		const newsListT = nextProps.newsList || []
+		for (var i = 0; i < newsListT.length; i++) {
+			console.log(newsListT[i])
+			const newsListTT = newsListT[i].attachment.fileList || []
+			for (var j = 0; j < newsListTT.length; j++) {
+				console.log(newsListTT[j])
+				const videos = newsListTT[3].down_file
+				this.setState({ video: videos })
+				break;
+			}
+			break;
+		}
+	}
+	componentWillMount() {
+		console.log(this.props)
+	}
 	componentDidMount() {
-		const {actions: {getNewsList}} = this.props;
-		getNewsList({}, {tag: '新闻', is_draft: false});
+		const { actions: { getNewsList } } = this.props;
+		console.log(this.props)
+		console.log(this.props.getNewsList)
+		getNewsList({}, { tag: '新闻', is_draft: false });
+
+		$(".box").mouseover(function(){
+			$(".box").css({"background-color":"#eee",zIndex:"100"})
+		})
+		$(".box").mouseout(function(){
+			$(".box").css({"background-color":"",zIndex:"0"})
+		})
 	}
 
 	clickNews(record, type) {
@@ -66,23 +98,51 @@ export default class Video extends Component {
 	}
 
 	render() {
-		const {
-			newsList = [],
-		} = this.props;
-
+		
+		console.log(this.state.video)
 		return (
 			<Blade title="安全生产视频">
-					<Table 
-						bordered={false} 
-						dataSource={newsList} 
-						columns={this.columns}
-				        rowKey="id" size="small" pagination={{pageSize: 8}}
-				    />
-					<Modal title="新闻预览" width={800} visible={this.state.visible}
-						onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
-						<div style={{maxHeight: '800px', overflow: 'auto'}}
-						     dangerouslySetInnerHTML={{__html: this.state.container}}/>
-					</Modal>
+				<Row>
+					<Col span={16}>
+						<video
+							className="box"
+							preload="auto"
+							width="300px"
+							height="300px"
+							src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_APkNixj.mp4"}
+						>
+						</video>
+						<Icon style={{widtg:"30px",height:"30px"}} className={"playBtn Icon Icon-play_b"}></Icon>
+					</Col>
+					<Col span={8}>
+						<Row>
+							<video
+								preload="auto"
+								width="200px"
+								height="150px"
+								src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_APkNixj.mp4"}
+
+							>
+							</video>
+						</Row>
+						<Row>
+							<video
+								preload="auto"
+								width="200px"
+								height="150px"
+								src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_APkNixj.mp4"}
+
+							>
+							</video>
+						</Row>
+
+					</Col>
+
+
+
+				</Row>
+
+
 			</Blade>
 		);
 	}

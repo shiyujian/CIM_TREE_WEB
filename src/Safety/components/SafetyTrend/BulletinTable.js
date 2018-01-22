@@ -171,7 +171,7 @@ export default class BulletinTable extends Component {
 
 	columns = [
 		{
-			title: '新闻ID',
+			title: '新闻ID222',
 			dataIndex: 'id',
 			key: 'id',
 		}, {

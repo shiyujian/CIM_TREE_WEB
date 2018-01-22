@@ -1,126 +1,168 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import {Table, Spin,Input,Select,Popover,Modal,Button} from 'antd';
-import {SOURCE_API, STATIC_DOWNLOAD_API} from '_platform/api';
+import React, { Component } from 'react';
+import { Table, Spin, message, Modal } from 'antd';
+import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
-const Option = Select.Option;
-
+import './index.less';
 export default class GeneralTable extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            visible:false,
-            imgurl:null
-        };
-    }
-    render() {
-	    const {newkey = [],tableSrc =[]} = this.props;
-
-	    const columns = newkey.map(rst=>{
-		    if(rst.name === "文件名" ||rst.name === "卷册名" ||rst.name === "事件" ||rst.name ==="名称"){
-			    return 	{
-				    title:rst.name,
-				    dataIndex:'extra_params.name',
-				    key:rst.name
-			    }
-		    }
-		    else if(rst.name !== "操作"){
-			    return 	{
-				    title:rst.name,
-				    key:rst.name,
-				    dataIndex:`extra_params[${rst.code}]`
-			    }
-		    }else{
-			    return {
-				    title:'操作',
-				    key:'操作',
-				    render:(record) =>{
-					    let nodes = [];
-					    nodes.push(
-						    <div>
-							    {/*<a onClick={this.previewFile.bind(this,record)}>预览</a>*/}
-							    <Popover content={this.genDownload(record.basic_params.files)}
-							             placement="right">
-								    <a>预览</a>
-							    </Popover>
-								
-                                <span className="ant-divider" />
-							    <a onClick={this.update.bind(this,record)}>更新</a>
-						    </div>
-					    );
-					    return nodes;
-				    }
-			    }
-		    }
-	    });
-
-	    columns.splice(-1,0,{title:'状态',dataIndex:'extra_params.state'});
-
-        return (
-        	<div>
-				<Table rowSelection={this.rowSelection}
-					   dataSource={tableSrc}
-					   columns={columns}
-					   bordered rowKey="code"/>
-				<Modal  title="图片预览"
-        				width='70%'
-        				closable={false}
-					 visible={this.state.visible}
-					 footer={[<Button key="back" size="large" onClick={this.cancel.bind(this)}>关闭查看</Button>]}>
-				  <img  src={`${SOURCE_API}` + this.state.imgurl} alt="图片"/>
-				</Modal>
-				预览
-				 <video width={200} height={100} autoplay={autoplay} src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_6c2DEME.mp4"}>
-				预览
-									
-				</video>
-			</div>
-        );
-    }
-    cancel(){
-    	this.setState({
-    		visible:false
-		})
+	constructor(props) {
+		super(props);
+		this.state = {
+			previewModalVisible: false,
+			video: ''
+		}
 	}
-    rowSelection = {
-        onChange: (selectedRowKeys,selectedRows) => {
-            const {actions: {selectDocuments}} = this.props;
-            selectDocuments(selectedRows);
-        }
-    };
 
-	genDownload = (text)=>{
-		return(
-			text.map((rst) =>{
-				return (
-					<div>
-						<a onClick={this.previewFile.bind(this,rst)}>{rst.name}</a>
-					</div>)
-			})
-		)
+	render() {
+		const { Doc = [] } = this.props;
+		return (
+			<Table rowSelection={this.rowSelection}
+				dataSource={Doc}
+				columns={this.columns}
+				className='foresttable'
+				bordered rowKey="code" />
+		);
+	}
+
+	rowSelection = {
+		onChange: (selectedRowKeys, selectedRows) => {
+			const { actions: { selectDocuments } } = this.props;
+			selectDocuments(selectedRows);
+		},
 	};
+	cancelT() {
+		this.setState({ previewModalVisible: false })
+	}
 
-
-previewFile(file) {
-        const {actions: {openPreview}} = this.props;
-    	let imgurl = file.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        if(file.mime_type == "image/png" || file.mime_type == "image/jpg" || file.mime_type == "image/jpeg")
+	columns = [
 		{
-            this.setState({visible:true,imgurl:imgurl})
-		}else{
-            if(JSON.stringify(file) === "{}"){
-                return
-            }else {
-                const filed = file;
-                openPreview(filed);
-            }
+			title: '名称',
+			dataIndex: 'name',
+			key: 'name',
+			// sorter: (a, b) => a.name.length - b.name.length
+		}, {
+			title: '编号',
+			dataIndex: 'extra_params.number',
+			key: 'extra_params.number',
+			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
+		}, {
+			title: '发布单位',
+			dataIndex: 'extra_params.company',
+			key: 'extra_params.company',
+			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
+		}, {
+			title: '实施日期',
+			dataIndex: 'extra_params.time',
+			key: 'extra_params.time',
+			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
+		}, {
+			title: '备注',
+			dataIndex: 'extra_params.remark',
+			key: 'extra_params.remark'
+		}, {
+			title: '文档状态',
+			dataIndex: 'extra_params.state',
+			key: 'extra_params.state'
+		}, {
+			title: '操作',
+			render: (record, index) => {
+				let nodes = [];
+				nodes.push(
+					<div>
+						<a onClick={this.previewFile.bind(this, record)}>预览
+						<Modal title="影像预览"
+								closable
+								width={920} visible={this.state.previewModalVisible}
+								footer={null}
+								onCancel={this.cancelT.bind(this)}
+								cancelText={"关闭"}
+								maskClosable={false}>
+								<video
+									controls
+									preload="auto"
+									width="100%"
+									height="500px"
+									src={this.state.video}
+								>
+									{/* <source src={this.props.video} /> */}
+								</video>
+							</Modal>
+						</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
+						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+					</div>
+				);
+				return nodes;
+			}
+		}
+	];
+	createLink = (name, url) => {    //下载
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download', this);
+		link.setAttribute('target', '_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+	download(index, key, e) {
+		const { selected = [], file = [], files = [], down_file = [] } = this.props;
+
+		if (selected.length == 0) {
+			message.warning('没有选择无法下载');
+		}
+		for (var j = 0; j < selected.length; j++) {
+			if (selected[j].code == index.code) {
+
+				selected.map(rst => {
+					file.push(rst.basic_params.files);
+				});
+				file.map(value => {
+					value.map(cot => {
+						files.push(cot.download_url)
+					})
+				});
+				files.map(down => {
+					let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
+					this.createLink(this, down_load);
+				});
+			}
+		}
+	}
+
+	previewFile(file) {
+		console.log(file.basic_params.files)
+		const videos = file.basic_params.files[0] || []
+		console.log(videos.a_file.split(".")[4])
+		// const index=videos.a_file.indexOf(".")
+		// console.log(index)
+		let a_file=videos.a_file.split(".")[4]
+		console.log(a_file)
+		
+		if (a_file == "mp4") {
+			console.log(1)
+			this.setState({ previewModalVisible: true, video: videos.a_file })
+
+		} else {
+			const { actions: { openPreview } } = this.props;
+			console.log(2)
+
+			if (JSON.stringify(file.basic_params) == "{}") {
+				console.log(3)
+				return
+			} else {
+				console.log(4)
+
+				const filed = file.basic_params.files[0];
+				openPreview(filed);
+			}
 		}
 
-    }
 
-    update(file){
-	    const {actions:{updatevisible,setoldfile}}= this.props;
-	    updatevisible(true);
-	    setoldfile(file);
-    }
+	}
+
+	update(file) {
+		const { actions: { updatevisible, setoldfile } } = this.props;
+		updatevisible(true);
+		setoldfile(file);
+	}
 }

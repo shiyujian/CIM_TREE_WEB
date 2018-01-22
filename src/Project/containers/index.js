@@ -6,6 +6,7 @@ export SubunitPro from './SubunitPro';
 export SubPro from './SubPro';
 export ItemPro from './ItemPro';
 export Standard from './Standard';
+export EngineeringImage from './EngineeringImage';
 export Keyword from './Keyword';
 export Template from './Template';
 export Dictionaries from './Dictionaries';

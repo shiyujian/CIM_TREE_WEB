@@ -15,7 +15,8 @@ window.DeathCode = {
     OVERALL_APPROVAL_UNIT_LEADER_CODE:20,//综合管理.项目报批.发起计划.判断是否为业主单位领导 - 领导用户的code
 
     DATUM_ENGINEERING:"Q001",//资料管理工程文档写死的编码
-    DATUM_DATUM:"QH01" ,//资料管理制度规范编码
+	DATUM_DATUM:"QH01" ,//资料管理制度规范编码
+	DATUM_GCYX:"TREE_GCYX" ,//工程影像目录名称
     DATUM_PK:"3407341485020",
 	SETUP_KEYWORD:"Keyword",  //系统设置工程文档关键字编码
 	SYSTEM_WX:"wxlist",  //系统管理事件管理危险源编码
