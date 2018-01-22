@@ -37,7 +37,7 @@ export default class Addition extends Component {
                         <Select>
                             <Option value='第一经理'>第一经理</Option>
                             <Option value='第二经理'>第二经理</Option>
-                        </Select>
+                        </Select> 
                     </FormItem>
                 </Form>
                 </Col>

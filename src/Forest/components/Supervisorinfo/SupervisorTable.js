@@ -25,7 +25,7 @@ export default class SupervisorTable extends Component {
     		smallclass: '',
     		thinclass: '',
     		status: '',
-    		supervisorcheck: '',
+    		SupervisorCheck: '',
     		role: '',
     		rolename: '',
     		percent:0,
@@ -106,7 +106,7 @@ export default class SupervisorTable extends Component {
 			}
 		},{
 			title:"状态",
-			dataIndex: 'status',
+			dataIndex: 'statusname',
 		},{
 			title:"定位",
 			dataIndex: 'locationstatus',
@@ -240,21 +240,21 @@ export default class SupervisorTable extends Component {
 	}
 
 	onstatuschange(value) {
-		let supervisorcheck = '';
+		let SupervisorCheck = '';
 		switch(value){
 			case "1": 
-				supervisorcheck = -1;
+				SupervisorCheck = -1;
 				break;
 			case "2": 
-				supervisorcheck = 1;
+				SupervisorCheck = 0;
 				break;
 			case "3": 
-				supervisorcheck = 0;
+				SupervisorCheck = 1;
 				break;
 			default:
 				break;
 		}
-		this.setState({supervisorcheck,status:value || ''})
+		this.setState({SupervisorCheck,status:value || ''})
 
     }
 
@@ -297,13 +297,14 @@ export default class SupervisorTable extends Component {
     	const {
     		sxm = '',
     		section = '',
-    		// supervisorcheck = '',
+    		// SupervisorCheck = '',
     		smallclass = '',
     		thinclass = '',
     		role = '',
     		rolename = '',
     		stime = '',
     		etime = '',
+    		status = '',
     		size,
     	} = this.state;
     	const {actions: {getqueryTree},keycode = ''} = this.props;
@@ -313,7 +314,8 @@ export default class SupervisorTable extends Component {
     		section,
     		smallclass,
     		thinclass,
-    		// supervisorcheck,
+    		status,
+    		// SupervisorCheck,
     		// stime:stime&&moment(stime).add(8, 'h').unix(),
     		// etime:etime&&moment(etime).add(8, 'h').unix(),
     		page,
@@ -334,15 +336,15 @@ export default class SupervisorTable extends Component {
 	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;	    			tblData[i].place = place;
-	    			let status = '';
-					if(plan.supervisorcheck == -1)
-						status = "待审批"
-					else if(plan.supervisorcheck == 0) 
-						status = "审批未通过"
+	    			let statusname = '';
+					if(plan.SupervisorCheck == -1)
+						statusname = "待审批"
+					else if(plan.SupervisorCheck == 0) 
+						statusname = "审批未通过"
 					else {
-						status = "审批通过"
+						statusname = "审批通过"
 					}
-					tblData[i].status = status;
+					tblData[i].statusname = statusname;
 					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
 					let yssj1 = !!plan.YSSJ ? moment(plan.YSSJ).format('YYYY-MM-DD') : '/';
@@ -362,7 +364,7 @@ export default class SupervisorTable extends Component {
 		const {
     		sxm = '',
     		section = '',
-    		// supervisorcheck = '',
+    		// SupervisorCheck = '',
     		role = '',
     		rolename = '',
     		stime = '',
@@ -374,7 +376,7 @@ export default class SupervisorTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		// supervisorcheck,
+    		// SupervisorCheck,
     		stime:stime&&moment(stime).add(8, 'h').unix(),
     		etime:etime&&moment(etime).add(8, 'h').unix(),
     		page:1,

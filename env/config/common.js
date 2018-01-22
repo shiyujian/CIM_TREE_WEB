@@ -18,7 +18,7 @@ const autoprefixer = require('autoprefixer');
 const themeConfig = require(THEME);
 module.exports = {
 	target: 'web',
-	devtool: 'source-map',
+	devtool: 'cheap-module-eval-source-map',
 	entry: {
 		app: APP,
 		vendor: vendors

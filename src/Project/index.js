@@ -145,6 +145,13 @@ export default class Project extends Component {
 				path: '/project/standard',
 				exact: true,
 				icon: <Icon name="retweet"/>,
+			},{
+				key: 'EngineeringImage',
+				id: 'ENGINEERINGIMAGE',
+				name: '工程影像',
+				path: '/project/engineeringImage',
+				exact: true,
+				icon: <Icon name="retweet"/>,
 			}, {
 				key: 'ProDoc',
 				id: 'PRODOC',

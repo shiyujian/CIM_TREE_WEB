@@ -18,6 +18,7 @@ import itemProReducer, {actions as itemProActions} from './itemPro';
 import safetySystemReducer, {actions as safetySystemActions} from './safetySystem';
 import standardReducer, {actions as standardActions} from './standard';
 import materialReducer, {actions as materialActions} from './material';
+import engineeringImageReducer, {actions as engineeringImageActions} from './engineeringImage';
 import keywordReducer, {actions as keywordActions} from './keyword';
 // import userReducer, {actions as userActions} from './user';
 import orgTypeReducer, {actions as orgTypeActions} from './orgType';
@@ -118,6 +119,10 @@ export default handleActions({
 	[combineActions(...actionsMap(materialActions))]: (state = {}, action) => ({
 		...state,
 		material: materialReducer(state.material, action),
+	}),
+	[combineActions(...actionsMap(engineeringImageActions))]: (state = {}, action) => ({
+		...state,
+		engineeringImage: engineeringImageReducer(state.engineeringImage, action),
 	}),
 	[combineActions(...actionsMap(keywordActions))]: (state = {}, action) => ({
 		...state,

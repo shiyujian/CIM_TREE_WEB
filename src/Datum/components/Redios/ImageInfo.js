@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Sidebar, DynamicTitle } from '_platform/components/layout';
 
 import {
-  Form, Input, Button, Row, Col, message, Popconfirm, DatePicker, Table,Modal
+  Form, Input, Button, Row, Col, message, Popconfirm, DatePicker, Table, Modal
 } from 'antd';
 
 
@@ -14,24 +14,36 @@ const { RangePicker } = DatePicker;
 
 const data = [{
   key: '1',
-  name: 'John Brown',
-  age: 32,
-  address: 'New York No. 1 Lake Park',
+  name: '九号一区造林工程正射影像',
+  age: '雄安集团',
+  address: '正常文档',
+  video: 'http://47.104.160.65:6510/media/documents/2018/01/1510116943014_6c2DEME.mp4',
+  remarks:'',
+  imageNumber:'20171115',
 }, {
   key: '2',
-  name: 'Jim Green',
-  age: 42,
-  address: 'London No. 1 Lake Park',
+  name: '九号一区造林工程正射影像',
+  age: '雄安集团',
+  address: '正常文档',
+  video: 'http://47.104.160.65:6510/media/documents/2018/01/1510116943014_6c2DEME.mp4',
+  remarks:'',
+  imageNumber:'20171115',  
 }, {
   key: '3',
-  name: 'Joe Black',
-  age: 32,
-  address: 'Sidney No. 1 Lake Park',
+  name: '九号一区造林工程正射影像',
+  age: '雄安集团',
+  address: '正常文档',
+  video: 'http://47.104.160.65:6510/media/documents/2018/01/1510116943014_6c2DEME.mp4',
+  remarks:'',
+  imageNumber:'20171115',  
 }, {
   key: '4',
-  name: 'Jim Red',
-  age: 32,
-  address: 'London No. 2 Lake Park',
+  name: '九号一区造林工程正射影像',
+  age: '雄安集团',
+  address: '正常文档',
+  video: 'http://47.104.160.65:6510/media/documents/2018/01/1510116943014_6c2DEME.mp4',
+  remarks:'',
+  imageNumber:'20171115',  
 }];
 const rowSelection = {
   onChange: (selectedRowKeys, selectedRows) => {
@@ -49,10 +61,10 @@ import {
   NavLink
 } from 'react-router-dom';
 class ImageInfo extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
-    this.state={
-      previewModalVisible:false
+    this.state = {
+      previewModalVisible: false
     }
   }
 
@@ -72,27 +84,35 @@ class ImageInfo extends Component {
     getModalUpdate(true)
   }
   preview(file) {
-    this.setState({previewModalVisible:true})
+    this.setState({ previewModalVisible: true })
   }
-  cancelT(){
-    this.setState({previewModalVisible:false})
+  cancelT() {
+    this.setState({ previewModalVisible: false })
   }
-  determine(){
+  determine() {
 
   }
 
 
   render() {
     const columns = [{
-      title: 'Name',
+      title: '影像名称',
       dataIndex: 'name',
       sorter: (a, b) => a.name.length - b.name.length,
     }, {
-      title: 'Age',
-      dataIndex: 'age',
+      title: '影像编号',
+      dataIndex: 'imageNumber',
       sorter: (a, b) => a.age - b.age,
     }, {
-      title: 'Address',
+      title: '发布单位',
+      dataIndex: 'age',
+      sorter: (a, b) => a.age - b.age,
+    }
+    , {
+      title: '备注',
+      dataIndex: 'remarks',
+    }, {
+      title: '影像状态',
       dataIndex: 'address',
       sorter: (a, b) => a.address.length - b.address.length,
     },
@@ -102,7 +122,24 @@ class ImageInfo extends Component {
         let nodes = [];
         nodes.push(
           <div>
-            <a onClick={this.preview.bind(this)}>预览</a>
+            <a onClick={this.preview.bind(this)}>预览
+            <Modal title="影像预览"
+                closable
+                width={920} visible={this.state.previewModalVisible}
+                footer={null}
+                onCancel={this.cancelT.bind(this)}
+                cancelText={"关闭"}
+                maskClosable={false}>
+                <video
+                  controls
+                  preload="auto"
+                  width="100%"
+                  height="500px"
+                >
+                  <source src={record.video} />
+                </video>
+              </Modal>
+            </a>
             <a onClick={this.updateT.bind(this)} style={{ marginLeft: 10 }}>更新</a>
           </div>
         );
@@ -165,22 +202,7 @@ class ImageInfo extends Component {
             dataSource={data}
           />
 
-          <Modal title="影像预览"
-            closable
-            width={920} visible={this.state.previewModalVisible}
-            footer={null}
-            onCancel={this.cancelT.bind(this)}
-            cancelText={"关闭"}
-            maskClosable={false}>
-            <video
-              controls
-              preload="auto"
-              width="800px"
-              height="500px"
-            >
-              <source src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_6c2DEME.mp4"} />
-            </video>
-          </Modal>
+
         </Row>
       </Form>
     );

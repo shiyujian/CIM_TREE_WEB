@@ -27,7 +27,7 @@ export default class CheckerTable extends Component {
     		status: '',
     		treety: '',
     		treetype: '',
-    		checkstatus: '',
+    		CheckStatus: '',
     		locationstatus: '',
     		role: 'checker',
     		rolename: '',
@@ -111,7 +111,7 @@ export default class CheckerTable extends Component {
 			}
 		},{
 			title:"状态",
-			dataIndex: 'status',
+			dataIndex: 'statusname',
 		},{
 			title:"定位",
 			dataIndex: 'locationstatus',
@@ -245,21 +245,22 @@ export default class CheckerTable extends Component {
 	}
 
 	onstatuschange(value) {
-		let checkstatus = '';
+		console.log('value',value)
+		let CheckStatus = '';
 		switch(value){
 			case "1": 
-				checkstatus = 0;
+				CheckStatus = 0;
 				break;
 			case "2": 
-				checkstatus = 1;
+				CheckStatus = -1;
 				break;
 			case "3": 
-				checkstatus = 2;
+				CheckStatus = 1;
 				break;
 			default:
 				break;
 		}
-		this.setState({checkstatus,status:value || ''})
+		this.setState({CheckStatus,status:value || ''})
     }
 
     onlocationchange(value) {
@@ -303,7 +304,7 @@ export default class CheckerTable extends Component {
     	const {
     		sxm = '',
     		section = '',
-    		checkstatus = '',
+    		status = '',
     		role = '',
     		rolename = '',
     		stime = '',
@@ -315,7 +316,7 @@ export default class CheckerTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		checkstatus,
+    		status,
     		checktime_min:stime&&moment(stime).unix(),
     		checktime_max:etime&&moment(etime).unix(),
     		page,
@@ -336,15 +337,15 @@ export default class CheckerTable extends Component {
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
 	    			tblData[i].place = place;
-	    			let status = '';
-					if(plan.checkstatus == 0)
-						status = "抽检不通过"
-					else if(plan.checkstatus == 1) 
-						status = "抽检通过"
+	    			let statusname = '';
+					if(plan.CheckStatus == 0)
+						statusname = "抽检不通过"
+					else if(plan.CheckStatus == -1) 
+						statusname = "业主未抽查"
 					else {
-						status = "抽检不通过后修改"
+						statusname = "抽检通过"
 					}
-					tblData[i].status = status;
+					tblData[i].statusname = statusname;
 					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
 					let checktime1 = !!plan.CheckTime ? moment(plan.CheckTime).format('YYYY-MM-DD') : '/';
@@ -364,7 +365,7 @@ export default class CheckerTable extends Component {
 		const {
     		sxm = '',
     		section = '',
-    		// checkstatus = '',
+    		// CheckStatus = '',
     		role = '',
     		rolename = '',
     		stime = '',
@@ -376,7 +377,7 @@ export default class CheckerTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		// checkstatus,
+    		// CheckStatus,
     		stime:stime&&moment(stime).unix(),
     		etime:etime&&moment(etime).unix(),
     		page:1,

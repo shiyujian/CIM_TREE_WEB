@@ -82,9 +82,9 @@ export default class Checkerinfo extends Component {
         //状态
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={"1"}>抽检未通过</Option>,
-            <Option key={'2'} value={"2"}>抽检通过</Option>,
-            <Option key={'3'} value={"3"}>抽检未通过后修改</Option>,
+            <Option key={'1'} value={"2"}>抽检未通过</Option>,
+            <Option key={'2'} value={"3"}>抽检通过</Option>,
+            <Option key={'3'} value={"0"}>业主未抽查</Option>,
         ]
         this.setState({statusoption})
     }
