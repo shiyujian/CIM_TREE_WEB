@@ -20,7 +20,7 @@ export default class CheckerTable extends Component {
         	leftkeycode: '',
         	stime: moment().format('2017-11-23 00:00:00'),
 			etime: moment().format('2017-11-23 23:59:59'),
-			zzbm: '',
+			sxm: '',
     		section: '',
     		smallclass: '',
     		thinclass: '',
@@ -65,6 +65,7 @@ export default class CheckerTable extends Component {
 		);
 	}
 	treeTable(details) {
+		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -77,14 +78,14 @@ export default class CheckerTable extends Component {
 			locationoption,
 		} = this.props;
 		const {
-			zzbm, 
+			sxm, 
 			rolename,
 			section,
 			smallclass,
 			thinclass,
 			status,
 		} = this.state;
-		const suffix1 = zzbm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
+		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		let columns = [];
 		let header = '';
@@ -93,21 +94,20 @@ export default class CheckerTable extends Component {
 			dataIndex: 'order',
 		},{
 			title:"编码",
-			dataIndex: 'attrs.zzbm',
+			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
-			dataIndex: 'section',
+			dataIndex: 'Section',
 		},{
 			title:"位置",
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'treetype',
+			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"抽查人",
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				return <span>{attrs.checker || '/'}</span>
+				return <span>{record.Checker || '/'}</span>
 			}
 		},{
 			title:"状态",
@@ -117,7 +117,7 @@ export default class CheckerTable extends Component {
 			dataIndex: 'locationstatus',
 		},{
 			title:"状态信息",
-			dataIndex: 'attrs.checkerinfo',
+			dataIndex: 'SupervisorInfo',
 		},{
 			title:"状态时间",
 			render: (text,record) => {
@@ -129,7 +129,7 @@ export default class CheckerTable extends Component {
 					<Row>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>编码：</span>
-							<Input  suffix={suffix1} value={zzbm} className='forestcalcw2 mxw100' onChange={this.zzbmchange.bind(this)}/>
+							<Input  suffix={suffix1} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>标段：</span>
@@ -213,15 +213,15 @@ export default class CheckerTable extends Component {
 	}
 
 	emitEmpty1 = () => {
-	    this.setState({zzbm: ''});
+	    this.setState({sxm: ''});
   	}
 
   	emitEmpty2 = () => {
 	    this.setState({rolename: ''});
   	}
 
-	zzbmchange(value) {
-		this.setState({zzbm:value.target.value})
+	sxmchange(value) {
+		this.setState({sxm:value.target.value})
 	}
 
 	onsectionchange(value) {
@@ -301,7 +301,7 @@ export default class CheckerTable extends Component {
     }
     qury(page) {
     	const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
     		checkstatus = '',
     		role = '',
@@ -313,13 +313,13 @@ export default class CheckerTable extends Component {
     	const {actions: {getqueryTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
     		checkstatus,
     		checktime_min:stime&&moment(stime).unix(),
     		checktime_max:etime&&moment(etime).unix(),
     		page,
-    		per_page:size
+    		size
     	}
     	if(!!role)
     		postdata[role] = rolename;
@@ -329,34 +329,31 @@ export default class CheckerTable extends Component {
     		this.setState({loading:false,percent:100})
     		if(!rst)
     			return
-    		let tblData = rst.results;
+    		let tblData = rst.content;
     		if(tblData instanceof Array) {
-    			console.log(222, tblData)
 	    		tblData.forEach((plan, i) => {
-	    			console.log(3333,plan)
-	    			console.log(444, i)
-	    			const {attrs = {}} = plan;
+	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
+	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
 	    			tblData[i].place = place;
 	    			let status = '';
-					if(attrs.checkstatus == 0)
+					if(plan.checkstatus == 0)
 						status = "抽检不通过"
-					else if(attrs.checkstatus == 1) 
+					else if(plan.checkstatus == 1) 
 						status = "抽检通过"
 					else {
 						status = "抽检不通过后修改"
 					}
 					tblData[i].status = status;
-					let locationstatus = !!attrs.locationtime ? '已定位' : '未定位';
+					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
-					let checktime1 = !!attrs.checktime ? moment(attrs.checktime).format('YYYY-MM-DD') : '/';
-					let checktime2 = !!attrs.checktime ? moment(attrs.checktime).format('HH:mm:ss') : '/';
+					let checktime1 = !!plan.CheckTime ? moment(plan.CheckTime).format('YYYY-MM-DD') : '/';
+					let checktime2 = !!plan.CheckTime ? moment(plan.CheckTime).format('HH:mm:ss') : '/';
 					tblData[i].checktime1 = checktime1;
 					tblData[i].checktime2 = checktime2;
 	    		})
 		    	const pagination = { ...this.state.pagination };
-				pagination.total = rst.total;
+				pagination.total = rst.pageinfo.total;
 				pagination.pageSize = size;
 				this.setState({ tblData,pagination:pagination });	
 	    	}
@@ -365,105 +362,35 @@ export default class CheckerTable extends Component {
 
 	exportexcel() {
 		const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
-    		checkstatus = '',
+    		// checkstatus = '',
     		role = '',
     		rolename = '',
     		stime = '',
     		etime = '',
     		exportsize,
     	} = this.state;
-    	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
+    	const {actions: {getqueryTree,getexportTree4Checker},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
-    		checkstatus,
-    		checktime_min:stime&&moment(stime).unix(),
-    		checktime_max:etime&&moment(etime).unix(),
+    		// checkstatus,
+    		stime:stime&&moment(stime).unix(),
+    		etime:etime&&moment(etime).unix(),
     		page:1,
-    		per_page:exportsize
+    		size:exportsize
     	}
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})
-    	getqueryTree({},postdata)
-    	.then(result => {
-    		console.log(111, result)
-    		let rst = result.results;
-    		let total = result.pages;
-    		this.setState({percent:parseFloat((100/total).toFixed(2)),num:1});
-    		if(total !== undefined) {
-    			let all = [Promise.resolve(rst)];
-    			for(let i=2; i<=total; i++)
-                {
-                	postdata.page = i;
-                    all.push(getqueryTree({},postdata)
-                        .then(rst1 => {
-                            let {num} = this.state;
-                            num++;
-                            this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
-                            if(!rst1) {
-                            	message.error(`数据获取失败,丢失100条数据`)
-				    			return []
-				    		} else {
-                            	return rst1.results
-                            }
-                        }))
-                }
-    			Promise.all(all)
-                .then(rst2 => {
-                    if(!rst2) {
-                    	this.setState({loading:false})
-		    			return
-		    		}
-		    		let allData = rst2.reduce((a,b) => {
-                        return a.concat(b)
-                    })
-		    		if(allData instanceof Array) {
-		    			let data = allData.map((plan, i) => {
-		    				const {attrs = {}}= plan;
-		    				let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-		    				let status = '';
-							if(attrs.checkstatus == 0)
-								status = "抽检不通过"
-							else if(attrs.checkstatus == 1) 
-								status = "抽检通过"
-							else {
-								status = "抽检不通过后修改"
-							}
-							let locationstatus = !!attrs.locationtime ? '已定位' : '未定位';
-							let checktime = !!attrs.checktime ? moment(attrs.checktime).format('YYYY-MM-DD HH:mm:ss') : '/';
-		    				return [
-		    					++i,
-		    					attrs.zzbm || '/',
-		    					plan.section || '/',
-		    					place,
-		    					plan.treetype || '/',
-		    					attrs.checker || '/',
-		    					status,
-		    					locationstatus,
-		    					attrs.checkerinfo || '/',
-		    					checktime,
-		    				]
-		    			})
-			    		const postdata = {
-			    			keys: ["序号", "编码", "标段", "位置", "树种", "抽检人", "状态", "定位", "状态信息", "状态时间"],
-			    			values: data
-			    		}
-			    		getexportTree({},postdata)
-			    		.then(rst3 => {
-			    			this.setState({loading:false})
-			    			let url = `${FOREST_API}/${rst3.file_path}`
-							this.createLink("excel_link", url);
-			    		})
-                    } else {
-                    	this.setState({loading:false})
-                    }
-    		    })
-    		}
-    	})
+    	getexportTree4Checker({},postdata)
+		.then(rst3 => {
+			console.log('rst3',rst3)
+			this.setState({loading:false})
+			window.location.href = `${FOREST_API}/${rst3}`
+		})
 	}
 
 	createLink(name,url) {

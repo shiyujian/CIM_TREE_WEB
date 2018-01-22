@@ -114,15 +114,83 @@ class NewsTable extends Component {
 
 	}
 
-	// //发布新闻
+
+	//发布新闻
 	// publishNewsClick() {
-	// 	const { actions: { toggleModal } } = this.props;
+	// 	const {
+	// 		actions: { deleteData, getNewsList, getDraftNewsList, toggleModal, patchData },
+	// 		newsTabValue = '1'
+	// 	} = this.props;
+	// 	// const { actions: { toggleModal } } = this.props;
 	// 	toggleModal({
 	// 		type: 'NEWS',
 	// 		status: 'ADD',
 	// 		visible: true,
 	// 		editData: null
 	// 	})
+	// 	if (type === 'DELETE') {
+	// 		deleteData({ pk: record.id })
+	// 			.then(() => {
+	// 				message.success('删除新闻成功！');
+	// 				if (newsTabValue === '1') {
+	// 					getNewsList({
+	// 						user_id: user_id
+	// 					});
+	// 				} else {
+	// 					getDraftNewsList({
+	// 						user_id: user_id
+	// 					});
+	// 				}
+	// 			})
+	// 	} else if (type === 'EDIT') {
+	// 		toggleModal({
+	// 			type: 'NEWS',
+	// 			status: 'EDIT',
+	// 			visible: true,
+	// 			editData: record,
+	// 		})
+	// 	} else if (type === 'VIEW') {
+	// 		this.setState({
+	// 			visible: true,
+	// 			container: record.raw
+	// 		})
+	// 	} else if (type === 'BACK') {
+	// 		let newData = {
+	// 			"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+	// 			"is_draft": true
+	// 		};
+	// 		patchData({ pk: record.id }, newData)
+	// 			.then(rst => {
+	// 				if (rst.id) {
+	// 					message.success('撤回成功，撤回的新闻在暂存的新闻中可查看');
+	// 					//更新暂存的新闻列表数据
+	// 					getNewsList({
+	// 						user_id: user_id
+	// 					});
+	// 					getDraftNewsList({
+	// 						user_id: user_id
+	// 					});
+	// 				}
+	// 			})
+	// 	} else if (type === 'PUBLISH') {
+	// 		let newData = {
+	// 			"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+	// 			"is_draft": false
+	// 		};
+	// 		patchData({ pk: record.id }, newData)
+	// 			.then(rst => {
+	// 				if (rst.id) {
+	// 					message.success('重新发布新闻成功！');
+	// 					//更新暂存的新闻列表数据
+	// 					getNewsList({
+	// 						user_id: user_id
+	// 					});
+	// 					getDraftNewsList({
+	// 						user_id: user_id
+	// 					});
+	// 				}
+	// 			})
+	// 	}
 	// }
 
 	handleCancel() {
@@ -172,7 +240,7 @@ class NewsTable extends Component {
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
 				// task: filter.type || "processing",
-				executor:user.id,
+				executor: user.id,
 				title: values.title || "",
 				// workflow:values.workflow || "",
 				// creator:values.creator || "",
@@ -194,14 +262,23 @@ class NewsTable extends Component {
 			// setLoadingStatus(false);
 		})
 	}
+	publishNewsClick(record) {
+		const {actions: {toggleModal}} = this.props;
+		toggleModal({
+			type: 'NEWS',
+			status: 'ADD',
+			visible: true,
+			editData: record
+		})
+	}
 
 	query1() {
-	
+
 		const {
 			actions: { getDraftNewsList },
 			filter = {}
 		} = this.props;
-		
+
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
 				// task: filter.type || "processing",
@@ -244,7 +321,14 @@ class NewsTable extends Component {
 						}
 					</div>}
 				<Col span={22} offset={1}>
-					<Tabs activeKey={newsTabValue} onChange={this.subTabChange.bind(this)} >
+					<Tabs activeKey={newsTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
+						<div style={{ marginBottom: '10px' }}>
+							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>新闻发布</Button>
+							{
+								(toggleData.visible && toggleData.type === 'NEWS') && <RichModal {...this.props} />
+							}
+						</div>
+					} >
 
 						<TabPane tab="新闻查询" key="1">
 							<Row >
@@ -398,7 +482,7 @@ class NewsTable extends Component {
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
-									<Button icon='search'  onClick={this.query1.bind(this)}>查找</Button>
+									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
 									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
 								</Col>
 							</Row>
@@ -411,9 +495,9 @@ class NewsTable extends Component {
 								rowKey="id" />
 						</TabPane>
 
-						<TabPane tab="新闻发布" key="3">
+						{/* <TabPane tab="新闻发布" key="3">
 							<RichText {...this.props} />
-						</TabPane>
+						</TabPane> */}
 
 					</Tabs>
 
@@ -512,8 +596,8 @@ class NewsTable extends Component {
 			render: record => {
 				return (
 					<span>
-						{/* <a onClick={this.clickNews.bind(this, record, 'PUBLISH')}>发布</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp; */}
+						<a onClick={this.clickNews.bind(this, record, 'PUBLISH')}>发布</a>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>

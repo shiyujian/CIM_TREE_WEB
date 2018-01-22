@@ -222,7 +222,13 @@ class TipsTable extends Component {
 						}
 					</div>}
 				<Col span={22} offset={1}>
-					<Tabs activeKey={tipsTabValue} onChange={this.subTabChange.bind(this)} >
+					<Tabs activeKey={tipsTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
+						<div style={{ marginBottom: '10px' }}>
+							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>通知发布</Button>
+							{
+								(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props} />)
+							}
+						</div>} >
 						<TabPane tab="通知查询" key="1">
 							<Row >
 								<Col span={4}>
@@ -427,9 +433,9 @@ class TipsTable extends Component {
 								style={{ marginTop: 20 }}
 							/>
 						</TabPane>
-						<TabPane tab="通知发布" key="3">
+						{/* <TabPane tab="通知发布" key="3">
 							<SimpleText {...this.props} />
-						</TabPane>
+						</TabPane> */}
 					</Tabs>
 				</Col>
 			</Row>

@@ -23,12 +23,13 @@ export default class FaithModal extends Component {
     		treetypename: '',
     		integrity: '',
     		percent:0,
-    		nurseryname: '',
+    		factory: '',
 		}
 	}
 
     componentWillReceiveProps(nextProps) {
         const {honestyList = []} = nextProps;
+        console.log('honestyList',honestyList)
         if(honestyList.length != 0){
             this.setState({
                 loading1:false
@@ -47,12 +48,11 @@ export default class FaithModal extends Component {
             honestyList = [],
             nurseryName =  ""
 		} = this.props;
+        console.log('this.props',this.props)
         let newList = [];
-        honestyList.map((item) => {
-            item.map((it,index)=>{
-                it.order = index + 1;
-                newList.push(it);
-            })
+        honestyList.map((item,index) => {
+                item.order = index + 1;
+                newList.push(item);
         })
 		return (
 			<Modal
@@ -92,13 +92,13 @@ export default class FaithModal extends Component {
 			dataIndex: 'order',
 		},{
 			title:"标段",
-			dataIndex: 'section',
+			dataIndex: 'Section',
 		},{
 			title:"树种",
-			dataIndex: 'treetype',
+			dataIndex: 'TreeTypeName',
 		},{
 			title:"诚信度",
-			dataIndex: 'integrity',
+			dataIndex: 'Sincerity',
 		}];
 
 	hideModal() {
@@ -113,44 +113,20 @@ export default class FaithModal extends Component {
             integrity = '',
         } = this.state;
         const {
-            actions: {getHonestyNewDetailModal, getexportTree},
+            actions: {getHonestyNewDetailModal, getexportFactoryAnalyseDetailInfo},
             keycode = '',
             nurseryName = '',
         } = this.props;
         
         let postdata = {
-            nurseryname: nurseryName
+            factory: nurseryName
         }
         this.setState({loading:true,percent:0})
-        getHonestyNewDetailModal({}, postdata)
-        .then(result => {
-            if(!result) {
-                this.setState({loading:false,percent:100})
-                return
-            }
-            if(result instanceof Array) {
-                let data = result[0].map((plan, i) => {
-                    return [
-                        ++i,
-                        plan.section || '/',
-                        plan.treetype || '/',
-                        plan.integrity || '',
-                    ]
-                })
-                const postdata = {
-                    keys: ["序号", "标段", "树种" , "诚信度"],
-                    values: data
-                }
-                getexportTree({},postdata)
+        getexportFactoryAnalyseDetailInfo({},postdata)
                 .then(rst3 => {
                     this.setState({loading:false,percent:100})
-                    let url = `${FOREST_API}/${rst3.file_path}`
-                    this.createLink("excel_link", url);
+                    window.location.href = `${FOREST_API}/${rst3}`
                 })
-            } else {
-                this.setState({loading:false,percent:100})
-            }
-        })
     }
 
 	createLink(name,url) {

@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { Sidebar, DynamicTitle } from '_platform/components/layout';
+
 import {
-  Form, Input, Button, Row, Col, message, Popconfirm, DatePicker, Table
+  Form, Input, Button, Row, Col, message, Popconfirm, DatePicker, Table,Modal
 } from 'antd';
+
+
 import '../Datum/index.less'
 
 const FormItem = Form.Item;
@@ -46,6 +49,12 @@ import {
   NavLink
 } from 'react-router-dom';
 class ImageInfo extends Component {
+  constructor(props){
+    super(props);
+    this.state={
+      previewModalVisible:false
+    }
+  }
 
   static layout = {
     labelCol: { span: 6 },
@@ -62,6 +71,16 @@ class ImageInfo extends Component {
     const { actions: { getModalUpdate } } = this.props;
     getModalUpdate(true)
   }
+  preview(file) {
+    this.setState({previewModalVisible:true})
+  }
+  cancelT(){
+    this.setState({previewModalVisible:false})
+  }
+  determine(){
+
+  }
+
 
   render() {
     const columns = [{
@@ -83,8 +102,8 @@ class ImageInfo extends Component {
         let nodes = [];
         nodes.push(
           <div>
-            <a >预览</a>
-            <a onClick={this.updateT.bind(this, record)} style={{ marginLeft: 10 }}>更新</a>
+            <a onClick={this.preview.bind(this)}>预览</a>
+            <a onClick={this.updateT.bind(this)} style={{ marginLeft: 10 }}>更新</a>
           </div>
         );
         return nodes;
@@ -94,7 +113,7 @@ class ImageInfo extends Component {
 
     return (
 
-      <Form style={{ marginBottom: 24 ,marginLeft:50}}>
+      <Form style={{ marginBottom: 24, marginLeft: 50 }}>
         <Row gutter={24}>
           <Col span={14}>
             <FormItem>
@@ -145,6 +164,23 @@ class ImageInfo extends Component {
             columns={columns}
             dataSource={data}
           />
+
+          <Modal title="影像预览"
+            closable
+            width={920} visible={this.state.previewModalVisible}
+            footer={null}
+            onCancel={this.cancelT.bind(this)}
+            cancelText={"关闭"}
+            maskClosable={false}>
+            <video
+              controls
+              preload="auto"
+              width="800px"
+              height="500px"
+            >
+              <source src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_6c2DEME.mp4"} />
+            </video>
+          </Modal>
         </Row>
       </Form>
     );

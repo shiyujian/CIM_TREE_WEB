@@ -5,9 +5,10 @@ import {actions as platformActions} from '_platform/store/global';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Tabs} from 'antd';
+import { getUser } from '_platform/auth';
 import NewsTable from '../components/Receipt/NewsTable'
 import TipsTable from '../components/Receipt/TipsTable'
-import ProjectTree from '../components/Receipt/ProjectTree'
+// import ProjectTree from '../components/Receipt/ProjectTree'
 
 const TabPane = Tabs.TabPane;
 
@@ -22,6 +23,19 @@ const TabPane = Tabs.TabPane;
 )
 export default class Receipt extends Component {
 	static propTypes = {};
+
+	
+	componentDidMount() {
+		const { actions: { getReceiveInfoAc, getSentInfoAc, getOrgListAc } } = this.props;
+		getReceiveInfoAc({
+			user: encodeURIComponent(getUser().org)
+		});
+		getSentInfoAc({
+			user: encodeURIComponent(getUser().org)
+		});
+		getOrgListAc()
+	}
+
 
 	//新闻和通知的切换
 	tabChange(tabValue) {
@@ -52,7 +66,7 @@ export default class Receipt extends Component {
 			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="现场收发文" {...this.props}/>
 				<Sidebar>
-					<ProjectTree {...this.props} onSelect={this.onSelect.bind(this)} />
+					{/* <ProjectTree {...this.props} onSelect={this.onSelect.bind(this)} /> */}
 				</Sidebar>
 				<Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
 					<TabPane tab="现场发文" key="1">
@@ -62,7 +76,7 @@ export default class Receipt extends Component {
 						<TipsTable {...this.props}/>
 					</TabPane>
 					<TabPane tab="现场回文" key="3">
-						<TipsTable {...this.props}/>
+						{/* <TipsTable {...this.props}/> */}
 					</TabPane>
 				</Tabs>
 				

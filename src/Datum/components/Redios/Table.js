@@ -43,6 +43,7 @@ export default class GeneralTable extends Component {
 							             placement="right">
 								    <a>预览</a>
 							    </Popover>
+								
                                 <span className="ant-divider" />
 							    <a onClick={this.update.bind(this,record)}>更新</a>
 						    </div>
@@ -68,6 +69,11 @@ export default class GeneralTable extends Component {
 					 footer={[<Button key="back" size="large" onClick={this.cancel.bind(this)}>关闭查看</Button>]}>
 				  <img  src={`${SOURCE_API}` + this.state.imgurl} alt="图片"/>
 				</Modal>
+				预览
+				 <video width={200} height={100} autoplay={autoplay} src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_6c2DEME.mp4"}>
+				预览
+									
+				</video>
 			</div>
         );
     }

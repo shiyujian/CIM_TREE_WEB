@@ -90,7 +90,7 @@ class Modals extends Component {
 			});
 			editor.txt.html(toggleData.editData.raw)
 			setFieldsValue({
-				'title': toggleData.editData.title,
+				'title': toggleData.editData.title1 || '',
 			})
 		}
 	}
@@ -152,7 +152,7 @@ class Modals extends Component {
 				//判断是发布公告还是更新公告
 				if (toggleData.status === 'ADD') {
 					let newData = {
-						"title": values['title'],
+						"title": values['title1'] || '',
 						"abstract": '',
 						"raw": this.state.content,
 						"content": "",
@@ -180,7 +180,7 @@ class Modals extends Component {
 						})
 				} else if (toggleData.status === 'EDIT') {
 					let newData = {
-						"title": values['title'],
+						"title": values['title1'] || '',
 						"raw": this.state.content,
 						"attachment": {
 							"fileList": fileList || [],
@@ -206,12 +206,14 @@ class Modals extends Component {
 				}
 			}
 		});
+		
 	}
 
 	//暂存公告
 	draftDataFunc() {
+
 		const {
-			actions: { postData, patchData, getTipsList, getDraftTipsList },
+			actions: {postData, patchData, getTipsList, getDraftTipsList },
 			form: { validateFields },
 			toggleData: toggleData = {
 				status: 'ADD',
@@ -224,7 +226,7 @@ class Modals extends Component {
 		if (toggleData.status === 'EDIT') {
 			validateFields((err, values) => {
 				let newData = {
-					"title": values['title'],
+					"title": values['title1'] || '',
 					"raw": this.state.content,
 					"attachment": {
 						"fileList": fileList || [],
@@ -250,7 +252,7 @@ class Modals extends Component {
 		} else if (toggleData.status === 'ADD') {
 			validateFields((err, values) => {
 				let newData = {
-					"title": values['title'] || '',
+					"title": values['title1'] || '',
 					"abstract": '',
 					"raw": this.state.content,
 					"attachment": {
@@ -274,6 +276,7 @@ class Modals extends Component {
 					})
 			})
 		}
+		
 	}
 
 	render() {
@@ -295,22 +298,18 @@ class Modals extends Component {
 		};
 		return (
 			<Modal
-				title={toggleData.type === 'TIPS' ? (
-					toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
-				) : '发布公告'}
-				visible={toggleData.visible}
-				footer={null}
-				width="80%"
-				maskClosable={false}
-				onOk={this.modalClick.bind(this)}
-				onCancel={this.modalClick.bind(this)}
-			>
+            visible={toggleData.visible}
+            onOk={this.modalClick.bind(this)}
+            onCancel={this.modalClick.bind(this)}
+            footer={null}
+            width="80%"
+            >
 			<div>
 				<Form>
 					<Row span={22}>
 						<Col span={8} offset={1}>
 							<FormItem {...formItemLayout} label="主题">
-								{getFieldDecorator('title', {
+								{getFieldDecorator('title1', {
 									rules: [{ required: true, message: '请输入公告标题' }],
 									initialValue: ''
 								})(

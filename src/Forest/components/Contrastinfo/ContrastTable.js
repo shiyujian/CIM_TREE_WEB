@@ -15,12 +15,12 @@ export default class ContrastTable extends Component {
         	tblData: [],
         	pagination: {},
         	loading: false,
-        	size:12,
+        	size:10,
         	exportsize: 100,
         	leftkeycode: '',
         	stime: moment().format('2017-11-23 00:00:00'),
 			etime: moment().format('2017-11-23 23:59:59'),
-			zzbm: '',
+			sxm: '',
 			section: '',
     		treety: '',
     		treetype: '',
@@ -61,6 +61,7 @@ export default class ContrastTable extends Component {
 		);
 	}
 	treeTable(details) {
+		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -70,7 +71,7 @@ export default class ContrastTable extends Component {
 			standardoption,
 		} = this.props;
 		const {
-			zzbm, 
+			sxm, 
 			factory,
 			section,
 			treety,
@@ -78,7 +79,7 @@ export default class ContrastTable extends Component {
 			isstandard,
 		} = this.state;
 		//清除
-		const suffix1 = zzbm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
+		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = factory ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		let columns = [];
 		let header = '';
@@ -87,22 +88,22 @@ export default class ContrastTable extends Component {
 			dataIndex: 'order',
 		},{
 			title:"编码",
-			dataIndex: 'attrs.zzbm',
+			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
-			dataIndex: 'section',
+			dataIndex: 'Section',
 		},{
 			title:"位置",
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'treetype',
+			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"供苗商",
-			dataIndex: 'factory',
+			dataIndex: 'Factory',
 		},{
 			title:"苗圃名称",
-			dataIndex: 'nurseryname',
+			dataIndex: 'NurseryName',
 		},{
 			title: "起苗时间",
 			render: (text,record) => {
@@ -112,8 +113,8 @@ export default class ContrastTable extends Component {
 		},{
 			title:<div><div>树高</div><div>(供苗商)</div></div>,
 			render: (text,record) => {
-				if(record.n_gd && record.n_gd != 0)
-					return <a disabled={!record.n_gdfj} onClick={this.onImgClick.bind(this,record.n_gdfj)}>{record.n_gd}</a>
+				if(record.FGD && record.FGD != 0)
+					return <a disabled={!record.FGDFJ} onClick={this.onImgClick.bind(this,record.FGDFJ)}>{record.FGD}</a>
 				else {
 					return <span>/</span>
 				}
@@ -121,8 +122,8 @@ export default class ContrastTable extends Component {
 		},{
 			title:<div><div>土球高度</div><div>(供苗商)</div></div>,
 			render: (text,record) => {
-				if(record.n_tqhd && record.n_tqhd != 0)
-					return <a disabled={!record.n_tqhdfj} onClick={this.onImgClick.bind(this,record.n_tqhdfj)}>{record.n_tqhd}</a>
+				if(record.FTQHD && record.FTQHD != 0)
+					return <a disabled={!record.FTQHDFJ} onClick={this.onImgClick.bind(this,record.FTQHDFJ)}>{record.FTQHD}</a>
 				else {
 					return <span>/</span>
 				}
@@ -130,8 +131,8 @@ export default class ContrastTable extends Component {
 		},{
 			title:<div><div>土球直径</div><div>(供苗商)</div></div>,
 			render: (text,record) => {
-				if(record.n_tqzj && record.n_tqzj != 0)
-					return <a disabled={!record.n_tqzjfj} onClick={this.onImgClick.bind(this,record.n_tqzjfj)}>{record.n_tqzj}</a>
+				if(record.FTQZJ && record.FTQZJ != 0)
+					return <a disabled={!record.FTQZJFJ} onClick={this.onImgClick.bind(this,record.FTQZJFJ)}>{record.FTQZJ}</a>
 				else {
 					return <span>/</span>
 				}
@@ -139,9 +140,8 @@ export default class ContrastTable extends Component {
 		},{
 			title:<div><div>树高</div><div>(监理)</div></div>,
 			render: (text,record) => {
-				const {attrs = {} } = record;
-				if(attrs.gd && attrs.gd != 0)
-					return <a disabled={!attrs.gdfj} onClick={this.onImgClick.bind(this,attrs.gdfj)}>{attrs.gd}</a>
+				if(record.GD && record.GD != 0)
+					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
 				else {
 					return <span>/</span>
 				}
@@ -149,9 +149,8 @@ export default class ContrastTable extends Component {
 		},{
 			title:<div><div>土球高度</div><div>(监理)</div></div>,
 			render: (text,record) => {
-				const {attrs = {} } = record;
-				if(attrs.tqhd && attrs.tqhd != 0)
-					return <a disabled={!attrs.tqhdfj} onClick={this.onImgClick.bind(this,attrs.tqhdfj)}>{attrs.tqhd}</a>
+				if(record.TQHD && record.TQHD != 0)
+					return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
 				else {
 					return <span>/</span>
 				}
@@ -159,9 +158,8 @@ export default class ContrastTable extends Component {
 		},{
 			title:<div><div>土球直径</div><div>(监理)</div></div>,
 			render: (text,record) => {
-				const {attrs = {} } = record;
-				if(attrs.tqzj && attrs.tqzj != 0)
-					return <a disabled={!attrs.tqzjfj} onClick={this.onImgClick.bind(this,attrs.tqzjfj)}>{attrs.tqzj}</a>
+				if(record.TQZJ && record.TQZJ != 0)
+					return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
 				else {
 					return <span>/</span>
 				}
@@ -171,7 +169,7 @@ export default class ContrastTable extends Component {
 			render: (text,record) => {
 				return <div>
 					{
-						record.isstandard == 1
+						record.IsStandard == 1
 						? <span>合标</span>
 						: <span style={{color: 'red'}}>不合标</span>
 					}
@@ -180,8 +178,7 @@ export default class ContrastTable extends Component {
 		},{
 			title:"监理人",
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				return <span>{attrs.supervisor || '/'}</span>
+				return <span>{record.SupervisorUser.Full_Name || '/'}</span>
 				
 			}
 		}];
@@ -189,7 +186,7 @@ export default class ContrastTable extends Component {
 					<Row>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>编码：</span>
-							<Input suffix={suffix1} value={zzbm} className='forestcalcw2 mxw100' onChange={this.zzbmchange.bind(this)}/>
+							<Input suffix={suffix1} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>标段：</span>
@@ -273,15 +270,15 @@ export default class ContrastTable extends Component {
 	}
 
 	emitEmpty1 = () => {
-	    this.setState({zzbm: ''});
+	    this.setState({sxm: ''});
   	}
 
   	emitEmpty2 = () => {
 	    this.setState({factory: ''});
   	}
 
-	zzbmchange(value) {
-		this.setState({zzbm:value.target.value})
+	sxmchange(value) {
+		this.setState({sxm:value.target.value})
 	}
 
 	onsectionchange(value) {
@@ -300,8 +297,8 @@ export default class ContrastTable extends Component {
 
 	ontreetypechange(value) {
 		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.name == value)
-		this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''})
+		let treetype = treetypelist.find(rst => rst.TreeTypeNo == value)
+		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
     }
 
     factorychange(value) {
@@ -345,7 +342,7 @@ export default class ContrastTable extends Component {
 
     qury(page) {
     	const {
-    		zzbm = '',
+    		sxm = '',
     		section = '',
     		treety = '',
     		treetype = '',
@@ -358,16 +355,16 @@ export default class ContrastTable extends Component {
     	const {actions: {getfactoryAnalyse},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
     		treety,
     		treetype,
     		factory,
     		isstandard,
-    		liftime_min:stime&&moment(stime).add(8, 'h').unix(),
-    		liftime_max:etime&&moment(etime).add(8, 'h').unix(),
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
-    		per_page:size
+    		size
     	}
     	this.setState({loading:true,percent:0})
     	getfactoryAnalyse({},postdata)
@@ -375,20 +372,20 @@ export default class ContrastTable extends Component {
     		this.setState({loading:false,percent:100})
     		if(!rst)
     			return
-    		let tblData = rst.result;
+    		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
-	    			const {attrs = {}} = plan;
+	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
+	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
 	    			tblData[i].place = place;
-					let liftertime1 = !!plan.liftertime ? moment(plan.liftertime).format('YYYY-MM-DD') : '/';
-					let liftertime2 = !!plan.liftertime ? moment(plan.liftertime).format('HH:mm:ss') : '/';
+					let liftertime1 = !!plan.LifterTime ? moment(plan.LifterTime).format('YYYY-MM-DD') : '/';
+					let liftertime2 = !!plan.LifterTime ? moment(plan.LifterTime).format('HH:mm:ss') : '/';
 					tblData[i].liftertime1 = liftertime1;
 					tblData[i].liftertime2 = liftertime2;
 	    		})
 		    	const pagination = { ...this.state.pagination };
-				pagination.total = rst.total;
+				pagination.total = rst.pageinfo.total;
 				pagination.pageSize = size;
 				this.setState({ tblData,pagination:pagination });	
 	    	}
@@ -397,9 +394,8 @@ export default class ContrastTable extends Component {
 
 	exportexcel() {
 		const {
-			zzbm = '',
+			sxm = '',
     		section = '',
-    		treety = '',
     		treetype = '',
     		factory = '',
     		isstandard = '',
@@ -407,94 +403,25 @@ export default class ContrastTable extends Component {
     		etime = '',
     		exportsize,
     	} = this.state;
-    	const {actions: {getfactoryAnalyse,getexportTree},keycode = ''} = this.props;
+    	const {actions: {getfactoryAnalyse,getexportFactoryAnalyse},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
-    		zzbm,
+    		sxm,
     		section,
-    		treety,
     		treetype,
     		factory,
     		isstandard,
     		liftime_min:stime&&moment(stime).add(8, 'h').unix(),
     		liftime_max:etime&&moment(etime).add(8, 'h').unix(),
     		page:1,
-    		per_page:exportsize
+    		size:exportsize
     	}
     	this.setState({loading:true,percent:0})
-    	getfactoryAnalyse({},postdata)
-    	.then(result => {
-    		let rst = result.result;
-    		let total = result.pages;
-    		this.setState({percent:parseFloat((100/total).toFixed(2)),num:1});
-    		if(total !== undefined) {
-    			let all = [Promise.resolve(rst)];
-    			for(let i=2; i<=total; i++)
-                {
-                	postdata.page = i;
-                    all.push(getfactoryAnalyse({},postdata)
-                        .then(rst1 => {
-                            let {num} = this.state;
-                            num++;
-                            this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
-                            if(!rst1) {
-                            	message.error(`数据获取失败,丢失100条数据`)
-				    			return []
-				    		} else {
-                            	return rst1.result
-                            }
-                        }))
-                }
-    			Promise.all(all)
-                .then(rst2 => {
-                    if(!rst2) {
-                    	this.setState({loading:false})
-		    			return
-		    		}
-		    		let allData = rst2.reduce((a,b) => {
-                        return a.concat(b)
-                    })
-		    		if(allData instanceof Array) {
-		    			let data = allData.map((plan, i) => {
-		    				const {attrs = {}}= plan;
-		    				let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-							let liftertime = !!plan.liftertime ? moment(plan.liftertime).format('YYYY-MM-DD HH:mm:ss') : '/';
-							let isstandard = plan.isstandard == 1 ? '合标' : '不合标';
-		    				return [
-		    					++i,
-		    					attrs.zzbm || '/',
-		    					plan.section || '/',
-		    					place,
-		    					plan.treetype || '/',
-		    					plan.factory || '',
-		    					plan.nurseryname || '/',
-		    					liftertime,
-		    					plan.n_gd || '/',
-		    					plan.n_tqhd || '/',
-		    					plan.n_tqzj || '/',
-		    					attrs.gd || '/',
-		    					attrs.tqhd || '/',
-		    					attrs.tqzj || '/',
-		    					isstandard,
-		    					attrs.supervisor || '/',
-		    				]
-		    			})
-			    		const postdata = {
-			    			keys: ["序号", "编码", "标段", "位置", "树种", "供苗商", "苗圃名称", "起苗时间", "树高（供苗商）","土球高度（供苗商）","土球直径（供苗商）","树高（监理）","土球高度（监理）","土球直径（监理）","是否合标", "监理人"],
-			    			values: data
-			    		}
-			    		getexportTree({},postdata)
-			    		.then(rst3 => {
-			    			this.setState({loading:false})
-			    			let url = `${FOREST_API}/${rst3.file_path}`
-							this.createLink("excel_link", url);
-			    		})
-                    } else {
-                    	this.setState({loading:false})
-                    }
-    		    })
-    		}
-    	})
+    	getexportFactoryAnalyse({},postdata)
+		.then(rst3 => {
+			window.location.href = `${FOREST_API}/${rst3}`
+			this.setState({loading:false})
+		})
 	}
 
 	createLink(name,url) {
