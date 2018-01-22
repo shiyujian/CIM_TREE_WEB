@@ -7,6 +7,7 @@ export default class GeneralTable extends Component {
 
 	render() {
 		const { Doc = [] } = this.props;
+		console.log('ttt',this.props)
 		return (
 			<Table rowSelection={this.rowSelection}
 				dataSource={Doc}

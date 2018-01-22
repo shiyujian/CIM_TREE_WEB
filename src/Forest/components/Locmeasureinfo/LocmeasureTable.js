@@ -28,9 +28,9 @@ export default class LocmeasureTable extends Component {
         	thinclass: '',
         	treetypename: '',
         	status: '',
-    		supervisorcheck: '',
-    		checkstatus: '',
-    		locationstatus: '',
+    		SupervisorCheck: '',
+    		CheckStatus: '',
+    		islocation: '',
     		role: 'inputer',
     		rolename: '',
     		percent:0,
@@ -88,7 +88,7 @@ export default class LocmeasureTable extends Component {
 			treety,
 			treetypename,
 			status,
-			locationstatus,
+			islocation,
 		} = this.state;
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
@@ -111,10 +111,10 @@ export default class LocmeasureTable extends Component {
 			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"状态",
-			dataIndex: 'status',
+			dataIndex: 'statusname',
 		},{
 			title:"定位",
-			dataIndex: 'locationstatus',
+			dataIndex: 'islocation',
 		},{
 			title:"测量人",
 			render: (text,record) => {
@@ -283,7 +283,7 @@ export default class LocmeasureTable extends Component {
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>定位：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={locationstatus} onChange={this.onlocationchange.bind(this)}>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={islocation} onChange={this.onlocationchange.bind(this)}>
 								{locationoption}
 							</Select>
 						</Col>
@@ -391,40 +391,40 @@ export default class LocmeasureTable extends Component {
     }
 
 	onstatuschange(value) {
-		let supervisorcheck = '';
-		let checkstatus  = '';
+		let SupervisorCheck = '';
+		let CheckStatus  = '';
 		switch(value){
 			case "1": 
-				supervisorcheck = -1;
+				SupervisorCheck = -1;
 				break;
 			case "2": 
-				supervisorcheck = 1;
-				checkstatus = -1;
+				SupervisorCheck = 1;
+				CheckStatus = -1;
 				break;
 			case "3": 
-				supervisorcheck = 0;
+				SupervisorCheck = 0;
 				break;
 			case "4": 
-				supervisorcheck = 1;
-				checkstatus = 0;
+				SupervisorCheck = 1;
+				CheckStatus = 0;
 				break;
 			case "5": 
-				supervisorcheck = 1;
-				checkstatus = 1;
+				SupervisorCheck = 1;
+				CheckStatus = 1;
 				break;
-			case "6": 
-				supervisorcheck = 1;
-				checkstatus = 2;
-				break;
+			// case "6": 
+			// 	SupervisorCheck = 1;
+			// 	CheckStatus = 2;
+			// 	break;
 			default:
 				break;
 		}
-		this.setState({supervisorcheck,checkstatus,status:value || ''})
+		this.setState({SupervisorCheck,CheckStatus,status:value || ''})
 
     }
 
     onlocationchange(value) {
-		this.setState({locationstatus:value || ''})
+		this.setState({islocation:value || ''})
     }
 
 	onrolenamechange(value) {
@@ -470,11 +470,12 @@ export default class LocmeasureTable extends Component {
     		treetype = '',
     		supervisorcheck = '',
     		checkstatus = '',
-    		locationstatus = '',
+    		islocation = '',
     		role = '',
     		rolename = '',
     		stime = '',
     		etime = '',
+    		status = '',
     		size,
     	} = this.state;
     	const {actions: {getqueryTree},keycode = ''} = this.props;
@@ -486,9 +487,10 @@ export default class LocmeasureTable extends Component {
     		treetype,
     		supervisorcheck,
     		checkstatus,
-    		locationstatus,
-    		createtime_min:stime&&moment(stime).add(8, 'h').unix(),
-    		createtime_max:etime&&moment(etime).add(8, 'h').unix(),
+    		islocation,
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+    		status,
     		page,
     		size:size
     	}
@@ -508,25 +510,25 @@ export default class LocmeasureTable extends Component {
 	    			console.log('plan.No',~~plan.No)
 	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
 	    			tblData[i].place = place;
-	    			let status = '';
-					if(plan.supervisorcheck == -1)
-						status = "待审批"
-					else if(plan.supervisorcheck == 0) 
-						status = "审批未通过"
+	    			let statusname = '';
+					if(plan.SupervisorCheck == -1)
+						statusname = "待审批"
+					else if(plan.SupervisorCheck == 0) 
+						statusname = "审批未通过"
 					else {
-						if(plan.checkstatus == 0)
-							status = "抽检不通过"
-						else if(plan.checkstatus == 1)
-							status = "抽检通过"
-						else if(plan.checkstatus == 2)
-							status = "抽检不通过后修改"
+						if(plan.CheckStatus == 0)
+							statusname = "抽检不通过"
+						else if(plan.CheckStatus == 1)
+							statusname = "抽检通过"
+						// else if(plan.CheckStatus == 2)
+							
 						else {
-							status = "审批通过"
+							statusname = "审批通过"
 						}
 					}
-					tblData[i].status = status;
-					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
-					tblData[i].locationstatus = locationstatus;
+					tblData[i].statusname = statusname;
+					let islocation = !!plan.LocationTime ? '已定位' : '未定位';
+					tblData[i].islocation = islocation;
 					let createtime1 = !!plan.CreateTime ? moment(plan.CreateTime).utc().format('YYYY-MM-DD') : '/';
 					let createtime2 = !!plan.CreateTime ? moment(plan.CreateTime).utc().format('HH:mm:ss') : '/';
 					tblData[i].createtime1 = createtime1;

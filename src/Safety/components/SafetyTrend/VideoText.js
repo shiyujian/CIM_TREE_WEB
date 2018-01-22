@@ -106,13 +106,15 @@ class VideoText extends Component {
 		onChange:({file,event})=>{
 			const status = file.status;
 			if (status === 'done') {
-				const {actions:{postUploadFiles},fileList=[]}=this.props;
+				const {actions:{postUploadFiles,postUploadVideo},fileList=[]}=this.props;
 				let newFileList=fileList;
 				let newFile={
 					name:file.name,
 					down_file:STATIC_DOWNLOAD_API + "/media"+file.response.download_url.split('/media')[1]
 				};
 				newFileList=newFileList.concat(newFile);
+				console.log(newFileList)
+				postUploadVideo(newFileList)
 				postUploadFiles(newFileList)
 			}
 			if(event){
@@ -286,6 +288,7 @@ class VideoText extends Component {
 			},
 			fileList=[]
 		} = this.props;
+		console.log(this.props.fileList)
 
 		const {progress} = this.state;
 

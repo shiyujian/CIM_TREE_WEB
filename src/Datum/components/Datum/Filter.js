@@ -28,7 +28,7 @@ export default class Filter extends Component {
 							<Button style={{ marginRight: 10 }} disabled>新增</Button> :
 							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
 						}
-						{/* </Col> */}
+						{/* </Col> */}·
 						{/* <Col span ={2}> */}
 						{/* {
 							(Doc.length === 0 )?

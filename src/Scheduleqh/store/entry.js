@@ -15,14 +15,27 @@ export const changeNursery = createAction(`${ID}传递nurseryName`);
 /*****************************院内************************/
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
 // export const gettreetype = createFetchAction(`${FOREST_API}/tree-types/`, []);
-export const gettreetype = createFetchAction(`${FOREST_API}/tree/wpunits?parent=P009-01`, []);
+export const gettreetype = createFetchAction(`${FOREST_API}/tree/nurserystat?no=P009{{etime}}`, []);
+
+export const gettreetype1 = createFetchAction(`${FOREST_API}/tree/treestat?no=P009`, []);
+export const gettreetype2 = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
+
+export const gettreetype3 = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass{{params}}`, []);
+export const gettreetype4 = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass{{params}}`, []);
+
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/trees/analyse/`, []);
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys/`, []);
 export const getqueryTree = createFetchAction(`${FOREST_API}/tree/queryTree`, []);
 export const getexportTree = createFetchAction(`${FOREST_API}/tree/xlsx/`, [],'POST');
 export const getTreeList = createFetchAction(`${FOREST_API}/trees/list/`, []);
 export const getNurserysCount = createFetchAction(`${FOREST_API}/tree/nurserys/count/`, []);
-export const getNurserysCountFast = createFetchAction(`${FOREST_API}/tree/nurserys/count/fast/`, []);
+// export const getNurserysCountFast = createFetchAction(`${FOREST_API}/tree/nurserys/count/fast/`, []);
+export const getNurserysCountFast = createFetchAction(`${FOREST_API}/tree/nurserystat?no=P009`, []);
+export const getfactory = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, []);
+export const gettreeevery = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
+
+
+
 export const getNurserysProgress = createFetchAction(`${FOREST_API}/tree/nurserys/progress/`, []);
 export const getquality = createFetchAction(`${FOREST_API}/trees/quality/`, []);
 export const getreturn = createFetchAction(`${FOREST_API}/trees/return/`, []);

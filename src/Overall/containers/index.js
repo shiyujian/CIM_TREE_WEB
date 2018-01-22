@@ -7,3 +7,4 @@ export News1 from './News1';
 export Dispatch from './Dispatch';
 export Approval from './Approval';
 export Receipt from './Receipt';
+export Material from './Material';
