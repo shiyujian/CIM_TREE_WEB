@@ -108,7 +108,7 @@ export default class Addition extends Component {
 								<p className="ant-upload-drag-icon">
 									<Icon type="inbox"/>
 								</p>
-								<p className="ant-upload-text">点击或者拖拽开始上传</p>
+								<p>点击或者拖拽开始上传</p>
 								<p className="ant-upload-hint">
 									支持 pdf、doc、docx 文件
 

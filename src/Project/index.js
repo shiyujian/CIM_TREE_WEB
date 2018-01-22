@@ -171,6 +171,18 @@ export default class Project extends Component {
 				icon: <Icon name="money"/>
 			}]
 		}, {
+			key: 'OverallManage',
+			name: '综合管理',
+			icon: <Icon name="won"/>,
+			children: [{
+				key: 'Material',
+				id: 'MATERIAL',
+				name: '物资管理',
+				path: '/project/material',
+				exact: true,
+				icon: <Icon name="retweet"/>,
+			}]
+		},{
 			key: 'safetyManage',
 			name: '安全管理',
 			icon: <Icon name="won"/>,
