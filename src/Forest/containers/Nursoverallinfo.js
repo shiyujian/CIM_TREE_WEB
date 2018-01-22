@@ -99,12 +99,11 @@ export default class Nursoverallinfo extends Component {
         //状态
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={"1"}>待审批</Option>,
-            <Option key={'2'} value={"2"}>审批通过</Option>,
-            <Option key={'3'} value={"3"}>审批未通过</Option>,
-            <Option key={'4'} value={"4"}>抽检未通过</Option>,
-            <Option key={'5'} value={"5"}>抽检通过</Option>,
-            <Option key={'6'} value={"6"}>抽检未通过后修改</Option>,
+            <Option key={'1'} value={"-1"}>待审批</Option>,
+            <Option key={'2'} value={"0"}>审批通过</Option>,
+            <Option key={'3'} value={"1"}>审批未通过</Option>,
+            <Option key={'4'} value={"2"}>抽检未通过</Option>,
+            <Option key={'5'} value={"3"}>抽检通过</Option>,
         ]
         this.setState({statusoption})
         //定位 

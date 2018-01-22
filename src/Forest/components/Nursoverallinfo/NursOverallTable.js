@@ -41,15 +41,9 @@ export default class NursOverallTable extends Component {
     		tqhd_max: '',
     		tqzj_min: '',
     		tqzj_max: '',
-    		gd: '',
-			xj: '',
-			gf: '',
-			dj: '',
-			tqhd: '',
-			tqzj: '',
-    		supervisorcheck: '',
-    		checkstatus: '',
-    		locationstatus: '',
+    		SupervisorCheck: '',
+    		CheckStatus: '',
+    		islocation: '',
     		factory: '',
     		role: 'inputer',
     		rolename: '',
@@ -88,6 +82,7 @@ export default class NursOverallTable extends Component {
 		);
 	}
 	treeTable(details) {
+		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -110,7 +105,7 @@ export default class NursOverallTable extends Component {
 			treetypename,
 			treety,
 			status,
-			locationstatus,
+			islocation,
 			role,
 		} = this.state;
 		const suffix = sxm ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
@@ -135,10 +130,10 @@ export default class NursOverallTable extends Component {
 			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"状态",
-			dataIndex: 'status',
+			dataIndex: 'statusname',
 		},{
 			title:"定位",
-			dataIndex: 'locationstatus',
+			dataIndex: 'islocation',
 		},{
 			title:"定位时间",
 			render: (text,record) => {
@@ -225,7 +220,7 @@ export default class NursOverallTable extends Component {
 		},{
 			title:<div><div>是否</div><div>截干</div></div>,
 			render: (text,record) => {
-				console.log('record',record)
+				// console.log('record',record)
 				return <div>
 							{
 								record.JG == 1
@@ -443,7 +438,7 @@ export default class NursOverallTable extends Component {
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>定位：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={locationstatus} onChange={this.onlocationchange.bind(this)}>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={islocation} onChange={this.onlocationchange.bind(this)}>
 								{locationoption}
 							</Select>
 						</Col>
@@ -609,39 +604,41 @@ export default class NursOverallTable extends Component {
 		this.setState({tqzj_max:value})
 	}
 	onstatuschange(value) {
-		let supervisorcheck = '';
-		let checkstatus  = '';
+		console.log('value',value)
+		let SupervisorCheck = '';
+		let CheckStatus  = '';
 		switch(value){
 			case "1": 
-				supervisorcheck = -1;
+				SupervisorCheck = -1;
 				break;
 			case "2": 
-				supervisorcheck = 1;
-				checkstatus = -1;
+				SupervisorCheck = 1;
+				CheckStatus = -1;
 				break;
 			case "3": 
-				supervisorcheck = 0;
+				SupervisorCheck = 0;
 				break;
 			case "4": 
-				supervisorcheck = 1;
-				checkstatus = 0;
+				SupervisorCheck = 1;
+				CheckStatus = 0;
 				break;
 			case "5": 
-				supervisorcheck = 1;
-				checkstatus = 1;
+				SupervisorCheck = 1;
+				CheckStatus = 1;
 				break;
-			case "6": 
-				supervisorcheck = 1;
-				checkstatus = 2;
-				break;
+			// case "6": 
+			// 	SupervisorCheck = 1;
+			// 	CheckStatus = 2;
+			// 	break;
 			default:
 				break;
 		}
-		this.setState({supervisorcheck,checkstatus,status:value || ''})
+		this.setState({SupervisorCheck,CheckStatus,status:value || ''})
     }
 
     onlocationchange(value) {
-		this.setState({locationstatus:value || ''})
+    	console.log('value',value)
+		this.setState({islocation:value || ''})
     }
 
 	factorychange(value) {
@@ -693,22 +690,48 @@ export default class NursOverallTable extends Component {
     		section = '',
     		treety = '',
     		treetype = '',
-    		gd = '',
-    		xj = '',
-    		gf = '',
-    		dj = '',
-    		tqhd = '',
-    		tqzj = '',
-    		supervisorcheck = '',
-    		checkstatus = '',
-    		locationstatus = '',
+    		gd_min = '',
+    		gd_max = '',
+    		xj_min = '',
+    		xj_max = '',
+    		gf_min = '',
+    		gf_max = '',
+    		dj_min = '',
+    		dj_max = '',
+    		tqhd_min = '',
+    		tqhd_max = '',
+    		tqzj_min = '',
+    		tqzj_max = '',
+    		SupervisorCheck = '',
+    		CheckStatus = '',
+    		islocation = '',
     		factory = '',
     		role = '',
     		rolename = '',
     		stime = '',
     		etime = '',
+    		status = '',
     		size,
     	} = this.state;
+    	let gd = '', xj = '', gf = '', dj = '', tqhd = '', tqzj = ''; 
+    	if(gd_min !== '' && gd_max !== '') {
+    		gd = `${gd_min}-${gd_max}`
+    	}
+    	if(xj_min !== '' && xj_max !== '') {
+    		xj = `${xj_min}-${xj_max}`
+    	}
+    	if(gf_min !== '' && gf_max !== '') {
+    		gf = `${gf_min}-${gf_max}`
+    	}
+    	if(dj_min !== '' && dj_max !== '') {
+    		dj = `${dj_min}-${dj_max}`
+    	}
+    	if(tqhd_min !== '' && tqhd_max !== '') {
+    		tqhd = `${tqhd_min}-${tqhd_max}`
+    	}
+    	if(tqzj_min !== '' && tqzj_max !== '') {
+    		tqzj = `${tqzj_min}-${tqzj_max}`
+    	}
     	const {actions: {getNurserysTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
@@ -722,9 +745,10 @@ export default class NursOverallTable extends Component {
     		dj,
     		tqhd,
     		tqzj,
-    		supervisorcheck,
-    		checkstatus,
-    		locationstatus,
+    		SupervisorCheck,
+    		CheckStatus,
+    		status,
+    		islocation,
     		factory,
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
@@ -745,25 +769,25 @@ export default class NursOverallTable extends Component {
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
 	    			tblData[i].place = place;
-	    			let status = '';
+	    			let statusname = '';
 					if(plan.SupervisorCheck == -1)
-						status = "待审批"
+						statusname = "待审批"
 					else if(plan.SupervisorCheck == 0) 
-						status = "审批未通过"
+						statusname = "审批未通过"
 					else {
 						if(plan.CheckStatus == 0)
-							status = "抽检不通过"
+							statusname = "抽检不通过"
 						else if(plan.CheckStatus == 1)
-							status = "抽检通过"
-						else if(plan.CheckStatus == 2)
-							status = "抽检不通过后修改"
+							statusname = "抽检通过"
+						// else if(plan.CheckStatus == 2)
+							
 						else {
-							status = "审批通过"
+							statusname = "审批通过"
 						}
 					}
-					tblData[i].status = status;
-					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
-					tblData[i].locationstatus = locationstatus;
+					tblData[i].statusname = statusname;
+					let islocation = !!plan.LocationTime ? '已定位' : '未定位';
+					tblData[i].islocation = islocation;
 					let locationtime1 = !!plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
 					let locationtime2 = !!plan.LocationTime ? moment(plan.LocationTime).format('HH:mm:ss') : '/';
 					tblData[i].locationtime1 = locationtime1;
