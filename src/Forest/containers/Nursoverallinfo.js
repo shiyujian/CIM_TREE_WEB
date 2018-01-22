@@ -140,7 +140,7 @@ export default class Nursoverallinfo extends Component {
             locationoption,
             resetkey,
         } = this.state;
-		return (
+        return (
 				<Body>
 					<Main>
 						<DynamicTitle title="苗木综合信息" {...this.props}/>

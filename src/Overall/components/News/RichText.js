@@ -20,12 +20,12 @@ class RichText extends Component {
 
 	componentDidMount() {
 		const elem = this.refs.editorElem;
-		
+
 		editor = new E(elem);
 		this.setState({
 			editor
 		})
-		
+
 		// 使用 onchange 函数监听内容的变化，并实时更新到 state 中
 		editor.customConfig.onchange = html => {
 			this.setState({
@@ -93,7 +93,7 @@ class RichText extends Component {
 
 	//发布新闻
 	postData() {
-		
+
 		const {
 			actions: { postData, getNewsList, patchData, getDraftNewsList },
 			form: { validateFields },
@@ -123,7 +123,7 @@ class RichText extends Component {
 				};
 				postData({}, newData)
 					.then(rst => {
-						
+
 						if (rst.id) {
 							// this.modalClick();
 							this.props.form.setFieldsValue({
@@ -202,46 +202,57 @@ class RichText extends Component {
 		};
 
 		return (
-
-			<div>
-				<Form>
-					<Row>
-						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="主题">
-								{getFieldDecorator('title', {
-									rules: [{ required: true, message: '请输入新闻标题' }],
-									initialValue: ''
-								})(
-									<Input type="text" placeholder="主题" />
+			<Modal
+				title={toggleData.type === 'TIPS' ? (
+					toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
+				) : '发布公告'}
+				visible={toggleData.visible}
+				footer={null}
+				width="80%"
+				maskClosable={false}
+				onOk={this.modalClick.bind(this)}
+				onCancel={this.modalClick.bind(this)}
+			>
+				<div>
+					<Form>
+						<Row>
+							<Col span={8} offset={1}>
+								<FormItem {...formItemLayout} label="主题">
+									{getFieldDecorator('title', {
+										rules: [{ required: true, message: '请输入新闻标题' }],
+										initialValue: ''
+									})(
+										<Input type="text" placeholder="主题" />
+										)}
+								</FormItem>
+							</Col>
+							<Col span={8} offset={1}>
+								<FormItem {...formItemLayout} label="发布单位">
+									{getFieldDecorator('abstract', {})(
+										<Input type="text" />
 									)}
-							</FormItem>
-						</Col>
-						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="发布单位">
-								{getFieldDecorator('abstract', {})(
-									<Input type="text" />
-								)}
-							</FormItem>
-						</Col>
-						{/* <Col span={4} offset={1}>
+								</FormItem>
+							</Col>
+							{/* <Col span={4} offset={1}>
 							<Button>上传</Button>
 						</Col> */}
 
+						</Row>
+					</Form>
+					<Row>
+						<Col span={22} offset={1}>
+							<div ref="editorElem"></div>
+						</Col>
 					</Row>
-				</Form>
-				<Row>
-					<Col span={22} offset={1}>
-						<div ref="editorElem"></div>
-					</Col>
-				</Row>
-				<Row style={{ marginTop: 20 }}>
-					<Col span={24} offset={10} >
-						<Button onClick={this.modalClick.bind(this)}>取消</Button>
-						<Button type='primary' style={{ marginLeft: 20 }} onClick={this.postData.bind(this)} >提交</Button>
-						<Button style={{ marginLeft: 20 }} onClick={this.draftDataFunc.bind(this)}>暂存</Button>
-					</Col>
-				</Row>
-			</div>
+					<Row style={{ marginTop: 20 }}>
+						<Col span={24} offset={10} >
+							<Button onClick={this.modalClick.bind(this)}>取消</Button>
+							<Button type='primary' style={{ marginLeft: 20 }} onClick={this.postData.bind(this)} >提交</Button>
+							<Button style={{ marginLeft: 20 }} onClick={this.draftDataFunc.bind(this)}>暂存</Button>
+						</Col>
+					</Row>
+				</div>
+			</Modal >
 
 		);
 	}
