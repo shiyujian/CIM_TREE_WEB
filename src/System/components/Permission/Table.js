@@ -112,7 +112,7 @@ export default class PermissionTable extends Component {
 			return <Switch checked={value} disabled={!editing} checkedChildren="开" unCheckedChildren="关" onChange={this.check.bind(this, key)}/>
 		}
 	}
-];
+    ];
 	static loop = (MODULES, permissions = []) => {
 		return MODULES.map(module => {
 			const {children = []} = module || {};

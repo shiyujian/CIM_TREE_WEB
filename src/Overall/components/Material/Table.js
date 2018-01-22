@@ -7,7 +7,7 @@ export default class GeneralTable extends Component {
 
 	render() {
 		const { Doc = [] } = this.props;
-		console.log('ttt',this.props)
+		console.log('table.this.props',this.props)
 		return (
 			<Table rowSelection={this.rowSelection}
 				dataSource={Doc}
@@ -26,42 +26,46 @@ export default class GeneralTable extends Component {
 
 	columns = [
 		{
-			title: '名称',
+			title: '单位工程',
 			dataIndex: 'name',
 			key: 'name',
 			// sorter: (a, b) => a.name.length - b.name.length
 		}, {
 			title: '编号',
-			dataIndex: 'extra_params.number',
-			key: 'extra_params.number',
+			dataIndex: 'number',
+			key: 'number',
 			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
 		}, {
-			title: '发布单位',
-			dataIndex: 'extra_params.company',
-			key: 'extra_params.company',
+			title: '文档类型',
+			dataIndex: 'docStyle',
+			key: 'docStyle',
 			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
-			title: '实施日期',
-			dataIndex: 'extra_params.time',
-			key: 'extra_params.time',
+			title: '提交单位',
+			dataIndex: 'company',
+			key: 'company',
 			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
 		}, {
-			title: '备注',
-			dataIndex: 'extra_params.remark',
-			key: 'extra_params.remark'
+			title: '提交人',
+			dataIndex: 'submitPerson',
+			key: 'submitPerson'
 		}, {
-			title: '文档状态',
-			dataIndex: 'extra_params.state',
-			key: 'extra_params.state'
+			title: '提交时间',
+			dataIndex: 'submitTime',
+			key: 'submitTime'
+		},{
+			title: '流程状态',
+			dataIndex: 'flowStyle',
+			key: 'flowStyle'
 		}, {
 			title: '操作',
 			render: (record, index) => {
 				let nodes = [];
 				nodes.push(
 					<div>
-						<a onClick={this.previewFile.bind(this, record)}>预览</a>
-						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
+						<a onClick={this.previewFile.bind(this, record)}>查看</a>
 						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>
 					</div>
 				);
 				return nodes;

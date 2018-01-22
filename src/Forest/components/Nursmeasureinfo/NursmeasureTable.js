@@ -127,7 +127,7 @@ export default class NursmeasureTable extends Component {
 			}
 		},{
 			title:"状态",
-			dataIndex: 'status',
+			dataIndex: 'statusname',
 		},{
 			title:<div><div>树高</div><div>(cm)</div></div>,
 			render: (text,record) => {
@@ -340,15 +340,15 @@ export default class NursmeasureTable extends Component {
     	let status = '';
     	if (value.length === 2) {
     		switch(value[1]){
-    			// 监理退回
+    			// 进场退回
 				case "1": 
 					status = 1;
 					break;
-				// 业主退回
+				// 监理退回
 				case "2": 
 					status = 2;
 					break;
-				// 进场退回
+				// 业主退回
 				case "3": 
 					status = 3;
 					break;
@@ -362,8 +362,8 @@ export default class NursmeasureTable extends Component {
     				status = 0;
     				break;
     			//未种植
-    			case "4":
-    				status = 4;
+    			case "-1":
+    				status = -1;
     				break;
     			default:
     				break;
@@ -446,8 +446,8 @@ export default class NursmeasureTable extends Component {
     		factory,
     		treeplace,
     		nurseryname,
-    		liftime_min:stime&&moment(stime).add(8, 'h').unix(),
-    		liftime_max:etime&&moment(etime).add(8, 'h').unix(),
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
     		size,
     		supervisorcheck,
@@ -465,18 +465,18 @@ export default class NursmeasureTable extends Component {
     		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
-	    			let status = plan.status;
+	    			let statusname = plan.statusname;
 	    			if(postdata.status === '0') 
-	    				status = '已种植'
+	    				statusname = '已种植'
 	    			else if(postdata.status === '1')
-	    				status = '监理退回'
+	    				statusname = '进场退回'
 	    			else if(postdata.status === '2')
-	    				status = '业主退回'
+	    				statusname = '监理退回'
 	    			else if(postdata.status === '3')
-	    				status = '进场退回'
+	    				statusname = '业主退回'
 	    			else
-	    				status = '未种植'
-	    			tblData[i].status = status;
+	    				statusname = '未种植'
+	    			tblData[i].statusname = statusname;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			tblData[i].liftertime1 = !!plan.LifterTime ? moment(plan.LifterTime).utc().format('YYYY-MM-DD') : '/';
 					tblData[i].liftertime2 = !!plan.LifterTime ? moment(plan.LifterTime).utc().format('HH:mm:ss') : '/';
