@@ -183,17 +183,17 @@ export default class Entry extends Component {
             });
             let biaoduan = Object.keys(res);
             let trees = [];
-            let qaz = 0;
+            // let qaz = 0;
             let wsx = [];
             trees = Object.entries(res);
             for(var j = 0 ; j<=trees.length-1; j++){
-                  console.log(trees[j][1]);
+                
                   var abc = trees[j][1];
-                 
+                 let qaz = 0;
                   for(var k = 0 ; k<=abc.length-1; k++){
-                    console.log(abc[k]);
+                  
                      qaz = qaz + abc[k].Num;
-                    console.log(qaz);
+                   
 
                   }
                    wsx.push(qaz);
@@ -204,9 +204,8 @@ export default class Entry extends Component {
             // console.log(day);
                 for(var i = 0; i<=rst.length-1; i++){
                     Num1 = Num1 + rst[i].Num;
-                    console.log(Num1);
+                   
                 }
-                console.log(Num1,"like");
             this.setState({
                 data:res,
                 account:Num1,
@@ -214,27 +213,7 @@ export default class Entry extends Component {
                 shuzhi:wsx,
 
             })
-            console.log(res);
-            console.log(biaoduan);
-            console.log(wsx);
-// let test1 = Object.keys(res);
-// let test = [];
-// test1.forEach((a,b)=>{
-//     let aa = "{'target':'"+a+"','num':0}";
-//      test.push( aa)
-// });
-//             rst.forEach((item,i)=>{
-//                 test=test.map(_item=>{
-//                     if(item.Section===JSON.parse(_item).target){
-//                         return {
-//                             ...JSON.parse(_item),
-//                             "num":parseInt(JSON.parse(_item).num)+parseInt(item.Num)
-//                         }
-//                     }
-//                 })
-//             })
-
-//  console.log(test);
+           
 
         })
     }

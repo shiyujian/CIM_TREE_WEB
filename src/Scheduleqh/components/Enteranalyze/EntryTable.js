@@ -3,7 +3,7 @@ import {Row, Col, Input, Icon, DatePicker, Select, Spin} from 'antd';
 import {Cards, SumTotal, DateImg} from '../../components';
 import { FOREST_API} from '../../../_platform/api';
 import moment from 'moment';
-
+import {groupBy} from 'lodash';
 var echarts = require('echarts');
 const Option = Select.Option;
 const {RangePicker} = DatePicker;
@@ -19,10 +19,10 @@ export default class EntryTable extends Component {
             today: '',
             nurserys: '',
             section: '',
-            stime1: moment().format('2017-11-17 00:00:00'),
-            etime1: moment().format('2017-11-24 23:59:59'),
-            stime2: moment().format('2017-11-17 00:00:00'),
-            etime2: moment().format('2017-11-24 23:59:59'),
+            stime1: moment().format('YYYY/MM/DD'),
+            etime1: moment().format('YYYY/MM/DD'),
+            stime2: moment().format('YYYY/MM/DD'),
+            etime2: moment().format('YYYY/MM/DD'),
             etime3: moment().unix(),
             loading1: false,
             loading2: false,
@@ -40,34 +40,52 @@ export default class EntryTable extends Component {
         }
     }
     componentWillReceiveProps(nextProps){
-
       this.setState({
-        amount:this.props.account,
-        biaoduan:this.props.biaoduan,
-        shuzhi:this.props.shuzhi,
+        amount:nextProps.account,
+        biaoduan:nextProps.biaoduan,
+        shuzhi:nextProps.shuzhi,
       })
 
 
-
-
-
-
-
-
-        if(nextProps.leftkeycode != this.state.leftkeycode) {
+        // if(nextProps.leftkeycode != this.state.leftkeycode) {
             this.setState({
                 leftkeycode: nextProps.leftkeycode,
             }, () => {
                 this.datepickok(1);
                 this.datepickok(2);
-                this.sum(0);
-                this.sum(1);
-                this.sum(2);
+                // this.sum(0);
+                // this.sum(1);
+                // this.sum(2);
             })
-        }   
+        // }   
     }
 
     componentDidMount(){
+        const {actions: {getNurserysCountFast,getfactory}} = this.props;
+        getfactory().then(rst=>{
+            var factorynum = rst.length;
+            this.setState({
+                nurserys:factorynum,
+            }) 
+        })
+        const param = {stime:this.state.stime1,etime:this.state.etime1};
+        console.log(param,"cnm");
+         // getNurserysCountFast({},{stime:"2017/11/26",etime:"2017/11/27"})
+         getNurserysCountFast({},param)
+         .then(rst=>{
+            let todaynum = 0;
+            console.log(rst,"kawayi");
+            for(let key=0;key<=rst.length-1; key++){
+                console.log(rst[key]);
+                todaynum = todaynum + rst[key].Num;
+                
+            }
+            console.log(todaynum);
+            this.setState({
+                 today:todaynum,
+            })
+         })
+        
         var myChart1 = echarts.init(document.getElementById('king'));
         let option1 = {
             tooltip: {
@@ -171,13 +189,15 @@ export default class EntryTable extends Component {
     }
 
     render() {
+        let {amount} = this.state;
+        console.log(amount);
         return (
             <div>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
                     <Col span={6}>
                         <Spin spinning={this.state.loading3}>
                             <SumTotal search={this.searchSum(0)} title='苗木累计进场总数' title1='Total number of nursery stock'>
-                                <div>{this.state.amount}</div>
+                                <div>{amount}</div>
                             </SumTotal>
                         </Spin>
                     </Col>
@@ -238,15 +258,15 @@ export default class EntryTable extends Component {
         if(index === 1) {
             return <div>
                 <span>截止时间：</span>
-                <RangePicker 
-                 style={{verticalAlign:"middle"}} 
-                 defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
-                 showTime={{ format: 'HH:mm:ss' }}
-                 format={'YYYY/MM/DD HH:mm:ss'}
-                 onChange={this.datepick.bind(this,index)}
-                 onOk={this.datepickok.bind(this,index)}
-                >
-                </RangePicker>
+                <DatePicker  
+                     style={{textAlign:"center"}} 
+                     showTime
+                     defaultValue={moment(this.state.etime1, 'YYYY/MM/DD')} 
+                     format={'YYYY/MM/DD'}
+                     onChange={this.datepick.bind(this,index)}
+                     onOk={this.datepickok.bind(this,index)}
+                    >
+                    </DatePicker>
             </div>
         } else {
             const {treetyoption = [],treetypeoption = []} = this.props;
@@ -269,9 +289,9 @@ export default class EntryTable extends Component {
                         <span>起苗时间：</span>
                         <RangePicker 
                          style={{verticalAlign:"middle"}} 
-                         defaultValue={[moment(this.state.stime2, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime2, 'YYYY-MM-DD HH:mm:ss')]} 
-                         showTime={{ format: 'HH:mm:ss' }}
-                         format={'YYYY/MM/DD HH:mm:ss'}
+                         defaultValue={[moment(this.state.stime2, 'YYYY/MM/DD'),moment(this.state.etime2, 'YYYY/MM/DD')]} 
+                         showTime
+                         format={'YYYY/MM/DD'}
                          onChange={this.datepick.bind(this,index)}
                          onOk={this.datepickok.bind(this,index)}
                         >
@@ -280,6 +300,9 @@ export default class EntryTable extends Component {
                 </Row>
             )
         }
+    }
+    close(){
+        console.log("adhkjawhd");
     }
     //点击图片出现日期选择
     handleIsOpen(index) {
@@ -291,17 +314,18 @@ export default class EntryTable extends Component {
 
     datepick(index,value){
         if(index == 1) {
-            this.setState({stime1:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
-            this.setState({etime1:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
+            // this.setState({stime1:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
+            console.log(value,"123");
+            this.setState({etime1:value?moment(value).format('YYYY/MM/DD'):''});
         }
         if(index == 2){
-            this.setState({stime2:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
-            this.setState({etime2:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
+            this.setState({stime2:value[0]?moment(value[0]).format('YYYY/MM/DD'):''})
+            this.setState({etime2:value[1]?moment(value[1]).format('YYYY/MM/DD'):''})
         }
     }
     //总数时间点击
     datepick1(index, value) {
-        console.log(value)
+        
         let param = {
             etime:value?moment(value).unix():''
         }
@@ -314,19 +338,23 @@ export default class EntryTable extends Component {
     datepickok(index) {
         if(index == 1) {
             const {stime1,etime1} = this.state;
+            console.log(etime1,"xiha");
             let param = {
-                stime:stime1?moment(stime1).add(8, 'h').unix():'',
-                etime:etime1?moment(etime1).add(8, 'h').unix():''
+                // stime:stime1?moment(stime1).add(8, 'h').unix():'',
+                // etime:etime1?moment(etime1).add(8, 'h').unix():''
+                etime:etime1
             }
             this.qury(index,param);
         }
         if(index == 2) {
             const {stime2,etime2,treetype,treety} = this.state;
             let param = {
-                stime:stime2?moment(stime2).add(8, 'h').unix():'',
-                etime:etime2?moment(etime2).add(8, 'h').unix():'',
-                treety,
-                treetype
+                // stime:stime2?moment(stime2).add(8, 'h').unix():'',
+                // etime:etime2?moment(etime2).add(8, 'h').unix():'',
+                // treety,
+                // treetype,
+                stime:stime2,
+                etime:etime2,
             }
             this.qury(index,param);
         }
@@ -349,52 +377,71 @@ export default class EntryTable extends Component {
         })
     }
 
-    sum(index, param) {
-        const {actions: {getNurserysProgress}} = this.props;
-        if(index === 0) {
-            this.setState({loading3: true})
-            getNurserysProgress({}, param)
-            .then(rst => {
-                this.setState({loading3: false})
-                if(!rst)
-                    return
-                this.setState({
-                    amount: rst.amount
-                })
-            })
-        }else if(index === 1) {
-            this.setState({loading4: true})
-            getNurserysProgress({}, param)
-            .then(rst => {
-                this.setState({loading4: false})
-                if(!rst)
-                    return
-                this.setState({
-                    today: rst.today
-                })
-            })
-        }else if(index === 2) {
-            this.setState({loading5: true})
-            getNurserysProgress({}, param)
-            .then(rst => {
-                this.setState({loading5: false})
-                if(!rst)
-                    return
-                this.setState({
-                    nurserys: rst.nurserys
-                })
-            })
-        }
-    }
+    // sum(index, param) {
+    //     const {actions: {getNurserysProgress}} = this.props;
+    //     if(index === 0) {
+    //         this.setState({loading3: true})
+    //         getNurserysProgress({}, param)
+    //         .then(rst => {
+    //             this.setState({loading3: false})
+    //             if(!rst)
+    //                 return
+    //             // this.setState({
+    //             //     amount: rst.amount
+    //             // })
+    //         })
+    //     }else if(index === 1) {
+    //         this.setState({loading4: true})
+    //         getNurserysProgress({}, param)
+    //         .then(rst => {
+    //             this.setState({loading4: false})
+    //             if(!rst)
+    //                 return
+    //             this.setState({
+    //                 today: rst.today
+    //             })
+    //         })
+    //     }else if(index === 2) {
+    //         this.setState({loading5: true})
+    //         getNurserysProgress({}, param)
+    //         .then(rst => {
+    //             this.setState({loading5: false})
+    //             if(!rst)
+    //                 return
+    //             this.setState({
+    //                 nurserys: rst.nurserys
+    //             })
+    //         })
+    //     }
+    // }
 
     qury(index,param) {
         const {actions: {getNurserysCount, getNurserysCountFast}} = this.props;
         if(index === 1) {
             this.setState({loading1:true})
-            getNurserysCountFast({},param)
+            getNurserysCountFast({},{etime:param.etime})
             .then(rst => {
+                console.log(rst,"xiaozhu");
+                 let res = groupBy(rst, function(n){
+                return n.Section
+            });
+            let biaoduan = Object.keys(res);
+            let trees = [];
+            let wsx = [];
+            trees = Object.entries(res);
+            for(var j = 0 ; j<=trees.length-1; j++){
+            var abc = trees[j][1];
+            let qaz = 0;
+            for(var k = 0 ; k<=abc.length-1; k++){
+            qaz = qaz + abc[k].Num;
+            }
+            wsx.push(qaz);
+            }
+            let Num1 = 0;
+            for(var i = 0; i<=rst.length-1; i++){
+            Num1 = Num1 + rst[i].Num;
+            }
                 this.setState({loading1:false})
-                console.log('rst',rst)
                 if(!rst)
                     return
                 try {
@@ -406,14 +453,14 @@ export default class EntryTable extends Component {
                         xAxis: [
                             {
                                 type: 'category',
-                                data: this.state.biaoduan,
+                                data: biaoduan,
                             }
                         ],
                         series: [
                             {
                                 name: '进场总数',
                                 type: 'bar',
-                                data: this.state.shuzhi,
+                                data: wsx,
                                 markPoint: {
                                     data: [
                                         {type: 'max', name: '最大值'},
@@ -437,47 +484,233 @@ export default class EntryTable extends Component {
         } else if(index === 2) {
             this.setState({loading2:true})
             console.log('222',param);
-            getNurserysCount({},param)
+           getNurserysCountFast({},param)
+           // getNurserysCountFast()
             .then(rst => {
+                console.log(rst,"fenbushi");
+               let res = groupBy(rst, function(n){
+                return n.Time
+            });
+               let biaoduan1 = [];
+               let biaoduan2 = [];
+               let biaoduan3 = [];
+               let biaoduan4 = [];
+               let biaoduan5 = [];
+               let bytime = Object.values(res);
+               console.log(bytime,"tiantain");
+               for(var x = 0 ; x <= bytime.length-1; x++){
+                   let number1 = 0;
+                   let number2 = 0;
+                   let number3 = 0;
+                   let number4 = 0;
+                   let number5 = 0;
+                   for(var y = 0; y <= bytime[x].length-1;y++){
+                       if(bytime[x][y].Section === "1标段"){
+                             number1 = bytime[x][y].Num
+                             biaoduan1[x]= number1;
+                       }else if(number1!=0){
+                             biaoduan1[x]=number1;
+                       }else{
+                             biaoduan1[x]=0;
+                       }
+                        if(bytime[x][y].Section === "2标段"){
+                             number2 = bytime[x][y].Num
+                             biaoduan2[x]= number2;
+                       }else if(number2!=0){
+                             biaoduan2[x]=number2;
+                       }else{
+                             biaoduan2[x]=0;
+                       }
+                        if(bytime[x][y].Section === "3标段"){
+                             number3 = bytime[x][y].Num
+                             biaoduan3[x]= number3;
+                       }else if(number3!=0){
+                             biaoduan3[x]=number3;
+                       }else{
+                             biaoduan3[x]=0;
+                       }
+                        if(bytime[x][y].Section === "4标段"){
+                             number4 = bytime[x][y].Num
+                             biaoduan4[x]= number4;
+                       }else if(number4!=0){
+                             biaoduan4[x]=number4;
+                       }else{
+                             biaoduan4[x]=0;
+                       }
+                        if(bytime[x][y].Section === "5标段"){
+                             number5 = bytime[x][y].Num
+                             biaoduan5[x]= number5;
+                       }else if(number5!=0){
+                             biaoduan5[x]=number5;
+                       }else{
+                             biaoduan5[x]=0;
+                       }
+                   }
+               } 
+               console.log(biaoduan1,"dwad");
+               console.log(biaoduan2,"dwad");
+               console.log(biaoduan3,"dwad");
+               console.log(biaoduan4,"dwad");
+               console.log(biaoduan5,"dwad");
+               let lastshuzhu =[];
+               lastshuzhu = [biaoduan1,biaoduan2,biaoduan3,biaoduan4,biaoduan5];
+               console.log(lastshuzhu,"vytdfifdufud");
+            let time = Object.keys(res);
+            let value = Object.values(res);
+            let biaoduan = Object.keys(res);
+            let trees = [];
+            let wsx = [];
+            trees = Object.entries(res);
+            for(var j = 0 ; j<=trees.length-1; j++){
+            var abc = trees[j][1];
+            let qaz = 0;
+            for(var k = 0 ; k<=abc.length-1; k++){
+            qaz = qaz + abc[k].Num;
+            }
+            wsx.push(qaz);
+            }
+            console.log(wsx,"wsx");
+            // let Num1 = 0;
+            // for(var i = 0; i<=rst.length-1; i++){
+            // Num1 = Num1 + rst[i].Num;
+            // }
+            console.log(value,"dajkh")
+            console.log(time);
                 this.setState({loading2:false})
                 if(!rst)
                     return
                 this.setState({treetypetitlename:this.state.treetypename || '全部'})
                 try {
-                    let myChart2 = echarts.getInstanceByDom(document.getElementById('stock'));
-                    let totledata = [],series = [],legend = [`${this.state.treetypetitlename}进场总数`];
-                    for(let key in rst) {
-                        if(key !== '日期') {
-                            if(totledata.length == 0 )
-                                 totledata = rst[key]
-                            else
-                                totledata = arraynumadd(rst[key],totledata);
-                            series.push({
-                                name: key,
-                                type: 'line',
-                                yAxisIndex: 1,
-                                data: rst[key]
-                            });
-                            legend.push(key)
-                        }
-                    }
-                    series.unshift({
-                        name:`${this.state.treetypetitlename}进场总数`,
-                        type:'bar',
-                        data:totledata
-                    });
+                       let myChart2 = echarts.getInstanceByDom(document.getElementById('stock'));
                     let options2 = {
-                        legend: {
-                            data:legend
-                        },
-                        xAxis : [
-                            {
-                                data: rst['日期'],
-                            }
-                        ],
-                        series: series
-                    };
+
+                         title: {
+                                    // text: '折线图堆叠'
+                                },
+                                tooltip: {
+                                    trigger: 'axis'
+                                },
+                                legend: {
+                                    data:['总数','1标段','2标段','3标段','4标段','5标段']
+                                },
+                                grid: {
+                                    left: '3%',
+                                    right: '4%',
+                                    bottom: '3%',
+                                    containLabel: true
+                                },
+                                // toolbox: {
+                                //     feature: {
+                                //         saveAsImage: {}
+                                //     }
+                                // },
+                                xAxis: {
+                                    type: 'category',
+                                    // boundaryGap: false,
+                                    data: time,
+                                    axisPointer: {
+                                          type: 'shadow'
+                                        }
+                                },
+                                yAxis: [
+                                    // type: 'value'
+                                    {
+                                        type: 'value',
+                                        name: '',
+                                        axisLabel: {
+                                            formatter: '{value} 棵'
+                                        }
+                                    },
+                                    {
+                                        type: 'value',
+                                        name: '',
+                                        axisLabel: {
+                                            formatter: '{value} 棵'
+                                        }
+                                    }
+                                ],
+                                series: [
+                                    {
+                                        name:'总数',
+                                        type:'bar',
+                                        data:wsx,
+                                        barWidth:'25%',
+                                        // itemStyle:{
+                                        //     normal:{
+                                        //         color:'#02e5cd',
+                                        //         barBorderRadius:[50,50,50,50]
+                                        //     }
+                                        // }
+                                    },
+                                    {
+                                        name:'1标段',
+                                        type:'line',
+                                        // stack: '总量',
+                                        data:lastshuzhu[0]
+                                    },
+                                    {
+                                        name:'2标段',
+                                        type:'line',
+                                        // stack: '总量',
+                                        data:lastshuzhu[1]
+                                    },
+                                    {
+                                        name:'3标段',
+                                        type:'line',
+                                        // stack: '总量',
+                                        data:lastshuzhu[2]
+                                    },
+                                    {
+                                        name:'4标段',
+                                        type:'line',
+                                        // stack: '总量',
+                                        data:lastshuzhu[3]
+                                    },
+                                    {
+                                        name:'5标段',
+                                        type:'line',
+                                        // stack: '总量',
+                                        data:lastshuzhu[4]
+                                    }
+                                ]
+                            };
+
                     myChart2.setOption(options2);
+
+                    // let myChart2 = echarts.getInstanceByDom(document.getElementById('stock'));
+                    // let totledata = [],series = [],legend = [`${this.state.treetypetitlename}进场总数`];
+                    // for(let key in lastshuzhu) {
+                    //     if(key !== '日期') {
+                    //         if(totledata.length == 0 )
+                    //              totledata = lastshuzhu[key]
+                    //         else
+                    //             totledata = arraynumadd(lastshuzhue[key],totledata);
+                    //         series.push({
+                    //             name: key,
+                    //             type: 'line',
+                    //             yAxisIndex: 1,
+                    //             data: lastshuzhu[key]
+                    //         });
+                    //         legend.push(key)
+                    //     }
+                    // }
+                    // series.unshift({
+                    //     name:`${this.state.treetypetitlename}进场总数`,
+                    //     type:'bar',
+                    //     data:totledata
+                    // });
+                    // let options2 = {
+                    //     legend: {
+                    //         data:legend
+                    //     },
+                    //     xAxis : [
+                    //         {
+                    //             data: time['日期'],
+                    //         }
+                    //     ],
+                    //     series: series
+                    // };
+                    // myChart2.setOption(options2);
                 } catch(e) {
                     console.log(e)
                 }
