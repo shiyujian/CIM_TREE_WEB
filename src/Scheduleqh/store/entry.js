@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import {createFetchActionWithHeaders} from './fetchAction'
 // 
 import faithInfoReducer, {actions as faithActions} from './faithInfo';
-import { FOREST_API} from '_platform/api';
+import { FOREST_API,WORKFLOW_API} from '_platform/api';
 import {actionsMap} from '_platform/store/util';
 const ID = 'entry';
 
@@ -44,6 +44,7 @@ export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/h
 export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/trees/honesty/nursery/treetype/`, '');
 export const clearList = createAction(`${ID}清空列表`);
 export const nurseryName = createAction(`${ID}供苗商名字`);
+const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
 export const actions = {
 	getTreeOK,
 	getTree,
@@ -76,7 +77,8 @@ export const actions = {
 	getHonestyNewSort,
 	getNurserysCountFast,
 	getHonestyNewTreetype,
-	getHonestyNewDetailModal
+	getHonestyNewDetailModal,
+	getWorkflowById
 };
 export default handleActions({
 	[getTreeOK]: (state, {payload}) => {
