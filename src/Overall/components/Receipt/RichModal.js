@@ -69,7 +69,7 @@ class RichModal extends Component {
             });
             editor.txt.html(toggleData.editData.raw)
             setFieldsValue({
-                'title': toggleData.editData.title1 || '',
+                'title': toggleData.editData.title,
                 'abstract': toggleData.editData.abstract
             })
         }
@@ -102,7 +102,7 @@ class RichModal extends Component {
 				//判断是发布新闻还是更新新闻
 				if (toggleData.status === 'ADD') {
 					let newData = {
-						"title": values['title1'] || '',
+						"title": values['title'],
 						"abstract": values['abstract'] || '',
 						"raw": this.state.content,
 						"content": "",
@@ -127,7 +127,7 @@ class RichModal extends Component {
 						})
 				} else if (toggleData.status === 'EDIT') {
 					let newData = {
-						"title": values['title1'] || '',
+						"title": values['title'],
 						"abstract": values['abstract'] || '',
 						"raw": this.state.content,
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -167,7 +167,7 @@ class RichModal extends Component {
 		if (toggleData.status === 'EDIT') {
 			validateFields((err, values) => {
 				let newData = {
-					"title": values['title1'] || '',
+					"title": values['title'],
 					"abstract": values['abstract'] || '',
 					"raw": this.state.content,
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -191,8 +191,8 @@ class RichModal extends Component {
 		} else if (toggleData.status === 'ADD') {
 			validateFields((err, values) => {
 				let newData = {
-					"title": values['title1'] || '',
-					"abstract": values['abstract'] || '' ,
+					"title": values['title'] || '',
+					"abstract": values['abstract'] || '',
 					"raw": this.state.content || '',
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [1],
@@ -254,7 +254,10 @@ class RichModal extends Component {
                         <Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label="主题">
-                                    {getFieldDecorator('title1', {})(
+                                    {getFieldDecorator('title', {
+                                        rules: [{ required: true, message: '请输入新闻标题' }],
+                                        initialValue: ''
+                                    })(
                                         <Input type="text" placeholder="新闻标题" />
                                         )}
                                 </FormItem>
@@ -262,7 +265,7 @@ class RichModal extends Component {
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label="发布单位">
                                     {getFieldDecorator('abstract', {})(
-                                        <Input />
+                                        <Input type="text" />
                                     )}
                                 </FormItem>
                             </Col>

@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Upload, Icon, Row, Col, Button, message, TreeSelect, Checkbox, Table, Progress } from 'antd';
+import { Modal, Form, Input, Upload, Icon, Row, Col, Button, message, TreeSelect, Checkbox, Table, Progress, DatePicker } from 'antd';
 import { getUser } from '../../../_platform/auth';
 import { base, SOURCE_API } from '../../../_platform/api';
 import E from 'wangeditor'
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import './ToggleModal.css';
+// import './ToggleModal.css';
 
 const FormItem = Form.Item;
 const TreeNode = TreeSelect.TreeNode;
 let editor;
+const { RangePicker } = DatePicker;
 
 class ToggleModal extends Component {
 	constructor(props) {
@@ -85,39 +86,12 @@ class ToggleModal extends Component {
 			}
 		};
 		editor.create();
-		const {
-			toggleData: toggleData = {
-			type: 'NEWS',
-			status: 'ADD',
-			visible: false,
-			editData: null
-		},
-			form: { setFieldsValue }
-		} = this.props;
-		if (toggleData.type === 'NEWS' && toggleData.status === 'EDIT') {
-			this.setState({
-				content: toggleData.editData.body_rich
-			});
-			editor.txt.html(toggleData.editData.body_rich)
-			setFieldsValue({
-				'title': toggleData.editData.title,
-				// 'abstract': toggleData.editData.abstract
-			})
-		}
-
-
 	}
 
 	closeModal() {
 		const { actions: { toggleModalAc, postUploadFilesAc } } = this.props;
-
 		postUploadFilesAc([]);
-		toggleModalAc({
-			type: null,
-			status: null,
-			visible: false,
-		});
-
+		toggleModalAc(false);
 	}
 
 	//发送文件
@@ -133,10 +107,10 @@ class ToggleModal extends Component {
 			isSentMsg = false,
 			isCopyMsg = false,
 		} = this.state;
-		if (sentUsers.length === 0) {
-			message.warning("请添加接收单位！");
-			return
-		}
+		// if (sentUsers.length === 0) {
+		// 	message.warning("请添加接收单位！");
+		// 	return
+		// }
 		// if (copyUsers.length === 0) {
 		// 	message.warning("请添加抄送单位！");
 		// 	return
@@ -178,6 +152,7 @@ class ToggleModal extends Component {
 				// return
 				postSentDocAc({}, sendData)
 					.then(rst => {
+						console.log('rst', rst)
 						if (rst._id) {
 							message.success("发送文件成功！");
 							getSentInfoAc({
@@ -249,11 +224,7 @@ class ToggleModal extends Component {
 	render() {
 		const {
 			form: { getFieldDecorator },
-			toggleData: toggleData = {
-				type: 'NEWS',
-				status: 'ADD',
-				visible: false,
-			},
+			visible = false,
 			fileList = [],
 			orgList = [],
 		} = this.props;
@@ -263,66 +234,153 @@ class ToggleModal extends Component {
 		};
 		let { progress } = this.state;
 		return (
-			<Modal
-				title={toggleData.type === 'NEWS' ? (
-					toggleData.status === 'ADD' ? '发文' : '回文'
-				) : '发文'}
-				wrapClassName='edit-box'
-				visible={toggleData.visible}
-				width="70%"
-				maskClosable={false}
-				onOk={this._sendDoc.bind(this)}
-				onCancel={this.closeModal.bind(this)}
-			>
-				<div>
-					<Form>
-						<Row>
-							<Col>
-								<Row>
-									<FormItem {...formItemLayout} label="文件标题">
-										{getFieldDecorator('title', {
-											rules: [{ required: true, message: '请输入文件标题' }],
-											initialValue: ''
-										})(
-											<Input type="text"
-												placeholder="文件标题" />
-											)}
-									</FormItem>
-								</Row>
-								<Row>
-									<Col span={21} offset={2}>
-										<div ref="editorElem"></div>
-									</Col>
-								</Row>
-								<Row style={{ marginTop: '20px', marginBottom: '20px' }}>
-									<Col span={4}>
-										<div style={{ textAlign: 'right', paddingRight: '8px' }}><i
-											style={{ color: 'red' }}>*</i>&nbsp;附件上传:
-										</div>
-									</Col>
-									<Col span={18}>
-										<Row>
-											<Col span={6}>
-												<Upload {...this.uploadProps}>
-													<Button>
-														<Icon type="upload" />上传文档
-													</Button>
-												</Upload>
-												<Progress percent={progress} strokeWidth={2} />
-											</Col>
-											<Col span={6}>
-												{
-													fileList.map((file, index) => {
-														return <div key={index}>{file.name}</div>
-													})
-												}
-											</Col>
-										</Row>
+			// <Modal
+			// 	title="发文"
+			// 	wrapClassName='edit-box'
+			// 	visible={visible}
+			// 	width="70%"
+			// 	maskClosable={false}
+			// 	onOk={this._sendDoc.bind(this)}
+			// 	onCancel={this.closeModal.bind(this)}
+			// >
+			<div>
+				<Form>
 
+					<Row>
+						<Col span={10} offset={2}>
+							<FormItem {...formItemLayout} label="文件类型">
+								{getFieldDecorator('mold', {
+									rules: [{ required: false, message: '请输入文件标题' }],
+									initialValue: ''
+								})(
+									<Input type="text" style={{ width: '80%' }}
+										placeholder="申请 工作联系单 监理通知" />
+									)}
+							</FormItem>
+						</Col>
+						<Col span={10} offset={2}>
+							<FormItem {...formItemLayout} label="文件标题">
+								{getFieldDecorator('title', {
+									rules: [{ required: true, message: '请输入文件标题' }],
+									initialValue: ''
+								})(
+									<Input type="text" style={{ width: '80%' }}
+										placeholder="文件标题" />
+									)}
+							</FormItem>
+						</Col>
+					</Row>
+					<Row>
+						<Col span={10} offset={2}>
+							<FormItem {...formItemLayout} label="单位工程">
+								{getFieldDecorator('orgList', {
+									rules: [{ required: false, message: '请输入文件标题' }],
+									initialValue: ''
+								})(
+									<TreeSelect style={{ width: '80%' }}
+										onChange={this._orgChange.bind(this)}
+									>
+										{
+											ToggleModal.loop(orgList, this.state.sentUsers)
+										}
+									</TreeSelect>
+									)}
+							</FormItem>
+						</Col>
+						<Col span={10} offset={2}>
+							<FormItem {...formItemLayout} label="来文单位">
+								{getFieldDecorator('orgLists', {
+									rules: [{ required: false, message: '请输入文件标题' }],
+									initialValue: ''
+								})(
+									<TreeSelect style={{ width: '80%' }}
+										onChange={this._orgChange.bind(this)}
+									>
+										{
+											ToggleModal.loop(orgList, this.state.sentUsers)
+										}
+									</TreeSelect>
+									)}
+							</FormItem>
+						</Col>
+					</Row>
+					<Row>
+						<Col span={10} offset={2} >
+							<FormItem {...formItemLayout} label="编号">
+								{
+									getFieldDecorator('nubmers', {
+										rules: [
+											{ required: false, message: '请输入编号' },
+										]
+									})
+										(<Input style={{ width: '80%' }} />)
+								}
+							</FormItem>
+						</Col>
+						<Col span={10} offset={2}>
+
+							<Col span={4}>
+								<div style={{ textAlign: 'right', paddingRight: '8px' }}><i
+									style={{ color: 'red' }}>*</i>&nbsp;附件上传:
+									</div>
+							</Col>
+							<Col span={18}>
+								<Row>
+									<Col span={6}>
+										<Upload {...this.uploadProps}>
+											<Button>
+												<Icon type="upload" />上传
+												</Button>
+										</Upload>
+										<Progress percent={progress} strokeWidth={2} />
+									</Col>
+									<Col span={6}>
+										{
+											fileList.map((file, index) => {
+												return <div key={index}>{file.name}</div>
+											})
+										}
 									</Col>
 								</Row>
-								<Row>
-									<Col span={12}>
+
+							</Col>
+
+						</Col>
+					</Row>
+					<Row>
+						<Col span={21} offset={2}>
+							<div ref="editorElem"></div>
+						</Col>
+					</Row>
+					{/* <Row style={{ marginTop: '20px', marginBottom: '20px' }}>
+						<Col span={4}>
+							<div style={{ textAlign: 'right', paddingRight: '8px' }}><i
+								style={{ color: 'red' }}>*</i>&nbsp;附件上传:
+										</div>
+						</Col>
+						<Col span={18}>
+							<Row>
+								<Col span={6}>
+									<Upload {...this.uploadProps}>
+										<Button>
+											<Icon type="upload" />上传文档
+													</Button>
+									</Upload>
+									<Progress percent={progress} strokeWidth={2} />
+								</Col>
+								<Col span={6}>
+									{
+										fileList.map((file, index) => {
+											return <div key={index}>{file.name}</div>
+										})
+									}
+								</Col>
+							</Row>
+
+						</Col>
+					</Row> */}
+					<Row>
+						{/* <Col span={12}>
 										<Row>
 											<Col span={4} offset={2}>
 												接受单位：
@@ -346,12 +404,12 @@ class ToggleModal extends Component {
 										<Row>
 											<Col span={20} offset={2}>
 												<Table dataSource={this._getUserFunc(this.state.sentUsers)}
-													columns={this.columns}
-													rowKey="code" />
+													   columns={this.columns}
+													   rowKey="code"/>
 											</Col>
 										</Row>
-									</Col>
-									<Col span={12}>
+									</Col> */}
+						{/* <Col span={12}>
 										<Row>
 											<Col span={4} offset={2}>
 												抄送单位：
@@ -375,17 +433,22 @@ class ToggleModal extends Component {
 										<Row>
 											<Col span={20} offset={4}>
 												<Table dataSource={this._getUserFunc(this.state.copyUsers)}
-													columns={this.columnsT}
-													rowKey="code" />
+													   columns={this.columnsT}
+													   rowKey="code"/>
 											</Col>
 										</Row>
-									</Col>
-								</Row>
-							</Col>
-						</Row>
-					</Form>
-				</div>
-			</Modal>
+									</Col> */}
+						<Col span={24} offset={10} style={{marginTop:20}}>
+							<Button >取消</Button>
+							<Button style={{ marginLeft: 20 }} type='primary' onClick={this._sendDoc.bind(this)}>提交</Button>
+							<Button style={{ marginLeft: 20 }}>暂存</Button>
+						</Col>
+
+					</Row>
+
+				</Form>
+			</div>
+			// </Modal>
 		);
 	}
 

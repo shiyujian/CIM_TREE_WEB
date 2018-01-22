@@ -68,7 +68,7 @@ export default class Redios extends Component {
 				</Content> */}
 				<Content >
 					<ImageInfo  {...this.props} />
-					<Updatemodal {...this.props}/>
+					<Updatemodal {...this.props}/>					
                 </Content>
             <Preview/>
             </Body>

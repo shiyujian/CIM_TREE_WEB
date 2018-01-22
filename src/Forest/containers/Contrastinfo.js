@@ -90,11 +90,11 @@ export default class Contrastinfo extends Component {
             <Option key={'5'} value={'5'}>草本</Option>,
         ];
         this.setState({typeoption})
-        //诚信
+        //合标
         let standardoption = [
             <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={'1'}>诚信</Option>,
-            <Option key={'2'} value={'0'}>不诚信</Option>,
+            <Option key={'1'} value={'1'}>合标</Option>,
+            <Option key={'2'} value={'0'}>不合标</Option>,
         ]
         this.setState({standardoption})
     }

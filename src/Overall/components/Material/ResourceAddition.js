@@ -11,7 +11,7 @@ const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
 
-export default class Addition extends Component {
+export default class ResourceAddition extends Component {
 
     static propTypes = {};
 
@@ -33,7 +33,7 @@ export default class Addition extends Component {
             <Row gutter={24}>
                 <Col span={12}>
                 <Form>
-                    <FormItem style={{marginLeft:'100',marginRight:'50'}}  {...Addition.layoutT} label="审核人:">
+                    <FormItem style={{marginLeft:'100',marginRight:'50'}}  {...ResourceAddition.layoutT} label="审核人:">
                         <Select>
                             <Option value='第一经理'>第一经理</Option>
                             <Option value='第二经理'>第二经理</Option>
@@ -57,29 +57,41 @@ export default class Addition extends Component {
                    maskClosable={false}>
 				<Form>
                     <Row gutter={24}>
-                        <Col span={24} style={{paddingLeft:'3em'}}>
+                        <Col span={24} style={{paddingLeft:'2em'}}>
                             <Row gutter={15} >
-                                <Col span={10}>
-                                    <FormItem   {...Addition.layoutT} label="单位工程:">
-                                     <Select>
-                                          <Option value='第一阶段'>第一阶段</Option>
-                                          <Option value='第二阶段'>第二阶段</Option>
-                                     </Select>
+                                <Col span={8}>
+                                    <FormItem {...ResourceAddition.layoutT} label="单位工程:">
+                                        <Input />
                                     </FormItem>
                                 </Col>
-                                <Col span={10}>
-                                    <FormItem {...Addition.layoutT} label="编号:">
-                                        <Input />
+                                <Col span={8}>
+                                    <FormItem {...ResourceAddition.layoutT} label="名称:">
+                                        <Input  placeholder='具体材料名'/>
+                                    </FormItem>
+                                </Col>
+                                <Col span={8}>
+                                    <FormItem {...ResourceAddition.layoutT} label="编号:">
+                                        <Input   placeholder='系统自动编号'/>
                                     </FormItem>
                                 </Col>
                             </Row>
                             <Row gutter={15}>
-                                <Col span={20}>
-                                    <FormItem  {...Addition.layout} label="审批单位:">
-                                        <Select>
+                                <Col span={8}>
+                                    <FormItem  {...ResourceAddition.layoutT} label="审批单位:">
+                                        <Select  placeholder='系统默认相应监理单位'>
                                               <Option value='第一公司'>第一公司</Option>
                                               <Option value='第二公司'>第二公司</Option>
                                         </Select>
+                                    </FormItem>
+                                </Col>
+                                <Col span={8}>
+                                    <FormItem {...ResourceAddition.layoutT} label="进场日期:">
+                                        <DatePicker   placeholder='材料进场日期'/>
+                                    </FormItem>
+                                </Col>
+                                <Col span={8}>
+                                    <FormItem {...ResourceAddition.layoutT} label="施工部位:">
+                                        <Input   placeholder='材料具体应用部位'/>
                                     </FormItem>
                                 </Col>
                             </Row>
@@ -126,7 +138,6 @@ export default class Addition extends Component {
 						</Col>
 					</Row>
 				</Form>
-
 			</Modal>
         );
     }
@@ -306,10 +317,6 @@ export default class Addition extends Component {
     static layoutT = {
       labelCol: {span: 8},
       wrapperCol: {span: 16},
-    };
-    static layout = {
-      labelCol: {span: 4},
-      wrapperCol: {span: 20},
     };
 
 }

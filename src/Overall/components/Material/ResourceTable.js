@@ -3,11 +3,10 @@ import { Table, Spin, message } from 'antd';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
 import './index.less';
-export default class GeneralTable extends Component {
+export default class ResourceTable extends Component {
 
 	render() {
 		const { Doc = [] } = this.props;
-		console.log('table.this.props',this.props)
 		return (
 			<Table rowSelection={this.rowSelection}
 				dataSource={Doc}
@@ -27,23 +26,28 @@ export default class GeneralTable extends Component {
 	columns = [
 		{
 			title: '单位工程',
-			dataIndex: 'name',
-			key: 'name',
+			dataIndex: 'resourceEngineer',
+			key: 'resourceEngineer',
 			// sorter: (a, b) => a.name.length - b.name.length
 		}, {
+			title: '名称',
+			dataIndex: 'resourceName',
+			key: 'resourceName',
+			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
+		},{
 			title: '编号',
-			dataIndex: 'number',
-			key: 'number',
+			dataIndex: 'resourceNumber',
+			key: 'resourceNumber',
 			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
 		}, {
 			title: '文档类型',
-			dataIndex: 'docStyle',
-			key: 'docStyle',
+			dataIndex: 'resourceDoc',
+			key: 'resourceDoc',
 			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
-			title: '提交单位',
-			dataIndex: 'company',
-			key: 'company',
+			title: '施工部位',
+			dataIndex: 'workBody',
+			key: 'workBody',
 			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
 		}, {
 			title: '提交人',
@@ -53,19 +57,19 @@ export default class GeneralTable extends Component {
 			title: '提交时间',
 			dataIndex: 'submitTime',
 			key: 'submitTime'
-		},{
+		}, {
 			title: '流程状态',
-			dataIndex: 'flowStyle',
-			key: 'flowStyle'
+			dataIndex: 'resourceStyle',
+			key: 'resourceStyle'
 		}, {
 			title: '操作',
 			render: (record, index) => {
 				let nodes = [];
 				nodes.push(
 					<div>
-						<a onClick={this.previewFile.bind(this, record)}>查看</a>
+						<a onClick={this.previewFile.bind(this, record)}>预览</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
 						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
-						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>
 					</div>
 				);
 				return nodes;

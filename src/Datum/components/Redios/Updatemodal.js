@@ -8,7 +8,7 @@ import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 const Dragger = Upload.Dragger;
 const Option = Select.Option;
-let fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
+let fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/mp4,application/3gpp,video/mp4,video/3gpp';
 
 export default class Addition extends Component {
 
@@ -31,8 +31,8 @@ export default class Addition extends Component {
 			newkey =[],
             judgeFile = ''
 		} = this.props;
-        let content = judgeFile.indexOf('照片') == -1 ? "支持 pdf、doc、docx 文件" : "支持 jpg、jpeg、png 文件";
-        fileTypes = judgeFile.indexOf('照片') == -1 ? 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword' : 'image/jpg,image/jpeg,image/png';
+        let content = judgeFile.indexOf('照片') == -1 
+		fileTypes = judgeFile.indexOf('照片') == -1 ? 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/mp4,application/3gpp,video/3gpp,video/mp4' : 'image/jpg,image/jpeg,image/png,video/mp4,video/3gpp,';
         let {progress,isUploading} = this.state;
         let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
                     <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
@@ -175,6 +175,7 @@ export default class Addition extends Component {
 									{content}
 								</p>
 							</Dragger>
+							
 							<Progress percent={progress} strokeWidth={5}/>
 						</Col>
 					</Row>
@@ -226,7 +227,7 @@ export default class Addition extends Component {
 		},
 		beforeUpload(file) {
 			const valid = fileTypes.indexOf(file.type) >= 0;
-            const errorMsg = fileTypes.indexOf('image') == -1 ? '只能上传 pdf、doc、docx 文件！':'只能上传 jpg、jpeg、png 文件！';
+            const errorMsg = fileTypes.indexOf('image') == -1 
 			if (!valid) {
 				message.error(errorMsg);
 			}

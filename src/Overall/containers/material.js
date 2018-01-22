@@ -5,7 +5,7 @@ import reducer, {actions} from '../store/material';
 //import PkCodeTree from '../../Quality/components/PkCodeTree';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import {Filter, Table,Addition,Updatemodal,DatumTree} from '../components/Material';
+import {Filter, Table,Addition,Updatemodal,DatumTree,ResourceFilter,ResourceTable,ResourceAddition} from '../components/Material';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import moment from 'moment';
@@ -56,20 +56,21 @@ export default class Material extends Component {
                         <TabPane tab="机械设备" key="1">
                             <Filter  {...this.props} {...this.state}/>
                             <Table {...this.props}/>
+                            <Addition {...this.props}/>
                         </TabPane>
                         <TabPane tab="工程材料" key="2">
-                            <Filter  {...this.props} {...this.state}/>
-                            <Table {...this.props}/>
+                            <ResourceFilter  {...this.props} {...this.state}/>
+                            <ResourceTable {...this.props}/>
+                            <ResourceAddition {...this.props}/>
                         </TabPane>
                         <TabPane tab="苗木资料" key="3">
-                            <Filter  {...this.props} {...this.state}/>
-                            <Table {...this.props}/>
+                            <ResourceFilter  {...this.props} {...this.state}/>
+                            <ResourceTable {...this.props}/>
+                            <ResourceAddition {...this.props}/>
                         </TabPane>
                     </Tabs>
                 </Content>
-                <Addition {...this.props}/>
             </Main>
-            <Updatemodal {...this.props}/>
             <Preview/>
             </Body>
         );

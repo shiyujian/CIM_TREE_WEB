@@ -54,6 +54,9 @@ const getDesignStage = createFetchAction(`${SERVICE_API}/metalist/designstage/`,
 // 操作更新弹出框状态
 const getModalUpdate =createAction(`${ID}操作更新弹出框状态`);
 
+// 操作预览弹出框状态
+const getPreviewModal =createAction(`${ID}操作更新弹出框状态`);
+
 export const actions = {
 	getDesignStageOK,
 	getDesignStage,
@@ -90,7 +93,8 @@ export const actions = {
 	getDesignUnit,
 	getProjectAcOK,
 	getProjectAc,
-	getModalUpdate
+	getModalUpdate,
+	getPreviewModal
 };
 
 export default handleActions({
@@ -194,5 +198,9 @@ export default handleActions({
 	[getModalUpdate]: (state, {payload}) => ({
 		...state,
 		getModalUpdateVisible: payload
+	}),
+	[getPreviewModal]: (state, {payload}) => ({
+		...state,
+		getPreviewModalVisible: payload
 	}),
 }, {});

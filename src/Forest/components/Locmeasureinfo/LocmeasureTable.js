@@ -118,8 +118,7 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:"测量人",
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				return <span>{attrs.inputer || '/'}</span>
+				return <span>{record.Inputer || '/'}</span>
 				
 			}
 		},{
@@ -131,9 +130,8 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:<div><div>树高</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.gd != 0)
-					return <a disabled={!attrs.gdfj} onClick={this.onImgClick.bind(this,attrs.gdfj)}>{attrs.gd}</a>
+				if(record.GD != 0)
+					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
 				else {
 					return <span>/</span>
 				}
@@ -141,9 +139,8 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:<div><div>胸径</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.xj != 0)
-					return <a disabled={!attrs.xjfj} onClick={this.onImgClick.bind(this,attrs.xjfj)}>{attrs.xj}</a>
+				if(record.XJ != 0)
+					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
 				else {
 					return <span>/</span>
 				}
@@ -151,9 +148,8 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:<div><div>冠幅</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.gf != 0)
-					return <a disabled={!attrs.gffj} onClick={this.onImgClick.bind(this,attrs.gffj)}>{attrs.gf}</a>
+				if(record.GF != 0)
+					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
 				else {
 					return <span>/</span>
 				}
@@ -161,9 +157,8 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:<div><div>地径</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.dj != 0)
-					return <a disabled={!attrs.djfj} onClick={this.onImgClick.bind(this,attrs.djfj)}>{attrs.dj}</a>
+				if(record.DJ != 0)
+					return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
 				else {
 					return <span>/</span>
 				}
@@ -172,9 +167,8 @@ export default class LocmeasureTable extends Component {
 			title:<div><div>土球高度</div><div>(cm)</div></div>,
 			dataIndex: 'tqhd',
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.tqhd != 0)
-					return <a disabled={!attrs.tqhdfj} onClick={this.onImgClick.bind(this,attrs.tqhdfj)}>{attrs.tqhd}</a>
+				if(record.TQHD != 0)
+					return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
 				else {
 					return <span>/</span>
 				}
@@ -183,9 +177,8 @@ export default class LocmeasureTable extends Component {
 			title:<div><div>土球直径</div><div>(cm)</div></div>,
 			dataIndex: 'tqzj',
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				if(attrs.tqzj != 0)
-					return <a disabled={!attrs.tqzjfj} onClick={this.onImgClick.bind(this,attrs.tqzjfj)}>{attrs.tqzj}</a>
+				if(record.TQZJ != 0)
+					return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQZJ}</a>
 				else {
 					return <span>/</span>
 				}
@@ -193,10 +186,9 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:<div><div>是否</div><div>截干</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
 				return <div>
 							{
-								attrs.jg == 1
+								record.JG == 1
 								? <span>是</span>
 								: <span>否</span>
 							}
@@ -205,10 +197,9 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:<div><div>干皮有无</div><div>损伤</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
 				return <div>
 							{
-								attrs.gp == 1
+								record.GP == 1
 								? <span>有</span>
 								: <span>无</span>
 							}
@@ -217,10 +208,9 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:<div><div>冠型完整，</div><div>不偏冠</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
 				return <div>
 							{
-								attrs.gxwz == 1
+								record.GXWZ == 1
 								? <span>是</span>
 								: <span>否</span>
 							}
@@ -229,10 +219,9 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:<div><div>生长</div><div>健壮</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
 				return <div>
 							{
-								attrs.szjz == 1
+								record.SZJZ == 1
 								? <span>是</span>
 								: <span>否</span>
 							}
@@ -241,10 +230,9 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:<div><div>有无病</div><div>虫害</div></div>,
 			render: (text,record) => {
-				const {attrs = {}}= record;
 				return <div>
 							{
-								attrs.bch == 1
+								record.BCH == 1
 								? <span>有</span>
 								: <span>无</span>
 							}
@@ -517,8 +505,8 @@ export default class LocmeasureTable extends Component {
 	    		tblData.forEach((plan, i) => {
 	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			// let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-	    			let place = '';
+	    			console.log('plan.No',~~plan.No)
+	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
 	    			tblData[i].place = place;
 	    			let status = '';
 					if(plan.supervisorcheck == -1)
@@ -537,10 +525,10 @@ export default class LocmeasureTable extends Component {
 						}
 					}
 					tblData[i].status = status;
-					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';
+					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
-					let createtime1 = !!plan.createtime ? moment(plan.createtime).utc().format('YYYY-MM-DD') : '/';
-					let createtime2 = !!plan.createtime ? moment(plan.createtime).utc().format('HH:mm:ss') : '/';
+					let createtime1 = !!plan.CreateTime ? moment(plan.CreateTime).utc().format('YYYY-MM-DD') : '/';
+					let createtime2 = !!plan.CreateTime ? moment(plan.CreateTime).utc().format('HH:mm:ss') : '/';
 					tblData[i].createtime1 = createtime1;
 					tblData[i].createtime2 = createtime2;
 	    		})
@@ -572,117 +560,23 @@ export default class LocmeasureTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		treety,
     		treetype,
-    		supervisorcheck,
-    		checkstatus,
-    		locationstatus,
-    		createtime_min:stime&&moment(stime).add(8, 'h').unix(),
-    		createtime_max:etime&&moment(etime).add(8, 'h').unix(),
+    		// supervisorcheck,
+    		// checkstatus,
+    		// locationstatus,
+    		stime:stime&&moment(stime).add(8, 'h').unix(),
+    		etime:etime&&moment(etime).add(8, 'h').unix(),
     		page:1,
     		size:exportsize
     	}
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})
-    	getqueryTree({},postdata)
-    	.then(result => {
-    		let rst = result.results;
-    		let total = result.pages;
-    		this.setState({percent:parseFloat((100/total).toFixed(2)),num:1});
-    		if(total !== undefined) {
-    			let all = [Promise.resolve(rst)];
-    			for(let i=2; i<=total; i++)
-                {
-                	postdata.page = i;
-                    all.push(getqueryTree({},postdata)
-                        .then(rst1 => {
-                            let {num} = this.state;
-                            num++;
-                            this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
-                            if(!rst1) {
-                            	message.error(`数据获取失败,丢失100条数据`)
-				    			return []
-				    		} else {
-                            	return rst1.results
-                            }
-                        }))
-                }
-    			Promise.all(all)
-                .then(rst2 => {
-                    if(!rst2) {
-                    	this.setState({loading:false})
-		    			return
-		    		}
-		    		let allData = rst2.reduce((a,b) => {
-                        return a.concat(b)
-                    })
-		    		if(allData instanceof Array) {
-		    			let data = allData.map((plan, i) => {
-		    				const {attrs = {}}= plan;
-		    				let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-		    				let status = '';
-							if(attrs.supervisorcheck == -1)
-								status = "待审批"
-							else if(attrs.supervisorcheck == 0) 
-								status = "审批未通过"
-							else {
-								if(attrs.checkstatus == 0)
-									status = "抽检不通过"
-								else if(attrs.checkstatus == 1)
-									status = "抽检通过"
-								else if(attrs.checkstatus == 2)
-									status = "抽检不通过后修改"
-								else {
-									status = "审批通过"
-								}
-							}
-							let locationstatus = !!attrs.locationtime ? '已定位' : '未定位';
-							let createtime = !!plan.createtime ? moment(plan.createtime).utc().format('YYYY-MM-DD HH:mm:ss') : '/';
-							let jg = attrs.jg == 1 ? '是' : "否";
-							let gp = attrs.gp == 1 ? '有' : "无";
-							let gxwz = attrs.gxwz == 1 ? '是' : "否";
-							let szjz = attrs.szjz == 1 ? '是' : "否";
-							let bch = attrs.bch == 1 ? '有' : "无";
-		    				return [
-		    					++i,
-		    					attrs.sxm || '/',
-		    					plan.section || '/',
-		    					place,
-		    					plan.treetype || '/',
-		    					status,
-		    					locationstatus,
-		    					attrs.inputer || '/',
-		    					createtime,
-		    					attrs.gd || '/',
-		    					attrs.xj || '/',
-		    					attrs.gf || '/',
-		    					attrs.dj || '/',
-		    					attrs.tqhd || '/',
-		    					attrs.tqzj || '/',
-		    					jg,
-		    					gp,
-		    					gxwz,
-		    					szjz,
-		    					bch,
-		    				]
-		    			})
-			    		const postdata = {
-			    			keys: ["序号", "编码", "标段", "位置", "树种", "状态", "定位", "测量人", "测量时间", "树高（cm）", "胸径（cm）", "冠幅（cm）", "地径（cm）", "土球高度（cm）", "土球直径（cm）", "是否截干（cm）", "干皮有无损伤", "冠型完整，不偏冠", "生长健壮", "有无病虫害"],
-			    			values: data
-			    		}
-			    		getexportTree({},postdata)
-			    		.then(rst3 => {
-			    			this.setState({loading:false})
-			    			let url = `${FOREST_API}/${rst3.file_path}`
-							this.createLink("excel_link", url);
-			    		})
-                    } else {
-                    	this.setState({loading:false})
-                    }
-    		    })
-    		}
-    	})
+    	getexportTree({},postdata)
+		.then(rst3 => {
+			this.setState({loading:false})
+			window.location.href = `${FOREST_API}/${rst3}`
+		})
 	}
 
 	createLink(name,url) {

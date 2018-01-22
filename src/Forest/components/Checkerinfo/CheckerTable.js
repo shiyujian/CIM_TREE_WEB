@@ -65,6 +65,7 @@ export default class CheckerTable extends Component {
 		);
 	}
 	treeTable(details) {
+		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -106,8 +107,7 @@ export default class CheckerTable extends Component {
 		},{
 			title:"抽查人",
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				return <span>{attrs.checker || '/'}</span>
+				return <span>{record.Checker || '/'}</span>
 			}
 		},{
 			title:"状态",
@@ -334,8 +334,7 @@ export default class CheckerTable extends Component {
 	    		tblData.forEach((plan, i) => {
 	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			// let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-	    			let place = '';
+	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
 	    			tblData[i].place = place;
 	    			let status = '';
 					if(plan.checkstatus == 0)
@@ -346,7 +345,7 @@ export default class CheckerTable extends Component {
 						status = "抽检不通过后修改"
 					}
 					tblData[i].status = status;
-					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';
+					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
 					let checktime1 = !!plan.CheckTime ? moment(plan.CheckTime).format('YYYY-MM-DD') : '/';
 					let checktime2 = !!plan.CheckTime ? moment(plan.CheckTime).format('HH:mm:ss') : '/';
@@ -365,103 +364,33 @@ export default class CheckerTable extends Component {
 		const {
     		sxm = '',
     		section = '',
-    		checkstatus = '',
+    		// checkstatus = '',
     		role = '',
     		rolename = '',
     		stime = '',
     		etime = '',
     		exportsize,
     	} = this.state;
-    	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
+    	const {actions: {getqueryTree,getexportTree4Checker},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
     		sxm,
     		section,
-    		checkstatus,
-    		checktime_min:stime&&moment(stime).unix(),
-    		checktime_max:etime&&moment(etime).unix(),
+    		// checkstatus,
+    		stime:stime&&moment(stime).unix(),
+    		etime:etime&&moment(etime).unix(),
     		page:1,
-    		per_page:exportsize
+    		size:exportsize
     	}
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})
-    	getqueryTree({},postdata)
-    	.then(result => {
-    		console.log(111, result)
-    		let rst = result.results;
-    		let total = result.pages;
-    		this.setState({percent:parseFloat((100/total).toFixed(2)),num:1});
-    		if(total !== undefined) {
-    			let all = [Promise.resolve(rst)];
-    			for(let i=2; i<=total; i++)
-                {
-                	postdata.page = i;
-                    all.push(getqueryTree({},postdata)
-                        .then(rst1 => {
-                            let {num} = this.state;
-                            num++;
-                            this.setState({percent:parseFloat((num*100/total).toFixed(2)),num:num});
-                            if(!rst1) {
-                            	message.error(`数据获取失败,丢失100条数据`)
-				    			return []
-				    		} else {
-                            	return rst1.results
-                            }
-                        }))
-                }
-    			Promise.all(all)
-                .then(rst2 => {
-                    if(!rst2) {
-                    	this.setState({loading:false})
-		    			return
-		    		}
-		    		let allData = rst2.reduce((a,b) => {
-                        return a.concat(b)
-                    })
-		    		if(allData instanceof Array) {
-		    			let data = allData.map((plan, i) => {
-		    				const {attrs = {}}= plan;
-		    				let place = `${~~plan.land.replace('P','')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-		    				let status = '';
-							if(attrs.checkstatus == 0)
-								status = "抽检不通过"
-							else if(attrs.checkstatus == 1) 
-								status = "抽检通过"
-							else {
-								status = "抽检不通过后修改"
-							}
-							let locationstatus = !!attrs.locationtime ? '已定位' : '未定位';
-							let checktime = !!attrs.checktime ? moment(attrs.checktime).format('YYYY-MM-DD HH:mm:ss') : '/';
-		    				return [
-		    					++i,
-		    					attrs.sxm || '/',
-		    					plan.section || '/',
-		    					place,
-		    					plan.treetype || '/',
-		    					attrs.checker || '/',
-		    					status,
-		    					locationstatus,
-		    					attrs.checkerinfo || '/',
-		    					checktime,
-		    				]
-		    			})
-			    		const postdata = {
-			    			keys: ["序号", "编码", "标段", "位置", "树种", "抽检人", "状态", "定位", "状态信息", "状态时间"],
-			    			values: data
-			    		}
-			    		getexportTree({},postdata)
-			    		.then(rst3 => {
-			    			this.setState({loading:false})
-			    			let url = `${FOREST_API}/${rst3.file_path}`
-							this.createLink("excel_link", url);
-			    		})
-                    } else {
-                    	this.setState({loading:false})
-                    }
-    		    })
-    		}
-    	})
+    	getexportTree4Checker({},postdata)
+		.then(rst3 => {
+			console.log('rst3',rst3)
+			this.setState({loading:false})
+			window.location.href = `${FOREST_API}/${rst3}`
+		})
 	}
 
 	createLink(name,url) {

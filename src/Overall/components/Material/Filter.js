@@ -14,7 +14,7 @@ export default class Filter extends Component {
 
 	render() {
 		const { actions: { toggleAddition }, Doc = [] } = this.props;
-		console.log('this.props',this.props)
+		console.log('filter.this.props',this.props)
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
