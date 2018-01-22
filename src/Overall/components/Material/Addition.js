@@ -2,22 +2,23 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table,DatePicker,Progress,Select,
+    Icon, message, Table,DatePicker,Progress,Select,Checkbox
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
+const FormItem = Form.Item;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
 
 export default class Addition extends Component {
 
     static propTypes = {};
 
-    static layout = {
-        labelCol: {span: 8},
-        wrapperCol: {span: 16}
-    };
+    // static layout = {
+    //     labelCol: {span: 8},
+    //     wrapperCol: {span: 16}
+    // };
     state={
         progress:0,
         isUploading: false
@@ -27,18 +28,78 @@ export default class Addition extends Component {
             additionVisible = false,
             docs = []
         } = this.props;
-        console.log('add.props',this.props);
         let {progress,isUploading} = this.state;
-        let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
-                    <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
+        let arr = [ 
+            <Row gutter={24}>
+                <Col span={12}>
+                <Form>
+                    <FormItem style={{marginLeft:'100',marginRight:'50'}}  {...Addition.layoutT} label="审核人:">
+                        <Select>
+                            <Option value='第一经理'>第一经理</Option>
+                            <Option value='第二经理'>第二经理</Option>
+                        </Select>
+                    </FormItem>
+                </Form>
+                </Col>
+                <Col span={12}>
+                    <Checkbox style={{marginRight:'150'}}>短信通知</Checkbox>
+                    <Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
+                    <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>
+                </Col>
+            </Row>
+        ];
         let footer = isUploading ? null : arr;
         return (
-			<Modal title="新增资料"
+			<Modal title="新增文档"
 				   width={920} visible={additionVisible}
                    closable={false}
                    footer={footer}
                    maskClosable={false}>
 				<Form>
+                    <Row gutter={24}>
+                        <Col span={24} style={{paddingLeft:'3em'}}>
+                            <Row gutter={15} >
+                                <Col span={10}>
+                                    <FormItem   {...Addition.layoutT} label="单位工程:">
+                                     <Select>
+                                          <Option value='第一阶段'>第一阶段</Option>
+                                          <Option value='第二阶段'>第二阶段</Option>
+                                     </Select>
+                                    </FormItem>
+                                </Col>
+                                <Col span={10}>
+                                    <FormItem {...Addition.layoutT} label="编号:">
+                                        <Input />
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row gutter={15}>
+                                <Col span={20}>
+                                    <FormItem  {...Addition.layout} label="审批单位:">
+                                        <Select>
+                                              <Option value='第一公司'>第一公司</Option>
+                                              <Option value='第二公司'>第二公司</Option>
+                                        </Select>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                    <Row gutter={24}>
+                        <Col span={24}>
+                            <Table  rowSelection={this.rowSelectionAdd}
+                                    dataSource={docs}
+                                    columns={this.equipment}
+                                    className='foresttable'
+                                    bordered rowKey="code" />
+                        </Col>
+                    </Row>
+                    <Row gutter={24}>
+                        <Col span={24}>
+                            <Button  style={{ marginLeft: 20,marginRight: 10 }} type="primary" ghost>添加</Button>
+                            <Button  type="primary" ghost>删除</Button>
+                        </Col>
+                    </Row>
 					<Row gutter={24}>
 						<Col span={24} style={{marginTop: 16, height: 160}}>
 							<Dragger {...this.uploadProps}
@@ -53,10 +114,10 @@ export default class Addition extends Component {
 
 								</p>
 							</Dragger>
-							<Progress percent={progress} strokeWidth={5}/>
+							<Progress percent={progress} strokeWidth={5} />
 						</Col>
 					</Row>
-					<Row gutter={24} style={{marginTop: 35}}>
+					<Row gutter={24} style={{marginTop: 15}}>
 						<Col span={24}>
 							<Table rowSelection={this.rowSelection}
 								   columns={this.docCols}
@@ -65,10 +126,17 @@ export default class Addition extends Component {
 						</Col>
 					</Row>
 				</Form>
+
 			</Modal>
         );
     }
 
+    rowSelectionAdd = {
+        onChange: (selectedRowKeys, selectedRows) => {
+            const { actions: { selectDocuments } } = this.props;
+            selectDocuments(selectedRows);
+        },
+    };
     rowSelection = {
         onChange: (selectedRowKeys) => {
             const {actions: {selectDocuments}} = this.props;
@@ -126,26 +194,39 @@ export default class Addition extends Component {
         }
     }
 
+    equipment=[
+        {
+            title: '设备名称',
+            dataIndex: 'equipName',
+            key: 'equipName',
+        }, {
+            title: '规格型号',
+            dataIndex: 'equipNumber',
+            key: 'equipNumber',
+        }, {
+            title: '数量',
+            dataIndex: 'equipCount',
+            key: 'equipCount',
+        }, {
+            title: '进场日期',
+            dataIndex: 'equipTime',
+            key: 'equipTime',
+        }, {
+            title: '技术状况',
+            dataIndex: 'equipMoment',
+            key: 'equipMoment'
+        },{
+            title: '备注',
+            dataIndex: 'equipRemark',
+            key: 'equipRemark'
+        }
+
+    ]
     docCols = [
         {
-            title:'规范名称',
+            title:'名称',
             dataIndex:'name'
-        },{
-            title:'规范编号',
-            render: (doc) => {
-                return <Input onChange={this.number.bind(this, doc)}/>;
-            }
-        },{
-            title:'发布单位',
-            render: (doc) => {
-                return <Input onChange={this.company.bind(this, doc)}/>;
-            }
-        },{
-            title:'实施日期',
-            render: (doc) => {
-                return <DatePicker  onChange={this.time.bind(this, doc)}/>;
-            }
-        },{
+        }, {
             title:'备注',
             render: (doc) => {
                 return <Input onChange={this.remark.bind(this, doc)}/>;
@@ -166,33 +247,6 @@ export default class Addition extends Component {
             actions: {changeDocs}
         } = this.props;
         doc.remark = event.target.value;
-        changeDocs(docs);
-    }
-
-    time(doc, event,date) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.time = date;
-        changeDocs(docs);
-    }
-
-    company(doc, event) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.company = event.target.value;
-        changeDocs(docs);
-    }
-
-    number(doc, event) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.number = event.target.value;
         changeDocs(docs);
     }
 
@@ -249,5 +303,13 @@ export default class Addition extends Component {
             progress:0
         })
     }
+    static layoutT = {
+      labelCol: {span: 8},
+      wrapperCol: {span: 16},
+    };
+    static layout = {
+      labelCol: {span: 4},
+      wrapperCol: {span: 20},
+    };
 
 }

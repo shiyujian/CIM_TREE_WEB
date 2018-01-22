@@ -7,7 +7,7 @@ const getLoginUser = createFetchAction(`${base}/accounts/api/users/{{id}}/`, [],
 export const actions2 = {
 	getLoginUser
 };
-export const ID = 'SYSTEM_PERMISSIONN';
+export const ID = 'SYSTEM_PROJECT_PERMISSIONN';
 
 const tableReducer = fieldFactory(ID, 'table');
 

@@ -1,12 +1,11 @@
 import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
-    Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table,DatePicker,Progress,Select,
+    Form, Input,Button, Row, Col, Modal, Upload,DatePicker,Progress,
+    Icon, message, Table
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
-//import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
 
@@ -22,50 +21,49 @@ export default class Addition extends Component {
         progress:0,
         isUploading: false
     }
+
     render() {
         const{
-            additionVisible = false,
+            updatevisible = false,
             docs = []
         } = this.props;
-        console.log('add.props',this.props);
         let {progress,isUploading} = this.state;
         let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
                     <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
         let footer = isUploading ? null : arr;
         return (
-			<Modal title="新增资料"
-				   width={920} visible={additionVisible}
+            <Modal title="新增资料"
+                   width={920} visible={updatevisible}
                    closable={false}
                    footer={footer}
                    maskClosable={false}>
-				<Form>
-					<Row gutter={24}>
-						<Col span={24} style={{marginTop: 16, height: 160}}>
-							<Dragger {...this.uploadProps}
-									 accept={fileTypes}
-									 onChange={this.changeDoc.bind(this)}>
-								<p className="ant-upload-drag-icon">
-									<Icon type="inbox"/>
-								</p>
-								<p className="ant-upload-text">点击或者拖拽开始上传</p>
-								<p className="ant-upload-hint">
-									支持 pdf、doc、docx 文件
-
-								</p>
-							</Dragger>
-							<Progress percent={progress} strokeWidth={5}/>
-						</Col>
-					</Row>
-					<Row gutter={24} style={{marginTop: 35}}>
-						<Col span={24}>
-							<Table rowSelection={this.rowSelection}
-								   columns={this.docCols}
-								   dataSource={docs}
-								   bordered rowKey="uid"/>
-						</Col>
-					</Row>
-				</Form>
-			</Modal>
+                <Form>
+                    <Row gutter={24}>
+                        <Col span={24} style={{marginTop: 16, height: 160}}>
+                            <Dragger {...this.uploadProps}
+                                     accept={fileTypes}
+                                     onChange={this.changeDoc.bind(this)}>
+                                <p className="ant-upload-drag-icon">
+                                    <Icon type="inbox"/>
+                                </p>
+                                <p className="ant-upload-text">点击或者拖拽开始上传</p>
+                                <p className="ant-upload-hint">
+                                    支持 pdf、doc、docx 文件
+                                </p>
+                            </Dragger>
+                            <Progress percent={progress} strokeWidth={5}/>
+                        </Col>
+                    </Row>
+                    <Row gutter={24} style={{marginTop: 35}} >
+                        <Col span={24}>
+                            <Table rowSelection={this.rowSelection}
+                                   columns={this.docCols}
+                                   dataSource={docs}
+                                   bordered rowKey="uid"/>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal>
         );
     }
 
@@ -73,15 +71,15 @@ export default class Addition extends Component {
         onChange: (selectedRowKeys) => {
             const {actions: {selectDocuments}} = this.props;
             selectDocuments(selectedRowKeys);
-        },
+        }
     };
 
     cancel() {
         const {
-            actions: {toggleAddition,changeDocs}
+            actions: {updatevisible,changeDocs}
         } = this.props;
-        toggleAddition(false);
-        changeDocs();
+        updatevisible(false);
+	    changeDocs();
         this.setState({
             progress:0
         })
@@ -94,12 +92,11 @@ export default class Addition extends Component {
         data(file) {
             return {
                 name: file.fileName,
-                a_file: file,
+                a_file: file
             };
         },
         beforeUpload(file) {
             const valid = fileTypes.indexOf(file.type) >= 0;
-            //console.log(file);
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
             }
@@ -142,9 +139,9 @@ export default class Addition extends Component {
             }
         },{
             title:'实施日期',
-            render: (doc) => {
-                return <DatePicker  onChange={this.time.bind(this, doc)}/>;
-            }
+		    render: (doc) => {
+			    return <DatePicker  onChange={this.time.bind(this, doc)}/>;
+		    }
         },{
             title:'备注',
             render: (doc) => {
@@ -154,7 +151,7 @@ export default class Addition extends Component {
             title:'操作',
             render: doc => {
                 return (
-					<a onClick={this.remove.bind(this, doc)}>删除</a>
+                    <a onClick={this.remove.bind(this, doc)}>删除</a>
                 );
             }
         }
@@ -169,14 +166,14 @@ export default class Addition extends Component {
         changeDocs(docs);
     }
 
-    time(doc, event,date) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.time = date;
-        changeDocs(docs);
-    }
+	time(doc, event,date) {
+		const {
+			docs = [],
+			actions: {changeDocs}
+		} = this.props;
+		doc.time = date;
+		changeDocs(docs);
+	}
 
     company(doc, event) {
         const {
@@ -211,7 +208,7 @@ export default class Addition extends Component {
         const {
             currentcode = {},
             docs = [],
-            actions: {toggleAddition, postDocument, getdocument,changeDocs}
+            actions: {updatevisible, postDocument, getdocument,changeDocs,PatchDocument}
         } = this.props;
         const promises = docs.map(doc => {
             const response = doc.response;
@@ -234,16 +231,22 @@ export default class Addition extends Component {
                     type: doc.type,
                     lasttime: doc.lastModifiedDate,
                     state: '正常文档',
-                    submitTime: moment.utc().format()
+	                submitTime: moment.utc().format()
                 },
             });
         });
         message.warning('新增文件中...');
         Promise.all(promises).then(rst => {
+            const {oldfile = {},currentcode = {},actions:{putdocument}}=this.props;
             message.success('新增文件成功！');
-            changeDocs();
-            toggleAddition(false);
-            getdocument({code: currentcode.code});
+            putdocument({code:oldfile.code},{
+                    extra_params: {
+                        state: '作废'
+                    },
+            });
+            changeDocs([]);
+            updatevisible(false);
+	        setTimeout(()=>{getdocument({code: currentcode.code})},1000);
         });
         this.setState({
             progress:0

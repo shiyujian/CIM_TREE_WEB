@@ -1,26 +1,71 @@
 import React, { Component } from 'react';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import {
-	Form, Input, Button, Row, Col, message, Popconfirm
+	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
 const FormItem = Form.Item;
 const Search = Input.Search;
+const TabPane=Tabs.TabPane;
+const {RangePicker}=DatePicker;
 
-export default class Filter extends Component {
+export default class ResourceFilter extends Component {
 
 	static propTypes = {};
 
 	render() {
 		const { actions: { toggleAddition }, Doc = [] } = this.props;
+		console.log('this.props',this.props)
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
-					<FormItem>
-						<Col span={14}>
-							<Search placeholder="输入内容"
-								onSearch={this.query.bind(this)} />
-						</Col>
-					</FormItem>
+					<Col span={24} style={{paddingLeft:'5em'}}>
+						<Row gutter={15}  style={{marginTop: 5}}>
+							<Col span={6}>
+								<FormItem   {...ResourceFilter.layoutT} label="单位工程:">
+                                     <Select>
+                                          <Option value='第一阶段'>第一阶段</Option>
+                                          <Option value='第二阶段'>第二阶段</Option>
+                                     </Select>
+                                </FormItem>
+							</Col>
+							<Col span={6}>
+								<FormItem {...ResourceFilter.layoutT} label="名称:">
+									<Input />
+                                </FormItem>
+							</Col>
+							<Col span={6}>
+								<FormItem {...ResourceFilter.layoutT} label="编号:">
+									<Input />
+                                </FormItem>
+							</Col>
+							<Col span={6}>
+								<Button type="primary" style={{marginLeft:'100px'}}>查询</Button>
+							</Col>
+						</Row>
+						<Row gutter={15}  style={{marginTop: 5}}>
+							<Col span={6}>
+								<FormItem {...ResourceFilter.layoutT} label="审批单位:">
+									<Input />
+                                </FormItem>
+							</Col>
+							<Col span={6}>
+								<FormItem {...ResourceFilter.layoutT} label="进场日期:">
+									<RangePicker/>
+                                </FormItem>
+							</Col>
+							<Col span={6}>
+								<FormItem {...ResourceFilter.layoutT} label="流程状态:">
+									<Select>
+                                          <Option value='待提交'>待提交</Option>
+                                          <Option value='审批中'>审批中</Option>
+                                     </Select>
+                                </FormItem>
+							</Col>
+							<Col span={6}>
+								<Button type="primary" ghost style={{marginLeft:'100px'}}>清空</Button>
+							</Col>
+						</Row>
+					</Col>
 				</Row>
 				<Row gutter={24}>
 					<Col span={24}>
@@ -28,15 +73,6 @@ export default class Filter extends Component {
 							<Button style={{ marginRight: 10 }} disabled>新增</Button> :
 							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
 						}
-						{/* </Col> */}·
-						{/* <Col span ={2}> */}
-						{/* {
-							(Doc.length === 0 )?
-								<Button style={{marginRight: 10}} disabled>下载</Button>:
-								<Button style={{marginRight: 10}} type="primary" onClick={this.download.bind(this)}>下载</Button>
-						} */}
-						{/* </Col> */}
-						{/* <Col span ={2}> */}
 						{
 							(Doc.length === 0) ?
 								<Button style={{ marginRight: 10 }} disabled>删除</Button> :
@@ -122,4 +158,8 @@ export default class Filter extends Component {
 			this.createLink(this, down_load);
 		});
 	}
+	static layoutT = {
+          labelCol: {span: 8},
+          wrapperCol: {span: 16},
+     };
 };
