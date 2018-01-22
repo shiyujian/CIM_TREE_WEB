@@ -61,7 +61,11 @@ export default class EntryTable extends Component {
     }
 
     componentDidMount(){
-        const {actions: {getNurserysCountFast,getfactory}} = this.props;
+
+        const {actions: {getNurserysCountFast,getfactory,gettreeevery}} = this.props;
+        gettreeevery().then(rst=>{
+            
+        })
         getfactory().then(rst=>{
             var factorynum = rst.length;
             this.setState({
@@ -69,18 +73,18 @@ export default class EntryTable extends Component {
             }) 
         })
         const param = {stime:this.state.stime1,etime:this.state.etime1};
-        console.log(param,"cnm");
+     
          // getNurserysCountFast({},{stime:"2017/11/26",etime:"2017/11/27"})
          getNurserysCountFast({},param)
          .then(rst=>{
             let todaynum = 0;
-            console.log(rst,"kawayi");
+            
             for(let key=0;key<=rst.length-1; key++){
-                console.log(rst[key]);
+                
                 todaynum = todaynum + rst[key].Num;
                 
             }
-            console.log(todaynum);
+            
             this.setState({
                  today:todaynum,
             })
@@ -190,7 +194,7 @@ export default class EntryTable extends Component {
 
     render() {
         let {amount} = this.state;
-        console.log(amount);
+        
         return (
             <div>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
@@ -271,6 +275,7 @@ export default class EntryTable extends Component {
         } else {
             const {treetyoption = [],treetypeoption = []} = this.props;
             const {treetypename,treety} = this.state;
+            
             return (
                 <Row>
                     <Col xl={4} lg={10}>
@@ -281,7 +286,7 @@ export default class EntryTable extends Component {
                     </Col>
                     <Col xl={5} lg={10}>
                         <span>树种：</span>
-                        <Select allowClear showSearch className="forestcalcw2 mxw100" defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
+                        <Select style={{width:"100px"}} allowClear showSearch className="forestcalcw2 mxw100" defaultValue='全      部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
                             {treetypeoption}
                         </Select>
                     </Col>
@@ -302,7 +307,7 @@ export default class EntryTable extends Component {
         }
     }
     close(){
-        console.log("adhkjawhd");
+        
     }
     //点击图片出现日期选择
     handleIsOpen(index) {
@@ -315,7 +320,7 @@ export default class EntryTable extends Component {
     datepick(index,value){
         if(index == 1) {
             // this.setState({stime1:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
-            console.log(value,"123");
+            
             this.setState({etime1:value?moment(value).format('YYYY/MM/DD'):''});
         }
         if(index == 2){
@@ -329,7 +334,7 @@ export default class EntryTable extends Component {
         let param = {
             etime:value?moment(value).unix():''
         }
-        this.sum(index, param);
+        // this.sum(index, param);
         this.state.isOpen[index] = !this.state.isOpen[index];
         this.setState({
             isOpen:this.state.isOpen
@@ -338,7 +343,7 @@ export default class EntryTable extends Component {
     datepickok(index) {
         if(index == 1) {
             const {stime1,etime1} = this.state;
-            console.log(etime1,"xiha");
+          
             let param = {
                 // stime:stime1?moment(stime1).add(8, 'h').unix():'',
                 // etime:etime1?moment(etime1).add(8, 'h').unix():''
@@ -361,7 +366,7 @@ export default class EntryTable extends Component {
     }
 
     ontypechange(value) {
-        console.log(value,"jjlkjl");
+       
         const {typeselect,leftkeycode = ''} = this.props;
         typeselect(value || '',leftkeycode)
         this.setState({treety:value || ''}, () => {
@@ -370,6 +375,7 @@ export default class EntryTable extends Component {
     }
 
     ontreetypechange(value) {
+        
         const {treetypelist} = this.props;
         let treetype = treetypelist.find(rst => rst.name == value)
         this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''},() => {
@@ -421,7 +427,7 @@ export default class EntryTable extends Component {
             this.setState({loading1:true})
             getNurserysCountFast({},{etime:param.etime})
             .then(rst => {
-                console.log(rst,"xiaozhu");
+                
                  let res = groupBy(rst, function(n){
                 return n.Section
             });
@@ -483,11 +489,11 @@ export default class EntryTable extends Component {
             })
         } else if(index === 2) {
             this.setState({loading2:true})
-            console.log('222',param);
+            
            getNurserysCountFast({},param)
            // getNurserysCountFast()
             .then(rst => {
-                console.log(rst,"fenbushi");
+                
                let res = groupBy(rst, function(n){
                 return n.Time
             });
@@ -497,7 +503,7 @@ export default class EntryTable extends Component {
                let biaoduan4 = [];
                let biaoduan5 = [];
                let bytime = Object.values(res);
-               console.log(bytime,"tiantain");
+               
                for(var x = 0 ; x <= bytime.length-1; x++){
                    let number1 = 0;
                    let number2 = 0;
@@ -547,14 +553,10 @@ export default class EntryTable extends Component {
                        }
                    }
                } 
-               console.log(biaoduan1,"dwad");
-               console.log(biaoduan2,"dwad");
-               console.log(biaoduan3,"dwad");
-               console.log(biaoduan4,"dwad");
-               console.log(biaoduan5,"dwad");
+              
                let lastshuzhu =[];
                lastshuzhu = [biaoduan1,biaoduan2,biaoduan3,biaoduan4,biaoduan5];
-               console.log(lastshuzhu,"vytdfifdufud");
+               
             let time = Object.keys(res);
             let value = Object.values(res);
             let biaoduan = Object.keys(res);
@@ -569,13 +571,9 @@ export default class EntryTable extends Component {
             }
             wsx.push(qaz);
             }
-            console.log(wsx,"wsx");
-            // let Num1 = 0;
-            // for(var i = 0; i<=rst.length-1; i++){
-            // Num1 = Num1 + rst[i].Num;
-            // }
-            console.log(value,"dajkh")
-            console.log(time);
+            
+       
+           
                 this.setState({loading2:false})
                 if(!rst)
                     return
@@ -697,7 +695,7 @@ export default class EntryTable extends Component {
                     // series.unshift({
                     //     name:`${this.state.treetypetitlename}进场总数`,
                     //     type:'bar',
-                    //     data:totledata
+                    //     data:wsx
                     // });
                     // let options2 = {
                     //     legend: {

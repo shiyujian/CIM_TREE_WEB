@@ -42,8 +42,20 @@ export default class Entry extends Component {
     }
 
     componentDidMount () {
+        const {actions: {gettreeevery}} = this.props;
+        gettreeevery().then(rst=>{
+            console.log(rst,"soooso");
+            // this.setTreeTypeOption(rst);
+            let treetypeoption = rst.map(item => {
+                return <Option key={item.ID} value={item.ID}>{item.TreeTypeNo}</Option>
+            })
+            treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
+            console.log(treetypeoption,"ahdjkahkfhakhf")
+            this.setState({treetypeoption,treetypelist:rst})
+        });
         console.log(this.props,"46546");
         const {actions: {getTree,gettreetype,getTreeList,getNurserysCount}} = this.props;
+
         //地块树
        try {
             getTree({},{parent:'root'})
@@ -135,10 +147,10 @@ export default class Entry extends Component {
                          account={this.state.account}
                          sectionoption={sectionoption}
                          leftkeycode={leftkeycode}
-                         treetypeoption={treetypeoption}
+                         treetypeoption={this.state.treetypeoption}
                          treetypelist={treetypelist}
                          treetyoption={treetyoption}
-                         typeselect={this.typeselect.bind(this)}
+                         // typeselect={this.typeselect.bind(this)}
                         />
                     </Content>
                 </Main>
@@ -147,25 +159,32 @@ export default class Entry extends Component {
     }
 
     //类型选择, 重新获取: 树种
-    typeselect(value,keycode){
-        const {actions:{setkeycode,getTreeList}} =this.props;
-        //树种
-        getTreeList({},{field:'treetype',no:keycode,treety:value,paginate:false})
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
-    }
+    // typeselect(value,keycode){
+    //     console.log(value,keycode);
+    //     // const {actions:{setkeycode,getTreeList}} =this.props;
+    //     //树种
+    //      const {actions: {gettreeevery}} = this.props;
+    //     gettreeevery().then(rst=>{
+    //         console.log(rst,"soooso");
+    //         // this.setTreeTypeOption(rst);
+    //     })
+    //     // getTreeList({},{field:'treetype',no:keycode,treety:value,paginate:false})
+    //     // .then(rst => {
+    //     //     this.setTreeTypeOption(rst)
+    //     // })
+    // }
 
     //设置树种选项
-    setTreeTypeOption(rst) {
-        if(rst instanceof Array){
-            let treetypeoption = rst.map(item => {
-                return <Option key={item.name} value={item.name}>{item.name}</Option>
-            })
-            treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({treetypeoption,treetypelist:rst})
-        }
-    }
+    // setTreeTypeOption(rst) {
+    //     // if(rst instanceof Array){
+    //         let treetypeoption = rst.map(item => {
+    //             return <Option key={item.ID} value={item.ID}>{item.TreeTypeNo}</Option>
+    //         })
+    //         treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
+    //         console.log(treetypeoption,"ahdjkahkfhakhf")
+    //         this.setState({treetypeoption,treetypelist:rst})
+    //     // }
+    // }
 
      //树选择
     onSelect(value = []) {
@@ -176,7 +195,7 @@ export default class Entry extends Component {
         gettreetype()
         // gettreetype({},{no:keycode,paginate:false})
         .then(rst => {
-            this.setTreeTypeOption(rst)
+            // this.setTreeTypeOption(rst)
             console.log(rst);
             let res = groupBy(rst, function(n){
                 return n.Section
