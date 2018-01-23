@@ -47,7 +47,7 @@ export default class Entry extends Component {
             console.log(rst,"soooso");
             // this.setTreeTypeOption(rst);
             let treetypeoption = rst.map(item => {
-                return <Option key={item.ID} value={item.ID}>{item.TreeTypeNo}</Option>
+                return <Option key={item.ID} lable={item.TreeTypeNo} value={item.ID}>{item.TreeTypeNo}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
             console.log(treetypeoption,"ahdjkahkfhakhf")

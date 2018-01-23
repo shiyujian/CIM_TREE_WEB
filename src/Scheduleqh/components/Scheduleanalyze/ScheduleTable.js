@@ -349,7 +349,7 @@ export default class ScheduleTable extends Component {
                 <div style={{cursor:'pointer'}} onClick = {this.handleIsOpen.bind(this,index)}><img style={{height: '36px'}} src={DateImg}/></div>
                 <DatePicker
                     style={{textAlign:"center",visibility:"hidden"}}
-                    // defaultValue={moment(new Date(), 'YYYY/MM/DD')}
+                    defaultValue={moment(new Date(), 'YYYY/MM/DD')}
                     format={'YYYY/MM/DD'}
                     onChange={this.datepick1.bind(this,index)}
                     open={this.state.isOpen[index]}
@@ -366,7 +366,7 @@ export default class ScheduleTable extends Component {
                     <span>种植时间：</span>
                     <RangePicker 
                      style={{verticalAlign:"middle"}} 
-                     // defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
+                     defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
                      showTime={{ format: 'HH:mm:ss' }}
                      format={'YYYY/MM/DD HH:mm:ss'}
                      onChange={this.datepick.bind(this,index)}
@@ -380,7 +380,7 @@ export default class ScheduleTable extends Component {
                     <DatePicker  
                      style={{textAlign:"center"}} 
                      showTime
-                     // defaultValue={moment(this.state.etime2, 'YYYY-MM-DD HH:mm:ss')} 
+                     defaultValue={moment(this.state.etime2, 'YYYY-MM-DD HH:mm:ss')} 
                      format={'YYYY/MM/DD HH:mm:ss'}
                      onChange={this.datepick.bind(this,index)}
                      onOk={this.datepickok.bind(this,index)}
@@ -910,6 +910,7 @@ export default class ScheduleTable extends Component {
                     notzhongshu2.push(rst[i].UnComplete);
                 }
                 console.log(biaoduan2,yeszhongshu2,notzhongshu2);
+                
                 this.setState({loading4:false})
 
                 if(!rst)
