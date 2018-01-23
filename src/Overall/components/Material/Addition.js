@@ -2,7 +2,7 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table,DatePicker,Progress,Select,Checkbox
+    Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
@@ -21,14 +21,24 @@ export default class Addition extends Component {
     // };
     state={
         progress:0,
-        isUploading: false
+        isUploading: false,
+        engineerNumber:'',
+        engineerName:'',
+        engineerApprove:'',
+        dataSource:[],
+        count:0,
+        equipName:'',
+        equipNumber:'',
+
     }
     render() {
         const{
             additionVisible = false,
             docs = []
         } = this.props;
-        let {progress,isUploading} = this.state;
+        let {progress,isUploading,engineerName,engineerNumber,engineerApprove,dataSource,count,
+             equipName,equipNumber
+            } = this.state;
         let arr = [ 
             <Row gutter={24}>
                 <Col span={12}>
@@ -61,22 +71,49 @@ export default class Addition extends Component {
                             <Row gutter={15} >
                                 <Col span={10}>
                                     <FormItem   {...Addition.layoutT} label="单位工程:">
-                                     <Select>
+                                     <Select onSelect={(value,option)=>{
+                                                const {
+                                                        docs = [],
+                                                        actions: {changeDocs}
+                                                    } = this.props;
+                                                    this.state.engineerName = value;
+                                                    changeDocs(docs);
+                                             }}
+                                     >
                                           <Option value='第一阶段'>第一阶段</Option>
                                           <Option value='第二阶段'>第二阶段</Option>
+                                          <Option value='第三阶段'>第三阶段</Option>
+                                          <Option value='第四阶段'>第四阶段</Option>
                                      </Select>
                                     </FormItem>
                                 </Col>
                                 <Col span={10}>
                                     <FormItem {...Addition.layoutT} label="编号:">
-                                        <Input />
+                                        <Input   onChange={(event)=>{
+                                                    event=(event)?event:window.event;
+                                                    const {
+                                                        docs = [],
+                                                        actions: {changeDocs}
+                                                    } = this.props;
+                                                    this.state.engineerNumber = event.target.value;
+                                                    changeDocs(docs);
+                                                }}
+                                        />
                                     </FormItem>
                                 </Col>
                             </Row>
                             <Row gutter={15}>
                                 <Col span={20}>
                                     <FormItem  {...Addition.layout} label="审批单位:">
-                                        <Select>
+                                        <Select onSelect={(value,option)=>{
+                                                const {
+                                                        docs = [],
+                                                        actions: {changeDocs}
+                                                    } = this.props;
+                                                    this.state.engineerApprove = value;
+                                                    changeDocs(docs);
+                                             }}
+                                        >
                                               <Option value='第一公司'>第一公司</Option>
                                               <Option value='第二公司'>第二公司</Option>
                                         </Select>
@@ -88,16 +125,18 @@ export default class Addition extends Component {
                     <Row gutter={24}>
                         <Col span={24}>
                             <Table  rowSelection={this.rowSelectionAdd}
-                                    dataSource={docs}
+                                    dataSource={dataSource}
                                     columns={this.equipment}
-                                    className='foresttable'
+                                    pagination={false}
                                     bordered rowKey="code" />
                         </Col>
                     </Row>
                     <Row gutter={24}>
                         <Col span={24}>
-                            <Button  style={{ marginLeft: 20,marginRight: 10 }} type="primary" ghost>添加</Button>
-                            <Button  type="primary" ghost>删除</Button>
+                            <Button  style={{ marginLeft: 20,marginRight: 10 }}
+                                     type="primary" ghost
+                                     onClick={this.handleAdd. bind(this)}>添加</Button>
+                            <Button type="primary" onClick={this.onDelete.bind(this)}>删除</Button>
                         </Col>
                     </Row>
 					<Row gutter={24}>
@@ -111,7 +150,6 @@ export default class Addition extends Component {
 								<p>点击或者拖拽开始上传</p>
 								<p className="ant-upload-hint">
 									支持 pdf、doc、docx 文件
-
 								</p>
 							</Dragger>
 							<Progress percent={progress} strokeWidth={5} />
@@ -131,6 +169,7 @@ export default class Addition extends Component {
         );
     }
 
+
     rowSelectionAdd = {
         onChange: (selectedRowKeys, selectedRows) => {
             const { actions: { selectDocuments } } = this.props;
@@ -143,7 +182,7 @@ export default class Addition extends Component {
             selectDocuments(selectedRowKeys);
         },
     };
-
+    
     cancel() {
         const {
             actions: {toggleAddition,changeDocs}
@@ -197,28 +236,64 @@ export default class Addition extends Component {
     equipment=[
         {
             title: '设备名称',
-            dataIndex: 'equipName',
-            key: 'equipName',
+            dataIndex: 'extra_params.equipName',
+            key: 'extra_params.equipName',
+            render:() => {
+                return <Input onChange={(event)=>{
+                                event=(event)?event:window.event;
+                                const {
+                                    docs = [],
+                                    actions: {changeDocs}
+                                } = this.props;
+                                this.state.equipName = event.target.value;
+                                changeDocs(docs);
+                            }}
+                        />;
+            }
         }, {
             title: '规格型号',
-            dataIndex: 'equipNumber',
-            key: 'equipNumber',
+            dataIndex: 'extra_params.equipNumber',
+            key: 'extra_params.equipNumber',
+            render:() => {
+                return <Input onChange={(event)=>{
+                                event=(event)?event:window.event;
+                                const {
+                                    docs = [],
+                                    actions: {changeDocs}
+                                } = this.props;
+                                this.state.equipNumber = event.target.value;
+                                changeDocs(docs);
+                            }}
+                        />;
+            }
         }, {
             title: '数量',
-            dataIndex: 'equipCount',
-            key: 'equipCount',
+            dataIndex: 'extra_params.equipCount',
+            key: 'extra_params.equipCount',
+            render:(doc) => {
+                return <Input onChange={this.equipCount.bind(this, doc)}/>;
+            }
         }, {
             title: '进场日期',
-            dataIndex: 'equipTime',
-            key: 'equipTime',
+            dataIndex: 'extra_params.equipTime',
+            key: 'extra_params.equipTime',
+            render:(doc) => {
+                return <Input onChange={this.equipTime.bind(this, doc)}/>;
+            }
         }, {
             title: '技术状况',
-            dataIndex: 'equipMoment',
-            key: 'equipMoment'
+            dataIndex: 'extra_params.equipMoment',
+            key: 'extra_params.equipMoment',
+            render:(doc) => {
+                return <Input onChange={this.equipMoment.bind(this, doc)}/>;
+            }
         },{
             title: '备注',
-            dataIndex: 'equipRemark',
-            key: 'equipRemark'
+            dataIndex: 'extra_params.equipRemark',
+            key: 'extra_params.equipRemark',
+            render:(doc) => {
+                return <Input onChange={this.equipRemark.bind(this, doc)}/>;
+            }
         }
 
     ]
@@ -231,16 +306,83 @@ export default class Addition extends Component {
             render: (doc) => {
                 return <Input onChange={this.remark.bind(this, doc)}/>;
             }
-        },{
+        }, {
             title:'操作',
             render: doc => {
                 return (
 					<a onClick={this.remove.bind(this, doc)}>删除</a>
                 );
             }
+
         }
     ];
 
+    handleAdd(){
+        const {count,dataSource } = this.state;
+        const newData = {
+          key:count,
+          equipName:this.state.equipName,
+          equipNumber:this.state.equipNumber,
+        };
+        console.log('newDate',newData)
+        this.setState({
+          dataSource: [...dataSource, newData],
+          count: count + 1,
+        });
+        console.log('dataSource',dataSource)
+    }
+    onDelete(key){
+        const dataSource = [...this.state.dataSource];
+        this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
+    }
+    equipName(event){
+       const {
+            docs = [],
+            actions: {changeDocs}
+        } = this.props;
+        this.state.equipName = event.target.value;
+        changeDocs(docs); 
+    }
+    equipNumber(doc, event){
+       const {
+            docs = [],
+            actions: {changeDocs}
+        } = this.props;
+        doc.equipNumber = event.target.value;
+        changeDocs(docs); 
+    }
+    equipCount(doc, event){
+       const {
+            docs = [],
+            actions: {changeDocs}
+        } = this.props;
+        doc.equipCount = event.target.value;
+        changeDocs(docs); 
+    }
+    equipTime(doc, event){
+       const {
+            docs = [],
+            actions: {changeDocs}
+        } = this.props;
+        doc.equipTime = event.target.value;
+        changeDocs(docs); 
+    }
+    equipMoment(doc, event){
+       const {
+            docs = [],
+            actions: {changeDocs}
+        } = this.props;
+        doc.equipMoment = event.target.value;
+        changeDocs(docs); 
+    }
+    equipRemark(doc, event){
+       const {
+            docs = [],
+            actions: {changeDocs}
+        } = this.props;
+        doc.equipRemark = event.target.value;
+        changeDocs(docs); 
+    }
     remark(doc, event) {
         const {
             docs = [],
@@ -269,7 +411,12 @@ export default class Addition extends Component {
         } = this.props;
         const promises = docs.map(doc => {
             const response = doc.response;
+            console.log('doc',doc)
             let files=DeleteIpPort(doc);
+            doc.engineer=this.state.engineerName;
+            doc.number=this.state.engineerNumber;
+            doc.approve=this.state.engineerApprove;
+            doc.equipName=this.state.equipName;
             return postDocument({}, {
                 code: `${currentcode.code}_${response.id}`,
                 name: doc.name,
@@ -280,15 +427,24 @@ export default class Addition extends Component {
                 basic_params: {
                     files:[files]
                 },
+                companyEngineer:doc.companyEngineer,
                 extra_params: {
+                    engineer:doc.engineer,
                     number:doc.number,
+                    approve:doc.approve,
                     company:doc.company,
                     time:doc.time,
                     remark: doc.remark,
                     type: doc.type,
                     lasttime: doc.lastModifiedDate,
-                    state: '正常文档',
-                    submitTime: moment.utc().format()
+                    style: '机械设备',
+                    submitTime: moment.utc().format(),
+                    equipName:doc.equipName,
+                    equipNumber:doc.equipNumber,
+                    equipMoment:doc.equipMoment,
+                    equipCount:doc.equipCount,
+                    equipTime:doc.equipTime,
+                    equipRemark:doc.equipRemark
                 },
             });
         });

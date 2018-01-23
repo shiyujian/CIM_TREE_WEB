@@ -44,7 +44,7 @@ export default class Material extends Component {
         return (
             <Body>
             <Main>
-                <DynamicTitle title="制度标准" {...this.props}/>
+                <DynamicTitle title="物资管理" {...this.props}/>
                 <Sidebar>
                     <DatumTree treeData={list}
                                 selectedKeys={keycode}
