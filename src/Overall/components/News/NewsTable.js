@@ -115,83 +115,7 @@ class NewsTable extends Component {
 	}
 
 
-	//发布新闻
-	// publishNewsClick() {
-	// 	const {
-	// 		actions: { deleteData, getNewsList, getDraftNewsList, toggleModal, patchData },
-	// 		newsTabValue = '1'
-	// 	} = this.props;
-	// 	// const { actions: { toggleModal } } = this.props;
-	// 	toggleModal({
-	// 		type: 'NEWS',
-	// 		status: 'ADD',
-	// 		visible: true,
-	// 		editData: null
-	// 	})
-	// 	if (type === 'DELETE') {
-	// 		deleteData({ pk: record.id })
-	// 			.then(() => {
-	// 				message.success('删除新闻成功！');
-	// 				if (newsTabValue === '1') {
-	// 					getNewsList({
-	// 						user_id: user_id
-	// 					});
-	// 				} else {
-	// 					getDraftNewsList({
-	// 						user_id: user_id
-	// 					});
-	// 				}
-	// 			})
-	// 	} else if (type === 'EDIT') {
-	// 		toggleModal({
-	// 			type: 'NEWS',
-	// 			status: 'EDIT',
-	// 			visible: true,
-	// 			editData: record,
-	// 		})
-	// 	} else if (type === 'VIEW') {
-	// 		this.setState({
-	// 			visible: true,
-	// 			container: record.raw
-	// 		})
-	// 	} else if (type === 'BACK') {
-	// 		let newData = {
-	// 			"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-	// 			"is_draft": true
-	// 		};
-	// 		patchData({ pk: record.id }, newData)
-	// 			.then(rst => {
-	// 				if (rst.id) {
-	// 					message.success('撤回成功，撤回的新闻在暂存的新闻中可查看');
-	// 					//更新暂存的新闻列表数据
-	// 					getNewsList({
-	// 						user_id: user_id
-	// 					});
-	// 					getDraftNewsList({
-	// 						user_id: user_id
-	// 					});
-	// 				}
-	// 			})
-	// 	} else if (type === 'PUBLISH') {
-	// 		let newData = {
-	// 			"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-	// 			"is_draft": false
-	// 		};
-	// 		patchData({ pk: record.id }, newData)
-	// 			.then(rst => {
-	// 				if (rst.id) {
-	// 					message.success('重新发布新闻成功！');
-	// 					//更新暂存的新闻列表数据
-	// 					getNewsList({
-	// 						user_id: user_id
-	// 					});
-	// 					getDraftNewsList({
-	// 						user_id: user_id
-	// 					});
-	// 				}
-	// 			})
-	// 	}
-	// }
+	
 
 	handleCancel() {
 		this.setState({
@@ -215,7 +139,7 @@ class NewsTable extends Component {
 		} = this.props;
 		this.props.form.setFieldsValue({
 
-			title: undefined,
+			theme: undefined,
 			worktime: undefined,
 			workunit: undefined,
 
@@ -236,12 +160,12 @@ class NewsTable extends Component {
 			actions: { getNewsList },
 			filter = {}
 		} = this.props;
-		const user = getUser();
+		// const user = getUser();
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
 				// task: filter.type || "processing",
-				executor: user.id,
-				title: values.title || "",
+				// executor: user.id,
+				title: values.theme || "",
 				// workflow:values.workflow || "",
 				// creator:values.creator || "",
 				// status:values.status || "",
@@ -332,15 +256,15 @@ class NewsTable extends Component {
 
 						<TabPane tab="新闻查询" key="1">
 							<Row >
-								<Col span={4}>
+								{/* <Col span={4}>
 									<Icon type='exception' style={{ fontSize: 32 }} />
-								</Col>
-								<Col span={16}>
+								</Col> */}
+								<Col span={18}>
 									<Row>
-										<Col span={12} >
+										<Col span={8} >
 											<FormItem {...formItemLayout} label="主题">
 												{
-													getFieldDecorator('title', {
+													getFieldDecorator('theme', {
 														rules: [
 															{ required: false, message: '请输入主题' },
 														]
@@ -349,7 +273,7 @@ class NewsTable extends Component {
 												}
 											</FormItem>
 										</Col>
-										<Col span={12} >
+										<Col span={8} >
 											<FormItem {...formItemLayout} label="发布日期">
 
 												{
@@ -359,7 +283,7 @@ class NewsTable extends Component {
 														]
 													})
 														(<RangePicker
-															style={{ verticalAlign: "middle", width: '70%' }}
+															style={{ verticalAlign: "middle", width: '100%' }}
 															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
 															showTime={{ format: 'HH:mm:ss' }}
 															format={'YYYY/MM/DD HH:mm:ss'}
@@ -371,9 +295,7 @@ class NewsTable extends Component {
 											</FormItem>
 
 										</Col>
-									</Row>
-									<Row>
-										<Col span={12} style={{ marginTop: 20 }}>
+										<Col span={8} >
 											<FormItem {...formItemLayout} label="发布单位">
 												{
 													getFieldDecorator('workunit', {
@@ -397,15 +319,20 @@ class NewsTable extends Component {
 
 										</Col>
 									</Row>
+									<Row>
+										
+									</Row>
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
-									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear.bind(this)}>清除</Button>
+								</Col>
+								<Col span={2} >
+									<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
 								</Col>
 							</Row>
 
 							<Table
-								style={{ marginTop: 20 }}
+							
 								rowSelection={rowSelection}
 								dataSource={newsList}
 								columns={this.columns}
@@ -415,12 +342,12 @@ class NewsTable extends Component {
 						</TabPane>
 						<TabPane tab="暂存的新闻" key="2">
 							<Row >
-								<Col span={4}>
+								{/* <Col span={4}>
 									<Icon type='exception' style={{ fontSize: 32 }} />
-								</Col>
-								<Col span={16}>
+								</Col> */}
+								<Col span={18}>
 									<Row>
-										<Col span={12} >
+										<Col span={8} >
 											<FormItem {...formItemLayout} label="主题">
 												{
 													getFieldDecorator('title1', {
@@ -432,7 +359,7 @@ class NewsTable extends Component {
 												}
 											</FormItem>
 										</Col>
-										<Col span={12} >
+										<Col span={8} >
 											<FormItem {...formItemLayout} label="发布日期">
 
 												{
@@ -442,7 +369,7 @@ class NewsTable extends Component {
 														]
 													})
 														(<RangePicker
-															style={{ verticalAlign: "middle", width: '70%' }}
+															style={{ verticalAlign: "middle" }}
 															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
 															showTime={{ format: 'HH:mm:ss' }}
 															format={'YYYY/MM/DD HH:mm:ss'}
@@ -454,9 +381,7 @@ class NewsTable extends Component {
 											</FormItem>
 
 										</Col>
-									</Row>
-									<Row>
-										<Col span={12} style={{ marginTop: 20 }}>
+										<Col span={8} >
 											<FormItem {...formItemLayout} label="发布单位">
 												{
 													getFieldDecorator('workunits', {
@@ -479,15 +404,19 @@ class NewsTable extends Component {
 											</FormItem>
 
 										</Col>
+									
+										
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
-									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
+								</Col>
+								<Col span={2}>
+									<Button  icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
 								</Col>
 							</Row>
 							<Table dataSource={draftNewsLis}
-								style={{ marginTop: 20 }}
+								
 								rowSelection={rowSelection}
 								title={() => '新闻查询'}
 								columns={this.draftColumns}
@@ -518,7 +447,7 @@ class NewsTable extends Component {
 
 	columns = [
 		{
-			title: '序号',
+			title: '新闻ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
@@ -553,12 +482,12 @@ class NewsTable extends Component {
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
 
 
-						{/* <a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp; */}
-						{/* <Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
+						{/* <a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a> */}
+						&nbsp;&nbsp;|&nbsp;&nbsp;
+						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
 							cancelText="取消">
 							<a>删除</a>
-						</Popconfirm> */}
+						</Popconfirm>
 					</span>
 				)
 			},
@@ -566,7 +495,7 @@ class NewsTable extends Component {
 	];
 	draftColumns = [
 		{
-			title: '序号',
+			title: '新闻ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
@@ -601,7 +530,6 @@ class NewsTable extends Component {
 						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
-
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
 							cancelText="取消">
