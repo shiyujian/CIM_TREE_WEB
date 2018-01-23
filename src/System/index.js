@@ -83,7 +83,7 @@ export default class System extends Component {
 			name: '权限设置',
 			path: '/system/permissionn',
 			icon: <Icon name="key"/>
-		}
+		},
 		// {
 		// 	key: 'Major',
 		// 	id: 'SYSTEM.MAJOR',
@@ -108,13 +108,15 @@ export default class System extends Component {
 		// 	name: '图标设置',
 		// 	path: '/system/icon',
 		// 	icon: <Icon name="terminal"/>
-		// }, {
-		// 	key: 'Workflow',
-		// 	id: 'SYSTEM.WORKFLOW',
-		// 	name: '流程设置',
-		// 	path: '/system/workflow',
-		// 	icon: <Icon name="object-group"/>
-		// },{
+		// }, 
+		{
+			key: 'Workflow',
+			id: 'SYSTEM.WORKFLOW',
+			name: '流程设置',
+			path: '/system/workflow',
+			icon: <Icon name="object-group"/>
+		}
+		// ,{
 		// 	key: 'Document',
 		// 	id: 'SYSTEM.DOCUMENT',
 		// 	name: '文档设置',

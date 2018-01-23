@@ -203,6 +203,7 @@ class Stage extends Component {
         //树种
         gettreetype({},{no:keycode,paginate:false})
         .then(rst => {
+            console.log('rst',rst)
             this.setTreeTypeOption(rst)
         })
     }
