@@ -52,6 +52,13 @@ export const getTrendsList = createFetchAction(`${base}/main/api/post/?publisher
 export const getTrenListOK = createAction('xhy获取安全事故快报');
 export const getTrenList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=公告&is_draft=false&category=3&time=${moment().valueOf()}`, [getTrenListOK]);
 
+//获取暂存的安全生产视频
+export const getVideosListOK = createAction('xhy获取暂存安全生产视频');
+export const getVideosList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=公告&category=5&time=${moment().valueOf()}`, [getVideosListOK]);
+//获取安全生产视频
+export const getVideoListOK = createAction('xhy获取安全生产视频');
+export const getVideoList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=公告&is_draft=false&category=5&time=${moment().valueOf()}`, [getVideoListOK]);
+
 export const actions = {
 	setTabActive,
 	setBulletinTabActive,
@@ -76,7 +83,14 @@ export const actions = {
 	getTrendsListOK,
 	getTrendsList,
 	getTrenListOK,
-	getTrenList
+	getTrenList,
+
+	getVideosListOK,
+	getVideosList,
+	getVideoListOK,
+	getVideoList,
+
+
 
 
 
@@ -140,6 +154,16 @@ export default handleActions({
 	[getTrendsListOK]: (state, {payload}) => ( {
 		...state,
 		trendsList: payload
+	}),
+
+
+	[getVideosListOK]: (state, {payload}) => ( {
+		...state,
+		videosList: payload
+	}),
+	[getVideoListOK]: (state, {payload}) => ( {
+		...state,
+		videoList: payload
 	}),
 
 }, {});

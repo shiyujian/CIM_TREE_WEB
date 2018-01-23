@@ -143,7 +143,7 @@ class VideoText extends Component {
 	//发布新闻
 	postData() {
 		const {
-			actions: {postData, getNewsList, patchData, getDraftNewsList,postUploadFiles},
+			actions: {postData, getVideoList, patchData, getVideosList,postUploadFiles},
 			form: {validateFields},
 			toggleData: toggleData = {
 				type: 'NEWS',
@@ -167,8 +167,8 @@ class VideoText extends Component {
 						},
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-						"tags": [1],
-						"categories": [],
+						"tags": [2],
+						"categories": [5],
 						"publisher": getUser().id,
 						"is_draft": false
 					};
@@ -178,7 +178,7 @@ class VideoText extends Component {
 								this.modalClick();
 								message.success('发布新闻成功');
 								//更新新闻列表数据
-								getNewsList({
+								getVideoList({
 									user_id: getUser().id
 								});
 								postUploadFiles([]);								
@@ -189,6 +189,7 @@ class VideoText extends Component {
 						"title": values['title'],
 						"abstract": values['abstract'] || '',
 						"raw": this.state.content,
+						"categories": [5],
 						"attachment": {
 							"fileList":fileList || [],
 						},
@@ -201,10 +202,10 @@ class VideoText extends Component {
 								this.modalClick();
 								message.success('编辑新闻成功');
 								//更新新闻列表数据
-								getNewsList({
+								getVideoList({
 									user_id: getUser().id
 								});
-								getDraftNewsList({
+								getVideosList({
 									user_id: getUser().id
 								});
 								postUploadFiles([]);								
@@ -218,7 +219,7 @@ class VideoText extends Component {
 	//暂存新闻
 	draftDataFunc() {
 		const {
-			actions: {postData, patchData, getNewsList, getDraftNewsList},
+			actions: {postData, patchData, getVideoList, getVideosList},
 			form: {validateFields},
 			toggleData: toggleData = {
 				status: 'ADD',
@@ -234,6 +235,7 @@ class VideoText extends Component {
 					"title": values['title'],
 					"abstract": values['abstract'] || '',
 					"raw": this.state.content,
+					"categories": [5],
 					"attachment": {
 						"fileList":fileList || [],
 					},
@@ -246,10 +248,10 @@ class VideoText extends Component {
 							this.modalClick();
 							message.success('暂存成功');
 							//更新暂存的新闻列表数据
-							getNewsList({
+							getVideoList({
 								user_id: getUser().id
 							});
-							getDraftNewsList({
+							getVideosList({
 								user_id: getUser().id
 							});
 						}
@@ -261,11 +263,12 @@ class VideoText extends Component {
 					"title": values['title'] || '',
 					"abstract": values['abstract'] || '',
 					"raw": this.state.content || '',
+					"categories": [5],
 					"attachment": {
 						"fileList":fileList || [],
 					},
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-					"tags": [1],
+					"tags": [2],
 					"publisher": getUser().id,
 					"is_draft": true
 				};
@@ -275,7 +278,7 @@ class VideoText extends Component {
 							this.modalClick();
 							message.success('暂存成功！');
 							//更新暂存的新闻列表数据
-							getDraftNewsList({
+							getVideosList({
 								user_id: getUser().id
 							});
 						}

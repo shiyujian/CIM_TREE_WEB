@@ -20,17 +20,17 @@ export default class Video extends Component {
 
 	static propTypes = {};
 	componentWillReceiveProps(nextProps) {
-		console.log(nextProps)
+		
 		// const {
 		// 	fileList = [],
 		// } = this.props;
 		// console.log(this.props)		
 		const newsListT = nextProps.newsList || []
 		for (var i = 0; i < newsListT.length; i++) {
-			console.log(newsListT[i])
+			
 			const newsListTT = newsListT[i].attachment.fileList || []
 			for (var j = 0; j < newsListTT.length; j++) {
-				console.log(newsListTT[j])
+				
 				const videos = newsListTT[j].down_file
 				this.setState({ video: videos })
 				break;
@@ -39,13 +39,12 @@ export default class Video extends Component {
 		}
 	}
 	componentWillMount() {
-		console.log(this.props)
+	
 	}
 	componentDidMount() {
-		const { actions: { getNewsList } } = this.props;
-		console.log(this.props)
-		console.log(this.props.getNewsList)
-		getNewsList({}, { tag: '新闻', is_draft: false });
+		const { actions: { getVideoList } } = this.props;
+		
+		getVideoList({}, { tag: '公告', is_draft: false });
 
 		// // 视频一
 		// $(".firstVideo").mouseover(function () {

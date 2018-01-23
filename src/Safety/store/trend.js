@@ -22,6 +22,10 @@ export const getNewsList = createFetchAction(`${base}/main/api/post/?publisher={
 export const getTrenListOK = createAction('xhy获取安全事故快报');
 export const getTrenList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=公告&is_draft=false&category=3&time=${moment().valueOf()}`, [getTrenListOK]);
 
+//获取安全生产视频
+export const getVideoListOK = createAction('xhy获取安全生产视频');
+export const getVideoList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=公告&is_draft=false&category=5&time=${moment().valueOf()}`, [getVideoListOK]);
+
 export const actions = {
     getNewsListOK,
     getNewsList,
@@ -32,7 +36,9 @@ export const actions = {
 	getTipsListOK,
 	getTipsList,
 	getTrenListOK,
-	getTrenList
+	getTrenList,
+	getVideoListOK,
+	getVideoList
 };
 
 export default handleActions(
@@ -57,6 +63,10 @@ export default handleActions(
 		[getTrenListOK]: (state, {payload}) => ( {
 			...state,
 			trenList: payload
+		}),
+		[getVideoListOK]: (state, {payload}) => ( {
+			...state,
+			videoList: payload
 		}),
     },
     {},
