@@ -9,6 +9,7 @@ import docDispatchReducer, {actions as docDispatchActions} from './docdispatch';
 import approvalReducer, {actions as approvalActions} from './approval';
 import dispatchReducer, {actions as adispatchActions} from './dispatch';
 import receiptReducer, {actions as receiptActions} from './receipt';
+import formmanageReducer, {actions as formmanageActions} from './formmanage';
 
 
 
@@ -39,6 +40,9 @@ export default handleActions({
 	},
 	[combineActions(...actionsMap(receiptActions))]: (state, action) => {
 		return {...state, receipt: receiptReducer(state.receipt, action)};
+	},
+	[combineActions(...actionsMap(formmanageActions))]: (state, action) => {
+		return {...state, formmanage: formmanageReducer(state.formmanage, action)};
 	},
 
 }, {});
