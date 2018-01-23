@@ -117,7 +117,8 @@ export default class EntryTable extends Component {
                     type: 'category',
                     axisPointer: {
                         type: 'shadow'
-                    }
+                    },
+                   
                 }
             ],
             yAxis: [
@@ -286,7 +287,7 @@ export default class EntryTable extends Component {
                     </Col>
                     <Col xl={5} lg={10}>
                         <span>树种：</span>
-                        <Select style={{width:"100px"}} allowClear showSearch className="forestcalcw2 mxw100" defaultValue='全      部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
+                        <Select style={{width:"100px"}} allowClear showSearch className="forestcalcw2 mxw100" defaultValue='全部' onSelect={() =>this.select()} onChange={this.ontreetypechange.bind(this)}>
                             {treetypeoption}
                         </Select>
                     </Col>
@@ -308,6 +309,11 @@ export default class EntryTable extends Component {
     }
     close(){
         
+    }
+
+    
+    select(e) {
+        console.log(e)
     }
     //点击图片出现日期选择
     handleIsOpen(index) {
@@ -341,6 +347,7 @@ export default class EntryTable extends Component {
         })
     }
     datepickok(index) {
+       
         if(index == 1) {
             const {stime1,etime1} = this.state;
           
@@ -357,7 +364,7 @@ export default class EntryTable extends Component {
                 // stime:stime2?moment(stime2).add(8, 'h').unix():'',
                 // etime:etime2?moment(etime2).add(8, 'h').unix():'',
                 // treety,
-                // treetype,
+                treetype:treetype,
                 stime:stime2,
                 etime:etime2,
             }
@@ -366,7 +373,7 @@ export default class EntryTable extends Component {
     }
 
     ontypechange(value) {
-       
+        
         const {typeselect,leftkeycode = ''} = this.props;
         typeselect(value || '',leftkeycode)
         this.setState({treety:value || ''}, () => {
@@ -374,13 +381,19 @@ export default class EntryTable extends Component {
         })
     }
 
-    ontreetypechange(value) {
-        
+    ontreetypechange(value,children) {
+       
         const {treetypelist} = this.props;
-        let treetype = treetypelist.find(rst => rst.name == value)
-        this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''},() => {
+        let treetype = treetypelist.find(rst => rst.ID == value)
+        this.setState({treetype:treetype?treetype.ID:'',treetypename:treetype.TreeTypeNo || ''},() => {
             this.datepickok(2)
         })
+        // this.setState({
+        //     treetype:value,
+        // })
+        // this.datepickok(2);
+        
+
     }
 
     // sum(index, param) {
@@ -489,7 +502,7 @@ export default class EntryTable extends Component {
             })
         } else if(index === 2) {
             this.setState({loading2:true})
-            
+            console.log(param,"haha");
            getNurserysCountFast({},param)
            // getNurserysCountFast()
             .then(rst => {
@@ -582,9 +595,6 @@ export default class EntryTable extends Component {
                        let myChart2 = echarts.getInstanceByDom(document.getElementById('stock'));
                     let options2 = {
 
-                         title: {
-                                    // text: '折线图堆叠'
-                                },
                                 tooltip: {
                                     trigger: 'axis'
                                 },
@@ -612,20 +622,20 @@ export default class EntryTable extends Component {
                                 },
                                 yAxis: [
                                     // type: 'value'
-                                    {
-                                        type: 'value',
-                                        name: '',
-                                        axisLabel: {
-                                            formatter: '{value} 棵'
+                                        {
+                                            type: 'value',
+                                            name: '',
+                                            axisLabel: {
+                                                formatter: '{value} 棵'
+                                            }
+                                        },
+                                        {
+                                            type: 'value',
+                                            name: '',
+                                            axisLabel: {
+                                                formatter: '{value} 棵'
+                                            }
                                         }
-                                    },
-                                    {
-                                        type: 'value',
-                                        name: '',
-                                        axisLabel: {
-                                            formatter: '{value} 棵'
-                                        }
-                                    }
                                 ],
                                 series: [
                                     {
@@ -643,33 +653,33 @@ export default class EntryTable extends Component {
                                     {
                                         name:'1标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[0]
                                     },
                                     {
                                         name:'2标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[1]
                                     },
                                     {
                                         name:'3标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[2]
                                     },
                                     {
                                         name:'4标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[3]
                                     },
                                     {
                                         name:'5标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[4]
-                                    }
+                                    },
                                 ]
                             };
 

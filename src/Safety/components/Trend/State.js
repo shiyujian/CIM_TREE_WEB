@@ -67,14 +67,14 @@ export default class State extends Component {
 
 	render() {
 		const {
-			newsList = [],
+			domesticList = [],
 		} = this.props;
 
 		return (
 			<Blade title="国内安全动态">
 					<Table 
 						bordered={false} 
-						dataSource={newsList} 
+						dataSource={domesticList} 
 						columns={this.columns}
 				        rowKey="id" size="small" pagination={{pageSize: 8}}
 				    />

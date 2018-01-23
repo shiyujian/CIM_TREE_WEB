@@ -90,7 +90,7 @@ class Modals extends Component {
 			});
 			editor.txt.html(toggleData.editData.raw)
 			setFieldsValue({
-				'title': toggleData.editData.title1 || '',
+				'title': toggleData.editData.title || '',
 			})
 		}
 	}
@@ -152,7 +152,7 @@ class Modals extends Component {
 				//判断是发布公告还是更新公告
 				if (toggleData.status === 'ADD') {
 					let newData = {
-						"title": values['title1'] || '',
+						"title": values['title'] || '',
 						"abstract": '',
 						"raw": this.state.content,
 						"content": "",
@@ -162,7 +162,7 @@ class Modals extends Component {
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"tags": [2],
-						"categories": [],
+						"categories": [4],
 						"publisher": getUser().id,
 						"is_draft": false
 					};
@@ -180,11 +180,12 @@ class Modals extends Component {
 						})
 				} else if (toggleData.status === 'EDIT') {
 					let newData = {
-						"title": values['title1'] || '',
+						"title": values['title'] || '',
 						"raw": this.state.content,
 						"attachment": {
 							"fileList": fileList || [],
 						},
+						"categories": [4],
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"is_draft": false
 					};
@@ -226,11 +227,12 @@ class Modals extends Component {
 		if (toggleData.status === 'EDIT') {
 			validateFields((err, values) => {
 				let newData = {
-					"title": values['title1'] || '',
+					"title": values['title'] || '',
 					"raw": this.state.content,
 					"attachment": {
 						"fileList": fileList || [],
 					},
+					"categories": [4],
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"is_draft": true
 				};
@@ -252,7 +254,7 @@ class Modals extends Component {
 		} else if (toggleData.status === 'ADD') {
 			validateFields((err, values) => {
 				let newData = {
-					"title": values['title1'] || '',
+					"title": values['title'] || '',
 					"abstract": '',
 					"raw": this.state.content,
 					"attachment": {
@@ -260,6 +262,7 @@ class Modals extends Component {
 					},
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [2],
+					"categories": [4],
 					"publisher": getUser().id,
 					"is_draft": true
 				};
@@ -309,7 +312,7 @@ class Modals extends Component {
 					<Row span={22}>
 						<Col span={8} offset={1}>
 							<FormItem {...formItemLayout} label="主题">
-								{getFieldDecorator('title1', {
+								{getFieldDecorator('title', {
 									rules: [{ required: true, message: '请输入公告标题' }],
 									initialValue: ''
 								})(

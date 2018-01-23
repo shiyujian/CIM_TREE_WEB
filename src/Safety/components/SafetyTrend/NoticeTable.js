@@ -152,18 +152,18 @@ export default class NoticeTable extends Component {
 				<Col span={22} offset={1}>
 					<Tabs activeKey={noticeTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
 						<div style={{marginBottom: '10px'}}>
-							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>发布公告</Button>
+							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>发布的项目安全公告</Button>
 							{
 								(toggleData.visible && toggleData.type === 'TIPS') && (<NoticeText {...this.props}/>)
 							}
 						</div>}>
-						<TabPane tab="发布的公告" key="1">
+						<TabPane tab="发布的项目安全公告" key="1">
 							<Table dataSource={tipsList}
 							       columns={this.columns}
 							       rowKey="id"
 							/>
 						</TabPane>
-						<TabPane tab="暂存的公告" key="2">
+						<TabPane tab="暂存的项目安全公告" key="2">
 							<Table dataSource={draftTipsList}
 							       columns={this.draftColumns}
 							       rowKey="id"

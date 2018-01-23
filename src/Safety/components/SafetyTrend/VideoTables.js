@@ -20,15 +20,15 @@ export default class VideoTables extends Component {
 	}
 
 	componentDidMount() {
-		const { actions: { getNewsList, getDraftNewsList } } = this.props;
-		getNewsList({
+		const { actions: { getVideoList, getVideosList } } = this.props;
+		getVideoList({
 			user_id: user_id
 		})
-		getDraftNewsList({
+		getVideosList({
 			user_id: user_id
 		})
 		// this.state.video.push(this.state.file)
-		console.log(this.props, "333333333333")
+		// console.log(this.props, "333333333333")
 		// console.log(this.state.video)
 
 		const newsLists = this.props.tipsList || []
@@ -75,7 +75,7 @@ export default class VideoTables extends Component {
 		console.log(record)
 		this.setState({down_file:record.down_file})
 		const {
-			actions: { deleteData, getNewsList, getDraftNewsList, toggleModal, patchData },
+			actions: { deleteData, getVideoList, getVideosList, toggleModal, patchData },
 			bulletinTabValue = '1'
 		} = this.props;
 		if (type === 'DELETE') {
@@ -83,11 +83,11 @@ export default class VideoTables extends Component {
 				.then(() => {
 					message.success('删除新闻成功！');
 					if (bulletinTabValue === '1') {
-						getNewsList({
+						getVideoList({
 							user_id: user_id
 						});
 					} else {
-						getDraftNewsList({
+						getVideosList({
 							user_id: user_id
 						});
 					}
@@ -114,10 +114,10 @@ export default class VideoTables extends Component {
 					if (rst.id) {
 						message.success('撤回成功，撤回的新闻在暂存的新闻中可查看');
 						//更新暂存的新闻列表数据
-						getNewsList({
+						getVideoList({
 							user_id: user_id
 						});
-						getDraftNewsList({
+						getVideosList({
 							user_id: user_id
 						});
 					}
@@ -132,10 +132,10 @@ export default class VideoTables extends Component {
 					if (rst.id) {
 						message.success('重新发布新闻成功！');
 						//更新暂存的新闻列表数据
-						getNewsList({
+						getVideoList({
 							user_id: user_id
 						});
-						getDraftNewsList({
+						getVideosList({
 							user_id: user_id
 						});
 					}
@@ -172,8 +172,8 @@ export default class VideoTables extends Component {
 
 	render() {
 		const {
-			newsList = [],
-			draftNewsLis = [],
+			videoList = [],
+			videosList = [],
 			toggleData: toggleData = {
 				type: 'NEWS',
 				visible: false,
@@ -195,12 +195,12 @@ export default class VideoTables extends Component {
 							}
 						</div>}>
 						<TabPane tab="发布的视频" key="1">
-							<Table dataSource={newsList}
+							<Table dataSource={videoList}
 								columns={this.columns}
 								rowKey="id" />
 						</TabPane>
 						<TabPane tab="暂存的视频" key="2">
-							<Table dataSource={draftNewsLis}
+							<Table dataSource={videosList}
 								columns={this.draftColumns}
 								rowKey="id" />
 						</TabPane>

@@ -162,7 +162,7 @@ class NoticeText extends Component {
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"tags": [2],
-						"categories": [],
+						"categories": [1],
 						"publisher": getUser().id,
 						"is_draft": false
 					};
@@ -182,10 +182,12 @@ class NoticeText extends Component {
 					let newData = {
 						"title": values['title'],
 						"raw": this.state.content,
+						"categories": [],
 						"attachment": {
 							"fileList":fileList || [],
 						},
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+						"categories": [1],
 						"is_draft": false
 					};
 					patchData({pk: toggleData.editData.id}, newData)
@@ -224,8 +226,10 @@ class NoticeText extends Component {
 		if (toggleData.status === 'EDIT') {
 			validateFields((err, values) => {
 				let newData = {
+					"categories": [],
 					"title": values['title'],
 					"raw": this.state.content,
+					"categories": [1],
 					"attachment": {
 						"fileList":fileList || [],
 					},
@@ -259,6 +263,7 @@ class NoticeText extends Component {
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [2],
 					"publisher": getUser().id,
+					"categories": [1],
 					"is_draft": true
 				};
 				postData({}, newData)
@@ -296,8 +301,8 @@ class NoticeText extends Component {
 		return (
 			<Modal
 				title={toggleData.type === 'TIPS' ? (
-					toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
-				) : '发布公告'}
+					toggleData.status === 'ADD' ? '发布项目安全公告' : '编辑安全项目公告'
+				) : '发布项目安全公告'}
 				visible={toggleData.visible}
 				footer={null}
 				width="80%"
