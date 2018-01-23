@@ -153,7 +153,7 @@ class TipsTable extends Component {
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
 				executor: user.id,
-				title: values.title || "",
+				title: values.theme || "",
 			}
 			await getTipsList({}, conditions);
 		})
@@ -178,7 +178,7 @@ class TipsTable extends Component {
 	clear() {
 
 		this.props.form.setFieldsValue({
-			title: undefined,
+			theme: undefined,
 			worktime: undefined,
 			workunit: undefined,
 			degree: undefined
@@ -231,15 +231,15 @@ class TipsTable extends Component {
 						</div>} >
 						<TabPane tab="通知查询" key="1">
 							<Row >
-								<Col span={4}>
+								{/* <Col span={4}>
 									<Icon type='exception' style={{ fontSize: 32 }} />
-								</Col>
-								<Col span={16}>
+								</Col> */}
+								<Col span={18}>
 									<Row>
-										<Col span={12} >
+										<Col span={6} >
 											<FormItem {...formItemLayout} label="主题">
 												{
-													getFieldDecorator('title', {
+													getFieldDecorator('theme', {
 														rules: [
 															{ required: false, message: '请输入主题' },
 														]
@@ -248,7 +248,7 @@ class TipsTable extends Component {
 												}
 											</FormItem>
 										</Col>
-										<Col span={12} >
+										<Col span={6} >
 											<FormItem {...formItemLayout} label="发布日期">
 
 												{
@@ -270,9 +270,7 @@ class TipsTable extends Component {
 											</FormItem>
 
 										</Col>
-									</Row>
-									<Row>
-										<Col span={12} style={{ marginTop: 20 }}>
+										<Col span={6}>
 											<FormItem {...formItemLayout} label="发布单位">
 												{
 													getFieldDecorator('workunit', {
@@ -295,7 +293,7 @@ class TipsTable extends Component {
 											</FormItem>
 
 										</Col>
-										<Col span={12} style={{ marginTop: 20 }}>
+										<Col span={6}>
 											<FormItem {...formItemLayout} label="紧急程度">
 												{
 													getFieldDecorator('degree', {
@@ -319,26 +317,29 @@ class TipsTable extends Component {
 
 										</Col>
 									</Row>
+								
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
-									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear.bind(this)}>清除</Button>
+								</Col>
+								<Col span={2} >
+									<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
 								</Col>
 							</Row>
 							<Table dataSource={tipsList}
 								columns={this.columns}
 								rowKey="id"
-								style={{ marginTop: 20 }}
+							
 							/>
 						</TabPane>
 						<TabPane tab="暂存的通知" key="2">
 							<Row >
-								<Col span={4}>
+								{/* <Col span={4}>
 									<Icon type='exception' style={{ fontSize: 32 }} />
-								</Col>
-								<Col span={16}>
+								</Col> */}
+								<Col span={18}>
 									<Row>
-										<Col span={12} >
+										<Col span={6} >
 											<FormItem {...formItemLayout} label="主题">
 												{
 													getFieldDecorator('titles', {
@@ -350,7 +351,7 @@ class TipsTable extends Component {
 												}
 											</FormItem>
 										</Col>
-										<Col span={12} >
+										<Col span={6} >
 											<FormItem {...formItemLayout} label="发布日期">
 
 												{
@@ -372,9 +373,7 @@ class TipsTable extends Component {
 											</FormItem>
 
 										</Col>
-									</Row>
-									<Row>
-										<Col span={12} style={{ marginTop: 20 }}>
+										<Col span={6}>
 											<FormItem {...formItemLayout} label="发布单位">
 												{
 													getFieldDecorator('workunits', {
@@ -397,7 +396,7 @@ class TipsTable extends Component {
 											</FormItem>
 
 										</Col>
-										<Col span={12} style={{ marginTop: 20 }}>
+										<Col span={6}>
 											<FormItem {...formItemLayout} label="紧急程度">
 												{
 													getFieldDecorator('degrees', {
@@ -421,16 +420,19 @@ class TipsTable extends Component {
 
 										</Col>
 									</Row>
+									
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
-									<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
+								</Col>
+								<Col span={2}>
+									<Button  icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
 								</Col>
 							</Row>
 							<Table dataSource={draftTipsList}
 								columns={this.draftColumns}
 								rowKey="id"
-								style={{ marginTop: 20 }}
+								
 							/>
 						</TabPane>
 						{/* <TabPane tab="通知发布" key="3">

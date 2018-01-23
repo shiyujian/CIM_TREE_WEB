@@ -317,8 +317,8 @@ export default class CheckerTable extends Component {
     		sxm,
     		section,
     		status,
-    		checktime_min:stime&&moment(stime).unix(),
-    		checktime_max:etime&&moment(etime).unix(),
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
     		size
     	}

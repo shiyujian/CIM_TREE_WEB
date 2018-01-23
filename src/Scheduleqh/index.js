@@ -26,7 +26,7 @@ export default class Schedule extends Component {
 				<Submenu {...this.props} menus={Schedule.menus} defaultOpenKeys={Schedule.defaultOpenKeys}/>
 			</Aside>
 			<Main>
-				{Dashboard && <Route exact path="/schedule" component={Dashboard}/>}
+				{Stage && <Route exact path="/schedule" component={Stage}/>}
 				
 				{TotalPlan &&  <Route exact path="/schedule/totalplan" component={TotalPlan}/>}
 				{DgnDetail && <Route exact path="/schedule/dgndetail" component={DgnDetail}/>}

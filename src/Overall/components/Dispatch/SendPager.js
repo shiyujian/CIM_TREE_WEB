@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {Table, Tabs, Button, Row, Col, message, Modal,Popconfirm} from 'antd';
+import React, { Component } from 'react';
+import { Table, Tabs, Button, Row, Col, message, Modal, Popconfirm } from 'antd';
 // import SimpleText from './SimpleText';
-import {getUser} from '../../../_platform/auth';
+import { getUser } from '../../../_platform/auth';
 import moment from 'moment';
 import ToggleModal from './ToggleModal'
-import {STATIC_DOWNLOAD_API} from '../../../_platform/api';
+import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
 
 export default class SendPage1 extends Component {
 	constructor(props) {
@@ -24,19 +24,19 @@ export default class SendPage1 extends Component {
 	}
 
 
-	_deleteClick(_id){
-		const {actions: {deleteSentDocAc,getSentInfoAc}} = this.props;
-		deleteSentDocAc({id:_id,user:encodeURIComponent(getUser().org)})
-			.then(()=>{
+	_deleteClick(_id) {
+		const { actions: { deleteSentDocAc, getSentInfoAc } } = this.props;
+		deleteSentDocAc({ id: _id, user: encodeURIComponent(getUser().org) })
+			.then(() => {
 				message.success("删除发文成功！");
 				getSentInfoAc({
-					user:encodeURIComponent(getUser().org)
+					user: encodeURIComponent(getUser().org)
 				});
 			})
 
 	}
-	_sentDoc(){
-		const {actions:{toggleModalAc}}=this.props;
+	_sentDoc() {
+		const { actions: { toggleModalAc } } = this.props;
 		toggleModalAc({
 			type: 'NEWS',
 			status: 'ADD',
@@ -46,31 +46,36 @@ export default class SendPage1 extends Component {
 	}
 	render() {
 		const {
-			sendInfo={},
+			sendInfo = {},
 			toggleData: toggleData = {
 				type: 'NEWS',
 				visible: false,
 			},
 		} = this.props;
-		const {notifications=[]}=sendInfo;
-		const {showInfo = {}} = this.state;
-		const {notification = {}, is_read = false, _id = ''} = showInfo;
+		const { notifications = [] } = sendInfo;
+		const { showInfo = {} } = this.state;
+		const { notification = {}, is_read = false, _id = '' } = showInfo;
 		// console.log(111111,sendInfo)
 		// console.log(2222,notifications)
 		return (
 			<Row>
 				<Col span={22} offset={1}>
-					<Button onClick={this._sentDoc.bind(this)}>发文</Button>
+					<Row>
+						<Col offset={22}>
+							<Button type="primary"  onClick={this._sentDoc.bind(this)}>发文</Button>
+						</Col>
+					</Row>
 					<Table dataSource={this._getNewArrFunc(notifications)}
-						   columns={this.columns}
-						   rowKey="_id"
+						columns={this.columns}
+						rowKey="_id"
+						// style={{marginTop:10}}
 					/>
 				</Col>
-				{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props}/>}
+				{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
 				<Modal
 					title="查看详情"
 					width="90%"
-					style={{padding: "0 20px"}}
+					style={{ padding: "0 20px" }}
 					visible={this.state.visible}
 					closable={false}
 					maskClosable={false}
@@ -79,17 +84,17 @@ export default class SendPage1 extends Component {
 					{
 						notification.title &&
 						<Row>
-							<Col span={24} style={{textAlign: 'center', marginBottom: '20px'}}>
+							<Col span={24} style={{ textAlign: 'center', marginBottom: '20px' }}>
 								<h1>{notification.title}</h1>
 							</Col>
-							<Row style={{marginBottom: '20px'}}>
+							<Row style={{ marginBottom: '20px' }}>
 								<Col span={24}>
 									<h3>接受单位：{this._getText(notification.to_whom)}</h3>
 									<h3>抄送单位：{this._getText(notification.cc)}</h3>
 									<h3>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h3>
 								</Col>
 							</Row>
-							<Row style={{marginBottom: '20px'}}>
+							<Row style={{ marginBottom: '20px' }}>
 								<Col span={2}>
 									<h3>正文</h3>
 								</Col>
@@ -100,7 +105,7 @@ export default class SendPage1 extends Component {
 										border: '1px solid #ccc',
 										padding: '10px'
 									}}
-										 dangerouslySetInnerHTML={{__html: notification.body_rich}}/>
+										dangerouslySetInnerHTML={{ __html: notification.body_rich }} />
 								</Col>
 							</Row>
 							<Col span={24}>
@@ -108,7 +113,7 @@ export default class SendPage1 extends Component {
 								{
 									notification.fixed_external_attachments.length > 0 &&
 									<a href={STATIC_DOWNLOAD_API + notification.fixed_external_attachments[0].file_partial_url}
-									   target="_bank">{notification.fixed_external_attachments[0].file_name}</a>
+										target="_bank">{notification.fixed_external_attachments[0].file_name}</a>
 								}
 							</Col>
 							<Col span={6} offset={18}>
@@ -121,27 +126,27 @@ export default class SendPage1 extends Component {
 			</Row>
 		);
 	}
-	_getText(arr=[]){
-		let text='';
-		arr.map(org=>{
-			text=text+org+'、'
+	_getText(arr = []) {
+		let text = '';
+		arr.map(org => {
+			text = text + org + '、'
 		});
-		if(text !== ''){
-			text=text.slice(0,text.length-1)
+		if (text !== '') {
+			text = text.slice(0, text.length - 1)
 		}
 		return text;
 	}
-	_getNewArrFunc(list=[]){
-		let arr=list;
-		list.map((itm,index)=>{
-			itm.index=index+1;
+	_getNewArrFunc(list = []) {
+		let arr = list;
+		list.map((itm, index) => {
+			itm.index = index + 1;
 		});
 		return arr;
 	}
 	//查看信息详情
 	_viewClick(id) {
 		//	获取详情
-		const {actions: {getSendDetailAc}} = this.props;
+		const { actions: { getSendDetailAc } } = this.props;
 		this.setState({
 			visible: true
 		});
@@ -176,14 +181,14 @@ export default class SendPage1 extends Component {
 			title: '接收单位',
 			dataIndex: 'extend_to_whom_list',
 			render: extend_to_whom_list => {
-				let orgListName=this._getText(extend_to_whom_list);
+				let orgListName = this._getText(extend_to_whom_list);
 				return orgListName;
 			}
 		}, {
 			title: '抄送单位',
 			dataIndex: 'extend_cc_list',
 			render: extend_cc_list => {
-				let orgListName=this._getText(extend_cc_list);
+				let orgListName = this._getText(extend_cc_list);
 				return orgListName;
 			}
 		}, {

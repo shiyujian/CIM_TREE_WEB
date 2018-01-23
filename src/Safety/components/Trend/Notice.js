@@ -16,8 +16,8 @@ export default class Notice extends Component {
 	static propTypes = {};
 
 	componentDidMount() {
-		const {actions: {getNewsList}} = this.props;
-		getNewsList({}, {tag: '新闻', is_draft: false});
+		const {actions: {getTipsList}} = this.props;
+		getTipsList({}, {tag: '公告', is_draft: false});
 	}
 
 	clickNews(record, type) {
@@ -67,14 +67,14 @@ export default class Notice extends Component {
 
 	render() {
 		const {
-			newsList = [],
+			TipsList = [],
 		} = this.props;
 
 		return (
 			<Blade title="项目安全公告">
 					<Table 
 						bordered={false} 
-						dataSource={newsList} 
+						dataSource={TipsList} 
 						columns={this.columns}
 				        rowKey="id" size="small" pagination={{pageSize: 8}}
 				    />

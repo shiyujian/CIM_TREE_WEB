@@ -24,6 +24,7 @@ export default class Trend extends Component {
 
 	render() {
 		const props = this.props;
+		console.log(this.props)
 		return (
 			<div>
 				<DynamicTitle title="安全动态" {...this.props} />

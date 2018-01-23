@@ -79,17 +79,17 @@ class ReceivePage extends Component {
 	//清除
 	clear() {
 		this.props.form.setFieldsValue({
-			mold:undefined,
+			mold: undefined,
 			title: undefined,
-			orgList:undefined,
-			orgLists:undefined,
-			numbers:undefined,
+			orgList: undefined,
+			orgLists: undefined,
+			numbers: undefined,
 			worktimes: undefined,
 		});
 	}
 	//查找
 	query() {
-	
+
 		const {
 			actions: { getReceiveInfoAc },
 			filter = {}
@@ -104,7 +104,7 @@ class ReceivePage extends Component {
 
 			}
 
-			await getReceiveInfoAc({user: encodeURIComponent(getUser().org)}, conditions);
+			await getReceiveInfoAc({ user: encodeURIComponent(getUser().org) }, conditions);
 
 		})
 	}
@@ -117,8 +117,8 @@ class ReceivePage extends Component {
 	}
 
 	//回文弹出框
-	_sentDoc(){
-		const {actions:{toggleModalAc}}=this.props;
+	_sentDoc() {
+		const { actions: { toggleModalAc } } = this.props;
 		toggleModalAc({
 			type: 'NEWS',
 			status: 'EDIT',
@@ -151,86 +151,73 @@ class ReceivePage extends Component {
 			<Row>
 				<Col span={22} offset={1}>
 					<Row >
-						<Col span={2}>
+						{/* <Col span={2}>
 							<Icon type='exception' style={{ fontSize: 32 }} />
-						</Col>
+						</Col> */}
 						<Col span={18}>
 							<Row>
-								<Col span={10} offset={1}>
+								<Col span={8}>
 									<FormItem {...formItemLayout} label="文件类型">
 										{getFieldDecorator('mold', {
 											rules: [{ required: false, message: '请输入文件标题' }],
 											initialValue: ''
 										})(
-											<Input type="text" style={{ width: '80%' }}
+											<Input type="text"
 												placeholder="申请 工作联系单 监理通知" />
 											)}
 									</FormItem>
 								</Col>
-								<Col span={10} offset={1}>
+								<Col span={8}>
 									<FormItem {...formItemLayout} label="主题">
 										{getFieldDecorator('title', {
 											rules: [{ required: false, message: '请输入主题' }],
 											initialValue: ''
 										})(
-											<Input type="text" style={{ width: '80%' }}
+											<Input type="text"
 											/>
 											)}
 									</FormItem>
 								</Col>
-							</Row>
-							<Row>
-								<Col span={10} offset={1}>
+								<Col span={8} >
 									<FormItem {...formItemLayout} label="单位工程">
 										{getFieldDecorator('orgList', {
 											rules: [{ required: false, message: '请输入文件标题' }],
 											initialValue: ''
 										})(
-											// <TreeSelect style={{ width: '80%' }}
-											// 	onChange={this._orgChange.bind(this)}
-											// >
-											// 	{
-											// 		ToggleModal.loop(orgList, this.state.sentUsers)
-											// 	}
-											// </TreeSelect>
-											<Input type="text" style={{ width: '80%' }}
+
+											<Input type="text"
 											/>
 											)}
 
 									</FormItem>
 								</Col>
-								<Col span={10} offset={1}>
+							</Row>
+							
+							<Row>
+								<Col span={8} >
 									<FormItem {...formItemLayout} label="来文单位">
 										{getFieldDecorator('orgLists', {
 											rules: [{ required: false, message: '请输入文件标题' }],
 											initialValue: ''
 										})(
-											// <TreeSelect style={{ width: '80%' }}
-											// 	onChange={this._orgChange.bind(this)}
-											// >
-											// 	{
-											// 		ToggleModal.loop(orgList, this.state.sentUsers)
-											// 	}
-											// </TreeSelect>
-											<Input type="text" style={{ width: '80%' }}
+
+											<Input type="text"
 											/>
 											)}
 									</FormItem>
 								</Col>
-							</Row>
-							<Row>
-								<Col span={10} offset={1}>
+								<Col span={8}>
 									<FormItem {...formItemLayout} label="编号">
 										{getFieldDecorator('numbers', {
 											rules: [{ required: false, message: '请输入编号' }],
 											initialValue: ''
 										})(
-											<Input type="text" style={{ width: '80%' }}
+											<Input type="text" 
 											/>
 											)}
 									</FormItem>
 								</Col>
-								<Col span={10} offset={1}>
+								<Col span={8}>
 									<FormItem {...formItemLayout} label="收文日期">
 
 										{
@@ -240,7 +227,7 @@ class ReceivePage extends Component {
 												]
 											})
 												(<RangePicker
-													style={{ verticalAlign: "middle", width: '80%' }}
+													style={{ verticalAlign: "middle", width:'98%' }}
 													// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
 													showTime={{ format: 'HH:mm:ss' }}
 													format={'YYYY/MM/DD HH:mm:ss'}
@@ -257,25 +244,26 @@ class ReceivePage extends Component {
 						</Col>
 						<Col span={2} offset={1}>
 							<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
-							<Button style={{ marginTop: 20 }} icon='reload' onClick={this.clear.bind(this)}>清除</Button>
+						</Col>
+						<Col span={2}>
+							<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
 						</Col>
 					</Row>
-					{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props}/>}
+					{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
 					<Table dataSource={this._getNewArrFunc(notifications)}
 						columns={this.columns}
-						rowKey="_id"
 					/>
 				</Col>
 				<Modal
 					title="查看详情"
-					width="90%"
+					width="70%"
 					style={{ padding: "0 20px" }}
 					visible={this.state.visible}
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 					closable={false}
 					maskClosable={false}
-					// footer={null}
+				// footer={null}
 				>
 					{
 						notification.title &&
@@ -325,24 +313,39 @@ class ReceivePage extends Component {
 		);
 	}
 	_getNewArrFunc(list = []) {
+
 		let arr = list;
-		list.map((itm, index) => {
+
+		list.map((itm, index) => { 
 			itm.index = index + 1;
+            if(item.external_attachments.backTo_id === item.pk ){
+
+			}
+
 		});
 		// return [arr];
-		return [{index:'1',notification_title:'花开',from_whom:'嘻嘻北苑'},{index:'2',notification_title:'富贵',from_whom:'嘻嘻北苑'}]
+
+		return [{
+			index: '1', key: 1, notification_title: '花开', from_whom: '嘻嘻北苑',
+			children: [{ index: '2', key: 11, notification_title: '富贵', from_whom: '嘻嘻北苑'}]
+		},{index: '3', key: 3, notification_title: '花开', from_whom: '嘻嘻北苑',}]
+
+
 
 	}
 	columns = [
 		{
 			title: 'ID',
 			dataIndex: 'index',
+			key: 'index'
 		}, {
 			title: '标题',
 			dataIndex: 'notification_title',
+			key: 'notification_title'
 		}, {
 			title: '来文单位',
-			dataIndex: 'from_whom'
+			dataIndex: 'from_whom',
+			key: 'from_whom'
 		},
 		/* {
 			title: '状态',
@@ -354,6 +357,7 @@ class ReceivePage extends Component {
 		{
 			title: '发送时间',
 			dataIndex: 'create_time',
+			key: 'create_time',
 			render: create_time => {
 				return moment(create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss');
 			}
@@ -370,13 +374,13 @@ class ReceivePage extends Component {
 							cancelText="取消">
 							<a >删除</a>
 						</Popconfirm>
-						
+
 					</span>
 				)
 			},
 		}
 	];
 
-	
+
 }
 export default Form.create()(ReceivePage)

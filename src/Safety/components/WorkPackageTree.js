@@ -19,20 +19,20 @@ const TreeNode = Tree.TreeNode;
 export default class WorkPackageTree extends Component {
 
     state = {
-        treeData: [],
+        treeLists: [],
         loading:false,
     }
 
     render() {
-        const { treeData } = this.state
+        const { treeLists } = this.state
         return (
             <Spin tip="加载中" spinning={this.state.loading}>
-                <div style={{minHeight:1000}}>
-                    {treeData.length ?
+                <div>
+                    {treeLists.length ?
                         <Tree showLine
                             defaultExpandAll={true}
                             onSelect={this.props.onSelect}>
-                            {this.renderTreeNodes(this.state.treeData)}
+                            {this.renderTreeNodes(this.state.treeLists)}
                         </Tree> : ''
                     }
                 </div>
@@ -40,66 +40,69 @@ export default class WorkPackageTree extends Component {
         )
     }
 
-    /* componentWillMount() {
-        this.initTree();
-    } */
     componentDidMount(){
-        this.initTree();
-    }
-
-    initTree = () => {
-        const { actions: {getProjectTree} } = this.props;
-        this.setState({loading:true});
-        //debugger
-        getProjectTree().then(res => {
-            console.log(res)
-            //debugger
-            const treeData = res.children.map(engineering => {
-                console.log('')
-                const projects = engineering.children
-                return {
-                    title: engineering.name,
-                    key: engineering.code,
-                    pk: engineering.pk,
-                    children: projects.map(project => {
-                        const pNames = project.children
-                        return pNames ? {
-                            title: project.name,
-                            key: project.code,
-                            pk: project.pk,
-                            /* children: pNames ? pNames.map(pName => {
-                                return {
-                                    title: pName.name,
-                                    key: pName.code,
-                                    pk: pName.pk
+        const {actions: {getProjectTree}} = this.props;
+        //地块树
+        try {
+            getProjectTree({},{parent:'root'})
+            .then(rst => {
+                if(rst instanceof Array && rst.length > 0){
+                    rst.forEach((item,index) => {
+                        rst[index].children = []
+                    })
+                    getProjectTree({},{parent:rst[0].No})
+                    .then(rst1 => {
+                        if(rst1 instanceof Array && rst1.length > 0){
+                            rst1.forEach((item,index) => {
+                                rst1[index].children = []
+                            })
+                            getNewTreeData(rst,rst[0].No,rst1)
+                            getProjectTree({},{parent:rst1[0].No})
+                            .then(rst2 => {
+                                if(rst2 instanceof Array && rst2.length > 0){
+                                    getNewTreeData(rst,rst1[0].No,rst2)
+                                    this.setState({treeLists:rst})
                                 }
-                            }) : [] */
-                        } : {
-                            title: project.name,
-                            key: project.code,
-                            pk: project.pk,
+                            })
+                        }else {
+                            this.setState({treeLists:rst})
                         }
                     })
                 }
             })
-            this.setState({treeData: treeData});
-            //debugger
-            this.setState({loading:false});
-        });
+        } catch(e){
+            console.log(e)
+        }
     }
-
 
     renderTreeNodes = (data) => {
         return data.map(item => {
             if (item.children) {
                 return (
-                    <TreeNode title={item.title} key = {item.key} dataRef={item}>
+                    <TreeNode title={item.Name} key = {item.No} pk = {item.ID}>
                         {this.renderTreeNodes(item.children)}
                     </TreeNode>
                 )
             }
-            return <TreeNode {...item} dataRef={item} />
+            return <TreeNode key={item.No} title={item.Name} pk = {item.ID}/>
         })
     }
-
+}
+//连接树children
+function getNewTreeData(treeData, curKey, child) {
+    const loop = (data) => {
+        data.forEach((item) => {
+            if (curKey == item.No) {
+                item.children = child;
+            }else{
+                if(item.children)
+                    loop(item.children);
+            }
+        });
+    };
+    try {
+       loop(treeData);
+    } catch(e) {
+        console.log(e)
+    }
 }
