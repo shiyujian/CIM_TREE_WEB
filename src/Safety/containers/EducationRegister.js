@@ -65,11 +65,11 @@ export default class EducationRegister extends Component {
             this.setState({code:"",pcode:""})
             return
         }
-        let node = e.selectedNodes[0].props;
-        if(!node.pk){
-            this.setState({code:"",pcode:node.dataRef.key})
+        let node = e.selectedNodes[0];
+        if(!node.props.pk){
+            this.setState({code:"",pcode:node.key})
         }else{
-            this.setState({code:node.dataRef.key})            
+            this.setState({code:node.key})            
         }
     }
     render() {

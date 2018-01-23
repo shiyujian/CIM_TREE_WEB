@@ -76,16 +76,15 @@ export default class WorkPackageTree extends Component {
     }
 
     renderTreeNodes = (data) => {
-        console.log('data',data)
         return data.map(item => {
             if (item.children) {
                 return (
-                    <TreeNode title={item.Name} key = {item.No}>
+                    <TreeNode title={item.Name} key = {item.No} pk = {item.ID}>
                         {this.renderTreeNodes(item.children)}
                     </TreeNode>
                 )
             }
-            return <TreeNode key={item.No} title={item.Name}/>
+            return <TreeNode key={item.No} title={item.Name} pk = {item.ID}/>
         })
     }
 }
