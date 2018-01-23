@@ -27,18 +27,18 @@ export default class GeneralTable extends Component {
 	columns = [
 		{
 			title: '单位工程',
-			dataIndex: 'name',
-			key: 'name',
+			dataIndex: 'extra_params.engineer',
+			key: 'extra_params.engineer',
 			// sorter: (a, b) => a.name.length - b.name.length
 		}, {
 			title: '编号',
-			dataIndex: 'number',
-			key: 'number',
+			dataIndex: 'extra_params.number',
+			key: 'extra_params.number',
 			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
 		}, {
 			title: '文档类型',
-			dataIndex: 'docStyle',
-			key: 'docStyle',
+			dataIndex: 'extra_params.style',
+			key: 'extra_params.style',
 			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
 			title: '提交单位',
