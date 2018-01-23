@@ -37,14 +37,14 @@ class Level3 extends Component {
         })
     }
     addClick = () => {
-        if(this.state.code === ""){
-             message.info("请选择单位工程")
-        }else{
+        // if(this.state.code === ""){
+        //      message.info("请选择单位工程")
+        // }else{
             this.setState({
                 newKey: Math.random()*2,
                 setVisible: true,
             });
-        } 
+        // } 
     }
 
     setEditData(){
