@@ -20,17 +20,17 @@ export default class Video extends Component {
 
 	static propTypes = {};
 	componentWillReceiveProps(nextProps) {
-		
+
 		// const {
 		// 	fileList = [],
 		// } = this.props;
 		// console.log(this.props)		
-		const newsListT = nextProps.newsList || []
+		const newsListT = nextProps.videoList || []
 		for (var i = 0; i < newsListT.length; i++) {
-			
+
 			const newsListTT = newsListT[i].attachment.fileList || []
 			for (var j = 0; j < newsListTT.length; j++) {
-				
+
 				const videos = newsListTT[j].down_file
 				this.setState({ video: videos })
 				break;
@@ -39,66 +39,13 @@ export default class Video extends Component {
 		}
 	}
 	componentWillMount() {
-	
+
 	}
 	componentDidMount() {
 		const { actions: { getVideoList } } = this.props;
-		
+
 		getVideoList({}, { tag: '公告', is_draft: false });
 
-		// // 视频一
-		// $(".firstVideo").mouseover(function () {
-		// 	$(".firstVideo").css({ "background-color": "#eee", zIndex: "100" })
-		// 	$(".firstIcon").css({ display: "block", zIndex: "100" })
-		// })
-		// $(".firstIcon").mouseover(function () {
-		// 	$(".firstVideo").css({ "background-color": "#eee", zIndex: "100" })
-		// 	$(".firstIcon").css({ display: "block", zIndex: "100" })
-		// })
-		// $(".firstVideo").mouseout(function () {
-		// 	$(".firstVideo").css({ "background-color": "", zIndex: "0" })
-		// 	$(".firstIcon").css({ display: "none", zIndex: "0" })
-
-		// })
-		var boxs=document.getElementsByClassName("box")[0]
-		console.log(boxs)
-		boxs.onmouseover=function(){
-			console.log("1111")
-			boxs.classList.add("box")
-		}
-		boxs.onmouseout=function(){
-			console.log("2222")
-			boxs.classList.remove("box")
-		}
-
-		// // 视频二
-		// $(".secondVideo").mouseover(function () {
-		// 	$(".secondVideo").css({ "background-color": "#eee", zIndex: "100" })
-		// 	$(".secondIcon").css({ display: "block", zIndex: "101" })
-		// })
-		// $(".secondIcon").mouseover(function () {
-		// 	$(".secondVideo").css({ "background-color": "#eee", zIndex: "100" })
-		// 	$(".secondIcon").css({ display: "block", zIndex: "101" })
-		// })
-		// $(".secondVideo").mouseout(function () {
-		// 	$(".secondVideo").css({ "background-color": "", zIndex: "0" })
-		// 	$(".secondIcon").css({ display: "none", zIndex: "0" })
-
-		// })
-		// 视频三
-		// $(".thirdVideo").mouseover(function () {
-		// 	$(".thirdVideo").css({ "background-color": "#eee", zIndex: "100" })
-		// 	$(".thirdIcon").css({ display: "block", zIndex: "101" })
-		// })
-		// $(".thirdIcon").mouseover(function () {
-		// 	$(".thirdVideo").css({ "background-color": "#eee", zIndex: "100" })
-		// 	$(".thirdIcon").css({ display: "block", zIndex: "101" })
-		// })
-		// $(".thirdVideo").mouseout(function () {
-		// 	$(".thirdVideo").css({ "background-color": "", zIndex: "0" })
-		// 	$(".thirdIcon").css({ display: "none", zIndex: "0" })
-
-		// })
 	}
 	play() {
 		this.setState({
@@ -120,6 +67,11 @@ export default class Video extends Component {
 		}
 	}
 
+	data = [
+		{ down_file: "http://47.104.160.65:6512/media/documents/2018/01/1510116943014_Hbu2FIz.mp4", name: "1510116943014.mp4" },
+		{ down_file: "http://47.104.160.65:6512/media/documents/2018/01/1510116943014_Hbu2FIz.mp4", name: "1510116943014.mp4" },
+		{ down_file: "http://47.104.160.65:6512/media/documents/2018/01/1510116943014_Hbu2FIz.mp4", name: "1510116943014.mp4" },
+	]
 	columns = [
 		{
 			title: '新闻标题',
@@ -157,68 +109,33 @@ export default class Video extends Component {
 	}
 
 	render() {
-
-		console.log(this.state.video)
+		const videoa = []
+		console.log(this.props)
+		
+		for (var k = 0; k < this.data.length; k++) {
+			videoa.push(
+				<div className="video box ">
+					<video
+						// onClick={this.play.bind(this)}
+						className="firstVideo"
+						preload="auto"
+						width="60%"
+						height="300px"
+						src={this.data[k].down_file}
+					>
+					</video>
+					<Icon
+						className="Icon"
+						onClick={this.play.bind(this)}
+						name="play-circle"></Icon>
+				</div>
+			)
+		}
 		return (
 			<Blade style={{ height: "300px", background: "#eee" }} title="安全生产视频">
-				{/* <Row >
-					<Col style={{ height: "300px" }} span={16}>
-						<video
-							style={{ position: "relative" }}
-							onClick={this.play.bind(this)}
-							className="firstVideo"
-							preload="auto"
-							width="100%"
-							height="100%"
-							src={this.state.video}
-						>
-						</video>
-						<Icon className="firstIcon" 
-						onClick={this.play.bind(this)}
-						style={{ fontSize: 60, width: "60px", height: "60px", display: "none", position: "absolute", top: "0", bottom: "0", left: "0", right: "0", margin: "auto" }} name="play-circle"></Icon>
-					</Col>
-					<Col style={{ height: "300px" }} span={8}>
-						<Row style={{ height: "150px" }}>
-							<video
-								style={{ position: "relative" }}
-								onClick={this.play.bind(this)}
-								className="secondVideo"
-								preload="auto"
-								width="100%"
-								height="100%"
-								src={this.state.video}
-
-							>
-							</video>
-							<Icon className="secondIcon" 
-							onClick={this.play.bind(this)}
-							style={{ fontSize: 30, width: "30px", height: "30px", display: "none", position: "absolute", top: "0", bottom: "0", left: "0", right: "0", margin: "auto" }} name="play-circle"></Icon>
-						</Row>
-						<Row style={{ height: "150px" }}>
-							<video
-								style={{ position: "relative" }}
-								onClick={this.play.bind(this)}
-								className="thirdVideo"
-								preload="auto"
-								width="100%"
-								height="100%"
-								src={this.state.video}
-
-							>
-							</video>
-							<Icon className="thirdIcon" 
-							onClick={this.play.bind(this)}
-							style={{ fontSize: 30, width: "30px", height: "30px", display: "none", position: "absolute", top: "0", bottom: "0", left: "0", right: "0", margin: "auto" }} name="play-circle"></Icon>
-						</Row>
-
-					</Col>
-
-
-
-				</Row> */}
-
 				<div className="container">
-					<div className="box" style={{width:"60%",height:"300px",float:"left"}}>
+					{videoa}
+					{/* <div className="video box " style={{ width: "60%", height: "300px", float: "left", textAlign: "center" }}>
 						<video
 							// onClick={this.play.bind(this)}
 							className="firstVideo"
@@ -228,40 +145,42 @@ export default class Video extends Component {
 							src={this.state.video}
 						>
 						</video>
-						<Icon className="firstIcon"
+						<Icon
+							className="Icon"
 							onClick={this.play.bind(this)}
-							style={{ fontSize: 60, width: "60px", height: "60px", display: "none"  }} name="play-circle"></Icon>
+							style={{ fontSize: 60, width: "60px", height: "60px" }} name="play-circle"></Icon>
 					</div>
-					<div  className="box" style={{width:"40%",height:"150px", float:"right"}} >
+					<div className="video box" style={{ width: "40%", height: "150px", float: "right", textAlign: "center" }} >
 						<video
 							// onClick={this.play.bind(this)}
-							className="firstVideo"
+							id="firstVideo"
 							preload="auto"
 							width="40%"
 							height="150px"
 							src={this.state.video}
 						>
 						</video>
-						<Icon className="firstIcon"
+						<Icon
+							className="Icon"
 							onClick={this.play.bind(this)}
 							style={{ fontSize: 30, width: "30px", height: "30px" }} name="play-circle"></Icon>
 					</div>
-					<div  className="box" style={{width:"40%",height:"150px",float:"right"}}>
+					<div className="video box" style={{ width: "40%", height: "150px", float: "right", textAlign: "center" }}>
 						<video
 							// onClick={this.play.bind(this)}
-							className="firstVideo"
+							id="firstVideo"
 							preload="auto"
 							width="40%"
 							height="150px"
 							src={this.state.video}
 						>
 						</video>
-						<Icon className="firstIcon"
+						<Icon
+							className="Icon"
 							onClick={this.play.bind(this)}
 							style={{ fontSize: 30, width: "30px", height: "30px" }} name="play-circle"></Icon>
-					</div>
+					</div> */}
 				</div>
-
 				<Modal
 					visible={this.state.visible}
 					footer={null}
