@@ -16,8 +16,8 @@ export default class Bulletin extends Component {
 	static propTypes = {};
 
 	componentDidMount() {
-		const {actions: {getNewsList}} = this.props;
-		getNewsList({}, {tag: '新闻', is_draft: false});
+		const {actions: {getTrenList}} = this.props;
+		getTrenList({}, {tag: '公告', is_draft: false});
 	}
 
 	clickNews(record, type) {
@@ -67,14 +67,14 @@ export default class Bulletin extends Component {
 
 	render() {
 		const {
-			newsList = [],
+			trenList = [],
 		} = this.props;
 
 		return (
 			<Blade title="安全事故快报">
 					<Table 
 						bordered={false} 
-						dataSource={newsList} 
+						dataSource={trenList} 
 						columns={this.columns}
 				        rowKey="id" size="small" pagination={{pageSize: 8}}
 				    />

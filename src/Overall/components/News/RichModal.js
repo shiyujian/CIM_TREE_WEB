@@ -69,7 +69,7 @@ class RichModal extends Component {
             });
             editor.txt.html(toggleData.editData.raw)
             setFieldsValue({
-                'title': toggleData.editData.title1 || '',
+                'title': toggleData.editData.title || '',
                 'abstract': toggleData.editData.abstract
             })
         }
@@ -102,7 +102,7 @@ class RichModal extends Component {
 				//判断是发布新闻还是更新新闻
 				if (toggleData.status === 'ADD') {
 					let newData = {
-						"title": values['title1'] || '',
+						"title": values['title'] || '',
 						"abstract": values['abstract'] || '',
 						"raw": this.state.content,
 						"content": "",
@@ -110,7 +110,7 @@ class RichModal extends Component {
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"tags": [1],
-						"categories": [],
+						"categories": [4],
 						"publisher": getUser().id,
 						"is_draft": false
 					};
@@ -127,10 +127,11 @@ class RichModal extends Component {
 						})
 				} else if (toggleData.status === 'EDIT') {
 					let newData = {
-						"title": values['title1'] || '',
+						"title": values['title'] || '',
 						"abstract": values['abstract'] || '',
 						"raw": this.state.content,
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+						"categories": [4],
 						"is_draft": false
 					};
 					patchData({pk: toggleData.editData.id}, newData)
@@ -167,9 +168,10 @@ class RichModal extends Component {
 		if (toggleData.status === 'EDIT') {
 			validateFields((err, values) => {
 				let newData = {
-					"title": values['title1'] || '',
+					"title": values['title'] || '',
 					"abstract": values['abstract'] || '',
 					"raw": this.state.content,
+					"categories": [4],
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"is_draft": true
 				};
@@ -191,11 +193,12 @@ class RichModal extends Component {
 		} else if (toggleData.status === 'ADD') {
 			validateFields((err, values) => {
 				let newData = {
-					"title": values['title1'] || '',
+					"title": values['title'] || '',
 					"abstract": values['abstract'] || '' ,
 					"raw": this.state.content || '',
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [1],
+					"categories": [4],
 					"publisher": getUser().id,
 					"is_draft": true
 				};
@@ -243,6 +246,9 @@ class RichModal extends Component {
         return (
 
             <Modal
+			title={toggleData.type === 'NEWS' ? (
+				toggleData.status === 'ADD' ? '发布新闻' : '编辑新闻'
+			) : '发布新闻'}
             visible={toggleData.visible}
             onOk={this.modalClick.bind(this)}
             onCancel={this.modalClick.bind(this)}
@@ -254,7 +260,7 @@ class RichModal extends Component {
                         <Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label="主题">
-                                    {getFieldDecorator('title1', {})(
+                                    {getFieldDecorator('title', {})(
                                         <Input type="text" placeholder="新闻标题" />
                                         )}
                                 </FormItem>
@@ -266,9 +272,9 @@ class RichModal extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={4} offset={1}>
+                            {/* <Col span={4} offset={1}>
                                 <Button>上传</Button>
-                            </Col>
+                            </Col> */}
 
                         </Row>
                     </Form>
@@ -280,7 +286,7 @@ class RichModal extends Component {
                     <Row style={{ marginTop: 20 }}>
                         <Col span={24} offset={10} >
                             <Button onClick={this.modalClick.bind(this)}>取消</Button>
-                            <Button style={{ marginLeft: 20 }} onClick={this.postData.bind(this)}>提交</Button>
+                            <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>提交</Button>
                             <Button style={{ marginLeft: 20 }} onClick={this.draftDataFunc.bind(this)}>暂存</Button>
                         </Col>
                     </Row>

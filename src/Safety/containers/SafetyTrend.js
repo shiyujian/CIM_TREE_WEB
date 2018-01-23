@@ -5,10 +5,10 @@ import {actions as platformActions} from '_platform/store/global';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Tabs} from 'antd';
-import BulletinTable from '../components/SafetyTrend/BulletinTable'
+import VideoTables from '../components/SafetyTrend/VideoTables'
 import NoticeTable from '../components/SafetyTrend/NoticeTable'
 import StateTable from '../components/SafetyTrend/StateTable'
-import VideoTable from '../components/SafetyTrend/VideoTable'
+import BulletinTable from '../components/SafetyTrend/BulletinTable'
 
 const TabPane = Tabs.TabPane;
 
@@ -48,7 +48,7 @@ export default class SafetyTrend extends Component {
 						<BulletinTable {...this.props}/>
 					</TabPane>
 					<TabPane tab="安全生产视频" key="4">
-						<VideoTable {...this.props}/>
+						<VideoTables {...this.props}/>
 					</TabPane>
 				</Tabs>
 			</div>

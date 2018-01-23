@@ -50,7 +50,7 @@ export const tree_menus = [{
 	key: 'schedule',
 	id: 'SCHEDULE',
 	title: '进度管理',
-	path: '/schedule',
+	path: '/schedule/stagereport',
 	icon: <Icon name="random"/>
 }, {
 	key: 'safety',

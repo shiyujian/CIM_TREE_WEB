@@ -10,7 +10,7 @@ import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import moment from 'moment';
 import {Tabs} from 'antd';
-export const Datumcode = window.DeathCode.DATUM_DATUM;
+export const Datumcode = window.DeathCode.OVERALL_MATERIAL;
 
 const TabPane=Tabs.TabPane;
 

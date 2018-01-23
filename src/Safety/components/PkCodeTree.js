@@ -8,6 +8,9 @@ export default class PkCodeTree extends Component {
 
 	static loop(data = []) {
 		return data.map((item,index) => {
+			// const {attrs = {} = item;
+			// console.log('item',item)
+			// console.log('attrs',attrs)
 			if (item.children) {
 				return (
 					<TreeNode key={item.No}

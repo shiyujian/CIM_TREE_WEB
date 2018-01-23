@@ -7,12 +7,17 @@
  */
 
 import 'whatwg-fetch';
+import {getUser} from '_platform/auth';
 require('es6-promise').polyfill();
 
 const headers = {
-	'Content-Type': 'application/json',
+	// 'Content-Type': 'application/json',
 	// 'cache-control': 'no-cache',
 	// 'pragma': 'no-cache',
+	'Accept': 'application/json',
+	'Content-Type': 'application/json',
+	'Authorization': 'Basic ' + btoa(getUser().username + ':' + getUser().password)
+
 };
 
 
@@ -77,7 +82,7 @@ export const serialize = (params) => {
 
 export const createFetchActionWithHeaders = (url, [successAction, failAction], method = 'POST') => {
 	method = method.toUpperCase();
-	return (pathnames = {}, data = {}, headers = {},refresh = true) => {
+	return (pathnames = {}, data = {}, headers = {}, refresh = true) => {
 
 		return dispatch => {
 			const params = {
@@ -88,7 +93,7 @@ export const createFetchActionWithHeaders = (url, [successAction, failAction], m
 
 			let u = getUrl(url, pathnames);
 
-				params.body = data;
+			params.body = data;
 
 			return fetch(u, params)
 				.then(response => {

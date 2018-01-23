@@ -71,11 +71,4 @@ export default class Overall extends Component {
 		name: '考勤管理',
 		icon: <Icon name="user-o"/>,
 	}]
-	// }, {
-	// 	key: 'approval',
-	// 	id: 'MANAGE.APPROVAL',
-	// 	path: '/overall/approval',
-	// 	name: '项目报批',
-	// 	icon: <Icon name="sliders"/>,
-	// }];
 }
