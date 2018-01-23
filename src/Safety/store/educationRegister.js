@@ -7,9 +7,9 @@ import { SERVICE_API,base,USER_API,WORKFLOW_API,FILE_API} from '_platform/api'
 
 export const ID = 'EDUCATIONREGISTER';
 
-export const setIsAddPlan =  createAction ('教育登记-设置新增状态');
+export const setIsAddPlan =  createAction (`${ID}教育登记-设置新增状态`);
 //export const setCurrentAcc =  createAction ('事故登记-设置当前事故');
-export const setAddModalVisiblePlan = createAction('教育登记-设置添加内容操作窗可视性');
+export const setAddModalVisiblePlan = createAction(`${ID}教育登记-设置添加内容操作窗可视性`);
 
 //上传文件
 export const getStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [])

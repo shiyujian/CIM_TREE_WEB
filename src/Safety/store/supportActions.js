@@ -3,7 +3,7 @@ import createFetchAction from 'fetch-action';
 import {createFetchActionWithHeaders} from './fetchAction'
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import { SERVICE_API,base,USER_API,WORKFLOW_API,FILE_API} from '_platform/api'
+import { SERVICE_API,base,USER_API,WORKFLOW_API,FILE_API,FOREST_API} from '_platform/api'
 
 
 //根据pk得到安全管控对象--单位资质
@@ -14,7 +14,8 @@ export const putVerification =
     createFetchAction(`${base}/main/api/unit-certificate/`,[],'POST');
     //得到施工包对象：
 export const getWkByCode = 
-    createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`, [], 'GET');
+    // createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`, [], 'GET');
+    createFetchAction(`${FOREST_API}/tree/wpunits?parent={{parent}}`,[],'GET');
 //删除一个安全管控对象
 export const delVerfication = 
     createFetchAction(`${base}/main/api/unit-certificate/{{id}}/`,[],'DELETE');
