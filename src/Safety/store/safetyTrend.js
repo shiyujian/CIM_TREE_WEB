@@ -38,6 +38,9 @@ export const deleteData = createFetchAction(`${base}/main/api/post/{{pk}}/`, [],
 //设置上传的文件列表
 export const postUploadFiles = createAction('xhy设置上传的文件列表');
 
+//设置上传的视频
+export const postUploadVideo = createAction('xhy设置上传的视频');
+
 export const actions = {
 	setTabActive,
 	setBulletinTabActive,
@@ -57,6 +60,7 @@ export const actions = {
 	patchData,
 	deleteData,
 	postUploadFiles,
+	postUploadVideo
 };
 export default handleActions({
 	[setTabActive]: (state, {payload}) => ( {
@@ -102,5 +106,9 @@ export default handleActions({
 	[postUploadFiles]: (state, {payload}) => ( {
 		...state,
 		fileList: payload
+	}),
+	[postUploadVideo]: (state, {payload}) => ( {
+		...state,
+		videoList: payload
 	}),
 }, {});

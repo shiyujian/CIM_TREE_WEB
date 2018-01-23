@@ -42,8 +42,8 @@ export default class GeneralTable extends Component {
 			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
 			title: '提交单位',
-			dataIndex: 'company',
-			key: 'company',
+			dataIndex: 'submitCompany',
+			key: 'submitCompany',
 			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
 		}, {
 			title: '提交人',

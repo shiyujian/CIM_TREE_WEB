@@ -99,17 +99,17 @@ export default class Nursmeasureinfo extends Component {
               value: '0',
               label: '已种植',
             }, {
-                value: '4',
+                value: '-1',
                 label: '未种植',
                 children: [{
                 value: '1',
-                label: '监理退回',
+                label: '进场退回',
             }, {
                 value: '2',
-                label: '业主退回',
+                label: '监理退回',
             }, {
                 value: '3',
-                label: '进场退回',
+                label: '业主退回',
             }],
         }]
         this.setState({statusoption})
