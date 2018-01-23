@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import queryString from 'query-string';
 import reducer, { actions } from '../store/formmanage';
 //import PkCodeTree from '../../Quality/components/PkCodeTree';
 import { actions as platformActions } from '_platform/store/global';

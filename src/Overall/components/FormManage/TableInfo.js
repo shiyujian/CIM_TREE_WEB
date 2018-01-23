@@ -1,12 +1,17 @@
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
 import moment from 'moment';
+import 'moment/locale/zh-cn';
 import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
 import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
 import PerSearch from './PerSearch';
+import {WORKFLOW_CODE} from '../../../_platform/api';
+import {getNextStates} from '../../../_platform/components/Progress/util';
+import queryString from 'query-string';
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
+moment.locale('zh-cn');
 class TableInfo extends Component {
     static propTypes = {};
     constructor(props) {
@@ -59,6 +64,15 @@ class TableInfo extends Component {
             visible: true,
             TreatmentData:[],
         })
+        this.props.form.setFieldsValue({
+            area:undefined,
+            unit:undefined,
+            type:undefined,
+            approvalunit:undefined,
+            dataReview:undefined,
+            number:undefined,
+            name:undefined
+        })
 
     }
     // 关闭弹框
@@ -73,9 +87,168 @@ class TableInfo extends Component {
     }
     // 确认提交
     sendWork() {
-        this.setState({
-            visible: false,
+        const{
+            actions:{
+                createFlow, 
+                getWorkflowById,
+                putFlow
+            },
+            location,
+        }=this.props
+        const{
+            TreatmentData,
+        }=this.state
+        let user = getUser();//当前登录用户
+        let me = this;
+        //共有信息
+        let postData = {};
+        //专业信息
+        let attrs = {};
+        console.log("登录用户",user)
+        console.log("文件信息",TreatmentData)
+        me.props.form.validateFields((err,values)=>{
+            console.log('Received values of form: ', values);
+            if(!err){
+                if(TreatmentData.length === 0){
+                    notification.error({
+                        message:'请上传文件',
+                        duration:5
+                    })
+                    return
+                }
+                // 共有信息
+                for(let value in values){
+                    if(value === 'area'){
+                        postData.area = values[value];
+                    }else if (value === 'unit'){
+                        postData.unit = values[value];
+                    }else if (value === 'type'){
+                        postData.type = values[value];
+                    }else if (value === 'approvalunit'){
+                        postData.approvalunit = values[value];
+                    }else if (value === 'dataReview'){
+                        postData.dataReview = values[value];
+                    }else if (value === 'number'){
+                        postData.number = values[value];
+                    }else if (value === 'name'){
+                        postData.name = values[value];
+                    }else{
+                        //是否为数字  数字需要查找范围，必须转化为数字类型
+                        if(!isNaN(values[value]) ){
+                            attrs[value] = Number(values[value])
+                        }else{
+                            attrs[value] = values[value]
+                        }
+                       
+                        
+                    }
+                }
+                postData.upload_unit = user.org?user.org:'';
+                postData.upload_person = user.name?user.name:user.username;
+                postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
+
+                let data_list = [];
+                for(let i=0;i<TreatmentData.length;i++){
+                    data_list.push(TreatmentData[i].fileId)
+                }
+
+                const currentUser = {
+                    "username": user.username,
+                    "person_code": user.code,
+                    "person_name": 'aaaa',
+                    "id": parseInt(user.id)
+                };
+                let subject = [{
+                    //共有属性
+                    "postData":JSON.stringify(postData),
+                    //专业属性
+                    "attrs":JSON.stringify(attrs),
+                    //数据清单
+                    "TreatmentData":JSON.stringify(TreatmentData),
+                    //数据清单id
+                    "data_list":JSON.stringify(data_list),
+                }];
+                const nextUser = this.member;
+                let WORKFLOW_MAP = {
+                    name:"表单管理流程",
+                    desc:"综合管理模块表单管理流程",
+                    code:WORKFLOW_CODE.表单管理流程
+                };
+                let workflowdata={
+                    name: WORKFLOW_MAP.name,
+                    description: WORKFLOW_MAP.desc,
+                    subject: subject,
+                    code: WORKFLOW_MAP.code,
+                    creator: currentUser,
+                    plan_start_time: null,
+                    deadline: null,
+                    "status":2
+                }
+                createFlow({},workflowdata).then((instance)=>{
+                    console.log("instance",instance)
+                    if(!instance.id){
+                        notification.error({
+                            message:'数据提交失败',
+                            duration:2
+                        })
+                        return;
+                    }
+                    const {id,workflow: {states = []} = {}} = instance;
+                    const [{id:state_id,actions:[action]}] = states;
+                   
+                    
+                    
+                    getWorkflowById({id:id}).then(instance =>{
+                        if(instance && instance.current){
+                            let currentStateId = instance.current[0].id;
+                            let nextStates = getNextStates(instance,currentStateId);
+                            console.log('nextStates',nextStates)
+                            let stateid = nextStates[0].to_state[0].id;
+
+                            let postInfo={
+                                next_states:[{
+                                    state:stateid,
+                                    participants:[nextUser],
+                                    deadline:null,
+                                    remark:null
+                                }],
+                                state:instance.workflow.states[0].id,
+                                executor:currentUser,
+                                action:nextStates[0].action_name,
+                                note:"提交",
+                                attachment:null
+                            }
+                            let data={pk:id};
+                            //提交流程到下一步
+                            putFlow(data,postInfo).then(rst =>{
+                                if(rst && rst.creator){
+                                    notification.success({
+                                        message: '流程提交成功',
+                                        duration: 2
+                                    });
+                                    this.setState({
+                                        visible:false
+                                    })
+                                }else{
+                                    notification.error({
+                                        message: '流程提交失败',
+                                        duration: 2
+                                    });
+                                    return;
+                                }
+                            });
+                            
+                            
+                        }
+                    });
+                    
+                });
+                 
+
+            }
         })
+        
+
     }
     // 短信
     _cpoyMsgT(e) {
@@ -150,10 +323,9 @@ class TableInfo extends Component {
     // 修改备注
 
     //删除文件表格中的某行
-    deleteTreatmentFile = (index) => {
+    deleteTreatmentFile = (record,index) => {
         let newFileLists = this.state.newFileLists;
         let newdata = [];
-        console.log(index,newFileLists)
         newFileLists.splice(index, 1);
         newFileLists.map((item,index)=>{
             let data = {
@@ -312,12 +484,13 @@ class TableInfo extends Component {
                                                 {
                                                     getFieldDecorator('dataReview', {
                                                         rules: [
-                                                            { required: true, message: '请选择审核人员' }
+                                                            {  required: true, message: '请选择审核人员' }
                                                         ]
                                                     })
-                                                        (<PerSearch
-                                                            selectMember={this.selectMember.bind(this)}
-                                                        />)
+                                                        (
+                                                        
+                                                        <Input placeholder='请输入名称' />
+                                                        )
                                                 }
                                             </FormItem>
                                         </Col>
@@ -402,12 +575,12 @@ class TableInfo extends Component {
         dataIndex: 'remarks',
         key: 'remarks',
         width: '30%',
-        render: (text, record, index) => {
-            return <span>备注1111</span>
-        }
-            
-                         
-
+         render: (text, record, index) => {
+                    return <Input value={record.remarks || ""} onChange={ele => {
+                        record.remarks = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                }           
     }, {
         title: '操作',
         dataIndex: 'operation',
