@@ -137,17 +137,17 @@ export default class StateTable extends Component {
 				<Col span={22} offset={1}>
 					<Tabs activeKey={stateTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
 						<div style={{marginBottom: '10px'}}>
-							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布新闻</Button>
+							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布国内安全动态</Button>
 							{
 								(toggleData.visible && toggleData.type === 'NEWS') && <StateText {...this.props}/>
 							}
 						</div>}>
-						<TabPane tab="发布的新闻" key="1">
+						<TabPane tab="发布的国内安全动态" key="1">
 							<Table dataSource={newsList}
 								   columns={this.columns}
 								   rowKey="id"/>
 						</TabPane>
-						<TabPane tab="暂存的新闻" key="2">
+						<TabPane tab="暂存的国内安全动态" key="2">
 							<Table dataSource={draftNewsLis}
 								   columns={this.draftColumns}
 								   rowKey="id"/>
@@ -156,7 +156,7 @@ export default class StateTable extends Component {
 
 				</Col>
 				<Modal
-					title="新闻预览"
+					title="国内安全动态预览"
 					width="800px"
 					visible={this.state.visible}
 					onOk={this.handleCancel.bind(this)}

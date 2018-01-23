@@ -15,11 +15,11 @@ export default class BulletinTable extends Component {
 	}
 
 	componentDidMount() {
-		const {actions: {getTipsList, getDraftTipsList}} = this.props;
-		getTipsList({
+		const {actions: {getTrenList, getTrendsList}} = this.props;
+		getTrenList({
 			user_id: user_id
 		});
-		getDraftTipsList({
+		getTrendsList({
 			user_id: user_id
 		})
 	}
@@ -27,7 +27,7 @@ export default class BulletinTable extends Component {
 	//公告操作按钮
 	clickTips(record, type) {
 		const {
-			actions: {deleteData, getTipsList, getDraftTipsList, toggleModal, patchData},
+			actions: {deleteData, getTrenList, getTrendsList, toggleModal, patchData},
 			videoTabValue = '1'
 		} = this.props;
 		if (type === 'DELETE') {
@@ -35,11 +35,11 @@ export default class BulletinTable extends Component {
 				.then(() => {
 					message.success('删除公告成功！');
 					if (videoTabValue === '1') {
-						getTipsList({
+						getTrenList({
 							user_id: user_id
 						});
 					} else {
-						getDraftTipsList({
+						getTrendsList({
 							user_id: user_id
 						});
 					}
@@ -90,10 +90,10 @@ export default class BulletinTable extends Component {
 					if (rst.id) {
 						message.success('撤回成功，撤回的公告在暂存的公告中可查看');
 						//更新暂存的公告列表数据
-						getTipsList({
+						getTrenList({
 							user_id: user_id
 						});
-						getDraftTipsList({
+						getTrendsList({
 							user_id: user_id
 						});
 					}
@@ -108,10 +108,10 @@ export default class BulletinTable extends Component {
 					if (rst.id) {
 						message.success('重新发布公告成功！');
 						//更新暂存的公告列表数据
-						getTipsList({
+						getTrenList({
 							user_id: user_id
 						});
-						getDraftTipsList({
+						getTrendsList({
 							user_id: user_id
 						});
 					}
@@ -139,8 +139,8 @@ export default class BulletinTable extends Component {
 
 	render() {
 		const {
-			tipsList = [],
-			draftTipsList = [],
+			trenList = [],
+			trendsList = [],
 			toggleData: toggleData = {
 				type: 'TIPS',
 				visible: false,
@@ -152,19 +152,19 @@ export default class BulletinTable extends Component {
 				<Col span={22} offset={1}>
 					<Tabs activeKey={videoTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
 						<div style={{marginBottom: '10px'}}>
-							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>发布公告</Button>
+							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>发布安全事故快报</Button>
 							{
 								(toggleData.visible && toggleData.type === 'TIPS') && (<BulletinText {...this.props}/>)
 							}
 						</div>}>
 						<TabPane tab="发布的安全事故快报" key="1">
-							<Table dataSource={tipsList}
+							<Table dataSource={trenList}
 							       columns={this.columns}
 							       rowKey="id"
 							/>
 						</TabPane>
 						<TabPane tab="暂存的安全事故快报" key="2">
-							<Table dataSource={draftTipsList}
+							<Table dataSource={trendsList}
 							       columns={this.draftColumns}
 							       rowKey="id"
 							/>

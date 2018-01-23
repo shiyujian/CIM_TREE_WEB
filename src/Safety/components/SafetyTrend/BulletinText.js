@@ -113,7 +113,7 @@ class BulletinText extends Component {
 					down_file:STATIC_DOWNLOAD_API + "/media"+file.response.download_url.split('/media')[1]
 				};
 				newFileList=newFileList.concat(newFile);
-				console.log(newFileList)
+				
 				postUploadVideo(newFileList)
 				postUploadFiles(newFileList)
 			}
@@ -139,7 +139,7 @@ class BulletinText extends Component {
 	//发布公告
 	postData() {
 		const {
-			actions: {postData, getTipsList, patchData, getDraftTipsList,postUploadFiles},
+			actions: {postData, getTrenList, patchData, getTrendsList,postUploadFiles},
 			form: {validateFields},
 			toggleData: toggleData = {
 				type: 'TIPS',
@@ -164,7 +164,7 @@ class BulletinText extends Component {
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"tags": [2],
-						"categories": [],
+						"categories": [3],
 						"publisher": getUser().id,
 						"is_draft": false
 					};
@@ -174,7 +174,7 @@ class BulletinText extends Component {
 								this.modalClick();
 								message.success('发布公告成功');
 								//更新公告列表数据
-								getTipsList({
+								getTrenList({
 									user_id: getUser().id
 								});
 								postUploadFiles([]);
@@ -187,6 +187,7 @@ class BulletinText extends Component {
 						"attachment": {
 							"fileList":fileList || [],
 						},
+						"categories": [3],
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"is_draft": false
 					};
@@ -196,10 +197,10 @@ class BulletinText extends Component {
 								this.modalClick();
 								message.success('编辑公告成功');
 								//更新公告列表数据
-								getTipsList({
+								getTrenList({
 									user_id: getUser().id
 								});
-								getDraftTipsList({
+								getTrendsList({
 									user_id: getUser().id
 								});
 								postUploadFiles([]);
@@ -213,7 +214,7 @@ class BulletinText extends Component {
 	//暂存公告
 	draftDataFunc() {
 		const {
-			actions: {postData, patchData, getTipsList, getDraftTipsList},
+			actions: {postData, patchData, getTrenList, getTrendsList},
 			form: {validateFields},
 			toggleData: toggleData = {
 				status: 'ADD',
@@ -231,6 +232,7 @@ class BulletinText extends Component {
 					"attachment": {
 						"fileList":fileList || [],
 					},
+					"categories": [3],
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"is_draft": true
 				};
@@ -240,10 +242,10 @@ class BulletinText extends Component {
 							this.modalClick();
 							message.success('暂存成功');
 							//更新暂存的公告列表数据
-							getTipsList({
+							getTrenList({
 								user_id: getUser().id
 							});
-							getDraftTipsList({
+							getTrendsList({
 								user_id: getUser().id
 							});
 						}
@@ -260,6 +262,7 @@ class BulletinText extends Component {
 					},
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [2],
+					"categories": [3],
 					"publisher": getUser().id,
 					"is_draft": true
 				};
@@ -269,7 +272,7 @@ class BulletinText extends Component {
 							this.modalClick();
 							message.success('暂存成功！');
 							//更新暂存的公告列表数据
-							getDraftTipsList({
+							getTrendsList({
 								user_id: getUser().id
 							});
 						}
@@ -288,7 +291,7 @@ class BulletinText extends Component {
 			},
 			fileList=[]
 		} = this.props;
-		console.log(this.props.fileList)
+		
 
 		const {progress} = this.state;
 
@@ -299,8 +302,8 @@ class BulletinText extends Component {
 		return (
 			<Modal
 				title={toggleData.type === 'TIPS' ? (
-					toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
-				) : '发布公告'}
+					toggleData.status === 'ADD' ? '发布安全事故快报' : '编辑安全事故快报'
+				) : '发布安全事故快报'}
 				visible={toggleData.visible}
 				footer={null}
 				width="80%"

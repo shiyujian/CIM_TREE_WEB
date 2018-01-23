@@ -110,7 +110,7 @@ class StateText extends Component {
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"tags": [1],
-						"categories": [],
+						"categories": [2],
 						"publisher": getUser().id,
 						"is_draft": false
 					};
@@ -130,6 +130,7 @@ class StateText extends Component {
 						"title": values['title'],
 						"abstract": values['abstract'] || '',
 						"raw": this.state.content,
+						"categories": [2],
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"is_draft": false
 					};
@@ -170,6 +171,7 @@ class StateText extends Component {
 					"title": values['title'],
 					"abstract": values['abstract'] || '',
 					"raw": this.state.content,
+					"categories": [2],
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"is_draft": true
 				};
@@ -196,6 +198,7 @@ class StateText extends Component {
 					"raw": this.state.content || '',
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [1],
+					"categories": [2],
 					"publisher": getUser().id,
 					"is_draft": true
 				};
@@ -232,8 +235,8 @@ class StateText extends Component {
 		return (
 			<Modal
 				title={toggleData.type === 'NEWS' ? (
-					toggleData.status === 'ADD' ? '发布新闻' : '编辑新闻'
-				) : '发布新闻'}
+					toggleData.status === 'ADD' ? '发布国内安全动态' : '编辑国内安全动态'
+				) : '发布国内安全动态'}
 				wrapClassName='edit-box'
 				visible={toggleData.visible}
 				width="70%"
