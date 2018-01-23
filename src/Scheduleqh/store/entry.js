@@ -17,7 +17,7 @@ export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeO
 // export const gettreetype = createFetchAction(`${FOREST_API}/tree-types/`, []);
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/nurserystat?no=P009{{etime}}`, []);
 
-export const gettreetype1 = createFetchAction(`${FOREST_API}/tree/treestat?no=P009`, []);
+export const gettreetype1 = createFetchAction(`${FOREST_API}/tree/treestat?`, []);
 export const gettreetype2 = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
 
 export const gettreetype3 = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass{{params}}`, []);

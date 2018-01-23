@@ -117,7 +117,8 @@ export default class EntryTable extends Component {
                     type: 'category',
                     axisPointer: {
                         type: 'shadow'
-                    }
+                    },
+                   
                 }
             ],
             yAxis: [
@@ -582,9 +583,6 @@ export default class EntryTable extends Component {
                        let myChart2 = echarts.getInstanceByDom(document.getElementById('stock'));
                     let options2 = {
 
-                         title: {
-                                    // text: '折线图堆叠'
-                                },
                                 tooltip: {
                                     trigger: 'axis'
                                 },
@@ -612,20 +610,20 @@ export default class EntryTable extends Component {
                                 },
                                 yAxis: [
                                     // type: 'value'
-                                    {
-                                        type: 'value',
-                                        name: '',
-                                        axisLabel: {
-                                            formatter: '{value} 棵'
+                                        {
+                                            type: 'value',
+                                            name: '',
+                                            axisLabel: {
+                                                formatter: '{value} 棵'
+                                            }
+                                        },
+                                        {
+                                            type: 'value',
+                                            name: '',
+                                            axisLabel: {
+                                                formatter: '{value} 棵'
+                                            }
                                         }
-                                    },
-                                    {
-                                        type: 'value',
-                                        name: '',
-                                        axisLabel: {
-                                            formatter: '{value} 棵'
-                                        }
-                                    }
                                 ],
                                 series: [
                                     {
@@ -643,33 +641,33 @@ export default class EntryTable extends Component {
                                     {
                                         name:'1标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[0]
                                     },
                                     {
                                         name:'2标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[1]
                                     },
                                     {
                                         name:'3标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[2]
                                     },
                                     {
                                         name:'4标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[3]
                                     },
                                     {
                                         name:'5标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[4]
-                                    }
+                                    },
                                 ]
                             };
 
