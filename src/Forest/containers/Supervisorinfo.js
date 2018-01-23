@@ -82,9 +82,9 @@ export default class Supervisorinfo extends Component {
         //状态
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={"1"}>待审批</Option>,
-            <Option key={'2'} value={"2"}>审批通过</Option>,
-            <Option key={'3'} value={"3"}>审批未通过</Option>,
+            <Option key={'1'} value={"-1"}>待审批</Option>,
+            <Option key={'2'} value={"0"}>审批通过</Option>,
+            <Option key={'3'} value={"1"}>审批未通过</Option>,
         ]
         this.setState({statusoption})
     }

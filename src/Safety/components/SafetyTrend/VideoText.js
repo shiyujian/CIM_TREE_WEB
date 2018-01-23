@@ -17,7 +17,7 @@ class VideoText extends Component {
 		super(props);
 		this.state = {
 			content: "",
-			progress: 0,
+			progress: 0,			
 		}
 	}
 
@@ -72,29 +72,33 @@ class VideoText extends Component {
 				insertImg(url)
 			}
 		};
+		editor.customConfig.customAlert = function(info){
+			alert(info + ' \n\n如果粘贴无效，请使用图片上传功能进行上传');
+		}
 		editor.create();
+
 		const {
 			actions:{postUploadFiles},
 			toggleData: toggleData = {
-				type: 'TIPS',
+				type: 'NEWS',
 				status: 'ADD',
 				visible: false,
 				editData: null
 			},
 			form: {setFieldsValue}
 		} = this.props;
-		if (toggleData.type === 'TIPS' && toggleData.status === 'EDIT') {
-			postUploadFiles(toggleData.editData.attachment.fileList)
+		if (toggleData.type === 'NEWS' && toggleData.status === 'EDIT') {
+			postUploadFiles(toggleData.editData.attachment.fileList)			
 			this.setState({
 				content: toggleData.editData.raw
 			});
 			editor.txt.html(toggleData.editData.raw)
 			setFieldsValue({
 				'title': toggleData.editData.title,
+				'abstract': toggleData.editData.abstract
 			})
 		}
 	}
-
 	uploadProps = {
 		name: 'a_file',
 		multiple: true,
@@ -113,6 +117,8 @@ class VideoText extends Component {
 					down_file:STATIC_DOWNLOAD_API + "/media"+file.response.download_url.split('/media')[1]
 				};
 				newFileList=newFileList.concat(newFile);
+				console.log(newFileList)
+				// postUploadVideo(newFileList)
 				postUploadFiles(newFileList)
 			}
 			if(event){
@@ -126,7 +132,7 @@ class VideoText extends Component {
 	//modal显示与影藏
 	modalClick() {
 		const {actions: {toggleModal,postUploadFiles}} = this.props;
-		postUploadFiles([]);
+		postUploadFiles([]);		
 		toggleModal({
 			type: null,
 			status: null,
@@ -134,26 +140,26 @@ class VideoText extends Component {
 		})
 	}
 
-	//发布公告
+	//发布新闻
 	postData() {
 		const {
-			actions: {postData, getTipsList, patchData, getDraftTipsList,postUploadFiles},
+			actions: {postData, getNewsList, patchData, getDraftNewsList,postUploadFiles},
 			form: {validateFields},
 			toggleData: toggleData = {
-				type: 'TIPS',
+				type: 'NEWS',
 				status: 'ADD',
 				visible: false,
 				editData: null
 			},
-			fileList=[]
+			fileList=[]			
 		} = this.props;
 		validateFields((err, values) => {
 			if (!err) {
-				//判断是发布公告还是更新公告
+				//判断是发布新闻还是更新新闻
 				if (toggleData.status === 'ADD') {
 					let newData = {
 						"title": values['title'],
-						"abstract": '',
+						"abstract": values['abstract'] || '',
 						"raw": this.state.content,
 						"content": "",
 						"attachment": {
@@ -161,7 +167,7 @@ class VideoText extends Component {
 						},
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-						"tags": [2],
+						"tags": [1],
 						"categories": [],
 						"publisher": getUser().id,
 						"is_draft": false
@@ -170,17 +176,18 @@ class VideoText extends Component {
 						.then(rst => {
 							if (rst.id) {
 								this.modalClick();
-								message.success('发布公告成功');
-								//更新公告列表数据
-								getTipsList({
+								message.success('发布新闻成功');
+								//更新新闻列表数据
+								getNewsList({
 									user_id: getUser().id
 								});
-								postUploadFiles([]);
+								postUploadFiles([]);								
 							}
 						})
 				} else if (toggleData.status === 'EDIT') {
 					let newData = {
 						"title": values['title'],
+						"abstract": values['abstract'] || '',
 						"raw": this.state.content,
 						"attachment": {
 							"fileList":fileList || [],
@@ -192,15 +199,15 @@ class VideoText extends Component {
 						.then(rst => {
 							if (rst.id) {
 								this.modalClick();
-								message.success('编辑公告成功');
-								//更新公告列表数据
-								getTipsList({
+								message.success('编辑新闻成功');
+								//更新新闻列表数据
+								getNewsList({
 									user_id: getUser().id
 								});
-								getDraftTipsList({
+								getDraftNewsList({
 									user_id: getUser().id
 								});
-								postUploadFiles([]);
+								postUploadFiles([]);								
 							}
 						})
 				}
@@ -208,16 +215,16 @@ class VideoText extends Component {
 		});
 	}
 
-	//暂存公告
+	//暂存新闻
 	draftDataFunc() {
 		const {
-			actions: {postData, patchData, getTipsList, getDraftTipsList},
+			actions: {postData, patchData, getNewsList, getDraftNewsList},
 			form: {validateFields},
 			toggleData: toggleData = {
 				status: 'ADD',
 				editData: null,
 			},
-			fileList=[]
+			fileList=[]			
 		} = this.props;
 		//判断暂存的是新增的还是编辑的暂存
 		//编辑暂存的
@@ -225,6 +232,7 @@ class VideoText extends Component {
 			validateFields((err, values) => {
 				let newData = {
 					"title": values['title'],
+					"abstract": values['abstract'] || '',
 					"raw": this.state.content,
 					"attachment": {
 						"fileList":fileList || [],
@@ -237,11 +245,11 @@ class VideoText extends Component {
 						if (rst.id) {
 							this.modalClick();
 							message.success('暂存成功');
-							//更新暂存的公告列表数据
-							getTipsList({
+							//更新暂存的新闻列表数据
+							getNewsList({
 								user_id: getUser().id
 							});
-							getDraftTipsList({
+							getDraftNewsList({
 								user_id: getUser().id
 							});
 						}
@@ -251,13 +259,13 @@ class VideoText extends Component {
 			validateFields((err, values) => {
 				let newData = {
 					"title": values['title'] || '',
-					"abstract": '',
-					"raw": this.state.content,
+					"abstract": values['abstract'] || '',
+					"raw": this.state.content || '',
 					"attachment": {
 						"fileList":fileList || [],
 					},
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-					"tags": [2],
+					"tags": [1],
 					"publisher": getUser().id,
 					"is_draft": true
 				};
@@ -266,8 +274,8 @@ class VideoText extends Component {
 						if (rst.id) {
 							this.modalClick();
 							message.success('暂存成功！');
-							//更新暂存的公告列表数据
-							getDraftTipsList({
+							//更新暂存的新闻列表数据
+							getDraftNewsList({
 								user_id: getUser().id
 							});
 						}
@@ -277,15 +285,24 @@ class VideoText extends Component {
 	}
 
 	render() {
+		// const {
+		// 	form: {getFieldDecorator},
+		// 	toggleData: toggleData = {
+		// 		type: 'NEWS',
+		// 		status: 'ADD',
+		// 		visible: false,
+		// 	}
+		// } = this.props;
 		const {
 			form: {getFieldDecorator},
 			toggleData: toggleData = {
-				type: 'TIPS',
+				type: 'NEWS',
 				status: 'ADD',
 				visible: false,
 			},
 			fileList=[]
 		} = this.props;
+		// console.log(this.props.fileList)
 
 		const {progress} = this.state;
 
@@ -293,32 +310,40 @@ class VideoText extends Component {
 			labelCol: {span: 8},
 			wrapperCol: {span: 16},
 		};
+
 		return (
 			<Modal
-				title={toggleData.type === 'TIPS' ? (
-					toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
-				) : '发布公告'}
-				visible={toggleData.visible}
-				footer={null}
-				width="80%"
-				maskClosable={false}
-				onOk={this.modalClick.bind(this)}
-				onCancel={this.modalClick.bind(this)}
-			>
+			title={toggleData.type === 'TIPS' ? (
+				toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
+			) : '发布公告'}
+			visible={toggleData.visible}
+			footer={null}
+			width="80%"
+			maskClosable={false}
+			onOk={this.modalClick.bind(this)}
+			onCancel={this.modalClick.bind(this)}
+		>
 				<div>
 					<Form>
 						<Row>
-							<Col span={12} offset={1}>
-								<FormItem {...formItemLayout} label="公告标题">
+							<Col span={5} offset={1}>
+								<FormItem {...formItemLayout} label="新闻标题">
 									{getFieldDecorator('title', {
-										rules: [{required: true, message: '请输入公告标题'}],
+										rules: [{required: true, message: '请输入新闻标题'}],
 										initialValue: ''
 									})(
-										<Input type="text" placeholder="公告标题"/>
+										<Input type="text" placeholder="新闻标题"/>
 									)}
 								</FormItem>
 							</Col>
-							<Col span={10} offset={1}>
+							<Col span={5} offset={1}>
+								<FormItem {...formItemLayout} label="关键字">
+									{getFieldDecorator('abstract', {})(
+										<Input type="text" placeholder="请输入关键字"/>
+									)}
+								</FormItem>
+							</Col>
+							<Col span={5} offset={1}>
 								<Button onClick={this.draftDataFunc.bind(this)}>暂存</Button>
 								<Button onClick={this.postData.bind(this)}>发布</Button>
 								<Button onClick={this.modalClick.bind(this)}>取消</Button>
@@ -354,10 +379,8 @@ class VideoText extends Component {
 					</Form>
 				</div>
 			</Modal>
-
 		);
 	}
-
 	columns = [
 		{
 			title: '文件名称',

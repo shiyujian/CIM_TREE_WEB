@@ -37,7 +37,7 @@ export default class Addition extends Component {
                         <Select>
                             <Option value='第一经理'>第一经理</Option>
                             <Option value='第二经理'>第二经理</Option>
-                        </Select>
+                        </Select> 
                     </FormItem>
                 </Form>
                 </Col>
@@ -108,7 +108,7 @@ export default class Addition extends Component {
 								<p className="ant-upload-drag-icon">
 									<Icon type="inbox"/>
 								</p>
-								<p className="ant-upload-text">点击或者拖拽开始上传</p>
+								<p>点击或者拖拽开始上传</p>
 								<p className="ant-upload-hint">
 									支持 pdf、doc、docx 文件
 

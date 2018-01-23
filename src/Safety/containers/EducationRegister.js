@@ -14,7 +14,7 @@ import reducer,  {actions} from '../store/educationRegister';
 import {actions as platformActions} from '_platform/store/global';
 import { actions as fileActions } from '../store/staticFile';
 import { actions as supportActions } from '../store/supportActions';
-import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
+import {Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {Table, Button, Row, Col, Icon, Modal, Input, message,Tabs,
     notification, DatePicker, Select, InputNumber, Form, Upload, Card} from 'antd';
 // import {ProjectTree}from '../components/Register';
@@ -60,6 +60,7 @@ export default class EducationRegister extends Component {
     }
     //点击树事件
     onTreeNodeClick(selectedKeys,e){
+        console.log('selectedKeys', selectedKeys, e)
         if(!selectedKeys.length){
             this.setState({code:"",pcode:""})
             return
