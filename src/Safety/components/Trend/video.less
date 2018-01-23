@@ -1,42 +1,128 @@
 
-.box{
-    text-align: center;
-    // display: none;
-    // width:60%;
-    // height:300px;
-    // float:left;
-    // width: 500px;
+// .video:first-child(1){
+//     width: 300px
+// }
+.box:nth-child(1){
     position: relative;
-    // background-color: #f666ff;
-    .firstVideo{
-    }
-    .firstIcon{
-        display: block;
-        position: absolute;
-        top: 0; bottom: 0; 
-        left: 0; 
-        right: 0; 
-        margin: auto;
-    }
-}
-.box1{
+    // background-color: #111111;
+    width: 60%; 
+    margin: 0;
+    padding: 0;
+    height: 300px;
+    float: left; 
     text-align: center;
-    // display: none;
-    // width:60%;
-    // height:300px;
-    // float:left;
-    // width: 500px;
-    position: relative;
-    background-color:#ffffff;
     .firstVideo{
+        position: relative;
+        width: 60%;
+        height: 300px;
     }
-    .firstIcon{
+    .Icon{
         display: none;
         position: absolute;
+        font-size: 60; 
+        width: 60px; 
+        height: 60px;
+    }
+}
+.box:nth-child(2){
+    position: relative;
+    // background-color: #111111;
+    width: 40%; 
+    height: 150px;
+    float: left; 
+    text-align: center;
+    .firstVideo{
+        position: relative; 
+        width: 40%;
+        height: 150px;
+    }
+    .Icon{
+        display: none;
+        position: absolute;
+        font-size: 30; 
+        width: 30px; 
+        height: 30px;
+    }
+}
+.box:nth-child(3){
+    position: relative;
+    // background-color: #111111;
+    width: 40%; 
+    height: 150px;
+    float: left; 
+    text-align: center;
+    .firstVideo{
+        position: relative;    
+        width: 40%;
+        height: 150px;
+    }
+    .Icon{
+        display: none;
+        position: absolute;
+        font-size: 30; 
+        width: 30px; 
+        height: 30px;
+    }
+}
+.box:nth-child(1):hover{
+    position: relative;    
+    background-color: #eeeeee;
+    width: 60%;     
+    // .firstVideo:hover{
+    //     position: relative;    
+    // }
+    .Icon{
+        display: block;
+        font-size: 60px;        
+        position: absolute;
         top: 0; bottom: 0; 
         left: 0; 
         right: 0; 
         margin: auto;
     }
 }
-
+.box:nth-child(2):hover{
+    position: relative;    
+    background-color: #eeeeee;
+    width: 40%;     
+    // .firstVideo:hover{
+    //     position: relative;    
+    // }
+    .Icon{
+        display: block;
+        font-size: 30px;        
+        position: absolute;
+        top: 0; bottom: 0; 
+        left: 0; 
+        right: 0; 
+        margin: auto;
+    }
+}
+.box:nth-child(3):hover{
+    position: relative;    
+    background-color: #eeeeee;
+    width: 40%;     
+    // .firstVideo:hover{
+    //     position: relative;    
+    // }
+    .Icon{
+        display: block;
+        font-size: 30px;
+        position: absolute;
+        top: 0; bottom: 0; 
+        left: 0; 
+        right: 0; 
+        margin: auto;
+    }
+}
+// .firstVideo:hover{
+//     position: relative;    
+// }
+// .Icon:hover{
+//     display: block;
+//     position: absolute;
+//     top: 0; bottom: 0; 
+//     left: 0; 
+//     right: 0; 
+//     margin: auto;
+// }

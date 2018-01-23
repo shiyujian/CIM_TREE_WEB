@@ -28,8 +28,10 @@ class Level3 extends Component {
     }
 
     componentWillReceiveProps(props){
+        console.log('props',props)
         const {code,pcode} = props;
         const {actions:{getSafetyEducation}} = this.props;
+        console.log('this.props', this.props)
         const tempcode = code === "" ? `?project_code=${pcode}` : `?project_unit_code=${code}`
         getSafetyEducation({code:tempcode}).then(rst => {
             let dataSource = this.handleData(rst) || [];
@@ -76,8 +78,10 @@ class Level3 extends Component {
         this.props.form.validateFields(async (err,values) => {
             const {actions:{getSafetyEducation,addSafetyEducation,getWkByCode}} = this.props;
             const {code} = this.state;
+            console.log('code', code)
             if(!err){
-                let wkunit = await getWkByCode({code:code});
+                let wkunit = await getWkByCode({parent:code});
+                console.log('wkunit',wkunit)
                 let project = wkunit.parent.obj_type !== "C_PJ" ?  await getWkByCode({code:wkunit.parent.code}) : wkunit.parent; 
                 values.age = moment().format("YYYY") - moment(values.birthdate._d).format('YYYY');
                 values.inTime = moment(values.inTime._d).format('YYYY-MM-DD');
