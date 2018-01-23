@@ -287,7 +287,7 @@ export default class EntryTable extends Component {
                     </Col>
                     <Col xl={5} lg={10}>
                         <span>树种：</span>
-                        <Select style={{width:"100px"}} allowClear showSearch className="forestcalcw2 mxw100" defaultValue='全      部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
+                        <Select style={{width:"100px"}} allowClear showSearch className="forestcalcw2 mxw100" defaultValue='全部' onSelect={() =>this.select()} onChange={this.ontreetypechange.bind(this)}>
                             {treetypeoption}
                         </Select>
                     </Col>
@@ -309,6 +309,11 @@ export default class EntryTable extends Component {
     }
     close(){
         
+    }
+
+    
+    select(e) {
+        console.log(e)
     }
     //点击图片出现日期选择
     handleIsOpen(index) {
@@ -342,6 +347,7 @@ export default class EntryTable extends Component {
         })
     }
     datepickok(index) {
+       
         if(index == 1) {
             const {stime1,etime1} = this.state;
           
@@ -358,7 +364,7 @@ export default class EntryTable extends Component {
                 // stime:stime2?moment(stime2).add(8, 'h').unix():'',
                 // etime:etime2?moment(etime2).add(8, 'h').unix():'',
                 // treety,
-                // treetype,
+                treetype:treetype,
                 stime:stime2,
                 etime:etime2,
             }
@@ -367,7 +373,7 @@ export default class EntryTable extends Component {
     }
 
     ontypechange(value) {
-       
+        
         const {typeselect,leftkeycode = ''} = this.props;
         typeselect(value || '',leftkeycode)
         this.setState({treety:value || ''}, () => {
@@ -375,13 +381,19 @@ export default class EntryTable extends Component {
         })
     }
 
-    ontreetypechange(value) {
-        
+    ontreetypechange(value,children) {
+       
         const {treetypelist} = this.props;
-        let treetype = treetypelist.find(rst => rst.name == value)
-        this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''},() => {
+        let treetype = treetypelist.find(rst => rst.ID == value)
+        this.setState({treetype:treetype?treetype.ID:'',treetypename:treetype.TreeTypeNo || ''},() => {
             this.datepickok(2)
         })
+        // this.setState({
+        //     treetype:value,
+        // })
+        // this.datepickok(2);
+        
+
     }
 
     // sum(index, param) {
@@ -490,7 +502,7 @@ export default class EntryTable extends Component {
             })
         } else if(index === 2) {
             this.setState({loading2:true})
-            
+            console.log(param,"haha");
            getNurserysCountFast({},param)
            // getNurserysCountFast()
             .then(rst => {
