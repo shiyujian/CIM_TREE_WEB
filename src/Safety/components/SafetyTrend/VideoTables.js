@@ -3,6 +3,7 @@ import { Table, Tabs, Button, Row, Col, Modal, message, Popconfirm } from 'antd'
 import VideoText from './VideoText';
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
+import '../../../Datum/components/Datum/index.less'
 
 const TabPane = Tabs.TabPane;
 const user_id = getUser().id;
@@ -15,7 +16,7 @@ export default class VideoTables extends Component {
 			container: null,
 			video: [],
 			file: {},
-			down_file:''
+			down_file: ''
 		}
 	}
 
@@ -27,53 +28,23 @@ export default class VideoTables extends Component {
 		getVideosList({
 			user_id: user_id
 		})
-		// this.state.video.push(this.state.file)
-		// console.log(this.props, "333333333333")
-		// console.log(this.state.video)
-
 		const newsLists = this.props.tipsList || []
 		for (var i = 0; i < newsLists.length; i++) {
-			// console.log(newsLists[i])
-			// console.log(newsLists[i].attachment.fileList,"1111111111111")			
+
 			if (newsLists[i].attachment.fileList != undefined) {
-				console.log(newsLists[i].attachment.fileList[0], "222222222222222222")
 				if (newsLists[i].attachment.fileList[0] != undefined) {
 					this.state.file = newsLists[i].attachment.fileList[0]
 					this.state.video.push(this.state.file)
-					console.log(this.props, "333333333333")
-					console.log(this.state.video,"444444444444444")
+
 				}
 			}
 		}
 	}
-	// componentWillReceiveProps(nextProps) {
-	// 	let btn=true		
-	// 	console.log(nextProps)
-	// 	const newsLists = nextProps.tipsList || []
-	// 	for (var i = 0; i < newsLists.length; i++) {
-	// 		// console.log(newsLists[i])
-	// 		// console.log(newsLists[i].attachment.fileList,"1111111111111")			
-	// 		if (newsLists[i].attachment.fileList != undefined) {
-	// 			console.log(newsLists[i].attachment.fileList[0], "222222222222222222")
-	// 			if (newsLists[i].attachment.fileList[0] != undefined) {
-	// 				this.state.file = newsLists[i].attachment.fileList[0]
-	// 				this.state.video.push(this.state.file)
-	// 					// console.log(this.props, "333333333333")
-	// 					console.log(this.state.video,"444444444444444")
-
-	// 			}
-	// 		}
-	// 	}
-	// 	console.log(btn)
-	// 	  btn=false
-	// 	console.log(btn)
-		
-	// }
 
 	//新闻操作按钮
 	clickNews(record, type) {
 		console.log(record)
-		this.setState({down_file:record.down_file})
+		this.setState({ down_file: record.attachment.fileList[0].down_file })
 		const {
 			actions: { deleteData, getVideoList, getVideosList, toggleModal, patchData },
 			bulletinTabValue = '1'
@@ -82,6 +53,7 @@ export default class VideoTables extends Component {
 			deleteData({ pk: record.id })
 				.then(() => {
 					message.success('删除新闻成功！');
+
 					if (bulletinTabValue === '1') {
 						getVideoList({
 							user_id: user_id
@@ -171,6 +143,10 @@ export default class VideoTables extends Component {
 	}
 
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		const {
 			videoList = [],
 			videosList = [],
@@ -180,29 +156,33 @@ export default class VideoTables extends Component {
 			},
 			bulletinTabValue = '1'
 		} = this.props;
-		// const data = [{
-		// 	name: this.state.video.name
-		// }]
-		// console.log(this.state.video)
 		return (
 			<Row>
 				<Col span={22} offset={1}>
 					<Tabs activeKey={bulletinTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
 						<div style={{ marginBottom: '10px' }}>
-							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布安全事故快报</Button>
+							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布安全生产视频</Button>
 							{
 								(toggleData.visible && toggleData.type === 'NEWS') && <VideoText {...this.props} />
 							}
 						</div>}>
-						<TabPane tab="发布的视频" key="1">
+						<TabPane tab="发布的安全生产视频" key="1">
 							<Table dataSource={videoList}
 								columns={this.columns}
-								rowKey="id" />
+								rowKey="id"
+								className="foresttables"
+								rowSelection={rowSelection}
+								bordered
+							/>
 						</TabPane>
-						<TabPane tab="暂存的视频" key="2">
+						<TabPane tab="暂存的安全生产视频" key="2">
 							<Table dataSource={videosList}
 								columns={this.draftColumns}
-								rowKey="id" />
+								rowKey="id"
+								className="foresttables"
+								rowSelection={rowSelection}
+								bordered
+							/>
 						</TabPane>
 					</Tabs>
 
@@ -214,50 +194,29 @@ export default class VideoTables extends Component {
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 					footer={null}>
-						<video
+					<video
 						controls
 						preload="auto"
 						width="100%"
 						height="500px"
 						src={this.state.down_file}
 					>
+						<source src="this.state.video" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+						<source src="this.state.video" type='video/ogg; codecs="theora, vorbis"' />
+						<source src="this.state.video" type='video/webm; codecs="vp8, vorbis"' />
 					</video>
 				</Modal>
 			</Row>
 		);
 
 	}
-
-	// columns1 = [{
-	// 	title: "视频名称",
-	// 	dataIndex: "name",
-	// }, {
-	// 	title: '操作',
-	// 	render: record => {
-	// 		return (
-	// 			<span>
-	// 				<a onClick={this.clickNews.bind(this, record, 'VIEW')}>预览</a>
-	// 				&nbsp;&nbsp;|&nbsp;&nbsp;
-	// 				<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
-	// 				&nbsp;&nbsp;|&nbsp;&nbsp;
-	// 				<a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a>
-	// 				&nbsp;&nbsp;|&nbsp;&nbsp;
-	// 				<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
-	// 					cancelText="取消">
-	// 					<a>删除</a>
-	// 				</Popconfirm>
-	// 			</span>
-	// 		)
-	// 	},
-	// }]
-
 	columns = [
 		{
-			title: '新闻ID222',
+			title: '发布视频ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '新闻标题',
+			title: '视频名称',
 			dataIndex: 'title',
 			key: 'title',
 		}, {
@@ -300,11 +259,11 @@ export default class VideoTables extends Component {
 	];
 	draftColumns = [
 		{
-			title: '新闻ID',
+			title: '暂存视频ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '新闻标题',
+			title: '视频名称',
 			dataIndex: 'title',
 			key: 'title',
 		}, {

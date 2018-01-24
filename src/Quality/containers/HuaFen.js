@@ -13,6 +13,8 @@ import QualityTree from '../components/QualityTree'
 import './common.less'
 import {USER_API, SERVICE_API, WORKFLOW_API,JYPMOD_API,UPLOADFILE_API} from '_platform/api';
 import EditMod from '../components/HuaFenModal'
+import '../../Datum/components/Datum/index.less'
+
 const Option = Select.Option;
 const confirm = Modal.confirm;
 @connect(
@@ -376,6 +378,10 @@ export default class HuaFen extends Component {
 		
 	}
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		const {table: {editing = false} = {}} = this.props;
 		let fenxiangs = this.state.fenxiangs.filter((element) => {
 			return element.obj_type === "C_WP_LOC" ? false : true; 
@@ -453,7 +459,10 @@ export default class HuaFen extends Component {
 						<div style={{ width: '100%' }}>
 							<h3 style={{marginBottom:"10px"}}>检验批清单</h3>
 							<Table
-								className='huafenTable'
+								rowSelection={rowSelection}
+								// className='huafenTable'
+								className="foresttables"
+								bordered
 								dataSource={this.state.jianyanpis}
 								columns={this.columns}
 							/>

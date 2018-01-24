@@ -19,25 +19,6 @@ export default class Video extends Component {
 	}
 
 	static propTypes = {};
-	componentWillReceiveProps(nextProps) {
-
-		// const {
-		// 	fileList = [],
-		// } = this.props;
-		// console.log(this.props)		
-		const newsListT = nextProps.videoList || []
-		for (var i = 0; i < newsListT.length; i++) {
-
-			const newsListTT = newsListT[i].attachment.fileList || []
-			for (var j = 0; j < newsListTT.length; j++) {
-
-				const videos = newsListTT[j].down_file
-				this.setState({ video: videos })
-				break;
-			}
-			break;
-		}
-	}
 	componentWillMount() {
 
 	}
@@ -47,10 +28,19 @@ export default class Video extends Component {
 		getVideoList({}, { tag: '公告', is_draft: false });
 
 	}
-	play() {
-		this.setState({
-			visible: true
-		})
+	play(k) {
+		console.log(k)
+		if (k < 3) {
+			const newsListT = this.props.videoList || []
+			const newsListTT = newsListT[k].attachment.fileList[0] || {}
+			console.log(newsListTT)
+			const videos = newsListTT.down_file
+			console.log(videos)
+			this.setState({ video: videos })
+			this.setState({
+				visible: true
+			})
+		}
 	}
 	modalClick() {
 		this.setState({
@@ -67,11 +57,6 @@ export default class Video extends Component {
 		}
 	}
 
-	data = [
-		{ down_file: "http://47.104.160.65:6512/media/documents/2018/01/1510116943014_Hbu2FIz.mp4", name: "1510116943014.mp4" },
-		{ down_file: "http://47.104.160.65:6512/media/documents/2018/01/1510116943014_Hbu2FIz.mp4", name: "1510116943014.mp4" },
-		{ down_file: "http://47.104.160.65:6512/media/documents/2018/01/1510116943014_Hbu2FIz.mp4", name: "1510116943014.mp4" },
-	]
 	columns = [
 		{
 			title: '新闻标题',
@@ -110,76 +95,40 @@ export default class Video extends Component {
 
 	render() {
 		const videoa = []
-		console.log(this.props)
-		
-		for (var k = 0; k < this.data.length; k++) {
-			videoa.push(
-				<div className="video box ">
-					<video
-						// onClick={this.play.bind(this)}
-						className="firstVideo"
-						preload="auto"
-						width="60%"
-						height="300px"
-						src={this.data[k].down_file}
-					>
-					</video>
-					<Icon
-						className="Icon"
-						onClick={this.play.bind(this)}
-						name="play-circle"></Icon>
-				</div>
-			)
+		const newsListT = this.props.videoList || []
+		for (var k = 0; k < newsListT.length; k++) {
+			const newsListTT = newsListT[k].attachment.fileList[0] || {}
+			console.log(newsListTT)
+			if (k < 3) {
+				videoa.push(
+					<div className="video box ">
+						<video
+							onClick={this.play.bind(this, k)}
+							className="firstVideo"
+							preload="auto"
+							width="60%"
+							height="300px"
+							src={newsListTT.down_file}
+						>
+							<source src="newsListTT.down_file" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+							<source src="newsListTT.down_file" type='video/ogg; codecs="theora, vorbis"' />
+							<source src="newsListTT.down_file" type='video/webm; codecs="vp8, vorbis"' />
+
+						</video>
+
+						{/* {newsListTT.name} */}
+						<Icon
+							className="Icon"
+							onClick={this.play.bind(this, k)}
+							name="play-circle"></Icon>
+					</div>
+				)
+			}
 		}
 		return (
 			<Blade style={{ height: "300px", background: "#eee" }} title="安全生产视频">
 				<div className="container">
 					{videoa}
-					{/* <div className="video box " style={{ width: "60%", height: "300px", float: "left", textAlign: "center" }}>
-						<video
-							// onClick={this.play.bind(this)}
-							className="firstVideo"
-							preload="auto"
-							width="60%"
-							height="300px"
-							src={this.state.video}
-						>
-						</video>
-						<Icon
-							className="Icon"
-							onClick={this.play.bind(this)}
-							style={{ fontSize: 60, width: "60px", height: "60px" }} name="play-circle"></Icon>
-					</div>
-					<div className="video box" style={{ width: "40%", height: "150px", float: "right", textAlign: "center" }} >
-						<video
-							// onClick={this.play.bind(this)}
-							id="firstVideo"
-							preload="auto"
-							width="40%"
-							height="150px"
-							src={this.state.video}
-						>
-						</video>
-						<Icon
-							className="Icon"
-							onClick={this.play.bind(this)}
-							style={{ fontSize: 30, width: "30px", height: "30px" }} name="play-circle"></Icon>
-					</div>
-					<div className="video box" style={{ width: "40%", height: "150px", float: "right", textAlign: "center" }}>
-						<video
-							// onClick={this.play.bind(this)}
-							id="firstVideo"
-							preload="auto"
-							width="40%"
-							height="150px"
-							src={this.state.video}
-						>
-						</video>
-						<Icon
-							className="Icon"
-							onClick={this.play.bind(this)}
-							style={{ fontSize: 30, width: "30px", height: "30px" }} name="play-circle"></Icon>
-					</div> */}
 				</div>
 				<Modal
 					visible={this.state.visible}
@@ -196,6 +145,9 @@ export default class Video extends Component {
 						height="500px"
 						src={this.state.video}
 					>
+						<source src="this.state.video" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+						<source src="this.state.video" type='video/ogg; codecs="theora, vorbis"' />
+						<source src="this.state.video" type='video/webm; codecs="vp8, vorbis"' />
 					</video>
 				</Modal>
 			</Blade>

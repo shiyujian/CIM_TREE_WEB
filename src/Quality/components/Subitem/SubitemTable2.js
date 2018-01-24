@@ -14,6 +14,8 @@ import {getUser} from '_platform/auth'
 import {Table, Select, Radio} from 'antd';
 // import moment from 'moment';
 import './index.css';
+import '../../../Datum/components/Datum/index.less'
+
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -58,6 +60,10 @@ export class SubitemTable2 extends Component{
     }
 
     render() {
+        const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
         const columns = [{
             title: '序号',
             dataIndex: 'order_number',
@@ -121,7 +127,10 @@ export class SubitemTable2 extends Component{
                     dataSource={dataSource}
                     bordered
                     rowClassName={this.rowClassName}
-                    className="defectTable"
+                    rowSelection={rowSelection}
+                    // className="defectTable"
+                    className="foresttables"
+                    bordered
                     onRowClick={this.onTblRowClick}
                     pagination={{ pageSize: 20 }}
                 />

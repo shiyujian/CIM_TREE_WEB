@@ -41,7 +41,7 @@ export default class Header extends Component {
 					<img src={loadHeadLogo} alt="logo"/>
 					<div className="brand">
 						<div>
-						数字化建设管理平台
+						森林大数据建设管理平台
 						</div>
 					</div>
 				</a>

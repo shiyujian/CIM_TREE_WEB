@@ -8,7 +8,7 @@ import moment from 'moment';
 import { DeleteIpPort } from '../../../_platform/components/singleton/DeleteIpPort';
 const Dragger = Upload.Dragger;
 const Option = Select.Option;
-let fileTypes = 'application/mp4,application/3gpp,video/mp4,video/3gpp';
+let fileTypes = 'application/mp4,application/3gpp,application/wmv,video/mp4,video/ogg,video/webm';
 
 export default class Addition extends Component {
 
@@ -76,8 +76,7 @@ export default class Addition extends Component {
 								</p>
 								<p className="ant-upload-text">点击或者拖拽开始上传</p>
 								<p className="ant-upload-hint">
-									{content}
-								</p>
+								支持mp4、ogg、webm视频</p>
 							</Dragger>
 
 							<Progress percent={progress} strokeWidth={5} />

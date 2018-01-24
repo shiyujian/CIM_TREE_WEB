@@ -8,6 +8,8 @@ import {getUser} from '_platform/auth';
 import {DatePicker, Row, Col, Button, Table} from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import '../../Datum/components/Datum/index.less'
+
 // moment.locale('zh-cn');
 let on_off_duty=window.config['IN_OFF_DUTY'].split('--');
 const {RangePicker, MonthPicker} = DatePicker;
@@ -80,6 +82,10 @@ export default class Query extends Component {
 	}
 
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		const {checkList = []} = this.props;
 		const newChecks = this.renderChecks(checkList);
 		return (
@@ -101,6 +107,9 @@ export default class Query extends Component {
 					<Row>
 						<Table dataSource={newChecks}
 							   columns={this.columns}
+							   className="foresttables"
+							   rowSelection={rowSelection}
+							   bordered
 							   rowKey="id"/>
 					</Row>
 				</Content>
