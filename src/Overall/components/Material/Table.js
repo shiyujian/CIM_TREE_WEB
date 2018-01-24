@@ -5,6 +5,8 @@ import moment from 'moment';
 import './index.less';
 
 const FormItem = Form.Item;
+import '../../../Datum/components/Datum/index.less'
+
 export default class GeneralTable extends Component {
 
 	state = { 
@@ -34,11 +36,13 @@ export default class GeneralTable extends Component {
         } = this.state;
 		const { Doc = [] } = this.props;
 		// console.log('table.this.props',this.props)
+		console.log('table.this.props', this.props)
 		return (
-			<Table rowSelection={this.rowSelection}
+			<Table
+				rowSelection={this.rowSelection}
 				dataSource={Doc}
 				columns={this.columns}
-				className='foresttable'
+				className='foresttables'
 				bordered rowKey="code" />
 		);
 	}
@@ -79,7 +83,7 @@ export default class GeneralTable extends Component {
 			title: '提交时间',
 			dataIndex: 'submitTime',
 			key: 'submitTime'
-		},{
+		}, {
 			title: '流程状态',
 			dataIndex: 'flowStyle',
 			key: 'flowStyle'
@@ -237,6 +241,15 @@ export default class GeneralTable extends Component {
 	// 		openPreview(filed);
 	// 	}
 	// }
+	previewFile(file) {
+		const { actions: { openPreview } } = this.props;
+		if (JSON.stringify(file.basic_params) == "{}") {
+			return
+		} else {
+			const filed = file.basic_params.files[0];
+			openPreview(filed);
+		}
+	}
 
 	update(file) {
 		const { actions: { updatevisible, setoldfile } } = this.props;

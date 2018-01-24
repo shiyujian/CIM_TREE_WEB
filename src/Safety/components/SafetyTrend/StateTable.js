@@ -1,8 +1,9 @@
-import React, {Component} from 'react';
-import {Table, Tabs, Button, Row, Col, Modal, message, Popconfirm} from 'antd';
+import React, { Component } from 'react';
+import { Table, Tabs, Button, Row, Col, Modal, message, Popconfirm } from 'antd';
 import StateText from './StateText';
 import moment from 'moment';
-import {getUser} from '../../../_platform/auth';
+import { getUser } from '../../../_platform/auth';
+import '../../../Datum/components/Datum/index.less'
 
 const TabPane = Tabs.TabPane;
 const user_id = getUser().id;
@@ -17,7 +18,7 @@ export default class StateTable extends Component {
 	}
 
 	componentDidMount() {
-		const {actions: {getNewsList, getDraftNewsList}} = this.props;
+		const { actions: { getNewsList, getDraftNewsList } } = this.props;
 		getNewsList({
 			user_id: user_id
 		})
@@ -29,11 +30,11 @@ export default class StateTable extends Component {
 	//新闻操作按钮
 	clickNews(record, type) {
 		const {
-			actions: {deleteData, getNewsList, getDraftNewsList, toggleModal, patchData},
+			actions: { deleteData, getNewsList, getDraftNewsList, toggleModal, patchData },
 			stateTabValue = '1'
 		} = this.props;
 		if (type === 'DELETE') {
-			deleteData({pk: record.id})
+			deleteData({ pk: record.id })
 				.then(() => {
 					message.success('删除新闻成功！');
 					if (stateTabValue === '1') {
@@ -63,7 +64,7 @@ export default class StateTable extends Component {
 				"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 				"is_draft": true
 			};
-			patchData({pk: record.id}, newData)
+			patchData({ pk: record.id }, newData)
 				.then(rst => {
 					if (rst.id) {
 						message.success('撤回成功，撤回的新闻在暂存的新闻中可查看');
@@ -81,7 +82,7 @@ export default class StateTable extends Component {
 				"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 				"is_draft": false
 			};
-			patchData({pk: record.id}, newData)
+			patchData({ pk: record.id }, newData)
 				.then(rst => {
 					if (rst.id) {
 						message.success('重新发布新闻成功！');
@@ -100,7 +101,7 @@ export default class StateTable extends Component {
 
 	//发布新闻
 	publishNewsClick() {
-		const {actions: {toggleModal}} = this.props;
+		const { actions: { toggleModal } } = this.props;
 		toggleModal({
 			type: 'NEWS',
 			status: 'ADD',
@@ -118,11 +119,16 @@ export default class StateTable extends Component {
 
 	//新闻列表和暂存的新闻列表切换
 	subTabChange(stateTabValue) {
-		const {actions: {setStateTabActive}} = this.props;
+		const { actions: { setStateTabActive } } = this.props;
 		setStateTabActive(stateTabValue);
 	}
 
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
+
 		const {
 			newsList = [],
 			draftNewsLis = [],
@@ -136,21 +142,29 @@ export default class StateTable extends Component {
 			<Row>
 				<Col span={22} offset={1}>
 					<Tabs activeKey={stateTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
-						<div style={{marginBottom: '10px'}}>
+						<div style={{ marginBottom: '10px' }}>
 							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布国内安全动态</Button>
 							{
-								(toggleData.visible && toggleData.type === 'NEWS') && <StateText {...this.props}/>
+								(toggleData.visible && toggleData.type === 'NEWS') && <StateText {...this.props} />
 							}
 						</div>}>
 						<TabPane tab="发布的国内安全动态" key="1">
-							<Table dataSource={newsList}
-								   columns={this.columns}
-								   rowKey="id"/>
+							<Table
+								rowSelection={rowSelection}
+								className="foresttables"
+								bordered
+								dataSource={newsList}
+								columns={this.columns}
+								rowKey="id" />
 						</TabPane>
 						<TabPane tab="暂存的国内安全动态" key="2">
-							<Table dataSource={draftNewsLis}
-								   columns={this.draftColumns}
-								   rowKey="id"/>
+							<Table
+								rowSelection={rowSelection}
+								className="foresttables"
+								bordered
+								dataSource={draftNewsLis}
+								columns={this.draftColumns}
+								rowKey="id" />
 						</TabPane>
 					</Tabs>
 
@@ -162,8 +176,8 @@ export default class StateTable extends Component {
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 					footer={null}>
-					<div style={{maxHeight: '800px', overflow: 'auto'}}
-						 dangerouslySetInnerHTML={{__html: this.state.container}}/>
+					<div style={{ maxHeight: '800px', overflow: 'auto' }}
+						dangerouslySetInnerHTML={{ __html: this.state.container }} />
 				</Modal>
 			</Row>
 		);
@@ -171,11 +185,11 @@ export default class StateTable extends Component {
 
 	columns = [
 		{
-			title: '新闻ID',
+			title: '发布动态ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '新闻标题',
+			title: '动态标题',
 			dataIndex: 'title',
 			key: 'title',
 		}, {
@@ -201,15 +215,15 @@ export default class StateTable extends Component {
 			render: record => {
 				return (
 					<span>
-				  	<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
+						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
-									cancelText="取消">
-								<a>删除</a>
+							cancelText="取消">
+							<a>删除</a>
 						</Popconfirm>
 					</span>
 				)
@@ -218,11 +232,11 @@ export default class StateTable extends Component {
 	];
 	draftColumns = [
 		{
-			title: '新闻ID',
+			title: '暂存动态ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '新闻标题',
+			title: '动态标题',
 			dataIndex: 'title',
 			key: 'title',
 		}, {
@@ -255,7 +269,7 @@ export default class StateTable extends Component {
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
-									cancelText="取消">
+							cancelText="取消">
 							<a>删除</a>
 						</Popconfirm>
 					</span>

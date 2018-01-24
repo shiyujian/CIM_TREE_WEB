@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Table, Spin } from 'antd';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
+import '../../../Datum/components/Datum/index.less'
 
 export default class TaskTable extends Component {
 
@@ -14,6 +15,10 @@ export default class TaskTable extends Component {
 		setTablePage(pagination)
 	}
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		//console.log("TaskTable  ====  ", this.state, this.props);
 		let loading = this.props.loadingstatus ? this.props.loadingstatus : false;
 		const { platform: { tasks = [] }, pagination = {} } = this.props;
@@ -23,6 +28,9 @@ export default class TaskTable extends Component {
 		return (
 			<Spin tip="加载中" spinning={loading}>
 				<Table columns={this.columns} dataSource={tasks}
+					rowSelection={rowSelection}
+					bordered
+					className="foresttables"
 					rowKey={(item, index) => `${item.id}-${index}`}
 					onChange={this.onChange.bind(this)}
 					pagination={pagination} />

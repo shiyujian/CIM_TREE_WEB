@@ -12,7 +12,7 @@ export default class GeneralTable extends Component {
 			<Table rowSelection={this.rowSelection}
 				dataSource={Doc}
 				columns={this.columns}
-				className='foresttable'
+				className='foresttables'
 				bordered rowKey="code" />
 		);
 	}

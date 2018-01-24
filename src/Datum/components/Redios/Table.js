@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Table, Spin, message, Modal } from 'antd';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
-import './index.less';
+import '../Datum/index.less';
 export default class GeneralTable extends Component {
 	constructor(props) {
 		super(props);
@@ -18,7 +18,7 @@ export default class GeneralTable extends Component {
 			<Table rowSelection={this.rowSelection}
 				dataSource={Doc}
 				columns={this.columns}
-				className='foresttable'
+				className='foresttables'
 				bordered rowKey="code" />
 		);
 	}
@@ -38,22 +38,22 @@ export default class GeneralTable extends Component {
 			title: '名称',
 			dataIndex: 'name',
 			key: 'name',
-			// sorter: (a, b) => a.name.length - b.name.length
+			sorter: (a, b) => a.name.length - b.name.length
 		}, {
 			title: '编号',
 			dataIndex: 'extra_params.number',
 			key: 'extra_params.number',
-			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
+			sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
 		}, {
 			title: '发布单位',
 			dataIndex: 'extra_params.company',
 			key: 'extra_params.company',
-			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
+			sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
 			title: '实施日期',
 			dataIndex: 'extra_params.time',
 			key: 'extra_params.time',
-			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
+			sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
 		}, {
 			title: '备注',
 			dataIndex: 'extra_params.remark',

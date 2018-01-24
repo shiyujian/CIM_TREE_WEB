@@ -159,7 +159,7 @@ export default class LeaveTable extends Component {
 					<Row>
 						<Table 
 							bordered = {true}
-							className = 'foresttable'
+							className = 'foresttables'
 							columns = {columns}
 							rowKey = 'order'
 							loading = {{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}

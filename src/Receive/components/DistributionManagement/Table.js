@@ -7,12 +7,17 @@ export const Acccode = window.DeathCode.SYSTEM_ACC;
 export default class Tablelevel extends Component {
 
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		const { newdocumentlist = [] } = this.props;
 
 		return (
 			<Table dataSource={newdocumentlist}
-				className='foresttable'
+				className='foresttablel'
 				columns={this.columns}
+				rowSelection={rowSelection}
 				bordered rowKey="code" />
 
 		);

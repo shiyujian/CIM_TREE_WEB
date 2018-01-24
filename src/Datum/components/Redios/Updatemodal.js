@@ -7,7 +7,7 @@ import {
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 const Dragger = Upload.Dragger;
-const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
+let fileTypes = 'application/mp4,application/3gpp,application/wmv,video/mp4,video/ogg,video/webm';
 
 export default class Addition extends Component {
 
@@ -32,7 +32,7 @@ export default class Addition extends Component {
                     <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
         let footer = isUploading ? null : arr;
         return (
-            <Modal title="新增资料"
+            <Modal title="更新文件"
                    width={920} visible={updatevisible}
                    closable={false}
                    footer={footer}
@@ -48,8 +48,7 @@ export default class Addition extends Component {
                                 </p>
                                 <p className="ant-upload-text">点击或者拖拽开始上传</p>
                                 <p className="ant-upload-hint">
-                                    支持 pdf、doc、docx 文件
-                                </p>
+                                支持mp4、ogg、webm视频</p>
                             </Dragger>
                             <Progress percent={progress} strokeWidth={5}/>
                         </Col>

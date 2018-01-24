@@ -61,7 +61,7 @@ export default class Stagereporttab extends Component {
 		];
 		const columns = [
 			{
-				title:'3单位工程',
+				title:'1单位工程',
 				dataIndex:'gongcheng',
 				key: 'gongcheng',
 				width: '15%'
