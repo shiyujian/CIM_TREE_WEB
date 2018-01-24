@@ -17,7 +17,9 @@ import {SMUrl_template11} from '_platform/api';
 import EditableCell from '../components/EditableCell';
 import EditableCheckbox from '../components/EditableCheckbox';
 import queryString from 'query-string';
-import Stagereporttab from '../components/stagereport/stagereporttab'
+import Stagereporttab from '../components/stagereport/stagereporttab';
+import All from '../components/stagereport/all';
+import Plan from '../components/stagereport/plan';
 import {PkCodeTree, Cards} from '../components';
 import {actions as platformActions} from '_platform/store/global';
 import * as actions from '../store/entry';
@@ -161,10 +163,10 @@ class Stage extends Component {
 					<div>
 					<Tabs>
 					<TabPane tab="总计划进度" key="1">
-					   <Stagereporttab{...this.props}/>
+					   <All{...this.props}/>
 					</TabPane>
 					<TabPane tab="每日计划进度" key="2">
-						<Stagereporttab{...this.props}/>
+						<Plan{...this.props}/>
 					</TabPane>
 					<TabPane tab="每日实际进度" key="3">
 					    <Stagereporttab{...this.props}/>
