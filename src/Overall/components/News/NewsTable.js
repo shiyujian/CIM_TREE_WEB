@@ -8,6 +8,7 @@ import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
 import { base, SOURCE_API } from '../../../_platform/api';
 // import { Icon } from './C:/Users/ecidi/AppData/Local/Microsoft/TypeScript/2.6/node_modules/@types/react-fa';
+import '../../../Datum/components/Datum/index.less'
 import E from 'wangeditor'
 
 let editor;
@@ -115,7 +116,7 @@ class NewsTable extends Component {
 	}
 
 
-	
+
 
 	handleCancel() {
 		this.setState({
@@ -187,7 +188,7 @@ class NewsTable extends Component {
 		})
 	}
 	publishNewsClick(record) {
-		const {actions: {toggleModal}} = this.props;
+		const { actions: { toggleModal } } = this.props;
 		toggleModal({
 			type: 'NEWS',
 			status: 'ADD',
@@ -262,14 +263,14 @@ class NewsTable extends Component {
 								<Col span={18}>
 									<Row>
 										<Col span={8} >
-											<FormItem {...formItemLayout} label="主题">
+											<FormItem {...formItemLayout} label="名称">
 												{
 													getFieldDecorator('theme', {
 														rules: [
-															{ required: false, message: '请输入主题' },
+															{ required: false, message: '请输入名称' },
 														]
 													})
-														(<Input placeholder="请输入主题" />)
+														(<Input placeholder="请输入名称" />)
 												}
 											</FormItem>
 										</Col>
@@ -320,23 +321,25 @@ class NewsTable extends Component {
 										</Col>
 									</Row>
 									<Row>
-										
+
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
 								</Col>
 								<Col span={2} >
-									<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
+									<Button icon='reload' onClick={this.clear.bind(this)}>清空</Button>
 								</Col>
 							</Row>
 
 							<Table
-							
-								rowSelection={rowSelection}
+
+
 								dataSource={newsList}
 								columns={this.columns}
 								title={() => '新闻查询'}
+								className="foresttables"
+								rowSelection={rowSelection}
 								bordered
 								rowKey="id" />
 						</TabPane>
@@ -348,14 +351,14 @@ class NewsTable extends Component {
 								<Col span={18}>
 									<Row>
 										<Col span={8} >
-											<FormItem {...formItemLayout} label="主题">
+											<FormItem {...formItemLayout} label="名称">
 												{
 													getFieldDecorator('title1', {
 														rules: [
-															{ required: false, message: '请输入主题' },
+															{ required: false, message: '请输入名称' },
 														]
 													})
-														(<Input placeholder="请输入主题" />)
+														(<Input placeholder="请输入名称" />)
 												}
 											</FormItem>
 										</Col>
@@ -369,7 +372,7 @@ class NewsTable extends Component {
 														]
 													})
 														(<RangePicker
-															style={{ verticalAlign: "middle" }}
+															style={{ verticalAlign: "middle", width: '100%' }}
 															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
 															showTime={{ format: 'HH:mm:ss' }}
 															format={'YYYY/MM/DD HH:mm:ss'}
@@ -404,22 +407,23 @@ class NewsTable extends Component {
 											</FormItem>
 
 										</Col>
-									
-										
+
+
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
 								</Col>
 								<Col span={2}>
-									<Button  icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
+									<Button icon='reload' onClick={this.clear1.bind(this)}>清空</Button>
 								</Col>
 							</Row>
 							<Table dataSource={draftNewsLis}
-								
+
 								rowSelection={rowSelection}
-								title={() => '新闻查询'}
+								title={() => '暂存的查询'}
 								columns={this.draftColumns}
+								className="foresttables"
 								bordered
 								rowKey="id" />
 						</TabPane>
@@ -447,11 +451,11 @@ class NewsTable extends Component {
 
 	columns = [
 		{
-			title: '新闻ID',
+			title: '新闻查询ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '主题',
+			title: '名称',
 			dataIndex: 'title',
 			key: 'title',
 		}, {
@@ -495,11 +499,11 @@ class NewsTable extends Component {
 	];
 	draftColumns = [
 		{
-			title: '新闻ID',
+			title: '暂存新闻ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '主题',
+			title: '名称',
 			dataIndex: 'title',
 			key: 'title',
 		}, {

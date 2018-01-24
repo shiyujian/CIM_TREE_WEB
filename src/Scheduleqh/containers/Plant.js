@@ -42,8 +42,15 @@ export default class Scheduleanalyze extends Component {
     }
 
     componentDidMount () {
-        const {actions: {getTree,getTreeList}} = this.props;
+         // const {actions: {getTree}} = this.props;
+          
 
+        const {actions: {getTree,getTreeList}} = this.props;
+           getTree()
+            .then(rst => {
+                this.setSectionOption(rst);
+                this.setSmallClassOption(rst);
+            });
         //地块树
          try {
             getTree({},{parent:'root'})
@@ -131,31 +138,132 @@ export default class Scheduleanalyze extends Component {
         );
     }
     //标段选择, 重新获取: 小班、细班、树种
-    sectionselect(value) {
-        const {actions:{setkeycode,getTreeList}} = this.props;
+    // sectionselect(value) {
+
+    //     const {actions:{setkeycode,getTreeList}} = this.props;
+    //     const {leftkeycode} = this.state;
+    //     this.setState({section:value})
+    //     //小班
+    //     getTreeList({},{field:'smallclass',no:leftkeycode,section:value,paginate:false})
+    //     .then(rst => {
+    //         if(rst instanceof Array){
+    //             let smallName;
+    //             let smallNameArr = Array();
+    //             if(rst instanceof Array){
+    //                 debugger;
+    //                 let smallclassoption = rst.map(item => {
+    //                     console.log(11111,item);
+
+    //                     let smallclassName = item.attrs.name;
+    //                     // smallName = smallclassName.replace("号小班","");
+    //                     smallName = smallclassName
+    //                     if (smallName < 100) {
+    //                         smallName = "0" + smallName;
+    //                     }
+    //                     if (smallName < 10) {
+    //                         smallName = "00" + smallName;
+    //                     }
+    //                     smallNameArr.push(smallName);
+    //                     return <Option key={smallName} value={smallName}>{smallName}</Option>
+    //                 })
+    //                 console.log("smallNameArr",smallNameArr[0]);
+    //                 this.setState({smallclassoption, smallclass:smallNameArr[0]})
+    //             }
+    //         }
+    //     })
+    // }
+
+    //标段选择, 重新获取: 小班、细班、树种
+    sectionselect(value,treety) {
+        const {actions:{setkeycode, getTreeList, getTree}} =this.props;
         const {leftkeycode} = this.state;
-        this.setState({section:value})
+        setkeycode(leftkeycode)
         //小班
-        getTreeList({},{field:'smallclass',no:leftkeycode,section:value,paginate:false})
+        getTree({},{parent:leftkeycode})
         .then(rst => {
-            if(rst instanceof Array){
-                let smallName;
-                let smallNameArr = Array();
-                if(rst instanceof Array){
-                    let smallclassoption = rst.map(item => {
-                        let smallclassName = item.attrs.name;
-                        smallName = smallclassName.replace("号小班","");
-                        if (smallName < 100) {
-                            smallName = "0" + smallName;
+            console.log(rst,"dwa")
+            let smallclasses = [];
+            rst.map((item, index) => {
+                if(rst[index].Section == value) {
+                    let smallclassName = rst[index].Name.replace("号小班","");
+                     if (smallclassName < 100) {
+                            smallclassName = "0" + smallclassName;
                         }
-                        smallNameArr.push(smallName);
-                        return <Option key={smallName} value={smallName}>{smallName}</Option>
-                    })
-                    console.log("smallNameArr",smallNameArr[0]);
-                    this.setState({smallclassoption, smallclass:smallNameArr[0]})
+                        // if (smallclassName < 10) {
+                        //     smallclassName = "00" + smallclassName;
+                        // }
+                    let smallname = {
+                        Name: smallclassName,
+                    }
+                    smallclasses.push(smallname)
                 }
-            }
+            })
+            this.setSmallClassOption(smallclasses)
         })
+        //细班
+        // getTree({},{parent:leftkeycode})
+        // .then((rst, index) => {
+        //     let thin = [];
+        //     let promises = rst.map(item => {
+        //         return getTree({}, {parent: item.No})
+        //     })
+        //     Promise.all(promises).then(rest => {
+        //         rest.map(items => {
+        //             items.map(i => {
+        //                 thin.push(i);
+        //             })
+        //         })
+        //         this.setThinClassOption(thin)
+        //     })
+        // })
+        // //树种
+        // getTreeList()
+        // .then(rst => {
+        //     this.setTreeTypeOption(rst)
+        // })
+    }
+
+
+    //设置标段选项
+    setSectionOption(rst){
+        if(rst instanceof Array){
+            let sectionList = [];
+            let sectionOptions = [];
+            let sectionoption = rst.map((item, index) => {
+                if(item.Section) {
+                    let sections = item.Section;
+                    sectionList.push(sections);
+                }
+            })
+            let sectionData = [...new Set(sectionList)];
+            sectionData.sort();
+            sectionData.map(sec => {
+                sectionOptions.push(<Option key={sec} value={sec}>{sec}</Option>)
+            })
+            // sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            this.setState({sectionoption: sectionOptions})
+        }
+    }
+
+    //设置小班选项
+    setSmallClassOption(rst){
+        if(rst instanceof Array){
+            let smallclassList = [];
+            let smallclassOptions = [];
+            let smallclassoption = rst.map(item => {
+                if(item.Name) {
+                    let smalls = item.Name;
+                    smallclassList.push(smalls);
+                }
+            })
+            let smallclassData = [...new Set(smallclassList)];
+            smallclassData.sort();
+            smallclassData.map(small => {
+                smallclassOptions.push(<Option key={small} value={small}>{small}</Option>)
+            })
+            // smallclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            this.setState({smallclassoption: smallclassOptions})
+        }
     }
      //树选择
     onSelect(value = []) {

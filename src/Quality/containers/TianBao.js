@@ -20,6 +20,8 @@ import WorkflowHistory from '../components/WorkflowHistory';
 import {STATIC_DOWNLOAD_API,USER_API, SERVICE_API, WORKFLOW_API,JYPMOD_API,UPLOADFILE_API,DOWNLOAD_FILE,PDF_FILE_API} from '_platform/api';
 import {getUser} from '_platform/auth'
 import moment from 'moment'
+import '../../Datum/components/Datum/index.less'
+
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
@@ -551,6 +553,10 @@ async  tianbao(jianyanpi,p2){
         this.setState({tianbaoing:false,buchonging:false});
     }
     render() {
+        const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
         const { table: { editing = false } = {} } = this.props;
        //this.state.jianyanpis
        //this.columns
@@ -646,6 +652,8 @@ async  tianbao(jianyanpi,p2){
                             <Table
                                 className='huafenTable'
                                 dataSource={ds}
+                                className="foresttables"
+                                bordered
                                 columns={columns}
                             />
                         </div>

@@ -8,3 +8,4 @@ export Dispatch from './Dispatch';
 export Approval from './Approval';
 export Receipt from './Receipt';
 export Material from './Material';
+export FormManage from './FormManage';

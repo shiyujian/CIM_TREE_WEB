@@ -17,7 +17,7 @@ export default class Overall extends Component {
 	}
 
 	render() {
-		const {Package, News, News1, Attend, Dispatch,Material,Form, Approval,Receipt} = this.state || {};
+		const {Package, News, News1, Attend, Dispatch,Material,FormManage, Approval,Receipt} = this.state || {};
 		return (
 			<Body>
 			<Aside>
@@ -29,7 +29,7 @@ export default class Overall extends Component {
 				{/* {News1 && <Route path="/overall/news1" component={News1}/>} */}
 				{Receipt && <Route path="/overall/receipt" component={Receipt}/>}
 				{Material && <Route path="/overall/material" component={Material}/>}
-				{Form && <Route path="/overall/form" component={Form}/>}
+				{FormManage && <Route path="/overall/formmanage" component={FormManage}/>}
 				{/* {Receipt && <Route path="/overall/receipt" component={Receipt}/>} */}
 				{Dispatch && <Route path="/overall/dispatch" component={Dispatch}/>}
 				{Attend && <Route path="/overall/attend" component={Attend}/>}
@@ -60,7 +60,7 @@ export default class Overall extends Component {
 	},{
 		key: 'form',
 		id: 'MANAGE.FORM',
-		path: '/overall/form',
+		path: '/overall/formmanage',
 		name: '表单管理',
 		icon: <Icon name="file-text"/>,
 	},
