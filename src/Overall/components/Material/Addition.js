@@ -10,15 +10,18 @@ import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
+const EditableCell = ({ editable, value, onChange }) => (
+          <div>
+            {editable
+              ? <Input style={{ margin: '-5px 0' }} value={value} onChange={e => onChange(e.target.value)} />
+              : value
+            }
+          </div>
+        );
 
 export default class Addition extends Component {
 
     static propTypes = {};
-
-    // static layout = {
-    //     labelCol: {span: 8},
-    //     wrapperCol: {span: 16}
-    // };
     state={
         progress:0,
         isUploading: false,
@@ -39,6 +42,7 @@ export default class Addition extends Component {
         let {progress,isUploading,engineerName,engineerNumber,engineerApprove,dataSource,count,
              equipName,equipNumber
             } = this.state;
+        let cacheData=this.state.dataSource.map(item => ({ ...item }));
         let arr = [ 
             <Row gutter={24}>
                 <Col span={12}>
@@ -125,7 +129,7 @@ export default class Addition extends Component {
                     <Row gutter={24}>
                         <Col span={24}>
                             <Table  rowSelection={this.rowSelectionAdd}
-                                    dataSource={dataSource}
+                                    dataSource={this.state.dataSource}
                                     columns={this.equipment}
                                     pagination={false}
                                     bordered rowKey="code" />
@@ -238,65 +242,64 @@ export default class Addition extends Component {
             title: '设备名称',
             dataIndex: 'extra_params.equipName',
             key: 'extra_params.equipName',
-            render:() => {
-                return <Input onChange={(event)=>{
-                                event=(event)?event:window.event;
-                                const {
-                                    docs = [],
-                                    actions: {changeDocs}
-                                } = this.props;
-                                this.state.equipName = event.target.value;
-                                changeDocs(docs);
-                            }}
-                        />;
-            }
+            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipName'),
+            // render:() => {
+            //     return <Input onChange={(event)=>{
+            //                     event=(event)?event:window.event;
+            //                     const {
+            //                         docs = [],
+            //                         actions: {changeDocs}
+            //                     } = this.props;
+            //                     this.state.equipName = event.target.value;
+            //                     changeDocs(docs);
+            //                 }}
+            //             />;
+            // }
         }, {
             title: '规格型号',
             dataIndex: 'extra_params.equipNumber',
             key: 'extra_params.equipNumber',
-            render:() => {
-                return <Input onChange={(event)=>{
-                                event=(event)?event:window.event;
-                                const {
-                                    docs = [],
-                                    actions: {changeDocs}
-                                } = this.props;
-                                this.state.equipNumber = event.target.value;
-                                changeDocs(docs);
-                            }}
-                        />;
-            }
+            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipNumber'),
         }, {
             title: '数量',
             dataIndex: 'extra_params.equipCount',
             key: 'extra_params.equipCount',
-            render:(doc) => {
-                return <Input onChange={this.equipCount.bind(this, doc)}/>;
-            }
+            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipCount'),
         }, {
             title: '进场日期',
             dataIndex: 'extra_params.equipTime',
             key: 'extra_params.equipTime',
-            render:(doc) => {
-                return <Input onChange={this.equipTime.bind(this, doc)}/>;
-            }
+            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipTime'),
         }, {
             title: '技术状况',
             dataIndex: 'extra_params.equipMoment',
             key: 'extra_params.equipMoment',
-            render:(doc) => {
-                return <Input onChange={this.equipMoment.bind(this, doc)}/>;
-            }
+            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipMoment'),
         },{
             title: '备注',
             dataIndex: 'extra_params.equipRemark',
             key: 'extra_params.equipRemark',
-            render:(doc) => {
-                return <Input onChange={this.equipRemark.bind(this, doc)}/>;
-            }
+            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipRemark')
+        }, {
+          title: '操作',
+          dataIndex: 'extra_params.equipOperation',
+          render: (text, record) => {
+            const { editable } = record;
+            return (
+              <div>
+                    <span>
+                      <a style={{marginRight:'10'}}onClick={() => this.saveTable(record.key)}>
+                        <Icon type='save' style={{fontSize:20}}/>
+                      </a>
+                      <a onClick={() => this.edit(record.key)}>
+                        <Icon type='edit' style={{fontSize:20}}/>
+                      </a>
+                    </span>
+              </div>
+            );
+          }
         }
-
-    ]
+    ];
     docCols = [
         {
             title:'名称',
@@ -321,8 +324,8 @@ export default class Addition extends Component {
         const {count,dataSource } = this.state;
         const newData = {
           key:count,
-          equipName:this.state.equipName,
-          equipNumber:this.state.equipNumber,
+          // equipName:this.state.equipName,
+          // equipNumber:this.state.equipNumber,
         };
         console.log('newDate',newData)
         this.setState({
@@ -331,58 +334,101 @@ export default class Addition extends Component {
         });
         console.log('dataSource',dataSource)
     }
-    onDelete(key){
+    onDelete(){
+        const { selected } = this.props;
+        console.log('selected',selected)
         const dataSource = [...this.state.dataSource];
-        this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
+        selected.map(rst => {
+            this.setState({ dataSource: dataSource.filter(item => item.key !== rst.key) });
+        });
     }
-    equipName(event){
-       const {
+    renderColumns(text, record, column) {
+        return (
+          <EditableCell
+            editable={record.editable}
+            value={text}
+            onChange={value => this.handleChange(value, record.key, column)}
+          />
+        );
+    }
+    handleChange(value, key, column) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target[column] = value;
+          this.setState({ dataSource: newData });
+        }
+    }
+    edit(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        const {
             docs = [],
             actions: {changeDocs}
         } = this.props;
-        this.state.equipName = event.target.value;
-        changeDocs(docs); 
+        changeDocs(docs);
+        if (target) {
+          target.editable = true;
+          this.setState({ dataSource: newData });
+        }
     }
-    equipNumber(doc, event){
-       const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.equipNumber = event.target.value;
-        changeDocs(docs); 
+    saveTable(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target.editable = false;
+          this.setState({dataSource: newData });
+          this.cacheData = newData.map(item => ({ ...item }));
+        }
     }
-    equipCount(doc, event){
-       const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.equipCount = event.target.value;
-        changeDocs(docs); 
-    }
-    equipTime(doc, event){
-       const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.equipTime = event.target.value;
-        changeDocs(docs); 
-    }
-    equipMoment(doc, event){
-       const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.equipMoment = event.target.value;
-        changeDocs(docs); 
-    }
-    equipRemark(doc, event){
-       const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.equipRemark = event.target.value;
-        changeDocs(docs); 
-    }
+    // equipName(event){
+    //    const {
+    //         docs = [],
+    //         actions: {changeDocs}
+    //     } = this.props;
+    //     this.state.equipName = event.target.value;
+    //     changeDocs(docs); 
+    // }
+    // equipNumber(doc, event){
+    //    const {
+    //         docs = [],
+    //         actions: {changeDocs}
+    //     } = this.props;
+    //     doc.equipNumber = event.target.value;
+    //     changeDocs(docs); 
+    // }
+    // equipCount(doc, event){
+    //    const {
+    //         docs = [],
+    //         actions: {changeDocs}
+    //     } = this.props;
+    //     doc.equipCount = event.target.value;
+    //     changeDocs(docs); 
+    // }
+    // equipTime(doc, event){
+    //    const {
+    //         docs = [],
+    //         actions: {changeDocs}
+    //     } = this.props;
+    //     doc.equipTime = event.target.value;
+    //     changeDocs(docs); 
+    // }
+    // equipMoment(doc, event){
+    //    const {
+    //         docs = [],
+    //         actions: {changeDocs}
+    //     } = this.props;
+    //     doc.equipMoment = event.target.value;
+    //     changeDocs(docs); 
+    // }
+    // equipRemark(doc, event){
+    //    const {
+    //         docs = [],
+    //         actions: {changeDocs}
+    //     } = this.props;
+    //     doc.equipRemark = event.target.value;
+    //     changeDocs(docs); 
+    // }
     remark(doc, event) {
         const {
             docs = [],
@@ -416,7 +462,9 @@ export default class Addition extends Component {
             doc.engineer=this.state.engineerName;
             doc.number=this.state.engineerNumber;
             doc.approve=this.state.engineerApprove;
-            doc.equipName=this.state.equipName;
+            // doc.equipName=this.state.equipName;
+            doc.student=this.state.dataSource;
+            console.log('doc.student',this.state.dataSource);
             return postDocument({}, {
                 code: `${currentcode.code}_${response.id}`,
                 name: doc.name,
@@ -439,12 +487,12 @@ export default class Addition extends Component {
                     lasttime: doc.lastModifiedDate,
                     style: '机械设备',
                     submitTime: moment.utc().format(),
-                    equipName:doc.equipName,
-                    equipNumber:doc.equipNumber,
-                    equipMoment:doc.equipMoment,
-                    equipCount:doc.equipCount,
-                    equipTime:doc.equipTime,
-                    equipRemark:doc.equipRemark
+                    // equipName:doc.equipName,
+                    // equipNumber:doc.equipNumber,
+                    // equipMoment:doc.equipMoment,
+                    // equipCount:doc.equipCount,
+                    // equipTime:doc.equipTime,
+                    // equipRemark:doc.equipRemark
                 },
             });
         });

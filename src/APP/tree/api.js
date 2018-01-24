@@ -8,7 +8,7 @@
 */
 import React from 'react';
 import {Icon} from 'react-fa';
-import headLogo from './logo_head.png';
+import headLogo from './LOGO.png';
 
 export const tree_headLogo = headLogo;
 

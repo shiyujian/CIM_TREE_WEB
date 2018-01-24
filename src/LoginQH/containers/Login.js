@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as actions from '../store/login';
-import {Form, Icon, Input, Button, Checkbox, message, notification, Radio,Tooltip} from 'antd';
+import {Row,Col,Select,Form, Icon, Input, Button, Checkbox, message, notification, Radio,Tooltip} from 'antd';
 import {setUser, clearUser, setPermissions, removePermissions} from '../../_platform/auth';
 import QRCode from '../components/QRCode';
 import {base,QRCODE_API} from '_platform/api';
@@ -149,6 +149,8 @@ class Login extends Component {
 		}=this.state
 		// const loginTitle = require('../../_layouts/logo.png');
 		const loginTitle = require('./images/logo1.png');
+		const docDescibe = require('./images/doc.png');
+		const hello = require('./images/hello.png');
 		const appImg=require('./images/app.png');
 		const pwdType = this.state.isPwd ? 'password' : 'text';
 		/// 密码输入框类型改变时图标变化
@@ -166,105 +168,134 @@ class Login extends Component {
 
 		return (
 			<div className="login-wrap">
-				<div className="img-box">
-					<a className="login-title"><img src={loginTitle}/></a>
-				</div>
-				<div className="loginState-box">
-					<RadioGroup  className="radio" onChange={this.loginChange.bind(this)} defaultValue="account" style={{width:'100%'}}>
-						<RadioButton value="account">账号登录</RadioButton>
-						<RadioButton value="code">扫码登录</RadioButton>
-					</RadioGroup>
-				</div>
-				{	
-					loginState? !forgectState?
-						<div className="main-box">
-							<Form onSubmit={this.handleSubmit.bind(this)}
-								className='login-form' id="loginForm">
-								<FormItem>
-									{getFieldDecorator('username', {
-										rules: [{required: true, message: '请输入用户名'}],
-									})(
-										<Input addonBefore={<Icon type="user"/>} id="username"
-											placeholder="请输入用户名"/>,
-									)}
-								</FormItem>
-								<FormItem>
-									{getFieldDecorator('password', {
-										rules: [{required: true, message: '请输入密码'}],
-									})(
-										<div>
-											<Input addonBefore={<Icon type="lock"/>}
-												id='pwdInp' type={pwdType}
-												placeholder="请输入密码"/>
-											<a className="btn-change-type"
-											style={{backgroundImage: `url(${chgTypeImg})`}}
-											onClick={this.handleClick.bind(
-												this)}/>
-										</div>,
-									)}
-								</FormItem>
-								<FormItem>
-									{getFieldDecorator('remember', {
-										valuePropName: 'checked',
-										initialValue: false,
-									})(
-										<div>
-										<Checkbox onChange={this.loginRememberChange.bind(this)}>记住密码</Checkbox>
-										<span className="forgetPassword" onClick={this.ForgetPassword.bind(this)}>忘记密码</span>
-										</div>	
-									)}
-								</FormItem>
-								<Button type="primary" htmlType="submit"
-										className="login-form-button">登录</Button>
-							</Form>
-						</div>: 
-							<div className="main-box">
-							<h1 style ={{textAlign:'center',marginBottom:10,marginTop:20,color:'red'}}></h1>
-							<Form onSubmit={this.sureSubmit.bind(this)}
-								className='login-form' id="loginForm">
-								<FormItem>
-									{getFieldDecorator('nickname', {
-										rules: [{required: true, message: '请输入用户名'}],
-									})(
-										<Input addonBefore={<Icon type="user"/>} id="nickname"
-											placeholder="请输入用户名"/>,
-									)}
-								</FormItem>
-		
-								<FormItem>
-									{getFieldDecorator('phone', {
-										rules: [{required: true, message: '请输入手机号'}],
-									})(
-										<div>
-											<Input addonBefore={<Icon type="mobile"/>}
-												id='phoneNumber' 
-												placeholder="请输入手机号"
-												/>
-										</div>,
-									)}
-								</FormItem>
-								<Button type="primary"  onClick={this.cancel.bind(this)} style={{width:'44%',height:'45px',marginTop:50,marginLeft:10,fontSize:18}}>返回</Button>	
-								<Button type="primary" htmlType="submit" style={{width:'44%',height:'45px',marginTop:50,marginLeft:30,fontSize:18}}>确定</Button>
-							</Form>
-							
-						</div>:
-						 appDownload?<div className="imgbox">
-							             <a className="Imgtitle"><img src={appImg}/></a>
-										 <p onClick={this.backLogin.bind(this)} style={{fontSize:16,color:'white',marginTop:'10',color:'red',cursor:'pointer',textDecoration:'underline',textAlign:'center'}}>返回扫码登录</p>
-							         </div>:
-									 <div className="picture-box">
-										<QRCode {...this.props}
-										size={size}
-										level={level}
-										bgColor={bgColor}
-										fgColor={fgColor}
-										value={QRUrl}/>
-										<p style={{fontSize:16,color:'white',marginTop:'10'}}>请打开移动端"扫一扫"</p>
-										<p style={{fontSize:16,color:'white',marginTop:'10'}}>还没有移动端?<span onClick={this.nowDownload.bind(this)} style={{fontSize:16,color:'red',marginTop:'10',textDecoration:'underline',cursor:'pointer' }}>立即下载</span></p>
-									 </div>
-				}
-			
-			</div>
+				<Row>
+					<Col span={4}>
+                    </Col>
+                    <Col span={4} style={{marginTop:'50'}}>
+                    	<div style={{width:'300'}} >
+							<a className="login-title"><img src={loginTitle}/></a>
+						</div>
+                    </Col>
+                    <Col span={11}>
+                    </Col>
+                    <Col span={4} style={{marginTop:'100'}}>
+                    	<div style={{width:'300'}} >
+							<a className="login-title"><img src={hello}/></a>
+						</div>
+                    </Col>
+                </Row>
+                <Row style={{height:'60%'}}>
+					<Col span={5}>
+                    </Col>
+                    <Col span={10}>
+                    	<div >
+							<img style={{width:"100%",height:'100%'}}src={docDescibe}/>
+						</div>
+                    </Col>
+                    <Col span={6} style={{height:'100%'}}>
+                    	{	
+							loginState? !forgectState?
+
+								<div className="main-box" >
+									<Form onSubmit={this.handleSubmit.bind(this)}
+										className='login-form' id="loginForm">
+										<div style={{padding:'40'}}>
+											<p style={{fontSize:'25',color:'#108EE9',textAlign:'center'}}>深林大数据建设管理平台</p>
+											<FormItem  style={{marginTop:'10%'}}>
+			                                     <Select  placeholder="项目选择">
+			                                          <Option value='二'>二</Option>
+			                                          <Option value='一'>一</Option>
+			                                     </Select>
+		                                    </FormItem>
+											<FormItem style={{marginTop:'10%'}}>
+												{getFieldDecorator('username', {
+													rules: [{required: true, message: '请输入用户名'}],
+												})(
+													<Input id="username"
+														placeholder="用户名/手机号"/>,
+												)}
+											</FormItem>
+											<FormItem style={{marginTop:'10%'}}>
+												{getFieldDecorator('password', {
+													rules: [{required: true, message: '请输入密码'}],
+												})(
+													<div>
+														<Input 
+															id='pwdInp' type={pwdType}
+															placeholder="密码"/>
+														<a className="btn-change-type"
+														style={{backgroundImage: `url(${chgTypeImg})`}}
+														onClick={this.handleClick.bind(
+															this)}/>
+													</div>,
+												)}
+											</FormItem>
+											<FormItem style={{marginTop:'10%'}}>
+												{getFieldDecorator('remember', {
+													valuePropName: 'checked',
+													initialValue: false,
+												})(
+													<div>
+													<Checkbox  style={{color:'gray',marginLeft:'10'}} onChange={this.loginRememberChange.bind(this)}>记住密码</Checkbox>
+													<span className="forgetPassword" onClick={this.ForgetPassword.bind(this)}>忘记密码</span>
+													</div>	
+												)}
+											</FormItem>
+											<Button type="primary" htmlType="submit"
+													className="login-form-button">登录</Button>
+										</div>
+									</Form>
+								</div>: 
+									<div className="main-box">
+									<h1 style ={{textAlign:'center',marginBottom:10,marginTop:20,color:'red'}}></h1>
+										<Form onSubmit={this.sureSubmit.bind(this)}
+											className='login-form' id="loginForm">
+											<div style={{padding:'40'}}>
+												<FormItem style={{marginTop:'40'}}>
+													{getFieldDecorator('nickname', {
+														rules: [{required: true, message: '请输入用户名'}],
+													})(
+														<Input  id="nickname"
+															placeholder="请输入用户名"/>,
+													)}
+												</FormItem>
+						
+												<FormItem style={{marginTop:'30'}}>
+													{getFieldDecorator('phone', {
+														rules: [{required: true, message: '请输入手机号'}],
+													})(
+														<div>
+															<Input 
+																id='phoneNumber' 
+																placeholder="请输入手机号"
+																/>
+														</div>,
+													)}
+												</FormItem>
+												<Button type="primary"  onClick={this.cancel.bind(this)} style={{width:'35%',height:'45px',marginTop:50,marginLeft:30,fontSize:18}}>返回</Button>	
+												<Button type="primary" htmlType="submit" style={{width:'35%',height:'45px',marginTop:50,marginLeft:30,fontSize:18}}>确定</Button>
+											</div>
+										</Form>
+									
+								</div>:
+								 appDownload?<div className="imgbox">
+									             <a className="Imgtitle"><img src={appImg}/></a>
+												 <p onClick={this.backLogin.bind(this)} style={{fontSize:16,color:'white',marginTop:'10',color:'red',cursor:'pointer',textDecoration:'underline',textAlign:'center'}}>返回扫码登录</p>
+									         </div>:
+											 <div className="picture-box">
+												<QRCode {...this.props}
+												size={size}
+												level={level}
+												bgColor={bgColor}
+												fgColor={fgColor}
+												value={QRUrl}/>
+												<p style={{fontSize:16,color:'white',marginTop:'10'}}>请打开移动端"扫一扫"</p>
+												<p style={{fontSize:16,color:'white',marginTop:'10'}}>还没有移动端?<span onClick={this.nowDownload.bind(this)} style={{fontSize:16,color:'red',marginTop:'10',textDecoration:'underline',cursor:'pointer' }}>立即下载</span></p>
+											 </div>
+						}
+                    </Col>
+                </Row>
+            </div>			
 		);
 	}
 
