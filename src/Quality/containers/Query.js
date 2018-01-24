@@ -13,6 +13,8 @@ import QualityTree from '../components/QualityTree'
 import './common.less';
 import WorkflowHistory from '../components/WorkflowHistory.js';
 import {USER_API, SERVICE_API, WORKFLOW_API,JYPMOD_API,UPLOADFILE_API,SOURCE_API,STATIC_DOWNLOAD_API,} from '_platform/api';
+import '../../Datum/components/Datum/index.less'
+
 const FormItem = Form.Item
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
@@ -429,6 +431,10 @@ export default class Query extends Component {
 		}
 	}
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		const {table: {editing = false} = {}} = this.props;
 		let columns = this.columns_all[this.state.checkObj];
 		let ds = this.state.checkType === 'checked' ? this.state.checked : this.state.unchecked;
@@ -486,7 +492,13 @@ export default class Query extends Component {
                             </RadioGroup>
                         </div>
                         <div className = 'flexBox'>
-                            <Table dataSource={ds} style = {{width:'100%'}} columns ={ columns } />
+							<Table dataSource={ds} 
+							rowSelection={rowSelection}
+							style = {{width:'100%'}} 
+							columns ={ columns } 
+							className="foresttables"
+							bordered
+							/>
                         </div>
 					</Spin>
 					{
