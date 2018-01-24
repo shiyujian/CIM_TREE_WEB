@@ -15,16 +15,16 @@ export default class ScheduleTable extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            section: '',
-            smallclass: '',
+            section: '1标段',
+            smallclass: '001',
             leftkeycode: '',
             amount: '',
             today: '',
             plan_amount: '',
             pers: '',
             score: '',
-            stime1: moment().format('YYYY-MM-DD HH:mm:ss'),
-            etime1: moment().format('YYYY-MM-DD HH:mm:ss'),
+            stime1: moment().format('2017-11-10 00:00:00'),
+            etime1: moment().format('2017-11-30 00:00:00'),
             etime2: moment().format('YYYY-MM-DD HH:mm:ss'),
             etime3: moment().format('YYYY-MM-DD HH:mm:ss'),
             etime4: moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -41,23 +41,25 @@ export default class ScheduleTable extends Component {
         }
     }
     componentWillReceiveProps(nextProps){
+        console.log(this.state,"wojiucaole");
+        console.log(nextProps,"ksajdlahdk");
         if(nextProps.section != this.state.section && nextProps.leftkeycode != '') {
             this.setState({
-                section: nextProps.section,
+                section: this.state.section,
             }, () => {
                 this.datepickok(3);
             })
         }
         if(nextProps.smallclass != this.state.smallclass && nextProps.leftkeycode != ''){
             this.setState({
-                smallclass:nextProps.smallclass
+                smallclass:this.state.smallclass
             }, () => {
                 this.datepickok(4);
             })
         } 
         if(nextProps.leftkeycode != this.state.leftkeycode) {
             this.setState({
-                leftkeycode:nextProps.leftkeycode
+                leftkeycode:this.state.leftkeycode
             }, () => {
                 this.datepickok(1);
                 this.datepickok(2);
@@ -404,18 +406,20 @@ export default class ScheduleTable extends Component {
         const {sectionoption, smallclassoption} = this.props;
         const {section, smallclass} = this.state;
         return <div>
-                    <Select value={section} onSelect={this.onsectionchange.bind(this)} style={{width: '65px'}}>
+                    <Select value={section}  onSelect={this.onsectionchange.bind(this)} style={{width: '65px'}}>
                         {sectionoption}
                     </Select>
-                    <Select value={smallclass} onChange={this.smallclasschange.bind(this)} style={{width: '54px'}}>
+                    <Select value={smallclass}  onChange={this.smallclasschange.bind(this)} style={{width: '100px'}}>
                         {smallclassoption}
                     </Select>
                     <span>小班各细班种植进度分析</span>
                 </div>
     }
     onsectionchange(value) {
-        // const {sectionselect} = this.props;
-        // sectionselect(value)
+        console.log(value,"cnmm");
+        const {sectionselect} = this.props;
+
+        sectionselect(value)
         this.setState({section:value},() => {
             this.datepickok(3)
         })
@@ -478,8 +482,9 @@ export default class ScheduleTable extends Component {
             let param = {
                 // etime:etime3?moment(etime3).add(8, 'h').unix():'',
                 etime:this.state.etime3,
-                section
+                section:section,
             }
+            console.log(param);
             this.qury(index,param);
         }
         if(index == 4 ) {
@@ -801,8 +806,7 @@ export default class ScheduleTable extends Component {
                 console.log(biaoduan,yeszhongshu,notzhongshu);
                 this.setState({
                     loading2:false,
-                     // pers:allyeszhongshu/allzhongshu,
-                     // score:allyeszhongshu+"/"+allzhongshu
+                     
                      pers: division(allyeszhongshu,allzhongshu),
                      score: joint(allyeszhongshu,allzhongshu),
                      })
@@ -844,7 +848,9 @@ export default class ScheduleTable extends Component {
             }) 
         } else if(index === 3) {
             this.setState({loading3:true})
+            debugger;
             gettreetype3({},param)
+
             .then(rst => {
                 console.log(rst);
                  let biaoduan1 = [];
