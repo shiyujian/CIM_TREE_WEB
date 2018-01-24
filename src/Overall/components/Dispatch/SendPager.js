@@ -5,6 +5,7 @@ import { getUser } from '../../../_platform/auth';
 import moment from 'moment';
 import ToggleModal from './ToggleModal'
 import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import '../../../Datum/components/Datum/index.less'
 
 export default class SendPage1 extends Component {
 	constructor(props) {
@@ -45,6 +46,10 @@ export default class SendPage1 extends Component {
 		})
 	}
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		const {
 			sendInfo = {},
 			toggleData: toggleData = {
@@ -65,8 +70,13 @@ export default class SendPage1 extends Component {
 							<Button type="primary"  onClick={this._sentDoc.bind(this)}>发文</Button>
 						</Col>
 					</Row>
-					<Table dataSource={this._getNewArrFunc(notifications)}
+					<Table 
+						dataSource={this._getNewArrFunc(notifications)}
+						rowSelection={rowSelection}
 						columns={this.columns}
+						title={() => '发文查询'}
+						className="foresttables"
+						bordered
 						rowKey="_id"
 						// style={{marginTop:10}}
 					/>

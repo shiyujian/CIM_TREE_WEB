@@ -16,6 +16,7 @@ import './fenbu.less';
 import {USER_API, SERVICE_API, WORKFLOW_API,JYPMOD_API,UPLOADFILE_API,SERVICE_USER_ID,SERVICE_USER_PWD,SOURCE_API,STATIC_DOWNLOAD_API} from '_platform/api';
 import {getUser} from '_platform/auth';
 import WorkflowHistory from '../components/WorkflowHistory';
+import '../../Datum/components/Datum/index.less'
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -332,6 +333,10 @@ export default class Fenbu extends Component {
         this.setState({checkObj:e.target.value});
     }
     render() {
+        const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
         let isAllCheck = this.state.unChecked.length === 0 && this.state.checked.length > 0 ? false : true; //表示判断是否所有的分项工程都已验收，可发起流程
         let fenbuAble = this.state.checkObj === 'fenbu' ? true : false;//表示验收对象为分部的时候，禁用子分部下拉框
         let ds = this.state.checkState === 'b' ? this.state.checked : this.state.unChecked;
@@ -396,8 +401,11 @@ export default class Fenbu extends Component {
                         </div>
                         <div style={{ width: '100%',display:authDisplay1 }}>
                             <Table
-                                className='huafenTable'
+                                // className='huafenTable'
+                                rowSelection={rowSelection}
                                 dataSource={ds}
+                                className="foresttables"
+								bordered
                                 columns={this.columns_sv}
                             />
                         </div>

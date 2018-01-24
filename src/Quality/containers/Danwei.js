@@ -15,6 +15,8 @@ import WorkflowHistory from '../components/WorkflowHistory'
 import './fenbu.less';
 import {USER_API, SERVICE_API, WORKFLOW_API,JYPMOD_API,UPLOADFILE_API,SERVICE_USER_ID,SERVICE_USER_PWD,SOURCE_API,STATIC_DOWNLOAD_API} from '_platform/api';
 import {getUser} from '_platform/auth'
+import '../../Datum/components/Datum/index.less'
+
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -224,6 +226,10 @@ export default class Danwei extends Component {
         }
     }
     render() {
+        const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
         const { table: { editing = false } = {} } = this.props;
         let ds=[];
         switch(this.state.tableType){
@@ -279,8 +285,11 @@ export default class Danwei extends Component {
                         </div>
                         <div style={{ width: '100%' }}>
                             <Table
-                                className='huafenTable'
+                                // className='huafenTable'
+                                rowSelection={rowSelection}
+                                className="foresttables"
                                 dataSource={ds}
+                                bordered
                                 columns={this.columns}
                             />
                         </div>

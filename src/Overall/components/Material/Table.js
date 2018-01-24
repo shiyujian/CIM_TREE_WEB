@@ -2,17 +2,19 @@ import React, { Component } from 'react';
 import { Table, Spin, message } from 'antd';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
-import './index.less';
+import '../../../Datum/components/Datum/index.less'
+
 export default class GeneralTable extends Component {
 
 	render() {
 		const { Doc = [] } = this.props;
-		console.log('table.this.props',this.props)
+		console.log('table.this.props', this.props)
 		return (
-			<Table rowSelection={this.rowSelection}
+			<Table
+				rowSelection={this.rowSelection}
 				dataSource={Doc}
 				columns={this.columns}
-				className='foresttable'
+				className='foresttables'
 				bordered rowKey="code" />
 		);
 	}
@@ -53,7 +55,7 @@ export default class GeneralTable extends Component {
 			title: '提交时间',
 			dataIndex: 'submitTime',
 			key: 'submitTime'
-		},{
+		}, {
 			title: '流程状态',
 			dataIndex: 'flowStyle',
 			key: 'flowStyle'
@@ -110,7 +112,7 @@ export default class GeneralTable extends Component {
 		const { actions: { openPreview } } = this.props;
 		if (JSON.stringify(file.basic_params) == "{}") {
 			return
-		} else { 
+		} else {
 			const filed = file.basic_params.files[0];
 			openPreview(filed);
 		}
