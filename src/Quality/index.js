@@ -115,6 +115,7 @@ import {message} from 'antd'
 				{Score && <Route path="/quality/score" component={Score}/>}
 				{Search && <Route path="/quality/score/search" component={Score}/>}
 				{Appraising && <Route path="/quality/appraising" component={Appraising}/>}
+				{/*Faithanalyze && <Route path="/quality/faithanalyze" component={Faithanalyze}/>*/}
 
 			</Main>
 			</Body>);
@@ -257,4 +258,12 @@ const menus = [
     	name: '质量缺陷',
     	path: '/quality/defect',
     	icon: <Icon name="life-buoy"/>
-    }];
+    }, 
+ //    {
+	// 	key: 'faithanalyze',
+	// 	id: 'QUALITY.FAITHANALYZE',
+	// 	name: '诚信供应商分析',
+	// 	path: '/quality/faithanalyze',
+	// 	icon: <Icon name="crosshairs"/>
+	// }
+	];

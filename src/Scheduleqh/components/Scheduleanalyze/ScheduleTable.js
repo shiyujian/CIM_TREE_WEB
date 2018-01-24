@@ -23,11 +23,11 @@ export default class ScheduleTable extends Component {
             plan_amount: '',
             pers: '',
             score: '',
-            stime1: moment().format('2017-11-17 00:00:00'),
-            etime1: moment().format('2017-11-24 23:59:59'),
-            etime2: moment().format('2017-11-24 23:59:59'),
-            etime3: moment().format('2017-11-24 23:59:59'),
-            etime4: moment().format('2017-11-24 23:59:59'),
+            stime1: moment().format('YYYY-MM-DD HH:mm:ss'),
+            etime1: moment().format('YYYY-MM-DD HH:mm:ss'),
+            etime2: moment().format('YYYY-MM-DD HH:mm:ss'),
+            etime3: moment().format('YYYY-MM-DD HH:mm:ss'),
+            etime4: moment().format('YYYY-MM-DD HH:mm:ss'),
             etime5: moment().unix(),
             loading1: false,
             loading2: false,
@@ -68,6 +68,34 @@ export default class ScheduleTable extends Component {
         }
     }
 	componentDidMount() {
+        const {actions: {gettreetype1}} = this.props;
+        const param = {stime:this.state.stime1,etime:this.state.etime1};
+        console.log(param);
+        gettreetype1().then(rst=>{
+             let Num1 = 0;
+            for(var i = 0; i<=rst.length-1; i++){
+            Num1 = Num1 + rst[i].Num;
+            }
+            this.setState({
+                 amount:Num1,
+            })
+        })
+         // getNurserysCountFast({},{stime:"2017/11/26",etime:"2017/11/27"})
+         gettreetype1({},param)
+         .then(rst=>{
+            let todaynum = 0;
+            
+            for(let key=0;key<=rst.length-1; key++){
+                
+                todaynum = todaynum + rst[key].Num;
+                
+            }
+            
+            this.setState({
+                 today:todaynum,
+            })
+         })
+
 		var myChart1 = echarts.init(document.getElementById('plant'));
         const that = this;
         let option1 = {
@@ -386,14 +414,15 @@ export default class ScheduleTable extends Component {
                 </div>
     }
     onsectionchange(value) {
-        const {sectionselect} = this.props;
-        sectionselect(value)
+        // const {sectionselect} = this.props;
+        // sectionselect(value)
         this.setState({section:value},() => {
             this.datepickok(3)
         })
     }
 
     smallclasschange(value){
+        console.log(value,"cnm")
         this.setState({smallclass:value},() => {
             this.datepickok(4)
         })
@@ -429,15 +458,18 @@ export default class ScheduleTable extends Component {
         if(index == 1 ) {
             const {stime1,etime1} = this.state;
             let param = {
-                stime:stime1?moment(stime1).add(8, 'h').unix():'',
-                etime:etime1?moment(etime1).add(8, 'h').unix():''
+                // stime:stime1?moment(stime1).add(8, 'h').unix():'',
+                // etime:etime1?moment(etime1).add(8, 'h').unix():''
+                stime:this.state.stime1,
+                etime:this.state.etime1,
             }
             this.qury(index,param);
         }
         if(index == 2 ) {
             const {etime2} = this.state;
             let param = {
-                etime:etime2?moment(etime2).add(8, 'h').unix():''
+                // etime:etime2?moment(etime2).add(8, 'h').unix():''
+                etime:this.state.etime2,
             }
             this.qury(index,param);
         }
@@ -445,6 +477,7 @@ export default class ScheduleTable extends Component {
             const {etime3,section} = this.state;
             let param = {
                 // etime:etime3?moment(etime3).add(8, 'h').unix():'',
+                etime:this.state.etime3,
                 section
             }
             this.qury(index,param);
@@ -453,6 +486,7 @@ export default class ScheduleTable extends Component {
             const {etime4,section,smallclass} = this.state;
             let param = {
                 // etime:etime4?moment(etime4).add(8, 'h').unix():'',
+                etime:this.state.etime4,
                 section,
                 // smallclass
             }
@@ -460,46 +494,46 @@ export default class ScheduleTable extends Component {
         }
     }
 
-    sum(index, param) {
-        const {actions: {getTreesProgress}} = this.props;
-        if(index === 0) {
-            this.setState({loading5: true})
-            getTreesProgress({}, param)
-            .then(rst => {
-                this.setState({loading5: false})
-                if(!rst)
-                    return
-                this.setState({
-                    amount: rst.amount
-                })
-            })
-        }else if(index === 1) {
-            this.setState({loading6: true})
-            getTreesProgress({}, param)
-            .then(rst => {
-                this.setState({loading6: false})
-                if(!rst)
-                    return
-                this.setState({
-                    today: rst.today
-                })
-            })
-        } else if(index === 2) {
-            this.setState({loading7: true})
-            getTreesProgress({}, param)
-            .then(rst => {
-                this.setState({loading7: false})
-                if(!rst)
-                    return
-                let amount = rst.amount
-                let plan_amount = rst.plan_amount
-                this.setState({
-                    pers: division(amount,plan_amount),
-                    score: joint(amount,plan_amount)
-                })
-            })
-        }
-    }
+    // sum(index, param) {
+    //     const {actions: {getTreesProgress}} = this.props;
+    //     if(index === 0) {
+    //         this.setState({loading5: true})
+    //         getTreesProgress({}, param)
+    //         .then(rst => {
+    //             this.setState({loading5: false})
+    //             if(!rst)
+    //                 return
+    //             this.setState({
+    //                 amount: rst.amount
+    //             })
+    //         })
+    //     }else if(index === 1) {
+    //         this.setState({loading6: true})
+    //         getTreesProgress({}, param)
+    //         .then(rst => {
+    //             this.setState({loading6: false})
+    //             if(!rst)
+    //                 return
+    //             this.setState({
+    //                 today: rst.today
+    //             })
+    //         })
+    //     } else if(index === 2) {
+    //         this.setState({loading7: true})
+    //         getTreesProgress({}, param)
+    //         .then(rst => {
+    //             this.setState({loading7: false})
+    //             if(!rst)
+    //                 return
+    //             let amount = rst.amount
+    //             let plan_amount = rst.plan_amount
+    //             this.setState({
+    //                 pers: division(amount,plan_amount),
+    //                 score: joint(amount,plan_amount)
+    //             })
+    //         })
+    //     }
+    // }
 
     qury(index,param) {
         // debugger;
@@ -507,7 +541,8 @@ export default class ScheduleTable extends Component {
         param.no = leftkeycode;
         if(index === 1 ){
             this.setState({loading1:true})
-            gettreetype1()
+            console.log(param,"xiamada");
+            gettreetype1({},param)
             .then(rst => {
                 console.log(rst,"fenbushi");
                let res = groupBy(rst, function(n){
@@ -592,14 +627,13 @@ export default class ScheduleTable extends Component {
             wsx.push(qaz);
             }
             console.log(wsx,"wsx");
-            let Num1 = 0;
-            for(var i = 0; i<=rst.length-1; i++){
-            Num1 = Num1 + rst[i].Num;
-            }
-            this.setState({
-                 amount:Num1,
-            })
-            console.log(Num1,"Num1");
+            // let Num1 = 0;
+            // for(var i = 0; i<=rst.length-1; i++){
+            // Num1 = Num1 + rst[i].Num;
+            // }
+            // this.setState({
+            //      amount:Num1,
+            // })
             console.log(value,"dajkh")
             console.log(time);
                 this.setState({loading1:false})
@@ -635,7 +669,13 @@ export default class ScheduleTable extends Component {
                                     data: time,
                                     axisPointer: {
                                           type: 'shadow'
-                                        }
+                                        },
+                                     axisLabel:{
+                                            interval:0,
+                                            rotate:30,
+                                            color:"#fff",
+                                            textStyle: {color: '#000', fontSize: 13}
+                                        },
                                 },
                                 yAxis: [
                                     // type: 'value'
@@ -670,31 +710,31 @@ export default class ScheduleTable extends Component {
                                     {
                                         name:'1标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[0]
                                     },
                                     {
                                         name:'2标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[1]
                                     },
                                     {
                                         name:'3标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[2]
                                     },
                                     {
                                         name:'4标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[3]
                                     },
                                     {
                                         name:'5标段',
                                         type:'line',
-                                        // stack: '总量',
+                                        yAxisIndex: 1,
                                         data:lastshuzhu[4]
                                     }
                                 ]
@@ -743,24 +783,34 @@ export default class ScheduleTable extends Component {
         } else if(index === 2) {
             this.setState({loading2:true})
             // getCountSection({},param)
-            gettreetype2()
+            gettreetype2({},param)
             .then(rst => {
                 console.log(rst);
                 let biaoduan = [];
                 let yeszhongshu = [];
                 let notzhongshu = [];
+                let allyeszhongshu = 0;
+                let allzhongshu = 0;
                 for(let i = 0; i<=rst.length-1 ; i++){
+                    allyeszhongshu = allyeszhongshu + rst[i].Complete;
+                    allzhongshu = allzhongshu + rst[i].Num;
                     biaoduan.push(rst[i].Label);
                     yeszhongshu.push(rst[i].Complete);
-                    notzhongshu.push(rst[i].No);
+                    notzhongshu.push(rst[i].Num-rst[i].Complete);
                 }
                 console.log(biaoduan,yeszhongshu,notzhongshu);
-                this.setState({loading2:false})
+                this.setState({
+                    loading2:false,
+                     // pers:allyeszhongshu/allzhongshu,
+                     // score:allyeszhongshu+"/"+allzhongshu
+                     pers: division(allyeszhongshu,allzhongshu),
+                     score: joint(allyeszhongshu,allzhongshu),
+                     })
                 if(!rst)
                     return
                 try {
                     let myChart2 = echarts.getInstanceByDom(document.getElementById('section1'));
-                    let unplanted = arraynumsub(rst["总数"], rst["已种植数量"]);
+                    // let unplanted = arraynumsub(rst["总数"], rst["已种植数量"]);
                     let options2 = {
                         legend: {
                             data: ['未种植','已种植']
@@ -803,7 +853,7 @@ export default class ScheduleTable extends Component {
                 for(let i = 0; i<=rst.length-1 ; i++){
                     biaoduan1.push(rst[i].Label);
                     yeszhongshu1.push(rst[i].Complete);
-                    notzhongshu1.push(rst[i].No);
+                    notzhongshu1.push(rst[i].Num-rst[i].Complete);
                 }
                 console.log(biaoduan1,yeszhongshu1,notzhongshu1);
                 this.setState({loading3:false})
@@ -811,7 +861,7 @@ export default class ScheduleTable extends Component {
                     return
                 try {
                     let myChart3 = echarts.getInstanceByDom(document.getElementById('primaryClass'));
-                    let unplanted = arraynumsub(rst["总数"], rst["已种植数量"])
+                    // let unplanted = arraynumsub(rst["总数"], rst["已种植数量"])
                     let options3 = {
                         legend: {
                             data: ['未种植','已种植']
@@ -846,6 +896,8 @@ export default class ScheduleTable extends Component {
         } else {
             this.setState({loading4:true})
             console.log(param,"laodaye");
+            param.no = param.no + "-" +this.state.smallclass;
+            console.log(param.no,"smallclass");
             gettreetype4({},param)
             .then(rst => {
                 console.log(rst);
@@ -858,12 +910,14 @@ export default class ScheduleTable extends Component {
                     notzhongshu2.push(rst[i].UnComplete);
                 }
                 console.log(biaoduan2,yeszhongshu2,notzhongshu2);
+                
                 this.setState({loading4:false})
+
                 if(!rst)
                     return
                 try {
                     let myChart4 = echarts.getInstanceByDom(document.getElementById('overall'));
-                    let unplanted = arraynumsub(rst["总数"], rst["已种植数量"]);
+                    // let unplanted = arraynumsub(rst["总数"], rst["已种植数量"]);
                     let options4 = {
                         legend: {
                             data: ['未种植','已种植']
@@ -899,33 +953,33 @@ export default class ScheduleTable extends Component {
     }
     
 }
-//数组数值相加
-function arraynumadd(arr1, arr2) {
-    if(arr1 instanceof Array && arr2 instanceof Array) {
-        let arr = arr1.map((rst,index) => {
-            return arr1[index] + arr2[index]
-        })
-        return arr
-    }
-}
+// //数组数值相加
+// function arraynumadd(arr1, arr2) {
+//     if(arr1 instanceof Array && arr2 instanceof Array) {
+//         let arr = arr1.map((rst,index) => {
+//             return arr1[index] + arr2[index]
+//         })
+//         return arr
+//     }
+// }
 
-//减法
-function arraynumsub(arr1, arr2) {
-    if(arr1 instanceof Array && arr2 instanceof Array) {
-        let arr = arr1.map((rst,index) => {
-            return arr1[index] - arr2[index]
-        })
-        return arr
-    }
-}
-//总数
-function addNum(arr){
-    let total = 0;
-    arr.map( item => {
-        total += item;
-    })
-    return total;
-}
+// //减法
+// function arraynumsub(arr1, arr2) {
+//     if(arr1 instanceof Array && arr2 instanceof Array) {
+//         let arr = arr1.map((rst,index) => {
+//             return arr1[index] - arr2[index]
+//         })
+//         return arr
+//     }
+// }
+// //总数
+// function addNum(arr){
+//     let total = 0;
+//     arr.map( item => {
+//         total += item;
+//     })
+//     return total;
+// }
 //除
 function division(arr1, arr2) {
     if(arr1 !== 0 && arr2 !== 0) {

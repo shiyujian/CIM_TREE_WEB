@@ -604,7 +604,7 @@ export default class NursOverallTable extends Component {
 		this.setState({tqzj_max:value})
 	}
 	onstatuschange(value) {
-		console.log('value',value)
+		// console.log('value',value)
 		let SupervisorCheck = '';
 		let CheckStatus  = '';
 		switch(value){
@@ -637,7 +637,6 @@ export default class NursOverallTable extends Component {
     }
 
     onlocationchange(value) {
-    	console.log('value',value)
 		this.setState({islocation:value || ''})
     }
 
@@ -733,6 +732,7 @@ export default class NursOverallTable extends Component {
     		tqzj = `${tqzj_min}-${tqzj_max}`
     	}
     	const {actions: {getNurserysTree},keycode = ''} = this.props;
+    	console.log('props',this.props)
     	let postdata = {
     		no:keycode,
     		sxm,

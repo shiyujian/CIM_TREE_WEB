@@ -2,17 +2,16 @@ import {handleActions, combineActions, createAction} from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import {CODE_API} from '_platform/api';
-import {SERVICE_API} from '_platform/api';
+import {SERVICE_API, FOREST_API} from '_platform/api';
 
 export const ID = 'SAFETYTREE';
 
-export const setUploadFile = createAction('${ID}_获取上传的文件数据');
+export const setUploadFile = createAction(`${ID}_获取上传的文件数据`);
 
 //获取树
-export const getProjectTreeOK = createAction('${ID}_获取项目树');
+export const getProjectTreeOK = createAction(`${ID}_获取项目树`);
 export const getProjectTree =
-	createFetchAction(`${SERVICE_API}/project-tree/?depth=3`,[getProjectTreeOK]);
+	createFetchAction(`${FOREST_API}/tree/wpunits`,[getProjectTreeOK]);
 
 export const getProjects =
 	createFetchAction(`${SERVICE_API}/projects/code/{{code}}/`, [], 'GET');

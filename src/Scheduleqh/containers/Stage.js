@@ -117,20 +117,20 @@ class Stage extends Component {
         this.setState({treetyoption})
     }
     
-	onSelect = (project,unitProjecte)=>{
-		console.log('project',project);
-		console.log('unitProjecte',unitProjecte);
-		let me = this;
-		//选择最下级的工程
-		if(unitProjecte){
-			this.setState({
-				item:{
-					unitProjecte:unitProjecte,
-					project:project
-				}
-			})
-		}
-    };
+	// onSelect = (project,unitProjecte)=>{
+	// 	console.log('project',project);
+	// 	console.log('unitProjecte',unitProjecte);
+	// 	let me = this;
+	// 	//选择最下级的工程
+	// 	if(unitProjecte){
+	// 		this.setState({
+	// 			item:{
+	// 				unitProjecte:unitProjecte,
+	// 				project:project
+	// 			}
+	// 		})
+	// 	}
+ //    };
 
 	// onSelect(){}
 

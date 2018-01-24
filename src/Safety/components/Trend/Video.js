@@ -1,9 +1,12 @@
+// import './video.less'
+
 import React, { Component } from 'react';
 import { Table, Row, Col, Modal } from 'antd';
 import Blade from '_platform/components/panels/Blade';
 import moment from 'moment';
 import $ from 'jquery';
 import { Icon } from 'react-fa';
+import './video.less'
 export default class Video extends Component {
 
 	constructor(props) {
@@ -17,18 +20,18 @@ export default class Video extends Component {
 
 	static propTypes = {};
 	componentWillReceiveProps(nextProps) {
-		console.log(nextProps)
+
 		// const {
 		// 	fileList = [],
 		// } = this.props;
 		// console.log(this.props)		
-		const newsListT = nextProps.newsList || []
+		const newsListT = nextProps.videoList || []
 		for (var i = 0; i < newsListT.length; i++) {
-			console.log(newsListT[i])
+
 			const newsListTT = newsListT[i].attachment.fileList || []
 			for (var j = 0; j < newsListTT.length; j++) {
-				console.log(newsListTT[j])
-				const videos = newsListTT[3].down_file
+
+				const videos = newsListTT[j].down_file
 				this.setState({ video: videos })
 				break;
 			}
@@ -36,19 +39,22 @@ export default class Video extends Component {
 		}
 	}
 	componentWillMount() {
-		console.log(this.props)
+
 	}
 	componentDidMount() {
-		const { actions: { getNewsList } } = this.props;
-		console.log(this.props)
-		console.log(this.props.getNewsList)
-		getNewsList({}, { tag: '新闻', is_draft: false });
+		const { actions: { getVideoList } } = this.props;
 
-		$(".box").mouseover(function(){
-			$(".box").css({"background-color":"#eee",zIndex:"100"})
+		getVideoList({}, { tag: '公告', is_draft: false });
+
+	}
+	play() {
+		this.setState({
+			visible: true
 		})
-		$(".box").mouseout(function(){
-			$(".box").css({"background-color":"",zIndex:"0"})
+	}
+	modalClick() {
+		this.setState({
+			visible: false
 		})
 	}
 
@@ -61,6 +67,11 @@ export default class Video extends Component {
 		}
 	}
 
+	data = [
+		{ down_file: "http://47.104.160.65:6512/media/documents/2018/01/1510116943014_Hbu2FIz.mp4", name: "1510116943014.mp4" },
+		{ down_file: "http://47.104.160.65:6512/media/documents/2018/01/1510116943014_Hbu2FIz.mp4", name: "1510116943014.mp4" },
+		{ down_file: "http://47.104.160.65:6512/media/documents/2018/01/1510116943014_Hbu2FIz.mp4", name: "1510116943014.mp4" },
+	]
 	columns = [
 		{
 			title: '新闻标题',
@@ -98,51 +109,95 @@ export default class Video extends Component {
 	}
 
 	render() {
+		const videoa = []
+		console.log(this.props)
 		
-		console.log(this.state.video)
+		for (var k = 0; k < this.data.length; k++) {
+			videoa.push(
+				<div className="video box ">
+					<video
+						// onClick={this.play.bind(this)}
+						className="firstVideo"
+						preload="auto"
+						width="60%"
+						height="300px"
+						src={this.data[k].down_file}
+					>
+					</video>
+					<Icon
+						className="Icon"
+						onClick={this.play.bind(this)}
+						name="play-circle"></Icon>
+				</div>
+			)
+		}
 		return (
-			<Blade title="安全生产视频">
-				<Row>
-					<Col span={16}>
+			<Blade style={{ height: "300px", background: "#eee" }} title="安全生产视频">
+				<div className="container">
+					{videoa}
+					{/* <div className="video box " style={{ width: "60%", height: "300px", float: "left", textAlign: "center" }}>
 						<video
-							className="box"
+							// onClick={this.play.bind(this)}
+							className="firstVideo"
 							preload="auto"
-							width="300px"
+							width="60%"
 							height="300px"
-							src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_APkNixj.mp4"}
+							src={this.state.video}
 						>
 						</video>
-						<Icon style={{widtg:"30px",height:"30px"}} className={"playBtn Icon Icon-play_b"}></Icon>
-					</Col>
-					<Col span={8}>
-						<Row>
-							<video
-								preload="auto"
-								width="200px"
-								height="150px"
-								src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_APkNixj.mp4"}
-
-							>
-							</video>
-						</Row>
-						<Row>
-							<video
-								preload="auto"
-								width="200px"
-								height="150px"
-								src={"http://47.104.160.65:6510/media/documents/2018/01/1510116943014_APkNixj.mp4"}
-
-							>
-							</video>
-						</Row>
-
-					</Col>
-
-
-
-				</Row>
-
-
+						<Icon
+							className="Icon"
+							onClick={this.play.bind(this)}
+							style={{ fontSize: 60, width: "60px", height: "60px" }} name="play-circle"></Icon>
+					</div>
+					<div className="video box" style={{ width: "40%", height: "150px", float: "right", textAlign: "center" }} >
+						<video
+							// onClick={this.play.bind(this)}
+							id="firstVideo"
+							preload="auto"
+							width="40%"
+							height="150px"
+							src={this.state.video}
+						>
+						</video>
+						<Icon
+							className="Icon"
+							onClick={this.play.bind(this)}
+							style={{ fontSize: 30, width: "30px", height: "30px" }} name="play-circle"></Icon>
+					</div>
+					<div className="video box" style={{ width: "40%", height: "150px", float: "right", textAlign: "center" }}>
+						<video
+							// onClick={this.play.bind(this)}
+							id="firstVideo"
+							preload="auto"
+							width="40%"
+							height="150px"
+							src={this.state.video}
+						>
+						</video>
+						<Icon
+							className="Icon"
+							onClick={this.play.bind(this)}
+							style={{ fontSize: 30, width: "30px", height: "30px" }} name="play-circle"></Icon>
+					</div> */}
+				</div>
+				<Modal
+					visible={this.state.visible}
+					footer={null}
+					width="70%"
+					maskClosable={false}
+					onOk={this.modalClick.bind(this)}
+					onCancel={this.modalClick.bind(this)}
+				>
+					<video
+						controls
+						preload="auto"
+						width="100%"
+						height="500px"
+						src={this.state.video}
+					>
+					</video>
+				</Modal>
 			</Blade>
 		);
 	}

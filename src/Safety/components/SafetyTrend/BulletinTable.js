@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table, Tabs, Button, Row, Col, Modal, message, Popconfirm} from 'antd';
+import {Table, Tabs, Button, Row, Col, message, Modal, Popconfirm} from 'antd';
 import BulletinText from './BulletinText';
 import moment from 'moment';
 import {getUser} from '../../../_platform/auth';
@@ -7,57 +7,79 @@ import {getUser} from '../../../_platform/auth';
 const TabPane = Tabs.TabPane;
 const user_id = getUser().id;
 
+
 export default class BulletinTable extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			visible: false,
-			container: null,
-		}
+		this.state = {}
 	}
 
 	componentDidMount() {
-		const {actions: {getNewsList, getDraftNewsList}} = this.props;
-		getNewsList({
+		const {actions: {getTrenList, getTrendsList}} = this.props;
+		getTrenList({
 			user_id: user_id
-		})
-		getDraftNewsList({
+		});
+		getTrendsList({
 			user_id: user_id
 		})
 	}
 
-	//新闻操作按钮
-	clickNews(record, type) {
+	//公告操作按钮
+	clickTips(record, type) {
 		const {
-			actions: {deleteData, getNewsList, getDraftNewsList, toggleModal, patchData},
-			bulletinTabValue = '1'
+			actions: {deleteData, getTrenList, getTrendsList, toggleModal, patchData},
+			videoTabValue = '1'
 		} = this.props;
 		if (type === 'DELETE') {
 			deleteData({pk: record.id})
 				.then(() => {
-					message.success('删除新闻成功！');
-					if (bulletinTabValue === '1') {
-						getNewsList({
+					message.success('删除公告成功！');
+					if (videoTabValue === '1') {
+						getTrenList({
 							user_id: user_id
 						});
 					} else {
-						getDraftNewsList({
+						getTrendsList({
 							user_id: user_id
 						});
 					}
 				})
 		} else if (type === 'EDIT') {
 			toggleModal({
-				type: 'NEWS',
+				type: 'TIPS',
 				status: 'EDIT',
 				visible: true,
 				editData: record,
 			})
 		} else if (type === 'VIEW') {
-			this.setState({
-				visible: true,
-				container: record.raw
-			})
+			Modal.info({
+				title: <h1>公告标题：{record.title}</h1>,
+				okText: '知道了',
+				width: '800px',
+				content: (
+					<div>
+						<h2>公告正文：
+							<div style={{maxHeight: '600px', overflow: 'auto',border:'1px solid #ccc'}}
+								 dangerouslySetInnerHTML={{__html: record.raw}}/>
+						</h2>
+						<h2>
+							公告附件：{
+							record.attachment.fileList.length > 0 ? (
+								record.attachment.fileList.map((file, index) => {
+									return (
+										<div key={index}>
+											<a target="_bank" href={file.down_file}>附件{index + 1}、{file.name}</a>
+										</div>
+									)
+								})
+							) : '暂无附件'
+						}
+						</h2>
+					</div>
+				),
+				onOk() {
+				},
+			});
 		} else if (type === 'BACK') {
 			let newData = {
 				"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -66,12 +88,12 @@ export default class BulletinTable extends Component {
 			patchData({pk: record.id}, newData)
 				.then(rst => {
 					if (rst.id) {
-						message.success('撤回成功，撤回的新闻在暂存的新闻中可查看');
-						//更新暂存的新闻列表数据
-						getNewsList({
+						message.success('撤回成功，撤回的公告在暂存的公告中可查看');
+						//更新暂存的公告列表数据
+						getTrenList({
 							user_id: user_id
 						});
-						getDraftNewsList({
+						getTrendsList({
 							user_id: user_id
 						});
 					}
@@ -84,12 +106,12 @@ export default class BulletinTable extends Component {
 			patchData({pk: record.id}, newData)
 				.then(rst => {
 					if (rst.id) {
-						message.success('重新发布新闻成功！');
-						//更新暂存的新闻列表数据
-						getNewsList({
+						message.success('重新发布公告成功！');
+						//更新暂存的公告列表数据
+						getTrenList({
 							user_id: user_id
 						});
-						getDraftNewsList({
+						getTrendsList({
 							user_id: user_id
 						});
 					}
@@ -98,90 +120,70 @@ export default class BulletinTable extends Component {
 
 	}
 
-	//发布新闻
-	publishNewsClick() {
+	//发布公告
+	publishTipsClick() {
 		const {actions: {toggleModal}} = this.props;
 		toggleModal({
-			type: 'NEWS',
+			type: 'TIPS',
 			status: 'ADD',
 			visible: true,
 			editData: null
 		})
 	}
 
-	handleCancel() {
-		this.setState({
-			visible: false,
-			container: null,
-		})
-	}
-
-	//新闻列表和暂存的新闻列表切换
-	subTabChange(bulletinTabValue) {
-		const {actions: {setBulletinTabActive}} = this.props;
-		setBulletinTabActive(bulletinTabValue);
+	//公告列表和暂存的公告列表切换
+	subTabChange(videoTabValue) {
+		const {actions: {setVideoTabActive}} = this.props;
+		setVideoTabActive(videoTabValue);
 	}
 
 	render() {
 		const {
-			newsList = [],
-			draftNewsLis = [],
+			trenList = [],
+			trendsList = [],
 			toggleData: toggleData = {
-				type: 'NEWS',
+				type: 'TIPS',
 				visible: false,
 			},
-			bulletinTabValue = '1'
+			videoTabValue = '1'
 		} = this.props;
 		return (
 			<Row>
 				<Col span={22} offset={1}>
-					<Tabs activeKey={bulletinTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
+					<Tabs activeKey={videoTabValue} onChange={this.subTabChange.bind(this)} tabBarExtraContent={
 						<div style={{marginBottom: '10px'}}>
-							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>发布安全事故快报</Button>
+							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>发布安全事故快报</Button>
 							{
-								(toggleData.visible && toggleData.type === 'NEWS') && <BulletinText {...this.props}/>
+								(toggleData.visible && toggleData.type === 'TIPS') && (<BulletinText {...this.props}/>)
 							}
 						</div>}>
 						<TabPane tab="发布的安全事故快报" key="1">
-							<Table dataSource={newsList}
-								   columns={this.columns}
-								   rowKey="id"/>
+							<Table dataSource={trenList}
+							       columns={this.columns}
+							       rowKey="id"
+							/>
 						</TabPane>
 						<TabPane tab="暂存的安全事故快报" key="2">
-							<Table dataSource={draftNewsLis}
-								   columns={this.draftColumns}
-								   rowKey="id"/>
+							<Table dataSource={trendsList}
+							       columns={this.draftColumns}
+							       rowKey="id"
+							/>
 						</TabPane>
 					</Tabs>
-
 				</Col>
-				<Modal
-					title="新闻预览"
-					width="800px"
-					visible={this.state.visible}
-					onOk={this.handleCancel.bind(this)}
-					onCancel={this.handleCancel.bind(this)}
-					footer={null}>
-					<div style={{maxHeight: '800px', overflow: 'auto'}}
-						 dangerouslySetInnerHTML={{__html: this.state.container}}/>
-				</Modal>
 			</Row>
 		);
 	}
 
 	columns = [
 		{
-			title: '新闻ID222',
+			title: '公告ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '新闻标题',
+			title: '公告标题',
 			dataIndex: 'title',
 			key: 'title',
-		}, {
-			title: '关键字',
-			dataIndex: 'abstract',
-			key: 'abstract',
 		}, {
 			title: '发布时间',
 			dataIndex: 'pub_time',
@@ -201,15 +203,15 @@ export default class BulletinTable extends Component {
 			render: record => {
 				return (
 					<span>
-				  	<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
+						<a onClick={this.clickTips.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
+						<a onClick={this.clickTips.bind(this, record, 'EDIT')}>修改</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a>
+						<a onClick={this.clickTips.bind(this, record, 'BACK')}>撤回</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
+						<Popconfirm title="确定删除吗?" onConfirm={this.clickTips.bind(this, record, 'DELETE')} okText="确定"
 									cancelText="取消">
-								<a>删除</a>
+							<a>删除</a>
 						</Popconfirm>
 					</span>
 				)
@@ -218,17 +220,13 @@ export default class BulletinTable extends Component {
 	];
 	draftColumns = [
 		{
-			title: '新闻ID',
+			title: '公告ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '新闻标题',
+			title: '公告标题',
 			dataIndex: 'title',
 			key: 'title',
-		}, {
-			title: '关键字',
-			dataIndex: 'abstract',
-			key: 'abstract',
 		}, {
 			title: '暂存时间',
 			dataIndex: 'pub_time',
@@ -248,15 +246,15 @@ export default class BulletinTable extends Component {
 			render: record => {
 				return (
 					<span>
-						<a onClick={this.clickNews.bind(this, record, 'PUBLISH')}>发布</a>
+						<a onClick={this.clickTips.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
+						<a onClick={this.clickTips.bind(this, record, 'PUBLISH')}>发布</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
+						<a onClick={this.clickTips.bind(this, record, 'EDIT')}>修改</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
+						<Popconfirm title="确定删除吗?" onConfirm={this.clickTips.bind(this, record, 'DELETE')} okText="确定"
 									cancelText="取消">
-							<a>删除</a>
+						<a>删除</a>
 						</Popconfirm>
 					</span>
 				)

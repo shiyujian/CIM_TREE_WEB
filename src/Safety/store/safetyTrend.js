@@ -16,30 +16,48 @@ export const setStateTabActive = createAction('xhy国内安全动态列表的Tab
 export const setVideoTabActive = createAction('xhy安全生产视频列表的Tab切换状态');
 //发布或编辑新闻或公告的的modal
 export const toggleModal = createAction('xhy发布或编辑新闻或公告的的modal');
-//获取暂存的新闻列表
-export const getDraftNewsListOK = createAction('xhy获取暂存的新闻列表');
-export const getDraftNewsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=新闻&time=${moment().valueOf()}`, [getDraftNewsListOK]);
-//获取新闻列表
-export const getNewsListOK = createAction('xhy获取新闻列表');
-export const getNewsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=新闻&is_draft=false&time=${moment().valueOf()}`, [getNewsListOK]);
-//获取暂存的通知列表
-export const getDraftTipsListOK = createAction('xhy获取暂存的通知列表');
-export const getDraftTipsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=公告&time=${moment().valueOf()}`, [getDraftTipsListOK]);
-//获取通知列表
-export const getTipsListOK = createAction('xhy获取通知列表');
-export const getTipsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=公告&is_draft=false&time=${moment().valueOf()}`, [getTipsListOK]);
+
+
 //发布新闻或公告
 export const postData = createFetchAction(`${base}/main/api/post/`, [],'POST');
 //编辑新闻或公告
 export const patchData = createFetchAction(`${base}/main/api/post/{{pk}}/`, [],'PATCH');
 //删除新闻或公告
-export const deleteData = createFetchAction(`${base}/main/api/post/{{pk}}/`, [],'DELETE');
+export const deleteData = createFetchAction(`${base}/main/api/post/{{pk}}/?this=true`, [],'DELETE');
 
 //设置上传的文件列表
 export const postUploadFiles = createAction('xhy设置上传的文件列表');
 
 //设置上传的视频
 export const postUploadVideo = createAction('xhy设置上传的视频');
+
+//获取暂存的项目安全公告
+export const getDraftTipsListOK = createAction('xhy获取暂存项目安全公告');
+export const getDraftTipsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=公告&category=1&time=${moment().valueOf()}`, [getDraftTipsListOK]);
+//获取项目安全公告
+export const getTipsListOK = createAction('xhy获取项目安全公告');
+export const getTipsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=公告&is_draft=false&category=1&time=${moment().valueOf()}`, [getTipsListOK]);
+
+//获取暂存的国内安全动态
+export const getDraftNewsListOK = createAction('xhy获取暂存的国内安全动态');
+export const getDraftNewsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=新闻&category=2&time=${moment().valueOf()}`, [getDraftNewsListOK]);
+//获取国内安全动态
+export const getNewsListOK = createAction('xhy获取国内安全动态');
+export const getNewsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=新闻&is_draft=false&category=2&time=${moment().valueOf()}`, [getNewsListOK]);
+
+//获取暂存的安全事故快报
+export const getTrendsListOK = createAction('xhy获取暂存安全事故快报');
+export const getTrendsList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=公告&category=3&time=${moment().valueOf()}`, [getTrendsListOK]);
+//获取安全事故快报
+export const getTrenListOK = createAction('xhy获取安全事故快报');
+export const getTrenList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=公告&is_draft=false&category=3&time=${moment().valueOf()}`, [getTrenListOK]);
+
+//获取暂存的安全生产视频
+export const getVideosListOK = createAction('xhy获取暂存安全生产视频');
+export const getVideosList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&is_draft=true&tag=公告&category=5&time=${moment().valueOf()}`, [getVideosListOK]);
+//获取安全生产视频
+export const getVideoListOK = createAction('xhy获取安全生产视频');
+export const getVideoList = createFetchAction(`${base}/main/api/post/?publisher={{user_id}}&tag=公告&is_draft=false&category=5&time=${moment().valueOf()}`, [getVideoListOK]);
 
 export const actions = {
 	setTabActive,
@@ -60,7 +78,22 @@ export const actions = {
 	patchData,
 	deleteData,
 	postUploadFiles,
-	postUploadVideo
+	postUploadVideo,
+
+	getTrendsListOK,
+	getTrendsList,
+	getTrenListOK,
+	getTrenList,
+
+	getVideosListOK,
+	getVideosList,
+	getVideoListOK,
+	getVideoList,
+
+
+
+
+
 };
 export default handleActions({
 	[setTabActive]: (state, {payload}) => ( {
@@ -111,4 +144,26 @@ export default handleActions({
 		...state,
 		videoList: payload
 	}),
+
+
+
+	[getTrenListOK]: (state, {payload}) => ( {
+		...state,
+		trenList: payload
+	}),
+	[getTrendsListOK]: (state, {payload}) => ( {
+		...state,
+		trendsList: payload
+	}),
+
+
+	[getVideosListOK]: (state, {payload}) => ( {
+		...state,
+		videosList: payload
+	}),
+	[getVideoListOK]: (state, {payload}) => ( {
+		...state,
+		videoList: payload
+	}),
+
 }, {});
