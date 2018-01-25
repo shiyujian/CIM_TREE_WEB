@@ -441,9 +441,16 @@ export default class EntryTable extends Component {
             getNurserysCountFast({},{etime:param.etime})
             .then(rst => {
                 
-                 let res = groupBy(rst, function(n){
+                 let object = groupBy(rst, function(n){
                 return n.Section
             });
+                 
+                 let res = {};
+                 res["1标段"]=object["1标段"];
+                 res["2标段"]=object["2标段"];
+                 res["3标段"]=object["3标段"];
+                 res["4标段"]=object["4标段"];
+                 res["5标段"]=object["5标段"];
             let biaoduan = Object.keys(res);
             let trees = [];
             let wsx = [];
@@ -502,7 +509,7 @@ export default class EntryTable extends Component {
             })
         } else if(index === 2) {
             this.setState({loading2:true})
-            console.log(param,"haha");
+            
            getNurserysCountFast({},param)
            // getNurserysCountFast()
             .then(rst => {
