@@ -157,7 +157,7 @@ class TableInfo extends Component {
                 const currentUser = {
                     "username": user.username,
                     "person_code": user.code,
-                    "person_name": 'aaaa',
+                    "person_name": user.name,
                     "id": parseInt(user.id)
                 };
                 let subject = [{
@@ -284,8 +284,8 @@ class TableInfo extends Component {
             dataReview: this.member
         });
     }
-    //上传文件
-    uploadProps = {
+     //上传文件
+     uploadProps = {
 		name: 'a_file',
 		multiple: true,
 		showUploadList: false,
@@ -493,8 +493,7 @@ class TableInfo extends Component {
                                                         ]
                                                     })
                                                         (
-                                                        
-                                                        <Input placeholder='请输入名称' />
+                                                            <PerSearch selectMember={this.selectMember.bind(this)}/>
                                                         )
                                                 }
                                             </FormItem>
@@ -555,11 +554,6 @@ class TableInfo extends Component {
                 return (
                     <span>
                         <a onClick={this.clickInfo.bind(this, record, 'VIEW')}>查看</a>
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this.clickInfo.bind(this, record, 'DOWNLOAD')}>下载</a>
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this.clickInfo.bind(this, record, 'CARD')}>查看流程卡</a>
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
 					</span>
                 )
             },
