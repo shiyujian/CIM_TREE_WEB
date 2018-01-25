@@ -541,7 +541,7 @@ export default class ScheduleTable extends Component {
     // }
 
     qury(index,param) {
-        // debugger;
+        
         const {actions: {gettreetype1,gettreetype2,gettreetype3,gettreetype4,getCount,getCountSection,getCountSmall,getCountThin},leftkeycode} = this.props;
         param.no = leftkeycode;
         if(index === 1 ){
@@ -848,9 +848,7 @@ export default class ScheduleTable extends Component {
             }) 
         } else if(index === 3) {
             this.setState({loading3:true})
-            debugger;
             gettreetype3({},param)
-
             .then(rst => {
                 console.log(rst);
                  let biaoduan1 = [];

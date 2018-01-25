@@ -31,7 +31,7 @@ export default class Scheduleanalyze extends Component {
             treeLists: [],
             sectionoption: [],
             smallclassoption: [],
-            leftkeycode: '',
+            leftkeycode: 'P009-01',
             section: '',
             smallclass: '',
             data:[],
@@ -45,11 +45,14 @@ export default class Scheduleanalyze extends Component {
          // const {actions: {getTree}} = this.props;
           
 
-        const {actions: {getTree,getTreeList}} = this.props;
-           getTree()
+        const {actions: {setkeycode,getTree,getTreeList}} = this.props;
+        // setkeycode(value);
+        const {leftkeycode} = this.state;
+           getTree({},{parent:leftkeycode})
             .then(rst => {
                 this.setSectionOption(rst);
-                this.setSmallClassOption(rst);
+                this.setSmallClassOption(rst,"1标段");
+                // this.sectionselect(rst);
             });
         //地块树
          try {
@@ -186,12 +189,10 @@ export default class Scheduleanalyze extends Component {
             rst.map((item, index) => {
                 if(rst[index].Section == value) {
                     let smallclassName = rst[index].Name.replace("号小班","");
-                     if (smallclassName < 100) {
-                            smallclassName = "0" + smallclassName;
-                        }
-                        // if (smallclassName < 10) {
-                        //     smallclassName = "00" + smallclassName;
-                        // }
+                     // if (smallclassName < 100) {
+                     //        smallclassName = "0" + smallclassName;
+                     //    }
+                       
                     let smallname = {
                         Name: smallclassName,
                     }
@@ -233,6 +234,7 @@ export default class Scheduleanalyze extends Component {
                 if(item.Section) {
                     let sections = item.Section;
                     sectionList.push(sections);
+
                 }
             })
             let sectionData = [...new Set(sectionList)];
@@ -246,15 +248,23 @@ export default class Scheduleanalyze extends Component {
     }
 
     //设置小班选项
-    setSmallClassOption(rst){
+    setSmallClassOption(rst,biaoduan){
+       debugger;
         if(rst instanceof Array){
             let smallclassList = [];
             let smallclassOptions = [];
             let smallclassoption = rst.map(item => {
+                if (item.Section === biaoduan){
                 if(item.Name) {
-                    let smalls = item.Name;
-                    smallclassList.push(smalls);
+                    let smalls = item.Name.replace("号小班","");
+                     if (smalls < 100) {
+                            smalls = "0" + smalls;
+                        }
+                    smallclassList.push(smalls)
                 }
+            }
+                
+                
             })
             let smallclassData = [...new Set(smallclassList)];
             smallclassData.sort();
