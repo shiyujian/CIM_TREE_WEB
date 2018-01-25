@@ -251,10 +251,10 @@ class Plan extends Component {
 												{
 													getFieldDecorator('timedate', {
 														rules: [
-															{ required: true, message: '请输入监理单位' }
+															{ required: true, message: '请输入日期' }
 														]
 													})
-														(<Input placeholder='请输入监理单位' />)
+														(<Input placeholder='请输入日期' />)
 												}
 											</FormItem>
 										</Col>
