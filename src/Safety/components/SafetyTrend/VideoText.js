@@ -1,23 +1,24 @@
-import React, {Component} from 'react';
-import {Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Progress} from 'antd';
+import React, { Component } from 'react';
+import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Progress } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import {getUser} from '../../../_platform/auth';
-import {base, STATIC_DOWNLOAD_API,SOURCE_API} from '../../../_platform/api';
+import { getUser } from '../../../_platform/auth';
+import { base, STATIC_DOWNLOAD_API, SOURCE_API } from '../../../_platform/api';
 import E from 'wangeditor'
+let fileTypes = 'application/mp4,application/3gpp,application/wmv,video/mp4,video/ogg,video/webm';
 
 let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
-const {TextArea} = Input;
+const { TextArea } = Input;
 
 class VideoText extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			content: "",
-			progress: 0,			
+			progress: 0,
 		}
 	}
 
@@ -72,23 +73,23 @@ class VideoText extends Component {
 				insertImg(url)
 			}
 		};
-		editor.customConfig.customAlert = function(info){
+		editor.customConfig.customAlert = function (info) {
 			alert(info + ' \n\n如果粘贴无效，请使用图片上传功能进行上传');
 		}
 		editor.create();
 
 		const {
-			actions:{postUploadFiles},
+			actions: { postUploadFiles },
 			toggleData: toggleData = {
 				type: 'NEWS',
 				status: 'ADD',
 				visible: false,
 				editData: null
 			},
-			form: {setFieldsValue}
+			form: { setFieldsValue }
 		} = this.props;
 		if (toggleData.type === 'NEWS' && toggleData.status === 'EDIT') {
-			postUploadFiles(toggleData.editData.attachment.fileList)			
+			postUploadFiles(toggleData.editData.attachment.fileList)
 			this.setState({
 				content: toggleData.editData.raw
 			});
@@ -104,35 +105,35 @@ class VideoText extends Component {
 		multiple: true,
 		showUploadList: false,
 		action: base + "/service/fileserver/api/user/files/",
-		beforeUpload: ()=>{
-			this.setState({progress:0});
+		beforeUpload: () => {
+			this.setState({ progress: 0 });
 		},
-		onChange:({file,event})=>{
+		onChange: ({ file, event }) => {
 			const status = file.status;
 			if (status === 'done') {
-				const {actions:{postUploadFiles},fileList=[]}=this.props;
-				let newFileList=fileList;
-				let newFile={
-					name:file.name,
-					down_file:STATIC_DOWNLOAD_API + "/media"+file.response.download_url.split('/media')[1]
+				const { actions: { postUploadFiles }, fileList = [] } = this.props;
+				let newFileList = fileList;
+				let newFile = {
+					name: file.name,
+					down_file: STATIC_DOWNLOAD_API + "/media" + file.response.download_url.split('/media')[1]
 				};
-				newFileList=newFileList.concat(newFile);
+				newFileList = newFileList.concat(newFile);
 				console.log(newFileList)
 				// postUploadVideo(newFileList)
 				postUploadFiles(newFileList)
 			}
-			if(event){
-				let {percent} = event;
-				if(percent!==undefined)
-					this.setState({progress:parseFloat(percent.toFixed(1))});
+			if (event) {
+				let { percent } = event;
+				if (percent !== undefined)
+					this.setState({ progress: parseFloat(percent.toFixed(1)) });
 			}
 		},
 	};
 
 	//modal显示与影藏
 	modalClick() {
-		const {actions: {toggleModal,postUploadFiles}} = this.props;
-		postUploadFiles([]);		
+		const { actions: { toggleModal, postUploadFiles } } = this.props;
+		postUploadFiles([]);
 		toggleModal({
 			type: null,
 			status: null,
@@ -143,15 +144,15 @@ class VideoText extends Component {
 	//发布新闻
 	postData() {
 		const {
-			actions: {postData, getVideoList, patchData, getVideosList,postUploadFiles},
-			form: {validateFields},
+			actions: { postData, getVideoList, patchData, getVideosList, postUploadFiles },
+			form: { validateFields },
 			toggleData: toggleData = {
 				type: 'NEWS',
 				status: 'ADD',
 				visible: false,
 				editData: null
 			},
-			fileList=[]			
+			fileList = []
 		} = this.props;
 		validateFields((err, values) => {
 			if (!err) {
@@ -163,7 +164,7 @@ class VideoText extends Component {
 						"raw": this.state.content,
 						"content": "",
 						"attachment": {
-							"fileList":fileList || [],
+							"fileList": fileList || [],
 						},
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -181,7 +182,7 @@ class VideoText extends Component {
 								getVideoList({
 									user_id: getUser().id
 								});
-								postUploadFiles([]);								
+								postUploadFiles([]);
 							}
 						})
 				} else if (toggleData.status === 'EDIT') {
@@ -191,12 +192,12 @@ class VideoText extends Component {
 						"raw": this.state.content,
 						"categories": [5],
 						"attachment": {
-							"fileList":fileList || [],
+							"fileList": fileList || [],
 						},
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"is_draft": false
 					};
-					patchData({pk: toggleData.editData.id}, newData)
+					patchData({ pk: toggleData.editData.id }, newData)
 						.then(rst => {
 							if (rst.id) {
 								this.modalClick();
@@ -208,7 +209,7 @@ class VideoText extends Component {
 								getVideosList({
 									user_id: getUser().id
 								});
-								postUploadFiles([]);								
+								postUploadFiles([]);
 							}
 						})
 				}
@@ -219,13 +220,13 @@ class VideoText extends Component {
 	//暂存新闻
 	draftDataFunc() {
 		const {
-			actions: {postData, patchData, getVideoList, getVideosList},
-			form: {validateFields},
+			actions: { postData, patchData, getVideoList, getVideosList },
+			form: { validateFields },
 			toggleData: toggleData = {
 				status: 'ADD',
 				editData: null,
 			},
-			fileList=[]			
+			fileList = []
 		} = this.props;
 		//判断暂存的是新增的还是编辑的暂存
 		//编辑暂存的
@@ -237,12 +238,12 @@ class VideoText extends Component {
 					"raw": this.state.content,
 					"categories": [5],
 					"attachment": {
-						"fileList":fileList || [],
+						"fileList": fileList || [],
 					},
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"is_draft": true
 				};
-				patchData({pk: toggleData.editData.id}, newData)
+				patchData({ pk: toggleData.editData.id }, newData)
 					.then(rst => {
 						if (rst.id) {
 							this.modalClick();
@@ -265,7 +266,7 @@ class VideoText extends Component {
 					"raw": this.state.content || '',
 					"categories": [5],
 					"attachment": {
-						"fileList":fileList || [],
+						"fileList": fileList || [],
 					},
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [2],
@@ -288,6 +289,7 @@ class VideoText extends Component {
 	}
 
 	render() {
+		// fileTypes = judgeFile.indexOf('照片') == -1 ? 'application/mp4,application/3gpp,video/3gpp,video/mp4' : 'video/mp4,video/3gpp,';		
 		// const {
 		// 	form: {getFieldDecorator},
 		// 	toggleData: toggleData = {
@@ -297,52 +299,52 @@ class VideoText extends Component {
 		// 	}
 		// } = this.props;
 		const {
-			form: {getFieldDecorator},
+			form: { getFieldDecorator },
 			toggleData: toggleData = {
 				type: 'NEWS',
 				status: 'ADD',
 				visible: false,
 			},
-			fileList=[]
+			fileList = []
 		} = this.props;
 		// console.log(this.props.fileList)
 
-		const {progress} = this.state;
+		const { progress } = this.state;
 
 		const formItemLayout = {
-			labelCol: {span: 8},
-			wrapperCol: {span: 16},
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
 		};
 
 		return (
 			<Modal
-			title={toggleData.type === 'TIPS' ? (
-				toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
-			) : '发布公告'}
-			visible={toggleData.visible}
-			footer={null}
-			width="80%"
-			maskClosable={false}
-			onOk={this.modalClick.bind(this)}
-			onCancel={this.modalClick.bind(this)}
-		>
+				title={toggleData.type === 'TIPS' ? (
+					toggleData.status === 'ADD' ? '发布公告' : '编辑公告'
+				) : '发布公告'}
+				visible={toggleData.visible}
+				footer={null}
+				width="80%"
+				maskClosable={false}
+				onOk={this.modalClick.bind(this)}
+				onCancel={this.modalClick.bind(this)}
+			>
 				<div>
 					<Form>
 						<Row>
 							<Col span={5} offset={1}>
 								<FormItem {...formItemLayout} label="新闻标题">
 									{getFieldDecorator('title', {
-										rules: [{required: true, message: '请输入新闻标题'}],
+										rules: [{ required: true, message: '请输入新闻标题' }],
 										initialValue: ''
 									})(
-										<Input type="text" placeholder="新闻标题"/>
-									)}
+										<Input type="text" placeholder="新闻标题" />
+										)}
 								</FormItem>
 							</Col>
 							<Col span={5} offset={1}>
 								<FormItem {...formItemLayout} label="关键字">
 									{getFieldDecorator('abstract', {})(
-										<Input type="text" placeholder="请输入关键字"/>
+										<Input type="text" placeholder="请输入关键字" />
 									)}
 								</FormItem>
 							</Col>
@@ -359,22 +361,26 @@ class VideoText extends Component {
 							<Col span={10} offset={1}>
 								<Row>
 									<Col>
-										<Dragger {...this.uploadProps}>
+										<Dragger {...this.uploadProps}
+											accept={fileTypes}
+										>
 											<p className="ant-upload-drag-icon">
-												<Icon type="inbox"/>
+												<Icon type="inbox" />
 											</p>
 											<p className="ant-upload-text">
 												点击或者拖拽开始上传</p>
+											<p className="ant-upload-hint">
+												支持mp4、ogg、webm视频</p>
 										</Dragger>
 									</Col>
 									<Col>
-										<Progress percent={progress}/>
+										<Progress percent={progress} />
 									</Col>
 									<Col>
 										<Table columns={this.columns}
-											   dataSource={fileList}
-											   pagination={false}
-											   bordered rowKey="down_file"/>
+											dataSource={fileList}
+											pagination={false}
+											bordered rowKey="down_file" />
 									</Col>
 								</Row>
 							</Col>
@@ -397,8 +403,8 @@ class VideoText extends Component {
 			},
 		}
 	];
-	removeFile(file){
-		const {actions:{postUploadFiles},fileList=[]}=this.props;
+	removeFile(file) {
+		const { actions: { postUploadFiles }, fileList = [] } = this.props;
 		let newFileList = fileList.filter(f => f.down_file !== file.down_file);
 		postUploadFiles(newFileList)
 	}

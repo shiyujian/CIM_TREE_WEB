@@ -5,6 +5,7 @@ import moment from 'moment';
 import ToggleModal from './ToggleModal'
 import { getUser } from '../../../_platform/auth';
 import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import '../../../Datum/components/Datum/index.less'
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -131,6 +132,10 @@ class ReceivePage extends Component {
 
 
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		const {
 			receiveInfo = {},
 			form: { getFieldDecorator },
@@ -192,7 +197,7 @@ class ReceivePage extends Component {
 									</FormItem>
 								</Col>
 							</Row>
-							
+
 							<Row>
 								<Col span={8} >
 									<FormItem {...formItemLayout} label="来文单位">
@@ -212,7 +217,7 @@ class ReceivePage extends Component {
 											rules: [{ required: false, message: '请输入编号' }],
 											initialValue: ''
 										})(
-											<Input type="text" 
+											<Input type="text"
 											/>
 											)}
 									</FormItem>
@@ -227,7 +232,7 @@ class ReceivePage extends Component {
 												]
 											})
 												(<RangePicker
-													style={{ verticalAlign: "middle", width:'98%' }}
+													style={{ verticalAlign: "middle", width: '98%' }}
 													// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
 													showTime={{ format: 'HH:mm:ss' }}
 													format={'YYYY/MM/DD HH:mm:ss'}
@@ -250,8 +255,13 @@ class ReceivePage extends Component {
 						</Col>
 					</Row>
 					{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
-					<Table dataSource={this._getNewArrFunc(notifications)}
+					<Table
+						rowSelection={rowSelection}
+						dataSource={this._getNewArrFunc(notifications)}
 						columns={this.columns}
+						title={() => '收文查询'}
+						className="foresttables"
+						bordered
 					/>
 				</Col>
 				<Modal
@@ -316,9 +326,9 @@ class ReceivePage extends Component {
 
 		let arr = list;
 
-		list.map((itm, index) => { 
+		list.map((itm, index) => {
 			itm.index = index + 1;
-            if(item.external_attachments.backTo_id === item.pk ){
+			if (item.external_attachments.backTo_id === item.pk) {
 
 			}
 
@@ -327,19 +337,19 @@ class ReceivePage extends Component {
 
 		return [{
 			index: '1', key: 1, notification_title: '花开', from_whom: '嘻嘻北苑',
-			children: [{ index: '2', key: 11, notification_title: '富贵', from_whom: '嘻嘻北苑'}]
-		},{index: '3', key: 3, notification_title: '花开', from_whom: '嘻嘻北苑',}]
+			children: [{ index: '2', key: 11, notification_title: '富贵', from_whom: '嘻嘻北苑' }]
+		}, { index: '3', key: 3, notification_title: '花开', from_whom: '嘻嘻北苑', }]
 
 
 
 	}
 	columns = [
 		{
-			title: 'ID',
+			title: '收文管理ID',
 			dataIndex: 'index',
 			key: 'index'
 		}, {
-			title: '标题',
+			title: '主题',
 			dataIndex: 'notification_title',
 			key: 'notification_title'
 		}, {

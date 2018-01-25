@@ -3,6 +3,8 @@ import { Form, Icon, Table, Spin, Tabs, Modal, Row, Col, Select, DatePicker, But
 import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
 import '../index.less';
+import '../../../Datum/components/Datum/index.less'
+
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -46,6 +48,11 @@ class SafetyTable extends Component {
 		}
 	}
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
+
 		const { tblData } = this.state;
 		const {
 			platform: { users = [] },
@@ -175,7 +182,7 @@ class SafetyTable extends Component {
 			</Row>
 			<Row>
 				<Table bordered
-					className='foresttable'
+					className='foresttables'
 					columns={columns}
 					rowKey='order'
 					loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.state.loading }}

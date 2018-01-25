@@ -94,33 +94,33 @@ export default class ForestContainer extends Component {
 			name: '供应商诚信信息',
 		}]
 	},
-	// {
-	// 	key: 'analyze',
-	// 	id: 'FOREST.ANALYZE',
-	// 	name: '数据分析',
-	// 	children: [{
-	// 		key: 'enteranalyze',
-	// 		id: 'ENTERANALYZE',
-	// 		path: '/forest/enteranalyze',
-	// 		name: '苗木进场分析',
-	// 	},{
-	// 		key: 'scheduleanalyze',
-	// 		id: 'SCHEDULEANALYZE',
-	// 		path: '/forest/scheduleanalyze',
-	// 		name: '种植进度分析',
-	// 	},{
-	// 		key: 'qualityanalyze',
-	// 		id: 'QUALITYANALYZE',
-	// 		path: '/forest/qualityanalyze',
-	// 		name: '种植质量分析',
-	// 	},{
-	// 		key: 'faithanalyze',
-	// 		id: 'FAITHANALYZE',
-	// 		path: '/forest/faithanalyze',
-	// 		name: '诚信供应商分析',
-	// 	}
-	// 	]
-	// },
+	{
+		key: 'analyze',
+		id: 'FOREST.ANALYZE',
+		name: '数据分析',
+		children: [{
+			key: 'enteranalyze',
+			id: 'ENTERANALYZE',
+			path: '/forest/enteranalyze',
+			name: '苗木进场分析',
+		},{
+			key: 'scheduleanalyze',
+			id: 'SCHEDULEANALYZE',
+			path: '/forest/scheduleanalyze',
+			name: '种植进度分析',
+		},{
+			key: 'qualityanalyze',
+			id: 'QUALITYANALYZE',
+			path: '/forest/qualityanalyze',
+			name: '种植质量分析',
+		},{
+			key: 'faithanalyze',
+			id: 'FAITHANALYZE',
+			path: '/forest/faithanalyze',
+			name: '诚信供应商分析',
+		}
+		]
+	},
 	{
 		key: 'import',
 		id: 'FOREST.IMPORT',

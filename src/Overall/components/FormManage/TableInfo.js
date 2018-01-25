@@ -9,6 +9,8 @@ import PerSearch from './PerSearch';
 import {WORKFLOW_CODE} from '../../../_platform/api';
 import {getNextStates} from '../../../_platform/components/Progress/util';
 import queryString from 'query-string';
+import '../../../Datum/components/Datum/index.less'
+
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
 moment.locale('zh-cn');
@@ -360,7 +362,10 @@ class TableInfo extends Component {
                 <Button onClick={this.deleteClick.bind(this)}>删除</Button>
                 <Table
                     columns={this.columns}
-                    rowSelection={rowSelection} />
+                    rowSelection={rowSelection} 
+                    className="foresttables"
+                    bordered
+                    />
                 <Modal
                     title="新增文档"
                     width={920}

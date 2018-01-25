@@ -5,6 +5,7 @@ import Modals from './SimpModal';
 
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
+import '../../../Datum/components/Datum/index.less'
 
 const TabPane = Tabs.TabPane;
 const user_id = getUser().id;
@@ -196,6 +197,10 @@ class TipsTable extends Component {
 	}
 
 	render() {
+		const rowSelection = {
+			// selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
 		const {
 			tipsList = [],
 			draftTipsList = [],
@@ -317,7 +322,7 @@ class TipsTable extends Component {
 
 										</Col>
 									</Row>
-								
+
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
@@ -326,10 +331,15 @@ class TipsTable extends Component {
 									<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
 								</Col>
 							</Row>
-							<Table dataSource={tipsList}
+							<Table
+								rowSelection={rowSelection}
+								dataSource={tipsList}
+								title={() => '通知查询'}
+								className="foresttables"
 								columns={this.columns}
+								bordered
 								rowKey="id"
-							
+
 							/>
 						</TabPane>
 						<TabPane tab="暂存的通知" key="2">
@@ -420,20 +430,27 @@ class TipsTable extends Component {
 
 										</Col>
 									</Row>
-									
+
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
 								</Col>
 								<Col span={2}>
-									<Button  icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
+									<Button icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
 								</Col>
 							</Row>
-							<Table dataSource={draftTipsList}
+							<Table 
+								rowSelection={rowSelection}
+								dataSource={draftTipsList}
 								columns={this.draftColumns}
+								title={() => '暂存的通知'}
+								className="foresttables"
+								bordered
 								rowKey="id"
-								
+
 							/>
+
+
 						</TabPane>
 						{/* <TabPane tab="通知发布" key="3">
 							<SimpleText {...this.props} />
@@ -446,7 +463,7 @@ class TipsTable extends Component {
 
 	columns = [
 		{
-			title: '公告ID',
+			title: '通知查询ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {
@@ -489,7 +506,7 @@ class TipsTable extends Component {
 	];
 	draftColumns = [
 		{
-			title: '公告ID',
+			title: '暂存通知ID',
 			dataIndex: 'id',
 			key: 'id',
 		}, {

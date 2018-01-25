@@ -83,7 +83,7 @@ import {message} from 'antd'
 			HuaFen,DanweiJL,DanweiJLAsk,Monitoring,
 			TianBao,TianBao2, Fenbu, Danwei, FenbuRecord,
 			Query,FenbuPreview,Subitem,DanWeiAsk,FenbuCheck,
-			Score,Search,Appraising} = this.state || {};
+			Score,Search,Appraising,Faithanalyze} = this.state || {};
 
 		let dwys = this.state.dwysjl?DanweiJL:Danwei;
 		let jyptb = this.state.dwysjl?TianBaoJL:TianBao;
@@ -115,7 +115,7 @@ import {message} from 'antd'
 				{Score && <Route path="/quality/score" component={Score}/>}
 				{Search && <Route path="/quality/score/search" component={Score}/>}
 				{Appraising && <Route path="/quality/appraising" component={Appraising}/>}
-				{/*Faithanalyze && <Route path="/quality/faithanalyze" component={Faithanalyze}/>*/}
+				{Faithanalyze && <Route path="/quality/faithanalyze" component={Faithanalyze}/>}
 
 			</Main>
 			</Body>);
