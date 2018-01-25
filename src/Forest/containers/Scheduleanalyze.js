@@ -170,19 +170,27 @@ export default class Scheduleanalyze extends Component {
                  // 小班默认值
                 getTree({},{parent:keycode})
                 .then(rst => {
-                    console.log('rst2',rst)
-                    let smallName;
-                    let smallNameArr = Array();
-                    if(rst instanceof Array){
-                        let smallclassoption = rst.map(item => {
-                            let smallclassName = item.Name;
-                            smallName = smallclassName.replace("号小班","");
-                            smallNameArr.push(smallName);
-                            return <Option key={smallName} value={smallName}>{smallName}</Option>
-                        })
-                        console.log('smallNameArr', smallNameArr)
-                        this.setState({smallclassoption, smallclass:smallNameArr[0]})
-                    }  
+                    let smallclasses = [];
+                    let smallclassList = [];
+                    let smallclassOptions = [];
+                    rst.map((item, index) => {
+                        if(rst[index].Section == "1标段") {
+                            let smallname = {
+                                Name: rst[index].Name,
+                            }
+                            smallclasses.push(smallname)
+                        }
+                    })
+                    let smallclassoption = smallclasses.map(item => {
+                        if(item.Name) {
+                            let smallName = item.Name.replace("号小班","");
+                            smallclassList.push(smallName);
+                        }
+                    })
+                    smallclassList.map(small => {
+                        smallclassOptions.push(<Option key={small} value={small}>{small}</Option>)
+                    })
+                    this.setState({smallclassoption: smallclassOptions, smallclass: smallclassList[0]})
                 })
                 this.setState({sectionoption: sectionOptions,section:rst[0].Section})
             }
