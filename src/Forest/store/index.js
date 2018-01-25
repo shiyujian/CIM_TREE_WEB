@@ -41,9 +41,9 @@ export const getreturnowner = createFetchAction(`${FOREST_API}/trees/return/owne
 export const getreturnsupervision = createFetchAction(`${FOREST_API}/trees/return/supervision/`, []);
 export const getCount = createFetchAction(`${FOREST_API}/trees/count/`, []);
 export const getTreesProgress = createFetchAction(`${FOREST_API}/trees/progress/`, []);
-export const getCountSection = createFetchAction(`${FOREST_API}/trees/count/section/`, []);
-export const getCountSmall = createFetchAction(`${FOREST_API}/trees/count/small/`, []);
-export const getCountThin = createFetchAction(`${FOREST_API}/trees/count/thin/`, []);
+export const getCountSection = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
+export const getCountSmall = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass`, []);
+export const getCountThin = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass`, []);
 export const getHonesty = createFetchAction(`${FOREST_API}/trees/honesty/`, []);
 export const getHonestyNursery = createFetchAction(`${FOREST_API}/trees/honesty/nursery/`, []);
 export const getHonestyNew = createFetchAction(`${FOREST_API}/tree/factoryAnalyseInfo`, []);
@@ -51,7 +51,7 @@ export const getHonestyNewSort = createFetchAction(`${FOREST_API}/trees/honesty/
 export const postFile = createFetchAction(`${FOREST_API}/db/import_location/`, [], 'POST');
 export const getHonestyNewDetail = createFetchAction(`${FOREST_API}/tree/factoryAnalyseDetailInfo?factory={{name}}`, [getHonestyNewDetailOk], 'GET');
 export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/honesty/new/?detail=true`, []);
-export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/trees/honesty/nursery/treetype/`, '');
+export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, '');
 export const actions = {
 	getTreeOK,
 	getTree,

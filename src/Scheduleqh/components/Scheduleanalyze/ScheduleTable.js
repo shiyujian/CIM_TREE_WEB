@@ -23,8 +23,10 @@ export default class ScheduleTable extends Component {
             plan_amount: '',
             pers: '',
             score: '',
-            stime1: moment().format('YYYY-MM-DD HH:mm:ss'),
-            etime1: moment().format('YYYY-MM-DD HH:mm:ss'),
+            stime: moment().format('YYYY-MM-DD HH:mm:ss'),
+            etime: moment().format('YYYY-MM-DD HH:mm:ss'),
+            stime1: moment().format('2017-11-10 00:00:00'),
+            etime1: moment().format('2017-11-30 00:00:00'),
             etime2: moment().format('YYYY-MM-DD HH:mm:ss'),
             etime3: moment().format('YYYY-MM-DD HH:mm:ss'),
             etime4: moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -41,6 +43,8 @@ export default class ScheduleTable extends Component {
         }
     }
     componentWillReceiveProps(nextProps){
+        
+        
         if(nextProps.section != this.state.section && nextProps.leftkeycode != '') {
             this.setState({
                 section: nextProps.section,
@@ -50,14 +54,14 @@ export default class ScheduleTable extends Component {
         }
         if(nextProps.smallclass != this.state.smallclass && nextProps.leftkeycode != ''){
             this.setState({
-                smallclass:nextProps.smallclass
+                smallclass:nextProps.smallclass,
             }, () => {
                 this.datepickok(4);
             })
         } 
         if(nextProps.leftkeycode != this.state.leftkeycode) {
             this.setState({
-                leftkeycode:nextProps.leftkeycode
+                leftkeycode:this.state.leftkeycode,
             }, () => {
                 this.datepickok(1);
                 this.datepickok(2);
@@ -69,8 +73,8 @@ export default class ScheduleTable extends Component {
     }
 	componentDidMount() {
         const {actions: {gettreetype1}} = this.props;
-        const param = {stime:this.state.stime1,etime:this.state.etime1};
-        console.log(param);
+        const param = {stime:this.state.stime,etime:this.state.etime};
+        
         gettreetype1().then(rst=>{
              let Num1 = 0;
             for(var i = 0; i<=rst.length-1; i++){
@@ -404,25 +408,27 @@ export default class ScheduleTable extends Component {
         const {sectionoption, smallclassoption} = this.props;
         const {section, smallclass} = this.state;
         return <div>
-                    <Select value={section} onSelect={this.onsectionchange.bind(this)} style={{width: '65px'}}>
+                    <Select value={section}  onSelect={this.onsectionchange.bind(this)} style={{width: '65px'}}>
                         {sectionoption}
                     </Select>
-                    <Select value={smallclass} onChange={this.smallclasschange.bind(this)} style={{width: '54px'}}>
+                    <Select value={smallclass}  onChange={this.smallclasschange.bind(this)} style={{width: '100px'}}>
                         {smallclassoption}
                     </Select>
                     <span>小班各细班种植进度分析</span>
                 </div>
     }
     onsectionchange(value) {
-        // const {sectionselect} = this.props;
-        // sectionselect(value)
+        
+        const {sectionselect} = this.props;
+
+        sectionselect(value)
         this.setState({section:value},() => {
             this.datepickok(3)
         })
     }
 
     smallclasschange(value){
-        console.log(value,"cnm")
+        
         this.setState({smallclass:value},() => {
             this.datepickok(4)
         })
@@ -478,8 +484,9 @@ export default class ScheduleTable extends Component {
             let param = {
                 // etime:etime3?moment(etime3).add(8, 'h').unix():'',
                 etime:this.state.etime3,
-                section
+                section:section,
             }
+          
             this.qury(index,param);
         }
         if(index == 4 ) {
@@ -536,15 +543,15 @@ export default class ScheduleTable extends Component {
     // }
 
     qury(index,param) {
-        // debugger;
+        
         const {actions: {gettreetype1,gettreetype2,gettreetype3,gettreetype4,getCount,getCountSection,getCountSmall,getCountThin},leftkeycode} = this.props;
         param.no = leftkeycode;
         if(index === 1 ){
             this.setState({loading1:true})
-            console.log(param,"xiamada");
+            
             gettreetype1({},param)
             .then(rst => {
-                console.log(rst,"fenbushi");
+                
                let res = groupBy(rst, function(n){
                 return n.Time
             });
@@ -554,7 +561,7 @@ export default class ScheduleTable extends Component {
                let biaoduan4 = [];
                let biaoduan5 = [];
                let bytime = Object.values(res);
-               console.log(bytime,"tiantain");
+               
                for(var x = 0 ; x <= bytime.length-1; x++){
                    let number1 = 0;
                    let number2 = 0;
@@ -604,14 +611,10 @@ export default class ScheduleTable extends Component {
                        }
                    }
                } 
-               console.log(biaoduan1,"dwad");
-               console.log(biaoduan2,"dwad");
-               console.log(biaoduan3,"dwad");
-               console.log(biaoduan4,"dwad");
-               console.log(biaoduan5,"dwad");
+              
                let lastshuzhu =[];
                lastshuzhu = [biaoduan1,biaoduan2,biaoduan3,biaoduan4,biaoduan5];
-               console.log(lastshuzhu,"vytdfifdufud");
+              
             let time = Object.keys(res);
             let value = Object.values(res);
             let biaoduan = Object.keys(res);
@@ -626,16 +629,6 @@ export default class ScheduleTable extends Component {
             }
             wsx.push(qaz);
             }
-            console.log(wsx,"wsx");
-            // let Num1 = 0;
-            // for(var i = 0; i<=rst.length-1; i++){
-            // Num1 = Num1 + rst[i].Num;
-            // }
-            // this.setState({
-            //      amount:Num1,
-            // })
-            console.log(value,"dajkh")
-            console.log(time);
                 this.setState({loading1:false})
                 if(!rst)
                     return
@@ -785,7 +778,7 @@ export default class ScheduleTable extends Component {
             // getCountSection({},param)
             gettreetype2({},param)
             .then(rst => {
-                console.log(rst);
+               
                 let biaoduan = [];
                 let yeszhongshu = [];
                 let notzhongshu = [];
@@ -798,11 +791,10 @@ export default class ScheduleTable extends Component {
                     yeszhongshu.push(rst[i].Complete);
                     notzhongshu.push(rst[i].Num-rst[i].Complete);
                 }
-                console.log(biaoduan,yeszhongshu,notzhongshu);
+                
                 this.setState({
                     loading2:false,
-                     // pers:allyeszhongshu/allzhongshu,
-                     // score:allyeszhongshu+"/"+allzhongshu
+                     
                      pers: division(allyeszhongshu,allzhongshu),
                      score: joint(allyeszhongshu,allzhongshu),
                      })
@@ -846,7 +838,7 @@ export default class ScheduleTable extends Component {
             this.setState({loading3:true})
             gettreetype3({},param)
             .then(rst => {
-                console.log(rst);
+                
                  let biaoduan1 = [];
                 let yeszhongshu1 = [];
                 let notzhongshu1 = [];
@@ -855,7 +847,7 @@ export default class ScheduleTable extends Component {
                     yeszhongshu1.push(rst[i].Complete);
                     notzhongshu1.push(rst[i].Num-rst[i].Complete);
                 }
-                console.log(biaoduan1,yeszhongshu1,notzhongshu1);
+                
                 this.setState({loading3:false})
                 if(!rst)
                     return
@@ -895,12 +887,12 @@ export default class ScheduleTable extends Component {
             })
         } else {
             this.setState({loading4:true})
-            console.log(param,"laodaye");
+            
             param.no = param.no + "-" +this.state.smallclass;
-            console.log(param.no,"smallclass");
+            
             gettreetype4({},param)
             .then(rst => {
-                console.log(rst);
+               
                  let biaoduan2 = [];
                 let yeszhongshu2 = [];
                 let notzhongshu2 = [];
@@ -909,8 +901,7 @@ export default class ScheduleTable extends Component {
                     yeszhongshu2.push(rst[i].Complete);
                     notzhongshu2.push(rst[i].UnComplete);
                 }
-                console.log(biaoduan2,yeszhongshu2,notzhongshu2);
-                
+               
                 this.setState({loading4:false})
 
                 if(!rst)

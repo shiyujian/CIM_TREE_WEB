@@ -1,110 +1,104 @@
-import React, {Component} from 'react';
-import {DynamicTitle,Content,Sidebar} from '_platform/components/layout';
-
+import React, { Component } from 'react';
+import { DynamicTitle, Content, Sidebar } from '_platform/components/layout';
 import ProjectUnitWrapper from '../components/ProjectUnitWrapper';
-import {getUser} from '_platform/auth';
-import {connect} from 'react-redux';
-
-import {bindActionCreators} from 'redux';
+import { getUser } from '_platform/auth';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import EditData from '../components/Stage/EditData';
 import moment from 'moment';
-import {SERVICE_API} from '_platform/api';
-import {getNextStates} from '_platform/components/Progress/util';
 import './Schedule.less';
-import {Link} from 'react-router-dom';
-import {WORKFLOW_CODE} from '_platform/api';
-import {SMUrl_template11} from '_platform/api';
-import EditableCell from '../components/EditableCell';
-import EditableCheckbox from '../components/EditableCheckbox';
+import { Link } from 'react-router-dom';
+import { WORKFLOW_CODE } from '_platform/api';
 import queryString from 'query-string';
-import Stagereporttab from '../components/stagereport/stagereporttab';
-import All from '../components/stagereport/all';
-import Plan from '../components/stagereport/plan';
-import {PkCodeTree, Cards} from '../components';
-import {actions as platformActions} from '_platform/store/global';
-import * as actions from '../store/entry';
+import { Stagereporttab, All, Plan } from '../components/stagereport';
+import { PkCodeTree, Cards } from '../components';
+import { actions as platformActions } from '_platform/store/global';
+import * as previewActions from '_platform/store/global/preview';
+import reducer, { actions } from '../store/stage';
 
-import {Row, Col,Spin, Card, DatePicker, Upload,Icon,notification,message,
-	Input,Button,Modal,Table,Form,Select,Radio,Calendar,Checkbox,Popover,Tabs} from 'antd';
+import {
+    Row, Col, Spin, Card, DatePicker, Upload, Icon, notification, message,
+    Input, Button, Modal, Table, Form, Select, Radio, Calendar, Checkbox, Popover, Tabs
+} from 'antd';
 const TabPane = Tabs.TabPane;
-const {RangePicker} = DatePicker;
-const {Option} = Select;
+const { RangePicker } = DatePicker;
+const { Option } = Select;
 const RadioGroup = Radio.Group;
 const CheckboxGroup = Checkbox.Group;
 
 @connect(
-	state => {
-		const {platform} = state || {};
-		return {platform};
-	},
-	dispatch => ({
-		actions: bindActionCreators({...platformActions,...actions}, dispatch)
-	})
+    state => {
+        const { schedule: { stage = {} }, platform } = state;
+        return { platform, ...stage };
+    },
+    dispatch => ({
+        actions: bindActionCreators({ ...platformActions, ...previewActions, ...actions }, dispatch)
+    })
 )
 
 class Stage extends Component {
-	static propTypes = {};
+    static propTypes = {};
 
-	constructor(props) {
-		super(props);
-		this.state = {
-			  treetypeoption: [],
+    constructor(props) {
+        super(props);
+        this.state = {
+            treetypeoption: [],
             treetyoption: [],
             treetypelist: [],
             treeLists: [],
             sectionoption: [],
             leftkeycode: '',
-		};
-	}
+        };
+    }
 
-	componentDidMount () {
-        console.log(this.props,"46546");
-        const {actions: {getTree,gettreetype,getTreeList,getNurserysCount}} = this.props;
+    componentDidMount() {
+        console.log(this.props, "46546");
+        const { actions: { getTree, gettreetype, getTreeList, } } = this.props;
         //地块树
-       try {
-            getTree({},{parent:'root'})
-            .then(rst => {
-                if(rst instanceof Array && rst.length > 0){
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
-                    getTree({},{parent:rst[0].No})
-                    .then(rst1 => {
-                        if(rst1 instanceof Array && rst1.length > 0){
-                            rst1.forEach((item,index) => {
-                                rst1[index].children = []
-                            })
-                            getNewTreeData(rst,rst[0].No,rst1)
-                            getTree({},{parent:rst1[0].No})
-                            .then(rst2 => {
-                                if(rst2 instanceof Array && rst2.length > 0){
-                                    getNewTreeData(rst,rst1[0].No,rst2)
-                                    this.setState({treeLists:rst},() => {
-                                        this.onSelect([rst2[0].No])
+        try {
+            getTree({}, { parent: 'root' })
+                .then(rst => {
+                    if (rst instanceof Array && rst.length > 0) {
+                        rst.forEach((item, index) => {
+                            rst[index].children = []
+                        })
+                        getTree({}, { parent: rst[0].No })
+                            .then(rst1 => {
+                                if (rst1 instanceof Array && rst1.length > 0) {
+                                    rst1.forEach((item, index) => {
+                                        rst1[index].children = []
                                     })
-                                    // getNewTreeData(rst,rst[0].No,rst2)
-                                    // getTree({},{parent:rst2[0].No})
-                                    // .then(rst3 => {
-                                    //     if(rst3 instanceof Array && rst3.length > 0){
-                                    //         getNewTreeData(rst,rst2[0].No,rst3)
-                                    //         this.setState({treeLists:rst},() => {
-                                    //             this.onSelect([rst3[0].No])
-                                    //         })
-                                    //     } else {
-                                    //         this.setState({treeLists:rst})
-                                    //     }
-                                    // })
+                                    getNewTreeData(rst, rst[0].No, rst1)
+                                    getTree({}, { parent: rst1[0].No })
+                                        .then(rst2 => {
+                                            if (rst2 instanceof Array && rst2.length > 0) {
+                                                getNewTreeData(rst, rst1[0].No, rst2)
+                                                this.setState({ treeLists: rst }, () => {
+                                                    this.onSelect([rst2[0].No])
+                                                })
+                                                // getNewTreeData(rst,rst[0].No,rst2)
+                                                // getTree({},{parent:rst2[0].No})
+                                                // .then(rst3 => {
+                                                //     if(rst3 instanceof Array && rst3.length > 0){
+                                                //         getNewTreeData(rst,rst2[0].No,rst3)
+                                                //         this.setState({treeLists:rst},() => {
+                                                //             this.onSelect([rst3[0].No])
+                                                //         })
+                                                //     } else {
+                                                //         this.setState({treeLists:rst})
+                                                //     }
+                                                // })
+                                            } else {
+                                                this.setState({ treeLists: rst })
+                                            }
+                                        })
                                 } else {
-                                    this.setState({treeLists:rst})
+                                    this.setState({ treeLists: rst })
                                 }
                             })
-                        }else {
-                            this.setState({treeLists:rst})
-                        }
-                    })
-                }
-            })
-        } catch(e){
+                    }
+                })
+        } catch (e) {
             console.log(e)
         }
         //类型
@@ -116,28 +110,28 @@ class Stage extends Component {
             <Option key={'4'} value={'4'}>灌木</Option>,
             <Option key={'5'} value={'5'}>草本</Option>,
         ];
-        this.setState({treetyoption})
+        this.setState({ treetyoption })
     }
-    
-	// onSelect = (project,unitProjecte)=>{
-	// 	console.log('project',project);
-	// 	console.log('unitProjecte',unitProjecte);
-	// 	let me = this;
-	// 	//选择最下级的工程
-	// 	if(unitProjecte){
-	// 		this.setState({
-	// 			item:{
-	// 				unitProjecte:unitProjecte,
-	// 				project:project
-	// 			}
-	// 		})
-	// 	}
- //    };
 
-	// onSelect(){}
+    // onSelect = (project,unitProjecte)=>{
+    // 	console.log('project',project);
+    // 	console.log('unitProjecte',unitProjecte);
+    // 	let me = this;
+    // 	//选择最下级的工程
+    // 	if(unitProjecte){
+    // 		this.setState({
+    // 			item:{
+    // 				unitProjecte:unitProjecte,
+    // 				project:project
+    // 			}
+    // 		})
+    // 	}
+    //    };
 
-	render() {
-        const {keycode} = this.props;
+    // onSelect(){}
+
+    render() {
+        const { keycode } = this.props;
         const {
             treetypeoption,
             treetypelist,
@@ -147,87 +141,87 @@ class Stage extends Component {
             leftkeycode,
         } = this.state;
 
-		return (
-			<div>
-				<DynamicTitle title="进度填报" {...this.props}/>
-				<Sidebar>
-					<div style={{overflow:'hidden'}} className="project-tree">
-						<PkCodeTree treeData={treeLists}
+        return (
+            <div>
+                <DynamicTitle title="进度填报" {...this.props} />
+                <Sidebar>
+                    <div style={{ overflow: 'hidden' }} className="project-tree">
+                        <PkCodeTree treeData={treeLists}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
-                            onExpand={this.onExpand.bind(this)}/>
+                            onExpand={this.onExpand.bind(this)} />
                         {/*<ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)} />*/}
-					</div>
-				</Sidebar>
-				<Content>
-					<div>
-					<Tabs>
-					<TabPane tab="总计划进度" key="1">
-					   <All{...this.props}/>
-					</TabPane>
-					<TabPane tab="每日计划进度" key="2">
-						<Plan{...this.props}/>
-					</TabPane>
-					<TabPane tab="每日实际进度" key="3">
-					    <Stagereporttab{...this.props}/>
-					</TabPane>
-				    </Tabs>
-					</div>
-				</Content>
-			</div>);
-	}
-//类型选择, 重新获取: 树种
-    typeselect(value,keycode){
-        const {actions:{setkeycode,getTreeList}} =this.props;
+                    </div>
+                </Sidebar>
+                <Content>
+                    <div>
+                        <Tabs>
+                            <TabPane tab="总计划进度" key="1">
+                                <All {...this.props} />
+                            </TabPane>
+                            <TabPane tab="每日计划进度" key="2">
+                                <Plan {...this.props} />
+                            </TabPane>
+                            <TabPane tab="每日实际进度" key="3">
+                                <Stagereporttab {...this.props} />
+                            </TabPane>
+                        </Tabs>
+                    </div>
+                </Content>
+            </div>);
+    }
+    //类型选择, 重新获取: 树种
+    typeselect(value, keycode) {
+        const { actions: { setkeycode, getTreeList } } = this.props;
         //树种
-        getTreeList({},{field:'treetype',no:keycode,treety:value,paginate:false})
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
+        getTreeList({}, { field: 'treetype', no: keycode, treety: value, paginate: false })
+            .then(rst => {
+                this.setTreeTypeOption(rst)
+            })
     }
 
     //设置树种选项
     setTreeTypeOption(rst) {
-        if(rst instanceof Array){
+        if (rst instanceof Array) {
             let treetypeoption = rst.map(item => {
                 return <Option key={item.name} value={item.name}>{item.name}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({treetypeoption,treetypelist:rst})
+            this.setState({ treetypeoption, treetypelist: rst })
         }
     }
 
-     //树选择
+    //树选择
     onSelect(value = []) {
         let keycode = value[0] || '';
-        const {actions:{getTreeList,gettreetype}} =this.props;
-        this.setState({leftkeycode:keycode})
+        const { actions: { getTreeList, gettreetype } } = this.props;
+        this.setState({ leftkeycode: keycode })
         //树种
-        gettreetype({},{no:keycode,paginate:false})
-        .then(rst => {
-            console.log('rst',rst)
-            this.setTreeTypeOption(rst)
-        })
+        gettreetype({}, { no: keycode, paginate: false })
+            .then(rst => {
+                console.log('rst', rst)
+                this.setTreeTypeOption(rst)
+            })
     }
 
     //树展开
-    onExpand(expandedKeys,info) {
+    onExpand(expandedKeys, info) {
         const treeNode = info.node;
-        const {actions: {getTree}} = this.props;
-        const {treeLists} = this.state;
+        const { actions: { getTree } } = this.props;
+        const { treeLists } = this.state;
         const keycode = treeNode.props.eventKey;
-        getTree({},{parent:keycode,paginate:false})
-        .then(rst => {
-            if(rst instanceof Array){
-                if(rst.length > 0 && rst[0].wptype != '子单位工程') {
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
+        getTree({}, { parent: keycode, paginate: false })
+            .then(rst => {
+                if (rst instanceof Array) {
+                    if (rst.length > 0 && rst[0].wptype != '子单位工程') {
+                        rst.forEach((item, index) => {
+                            rst[index].children = []
+                        })
+                    }
+                    getNewTreeData(treeLists, keycode, rst)
+                    this.setState({ treeLists: treeLists })
                 }
-                getNewTreeData(treeLists,keycode,rst)
-                this.setState({treeLists:treeLists})
-            }
-        })
+            })
     }
 }
 
@@ -237,15 +231,15 @@ function getNewTreeData(treeData, curKey, child) {
         data.forEach((item) => {
             if (curKey == item.No) {
                 item.children = child;
-            }else{
-                if(item.children)
+            } else {
+                if (item.children)
                     loop(item.children);
             }
         });
     };
     try {
-       loop(treeData);
-    } catch(e) {
+        loop(treeData);
+    } catch (e) {
         console.log(e)
     }
 }

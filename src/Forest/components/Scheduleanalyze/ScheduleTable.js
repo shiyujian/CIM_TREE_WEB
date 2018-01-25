@@ -28,7 +28,7 @@ export default class ScheduleTable extends Component {
             etime2: moment().format('2017-11-24 23:59:59'),
             etime3: moment().format('2017-11-24 23:59:59'),
             etime4: moment().format('2017-11-24 23:59:59'),
-            etime5: moment().unix(),
+            etime5: moment().format('YYYY-MM-DD HH:mm:ss'),
             loading1: false,
             loading2: false,
             loading3: false,
@@ -416,7 +416,7 @@ export default class ScheduleTable extends Component {
 
     datepick1(index, value) {
         let param = {
-            etime:value?moment(value).unix():''
+            etime:value?moment(value).format('YYYY-MM-DD HH:mm:ss'):''
         }
         this.sum(index, param);
         this.state.isOpen[index] = !this.state.isOpen[index];
@@ -429,22 +429,22 @@ export default class ScheduleTable extends Component {
         if(index == 1 ) {
             const {stime1,etime1} = this.state;
             let param = {
-                stime:stime1?moment(stime1).add(8, 'h').unix():'',
-                etime:etime1?moment(etime1).add(8, 'h').unix():''
+                stime:stime1?moment(stime1).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):'',
+                etime:etime1?moment(etime1).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):''
             }
             this.qury(index,param);
         }
         if(index == 2 ) {
             const {etime2} = this.state;
             let param = {
-                etime:etime2?moment(etime2).add(8, 'h').unix():''
+                etime:etime2?moment(etime2).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):''
             }
             this.qury(index,param);
         }
         if(index == 3 ) {
             const {etime3,section} = this.state;
             let param = {
-                etime:etime3?moment(etime3).add(8, 'h').unix():'',
+                etime:etime3?moment(etime3).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):'',
                 section
             }
             this.qury(index,param);
@@ -452,7 +452,7 @@ export default class ScheduleTable extends Component {
         if(index == 4 ) {
             const {etime4,section,smallclass} = this.state;
             let param = {
-                etime:etime4?moment(etime4).add(8, 'h').unix():'',
+                etime:etime4?moment(etime4).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):'',
                 section,
                 smallclass
             }
@@ -554,19 +554,26 @@ export default class ScheduleTable extends Component {
             this.setState({loading2:true})
             getCountSection({},param)
             .then(rst => {
+                rst.sort(sorting)
+                console.log('rst',rst)
                 this.setState({loading2:false})
                 if(!rst)
                     return
                 try {
                     let myChart2 = echarts.getInstanceByDom(document.getElementById('section1'));
-                    let unplanted = arraynumsub(rst["总数"], rst["已种植数量"]);
+                    let sections = [], complete = [], UnComplete = [];
+                    rst.map(item => {
+                        sections.push(item.Label)
+                        complete.push(item.Complete)
+                        UnComplete.push(item.UnComplete)
+                    })
                     let options2 = {
                         legend: {
                             data: ['未种植','已种植']
                         },
                         xAxis: [
                             {
-                                data: rst['标段名称']
+                                data: sections
                             }
                         ],
                         series: [
@@ -575,14 +582,14 @@ export default class ScheduleTable extends Component {
                                 type: 'bar',
                                 stack: '总量',
                                 label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
-                                data: unplanted
+                                data: UnComplete
                             },
                             {
                                 name: '已种植',
                                 type: 'bar',
                                 stack: '总量',
                                 label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
-                                data: rst['已种植数量']
+                                data: complete
                             }
                         ]
                     };
@@ -600,14 +607,19 @@ export default class ScheduleTable extends Component {
                     return
                 try {
                     let myChart3 = echarts.getInstanceByDom(document.getElementById('primaryClass'));
-                    let unplanted = arraynumsub(rst["总数"], rst["已种植数量"])
+                    let small = [], complete = [], UnComplete = [];
+                    rst.map(item => {
+                        small.push(item.Label)
+                        complete.push(item.Complete)
+                        UnComplete.push(item.UnComplete)
+                    })
                     let options3 = {
                         legend: {
                             data: ['未种植','已种植']
                         },
                         xAxis: [
                             {
-                                data: rst['小班名称']
+                                data: small
                             }
                         ],
                         series: [
@@ -616,14 +628,14 @@ export default class ScheduleTable extends Component {
                                 type: 'bar',
                                 stack: '总量',
                                 label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
-                                data: unplanted
+                                data: UnComplete
                             },
                             {
                                 name: '已种植',
                                 type: 'bar',
                                 stack: '总量',
                                 label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
-                                data: rst['已种植数量']
+                                data: complete
                             }
                         ]
                     };
@@ -641,14 +653,21 @@ export default class ScheduleTable extends Component {
                     return
                 try {
                     let myChart4 = echarts.getInstanceByDom(document.getElementById('overall'));
-                    let unplanted = arraynumsub(rst["总数"], rst["已种植数量"]);
+                    let thin = [], complete = [], UnComplete = [];
+                    rst.map(item => {
+                        if(item.No.substring(8,11).indexOf(param.smallclass) !== -1) {
+                            thin.push(item.Label)
+                            complete.push(item.Complete)
+                            UnComplete.push(item.UnComplete)
+                        }
+                    })
                     let options4 = {
                         legend: {
                             data: ['未种植','已种植']
                         },
                         xAxis: [
                             {
-                                data: rst['细班名称']
+                                data: thin
                             }
                         ],
                         series: [
@@ -657,14 +676,14 @@ export default class ScheduleTable extends Component {
                                 type: 'bar',
                                 stack: '总量',
                                 label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
-                                data: unplanted
+                                data: UnComplete
                             },
                             {
                                 name: '已种植',
                                 type: 'bar',
                                 stack: '总量',
                                 label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
-                                data: rst['已种植数量']
+                                data: complete
                             }
                         ]
                     };
@@ -733,5 +752,18 @@ function dd(path){
                 ele[0].style.display="block";
             }
         }
+    }
+}
+
+//按照某个元素排序
+function sorting(val1, val2) {
+    let ele1 = val1.Label;
+    let ele2 = val2.Label;
+    if(ele1 < ele2) {
+        return -1;
+    } else if(ele1 > ele2) {
+        return 1;
+    } else {
+        return 0;
     }
 }

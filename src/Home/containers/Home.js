@@ -10,6 +10,7 @@ import {actions as newsActions} from '../store/news';
 import {actions as staffActions} from '../store/staff';
 
 
+
 @connect(
 	state => {
 		const {home: {news = {},staff = {}}, platform} = state || {};

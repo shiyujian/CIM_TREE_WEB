@@ -14,7 +14,7 @@ export default class Filter extends Component {
 
 	render() {
 		const { actions: { toggleAddition }, Doc = [] } = this.props;
-		console.log('filter.this.props',this.props)
+		// console.log('filter.this.props',this.props)
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
@@ -101,6 +101,7 @@ export default class Filter extends Component {
 			message.warning('请先选择要删除的文件！');
 			return;
 		}
+		console.log('filter.selected',selected)
 		selected.map(rst => {
 			coded.push(rst.code);
 		});
