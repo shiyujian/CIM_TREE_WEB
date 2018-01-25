@@ -1,630 +1,397 @@
-import React, {Component} from 'react';
-import {Row, Col,Input, Form, Spin,Icon,Button,Table,Modal,DatePicker,Progress,Upload,Select,Checkbox} from 'antd';
+import React, { Component, Children } from 'react';
+import { Row, Col, Input, Form, Spin, Icon, Button, Table, Modal, DatePicker, Progress, Upload, Select, Checkbox, notification, Popconfirm } from 'antd';
 // import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
-import {WORKFLOW_CODE} from '_platform/api';
-import {getNextStates} from '../../../_platform/components/Progress/util';
+import { WORKFLOW_CODE } from '_platform/api';
+import { getNextStates } from '../../../_platform/components/Progress/util';
 import PerSearch from './PerSearch';
-const {RangePicker} = DatePicker;
+import SearchInfo from './SearchInfo';
+const { RangePicker } = DatePicker;
 const FormItem = Form.Item;
+const Option = Select.Option;
 const FILE_API = "";
-const Dragger = Upload.Dragger;
-const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
-export default class Stagereporttab extends Component {
+class Plan extends Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
-			addvisible:false,
-			editvisible:false,
-			departOptions:"",
-			data:{
-				stime1: moment().format(''),
-                etime1: moment().format(''),
-			},
-			selectedRowKeys:"",
-			stime1: moment().format(''),
-            etime1: moment().format(''),
-			tabledata:[
-				{
-					gongcheng:"qwd"
-				},{
-					gongcheng:"qwd"
-				},{
-					gongcheng:"qwd"
-				},{
-					gongcheng:"qwd"
-				},{
-					gongcheng:"qwd"
-				}]
+			selectedRowKeys: [],
+			dataSourceSelected: [],
+			visible: false,
+			isCopyMsg: false, //接收人员是否发短信
+			treedataSource: [],
+			treetype: [],//树种
+			key: 6,
 		};
 	}
-    static layout = {
-        labelCol: {span: 8},
-        wrapperCol: {span: 16}
-    };
-    state={
-        progress:0,
-        isUploading: false
-    }
+
+	componentDidMount() {
+		const { actions: { gettreetype } } = this.props;
+		let treedata = [{
+			key: 1,
+			project: '便道施工',
+			units: 'm',
+		}, {
+			key: 2,
+			project: '给排水沟槽开挖',
+			units: 'm',
+		}, {
+			key: 3,
+			project: '给排水管道安装',
+			units: 'm',
+		}, {
+			key: 4,
+			project: '给排水回填',
+			units: 'm',
+		}, {
+			key: 5,
+			project: '绿地平整',
+			units: '亩',
+		}, {
+			key: 6,
+			project: '种植穴工程',
+			units: '个',
+		},];
+		this.setState({
+			treedataSource: treedata
+		})
+		gettreetype({})
+			.then(rst => {
+				let treetype = rst.map((o, index) => {
+					console.log(o.TreeTypeNo)
+					return (
+						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeNo}</Option>
+					)
+				})
+				console.log('treetype', treetype)
+				this.setState({ treetype });
+			})
+	}
+
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+	}
+	// 删除
+	deleteClick = () => {
+		const { selectedRowKeys } = this.state
+		if (selectedRowKeys.length === 0) {
+			notification.warning({
+				message: '请先选择数据！',
+				duration: 2
+			});
+			return
+		} else {
+			alert('还未做删除功能')
+		}
+	}
+
+	// 新增按钮
+	addClick = () => {
+		this.setState({
+			visible: true,
+		})
+		this.props.form.setFieldsValue({
+			superunit: undefined,
+			unit: undefined,
+			dataReview: undefined,
+			number: undefined,
+			timedate: moment().add(1, 'days').format('YYYY-MM-DD')
+		})
+
+	}
+	// 关闭弹框
+	closeModal() {
+
+		this.setState({
+			visible: false,
+		})
+	}
+	// 添加树列表
+	addTreeClick() {
+		const { treedataSource, key } = this.state;
+		let num = key + 1;
+		let project = [
+			<Select style={{ width: '200px' }} placeholder='请选择树种' onSelect={this.handleSelect.bind(this, key, 'project')}>
+				{
+					this.state.treetype
+				}
+			</Select>
+		]
+		let addtree = {
+			key: num,
+			project: project,
+			units: '棵'
+		}
+		treedataSource.push(addtree);
+		console.log('treedataSource',treedataSource)
+		this.setState({ treedataSource, key: num })
+	}
+	// 删除树列表
+	delTreeClick(index) {
+		alert('暂时无法删除')
+	}
+	//下拉框选择变化
+	handleSelect(index, key, value) {
+		const { treedataSource } = this.state;
+		value = JSON.parse(value);
+		treedataSource[index][key] = value.TreeTypeNo;
+		this.setState({ treedataSource });
+	}
+
+	// 短信
+	_cpoyMsgT(e) {
+		this.setState({
+			isCopyMsg: e.target.checked,
+		})
+	}
+	//选择审核人员
+	selectMember(memberInfo) {
+		const {
+            form: {
+                setFieldsValue
+            }
+        } = this.props
+		this.member = null;
+		if (memberInfo) {
+			let memberValue = memberInfo.toString().split('#');
+			if (memberValue[0] === 'C_PER') {
+				this.member = {
+					"username": memberValue[4],
+					"person_code": memberValue[1],
+					"person_name": memberValue[2],
+					"id": parseInt(memberValue[3])
+				}
+			}
+		} else {
+			this.member = null
+		}
+
+		setFieldsValue({
+			dataReview: this.member
+		});
+	}
 	render() {
-		const formItemLayout = {
-			labelCol: {span: 6},
-			wrapperCol: {span: 14}
+		const { selectedRowKeys, } = this.state;
+		const {
+            form: { getFieldDecorator },
+        } = this.props;
+		const rowSelection = {
+			selectedRowKeys,
+			onChange: this.onSelectChange,
 		};
-		let {progress,isUploading} = this.state;
-		// const {
-		// 	form: {getFieldDecorator}
-		// } = this.props.props;
-		const dataSource = [
-			{project:"www"}
-		];
-		const columns = [
-			{
-				title:'2单位工程',
-				dataIndex:'gongcheng',
-				key: 'gongcheng',
-				width: '15%'
-			},{
-				title:'进度类型',
-				dataIndex:'type',
-				key: 'type',
-				width: '10%'
-			},{
-				title:'编号',
-				dataIndex:'company',
-				key: 'company',
-				width: '10%'
-			},{
-				title:'提交人',
-				dataIndex:'quantity',
-				key: 'quantity',
-				width: '10%'
-			},{
-				title:'日期',
-				dataIndex:'output',
-				key: 'output',
-				width: '10%'
-			},{
-				title:'流程状态',
-				dataIndex:'total',
-				key: 'total',
-				width: '15%',
-			},{
-			title: '操作',
-			render: (record) => {
-				let nodes = [];
-				nodes.push(
-					<div>
-						<a onClick={this.previewFile.bind(this, record)}>查看</a>
-						<a style={{ marginLeft: 10 }} onClick={this.download.bind(this, record)}>下载</a>					
-						<a style={{ marginLeft: 10 }} type="primary" onClick={this.look.bind(this)}>查看流程卡</a>
-					</div>
-				);
-				return nodes;
-			    }
-		    }
-		];
-		const columns1 = [
-			{
-				title:'项目',
-				dataIndex:'project',
-				key: 'project',
-				width: '60%'
-			},{
-				title:'单位',
-				dataIndex:'unit',
-				key: 'unit',
-				width: '15%'
-			},{
-				title:'数量',
-				dataIndex:'number',
-				key: 'number',
-				width: '15%'
-			}
-		];
-		const columns2 = [
-			{
-				title:'名称',
-				dataIndex:'gongcheng',
-				key: 'gongcheng',
-				width: '15%'
-			},{
-				title:'备注',
-				dataIndex:'type',
-				key: 'type',
-				width: '10%'
-			},{
-				title:'操作',
-				dataIndex:'company',
-				key: 'company',
-				width: '10%'
-			}
-		];
-		
+		const FormItemLayout = {
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
+		}
 		return (
 			<div>
-				<Form>
-					<Row>
-					<Col span={7}>
-						<FormItem {...formItemLayout} label="单位工程">
-							
-								<Input type="text" onChange={this.search.bind(this,'gongcheng')} value={this.state.data.gongcheng}/>
-							
-						</FormItem>
-					</Col>
-					<Col span={7}>
-						<FormItem {...formItemLayout} label="编号">
+				<SearchInfo {...this.props} />
+				<Button onClick={this.addClick.bind(this)}>新增</Button>
+				<Button onClick={this.deleteClick.bind(this)}>删除</Button>
+				<Table
+					columns={this.columns}
+					rowSelection={rowSelection} />
+				<Modal
+					title="新增每日计划进度"
+					width={800}
+					visible={this.state.visible}
+					maskClosable={false}
+					onCancel={this.closeModal.bind(this)}
+				// onOk={this.sendWork.bind(this)}
+				>
+					<div>
+						<Form>
+							<Row>
+								<Col span={24}>
+									<Row>
+										<Col span={8}>
+											<FormItem {...FormItemLayout} label='单位工程'>
+												{
+													getFieldDecorator('unit', {
+														rules: [
+															{ required: true, message: '请选择单位工程' }
+														]
+													})
+														(<Select placeholder='请选择区域' allowClear>
+															<Option value='单位工程一'>单位工程一</Option>
+															<Option value='单位工程二'>单位工程二</Option>
+															<Option value='单位工程三'>单位工程三</Option>
+														</Select>)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8}>
+											<FormItem {...FormItemLayout} label='编号'>
+												{
+													getFieldDecorator('number', {
+														rules: [
+															{ required: true, message: '请输入编号' }
+														]
+													})
+														(<Input placeholder='请输入编号' />)
+												}
+											</FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Col span={8}>
+											<FormItem {...FormItemLayout} label='监理单位'>
+												{
+													getFieldDecorator('superunit', {
+														rules: [
+															{ required: true, message: '请输入监理单位' }
+														]
+													})
+														(<Input placeholder='请输入监理单位' />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8}>
+											<FormItem {...FormItemLayout} label='日期'>
+												{
+													getFieldDecorator('timedate', {
+														rules: [
+															{ required: true, message: '请输入监理单位' }
+														]
+													})
+														(<Input placeholder='请输入监理单位' />)
+												}
+											</FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Table
+											columns={this.columns1}
+											dataSource={this.state.treedataSource}
+										/>
+										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10 }} type="primary" ghost>添加</Button>
+									</Row>
+									<Row>
 
-								<Input type="text" onChange={this.search.bind(this,'number')} value={this.state.data.number}/>
-							
-						</FormItem>
-					</Col>	
-					<Col span={7}>
-						<FormItem {...formItemLayout} label="监理单位">
-						
-								<Input type="text" onChange={this.search.bind(this,'jianli')} value={this.state.data.jianli}/>
-							
-						</FormItem>
-					</Col>
-					<Col span={3}>
-						<Button onClick={this.clear.bind(this)}>清空</Button>
-					</Col>
-					</Row>
-					<Row>
-					<Col span={7}>
-						<FormItem {...formItemLayout} label="日期">
-								<RangePicker 
-									style={{verticalAlign:"middle"}} 
-									Value={[moment(this.state.data.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.data.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
-									showTime={{ format: 'HH:mm:ss' }}
-									format={'YYYY/MM/DD HH:mm:ss'}
-									onChange={this.datepick.bind(this)}
-									onOk={this.datepickok.bind(this)}
-									>
-									</RangePicker>
-								{/*<Input type="text" onChange={this.search.bind(this,'data')} value={this.state.data.data}/>*/}
-							
-						</FormItem>
-					</Col>
-					<Col span={3}></Col>
-					<Col span={7}>
-						<FormItem {...formItemLayout} label="流程状态">
-						
-								<Input type="text" onChange={this.search.bind(this,'status')} value={this.state.data.status}/>
-							
-						</FormItem>
-					</Col>
-					<Col span={4}>
-					</Col>
-					<Col span={3}>
-						<Button type="primary" onClick={this.query.bind(this)}>查询</Button>
-					</Col>
-					</Row>
-				</Form>
-				<Button onClick={this.add.bind(this)}>新增</Button>
-				<Button>删除</Button>
-				<Table 
-						columns={columns} 
-						dataSource={this.state.tabledata}
-						bordered
-						rowSelection={this.rowSelection}
-						pagination={{pageSize: 9}}
-						style={{marginTop:20}}
-						/>
-				<Modal title="新增总计划进度"
-					width={900}
-					visible={this.state.addvisible}
-					onOk={this.save.bind(this)}
-					onCancel={this.close.bind(this)}>
-					<Row>
-						<Col span={12}>
-							<FormItem {...formItemLayout} label="单位工程">
-								
-									<Input type="text" onChange={this.search.bind(this,'gongcheng')} />
-								
-							</FormItem>
-						</Col>
-						<Col span={12}>
-							<FormItem {...formItemLayout} label="编号">
+										<Col span={8} offset={4}>
+											<FormItem {...FormItemLayout} label='审核人'>
+												{
+													getFieldDecorator('dataReview', {
+														rules: [
+															{ required: true, message: '请选择审核人员' }
+														]
+													})
+														(
+														<PerSearch selectMember={this.selectMember.bind(this)} />
+														)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} offset={4}>
+											<Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
+										</Col>
+									</Row>
+								</Col>
+							</Row>
 
-									<Input type="text" onChange={this.search.bind(this,'number')} />
-								
-							</FormItem>
-						</Col>
-						</Row>
-						<Row>	
-						<Col span={12}>
-							<FormItem {...formItemLayout} label="监理单位">
-							
-									<Input type="text" onChange={this.search.bind(this,'jianli')} />
-								
-							</FormItem>
-						</Col>
-						<Col span={12}>
-							<FormItem {...formItemLayout} label="日期">
-									<RangePicker 
-									style={{verticalAlign:"middle"}} 
-									Value={[moment(this.state.data.stime1, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.data.etime1, 'YYYY-MM-DD HH:mm:ss')]} 
-									showTime={{ format: 'HH:mm:ss' }}
-									format={'YYYY/MM/DD HH:mm:ss'}
-									onChange={this.datepick.bind(this)}
-									onOk={this.datepickok.bind(this)}
-									>
-									</RangePicker>
-							
-									{/*<Input type="text" onChange={this.search.bind(this,'number')}/>*/}
-								
-							</FormItem>
-						</Col>
-						</Row>
-						<Row>
-							<Table 
-								columns={columns1} 
-								dataSource={dataSource}
-								rowSelection={this.rowSelection}
-								bordered
-								style={{marginTop:20}}
-								/>
-						</Row>
-						<Row>
-							<Button onClick={this.addtext.bind(this)}>添加</Button>
-							<Button>删除</Button>
-						</Row>
-						<Row style={{position:"relative"}}>
-							<Col span={12} style={{position:"absolute",top:"20px"}}>
-							<FormItem {...formItemLayout} label="审核人">
-								<PerSearch
-									selectMember={this.selectMember.bind(this)}
-								/>
-								{/* <Select 
-									placeholder="请选择部门"
-									notFoundContent="暂无数据"
-									value=""
-									onSelect={this.onDepartments.bind(this,'departments') }>
-									{this.state.departOptions}
-								</Select> */}
-							</FormItem>
-							</Col>
-							<Col span={12} style={{position:"absolute",top:"20px",left:"200px"}}>
-							<FormItem {...formItemLayout}>
-								<Checkbox>短信通知</Checkbox>
-							</FormItem>
-							</Col>
-						</Row>
-				</Modal>
-				<Modal title="新增文档"
-						width={900}
-						visible={this.state.editvisible}
-						onOk={this.editSave.bind(this)}
-						onCancel={this.editClose.bind(this)}>
-						<Row>
-						<Col span={12}>
-							<FormItem {...formItemLayout} label="单位工程">
-								
-									<Input type="text" onChange={this.search.bind(this,'gongcheng')}  />
-								
-							</FormItem>
-						</Col>
-						<Col span={12}>
-							<FormItem {...formItemLayout} label="编号">
-
-									<Input type="text" onChange={this.search.bind(this,'number')}/>
-								
-							</FormItem>
-						</Col>
-						</Row>
-						<Row>	
-						<Col span={12}>
-							<FormItem {...formItemLayout} label="监理单位">
-							
-									<Input type="text" onChange={this.search.bind(this,'jianli')}/>
-								
-							</FormItem>
-						</Col>
-						<Col span={12}>
-							<Button type="primary">模板下载</Button>
-						</Col>
-						</Row>
-						<Row>
-							<Dragger {...this.uploadProps}
-											accept={fileTypes}
-											onChange={this.changeDoc.bind(this)}>
-									<p className="ant-upload-drag-icon">
-										<Icon type="inbox"/>
-									</p>
-									<p className="ant-upload-text">点击或者拖拽开始上传</p>
-									<p className="ant-upload-hint">
-										支持 pdf、doc、docx 文件
-
-									</p>
-								</Dragger>
-								<Progress percent={progress} strokeWidth={5}/>
-						</Row>
-						<Row>
-							<Table 
-								columns={columns2} 
-								dataSource={dataSource}
-								bordered
-								style={{marginTop:20}}
-								/>
-						</Row>
-						<Row style={{position:"relative"}}>
-							<Col span={12} style={{position:"absolute",top:"20px"}}>
-							<FormItem {...formItemLayout} label="审核人" >
-								<PerSearch
-									selectMember={this.selectMember.bind(this)}
-								/>
-								{/* <Select 
-										placeholder="请选择部门"
-										notFoundContent="暂无数据"
-										value=""
-										onSelect={this.onDepartments.bind(this,'departments') }>
-										{this.state.departOptions}
-								</Select> */}
-							</FormItem>
-							</Col>
-							<Col span={12} style={{position:"absolute",top:"20px",left:"200px"}}>
-							<FormItem {...formItemLayout} >
-								<Checkbox onChange={this.check.bind(this)}>短信通知</Checkbox>
-							</FormItem>
-							</Col>
-						</Row>
+						</Form>
+					</div>
 				</Modal>
 			</div>
 		)
 	}
-	rowSelection = {
-		onChange: (selectedRowKeys, selectedRows) => {
-			console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-			this.setState({
-				selectedRowKeys:selectedRowKeys,
-			})
-		},
-		// onChange: (selectedRowKeys,selectedRows) => {
-		// 	// this.selectedCodes = selectedRowKeys;
-		// 	console.log(selectedRowKeys);
-			
-		// }
-	};
 
-	//选择人员
-    selectMember(memberInfo) {
-        const{
-            form:{
-                setFieldsValue
-            }
-        }=this.props
-        this.member = null;
-        if(memberInfo){
-            let memberValue = memberInfo.toString().split('#');
-            if(memberValue[0] === 'C_PER'){
-                this.member = {
-                    "username": memberValue[4],
-                    "person_code": memberValue[1],
-                    "person_name": memberValue[2],
-                    "id": parseInt(memberValue[3])
-                }
-            }
-        }else{
-            this.member = null
-        }
 
-        setFieldsValue({
-            dataReview: this.member
-        });
-        console.log('this.member',this.member)
-    }
-	previewFile(){
-
-	}
-	download(){
-        console.log(this.props);
-	}
-	look(){
-
-	}
-	datepick(e){
-        console.log(e);
-	}
-    datepickok(e){
-    	console.log(e);
-    	this.setState({
-       	  data: {
-	        	...this.state.data,
-	        	begin:e[0]?moment(e[0]).add(8, 'h').unix():'',
-	        	end:e[1]?moment(e[1]).add(8, 'h').unix():'',
-	        }
-
-       })
-    }
-
-	search(key,e){
-       console.log(key,e.target.value);
-       this.setState({
-       	  data: {
-	        	...this.state.data,
-	        	[key]:e.target.value
-	        }
-
-       })
-	}
-	check(e){
-		console.log(e.target.checked);
-
-	}
-	query(){
-		console.log(this.state.data);
-
-	}
-	clear(){
-		this.setState({
-			data:{}
-		})
-	}
-	add(){
-		this.setState({
-			addvisible:true,
-		})
-	}
-	addtext(){
-		this.setState({
-			editvisible:true,
-		})
-	}
-	
-	save(){
-		const {
-            actions: {
-                createFlow, 
-                addActor, 
-                commitFlow, 
-                startFlow,
-				carbonCopy,
-				getWorkflowById
-			},
-			item
-		} = this.props;
-		
-		const user = getUser();
-        const currentUser = {
-            "username": user.username,
-            "person_code": user.code,
-            "person_name": user.name,
-            "id": parseInt(user.id)
-		};
-		let subject = [{
-            "project":JSON.stringify({"code": item.project}),
-		}];
-		
-        let WORKFLOW_MAP = {
-            name:"总进度计划报批流程",
-            desc:"进度管理总进度计划填报审批流程",
-            code:WORKFLOW_CODE.总进度计划报批流程
-		};
-		let postdata={
-            name: WORKFLOW_MAP.name,
-            description: WORKFLOW_MAP.desc,
-            subject: subject,
-            code: WORKFLOW_MAP.code,
-            creator: currentUser,
-            plan_start_time: null,
-			deadline: null,
-			status:2
-		}
-
-		const nextUser = this.member;
-		
-		createFlow({},postdata).then((instance)=>{
-			if(!instance.id){
-				notification.error({
-					message:'流程提交失败',
-					duration:2
-				})
-				return;
+	columns = [
+		{
+			title: '单位工程',
+			dataIndex: 'unit',
+			key: 'unit',
+			width: '15%'
+		}, {
+			title: '进度类型',
+			dataIndex: 'type',
+			key: 'type',
+			width: '10%'
+		}, {
+			title: '编号',
+			dataIndex: 'number',
+			key: 'number',
+			width: '10%'
+		}, {
+			title: '备注',
+			dataIndex: 'remarks',
+			key: 'remarks',
+			width: '10%'
+		}, {
+			title: '提交人',
+			dataIndex: 'submitperson',
+			key: 'submitperson',
+			width: '10%'
+		}, {
+			title: '提交时间',
+			dataIndex: 'submittime',
+			key: 'submittime',
+			width: '10%',
+			sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
+			render: text => {
+				return moment(text).format('YYYY-MM-DD')
 			}
-			const {id,workflow: {states = []} = {}} = instance;
-			const [{id:state_id,actions:[action]}] = states;
-		   
-			getWorkflowById({id:id}).then(instance =>{
-				if(instance && instance.current){
-					let currentStateId = instance.current[0].id;
-					let nextStates = getNextStates(instance,currentStateId);
-					console.log('nextStates',nextStates)
-					let stateid = nextStates[0].to_state[0].id;
+		}, {
+			title: '流程状态',
+			dataIndex: 'status',
+			key: 'status',
+			width: '15%',
+		}, {
+			title: '操作',
+			render: record => {
+				return (
+					<span>
+						<a onClick={this.clickInfo.bind(this, record, 'VIEW')}>查看</a>
+					</span>
+				)
+			}
+		},
+	];
 
-					let postInfo={
-						next_states:[{
-							state:stateid,
-							participants:[nextUser],
-							deadline:null,
-							remark:null
-						}],
-						state:instance.workflow.states[0].id,
-						executor:currentUser,
-						action:nextStates[0].action_name,
-						note:"提交",
-						attachment:null
-					}
-					let data={pk:id};
-					//提交流程到下一步
-					putFlow(data,postInfo).then(rst =>{
-						if(rst && rst.creator){
-							notification.success({
-								message: '流程提交成功',
-								duration: 2
-							});
-							me.setState({
-								addvisible:false
-							})
-						}else{
-							notification.error({
-								message: '流程提交失败',
-								duration: 2
-							});
-							return;
-						}
-					});
-					
-					
-				}
-			});
-			
-		});
-		
+	columns1 = [{
+		title: '序号',
+		dataIndex: 'key',
+		key: 'key',
+		width: '10%',
+	}, {
+		title: '项目',
+		dataIndex: 'project',
+		key: 'project',
+	}, {
+		title: '单位',
+		dataIndex: 'units',
+		key: 'units',
+	}, {
+		title: '数量',
+		dataIndex: 'number',
+		key: 'number',
+		render: (text, record, index) => {
+			return <Input value={record.number || ""} onChange={ele => {
+				record.number = ele.target.value
+				this.forceUpdate();
+			}} />
+		}
+	}, {
+		title: '操作',
+		dataIndex: 'operation',
+		key: 'operation',
+		width: '10%',
+		render: (text, record, index) => {
+			if(index>=6){
+				return <div>
+				<Popconfirm
+					placement="rightTop"
+					title="确定删除吗？"
+					onConfirm={this.delTreeClick.bind(this, record, index+1)}
+					okText="确认"
+					cancelText="取消">
+					<a>删除</a>
+				</Popconfirm>
+			</div>
+			}	
+		}
 	}
-	close(){
-		this.setState({
-			addvisible:false
-		})
-	}
-	editSave(){
-		this.setState({
-			editvisible:false
-		})
-	}
-	editClose(){
-		this.setState({
-			editvisible:false
-		})
-	}
-	changeDoc(){}
-
-	uploadProps = {
-        name: 'file',
-        action: `${FILE_API}/api/user/files/`,
-        showUploadList: false,
-        data(file) {
-            return {
-                name: file.fileName,
-                a_file: file,
-            };
-        },
-        beforeUpload(file) {
-            const valid = fileTypes.indexOf(file.type) >= 0;
-            //console.log(file);
-            if (!valid) {
-                message.error('只能上传 pdf、doc、docx 文件！');
-            }
-            return valid;
-            this.setState({ progress: 0 });
-        },
-    };
-    changeDoc({file, fileList, event}) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        if (file.status === 'done') {
-            changeDocs([...docs, file]);
-        }
-        this.setState({
-            isUploading: file.status === 'done' ? false : true
-        })
-        if(event){
-            let {percent} = event;
-            if(percent!==undefined)
-                this.setState({progress:parseFloat(percent.toFixed(1))});
-        }
-    }
+	];
 }
+export default Form.create()(Plan)
