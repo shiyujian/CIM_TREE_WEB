@@ -156,25 +156,25 @@ export const DataReportTemplate_QualityProblem = STATIC_DOWNLOAD_API + '/media/d
 /***********************静态常量**************************/
 export const WORKFLOW_CODE = {
 	'总进度计划报批流程': 'TEMPLATE_001',
-	'表单管理流程': 'TEMPLATE_002',
-	'现场安全隐患排查工作流程': 'TEMPLATE_002',
-	'分部验收流程': 'TEMPLATE_003',
-	'周报填写流程': 'TEMPLATE_004',
-	'进度填报流程': 'TEMPLATE_005',
-	'进度节点填报流程': 'TEMPLATE_006',
-	'检验批验收流程': 'TEMPLATE_007',
-	'分项验收流程': 'TEMPLATE_008',
-	'施工包划分填报流程': 'TEMPLATE_012',
-	'总进度计划报批': 'TEMPLATE_028',
-	'申请推迟总进度计划填报流程': 'TEMPLATE_029',
-	'进度管控审批流程': 'TEMPLATE_031',
-	'安全隐患上报流程': 'TEMPLATE_011',
-	'设计计划填报流程': 'TEMPLATE_013',
-	'设计计划变更流程': 'TEMPLATE_014',
-	'设计成果上报流程': 'TEMPLATE_015',
-	'设计成果一般变更流程': 'TEMPLATE_016',
-	'设计成果重大变更流程': 'TEMPLATE_019',
-	'数据报送流程': 'TEMPLATE_033'
+	'表单管理流程': 'TEMPLATE_002'
+	// '现场安全隐患排查工作流程': 'TEMPLATE_002',
+	// '分部验收流程': 'TEMPLATE_003',
+	// '周报填写流程': 'TEMPLATE_004',
+	// '进度填报流程': 'TEMPLATE_005',
+	// '进度节点填报流程': 'TEMPLATE_006',
+	// '检验批验收流程': 'TEMPLATE_007',
+	// '分项验收流程': 'TEMPLATE_008',
+	// '施工包划分填报流程': 'TEMPLATE_012',
+	// '总进度计划报批': 'TEMPLATE_028',
+	// '申请推迟总进度计划填报流程': 'TEMPLATE_029',
+	// '进度管控审批流程': 'TEMPLATE_031',
+	// '安全隐患上报流程': 'TEMPLATE_011',
+	// '设计计划填报流程': 'TEMPLATE_013',
+	// '设计计划变更流程': 'TEMPLATE_014',
+	// '设计成果上报流程': 'TEMPLATE_015',
+	// '设计成果一般变更流程': 'TEMPLATE_016',
+	// '设计成果重大变更流程': 'TEMPLATE_019',
+	// '数据报送流程': 'TEMPLATE_033'
 };
 
 export const WORKFLOW_MAPS = {
