@@ -23,7 +23,7 @@ const {RangePicker} = DatePicker;
 		actions: bindActionCreators({...actions, ...platformActions}, dispatch),
 	}),
 )
-export default class Entry extends Component {
+export default class Enteranalyze extends Component {
 
     constructor(props) {
         super(props)
@@ -44,16 +44,16 @@ export default class Entry extends Component {
     componentDidMount () {
         const {actions: {gettreeevery}} = this.props;
         gettreeevery().then(rst=>{
-            console.log(rst,"soooso");
+            
             // this.setTreeTypeOption(rst);
             let treetypeoption = rst.map(item => {
                 return <Option key={item.ID} lable={item.TreeTypeNo} value={item.ID}>{item.TreeTypeNo}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            console.log(treetypeoption,"ahdjkahkfhakhf")
+            
             this.setState({treetypeoption,treetypelist:rst})
         });
-        console.log(this.props,"46546");
+        
         const {actions: {getTree,gettreetype,getTreeList,getNurserysCount}} = this.props;
 
         //地块树
@@ -116,8 +116,7 @@ export default class Entry extends Component {
     }
 
 	render() {
-        console.log(this.props);
-        console.log(this.state);
+       
   		const {keycode} = this.props;
         const {
             treetypeoption,
@@ -196,7 +195,7 @@ export default class Entry extends Component {
         // gettreetype({},{no:keycode,paginate:false})
         .then(rst => {
             // this.setTreeTypeOption(rst)
-            console.log(rst);
+            
             let res = groupBy(rst, function(n){
                 return n.Section
             });

@@ -39,7 +39,7 @@ export const getquality = createFetchAction(`${FOREST_API}/trees/quality/`, []);
 export const getreturn = createFetchAction(`${FOREST_API}/trees/return/`, []);
 export const getreturnowner = createFetchAction(`${FOREST_API}/trees/return/owner/`, []);
 export const getreturnsupervision = createFetchAction(`${FOREST_API}/trees/return/supervision/`, []);
-export const getCount = createFetchAction(`${FOREST_API}/trees/count/`, []);
+export const getCount = createFetchAction(`${FOREST_API}/tree/treestat`, []);
 export const getTreesProgress = createFetchAction(`${FOREST_API}/trees/progress/`, []);
 export const getCountSection = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
 export const getCountSmall = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass`, []);
