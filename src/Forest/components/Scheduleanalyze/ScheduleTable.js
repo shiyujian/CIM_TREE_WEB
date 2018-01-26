@@ -429,8 +429,8 @@ export default class ScheduleTable extends Component {
         if(index == 1 ) {
             const {stime1,etime1} = this.state;
             let param = {
-                stime:stime1?moment(stime1).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):'',
-                etime:etime1?moment(etime1).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):''
+                stime:stime1?moment(stime1).format('YYYY-MM-DD HH:mm:ss'):'',
+                etime:etime1?moment(etime1).format('YYYY-MM-DD HH:mm:ss'):''
             }
             this.qury(index,param);
         }
@@ -502,7 +502,7 @@ export default class ScheduleTable extends Component {
     }
 
     qury(index,param) {
-        const {actions: {getCount,getCountSection,getCountSmall,getCountThin},leftkeycode} = this.props;
+        const {actions: {getCount,getCountSection,getCountSmall,getCountThin},leftkeycode,sectionoption} = this.props;
         param.no = leftkeycode;
         if(index === 1 ){
             this.setState({loading1:true})
@@ -513,21 +513,55 @@ export default class ScheduleTable extends Component {
                     return
                 try {
                     let myChart1 = echarts.getInstanceByDom(document.getElementById('plant'));
-                    let totledata = [],series = [],legend = ['种植总数'];
-                    for(let key in rst) {
-                        if(key !== '日期') {
-                            if(totledata.length == 0 )
-                                 totledata = rst[key]
-                            else
-                                totledata = arraynumadd(rst[key],totledata);
-                            series.push({
-                                name: key,
-                                type: 'line',
-                                yAxisIndex: 1,
-                                data: rst[key]
-                            });
-                            legend.push(key)
+                    let totledata = [],series = [],legend = ['种植总数'],sectionList = [],timeData = [];
+                    sectionoption.map((item, index) => {
+                        sectionList.push(item.key)
+                    })
+                    rst.map((res, index) => {
+                        timeData.push(rst[index].Time)
+                    })
+                    timeData = [...new Set(timeData)]
+                    for(let i = 0; i < timeData.length; i++) {
+                        let sum = 0;
+                        for(let j = 0; j < rst.length; j++) {
+                            if(timeData[i] == rst[j].Time) {
+                                sum += rst[j].Num;
+                            }
                         }
+                        totledata.push(sum);
+                    }
+                    let sectionObj = {};
+                    for(let o = 0; o < sectionList.length; o++) {
+                        let sectionTimeData = rst.filter(n => {
+                            return n.Section == sectionList[o];
+                        });
+                        sectionObj[sectionList[o]] = sectionTimeData;
+                    }
+                    let totalDataObj = {};
+                    for(let section in sectionObj){
+                        let cTimeData = sectionObj[section];
+                        let serieData = [];
+                        for(let k = 0;k < timeData.length;k++){
+                            let value = 0;
+                            for(let l = 0;l < cTimeData.length;l++){
+                                if(timeData[k] == cTimeData[l].Time){
+                                    value = cTimeData[l].Num;
+                                    if(totalDataObj[timeData[k]]){
+                                        totalDataObj[timeData[k]] += value;
+                                    }else{
+                                        totalDataObj[timeData[k]] = value;
+                                    }
+                                    break;
+                                }
+                            }
+                            serieData.push(value);
+                        }
+                        series.push({
+                            name: section,
+                            type: 'line',
+                            yAxisIndex: 1,
+                            data: serieData
+                        });
                     }
                     series.unshift({
                         name:'种植总数',
@@ -540,7 +574,7 @@ export default class ScheduleTable extends Component {
                         },
                         xAxis : [
                             {
-                                data: rst['日期'],
+                                data: timeData,
                             }
                         ],
                         series: series
@@ -555,7 +589,6 @@ export default class ScheduleTable extends Component {
             getCountSection({},param)
             .then(rst => {
                 rst.sort(sorting)
-                console.log('rst',rst)
                 this.setState({loading2:false})
                 if(!rst)
                     return

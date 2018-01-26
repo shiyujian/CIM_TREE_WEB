@@ -188,6 +188,14 @@ export default class Project extends Component {
 				path: '/project/material',
 				exact: true,
 				icon: <Icon name="retweet"/>,
+			},
+			{
+				key: 'FormManage',
+				id: 'FORM',
+				name: '表单管理',
+				path: '/project/formmanage',
+				exact: true,
+				icon: <Icon name="retweet"/>,
 			}]
 		},{
 			key: 'safetyManage',
