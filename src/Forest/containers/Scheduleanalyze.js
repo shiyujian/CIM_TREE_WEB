@@ -152,7 +152,6 @@ export default class Scheduleanalyze extends Component {
         //标段
         getTree({},{parent:keycode})
         .then(rst => {
-            console.log('rst1',rst)
             if(rst instanceof Array){
                 let sectionList = [];
                 let sectionOptions = [];

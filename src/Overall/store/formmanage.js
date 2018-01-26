@@ -8,17 +8,23 @@ const ID = 'OVERALL_FORMMANAGE';
 export const postUploadFilesAc = createAction(`${ID}上传的文件列表`);
 
 export const getdocumentOK = createAction(`${ID}_搜索目录文档`);
+export const getdocument = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [getdocumentOK]);
 // 流程详情
 export const getWorkflowByIdOK = createAction('获取流程详情');
 export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
 //获取选中树节点信息
 export const getSelectedNodeInfo = createAction(`${ID}_获取选中树节点信息`);
+const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
+export const setkeycode =createAction(`${ID}_setkeycode`);
 export const actions = {
     getdocumentOK,
+    getdocument,
     postUploadFilesAc,
     getWorkflowByIdOK,
     getWorkflowById,
-    getSelectedNodeInfo
+    getSelectedNodeInfo,
+    setcurrentcode,
+    setkeycode
 }
 
 export default handleActions({
@@ -32,4 +38,16 @@ export default handleActions({
             selectedNodeInfo: payload
         }
     },
+    [getdocumentOK]: (state, {payload}) => ({
+        ...state,
+        Doc: payload.result
+    }),
+    [setcurrentcode]: (state, {payload}) => ({
+        ...state,
+        currentcode: payload
+    }),
+    [setkeycode]: (state, {payload}) => ({
+	    ...state,
+	    keycode: payload
+    }),
 },{});

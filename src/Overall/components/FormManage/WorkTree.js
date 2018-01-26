@@ -1,52 +1,40 @@
-import React, { Component } from 'react';
-import { Tree, Spin} from 'antd';
+import React, {Component} from 'react';
+import {Tree,Spin} from 'antd';
 const TreeNode = Tree.TreeNode;
-import {dataTree} from './worktree.json'
 
-export default class WorkTree extends Component {
-    static propTypes = {};
-    constructor(props) {
-        super(props);
-        this.state = {
-            selectedUnit:[],
-            dataTree:[],
-            loading:true,
-        }
-    }
-    componentDidMount(){
+export default class DatumTree extends Component {
 
-        this.setState({
-            dataTree,
-            loading:false
-        })
-    }
-    static loop(data = []) {
+	static propTypes = {};
+
+	static loop(data = []) {
 		return data.map((item) => {
 			if (item.children && item.children.length) {
 				return (
-					<TreeNode
+					<TreeNode key={`${item.pk}--${item.code}--children`}
 					          title={item.name}>
 						{
-							WorkTree.loop(item.children)
+							DatumTree.loop(item.children)
 						}
 					</TreeNode>
 				);
 			}
-			return <TreeNode 
+			return <TreeNode key={`${item.pk}--${item.code}--${item.obj_type_hum}`}
 			                 title={item.name}/>;
 		});
 	};
 
 	render() {
-		const {dataTree = [],loading} = this.state;
+		const {treeData = []} = this.props;
 		return (
-            <Spin tip="加载中" spinning={loading}>
+            <Spin tip="加载中" spinning={this.props.loading}>
                 <div>
-                    {dataTree.length ?
-                        <Tree showLine  
-                            defaultExpandAll={false}>
+                    {treeData.length ?
+                        <Tree showLine
+                            selectedKeys={[this.props.selectedKeys]}
+                            defaultExpandAll={true}
+                            onSelect={this.props.onSelect}>
                             {
-                                WorkTree.loop(dataTree)
+                                DatumTree.loop(treeData)
                             }
                         </Tree>
                         : ''

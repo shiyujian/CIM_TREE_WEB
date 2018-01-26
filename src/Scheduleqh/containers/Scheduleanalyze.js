@@ -139,15 +139,10 @@ export default class Scheduleanalyze extends Component {
         this.setState({section:value});
         getTree({},{parent:leftkeycode})
         .then(rst => {
-           
             let smallclasses = [];
             rst.map((item, index) => {
                 if(rst[index].Section == value) {
                     let smallclassName = rst[index].Name.replace("号小班","");
-                     // if (smallclassName < 100) {
-                     //        smallclassName = "0" + smallclassName;
-                     //    }
-                       
                     let smallname = {
                         Name: smallclassName,
                     }
@@ -175,7 +170,6 @@ export default class Scheduleanalyze extends Component {
             sectionData.map(sec => {
                 sectionOptions.push(<Option key={sec} value={sec}>{sec}</Option>)
             })
-            // sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({sectionoption: sectionOptions,section:sectionList[0]})
         }
     }
@@ -196,8 +190,6 @@ export default class Scheduleanalyze extends Component {
                 }
             }
             })
-            // let smallclassData = [...new Set(smallclassList)];
-            // smallclassData.sort();
             smallclassList.map(small => {
                 smallclassOptions.push(<Option key={small} value={small}>{small}</Option>)
             })
@@ -212,14 +204,6 @@ export default class Scheduleanalyze extends Component {
         this.setState({leftkeycode:value})
         console.log(keycode);
       console.log(this.state.leftkeycode);
-      //  const {actions: {setkeycode,getTree,getTreeList}} = this.props;
-      //   const {leftkeycode} = keycode;
-      //      getTree({},{parent:leftkeycode})
-      //       .then(rst => {
-      //           this.setSectionOption(rst);
-      //           this.setSmallClassOption(rst,"1标段");
-                
-      //       });
     }
     
     //树展开

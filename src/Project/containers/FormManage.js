@@ -5,21 +5,21 @@ import { Alert } from 'antd';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 import PkCodeTree from '../components/PkCodeTree';
-import reducer, { actions } from '../store/standard';
+import reducer, { actions } from '../store/formmanage';
 import Button from "antd/es/button/button";
-import AddDirPanel from "../components/Standard/AddDirPanel";
-import DelDirPanel from "../components/Standard/DelDirPanel";
-export const Datumcode = window.DeathCode.DATUM_DATUM;
+import AddFormTree from "../components/FormManage/AddFormTree";
+import DelFormTree from "../components/FormManage/DelFormTree";
+export const Datumcode = window.DeathCode.OVERALL_FORM;
 
 @connect(
 	state => {
 		const {
 			project: {
-				standard = {}
+				formmanage = {}
 			} = {},
 			platform 
 			} = state;
-			return {...standard, platform};
+			return {...formmanage, platform};
 		},
 	dispatch => ({
 		actions: bindActionCreators(
@@ -31,7 +31,7 @@ export const Datumcode = window.DeathCode.DATUM_DATUM;
 	})
 )
 
-export default class Standard extends Component {
+export default class FormManage extends Component {
 	
 	static propTypes = {};
 	constructor(props){
@@ -53,7 +53,7 @@ export default class Standard extends Component {
 		hadSelectDir: false,
 	};
 
-	selectStandardDir(value=[],node) {
+	selectMaterialDir(value=[],node) {
 		console.log(node)
 		let data = node.node.props.data[0].children ? node.node.props.data[0].children : "undefined";
 		this.setState({
@@ -75,10 +75,7 @@ export default class Standard extends Component {
 			refreshPanelTo('NOR')
 		}
 	}
-
-
 	render() {
-		console.log(this.props)
 		const
 			{
 				platform: {dir: {list = [],} = {}} = {},
@@ -96,7 +93,7 @@ export default class Standard extends Component {
 		return (
 
 			<div>
-				<DynamicTitle title="制度标准" {...this.props} />
+				<DynamicTitle title="表单管理" {...this.props} />
 				<Sidebar>
 					<div style={{borderBottom: 'solid 1px #999', paddingBottom: 8,}}>
 						<Button style={this.state.data === "undefined" ? this.state.hidden : this.state.show} onClick={() => {refreshPanelTo('ADD');}}>新增目录</Button>
@@ -104,13 +101,13 @@ export default class Standard extends Component {
 					</div>
 					<PkCodeTree treeData={list}
 					            selectedKeys={keycode}
-					            onSelect={this.selectStandardDir.bind(this)} />
+					            onSelect={this.selectMaterialDir.bind(this)} />
 				</Sidebar>
 				<Content>
 				{adddelpanel==='NOR'?
 					null:adddelpanel==='ADD'?
-						<AddDirPanel {...this.props }/>:hadSelectDir?
-							<DelDirPanel {...this.props }/> : <Alert message='请在左侧选择需要删除的目录' type='error' closable />}
+						<AddFormTree {...this.props }/>:hadSelectDir?
+							<DelFormTree {...this.props }/> : <Alert message='请在左侧选择需要删除的目录' type='error' closable />}
 				</Content>			
 			</div>
 		);
@@ -119,12 +116,14 @@ export default class Standard extends Component {
 	componentDidMount() {
 	    const {actions: {getDir,savepk,addDir}} = this.props;
 		getDir({code:Datumcode}).then(rst=>{
+            console.log(rst);
+            // debugger
 			if(!rst.pk){
 				addDir({},{
 					"status": "A",
 					"obj_type": "C_DIR",
 					"code":Datumcode,
-					"name": "制度规范",
+					"name": "表单管理",
 					"basic_params": {
 						"permitted_orgs": [],
 						"model_name": ""
