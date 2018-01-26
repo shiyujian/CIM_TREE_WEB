@@ -210,7 +210,6 @@ export default class Addition extends Component {
         },
         beforeUpload(file) {
             const valid = fileTypes.indexOf(file.type) >= 0;
-            //console.log(file);
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
             }
@@ -334,6 +333,7 @@ export default class Addition extends Component {
         });
         console.log('dataSource',dataSource)
     }
+
     onDelete(){
         const { selected } = this.props;
         console.log('selected',selected)
@@ -455,6 +455,7 @@ export default class Addition extends Component {
             docs = [],
             actions: {toggleAddition, postDocument, getdocument,changeDocs}
         } = this.props;
+        console.log('docs',docs)
         const promises = docs.map(doc => {
             const response = doc.response;
             console.log('doc',doc)
@@ -462,9 +463,8 @@ export default class Addition extends Component {
             doc.engineer=this.state.engineerName;
             doc.number=this.state.engineerNumber;
             doc.approve=this.state.engineerApprove;
-            // doc.equipName=this.state.equipName;
-            doc.student=this.state.dataSource;
-            console.log('doc.student',this.state.dataSource);
+            doc.children=this.state.dataSource;
+            console.log('doc.children',this.state.dataSource);
             return postDocument({}, {
                 code: `${currentcode.code}_${response.id}`,
                 name: doc.name,
@@ -475,7 +475,6 @@ export default class Addition extends Component {
                 basic_params: {
                     files:[files]
                 },
-                companyEngineer:doc.companyEngineer,
                 extra_params: {
                     engineer:doc.engineer,
                     number:doc.number,
@@ -487,6 +486,7 @@ export default class Addition extends Component {
                     lasttime: doc.lastModifiedDate,
                     style: '机械设备',
                     submitTime: moment.utc().format(),
+                    children:doc.children,
                     // equipName:doc.equipName,
                     // equipNumber:doc.equipNumber,
                     // equipMoment:doc.equipMoment,
