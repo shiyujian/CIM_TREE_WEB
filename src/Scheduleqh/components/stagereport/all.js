@@ -171,7 +171,7 @@ class All extends Component {
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {
                     name:"总进度计划报批流程",
-                    desc:"进度理模块总进度计划报批流程",
+                    desc:"进度管理模块总进度计划报批流程",
                     code:WORKFLOW_CODE.总进度计划报批流程
                 };
                 let workflowdata={

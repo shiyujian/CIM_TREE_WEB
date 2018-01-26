@@ -16,7 +16,8 @@ window.DeathCode = {
 
     DATUM_ENGINEERING:"Q001",//资料管理工程文档写死的编码
     DATUM_DATUM:"QH01" ,//资料管理制度规范编码
-    OVERALL_MATERIAL:"MATERIAL01",//综合管理物资管理编码
+	OVERALL_MATERIAL:"MATERIAL01",//综合管理物资管理编码
+	OVERALL_FORM:"FORMMANAGE01",//综合管理表单管理编码
 	DATUM_DATUM:"QH01" ,//资料管理制度规范编码
 	DATUM_GCYX:"TREE_GCYX" ,//工程影像目录名称
     DATUM_PK:"3407341485020",
