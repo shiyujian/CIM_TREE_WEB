@@ -11,7 +11,7 @@ export default class GeneralTable extends Component {
 
 	state = { 
 		visible: false,
-		data:[] 
+		data:[], 
 	}
 	  showModal = () => {
 	    this.setState({
@@ -22,6 +22,7 @@ export default class GeneralTable extends Component {
 	    console.log(e);
 	    this.setState({
 	      visible: false,
+	      index
 	    });
 	  }
 	  handleCancel = (e) => {
@@ -35,7 +36,6 @@ export default class GeneralTable extends Component {
 			  visible,data
         } = this.state;
 		const { Doc = [] } = this.props;
-		// console.log('table.this.props',this.props)
 		console.log('table.this.props', this.props)
 		return (
 			<Table
@@ -44,6 +44,7 @@ export default class GeneralTable extends Component {
 				columns={this.columns}
 				className='foresttables'
 				bordered rowKey="code" />
+
 		);
 	}
 
@@ -87,11 +88,17 @@ export default class GeneralTable extends Component {
 			title: '流程状态',
 			dataIndex: 'flowStyle',
 			key: 'flowStyle'
-		}, {
+		}, 	{
 			title: '操作',
-			render: (record, index) => {
-				let nodes = [];
-				nodes.push(
+			render: (text,record, index) => {
+				const { Doc = [] } = this.props;
+				console.log('doc222',Doc)
+				console.log('text',text)
+				console.log('record',record)
+				console.log('index',index)
+				// let nodes = [];
+				// nodes.push(
+				return (
 					<div>
 						{
 							// <a onClick={this.previewFile.bind(this, record)}>查看</a>
@@ -100,6 +107,7 @@ export default class GeneralTable extends Component {
 						<Modal
 				          title="查看文档"
 				          width={920}
+				          footer={null}
 				          visible={this.state.visible}
 				          maskClosable={false}
 				          onOk={this.handleOk}
@@ -113,10 +121,10 @@ export default class GeneralTable extends Component {
 					        	</Row>
 			                    <Row gutter={24}>
 			                        <Col span={24} style={{paddingLeft:'3em'}}>
-			                            <Row gutter={15} >
+			                            <Row gutter={15} style={{marginTop:'2em'}} >
 			                                <Col span={10}>
 			                                    <FormItem   {...GeneralTable.layoutT} label="单位工程:">
-			                                     <Select>
+			                                     <Select  style={{width:'90%'}} value={Doc[index].extra_params.engineer}>
 			                                          <Option value='第一阶段'>第一阶段</Option>
 			                                          <Option value='第二阶段'>第二阶段</Option>
 			                                          <Option value='第三阶段'>第三阶段</Option>
@@ -126,14 +134,14 @@ export default class GeneralTable extends Component {
 			                                </Col>
 			                                <Col span={10}>
 			                                    <FormItem {...GeneralTable.layoutT} label="编号:">
-			                                        <Input  />
+			                                        <Input value={Doc[index].extra_params.number} />
 			                                    </FormItem>
 			                                </Col>
 			                            </Row>
 			                            <Row gutter={15}>
 			                                <Col span={20}>
 			                                    <FormItem  {...GeneralTable.layout} label="审批单位:">
-			                                        <Select>
+			                                        <Select style={{width:'100%'}} value={Doc[index].extra_params.approve} >
 			                                              <Option value='第一公司'>第一公司</Option>
 			                                              <Option value='第二公司'>第二公司</Option>
 			                                        </Select>
@@ -144,9 +152,9 @@ export default class GeneralTable extends Component {
 			                    </Row>
 			                    <Row gutter={24}>
 			                        <Col span={24}>
-			                        	<Table rowSelection={this.rowSelection}
+			                        	<Table 
 										   columns={this.equipmentColumns}
-										   dataSource={this.state.data}
+										   dataSource={Doc[index].extra_params.children}
 										   bordered 
 										/>
 			                        </Col>
@@ -156,8 +164,9 @@ export default class GeneralTable extends Component {
 						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>
 					</div>
-				);
-				return nodes;
+				)
+				// );
+				// return nodes;
 			}
 		}
 	];
@@ -191,12 +200,12 @@ export default class GeneralTable extends Component {
         }
     ];
 
-    rowSelection = {
-        onChange: (selectedRowKeys) => {
-            const {actions: {selectDocuments}} = this.props;
-            selectDocuments(selectedRowKeys);
-        },
-    };
+    // rowSelection = {
+    //     onChange: (selectedRowKeys) => {
+    //         const {actions: {selectDocuments}} = this.props;
+    //         selectDocuments(selectedRowKeys);
+    //     },
+    // };
 	createLink = (name, url) => {    //下载
 		let link = document.createElement("a");
 		link.href = url;
