@@ -23,7 +23,7 @@ const {RangePicker} = DatePicker;
 		actions: bindActionCreators({...actions, ...platformActions}, dispatch),
 	}),
 )
-export default class Entry extends Component {
+export default class Enteranalyze extends Component {
 
     constructor(props) {
         super(props)
