@@ -194,7 +194,7 @@ class Login extends Component {
 									<Form onSubmit={this.handleSubmit.bind(this)}
 										className='login-form' id="loginForm">
 
-										<p style={{ fontSize: '25', color: '#108EE9', textAlign: 'center' }}>深林大数据建设管理平台</p>
+										<p style={{ fontSize: '25', color: '#108EE9', textAlign: 'center' }}>森林大数据建设管理平台</p>
 										<FormItem style={{ marginTop: '10' }}>
 											<Select placeholder="项目选择">
 												<Option value='二'>二</Option>
