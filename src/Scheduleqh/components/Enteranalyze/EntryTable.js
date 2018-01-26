@@ -452,86 +452,177 @@ export default class EntryTable extends Component {
     // }
 
     qury(index,param) {
-        const {actions: {getNurserysCount, getNurserysCountFast}} = this.props;
-        if(index === 1) {
-            this.setState({loading1:true})
-            getNurserysCountFast({},{etime:param.etime})
-            .then(rst => {
+        const {actions: {getNurserysCount, getNurserysCountFast,sectionoption}} = this.props;
+        console.log(sectionoption);
+        // let sectionList = ["1标段","2标段","3标段","4标段","5标段"];
+        // if(index === 1) {
+        //     this.setState({loading1:true})
+        //     getNurserysCountFast({},{etime:param.etime})
+        //     .then(rst => {
                 
-                 let object = groupBy(rst, function(n){
-                return n.Section
-            });
-                var dic =object;
-                var sdic = Object.keys(dic).sort();
-                let res = {};
-                let sub ='';
-                for(let a = 0 ; a< sdic.length;a++){
-                 sub += `"${sdic[a]}":${JSON.stringify(dic[sdic[a]])},`;
-                if(a===sdic.length-1){
-                    sub = '{'+sub.substr(0,sub.length-1)+'}'
-                res = JSON.parse(sub);
-                }
-                }
-                console.log(res,"dadadadadadadd");
+        //          let object = groupBy(rst, function(n){
+        //         return n.Section
+        //     });
+        //         var dic =object;
+        //         var sdic = Object.keys(dic).sort();
+        //         let res = {};
+        //         let sub ='';
+        //         for(let a = 0 ; a< sdic.length;a++){
+        //          sub += `"${sdic[a]}":${JSON.stringify(dic[sdic[a]])},`;
+        //         if(a===sdic.length-1){
+        //             sub = '{'+sub.substr(0,sub.length-1)+'}'
+        //         res = JSON.parse(sub);
+        //         }
+        //         }
+        //         console.log(res,"dadadadadadadd");
                  
-                 // let res = {};
-                 // res["1标段"]=object["1标段"];
-                 // res["2标段"]=object["2标段"];
-                 // res["3标段"]=object["3标段"];
-                 // res["4标段"]=object["4标段"];
-                 // res["5标段"]=object["5标段"];
-            let biaoduan = Object.keys(res);
-            let trees = [];
-            let wsx = [];
-            trees = Object.entries(res);
-            for(var j = 0 ; j<=trees.length-1; j++){
-            var abc = trees[j][1];
-            let qaz = 0;
-            for(var k = 0 ; k<=abc.length-1; k++){
-            qaz = qaz + abc[k].Num;
-            }
-            wsx.push(qaz);
-            }
-            let Num1 = 0;
-            for(var i = 0; i<=rst.length-1; i++){
-            Num1 = Num1 + rst[i].Num;
-            }
+        //          // let res = {};
+        //          // res["1标段"]=object["1标段"];
+        //          // res["2标段"]=object["2标段"];
+        //          // res["3标段"]=object["3标段"];
+        //          // res["4标段"]=object["4标段"];
+        //          // res["5标段"]=object["5标段"];
+        //     let biaoduan = Object.keys(res);
+        //     let trees = [];
+        //     let wsx = [];
+        //     trees = Object.entries(res);
+        //     for(var j = 0 ; j<=trees.length-1; j++){
+        //     var abc = trees[j][1];
+        //     let qaz = 0;
+        //     for(var k = 0 ; k<=abc.length-1; k++){
+        //     qaz = qaz + abc[k].Num;
+        //     }
+        //     wsx.push(qaz);
+        //     }
+        //     let Num1 = 0;
+        //     for(var i = 0; i<=rst.length-1; i++){
+        //     Num1 = Num1 + rst[i].Num;
+        //     }
+        //         this.setState({loading1:false})
+        //         if(!rst)
+        //             return
+        //         try {
+        //             let myChart1 = echarts.getInstanceByDom(document.getElementById('king'));
+        //             let options1 = {
+        //                 legend: {
+        //                     data:['进场总数']
+        //                 },
+        //                 xAxis: [
+        //                     {
+        //                         type: 'category',
+        //                         data: biaoduan,
+        //                     }
+        //                 ],
+        //                 series: [
+        //                     {
+        //                         name: '进场总数',
+        //                         type: 'bar',
+        //                         data: wsx,
+        //                         markPoint: {
+        //                             data: [
+        //                                 {type: 'max', name: '最大值'},
+        //                                 {type: 'min', name: '最小值'}
+        //                             ]
+        //                         },
+        //                         markLine: {
+        //                             data: [
+        //                                 {type: 'average', name: '平均值'}
+        //                             ]
+        //                         }
+        //                     },
+        //                 ]
+        //             }
+        //             myChart1.setOption(options1);
+        //         } 
+                     if(index === 1 ){
+            this.setState({loading1:true})
+            getNurserysCountFast({},param)
+            .then(rst => {
+                console.log('rst',rst)
+                 let object = groupBy(rst, function(n){
+                    return n.Section
+                });
+                 let sectionList = Object.keys(object)
                 this.setState({loading1:false})
                 if(!rst)
                     return
                 try {
                     let myChart1 = echarts.getInstanceByDom(document.getElementById('king'));
+                    let totledata = [],series = [],legend = ['种植总数'],sectionList = [],timeData = [];
+                    // sectionoption.map((item, index) => {
+                    //     sectionList.push(item.key)
+                    // })
+                    // console.log('sectionList',sectionList)
+                    rst.map((res, index) => {
+                        timeData.push(rst[index].Time)
+                    })
+                    timeData = [...new Set(timeData)]
+                    console.log('timeData',timeData)
+                    // let treeNum = 0;
+                    for(let i = 0; i < timeData.length; i++) {
+                        let sum = 0;
+                        for(let j = 0; j < rst.length; j++) {
+                            if(timeData[i] == rst[j].Time) {
+                                sum += rst[j].Num;
+                            }
+                        }
+                        // treeNum += sum;
+                        totledata.push(sum);
+                        console.log('totledata',totledata)
+                    }
+                    let sectionObj = {};
+                    for(let o = 0; o < sectionList.length; o++) {
+                        let sectionTimeData = rst.filter(n => {
+                            return n.Section == sectionList[o];
+                        });
+                        sectionObj[sectionList[o]] = sectionTimeData;
+                    }
+                    console.log('sectionObj',sectionObj)
+                    let totalDataObj = {};
+                    for(let section in sectionObj){
+                        let cTimeData = sectionObj[section];
+                        let serieData = [];
+                        for(let k = 0;k < timeData.length;k++){
+                            let value = 0;
+                            for(let l = 0;l < cTimeData.length;l++){
+                                if(timeData[k] == cTimeData[l].Time){
+                                    value = cTimeData[l].Num;
+                                    if(totalDataObj[timeData[k]]){
+                                        totalDataObj[timeData[k]] += value;
+                                    }else{
+                                        totalDataObj[timeData[k]] = value;
+                                    }
+                                    break;
+                                }
+                            }
+                            serieData.push(value);
+                        }
+                        series.push({
+                            name: section,
+                            type: 'line',
+                            yAxisIndex: 1,
+                            data: serieData
+                        });
+                        console.log('serieData',serieData)
+                    }
+                    series.unshift({
+                        name:'种植总数',
+                        type:'bar',
+                        data:totledata
+                    });
                     let options1 = {
                         legend: {
-                            data:['进场总数']
+                            data:legend
                         },
-                        xAxis: [
+                        xAxis : [
                             {
-                                type: 'category',
-                                data: biaoduan,
+                                data: timeData,
                             }
                         ],
-                        series: [
-                            {
-                                name: '进场总数',
-                                type: 'bar',
-                                data: wsx,
-                                markPoint: {
-                                    data: [
-                                        {type: 'max', name: '最大值'},
-                                        {type: 'min', name: '最小值'}
-                                    ]
-                                },
-                                markLine: {
-                                    data: [
-                                        {type: 'average', name: '平均值'}
-                                    ]
-                                }
-                            },
-                        ]
-                    }
+                        series: series
+                    };
                     myChart1.setOption(options1);
-                } catch(e) {
+                }catch(e) {
                     console.log(e)
                 }
                

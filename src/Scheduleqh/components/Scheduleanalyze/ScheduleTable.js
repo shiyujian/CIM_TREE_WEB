@@ -544,239 +544,92 @@ export default class ScheduleTable extends Component {
 
     qury(index,param) {
         
-        const {actions: {gettreetype1,gettreetype2,gettreetype3,gettreetype4,getCount,getCountSection,getCountSmall,getCountThin},leftkeycode} = this.props;
+        const {actions: {gettreetype1,gettreetype2,gettreetype3,gettreetype4,getCount,getCountSection,getCountSmall,getCountThin},leftkeycode,sectionoption} = this.props;
         param.no = leftkeycode;
         if(index === 1 ){
             this.setState({loading1:true})
-            
             gettreetype1({},param)
             .then(rst => {
-                
-               let res = groupBy(rst, function(n){
-                return n.Time
-            });
-                let data = groupBy(rst, function(n){
-                return n.Section
-            });
-                let allbiaoduan = Object.keys(data);
-                console.log(allbiaoduan);
-                
-
-
-               let biaoduan1 = [];
-               let biaoduan2 = [];
-               let biaoduan3 = [];
-               let biaoduan4 = [];
-               let biaoduan5 = [];
-               let bytime = Object.values(res);
-               
-               for(var x = 0 ; x <= bytime.length-1; x++){
-                   let number1 = 0;
-                   let number2 = 0;
-                   let number3 = 0;
-                   let number4 = 0;
-                   let number5 = 0;
-                   for(var y = 0; y <= bytime[x].length-1;y++){
-                       if(bytime[x][y].Section === "1标段"){
-                             number1 = bytime[x][y].Num
-                             biaoduan1[x]= number1;
-                       }else if(number1!=0){
-                             biaoduan1[x]=number1;
-                       }else{
-                             biaoduan1[x]=0;
-                       }
-                        if(bytime[x][y].Section === "2标段"){
-                             number2 = bytime[x][y].Num
-                             biaoduan2[x]= number2;
-                       }else if(number2!=0){
-                             biaoduan2[x]=number2;
-                       }else{
-                             biaoduan2[x]=0;
-                       }
-                        if(bytime[x][y].Section === "3标段"){
-                             number3 = bytime[x][y].Num
-                             biaoduan3[x]= number3;
-                       }else if(number3!=0){
-                             biaoduan3[x]=number3;
-                       }else{
-                             biaoduan3[x]=0;
-                       }
-                        if(bytime[x][y].Section === "4标段"){
-                             number4 = bytime[x][y].Num
-                             biaoduan4[x]= number4;
-                       }else if(number4!=0){
-                             biaoduan4[x]=number4;
-                       }else{
-                             biaoduan4[x]=0;
-                       }
-                        if(bytime[x][y].Section === "5标段"){
-                             number5 = bytime[x][y].Num
-                             biaoduan5[x]= number5;
-                       }else if(number5!=0){
-                             biaoduan5[x]=number5;
-                       }else{
-                             biaoduan5[x]=0;
-                       }
-                   }
-               } 
-              
-               let lastshuzhu =[];
-               lastshuzhu = [biaoduan1,biaoduan2,biaoduan3,biaoduan4,biaoduan5];
-              
-            let time = Object.keys(res);
-            let value = Object.values(res);
-            let biaoduan = Object.keys(res);
-            let trees = [];
-            let wsx = [];
-            trees = Object.entries(res);
-            for(var j = 0 ; j<=trees.length-1; j++){
-            var abc = trees[j][1];
-            let qaz = 0;
-            for(var k = 0 ; k<=abc.length-1; k++){
-            qaz = qaz + abc[k].Num;
-            }
-            wsx.push(qaz);
-            }
+                console.log('rst',rst)
                 this.setState({loading1:false})
                 if(!rst)
                     return
                 try {
                     let myChart1 = echarts.getInstanceByDom(document.getElementById('plant'));
+                    let totledata = [],series = [],legend = ['种植总数'],sectionList = [],timeData = [];
+                    sectionoption.map((item, index) => {
+                        sectionList.push(item.key)
+                    })
+                    console.log('sectionList',sectionList)
+                    rst.map((res, index) => {
+                        timeData.push(rst[index].Time)
+                    })
+                    timeData = [...new Set(timeData)]
+                    console.log('timeData',timeData)
+                    // let treeNum = 0;
+                    for(let i = 0; i < timeData.length; i++) {
+                        let sum = 0;
+                        for(let j = 0; j < rst.length; j++) {
+                            if(timeData[i] == rst[j].Time) {
+                                sum += rst[j].Num;
+                            }
+                        }
+                        // treeNum += sum;
+                        totledata.push(sum);
+                        console.log('totledata',totledata)
+                    }
+                    let sectionObj = {};
+                    for(let o = 0; o < sectionList.length; o++) {
+                        let sectionTimeData = rst.filter(n => {
+                            return n.Section == sectionList[o];
+                        });
+                        sectionObj[sectionList[o]] = sectionTimeData;
+                    }
+                    console.log('sectionObj',sectionObj)
+                    let totalDataObj = {};
+                    for(let section in sectionObj){
+                        let cTimeData = sectionObj[section];
+                        let serieData = [];
+                        for(let k = 0;k < timeData.length;k++){
+                            let value = 0;
+                            for(let l = 0;l < cTimeData.length;l++){
+                                if(timeData[k] == cTimeData[l].Time){
+                                    value = cTimeData[l].Num;
+                                    if(totalDataObj[timeData[k]]){
+                                        totalDataObj[timeData[k]] += value;
+                                    }else{
+                                        totalDataObj[timeData[k]] = value;
+                                    }
+                                    break;
+                                }
+                            }
+                            serieData.push(value);
+                        }
+                        series.push({
+                            name: section,
+                            type: 'line',
+                            yAxisIndex: 1,
+                            data: serieData
+                        });
+                        console.log('serieData',serieData)
+                    }
+                    series.unshift({
+                        name:'种植总数',
+                        type:'bar',
+                        data:totledata
+                    });
                     let options1 = {
-
-                         title: {
-                                    // text: '折线图堆叠'
-                                },
-                                tooltip: {
-                                    trigger: 'axis'
-                                },
-                                legend: {
-                                    data:['总数','1标段','2标段','3标段','4标段','5标段']
-                                },
-                                grid: {
-                                    left: '3%',
-                                    right: '4%',
-                                    bottom: '3%',
-                                    containLabel: true
-                                },
-                                // toolbox: {
-                                //     feature: {
-                                //         saveAsImage: {}
-                                //     }
-                                // },
-                                xAxis: {
-                                    type: 'category',
-                                    // boundaryGap: false,
-                                    data: time,
-                                    axisPointer: {
-                                          type: 'shadow'
-                                        },
-                                     axisLabel:{
-                                            interval:0,
-                                            rotate:30,
-                                            color:"#fff",
-                                            textStyle: {color: '#000', fontSize: 13}
-                                        },
-                                },
-                                yAxis: [
-                                    // type: 'value'
-                                    {
-                                        type: 'value',
-                                        name: '',
-                                        axisLabel: {
-                                            formatter: '{value} 棵'
-                                        }
-                                    },
-                                    {
-                                        type: 'value',
-                                        name: '',
-                                        axisLabel: {
-                                            formatter: '{value} 棵'
-                                        }
-                                    }
-                                ],
-                                series: [
-                                    {
-                                        name:'总数',
-                                        type:'bar',
-                                        data:wsx,
-                                        barWidth:'25%',
-                                        // itemStyle:{
-                                        //     normal:{
-                                        //         color:'#02e5cd',
-                                        //         barBorderRadius:[50,50,50,50]
-                                        //     }
-                                        // }
-                                    },
-                                    {
-                                        name:'1标段',
-                                        type:'line',
-                                        yAxisIndex: 1,
-                                        data:lastshuzhu[0]
-                                    },
-                                    {
-                                        name:'2标段',
-                                        type:'line',
-                                        yAxisIndex: 1,
-                                        data:lastshuzhu[1]
-                                    },
-                                    {
-                                        name:'3标段',
-                                        type:'line',
-                                        yAxisIndex: 1,
-                                        data:lastshuzhu[2]
-                                    },
-                                    {
-                                        name:'4标段',
-                                        type:'line',
-                                        yAxisIndex: 1,
-                                        data:lastshuzhu[3]
-                                    },
-                                    {
-                                        name:'5标段',
-                                        type:'line',
-                                        yAxisIndex: 1,
-                                        data:lastshuzhu[4]
-                                    }
-                                ]
-                            };
-
+                        legend: {
+                            data:legend
+                        },
+                        xAxis : [
+                            {
+                                data: timeData,
+                            }
+                        ],
+                        series: series
+                    };
                     myChart1.setOption(options1);
-
-                    // let myChart1 = echarts.getInstanceByDom(document.getElementById('plant'));
-                    // let totledata = [],series = [],legend = ['种植总数'];
-                    // for(let key in lastshuzhu) {
-                    //     // if(key !== '日期') {
-                    //     //     if(totledata.length == 0 )
-                    //     //          totledata = rst[key]
-                    //     //     else
-                    //     //         totledata = arraynumadd(rst[key],totledata);
-                    //         series.push({
-                    //             name: key,
-                    //             type: 'line',
-                    //             yAxisIndex: 1,
-                    //             data: lastshuzhu[key]
-                    //         });
-                    //         legend.push(key)
-                    //     // }
-                    // }
-                    // series.unshift({
-                    //     name:'种植总数',
-                    //     type:'bar',
-                    //     data:wsx
-                    // });
-                    // let options1 = {
-                    //     legend: {
-                    //         data:legend
-                    //     },
-                    //     xAxis : [
-                    //         {
-                    //             data: time,
-                    //         }
-                    //     ],
-                    //     series: series
-                    // };
-                    // myChart1.setOption(options1);
                 } catch(e) {
                     console.log(e)
                 }
