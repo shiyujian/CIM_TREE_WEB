@@ -444,6 +444,7 @@ export default class EntryTable extends Component {
                  let res = groupBy(rst, function(n){
                 return n.Section
             });
+            console.log('res',res)
             let biaoduan = Object.keys(res);
             let trees = [];
             let wsx = [];
