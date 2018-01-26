@@ -784,32 +784,34 @@ export default class ScheduleTable extends Component {
                 let notzhongshu = [];
                 let allyeszhongshu = 0;
                 let allzhongshu = 0;
-                let newrst = [];
+                rst.sort(sorting);
+                 console.log(rst,"xixixi");
+                // let newrst = [];
 
+                // for(let i = 0; i<=rst.length-1 ; i++){
+                //     if(rst[i].Label==="1标段"){
+                //         newrst[0]=rst[i];
+                //     }
+                //     if(rst[i].Label==="2标段"){
+                //         newrst[1]=rst[i];
+                //     }
+                //     if(rst[i].Label==="3标段"){
+                //         newrst[2]=rst[i];
+                //     }
+                //     if(rst[i].Label==="4标段"){
+                //         newrst[3]=rst[i];
+                //     }
+                //     if(rst[i].Label==="5标段"){
+                //         newrst[4]=rst[i];
+                //     }
+                // }
+                // console.log(newrst);
                 for(let i = 0; i<=rst.length-1 ; i++){
-                    if(rst[i].Label==="1标段"){
-                        newrst[0]=rst[i];
-                    }
-                    if(rst[i].Label==="2标段"){
-                        newrst[1]=rst[i];
-                    }
-                    if(rst[i].Label==="3标段"){
-                        newrst[2]=rst[i];
-                    }
-                    if(rst[i].Label==="4标段"){
-                        newrst[3]=rst[i];
-                    }
-                    if(rst[i].Label==="5标段"){
-                        newrst[4]=rst[i];
-                    }
-                }
-                console.log(newrst);
-                for(let i = 0; i<=newrst.length-1 ; i++){
-                    allyeszhongshu = allyeszhongshu + newrst[i].Complete;
-                    allzhongshu = allzhongshu + newrst[i].Num;
-                    biaoduan.push(newrst[i].Label);
-                    yeszhongshu.push(newrst[i].Complete);
-                    notzhongshu.push(newrst[i].Num-newrst[i].Complete);
+                    allyeszhongshu = allyeszhongshu + rst[i].Complete;
+                    allzhongshu = allzhongshu + rst[i].Num;
+                    biaoduan.push(rst[i].Label);
+                    yeszhongshu.push(rst[i].Complete);
+                    notzhongshu.push(rst[i].Num-rst[i].Complete);
                 }
                 
                 this.setState({
@@ -818,7 +820,7 @@ export default class ScheduleTable extends Component {
                      pers: division(allyeszhongshu,allzhongshu),
                      score: joint(allyeszhongshu,allzhongshu),
                      })
-                if(!newrst)
+                if(!rst)
                     return
                 try {
                     let myChart2 = echarts.getInstanceByDom(document.getElementById('section1'));
@@ -1022,3 +1024,16 @@ function dd(path){
         }
     }
 }
+
+function sorting(val1, val2) {
+    let ele1 = val1.Label;
+    let ele2 = val2.Label;
+    if(ele1 < ele2) {
+        return -1;
+    } else if(ele1 > ele2) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+

@@ -61,6 +61,23 @@ export default class EntryTable extends Component {
     }
 
     componentDidMount(){
+        var dic ={x:2,z:1,y:3};
+        var sdic = Object.keys(dic).sort();
+        let obj = {};
+        let sub ='';
+        for(let i =0 ; i< sdic.length;i++){
+         sub += `"${sdic[i]}":${dic[sdic[i]]},`;
+        if(i===sdic.length-1){
+            sub = '{'+sub.substr(0,sub.length-1)+'}'
+        obj = JSON.parse(sub)
+        }
+        }
+
+
+
+
+        // let obj={x,y,z}
+        console.log(obj);
 
         const {actions: {getNurserysCountFast,getfactory,gettreeevery}} = this.props;
         gettreeevery().then(rst=>{
@@ -444,13 +461,25 @@ export default class EntryTable extends Component {
                  let object = groupBy(rst, function(n){
                 return n.Section
             });
+                var dic =object;
+                var sdic = Object.keys(dic).sort();
+                let res = {};
+                let sub ='';
+                for(let a = 0 ; a< sdic.length;a++){
+                 sub += `"${sdic[a]}":${JSON.stringify(dic[sdic[a]])},`;
+                if(a===sdic.length-1){
+                    sub = '{'+sub.substr(0,sub.length-1)+'}'
+                res = JSON.parse(sub);
+                }
+                }
+                console.log(res,"dadadadadadadd");
                  
-                 let res = {};
-                 res["1标段"]=object["1标段"];
-                 res["2标段"]=object["2标段"];
-                 res["3标段"]=object["3标段"];
-                 res["4标段"]=object["4标段"];
-                 res["5标段"]=object["5标段"];
+                 // let res = {};
+                 // res["1标段"]=object["1标段"];
+                 // res["2标段"]=object["2标段"];
+                 // res["3标段"]=object["3标段"];
+                 // res["4标段"]=object["4标段"];
+                 // res["5标段"]=object["5标段"];
             let biaoduan = Object.keys(res);
             let trees = [];
             let wsx = [];
@@ -752,3 +781,16 @@ function addNum(arr){
     })
     return total;
 }
+
+
+// function sorting(val1, val2) {
+//     let ele1 = val1.Label;
+//     let ele2 = val2.Label;
+//     if(ele1 < ele2) {
+//         return -1;
+//     } else if(ele1 > ele2) {
+//         return 1;
+//     } else {
+//         return 0;
+//     }
+// }
