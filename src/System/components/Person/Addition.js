@@ -13,6 +13,7 @@ export default class Addition extends Component {
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
 		return (
 			<Modal title={addition.id ? "新增人员" : "编辑人员信息"} visible={addition.visible} className="large-modal" width={800}
+			maskClosable={false}
 			       onOk={this.save.bind(this)} onCancel={this.cancel.bind(this)}>
 				<Row gutter={24}>
 					<Col span={12}>
@@ -99,7 +100,7 @@ export default class Addition extends Component {
 			actions: {postUser, clearAdditionField, getUsers, putUser}
 		} = this.props;
 		console.log(this.props)
-
+		console.log(addition)
 		const roles = addition.roles || [];
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
@@ -109,7 +110,7 @@ export default class Addition extends Component {
 			if (addition.id) {
 				putUser({id: addition.id}, {
 					username: addition.username,
-					email: addition.email || '',
+					email: addition.email ,
 					// password: addition.password, // 密码不能变？信息中没有密码
 					account: {
 						person_name: addition.person_name,
@@ -140,24 +141,25 @@ export default class Addition extends Component {
 						const codes = Addition.collect(node);
 						getUsers({}, {org_code: codes});
 					} else {
+						console.log("111")						
 						message.warn('服务器端报错！');
 					}
 				})
 			} else {
 				postUser({}, {
 					username: addition.username,
-					email: addition.email || '',
+					email: addition.email,
 					password: addition.password,
 					account: {
 						person_name: addition.person_name,
 						person_type: "C_PER",
 						person_avatar_url: "",
 						organization: {
-							// pk: node.pk,
-							// code: node.code,
+							pk: node.pk,
+							code: node.code,
 							obj_type: "C_ORG",
 							rel_type: "member",
-							// name: node.name
+							name: node.name
 						},
 					},
 					groups: roles.map(role => +role),
@@ -180,6 +182,7 @@ export default class Addition extends Component {
 						if (rst.username) {
 							message.warn('用户名已存在！');
 						} else {
+							console.log("222")							
 							message.warn('服务器端报错！');
 						}
 					}
