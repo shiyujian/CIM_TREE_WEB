@@ -4,7 +4,7 @@ import {Table, Button, Popconfirm, message} from 'antd';
 export default class Users extends Component {
 	render() {
 		const {platform: {users = []}} = this.props;
-		console.log(users);
+		console.log(this.props);
 		return (
 			<div>
 				<div>
@@ -89,11 +89,13 @@ export default class Users extends Component {
 			sidebar: {node} = {},
 			actions: {changeAdditionField}
 		} = this.props;
-		if (node.children && node.children.length > 0) {
-			message.warn('请选择最下级组织结构目录');
-		} else {
-			changeAdditionField('visible', true);
-		}
+		console.log(this.props)
+		// if (node.children && node.children.length > 0) {
+		// 	message.warn('请选择最下级组织结构目录');
+		// } else {
+		// 	
+		// }
+		changeAdditionField('visible', true);
 	}
 
 	remove() {
@@ -102,11 +104,11 @@ export default class Users extends Component {
 			actions: {deleteUser, getUsers}
 		} = this.props;
 		const codes = Users.collect(node);
-		this.selectedCodes.map((userId) => {
-			return deleteUser({userID: userId}).then(() => {
-				getUsers({}, {org_code: codes});
-			});
-		});
+		// this.selectedCodes.map((userId) => {
+		// 	return deleteUser({userID: userId}).then(() => {
+		// 		getUsers({}, {org_code: codes});
+		// 	});
+		// });
 	}
 
 	edit(user, event) {
