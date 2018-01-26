@@ -508,7 +508,6 @@ export default class ScheduleTable extends Component {
             this.setState({loading1:true})
             getCount({},param)
             .then(rst => {
-                console.log('rst',rst)
                 this.setState({loading1:false})
                 if(!rst)
                     return
@@ -518,13 +517,10 @@ export default class ScheduleTable extends Component {
                     sectionoption.map((item, index) => {
                         sectionList.push(item.key)
                     })
-                    console.log('sectionList',sectionList)
                     rst.map((res, index) => {
                         timeData.push(rst[index].Time)
                     })
                     timeData = [...new Set(timeData)]
-                    console.log('timeData',timeData)
-                    // let treeNum = 0;
                     for(let i = 0; i < timeData.length; i++) {
                         let sum = 0;
                         for(let j = 0; j < rst.length; j++) {
@@ -532,9 +528,7 @@ export default class ScheduleTable extends Component {
                                 sum += rst[j].Num;
                             }
                         }
-                        // treeNum += sum;
                         totledata.push(sum);
-                        console.log('totledata',totledata)
                     }
                     let sectionObj = {};
                     for(let o = 0; o < sectionList.length; o++) {
@@ -543,7 +537,6 @@ export default class ScheduleTable extends Component {
                         });
                         sectionObj[sectionList[o]] = sectionTimeData;
                     }
-                    console.log('sectionObj',sectionObj)
                     let totalDataObj = {};
                     for(let section in sectionObj){
                         let cTimeData = sectionObj[section];
@@ -569,7 +562,6 @@ export default class ScheduleTable extends Component {
                             yAxisIndex: 1,
                             data: serieData
                         });
-                        console.log('serieData',serieData)
                     }
                     series.unshift({
                         name:'种植总数',
