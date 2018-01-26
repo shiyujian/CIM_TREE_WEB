@@ -106,23 +106,23 @@ export default handleActions({
 	    	keycode: payload
 	    }
     },
-    [combineActions(...actionsMap(faithActions))]: (state = {}, action) => ({
-		...state,
-		faith: faithInfoReducer(state.faith, action),
-	}),
+ //    [combineActions(...actionsMap(faithActions))]: (state = {}, action) => ({
+	// 	...state,
+	// 	faith: faithInfoReducer(state.faith, action),
+	// }),
 
-	[getHonestyNewDetailOk]: (state, {payload}) => ({
-		...state,
-		honestyList: payload
-	}),
-  	[clearList]: (state, {payload}) => ({
-		...state,
-		honestyList: payload
-	}),
+	// [getHonestyNewDetailOk]: (state, {payload}) => ({
+	// 	...state,
+	// 	honestyList: payload
+	// }),
+ //  	[clearList]: (state, {payload}) => ({
+	// 	...state,
+	// 	honestyList: payload
+	// }),
 
-	[nurseryName]: (state, {payload}) => ({
-		...state,
-		nurseryName: payload
-	})
+	// [nurseryName]: (state, {payload}) => ({
+	// 	...state,
+	// 	nurseryName: payload
+	// })
 
 }, {});

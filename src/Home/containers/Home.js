@@ -8,6 +8,7 @@ import * as previewActions from '_platform/store/global/preview';
 import Preview from '_platform/components/layout/Preview';
 import {actions as newsActions} from '../store/news';
 import {actions as staffActions} from '../store/staff';
+import banner from '../components/images/banner.png';
 
 
 
@@ -25,8 +26,14 @@ export default class Home extends Component {
 
 	render() {
 		const props = this.props;
+		const bannerUrl=banner;
 		return (
 			<div>
+				<Row>
+					<Col span={24}>
+						<img  style={{width:'100%'}}src={bannerUrl} />
+					</Col>
+				</Row>
 				<Row gutter={10} style={{margin: '5px 5px 5px 5px'}}>
 					<Col span={12}>
 						{News && <News {...props}/>}

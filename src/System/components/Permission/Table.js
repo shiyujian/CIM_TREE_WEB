@@ -22,7 +22,6 @@ export default class PermissionTable extends Component {
 				return { ...ele };
 			});
 		}
-		console.log('userPermi',userPermi);
 		const {
 			table: {editing} = {},
 			actions: {changeTableField},
@@ -104,7 +103,6 @@ export default class PermissionTable extends Component {
 		title: '是否可见',
 		width: '25%',
 		render: (item) => {
-			console.log('item',item)
 			const {table: {editing, permissions = []} = {}} = this.props;
 			const key = `appmeta.${item.id}.READ`;
 			// permissions里面是当前用户拥有的所有的权限
