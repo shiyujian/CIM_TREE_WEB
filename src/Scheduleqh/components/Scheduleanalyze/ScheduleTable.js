@@ -555,6 +555,14 @@ export default class ScheduleTable extends Component {
                let res = groupBy(rst, function(n){
                 return n.Time
             });
+                let data = groupBy(rst, function(n){
+                return n.Section
+            });
+                let allbiaoduan = Object.keys(data);
+                console.log(allbiaoduan);
+                
+
+
                let biaoduan1 = [];
                let biaoduan2 = [];
                let biaoduan3 = [];
