@@ -18,6 +18,7 @@ import itemProReducer, {actions as itemProActions} from './itemPro';
 import safetySystemReducer, {actions as safetySystemActions} from './safetySystem';
 import standardReducer, {actions as standardActions} from './standard';
 import materialReducer, {actions as materialActions} from './material';
+import formmanageReducer, {actions as formmanageActions} from './formmanage';
 import engineeringImageReducer, {actions as engineeringImageActions} from './engineeringImage';
 import keywordReducer, {actions as keywordActions} from './keyword';
 // import userReducer, {actions as userActions} from './user';
@@ -119,6 +120,10 @@ export default handleActions({
 	[combineActions(...actionsMap(materialActions))]: (state = {}, action) => ({
 		...state,
 		material: materialReducer(state.material, action),
+	}),
+	[combineActions(...actionsMap(formmanageActions))]: (state = {}, action) => ({
+		...state,
+		formmanage: formmanageReducer(state.formmanage, action),
 	}),
 	[combineActions(...actionsMap(engineeringImageActions))]: (state = {}, action) => ({
 		...state,

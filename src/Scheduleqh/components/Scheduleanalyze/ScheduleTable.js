@@ -784,6 +784,28 @@ export default class ScheduleTable extends Component {
                 let notzhongshu = [];
                 let allyeszhongshu = 0;
                 let allzhongshu = 0;
+                rst.sort(sorting);
+                 console.log(rst,"xixixi");
+                // let newrst = [];
+
+                // for(let i = 0; i<=rst.length-1 ; i++){
+                //     if(rst[i].Label==="1标段"){
+                //         newrst[0]=rst[i];
+                //     }
+                //     if(rst[i].Label==="2标段"){
+                //         newrst[1]=rst[i];
+                //     }
+                //     if(rst[i].Label==="3标段"){
+                //         newrst[2]=rst[i];
+                //     }
+                //     if(rst[i].Label==="4标段"){
+                //         newrst[3]=rst[i];
+                //     }
+                //     if(rst[i].Label==="5标段"){
+                //         newrst[4]=rst[i];
+                //     }
+                // }
+                // console.log(newrst);
                 for(let i = 0; i<=rst.length-1 ; i++){
                     allyeszhongshu = allyeszhongshu + rst[i].Complete;
                     allzhongshu = allzhongshu + rst[i].Num;
@@ -1002,3 +1024,16 @@ function dd(path){
         }
     }
 }
+
+function sorting(val1, val2) {
+    let ele1 = val1.Label;
+    let ele2 = val2.Label;
+    if(ele1 < ele2) {
+        return -1;
+    } else if(ele1 > ele2) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
