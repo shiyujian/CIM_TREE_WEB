@@ -20,6 +20,8 @@ import documentReducer, {actions as documentActions} from './document';
 import tagReducer, {actions as tagActions} from './tag';
 import quantitiesReducer, {actions as quantitiesActions} from './quantities';
 import personReducer, {actions as personActions} from './person';
+import orgReducer, {actions as orgActions} from './org';
+
 
 export default handleActions({
 	[combineActions(...actionsMap(quantitiesActions))]: (state = {}, action) => ({
@@ -102,5 +104,9 @@ export default handleActions({
 	[combineActions(...actionsMap(personActions))]: (state = {}, action) => ({
 		...state,
 		person: personReducer(state.person, action),
+	}),
+	[combineActions(...actionsMap(orgActions))]: (state = {}, action) => ({
+		...state,
+		org: orgReducer(state.org, action),
 	}),
 }, {});

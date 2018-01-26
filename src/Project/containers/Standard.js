@@ -78,6 +78,7 @@ export default class Standard extends Component {
 
 
 	render() {
+		console.log(this.props)
 		const
 			{
 				platform: {dir: {list = [],} = {}} = {},

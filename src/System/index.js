@@ -84,6 +84,7 @@ export default class System extends Component {
 			path: '/system/permissionn',
 			icon: <Icon name="key"/>
 		},
+		 
 		// {
 		// 	key: 'Major',
 		// 	id: 'SYSTEM.MAJOR',
@@ -115,7 +116,13 @@ export default class System extends Component {
 			name: '流程设置',
 			path: '/system/workflow',
 			icon: <Icon name="object-group"/>
-		}
+		},{
+			key: 'Org',
+			id: 'SYSTEM.ORG',
+			name: '组织机构',
+			path: '/system/org',
+			icon: <Icon name="street-view"/>
+		},
 		// ,{
 		// 	key: 'Document',
 		// 	id: 'SYSTEM.DOCUMENT',

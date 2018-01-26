@@ -23,3 +23,4 @@ export UnitManage from './UnitManage'
 export BranchManage from './BranchManage'
 export SafetySystem from './SafetySystem'
 export Material from './Material';
+export EngineeringImage from './EngineeringImage';

@@ -98,6 +98,7 @@ export default class Addition extends Component {
 			addition = {}, sidebar: {node} = {},
 			actions: {postUser, clearAdditionField, getUsers, putUser}
 		} = this.props;
+		console.log(this.props)
 
 		const roles = addition.roles || [];
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
@@ -152,11 +153,11 @@ export default class Addition extends Component {
 						person_type: "C_PER",
 						person_avatar_url: "",
 						organization: {
-							pk: node.pk,
-							code: node.code,
+							// pk: node.pk,
+							// code: node.code,
 							obj_type: "C_ORG",
 							rel_type: "member",
-							name: node.name
+							// name: node.name
 						},
 					},
 					groups: roles.map(role => +role),

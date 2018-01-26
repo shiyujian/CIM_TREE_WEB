@@ -36,7 +36,7 @@ export default class SafetyTrend extends Component {
 		} = this.props;
 		return (
 			<div style={{overflow: 'hidden', padding: 20}}>
-				<DynamicTitle title="新闻公告" {...this.props}/>
+				<DynamicTitle title="安全动态管理" {...this.props}/>
 				<Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
 					<TabPane tab="项目安全公告" key="1">
 						<NoticeTable {...this.props}/>

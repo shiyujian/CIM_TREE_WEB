@@ -61,7 +61,7 @@ export default class OrgType extends Component {
 		} = this.props;
 		return (
 			<div>
-				<DynamicTitle title="项目管理" {...this.props}/>
+				<DynamicTitle title="类型管理" {...this.props}/>
 				<Sidebar>
 					<SubTree {...this.props}/>
 				</Sidebar>
