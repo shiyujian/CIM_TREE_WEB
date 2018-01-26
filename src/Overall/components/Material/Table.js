@@ -1,49 +1,139 @@
 import React, { Component } from 'react';
-import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input} from 'antd';
+import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon} from 'antd';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
 import './index.less';
 
 const FormItem = Form.Item;
-import '../../../Datum/components/Datum/index.less'
 
+let indexSelect='';
 export default class GeneralTable extends Component {
 
-	state = { 
-		visible: false,
-		data:[], 
-	}
-	  showModal = () => {
+	constructor(props){
+         super(props);
+         this.state={
+         	visible: false,
+			data:[],
+			indexSelect:'' 
+         }
+    }
+	// state = { 
+	// 	visible: false,
+	// 	data:[],
+	// 	indexSelect:'' 
+	// }
+	  showModal = (key) => {
 	    this.setState({
 	      visible: true,
+	      indexSelect:key
 	    }); 
+	    // console.log('key',this.state.indexSelect)
 	  }
 	  handleOk = (e) => {
-	    console.log(e);
 	    this.setState({
 	      visible: false,
-	      index
 	    });
 	  }
 	  handleCancel = (e) => {
-	    console.log(e);
 	    this.setState({
 	      visible: false,
 	    });
-	  }
+	  } 
 	render() {
 		let {
 			  visible,data
         } = this.state;
 		const { Doc = [] } = this.props;
-		console.log('table.this.props', this.props)
 		return (
-			<Table
-				rowSelection={this.rowSelection}
-				dataSource={Doc}
-				columns={this.columns}
-				className='foresttables'
-				bordered rowKey="code" />
+			<div>
+				<Table
+					rowSelection={this.rowSelection}
+					dataSource={Doc}
+					columns={this.columns}
+					className='foresttables'
+					bordered rowKey="code" />
+			{
+				this.state.visible==true &&
+				<Modal
+		          title="查看文档"
+		          width={920}
+		          // footer={null}
+		          visible={this.state.visible}
+		          maskClosable={false}
+		          onOk={this.handleOk}
+		          onCancel={this.handleCancel}
+		        >
+			        <div>
+			        	<Row gutter={24}>
+			        		<Col>
+			        			<div style={{borderBottom: 'solid 1px #999'}}></div>
+			        		</Col>
+			        	</Row>
+	                    <Row gutter={24}>
+	                        <Col span={24} style={{paddingLeft:'3em'}}>
+	                            <Row gutter={15} style={{marginTop:'2em'}} >
+	                                <Col span={10}>
+	                                    <FormItem   {...GeneralTable.layoutT} label="单位工程:">
+	                                     <Select  style={{width:'90%'}} value={Doc[this.state.indexSelect].extra_params.engineer}>
+	                                          <Option value='第一阶段'>第一阶段</Option>
+	                                          <Option value='第二阶段'>第二阶段</Option>
+	                                          <Option value='第三阶段'>第三阶段</Option>
+	                                          <Option value='第四阶段'>第四阶段</Option>
+	                                     </Select>
+	                                    </FormItem>
+	                                </Col>
+	                                <Col span={10}>
+	                                    <FormItem {...GeneralTable.layoutT} label="编号:">
+	                                        <Input value={Doc[this.state.indexSelect].extra_params.number} />
+	                                    </FormItem>
+	                                </Col>
+	                            </Row>
+	                            <Row gutter={15}>
+	                                <Col span={20}>
+	                                    <FormItem  {...GeneralTable.layout} label="审批单位:">
+	                                        <Select style={{width:'100%'}} value={Doc[this.state.indexSelect].extra_params.approve} >
+	                                              <Option value='第一公司'>第一公司</Option>
+	                                              <Option value='第二公司'>第二公司</Option>
+	                                        </Select>
+	                                    </FormItem>
+	                                </Col>
+	                            </Row>
+	                        </Col>
+	                    </Row>
+	                    <Row gutter={24}>
+	                        <Col span={24}>
+	                        	<Table 
+								   columns={this.equipmentColumns}
+								   dataSource={Doc[this.state.indexSelect].extra_params.children}
+								   bordered 
+								   pagination={false}
+								/>
+	                        </Col>
+	                    </Row>
+	                    <Row gutter={24}>
+	                        <Col span={24} style={{paddingLeft:'2em'}}>
+	                            <Row gutter={15} style={{marginTop:'1em'}} >
+	                                <Col span={3}>
+	                                	<Button style={{width:100}}>附件</Button>
+	                                </Col>
+	                            </Row>
+	                            <Row gutter={20} style={{marginTop:'1em'}} >
+	                                <Col span={3} style={{marginLeft:'1em'}} span={4}>
+	                                	<Icon type="paper-clip"></Icon>
+	                                	<a>{Doc[this.state.indexSelect].name}</a>
+	                                </Col>
+	                                <Col span={4}>
+	                                	<a onClick={this.previewFile.bind(this)}>预览</a>
+										<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this)}>下载</a>
+	                                </Col>
+	                            </Row>
+
+	                        </Col>
+	                    </Row>
+					</div>
+		        </Modal>
+			}
+			</div>
 
 		);
 	}
@@ -92,81 +182,23 @@ export default class GeneralTable extends Component {
 			title: '操作',
 			render: (text,record, index) => {
 				const { Doc = [] } = this.props;
-				console.log('doc222',Doc)
-				console.log('text',text)
-				console.log('record',record)
-				console.log('index',index)
-				// let nodes = [];
-				// nodes.push(
-				return (
+				// console.log('doc222',Doc)
+				// console.log('record',record)
+				// console.log('index',index)
+				let nodes = [];
+				nodes.push(
+				// return (
 					<div>
 						{
 							// <a onClick={this.previewFile.bind(this, record)}>查看</a>
 						}
-						<a type="primary" onClick={this.showModal}>查看</a>
-						<Modal
-				          title="查看文档"
-				          width={920}
-				          footer={null}
-				          visible={this.state.visible}
-				          maskClosable={false}
-				          onOk={this.handleOk}
-				          onCancel={this.handleCancel}
-				        >
-					        <div>
-					        	<Row gutter={24}>
-					        		<Col>
-					        			<div style={{borderBottom: 'solid 1px #999'}}></div>
-					        		</Col>
-					        	</Row>
-			                    <Row gutter={24}>
-			                        <Col span={24} style={{paddingLeft:'3em'}}>
-			                            <Row gutter={15} style={{marginTop:'2em'}} >
-			                                <Col span={10}>
-			                                    <FormItem   {...GeneralTable.layoutT} label="单位工程:">
-			                                     <Select  style={{width:'90%'}} value={Doc[index].extra_params.engineer}>
-			                                          <Option value='第一阶段'>第一阶段</Option>
-			                                          <Option value='第二阶段'>第二阶段</Option>
-			                                          <Option value='第三阶段'>第三阶段</Option>
-			                                          <Option value='第四阶段'>第四阶段</Option>
-			                                     </Select>
-			                                    </FormItem>
-			                                </Col>
-			                                <Col span={10}>
-			                                    <FormItem {...GeneralTable.layoutT} label="编号:">
-			                                        <Input value={Doc[index].extra_params.number} />
-			                                    </FormItem>
-			                                </Col>
-			                            </Row>
-			                            <Row gutter={15}>
-			                                <Col span={20}>
-			                                    <FormItem  {...GeneralTable.layout} label="审批单位:">
-			                                        <Select style={{width:'100%'}} value={Doc[index].extra_params.approve} >
-			                                              <Option value='第一公司'>第一公司</Option>
-			                                              <Option value='第二公司'>第二公司</Option>
-			                                        </Select>
-			                                    </FormItem>
-			                                </Col>
-			                            </Row>
-			                        </Col>
-			                    </Row>
-			                    <Row gutter={24}>
-			                        <Col span={24}>
-			                        	<Table 
-										   columns={this.equipmentColumns}
-										   dataSource={Doc[index].extra_params.children}
-										   bordered 
-										/>
-			                        </Col>
-			                    </Row>
-							</div>
-				        </Modal>
+						<a type="primary" onClick={this.showModal.bind(this,index)}>查看</a>
 						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>
 					</div>
-				)
-				// );
-				// return nodes;
+				// )
+				);
+				return nodes;
 			}
 		}
 	];

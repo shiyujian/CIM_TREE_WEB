@@ -326,7 +326,7 @@ export default class Addition extends Component {
           // equipName:this.state.equipName,
           // equipNumber:this.state.equipNumber,
         };
-        console.log('newDate',newData)
+        // console.log('newDate',newData)
         this.setState({
           dataSource: [...dataSource, newData],
           count: count + 1,
@@ -336,7 +336,7 @@ export default class Addition extends Component {
 
     onDelete(){
         const { selected } = this.props;
-        console.log('selected',selected)
+        // console.log('selected',selected)
         const dataSource = [...this.state.dataSource];
         selected.map(rst => {
             this.setState({ dataSource: dataSource.filter(item => item.key !== rst.key) });
@@ -458,7 +458,6 @@ export default class Addition extends Component {
         console.log('docs',docs)
         const promises = docs.map(doc => {
             const response = doc.response;
-            console.log('doc',doc)
             let files=DeleteIpPort(doc);
             doc.engineer=this.state.engineerName;
             doc.number=this.state.engineerNumber;

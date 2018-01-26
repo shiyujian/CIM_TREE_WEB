@@ -6,7 +6,6 @@ import {Link} from 'react-router-dom';
 import {getUser, clearUser, getPermissions, removePermissions} from '../../auth';
 import {loadMenus,loadIgnoreModules,loadHeadLogo} from 'APP/api';
 
-
 export default class Header extends Component {
 	state = {
 		dotShow: false

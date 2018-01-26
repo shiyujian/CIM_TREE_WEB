@@ -3,7 +3,6 @@ import {actionsMap} from '_platform/store/util';
 import projectReducer, {actions as projectActions} from './project';
 import roleReducer, {actions as roleActions} from './role';
 import permissionReducer, {actions as permissionActions} from './permission';
-import permissionnReducer, {actions as permissionnActions} from './permissionn';
 
 import frameworkReducer, * as frameworkActions from './framework';
 import videoReducer, {actions as videoActions} from './video';
@@ -49,10 +48,6 @@ export default handleActions({
 	[combineActions(...actionsMap(permissionActions))]: (state = {}, action) => ({
 		...state,
 		permission: permissionReducer(state.permission, action),
-	}),
-	[combineActions(...actionsMap(permissionnActions))]: (state = {}, action) => ({
-		...state,
-		permissionn: permissionnReducer(state.permissionn, action),
 	}),
 	[combineActions(...actionsMap(frameworkActions))]: (state = {}, action) => {
 		const framework = state.framework;
