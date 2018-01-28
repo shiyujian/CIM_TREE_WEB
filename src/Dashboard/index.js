@@ -39,11 +39,11 @@ export default class Dashboard extends Component {
 		this.setState({
 			...Containers
 		})
-		debugger;
+		
 	}
 
 	render() {
-        const {OnSite, Project, Plan} = this.state || {};
+        const {OnSite, Project, Plan,Danger} = this.state || {};
 		return (
 			<div style={{display:"flex"}}>
 				<Aside style={{overflow:"hidden"}}>
@@ -53,8 +53,9 @@ export default class Dashboard extends Component {
 					<Switch>
 						{OnSite && <Route exact path="/dashboard" component={OnSite}/>}
 						{OnSite && <Route path="/dashboard/onsite" component={OnSite}/>}
-						{Project && <Route path="/dashboard/project" component={Project}/>}
 						{Plan && <Route path="/dashboard/plan" component={Plan}/>}
+						{Danger && <Route path="/dashboard/danger" component={Danger}/>}
+						{Project && <Route path="/dashboard/project" component={Project}/>}
 					</Switch>
 				</Main>
 			</div>);
@@ -70,13 +71,21 @@ export default class Dashboard extends Component {
 		key: 'PLAN',
 		id: 'DASHBOARD.PLAN',
 		path: '/dashboard/plan',
-		name: '规划信息',
+		name: '巡检路线',
         icon: <Icon name="university"/>,
+		
 	}, {
+		key: 'danger',
+		id: 'DASHBOARD.DANGER',
+		path: '/dashboard/danger',
+		name: '安全隐患',
+		icon: <Icon name="exclamation-triangle"/>,
+	
+	},{
 		key: 'PROJECT',
 		id: 'DASHBOARD.PROJECT',
 		path: '/dashboard/project',
-		name: '项目信息',
+		name: '工程影像',
         icon: <Icon name="caret-square-o-up"/>,
 	}];
 	static defaultOpenKeys = ['ONSITE']
