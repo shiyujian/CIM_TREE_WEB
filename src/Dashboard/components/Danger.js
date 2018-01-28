@@ -10,7 +10,7 @@ import {panorama_360} from './geojsonFeature';
 import {PDF_FILE_API, previewWord_API, CUS_TILEMAP, Video360_API2,DashboardVideo360API} from '_platform/api';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'
-import './Lmap.less';
+import './OnSite.less';
 import CityMarker from './CityMarker';
 import CameraVideo from '../../Video/components/CameraVideo';
 import DashPanel from "./DashPanel";
@@ -35,7 +35,7 @@ let model_name = window.config.dgn_model_name;
 		actions: bindActionCreators(actions, dispatch),
 	}),
 )
-export default class Lmap extends Component {
+export default class Danger extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -833,12 +833,20 @@ export default class Lmap extends Component {
 	}
 
 	options = [
+		// {label: '现场人员', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access',},
+		// {label: '安全监测', value: 'geojsonFeature_safety', IconUrl: require('./ImageIcon/camera.png'), IconName: 'shield',},
+		{label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning',},
+		// {label: '360全景', value: 'geojsonFeature_360',IconUrl: require('./ImageIcon/360.png'), IconName: 'icon360',},
+		// {label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera',},
+		// {label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'}
+	];
+	options1 = [
 		{label: '现场人员', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access',},
 		{label: '安全监测', value: 'geojsonFeature_safety', IconUrl: require('./ImageIcon/camera.png'), IconName: 'shield',},
 		{label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning',},
-		{label: '360全景', value: 'geojsonFeature_360',IconUrl: require('./ImageIcon/360.png'), IconName: 'icon360',},
+		// {label: '360全景', value: 'geojsonFeature_360',IconUrl: require('./ImageIcon/360.png'), IconName: 'icon360',},
 		{label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera',},
-		{label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'}
+		// {label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'}
 	];
 	//切换伟景行
 	switchToDgn(){
@@ -1266,25 +1274,6 @@ export default class Lmap extends Component {
 		let height = document.querySelector('html').clientHeight - 80 - 36 - 52;
 		return (
 			<div className="map-container">
-				<div className="l-menu">
-					<ul>
-						<li className={this.state.selectedMenu == '1' ? 'm-menu-item selected' : "m-menu-item"}
-						    onClick={this.show2DMap.bind(this)}>
-							<Icon name="map-o" size={'2x'}></Icon>
-							<p className="i-txt">现场信息</p>
-						</li>
-						<li className={this.state.selectedMenu == '2' ? 'm-menu-item selected' : "m-menu-item"}
-						    onClick={this.setTrueForThree.bind(this)}>
-							<Icon name="university" size={'2x'}></Icon>
-							<p className="i-txt">规划信息</p>
-						</li>
-						<li className={this.state.selectedMenu == '3' ? 'm-menu-item selected' : "m-menu-item"}
-						    onClick={this.switchToDgn.bind(this)}>
-							<Icon name="caret-square-o-up" size={'2x'}></Icon>
-							<p className="i-txt">项目信息</p>
-						</li>
-					</ul>
-				</div>
 				<div ref="appendBody" className="l-map r-main"
 				     onMouseUp={this.onEndResize.bind(this)}
 				     onMouseMove={this.onResizingMenu.bind(this)}>
@@ -1362,7 +1351,7 @@ export default class Lmap extends Component {
 							<img src={require('./ImageIcon/tuli.png')} className="imageControll"
 							     onClick={this.toggleIcon.bind(this)}/>
 							{
-								this.options.map((option, index) => {
+								this.options1.map((option, index) => {
 									if (option.label !== '区域地块') {
 										return (
 											<div key={index} className="imgIcon">
