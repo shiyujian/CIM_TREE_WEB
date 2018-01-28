@@ -194,28 +194,28 @@ class Login extends Component {
 									<Form onSubmit={this.handleSubmit.bind(this)}
 										className='login-form' id="loginForm">
 
-										<p style={{ fontSize: '25', color: '#108EE9', textAlign: 'center' }}>深林大数据建设管理平台</p>
-										<FormItem style={{ marginTop: '10' }}>
+										<p style={{ fontSize: '25', color: '#108EE9', textAlign: 'center' ,marginTop:"20", marginLeft:"5" }}>森林大数据建设管理平台</p>
+										{/* <FormItem style={{ marginTop: '10' }}>
 											<Select placeholder="项目选择">
 												<Option value='二'>二</Option>
 												<Option value='一'>一</Option>
 											</Select>
-										</FormItem>
-										<FormItem style={{ marginTop: '30' }}>
+										</FormItem> */}
+										<FormItem style={{ marginTop: '20', marginLeft:"24" }}>
 											{getFieldDecorator('username', {
 												rules: [{ required: true, message: '请输入用户名' }],
 											})(
-												<Input style={{ color: "#cccccc", borderBottom: "1px solid #cccccc" }} id="username"
+												<Input style={{ color: "#000000", borderBottom: "1px solid #cccccc" }} id="username"
 													placeholder="用户名/手机号" />,
 											)}
 										</FormItem>
-										<FormItem style={{ marginTop: '30' }}>
+										<FormItem style={{ marginTop: '50' , marginLeft:"24"}}>
 											{getFieldDecorator('password', {
 												rules: [{ required: true, message: '请输入密码' }],
 											})(
 												<div>
 													<Input
-														style={{ color: "#cccccc", borderBottom: "1px solid #cccccc" }}
+														style={{ color: "#000000", borderBottom: "1px solid #cccccc"}}
 														id='pwdInp' type={pwdType}
 														placeholder="密码" />
 													<a className="btn-change-type"
@@ -225,7 +225,7 @@ class Login extends Component {
 												</div>,
 											)}
 										</FormItem>
-										<FormItem style={{ marginTop: '30' }}>
+										<FormItem style={{ marginTop: '40' , marginLeft:"10"}}>
 											{getFieldDecorator('remember', {
 												valuePropName: 'checked',
 												initialValue: false,
@@ -248,23 +248,23 @@ class Login extends Component {
 									<Form onSubmit={this.sureSubmit.bind(this)}
 										className='login-form' id="loginForm">
 
-										<FormItem style={{ marginTop: '40' }}>
+										<FormItem style={{ marginTop: '40', marginLeft:"24" }}>
 											{getFieldDecorator('nickname', {
 												rules: [{ required: true, message: '请输入用户名' }],
 											})(
 												<Input id="nickname"
-													style={{ color: "#cccccc" , borderBottom: "1px solid #cccccc"}}
+													style={{ color: "#000000" , borderBottom: "1px solid #cccccc"}}
 													placeholder="请输入用户名" />,
 											)}
 										</FormItem>
 
-										<FormItem style={{ marginTop: '30' }}>
+										<FormItem style={{ marginTop: '30', marginLeft:"24" }}>
 											{getFieldDecorator('phone', {
 												rules: [{ required: true, message: '请输入手机号' }],
 											})(
 												<div>
 													<Input
-														style={{ color: "#cccccc" , borderBottom: "1px solid #cccccc"}}
+														style={{ color: "#000000" , borderBottom: "1px solid #cccccc"}}
 														id='phoneNumber'
 														placeholder="请输入手机号"
 													/>

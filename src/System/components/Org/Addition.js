@@ -4,26 +4,40 @@ import {CUS_TILEMAP} from '_platform/api';
 
 const FormItem = Form.Item;
 
-export default class Addition extends Component {
+class Addition extends Component {
 
 	static propTypes = {};
 
 	render() {
 		const {
+			form: {getFieldDecorator},
 			sidebar: {node = {}, parent} = {}, addition = {},
 			actions: {changeAdditionField}
 		} = this.props;
+
+		console.log(this.props)
+
 		const {type} = node;
 		const title = Addition.getTitle(node, parent);
 		return (
 			<Modal title={parent ? `新建${title} | ${parent.name}` : `编辑${title} | ${node.name}`}
+			maskClosable={false}
 			       visible={addition.visible} onOk={this.save.bind(this)} onCancel={this.cancel.bind(this)}>
 				<FormItem {...Addition.layout} label={`${title}名称`}>
 					<Input placeholder="请输入名称" value={addition.name} onChange={changeAdditionField.bind(this, 'name')}/>
 				</FormItem>
 				<FormItem {...Addition.layout} label={`${title}编码`}>
-					<Input readOnly={!parent} placeholder="请输入编码" value={addition.code}
-					       onChange={changeAdditionField.bind(this, 'code')}/>
+				   {getFieldDecorator('code', {
+				   	  rules: [{required: true, message: '必须为英文字母、数字以及 -_~`*!.[]{}()的组合'	,pattern:/^[\w\d\_\-]+$/}],
+                     initialValue: ''
+                    })(
+                    <Input readOnly={!parent} placeholder="请输入编码" value={addition.code}
+					onChange={changeAdditionField.bind(this, 'code')}/>                                    )}
+					
+				</FormItem>
+				<FormItem {...Addition.layout} label={`${title}简介`}>
+					<Input readOnly={!parent} placeholder="请输入简介" value={addition.introduction} type="textarea" rows={4}
+					       onChange={changeAdditionField.bind(this, 'introduction')}/>
 				</FormItem>
 			</Modal>);
 	}
@@ -31,8 +45,10 @@ export default class Addition extends Component {
 	save() {
 		const {
 			sidebar: {parent} = {}, addition = {},
-			actions: {postOrg, putOrg, getOrgTree, changeSidebarField, clearAdditionField}
+			actions: {postOrg, putOrg, getOrgTree, changeSidebarField, clearAdditionField, postRole}
 		} = this.props;
+		console.log(this.props)
+		console.log(addition.introduction)
 		if (parent) {
 			postOrg({}, {
 				name: addition.name,
@@ -44,7 +60,10 @@ export default class Addition extends Component {
 				},
 				parent: {pk: parent.pk, code: parent.code, obj_type: 'C_ORG'}
 			}).then(rst => {
-				getOrgTree({}, {depth: 3});
+				if (rst.pk) {
+					clearAdditionField();
+					getOrgTree({}, {depth: 3});
+				}
 			});
 		} else {
 			putOrg({code: addition.code}, {
@@ -53,10 +72,12 @@ export default class Addition extends Component {
 					introduction: addition.introduction
 				}
 			}).then(rst => {
-				changeSidebarField('addition', false);
-				parent && changeSidebarField('parent', null);
-				addition.code && clearAdditionField();
-				getOrgTree({}, {depth: 3});
+				if (rst.pk) {
+					changeSidebarField('addition', false);
+					parent && changeSidebarField('parent', null);
+					addition.code && clearAdditionField();
+					getOrgTree({}, {depth: 3});
+				}
 			});
 		}
 
@@ -95,3 +116,5 @@ export default class Addition extends Component {
 		wrapperCol: {span: 18},
 	};
 }
+export default Form.create()(Addition)
+

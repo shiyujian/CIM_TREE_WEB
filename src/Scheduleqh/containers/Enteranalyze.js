@@ -23,7 +23,7 @@ const {RangePicker} = DatePicker;
 		actions: bindActionCreators({...actions, ...platformActions}, dispatch),
 	}),
 )
-export default class Entry extends Component {
+export default class Enteranalyze extends Component {
 
     constructor(props) {
         super(props)
@@ -44,17 +44,17 @@ export default class Entry extends Component {
     componentDidMount () {
         const {actions: {gettreeevery}} = this.props;
         gettreeevery().then(rst=>{
-            console.log(rst,"soooso");
+            
             // this.setTreeTypeOption(rst);
             let treetypeoption = rst.map(item => {
                 return <Option key={item.ID} lable={item.TreeTypeNo} value={item.ID}>{item.TreeTypeNo}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            console.log(treetypeoption,"ahdjkahkfhakhf")
+            
             this.setState({treetypeoption,treetypelist:rst})
         });
-        console.log(this.props,"46546");
-        const {actions: {getTree,gettreetype,getTreeList,getNurserysCount}} = this.props;
+        
+        const {actions: {getTree,gettreetype,getTreeList}} = this.props;
 
         //地块树
        try {
@@ -78,18 +78,7 @@ export default class Entry extends Component {
                                     this.setState({treeLists:rst},() => {
                                         this.onSelect([rst2[0].No])
                                     })
-                                    // getNewTreeData(rst,rst[0].No,rst2)
-                                    // getTree({},{parent:rst2[0].No})
-                                    // .then(rst3 => {
-                                    //     if(rst3 instanceof Array && rst3.length > 0){
-                                    //         getNewTreeData(rst,rst2[0].No,rst3)
-                                    //         this.setState({treeLists:rst},() => {
-                                    //             this.onSelect([rst3[0].No])
-                                    //         })
-                                    //     } else {
-                                    //         this.setState({treeLists:rst})
-                                    //     }
-                                    // })
+                                    
                                 } else {
                                     this.setState({treeLists:rst})
                                 }
@@ -116,8 +105,7 @@ export default class Entry extends Component {
     }
 
 	render() {
-        console.log(this.props);
-        console.log(this.state);
+       
   		const {keycode} = this.props;
         const {
             treetypeoption,
@@ -150,7 +138,7 @@ export default class Entry extends Component {
                          treetypeoption={this.state.treetypeoption}
                          treetypelist={treetypelist}
                          treetyoption={treetyoption}
-                         // typeselect={this.typeselect.bind(this)}
+                        
                         />
                     </Content>
                 </Main>
@@ -158,33 +146,7 @@ export default class Entry extends Component {
         );
     }
 
-    //类型选择, 重新获取: 树种
-    // typeselect(value,keycode){
-    //     console.log(value,keycode);
-    //     // const {actions:{setkeycode,getTreeList}} =this.props;
-    //     //树种
-    //      const {actions: {gettreeevery}} = this.props;
-    //     gettreeevery().then(rst=>{
-    //         console.log(rst,"soooso");
-    //         // this.setTreeTypeOption(rst);
-    //     })
-    //     // getTreeList({},{field:'treetype',no:keycode,treety:value,paginate:false})
-    //     // .then(rst => {
-    //     //     this.setTreeTypeOption(rst)
-    //     // })
-    // }
-
-    //设置树种选项
-    // setTreeTypeOption(rst) {
-    //     // if(rst instanceof Array){
-    //         let treetypeoption = rst.map(item => {
-    //             return <Option key={item.ID} value={item.ID}>{item.TreeTypeNo}</Option>
-    //         })
-    //         treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
-    //         console.log(treetypeoption,"ahdjkahkfhakhf")
-    //         this.setState({treetypeoption,treetypelist:rst})
-    //     // }
-    // }
+   
 
      //树选择
     onSelect(value = []) {
@@ -193,10 +155,7 @@ export default class Entry extends Component {
         this.setState({leftkeycode:keycode})
         //树种
         gettreetype()
-        // gettreetype({},{no:keycode,paginate:false})
         .then(rst => {
-            // this.setTreeTypeOption(rst)
-            console.log(rst);
             let res = groupBy(rst, function(n){
                 return n.Section
             });
@@ -206,34 +165,23 @@ export default class Entry extends Component {
             let wsx = [];
             trees = Object.entries(res);
             for(var j = 0 ; j<=trees.length-1; j++){
-                
                   var abc = trees[j][1];
                  let qaz = 0;
                   for(var k = 0 ; k<=abc.length-1; k++){
-                  
                      qaz = qaz + abc[k].Num;
-                   
-
                   }
                    wsx.push(qaz);
             }
-            
             let Num1 = 0;
-            // let day = new Data();
-            // console.log(day);
                 for(var i = 0; i<=rst.length-1; i++){
                     Num1 = Num1 + rst[i].Num;
-                   
                 }
             this.setState({
                 data:res,
                 account:Num1,
                 biaoduan:biaoduan,
                 shuzhi:wsx,
-
             })
-           
-
         })
     }
 

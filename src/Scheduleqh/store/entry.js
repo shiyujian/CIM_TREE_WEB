@@ -17,11 +17,11 @@ export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeO
 // export const gettreetype = createFetchAction(`${FOREST_API}/tree-types/`, []);
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/nurserystat?no=P009{{etime}}`, []);
 
-export const gettreetype1 = createFetchAction(`${FOREST_API}/tree/treestat?`, []);
-export const gettreetype2 = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
+export const gettreetypeAll = createFetchAction(`${FOREST_API}/tree/treestat?`, []);
+export const gettreetypeSection = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
 
-export const gettreetype3 = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass{{params}}`, []);
-export const gettreetype4 = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass{{params}}`, []);
+export const gettreetypeSmallClass = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass{{params}}`, []);
+export const gettreetypeThinClass = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass{{params}}`, []);
 
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/trees/analyse/`, []);
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys/`, []);
@@ -106,23 +106,23 @@ export default handleActions({
 	    	keycode: payload
 	    }
     },
-    [combineActions(...actionsMap(faithActions))]: (state = {}, action) => ({
-		...state,
-		faith: faithInfoReducer(state.faith, action),
-	}),
+ //    [combineActions(...actionsMap(faithActions))]: (state = {}, action) => ({
+	// 	...state,
+	// 	faith: faithInfoReducer(state.faith, action),
+	// }),
 
-	[getHonestyNewDetailOk]: (state, {payload}) => ({
-		...state,
-		honestyList: payload
-	}),
-  	[clearList]: (state, {payload}) => ({
-		...state,
-		honestyList: payload
-	}),
+	// [getHonestyNewDetailOk]: (state, {payload}) => ({
+	// 	...state,
+	// 	honestyList: payload
+	// }),
+ //  	[clearList]: (state, {payload}) => ({
+	// 	...state,
+	// 	honestyList: payload
+	// }),
 
-	[nurseryName]: (state, {payload}) => ({
-		...state,
-		nurseryName: payload
-	})
+	// [nurseryName]: (state, {payload}) => ({
+	// 	...state,
+	// 	nurseryName: payload
+	// })
 
 }, {});

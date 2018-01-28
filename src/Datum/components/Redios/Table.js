@@ -15,11 +15,31 @@ export default class GeneralTable extends Component {
 	render() {
 		const { Doc = [] } = this.props;
 		return (
-			<Table rowSelection={this.rowSelection}
-				dataSource={Doc}
-				columns={this.columns}
-				className='foresttables'
-				bordered rowKey="code" />
+			<div>
+				<Table rowSelection={this.rowSelection}
+					dataSource={Doc}
+					columns={this.columns}
+					className='foresttables'
+					bordered rowKey="code" />
+				<Modal title="影像预览"
+					closable
+					width={920} visible={this.state.previewModalVisible}
+					footer={null}
+					onCancel={this.cancelT.bind(this)}
+					cancelText={"关闭"}
+					maskClosable={false}>
+					<video
+						controls
+						preload="auto"
+						width="100%"
+						height="500px"
+						src={this.state.video}
+					>
+						{/* <source src={this.props.video} /> */}
+					</video>
+				</Modal>
+
+			</div>
 		);
 	}
 
@@ -69,23 +89,7 @@ export default class GeneralTable extends Component {
 				nodes.push(
 					<div>
 						<a onClick={this.previewFile.bind(this, record)}>预览
-						<Modal title="影像预览"
-								closable
-								width={920} visible={this.state.previewModalVisible}
-								footer={null}
-								onCancel={this.cancelT.bind(this)}
-								cancelText={"关闭"}
-								maskClosable={false}>
-								<video
-									controls
-									preload="auto"
-									width="100%"
-									height="500px"
-									src={this.state.video}
-								>
-									{/* <source src={this.props.video} /> */}
-								</video>
-							</Modal>
+
 						</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
 						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
@@ -135,9 +139,9 @@ export default class GeneralTable extends Component {
 		console.log(videos.a_file.split(".")[4])
 		// const index=videos.a_file.indexOf(".")
 		// console.log(index)
-		let a_file=videos.a_file.split(".")[4]
+		let a_file = videos.a_file.split(".")[4]
 		console.log(a_file)
-		
+
 		if (a_file == "mp4") {
 			console.log(1)
 			this.setState({ previewModalVisible: true, video: videos.a_file })

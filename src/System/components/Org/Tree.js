@@ -39,6 +39,7 @@ export default class Tree extends Component {
 			platform: {org = {}},
 			actions: {changeAdditionField, changeSidebarField}
 		} = this.props;
+		console.log(this.props)
 		changeSidebarField('parent', org);
 		changeAdditionField('visible', true);
 	}

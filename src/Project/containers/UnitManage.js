@@ -61,7 +61,7 @@ export default class UnitManage extends Component {
 		} = this.props;
 		return (
 			<div>
-				<DynamicTitle title="项目管理" {...this.props}/>
+				<DynamicTitle title="单位管理" {...this.props}/>
 				<Sidebar>
 					<SubTree {...this.props}/>
 				</Sidebar>

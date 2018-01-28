@@ -3,7 +3,6 @@ import {actionsMap} from '_platform/store/util';
 import projectReducer, {actions as projectActions} from './project';
 import roleReducer, {actions as roleActions} from './role';
 import permissionReducer, {actions as permissionActions} from './permission';
-import permissionnReducer, {actions as permissionnActions} from './permissionn';
 
 import frameworkReducer, * as frameworkActions from './framework';
 import videoReducer, {actions as videoActions} from './video';
@@ -20,6 +19,8 @@ import documentReducer, {actions as documentActions} from './document';
 import tagReducer, {actions as tagActions} from './tag';
 import quantitiesReducer, {actions as quantitiesActions} from './quantities';
 import personReducer, {actions as personActions} from './person';
+import orgReducer, {actions as orgActions} from './org';
+
 
 export default handleActions({
 	[combineActions(...actionsMap(quantitiesActions))]: (state = {}, action) => ({
@@ -49,10 +50,6 @@ export default handleActions({
 	[combineActions(...actionsMap(permissionActions))]: (state = {}, action) => ({
 		...state,
 		permission: permissionReducer(state.permission, action),
-	}),
-	[combineActions(...actionsMap(permissionnActions))]: (state = {}, action) => ({
-		...state,
-		permissionn: permissionnReducer(state.permissionn, action),
 	}),
 	[combineActions(...actionsMap(frameworkActions))]: (state = {}, action) => {
 		const framework = state.framework;
@@ -102,5 +99,9 @@ export default handleActions({
 	[combineActions(...actionsMap(personActions))]: (state = {}, action) => ({
 		...state,
 		person: personReducer(state.person, action),
+	}),
+	[combineActions(...actionsMap(orgActions))]: (state = {}, action) => ({
+		...state,
+		org: orgReducer(state.org, action),
 	}),
 }, {});

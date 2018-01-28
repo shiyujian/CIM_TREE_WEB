@@ -61,7 +61,7 @@ export default class BranchManage extends Component {
 		} = this.props;
 		return (
 			<div>
-				<DynamicTitle title="项目管理" {...this.props}/>
+				<DynamicTitle title="部门管理" {...this.props}/>
 				<Sidebar>
 					<SubTree {...this.props}/>
 				</Sidebar>

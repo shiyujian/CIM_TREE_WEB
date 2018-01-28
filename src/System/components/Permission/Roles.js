@@ -17,14 +17,14 @@ export default class Roles extends Component {
 			<div>
 				<Tree showLine style={{paddingLeft: '30px', marginTop: '10px'}}
 				      onSelect={this.select.bind(this)} selectedKeys={[id]}>
-					<TreeNode key="a" title="系统角色">
+					<TreeNode key="a" title="苗圃">
 						{
 							systemRoles.map(role => {
 								return (<TreeNode key={role.id} title={role.name}/>)
 							})
 						}
 					</TreeNode>
-					<TreeNode key="b" title="项目角色">
+					<TreeNode key="b" title="施工">
 						{
 							projectRoles.map(role => {
 								return (
@@ -33,14 +33,14 @@ export default class Roles extends Component {
 							})
 						}
 					</TreeNode>
-					<TreeNode key="c" title="专业角色">
+					<TreeNode key="c" title="监理">
 						{
 							professionRoles.map(role => {
 								return (<TreeNode key={role.id} title={role.name}/>)
 							})
 						}
 					</TreeNode>
-					<TreeNode key="d" title="部门角色">
+					<TreeNode key="d" title="业主">
 						{
 							departmentRoles.map(role => {
 								return (<TreeNode key={role.id} title={role.name}/>)

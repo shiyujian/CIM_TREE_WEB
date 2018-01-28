@@ -1,20 +1,20 @@
-import React, {Component} from 'react';
-import {Table, Button, Popconfirm, message} from 'antd';
+import React, { Component } from 'react';
+import { Table, Button, Popconfirm, message } from 'antd';
 
 export default class Users extends Component {
 	render() {
-		const {platform: {users = []}} = this.props;
-		console.log(users);
+		const { platform: { users = [] } } = this.props;
+		console.log(this.props);
 		return (
 			<div>
 				<div>
 					<Button onClick={this.append.bind(this)}>添加用户</Button>
 					<Popconfirm title="是否真的要删除选中用户?"
-					            onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
+						onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
 						<Button>批量删除</Button>
 					</Popconfirm>
 				</div>
-				<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={users}/>
+				<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={users} />
 			</div>
 		);
 	}
@@ -37,7 +37,7 @@ export default class Users extends Component {
 	}, {
 		title: '角色',
 		render: (user) => {
-			const {groups = []} = user || {};
+			const { groups = [] } = user || {};
 			const roles = groups.map(group => group.name);
 			return roles.join('、')
 		}
@@ -57,21 +57,21 @@ export default class Users extends Component {
 		title: '电子签章',
 		dataIndex: 'relative_signature_url',
 		render: (sign) => {
-			return <img width={30} src={`${sign}`} alt=""/>;
+			return <img width={30} src={`${sign}`} alt="" />;
 		}
 	}, {
 		title: '头像',
 		dataIndex: 'relative_avatar_url',
 		render: (avatar) => {
-			return <img width={20} src={`${avatar}`} alt=""/>;
+			return <img width={20} src={`${avatar}`} alt="" />;
 		}
 	}, {
 		title: '操作',
 		render: (user) => {
 			return [
-				<a onClick={this.edit.bind(this, user)} key={1} style={{marginRight: '.5em'}}>编辑</a>,
+				<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
 				<Popconfirm title="是否真的要删除用户?" key={2}
-				            onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+					onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
 					<a>删除</a>
 				</Popconfirm>
 			]
@@ -86,25 +86,28 @@ export default class Users extends Component {
 
 	append() {
 		const {
-			sidebar: {node} = {},
-			actions: {changeAdditionField}
+			sidebar: { node } = {},
+			actions: { changeAdditionField }
 		} = this.props;
+		console.log(this.props)
 		if (node.children && node.children.length > 0) {
 			message.warn('请选择最下级组织结构目录');
 		} else {
 			changeAdditionField('visible', true);
+
 		}
+
 	}
 
 	remove() {
 		const {
-			sidebar: {node} = {},
-			actions: {deleteUser, getUsers}
+			sidebar: { node } = {},
+			actions: { deleteUser, getUsers }
 		} = this.props;
 		const codes = Users.collect(node);
 		this.selectedCodes.map((userId) => {
-			return deleteUser({userID: userId}).then(() => {
-				getUsers({}, {org_code: codes});
+			return deleteUser({ userID: userId }).then(() => {
+				getUsers({}, { org_code: codes });
 			});
 		});
 	}
@@ -114,7 +117,7 @@ export default class Users extends Component {
 		const account = user.account;
 		const groups = user.groups || [];
 		const {
-			actions: {resetAdditionField}
+			actions: { resetAdditionField }
 		} = this.props;
 		resetAdditionField({
 			visible: true,
@@ -127,19 +130,19 @@ export default class Users extends Component {
 
 	del(user) {
 		const {
-			sidebar: {node} = {},
-			actions: {deleteUser, getUsers}
+			sidebar: { node } = {},
+			actions: { deleteUser, getUsers }
 		} = this.props;
 		const codes = Users.collect(node);
 		if (user.id) {
-			deleteUser({userID: user.id}).then(() => {
-				getUsers({}, {org_code: codes});
+			deleteUser({ userID: user.id }).then(() => {
+				getUsers({}, { org_code: codes });
 			});
 		}
 	}
 
 	static collect = (node = {}) => {
-		const {children = [], code} = node;
+		const { children = [], code } = node;
 		let rst = [];
 		rst.push(code);
 		children.forEach(n => {

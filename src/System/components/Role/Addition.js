@@ -16,6 +16,7 @@ export default class Info extends Component {
 		} = this.props;
 		return (
 			<Modal title="添加角色" visible={addition.visible}
+			maskClosable={false}
 			       onOk={this.save.bind(this)}
 			       onCancel={this.cancel.bind(this)}>
 				<FormItem {...Info.layout} label="角色名称">

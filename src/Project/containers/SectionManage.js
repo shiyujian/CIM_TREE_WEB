@@ -30,7 +30,7 @@ export default class SectionManage extends Component {
 		} = this.props;
 		return (
 			<div>
-				<DynamicTitle title="地块管理" {...this.props}/>
+				<DynamicTitle title="标段管理" {...this.props}/>
 				<Sidebar>
 					<SubTree {...this.props}/>
 				</Sidebar>

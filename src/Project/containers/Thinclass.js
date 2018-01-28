@@ -30,7 +30,7 @@ export default class Thinclass extends Component {
 		} = this.props;
 		return (
 			<div>
-				<DynamicTitle title="地块管理" {...this.props}/>
+				<DynamicTitle title="细班管理" {...this.props}/>
 				<Sidebar>
 					<SubTree {...this.props}/>
 				</Sidebar>

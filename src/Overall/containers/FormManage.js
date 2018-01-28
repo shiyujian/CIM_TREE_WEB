@@ -11,6 +11,7 @@ import * as previewActions from '_platform/store/global/preview';
 import { WorkTree, SearchInfo, TableInfo } from '../components/FormManage';
 import moment from 'moment';
 import { Tabs } from 'antd';
+export const Datumcode = window.DeathCode.OVERALL_FORM;
 
 
 @connect(
@@ -26,13 +27,50 @@ import { Tabs } from 'antd';
 export default class FormManage extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            isTreeSelected: false,
+            loading:false
+        }
+    }
+    componentDidMount() {
+        const {actions: {getDir}} = this.props;
+        this.setState({loading:true});
+        getDir({code:Datumcode}).then(({children}) => {
+            this.setState({loading:false});
+        });
+        if(this.props.Doc){
+            this.setState({isTreeSelected:true})
+        }
+    }
+
+    onSelect(value = [],e) {
+        const [code] = value;
+        const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
+        setkeycode(code); 
+        if(code === undefined){
+            return
+        }
+        this.setState({isTreeSelected:e.selected})
+        setcurrentcode({code:code.split("--")[1]});
+        getdocument({code:code.split("--")[1]});
     }
     render() {
+        const {
+            platform: {
+                dir:{
+                    list = []
+                } = {}
+            } = {},
+            keycode
+        } = this.props;
         return (
             <div>
-                <DynamicTitle title="表单管理" {...this.props} />
+                <DynamicTitle title="表单管理" {...this.props}/>
                 <Sidebar>
-                    <WorkTree {...this.props} />
+                    <WorkTree treeData={list}
+                                selectedKeys={keycode}
+                                onSelect={this.onSelect.bind(this)}
+                                {...this.state}  />
                 </Sidebar>
                 <Content>
                     <SearchInfo {...this.props}/>
