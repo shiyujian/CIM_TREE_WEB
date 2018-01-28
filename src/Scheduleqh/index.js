@@ -19,7 +19,7 @@ export default class Schedule extends Component {
 
 	render() {
 		const {Dashboard, TotalPlan, Stage, Notice, History, TotalReport, Approve, 
-			StartPlan, TotalApproval,DGN,DgnSchedule,Scheduler,Progress,DgnDetail,Proprogress,Entry,Plant,Show} = this.state || {};
+			StartPlan, TotalApproval,DGN,DgnSchedule,Scheduler,Progress,DgnDetail,Proprogress,Scheduleanalyze,Enteranalyze,Show} = this.state || {};
 		return (
 			<Body>
 			<Aside>
@@ -44,8 +44,8 @@ export default class Schedule extends Component {
 				{Notice && <Route path="/schedule/reportmonitor" component={Notice}/>}
 				{Progress && <Route path="/schedule/noticemonitor" component={Progress}/>}
 				{Proprogress && <Route path="/schedule/proprogress" component={Proprogress}/>}
-				{Entry && <Route path="/schedule/entry" component={Entry}/>}
-				{Plant && <Route path="/schedule/plant" component={Plant}/>}
+				{Enteranalyze && <Route path="/schedule/enteranalyze" component={Enteranalyze}/>}
+				{Scheduleanalyze && <Route path="/schedule/scheduleanalyze" component={Scheduleanalyze}/>}
 				{History && <Route path="/schedule/history" component={History}/>}
 				{Show && <Route path="/schedule/show" component={Show}/>}
 
@@ -164,16 +164,16 @@ export default class Schedule extends Component {
 		icon: <Icon name="warning" />,
 
 	}, {
-		key: 'entry',
-		id: 'SCHEDULE.ENTRY',
+		key: 'enteranalyze',
+		id: 'SCHEDULE.ENTERANALYZE',
 		name: '苗木进场分析',
-		path: '/schedule/entry',
+		path: '/schedule/enteranalyze',
 		icon: <Icon name="ship" />
 	},{
-		key: 'plant',
+		key: 'Scheduleanalyze',
 		name: '种植进度分析',
-		id: 'SCHEDULE.PLANT',
-		path: '/schedule/plant',
+		id: 'SCHEDULE.SCHEDULEANALYZE',
+		path: '/schedule/Scheduleanalyze',
 		icon: <Icon name="warning" />,
 
 	},{

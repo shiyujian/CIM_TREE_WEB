@@ -30,7 +30,7 @@ export default class AreaManage extends Component {
 		} = this.props;
 		return (
 			<div>
-				<DynamicTitle title="地块管理" {...this.props}/>
+				<DynamicTitle title="区域管理" {...this.props}/>
 				<Sidebar>
 					<SubTree {...this.props}/>
 				</Sidebar>
