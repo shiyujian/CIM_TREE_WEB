@@ -126,6 +126,12 @@ class ToggleModal extends Component {
 	_sendDoc() {
 		const {
 			actions: { postSentDocAc, getSentInfoAc, getCopyUsersAc, sentMessageAc },
+			toggleData: toggleData = {
+				type: 'NEWS',
+				status: 'ADD',
+				visible: false,
+				editData: null
+			},
 			form: { validateFields },
 			fileList = []
 		} = this.props;
@@ -135,10 +141,10 @@ class ToggleModal extends Component {
 			isSentMsg = false,
 			isCopyMsg = false,
 		} = this.state;
-		if (sentUsers.length === 0) {
-			message.warning("请添加接收单位！");
-			return
-		}
+		// if (sentUsers.length === 0) {
+		// 	message.warning("请添加接收单位！");
+		// 	return
+		// }
 		// if (copyUsers.length === 0) {
 		// 	message.warning("请添加抄送单位！");
 		// 	return
