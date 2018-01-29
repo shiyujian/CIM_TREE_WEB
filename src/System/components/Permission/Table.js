@@ -13,6 +13,7 @@ export default class PermissionTable extends Component {
 	static propTypes = {};
 	render() {
 		let userPermi;
+		console.log('MODULES',MODULES)
 		if (this.state.userLogin === "admin") {
 			userPermi = MODULES.map(ele => {
 				return { ...ele };
@@ -78,12 +79,14 @@ export default class PermissionTable extends Component {
 				});
 				myrole && changeTableField('role', myrole);
 				myrole && myrole.permissions && changeTableField('permissions', myrole.permissions);
+				// console.log('p2p22',permissions)
 			});
 		})
 	}
 
 	check(key) {
 		const {table: {permissions = []} = {}, actions: {changeTableField}} = this.props;
+
 		const has = permissions.some(permission => permission === key);
 		let rst = [];
 		if (has) {
@@ -92,6 +95,25 @@ export default class PermissionTable extends Component {
 			rst = [...permissions, key]
 		}
 		changeTableField('permissions', rst);
+
+		// if(value=="0"){
+		// 	let newValue="1";
+		// 	for (var i = 0; i < permissions.length; i++) {
+		// 		if (permissions[i].id == id){
+		// 			permissions[i].value=newValue
+		// 		}
+		// 	}
+		// }
+		// if(value=="1"){
+		// 	let newValue="0";
+		// 	for (var i = 0; i < permissions.length; i++) {
+		// 		if (permissions[i].id == id){
+		// 			permissions[i].value=newValue
+		// 		}
+		// 	}
+		// }
+		// changeTableField('permissions', permissions);
+		// console.log('pppppp',permissions)
 	}
 
 	columns = [{
@@ -104,10 +126,25 @@ export default class PermissionTable extends Component {
 		width: '25%',
 		render: (item) => {
 			const {table: {editing, permissions = []} = {}} = this.props;
+
 			const key = `appmeta.${item.id}.READ`;
 			// permissions里面是当前用户拥有的所有的权限
 			const value = permissions.some(permission => permission === key);
 			return <Switch checked={value} disabled={!editing} checkedChildren="开" unCheckedChildren="关" onChange={this.check.bind(this, key)}/>
+
+			// const key = 1
+			// // permissions里面是当前用户拥有的所有的权限
+			// for (var i = 0; i < permissions.length; i++) {
+			// 	if (permissions[i].id == `${item.id}`) {
+			// 		if (permissions[i].value & key == 1) {
+			// 			return(
+			// 				<Switch checked={true} disabled={!editing} checkedChildren="开" unCheckedChildren="关" onChange={this.check.bind(this, permissions[i].id,permissions[i].value)}/>)	
+			// 		}else{
+			// 			return (
+			// 				<Switch checked={false} disabled={!editing} checkedChildren="开" unCheckedChildren="关" onChange={this.check.bind(this, permissions[i].id,permissions[i].value)}/>)
+			// 		}
+			// 	}				
+			// }
 		}
 	}
     ];

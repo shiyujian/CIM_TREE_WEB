@@ -63,9 +63,6 @@ export default class Header extends Component {
 									</Menu.Item>)
 							}
 							// for (var i = 0; i < permissions.length; i++) {
-							// 	console.log(permissions[i])
-							// 	// let has = permissions.some(permission => permissions[i].id === `${menu.id}`);
-							// 	// let has = true
 							// 取出数据使用二进制进行判断对比 如果有这个1就显示否则隐藏
 							// 	if (permissions[i].value & 1 == "1") {
 							// 		if (permissions[i].id == `${menu.id}`) {
@@ -79,9 +76,9 @@ export default class Header extends Component {
 							// 						<span className="title">{menu.title}</span>
 							// 					</Link>
 							// 				</Menu.Item>)
-							// break;
 							// 		}
 							// 	}
+							// break;
 							// }
 						})
 					}
