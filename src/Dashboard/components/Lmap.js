@@ -121,13 +121,14 @@ export default class Lmap extends Component {
 	}
 
 	componentDidMount() {
-		this.initMap();
-		this.getArea();
+		// this.initMap();
+		// this.getArea();
+		debugger
 		this.getRisk();
-		this.getVedio();
+		// this.getVedio();
 		this.getSafeMonitor();
-		this.getAllOrgs();
-		this.getUserOnline();
+		// this.getAllOrgs();
+		// this.getUserOnline();
 		this.get360ViewTree();
 	}
 
@@ -141,234 +142,236 @@ export default class Lmap extends Component {
 		}
 	}
 
-	getUserOnline() {
-		const {getUsersOnline} = this.props.actions;
-		let me = this;
-		return new Promise((resolve,reject)=>{
-			getUsersOnline(this.state.fullExtent).then((us = []) => {
-				me.setState({
-					userOnlineNumber: us.length,
-					userOnline: us
-				},()=>{
-					resolve();
-				});
-			});
-		})
-	}
+	// getUserOnline() {
+	// 	const {getUsersOnline} = this.props.actions;
+	// 	let me = this;
+	// 	return new Promise((resolve,reject)=>{
+	// 		getUsersOnline(this.state.fullExtent).then((us = []) => {
+	// 			me.setState({
+	// 				userOnlineNumber: us.length,
+	// 				userOnline: us
+	// 			},()=>{
+	// 				resolve();
+	// 			});
+	// 		});
+	// 	})
+	// }
 
 	/*定期更新人员坐标*/
-	timingUpdateUserLoc() {
-		let me = this;
-		const {getUsersOnline} = this.props.actions;
-		this.timeInteval = setInterval(function () {
-			getUsersOnline(this.state.fullExtent).then((users = []) => {
-				let checkItems = this.checkMarkers ? this.checkMarkers['geojsonFeature_people'] : {};
-				users.forEach((u) => {
-					let account = u.account;
-					let user = me.user.userList[u.id];
-					if (user)
-						user.geometry.coordinates = [account.lat, account.lng];
-					//更新地图图标
-					checkItems[u.id] &&
-					checkItems[u.id].setLatLng(L.latLng(account.lat, account.lng));
-				});
-				me.setState({userOnlineNumber: users.length,userOnline: users});
-			});
-		}, 60000 * 15);
-	}
+	// timingUpdateUserLoc() {
+	// 	let me = this;
+	// 	const {getUsersOnline} = this.props.actions;
+	// 	this.timeInteval = setInterval(function () {
+	// 		getUsersOnline(this.state.fullExtent).then((users = []) => {
+	// 			let checkItems = this.checkMarkers ? this.checkMarkers['geojsonFeature_people'] : {};
+	// 			users.forEach((u) => {
+	// 				let account = u.account;
+	// 				let user = me.user.userList[u.id];
+	// 				if (user)
+	// 					user.geometry.coordinates = [account.lat, account.lng];
+	// 				//更新地图图标
+	// 				checkItems[u.id] &&
+	// 				checkItems[u.id].setLatLng(L.latLng(account.lat, account.lng));
+	// 			});
+	// 			me.setState({userOnlineNumber: users.length,userOnline: users});
+	// 		});
+	// 	}, 60000 * 15);
+	// }
 
 	/*解析组织树*/
-	loopOrg(org = {}, root, leafs = []) {
-		let me = this;
-		var node = {
-			key: org.code,
-			properties: {
-				name: org.name
-			}
-		}
-		if (org.children && org.children.length) {
-			node.children = [];
-		} else {
-			leafs.push(node);
-		}
-		if (root) {
-			root.children.push(node);
-		} else {
-			root = node;
-		}
-		org.children && org.children.map(o => {
-			me.loopOrg(o, node, leafs)
-		});
-		return {
-			orgTrees: root,
-			leafs
-		};
-	}
+	// loopOrg(org = {}, root, leafs = []) {
+	// 	let me = this;
+	// 	var node = {
+	// 		key: org.code,
+	// 		properties: {
+	// 			name: org.name
+	// 		}
+	// 	}
+	// 	if (org.children && org.children.length) {
+	// 		node.children = [];
+	// 	} else {
+	// 		leafs.push(node);
+	// 	}
+	// 	if (root) {
+	// 		root.children.push(node);
+	// 	} else {
+	// 		root = node;
+	// 	}
+	// 	org.children && org.children.map(o => {
+	// 		me.loopOrg(o, node, leafs)
+	// 	});
+	// 	return {
+	// 		orgTrees: root,
+	// 		leafs
+	// 	};
+	// }
 
 	/*查询组织树*/
-	getAllOrgs() {
-		let me = this;
-		const {getOrgsByCode, getOrgs} = this.props.actions;
-		getOrgs().then((orgs) => {
-			let orgArr = orgs.children.map(or => {
-				return {
-					key: or.code,
-					properties: {
-						name: or.name
-					}
-				}
-			});
-			me.setState({users: orgArr});
-			orgs.children.forEach(o => {
-				//加载子组织
-				getOrgsByCode({CODE: o.code}).then(corgs => {
-					let orgRes = me.loopOrg(corgs);
-					me.user.orgs[o.code] = orgRes;
-					let isFind = false;
-					for (let i = 0; i < me.state.users.length; i++) {
-						if (me.state.users[i].key == o.code) {
-							me.state.users[i] = orgRes.orgTrees;
-							isFind = true;
-						}
-					}
-					if (!isFind)
-						me.state.users.push(orgRes.orgTrees);
-					me.setState({users: me.state.users});
-				});
-			});
-			/*定期更新人员坐标*/
-			me.timingUpdateUserLoc();
-		})
-	}
+	// getAllOrgs() {
+	// 	let me = this;
+	// 	const {getOrgsByCode, getOrgs} = this.props.actions;
+	// 	getOrgs().then((orgs) => {
+	// 		let orgArr = orgs.children.map(or => {
+	// 			return {
+	// 				key: or.code,
+	// 				properties: {
+	// 					name: or.name
+	// 				}
+	// 			}
+	// 		});
+	// 		me.setState({users: orgArr});
+	// 		orgs.children.forEach(o => {
+	// 			//加载子组织
+	// 			getOrgsByCode({CODE: o.code}).then(corgs => {
+	// 				let orgRes = me.loopOrg(corgs);
+	// 				me.user.orgs[o.code] = orgRes;
+	// 				let isFind = false;
+	// 				for (let i = 0; i < me.state.users.length; i++) {
+	// 					if (me.state.users[i].key == o.code) {
+	// 						me.state.users[i] = orgRes.orgTrees;
+	// 						isFind = true;
+	// 					}
+	// 				}
+	// 				if (!isFind)
+	// 					me.state.users.push(orgRes.orgTrees);
+	// 				me.setState({users: me.state.users});
+	// 			});
+	// 		});
+	// 		/*定期更新人员坐标*/
+	// 		me.timingUpdateUserLoc();
+	// 	})
+	// }
 
 	/*把人员填充到组织树*/
-	fillUserToOrgTrees(org, userMap) {
-		let users = userMap[org.key];
-		if (users) {
-			if(!org.children)
-				org.children = users;
-			else{
-				//清空原有叶子界面
-				for(let i = org.children.length-1;i>=0;i--){
-					if(org.children[i].isLeaf)
-						org.children.splice(i,1);
-				}
-				org.children = org.children.concat(users)
-			}
-		}
-		if (org.children && org.children.length) {
-			org.children.forEach(o => {
-				this.fillUserToOrgTrees(o, userMap)
-			});
-		}
-	}
+	// fillUserToOrgTrees(org, userMap) {
+	// 	let users = userMap[org.key];
+	// 	if (users) {
+	// 		if(!org.children)
+	// 			org.children = users;
+	// 		else{
+	// 			//清空原有叶子界面
+	// 			for(let i = org.children.length-1;i>=0;i--){
+	// 				if(org.children[i].isLeaf)
+	// 					org.children.splice(i,1);
+	// 			}
+	// 			org.children = org.children.concat(users)
+	// 		}
+	// 	}
+	// 	if (org.children && org.children.length) {
+	// 		org.children.forEach(o => {
+	// 			this.fillUserToOrgTrees(o, userMap)
+	// 		});
+	// 	}
+	// }
 
 	/*按部门请求组织人员*/
-	getUsersByOrg(key) {
-		const {
-			userOnline = [],
-		} =this.state
-		let me = this;
-		return new Promise(resolve => {
-			const {getUsers} = me.props.actions;
+	// getUsersByOrg(key) {
+	// 	const {
+	// 		userOnline = [],
+	// 	} =this.state
+	// 	let me = this;
+	// 	return new Promise(resolve => {
+	// 		const {getUsers} = me.props.actions;
 		
-			let orgNode = me.state.users.find(us => us.key == key);
-			if (orgNode.userLoaded) {//已加载不用重复加载
-				resolve();
-				return;
-			}
-			let org = me.user.orgs[key];
-			if (!org) {
-				resolve();
-				return;
-			}
-			getUsers({}, {'org_code': org.leafs.map(l => l.key).join()}).then(users => {
-				let usersObj = {};
-				let keys = [];
-				users.forEach((u) => {
-					let account = u.account;
-					let orgCode = account["org_code"];
-					if (!orgCode) {
-						return;
-					}
-					let user = {};
+	// 		let orgNode = me.state.users.find(us => us.key == key);
+	// 		if (orgNode.userLoaded) {//已加载不用重复加载
+	// 			resolve();
+	// 			return;
+	// 		}
+	// 		let org = me.user.orgs[key];
+	// 		if (!org) {
+	// 			resolve();
+	// 			return;
+	// 		}
+	// 		getUsers({}, {'org_code': org.leafs.map(l => l.key).join()}).then(users => {
+	// 			let usersObj = {};
+	// 			let keys = [];
+	// 			users.forEach((u) => {
+	// 				let account = u.account;
+	// 				let orgCode = account["org_code"];
+	// 				if (!orgCode) {
+	// 					return;
+	// 				}
+	// 				let user = {};
 				
-					usersObj[orgCode] = usersObj[orgCode] || [];
-					user = wrapperMapUser(u);
-					usersObj[orgCode].push(user);
-					me.user.userList[u.id] = user;
-					keys.push(u.id);
-				});
-				//填入组织树
-				if (orgNode) {
-					me.fillUserToOrgTrees(orgNode, usersObj);
-					orgNode.userLoaded = true;
-					me.setState({users: me.state.users});
-				}
-				resolve(keys);
-			})
-		});
-	}
+	// 				usersObj[orgCode] = usersObj[orgCode] || [];
+	// 				user = wrapperMapUser(u);
+	// 				usersObj[orgCode].push(user);
+	// 				me.user.userList[u.id] = user;
+	// 				keys.push(u.id);
+	// 			});
+	// 			//填入组织树
+	// 			if (orgNode) {
+	// 				me.fillUserToOrgTrees(orgNode, usersObj);
+	// 				orgNode.userLoaded = true;
+	// 				me.setState({users: me.state.users});
+	// 			}
+	// 			resolve(keys);
+	// 		})
+	// 	});
+	// }
 
 	/*异步加载人员信息*/
-	loadUsersByOrg(treeNode) {
-		let key = treeNode.props.eventKey;
-		return this.getUsersByOrg(key);
-	}
+	// loadUsersByOrg(treeNode) {
+	// 	let key = treeNode.props.eventKey;
+	// 	return this.getUsersByOrg(key);
+	// }
 
 	//查看在线人员按钮点击
-	userOnlineState(e){
-		this.setState({
-			userOnlineState:e.target.checked
-		})
-		this.OnlineState = e.target.checked
-		let me = this;
+	// userOnlineState(e){
+	// 	this.setState({
+	// 		userOnlineState:e.target.checked
+	// 	})
+	// 	this.OnlineState = e.target.checked
+	// 	let me = this;
 
-		if(e.target.checked){
-			const {getUsersOnline} = this.props.actions;
-			getUsersOnline(this.state.fullExtent).then((us=[])=>{
-				let keys = us.map(u=>{
-					//测试坐标
-					// u.account.lat = 22.517946;
-					// u.account.lng = 113.891754;
-					let user = wrapperMapUser(u);
-					me.user.userList[u.id] = user;
-					return u.id.toString();
-				});
+	// 	if(e.target.checked){
+	// 		const {getUsersOnline} = this.props.actions;
+	// 		getUsersOnline(this.state.fullExtent).then((us=[])=>{
+	// 			let keys = us.map(u=>{
+	// 				//测试坐标
+	// 				// u.account.lat = 22.517946;
+	// 				// u.account.lng = 113.891754;
+	// 				let user = wrapperMapUser(u);
+	// 				me.user.userList[u.id] = user;
+	// 				return u.id.toString();
+	// 			});
 
-				me.onCheck(keys,'geojsonFeature_people');
-			})
-		}
-	}
+	// 			me.onCheck(keys,'geojsonFeature_people');
+	// 		})
+	// 	}
+	// }
 
 	/*获取区域数据*/
-	getArea() {
-		let me = this;
-		const {getArea} = this.props.actions;
-		//获取区域数据
-		getArea({})
-			.then((rst = {}) => {
-				let areaData = rst.children || [];
-				var resAreas = me.loop(areaData, []);
-				resAreas.forEach((v, index) => {
-					v.key = index;
-				});
-				let areas = [{
-					key: 'ALL',
-					'properties': {
-						name: "区域地块",
-					},
-					children: resAreas
-				}];
-				me.setState({areaJson: areas});
-			});
-	}
+	// getArea() {
+	// 	let me = this;
+	// 	const {getArea} = this.props.actions;
+	// 	//获取区域数据
+	// 	getArea({})
+	// 		.then((rst = {}) => {
+	// 			let areaData = rst.children || [];
+	// 			var resAreas = me.loop(areaData, []);
+	// 			resAreas.forEach((v, index) => {
+	// 				v.key = index;
+	// 			});
+	// 			let areas = [{
+	// 				key: 'ALL',
+	// 				'properties': {
+	// 					name: "区域地块",
+	// 				},
+	// 				children: resAreas
+	// 			}];
+	// 			me.setState({areaJson: areas});
+	// 		});
+	// }
 
 	/*获取安全隐患点*/
 	getRisk() {
 		const {getRisk} = this.props.actions;
 		let me = this;
+		debugger
 		getRisk().then(data => {
+			console.log('data',data)
 			//安全隐患数据处理
 			let riskObj = {}
 			data.forEach((v, index) => {
@@ -413,121 +416,121 @@ export default class Lmap extends Component {
 	}
 
 	/*获取视频点*/
-	getVedio() {
-		let me = this;
-		const {getVedio} = this.props.actions;
-		// getVedio().then(data => {
-		// 	let vedioArr = [];
-		// 	data.children.forEach(pv => {
-		// 		let vedioData = {
-		// 			key: pv.pk,
-		// 			'properties': {
-		// 				name: pv.name,
-		// 			},
-		// 			children: []
-		// 		};
-		// 		pv.children.forEach((v, index) => {
-		// 			let name = v.name;
-		// 			let coord = [v.extra_params.lat, v.extra_params.lng];
-		// 			let vType = v.obj_type;
-		// 			let exParams = v.extra_params;
-		// 			let vedio = {
-		// 				'type': 'monitor',
-		// 				key: v.pk,
-		// 				'properties': {
-		// 					name,
-		// 					vType,
-		// 					pk: v.pk,
-		// 					ip: exParams.ip,
-		// 					port: exParams.port,
-		// 					password: exParams.password,
-		// 					username: exParams.username,
-		// 					description: exParams.description
-		// 				},
-		// 				'geometry': {
-		// 					'type': 'Point',
-		// 					'coordinates': coord
-		// 				}
-		// 			}
-		// 			vedioData.children.push(vedio);
-		// 		});
-		// 		vedioArr.push(vedioData);
-		// 	});
-		// 	me.setState({vedios: vedioArr});
-		// });
+	// getVedio() {
+	// 	let me = this;
+	// 	const {getVedio} = this.props.actions;
+	// 	// getVedio().then(data => {
+	// 	// 	let vedioArr = [];
+	// 	// 	data.children.forEach(pv => {
+	// 	// 		let vedioData = {
+	// 	// 			key: pv.pk,
+	// 	// 			'properties': {
+	// 	// 				name: pv.name,
+	// 	// 			},
+	// 	// 			children: []
+	// 	// 		};
+	// 	// 		pv.children.forEach((v, index) => {
+	// 	// 			let name = v.name;
+	// 	// 			let coord = [v.extra_params.lat, v.extra_params.lng];
+	// 	// 			let vType = v.obj_type;
+	// 	// 			let exParams = v.extra_params;
+	// 	// 			let vedio = {
+	// 	// 				'type': 'monitor',
+	// 	// 				key: v.pk,
+	// 	// 				'properties': {
+	// 	// 					name,
+	// 	// 					vType,
+	// 	// 					pk: v.pk,
+	// 	// 					ip: exParams.ip,
+	// 	// 					port: exParams.port,
+	// 	// 					password: exParams.password,
+	// 	// 					username: exParams.username,
+	// 	// 					description: exParams.description
+	// 	// 				},
+	// 	// 				'geometry': {
+	// 	// 					'type': 'Point',
+	// 	// 					'coordinates': coord
+	// 	// 				}
+	// 	// 			}
+	// 	// 			vedioData.children.push(vedio);
+	// 	// 		});
+	// 	// 		vedioArr.push(vedioData);
+	// 	// 	});
+	// 	// 	me.setState({vedios: vedioArr});
+	// 	// });
 
-		const { getCameraTree } = this.props.actions
-        getCameraTree().then(res => {
-			console.log(res);
-            // const tmp = res.children
-            // const treeData = tmp[0].children.map(project => {
-			const treeData = res.children.map(project => {
-				const engineerings = project.children;
-                return engineerings ? {
-					key: project.pk,
-					'properties': {
-						name:  project.name,
-					},
-					geometry:{'coordinates':[]},
-                    children: engineerings.map(engineering => {
-                        const cameras = engineering.extra_params.cameras
-                        return cameras ? {
-							key: engineering.pk,
-							'properties': {
-								name:  engineering.name,
-							},
-							geometry:{'coordinates':[]},
-                            children: cameras ? cameras.map(camera => {
-								let coord = [camera.lat, camera.lng];
-								return {
-									'type': 'monitor',
-									key:camera.pk,
-									'properties': {
-										name: camera.name,
-										// vType,
-										pk: camera.pk,
-										ip: camera.ip,
-										port: camera.port,
-										password: camera.password,
-										username: camera.username,
-										description: camera.desc
-									},
-									'geometry': {
-										'type': 'Point',
-										'coordinates': coord
-									}
-								}
-                            }) : []
-                        } : {
-							key: engineering.pk,
-							'properties': {
-								name:  engineering.name,
-							},
-							geometry:{'coordinates':[]},
-                        }
-                    })
-                } : {
-                    title: project.name,
-                    key: project.pk,
-                }
-			})
-			//过滤没有摄像头的单位工程
-			for(let i = treeData.length-1;i>=0;i--){
-				let en = treeData[i];
-				for(let j=en.children.length-1;j>=0;j--){
-					let unit = en.children[j];
-					if(!unit.children||!unit.children.length){
-						//移除该项目
-						en.children.splice(j,1);
-					}
-				}
-				if(!en.children||!en.children.length){
-					treeData.splice(i,1);
-				}
-			}
-			me.setState({vedios: treeData});
-		});
-	}
+	// 	const { getCameraTree } = this.props.actions
+ //        getCameraTree().then(res => {
+	// 		console.log(res);
+ //            // const tmp = res.children
+ //            // const treeData = tmp[0].children.map(project => {
+	// 		const treeData = res.children.map(project => {
+	// 			const engineerings = project.children;
+ //                return engineerings ? {
+	// 				key: project.pk,
+	// 				'properties': {
+	// 					name:  project.name,
+	// 				},
+	// 				geometry:{'coordinates':[]},
+ //                    children: engineerings.map(engineering => {
+ //                        const cameras = engineering.extra_params.cameras
+ //                        return cameras ? {
+	// 						key: engineering.pk,
+	// 						'properties': {
+	// 							name:  engineering.name,
+	// 						},
+	// 						geometry:{'coordinates':[]},
+ //                            children: cameras ? cameras.map(camera => {
+	// 							let coord = [camera.lat, camera.lng];
+	// 							return {
+	// 								'type': 'monitor',
+	// 								key:camera.pk,
+	// 								'properties': {
+	// 									name: camera.name,
+	// 									// vType,
+	// 									pk: camera.pk,
+	// 									ip: camera.ip,
+	// 									port: camera.port,
+	// 									password: camera.password,
+	// 									username: camera.username,
+	// 									description: camera.desc
+	// 								},
+	// 								'geometry': {
+	// 									'type': 'Point',
+	// 									'coordinates': coord
+	// 								}
+	// 							}
+ //                            }) : []
+ //                        } : {
+	// 						key: engineering.pk,
+	// 						'properties': {
+	// 							name:  engineering.name,
+	// 						},
+	// 						geometry:{'coordinates':[]},
+ //                        }
+ //                    })
+ //                } : {
+ //                    title: project.name,
+ //                    key: project.pk,
+ //                }
+	// 		})
+	// 		//过滤没有摄像头的单位工程
+	// 		for(let i = treeData.length-1;i>=0;i--){
+	// 			let en = treeData[i];
+	// 			for(let j=en.children.length-1;j>=0;j--){
+	// 				let unit = en.children[j];
+	// 				if(!unit.children||!unit.children.length){
+	// 					//移除该项目
+	// 					en.children.splice(j,1);
+	// 				}
+	// 			}
+	// 			if(!en.children||!en.children.length){
+	// 				treeData.splice(i,1);
+	// 			}
+	// 		}
+	// 		me.setState({vedios: treeData});
+	// 	});
+	// }
 
 	initCameraTree = () => {
         const { getCameraTree } = this.props.actions
@@ -673,57 +676,57 @@ export default class Lmap extends Component {
 	};
 
 	/*初始化地图*/
-	initMap() {
-		this.map = L.map('mapid', window.config.initLeaflet);
+	// initMap() {
+	// 	this.map = L.map('mapid', window.config.initLeaflet);
 
-		L.control.zoom({position: 'bottomright'}).addTo(this.map);
+	// 	L.control.zoom({position: 'bottomright'}).addTo(this.map);
 
-		this.tileLayer = L.tileLayer(this.tileUrls[1], {
-			attribution: '&copy;<a href="">ecidi</a>',
-			id: 'tiandi-map',
-			subdomains: this.subDomains
-		}).addTo(this.map);
-		//航拍影像
-		if (CUS_TILEMAP)
-			L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
+	// 	this.tileLayer = L.tileLayer(this.tileUrls[1], {
+	// 		attribution: '&copy;<a href="">ecidi</a>',
+	// 		id: 'tiandi-map',
+	// 		subdomains: this.subDomains
+	// 	}).addTo(this.map);
+	// 	//航拍影像
+	// 	if (CUS_TILEMAP)
+	// 		L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
 
-		L.tileLayer.wms(this.WMSTileLayerUrl, {
-			subdomains: this.subDomains
-		}).addTo(this.map);
-		let me = this;
+	// 	L.tileLayer.wms(this.WMSTileLayerUrl, {
+	// 		subdomains: this.subDomains
+	// 	}).addTo(this.map);
+	// 	let me = this;
 
-		document.querySelector('.leaflet-popup-pane').addEventListener('click', function (e) {
-			let target = e.target;
-			//绑定轨迹查看点击事件
-			if (target.getAttribute('class') == 'btnViewTrack') {
-				let id = target.getAttribute('data-id');
-				//拿到人员信息
-				let user = me.user.userList[id];
-				let name = user.properties.name;
+	// 	document.querySelector('.leaflet-popup-pane').addEventListener('click', function (e) {
+	// 		let target = e.target;
+	// 		//绑定轨迹查看点击事件
+	// 		if (target.getAttribute('class') == 'btnViewTrack') {
+	// 			let id = target.getAttribute('data-id');
+	// 			//拿到人员信息
+	// 			let user = me.user.userList[id];
+	// 			let name = user.properties.name;
 
-				//开始显示轨迹
-				me.setState({isShowTrack: false});
-				me.setState({isShowTrack: true, trackId: id, trackUser: name});
-			}
-			//绑定隐患详情点击事件
-			if (target.getAttribute('class') == 'btnViewRisk') {
-				let idRisk = target.getAttribute('data-id');
-				let risk = null;
-				me.state.hazards.forEach(v => {
-					if (!risk)
-						risk = v.children.find(v1 => v1.key == parseInt(idRisk));
-				});
-				if (risk) {
-					let oldRisk = me.state.risk;
-					oldRisk.showRiskDetail = true;
-					oldRisk.processHistory = [];
-					oldRisk.detail = risk;
-					me.setState({risk: oldRisk});
-					me.getRiskProcess(idRisk);
-				}
-			}
-		})
-	}
+	// 			//开始显示轨迹
+	// 			me.setState({isShowTrack: false});
+	// 			me.setState({isShowTrack: true, trackId: id, trackUser: name});
+	// 		}
+	// 		//绑定隐患详情点击事件
+	// 		if (target.getAttribute('class') == 'btnViewRisk') {
+	// 			let idRisk = target.getAttribute('data-id');
+	// 			let risk = null;
+	// 			me.state.hazards.forEach(v => {
+	// 				if (!risk)
+	// 					risk = v.children.find(v1 => v1.key == parseInt(idRisk));
+	// 			});
+	// 			if (risk) {
+	// 				let oldRisk = me.state.risk;
+	// 				oldRisk.showRiskDetail = true;
+	// 				oldRisk.processHistory = [];
+	// 				oldRisk.detail = risk;
+	// 				me.setState({risk: oldRisk});
+	// 				me.getRiskProcess(idRisk);
+	// 			}
+	// 		}
+	// 	})
+	// }
 
 	genPopUpContent(geo) {
 		const {properties = {}} = geo;
@@ -785,7 +788,7 @@ export default class Lmap extends Component {
 	/*在地图上添加marker和polygan*/
 	createMarker(geo, oldMarker) {
 		var me = this;
-		debugger
+		// debugger
 		if (geo.properties.type != 'area') {
 			if (!oldMarker) {
 				if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {

@@ -39,7 +39,9 @@ export default class ScheduleTable extends Component {
             loading6: false,
             loading7: false,
             isShow: true,
-            isOpen: [false,false,false]
+            isOpen: [false,false,false],
+            nowmessage:{CreateTime:"",Factory:"",nowmessage:"",nowmessage:"",TreeTypeObj:{TreeTypeNo:""}},
+            nowmessagelist:[],
         }
     }
     componentWillReceiveProps(nextProps){
@@ -73,7 +75,27 @@ export default class ScheduleTable extends Component {
         this.setState({loading5:true});
         this.setState({loading6:true});
         
-        const {actions: {gettreetypeAll}} = this.props;
+        const {actions: {gettreetypeAll,nowmessage}} = this.props;
+        nowmessage().then(rst=>{
+            console.log(rst.content,"xionsui");
+            this.setState({
+                nowmessagelist:rst.content,
+            })
+            // console.log(rst.content[0].sxm,rst.content[0].no,rst.content[0].section,rst.content[0].land,rst.content[0].region,rst.content[0].smallclass,rst.content[0].thinclass)
+        })
+        // sxm:编码 或顺序码  可选
+        // no:正式编码 可选
+        // section：标段 可选
+        // land：地块  可选
+        // region：区域  可选
+        // smallclass：小班  可选
+        // thinclass：细班  可选
+        // treetype：树类型  可选
+        // status：状态 -1:未确认 0：监理通过 业主未抽查  1：监理不通过  2：监理通过业主抽查未通过  3：监理通过 业主抽查通过
+        // stime：验收时间 开始时间
+        // etime：验收时间 结束时间
+        // page：页码，选填
+        // size：每页数量，选填
         const param = {stime:this.state.stime,etime:this.state.etime};
         
         gettreetypeAll().then(rst=>{
@@ -227,7 +249,7 @@ export default class ScheduleTable extends Component {
             series : []
         };
         myChart3.setOption(option3);
-
+  
         var myChart4 = echarts.init(document.getElementById('overall'));
         const sectionStatus = 0;
         let option4 = {
@@ -265,24 +287,28 @@ export default class ScheduleTable extends Component {
 	}
 
 	render() {
+        let asd = this.state.nowmessage;
+        console.log(asd);
+        
+        console.log(this.state.nowmessagelist,"xiaoxiao")
 		return (
 			<div>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
-                    <Col span={6}>
+                    <Col span={5}>
                         <Spin spinning={this.state.loading5}>
                             <SumTotal search={this.searchSum(0)} title='苗木累计种植总数' title1='Total number of planted trees'>
                                 <div>{this.state.amount}</div>
                             </SumTotal>
                         </Spin>
                     </Col>
-                    <Col span={6}>
+                    <Col span={5}>
                         <Spin spinning={this.state.loading6}>
                             <SumTotal search={this.searchSum(1)} title='苗木今日种植总数' title1='Total number of planted trees today'>
                                 <div>{this.state.today}</div>
                             </SumTotal>
                         </Spin>
                     </Col>
-                    <Col span={6}>
+                    <Col span={5}>
                         <Spin spinning={this.state.loading7}>
                             <SumTotal search={this.searchSum(2)} title='种植完工率' title1='Plant completion rate'>
                                 <div onClick ={this.handleclick.bind(this)} style={{cursor:'pointer'}}>
@@ -294,6 +320,18 @@ export default class ScheduleTable extends Component {
                                 </div>
                             </SumTotal>
                         </Spin>
+                    </Col>
+                    <Col span={6}>
+                    <div className="nowmessage" style={{border:"1px solid #666"}}>
+                    <div>实时种植信息</div>
+                    <div>
+                    {this.state.nowmessagelist.map((item,index)=>
+                            <div key={item.id}>
+                              <span>{item.CreateTime}{item.Factory}{item.Inputer}录入{item.TreeTypeObj.TreeTypeNo}</span>
+                            </div>
+                        )}
+                    </div>
+                    </div>
                     </Col>
                 </Row>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
@@ -354,14 +392,14 @@ export default class ScheduleTable extends Component {
         return(
             <div>
                 <div style={{cursor:'pointer'}} onClick = {this.handleIsOpen.bind(this,index)}><img style={{height: '36px'}} src={DateImg}/></div>
-                <DatePicker
+                {/*<DatePicker
                     style={{textAlign:"center",visibility:"hidden"}}
                     defaultValue={moment(new Date(), 'YYYY/MM/DD')}
                     format={'YYYY/MM/DD'}
                     onChange={this.datepick1.bind(this,index)}
                     open={this.state.isOpen[index]}
                 >
-                </DatePicker>
+                </DatePicker>*/}
                 
             </div>
         )
@@ -404,6 +442,7 @@ export default class ScheduleTable extends Component {
                         {sectionoption}
                     </Select>
                     <span>各小班种植进度分析</span>
+
                 </div>
     }
 
