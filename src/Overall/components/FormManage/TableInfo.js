@@ -96,7 +96,9 @@ class TableInfo extends Component {
                 putFlow
             },
             location,
+            currentcode = {}
         }=this.props
+        console.log("currentcode",currentcode)
         const{
             TreatmentData,
         }=this.state
@@ -310,9 +312,11 @@ class TableInfo extends Component {
                     let data = {
                         index:index+1,
                         fileName:item.file_name,
-                        fileId:item.file_id,
-                        fileUrl:item.file_partial_url,
-                        fileTime:item.send_time
+                        file_id:item.file_id,
+                        file_partial_url:item.file_partial_url,
+                        send_time:item.send_time,
+                        a_file:item.a_file,
+                        download_url:item.download_url,
                     }
                     newdata.push(data)
                 })

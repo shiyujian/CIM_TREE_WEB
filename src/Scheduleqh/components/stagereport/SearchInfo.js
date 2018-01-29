@@ -42,7 +42,7 @@ class SearchInfo extends Component {
                             <Col span={8}>
                                 <FormItem {...SearchInfo.layout} label='编号'>
                                     {
-                                        getFieldDecorator('number', {
+                                        getFieldDecorator('numbercode', {
                                             rules: [
                                                 { required: false, message: '请输入编号' }
                                             ]
@@ -123,7 +123,7 @@ class SearchInfo extends Component {
     clear() {
         this.props.form.setFieldsValue({
             unit: undefined,
-            number: undefined,
+            numbercode: undefined,
             date: undefined,
             status: undefined,
             superunit: undefined
