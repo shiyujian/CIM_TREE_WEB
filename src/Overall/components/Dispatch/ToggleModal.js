@@ -126,6 +126,7 @@ class ToggleModal extends Component {
 	_sendDoc() {
 		const {
 			actions: { postSentDocAc, getSentInfoAc, getCopyUsersAc, sentMessageAc },
+			
 			toggleData: toggleData = {
 				type: 'NEWS',
 				status: 'ADD',
@@ -135,6 +136,7 @@ class ToggleModal extends Component {
 			form: { validateFields },
 			fileList = []
 		} = this.props;
+		console.log(this.props)
 		const {
 			sentUsers = [],
 			copyUsers = [],
@@ -188,6 +190,7 @@ class ToggleModal extends Component {
 					// return
 					postSentDocAc({}, sendData)
 						.then(rst => {
+							console.log(rst)
 							if (rst._id) {
 								message.success("发送文件成功！");
 								getSentInfoAc({
@@ -346,6 +349,7 @@ class ToggleModal extends Component {
 	}
 
 	render() {
+		console.log(this.props)
 		const {
 			form: { getFieldDecorator },
 			toggleData: toggleData = {

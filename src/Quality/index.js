@@ -184,6 +184,7 @@ const menus = [
 	},{
 		key: 'score',
 		name: '质量评分',
+		id:'QUALITYSCORES',
 		path: '/quality/score',
 		icon: <Icon name="tasks" />,
 		children: [
