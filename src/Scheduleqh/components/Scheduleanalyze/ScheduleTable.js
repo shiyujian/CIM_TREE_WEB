@@ -392,14 +392,14 @@ export default class ScheduleTable extends Component {
         return(
             <div>
                 <div style={{cursor:'pointer'}} onClick = {this.handleIsOpen.bind(this,index)}><img style={{height: '36px'}} src={DateImg}/></div>
-                <DatePicker
+                {/*<DatePicker
                     style={{textAlign:"center",visibility:"hidden"}}
                     defaultValue={moment(new Date(), 'YYYY/MM/DD')}
                     format={'YYYY/MM/DD'}
                     onChange={this.datepick1.bind(this,index)}
                     open={this.state.isOpen[index]}
                 >
-                </DatePicker>
+                </DatePicker>*/}
                 
             </div>
         )
