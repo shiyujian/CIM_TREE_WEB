@@ -1,11 +1,11 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API,base,USER_API,WORKFLOW_API} from '_platform/api';
+import { SERVICE_API,base,USER_API,WORKFLOW_API,FOREST_API} from '_platform/api';
 
 export const getAreaOK = createAction('获取组织机构树');
 export const getArea = createFetchAction(`${SERVICE_API}/loc-tree/code/LOC_ROOT/`, [getAreaOK]);
 export const getTrack = createFetchAction(`${base}/main/api/user/{{ID}}/location/`,[]);
-export const getRisk = createFetchAction(`${base}/main/api/potential-risk/?status=1`,[]);
+export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`,[]);
 export const getVedio = createFetchAction(`${SERVICE_API}/loc-tree/code/CAM_ROOT/`,[]);
 export const getSafeMonitor = createFetchAction(`${SERVICE_API}/monitors/code/`,[]);
 export const getUsers = createFetchAction(`${USER_API}/users/`,[]);
@@ -30,7 +30,7 @@ const getImodelInfoAc = createFetchAction(`${SERVICE_API}/documents/code/{{pk}}/
 // http://bimcd.ecidi.com:6544/service/construction/api/documents/code/safetytestfile201710301635170/?all=true
 const getWorkpackages = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
 //获取安全隐患
-const getRiskAll = createFetchAction(`${base}/main/api/potential-risk/`,[]);
+const getRiskAll = createFetchAction(`${base}/tree/patrolevents`,[]);
 //----质量管理的模块代码
 export const getChildrenOrgTree = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?root=false&depth=4`, []);
 export const fetchDefectDataByLoc = createFetchAction(`${base}/main/api/quality-defect/?project_location={{keyword}}`,[])
