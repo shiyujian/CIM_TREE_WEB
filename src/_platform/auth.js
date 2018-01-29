@@ -16,6 +16,7 @@ export const getUser = () => {
 		code: cookie.get('code'),
 		is_superuser: cookie.get('is_superuser') !== 'false',
 		org_code: cookie.get('org_code')
+
 	};
 };
 
@@ -62,8 +63,11 @@ export const setPermissions = (permissions) => {
 export const getPermissions = () => {
 	let permissions = [];
 	const text = window.localStorage.getItem('permissions');
+	// var add= localStorage.getItem("TREE_LOGIN_USER")
+	
 	try {
 		permissions = JSON.parse(text);
+		// permissions = JSON.parse(add);
 	} catch (e) {
 
 	}

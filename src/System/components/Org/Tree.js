@@ -10,8 +10,6 @@ export default class Tree extends Component {
 			platform: {org: {children = []} = {}},
 			sidebar: {node = {}} = {},
 		} = this.props;
-		console.log(this.props,"11")
-		
 		const {code} = node || {};
 		return (
 			<div>
@@ -28,7 +26,6 @@ export default class Tree extends Component {
 
 	componentDidMount() {
 		const {actions: {getOrgTree, changeSidebarField}} = this.props;
-		console.log(this.props,"22")
 		getOrgTree({}, {depth: 4}).then(rst => {
 			const {children: [first] = []} = rst || {};
 			if (first) {
@@ -42,6 +39,7 @@ export default class Tree extends Component {
 			platform: {org = {}},
 			actions: {changeAdditionField, changeSidebarField}
 		} = this.props;
+		console.log(this.props)
 		changeSidebarField('parent', org);
 		changeAdditionField('visible', true);
 	}
