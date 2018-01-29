@@ -785,7 +785,7 @@ export default class Lmap extends Component {
 	/*在地图上添加marker和polygan*/
 	createMarker(geo, oldMarker) {
 		var me = this;
-		debugger
+		// debugger
 		if (geo.properties.type != 'area') {
 			if (!oldMarker) {
 				if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {
@@ -833,13 +833,23 @@ export default class Lmap extends Component {
 	}
 
 	options = [
+		{label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'},
+		{label: '现场人员', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access',},
+		// {label: '安全监测', value: 'geojsonFeature_safety', IconUrl: require('./ImageIcon/camera.png'), IconName: 'shield',},
+		// {label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning',},
+		// {label: '360全景', value: 'geojsonFeature_360',IconUrl: require('./ImageIcon/360.png'), IconName: 'icon360',},
+		// {label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera',},
+		
+	];
+	options1 = [
 		{label: '现场人员', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access',},
 		{label: '安全监测', value: 'geojsonFeature_safety', IconUrl: require('./ImageIcon/camera.png'), IconName: 'shield',},
 		{label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning',},
-		{label: '360全景', value: 'geojsonFeature_360',IconUrl: require('./ImageIcon/360.png'), IconName: 'icon360',},
+		// {label: '360全景', value: 'geojsonFeature_360',IconUrl: require('./ImageIcon/360.png'), IconName: 'icon360',},
 		{label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera',},
-		{label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'}
+		// {label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'}
 	];
+	
 	//切换伟景行
 	switchToDgn(){
 		this.setState({
@@ -1018,7 +1028,7 @@ export default class Lmap extends Component {
 				delete  checkItems[c];
 			}
 		}
-		debugger
+		// debugger
 		let me = this;
 		if (featureName == 'geojsonFeature_people') {
 			me.onPeopleCheck(keys,checkItems);
@@ -1343,7 +1353,7 @@ export default class Lmap extends Component {
 							<img src={require('./ImageIcon/tuli.png')} className="imageControll"
 							     onClick={this.toggleIcon.bind(this)}/>
 							{
-								this.options.map((option, index) => {
+								this.options1.map((option, index) => {
 									if (option.label !== '区域地块') {
 										return (
 											<div key={index} className="imgIcon">

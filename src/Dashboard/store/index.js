@@ -1,6 +1,6 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API,base,USER_API,WORKFLOW_API} from '_platform/api';
+import { SERVICE_API,base,USER_API,WORKFLOW_API,DOMAIN} from '_platform/api';
 
 export const getAreaOK = createAction('获取组织机构树');
 export const getArea = createFetchAction(`${SERVICE_API}/loc-tree/code/LOC_ROOT/`, [getAreaOK]);
@@ -38,6 +38,10 @@ export const fetchDefectDataByLoc = createFetchAction(`${base}/main/api/quality-
 //获取360全景图地址
 const getVideo360List = createFetchAction(`${SERVICE_API}/metalist/video360list/`, []);
 
+//获取巡检路线
+const getMapRouter = createFetchAction(`http://120.24.210.86:227/tree/patrolroutes`, []);
+//获取轨迹列表
+const getMapList = createFetchAction(`http://120.24.210.86:227/tree/patrolpositions`, []);
 export const actions = {
 	getAreaOK,
 	getArea,
@@ -64,6 +68,9 @@ export const actions = {
 	getChildrenOrgTree,
 	fetchDefectDataByLoc,
 	getVideo360List,
+	
+	getMapRouter,
+	getMapList
 };
 export default handleActions({
 	[getAreaOK]: (state, {payload}) => {
