@@ -72,7 +72,7 @@ export default class Dashboard extends Component {
 		id: 'DASHBOARD.PLAN',
 		path: '/dashboard/plan',
 		name: '巡检路线',
-        icon: <Icon name="university"/>,
+        icon: <Icon name="line-chart"/>,
 		
 	}, {
 		key: 'danger',

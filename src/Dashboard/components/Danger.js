@@ -369,16 +369,18 @@ export default class Danger extends Component {
 		const {getRisk} = this.props.actions;
 		let me = this;
 		getRisk().then(data => {
+			console.log('data',data)
 			//安全隐患数据处理
+			let datas = data.content;
 			let riskObj = {}
-			data.forEach((v, index) => {
-				let levelNode = v["risk_level"];
-				let level = levelNode["风险级别"];
-				let name = levelNode["name"];
-				let response_org = v['response_org'];
+			datas.forEach((v, index) => {
+				// let levelNode = v["risk_level"];
+				let level = v["EventType"];
+				let name = v["Problem"];
+				let response_org = v['ReorganizerObj'];
 				// let measure = levelNode["风险控制措施"];
-				let content = v["risk_content"];
-				let coordinates = [v.coordinate.latitude, v.coordinate.longitude];
+				let content = v["ProblemType"];
+				let coordinates = ["22.5202031353", "113.893730454"];
 				riskObj[level] = riskObj[level] || {
 					key: level,
 					'properties': {
@@ -388,15 +390,15 @@ export default class Danger extends Component {
 				};
 				riskObj[level].children.push({
 					'type': 'danger',
-					key: v.id,
+					key: v.ID,
 					'properties': {
 						'content': content,
 						'level': level,
 						'measure': '',
 						'name': name,
-						'response_org':response_org?response_org.name:'',
-						beforeImgs: v['rectify_before'] ? v['rectify_before'].images : [],
-						afterImgs: v['rectify_after'] ? v['rectify_after'].images : []
+						'response_org':response_org?response_org.Full_Name:'',
+						// beforeImgs: v['rectify_before'] ? v['rectify_before'].images : [],
+						// afterImgs: v['rectify_after'] ? v['rectify_after'].images : []
 					},
 					'geometry': {
 						'type': 'Point',
@@ -749,8 +751,8 @@ export default class Danger extends Component {
 						<h2><span>整改状态：</span>未整改</h2>
 						<h2><span>整改措施：</span>${properties.measure ? properties.measure : ''}</h2>
 						<h2><span>责任单位：</span>${properties.response_org}</h2>
-						<a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
 					</div>`
+					//<a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
 				)
 			}
 			case 'monitor': {
@@ -785,7 +787,7 @@ export default class Danger extends Component {
 	/*在地图上添加marker和polygan*/
 	createMarker(geo, oldMarker) {
 		var me = this;
-		debugger
+		// debugger
 		if (geo.properties.type != 'area') {
 			if (!oldMarker) {
 				if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {
@@ -1014,6 +1016,7 @@ export default class Danger extends Component {
 
 	/*显示隐藏地图marker*/
 	onCheck(keys, featureName) {
+		console.log('keys',keys,featureName)
 		var content = this.getPanelData(featureName);
 		//获取所有key对应的数据对象
 		this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
@@ -1026,7 +1029,7 @@ export default class Danger extends Component {
 				delete  checkItems[c];
 			}
 		}
-		debugger
+		// debugger
 		let me = this;
 		if (featureName == 'geojsonFeature_people') {
 			me.onPeopleCheck(keys,checkItems);
@@ -1282,9 +1285,9 @@ export default class Danger extends Component {
 						style={this.state.menuIsExtend ? {transform: 'translateX(0)', width: this.state.menuWidth} :
 							{transform: `translateX(-${this.state.menuWidth}px)`, width: this.state.menuWidth}}>
 						<aside className="aside" draggable="false">
-							<div>
+							{/*<div>
 								<UserSelect placeholder="查询人员" onChange={this.queryUser}></UserSelect>
-							</div>
+							</div>*/}
 							<Collapse defaultActiveKey={[this.options[0].value]} accordion>
 								{
 									this.options.map((option) => {
@@ -1328,12 +1331,12 @@ export default class Danger extends Component {
 								     style={{left: this.state.menuWidth}}
 								     onClick={this.extendAndFold.bind(this)}>展开</div>
 						}
-						<div style={{
+						{/*<div style={{
 							position: 'absolute', bottom: 0, left: 0,
 							width: '100%', lineHeight: '20px',
 							textAlign: 'center', zIndex: 1000, background: '#fff'
 						}}
-						>当前在线人数:{this.state.userOnlineNumber}</div>
+						>当前在线人数:{this.state.userOnlineNumber}</div>*/}
 					</div>
 					{
 						this.state.isVisibleMapBtn ?

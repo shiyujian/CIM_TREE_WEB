@@ -1,11 +1,13 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API,base,USER_API,WORKFLOW_API} from '_platform/api';
+
+import { SERVICE_API,base,USER_API,WORKFLOW_API,FOREST_API} from '_platform/api';
+
 
 export const getAreaOK = createAction('获取组织机构树');
 export const getArea = createFetchAction(`${SERVICE_API}/loc-tree/code/LOC_ROOT/`, [getAreaOK]);
 export const getTrack = createFetchAction(`${base}/main/api/user/{{ID}}/location/`,[]);
-export const getRisk = createFetchAction(`${base}/main/api/potential-risk/?status=1`,[]);
+export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`,[]);
 export const getVedio = createFetchAction(`${SERVICE_API}/loc-tree/code/CAM_ROOT/`,[]);
 export const getSafeMonitor = createFetchAction(`${SERVICE_API}/monitors/code/`,[]);
 export const getUsers = createFetchAction(`${USER_API}/users/`,[]);
@@ -22,7 +24,7 @@ export const getWKsOk = createAction('获取流程成功');
 export const getWks = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[]);
 const getDesignStage = createFetchAction(`${SERVICE_API}/metalist/designstage/`,[]);
 //批量获取设计成果
-const getDocumentList = createFetchAction(`${SERVICE_API}/documentgetlist/`,[]);
+const getDocumentList = createFetchAction(`${SERVICE_API}/documentgetlist/`,[])
 //批量模型下载地址
 const getImodelInfoAc = createFetchAction(`${SERVICE_API}/documents/code/{{pk}}/?all=true`,[]);
 //获取安全规则制度
@@ -30,7 +32,7 @@ const getImodelInfoAc = createFetchAction(`${SERVICE_API}/documents/code/{{pk}}/
 // http://bimcd.ecidi.com:6544/service/construction/api/documents/code/safetytestfile201710301635170/?all=true
 const getWorkpackages = createFetchAction(`${SERVICE_API}/workpackages/code/{{code}}/?all=true`,[]);
 //获取安全隐患
-const getRiskAll = createFetchAction(`${base}/main/api/potential-risk/`,[]);
+const getRiskAll = createFetchAction(`${base}/tree/patrolevents`,[]);
 //----质量管理的模块代码
 export const getChildrenOrgTree = createFetchAction(`${SERVICE_API}/project-tree/code/{{code}}/?root=false&depth=4`, []);
 export const fetchDefectDataByLoc = createFetchAction(`${base}/main/api/quality-defect/?project_location={{keyword}}`,[])
@@ -38,6 +40,10 @@ export const fetchDefectDataByLoc = createFetchAction(`${base}/main/api/quality-
 //获取360全景图地址
 const getVideo360List = createFetchAction(`${SERVICE_API}/metalist/video360list/`, []);
 
+//获取巡检路线
+const getMapRouter = createFetchAction(`http://120.24.210.86:227/tree/patrolroutes`, []);
+//获取轨迹列表
+const getMapList = createFetchAction(`http://120.24.210.86:227/tree/patrolpositions`, []);
 export const actions = {
 	getAreaOK,
 	getArea,
@@ -64,6 +70,9 @@ export const actions = {
 	getChildrenOrgTree,
 	fetchDefectDataByLoc,
 	getVideo360List,
+	
+	getMapRouter,
+	getMapList
 };
 export default handleActions({
 	[getAreaOK]: (state, {payload}) => {

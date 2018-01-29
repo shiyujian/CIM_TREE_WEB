@@ -28,7 +28,6 @@ export default class ScheduleTable extends Component {
             etime2: moment().format('2017-11-24 23:59:59'),
             etime3: moment().format('2017-11-24 23:59:59'),
             etime4: moment().format('2017-11-24 23:59:59'),
-            etime5: moment().format('YYYY-MM-DD HH:mm:ss'),
             loading1: false,
             loading2: false,
             loading3: false,
@@ -437,14 +436,14 @@ export default class ScheduleTable extends Component {
         if(index == 2 ) {
             const {etime2} = this.state;
             let param = {
-                etime:etime2?moment(etime2).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):''
+                etime:etime2?moment(etime2).format('YYYY-MM-DD HH:mm:ss'):''
             }
             this.qury(index,param);
         }
         if(index == 3 ) {
             const {etime3,section} = this.state;
             let param = {
-                etime:etime3?moment(etime3).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):'',
+                etime:etime3?moment(etime3).format('YYYY-MM-DD HH:mm:ss'):'',
                 section
             }
             this.qury(index,param);
@@ -452,7 +451,7 @@ export default class ScheduleTable extends Component {
         if(index == 4 ) {
             const {etime4,section,smallclass} = this.state;
             let param = {
-                etime:etime4?moment(etime4).add(8, 'h').format('YYYY-MM-DD HH:mm:ss'):'',
+                etime:etime4?moment(etime4).format('YYYY-MM-DD HH:mm:ss'):'',
                 section,
                 smallclass
             }
@@ -681,6 +680,7 @@ export default class ScheduleTable extends Component {
             this.setState({loading4:true})
             getCountThin({},param)
             .then(rst => {
+                console.log('rst',rst)
                 this.setState({loading4:false})
                 if(!rst)
                     return
