@@ -81,7 +81,7 @@ export default class System extends Component {
 		// }, 
 		{
 			key: 'Person',
-			id: 'SETUP. ',
+			id: 'SETUP.PERSON ',
 			name: '用户管理',
 			path: '/system/person',
 			icon: <Icon name="users"/>

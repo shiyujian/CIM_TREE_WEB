@@ -52,11 +52,20 @@ export default class Roles extends Component {
 	}
 
 	componentDidMount() {
+
+		// const permissions2 = [
+		// 	{ id: 'HOME', value: "1" },
+		// 	{ id: 'DISPLAY', value: "0" },
+		// 	{ id: 'MANAGE', value: "1" },
+		// 	{ id: 'DATUM', value: "1" },
+		//  { id: 'SAFETY', value: "0" },
+		// ]
 		const {actions: {getRoles}, actions: {changeTableField}} = this.props;
 		getRoles().then((roles = []) => {
 			const [role = {}] = roles || []; //默认第一个
 			role && changeTableField('role', role);
 			role && role.permissions && changeTableField('permissions', role.permissions);
+			// role && role.permissions && changeTableField('permissions', permissions2);
 		});
 	}
 
@@ -69,5 +78,6 @@ export default class Roles extends Component {
 		const role = roles.find(role => role.id === +eventKey);
 		role && changeTableField('role', role);
 		role && role.permissions && changeTableField('permissions', role.permissions);
+		// role && role.permissions && changeTableField('permissions', permissions2);
 	}
 }

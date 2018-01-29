@@ -39,6 +39,8 @@ export default class EntryTable extends Component {
             isOpen: [false,false,false],
             biaoduan:[],
             shuzhi:[],
+            nowmessage:[],
+            nowmessagelist:[],
         }
     }
     componentWillReceiveProps(nextProps){
@@ -62,10 +64,13 @@ export default class EntryTable extends Component {
 
     componentDidMount(){
 
-        const {actions: {getNurserysCountFast,getfactory,gettreeevery}} = this.props;
-        // gettreeevery().then(rst=>{
-            
-        // })
+        const {actions: {getNurserysCountFast,getfactory,gettreeevery,nowmessage}} = this.props;
+           nowmessage().then(rst=>{
+                console.log(rst.content,"xionsui");
+                this.setState({
+                    nowmessagelist:rst.content,
+                })
+            })
             this.setState({loading5:true})
             this.setState({loading4:true})
             this.setState({loading3:true})
@@ -218,26 +223,38 @@ export default class EntryTable extends Component {
         return (
             <div>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
-                    <Col span={6}>
+                    <Col span={5}>
                         <Spin spinning={this.state.loading3}>
                             <SumTotal search={this.searchSum(0)} title='苗木累计进场总数' title1='Total number of nursery stock'>
                                 <div>{amount}</div>
                             </SumTotal>
                         </Spin>
                     </Col>
-                    <Col span={6}>
+                    <Col span={5}>
                         <Spin spinning={this.state.loading4}>
                             <SumTotal search={this.searchSum(1)} title='苗木今日进场总数' title1='Total number of nursery stock today'>
                                 <div>{this.state.today}</div>
                             </SumTotal>
                         </Spin>
                     </Col>
-                    <Col span={6}>
+                    <Col span={5}>
                         <Spin spinning={this.state.loading5}>
                             <SumTotal search={this.searchSum(2)} title='供苗商总数' title1='Total number of nursery'>
                                 <div>{this.state.nurserys}</div>
                             </SumTotal>
                         </Spin>
+                    </Col>
+                    <Col span={6}>
+                     <div className="nowmessage" style={{border:"1px solid #666"}}>
+                    <div>实时种植信息</div>
+                    <div>
+                    {this.state.nowmessagelist.map((item,index)=>
+                            <div key={item.id}>
+                              <span>{item.CreateTime}{item.Factory}{item.Inputer}录入{item.TreeTypeObj.TreeTypeNo}</span>
+                            </div>
+                        )}
+                    </div>
+                    </div>
                     </Col>
                 </Row>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
@@ -266,14 +283,14 @@ export default class EntryTable extends Component {
         return(
             <div>
                 <div style={{cursor:'pointer'}} onClick = {this.handleIsOpen.bind(this,index)}><img style={{height:'36px'}} src={DateImg}/></div>
-                <DatePicker
+                {/*<DatePicker
                     style={{textAlign:"center",visibility:"hidden"}}
                     defaultValue={moment(new Date(), 'YYYY/MM/DD')}
                     format={'YYYY/MM/DD'}
                     onChange={this.datepick1.bind(this,index)}
                     open={this.state.isOpen[index]}
                 >
-                </DatePicker>
+                </DatePicker>*/}
             </div>
         )
     }
