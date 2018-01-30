@@ -31,6 +31,11 @@ export default class Material extends Component {
             loading:false
         }
     }
+    //Tab栏的切换
+    tabChange(tabValue) {
+        const {actions: {setTabActive}} = this.props;
+        setTabActive(tabValue);
+    }
 
     render() {
         const {
@@ -39,7 +44,8 @@ export default class Material extends Component {
                     list = []
                 } = {}
             } = {},
-            keycode
+            keycode,
+            tabValue = '1',
         } = this.props;
         return (
             <Body>
@@ -52,7 +58,7 @@ export default class Material extends Component {
                                 {...this.state}/>
                 </Sidebar>
                 <Content>
-                    <Tabs defaultActiveKey="1" >
+                    <Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)} >
                         <TabPane tab="机械设备" key="1">
                             <Filter  {...this.props} {...this.state}/>
                             <Table {...this.props}/>

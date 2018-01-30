@@ -13,6 +13,7 @@ const additionReducer = fieldFactory(ID, 'addition');
 const documentReducer = documentFactory(ID);
 // export const getdirTreeOK = createAction(`${ID}_获取文档结构树`);
 // export const getdirTree = createFetchAction(`${SERVICE_API}/dir-tree/code/QH01/`, [getdirTreeOK]);
+export const setTabActive = createAction(`${ID}设置当前选中的tab`);
 export const getdocumentOK = createAction(`${ID}_搜索目录文档`);
 export const getdocument = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [getdocumentOK]);
 export const deletedoc = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, 'DELETE');
@@ -30,6 +31,7 @@ export const setkeycode =createAction(`${ID}_setkeycode`);
 export const actions = {
 	// getdirTree,
 	// getdirTreeOK,
+    setTabActive,
     getdocumentOK,
     getdocument,
     changeDocs,
@@ -65,6 +67,10 @@ export default handleActions({
     [combineActions(...actionsMap(followReducer))]: (state, action) => ({
         ...state,
         follow: followReducer(state.follow, action)
+    }),
+    [setTabActive]: (state, {payload}) => ( {
+        ...state,
+        tabValue: payload
     }),
     [getdocumentOK]: (state, {payload}) => ({
         ...state,
