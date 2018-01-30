@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Table, Checkbox, Button, Switch} from 'antd';
-import { MODULES, MODULES2} from '_platform/api';
+import { MODULES, MODULES2,MODULES3} from '_platform/api';
 import Card from '_platform/components/panels/Card';
 import {getUser} from '_platform/auth';
 export default class PermissionTable extends Component {
@@ -12,9 +12,12 @@ export default class PermissionTable extends Component {
 	}
 	static propTypes = {};
 	render() {
+		console.log("MODULES",MODULES)
+		console.log("MODULES2",MODULES2)
+		console.log("MODULES3",MODULES3)
 		let userPermi;
 		if (this.state.userLogin === "admin") {
-			userPermi = MODULES.map(ele => {
+			userPermi = MODULES3.map(ele => {
 				return { ...ele };
 			});
 		} else {
@@ -70,6 +73,7 @@ export default class PermissionTable extends Component {
 			table: {role = {}, permissions = []} = {},
 			actions: {changeTableField, putRole, getRoles},
 		} = this.props;
+		console.log("permissions",permissions)
 		changeTableField('editing', false);
 		putRole({id: role.id}, {name: role.name, grouptype: role.grouptype, permissions}).then((rst) => {
 			getRoles().then((roles = []) => {

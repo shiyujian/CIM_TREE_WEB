@@ -4,7 +4,7 @@
 .login-wrap {
   width: 100%;
   height: 100%;
-  background: url(./images/bg_01.png) no-repeat center center;
+  background: url(./images/bg_06.png);
   overflow: hidden;
   left: 0;
   top: 0;
@@ -29,36 +29,50 @@
   }
   
   .main-center{
-    width:1267px;
+    width:1158px;
     height: 60%;
     min-height:479px;
-    margin-left: auto;
-    margin-right: auto;
+    position: fixed;
+    left: 0;
+    top:0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
     // position: relative;
   }
- .main-icon{
-   width: 80%;
-   height: 180px;
-   margin: 0 auto;
- }
+//  .main-icon{
+//     position: absolute;
+//     left: 0;
+//     top:-100px;
+//     background: url(./images/bg_03.png)no-repeat;
+//  }
  .main-on{
-   float: left;
-   margin-left: 10px;
-   padding-top:30px;
+   width: 900px;
+   height: 900px;
+  position: absolute;
+  left: -378px;
+  top:-516px;
+  z-index: 100;
+  background: url(./images/bg_04.png)no-repeat;
  }
  .main-at{
-  padding-top: 110px;
-   float: right;
+  width: 360px;
+  height: 360px;
+  position: absolute;
+  right: -170px;
+  z-index: 100;  
+  top: -160px;
+  background: url(./images/bg_03.png)no-repeat;
  }
   @media screen and(max-width:1918px){
     .main-center{
-      width: 1088px;
+      width: 1158px;
       margin-left: auto;
       margin-right: auto;
     .main-logo{
               margin-top: 1%;
-              height:490px;
-              width: 700px;
+              width: 770px;
+              height:506px;
               .main-logos{
                 height: 100%;
                 width: 100%;
@@ -67,7 +81,7 @@
         .main-img{
           width:388px;
           height:95%;
-          height: 550px;
+          height: 571px;
           background: url(./images/float.png)no-repeat;
           background-size:cover;
         }
@@ -78,13 +92,13 @@
   }
   @media screen and(max-width:1440px){
     .main-center{
-      width: 1088px;
+      width: 1158px;
       margin-left: auto;
       margin-right: auto;
       .main-logo{
               margin-top: 1%;
-              height:490px;
-              width: 700px;
+              width: 770px;
+              height:506px;
               .main-logos{
                 height: 100%;
                 width: 100%;
@@ -96,16 +110,16 @@
   }
   @media screen and(max-width:1366px){
     .main-center{
-      width: 1088px;
+      width: 1158px;
       .main-logo{
         margin-top: 1%;
-        height:490px;
-        width: 700px;
+        width: 770px;
+        height:506px;
         .main-logos{
           height: 100%;
           width: 100%;
       }
-  }
+      }
     
     }
     
@@ -117,18 +131,16 @@
     float: left;
   }
   .main-logos{
-    width: 864px;
-    height:530px;
+    width: 770px;
+    height:506px;
   }
 
   .main-box {
     float: left;
-    display: table;
   }
   .main-img{
-    width: 403px;
-    height:95%;
-    height: 595px;
+    width: 388px;
+    height: 571px;
     background: url(./images/float.png)no-repeat;
     background-size:cover;
   }
@@ -146,8 +158,27 @@
     
   }
 
+  .login-title1 {
+    position: absolute;
+    left: -80px;
+    top: -110px;
+    width: 300px;
+    display: block;
+    overflow: hidden;
+    // margin: 0 auto 58px;
+    img {
+      width: 30%;
+      /*width: 100px;*/
+      max-width: 50%;
+      display: block;
+      margin: 0 auto;
+    }
+  }
   .login-title {
-    width: 100%;
+    position: absolute;
+    right:-160px;
+    top: -30px;
+    width: 300px;
     display: block;
     overflow: hidden;
     // margin: 0 auto 58px;
