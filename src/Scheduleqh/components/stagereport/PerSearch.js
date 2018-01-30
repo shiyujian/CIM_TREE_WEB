@@ -70,7 +70,8 @@ export default class PerSearch extends Component {
                 pk:userList[i].id,
                 code:userList[i].account.person_code,
                 name: userList[i].account.person_name,
-                username: userList[i].username
+                username: userList[i].username,
+                org:userList[i].organization,
             })
         }
         dataList = tree.map(node=>({
@@ -79,9 +80,10 @@ export default class PerSearch extends Component {
                 code: node.code,
                 name: node.name,
                 pk: node.pk,
-                username: node.username
+                username: node.username,
+                org:node.org,
             }),
-            value: 'C_PER' + '#' + node.code + '#' + node.name + '#' + node.pk + '#' + node.username,
+            value: 'C_PER' + '#' + node.code + '#' + node.name + '#' + node.pk + '#' + node.username + '#' + node.org,
             fetching: false
         }));
         return (
