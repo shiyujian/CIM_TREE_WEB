@@ -25,7 +25,7 @@ class Plan extends Component {
 			treedataSource: [],
 			treetype: [],//树种
 			key: 6,
-			
+
 		};
 	}
 
@@ -116,13 +116,13 @@ class Plan extends Component {
 		},];
 		this.setState({
 			visible: true,
-			treedataSource:treedata
+			treedataSource: treedata
 		})
 		this.props.form.setFieldsValue({
 			superunit: undefined,
 			unit: undefined,
 			dataReview: undefined,
-			number: undefined,
+			numbercode: undefined,
 			timedate: moment().add(1, 'days').format('YYYY-MM-DD')
 		})
 
@@ -199,141 +199,133 @@ class Plan extends Component {
 		});
 	}
 	// 发起填报
-	sendWork(){
+	sendWork() {
 		const {
-			actions:{
+			actions: {
 				createFlow,
-				getWorkflowById,
-				putFlow
+			getWorkflowById,
+			putFlow
 			},
 			location,
 		} = this.props
-		const{treedataSource} = this.state
+		const { treedataSource } = this.state
 		let user = getUser();//当前登录用户
 		let me = this;
 		//共有信息
-        let postData = {};
-        //专业信息
-        let attrs = {};
-        console.log("登录用户",user)
-		console.log("表格信息",treedataSource)
-		me.props.form.validateFields((err,values)=>{
-			console.log("表单信息",values);
-			if(!err){
+		let postData = {};
+		console.log("登录用户", user)
+		console.log("表格信息", treedataSource)
+		me.props.form.validateFields((err, values) => {
+			console.log("表单信息", values);
+			if (!err) {
 				// 共有信息
-                for(let value in values){
-                    if(value === 'unit'){
-                        postData.unit = values[value];
-                    }else if (value === 'superunit'){
-                        postData.superunit = values[value];
-                    }else if (value === 'dataReview'){
-                        postData.dataReview = values[value];
-                    }else if (value === 'number'){
-                        postData.number = values[value];
-                    }else if (value === 'timedate'){
-                        postData.timedate = values[value];
-                    }else{
-                        //是否为数字  数字需要查找范围，必须转化为数字类型
-                        if(!isNaN(values[value]) ){
-                            attrs[value] = Number(values[value])
-                        }else{
-                            attrs[value] = values[value]
-                        } 
-                    }
+				for (let value in values) {
+					if (value === 'unit') {
+						postData.unit = values[value];
+					} else if (value === 'superunit') {
+						postData.superunit = values[value];
+					} else if (value === 'dataReview') {
+						postData.dataReview = values[value];
+					} else if (value === 'numbercode') {
+						postData.numbercode = values[value];
+					} else if (value === 'timedate') {
+						postData.timedate = values[value];
+					} else {
+						console.log(1111)
+					}
 				}
-				postData.upload_unit = user.org?user.org:'';
-                postData.upload_person = user.name?user.name:user.username;
+				postData.upload_unit = user.org ? user.org : '';
+				postData.type = '每日计划进度';
+				postData.upload_person = user.name ? user.name : user.username;
 				postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
-				console.log("postData",postData)
+				console.log("postData", postData)
 				const currentUser = {
-                    "username": user.username,
-                    "person_code": user.code,
-                    "person_name": user.name,
-                    "id": parseInt(user.id)
+					"username": user.username,
+					"person_code": user.code,
+					"person_name": user.name,
+					"id": parseInt(user.id)
 				};
 				let subject = [{
-                    //共有属性
-                    "postData":JSON.stringify(postData),
-                    //专业属性
-                    "attrs":JSON.stringify(attrs),
-                    //数据清单
-                    "treedataSource":JSON.stringify(treedataSource),
-                }];
+					//共有属性
+					"postData": JSON.stringify(postData),
+					//数据清单
+					"treedataSource": JSON.stringify(treedataSource),
+				}];
 				// 准备发起流程
 				const nextUser = this.member;
 				let WORKFLOW_MAP = {
-                    name:"每日计划进度计划填报流程",
-                    desc:"综合管理模块每日计划进度填报流程",
-                    code:WORKFLOW_CODE.每日进度填报流程
-                };
-                let workflowdata={
-                    name: WORKFLOW_MAP.name,
-                    description: WORKFLOW_MAP.desc,
-                    subject: subject,
-                    code: WORKFLOW_MAP.code,
-                    creator: currentUser,
-                    plan_start_time: null,
-                    deadline: null,
-                    "status":2
+					name: "每日计划进度填报流程",
+					desc: "综合管理模块每日计划进度填报流程",
+					code: WORKFLOW_CODE.每日进度填报流程
+				};
+				let workflowdata = {
+					name: WORKFLOW_MAP.name,
+					description: WORKFLOW_MAP.desc,
+					subject: subject,
+					code: WORKFLOW_MAP.code,
+					creator: currentUser,
+					plan_start_time: null,
+					deadline: null,
+					"status": 2
 				}
 				//创建流程
-				createFlow({},workflowdata).then((instance)=>{
-                    console.log("instance",instance)
-                    if(!instance.id){
-                        notification.error({
-                            message:'数据提交失败',
-                            duration:2
-                        })
-                        return;
-                    }
-                    const {id,workflow: {states = []} = {}} = instance;
-                    const [{id:state_id,actions:[action]}] = states;
-                	//获取流程信息 
-                    getWorkflowById({id:id}).then(instance =>{
-                        if(instance && instance.current){
-                            let currentStateId = instance.current[0].id;
-                            let nextStates = getNextStates(instance,currentStateId);
-                            console.log('nextStates',nextStates)
-                            let stateid = nextStates[0].to_state[0].id;
+				createFlow({}, workflowdata).then((instance) => {
+					console.log("instance", instance)
+					if (!instance.id) {
+						notification.error({
+							message: '数据提交失败',
+							duration: 2
+						})
+						return;
+					}
+					const { id, workflow: { states = [] } = {} } = instance;
+					const [{ id: state_id, actions: [action] }] = states;
+					//获取流程信息 
+					getWorkflowById({ id: id }).then(instance => {
+						if (instance && instance.current) {
+							let currentStateId = instance.current[0].id;
+							let nextStates = getNextStates(instance, currentStateId);
+							console.log('nextStates', nextStates)
+							let stateid = nextStates[0].to_state[0].id;
 
-                            let postInfo={
-                                next_states:[{
-                                    state:stateid,
-                                    participants:[nextUser],//下一步执行人
-                                    deadline:null,
-                                    remark:null
-                                }],
-                                state:instance.workflow.states[0].id,
-                                executor:currentUser,
-                                action:nextStates[0].action_name,
-                                note:"提交",
-                                attachment:null
-                            }
-                            let data={pk:id};
-                            //提交流程到下一步
-                            putFlow(data,postInfo).then(rst =>{
-                                if(rst && rst.creator){
-                                    notification.success({
-                                        message: '流程提交成功',
-                                        duration: 2
-                                    });
-                                    this.setState({
-                                        visible:false
-                                    })
-                                }else{
-                                    notification.error({
-                                        message: '流程提交失败',
-                                        duration: 2
-                                    });
-                                    return;
-                                }
-                            });
-                            
-                            
-                        }
-                    });
-                    
-                });
+							let postInfo = {
+								next_states: [{
+									state: stateid,
+									participants: [nextUser],//下一步执行人
+									deadline: null,
+									remark: null
+								}],
+								state: instance.workflow.states[0].id,
+								executor: currentUser,
+								action: nextStates[0].action_name,
+								note: "提交",
+								attachment: null
+							}
+							let data = { pk: id };
+							//提交流程到下一步
+							putFlow(data, postInfo).then(rst => {
+								if (rst && rst.creator) {
+									notification.success({
+										message: '流程提交成功',
+										duration: 2
+									});
+									this.setState({
+										visible: false
+									})
+								} else {
+									notification.error({
+										message: '流程提交失败',
+										duration: 2
+									});
+									return;
+								}
+							});
+
+
+						}
+					});
+
+				});
 			}
 		})
 	}
@@ -390,7 +382,7 @@ class Plan extends Component {
 										<Col span={8}>
 											<FormItem {...FormItemLayout} label='编号'>
 												{
-													getFieldDecorator('number', {
+													getFieldDecorator('numbercode', {
 														rules: [
 															{ required: true, message: '请输入编号' }
 														]
@@ -479,11 +471,6 @@ class Plan extends Component {
 			title: '编号',
 			dataIndex: 'number',
 			key: 'number',
-			width: '10%'
-		}, {
-			title: '备注',
-			dataIndex: 'remarks',
-			key: 'remarks',
 			width: '10%'
 		}, {
 			title: '提交人',

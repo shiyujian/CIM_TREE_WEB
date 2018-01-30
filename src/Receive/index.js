@@ -47,13 +47,13 @@ export default class ReceiveContainer extends Component {
 		icon: <Icon name="thermometer-empty"/>
 	}, {
 		key: 'DistributionManagement',
-		id: 'DISTRIBUTIONMANAGEMENT',
+		id: 'RECEIVE.DISTRIBUTIONMANAGEMENT',
 		name: '发放管理',
 		path: '/receive/distributionManagement',
 		icon: <Icon name="thermometer-empty"/>
 	}, {
 		key: 'InventoryManagement',
-		id: 'INVENTORYMANAGEMENT',
+		id: 'RECEIVE.INVENTORYMANAGEMENT',
 		name: '库存管理',
 		path: '/receive/inventoryManagement',
 		icon: <Icon name="building-o"/>
