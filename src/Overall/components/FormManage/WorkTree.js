@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Tree,Spin} from 'antd';
 const TreeNode = Tree.TreeNode;
 
-export default class DatumTree extends Component {
+export default class WorkTree extends Component {
 
 	static propTypes = {};
 
@@ -13,7 +13,7 @@ export default class DatumTree extends Component {
 					<TreeNode key={`${item.pk}--${item.code}--children`}
 					          title={item.name}>
 						{
-							DatumTree.loop(item.children)
+							WorkTree.loop(item.children)
 						}
 					</TreeNode>
 				);
@@ -34,7 +34,7 @@ export default class DatumTree extends Component {
                             defaultExpandAll={true}
                             onSelect={this.props.onSelect}>
                             {
-                                DatumTree.loop(treeData)
+                                WorkTree.loop(treeData)
                             }
                         </Tree>
                         : ''

@@ -29,9 +29,10 @@ export default (ID, service = '') => {
 			const [{id: subject_id, name: subject_name} = {}] = subject;
 			const {workflow: {name: type, code} = {}} = workflowactivity;
 			const {current = []} = workflowactivity;
-			//console.log("_platform task",task,current,code)
-			let exeName = "";
+			console.log("_platform task",task)
+			let exeName = task.state.participants&&task.state.participants[0]?task.state.participants[0].executor.person_name:" ";
 			if(current){
+				exeName = "";
 				current.map(cur => {
 					let participant = cur.participants;
 					participant.map(par => {
