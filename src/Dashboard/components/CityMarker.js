@@ -16,7 +16,7 @@ export default class CityMarker extends Component {
 					 "left": 0,
 					 "right": 0
 				 }}>
-				<iframe id="showCityMarkerId" src="/xaxq/index.html" frameBorder="0"
+				<iframe id="showCityMarkerId" src="/xaxq_xa/index.html" frameBorder="0"
 						style={{width: '100%', height: '100%'}}></iframe>
 			</div>
 		)

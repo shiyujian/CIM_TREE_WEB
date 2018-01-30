@@ -126,19 +126,27 @@ class ToggleModal extends Component {
 	_sendDoc() {
 		const {
 			actions: { postSentDocAc, getSentInfoAc, getCopyUsersAc, sentMessageAc },
+			
+			toggleData: toggleData = {
+				type: 'NEWS',
+				status: 'ADD',
+				visible: false,
+				editData: null
+			},
 			form: { validateFields },
 			fileList = []
 		} = this.props;
+		console.log(this.props)
 		const {
 			sentUsers = [],
 			copyUsers = [],
 			isSentMsg = false,
 			isCopyMsg = false,
 		} = this.state;
-		if (sentUsers.length === 0) {
-			message.warning("请添加接收单位！");
-			return
-		}
+		// if (sentUsers.length === 0) {
+		// 	message.warning("请添加接收单位！");
+		// 	return
+		// }
 		// if (copyUsers.length === 0) {
 		// 	message.warning("请添加抄送单位！");
 		// 	return
@@ -182,6 +190,7 @@ class ToggleModal extends Component {
 					// return
 					postSentDocAc({}, sendData)
 						.then(rst => {
+							console.log(rst)
 							if (rst._id) {
 								message.success("发送文件成功！");
 								getSentInfoAc({
@@ -340,6 +349,7 @@ class ToggleModal extends Component {
 	}
 
 	render() {
+		console.log(this.props)
 		const {
 			form: { getFieldDecorator },
 			toggleData: toggleData = {

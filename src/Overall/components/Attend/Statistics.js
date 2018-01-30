@@ -162,6 +162,7 @@ class Statistics extends Component {
 			platform: { users = [] },
 			form: { getFieldDecorator }
 		} = this.props;
+		console.log("countInfo",countInfo)
 		return (
 			<div>
 				<Row span={12}>
@@ -386,6 +387,7 @@ class Statistics extends Component {
 
 	_getOptions_1() {
 		const { countInfo = [] } = this.props;
+		// console.log("!111111",countInfo)
 		let options = {
 			color: ['#5e9cd3', '#eb7d3c', '#a5a5a5', '#febf2d'],
 			tooltip: {

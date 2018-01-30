@@ -29,29 +29,29 @@ export default class Roles extends Component {
 		return (
 			<div>
 				<Tabs defaultActiveKey="1">
-					<TabPane tab="系统角色" key="1">
-						<Card title="系统角色" extra={<Button type="primary" ghost onClick={this.append.bind(this, 0)}>添加系统角色</Button>}>
+					<TabPane tab="苗圃角色" key="1">
+						<Card title="苗圃角色" extra={<Button type="primary" ghost onClick={this.append.bind(this, 0)}>添加苗圃角色</Button>}>
 							<Table size="middle" bordered
 								style={{ marginBottom: "10px", overflow: "hidden" }}
 								columns={this.columns} dataSource={systemRoles} rowKey="id" />
 						</Card>
 					</TabPane>
-					<TabPane tab="项目角色" key="2">
-						<Card title="项目角色" extra={<Button type="primary" ghost onClick={this.append.bind(this, 1)}>添加项目角色</Button>}>
+					<TabPane tab="施工角色" key="2">
+						<Card title="施工角色" extra={<Button type="primary" ghost onClick={this.append.bind(this, 1)}>添加施工角色</Button>}>
 							<Table size="middle" bordered
 								style={{ marginBottom: "10px", overflow: "hidden" }}
 								columns={this.columns} dataSource={projectRoles} rowKey="id" />
 						</Card>
 					</TabPane>
-					<TabPane tab="专业角色" key="3">
-						<Card title="专业角色" extra={<Button type="primary" ghost onClick={this.append.bind(this, 2)}>添加专业角色</Button>}>
+					<TabPane tab="监理角色" key="3">
+						<Card title="监理角色" extra={<Button type="primary" ghost onClick={this.append.bind(this, 2)}>添加监理角色</Button>}>
 							<Table size="middle" bordered
 								style={{ marginBottom: "10px", overflow: "hidden" }}
 								columns={this.columns} dataSource={professionRoles} rowKey="id" />
 						</Card>
 					</TabPane>
-					<TabPane tab="部门角色" key="4">
-						<Card title="部门角色" extra={<Button type="primary" onClick={this.append.bind(this, 3)}>添加部门角色</Button>}>
+					<TabPane tab="业主角色" key="4">
+						<Card title="业主角色" extra={<Button type="primary" onClick={this.append.bind(this, 3)}>添加业主角色</Button>}>
 							<Table size="middle" bordered
 								style={{ marginBottom: "10px", overflow: "hidden" }}
 								columns={this.columns} dataSource={departmentRoles} rowKey="id" />

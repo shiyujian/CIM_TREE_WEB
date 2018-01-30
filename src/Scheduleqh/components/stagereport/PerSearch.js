@@ -66,7 +66,7 @@ export default class PerSearch extends Component {
             user.groups.map(group=>{
                 if(group.permissions instanceof Array){
                     group.permissions.map(per=>{
-                        if(per === "flow_approval") {
+                        if(per === "flow_approval"||per === "appmeta.DATUM.READ") {
                             userList.push(user)
                         }
                     })
@@ -77,8 +77,8 @@ export default class PerSearch extends Component {
             tree.push({
                 pk:userList[i].id,
                 code:userList[i].account.person_code,
-                name: payload[i].account.person_name,
-                username: payload[i].username
+                name: userList[i].account.person_name,
+                username: userList[i].username
             })
         }
         dataList = tree.map(node=>({

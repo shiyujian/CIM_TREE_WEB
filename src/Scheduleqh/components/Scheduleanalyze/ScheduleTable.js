@@ -39,7 +39,9 @@ export default class ScheduleTable extends Component {
             loading6: false,
             loading7: false,
             isShow: true,
-            isOpen: [false,false,false]
+            isOpen: [false,false,false],
+            nowmessage:{CreateTime:"",Factory:"",nowmessage:"",nowmessage:"",TreeTypeObj:{TreeTypeNo:""}},
+            nowmessagelist:[],
         }
     }
     componentWillReceiveProps(nextProps){
@@ -61,21 +63,43 @@ export default class ScheduleTable extends Component {
         } 
         if(nextProps.leftkeycode != this.state.leftkeycode) {
             this.setState({
-                leftkeycode:nextProps.leftkeycode,
+                leftkeycode:this.state.leftkeycode,
             }, () => {
                 this.datepickok(1);
                 this.datepickok(2);
-                // this.sum(0);
-                // this.sum(1);
-                // this.sum(2);
+                
             })
         }
     }
 	componentDidMount() {
-        const {actions: {gettreetypeAll}} = this.props;
+        this.setState({loading5:true});
+        this.setState({loading6:true});
+        
+        const {actions: {gettreetypeAll,nowmessage}} = this.props;
+        nowmessage().then(rst=>{
+            console.log(rst.content,"xionsui");
+            this.setState({
+                nowmessagelist:rst.content,
+            })
+            // console.log(rst.content[0].sxm,rst.content[0].no,rst.content[0].section,rst.content[0].land,rst.content[0].region,rst.content[0].smallclass,rst.content[0].thinclass)
+        })
+        // sxm:编码 或顺序码  可选
+        // no:正式编码 可选
+        // section：标段 可选
+        // land：地块  可选
+        // region：区域  可选
+        // smallclass：小班  可选
+        // thinclass：细班  可选
+        // treetype：树类型  可选
+        // status：状态 -1:未确认 0：监理通过 业主未抽查  1：监理不通过  2：监理通过业主抽查未通过  3：监理通过 业主抽查通过
+        // stime：验收时间 开始时间
+        // etime：验收时间 结束时间
+        // page：页码，选填
+        // size：每页数量，选填
         const param = {stime:this.state.stime,etime:this.state.etime};
         
         gettreetypeAll().then(rst=>{
+            this.setState({loading5:false});
              let Num1 = 0;
             for(var i = 0; i<=rst.length-1; i++){
             Num1 = Num1 + rst[i].Num;
@@ -84,9 +108,10 @@ export default class ScheduleTable extends Component {
                  amount:Num1,
             })
         })
-         // getNurserysCountFast({},{stime:"2017/11/26",etime:"2017/11/27"})
+         
          gettreetypeAll({},param)
          .then(rst=>{
+            this.setState({loading6:false});
             let todaynum = 0;
             
             for(let key=0;key<=rst.length-1; key++){
@@ -224,7 +249,7 @@ export default class ScheduleTable extends Component {
             series : []
         };
         myChart3.setOption(option3);
-
+  
         var myChart4 = echarts.init(document.getElementById('overall'));
         const sectionStatus = 0;
         let option4 = {
@@ -262,24 +287,28 @@ export default class ScheduleTable extends Component {
 	}
 
 	render() {
+        let asd = this.state.nowmessage;
+        console.log(asd);
+        
+        console.log(this.state.nowmessagelist,"xiaoxiao")
 		return (
 			<div>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
-                    <Col span={6}>
+                    <Col span={5}>
                         <Spin spinning={this.state.loading5}>
                             <SumTotal search={this.searchSum(0)} title='苗木累计种植总数' title1='Total number of planted trees'>
                                 <div>{this.state.amount}</div>
                             </SumTotal>
                         </Spin>
                     </Col>
-                    <Col span={6}>
+                    <Col span={5}>
                         <Spin spinning={this.state.loading6}>
                             <SumTotal search={this.searchSum(1)} title='苗木今日种植总数' title1='Total number of planted trees today'>
                                 <div>{this.state.today}</div>
                             </SumTotal>
                         </Spin>
                     </Col>
-                    <Col span={6}>
+                    <Col span={5}>
                         <Spin spinning={this.state.loading7}>
                             <SumTotal search={this.searchSum(2)} title='种植完工率' title1='Plant completion rate'>
                                 <div onClick ={this.handleclick.bind(this)} style={{cursor:'pointer'}}>
@@ -291,6 +320,18 @@ export default class ScheduleTable extends Component {
                                 </div>
                             </SumTotal>
                         </Spin>
+                    </Col>
+                    <Col span={6}>
+                    <div className="nowmessage" style={{border:"1px solid #666"}}>
+                    <div>实时种植信息</div>
+                    <div>
+                    {this.state.nowmessagelist.map((item,index)=>
+                            <div key={item.id}>
+                              <span>{item.CreateTime}{item.Factory}{item.Inputer}录入{item.TreeTypeObj.TreeTypeNo}</span>
+                            </div>
+                        )}
+                    </div>
+                    </div>
                     </Col>
                 </Row>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
@@ -351,14 +392,14 @@ export default class ScheduleTable extends Component {
         return(
             <div>
                 <div style={{cursor:'pointer'}} onClick = {this.handleIsOpen.bind(this,index)}><img style={{height: '36px'}} src={DateImg}/></div>
-                <DatePicker
+                {/*<DatePicker
                     style={{textAlign:"center",visibility:"hidden"}}
                     defaultValue={moment(new Date(), 'YYYY/MM/DD')}
                     format={'YYYY/MM/DD'}
                     onChange={this.datepick1.bind(this,index)}
                     open={this.state.isOpen[index]}
                 >
-                </DatePicker>
+                </DatePicker>*/}
                 
             </div>
         )
@@ -401,6 +442,7 @@ export default class ScheduleTable extends Component {
                         {sectionoption}
                     </Select>
                     <span>各小班种植进度分析</span>
+
                 </div>
     }
 
@@ -464,8 +506,6 @@ export default class ScheduleTable extends Component {
         if(index == 1 ) {
             const {stime1,etime1} = this.state;
             let param = {
-                // stime:stime1?moment(stime1).add(8, 'h').unix():'',
-                // etime:etime1?moment(etime1).add(8, 'h').unix():''
                 stime:this.state.stime1,
                 etime:this.state.etime1,
             }
@@ -474,7 +514,6 @@ export default class ScheduleTable extends Component {
         if(index == 2 ) {
             const {etime2} = this.state;
             let param = {
-                // etime:etime2?moment(etime2).add(8, 'h').unix():''
                 etime:this.state.etime2,
             }
             this.qury(index,param);
@@ -482,7 +521,6 @@ export default class ScheduleTable extends Component {
         if(index == 3 ) {
             const {etime3,section} = this.state;
             let param = {
-                // etime:etime3?moment(etime3).add(8, 'h').unix():'',
                 etime:this.state.etime3,
                 section:section,
             }
@@ -492,59 +530,18 @@ export default class ScheduleTable extends Component {
         if(index == 4 ) {
             const {etime4,section,smallclass} = this.state;
             let param = {
-                // etime:etime4?moment(etime4).add(8, 'h').unix():'',
                 etime:this.state.etime4,
                 section,
-                // smallclass
             }
             this.qury(index,param);
         }
     }
 
-    // sum(index, param) {
-    //     const {actions: {getTreesProgress}} = this.props;
-    //     if(index === 0) {
-    //         this.setState({loading5: true})
-    //         getTreesProgress({}, param)
-    //         .then(rst => {
-    //             this.setState({loading5: false})
-    //             if(!rst)
-    //                 return
-    //             this.setState({
-    //                 amount: rst.amount
-    //             })
-    //         })
-    //     }else if(index === 1) {
-    //         this.setState({loading6: true})
-    //         getTreesProgress({}, param)
-    //         .then(rst => {
-    //             this.setState({loading6: false})
-    //             if(!rst)
-    //                 return
-    //             this.setState({
-    //                 today: rst.today
-    //             })
-    //         })
-    //     } else if(index === 2) {
-    //         this.setState({loading7: true})
-    //         getTreesProgress({}, param)
-    //         .then(rst => {
-    //             this.setState({loading7: false})
-    //             if(!rst)
-    //                 return
-    //             let amount = rst.amount
-    //             let plan_amount = rst.plan_amount
-    //             this.setState({
-    //                 pers: division(amount,plan_amount),
-    //                 score: joint(amount,plan_amount)
-    //             })
-    //         })
-    //     }
-    // }
+   
 
     qury(index,param) {
         
-        const {actions: {gettreetypeAll,gettreetypeSection,gettreetypeSmallClass,gettreetypeThinClass,getCount,getCountSection,getCountSmall,getCountThin},leftkeycode,sectionoption} = this.props;
+        const {actions: {gettreetypeAll,gettreetypeSection,gettreetypeSmallClass,gettreetypeThinClass},leftkeycode,sectionoption} = this.props;
         param.no = leftkeycode;
         if(index === 1 ){
             this.setState({loading1:true})
@@ -566,7 +563,6 @@ export default class ScheduleTable extends Component {
                     })
                     timeData = [...new Set(timeData)]
                     console.log('timeData',timeData)
-                    // let treeNum = 0;
                     for(let i = 0; i < timeData.length; i++) {
                         let sum = 0;
                         for(let j = 0; j < rst.length; j++) {
@@ -574,7 +570,6 @@ export default class ScheduleTable extends Component {
                                 sum += rst[j].Num;
                             }
                         }
-                        // treeNum += sum;
                         totledata.push(sum);
                         console.log('totledata',totledata)
                     }
@@ -635,7 +630,7 @@ export default class ScheduleTable extends Component {
                 }
             }) 
         } else if(index === 2) {
-            this.setState({loading2:true})
+            this.setState({loading7:true})
             // getCountSection({},param)
             gettreetypeSection({},param)
             .then(rst => {
@@ -647,26 +642,6 @@ export default class ScheduleTable extends Component {
                 let allzhongshu = 0;
                 rst.sort(sorting);
                  console.log(rst,"xixixi");
-                // let newrst = [];
-
-                // for(let i = 0; i<=rst.length-1 ; i++){
-                //     if(rst[i].Label==="1标段"){
-                //         newrst[0]=rst[i];
-                //     }
-                //     if(rst[i].Label==="2标段"){
-                //         newrst[1]=rst[i];
-                //     }
-                //     if(rst[i].Label==="3标段"){
-                //         newrst[2]=rst[i];
-                //     }
-                //     if(rst[i].Label==="4标段"){
-                //         newrst[3]=rst[i];
-                //     }
-                //     if(rst[i].Label==="5标段"){
-                //         newrst[4]=rst[i];
-                //     }
-                // }
-                // console.log(newrst);
                 for(let i = 0; i<=rst.length-1 ; i++){
                     allyeszhongshu = allyeszhongshu + rst[i].Complete;
                     allzhongshu = allzhongshu + rst[i].Num;
@@ -674,10 +649,8 @@ export default class ScheduleTable extends Component {
                     yeszhongshu.push(rst[i].Complete);
                     notzhongshu.push(rst[i].Num-rst[i].Complete);
                 }
-                
                 this.setState({
-                    loading2:false,
-                     
+                    loading7:false,
                      pers: division(allyeszhongshu,allzhongshu),
                      score: joint(allyeszhongshu,allzhongshu),
                      })
@@ -685,7 +658,6 @@ export default class ScheduleTable extends Component {
                     return
                 try {
                     let myChart2 = echarts.getInstanceByDom(document.getElementById('section1'));
-                    // let unplanted = arraynumsub(rst["总数"], rst["已种植数量"]);
                     let options2 = {
                         legend: {
                             data: ['未种植','已种植']
@@ -719,7 +691,7 @@ export default class ScheduleTable extends Component {
             }) 
         } else if(index === 3) {
             this.setState({loading3:true})
-            gettreetypeThinClass({},param)
+            gettreetypeSmallClass({},param)
             .then(rst => {
                 
                  let biaoduan1 = [];
@@ -730,13 +702,11 @@ export default class ScheduleTable extends Component {
                     yeszhongshu1.push(rst[i].Complete);
                     notzhongshu1.push(rst[i].Num-rst[i].Complete);
                 }
-                
                 this.setState({loading3:false})
                 if(!rst)
                     return
                 try {
                     let myChart3 = echarts.getInstanceByDom(document.getElementById('primaryClass'));
-                    // let unplanted = arraynumsub(rst["总数"], rst["已种植数量"])
                     let options3 = {
                         legend: {
                             data: ['未种植','已种植']
@@ -791,7 +761,6 @@ export default class ScheduleTable extends Component {
                     return
                 try {
                     let myChart4 = echarts.getInstanceByDom(document.getElementById('overall'));
-                    // let unplanted = arraynumsub(rst["总数"], rst["已种植数量"]);
                     let options4 = {
                         legend: {
                             data: ['未种植','已种植']
@@ -827,33 +796,6 @@ export default class ScheduleTable extends Component {
     }
     
 }
-// //数组数值相加
-// function arraynumadd(arr1, arr2) {
-//     if(arr1 instanceof Array && arr2 instanceof Array) {
-//         let arr = arr1.map((rst,index) => {
-//             return arr1[index] + arr2[index]
-//         })
-//         return arr
-//     }
-// }
-
-// //减法
-// function arraynumsub(arr1, arr2) {
-//     if(arr1 instanceof Array && arr2 instanceof Array) {
-//         let arr = arr1.map((rst,index) => {
-//             return arr1[index] - arr2[index]
-//         })
-//         return arr
-//     }
-// }
-// //总数
-// function addNum(arr){
-//     let total = 0;
-//     arr.map( item => {
-//         total += item;
-//     })
-//     return total;
-// }
 //除
 function division(arr1, arr2) {
     if(arr1 !== 0 && arr2 !== 0) {

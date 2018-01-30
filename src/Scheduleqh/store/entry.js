@@ -33,65 +33,66 @@ export const getNurserysCount = createFetchAction(`${FOREST_API}/tree/nurserys/c
 export const getNurserysCountFast = createFetchAction(`${FOREST_API}/tree/nurserystat?no=P009`, []);
 export const getfactory = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, []);
 export const gettreeevery = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
+export const nowmessage = createFetchAction(`${FOREST_API}/tree/queryTree?page=1&size=5`,[]);
 
 
 
-export const getNurserysProgress = createFetchAction(`${FOREST_API}/tree/nurserys/progress/`, []);
-export const getquality = createFetchAction(`${FOREST_API}/trees/quality/`, []);
-export const getreturn = createFetchAction(`${FOREST_API}/trees/return/`, []);
-export const getreturnowner = createFetchAction(`${FOREST_API}/trees/return/owner/`, []);
-export const getreturnsupervision = createFetchAction(`${FOREST_API}/trees/return/supervision/`, []);
-export const getCount = createFetchAction(`${FOREST_API}/trees/count/`, []);
-export const getTreesProgress = createFetchAction(`${FOREST_API}/trees/progress/`, []);
-export const getCountSection = createFetchAction(`${FOREST_API}/trees/count/section/`, []);
-export const getCountSmall = createFetchAction(`${FOREST_API}/trees/count/small/`, []);
-export const getCountThin = createFetchAction(`${FOREST_API}/trees/count/thin/`, []);
-export const getHonesty = createFetchAction(`${FOREST_API}/trees/honesty/`, []);
-export const getHonestyNursery = createFetchAction(`${FOREST_API}/trees/honesty/nursery/`, []);
-export const getHonestyNew = createFetchAction(`${FOREST_API}/trees/honesty/new/fast/`, []);
-export const getHonestyNewSort = createFetchAction(`${FOREST_API}/trees/honesty/new/fast/?sort=true`, []);
-export const postFile = createFetchAction(`${FOREST_API}/db/import_location/`, [], 'POST');
-export const getHonestyNewDetailOk = createAction(`${ID}存储返回的详情`);
-export const getHonestyNewDetail = createFetchAction(`${FOREST_API}/trees/honesty/new/?nurseryname={{name}}&detail=true`, [getHonestyNewDetailOk], 'GET');
-export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/honesty/new/?detail=true`, []);
-export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/trees/honesty/nursery/treetype/`, '');
-export const clearList = createAction(`${ID}清空列表`);
-export const nurseryName = createAction(`${ID}供苗商名字`);
-const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
+// export const getNurserysProgress = createFetchAction(`${FOREST_API}/tree/nurserys/progress/`, []);
+// export const getquality = createFetchAction(`${FOREST_API}/trees/quality/`, []);
+// export const getreturn = createFetchAction(`${FOREST_API}/trees/return/`, []);
+// export const getreturnowner = createFetchAction(`${FOREST_API}/trees/return/owner/`, []);
+// export const getreturnsupervision = createFetchAction(`${FOREST_API}/trees/return/supervision/`, []);
+// export const getCount = createFetchAction(`${FOREST_API}/trees/count/`, []);
+// export const getTreesProgress = createFetchAction(`${FOREST_API}/trees/progress/`, []);
+// export const getCountSection = createFetchAction(`${FOREST_API}/trees/count/section/`, []);
+// export const getCountSmall = createFetchAction(`${FOREST_API}/trees/count/small/`, []);
+// export const getCountThin = createFetchAction(`${FOREST_API}/trees/count/thin/`, []);
+// export const getHonesty = createFetchAction(`${FOREST_API}/trees/honesty/`, []);
+// export const getHonestyNursery = createFetchAction(`${FOREST_API}/trees/honesty/nursery/`, []);
+// export const getHonestyNew = createFetchAction(`${FOREST_API}/trees/honesty/new/fast/`, []);
+// export const getHonestyNewSort = createFetchAction(`${FOREST_API}/trees/honesty/new/fast/?sort=true`, []);
+// export const postFile = createFetchAction(`${FOREST_API}/db/import_location/`, [], 'POST');
+// export const getHonestyNewDetailOk = createAction(`${ID}存储返回的详情`);
+// export const getHonestyNewDetail = createFetchAction(`${FOREST_API}/trees/honesty/new/?nurseryname={{name}}&detail=true`, [getHonestyNewDetailOk], 'GET');
+// export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/honesty/new/?detail=true`, []);
+// export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/trees/honesty/nursery/treetype/`, '');
+// export const clearList = createAction(`${ID}清空列表`);
+// export const nurseryName = createAction(`${ID}供苗商名字`);
+// const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
 export const actions = {
 	getTreeOK,
 	getTree,
 	setkeycode,
 	gettreetype,
-	getfactoryAnalyse,
-	getnurserys,
-	getqueryTree,
-	getexportTree,
-	getTreeList,
-	getNurserysCount,
-	getNurserysProgress,
-	getquality,
-	getreturn,
-	getreturnowner,
-	getreturnsupervision,
-	getCount,
-	getTreesProgress,
-	getCountSection,
-	getCountSmall,
-	getCountThin,
-	getHonesty,
-	getHonestyNursery,
-	getHonestyNew,
-	postFile,
-	getHonestyNewDetailOk,
-	getHonestyNewDetail,
-	clearList,
-	nurseryName,
-	getHonestyNewSort,
-	getNurserysCountFast,
-	getHonestyNewTreetype,
-	getHonestyNewDetailModal,
-	getWorkflowById
+	// getfactoryAnalyse,
+	// getnurserys,
+	// getqueryTree,
+	// getexportTree,
+	// getTreeList,
+	// getNurserysCount,
+	// getNurserysProgress,
+	// getquality,
+	// getreturn,
+	// getreturnowner,
+	// getreturnsupervision,
+	// getCount,
+	// getTreesProgress,
+	// getCountSection,
+	// getCountSmall,
+	// getCountThin,
+	// getHonesty,
+	// getHonestyNursery,
+	// getHonestyNew,
+	// postFile,
+	// getHonestyNewDetailOk,
+	// getHonestyNewDetail,
+	// clearList,
+	// nurseryName,
+	// getHonestyNewSort,
+	// getNurserysCountFast,
+	// getHonestyNewTreetype,
+	// getHonestyNewDetailModal,
+	// getWorkflowById
 };
 export default handleActions({
 	[getTreeOK]: (state, {payload}) => {
@@ -106,23 +107,23 @@ export default handleActions({
 	    	keycode: payload
 	    }
     },
-    [combineActions(...actionsMap(faithActions))]: (state = {}, action) => ({
-		...state,
-		faith: faithInfoReducer(state.faith, action),
-	}),
+ //    [combineActions(...actionsMap(faithActions))]: (state = {}, action) => ({
+	// 	...state,
+	// 	faith: faithInfoReducer(state.faith, action),
+	// }),
 
-	[getHonestyNewDetailOk]: (state, {payload}) => ({
-		...state,
-		honestyList: payload
-	}),
-  	[clearList]: (state, {payload}) => ({
-		...state,
-		honestyList: payload
-	}),
+	// [getHonestyNewDetailOk]: (state, {payload}) => ({
+	// 	...state,
+	// 	honestyList: payload
+	// }),
+ //  	[clearList]: (state, {payload}) => ({
+	// 	...state,
+	// 	honestyList: payload
+	// }),
 
-	[nurseryName]: (state, {payload}) => ({
-		...state,
-		nurseryName: payload
-	})
+	// [nurseryName]: (state, {payload}) => ({
+	// 	...state,
+	// 	nurseryName: payload
+	// })
 
 }, {});

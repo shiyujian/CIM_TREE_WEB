@@ -17,7 +17,7 @@ import {
     Table, Button, Row, Col, Icon, Modal, Input, message,
     notification, DatePicker, Select, InputNumber, Form, Upload, Card, Steps
 } from 'antd';
-// import {ProjectTree}from '../components/Register';
+import HiddenModle from './HiddenModle';
 import WorkPackageTree from '../components/WorkPackageTree';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
@@ -52,7 +52,34 @@ export default class HiddenDanger extends Component {
             currentSteps: 0,
             detailObj: {},
             currentSelectValue: '',
-            leafletCenter: [22.516818, 113.868495]
+            leafletCenter: [22.516818, 113.868495],
+            data: [
+                {
+                    o: 1,
+                    riskContent: "斤斤计较",
+                    unitName: "123",
+                    level: "V",
+                    timeLimit: "2016-11-01",
+                    status: "jj",
+                    resPeople: "嘻嘻嘻",
+                }, {
+                    o: 2,
+                    riskContent: "dddd",
+                    unitName: "123",
+                    level: "V",
+                    timeLimit: "2016-11-01",
+                    status: "hh",
+                    resPeople: "jjjjj",
+                }, {
+                    o: 3,
+                    riskContent: "ssss",
+                    unitName: "123",
+                    level: "V",
+                    timeLimit: "2016-11-01",
+                    status: "aaa",
+                    resPeople: "dfdf",
+                }
+            ]
         }
     }
     componentDidMount() {
@@ -148,6 +175,7 @@ export default class HiddenDanger extends Component {
     }
 
     onSelect(selectedKeys, e) {
+        console.log('selectedKeys',selectedKeys,e)
         if (!e.selected) {
             return
         }
@@ -240,7 +268,7 @@ export default class HiddenDanger extends Component {
         let detailObj = {};
         let array = [];
         const location = record.coordinate;
-        array.push(location.latitude);
+        // array.push(location.latitude);
         array.push(location.longitude);
         this.setState({ leafletCenter: array })
         detailObj.riskName = record.riskContent;
@@ -277,10 +305,6 @@ export default class HiddenDanger extends Component {
                 dataIndex: 'riskContent',
                 width: '10%'
             }, {
-                title: '工程名称',
-                dataIndex: 'projectName',
-                width: '25%'
-            }, {
                 title: '工程部位',
                 dataIndex: 'unitName',
                 width: '10%'
@@ -288,6 +312,10 @@ export default class HiddenDanger extends Component {
                 title: '等级',
                 dataIndex: 'level',
                 width: '10%'
+            }, {
+                title: '整改期限',
+                dataIndex: 'timeLimit',
+                width: '25%'
             }, {
                 title: '状态',
                 dataIndex: 'status',
@@ -339,12 +367,12 @@ export default class HiddenDanger extends Component {
                 </Sidebar>
                 <Content>
                     <Row>
-                        <Col span={12}>
+                        <Col>
                             <Row>
-                                <Col span={16}>
+                                <Col span={6}>
                                     <Input.Search
                                         placeholder="请输入搜索关键词"
-                                        style={{ width: '90%', display: 'block' }}
+                                        style={{ width: '300px', display: 'block' }}
                                         onSearch={(value) => this.onSearch(value)}
                                     ></Input.Search>
                                 </Col>
@@ -352,7 +380,7 @@ export default class HiddenDanger extends Component {
                                     <span style={{ fontSize: 16 }}>状态</span>
                                     <Select
                                         defaultValue=""
-                                        style={{ width: '60%', marginLeft: 5 }}
+                                        style={{ width: '70px', marginLeft: 5 }}
                                         onChange={(value) => this.onSelectChange(value)}>
                                         <Option value={1}>发起</Option>
                                         <Option value={2}>确认</Option>
@@ -364,46 +392,15 @@ export default class HiddenDanger extends Component {
                             </Row>
                             <Table
                                 columns={columns}
-                                dataSource={this.state.dataSet}
+                                // dataSource={this.state.dataSet}
+                                dataSource = {this.state.data}
                                 bordered
-                                style={{ marginTop: 20, width: '90%' }}
+                                style={{ marginTop: 20 }}
                             />
-                        </Col>
-                        <Col span={12}>
-                            <Row><h2 style={{ textAlign: 'center' }}>安全隐患详情</h2></Row>
-                            <Row style={{ marginTop: 15 }}>
-                                <Col span={8}><span style={{ fontSize: 16 }}>{`隐患名称：${detailObj.riskName}`}</span></Col>
-                                <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`发现人员：${detailObj.finder}`}</span></Col>
-                            </Row>
-                            <Row>
-                                <Col span={16}><span style={{ fontSize: 16 }}>{`工程名称：${detailObj.projectName}`}</span></Col>
-                                <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`监理工程师：${detailObj.supervision}`}</span></Col>
-                            </Row>
-                            <Row>
-                                <Col span={8}><span style={{ fontSize: 16 }}>{`工程部位：${detailObj.unitName}`}</span></Col>
-                                <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`整改负责人：${detailObj.charger}`}</span></Col>
-                            </Row>
-                            <Row style={{ marginTop: 30 }}>
-                                <Steps current={this.state.currentSteps}>
-                                    <Step title="发起" />
-                                    <Step title="确认" />
-                                    <Step title="整改" />
-                                    <Step title="审核" />
-                                </Steps>
-                            </Row>
-                            <Row style={{ marginTop: 20 }} gutter={5} style={{ height: 120 }}>
-                                {array}
-                            </Row>
-                            <Card style={{ marginTop: 50 }}>
-                                <Map center={this.state.leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
-                                    style={{ position: 'relative', height: 400, width: '100%' }}>
-                                    <TileLayer url={URL} subdomains={['7']} />
-                                </Map>
-                            </Card>
                         </Col>
                     </Row>
                 </Content>
-                <Preview />
+                {/*<HiddenModle {...this.props}/>*/}
             </div>
 
         );

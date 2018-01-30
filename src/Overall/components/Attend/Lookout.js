@@ -165,6 +165,7 @@ class Lookout extends Component {
 			platform: { users = [] },
 			form: { getFieldDecorator }
 		} = this.props;
+		console.log(this.props)
 		return (
 			<div>
 				<Row>
@@ -180,7 +181,13 @@ class Lookout extends Component {
 						>
 							<Col span={11}>
 								<FormItem>
-									<DatePicker />
+									<MonthPicker
+										disabledDate={this.disabledStartDate.bind(this)}
+										allowClear={false}
+										value={this.state.startValue}
+										// defaultValue={moment()}
+										placeholder="请选择开始月份"
+										onChange={this.onStartChange.bind(this)} />
 								</FormItem>
 							</Col>
 							<Col span={2}>
@@ -190,7 +197,15 @@ class Lookout extends Component {
 							</Col>
 							<Col span={11}>
 								<FormItem>
-									<DatePicker defaultvalue="" />
+									<MonthPicker
+										disabledDate={this.disabledEndDate.bind(this)}
+										allowClear={false}
+										value={this.state.endValue}
+										// defaultValue={moment()}
+										placeholder="请选择结束月份"
+										open={this.state.openEndChose}
+										onOpenChange={this.handleEndOpenChange.bind(this)}
+										onChange={this.onEndChange.bind(this)} />
 								</FormItem>
 							</Col>
 						</FormItem>
@@ -199,11 +214,11 @@ class Lookout extends Component {
 					</Col>
 					<Col span={12}>
 						<FormItem
-						label="人员"
-						{...Lookout.layout}
+							label="人员"
+							{...Lookout.layout}
 						>
-								<Search
-									onSearch={this.query} />
+							<Search
+								onSearch={this.query} />
 						</FormItem>
 					</Col>
 
@@ -303,8 +318,8 @@ class Lookout extends Component {
 							</FormItem>
 						</Col>
 						<Col span={6}>
-							<Button style={{marginLeft:"10px",marginTop:"2px"}}>查询</Button>
-							<Button style={{marginLeft:"10px",marginTop:"2px"}}>清空</Button>
+							<Button style={{ marginLeft: "10px", marginTop: "2px" }}>查询</Button>
+							<Button style={{ marginLeft: "10px", marginTop: "2px" }}>清空</Button>
 						</Col>
 					</Row>
 
@@ -384,6 +399,7 @@ class Lookout extends Component {
 
 	_getOptions_1() {
 		const { countInfo = [] } = this.props;
+		console.log("countInfo", countInfo)
 		let options = {
 			color: ['#5e9cd3', '#eb7d3c', '#a5a5a5', '#febf2d'],
 			tooltip: {
@@ -398,38 +414,72 @@ class Lookout extends Component {
 				}
 			},
 			legend: {
-				data: ['进场人数', '离场人数', '驻场人数']
+				data: ['早退率', '迟到率', '出勤率']
+				// data: ['进场人数', '离场人数', '驻场人数']
 				// data: ['进场人数', '离场人数', '驻场人数', '要求驻场人数']
 			},
 			xAxis: [
 				{
 					type: 'category',
 					data: [],
+					// data: [1, 2, 3, 4, 5],
 					name: '月'
 				}
 			],
 			yAxis: [
+				// {
+				// 	type: 'value',
+				// 	name: '100%'
+				// }
 				{
 					type: 'value',
-					name: '人'
+					axisLabel: {
+						formatter: '{value} %'
+					},
+					max: '100'
 				}
 			],
 			series: [
 				{
-					name: '进场人数',
+					name: '出勤率',
 					type: 'bar',
+					stack: '考勤',
+					label: {
+						normal: {
+							show: true,
+							position: 'inside'
+						}
+					},
 					data: []
+					// data: [50, 30, 50, 60, 70]
 				},
 				{
-					name: '离场人数',
+					name: '早退率',
 					type: 'bar',
+					stack: '考勤',
+					label: {
+						normal: {
+							show: true,
+							position: 'inside'
+						}
+					},
 					data: []
+					// data: [2, 4, 5, 6, 7]
 				},
 				{
-					name: '驻场人数',
+					name: '迟到率',
 					type: 'bar',
+					stack: '考勤',
+					label: {
+						normal: {
+							show: true,
+							position: 'inside'
+						}
+					},
 					data: []
+					// data: [2, 5, 6, 4, 3]
 				}
+
 				// ,
 				// {
 				// 	name: '要求驻场人数',
@@ -441,9 +491,10 @@ class Lookout extends Component {
 		countInfo.map((info) => {
 			options.xAxis[0].data.push(info.month);
 			options.series[0].data.push(info.in === -1 ? 0 : info.in);
-			options.series[1].data.push(info.leave === -1 ? 0 : info.leave);
+			options.series[1].data.push(info.leave === -1 ? 0 : info.leave*10);
 			options.series[2].data.push(info.stay === -1 ? 0 : info.stay);
 			// options.series[3].data.push(info.stay_days === -1 ? 0 : info.stay_days);
+			// (info.leave*10/info.leave+info.in+info.stay)*100+'%')
 		});
 		return options;
 	}
@@ -484,7 +535,7 @@ class Lookout extends Component {
 				{
 					name: '出勤人数',
 					type: 'bar',
-					data: []
+					data: [2]
 				}
 				// ,
 				// {
@@ -496,7 +547,7 @@ class Lookout extends Component {
 		};
 		countInfo.map((info) => {
 			options.xAxis[0].data.push(info.month);
-			options.series[0].data.push(info.real_check_days === -1 ? 0 : info.real_check_days);
+			// options.series[0].data.push(info.real_check_days === -1 ? 0 : info.real_check_days);
 			// options.series[1].data.push(info.check_days === -1 ? 0 : info.check_days);
 		});
 		return options;
