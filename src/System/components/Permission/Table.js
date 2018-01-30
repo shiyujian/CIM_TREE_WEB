@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Table, Checkbox, Button, Switch} from 'antd';
-import { MODULES, MODULES2,MODULES3} from '_platform/api';
+import { MODULES, MODULES2} from '_platform/api';
 import Card from '_platform/components/panels/Card';
 import {getUser} from '_platform/auth';
 export default class PermissionTable extends Component {
@@ -14,11 +14,10 @@ export default class PermissionTable extends Component {
 	render() {
 		console.log("MODULES",MODULES)
 		console.log("MODULES2",MODULES2)
-		console.log("MODULES3",MODULES3)
 		let userPermi;
 		console.log('MODULES',MODULES)
 		if (this.state.userLogin === "admin") {
-			userPermi = MODULES3.map(ele => {
+			userPermi = MODULES.map(ele => {
 				return { ...ele };
 			});
 		} else {
