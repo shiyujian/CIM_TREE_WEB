@@ -136,7 +136,7 @@ class ToggleModal extends Component {
 			form: { validateFields },
 			fileList = []
 		} = this.props;
-		console.log(this.props)
+		console.log(postSentDocAc)
 		const {
 			sentUsers = [],
 			copyUsers = [],
@@ -190,6 +190,7 @@ class ToggleModal extends Component {
 					// return
 					postSentDocAc({}, sendData)
 						.then(rst => {
+							console.log(sendData)
 							console.log(rst)
 							if (rst._id) {
 								message.success("发送文件成功！");

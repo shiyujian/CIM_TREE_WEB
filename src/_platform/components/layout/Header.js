@@ -49,8 +49,8 @@ export default class Header extends Component {
 					mode="horizontal">
 					{
 						Header.menus.map(menu => {
-							//let has = permissions.some(permission => permission === `appmeta.${menu.id}.READ`);
-							let has = true
+							let has = permissions.some(permission => permission === `appmeta.${menu.id}.READ`);
+							// let has = true
 							if (has) {
 								return (
 									<Menu.Item

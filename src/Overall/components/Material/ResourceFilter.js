@@ -163,3 +163,4 @@ export default class ResourceFilter extends Component {
           wrapperCol: {span: 16},
      };
 };
+

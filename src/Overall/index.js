@@ -41,32 +41,32 @@ export default class Overall extends Component {
 
 	static menus = [{
 		key: 'news',
-		id: 'MANAGE.NEWS',
+		id: 'OVERALL.NEWS',
 		path: '/overall/news',
 		name: '新闻通知',
 		icon: <Icon name="calendar-check-o"/>
 	},{
 		key: 'dispatch',
-		id: 'MANAGE.DISPATCH',
+		id: 'OVERALL.DISPATCH',
 		path: '/overall/dispatch',
 		name: '现场收发文',
 		icon: <Icon name="newspaper-o"/>,
 	},{
 		key: 'material',
-		id: 'MANAGE.MATERAIL',
+		id: 'OVERALL.MATERAIL',
 		path: '/overall/material',
 		name: '物资管理',
 		icon: <Icon name="bars"/>,
 	},{
 		key: 'form',
-		id: 'MANAGE.FORM',
+		id: 'OVERALL.FORM',
 		path: '/overall/formmanage',
 		name: '表单管理',
 		icon: <Icon name="file-text"/>,
 	},
 	{
 		key: 'attend',
-		id: 'MANAGE.CHECKIN',
+		id: 'OVERALL.CHECKIN',
 		path: '/overall/attend',
 		name: '考勤管理',
 		icon: <Icon name="user-o"/>,

@@ -25,13 +25,13 @@ export default class Addition extends Component {
     state={
         progress:0,
         isUploading: false,
+        dataSource:[],
         engineerNumber:'',
         engineerName:'',
         engineerApprove:'',
-        dataSource:[],
         count:0,
-        equipName:'',
-        equipNumber:'',
+        // equipName:'',
+        // equipNumber:'',
 
     }
     render() {

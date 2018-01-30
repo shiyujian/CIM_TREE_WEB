@@ -1,10 +1,13 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
 
+
 import { SERVICE_API,base,USER_API,WORKFLOW_API,FOREST_API} from '_platform/api';
 
 
 export const getAreaOK = createAction('获取组织机构树');
+export const getTreeOK = createAction(`first_getTreeOK`);
+export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]);
 export const getArea = createFetchAction(`${SERVICE_API}/loc-tree/code/LOC_ROOT/`, [getAreaOK]);
 export const getTrack = createFetchAction(`${base}/main/api/user/{{ID}}/location/`,[]);
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`,[]);
@@ -45,6 +48,8 @@ const getMapRouter = createFetchAction(`http://120.24.210.86:227/tree/patrolrout
 //获取轨迹列表
 const getMapList = createFetchAction(`http://120.24.210.86:227/tree/patrolpositions`, []);
 export const actions = {
+	getTreeOK,
+	getTree,
 	getAreaOK,
 	getArea,
 	getTrack,
@@ -75,6 +80,12 @@ export const actions = {
 	getMapList
 };
 export default handleActions({
+	[getTreeOK]: (state, {payload}) => {
+		return {
+			...state,
+			treeLists: [payload]
+		}
+	},
 	[getAreaOK]: (state, {payload}) => {
 		return {
 			...state,
