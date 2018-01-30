@@ -1,8 +1,11 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import { SERVICE_API,base,USER_API,WORKFLOW_API} from '_platform/api';
-
+import { FOREST_API} from '_platform/api';
+const ID = 'index';
 export const getAreaOK = createAction('获取组织机构树');
+export const getTreeOK = createAction(`${ID}_getTreeOK`);
+export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]);
 export const getArea = createFetchAction(`${SERVICE_API}/loc-tree/code/LOC_ROOT/`, [getAreaOK]);
 export const getTrack = createFetchAction(`${base}/main/api/user/{{ID}}/location/`,[]);
 export const getRisk = createFetchAction(`${base}/main/api/potential-risk/?status=1`,[]);
@@ -39,6 +42,8 @@ export const fetchDefectDataByLoc = createFetchAction(`${base}/main/api/quality-
 const getVideo360List = createFetchAction(`${SERVICE_API}/metalist/video360list/`, []);
 
 export const actions = {
+	getTreeOK,
+	getTree,
 	getAreaOK,
 	getArea,
 	getTrack,
@@ -66,6 +71,12 @@ export const actions = {
 	getVideo360List,
 };
 export default handleActions({
+	[getTreeOK]: (state, {payload}) => {
+		return {
+			...state,
+			treeLists: [payload]
+		}
+	},
 	[getAreaOK]: (state, {payload}) => {
 		return {
 			...state,

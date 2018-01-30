@@ -143,7 +143,8 @@ export default class Proprogress extends Component {
                     <PkCodeTree treeData={treeLists}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
-                            onExpand={this.onExpand.bind(this)}/>
+                            onExpand={this.onExpand.bind(this)}
+                            />
                         {/*<ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)} />*/}
                     </div>
                 </Sidebar>
