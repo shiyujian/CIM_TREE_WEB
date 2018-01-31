@@ -290,6 +290,7 @@ class All extends Component {
             let newdata = [];
             if (status === 'done') {
                 const { actions: { postUploadFilesAc } } = this.props;
+                console.log('fileList',fileList)
                 let newFileLists = fileList.map(item => {
                     return {
                         file_id: item.response.id,
@@ -297,7 +298,9 @@ class All extends Component {
                         send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
                         file_partial_url: '/media' + item.response.a_file.split('/media')[1],
                         download_url: '/media' + item.response.download_url.split('/media')[1],
-                        a_file: '/media' + item.response.a_file.split('/media')[1]
+                        a_file: '/media' + item.response.a_file.split('/media')[1],
+                        misc:item.response.misc,
+                        mime_type:item.response.mime_type,
                     }
                 })
                 newFileLists.map((item, index) => {
@@ -309,6 +312,8 @@ class All extends Component {
                         send_time: item.send_time,
                         a_file: item.a_file,
                         download_url: item.download_url,
+                        misc:item.misc,
+                        mime_type:item.mime_type,
                     }
                     newdata.push(data)
                 })

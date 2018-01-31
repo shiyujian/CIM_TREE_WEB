@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Input, Row, Col, Card, Select, DatePicker, Popconfirm, notification, Button, Form, message } from 'antd';
-import { WORKFLOW_MAPS, WORKFLOW_CODE } from '_platform/api';
+import { WORKFLOW_MAPS, WORKFLOW_CODE,SOURCE_API,STATIC_DOWNLOAD_API } from '_platform/api';
 import styles from './index.css';
 import moment from 'moment';
 import PerSearch from '../../../Overall/components/FormManage/PerSearch';
@@ -74,7 +74,7 @@ export default class Detail extends Component {
 				return <div>
 					<a href='javascript:;' onClick={this.onViewClick.bind(this, record, index)}>预览</a>
 					<span className="ant-divider" />
-					<a onClick={this.download.bind(this, record, index)}>下载</a>
+					<a href={`${STATIC_DOWNLOAD_API}${record.a_file}`}>下载</a>
 				</div>
 			}
 		}]
@@ -178,7 +178,7 @@ export default class Detail extends Component {
 								</Row>
 								<Row>
 									{
-										(name == '审核' || name == '') ?
+										(name == '复审' || name == '') ?
 											<Col span={8}>
 												<FormItem {...FormItemLayout} label='审核人'>
 													{
@@ -196,7 +196,7 @@ export default class Detail extends Component {
 												<FormItem {...FormItemLayout} label='审核人'>
 													{
 														getFieldDecorator('dataReview', {
-															initialValue: ``,
+															initialValue:'',
 															rules: [
 																{ required: true, message: '请输入审核人员' }
 															]
@@ -348,7 +348,7 @@ export default class Detail extends Component {
 								</Row>
 								<Row>
                                 {
-                                    (name == '审核' || name == '') ?
+                                    (name == '复审' || name == '') ?
                                         <Col span={8}>
                                             <FormItem {...FormItemLayout} label='审核人'>
                                                 {
@@ -416,39 +416,14 @@ export default class Detail extends Component {
 		console.log('this.member', this.member)
 	}
 	// 预览
-	onViewClick() {
-		notification.info({
-			message: "暂不支持预览，请等待更新！",
-			duration: 2
-		})
-		return;
-	}
-	async download(record, index) {
-		notification.info({
-			message: "暂不支持下载，请等待更新！",
-			duration: 2
-		})
-		return;
-		// const {actions: {downloadFilesLink} } = this.props
-		// try {
-		// 	let link = await downloadFilesLink({ id: record.file_id }, {});
-		// 	let apiGet = link.link;
-		// 	console.log(record, link, apiGet)
-		// 	this.createLink(this, apiGet);
-		// 	const hide = message.loading('开始下载...', 0);
-		// 	setTimeout(hide, 1500);
-		// } catch (error) {
-		// 	console.log(error)
-		// }
-	}
-
-	createLink = (name, url) => {    //下载
-		let link = document.createElement("a");
-		link.href = url;
-		link.setAttribute('download', this);
-		link.setAttribute('target', '_blank');
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
+	onViewClick(record,index) {
+		const {actions: {openPreview}} = this.props;
+        let filed = {}
+        filed.misc = record.misc;
+        filed.a_file = `${SOURCE_API}` + (record.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (record.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = record.fileName;
+        filed.mime_type = record.mime_type;
+        openPreview(filed);
 	}
 }
