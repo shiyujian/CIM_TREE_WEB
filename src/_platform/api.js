@@ -554,7 +554,7 @@ export const MODULES = [
 					name: '类型管理',
 				}, {
 					id: 'PROJECT.TREEMANAGE',
-					name: '树种管理',
+					name: '树种管理', 
 				}]
 			}, {
 				id:'PROJECT.NURSERY',
@@ -569,6 +569,8 @@ export const MODULES = [
 			}
 		]
 	}];
+
+//下面注释的是前海的模块
 // export const MODULES = [
 // 	{
 // 		id: 'HOME',
@@ -1102,6 +1104,8 @@ export const MODULES = [
 // 		}
 // 		]
 // 	}];
+
+//MODULES和MODULES2没有什么区别，只是前海的设置有区别分别是admin用户和其他用户的模块权限
 export const MODULES2 = [
 	{
 		id: 'HOME',

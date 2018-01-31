@@ -50,7 +50,6 @@ export default class ResourceTable extends Component {
 				<Table rowSelection={this.rowSelection}
 					dataSource={Doc}
 					columns={this.columns}
-					className='foresttable'
 					bordered rowKey="code" />
 			{
 				this.state.visible==true &&

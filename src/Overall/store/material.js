@@ -14,6 +14,7 @@ const documentReducer = documentFactory(ID);
 // export const getdirTreeOK = createAction(`${ID}_获取文档结构树`);
 // export const getdirTree = createFetchAction(`${SERVICE_API}/dir-tree/code/QH01/`, [getdirTreeOK]);
 export const setTabActive = createAction(`${ID}设置当前选中的tab`);
+export const toggleModal = createAction(`${ID}Tab页对应的modal类型`);
 export const getdocumentOK = createAction(`${ID}_搜索目录文档`);
 export const getdocument = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [getdocumentOK]);
 export const deletedoc = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, 'DELETE');
@@ -32,6 +33,7 @@ export const actions = {
 	// getdirTree,
 	// getdirTreeOK,
     setTabActive,
+    toggleModal,
     getdocumentOK,
     getdocument,
     changeDocs,
@@ -71,6 +73,10 @@ export default handleActions({
     [setTabActive]: (state, {payload}) => ( {
         ...state,
         tabValue: payload
+    }),
+    [toggleModal]: (state, {payload}) => ( {
+        ...state,
+        toggleData: payload
     }),
     [getdocumentOK]: (state, {payload}) => ({
         ...state,

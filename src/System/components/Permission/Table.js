@@ -12,10 +12,7 @@ export default class PermissionTable extends Component {
 	}
 	static propTypes = {};
 	render() {
-		console.log("MODULES",MODULES)
-		console.log("MODULES2",MODULES2)
 		let userPermi;
-		console.log('MODULES',MODULES)
 		if (this.state.userLogin === "admin") {
 			userPermi = MODULES.map(ele => {
 				return { ...ele };
