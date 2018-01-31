@@ -31,7 +31,7 @@ class SearchInfo extends Component {
                                                 { required: false, message: '请选择单位工程' }
                                             ]
                                         })
-                                            (<Select placeholder='请选择区域' allowClear>
+                                            (<Select placeholder='请选择单位工程' allowClear>
                                                 <Option value='单位工程一'>单位工程一</Option>
                                                 <Option value='单位工程二'>单位工程二</Option>
                                                 <Option value='单位工程三'>单位工程三</Option>
