@@ -13,6 +13,9 @@ const additionReducer = fieldFactory(ID, 'addition');
 const documentReducer = documentFactory(ID);
 // export const getdirTreeOK = createAction(`${ID}_获取文档结构树`);
 // export const getdirTree = createFetchAction(`${SERVICE_API}/dir-tree/code/QH01/`, [getdirTreeOK]);
+// 流程详情
+export const getWorkflowByIdOK = createAction('获取流程详情');
+export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
 export const setTabActive = createAction(`${ID}设置当前选中的tab`);
 export const toggleModal = createAction(`${ID}Tab页对应的modal类型`);
 export const getdocumentOK = createAction(`${ID}_搜索目录文档`);
@@ -31,7 +34,9 @@ const setoldfile = createAction(`${ID}setoldfile`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
 export const actions = {
 	// getdirTree,
-	// getdirTreeOK,
+    // getdirTreeOK,
+    getWorkflowByIdOK,
+    getWorkflowById,
     setTabActive,
     toggleModal,
     getdocumentOK,
