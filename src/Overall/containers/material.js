@@ -5,7 +5,7 @@ import reducer, {actions} from '../store/material';
 //import PkCodeTree from '../../Quality/components/PkCodeTree';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import {Filter, Table,Updatemodal,DatumTree,ResourceFilter,ResourceTable} from '../components/Material';
+import {Filter, Table,Updatemodal,DatumTree,ResourceFilter,ResourceTable,SeedingFilter,SeedingTable} from '../components/Material';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import moment from 'moment';
@@ -70,8 +70,8 @@ export default class Material extends Component {
                             <ResourceTable {...this.props}/>
                         </TabPane>
                         <TabPane tab="苗木资料" key="3">
-                            <ResourceFilter  {...this.props} {...this.state}/>
-                            <ResourceTable {...this.props}/>
+                            <SeedingFilter  {...this.props} {...this.state}/>
+                            <SeedingTable {...this.props}/>
                         </TabPane>
                     </Tabs>
                 </Content>

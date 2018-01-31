@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Form, Spin, Input } from 'antd';
+import { Row, Col, Form, Spin, Input, Button } from 'antd';
 
 const FormItem = Form.Item;
 
@@ -14,11 +14,13 @@ export default class Info extends Component {
 		const { platform: { task = {} } = {} } = this.props;
 		return (
 			<div style={{ marginBottom: 10 }}>
+
 				<div style={{ textAlign: 'center', fontSize: 20 }}>{task.name}</div>
 				<div style={{ textAlign: 'center', fontSize: 12, color: "#999999" }}>
 					<span>发起人：{task.creatorName}</span>
 					<span style={{ paddingLeft: 40 }}>当前状态：{task.status}</span>
 				</div>
+				<Button type='primary' onClick={this.backClick.bind(this)}>返回</Button>
 			</div>
 		);
 	}
@@ -31,5 +33,9 @@ export default class Info extends Component {
 		setTaskDetailLoading(true);
 		await getTask({ task_id: task_id });
 		setTaskDetailLoading(false);
+	}
+	backClick() {
+		let to = `/selfcare`;
+		this.props.history.push(to)
 	}
 }

@@ -3,63 +3,72 @@ import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
-import Addition from './Addition';
+import SeedingAddition from './SeedingAddition';
 
 const FormItem = Form.Item;
 const Search = Input.Search;
 const TabPane=Tabs.TabPane;
 const {RangePicker}=DatePicker;
 
-export default class Filter extends Component {
+export default class SeedingFilter extends Component {
 
 	static propTypes = {};
+
 	render() {
 		const { 
 			actions: { toggleAddition }, 
 			Doc = [],
 			toggleData: toggleData = {
-				type: 'equipment'
-			}
-		} = this.props;
-		console.log('filter.this.props',this.props)
-		console.log('filter.doc',Doc)
+				type: 'resource',
+			}, } = this.props;
+		console.log('this.props',this.props)
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
 					<Col span={24} style={{paddingLeft:'5em'}}>
 						<Row gutter={15}  style={{marginTop: 5}}>
-							<Col span={8}>
-								<FormItem   {...Filter.layoutT} label="单位工程:">
+							<Col span={6}>
+								<FormItem   {...SeedingFilter.layoutT} label="单位工程:">
                                      <Select>
                                           <Option value='第一阶段'>第一阶段</Option>
                                           <Option value='第二阶段'>第二阶段</Option>
                                      </Select>
                                 </FormItem>
 							</Col>
-							<Col span={8}>
-								<FormItem {...Filter.layoutT} label="编号:">
+							<Col span={6}>
+								<FormItem {...SeedingFilter.layoutT} label="名称:">
 									<Input />
                                 </FormItem>
 							</Col>
-							<Col span={8}>
+							<Col span={6}>
+								<FormItem {...SeedingFilter.layoutT} label="编号:">
+									<Input />
+                                </FormItem>
+							</Col>
+							<Col span={6}>
 								<Button type="primary" style={{marginLeft:'100px'}}>查询</Button>
 							</Col>
 						</Row>
 						<Row gutter={15}  style={{marginTop: 5}}>
-							<Col span={8}>
-								<FormItem {...Filter.layoutT} label="日期:">
+							<Col span={6}>
+								<FormItem {...SeedingFilter.layoutT} label="审批单位:">
+									<Input />
+                                </FormItem>
+							</Col>
+							<Col span={6}>
+								<FormItem {...SeedingFilter.layoutT} label="进场日期:">
 									<RangePicker/>
                                 </FormItem>
 							</Col>
-							<Col span={8}>
-								<FormItem {...Filter.layoutT} label="流程状态:">
+							<Col span={6}>
+								<FormItem {...SeedingFilter.layoutT} label="流程状态:">
 									<Select>
                                           <Option value='待提交'>待提交</Option>
                                           <Option value='审批中'>审批中</Option>
                                      </Select>
                                 </FormItem>
 							</Col>
-							<Col span={8}>
+							<Col span={6}>
 								<Button type="primary" ghost style={{marginLeft:'100px'}}>清空</Button>
 							</Col>
 						</Row>
@@ -72,13 +81,13 @@ export default class Filter extends Component {
 							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
 						}
 						{
-							toggleData.type == 'equipment' && <Addition {...this.props} />
+							toggleData.type == 'resource' && <SeedingAddition {...this.props} />
 						}
 						{
 							(Doc.length === 0) ?
 								<Button style={{ marginRight: 10 }} disabled>删除</Button> :
 								<Popconfirm title="确定要删除文件吗？" onConfirm={this.confirm.bind(this)} onCancel={this.cancel.bind(this)} okText="Yes" cancelText="No">
-									<Button style={{ marginRight: 10 }} type="primary" >删除</Button>
+									<Button style={{ marginRight: 10 }} type="primary" onClick={this.delete.bind(this)}>删除</Button>
 								</Popconfirm>
 						}
 					</Col>
@@ -98,6 +107,9 @@ export default class Filter extends Component {
 
 	}
 
+	delete() {
+		const { selected } = this.props;
+	}
 	confirm() {
 		const {
 			coded = [],
@@ -128,36 +140,37 @@ export default class Filter extends Component {
 				});
 		});
 	}
-	// createLink = (name, url) => {    //下载
-	// 	let link = document.createElement("a");
-	// 	link.href = url;
-	// 	link.setAttribute('download', this);
-	// 	link.setAttribute('target', '_blank');
-	// 	document.body.appendChild(link);
-	// 	link.click();
-	// 	document.body.removeChild(link);
-	// }
+	createLink = (name, url) => {    //下载
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download', this);
+		link.setAttribute('target', '_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
 
-	// download() {
-	// 	const { selected = [], file = [], files = [], down_file = [] } = this.props;
-	// 	if (selected.length == 0) {
-	// 		message.warning('没有选择无法下载');
-	// 	}
-	// 	selected.map(rst => {
-	// 		file.push(rst.basic_params.files);
-	// 	});
-	// 	file.map(value => {
-	// 		value.map(cot => {
-	// 			files.push(cot.download_url)
-	// 		})
-	// 	});
-	// 	files.map(down => {
-	// 		let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-	// 		this.createLink(this, down_load);
-	// 	});
-	// }
+	download() {
+		const { selected = [], file = [], files = [], down_file = [] } = this.props;
+		if (selected.length == 0) {
+			message.warning('没有选择无法下载');
+		}
+		selected.map(rst => {
+			file.push(rst.basic_params.files);
+		});
+		file.map(value => {
+			value.map(cot => {
+				files.push(cot.download_url)
+			})
+		});
+		files.map(down => {
+			let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
+			this.createLink(this, down_load);
+		});
+	}
 	static layoutT = {
           labelCol: {span: 8},
           wrapperCol: {span: 16},
      };
 };
+

@@ -31,13 +31,13 @@ export default class TaskStep extends Component {
 		if (task && task.workflow && task.workflow.code) {
 			let code = task.workflow.code;
 			let name = task.current ? task.current[0].name : '';
-			if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '审批') {
+			if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '初审') {
 				return this.renderResource(task);
-			} else if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '审核') {
+			} else if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '复审') {
 				return this.renderResource(task);
-			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '审批') {
+			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '初审') {
 				return this.renderResource(task);
-			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '审核') {
+			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '复审') {
 				return this.renderResource(task);
 			} else {
 				return (
@@ -120,7 +120,7 @@ export default class TaskStep extends Component {
 		})
 		task.workflow.states.map(item => {
 
-			if (item.name === '审批') {
+			if (item.name === '初审') {
 				executor = item.participants[0].executor.person_name;
 			}
 
@@ -200,7 +200,7 @@ export default class TaskStep extends Component {
 				{
 					(task.current && canExecute)
 						?
-						name == '审批' ?
+						name == '初审' ?
 							<div style={{ textAlign: 'center', marginTop: 10 }}>
 								<Button type='primary' onClick={this.handleSubmit.bind(this, task)} style={{ marginRight: 20 }}>提交</Button>
 								<Button onClick={this.handleReject.bind(this, task)}>退回</Button>
