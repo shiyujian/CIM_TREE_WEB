@@ -4,20 +4,14 @@
 .login-wrap {
   width: 100%;
   height: 100%;
-  background: url(./images/bg_06.png);
+  background: url(./images/bg_06.png) no-repeat center center;
+  background-size: cover;
   overflow: hidden;
+  position: relative;
   left: 0;
   top: 0;
 
-  .img-box{
-    // width: 500px;
-    margin: 8% auto 0;
-    display: table;
-    margin-left: auto;
-    margin-right: auto;
-  }
   .loginState-box{
-    // width: 350px;
     margin: 0% auto 0;
     display: block;
     text-align: center;
@@ -30,28 +24,21 @@
   
   .main-center{
     width:1158px;
-    height: 60%;
+    height: 540px;
     min-height:479px;
-    position: fixed;
+    position: absolute;
     left: 0;
     top:0;
     bottom: 0;
     right: 0;
     margin: auto;
-    // position: relative;
   }
-//  .main-icon{
-//     position: absolute;
-//     left: 0;
-//     top:-100px;
-//     background: url(./images/bg_03.png)no-repeat;
-//  }
  .main-on{
    width: 900px;
    height: 900px;
   position: absolute;
-  left: -378px;
-  top:-516px;
+  left: -405px;
+  top:-536px;
   z-index: 100;
   background: url(./images/bg_04.png)no-repeat;
  }
@@ -59,76 +46,16 @@
   width: 360px;
   height: 360px;
   position: absolute;
-  right: -170px;
+  right: -190px;
   z-index: 100;  
-  top: -160px;
+  top: -180px;
   background: url(./images/bg_03.png)no-repeat;
  }
-  @media screen and(max-width:1918px){
-    .main-center{
-      width: 1158px;
-      margin-left: auto;
-      margin-right: auto;
-    .main-logo{
-              margin-top: 1%;
-              width: 770px;
-              height:506px;
-              .main-logos{
-                height: 100%;
-                width: 100%;
-            }
-        }
-        .main-img{
-          width:388px;
-          height:95%;
-          height: 571px;
-          background: url(./images/float.png)no-repeat;
-          background-size:cover;
-        }
-    }
-    .main-icon{
-      width: 100%;
-    }
-  }
-  @media screen and(max-width:1440px){
-    .main-center{
-      width: 1158px;
-      margin-left: auto;
-      margin-right: auto;
-      .main-logo{
-              margin-top: 1%;
-              width: 770px;
-              height:506px;
-              .main-logos{
-                height: 100%;
-                width: 100%;
-            }
-        }
-    
-    }
-    
-  }
-  @media screen and(max-width:1366px){
-    .main-center{
-      width: 1158px;
-      .main-logo{
-        margin-top: 1%;
-        width: 770px;
-        height:506px;
-        .main-logos{
-          height: 100%;
-          width: 100%;
-      }
-      }
-    
-    }
-    
-  }
-  
   .main-logo{
     margin-top: 1%;
     margin-top: 10px;
     float: left;
+    position: relative;
   }
   .main-logos{
     width: 770px;
@@ -137,6 +64,7 @@
 
   .main-box {
     float: left;
+    position: relative;
   }
   .main-img{
     width: 388px;
@@ -151,7 +79,6 @@
     margin-top: 4%;
     display: block;
     text-align: center;
-    // width:200px;
     height:200px;
     background:white;
 
@@ -160,15 +87,13 @@
 
   .login-title1 {
     position: absolute;
-    left: -80px;
-    top: -110px;
+    left: -105px;
+    top: -130px;
     width: 300px;
     display: block;
     overflow: hidden;
-    // margin: 0 auto 58px;
     img {
       width: 30%;
-      /*width: 100px;*/
       max-width: 50%;
       display: block;
       margin: 0 auto;
@@ -181,10 +106,8 @@
     width: 300px;
     display: block;
     overflow: hidden;
-    // margin: 0 auto 58px;
     img {
       width: 30%;
-      /*width: 100px;*/
       max-width: 50%;
       display: block;
       margin: 0 auto;
@@ -193,15 +116,10 @@
 
   .login-form {
     width: 100%;
-    min-width: 40%;
     height:540px;
     padding:0 10%;
     display: table;
     line-height: 4;
-    // background: url(./images/float.png) no-repeat;
-    // background-size:cover;
-
-
     .ant-form-item {
       margin-bottom: 0;
       width: 85%;
@@ -220,7 +138,6 @@
     }
 
     .ant-input-group-addon {
-      // width: 48px;
       height: 32px;
       display: block;
       padding: 0;
@@ -274,7 +191,7 @@
     width: 100%;
     height: 32px;
     padding: 5px 0 5px 20px;
-    font-size: 20px;
+    font-size: 14px;
     line-height: 22px;
     color: #fff;
     vertical-align: middle;
@@ -430,14 +347,7 @@
   
 }
 
-// @media screen and (min-width:1000px){
-//   .main-center{
-//     width:75%;
-//     height: 60%;
-  
-//   }
-  
-// }
+
 
 
 

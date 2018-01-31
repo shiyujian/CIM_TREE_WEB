@@ -168,11 +168,6 @@ class Login extends Component {
 
 		return (
 			<div className="login-wrap">
-				<div className="main-icon">
-
-
-
-				</div>
 				<div className="main-center">
 
 
