@@ -10,6 +10,7 @@ import PerSearch from './PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
+import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
@@ -34,6 +35,8 @@ class Addition extends Component {
         engineerName:'',
         engineerApprove:'',
         count:0,
+        TreatmentData:[],
+        newFileLists: [],
         // equipName:'',
         // equipNumber:'',
 
@@ -122,6 +125,34 @@ class Addition extends Component {
 
         }
     ];
+    columns1 = [{
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index',
+        width: '20%',
+    }, {
+        title: '文件名称',
+        dataIndex: 'fileName',
+        key: 'fileName',
+        width: '45%',
+    }, {
+        title: '操作',
+        dataIndex: 'operation',
+        key: 'operation',
+        width: '20%',
+        render: (text, record, index) => {
+            return <div>
+                <Popconfirm
+                    placement="rightTop"
+                    title="确定删除吗？"
+                    onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
+                    okText="确认"
+                    cancelText="取消">
+                    <a>删除</a>
+                </Popconfirm>
+            </div>
+        }
+    }]
     static layoutT = {
         labelCol: {span: 8},
         wrapperCol: {span: 16},
@@ -159,14 +190,7 @@ class Addition extends Component {
                                             ]
                                         })
                                         (
-                                            <Select onSelect={(value,option)=>{
-                                                const {
-                                                        docs = [],
-                                                        actions: {changeDocs}
-                                                    } = this.props;
-                                                    this.state.engineerName = value;
-                                                    changeDocs(docs);
-                                             }}
+                                            <Select 
                                             >
                                                 <Option value='第一阶段'>第一阶段</Option>
                                                 <Option value='第二阶段'>第二阶段</Option>
@@ -213,14 +237,7 @@ class Addition extends Component {
                                             ]
                                         })
                                         (
-                                            <Select onSelect={(value,option)=>{
-                                                const {
-                                                        docs = [],
-                                                        actions: {changeDocs}
-                                                    } = this.props;
-                                                    this.state.engineerApprove = value;
-                                                    changeDocs(docs);
-                                            }}
+                                            <Select 
                                         >
                                             <Option value='第一公司'>第一公司</Option>
                                             <Option value='第二公司'>第二公司</Option>
@@ -252,9 +269,9 @@ class Addition extends Component {
                     </Row>
 					<Row gutter={24}>
 						<Col span={24} style={{marginTop: 16, height: 160}}>
-							<Dragger {...this.uploadProps}
-									 accept={fileTypes}
-									 onChange={this.changeDoc.bind(this)}>
+                            <Dragger
+                                {...this.uploadProps}
+                            >
 								<p className="ant-upload-drag-icon">
 									<Icon type="inbox"/>
 								</p>
@@ -263,15 +280,16 @@ class Addition extends Component {
 									支持 pdf、doc、docx 文件
 								</p>
 							</Dragger>
-							<Progress percent={progress} strokeWidth={5} />
+							{/* <Progress percent={progress} strokeWidth={5} /> */}
 						</Col>
 					</Row>
 					<Row gutter={24} style={{marginTop: 15}}>
 						<Col span={24}>
-							<Table rowSelection={this.rowSelection}
-								   columns={this.docCols}
-								   dataSource={docs}
-								   bordered rowKey="uid"/>
+							<Table 
+                                columns={this.columns1}
+                                dataSource={this.state.TreatmentData}
+                                pagination={true}
+                            />
 						</Col>
 					</Row>
                     <Row style={{marginTop: 15}}>
@@ -307,6 +325,57 @@ class Addition extends Component {
         );
     }
 
+    //上传文件
+    uploadProps = {
+        name: 'a_file',
+        multiple: true,
+        showUploadList: false,
+        action: base + "/service/fileserver/api/user/files/",
+        onChange: ({ file, fileList, event }) => {
+            console.log('file',file)
+            const status = file.status;
+            const {TreatmentData } = this.state;
+            let newdata = [];
+            if (status === 'done') {
+                // const { actions: { postUploadFilesAc } } = this.props;
+                console.log('fileList',fileList)
+                let length = TreatmentData.length
+                
+                TreatmentData.push({
+                    index: length,
+                    file_id: file.response.id,
+                    fileName: file.name,
+                    send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                    file_partial_url: '/media' + file.response.a_file.split('/media')[1],
+                    download_url: '/media' + file.response.download_url.split('/media')[1],
+                    a_file: '/media' + file.response.a_file.split('/media')[1],
+                    misc:file.response.misc,
+                    mime_type:file.response.mime_type,
+                })
+            
+                this.setState({ TreatmentData: TreatmentData })
+
+            }
+        },
+    };
+
+    //删除文件表格中的某行
+    deleteTreatmentFile = (record, index) => {
+        const {
+            TreatmentData
+        }=this.state
+        TreatmentData.splice(record.index,1)
+
+        for(let i=0;i<TreatmentData.length;i++){
+            if(i>=record.index){
+                TreatmentData[i].index = TreatmentData[i].index - 1;
+            }
+        }
+        this.setState({
+            TreatmentData:TreatmentData
+        })
+    }
+
 
     handleSubmit = (e) =>{
         e.preventDefault();
@@ -316,11 +385,16 @@ class Addition extends Component {
             actions: {
                 createFlow,
                 getWorkflowById,
-                putFlow
+                putFlow,
+                toggleAddition
             },
             location
             // actions: {toggleAddition, postDocument, getdocument,changeDocs}
         } = this.props;
+        const{
+            TreatmentData,
+            dataSource
+        } = this.state
         let user = getUser();//当前登录用户
         let me = this;
         let postData = {};
@@ -335,7 +409,11 @@ class Addition extends Component {
                     "id": parseInt(user.id)
                 };
                 let subject = [{
-                    
+                    "dataSource":JSON.stringify(dataSource),
+                    "TreatmentData":JSON.stringify(TreatmentData),
+                    "unit":JSON.stringify(values.unit),
+                    "code":JSON.stringify(values.code),
+                    "reviewUnit":JSON.stringify(values.reviewUnit),
                 }];
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {
@@ -391,6 +469,7 @@ class Addition extends Component {
                                         message: '流程提交成功',
                                         duration: 2
                                     });
+                                    toggleAddition(false);
                                     this.setState({
                                         visible: false
                                     })
@@ -467,25 +546,25 @@ class Addition extends Component {
     
     
 
-    uploadProps = {
-        name: 'file',
-        action: `${FILE_API}/api/user/files/`,
-        showUploadList: false,
-        data(file) {
-            return {
-                name: file.fileName,
-                a_file: file,
-            };
-        },
-        beforeUpload(file) {
-            const valid = fileTypes.indexOf(file.type) >= 0;
-            if (!valid) {
-                message.error('只能上传 pdf、doc、docx 文件！');
-            }
-            return valid;
-            this.setState({ progress: 0 });
-        },
-    };
+    // uploadProps = {
+    //     name: 'file',
+    //     action: `${FILE_API}/api/user/files/`,
+    //     showUploadList: false,
+    //     data(file) {
+    //         return {
+    //             name: file.fileName,
+    //             a_file: file,
+    //         };
+    //     },
+    //     beforeUpload(file) {
+    //         const valid = fileTypes.indexOf(file.type) >= 0;
+    //         if (!valid) {
+    //             message.error('只能上传 pdf、doc、docx 文件！');
+    //         }
+    //         return valid;
+    //         this.setState({ progress: 0 });
+    //     },
+    // };
 
     changeDoc({file, fileList, event}) {
         const {
