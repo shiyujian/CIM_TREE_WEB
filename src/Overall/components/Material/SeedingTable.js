@@ -8,7 +8,7 @@ const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
 
 let indexSelect='';
-export default class ResourceTable extends Component {
+export default class SeedingTable extends Component {
 
 	constructor(props){
          super(props);
@@ -72,7 +72,7 @@ export default class ResourceTable extends Component {
 	                        <Col span={24} style={{paddingLeft:'3em'}}>
 	                            <Row gutter={15} style={{marginTop:'2em'}} >
 	                                <Col span={8}>
-	                                    <FormItem   {...ResourceTable.layoutT} label="单位工程:">
+	                                    <FormItem   {...SeedingTable.layoutT} label="单位工程:">
 	                                     <Select  style={{width:'90%'}} value={Doc[this.state.indexSelect].extra_params.engineer}>
 	                                          <Option value='第一阶段'>第一阶段</Option>
 	                                          <Option value='第二阶段'>第二阶段</Option>
@@ -82,19 +82,19 @@ export default class ResourceTable extends Component {
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
-	                                    <FormItem {...ResourceTable.layoutT} label="名称:">
+	                                    <FormItem {...SeedingTable.layoutT} label="名称:">
 	                                        <Input value={Doc[this.state.indexSelect].extra_params.resource} />
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
-	                                    <FormItem {...ResourceTable.layoutT} label="编号:">
+	                                    <FormItem {...SeedingTable.layoutT} label="编号:">
 	                                        <Input value={Doc[this.state.indexSelect].extra_params.number} />
 	                                    </FormItem>
 	                                </Col>
 	                            </Row>
 	                            <Row gutter={15}>
 	                                <Col span={8}>
-	                                    <FormItem  {...ResourceTable.layoutT} label="审批单位:">
+	                                    <FormItem  {...SeedingTable.layoutT} label="审批单位:">
 	                                        <Select style={{width:'100%'}} value={Doc[this.state.indexSelect].extra_params.approve} >
 	                                              <Option value='第一公司'>第一公司</Option>
 	                                              <Option value='第二公司'>第二公司</Option>
@@ -102,12 +102,12 @@ export default class ResourceTable extends Component {
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
-	                                    <FormItem {...ResourceTable.layoutT} label="进场日期:">
+	                                    <FormItem {...SeedingTable.layoutT} label="进场日期:">
 	                                        <DatePicker  value={moment(Doc[this.state.indexSelect].extra_params.time)}/>
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
-	                                    <FormItem {...ResourceTable.layoutT} label="施工部位:">
+	                                    <FormItem {...SeedingTable.layoutT} label="施工部位:">
 	                                        <Input value={Doc[this.state.indexSelect].extra_params.body}/>
 	                                    </FormItem>
 	                                </Col>

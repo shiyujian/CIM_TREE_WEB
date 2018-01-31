@@ -157,7 +157,10 @@ export const DataReportTemplate_QualityProblem = STATIC_DOWNLOAD_API + '/media/d
 export const WORKFLOW_CODE = {
 	'总进度计划报批流程': 'TEMPLATE_001',
 	'表单管理流程': 'TEMPLATE_002',
-	'每日进度填报流程': 'TEMPLATE_003'
+	'每日进度填报流程': 'TEMPLATE_003',
+	'机械设备报批流程': 'TEMPLATE_004',
+	'工程材料报批流程': 'TEMPLATE_005',
+	'苗木资料报批流程': 'TEMPLATE_006'
 	// '现场安全隐患排查工作流程': 'TEMPLATE_002',
 	// '分部验收流程': 'TEMPLATE_003',
 	// '周报填写流程': 'TEMPLATE_004',
@@ -554,7 +557,7 @@ export const MODULES = [
 					name: '类型管理',
 				}, {
 					id: 'PROJECT.TREEMANAGE',
-					name: '树种管理',
+					name: '树种管理', 
 				}]
 			}, {
 				id:'PROJECT.NURSERY',
@@ -569,6 +572,8 @@ export const MODULES = [
 			}
 		]
 	}];
+
+//下面注释的是前海的模块
 // export const MODULES = [
 // 	{
 // 		id: 'HOME',
@@ -1102,6 +1107,8 @@ export const MODULES = [
 // 		}
 // 		]
 // 	}];
+
+//MODULES和MODULES2没有什么区别，只是前海的设置有区别分别是admin用户和其他用户的模块权限
 export const MODULES2 = [
 	{
 		id: 'HOME',

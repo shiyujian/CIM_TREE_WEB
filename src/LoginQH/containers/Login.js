@@ -457,15 +457,14 @@ class Login extends Component {
 	}
 
 	loginFunc(data, loginType, values) {
-		const permissions2 = [
-			{ id: 'HOME', value: "1" },
-			{ id: 'DISPLAY', value: "0" },
-			{ id: 'MANAGE', value: "1" }
+		// const permissions2 = [
+		// 	{ id: 'HOME', value: "1" },
+		// 	{ id: 'DISPLAY', value: "0" },
+		// 	{ id: 'MANAGE', value: "1" }
 
-		]
-
-		window.localStorage.setItem('TREE_LOGIN_USER',
-			JSON.stringify(permissions2));
+		// ]
+		// window.localStorage.setItem('TREE_LOGIN_USER',
+		// 	JSON.stringify(permissions2));
 		const { actions: { login, getTasks }, history: { replace } } = this.props;
 		clearUser();
 		clearUser();

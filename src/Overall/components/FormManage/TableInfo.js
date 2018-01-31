@@ -275,7 +275,8 @@ class TableInfo extends Component {
                     "username": memberValue[4],
                     "person_code": memberValue[1],
                     "person_name": memberValue[2],
-                    "id": parseInt(memberValue[3])
+                    "id": parseInt(memberValue[3]),
+                    org:memberValue[5],
                 }
             }
         } else {
@@ -283,7 +284,9 @@ class TableInfo extends Component {
         }
 
         setFieldsValue({
-            dataReview: this.member
+            dataReview: this.member,
+            approvalunit:this.member.org
+
         });
     }
      //上传文件

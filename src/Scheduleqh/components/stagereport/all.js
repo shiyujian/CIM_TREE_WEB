@@ -42,7 +42,6 @@ class All extends Component {
     }
     // 操作
     clickInfo(record) {
-        console.log(111111)
         this.setState({ totlevisible: true });
     }
     // 取消
@@ -112,10 +111,7 @@ class All extends Component {
         let postData = {};
         //专业信息
         let attrs = {};
-        console.log("登录用户", user)
-        console.log("文件信息", TreatmentData)
         me.props.form.validateFields((err, values) => {
-            console.log('Received values of form: ', values);
             if (!err) {
                 if (TreatmentData.length === 0) {
                     notification.error({
@@ -185,7 +181,6 @@ class All extends Component {
                     "status": 2
                 }
                 createFlow({}, workflowdata).then((instance) => {
-                    console.log("instance", instance)
                     if (!instance.id) {
                         notification.error({
                             message: '数据提交失败',
@@ -202,7 +197,6 @@ class All extends Component {
                         if (instance && instance.current) {
                             let currentStateId = instance.current[0].id;
                             let nextStates = getNextStates(instance, currentStateId);
-                            console.log('nextStates', nextStates)
                             let stateid = nextStates[0].to_state[0].id;
 
                             let postInfo = {
@@ -279,7 +273,8 @@ class All extends Component {
         }
 
         setFieldsValue({
-            dataReview: this.member
+            dataReview: this.member,
+            // superunit:
         });
     }
     //上传文件
@@ -295,6 +290,7 @@ class All extends Component {
             let newdata = [];
             if (status === 'done') {
                 const { actions: { postUploadFilesAc } } = this.props;
+                console.log('fileList',fileList)
                 let newFileLists = fileList.map(item => {
                     return {
                         file_id: item.response.id,
@@ -302,7 +298,9 @@ class All extends Component {
                         send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
                         file_partial_url: '/media' + item.response.a_file.split('/media')[1],
                         download_url: '/media' + item.response.download_url.split('/media')[1],
-                        a_file: '/media' + item.response.a_file.split('/media')[1]
+                        a_file: '/media' + item.response.a_file.split('/media')[1],
+                        misc:item.response.misc,
+                        mime_type:item.response.mime_type,
                     }
                 })
                 newFileLists.map((item, index) => {
@@ -314,6 +312,8 @@ class All extends Component {
                         send_time: item.send_time,
                         a_file: item.a_file,
                         download_url: item.download_url,
+                        misc:item.misc,
+                        mime_type:item.mime_type,
                     }
                     newdata.push(data)
                 })
@@ -499,7 +499,8 @@ class All extends Component {
                     "username": memberValue[4],
                     "person_code": memberValue[1],
                     "person_name": memberValue[2],
-                    "id": parseInt(memberValue[3])
+                    "id": parseInt(memberValue[3]),
+                    org:memberValue[5],
                 }
             }
         } else {
@@ -507,9 +508,9 @@ class All extends Component {
         }
 
         setFieldsValue({
-            dataReview: this.member
+            dataReview: this.member,
+            superunit:this.member.org
         });
-        console.log('this.member', this.member)
     }
 
     columns = [
