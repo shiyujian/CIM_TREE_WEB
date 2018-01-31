@@ -171,32 +171,35 @@ class Stagereporttab extends Component {
 			isCopyMsg: e.target.checked,
 		})
 	}
-	//选择审核人员
-	selectMember(memberInfo) {
-		const {
+	//选择人员
+    selectMember(memberInfo) {
+        const {
             form: {
                 setFieldsValue
             }
         } = this.props
-		this.member = null;
-		if (memberInfo) {
-			let memberValue = memberInfo.toString().split('#');
-			if (memberValue[0] === 'C_PER') {
-				this.member = {
-					"username": memberValue[4],
-					"person_code": memberValue[1],
-					"person_name": memberValue[2],
-					"id": parseInt(memberValue[3])
-				}
-			}
-		} else {
-			this.member = null
-		}
+        this.member = null;
+        if (memberInfo) {
+            let memberValue = memberInfo.toString().split('#');
+            if (memberValue[0] === 'C_PER') {
+                console.log('memberValue', memberValue)
+                this.member = {
+                    "username": memberValue[4],
+                    "person_code": memberValue[1],
+                    "person_name": memberValue[2],
+                    "id": parseInt(memberValue[3]),
+                    org:memberValue[5],
+                }
+            }
+        } else {
+            this.member = null
+        }
 
-		setFieldsValue({
-			dataReview: this.member
-		});
-	}
+        setFieldsValue({
+            dataReview: this.member,
+            superunit:this.member.org
+        });
+    }
 	// 发起填报
 	sendWork(){
 		const {

@@ -26,6 +26,7 @@ class ToggleModal extends Component {
 			isSentMsg: false, //接收人员是否发短信
 			isCopyMsg: false, //接收人员是否发短信
 			progress: 0,
+			org_codes:''
 		}
 	}
 
@@ -158,12 +159,15 @@ class ToggleModal extends Component {
 		validateFields((err, values) => {
 			if (!err) {
 				if (toggleData.status === 'ADD') {
+					// console.log("getUser",getUser())
+					// console.log("this._getOrgText(sentUsers)",this._getOrgText(sentUsers)[0])
+					console.log("this._getOrgText(copyUsers)",this._getOrgText(copyUsers))
 					let sendData = {
 						"from_whom": getUser().org,
 						"from_whom_department": getUser().org,
 						"to_whom": this._getOrgText(sentUsers),
 						"cc": this._getOrgText(copyUsers),
-						"title": values['title'],
+						"title": values['title3'],
 						"body_rich": this.state.content,
 						"is_draft": false,
 						"sent_email": false,
@@ -190,7 +194,7 @@ class ToggleModal extends Component {
 					// return
 					postSentDocAc({}, sendData)
 						.then(rst => {
-							console.log(rst)
+							// console.log("rst",rst)
 							if (rst._id) {
 								message.success("发送文件成功！");
 								getSentInfoAc({
@@ -246,12 +250,15 @@ class ToggleModal extends Component {
 							}
 						})
 				} else if (toggleData.status === 'EDIT') {
+					console.log("getUser()",getUser())
+					// console.log("1111111",this.state.org_codes)
+					console.log("this._getOrgText(sentUsers)",this._getOrgText(sentUsers))					
 					let sendData = {
 						"from_whom": getUser().org,
 						"from_whom_department": getUser().org,
 						"to_whom": this._getOrgText(sentUsers),
 						"cc": this._getOrgText(copyUsers),
-						"title": values['title'],
+						"title": values['title3'],
 						"body_rich": this.state.content,
 						"is_draft": false,
 						"sent_email": false,
@@ -263,7 +270,7 @@ class ToggleModal extends Component {
 								"file_partial_url": fileList[0].a_file,
 								"file_info": fileList[0],
 								"send_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-								'backTo_id':'1'
+								'backTo_id':this._getOrgText(sentUsers)[1]								
 							}
 						]
 					};
@@ -278,6 +285,9 @@ class ToggleModal extends Component {
 					// return
 					postSentDocAc({}, sendData)
 						.then(rst => {
+							console.log(sendData)
+							console.log(this.props,"111111")
+							console.log(rst)
 							if (rst._id) {
 								message.success("发送文件成功！");
 								getSentInfoAc({
@@ -339,17 +349,25 @@ class ToggleModal extends Component {
 	}
 
 	_getOrgText(arr) {
+		// console.log("arr",arr)
 		let tmpArr = [];
-		arr.map((itm) => {
+				
+				arr.map((itm) => {
+					console.log(itm)
 			if (tmpArr.filter(item => item == itm.split('--')[1]).length === 0) {
+				// console.log(itm)
 				tmpArr.push(itm.split('--')[1])
+				tmpArr.push(itm.split('--')[0])
 			}
+			
+			// console.log(itm.split('--')[0])
+			// this.setState({org_codes:itm.split('--')[0]})
+			
 		});
 		return tmpArr
 	}
 
 	render() {
-		console.log(this.props)
 		const {
 			form: { getFieldDecorator },
 			toggleData: toggleData = {
@@ -383,7 +401,7 @@ class ToggleModal extends Component {
 							<Col>
 								<Row>
 									<FormItem {...formItemLayout} label="文件标题">
-										{getFieldDecorator('title', {
+										{getFieldDecorator('title3', {
 											rules: [{ required: true, message: '请输入文件标题' }],
 											initialValue: ''
 										})(

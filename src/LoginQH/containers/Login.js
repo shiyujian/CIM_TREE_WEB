@@ -168,20 +168,15 @@ class Login extends Component {
 
 		return (
 			<div className="login-wrap">
-				<div className="main-icon">
-					<div className="main-on" style={{ width: '300' }} >
-						<a className="login-title"><img src={loginTitle} /></a>
-					</div>
-
-					<div className="main-at" style={{ width: '300' }} >
-						<a className="login-title"><img src={hello} /></a>
-					</div>
-				</div>
 				<div className="main-center">
 
 
 					<div className="main-logo">
 						<img className="main-logos" src={docDescibe} />
+						<div className="main-on"  >
+							
+						</div>
+						<a className="login-title1"><img src={loginTitle} /></a>
 					</div>
 
 
@@ -189,6 +184,10 @@ class Login extends Component {
 						loginState ? !forgectState ?
 
 							<div className="main-box" >
+								<div className="main-at" >
+									
+								</div>
+								<a className="login-title"><img src={hello} /></a>
 								<div className="main-img">
 
 									<Form onSubmit={this.handleSubmit.bind(this)}
@@ -458,15 +457,14 @@ class Login extends Component {
 	}
 
 	loginFunc(data, loginType, values) {
-		const permissions2 = [
-			{ id: 'HOME', value: "1" },
-			{ id: 'DISPLAY', value: "0" },
-			{ id: 'MANAGE', value: "1" }
+		// const permissions2 = [
+		// 	{ id: 'HOME', value: "1" },
+		// 	{ id: 'DISPLAY', value: "0" },
+		// 	{ id: 'MANAGE', value: "1" }
 
-		]
-
-		window.localStorage.setItem('TREE_LOGIN_USER',
-			JSON.stringify(permissions2));
+		// ]
+		// window.localStorage.setItem('TREE_LOGIN_USER',
+		// 	JSON.stringify(permissions2));
 		const { actions: { login, getTasks }, history: { replace } } = this.props;
 		clearUser();
 		clearUser();

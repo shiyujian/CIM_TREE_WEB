@@ -13,7 +13,6 @@ export default class PermissionTable extends Component {
 	static propTypes = {};
 	render() {
 		let userPermi;
-		console.log('MODULES',MODULES)
 		if (this.state.userLogin === "admin") {
 			userPermi = MODULES.map(ele => {
 				return { ...ele };
@@ -71,6 +70,7 @@ export default class PermissionTable extends Component {
 			table: {role = {}, permissions = []} = {},
 			actions: {changeTableField, putRole, getRoles},
 		} = this.props;
+		console.log("permissions",permissions)
 		changeTableField('editing', false);
 		putRole({id: role.id}, {name: role.name, grouptype: role.grouptype, permissions}).then((rst) => {
 			getRoles().then((roles = []) => {

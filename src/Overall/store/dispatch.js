@@ -1,7 +1,7 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from './dispatchFetchAction';
 import createFetchActionT from 'fetch-action';
-import { base, USER_API, SERVICE_API, EXCHANGE_API } from '_platform/api';
+import { base, USER_API, SERVICE_API, EXCHANGE_API ,CODE_API} from '_platform/api';
 const ID = "DISPATCH"
 //Tab切换状态
 export const setTabActive = createAction(`${ID}设置当前选中的tab`);
@@ -23,24 +23,33 @@ export const getCopyUsersAcOK = createAction(`${ID}获取抄送的人员列表`)
 export const getCopyUsersAc = createFetchActionT(`${USER_API}/users/?org_code={{code}}`, [getCopyUsersAcOK]);
 //获取收文列表
 export const getReceiveInfoAcOK = createAction(`${ID}获取收文列表`);
-export const getReceiveInfoAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/received/?user={{user}}&per_page=10000`, [getReceiveInfoAcOK]);
+export const getReceiveInfoAc = createFetchAction(`${CODE_API}/api/v1/file-notifications/received/?user={{user}}&per_page=10000`, [getReceiveInfoAcOK]);
+// export const getReceiveInfoAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/received/{{id}}/?user={{user}}&per_page=10000`, [getReceiveInfoAcOK]);
 //获取发送的列表
 export const getSentInfoAcOK = createAction(`${ID}获取发送的列表`);
-export const getSentInfoAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/sent/?user={{user}}&per_page=10000`, [getSentInfoAcOK]);
+export const getSentInfoAc = createFetchAction(`${CODE_API}/api/v1/file-notifications/sent/?user={{user}}&per_page=10000`, [getSentInfoAcOK]);
+// export const getSentInfoAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/sent/?user={{user}}&per_page=10000`, [getSentInfoAcOK]);
 //发送文件
-export const postSentDocAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/creation/`, [], "POST");
+export const postSentDocAc = createFetchAction(`${CODE_API}/api/v1/file-notifications/creation/`, [], "POST");
+// export const postSentDocAc = createFetchAction(`http://47.104.160.65:6545/api/v1/file-notifications/creation/`, [], "POST");
 //删除的发送文件
-export const deleteSentDocAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, [], "DELETE");
+export const deleteSentDocAc = createFetchAction(`${CODE_API}/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, [], "DELETE");
+// export const deleteSentDocAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, [], "DELETE");
 //获取收文的详情信息
-export const getReceiveDetailAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`, []);
+export const getReceiveDetailAc = createFetchAction(`${CODE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`, []);
+// export const getReceiveDetailAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/received/{{id}}/?user={{user}}`, []);
 //获取发文的详情信息
-export const getSendDetailAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, []);
+export const getSendDetailAc = createFetchAction(`${CODE_API}/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, []);
+// export const getSendDetailAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, []);
 //收文已阅
-export const patchReceiveDetailAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [], "PATCH");
+export const patchReceiveDetailAc = createFetchAction(`${CODE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [], "PATCH");
+// export const patchReceiveDetailAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [], "PATCH");
 //删除的收文
-export const deleteReceiveDocAc = createFetchAction(`${EXCHANGE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [], "DELETE");
+export const deleteReceiveDocAc = createFetchAction(`${CODE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [], "DELETE");
+// export const deleteReceiveDocAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [], "DELETE");
 //发送短信接口
-export const sentMessageAc = createFetchAction(`${EXCHANGE_API}/api/v1/sms/`, [], "POST");
+export const sentMessageAc = createFetchAction(`${CODE_API}/api/v1/sms/`, [], "POST");
+// export const sentMessageAc = createFetchAction(`http://10.215.160.38:6545/api/v1/sms/`, [], "POST");
 
 
 //Loading加载状态

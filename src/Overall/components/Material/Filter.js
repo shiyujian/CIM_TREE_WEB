@@ -3,6 +3,8 @@ import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
+import Addition from './Addition';
+
 const FormItem = Form.Item;
 const Search = Input.Search;
 const TabPane=Tabs.TabPane;
@@ -11,10 +13,16 @@ const {RangePicker}=DatePicker;
 export default class Filter extends Component {
 
 	static propTypes = {};
-
 	render() {
-		const { actions: { toggleAddition }, Doc = [] } = this.props;
-		// console.log('filter.this.props',this.props)
+		const { 
+			actions: { toggleAddition }, 
+			Doc = [],
+			toggleData: toggleData = {
+				type: 'equipment'
+			}
+		} = this.props;
+		console.log('filter.this.props',this.props)
+		console.log('filter.doc',Doc)
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
@@ -64,10 +72,13 @@ export default class Filter extends Component {
 							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
 						}
 						{
+							toggleData.type == 'equipment' && <Addition {...this.props} />
+						}
+						{
 							(Doc.length === 0) ?
 								<Button style={{ marginRight: 10 }} disabled>删除</Button> :
 								<Popconfirm title="确定要删除文件吗？" onConfirm={this.confirm.bind(this)} onCancel={this.cancel.bind(this)} okText="Yes" cancelText="No">
-									<Button style={{ marginRight: 10 }} type="primary" onClick={this.delete.bind(this)}>删除</Button>
+									<Button style={{ marginRight: 10 }} type="primary" >删除</Button>
 								</Popconfirm>
 						}
 					</Col>
@@ -87,9 +98,6 @@ export default class Filter extends Component {
 
 	}
 
-	delete() {
-		const { selected } = this.props;
-	}
 	confirm() {
 		const {
 			coded = [],

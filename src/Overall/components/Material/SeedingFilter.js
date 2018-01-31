@@ -3,14 +3,14 @@ import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
-import ResourceAddition from './ResourceAddition';
+import SeedingAddition from './SeedingAddition';
 
 const FormItem = Form.Item;
 const Search = Input.Search;
 const TabPane=Tabs.TabPane;
 const {RangePicker}=DatePicker;
 
-export default class ResourceFilter extends Component {
+export default class SeedingFilter extends Component {
 
 	static propTypes = {};
 
@@ -28,7 +28,7 @@ export default class ResourceFilter extends Component {
 					<Col span={24} style={{paddingLeft:'5em'}}>
 						<Row gutter={15}  style={{marginTop: 5}}>
 							<Col span={6}>
-								<FormItem   {...ResourceFilter.layoutT} label="单位工程:">
+								<FormItem   {...SeedingFilter.layoutT} label="单位工程:">
                                      <Select>
                                           <Option value='第一阶段'>第一阶段</Option>
                                           <Option value='第二阶段'>第二阶段</Option>
@@ -36,12 +36,12 @@ export default class ResourceFilter extends Component {
                                 </FormItem>
 							</Col>
 							<Col span={6}>
-								<FormItem {...ResourceFilter.layoutT} label="名称:">
+								<FormItem {...SeedingFilter.layoutT} label="名称:">
 									<Input />
                                 </FormItem>
 							</Col>
 							<Col span={6}>
-								<FormItem {...ResourceFilter.layoutT} label="编号:">
+								<FormItem {...SeedingFilter.layoutT} label="编号:">
 									<Input />
                                 </FormItem>
 							</Col>
@@ -51,17 +51,17 @@ export default class ResourceFilter extends Component {
 						</Row>
 						<Row gutter={15}  style={{marginTop: 5}}>
 							<Col span={6}>
-								<FormItem {...ResourceFilter.layoutT} label="审批单位:">
+								<FormItem {...SeedingFilter.layoutT} label="审批单位:">
 									<Input />
                                 </FormItem>
 							</Col>
 							<Col span={6}>
-								<FormItem {...ResourceFilter.layoutT} label="进场日期:">
+								<FormItem {...SeedingFilter.layoutT} label="进场日期:">
 									<RangePicker/>
                                 </FormItem>
 							</Col>
 							<Col span={6}>
-								<FormItem {...ResourceFilter.layoutT} label="流程状态:">
+								<FormItem {...SeedingFilter.layoutT} label="流程状态:">
 									<Select>
                                           <Option value='待提交'>待提交</Option>
                                           <Option value='审批中'>审批中</Option>
@@ -81,7 +81,7 @@ export default class ResourceFilter extends Component {
 							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
 						}
 						{
-							toggleData.type == 'resource' && <ResourceAddition {...this.props} />
+							toggleData.type == 'resource' && <SeedingAddition {...this.props} />
 						}
 						{
 							(Doc.length === 0) ?

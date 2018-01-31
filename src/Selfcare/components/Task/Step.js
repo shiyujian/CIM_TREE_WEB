@@ -31,13 +31,13 @@ export default class TaskStep extends Component {
 		if (task && task.workflow && task.workflow.code) {
 			let code = task.workflow.code;
 			let name = task.current ? task.current[0].name : '';
-			if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '审批') {
+			if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '初审') {
 				return this.renderResource(task);
-			} else if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '审核') {
+			} else if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '复审') {
 				return this.renderResource(task);
-			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '审批') {
+			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '初审') {
 				return this.renderResource(task);
-			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '审核') {
+			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '复审') {
 				return this.renderResource(task);
 			} else {
 				return (
@@ -120,7 +120,7 @@ export default class TaskStep extends Component {
 		})
 		task.workflow.states.map(item => {
 
-			if (item.name === '审批') {
+			if (item.name === '初审') {
 				executor = item.participants[0].executor.person_name;
 			}
 
@@ -200,7 +200,7 @@ export default class TaskStep extends Component {
 				{
 					(task.current && canExecute)
 						?
-						name == '审批' ?
+						name == '初审' ?
 							<div style={{ textAlign: 'center', marginTop: 10 }}>
 								<Button type='primary' onClick={this.handleSubmit.bind(this, task)} style={{ marginRight: 20 }}>提交</Button>
 								<Button onClick={this.handleReject.bind(this, task)}>退回</Button>
@@ -223,10 +223,10 @@ export default class TaskStep extends Component {
 		const {
 			location,
 			actions: {
-					putFlow
+					putFlow,
+					addDaySchedule,
 				},
 		} = this.props
-
 		const { state_id = '0' } = queryString.parse(location.search) || {};
 		console.log('state_id', state_id)
 
@@ -269,8 +269,46 @@ export default class TaskStep extends Component {
 					message: '流程通过成功',
 					duration: 2
 				})
-
-				// 在此处添加入库方法
+				if(rst.workflow.name=='每日进度填报流程'){
+					console.log('rst',rst)
+					let postdata = rst.subject[0].postData ? JSON.parse(rst.subject[0].postData) : '';
+					let treedatasource = rst.subject[0].treedataSource ? JSON.parse(rst.subject[0].treedataSource) : '';
+					console.log('treedatasource',treedatasource)
+					let items = [];
+					treedatasource.map(item=>{
+						let data = {
+							Num:item.number,
+							Project:item.project,
+							WPNo:'',
+						}
+						items.push(data)
+					})
+					let scheduledata = {
+						DocType:'doc',
+						Items:items,
+						ProgressNo:'01',
+						ProgressTime:postdata.timedate,
+						ProgressType:postdata.type,
+						SMS:0,
+						UnitProject:postdata.unit,
+						WPNo:''
+					}
+					// 日进度入库
+					addDaySchedule({},scheduledata).then(item=>{
+						console.log('item',item)
+						if(item&&item.msg){
+							notification.success({
+								message:"上传数据成功",
+								duration:2
+							})
+						}else{
+							notification.error({
+								message:"上传数据失败",
+								duration:2
+							})
+						}	
+					})
+				}
 				let to = `/selfcare`;
 				me.props.history.push(to)
 			} else {
@@ -288,10 +326,11 @@ export default class TaskStep extends Component {
 		const {
 			location,
 			actions: {
-					putFlow
+					putFlow,
+					addDaySchedule
 				},
 		} = this.props
-
+		
 		const { state_id = '0' } = queryString.parse(location.search) || {};
 		console.log('state_id', state_id)
 
