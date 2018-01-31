@@ -323,10 +323,7 @@ export default class Addition extends Component {
         const {count,dataSource } = this.state;
         const newData = {
           key:count,
-          // equipName:this.state.equipName,
-          // equipNumber:this.state.equipNumber,
         };
-        // console.log('newDate',newData)
         this.setState({
           dataSource: [...dataSource, newData],
           count: count + 1,
@@ -381,54 +378,6 @@ export default class Addition extends Component {
           this.cacheData = newData.map(item => ({ ...item }));
         }
     }
-    // equipName(event){
-    //    const {
-    //         docs = [],
-    //         actions: {changeDocs}
-    //     } = this.props;
-    //     this.state.equipName = event.target.value;
-    //     changeDocs(docs); 
-    // }
-    // equipNumber(doc, event){
-    //    const {
-    //         docs = [],
-    //         actions: {changeDocs}
-    //     } = this.props;
-    //     doc.equipNumber = event.target.value;
-    //     changeDocs(docs); 
-    // }
-    // equipCount(doc, event){
-    //    const {
-    //         docs = [],
-    //         actions: {changeDocs}
-    //     } = this.props;
-    //     doc.equipCount = event.target.value;
-    //     changeDocs(docs); 
-    // }
-    // equipTime(doc, event){
-    //    const {
-    //         docs = [],
-    //         actions: {changeDocs}
-    //     } = this.props;
-    //     doc.equipTime = event.target.value;
-    //     changeDocs(docs); 
-    // }
-    // equipMoment(doc, event){
-    //    const {
-    //         docs = [],
-    //         actions: {changeDocs}
-    //     } = this.props;
-    //     doc.equipMoment = event.target.value;
-    //     changeDocs(docs); 
-    // }
-    // equipRemark(doc, event){
-    //    const {
-    //         docs = [],
-    //         actions: {changeDocs}
-    //     } = this.props;
-    //     doc.equipRemark = event.target.value;
-    //     changeDocs(docs); 
-    // }
     remark(doc, event) {
         const {
             docs = [],
@@ -463,7 +412,7 @@ export default class Addition extends Component {
             doc.number=this.state.engineerNumber;
             doc.approve=this.state.engineerApprove;
             doc.children=this.state.dataSource;
-            console.log('doc.children',this.state.dataSource);
+            // console.log('doc.children',this.state.dataSource);
             return postDocument({}, {
                 code: `${currentcode.code}_${response.id}`,
                 name: doc.name,

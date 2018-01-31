@@ -14,7 +14,7 @@ export default class GeneralTable extends Component {
          this.state={
          	visible: false,
 			data:[],
-			indexSelect:'' 
+			indexSelect:'',
          }
     }
 	// state = { 
@@ -43,7 +43,9 @@ export default class GeneralTable extends Component {
 		let {
 			  visible,data
         } = this.state;
-		const { Doc = [] } = this.props;
+		const { Doc = [],docs = [],} = this.props;
+		console.log('222222',Doc)
+		console.log('ssssss',Doc[this.state.indexSelect])
 		return (
 			<div>
 				<Table
@@ -118,16 +120,23 @@ export default class GeneralTable extends Component {
 	                                </Col>
 	                            </Row>
 	                            <Row gutter={20} style={{marginTop:'1em'}} >
-	                                <Col span={3} style={{marginLeft:'1em'}} span={4}>
+	                            	<Col span={8} style={{marginLeft:'1em'}} >
+	                            		<Table  dataSource={[Doc[this.state.indexSelect]]} 
+				                                columns={this.optioncolumns} 
+				                                showHeader={false}
+				                                pagination={false}
+                                 		/>
+	                            	</Col>
+	                               {/* <Col span={3} style={{marginLeft:'1em'}} >
 	                                	<Icon type="paper-clip"></Icon>
 	                                	<a>{Doc[this.state.indexSelect].name}</a>
 	                                </Col>
 	                                <Col span={4}>
-	                                	<a onClick={this.previewFile.bind(this)}>预览</a>
-										<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this)}>下载</a>
-	                                </Col>
+	                                	<a onClick={this.previewFile.bind(this,Doc[this.state.indexSelect])}>预览</a>
+										<a style={{ marginLeft: 10 }}  
+										   href={Doc[this.state.indexSelect].basic_params.files[0].a_file}>下载</a>
+	                                </Col>*/ }
 	                            </Row>
-
 	                        </Col>
 	                    </Row>
 					</div>
@@ -145,6 +154,35 @@ export default class GeneralTable extends Component {
 		},
 	};
 
+	optioncolumns=[
+		{
+			title:'文档名称',
+			width:'40%',
+			render:()=>{
+				const { Doc = [] } = this.props;
+				return(
+					<div>
+						<Icon type="paper-clip"></Icon>
+		                <a>{Doc[this.state.indexSelect].name}</a>
+	                </div>
+	            )
+			}
+		},{
+			title:'操作',
+			width:'60%',
+			render:()=>{
+				const { Doc = [] } = this.props;
+				return (
+					<div>
+						<a onClick={this.previewFile.bind(this,Doc[this.state.indexSelect])}>预览</a>
+						<a  style={{ marginLeft: 10 }}  
+						  	href={Doc[this.state.indexSelect].basic_params.files[0].a_file}>下载
+						</a>
+					</div>
+				)
+			}
+		},
+	]
 	columns = [
 		{
 			title: '单位工程',
@@ -183,18 +221,15 @@ export default class GeneralTable extends Component {
 			render: (text,record, index) => {
 				const { Doc = [] } = this.props;
 				// console.log('doc222',Doc)
-				// console.log('record',record)
-				// console.log('index',index)
+				console.log('record22',record)
 				let nodes = [];
 				nodes.push(
 				// return (
 					<div>
-						{
-							// <a onClick={this.previewFile.bind(this, record)}>查看</a>
-						}
 						<a type="primary" onClick={this.showModal.bind(this,index)}>查看</a>
-						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
-						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>
+						{/*<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>*/
+						}
 					</div>
 				// )
 				);
@@ -238,39 +273,41 @@ export default class GeneralTable extends Component {
     //         selectDocuments(selectedRowKeys);
     //     },
     // };
-	createLink = (name, url) => {    //下载
-		let link = document.createElement("a");
-		link.href = url;
-		link.setAttribute('download', this);
-		link.setAttribute('target', '_blank');
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	}
-	download(index, key, e) {
-		const { selected = [], file = [], files = [], down_file = [] } = this.props;
 
-		if (selected.length == 0) {
-			message.warning('没有选择无法下载');
-		}
-		for (var j = 0; j < selected.length; j++) {
-			if (selected[j].code == index.code) {
+ //    //文件下载
+	// createLink = (name, url) => {    //下载
+	// 	let link = document.createElement("a");
+	// 	link.href = url;
+	// 	link.setAttribute('download', this);
+	// 	link.setAttribute('target', '_blank');
+	// 	document.body.appendChild(link);
+	// 	link.click();
+	// 	document.body.removeChild(link);
+	// }
+	// download(index, key, e) {
+	// 	const { selected = [], file = [], files = [], down_file = [] } = this.props;
 
-				selected.map(rst => {
-					file.push(rst.basic_params.files);
-				});
-				file.map(value => {
-					value.map(cot => {
-						files.push(cot.download_url)
-					})
-				});
-				files.map(down => {
-					let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-					this.createLink(this, down_load);
-				});
-			}
-		}
-	}
+	// 	if (selected.length == 0) {
+	// 		message.warning('没有选择无法下载');
+	// 	}
+	// 	for (var j = 0; j < selected.length; j++) {
+	// 		if (selected[j].code == index.code) {
+
+	// 			selected.map(rst => {
+	// 				file.push(rst.basic_params.files);
+	// 			});
+	// 			file.map(value => {
+	// 				value.map(cot => {
+	// 					files.push(cot.download_url)
+	// 				})
+	// 			});
+	// 			files.map(down => {
+	// 				let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
+	// 				this.createLink(this, down_load);
+	// 			});
+	// 		}
+	// 	}
+	// }
 
 	//文件预览
 	previewFile(file) {
@@ -283,11 +320,6 @@ export default class GeneralTable extends Component {
 		}
 	}
 
-	update(file) {
-		const { actions: { updatevisible, setoldfile } } = this.props;
-		updatevisible(true);
-		setoldfile(file);
-	}
 	static layoutT = {
       labelCol: {span: 8},
       wrapperCol: {span: 16},
