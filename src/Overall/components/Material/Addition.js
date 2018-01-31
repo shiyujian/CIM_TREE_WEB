@@ -590,10 +590,7 @@ class Addition extends Component {
         const {count,dataSource } = this.state;
         const newData = {
           key:count,
-          // equipName:this.state.equipName,
-          // equipNumber:this.state.equipNumber,
         };
-        // console.log('newDate',newData)
         this.setState({
           dataSource: [...dataSource, newData],
           count: count + 1,
@@ -648,7 +645,6 @@ class Addition extends Component {
           this.cacheData = newData.map(item => ({ ...item }));
         }
     }
-
     remark(doc, event) {
         const {
             docs = [],
@@ -668,9 +664,71 @@ class Addition extends Component {
             progress:0
         })
     }
-
-    
-    
+    save() {
+        const {
+            currentcode = {},
+            docs = [],
+            actions: {toggleAddition, postDocument, getdocument,changeDocs}
+        } = this.props;
+        console.log('docs',docs)
+        const promises = docs.map(doc => {
+            const response = doc.response;
+            let files=DeleteIpPort(doc);
+            doc.engineer=this.state.engineerName;
+            doc.number=this.state.engineerNumber;
+            doc.approve=this.state.engineerApprove;
+            doc.children=this.state.dataSource;
+            // console.log('doc.children',this.state.dataSource);
+            return postDocument({}, {
+                code: `${currentcode.code}_${response.id}`,
+                name: doc.name,
+                obj_type: 'C_DOC',
+                profess_folder: {
+                    code: currentcode.code, obj_type: 'C_DIR',
+                },
+                basic_params: {
+                    files:[files]
+                },
+                extra_params: {
+                    engineer:doc.engineer,
+                    number:doc.number,
+                    approve:doc.approve,
+                    company:doc.company,
+                    time:doc.time,
+                    remark: doc.remark,
+                    type: doc.type,
+                    lasttime: doc.lastModifiedDate,
+                    style: '机械设备',
+                    submitTime: moment.utc().format(),
+                    children:doc.children,
+                    // equipName:doc.equipName,
+                    // equipNumber:doc.equipNumber,
+                    // equipMoment:doc.equipMoment,
+                    // equipCount:doc.equipCount,
+                    // equipTime:doc.equipTime,
+                    // equipRemark:doc.equipRemark
+                },
+            });
+        });
+        message.warning('新增文件中...');
+        Promise.all(promises).then(rst => {
+            message.success('新增文件成功！');
+            changeDocs();
+            toggleAddition(false);
+            getdocument({code: currentcode.code});
+        });
+        this.setState({
+            progress:0
+        })
+    }
+    static layoutT = {
+      labelCol: {span: 8},
+      wrapperCol: {span: 16},
+    };
+    static layout = {
+      labelCol: {span: 4},
+      wrapperCol: {span: 20},
+    };
 
 }
 export default Form.create()(Addition)

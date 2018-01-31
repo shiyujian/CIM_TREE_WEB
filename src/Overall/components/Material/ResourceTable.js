@@ -132,14 +132,13 @@ export default class ResourceTable extends Component {
 	                                </Col>
 	                            </Row>
 	                            <Row gutter={20} style={{marginTop:'1em'}} >
-	                                <Col span={3} style={{marginLeft:'1em'}} span={4}>
-	                                	<Icon type="paper-clip"></Icon>
-	                                	<a>{Doc[this.state.indexSelect].name}</a>
-	                                </Col>
-	                                <Col span={4}>
-	                                	<a onClick={this.previewFile.bind(this)}>预览</a>
-										<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this)}>下载</a>
-	                                </Col>
+	                                <Col span={8} style={{marginLeft:'1em'}} >
+	                            		<Table  dataSource={[Doc[this.state.indexSelect]]} 
+				                                columns={this.optioncolumns} 
+				                                showHeader={false}
+				                                pagination={false}
+                                 		/>
+	                            	</Col>
 	                            </Row>
 	                        </Col>
 	                    </Row>
@@ -156,6 +155,36 @@ export default class ResourceTable extends Component {
 			selectDocuments(selectedRows);
 		},
 	};
+
+	optioncolumns=[
+		{
+			title:'文档名称',
+			width:'40%',
+			render:()=>{
+				const { Doc = [] } = this.props;
+				return(
+					<div>
+						<Icon type="paper-clip"></Icon>
+		                <a>{Doc[this.state.indexSelect].name}</a>
+	                </div>
+	            )
+			}
+		},{
+			title:'操作',
+			width:'60%',
+			render:()=>{
+				const { Doc = [] } = this.props;
+				return (
+					<div>
+						<a onClick={this.previewFile.bind(this,Doc[this.state.indexSelect])}>预览</a>
+						<a  style={{ marginLeft: 10 }}  
+						  	href={Doc[this.state.indexSelect].basic_params.files[0].a_file}>下载
+						</a>
+					</div>
+				)
+			}
+		},
+	]
 
 	columns = [
 		{
