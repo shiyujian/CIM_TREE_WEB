@@ -3,6 +3,8 @@ import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
+import Addition from './Addition';
+
 const FormItem = Form.Item;
 const Search = Input.Search;
 const TabPane=Tabs.TabPane;
@@ -11,9 +13,13 @@ const {RangePicker}=DatePicker;
 export default class Filter extends Component {
 
 	static propTypes = {};
-
 	render() {
-		const { actions: { toggleAddition }, Doc = [] } = this.props;
+		const { 
+			actions: { toggleAddition }, 
+			Doc = [],
+			toggleData: toggleData = {
+				type: 'equipment',
+			}, } = this.props;
 		console.log('filter.this.props',this.props)
 		console.log('filter.doc',Doc)
 		return (
@@ -63,6 +69,9 @@ export default class Filter extends Component {
 						{!this.props.isTreeSelected ?
 							<Button style={{ marginRight: 10 }} disabled>新增</Button> :
 							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
+						}
+						{
+							toggleData.type == 'equipment' && <Addition {...this.props} />
 						}
 						{
 							(Doc.length === 0) ?
