@@ -156,8 +156,7 @@ export const DataReportTemplate_QualityProblem = STATIC_DOWNLOAD_API + '/media/d
 /***********************静态常量**************************/
 export const WORKFLOW_CODE = {
 	'总进度计划报批流程': 'TEMPLATE_001',
-	'表单管理流程': 'TEMPLATE_002',
-	'每日进度填报流程': 'TEMPLATE_003'
+	'表单管理流程': 'TEMPLATE_002'
 	// '现场安全隐患排查工作流程': 'TEMPLATE_002',
 	// '分部验收流程': 'TEMPLATE_003',
 	// '周报填写流程': 'TEMPLATE_004',
@@ -489,7 +488,7 @@ export const MODULES2 = [
 		children: [{
 			id: 'SELFCARE.TASK',
 			name: '个人任务'
-		}, {
+		},{
 			id: 'SELFCARE.QUERY',
 			name: '个人考勤'
 		}]
@@ -617,7 +616,7 @@ export const MODULES = [
 			id: 'QUALITY.DEFECT',
 			name: '质量缺陷',
 		}]
-	},
+	}, 
 	{
 		id: 'SAFETY',
 		name: '安全管理',
@@ -667,7 +666,7 @@ export const MODULES = [
 				]
 			},
 			{
-				id: 'SAFETY.ZXFAJCS',
+				id:'SAFETY.ZXFAJCS',
 				name: '专项方案及措施',
 				children: [
 					{
@@ -681,7 +680,7 @@ export const MODULES = [
 			},
 			{
 				name: '安全监测',
-				id: 'SAFETY.MONITORAQJC',
+				id:'SAFETY.MONITORAQJC',
 				children: [
 					{
 						id: 'SAFETY.PLAN',
@@ -692,10 +691,10 @@ export const MODULES = [
 					}, {
 						id: 'SAFETY.QUERY',
 						name: '监测数据查询',
-					}, {
+					},{
 						id: 'SAFETY.PROJECT',
 						name: '监测项目',
-					}, {
+					},{
 						id: 'SAFETY.STATIONS',
 						name: '监测点',
 					},
@@ -704,7 +703,7 @@ export const MODULES = [
 						name: '监测数据',
 					}
 				]
-			},
+			}, 
 			{
 				id: 'SAFETY.MANAGEMENTANDCONTROL',
 				name: '安全管控',
@@ -735,7 +734,7 @@ export const MODULES = [
 			},
 			{
 				name: '事故管理',
-				id: 'SAFETY.ACCIDENT',
+				id:'SAFETY.ACCIDENT',
 				children: [
 					{
 						id: 'SAFETY.REGISTER',
@@ -1025,359 +1024,6 @@ export const MODULES = [
 			id: 'SYSTEM.ACCIDENT',
 			name: '安全事故',
 		}
-		]
-	}];
-export const MODULES3 = [
-	{
-		id: 'HOME',
-		name: '首页',
-	},
-	{
-		id: 'DISPLAY',
-		name: '综合展示',
-		children: [{
-			id: 'DISPLAY.2DGIS',
-			name: '现场信息',
-		}, {
-			id: 'DISPLAY.3DGIS',
-			name: '规划信息',
-		}, {
-			id: 'DISPLAY.DGNMODULE',
-			name: '项目信息',
-		}]
-	}, {
-		id: 'MANAGE',
-		name: '综合管理',
-		children: [{
-			id: 'MANAGE.NEWS',
-			name: '新闻通知'
-		}, {
-			id: 'MANAGE.DISPATCH',
-			name: '现场收发文'
-		}, {
-			id: 'MANAGE.MATERAIL',
-			name: '物资管理'
-		}, {
-			id: 'MANAGE.FORM',
-			name: '表单管理'
-		}, {
-			id: 'MANAGE.CHECKIN',
-			name: '考勤管理'
-		}]
-	}, {
-		id: 'DATUM',
-		name: '资料管理',
-		children: [{
-			id: 'DATUM.STANDARD',
-			name: '制度规范',
-		}, {
-			id: 'DATUM.ENGINEERING',
-			name: '工程文档'
-		}, {
-			id: 'DATUM.REDIOS',
-			name: '工程影像'
-		}]
-	}, {
-		id: 'QUALITY',
-		name: '质量管理',
-		children: [{
-			id: 'QUALITY.TONGJI',
-			name: '质量分析',
-		}, {
-			id: 'QUALITYSCORES',
-			name: '质量评分',
-			children: [{
-				id: 'QUALITY.SCORE',
-				name: '质量管理检查记录',
-			}]
-		}, {
-			id: 'QUALITY.APPRAISING',
-			name: '质量评优',
-		}, {
-			name: '质量验收',
-			children: [{
-				id: 'QUALITY.TIANBAO',
-				name: '进场材料填报',
-			}, {
-				id: 'QUALITY.QUERY',
-				name: '验收查询',
-			}, {
-				id: 'QUALITY.HUAFEN',
-				name: '检验批划分',
-			}, {
-				id: 'QUALITY.SUBITEM',
-				name: '分项验收',
-			}, {
-				id: 'QUALITY.FENBU',
-				name: '分部验收',
-			}, {
-				id: 'QUALITY.DANWEI',
-				name: '单位工程验收',
-			}]
-		}, {
-			id: 'QUALITY.DEFECT',
-			name: '质量缺陷',
-		}]
-	},
-	{
-		id: 'SAFETY',
-		name: '安环管理',
-		children: [
-			{
-				id: 'SAFETY',
-				name: '安全动态',
-			}, {
-				id: 'SAFETY.SYSTEM',
-				name: '安全体系',
-			}, {
-				id: 'SAFETY.HIDDENDANGER',
-				name: '安全隐患',
-			},
-			{
-				id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT',
-				name: '安全文明施工',
-				children: [
-					{
-						id: 'SAFETY.RISKEVALUATION',
-						name: '危险源风险评价',
-					}, {
-						id: 'SAFETY.UNBEARABLE',
-						name: '环境保护',
-					}, {
-						id: 'SAFETY.RISKFACTOR',
-						name: '文明施工',
-					}
-				]
-			},
-			{
-				id: 'SAFETY.EDUCATIONREGISTER',
-				name: '安全教育',
-			},
-			{
-				id: 'SAFETY.SAFETYTREND',
-				name: '安全动态管理',
-			}
-		]
-	},
-	{
-		id: 'SCHEDULE',
-		name: '进度管理',
-		children: [{
-			id: 'SCHEDULE.STAGEREPORT',
-			name: '进度填报',
-		}, {
-			id: 'SCHEDULE.PROPROGRESS',
-			name: '项目进度',
-		}, {
-			id: 'SCHEDULE.ENTERANALYZE',
-			name: '苗木进场分析',
-		}, {
-			id: 'Scheduleanalyze',
-			name: '种植进度分析',
-		}, {
-			id: 'SCHEDULE.SHOW',
-			name: '种植进度展示',
-		}]
-	}, {
-		id: 'FOREST',
-		name: '森林大数据',
-		children: [{
-			id: 'FOREST.INFO',
-			name: '植被信息',
-			children: [{
-				id: 'FOREST.NURSOVERALLINFO',
-				name: '苗木综合信息',
-			}, {
-				id: 'FOREST.NURSMEASUREINFO',
-				name: '苗圃测量信息',
-			}, {
-				id: 'FOREST.LOCMEASUREINFO',
-				name: '现场测量信息',
-			}, {
-				id: 'FOREST.SUPERVISORINFO',
-				name: '监理验收信息',
-			}, {
-				id: 'FOREST.OWNERINFO',
-				name: '业主抽查信息',
-			}, {
-				id: 'FOREST.CONTRASTINFO',
-				name: '苗木对比信息',
-			}, {
-				id: 'FOREST.FAITHINFO',
-				name: '供应商诚信信息',
-			}]
-		}, {
-			id: 'FOREST.IMPORT',
-			name: '数据导入',
-			children: [{
-				id: 'FOREST.DATAIMPORT',
-				name: '定位数据导入',
-			}]
-		}]
-	}, {
-		id: 'RECEIVE',
-		name: '收发货管理',
-		children: [{
-			id: 'RECEIVE.RECEIVEMANAGEMENT',
-			name: '收货管理',
-		}, {
-			id: 'RECEIVE.DISTRIBUTIONMANAGEMENT',
-			name: '发放管理',
-		}, {
-			id: 'RECEIVE.INVENTORYMANAGEMENT',
-			name: '库存管理',
-		}]
-	}, {
-		id: 'SELFCARE',
-		name: '个人中心',
-		children: [{
-			id: 'SELFCARE.TASK',
-			name: '个人任务',
-		}, {
-			id: 'SELFCARE.QUERY',
-			name: '个人考勤',
-		}, {
-			id: 'SELFCARE.LEAVE',
-			name: '个人请假',
-		}, {
-			id: 'SELFCARE.ACCOUNT',
-			name: '账号管理',
-		}]
-	}, {
-		id: 'SYSTEM',
-		name: '系统设置',
-		children: [
-			{
-				id: 'SYSTEM.ROLE',
-				name: '角色设置'
-			}, {
-				id: 'SYSTEM.PERMISSION',
-				name: '权限设置'
-			}, {
-				id: 'SETUP.PERSON',
-				name: '用户管理'
-			}, {
-				id: 'SYSTEM.WORKFLOW',
-				name: '流程设置'
-			}, {
-				id: 'SYSTEM.ORG',
-				name: '组织机构'
-			}
-		]
-	}, {
-		id: 'PROJECT',
-		name: '系统管理',
-		children: [
-			{
-				name: '地块区域',
-				children: [{
-					id: 'PROJECT.PLOTMAGE',
-					name: '地块管理',
-				}, {
-					id: 'PROJECT.AREAMANAGE',
-					name: '区域管理',
-				}, {
-					id: 'PROJECT.SECTIONMANAGE',
-					name: '标段管理',
-				}, {
-					id: 'PROJECT.SMALLCLASS',
-					name: '小班管理',
-				}, {
-					id: 'PROJECT.THINCLASS',
-					name: '细班管理',
-				}]
-			}, {
-				name: '工程管理',
-				children: [{
-					id: 'PROJECT.PLOTSET',
-					name: '地块设置',
-				}, {
-					id: 'PROJECT.AREASET',
-					name: '区域设置',
-				}, {
-					id: 'PROJECT.UNITPRO',
-					name: '单位工程',
-				}, {
-					id: 'PROJECT.SUBUNITPRO',
-					name: '子单位工程',
-				}, {
-					id: 'PROJECT.SUBPRO',
-					name: '分部工程',
-				}, {
-					id: 'PROJECT.ITEMPRO',
-					name: '分项工程',
-				}]
-			}, {
-				name: '组织机构',
-				children: [{
-					id: 'PROJECT.ORGTYPE',
-					name: '类型管理',
-				}, {
-					id: 'PROJECT.UNITMANAGE',
-					name: '单位管理',
-				}, {
-					id: 'PROJECT.BRANCHMANAGE',
-					name: '部门管理',
-				}]
-			}, {
-				name: '资料管理',
-				children: [{
-					id: 'PROJECT.STANDARD',
-					name: '制度标准',
-				}, {
-					id: 'PROJECT.ENGINEERINGIMAGE',
-					name: '工程影像',
-				}, {
-					id: 'PROJECT.PRODOC',
-					name: '工程文档',
-				}, {
-					id: 'PROJECT.KEYWORD',
-					name: '工程字段',
-				}, {
-					id: 'PROJECT.TEMPLATE',
-					name: '模板配置',
-				}, {
-					id: 'PROJECT.DICTIONARIES',
-					name: '工程文档字典',
-				}]
-			}, {
-				name: '综合管理',
-				children: [{
-					id: 'PROJECT.MATERIAL',
-					name: '物资管理',
-				},
-				{
-					id: 'PROJECT.FORM',
-					name: '表单管理',
-				}]
-			}, {
-				name: '安全管理',
-				children: [{
-					id: 'PROJECT.SAFETYSYSTEM',
-					name: '安全体系目录',
-				}, {
-					id: 'PROJECT.DANGER',
-					name: '危险源',
-				}, {
-					id: 'PROJECT.HAZARD',
-					name: '安全隐患',
-				}]
-			}, {
-				name: '质量管理',
-				children: [{
-					id: 'PROJECT.DEFECTS',
-					name: '质量缺陷',
-				}]
-			}, {
-				name: '苗木管理',
-				children: [{
-					id: 'PROJECT.NURSERYTYPE',
-					name: '类型管理',
-				}, {
-					id: 'PROJECT.TREEMANAGE',
-					name: '树种管理',
-				}]
-			}
 		]
 	}];
 
