@@ -1,52 +1,16 @@
 import React, { Component, Children } from 'react';
 import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification, } from 'antd';
 const FormItem = Form.Item;
-import { STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
-class TotleModal extends Component {
+class DayModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            TreatmentData: [],
+            treeDatasource: [],
         }
     }
     componentDidMount() {
-        this.setState({
-            TreatmentData: this.props.treatmentdata
-        })
+        
     }
-    // //文件预览
-    // onViewClick(record, index) {
-    //     const { actions: { openPreview } } = this.props;
-    
-    //     console.log('record',record)
-    //     let filed = {};
-    //     if (record && record.file_id) {
-            
-    //         filed.misc = "file";
-    //         filed.a_file = `${SOURCE_API}` + record.a_file;
-    //         filed.download_url = `${STATIC_DOWNLOAD_API}` + record.download_url;
-    //         filed.name = record.fileName;
-    //         filed.id = record.file_id;
-    //         let type = record.a_file.split('.')[1];
-    //         if (type == 'xlsx' || type == 'docx' || type == 'xls' || type == 'doc' || type == 'pptx' || type == 'ppt') {
-    //             filed.mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    //         }
-    //         if (type == 'pdf') {
-    //             filed.mime_type = "application/pdf";
-    //         }
-    //     }
-    //     openPreview(filed);
-    // }
-    onViewClick(record,index) {
-		const {actions: {openPreview}} = this.props;
-        let filed = {}
-        filed.misc = record.misc;
-        filed.a_file = `${SOURCE_API}` + (record.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.download_url = `${STATIC_DOWNLOAD_API}` + (record.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        filed.name = record.fileName;
-        filed.mime_type = record.mime_type;
-        openPreview(filed);
-	}
     render() {
         const {
             form: { getFieldDecorator },
@@ -58,7 +22,7 @@ class TotleModal extends Component {
         return (
             <div>
                 <Modal
-                    title='总进度计划流程详情'
+                    title='日进度计划流程详情'
                     width={800}
                     onOk={this.props.onok}
                     onCancel={this.props.oncancel}
@@ -72,8 +36,8 @@ class TotleModal extends Component {
                                         <Col span={8}>
                                             <FormItem {...FormItemLayout} label='区域'>
                                                 {
-                                                    getFieldDecorator('totlearea', {
-                                                        initialValue: `${this.props.area || '暂无区域'}`,
+                                                    getFieldDecorator('dayarea', {
+                                                        initialValue: ``,
                                                         rules: [
                                                             { required: false, message: '请选择区域' }
                                                         ]
@@ -85,8 +49,8 @@ class TotleModal extends Component {
                                         <Col span={8}>
                                             <FormItem {...FormItemLayout} label='单位工程'>
                                                 {
-                                                    getFieldDecorator('totleunit', {
-                                                        initialValue: `${this.props.unit || '暂无单位工程'}`,
+                                                    getFieldDecorator('dayunit', {
+                                                        initialValue: ``,
                                                         rules: [
                                                             { required: false, message: '请选择单位工程' }
                                                         ]
@@ -98,8 +62,8 @@ class TotleModal extends Component {
                                         <Col span={8}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
-                                                    getFieldDecorator('totlenumbercode', {
-                                                        initialValue: `${this.props.numbercode || '暂无编号'}`,
+                                                    getFieldDecorator('daynumbercode', {
+                                                        initialValue: ``,
                                                         rules: [
                                                             { required: false, message: '请输入编号' }
                                                         ]
@@ -113,8 +77,8 @@ class TotleModal extends Component {
                                         <Col span={8}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
-                                                    getFieldDecorator('totlesuperunit', {
-                                                        initialValue: `${this.props.totlesuperunit || '暂无监理单位'}`,
+                                                    getFieldDecorator('daysuperunit', {
+                                                        initialValue: ``,
                                                         rules: [
                                                             { required: false, message: '请输入监理单位' }
                                                         ]
@@ -139,8 +103,8 @@ class TotleModal extends Component {
                                         <Col span={8} style={{ marginTop: '30px' }}>
                                             <FormItem {...FormItemLayout} label='审核人'>
                                                 {
-                                                    getFieldDecorator('totledataReview', {
-                                                        initialValue: `${this.props.dataReview || ''}`,
+                                                    getFieldDecorator('daydataReview', {
+                                                        initialValue: ``,
                                                         rules: [
                                                             { required: true, message: '请输入审核人员' }
                                                         ]
@@ -160,35 +124,25 @@ class TotleModal extends Component {
         )
     }
     columns1 = [{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index',
-        width: '10%',
-    }, {
-        title: '文件名称',
-        dataIndex: 'fileName',
-        key: 'fileName',
-        width: '35%',
-    }, {
-        title: '备注',
-        dataIndex: 'remarks',
-        key: 'remarks',
-        width: '30%',
-    }, {
-        title: '操作',
-        dataIndex: 'operation',
-        key: 'operation',
-        width: '10%',
-        render: (text, record, index) => {
-            return <div>
-                <a href='javascript:;' onClick={this.onViewClick.bind(this, record, index)}>预览</a>
-                <span className="ant-divider" />
-                <a href={`${STATIC_DOWNLOAD_API}${record.a_file}`}>下载</a>
-            </div>
-        }
-    }]
+		title: '序号',
+		dataIndex: 'key',
+		key: 'key',
+		width: '10%',
+	}, {
+		title: '项目',
+		dataIndex: 'project',
+		key: 'project',
+	}, {
+		title: '单位',
+		dataIndex: 'units',
+		key: 'units',
+	}, {
+		title: '数量',
+		dataIndex: 'number',
+		key: 'number',
+	},];
 }
 
 
-export default Form.create()(TotleModal)
+export default Form.create()(DayModal)
 
