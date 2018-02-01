@@ -182,6 +182,7 @@ class Filter extends Component {
 			filter = {}
 		} = this.props;
 		const user = getUser();
+		console.log(this.props)
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
 				task: filter.type || "processing",
