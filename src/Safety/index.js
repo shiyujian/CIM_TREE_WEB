@@ -92,6 +92,12 @@ export default class Safety extends Component {
 		path: '/safety/educationRegister',
 		icon: <Icon name="tag" />
 	}, {
+		key: 'EducationRegisters',
+		id: 'SAFETY.EDUCATIONREGISTER',
+		name: '安全教育1',
+		path: '/safety/educationRegisters',
+		icon: <Icon name="tag" />
+	}, {
 		key: 'SafetyTrend',
 		id: 'SAFETY.SAFETYTREND',
 		name: '安全动态管理',
