@@ -25,14 +25,15 @@ import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from
 import './Register.css';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { divIcon } from 'leaflet';
-import { Map, TileLayer, Marker, Polygon } from 'react-leaflet';
+// import { divIcon } from 'leaflet';
+// import { Map, TileLayer, Marker, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import './HiddenDanger.less';
 moment.locale('zh-cn');
 const Option = Select.Option;
-const Step = Steps.Step;
-const URL = window.config.VEC_W;
-const leafletCenter = window.config.initLeaflet.center;
+// const Step = Steps.Step;
+// const URL = window.config.VEC_W;
+// const leafletCenter = window.config.initLeaflet.center;
 @connect(
     state => {
         const { safety: { hiddenDanger = {} } = {}, platform } = state;
@@ -52,39 +53,123 @@ export default class HiddenDanger extends Component {
             currentSteps: 0,
             detailObj: {},
             currentSelectValue: '',
+            modalVisible: false,
+            dataSous: {},
             leafletCenter: [22.516818, 113.868495],
+            // hazards: [],//安全隐患
             data: [
                 {
                     o: 1,
-                    riskContent: "斤斤计较",
-                    unitName: "123",
+                    riskContent: "侧枝折断",
+                    unitName: "1标段",
+                    smallName: "1小班",
+                    thinName: "12细班",
                     level: "V",
                     timeLimit: "2016-11-01",
                     status: "jj",
-                    resPeople: "嘻嘻嘻",
+                    resPeople: "张三",
+                    fsPeople: "小明",
+                    jlPeople: "小王",
+                    zgcuoshi: "随便",
+                    x: "22.5202031353",
+                    y: "113.893730454",
+                    geometry: {coordinates: [22.5202031353,113.893730454],type: "Point"},
+                    type: "danger",
+                    properties: {},
+                    key: "b5d535a8-9b52-4d8b-8e64-e68d96857ce2",
                 }, {
                     o: 2,
-                    riskContent: "dddd",
-                    unitName: "123",
+                    riskContent: "车辆停靠",
+                    unitName: "12标段",
+                    smallName: "2小班",
+                    thinName: "13细班",
                     level: "V",
                     timeLimit: "2016-11-01",
                     status: "hh",
-                    resPeople: "jjjjj",
+                    resPeople: "李四",
+                    fsPeople: "小明11",
+                    jlPeople: "小王11",
+                    zgcuoshi: "随便11",
+                    x: "22.5202031353",
+                    y: "113.893730454",
+                    geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
+                    type: "danger",
+                    properties: {},
                 }, {
                     o: 3,
-                    riskContent: "ssss",
-                    unitName: "123",
+                    riskContent: "苗木枯萎",
+                    unitName: "123标段",
+                    smallName: "3小班",
+                    thinName: "14细班",
                     level: "V",
                     timeLimit: "2016-11-01",
                     status: "aaa",
-                    resPeople: "dfdf",
+                    resPeople: "王五",
+                    fsPeople: "小明22",
+                    jlPeople: "小王22",
+                    zgcuoshi: "随便22",
+                    x: "22.5202031353",
+                    y: "113.893730454",
+                    geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
+                    type: "danger",
+                    properties: {},
                 }
             ]
         }
     }
     componentDidMount() {
-
+        // this.getRisk();
     }
+
+    /*获取安全隐患点*/
+    // getRisk() {
+    //     const {getRisk} = this.props.actions;
+    //     let me = this;
+    //     getRisk().then(data => {
+    //         //安全隐患数据处理
+    //         let datas = data.content;
+    //         let riskObj = {}
+    //         datas.forEach((v, index) => {
+    //             // let levelNode = v["risk_level"];
+    //             let level = v["EventType"];
+    //             let name = v["Problem"];
+    //             let response_org = v['ReorganizerObj'];
+    //             // let measure = levelNode["风险控制措施"];
+    //             let content = v["ProblemType"];
+    //             //位置
+    //             let coordinates = ["22.5202031353", "113.893730454"];
+    //             riskObj[level] = riskObj[level] || {
+    //                 key: level,
+    //                 'properties': {
+    //                     name: level
+    //                 },
+    //                 children: []
+    //             };
+    //             riskObj[level].children.push({
+    //                 'type': 'danger',
+    //                 key: v.ID,
+    //                 'properties': {
+    //                     'content': content,
+    //                     'level': level,
+    //                     'measure': '',
+    //                     'name': name,
+    //                     'response_org':response_org?response_org.Full_Name:'',
+    //                     // beforeImgs: v['rectify_before'] ? v['rectify_before'].images : [],
+    //                     // afterImgs: v['rectify_after'] ? v['rectify_after'].images : []
+    //                 },
+    //                 'geometry': {
+    //                     'type': 'Point',
+    //                     'coordinates': coordinates
+    //                 }
+    //             });
+    //         });
+    //         let risks = [];
+    //         for (let i in riskObj) {
+    //             risks.push(riskObj[i]);
+    //         }
+    //         me.setState({hazards: risks});
+    //     });
+    // }
 
     onSearch = (value) => {
         const { currentUnitCode, currentSelectValue } = this.state;
@@ -259,44 +344,62 @@ export default class HiddenDanger extends Component {
     }
 
     onDetailClick = (record, index) => {
-        const code = WORKFLOW_CODE.安全隐患上报流程;
-        const {
-            actions: {
-                getWrokflowByID
-            }
-        } = this.props;
-        let detailObj = {};
-        let array = [];
-        const location = record.coordinate;
-        // array.push(location.latitude);
-        array.push(location.longitude);
-        this.setState({ leafletCenter: array })
-        detailObj.riskName = record.riskContent;
-        detailObj.projectName = record.projectName;
-        detailObj.unitName = record.unitName;
-        detailObj.images = record.images;
-        this.setState({ currentSteps: this.getRiskState(record.status) });
-        getWrokflowByID({ id: record.id, code: code }).then(rst => {
-            let len = rst[0].workflow.states.length;
-            for (let i = 0; i < len; i++) {
-                debugger
-                if (rst[0].workflow.states[i].name === "隐患上报" && rst[0].workflow.states[i].participants.length !== 0) {
-                    detailObj.finder = rst[0].workflow.states[i].participants[0].executor.person_name;
-                } else if (rst[0].workflow.states[i].name === "隐患核查" && rst[0].workflow.states[i].participants.length !== 0) {
-                    detailObj.supervision = rst[0].workflow.states[i].participants[0].executor.person_name;
-                } else if (rst[0].workflow.states[i].name === "隐患整改" && rst[0].workflow.states[i].participants.length !== 0) {
-                    detailObj.charger = rst[0].workflow.states[i].participants[0].executor.person_name;
-                }
-            }
-            this.setState({ detailObj });
-        });
+        // debugger
+        console.log('record',record)
+        const {dataSous} = this.state;
+        this.setState({ dataSous: record, modalVisible: true });
+        // let dataes = {};
+        // dataes.o = record.o;
+        // dataes.level = record.level;
+        // dataes.resPeople = record.resPeople;
+        // dataes.riskContent = record.riskContent;
+        // dataes.status = record.status;
+        // dataes.timeLimit = record.timeLimit;
+        // dataes.unitName = record.unitName;
+        // dataes = {...record};
+        // console.log('dataes',dataes)
+        // const code = WORKFLOW_CODE.安全隐患上报流程;
+        // const {
+        //     actions: {
+        //         getWrokflowByID
+        //     }
+        // } = this.props;
+        // let detailObj = {};
+        // let array = [];
+        // const location = record.coordinate;
+        // // array.push(location.latitude);
+        // // array.push(location.longitude);
+        // this.setState({ leafletCenter: array })
+        // detailObj.riskName = record.riskContent;
+        // detailObj.projectName = record.projectName;
+        // detailObj.unitName = record.unitName;
+        // detailObj.images = record.images;
+        // this.setState({ currentSteps: this.getRiskState(record.status) });
+        // getWrokflowByID({ id: record.id, code: code }).then(rst => {
+        //     let len = rst[0].workflow.states.length;
+        //     for (let i = 0; i < len; i++) {
+        //         // debugger
+        //         if (rst[0].workflow.states[i].name === "隐患上报" && rst[0].workflow.states[i].participants.length !== 0) {
+        //             detailObj.finder = rst[0].workflow.states[i].participants[0].executor.person_name;
+        //         } else if (rst[0].workflow.states[i].name === "隐患核查" && rst[0].workflow.states[i].participants.length !== 0) {
+        //             detailObj.supervision = rst[0].workflow.states[i].participants[0].executor.person_name;
+        //         } else if (rst[0].workflow.states[i].name === "隐患整改" && rst[0].workflow.states[i].participants.length !== 0) {
+        //             detailObj.charger = rst[0].workflow.states[i].participants[0].executor.person_name;
+        //         }
+        //     }
+        // });
     }
+
+    cancel() {
+        this.setState({modalVisible: false})
+    }
+
     render() {
         const columns = [
             {
                 title: '编号',
                 dataIndex: 'o',
-                width: '8%',
+                width: '5%',
                 render: (text, record, index) => {
                     return <div>{index + 1}</div>;
                 }
@@ -309,13 +412,21 @@ export default class HiddenDanger extends Component {
                 dataIndex: 'unitName',
                 width: '10%'
             }, {
+                title: '小班',
+                dataIndex: 'smallName',
+                width: '10%'
+            }, {
+                title: '细班',
+                dataIndex: 'thinName',
+                width: '10%'
+            }, {
                 title: '等级',
                 dataIndex: 'level',
                 width: '10%'
             }, {
                 title: '整改期限',
                 dataIndex: 'timeLimit',
-                width: '25%'
+                width: '10%'
             }, {
                 title: '状态',
                 dataIndex: 'status',
@@ -391,6 +502,7 @@ export default class HiddenDanger extends Component {
                                 </Col>
                             </Row>
                             <Table
+                                className = 'foresttable'
                                 columns={columns}
                                 // dataSource={this.state.dataSet}
                                 dataSource = {this.state.data}
@@ -399,8 +511,16 @@ export default class HiddenDanger extends Component {
                             />
                         </Col>
                     </Row>
+                    {this.state.modalVisible && 
+                     <HiddenModle 
+                        {...this.props} 
+                        onok = {this.onDetailClick.bind(this)} 
+                        oncancel = {this.cancel.bind(this)}
+                        data = {this.state.data}
+                        dataSous = {this.state.dataSous}
+                        /*hazards = {this.state.hazards}*/
+                    />}
                 </Content>
-                {/*<HiddenModle {...this.props}/>*/}
             </div>
 
         );
