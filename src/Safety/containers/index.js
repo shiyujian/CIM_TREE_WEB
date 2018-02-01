@@ -3,6 +3,7 @@ export Unbearable from './Unbearable';
 export RiskFactor from './RiskFactor';
 export DynamicReport from './DynamicReport';
 export EducationRegister from './EducationRegister';
+export EducationRegisters from './EducationRegisters';
 export HiddenDanger from './HiddenDanger';
 export SafetySystem from './SafetySystem';
 export SafetyTrend from './SafetyTrend';
