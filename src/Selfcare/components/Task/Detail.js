@@ -6,6 +6,8 @@ import moment from 'moment';
 import PerSearch from '../../../Overall/components/FormManage/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
+import OverallMaterialGeneral from './OverallMaterialGeneral';
+import OverallMaterialResource from './OverallMaterialResource';
 const FormItem = Form.Item;
 export default class Detail extends Component {
 	render() {
@@ -13,13 +15,32 @@ export default class Detail extends Component {
 		if (task && task.workflow && task.workflow.code) {
 			console.log('task', task)
 			let code = task.workflow.code
-			switch (code) {
-				case WORKFLOW_CODE.总进度计划报批流程:
-					return this.renderSchedule(task);
-				case WORKFLOW_CODE.每日进度填报流程:
-					return this.daySchedule(task);
-				default:
-					return <div>待定流程</div>
+			let name = task.current ? task.current[0].name : '';
+
+			console.log('code',code)
+			console.log('WORKFLOW_CODE.机械设备报批流程',WORKFLOW_CODE.机械设备报批流程)
+			console.log('WORKFLOW_CODE.工程材料报批流程',WORKFLOW_CODE.工程材料报批流程)
+			console.log('WORKFLOW_CODE.苗木资料报批流程',WORKFLOW_CODE.苗木资料报批流程)
+			console.log('name',name)
+
+			if(code === WORKFLOW_CODE.总进度计划报批流程){
+				return this.renderSchedule(task);
+			}else if (code === WORKFLOW_CODE.每日进度填报流程){
+				return this.daySchedule(task);
+			}else if (code === WORKFLOW_CODE.机械设备报批流程 && (name == '初审' || name == '复审')){
+				return (
+					<OverallMaterialGeneral {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.工程材料报批流程 && (name == '初审' || name == '复审')){
+				return (
+					<OverallMaterialResource {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && (name == '初审' || name == '复审')){
+				return (
+					<OverallMaterialResource {...this.props} {...this.state}/>
+				)
+			}else {
+				return <div>待定流程</div>
 			}
 		} else {
 			return null

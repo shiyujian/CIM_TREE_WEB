@@ -1,105 +1,99 @@
-/**
-* Copyright (c) 2016-present, ecidi.
-* All rights reserved.
-* 
-* This source code is licensed under the GPL-2.0 license found in the
-* LICENSE file in the root directory of this source tree.
-*/
-
 import React, { Component } from 'react';
-// import { actions as platformActions } from '_platform/store/global';
-import {Row, Col, Modal, Card, Steps} from 'antd';
-import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from '_platform/api';
+import {Row, Col, Modal, Card, Steps, Button} from 'antd';
+import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel, CUS_TILEMAP } from '_platform/api';
 import './Register.css';
-import {TileLayer} from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import {Map, TileLayer} from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css'
 const Step = Steps.Step;
+const leafletCenter = window.config.initLeaflet.center;
+const URL = window.config.VEC_W;
 
 export default class HiddenModle extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dataSet: [],
-            currentUnitCode: '',
-            currentSteps: 0,
-            detailObj: {},
-            currentSelectValue: '',
-            leafletCenter: [22.516818, 113.868495],
+            // hazards: [],//安全隐患
         }
     }
     componentDidMount() {
-
+        this.initMap();
     }
 
-    // onDetailClick = (record, index) => {
-    //     const code = WORKFLOW_CODE.安全隐患上报流程;
-    //     const {
-    //         actions: {
-    //             getWrokflowByID
-    //         }
-    //     } = this.props;
-    //     let detailObj = {};
-    //     let array = [];
-    //     const location = record.coordinate;
-    //     array.push(location.latitude);
-    //     array.push(location.longitude);
-    //     this.setState({ leafletCenter: array })
-    //     detailObj.riskName = record.riskContent;
-    //     detailObj.projectName = record.projectName;
-    //     detailObj.unitName = record.unitName;
-    //     detailObj.images = record.images;
-    //     this.setState({ currentSteps: this.getRiskState(record.status) });
-    //     getWrokflowByID({ id: record.id, code: code }).then(rst => {
-    //         let len = rst[0].workflow.states.length;
-    //         for (let i = 0; i < len; i++) {
-    //             debugger
-    //             if (rst[0].workflow.states[i].name === "隐患上报" && rst[0].workflow.states[i].participants.length !== 0) {
-    //                 detailObj.finder = rst[0].workflow.states[i].participants[0].executor.person_name;
-    //             } else if (rst[0].workflow.states[i].name === "隐患核查" && rst[0].workflow.states[i].participants.length !== 0) {
-    //                 detailObj.supervision = rst[0].workflow.states[i].participants[0].executor.person_name;
-    //             } else if (rst[0].workflow.states[i].name === "隐患整改" && rst[0].workflow.states[i].participants.length !== 0) {
-    //                 detailObj.charger = rst[0].workflow.states[i].participants[0].executor.person_name;
-    //             }
-    //         }
-    //         this.setState({ detailObj });
-    //     });
-    // }
-    render() {
-        const { detailObj } = this.state;
-        // detailObj.riskName = detailObj.riskName ? detailObj.riskName : '';
-        // detailObj.projectName = detailObj.projectName ? detailObj.projectName : '';
-        // detailObj.unitName = detailObj.unitName ? detailObj.unitName : '';
-        // detailObj.finder = detailObj.finder ? detailObj.finder : '';
-        // detailObj.supervision = detailObj.supervision ? detailObj.supervision : '无';
-        // detailObj.charger = detailObj.charger ? detailObj.charger : '无';
-        // detailObj.images = detailObj.images ? detailObj.images : [];
-        // let array = [];
-        // for (let i = 0; i < detailObj.images.length; i++) {
-        //     array.push(<Col span={6}>
-        //         <Card>
-        //             <div>
-        //                 <img style={{ width: 115, height: 72 }} src={`${SOURCE_API}${detailObj.images[i]}`} />
-        //             </div>
-        //         </Card>
-        //     </Col>);
-        // }
+    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
+    subDomains = ['7'];
+    tileUrls = {
+        1: window.config.IMG_W,
+        2: window.config.VEC_W
+    };
+    /*初始化地图*/
+    initMap() {
+        this.map = L.map('mapid', window.config.initLeaflet);
 
+        L.control.zoom({position: 'bottomright'}).addTo(this.map);
+
+        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+            attribution: '&copy;<a href="">ecidi</a>',
+            id: 'tiandi-map',
+            subdomains: this.subDomains
+        }).addTo(this.map);
+        //航拍影像
+        if (CUS_TILEMAP)
+            L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
+
+        L.tileLayer.wms(this.WMSTileLayerUrl, {
+            subdomains: this.subDomains
+        }).addTo(this.map);
+    }
+
+    /*在地图上添加marker和polygan*/
+    createMarker() {
+        let geo = this.props.dataSous;
+        if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {
+            return;
+        }
+        let dangerIcon = L.icon({iconUrl: require('./ImageIcon/danger.png')});
+        let marker = L.marker(geo.geometry.coordinates,{icon: dangerIcon, title: geo.riskContent});
+        console.log('marker',marker)
+        marker.bindPopup(L.popup({maxWidth: 240}).setContent(this.genPopUpContent(geo)));
+        marker.addTo(this.map);
+        return marker;
+        // let dangerIcon = L.icon({iconUrl: require('./ImageIcon/danger.png')});
+        // L.marker([22.5202031353,113.893730454],{icon: dangerIcon}).addTo(this.map)
+    }
+
+    genPopUpContent(geo) {
+        return (
+            `<div>
+                <h2><span>隐患内容：</span>${geo.riskContent}</h2>
+                <h2><span>风险级别：</span>${geo.level}</h2>
+                <h2><span>整改状态：</span>未整改</h2>
+                <h2><span>整改措施：</span>${geo.zgcuoshi ? geo.zgcuoshi : ''}</h2>
+            </div>`
+        )
+    }
+
+    render() {
+        let detail = this.props.dataSous
         return (
             <Modal
                 visible = {true}
+                footer = {false}
+                width = {1000}
+                onCancel={this.props.oncancel}
             >
                 <Row><h2 style={{ textAlign: 'center' }}>安全隐患详情</h2></Row>
                 <Row style={{ marginTop: 15 }}>
-                    <Col span={8}><span style={{ fontSize: 16 }}>{`隐患名称：`}</span></Col>
-                    <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`发现人员：`}</span></Col>
+                    <Col span={8}><span style={{ fontSize: 16 }}>{`隐患内容：${detail.riskContent}`}</span></Col>
+                    <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`发现人员：${detail.fsPeople}`}</span></Col>
                 </Row>
                 <Row>
-                    <Col span={16}><span style={{ fontSize: 16 }}>{`工程名称：`}</span></Col>
-                    <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`监理工程师：`}</span></Col>
+                    <Col span={16}><span style={{ fontSize: 16 }}>{`单位工程：${detail.unitName}`}</span></Col>
+                    <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`监理工程师：${detail.jlPeople}`}</span></Col>
                 </Row>
                 <Row>
-                    <Col span={8}><span style={{ fontSize: 16 }}>{`工程部位：`}</span></Col>
-                    <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`整改负责人：`}</span></Col>
+                    <Col span={8}><span style={{ fontSize: 16 }}>{`整改措施：${detail.zgcuoshi}`}</span></Col>
+                    <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`整改负责人：${detail.resPeople}`}</span></Col>
                 </Row>
                 <Row style={{ marginTop: 30 }}>
                     <Steps /*current={this.state.currentSteps}*/>
@@ -109,14 +103,18 @@ export default class HiddenModle extends Component {
                         <Step title="审核" />
                     </Steps>
                 </Row>
-                <Row style={{ marginTop: 20 }} gutter={5} style={{ height: 120 }}>
-                    {/*array*/}
+                <Row style={{ marginTop: 50 }}>
+                    <Button style={{marginRight:"10px"}} onClick = {this.createMarker.bind(this)}>位置</Button>
                 </Row>
-                <Card style={{ marginTop: 50 }}>
-                    <Map center={this.state.leafletCenter} zoom={DefaultZoomLevel} zoomControl={false}
-                        style={{ position: 'relative', height: 400, width: '100%' }}>
-                        <TileLayer url={URL} subdomains={['7']} />
-                    </Map>
+                <Card style={{ height: 500, width: '100%' }}>
+                    <div id="mapid" style={{
+                        "position": "absolute",
+                        "top": 0,
+                        "bottom": 0,
+                        "left": 0,
+                        "right": 0,
+                        "borderLeft": "1px solid #ccc"
+                    }}></div>
                 </Card>
             </Modal>
         );

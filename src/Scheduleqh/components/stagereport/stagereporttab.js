@@ -9,6 +9,7 @@ import { getUser } from '../../../_platform/auth';
 import PerSearch from './PerSearch';
 import SearchInfo from './SearchInfo';
 import queryString from 'query-string';
+import DayModal from './DayModal';
 moment.locale('zh-cn');
 const { RangePicker } = DatePicker;
 const FormItem = Form.Item;
@@ -18,9 +19,15 @@ class Stagereporttab extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			daydata:[
+				{
+					unit:'1111'
+				}
+			],
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			visible: false,
+			dayvisible: false,
 			isCopyMsg: false, //接收人员是否发短信
 			treedataSource: [],
 			treetype: [],//树种
@@ -72,6 +79,18 @@ class Stagereporttab extends Component {
 	onSelectChange = (selectedRowKeys, selectedRows) => {
 		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
 	}
+	// 操作--查看
+    clickInfo(record) {
+        this.setState({ dayvisible: true });
+    }
+    // 取消
+    totleCancle() {
+        this.setState({ dayvisible: false });
+    }
+    // 确定
+    totleOk() {
+        this.setState({ dayvisible: false });
+    }
 	// 删除
 	deleteClick = () => {
 		const { selectedRowKeys } = this.state
@@ -348,12 +367,22 @@ class Stagereporttab extends Component {
 		}
 		return (
 			<div>
+				{
+                    this.state.dayvisible &&
+                    <DayModal {...this.props}
+                        oncancel={this.totleCancle.bind(this)}
+                        onok={this.totleOk.bind(this)}
+                    />
+                }
 				<SearchInfo {...this.props} />
 				<Button onClick={this.addClick.bind(this)}>新增</Button>
 				<Button onClick={this.deleteClick.bind(this)}>删除</Button>
 				<Table
 					columns={this.columns}
-					rowSelection={rowSelection} />
+					rowSelection={rowSelection} 
+					dataSource={this.state.daydata}
+					className='foresttable'
+					bordered/>
 				<Modal
 					title="新增每日实际进度"
 					width={800}
@@ -426,6 +455,7 @@ class Stagereporttab extends Component {
 										<Table
 											columns={this.columns1}
 											dataSource={this.state.treedataSource}
+											className='foresttable'
 										/>
 										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10 }} type="primary" ghost>添加</Button>
 									</Row>

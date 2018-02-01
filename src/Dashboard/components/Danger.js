@@ -380,6 +380,7 @@ export default class Danger extends Component {
 				let response_org = v['ReorganizerObj'];
 				// let measure = levelNode["风险控制措施"];
 				let content = v["ProblemType"];
+				//位置
 				let coordinates = ["22.5202031353", "113.893730454"];
 				riskObj[level] = riskObj[level] || {
 					key: level,
@@ -786,6 +787,7 @@ export default class Danger extends Component {
 
 	/*在地图上添加marker和polygan*/
 	createMarker(geo, oldMarker) {
+		console.log('geo',geo)
 		var me = this;
 		// debugger
 		if (geo.properties.type != 'area') {
@@ -795,6 +797,7 @@ export default class Danger extends Component {
 				}
 				let iconType = L.divIcon({className: this.getIconType(geo.type)});
 				let marker = L.marker(geo.geometry.coordinates, {icon: iconType, title: geo.properties.name});
+				console.log('marker',marker)
 				marker.bindPopup(L.popup({maxWidth: 240}).setContent(this.genPopUpContent(geo)));
 				marker.addTo(this.map);
 				return marker;

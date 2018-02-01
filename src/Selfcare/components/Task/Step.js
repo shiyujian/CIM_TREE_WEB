@@ -31,13 +31,15 @@ export default class TaskStep extends Component {
 		if (task && task.workflow && task.workflow.code) {
 			let code = task.workflow.code;
 			let name = task.current ? task.current[0].name : '';
-			if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '初审') {
+
+			
+			if (code === WORKFLOW_CODE.总进度计划报批流程 && name == '初审') {
 				return this.renderResource(task);
-			} else if (code = WORKFLOW_CODE.总进度计划报批流程 && name == '复审') {
+			} else if (code === WORKFLOW_CODE.总进度计划报批流程 && name === '复审') {
 				return this.renderResource(task);
-			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '初审') {
+			} else if (code === WORKFLOW_CODE.每日进度填报流程 && name === '初审') {
 				return this.renderResource(task);
-			} else if (code = WORKFLOW_CODE.每日进度填报流程 && name == '复审') {
+			} else if (code === WORKFLOW_CODE.每日进度填报流程 && name === '复审') {
 				return this.renderResource(task);
 			} else {
 				return (
