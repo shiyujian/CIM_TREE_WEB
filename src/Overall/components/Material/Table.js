@@ -3,11 +3,12 @@ import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon} from 
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
 import './index.less';
+import { WORKFLOW_CODE } from '../../../_platform/api';
 
 const FormItem = Form.Item;
 
 let indexSelect='';
-export default class GeneralTable extends Component {
+class GeneralTable extends Component {
 
 	constructor(props){
          super(props);
@@ -15,49 +16,81 @@ export default class GeneralTable extends Component {
          	visible: false,
 			data:[],
 			indexSelect:'',
+			record:{}
          }
     }
-	// state = { 
-	// 	visible: false,
-	// 	data:[],
-	// 	indexSelect:'' 
-	// }
-	  showModal = (key) => {
-	    this.setState({
-	      visible: true,
-	      indexSelect:key
-	    }); 
-	    // console.log('key',this.state.indexSelect)
-	  }
-	  handleOk = (e) => {
-	    this.setState({
-	      visible: false,
-	    });
-	  }
-	  handleCancel = (e) => {
-	    this.setState({
-	      visible: false,
-	    });
-	  } 
+	
+
+	columns1 = [{
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index',
+        width: '20%',
+    }, {
+        title: '文件名称',
+        dataIndex: 'fileName',
+        key: 'fileName',
+        width: '45%',
+    }, {
+        title: '操作',
+        dataIndex: 'operation',
+        key: 'operation',
+        width: '20%',
+		render:(text, record, index)=>{
+			const { Doc = [] } = this.props;
+			return (
+				<div>
+					<a onClick={this.previewFile.bind(this,record)}>预览</a>
+					<a  style={{ marginLeft: 10 }}  
+						>下载
+					</a>
+				</div>
+			)
+		}
+           
+          
+        
+    }]
+	
+	componentDidMount(){
+		const {
+			actions:{
+				getWorkflows
+			}
+		} = this.props
+
+		let code = {
+			code:WORKFLOW_CODE.机械设备报批流程
+		}
+		getWorkflows(code)
+	}
 	render() {
 		let {
-			  visible,data
+			  visible,
+			  data,
+			  record
         } = this.state;
-		const { Doc = [],docs = [],} = this.props;
-		console.log('222222',Doc)
-		console.log('ssssss',Doc[this.state.indexSelect])
+		const { 
+			Doc = [],
+			docs = [],
+			workflows,
+			form: { getFieldDecorator }
+		 } = this.props;
+		let dataSource = []
+		if(workflows && Array.isArray(workflows) && workflows.length>0){
+			dataSource = this.getTable(workflows)
+		}
 		return (
 			<div>
 				<Table
-					rowSelection={this.rowSelection}
-					dataSource={Doc}
+					// rowSelection={this.rowSelection}
+					dataSource={dataSource}
 					columns={this.columns}
-					className='foresttables'
 					bordered rowKey="code" />
 			{
 				this.state.visible==true &&
 				<Modal
-		          title="查看文档"
+		          title="查看流程"
 		          width={920}
 		          // footer={null}
 		          visible={this.state.visible}
@@ -76,27 +109,28 @@ export default class GeneralTable extends Component {
 	                            <Row gutter={15} style={{marginTop:'2em'}} >
 	                                <Col span={10}>
 	                                    <FormItem   {...GeneralTable.layoutT} label="单位工程:">
-	                                     <Select  style={{width:'90%'}} value={Doc[this.state.indexSelect].extra_params.engineer}>
-	                                          <Option value='第一阶段'>第一阶段</Option>
-	                                          <Option value='第二阶段'>第二阶段</Option>
-	                                          <Option value='第三阶段'>第三阶段</Option>
-	                                          <Option value='第四阶段'>第四阶段</Option>
-	                                     </Select>
+										{getFieldDecorator('unit', {
+                                            initialValue: `${record.unit?record.unit:''}`,
+                                            rules: [{ required: true, message: '请输入单位工程' }]
+                                        })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={10}>
 	                                    <FormItem {...GeneralTable.layoutT} label="编号:">
-	                                        <Input value={Doc[this.state.indexSelect].extra_params.number} />
+										{getFieldDecorator('code', {
+                                            initialValue: `${record.code?record.code:''}`,
+                                            rules: [{ required: true, message: '请输入编号' }]
+                                        })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                            </Row>
 	                            <Row gutter={15}>
 	                                <Col span={20}>
 	                                    <FormItem  {...GeneralTable.layout} label="审批单位:">
-	                                        <Select style={{width:'100%'}} value={Doc[this.state.indexSelect].extra_params.approve} >
-	                                              <Option value='第一公司'>第一公司</Option>
-	                                              <Option value='第二公司'>第二公司</Option>
-	                                        </Select>
+										{getFieldDecorator('reviewUnit', {
+                                            initialValue: `${record.reviewUnit?record.reviewUnit:''}`,
+                                            rules: [{ required: true, message: '请输入审批单位' }]
+                                        })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                            </Row>
@@ -106,37 +140,19 @@ export default class GeneralTable extends Component {
 	                        <Col span={24}>
 	                        	<Table 
 								   columns={this.equipmentColumns}
-								   dataSource={Doc[this.state.indexSelect].extra_params.children}
+								   dataSource={record.dataSource?record.dataSource:[]}
 								   bordered 
-								   pagination={false}
+								   pagination={true}
 								/>
 	                        </Col>
 	                    </Row>
 	                    <Row gutter={24}>
-	                        <Col span={24} style={{paddingLeft:'2em'}}>
-	                            <Row gutter={15} style={{marginTop:'1em'}} >
-	                                <Col span={3}>
-	                                	<Button style={{width:100}}>附件</Button>
-	                                </Col>
-	                            </Row>
-	                            <Row gutter={20} style={{marginTop:'1em'}} >
-	                            	<Col span={8} style={{marginLeft:'1em'}} >
-	                            		<Table  dataSource={[Doc[this.state.indexSelect]]} 
-				                                columns={this.optioncolumns} 
-				                                showHeader={false}
-				                                pagination={false}
-                                 		/>
-	                            	</Col>
-	                               {/* <Col span={3} style={{marginLeft:'1em'}} >
-	                                	<Icon type="paper-clip"></Icon>
-	                                	<a>{Doc[this.state.indexSelect].name}</a>
-	                                </Col>
-	                                <Col span={4}>
-	                                	<a onClick={this.previewFile.bind(this,Doc[this.state.indexSelect])}>预览</a>
-										<a style={{ marginLeft: 10 }}  
-										   href={Doc[this.state.indexSelect].basic_params.files[0].a_file}>下载</a>
-	                                </Col>*/ }
-	                            </Row>
+	                        <Col span={24} style={{marginTop:'1em'}}>
+								<Table  dataSource={record.TreatmentData?record.TreatmentData:[]}
+										columns={this.columns1} 
+										pagination={true}
+								/>
+	                            	
 	                        </Col>
 	                    </Row>
 					</div>
@@ -147,53 +163,65 @@ export default class GeneralTable extends Component {
 		);
 	}
 
-	rowSelection = {
-		onChange: (selectedRowKeys, selectedRows) => {
-			const { actions: { selectDocuments } } = this.props;
-			selectDocuments(selectedRows);
-		},
-	};
+	// rowSelection = {
+	// 	onChange: (selectedRowKeys, selectedRows) => {
+	// 		const { actions: { selectDocuments } } = this.props;
+	// 		selectDocuments(selectedRows);
+	// 	},
+	// };
+	getTable(instance){
+		let dataSource = []
+		instance.map((item)=>{
+			let subject = item.subject[0];
+			let creator = item.creator;
+			console.log('subject',subject)
+			let data = {
+				'id':item.id,
+				'workflow':item,
+				'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
+				'dataSource':subject.dataSource?JSON.parse(subject.dataSource):'',
+				'unit':subject.unit?JSON.parse(subject.unit):'',
+				'code':subject.code?JSON.parse(subject.code):'',
+				'extra_params.style':'',
+				'reviewUnit':subject.reviewUnit?JSON.parse(subject.reviewUnit):'',
+				'submitPerson':creator.person_name?creator.person_name:(creator.username?creator.username:''),
+				'submitTime':moment(item.real_start_time).format('YYYY-MM-DD'),
+				'flowStyle':item.status===2?'执行中':'已完成',
+			}
+			dataSource.push(data)
+		})
+		console.log('dataSource',dataSource)
+		return dataSource
+	}
 
-	optioncolumns=[
-		{
-			title:'文档名称',
-			width:'40%',
-			render:()=>{
-				const { Doc = [] } = this.props;
-				return(
-					<div>
-						<Icon type="paper-clip"></Icon>
-		                <a>{Doc[this.state.indexSelect].name}</a>
-	                </div>
-	            )
-			}
-		},{
-			title:'操作',
-			width:'60%',
-			render:()=>{
-				const { Doc = [] } = this.props;
-				return (
-					<div>
-						<a onClick={this.previewFile.bind(this,Doc[this.state.indexSelect])}>预览</a>
-						<a  style={{ marginLeft: 10 }}  
-						  	href={Doc[this.state.indexSelect].basic_params.files[0].a_file}>下载
-						</a>
-					</div>
-				)
-			}
-		},
-	]
+	showModal = (key,record) => {
+		this.setState({
+			record:record,
+			visible: true,
+			indexSelect:key
+		}); 
+	}
+	handleOk = (e) => {
+		this.setState({
+			visible: false,
+		});
+	}
+	handleCancel = (e) => {
+		this.setState({
+			visible: false,
+		});
+	} 
 	columns = [
 		{
 			title: '单位工程',
-			dataIndex: 'extra_params.engineer',
-			key: 'extra_params.engineer',
+			dataIndex: 'unit',
+			key: 'unit',
 			// sorter: (a, b) => a.name.length - b.name.length
 		}, {
 			title: '编号',
-			dataIndex: 'extra_params.number',
-			key: 'extra_params.number',
-			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
+			dataIndex: 'code',
+			key: 'code',
+			// sorter: (a, b) => a.code.length - b.code.length
 		}, {
 			title: '文档类型',
 			dataIndex: 'extra_params.style',
@@ -201,8 +229,8 @@ export default class GeneralTable extends Component {
 			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
 			title: '提交单位',
-			dataIndex: 'submitCompany',
-			key: 'submitCompany',
+			dataIndex: 'reviewUnit',
+			key: 'reviewUnit',
 			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
 		}, {
 			title: '提交人',
@@ -226,7 +254,7 @@ export default class GeneralTable extends Component {
 				nodes.push(
 				// return (
 					<div>
-						<a type="primary" onClick={this.showModal.bind(this,index)}>查看</a>
+						<a type="primary" onClick={this.showModal.bind(this,index,record)}>查看</a>
 						{/*<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>*/
 						}
@@ -329,3 +357,5 @@ export default class GeneralTable extends Component {
       wrapperCol: {span: 20},
     };
 }
+
+export default Form.create()(GeneralTable)

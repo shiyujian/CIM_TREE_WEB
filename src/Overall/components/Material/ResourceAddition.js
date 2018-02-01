@@ -483,9 +483,9 @@ class ResourceAddition extends Component {
                 }];
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {
-                    name: "物资管理苗木资料报批流程",
-                    desc: "综合管理模块物资管理苗木资料报批流程",
-                    code: WORKFLOW_CODE.苗木资料报批流程
+                    name: "物资管理工程材料报批流程",
+                    desc: "综合管理模块物资管理工程材料报批流程",
+                    code: WORKFLOW_CODE.工程材料报批流程
                 };
                 let workflowdata = {
                     name: WORKFLOW_MAP.name,

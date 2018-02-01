@@ -1,21 +1,23 @@
 import React, { Component } from 'react';
-import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,DatePicker} from 'antd';
+import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,DatePicker,Popconfirm} from 'antd';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
 import './index.less';
+import { WORKFLOW_CODE } from '../../../_platform/api';
 
 const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
 
 let indexSelect='';
-export default class ResourceTable extends Component {
+class ResourceTable extends Component {
 
 	constructor(props){
          super(props);
          this.state={
          	visible: false,
 			data:[],
-			indexSelect:'' 
+			indexSelect:'' ,
+			record:{}
          }
     }
 	// state = { 
@@ -23,32 +25,67 @@ export default class ResourceTable extends Component {
 	// 	data:[],
 	// 	indexSelect:'' 
 	// }
-	  showModal = (key) => {
-	    this.setState({
-	      visible: true,
-	      indexSelect:key
-	    }); 
-	    console.log('key',this.state.indexSelect)
-	  }
-	  handleOk = (e) => {
-	    this.setState({
-	      visible: false,
-	    });
-	  }
-	  handleCancel = (e) => {
-	    this.setState({
-	      visible: false,
-	    });
-	  }
+
+	columns1 = [{
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index',
+        width: '20%',
+    }, {
+        title: '文件名称',
+        dataIndex: 'fileName',
+        key: 'fileName',
+        width: '45%',
+    }, {
+        title: '操作',
+        dataIndex: 'operation',
+        key: 'operation',
+        width: '20%',
+        render:(text, record, index)=>{
+			const { Doc = [] } = this.props;
+			return (
+				<div>
+					<a onClick={this.previewFile.bind(this,record)}>预览</a>
+					<a  style={{ marginLeft: 10 }}  
+						>下载
+					</a>
+				</div>
+			)
+		}
+    }]
+	
+	componentDidMount(){
+		const {
+			actions:{
+				getWorkflows
+			}
+		} = this.props
+
+		let code = {
+			code:WORKFLOW_CODE.工程材料报批流程
+		}
+		getWorkflows(code)
+	}
 	render() {
 		let {
-			  visible,data
+			  visible,
+			  data,
+			  record
         } = this.state;
-		const { Doc = [] } = this.props;
+		const { 
+			Doc = [],
+			form: { getFieldDecorator },
+			workflows 
+		} = this.props;
+		let dataSource = []
+		if(workflows && Array.isArray(workflows) && workflows.length>0){
+			dataSource = this.getTable(workflows)
+		}
 		return (
 			<div>
-				<Table rowSelection={this.rowSelection}
-					dataSource={Doc}
+				<Table 
+					// rowSelection={this.rowSelection}
+					dataSource={dataSource}
 					columns={this.columns}
 					bordered rowKey="code" />
 			{
@@ -56,7 +93,6 @@ export default class ResourceTable extends Component {
 				<Modal
 		          title="查看文档"
 		          width={920}
-		          // footer={null}
 		          visible={this.state.visible}
 		          maskClosable={false}
 		          onOk={this.handleOk}
@@ -73,42 +109,52 @@ export default class ResourceTable extends Component {
 	                            <Row gutter={15} style={{marginTop:'2em'}} >
 	                                <Col span={8}>
 	                                    <FormItem   {...ResourceTable.layoutT} label="单位工程:">
-	                                     <Select  style={{width:'90%'}} value={Doc[this.state.indexSelect].extra_params.engineer}>
-	                                          <Option value='第一阶段'>第一阶段</Option>
-	                                          <Option value='第二阶段'>第二阶段</Option>
-	                                          <Option value='第三阶段'>第三阶段</Option>
-	                                          <Option value='第四阶段'>第四阶段</Option>
-	                                     </Select>
+										{getFieldDecorator('form_unit', {
+                                            initialValue: `${record.unit?record.unit:''}`,
+                                            rules: [{ required: true, message: '请输入单位工程' }]
+                                        })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
 	                                    <FormItem {...ResourceTable.layoutT} label="名称:">
-	                                        <Input value={Doc[this.state.indexSelect].extra_params.resource} />
+										{getFieldDecorator('form_name', {
+                                            initialValue: `${record.name?record.name:''}`,
+                                            rules: [{ required: true, message: '请输入名称' }]
+                                        })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
 	                                    <FormItem {...ResourceTable.layoutT} label="编号:">
-	                                        <Input value={Doc[this.state.indexSelect].extra_params.number} />
+										{getFieldDecorator('form_code', {
+                                            initialValue: `${record.code?record.code:''}`,
+                                            rules: [{ required: true, message: '请输入编号' }]
+                                        })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                            </Row>
 	                            <Row gutter={15}>
 	                                <Col span={8}>
 	                                    <FormItem  {...ResourceTable.layoutT} label="审批单位:">
-	                                        <Select style={{width:'100%'}} value={Doc[this.state.indexSelect].extra_params.approve} >
-	                                              <Option value='第一公司'>第一公司</Option>
-	                                              <Option value='第二公司'>第二公司</Option>
-	                                        </Select>
+										{getFieldDecorator('form_reviewUnit', {
+                                            initialValue: `${record.reviewUnit?record.reviewUnit:''}`,
+                                            rules: [{ required: true, message: '请输入审批单位' }]
+                                        })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
 	                                    <FormItem {...ResourceTable.layoutT} label="进场日期:">
-	                                        <DatePicker  value={moment(Doc[this.state.indexSelect].extra_params.time)}/>
+										{getFieldDecorator('form_date', {
+                                            initialValue: `${record.date?record.date:''}`,
+                                            rules: [{ required: true, message: '请输入进场日期' }]
+                                        })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
 	                                    <FormItem {...ResourceTable.layoutT} label="施工部位:">
-	                                        <Input value={Doc[this.state.indexSelect].extra_params.body}/>
+										{getFieldDecorator('form_site', {
+                                            initialValue: `${record.site?record.site:''}`,
+                                            rules: [{ required: true, message: '请输入施工部位' }]
+                                        })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                            </Row>
@@ -116,31 +162,22 @@ export default class ResourceTable extends Component {
 	                    </Row>
 	                    <Row gutter={24}>
 	                        <Col span={24}>
-	                        	<Table 
+								<Table 
 								   columns={this.equipmentColumns}
-								   dataSource={Doc[this.state.indexSelect].extra_params.children}
+								   dataSource={record.dataSource?record.dataSource:[]}
 								   bordered 
-								   pagination={false}
-								/>
+								   pagination={true}
+								/>	
 	                        </Col>
 	                    </Row>
 	                    <Row gutter={24}>
-	                        <Col span={24} style={{paddingLeft:'2em'}}>
-	                            <Row gutter={15} style={{marginTop:'1em'}} >
-	                                <Col span={3}>
-	                                	<Button style={{width:100}}>附件</Button>
-	                                </Col>
-	                            </Row>
-	                            <Row gutter={20} style={{marginTop:'1em'}} >
-	                                <Col span={8} style={{marginLeft:'1em'}} >
-	                            		<Table  dataSource={[Doc[this.state.indexSelect]]} 
-				                                columns={this.optioncolumns} 
-				                                showHeader={false}
-				                                pagination={false}
-                                 		/>
-	                            	</Col>
-	                            </Row>
-	                        </Col>
+							<Col span={24} style={{marginTop:'1em'}}>
+								<Table  dataSource={record.TreatmentData?record.TreatmentData:[]}
+										columns={this.columns1} 
+										pagination={true}
+								/>
+									
+							</Col>
 	                    </Row>
 					</div>
 		        </Modal>
@@ -149,59 +186,76 @@ export default class ResourceTable extends Component {
 		);
 	}
 
-	rowSelection = {
-		onChange: (selectedRowKeys, selectedRows) => {
-			const { actions: { selectDocuments } } = this.props;
-			selectDocuments(selectedRows);
-		},
-	};
+	getTable(instance){
+		let dataSource = []
+		instance.map((item)=>{
+			let subject = item.subject[0];
+			let creator = item.creator;
+			console.log('subject',subject)
+			let data = {
+				'id':item.id,
+				'workflow':item,
+				'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
+				'dataSource':subject.dataSource?JSON.parse(subject.dataSource):'',
+				'unit':subject.unit?JSON.parse(subject.unit):'',
+				'name':subject.name?JSON.parse(subject.name):'',
+				'code':subject.code?JSON.parse(subject.code):'',
+				'extra_params.style':'',
+				'reviewUnit':subject.reviewUnit?JSON.parse(subject.reviewUnit):'',
+				'date':subject.date?JSON.parse(subject.date):'',
+				'site':subject.site?JSON.parse(subject.site):'',
+				'submitPerson':creator.person_name?creator.person_name:(creator.username?creator.username:''),
+				'submitTime':moment(item.real_start_time).format('YYYY-MM-DD'),
+				'resourceStyle':item.status===2?'执行中':'已完成',
+			}
+			dataSource.push(data)
+		})
+		console.log('dataSource',dataSource)
+		return dataSource
+	}
 
-	optioncolumns=[
-		{
-			title:'文档名称',
-			width:'40%',
-			render:()=>{
-				const { Doc = [] } = this.props;
-				return(
-					<div>
-						<Icon type="paper-clip"></Icon>
-		                <a>{Doc[this.state.indexSelect].name}</a>
-	                </div>
-	            )
-			}
-		},{
-			title:'操作',
-			width:'60%',
-			render:()=>{
-				const { Doc = [] } = this.props;
-				return (
-					<div>
-						<a onClick={this.previewFile.bind(this,Doc[this.state.indexSelect])}>预览</a>
-						<a  style={{ marginLeft: 10 }}  
-						  	href={Doc[this.state.indexSelect].basic_params.files[0].a_file}>下载
-						</a>
-					</div>
-				)
-			}
-		},
-	]
+	showModal = (key,record) => {
+		this.setState({
+			record:record,
+			visible: true,
+			indexSelect:key
+		}); 
+	}
+	handleOk = (e) => {
+		this.setState({
+			visible: false,
+		});
+	}
+	handleCancel = (e) => {
+		this.setState({
+			visible: false,
+		});
+	}
+
+	// rowSelection = {
+	// 	onChange: (selectedRowKeys, selectedRows) => {
+	// 		const { actions: { selectDocuments } } = this.props;
+	// 		selectDocuments(selectedRows);
+	// 	},
+	// };
+
 
 	columns = [
 		{
 			title: '单位工程',
-			dataIndex: 'extra_params.engineer',
-			key: 'extra_params.engineer',
+			dataIndex: 'unit',
+			key: 'unit',
 			// sorter: (a, b) => a.name.length - b.name.length
 		}, {
 			title: '名称',
-			dataIndex: 'extra_params.resource',
-			key: 'extra_params.resource',
-			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
+			dataIndex: 'name',
+			key: 'name',
+			// sorter: (a, b) => a.code.length - b.code.length
 		},{
 			title: '编号',
-			dataIndex: 'extra_params.number',
-			key: 'extra_params.number',
-			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
+			dataIndex: 'code',
+			key: 'code',
+			// sorter: (a, b) => a.code.length - b.code.length
 		}, {
 			title: '文档类型',
 			dataIndex: 'extra_params.style',
@@ -209,8 +263,8 @@ export default class ResourceTable extends Component {
 			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
 			title: '施工部位',
-			dataIndex: 'extra_params.body',
-			key: 'extra_params.body',
+			dataIndex: 'reviewUnit',
+			key: 'reviewUnit',
 			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
 		}, {
 			title: '提交人',
@@ -231,9 +285,9 @@ export default class ResourceTable extends Component {
 				let nodes = [];
 				nodes.push(
 					<div>
-						<a type="primary" onClick={this.showModal.bind(this,index)}>查看</a>
-						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
-						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>
+						<a type="primary" onClick={this.showModal.bind(this,index,record)}>查看</a>
+						{/* <a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a> */}
 					</div>
 				);
 				return nodes;
@@ -300,7 +354,7 @@ export default class ResourceTable extends Component {
 		}
 	}
 
-	文件预览
+	//文件预览
 	previewFile(file) {
 		const { actions: { openPreview } } = this.props;
 		if (JSON.stringify(file.basic_params) == "{}") {
@@ -321,3 +375,4 @@ export default class ResourceTable extends Component {
       wrapperCol: {span: 16},
     };
 }
+export default Form.create()(ResourceTable)

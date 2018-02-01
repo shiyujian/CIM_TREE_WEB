@@ -48,18 +48,6 @@ class Addition extends Component {
             dataIndex: 'extra_params.equipName',
             key: 'extra_params.equipName',
             render: (text, record) => this.renderColumns(text, record, 'extra_params.equipName'),
-            // render:() => {
-            //     return <Input onChange={(event)=>{
-            //                     event=(event)?event:window.event;
-            //                     const {
-            //                         docs = [],
-            //                         actions: {changeDocs}
-            //                     } = this.props;
-            //                     this.state.equipName = event.target.value;
-            //                     changeDocs(docs);
-            //                 }}
-            //             />;
-            // }
         }, {
             title: '规格型号',
             dataIndex: 'extra_params.equipNumber',
