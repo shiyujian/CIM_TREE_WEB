@@ -5,7 +5,7 @@ import reducer, {actions} from '../store/material';
 //import PkCodeTree from '../../Quality/components/PkCodeTree';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import {Filter, Table,Updatemodal,DatumTree,ResourceFilter,ResourceTable,SeedingFilter,SeedingTable} from '../components/Material';
+import {GeneralFilter, GeneralTable,Updatemodal,DatumTree,ResourceFilter,ResourceTable,SeedingFilter,SeedingTable} from '../components/Material';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import moment from 'moment';
@@ -62,8 +62,8 @@ export default class Material extends Component {
                 <Content>
                     <Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)} >
                         <TabPane tab="机械设备" key="1">
-                            <Filter  {...this.props} {...this.state}/>
-                            <Table {...this.props}/>
+                            <GeneralFilter  {...this.props} {...this.state}/>
+                            <GeneralTable {...this.props}/>
                         </TabPane>
                         <TabPane tab="工程材料" key="2">
                             <ResourceFilter  {...this.props} {...this.state}/>
