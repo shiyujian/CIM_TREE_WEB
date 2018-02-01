@@ -156,7 +156,11 @@ export const DataReportTemplate_QualityProblem = STATIC_DOWNLOAD_API + '/media/d
 /***********************静态常量**************************/
 export const WORKFLOW_CODE = {
 	'总进度计划报批流程': 'TEMPLATE_001',
-	'表单管理流程': 'TEMPLATE_002'
+	'表单管理流程': 'TEMPLATE_002',
+	'每日进度填报流程': 'TEMPLATE_003',
+	'机械设备报批流程': 'TEMPLATE_004',
+	'工程材料报批流程': 'TEMPLATE_005',
+	'苗木资料报批流程': 'TEMPLATE_006'
 	// '现场安全隐患排查工作流程': 'TEMPLATE_002',
 	// '分部验收流程': 'TEMPLATE_003',
 	// '周报填写流程': 'TEMPLATE_004',
@@ -199,333 +203,45 @@ export const WORKFLOW_MAPS = {
 		code: 'TEMPLATE_012'
 	}
 };
-export const MODULES2 = [
-	{
-		id: 'HOME',
-		name: '首页',
-	},
-	{
-		id: 'DISPLAY',
-		name: '综合展示',
-		children: [{
-			id: 'DISPLAY.2DGIS',
-			name: '现场信息',
-		}, {
-			id: 'DISPLAY.3DGIS',
-			name: '规划信息',
-		}, {
-			id: 'DISPLAY.DGNMODULE',
-			name: '项目信息',
-		}]
-	}, {
-		id: 'MANAGE',
-		name: '综合管理',
-		children: [{
-			id: 'MANAGE.CHECKIN',
-			name: '人员考勤'
-		}, {
-			id: 'MANAGE.NEWS',
-			name: '新闻公告'
-		}, {
-			id: 'MANAGE.SENDRECIEVE',
-			name: '现场收发文'
-		}, {
-			id: 'MANAGE.APPROVAL',
-			name: '工程批文'
-		}]
-	}, {
-		id: 'DATUM',
-		name: '资料管理',
-		children: [{
-			id: 'DATUM.STANDARD',
-			name: '制度规范',
-		}, {
-			id: 'DATUM.ENGINEERING',
-			name: '工程文档'
-		}]
-	}, {
-		id: 'DESIGN',
-		name: '设计管理',
-		children: [{
-			id: 'DESIGN.STATISTICS',
-			name: '统计分析',
-		}, {
-			id: 'DESIGN.PLAN1',
-			name: '交付计划',
-		}, {
-			id: 'DESIGN.PLAN2',
-			name: '发起计划',
-		}, {
-			id: 'DESIGN.PLAN3',
-			name: '填报计划'
-		}, {
-			id: 'DESIGN.PLAN4',
-			name: '计划审查'
-		}, {
-			id: 'DESIGN.PLAN5',
-			name: '变更计划'
-		}, {
-			id: 'DESIGN.PLAN6',
-			name: '变更审查'
-		}, {
-			id: 'DESIGN.REPORTRESULT',
-			name: '设计上报'
-		}, {
-			id: 'DESIGN.APPROVALRESULT',
-			name: '设计审查'
-		}, {
-			id: 'DESIGN.CREATEMODIFY',
-			name: '发起变更',
-		}, {
-			id: 'DESIGN.MODIFY',
-			name: '设计变更'
-		}, {
-			id: 'DESIGN.MODIFYAPPROVAL',
-			name: '变更审查'
-		}, {
-			id: 'DESIGN.REMIND',
-			name: '进度提醒',
-		},
-		//设计交底
-		{ id: 'DESIGN.EXPLAINQUERY', name: '交底查询' },
-		{ id: 'DESIGN.EXPLAINSUBMIT', name: '交底填报' },
-		{ id: 'DESIGN.EXPLAINHANDLE', name: '交底处理' },
-		]
-	}, {
-		id: 'QUALITY',
-		name: '质量管理',
-		children: [{
-			id: 'QUALITY.TONGJI',
-			name: '统计分析',
-		}, {
-			id: 'QUALITY.QUERY',
-			name: '验收查询',
-		}, {
-			id: 'QUALITY.HUAFEN',
-			name: '检验批划分',
-		}, {
-			id: 'QUALITY.TIANBAO',
-			name: '检验批填报',
-		}, {
-			id: 'QUALITY.SUBITEM',
-			name: '分项验收',
-		}, {
-			id: 'QUALITY.FENBU',
-			name: '分部验收',
-		}, {
-			id: 'QUALITY.DANWEI',
-			name: '单位工程验收',
-		}, {
-			id: 'QUALITY.MONITORING',
-			name: '质量监控',
-		}, {
-			id: 'QUALITY.DEFECT',
-			name: '质量缺陷',
-		}]
-	}, {
-		id: 'SAFETY',
-		name: '安全管理',
-		children: [{
-			id: 'SAFETY.SCHEME',
-			name: '安全策划书',
-		}, {
-			id: 'SAFETY.ORGANIZATIONALSTRUCTURE',
-			name: '组织架构',
-		}, {
-			id: 'SAFETY.MANAGEMENTINSTITUTION',
-			name: '安全管理制度',
-		}, {
-			id: 'SAFETY.EMERGENCYPLAN',
-			name: '应急预案',
-		}, {
-			id: 'SAFETY.SAFETYGOAL',
-			name: '安全目标',
-		}, {
-			id: 'SAFETY.RESPONSIBILITYSYSTEM',
-			name: '安全责任制',
-		}, {
-			id: 'SAFETY.RISKEVALUATION',
-			name: '风险评价',
-		}, {
-			id: 'SAFETY.UNBEARABLE',
-			name: '不可承受风险',
-		}, {
-			id: 'SAFETY.RISKFACTOR',
-			name: '确定重大危险因素',
-		}, {
-			id: 'SAFETY.DYNAMICREPORT',
-			name: '重大危险源动态报表',
-		}, {
-			id: 'SAFETY.DISCIPLINE',
-			name: '安全规程',
-		}, {
-			id: 'SAFETY.SOLUTION',
-			name: '专项方案',
-		}, {
-			id: 'SAFETY.POSITION',
-			name: '按部位查询',
-		}, {
-			id: 'SAFETY.PROJECT',
-			name: '按项目查询',
-		}, {
-			id: 'SAFETY.WARNING',
-			name: '预警信息',
-		}, {
-			id: 'SAFETY.DATAINPUT',
-			name: '测值导入',
-		}, {
-			id: 'SAFETY.THRESHOLD',
-			name: '阈值导入',
-		}, {
-			id: 'SAFETY.QUALIFICATIONVERIFICATION',
-			name: '安全资质验证',
-		}, {
-			id: 'SAFETY.EDUCATIONREGISTER',
-			name: '安全教育登记',
-		}, {
-			id: 'SAFETY.ACTIONSRECORD',
-			name: '安全活动记录',
-		}, {
-			id: 'SAFETY.TECHNICALDISCLOSURE',
-			name: '安全技术交底',
-		}, {
-			id: 'SAFETY.FACILITIESACCEPTANCE',
-			name: '设备设施验收',
-		}, {
-			id: 'SAFETY.SAFETYCHECK',
-			name: '安全检查',
-		}, {
-			id: 'SAFETY.REGISTER',
-			name: '事故登记',
-		}, {
-			id: 'SAFETY.REPORT',
-			name: '事故报告',
-		}, {
-			id: 'SAFETY.TREATMENT',
-			name: '事故处理',
-		}, {
-			id: 'SAFETY.INVESTIGATION',
-			name: '事故调查',
-		}]
-	}, {
-		id: 'SCHEDULE',
-		name: '进度管理',
-		children: [{
-			id: 'SCHEDULE.STATISTICS',
-			name: '统计分析',
-		}, {
-			id: 'SCHEDULE.TOTALPLAN',
-			name: '总计进度',
-		}, {
-			id: 'SCHEDULE.STARTPLAN',
-			name: '发起计划',
-		}, {
-			id: 'SCHEDULE.TOTALREPORT',
-			name: '进度填报',
-		}, {
-			id: 'SCHEDULE.TOTALAPPROVAL',
-			name: '进度审批',
-		}, {
-			id: 'SCHEDULE.REPORTSETTING',
-			name: '管控日程',
-		}, {
-			id: 'SCHEDULE.STAGEREPORT',
-			name: '进度填报',
-		}, {
-			id: 'SCHEDULE.STAGEAPPROVAL',
-			name: '进度审批',
-		}, {
-			id: 'SCHEDULE.DGNSCHEDULE',
-			name: '进度模拟',
-		}, {
-			id: 'SCHEDULE.REPORTMONITOR',
-			name: '流程报警',
-		}, {
-			id: 'SCHEDULE.NOTICEMONITOR',
-			name: '进度报警',
-		}, {
-			id: 'SCHEDULE.HISTORY',
-			name: '进度历史',
-		}]
-	}, {
-		id: 'COST',
-		name: '造价管理',
-		children: [{
-			id: 'COST.COSTESTIMATE',
-			name: '造价估算',
-		}, {
-			id: 'COST.COSTSCHEDULE',
-			name: '造价进度',
-		}, {
-			id: 'COST.COSTCOMPARISON',
-			name: '造价对比',
-		}, {
-			id: 'COST.INFOSHOW',
-			name: '工程量信息展示',
-		}, {
-			id: 'COST.DATAMAINTENANCE',
-			name: '工程量数据维护',
-		}, {
-			id: 'COST.WORKESTIMATE',
-			name: '重要工程量预估',
-		}]
-	}, {
-		id: 'VIDEO',
-		name: '视频监控',
-		children: [{
-			name: '视频监控',
-			id: 'VIDEO.VIDEO',
-		}, {
-			name: '摄像头管理',
-			id: 'VIDEO.CAMERAMANAGE',
-		}, {
-			name: '全景图',
-			id: 'VIDEO.PANORAMA',
-		}]
-	}, {
-		id: 'SELFCARE',
-		name: '个人中心',
-		children: [{
-			id: 'SELFCARE.TASK',
-			name: '个人任务'
-		},{
-			id: 'SELFCARE.QUERY',
-			name: '个人考勤'
-		}]
-	}];
+
 export const MODULES = [
 	{
 		id: 'HOME',
 		name: '首页',
-	},
-	{
-		id: 'DISPLAY',
+	}, {
+		id: 'DASHBOARD',
 		name: '综合展示',
 		children: [{
-			id: 'DISPLAY.2DGIS',
-			name: '现场信息',
+			id: 'DASHBOARD.ONSITE',
+			name: '二维展示',
 		}, {
-			id: 'DISPLAY.3DGIS',
-			name: '规划信息',
+			id: 'DASHBOARD.PLAN',
+			name: '巡检路线',
 		}, {
-			id: 'DISPLAY.DGNMODULE',
-			name: '项目信息',
+			id: 'DASHBOARD.DANGER',
+			name: '安全隐患',
+		}, {
+			id: 'DASHBOARD.PROJECT',
+			name: '工程影像',
 		}]
 	}, {
-		id: 'MANAGE',
+		id: 'OVERALL',
 		name: '综合管理',
 		children: [{
-			id: 'MANAGE.CHECKIN',
-			name: '人员考勤'
+			id: 'OVERALL.NEWS',
+			name: '新闻通知'
 		}, {
-			id: 'MANAGE.NEWS',
-			name: '新闻公告'
-		}, {
-			id: 'MANAGE.SENDRECIEVE',
+			id: 'OVERALL.DISPATCH',
 			name: '现场收发文'
 		}, {
-			id: 'MANAGE.APPROVAL',
-			name: '工程批文'
+			id: 'OVERALL.MATERAIL',
+			name: '物资管理'
+		}, {
+			id: 'OVERALL.FORM',
+			name: '表单管理'
+		}, {
+			id: 'OVERALL.CHECKIN',
+			name: '考勤管理'
 		}]
 	}, {
 		id: 'DATUM',
@@ -536,494 +252,1229 @@ export const MODULES = [
 		}, {
 			id: 'DATUM.ENGINEERING',
 			name: '工程文档'
+		}, {
+			id: 'DATUM.REDIOS',
+			name: '工程影像'
 		}]
-	}, {
-		id: 'DESIGN',
-		name: '设计管理',
-		children: [{
-			id: 'DESIGN.STATISTICS',
-			name: '统计分析',
-		}, {
-			id: 'DESIGN.PLAN1',
-			name: '交付计划',
-		}, {
-			id: 'DESIGN.PLAN2',
-			name: '发起计划',
-		}, {
-			id: 'DESIGN.PLAN3',
-			name: '填报计划'
-		}, {
-			id: 'DESIGN.PLAN4',
-			name: '计划审查'
-		}, {
-			id: 'DESIGN.PLAN5',
-			name: '变更计划'
-		}, {
-			id: 'DESIGN.PLAN6',
-			name: '变更审查'
-		}, {
-			id: 'DESIGN.REPORTRESULT',
-			name: '设计上报'
-		}, {
-			id: 'DESIGN.APPROVALRESULT',
-			name: '设计审查'
-		}, {
-			id: 'DESIGN.CREATEMODIFY',
-			name: '发起变更',
-		}, {
-			id: 'DESIGN.MODIFY',
-			name: '设计变更'
-		}, {
-			id: 'DESIGN.MODIFYAPPROVAL',
-			name: '变更审查'
-		}, {
-			id: 'DESIGN.REMIND',
-			name: '进度提醒',
-		},
-		//设计交底
-		{ id: 'DESIGN.EXPLAINQUERY', name: '交底查询' },
-		{ id: 'DESIGN.EXPLAINSUBMIT', name: '交底填报' },
-		{ id: 'DESIGN.EXPLAINHANDLE', name: '交底处理' },
-		]
 	}, {
 		id: 'QUALITY',
 		name: '质量管理',
 		children: [{
 			id: 'QUALITY.TONGJI',
-			name: '统计分析',
+			name: '质量分析',
 		}, {
-			id: 'QUALITY.QUERY',
-			name: '验收查询',
+			id: 'QUALITY.SCORE',
+			name: '质量评分',
+			children: [{
+				id: 'QUALITY.SCORE.SEARCH',
+				name: '质量管理检查记录',
+			}]
 		}, {
-			id: 'QUALITY.HUAFEN',
-			name: '检验批划分',
+			id: 'QUALITY.APPRAISING',
+			name: '质量评优',
 		}, {
-			id: 'QUALITY.TIANBAO',
-			name: '检验批填报',
-		}, {
-			id: 'QUALITY.SUBITEM',
-			name: '分项验收',
-		}, {
-			id: 'QUALITY.FENBU',
-			name: '分部验收',
-		}, {
-			id: 'QUALITY.DANWEI',
-			name: '单位工程验收',
-		}, {
-			id: 'QUALITY.MONITORING',
-			name: '质量监控',
+			id:'QUALITY.YANSHOU',
+			name: '质量验收',
+			children: [{
+				id: 'QUALITY.TIANBAO',
+				name: '进场材料填报',
+			}, {
+				id: 'QUALITY.QUERY',
+				name: '验收查询',
+			}, {
+				id: 'QUALITY.HUAFEN',
+				name: '检验批划分',
+			}, {
+				id: 'QUALITY.SUBITEM',
+				name: '分项验收',
+			}, {
+				id: 'QUALITY.FENBU',
+				name: '分部验收',
+			}, {
+				id: 'QUALITY.DANWEI',
+				name: '单位工程验收',
+			}]
 		}, {
 			id: 'QUALITY.DEFECT',
 			name: '质量缺陷',
 		}]
-	}, 
-	{
-		id: 'SAFETY',
-		name: '安全管理',
-		children: [
-			{
-				id: 'SAFETY.SAFETYPLAN',
-				name: '安全策划',
-				children: [
-					{
-						id: 'SAFETY.SCHEME',
-						name: '安全策划书',
-					}, {
-						id: 'SAFETY.ORGANIZATIONALSTRUCTURE',
-						name: '组织架构',
-					}, {
-						id: 'SAFETY.MANAGEMENTINSTITUTION',
-						name: '安全管理制度',
-					}, {
-						id: 'SAFETY.EMERGENCYPLAN',
-						name: '应急预案',
-					}, {
-						id: 'SAFETY.SAFETYGOAL',
-						name: '安全目标',
-					}, {
-						id: 'SAFETY.RESPONSIBILITYSYSTEM',
-						name: '安全责任制',
-					}
-				]
-			},
-			{
-				id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT',
-				name: '危险源管理',
-				children: [
-					{
-						id: 'SAFETY.RISKEVALUATION',
-						name: '风险评价',
-					}, {
-						id: 'SAFETY.UNBEARABLE',
-						name: '不可承受风险',
-					}, {
-						id: 'SAFETY.RISKFACTOR',
-						name: '重大危险因素',
-					}, {
-						id: 'SAFETY.DYNAMICREPORT',
-						name: '动态报表'
-					}
-				]
-			},
-			{
-				id:'SAFETY.ZXFAJCS',
-				name: '专项方案及措施',
-				children: [
-					{
-						id: 'SAFETY.DISCIPLINE',
-						name: '安全规程',
-					}, {
-						id: 'SAFETY.SOLUTION',
-						name: '专项方案',
-					}
-				]
-			},
-			{
-				name: '安全监测',
-				id:'SAFETY.MONITORAQJC',
-				children: [
-					{
-						id: 'SAFETY.PLAN',
-						name: '监测方案',
-					}, {
-						id: 'SAFETY.QUERY',
-						name: '监测数据查询',
-					}, {
-						id: 'SAFETY.QUERY',
-						name: '监测数据查询',
-					},{
-						id: 'SAFETY.PROJECT',
-						name: '监测项目',
-					},{
-						id: 'SAFETY.STATIONS',
-						name: '监测点',
-					},
-					{
-						id: 'SAFETY.MONITORING',
-						name: '监测数据',
-					}
-				]
-			}, 
-			{
-				id: 'SAFETY.MANAGEMENTANDCONTROL',
-				name: '安全管控',
-				children: [
-					{
-						id: 'SAFETY.SAFETYCHECK',
-						name: '安全检查',
-					}, {
-						id: 'SAFETY.QUALIFICATIONVERIFICATION',
-						name: '安全资质验证',
-					}, {
-						id: 'SAFETY.EDUCATIONREGISTER',
-						name: '安全教育登记',
-					}, {
-						id: 'SAFETY.ACTIONSRECORD',
-						name: '安全活动记录',
-					}, {
-						id: 'SAFETY.TECHNICALDISCLOSURE',
-						name: '安全技术交底',
-					}, {
-						id: 'SAFETY.FACILITIESACCEPTANCE',
-						name: '设备设施验收',
-					}, {
-						id: 'SAFETY.HIDDENDANGER',
-						name: '安全隐患',
-					}
-				]
-			},
-			{
-				name: '事故管理',
-				id:'SAFETY.ACCIDENT',
-				children: [
-					{
-						id: 'SAFETY.REGISTER',
-						name: '事故登记',
-					}, {
-						id: 'SAFETY.REPORT',
-						name: '事故报告',
-					}, {
-						id: 'SAFETY.TREATMENT',
-						name: '事故处理',
-					}, {
-						id: 'SAFETY.INVESTIGATION',
-						name: '事故调查',
-					}
-				]
-			}
-		]
-	},
-	{
+	},{
 		id: 'SCHEDULE',
 		name: '进度管理',
 		children: [{
-			id: 'SCHEDULE.STATISTICS',
-			name: '统计分析',
-		}, {
-			id: 'SCHEDULE.TOTALPLAN',
-			name: '总计进度',
-		}, {
-			id: 'SCHEDULE.STARTPLAN',
-			name: '发起计划',
-		}, {
-			id: 'SCHEDULE.TOTALREPORT',
-			name: '进度填报',
-		}, {
-			id: 'SCHEDULE.TOTALAPPROVAL',
-			name: '进度审批',
-		}, {
-			id: 'SCHEDULE.REPORTSETTING',
-			name: '管控日程',
-		}, {
 			id: 'SCHEDULE.STAGEREPORT',
 			name: '进度填报',
 		}, {
-			id: 'SCHEDULE.STAGEAPPROVAL',
-			name: '进度审批',
+			id: 'SCHEDULE.PROPROGRESS',
+			name: '项目进度',
 		}, {
-			id: 'SCHEDULE.DGNSCHEDULE',
-			name: '进度模拟',
+			id: 'SCHEDULE.ENTERANALYZE',
+			name: '苗木进场分析',
 		}, {
-			id: 'SCHEDULE.REPORTMONITOR',
-			name: '流程报警',
+			id: 'SCHEDULE.SCHEDULEANALYZE',
+			name: '种植进度分析',
 		}, {
-			id: 'SCHEDULE.NOTICEMONITOR',
-			name: '进度报警',
-		}, {
-			id: 'SCHEDULE.HISTORY',
-			name: '进度历史',
+			id: 'SCHEDULE.SHOW',
+			name: '种植进度展示',
 		}]
 	}, {
-		id: 'COST',
-		name: '造价管理',
-		children: [{
-			id: 'COST.COSTESTIMATE',
-			name: '造价估算',
-		}, {
-			id: 'COST.COSTSCHEDULE',
-			name: '造价进度',
-		}, {
-			id: 'COST.COSTCOMPARISON',
-			name: '造价对比',
-		}, {
-			id: 'COST.INFOSHOW',
-			name: '工程量信息展示',
-		}, {
-			id: 'COST.DATAMAINTENANCE',
-			name: '工程量数据维护',
-		}, {
-			id: 'COST.WORKESTIMATE',
-			name: '重要工程量预估',
-		}]
+		id: 'SAFETY',
+		name: '安环管理',
+		children: [
+			{
+				id: 'SAFETY',
+				name: '安全动态',
+			}, {
+				id: 'SAFETY.SYSTEM',
+				name: '安全体系',
+			}, {
+				id: 'SAFETY.HIDDENDANGER',
+				name: '安全隐患',
+			},
+			{
+				id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT',
+				name: '安全文明施工',
+				children: [
+					{
+						id: 'SAFETY.RISKEVALUATION',
+						name: '危险源风险评价',
+					}, {
+						id: 'SAFETY.UNBEARABLE',
+						name: '环境保护',
+					}, {
+						id: 'SAFETY.RISKFACTOR',
+						name: '文明施工',
+					}
+				]
+			},
+			{
+				id: 'SAFETY.EDUCATIONREGISTER',
+				name: '安全教育',
+			},
+			{
+				id: 'SAFETY.SAFETYTREND',
+				name: '安全动态管理',
+			}
+		]
 	}, {
 		id: 'FOREST',
-		name: '智慧森林',
+		name: '森林大数据',
 		children: [{
 			id: 'FOREST.INFO',
-			name: '植被信息',
+			name: '苗木大数据',
+			children: [{
+				id: 'FOREST.NURSOVERALLINFO',
+				name: '苗木综合信息',
+			}, {
+				id: 'FOREST.NURSMEASUREINFO',
+				name: '苗圃测量信息',
+			}, {
+				id: 'FOREST.LOCMEASUREINFO',
+				name: '现场测量信息',
+			}, {
+				id: 'FOREST.SUPERVISORINFO',
+				name: '监理验收信息',
+			}, {
+				id: 'FOREST.OWNERINFO',
+				name: '业主抽查信息',
+			}, {
+				id: 'FOREST.CONTRASTINFO',
+				name: '苗木对比信息',
+			}, {
+				id: 'FOREST.FAITHINFO',
+				name: '供应商诚信信息',
+			}]
+		}, {
+			id: 'FOREST.FOREST.IMPORT',
+			name: '数据导入',
+			children: [{
+				id: 'FOREST.DATAIMPORT',
+				name: '定位数据导入',
+			}]
 		}]
 	}, {
-		id: 'VIDEO',
-		name: '视频监控',
+		id: 'RECEIVE',
+		name: '收发货管理',
 		children: [{
-			name: '视频监控',
-			id: 'VIDEO.VIDEO',
+			id: 'RECEIVE.RECEIVEMANAGEMENT',
+			name: '收货管理',
 		}, {
-			name: '摄像头管理',
-			id: 'VIDEO.CAMERAMANAGE',
+			id: 'RECEIVE.DISTRIBUTIONMANAGEMENT',
+			name: '发放管理',
 		}, {
-			name: '全景图',
-			id: 'VIDEO.PANORAMA',
+			id: 'RECEIVE.INVENTORYMANAGEMENT',
+			name: '库存管理',
 		}]
 	}, {
-		id: 'CONTRACTCARE',
-		name: '合同管理',
-		children: [{
-			id: 'CONTRACTCARE.CLIENT',
-			name: '客户管理'
-		}, {
-			id: 'CONTRACTCARE.ITEMINFO',
-			name: '项目信息列表'
-		}, {
-			id: 'CONTRACTCARE.MAINCONTRACT',
-			name: '总包合同信息维护'
-		}, {
-			id: 'CONTRACTCARE.SUBCONTRACT',
-			name: '分包合同信息维护'
-		}, {
-			id: 'CONTRACTCARE.CONTRACTCOLLECT',
-			name: '合同收款'
-		}, {
-			id: 'CONTRACTCARE.CONTRACTPAYMENT',
-			name: '合同付款'
-		}, {
-			id: 'CONTRACTCARE.MAININVOICE',
-			name: '总包合同发票'
-		}, {
-			id: 'CONTRACTCARE.SUBINVOICE',
-			name: '分包合同发票'
-		}, {
-			id: 'CONTRACTCARE.PRETAXINFO',
-			name: '预缴税信息维护'
-		}, {
-			id: 'CONTRACTCARE.DEPOSIT',
-			name: '合同保函保证金'
-		}, {
-			id: 'CONTRACTCARE.CONTRACTCHANGE',
-			name: '合同变更'
-		}, {
-			id: 'CONTRACTCARE.CONTRACTFINAL',
-			name: '合同结算'
-		}, {
-			id: 'CONTRACTCARE.ACCEPTANCEBILL',
-			name: '承兑汇票'
-		},]
-	}, {
-		id: 'DRAWINGCARE',
-		name: '图档管理',
-		children: [{
-			id: 'DRAWINGCARE.RECORDMANAGE',
-			name: '工程文档案卷管理'
-		}, {
-			id: 'DRAWINGCARE.FILEMANAGE',
-			name: '工程文档文件管理'
-		}, {
-			id: 'DRAWINGCARE.DRAWINGLIST',
-			name: '图纸编目'
-		}, {
-			id: 'DRAWINGCARE.RECORDLIST',
-			name: '档案编目'
-		}, {
-			id: 'DRAWINGCARE.TECHBOOKLIST',
-			name: '科技图书编目'
-		}, {
-			id: 'DRAWINGCARE.TOPOGRAPHICMAPLIST',
-			name: '地形图编目'
-		}, {
-			id: 'DRAWINGCARE.STANDARDSPECIFICATIONLIST',
-			name: '标准规范编目'
-		}, {
-			id: 'DRAWINGCARE.OPENRECORDLIST',
-			name: '公开档案编目'
-		}, {
-			id: 'DRAWINGCARE.AUDIOVISUALRECORDLIST',
-			name: '声像档案编目'
-		},]
-	},
-
-	{
 		id: 'SELFCARE',
 		name: '个人中心',
 		children: [{
 			id: 'SELFCARE.TASK',
-			name: '个人任务'
+			name: '个人任务',
 		}, {
 			id: 'SELFCARE.QUERY',
-			name: '个人考勤'
+			name: '个人考勤',
+		}, {
+			id: 'SELFCARE.LEAVE',
+			name: '个人请假',
+		}, {
+			id: 'SELFCARE.ACCOUNT',
+			name: '账号管理',
 		}]
 	}, {
 		id: 'SYSTEM',
 		name: '系统设置',
 		children: [
 			{
-				id: 'SYSTEM.FIELD',
-				name: '编码字段'
-			}, {
-				id: 'SYSTEM.CODETYPE',
-				name: '编码类型'
-			}, {
-				id: 'SYSTEM.CONVENTION',
-				name: '工程约定'
-			}, {
 				id: 'SYSTEM.ROLE',
-				name: '角色管理'
+				name: '角色设置'
 			}, {
 				id: 'SYSTEM.PERMISSION',
 				name: '权限设置'
 			}, {
-				id: 'SYSTEM.MAJOR',
-				name: '专业设置'
-			}, {
-				id: 'SYSTEM.PROJECT',
-				name: '项目设置'
-			}, {
-				id: 'SYSTEM.TEMPLATE',
-				name: '模板设置'
-			}, {
-				id: 'SYSTEM.ICON',
-				name: '图标设置'
+				id: 'SYSTEM.PERSON',
+				name: '用户管理'
 			}, {
 				id: 'SYSTEM.WORKFLOW',
 				name: '流程设置'
 			}, {
-				id: 'SYSTEM.DOCUMENT',
-				name: '文档设置'
-			}, {
-				id: 'SYSTEM.TAG',
-				name: '工程量项'
-			}, {
-				id: 'SYSTEM.PRICE',
-				name: '造价清单'
-			}, {
-				id: 'SYSTEM.DEVICE',
-				name: '设备设置'
-			}, {
-				id: 'SYSTEM.ITEM',
-				name: '分项工程量'
+				id: 'SYSTEM.ORG',
+				name: '组织机构'
 			}
 		]
 	}, {
-		id: 'SETUP',
-		name: '系统管理',
+		id: 'PROJECT',
+		name: '项目管理',
+		children: [
+			{	
+				id:'PROJECT.LANDAREA',
+				name: '地块区域',
+				children: [{
+					id: 'PROJECT.PLOTMAGE',
+					name: '地块管理',
+				}, {
+					id: 'PROJECT.AREAMANAGE',
+					name: '区域管理',
+				}, {
+					id: 'PROJECT.SECTIONMANAGE',
+					name: '标段管理',
+				}, {
+					id: 'PROJECT.SMALLCLASS',
+					name: '小班管理',
+				}, {
+					id: 'PROJECT.THINCLASS',
+					name: '细班管理',
+				}]
+			}, {
+				id:'PROJECT.PROMANAGE',
+				name: '工程管理',
+				children: [{
+					id: 'PROJECT.PLOTSET',
+					name: '地块设置',
+				}, {
+					id: 'PROJECT.AREASET',
+					name: '区域设置',
+				}, {
+					id: 'PROJECT.UNITPRO',
+					name: '单位工程',
+				}, {
+					id: 'PROJECT.SUBUNITPRO',
+					name: '子单位工程',
+				}, {
+					id: 'PROJECT.SUBPRO',
+					name: '分部工程',
+				}, {
+					id: 'PROJECT.ITEMPRO',
+					name: '分项工程',
+				}]
+			}, {
+				id:'PROJECT.ORG',
+				name: '组织机构',
+				children: [{
+					id: 'PROJECT.ORGTYPE',
+					name: '类型管理',
+				}, {
+					id: 'PROJECT.UNITMANAGE',
+					name: '单位管理',
+				}, {
+					id: 'PROJECT.BRANCHMANAGE',
+					name: '部门管理',
+				}]
+			}, {
+				id:'PROJECT.DATAMANAGE',
+				name: '资料管理',
+				children: [{
+					id: 'PROJECT.STANDARD',
+					name: '制度标准',
+				}, {
+					id: 'PROJECT.ENGINEERINGIMAGE',
+					name: '工程影像',
+				}, {
+					id: 'PROJECT.PRODOC',
+					name: '工程文档',
+				}, {
+					id: 'PROJECT.KEYWORD',
+					name: '工程字段',
+				}, {
+					id: 'PROJECT.TEMPLATE',
+					name: '模板配置',
+				}, {
+					id: 'PROJECT.DICTIONARIES',
+					name: '工程文档字典',
+				}]
+			}, {
+				id:'PROJECT.OVERALLMANAGE',
+				name: '综合管理',
+				children: [{
+					id: 'PROJECT.MATERIAL',
+					name: '物资管理',
+				},
+				{
+					id: 'PROJECT.FORM',
+					name: '表单管理',
+				}]
+			}, {
+				id:'PROJECT.SAFETYMANAGE',
+				name: '安环管理',
+				children: [{
+					id: 'PROJECT.SAFETYSYSTEM',
+					name: '安全体系目录',
+				}, {
+					id: 'PROJECT.DANGER',
+					name: '危险源',
+				}, {
+					id: 'PROJECT.HAZARD',
+					name: '安全隐患',
+				}]
+			}, {
+				id:'PROJECT.MASSMANAGE',
+				name: '质量管理',
+				children: [{
+					id: 'PROJECT.DEFECTS',
+					name: '质量缺陷',
+				}, {
+					id: 'PROJECT.NURSERYTYPE',
+					name: '类型管理',
+				}, {
+					id: 'PROJECT.TREEMANAGE',
+					name: '树种管理', 
+				}]
+			}, {
+				id:'PROJECT.NURSERY',
+				name: '苗木管理',
+				children: [{
+					id: 'PROJECT.NURSERYTYPE',
+					name: '类型管理',
+				}, {
+					id: 'PROJECT.TREEMANAGE',
+					name: '树种管理',
+				}]
+			}
+		]
+	}];
+
+//下面注释的是前海的模块
+// export const MODULES = [
+// 	{
+// 		id: 'HOME',
+// 		name: '首页',
+// 	},
+// 	{
+// 		id: 'DISPLAY',
+// 		name: '综合展示',
+// 		children: [{
+// 			id: 'DISPLAY.2DGIS',
+// 			name: '现场信息',
+// 		}, {
+// 			id: 'DISPLAY.3DGIS',
+// 			name: '规划信息',
+// 		}, {
+// 			id: 'DISPLAY.DGNMODULE',
+// 			name: '项目信息',
+// 		}]
+// 	}, {
+// 		id: 'MANAGE',
+// 		name: '综合管理',
+// 		children: [{
+// 			id: 'MANAGE.CHECKIN',
+// 			name: '人员考勤'
+// 		}, {
+// 			id: 'MANAGE.NEWS',
+// 			name: '新闻公告'
+// 		}, {
+// 			id: 'MANAGE.SENDRECIEVE',
+// 			name: '现场收发文'
+// 		}, {
+// 			id: 'MANAGE.APPROVAL',
+// 			name: '工程批文'
+// 		}]
+// 	}, {
+// 		id: 'DATUM',
+// 		name: '资料管理',
+// 		children: [{
+// 			id: 'DATUM.STANDARD',
+// 			name: '制度规范',
+// 		}, {
+// 			id: 'DATUM.ENGINEERING',
+// 			name: '工程文档'
+// 		}]
+// 	}, {
+// 		id: 'DESIGN',
+// 		name: '设计管理',
+// 		children: [{
+// 			id: 'DESIGN.STATISTICS',
+// 			name: '统计分析',
+// 		}, {
+// 			id: 'DESIGN.PLAN1',
+// 			name: '交付计划',
+// 		}, {
+// 			id: 'DESIGN.PLAN2',
+// 			name: '发起计划',
+// 		}, {
+// 			id: 'DESIGN.PLAN3',
+// 			name: '填报计划'
+// 		}, {
+// 			id: 'DESIGN.PLAN4',
+// 			name: '计划审查'
+// 		}, {
+// 			id: 'DESIGN.PLAN5',
+// 			name: '变更计划'
+// 		}, {
+// 			id: 'DESIGN.PLAN6',
+// 			name: '变更审查'
+// 		}, {
+// 			id: 'DESIGN.REPORTRESULT',
+// 			name: '设计上报'
+// 		}, {
+// 			id: 'DESIGN.APPROVALRESULT',
+// 			name: '设计审查'
+// 		}, {
+// 			id: 'DESIGN.CREATEMODIFY',
+// 			name: '发起变更',
+// 		}, {
+// 			id: 'DESIGN.MODIFY',
+// 			name: '设计变更'
+// 		}, {
+// 			id: 'DESIGN.MODIFYAPPROVAL',
+// 			name: '变更审查'
+// 		}, {
+// 			id: 'DESIGN.REMIND',
+// 			name: '进度提醒',
+// 		},
+// 		//设计交底
+// 		{ id: 'DESIGN.EXPLAINQUERY', name: '交底查询' },
+// 		{ id: 'DESIGN.EXPLAINSUBMIT', name: '交底填报' },
+// 		{ id: 'DESIGN.EXPLAINHANDLE', name: '交底处理' },
+// 		]
+// 	}, {
+// 		id: 'QUALITY',
+// 		name: '质量管理',
+// 		children: [{
+// 			id: 'QUALITY.TONGJI',
+// 			name: '统计分析',
+// 		}, {
+// 			id: 'QUALITY.QUERY',
+// 			name: '验收查询',
+// 		}, {
+// 			id: 'QUALITY.HUAFEN',
+// 			name: '检验批划分',
+// 		}, {
+// 			id: 'QUALITY.TIANBAO',
+// 			name: '检验批填报',
+// 		}, {
+// 			id: 'QUALITY.SUBITEM',
+// 			name: '分项验收',
+// 		}, {
+// 			id: 'QUALITY.FENBU',
+// 			name: '分部验收',
+// 		}, {
+// 			id: 'QUALITY.DANWEI',
+// 			name: '单位工程验收',
+// 		}, {
+// 			id: 'QUALITY.MONITORING',
+// 			name: '质量监控',
+// 		}, {
+// 			id: 'QUALITY.DEFECT',
+// 			name: '质量缺陷',
+// 		}]
+// 	},
+// 	{
+// 		id: 'SAFETY',
+// 		name: '安全管理',
+// 		children: [
+// 			{
+// 				id: 'SAFETY.SAFETYPLAN',
+// 				name: '安全策划',
+// 				children: [
+// 					{
+// 						id: 'SAFETY.SCHEME',
+// 						name: '安全策划书',
+// 					}, {
+// 						id: 'SAFETY.ORGANIZATIONALSTRUCTURE',
+// 						name: '组织架构',
+// 					}, {
+// 						id: 'SAFETY.MANAGEMENTINSTITUTION',
+// 						name: '安全管理制度',
+// 					}, {
+// 						id: 'SAFETY.EMERGENCYPLAN',
+// 						name: '应急预案',
+// 					}, {
+// 						id: 'SAFETY.SAFETYGOAL',
+// 						name: '安全目标',
+// 					}, {
+// 						id: 'SAFETY.RESPONSIBILITYSYSTEM',
+// 						name: '安全责任制',
+// 					}
+// 				]
+// 			},
+// 			{
+// 				id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT',
+// 				name: '危险源管理',
+// 				children: [
+// 					{
+// 						id: 'SAFETY.RISKEVALUATION',
+// 						name: '风险评价',
+// 					}, {
+// 						id: 'SAFETY.UNBEARABLE',
+// 						name: '不可承受风险',
+// 					}, {
+// 						id: 'SAFETY.RISKFACTOR',
+// 						name: '重大危险因素',
+// 					}, {
+// 						id: 'SAFETY.DYNAMICREPORT',
+// 						name: '动态报表'
+// 					}
+// 				]
+// 			},
+// 			{
+// 				id: 'SAFETY.ZXFAJCS',
+// 				name: '专项方案及措施',
+// 				children: [
+// 					{
+// 						id: 'SAFETY.DISCIPLINE',
+// 						name: '安全规程',
+// 					}, {
+// 						id: 'SAFETY.SOLUTION',
+// 						name: '专项方案',
+// 					}
+// 				]
+// 			},
+// 			{
+// 				name: '安全监测',
+// 				id: 'SAFETY.MONITORAQJC',
+// 				children: [
+// 					{
+// 						id: 'SAFETY.PLAN',
+// 						name: '监测方案',
+// 					}, {
+// 						id: 'SAFETY.QUERY',
+// 						name: '监测数据查询',
+// 					}, {
+// 						id: 'SAFETY.QUERY',
+// 						name: '监测数据查询',
+// 					}, {
+// 						id: 'SAFETY.PROJECT',
+// 						name: '监测项目',
+// 					}, {
+// 						id: 'SAFETY.STATIONS',
+// 						name: '监测点',
+// 					},
+// 					{
+// 						id: 'SAFETY.MONITORING',
+// 						name: '监测数据',
+// 					}
+// 				]
+// 			},
+// 			{
+// 				id: 'SAFETY.MANAGEMENTANDCONTROL',
+// 				name: '安全管控',
+// 				children: [
+// 					{
+// 						id: 'SAFETY.SAFETYCHECK',
+// 						name: '安全检查',
+// 					}, {
+// 						id: 'SAFETY.QUALIFICATIONVERIFICATION',
+// 						name: '安全资质验证',
+// 					}, {
+// 						id: 'SAFETY.EDUCATIONREGISTER',
+// 						name: '安全教育登记',
+// 					}, {
+// 						id: 'SAFETY.ACTIONSRECORD',
+// 						name: '安全活动记录',
+// 					}, {
+// 						id: 'SAFETY.TECHNICALDISCLOSURE',
+// 						name: '安全技术交底',
+// 					}, {
+// 						id: 'SAFETY.FACILITIESACCEPTANCE',
+// 						name: '设备设施验收',
+// 					}, {
+// 						id: 'SAFETY.HIDDENDANGER',
+// 						name: '安全隐患',
+// 					}
+// 				]
+// 			},
+// 			{
+// 				name: '事故管理',
+// 				id: 'SAFETY.ACCIDENT',
+// 				children: [
+// 					{
+// 						id: 'SAFETY.REGISTER',
+// 						name: '事故登记',
+// 					}, {
+// 						id: 'SAFETY.REPORT',
+// 						name: '事故报告',
+// 					}, {
+// 						id: 'SAFETY.TREATMENT',
+// 						name: '事故处理',
+// 					}, {
+// 						id: 'SAFETY.INVESTIGATION',
+// 						name: '事故调查',
+// 					}
+// 				]
+// 			}
+// 		]
+// 	},
+// 	{
+// 		id: 'SCHEDULE',
+// 		name: '进度管理',
+// 		children: [{
+// 			id: 'SCHEDULE.STATISTICS',
+// 			name: '统计分析',
+// 		}, {
+// 			id: 'SCHEDULE.TOTALPLAN',
+// 			name: '总计进度',
+// 		}, {
+// 			id: 'SCHEDULE.STARTPLAN',
+// 			name: '发起计划',
+// 		}, {
+// 			id: 'SCHEDULE.TOTALREPORT',
+// 			name: '进度填报',
+// 		}, {
+// 			id: 'SCHEDULE.TOTALAPPROVAL',
+// 			name: '进度审批',
+// 		}, {
+// 			id: 'SCHEDULE.REPORTSETTING',
+// 			name: '管控日程',
+// 		}, {
+// 			id: 'SCHEDULE.STAGEREPORT',
+// 			name: '进度填报',
+// 		}, {
+// 			id: 'SCHEDULE.STAGEAPPROVAL',
+// 			name: '进度审批',
+// 		}, {
+// 			id: 'SCHEDULE.DGNSCHEDULE',
+// 			name: '进度模拟',
+// 		}, {
+// 			id: 'SCHEDULE.REPORTMONITOR',
+// 			name: '流程报警',
+// 		}, {
+// 			id: 'SCHEDULE.NOTICEMONITOR',
+// 			name: '进度报警',
+// 		}, {
+// 			id: 'SCHEDULE.HISTORY',
+// 			name: '进度历史',
+// 		}]
+// 	}, {
+// 		id: 'COST',
+// 		name: '造价管理',
+// 		children: [{
+// 			id: 'COST.COSTESTIMATE',
+// 			name: '造价估算',
+// 		}, {
+// 			id: 'COST.COSTSCHEDULE',
+// 			name: '造价进度',
+// 		}, {
+// 			id: 'COST.COSTCOMPARISON',
+// 			name: '造价对比',
+// 		}, {
+// 			id: 'COST.INFOSHOW',
+// 			name: '工程量信息展示',
+// 		}, {
+// 			id: 'COST.DATAMAINTENANCE',
+// 			name: '工程量数据维护',
+// 		}, {
+// 			id: 'COST.WORKESTIMATE',
+// 			name: '重要工程量预估',
+// 		}]
+// 	}, {
+// 		id: 'FOREST',
+// 		name: '智慧森林',
+// 		children: [{
+// 			id: 'FOREST.INFO',
+// 			name: '植被信息',
+// 		}]
+// 	}, {
+// 		id: 'VIDEO',
+// 		name: '视频监控',
+// 		children: [{
+// 			name: '视频监控',
+// 			id: 'VIDEO.VIDEO',
+// 		}, {
+// 			name: '摄像头管理',
+// 			id: 'VIDEO.CAMERAMANAGE',
+// 		}, {
+// 			name: '全景图',
+// 			id: 'VIDEO.PANORAMA',
+// 		}]
+// 	}, {
+// 		id: 'CONTRACTCARE',
+// 		name: '合同管理',
+// 		children: [{
+// 			id: 'CONTRACTCARE.CLIENT',
+// 			name: '客户管理'
+// 		}, {
+// 			id: 'CONTRACTCARE.ITEMINFO',
+// 			name: '项目信息列表'
+// 		}, {
+// 			id: 'CONTRACTCARE.MAINCONTRACT',
+// 			name: '总包合同信息维护'
+// 		}, {
+// 			id: 'CONTRACTCARE.SUBCONTRACT',
+// 			name: '分包合同信息维护'
+// 		}, {
+// 			id: 'CONTRACTCARE.CONTRACTCOLLECT',
+// 			name: '合同收款'
+// 		}, {
+// 			id: 'CONTRACTCARE.CONTRACTPAYMENT',
+// 			name: '合同付款'
+// 		}, {
+// 			id: 'CONTRACTCARE.MAININVOICE',
+// 			name: '总包合同发票'
+// 		}, {
+// 			id: 'CONTRACTCARE.SUBINVOICE',
+// 			name: '分包合同发票'
+// 		}, {
+// 			id: 'CONTRACTCARE.PRETAXINFO',
+// 			name: '预缴税信息维护'
+// 		}, {
+// 			id: 'CONTRACTCARE.DEPOSIT',
+// 			name: '合同保函保证金'
+// 		}, {
+// 			id: 'CONTRACTCARE.CONTRACTCHANGE',
+// 			name: '合同变更'
+// 		}, {
+// 			id: 'CONTRACTCARE.CONTRACTFINAL',
+// 			name: '合同结算'
+// 		}, {
+// 			id: 'CONTRACTCARE.ACCEPTANCEBILL',
+// 			name: '承兑汇票'
+// 		},]
+// 	}, {
+// 		id: 'DRAWINGCARE',
+// 		name: '图档管理',
+// 		children: [{
+// 			id: 'DRAWINGCARE.RECORDMANAGE',
+// 			name: '工程文档案卷管理'
+// 		}, {
+// 			id: 'DRAWINGCARE.FILEMANAGE',
+// 			name: '工程文档文件管理'
+// 		}, {
+// 			id: 'DRAWINGCARE.DRAWINGLIST',
+// 			name: '图纸编目'
+// 		}, {
+// 			id: 'DRAWINGCARE.RECORDLIST',
+// 			name: '档案编目'
+// 		}, {
+// 			id: 'DRAWINGCARE.TECHBOOKLIST',
+// 			name: '科技图书编目'
+// 		}, {
+// 			id: 'DRAWINGCARE.TOPOGRAPHICMAPLIST',
+// 			name: '地形图编目'
+// 		}, {
+// 			id: 'DRAWINGCARE.STANDARDSPECIFICATIONLIST',
+// 			name: '标准规范编目'
+// 		}, {
+// 			id: 'DRAWINGCARE.OPENRECORDLIST',
+// 			name: '公开档案编目'
+// 		}, {
+// 			id: 'DRAWINGCARE.AUDIOVISUALRECORDLIST',
+// 			name: '声像档案编目'
+// 		},]
+// 	},
+
+// 	{
+// 		id: 'SELFCARE',
+// 		name: '个人中心',
+// 		children: [{
+// 			id: 'SELFCARE.TASK',
+// 			name: '个人任务'
+// 		}, {
+// 			id: 'SELFCARE.QUERY',
+// 			name: '个人考勤'
+// 		}]
+// 	}, {
+// 		id: 'SYSTEM',
+// 		name: '系统设置',
+// 		children: [
+// 			{
+// 				id: 'SYSTEM.FIELD',
+// 				name: '编码字段'
+// 			}, {
+// 				id: 'SYSTEM.CODETYPE',
+// 				name: '编码类型'
+// 			}, {
+// 				id: 'SYSTEM.CONVENTION',
+// 				name: '工程约定'
+// 			}, {
+// 				id: 'SYSTEM.ROLE',
+// 				name: '角色管理'
+// 			}, {
+// 				id: 'SYSTEM.PERMISSION',
+// 				name: '权限设置'
+// 			}, {
+// 				id: 'SYSTEM.MAJOR',
+// 				name: '专业设置'
+// 			}, {
+// 				id: 'SYSTEM.PROJECT',
+// 				name: '项目设置'
+// 			}, {
+// 				id: 'SYSTEM.TEMPLATE',
+// 				name: '模板设置'
+// 			}, {
+// 				id: 'SYSTEM.ICON',
+// 				name: '图标设置'
+// 			}, {
+// 				id: 'SYSTEM.WORKFLOW',
+// 				name: '流程设置'
+// 			}, {
+// 				id: 'SYSTEM.DOCUMENT',
+// 				name: '文档设置'
+// 			}, {
+// 				id: 'SYSTEM.TAG',
+// 				name: '工程量项'
+// 			}, {
+// 				id: 'SYSTEM.PRICE',
+// 				name: '造价清单'
+// 			}, {
+// 				id: 'SYSTEM.DEVICE',
+// 				name: '设备设置'
+// 			}, {
+// 				id: 'SYSTEM.ITEM',
+// 				name: '分项工程量'
+// 			}
+// 		]
+// 	}, {
+// 		id: 'SETUP',
+// 		name: '系统管理',
+// 		children: [{
+// 			id: 'SETUP.AREA',
+// 			name: '区域地块',
+// 		}, {
+// 			id: 'SETUP.PROJECT',
+// 			name: '项目管理',
+// 		}, {
+// 			id: 'SETUP.UNIT',
+// 			name: '单位工程',
+// 		}, {
+// 			id: 'SETUP.SECTION',
+// 			name: '分部分项',
+// 		}, {
+// 			id: 'SETUP.SITE',
+// 			name: '工程部位',
+// 		}, {
+// 			id: 'SETUP.ORG',
+// 			name: '组织机构',
+// 		}, {
+// 			id: 'SETUP.PERSON',
+// 			name: '人员管理',
+// 		}, {
+// 			id: 'SETUP.STANDARD',
+// 			name: '制度标准',
+// 		}, {
+// 			id: 'SETUP.ENGINEERING',
+// 			name: '工程目录',
+// 		}, {
+// 			id: 'SETUP.KEYWORD',
+// 			name: '工程字段',
+// 		}, {
+// 			id: 'SETUP.TEMPLATE',
+// 			name: '模板配置'
+// 		}, {
+// 			id: 'SETUP.DICTIONARIES',
+// 			name: '工程文档字典'
+// 		}, {
+// 			id: 'SYSTEM.HAZARD',
+// 			name: '危险源',
+// 		}, {
+// 			id: 'SYSTEM.RISK',
+// 			name: '安全隐患'
+// 		}, {
+// 			id: 'SYSTEM.QUALITY',
+// 			name: '质量缺陷'
+// 		}, {
+// 			id: 'SYSTEM.ACCIDENT',
+// 			name: '安全事故',
+// 		}
+// 		]
+// 	}];
+
+//MODULES和MODULES2没有什么区别，只是前海的设置有区别分别是admin用户和其他用户的模块权限
+export const MODULES2 = [
+	{
+		id: 'HOME',
+		name: '首页',
+	}, {
+		id: 'DASHBOARD',
+		name: '综合展示',
 		children: [{
-			id: 'SETUP.AREA',
-			name: '区域地块',
+			id: 'DASHBOARD.ONSITE',
+			name: '二维展示',
 		}, {
-			id: 'SETUP.PROJECT',
-			name: '项目管理',
+			id: 'DASHBOARD.PLAN',
+			name: '巡检路线',
 		}, {
-			id: 'SETUP.UNIT',
-			name: '单位工程',
+			id: 'DASHBOARD.DANGER',
+			name: '安全隐患',
 		}, {
-			id: 'SETUP.SECTION',
-			name: '分部分项',
+			id: 'DASHBOARD.PROJECT',
+			name: '工程影像',
+		}]
+	}, {
+		id: 'OVERALL',
+		name: '综合管理',
+		children: [{
+			id: 'OVERALL.NEWS',
+			name: '新闻通知'
 		}, {
-			id: 'SETUP.SITE',
-			name: '工程部位',
+			id: 'OVERALL.DISPATCH',
+			name: '现场收发文'
 		}, {
-			id: 'SETUP.ORG',
-			name: '组织机构',
+			id: 'OVERALL.MATERAIL',
+			name: '物资管理'
 		}, {
-			id: 'SETUP.PERSON',
-			name: '人员管理',
+			id: 'OVERALL.FORM',
+			name: '表单管理'
 		}, {
-			id: 'SETUP.STANDARD',
-			name: '制度标准',
+			id: 'OVERALL.CHECKIN',
+			name: '考勤管理'
+		}]
+	}, {
+		id: 'DATUM',
+		name: '资料管理',
+		children: [{
+			id: 'DATUM.STANDARD',
+			name: '制度规范',
 		}, {
-			id: 'SETUP.ENGINEERING',
-			name: '工程目录',
+			id: 'DATUM.ENGINEERING',
+			name: '工程文档'
 		}, {
-			id: 'SETUP.KEYWORD',
-			name: '工程字段',
+			id: 'DATUM.REDIOS',
+			name: '工程影像'
+		}]
+	}, {
+		id: 'QUALITY',
+		name: '质量管理',
+		children: [{
+			id: 'QUALITY.TONGJI',
+			name: '质量分析',
 		}, {
-			id: 'SETUP.TEMPLATE',
-			name: '模板配置'
+			id: 'QUALITY.SCORE',
+			name: '质量评分',
+			children: [{
+				id: 'QUALITY.SCORE.SEARCH',
+				name: '质量管理检查记录',
+			}]
 		}, {
-			id: 'SETUP.DICTIONARIES',
-			name: '工程文档字典'
+			id: 'QUALITY.APPRAISING',
+			name: '质量评优',
 		}, {
-			id: 'SYSTEM.HAZARD',
-			name: '危险源',
+			id:'QUALITY.YANSHOU',
+			name: '质量验收',
+			children: [{
+				id: 'QUALITY.TIANBAO',
+				name: '进场材料填报',
+			}, {
+				id: 'QUALITY.QUERY',
+				name: '验收查询',
+			}, {
+				id: 'QUALITY.HUAFEN',
+				name: '检验批划分',
+			}, {
+				id: 'QUALITY.SUBITEM',
+				name: '分项验收',
+			}, {
+				id: 'QUALITY.FENBU',
+				name: '分部验收',
+			}, {
+				id: 'QUALITY.DANWEI',
+				name: '单位工程验收',
+			}]
 		}, {
-			id: 'SYSTEM.RISK',
-			name: '安全隐患'
+			id: 'QUALITY.DEFECT',
+			name: '质量缺陷',
+		}]
+	},{
+		id: 'SCHEDULE',
+		name: '进度管理',
+		children: [{
+			id: 'SCHEDULE.STAGEREPORT',
+			name: '进度填报',
 		}, {
-			id: 'SYSTEM.QUALITY',
-			name: '质量缺陷'
+			id: 'SCHEDULE.PROPROGRESS',
+			name: '项目进度',
 		}, {
-			id: 'SYSTEM.ACCIDENT',
-			name: '安全事故',
-		}
+			id: 'SCHEDULE.ENTERANALYZE',
+			name: '苗木进场分析',
+		}, {
+			id: 'SCHEDULE.SCHEDULEANALYZE',
+			name: '种植进度分析',
+		}, {
+			id: 'SCHEDULE.SHOW',
+			name: '种植进度展示',
+		}]
+	}, {
+		id: 'SAFETY',
+		name: '安环管理',
+		children: [
+			{
+				id: 'SAFETY',
+				name: '安全动态',
+			}, {
+				id: 'SAFETY.SYSTEM',
+				name: '安全体系',
+			}, {
+				id: 'SAFETY.HIDDENDANGER',
+				name: '安全隐患',
+			},
+			{
+				id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT',
+				name: '安全文明施工',
+				children: [
+					{
+						id: 'SAFETY.RISKEVALUATION',
+						name: '危险源风险评价',
+					}, {
+						id: 'SAFETY.UNBEARABLE',
+						name: '环境保护',
+					}, {
+						id: 'SAFETY.RISKFACTOR',
+						name: '文明施工',
+					}
+				]
+			},
+			{
+				id: 'SAFETY.EDUCATIONREGISTER',
+				name: '安全教育',
+			},
+			{
+				id: 'SAFETY.SAFETYTREND',
+				name: '安全动态管理',
+			}
+		]
+	}, {
+		id: 'FOREST',
+		name: '森林大数据',
+		children: [{
+			id: 'FOREST.INFO',
+			name: '苗木大数据',
+			children: [{
+				id: 'FOREST.NURSOVERALLINFO',
+				name: '苗木综合信息',
+			}, {
+				id: 'FOREST.NURSMEASUREINFO',
+				name: '苗圃测量信息',
+			}, {
+				id: 'FOREST.LOCMEASUREINFO',
+				name: '现场测量信息',
+			}, {
+				id: 'FOREST.SUPERVISORINFO',
+				name: '监理验收信息',
+			}, {
+				id: 'FOREST.OWNERINFO',
+				name: '业主抽查信息',
+			}, {
+				id: 'FOREST.CONTRASTINFO',
+				name: '苗木对比信息',
+			}, {
+				id: 'FOREST.FAITHINFO',
+				name: '供应商诚信信息',
+			}]
+		}, {
+			id: 'FOREST.FOREST.IMPORT',
+			name: '数据导入',
+			children: [{
+				id: 'FOREST.DATAIMPORT',
+				name: '定位数据导入',
+			}]
+		}]
+	}, {
+		id: 'RECEIVE',
+		name: '收发货管理',
+		children: [{
+			id: 'RECEIVE.RECEIVEMANAGEMENT',
+			name: '收货管理',
+		}, {
+			id: 'RECEIVE.DISTRIBUTIONMANAGEMENT',
+			name: '发放管理',
+		}, {
+			id: 'RECEIVE.INVENTORYMANAGEMENT',
+			name: '库存管理',
+		}]
+	}, {
+		id: 'SELFCARE',
+		name: '个人中心',
+		children: [{
+			id: 'SELFCARE.TASK',
+			name: '个人任务',
+		}, {
+			id: 'SELFCARE.QUERY',
+			name: '个人考勤',
+		}, {
+			id: 'SELFCARE.LEAVE',
+			name: '个人请假',
+		}, {
+			id: 'SELFCARE.ACCOUNT',
+			name: '账号管理',
+		}]
+	}, {
+		id: 'SYSTEM',
+		name: '系统设置',
+		children: [
+			{
+				id: 'SYSTEM.ROLE',
+				name: '角色设置'
+			}, {
+				id: 'SYSTEM.PERMISSION',
+				name: '权限设置'
+			}, {
+				id: 'SYSTEM.PERSON',
+				name: '用户管理'
+			}, {
+				id: 'SYSTEM.WORKFLOW',
+				name: '流程设置'
+			}, {
+				id: 'SYSTEM.ORG',
+				name: '组织机构'
+			}
+		]
+	}, {
+		id: 'PROJECT',
+		name: '项目管理',
+		children: [
+			{	
+				id:'PROJECT.LANDAREA',
+				name: '地块区域',
+				children: [{
+					id: 'PROJECT.PLOTMAGE',
+					name: '地块管理',
+				}, {
+					id: 'PROJECT.AREAMANAGE',
+					name: '区域管理',
+				}, {
+					id: 'PROJECT.SECTIONMANAGE',
+					name: '标段管理',
+				}, {
+					id: 'PROJECT.SMALLCLASS',
+					name: '小班管理',
+				}, {
+					id: 'PROJECT.THINCLASS',
+					name: '细班管理',
+				}]
+			}, {
+				id:'PROJECT.PROMANAGE',
+				name: '工程管理',
+				children: [{
+					id: 'PROJECT.PLOTSET',
+					name: '地块设置',
+				}, {
+					id: 'PROJECT.AREASET',
+					name: '区域设置',
+				}, {
+					id: 'PROJECT.UNITPRO',
+					name: '单位工程',
+				}, {
+					id: 'PROJECT.SUBUNITPRO',
+					name: '子单位工程',
+				}, {
+					id: 'PROJECT.SUBPRO',
+					name: '分部工程',
+				}, {
+					id: 'PROJECT.ITEMPRO',
+					name: '分项工程',
+				}]
+			}, {
+				id:'PROJECT.ORG',
+				name: '组织机构',
+				children: [{
+					id: 'PROJECT.ORGTYPE',
+					name: '类型管理',
+				}, {
+					id: 'PROJECT.UNITMANAGE',
+					name: '单位管理',
+				}, {
+					id: 'PROJECT.BRANCHMANAGE',
+					name: '部门管理',
+				}]
+			}, {
+				id:'PROJECT.DATAMANAGE',
+				name: '资料管理',
+				children: [{
+					id: 'PROJECT.STANDARD',
+					name: '制度标准',
+				}, {
+					id: 'PROJECT.ENGINEERINGIMAGE',
+					name: '工程影像',
+				}, {
+					id: 'PROJECT.PRODOC',
+					name: '工程文档',
+				}, {
+					id: 'PROJECT.KEYWORD',
+					name: '工程字段',
+				}, {
+					id: 'PROJECT.TEMPLATE',
+					name: '模板配置',
+				}, {
+					id: 'PROJECT.DICTIONARIES',
+					name: '工程文档字典',
+				}]
+			}, {
+				id:'PROJECT.OVERALLMANAGE',
+				name: '综合管理',
+				children: [{
+					id: 'PROJECT.MATERIAL',
+					name: '物资管理',
+				},
+				{
+					id: 'PROJECT.FORM',
+					name: '表单管理',
+				}]
+			}, {
+				id:'PROJECT.SAFETYMANAGE',
+				name: '安环管理',
+				children: [{
+					id: 'PROJECT.SAFETYSYSTEM',
+					name: '安全体系目录',
+				}, {
+					id: 'PROJECT.DANGER',
+					name: '危险源',
+				}, {
+					id: 'PROJECT.HAZARD',
+					name: '安全隐患',
+				}]
+			}, {
+				id:'PROJECT.MASSMANAGE',
+				name: '质量管理',
+				children: [{
+					id: 'PROJECT.DEFECTS',
+					name: '质量缺陷',
+				}, {
+					id: 'PROJECT.NURSERYTYPE',
+					name: '类型管理',
+				}, {
+					id: 'PROJECT.TREEMANAGE',
+					name: '树种管理',
+				}]
+			}, {
+				id:'PROJECT.NURSERY',
+				name: '苗木管理',
+				children: [{
+					id: 'PROJECT.NURSERYTYPE',
+					name: '类型管理',
+				}, {
+					id: 'PROJECT.TREEMANAGE',
+					name: '树种管理',
+				}]
+			}
 		]
 	}];
 

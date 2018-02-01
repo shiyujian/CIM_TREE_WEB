@@ -51,7 +51,7 @@ export default class Roles extends Component {
 			</div>)
 	}
 
-	componentDidMount() {
+	componentDidMount() { 
 
 		// const permissions2 = [
 		// 	{ id: 'HOME', value: "1" },

@@ -64,22 +64,15 @@ export default class PerSearch extends Component {
             tree = [],
             dataList = [];
         users.map(user => {
-            user.groups.map(group=>{
-                if(group.permissions instanceof Array){
-                    group.permissions.map(per=>{
-                        if(per === "flow_approval"||per === "appmeta.DATUM.READ") {
-                            userList.push(user)
-                        }
-                    })
-                }
-            })
+            userList.push(user)
         })
         for (var i = 0;i <userList.length;i++){
             tree.push({
                 pk:userList[i].id,
                 code:userList[i].account.person_code,
                 name: userList[i].account.person_name,
-                username: userList[i].username
+                username: userList[i].username,
+                org:userList[i].organization,
             })
         }
         dataList = tree.map(node=>({
@@ -88,9 +81,10 @@ export default class PerSearch extends Component {
                 code: node.code,
                 name: node.name,
                 pk: node.pk,
-                username: node.username
+                username: node.username,
+                org:node.org,
             }),
-            value: 'C_PER' + '#' + node.code + '#' + node.name + '#' + node.pk + '#' + node.username,
+            value: 'C_PER' + '#' + node.code + '#' + node.name + '#' + node.pk + '#' + node.username + '#' + node.org,
             fetching: false
         }));
         return (

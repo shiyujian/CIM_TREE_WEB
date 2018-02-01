@@ -71,22 +71,13 @@ export default class System extends Component {
 			name: '权限设置',
 			path: '/system/permission',
 			icon: <Icon name="key"/>
-		}, 
-		// {
-		// 	key: 'Permission',
-		// 	id: 'SYSTEM.PERMISSION',
-		// 	name: '权限设置',
-		// 	path: '/system/permission',
-		// 	icon: <Icon name="key"/>
-		// }, 
-		{
+		},{
 			key: 'Person',
-			id: 'SETUP.PERSON ',
+			id: 'SYSTEM.PERSON ',
 			name: '用户管理',
 			path: '/system/person',
 			icon: <Icon name="users"/>
-		},
-		 
+		}, 
 		// {
 		// 	key: 'Major',
 		// 	id: 'SYSTEM.MAJOR',

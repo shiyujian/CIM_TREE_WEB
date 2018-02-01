@@ -40,7 +40,7 @@ window.config = {
 	//现场收发文接口的端口
 	'DOC_EXCHANGE_URL': 'http://47.104.160.65:6545',
 	//现场收发文接口验证用的用户名和密码
-	'DOC_EXCHANGE_USER_PASSWORD': 'bimqh:bimqh',
+	'DOC_EXCHANGE_USER_PASSWORD': 'bimtest:bimtest',
 
 	//node服务,验评表单转化Word,pdf转word
 	'NODE_FILE_STATIC_URL': 'http://47.104.160.65:6546',

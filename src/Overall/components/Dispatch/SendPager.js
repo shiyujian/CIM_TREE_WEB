@@ -58,6 +58,9 @@ export default class SendPage1 extends Component {
 			},
 		} = this.props;
 		const { notifications = [] } = sendInfo;
+		// console.log("notifications",notifications)
+		// console.log(this.props)
+		// console.log("sendInfo",sendInfo)
 		const { showInfo = {} } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
 		// console.log(111111,sendInfo)
@@ -147,6 +150,7 @@ export default class SendPage1 extends Component {
 		return text;
 	}
 	_getNewArrFunc(list = []) {
+		// console.log(list)
 		let arr = list;
 		list.map((itm, index) => {
 			itm.index = index + 1;
@@ -157,6 +161,7 @@ export default class SendPage1 extends Component {
 	_viewClick(id) {
 		//	获取详情
 		const { actions: { getSendDetailAc } } = this.props;
+		console.log(this.props)
 		this.setState({
 			visible: true
 		});

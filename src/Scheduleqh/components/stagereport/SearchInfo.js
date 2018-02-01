@@ -26,12 +26,12 @@ class SearchInfo extends Component {
                             <Col span={8}>
                                 <FormItem {...SearchInfo.layout} label='单位工程'>
                                     {
-                                        getFieldDecorator('unit', {
+                                        getFieldDecorator('sunitproject', {
                                             rules: [
                                                 { required: false, message: '请选择单位工程' }
                                             ]
                                         })
-                                            (<Select placeholder='请选择区域' allowClear>
+                                            (<Select placeholder='请选择单位工程' allowClear>
                                                 <Option value='单位工程一'>单位工程一</Option>
                                                 <Option value='单位工程二'>单位工程二</Option>
                                                 <Option value='单位工程三'>单位工程三</Option>
@@ -42,7 +42,7 @@ class SearchInfo extends Component {
                             <Col span={8}>
                                 <FormItem {...SearchInfo.layout} label='编号'>
                                     {
-                                        getFieldDecorator('numbercode', {
+                                        getFieldDecorator('snumbercode', {
                                             rules: [
                                                 { required: false, message: '请输入编号' }
                                             ]
@@ -54,9 +54,9 @@ class SearchInfo extends Component {
                             <Col span={8}>
                                 <FormItem {...SearchInfo.layout} label='监理单位'>
                                     {
-                                        getFieldDecorator('superunit', {
+                                        getFieldDecorator('ssuperunit', {
                                             rules: [
-                                                { required: true, message: '请输入监理单位' }
+                                                { required: false, message: '请输入监理单位' }
                                             ]
                                         })
                                             (<Input placeholder='请输入监理单位' />)
@@ -68,7 +68,7 @@ class SearchInfo extends Component {
                             <Col span={8}>
                                 <FormItem {...SearchInfo.layout} label='日期'>
                                     {
-                                        getFieldDecorator('date', {
+                                        getFieldDecorator('stimedate', {
                                             rules: [
                                                 { type: 'array', required: false, message: '请选择时期' }
                                             ]
@@ -80,7 +80,7 @@ class SearchInfo extends Component {
                             <Col span={8}>
                                 <FormItem {...SearchInfo.layout} label='流程状态'>
                                     {
-                                        getFieldDecorator('status', {
+                                        getFieldDecorator('sstatus', {
                                             rules: [
                                                 { required: false, message: '请选择流程状态' }
                                             ]
@@ -122,11 +122,11 @@ class SearchInfo extends Component {
 
     clear() {
         this.props.form.setFieldsValue({
-            unit: undefined,
-            numbercode: undefined,
-            date: undefined,
-            status: undefined,
-            superunit: undefined
+            sunitproject: undefined,
+            snumbercode: undefined,
+            stimedate: undefined,
+            sstatus: undefined,
+            ssuperunit: undefined
         })
     }
 }

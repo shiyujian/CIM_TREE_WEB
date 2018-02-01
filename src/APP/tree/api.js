@@ -24,13 +24,13 @@ export const tree_menus = [{
 	icon: <Icon name="home"/>,
 }, {
 	key: 'dashboard',
-	id: 'DISPLAY',
+	id: 'DASHBOARD',
 	title: '综合展示',
 	path: '/dashboard',
 	icon: <Icon name="map"/>
 }, {
 	key: 'overall',
-	id: 'MANAGE',
+	id: 'OVERALL',
 	title: '综合管理',
 	path: '/overall/news',
 	icon: <Icon name="cubes"/>,
