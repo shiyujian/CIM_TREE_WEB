@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,DatePicker,Popconfirm} from 'antd';
+import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,DatePicker} from 'antd';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
 import './index.less';
@@ -9,7 +9,7 @@ const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
 
 let indexSelect='';
-class ResourceTable extends Component {
+class SeedingTable extends Component {
 
 	constructor(props){
          super(props);
@@ -20,12 +20,6 @@ class ResourceTable extends Component {
 			record:{}
          }
     }
-	// state = { 
-	// 	visible: false,
-	// 	data:[],
-	// 	indexSelect:'' 
-	// }
-
 	columns1 = [{
         title: '序号',
         dataIndex: 'index',
@@ -53,18 +47,18 @@ class ResourceTable extends Component {
 			)
 		}
     }]
-	
+
 	componentDidMount(){
 		const {
 			actions:{
-				getWorkflows2
+				getWorkflows3
 			}
 		} = this.props
 
 		let code = {
-			code:WORKFLOW_CODE.工程材料报批流程
+			code:WORKFLOW_CODE.苗木资料报批流程
 		}
-		getWorkflows2(code)
+		getWorkflows3(code)
 	}
 	render() {
 		let {
@@ -75,11 +69,11 @@ class ResourceTable extends Component {
 		const { 
 			Doc = [],
 			form: { getFieldDecorator },
-			workflows2 
+			workflows3 
 		} = this.props;
 		let dataSource = []
-		if(workflows2 && Array.isArray(workflows2) && workflows2.length>0){
-			dataSource = this.getTable(workflows2)
+		if(workflows3 && Array.isArray(workflows3) && workflows3.length>0){
+			dataSource = this.getTable(workflows3)
 		}
 		return (
 			<div>
@@ -108,24 +102,24 @@ class ResourceTable extends Component {
 	                        <Col span={24} style={{paddingLeft:'3em'}}>
 	                            <Row gutter={15} style={{marginTop:'2em'}} >
 	                                <Col span={8}>
-	                                    <FormItem   {...ResourceTable.layoutT} label="单位工程:">
-										{getFieldDecorator('form_unit', {
+	                                    <FormItem   {...SeedingTable.layoutT} label="单位工程:">
+										{getFieldDecorator('form2_unit', {
                                             initialValue: `${record.unit?record.unit:''}`,
                                             rules: [{ required: true, message: '请输入单位工程' }]
                                         })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
-	                                    <FormItem {...ResourceTable.layoutT} label="名称:">
-										{getFieldDecorator('form_name', {
+	                                    <FormItem {...SeedingTable.layoutT} label="名称:">
+										{getFieldDecorator('form2_name', {
                                             initialValue: `${record.name?record.name:''}`,
                                             rules: [{ required: true, message: '请输入名称' }]
                                         })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
-	                                    <FormItem {...ResourceTable.layoutT} label="编号:">
-										{getFieldDecorator('form_code', {
+	                                    <FormItem {...SeedingTable.layoutT} label="编号:">
+										{getFieldDecorator('form2_code', {
                                             initialValue: `${record.code?record.code:''}`,
                                             rules: [{ required: true, message: '请输入编号' }]
                                         })(<Input readOnly />)}
@@ -134,24 +128,24 @@ class ResourceTable extends Component {
 	                            </Row>
 	                            <Row gutter={15}>
 	                                <Col span={8}>
-	                                    <FormItem  {...ResourceTable.layoutT} label="审批单位:">
-										{getFieldDecorator('form_reviewUnit', {
+	                                    <FormItem  {...SeedingTable.layoutT} label="审批单位:">
+										{getFieldDecorator('form2_reviewUnit', {
                                             initialValue: `${record.reviewUnit?record.reviewUnit:''}`,
                                             rules: [{ required: true, message: '请输入审批单位' }]
                                         })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
-	                                    <FormItem {...ResourceTable.layoutT} label="进场日期:">
-										{getFieldDecorator('form_date', {
+	                                    <FormItem {...SeedingTable.layoutT} label="进场日期:">
+										{getFieldDecorator('form2_date', {
                                             initialValue: `${record.date?record.date:''}`,
                                             rules: [{ required: true, message: '请输入进场日期' }]
                                         })(<Input readOnly />)}
 	                                    </FormItem>
 	                                </Col>
 	                                <Col span={8}>
-	                                    <FormItem {...ResourceTable.layoutT} label="施工部位:">
-										{getFieldDecorator('form_site', {
+	                                    <FormItem {...SeedingTable.layoutT} label="施工部位:">
+										{getFieldDecorator('form2_site', {
                                             initialValue: `${record.site?record.site:''}`,
                                             rules: [{ required: true, message: '请输入施工部位' }]
                                         })(<Input readOnly />)}
@@ -238,7 +232,6 @@ class ResourceTable extends Component {
 	// 		selectDocuments(selectedRows);
 	// 	},
 	// };
-
 
 	columns = [
 		{
@@ -352,7 +345,7 @@ class ResourceTable extends Component {
 		}
 	}
 
-	//文件预览
+	文件预览
 	previewFile(file) {
 		const { actions: { openPreview } } = this.props;
 		if (JSON.stringify(file.basic_params) == "{}") {
@@ -373,4 +366,4 @@ class ResourceTable extends Component {
       wrapperCol: {span: 16},
     };
 }
-export default Form.create()(ResourceTable)
+export default Form.create()(SeedingTable)

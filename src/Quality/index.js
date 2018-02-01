@@ -185,12 +185,13 @@ const menus = [
 	},{
 		key: 'score',
 		name: '质量评分',
+		id:'QUALITY.SCORE',
 		path: '/quality/score',
 		icon: <Icon name="tasks" />,
 		children: [
 			{
         		key: 'query',
-        		id: 'QUALITY.SCORE',
+        		id: 'QUALITY.SCORE.SEARCH',
 				name: '质量管理检查记录',
 				path: '/quality/score/search',
 				icon: <Icon name="bullseye"/>
@@ -205,6 +206,7 @@ const menus = [
 	},{
 		key: 'yanshou',
 		name: '质量验收',
+		id: 'QUALITY.YANSHOU',		
 		path: '/quality/yanshou',
 		icon: <Icon name="check-square-o" />,
 		children: [

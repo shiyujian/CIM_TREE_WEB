@@ -121,7 +121,7 @@ class Stagereporttab extends Component {
 			superunit: undefined,
 			unit: undefined,
 			dataReview: undefined,
-			number: undefined,
+			numbercode: undefined,
 			timedate: moment().format('YYYY-MM-DD')
 		})
 
@@ -171,32 +171,35 @@ class Stagereporttab extends Component {
 			isCopyMsg: e.target.checked,
 		})
 	}
-	//选择审核人员
-	selectMember(memberInfo) {
-		const {
+	//选择人员
+    selectMember(memberInfo) {
+        const {
             form: {
                 setFieldsValue
             }
         } = this.props
-		this.member = null;
-		if (memberInfo) {
-			let memberValue = memberInfo.toString().split('#');
-			if (memberValue[0] === 'C_PER') {
-				this.member = {
-					"username": memberValue[4],
-					"person_code": memberValue[1],
-					"person_name": memberValue[2],
-					"id": parseInt(memberValue[3])
-				}
-			}
-		} else {
-			this.member = null
-		}
+        this.member = null;
+        if (memberInfo) {
+            let memberValue = memberInfo.toString().split('#');
+            if (memberValue[0] === 'C_PER') {
+                console.log('memberValue', memberValue)
+                this.member = {
+                    "username": memberValue[4],
+                    "person_code": memberValue[1],
+                    "person_name": memberValue[2],
+                    "id": parseInt(memberValue[3]),
+                    org:memberValue[5],
+                }
+            }
+        } else {
+            this.member = null
+        }
 
-		setFieldsValue({
-			dataReview: this.member
-		});
-	}
+        setFieldsValue({
+            dataReview: this.member,
+            superunit:this.member.org
+        });
+    }
 	// 发起填报
 	sendWork(){
 		const {
@@ -227,20 +230,16 @@ class Stagereporttab extends Component {
                         postData.superunit = values[value];
                     }else if (value === 'dataReview'){
                         postData.dataReview = values[value];
-                    }else if (value === 'number'){
-                        postData.number = values[value];
+                    }else if (value === 'numbercode'){
+                        postData.numbercode = values[value];
                     }else if (value === 'timedate'){
                         postData.timedate = values[value];
                     }else{
-                        //是否为数字  数字需要查找范围，必须转化为数字类型
-                        if(!isNaN(values[value]) ){
-                            attrs[value] = Number(values[value])
-                        }else{
-                            attrs[value] = values[value]
-                        } 
+                       console.log(1111)
                     }
 				}
 				postData.upload_unit = user.org?user.org:'';
+				postData.type = '每日实际进度';
                 postData.upload_person = user.name?user.name:user.username;
 				postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 				console.log("postData",postData)
@@ -253,8 +252,6 @@ class Stagereporttab extends Component {
 				let subject = [{
                     //共有属性
                     "postData":JSON.stringify(postData),
-                    //专业属性
-                    "attrs":JSON.stringify(attrs),
                     //数据清单
                     "treedataSource":JSON.stringify(treedataSource),
                 }];
@@ -389,7 +386,7 @@ class Stagereporttab extends Component {
 										<Col span={8}>
 											<FormItem {...FormItemLayout} label='编号'>
 												{
-													getFieldDecorator('number', {
+													getFieldDecorator('numbercode', {
 														rules: [
 															{ required: true, message: '请输入编号' }
 														]
@@ -476,13 +473,8 @@ class Stagereporttab extends Component {
 			width: '10%'
 		}, {
 			title: '编号',
-			dataIndex: 'number',
-			key: 'number',
-			width: '10%'
-		}, {
-			title: '备注',
-			dataIndex: 'remarks',
-			key: 'remarks',
+			dataIndex: 'numbercode',
+			key: 'numbercode',
 			width: '10%'
 		}, {
 			title: '提交人',

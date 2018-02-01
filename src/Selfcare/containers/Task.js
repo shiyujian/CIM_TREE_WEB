@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Info, Detail, Docs, Step} from '../components/Task';
 import {actions as platformActions} from '_platform/store/global';
-import {Spin} from 'antd';
+import {Spin,Form} from 'antd';
 
 @connect(
 	state => {
@@ -33,3 +33,4 @@ export default class Task extends Component {
 		);
 	}
 };
+Task = Form.create({})(Task);

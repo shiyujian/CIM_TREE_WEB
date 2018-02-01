@@ -21,6 +21,7 @@ import UserSelect from '_platform/components/panels/UserSelect';
 import {wrapperMapUser} from './util';
 import DGN from '_platform/components/panels/DGN';
 import DGNProjectInfo from './DGNProjectInfo';
+import PkCodeTree from './PkCodeTree'
 
 const Panel = Collapse.Panel;
 const $ = window.$;
@@ -39,6 +40,8 @@ export default class Lmap extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			treeLists: [],
+			leftkeycode: '',
 			TileLayerUrl: this.tileUrls[1],
 			mapLayerBtnType:true,
 			isNotThree: true,
@@ -96,6 +99,7 @@ export default class Lmap extends Component {
 				minlng: 113.827781,
 				maxlng: 113.931283
 			}
+
 		};
 		this.OnlineState = false;
 		this.checkMarkers = {};
@@ -121,6 +125,74 @@ export default class Lmap extends Component {
 	}
 
 	componentDidMount() {
+		const {actions: {getTree}} = this.props;
+        //地块树
+       try {
+            getTree({},{parent:'root'})
+            .then(rst => {
+                if(rst instanceof Array && rst.length > 0){
+                    rst.forEach((item,index) => {
+                        rst[index].children = []
+                    })
+                    getTree({},{parent:rst[0].No})
+                    .then(rst1 => {
+                        if(rst1 instanceof Array && rst1.length > 0){
+                            rst1.forEach((item,index) => {
+                                rst1[index].children = []
+                            })
+                            getNewTreeData(rst,rst[0].No,rst1)
+                            getTree({},{parent:rst1[0].No})
+                            .then(rst2 => {
+                                if(rst2 instanceof Array && rst2.length > 0){
+                                    getNewTreeData(rst,rst1[0].No,rst2)
+                                    this.setState({treeLists:rst},() => {
+                                        this.onSelect([rst2[0].No])
+                                    })
+                                    getNewTreeData(rst,rst1[0].No,rst2)
+                                    getTree({},{parent:rst2[0].No})
+                                    .then(rst3=>{
+                                    	 if(rst3 instanceof Array && rst3.length > 0){
+                                    	 	 getNewTreeData(rst,rst2[0].No,rst3)
+		                                    this.setState({treeLists:rst},() => {
+		                                        this.onSelect([rst3[0].No])
+		                                    })
+		                                    getNewTreeData(rst,rst3[0].No,rst3)
+		                                    console.log(rst3,"vacaca");
+		                                    for(let i = 0 ; i<=rst3.length-1; i++){
+		                                    	getTree({},{parent:rst3[i].No}).then(rst4=>{
+		                                    		getNewTreeData(rst,rst3[i].No,rst4)
+				                                    this.setState({treeLists:rst},() => {
+				                                        this.onSelect([rst3[i].No])
+				                                    })
+
+		                                    	})
+		                                    }
+		                                    // getTree({},{parent:rst3[0].No}).then(rst4=>{
+		                                    // 	getNewTreeData(rst,rst3[0].No,rst4)
+		                                    // 	this.setState({treeLists:rst});
+		                                    // 	console.log(rst4);
+
+		                                    // })
+		                                     
+                                 	 }else{
+                                              this.setState({treeLists:rst})
+                                    	 }
+                                    })
+                                } else {
+                                    this.setState({treeLists:rst})
+                                }
+                            })
+                        }else {
+                            this.setState({treeLists:rst})
+                        }
+                    })
+                }
+            })
+
+        } catch(e){
+            console.log(e)
+        }
+
 		this.initMap();
 		this.getArea();
 		this.getRisk();
@@ -785,7 +857,7 @@ export default class Lmap extends Component {
 	/*在地图上添加marker和polygan*/
 	createMarker(geo, oldMarker) {
 		var me = this;
-		debugger
+		// debugger
 		if (geo.properties.type != 'area') {
 			if (!oldMarker) {
 				if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {
@@ -833,13 +905,9 @@ export default class Lmap extends Component {
 	}
 
 	options = [
-		{label: '现场人员', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access',},
-		{label: '安全监测', value: 'geojsonFeature_safety', IconUrl: require('./ImageIcon/camera.png'), IconName: 'shield',},
-		{label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning',},
-		{label: '360全景', value: 'geojsonFeature_360',IconUrl: require('./ImageIcon/360.png'), IconName: 'icon360',},
-		{label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera',},
 		{label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'}
 	];
+	
 	//切换伟景行
 	switchToDgn(){
 		this.setState({
@@ -947,7 +1015,7 @@ export default class Lmap extends Component {
 				content = this.state.vedios;
 				break;
 			case 'geojsonFeature_area':
-				content = this.state.areaJson;
+				content = this.state.treeLists;
 				break;
 		// {label: '360全景', value: 'geojsonFeature_360'},
 			case 'geojsonFeature_360':
@@ -1006,6 +1074,7 @@ export default class Lmap extends Component {
 
 	/*显示隐藏地图marker*/
 	onCheck(keys, featureName) {
+		console.log(keys,featureName,"nimade")
 		var content = this.getPanelData(featureName);
 		//获取所有key对应的数据对象
 		this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
@@ -1018,7 +1087,7 @@ export default class Lmap extends Component {
 				delete  checkItems[c];
 			}
 		}
-		debugger
+		
 		let me = this;
 		if (featureName == 'geojsonFeature_people') {
 			me.onPeopleCheck(keys,checkItems);
@@ -1264,6 +1333,7 @@ export default class Lmap extends Component {
 
 	render() {
 		let height = document.querySelector('html').clientHeight - 80 - 36 - 52;
+		let treeLists = this.state.treeLists;
 		return (
 			<div className="map-container">
 				<div ref="appendBody" className="l-map r-main"
@@ -1451,14 +1521,37 @@ export default class Lmap extends Component {
 	renderPanel(option) {
 		let content = this.getPanelData(option.value);
 		return (
-			<DashPanel onCheck={this.onCheck.bind(this)}
-			           onSelect={this.onSelect.bind(this)}
-			           content={content}
-					   userCheckKeys={this.state.userCheckedKeys}
-			           loadData={this.loadUsersByOrg.bind(this)}
-			           featureName={option.value}/>
+			<PkCodeTree treeData={content}
+                        selectedKeys={this.state.leftkeycode}
+                        onSelect={this.onSelect.bind(this)}
+                        onExpand={this.onExpand.bind(this)}
+                        // checkable
+                        // showIcon={true}
+                        onCheck={this.onCheck.bind(this)}
+                            />
+			
 		)
 	}
+	onExpand(expandedKeys,info) {
+        const treeNode = info.node;
+        const {actions: {getTree}} = this.props;
+        const {treeLists} = this.state;
+        const keycode = treeNode.props.eventKey;
+        getTree({},{parent:keycode,paginate:false})
+        .then(rst => {
+            if(rst instanceof Array){
+                if(rst.length > 0 && rst[0].wptype != '子单位工程') {
+                    rst.forEach((item,index) => {
+                        rst[index].children = []
+                    })
+                }
+                getNewTreeData(treeLists,keycode,rst)
+                this.setState({treeLists:treeLists})
+            }
+        })
+    }
+
+  
 
 	fillAreaColor(index) {
 		let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
@@ -1495,3 +1588,21 @@ export default class Lmap extends Component {
 		});
 	}
 }
+ function getNewTreeData(treeData, curKey, child) {
+    const loop = (data) => {
+        data.forEach((item) => {
+            if (curKey == item.No) {
+                item.children = child;
+            }else{
+                if(item.children)
+                    loop(item.children);
+            }
+        });
+    };
+    try {
+       loop(treeData);
+    } catch(e) {
+        console.log(e)
+    }
+}
+

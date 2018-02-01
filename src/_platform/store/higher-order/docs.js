@@ -4,7 +4,7 @@ import {SERVICE_API} from '../../api';
 import {capitalize} from '../util';
 import documentFactory from './doc';
 
-export default (ID, service = '') => {
+export default (ID, service = '') =>{
 	const suffix = service.toUpperCase();
 	service = capitalize(service);
 	const documentReducer = documentFactory(ID);

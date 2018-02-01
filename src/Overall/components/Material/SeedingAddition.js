@@ -24,7 +24,7 @@ const EditableCell = ({ editable, value, onChange }) => (
           </div>
         );
 
-class ResourceAddition extends Component {
+class SeedingAddition extends Component {
 
     static propTypes = {};
 
@@ -176,7 +176,7 @@ class ResourceAddition extends Component {
                         <Col span={24} style={{paddingLeft:'2em'}}>
                             <Row gutter={15} >
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="单位工程:">
+                                    <FormItem {...SeedingAddition.layoutT} label="单位工程:">
                                     {
                                         getFieldDecorator('unit', {
                                             rules: [
@@ -196,7 +196,7 @@ class ResourceAddition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="名称:">
+                                    <FormItem {...SeedingAddition.layoutT} label="名称:">
                                     {
                                         getFieldDecorator('name', {
                                             rules: [
@@ -221,7 +221,7 @@ class ResourceAddition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="编号:">
+                                    <FormItem {...SeedingAddition.layoutT} label="编号:">
                                     {
                                         getFieldDecorator('code', {
                                             rules: [
@@ -247,7 +247,7 @@ class ResourceAddition extends Component {
                             </Row>
                             <Row gutter={15}>
                                 <Col span={8}>
-                                    <FormItem  {...ResourceAddition.layoutT} label="审批单位:">
+                                    <FormItem  {...SeedingAddition.layoutT} label="审批单位:">
                                     {
                                         getFieldDecorator('reviewUnit', {
                                             rules: [
@@ -266,7 +266,7 @@ class ResourceAddition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="进场日期:">
+                                    <FormItem {...SeedingAddition.layoutT} label="进场日期:">
                                     {
                                         getFieldDecorator('date', {
                                             rules: [
@@ -290,7 +290,7 @@ class ResourceAddition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="施工部位:">
+                                    <FormItem {...SeedingAddition.layoutT} label="施工部位:">
                                     {
                                         getFieldDecorator('site', {
                                             rules: [
@@ -359,7 +359,7 @@ class ResourceAddition extends Component {
                     </Row>
                     <Row style={{marginTop: 15}}>
                         <Col span={10} >
-                            <FormItem {...ResourceAddition.layoutT} label='审核人'>
+                            <FormItem {...SeedingAddition.layoutT} label='审核人'>
                                 {
                                     getFieldDecorator('dataReview', {
                                         rules: [
@@ -483,9 +483,9 @@ class ResourceAddition extends Component {
                 }];
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {
-                    name: "物资管理工程材料报批流程",
-                    desc: "综合管理模块物资管理工程材料报批流程",
-                    code: WORKFLOW_CODE.工程材料报批流程
+                    name: "物资管理苗木资料报批流程",
+                    desc: "综合管理模块物资管理苗木资料报批流程",
+                    code: WORKFLOW_CODE.苗木资料报批流程
                 };
                 let workflowdata = {
                     name: WORKFLOW_MAP.name,
@@ -717,4 +717,4 @@ class ResourceAddition extends Component {
     
 
 }
-export default Form.create()(ResourceAddition)
+export default Form.create()(SeedingAddition)

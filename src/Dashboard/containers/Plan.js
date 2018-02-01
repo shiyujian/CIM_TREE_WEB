@@ -1,22 +1,25 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import * as actions from '../store';
-import {actions as platformActions} from '_platform/store/global';
+import Plan from '../components/Plan';
+import { actions as platformActions } from '_platform/store/global';
 
 @connect(
 	state => {
-		const {platform} = state;
-		return {platform};
+		const { platform } = state;
+		return { platform };
 	},
 	dispatch => ({
-		actions: bindActionCreators({...actions, ...platformActions}, dispatch),
+		actions: bindActionCreators({ ...actions, ...platformActions }, dispatch),
 	}),
 )
-export default  class OnSite extends Component {
-    render () {
-        return (
-            <p>plan</p>
+export default class Plans extends Component {
+	render() {
+		return (
+			<div>
+				<Plan />
+			</div>
         )
-    }
+	}
 }

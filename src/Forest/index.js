@@ -55,41 +55,41 @@ export default class ForestContainer extends Component {
 
 	static menus = [{
 		key: 'info',
-		id: 'INFO',
+		id: 'FOREST.INFO',
 		name: '苗木大数据',
 		children: [{
 			key: 'nursoverallinfo',
-			id: 'NURSOVERALLINFO',
+			id: 'FOREST.NURSOVERALLINFO',
 			path: '/forest/nursoverallinfo',
 			name: '苗木综合信息',
 		},{
 			key: 'nursmeasureinfo',
-			id: 'NURSMEASUREINFO',
+			id: 'FOREST.NURSMEASUREINFO',
 			path: '/forest/nursmeasureinfo',
 			name: '苗圃测量信息',
 		},{
 			key: 'locmeasureinfo',
-			id: 'LOCMEASUREINFO',
+			id: 'FOREST.LOCMEASUREINFO',
 			path: '/forest/locmeasureinfo',
 			name: '现场测量信息',
 		},{
 			key: 'supervisorinfo',
-			id: 'SUPERVISORINFO',
+			id: 'FOREST.SUPERVISORINFO',
 			path: '/forest/supervisorinfo',
 			name: '监理验收信息',
 		},{
 			key: 'ownerinfo',
-			id: 'OWNERINFO',
+			id: 'FOREST.OWNERINFO',
 			path: '/forest/checkerinfo',
 			name: '业主抽查信息',
 		},{
 			key: 'contrastinfo',
-			id: 'CONTRASTINFO',
+			id: 'FOREST.CONTRASTINFO',
 			path: '/forest/contrastinfo',
 			name: '苗木对比信息',
 		},{
 			key: 'faithinfo',
-			id: 'FAITHINFO',
+			id: 'FOREST.FAITHINFO',
 			path: '/forest/faithinfo',
 			name: '供应商诚信信息',
 		}]
@@ -127,7 +127,7 @@ export default class ForestContainer extends Component {
 		name: '数据导入',
 		children: [{
 			key: 'dataimport',
-			id: 'DATAIMPORT',
+			id: 'FOREST.DATAIMPORT',
 			path: '/forest/dataimport',
 			name: '定位数据导入',
 		}]

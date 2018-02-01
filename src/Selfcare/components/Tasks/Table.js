@@ -22,6 +22,7 @@ export default class TaskTable extends Component {
 		//console.log("TaskTable  ====  ", this.state, this.props);
 		let loading = this.props.loadingstatus ? this.props.loadingstatus : false;
 		const { platform: { tasks = [] }, pagination = {} } = this.props;
+		console.log(tasks)
 		tasks.forEach((task, index) => {
 			task.index = index + 1;
 		});

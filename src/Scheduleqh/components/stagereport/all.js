@@ -6,44 +6,51 @@ import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
 import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
 import PerSearch from './PerSearch';
-import {WORKFLOW_CODE} from '../../../_platform/api';
-import {getNextStates} from '../../../_platform/components/Progress/util';
+import { WORKFLOW_CODE } from '../../../_platform/api';
+import { getNextStates } from '../../../_platform/components/Progress/util';
 import queryString from 'query-string';
 import SearchInfo from './SearchInfo';
+import TotleModal from './TotleModal';
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
-moment.locale('zh-cn');    
+moment.locale('zh-cn');
 
 
 class All extends Component {
-	static propTypes = {};
-	constructor(props) {
-		super(props);
-		this.state = {
-			workdata: [],
+    static propTypes = {};
+    constructor(props) {
+        super(props);
+        this.state = {
+            totolData: [
+                {
+                    unit: "1111"
+                }
+            ],
             selectedRowKeys: [],
             dataSourceSelected: [],
             visible: false,
+            totlevisible: false,
             fileList: [],
             isCopyMsg: false, //接收人员是否发短信
             TreatmentData: [],
-            newFileLists:[],
-		};
-	}
+            newFileLists: [],
+        };
+    }
 
-	onSelectChange = (selectedRowKeys, selectedRows) => {
+    onSelectChange = (selectedRowKeys, selectedRows) => {
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     }
     // 操作
-    clickInfo(record, type) {
-
-        if (type === 'VIEW') {
-            alert("查看未做")
-        } else if (type === 'DOWNLOAD') {
-            alert("下载未做")
-        } else if (type === 'CARD') {
-            alert("产品卡未做")
-        }
+    clickInfo(record) {
+        this.setState({ totlevisible: true });
+    }
+    // 取消
+    totleCancle() {
+        this.setState({ totlevisible: false });
+    }
+    // 确定
+    totleOk() {
+        this.setState({ totlevisible: false });
     }
     // 删除
     deleteClick = () => {
@@ -61,94 +68,83 @@ class All extends Component {
 
     // 新增按钮
     addClick = () => {
-        const {actions: {postUploadFilesAc}} = this.props;
-		postUploadFilesAc([]);
+        const { actions: { postUploadFilesAc } } = this.props;
+        postUploadFilesAc([]);
         this.setState({
             visible: true,
-            TreatmentData:[],
+            TreatmentData: [],
         })
         this.props.form.setFieldsValue({
-            superunit:undefined,
-            unit:undefined,
-            dataReview:undefined,
-            number:undefined
+            superunit: undefined,
+            unit: undefined,
+            dataReview: undefined,
+            numbercode: undefined
         })
 
     }
     // 关闭弹框
     closeModal() {
-        const {actions: {postUploadFilesAc}} = this.props;
+        const { actions: { postUploadFilesAc } } = this.props;
         postUploadFilesAc([]);
-        
+
         this.setState({
             visible: false,
-            TreatmentData:[],
+            TreatmentData: [],
         })
-	}
-	// 确认提交
+    }
+    // 确认提交
     sendWork() {
-        const{
-            actions:{
-                createFlow, 
-                getWorkflowById,
-                putFlow
+        const {
+            actions: {
+                createFlow,
+            getWorkflowById,
+            putFlow
             },
             location,
-        }=this.props
-        const{
+        } = this.props
+        const {
             TreatmentData,
-        }=this.state
+        } = this.state
         let user = getUser();//当前登录用户
         let me = this;
         //共有信息
         let postData = {};
         //专业信息
         let attrs = {};
-        console.log("登录用户",user)
-        console.log("文件信息",TreatmentData)
-        me.props.form.validateFields((err,values)=>{
-            console.log('Received values of form: ', values);
-            if(!err){
-                if(TreatmentData.length === 0){
+        me.props.form.validateFields((err, values) => {
+            if (!err) {
+                if (TreatmentData.length === 0) {
                     notification.error({
-                        message:'请上传文件',
-                        duration:5
+                        message: '请上传文件',
+                        duration: 5
                     })
                     return
                 }
                 // 共有信息
-                for(let value in values){
-                    if(value === 'area'){
+                for (let value in values) {
+                    if (value === 'area') {
                         postData.area = values[value];
-                    }else if (value === 'unit'){
+                    } else if (value === 'unit') {
                         postData.unit = values[value];
-                    }else if (value === 'type'){
+                    } else if (value === 'type') {
                         postData.type = values[value];
-                    }else if (value === 'approvalunit'){
-                        postData.approvalunit = values[value];
-                    }else if (value === 'dataReview'){
+                    } else if (value === 'superunit') {
+                        postData.superunit = values[value];
+                    } else if (value === 'dataReview') {
                         postData.dataReview = values[value];
-                    }else if (value === 'number'){
-                        postData.number = values[value];
-                    }else if (value === 'name'){
-                        postData.name = values[value];
-                    }else{
-                        //是否为数字  数字需要查找范围，必须转化为数字类型
-                        if(!isNaN(values[value]) ){
-                            attrs[value] = Number(values[value])
-                        }else{
-                            attrs[value] = values[value]
-                        }
-                       
-                        
+                    } else if (value === 'numbercode') {
+                        postData.numbercode = values[value];
+                    } else {
+                        console.log("attrs")
                     }
                 }
-                postData.upload_unit = user.org?user.org:'';
-                postData.upload_person = user.name?user.name:user.username;
+                postData.upload_unit = user.org ? user.org : '';
+                postData.type = '总进度计划';
+                postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
                 let data_list = [];
-                for(let i=0;i<TreatmentData.length;i++){
+                for (let i = 0; i < TreatmentData.length; i++) {
                     data_list.push(TreatmentData[i].fileId)
                 }
 
@@ -160,21 +156,21 @@ class All extends Component {
                 };
                 let subject = [{
                     //共有属性
-                    "postData":JSON.stringify(postData),
+                    "postData": JSON.stringify(postData),
                     //专业属性
-                    "attrs":JSON.stringify(attrs),
+                    "attrs": JSON.stringify(attrs),
                     //数据清单
-                    "TreatmentData":JSON.stringify(TreatmentData),
+                    "TreatmentData": JSON.stringify(TreatmentData),
                     //数据清单id
-                    "data_list":JSON.stringify(data_list),
+                    "data_list": JSON.stringify(data_list),
                 }];
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {
-                    name:"总进度计划报批流程",
-                    desc:"进度管理模块总进度计划报批流程",
-                    code:WORKFLOW_CODE.总进度计划报批流程
+                    name: "总进度计划报批流程",
+                    desc: "进度管理模块总进度计划报批流程",
+                    code: WORKFLOW_CODE.总进度计划报批流程
                 };
-                let workflowdata={
+                let workflowdata = {
                     name: WORKFLOW_MAP.name,
                     description: WORKFLOW_MAP.desc,
                     subject: subject,
@@ -182,54 +178,52 @@ class All extends Component {
                     creator: currentUser,
                     plan_start_time: null,
                     deadline: null,
-                    "status":2
+                    "status": 2
                 }
-                createFlow({},workflowdata).then((instance)=>{
-                    console.log("instance",instance)
-                    if(!instance.id){
+                createFlow({}, workflowdata).then((instance) => {
+                    if (!instance.id) {
                         notification.error({
-                            message:'数据提交失败',
-                            duration:2
+                            message: '数据提交失败',
+                            duration: 2
                         })
                         return;
                     }
-                    const {id,workflow: {states = []} = {}} = instance;
-                    const [{id:state_id,actions:[action]}] = states;
-                   
-                    
-                    
-                    getWorkflowById({id:id}).then(instance =>{
-                        if(instance && instance.current){
+                    const { id, workflow: { states = [] } = {} } = instance;
+                    const [{ id: state_id, actions: [action] }] = states;
+
+
+
+                    getWorkflowById({ id: id }).then(instance => {
+                        if (instance && instance.current) {
                             let currentStateId = instance.current[0].id;
-                            let nextStates = getNextStates(instance,currentStateId);
-                            console.log('nextStates',nextStates)
+                            let nextStates = getNextStates(instance, currentStateId);
                             let stateid = nextStates[0].to_state[0].id;
 
-                            let postInfo={
-                                next_states:[{
-                                    state:stateid,
-                                    participants:[nextUser],
-                                    deadline:null,
-                                    remark:null
+                            let postInfo = {
+                                next_states: [{
+                                    state: stateid,
+                                    participants: [nextUser],
+                                    deadline: null,
+                                    remark: null
                                 }],
-                                state:instance.workflow.states[0].id,
-                                executor:currentUser,
-                                action:nextStates[0].action_name,
-                                note:"提交",
-                                attachment:null
+                                state: instance.workflow.states[0].id,
+                                executor: currentUser,
+                                action: nextStates[0].action_name,
+                                note: "提交",
+                                attachment: null
                             }
-                            let data={pk:id};
+                            let data = { pk: id };
                             //提交流程到下一步
-                            putFlow(data,postInfo).then(rst =>{
-                                if(rst && rst.creator){
+                            putFlow(data, postInfo).then(rst => {
+                                if (rst && rst.creator) {
                                     notification.success({
                                         message: '流程提交成功',
                                         duration: 2
                                     });
                                     this.setState({
-                                        visible:false
+                                        visible: false
                                     })
-                                }else{
+                                } else {
                                     notification.error({
                                         message: '流程提交失败',
                                         duration: 2
@@ -237,20 +231,20 @@ class All extends Component {
                                     return;
                                 }
                             });
-                            
-                            
+
+
                         }
                     });
-                    
+
                 });
-                 
+
 
             }
         })
-        
+
 
     }
-	// 短信
+    // 短信
     _cpoyMsgT(e) {
         this.setState({
             isCopyMsg: e.target.checked,
@@ -279,69 +273,77 @@ class All extends Component {
         }
 
         setFieldsValue({
-            dataReview: this.member
+            dataReview: this.member,
+            // superunit:
         });
     }
     //上传文件
     uploadProps = {
-		name: 'a_file',
-		multiple: true,
-		showUploadList: false,
-		action: base + "/service/fileserver/api/user/files/",
-		onChange: ({file,fileList,event}) => {
-            
+        name: 'a_file',
+        multiple: true,
+        showUploadList: false,
+        action: base + "/service/fileserver/api/user/files/",
+        onChange: ({ file, fileList, event }) => {
+
             const status = file.status;
-            const {newFileLists} = this.state;
+            const { newFileLists } = this.state;
             let newdata = [];
-			if (status === 'done') {
-				const {actions:{postUploadFilesAc}}=this.props;
-                let newFileLists = fileList.map(item =>{
+            if (status === 'done') {
+                const { actions: { postUploadFilesAc } } = this.props;
+                console.log('fileList',fileList)
+                let newFileLists = fileList.map(item => {
                     return {
-                        file_id:item.response.id,
-                        file_name:item.name,
-                        send_time:moment().format('YYYY-MM-DD HH:mm:ss'),
+                        file_id: item.response.id,
+                        file_name: item.name,
+                        send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
                         file_partial_url: '/media' + item.response.a_file.split('/media')[1],
                         download_url: '/media' + item.response.download_url.split('/media')[1],
-                        a_file: '/media' + item.response.a_file.split('/media')[1]
+                        a_file: '/media' + item.response.a_file.split('/media')[1],
+                        misc:item.response.misc,
+                        mime_type:item.response.mime_type,
                     }
                 })
-                newFileLists.map((item,index)=>{
+                newFileLists.map((item, index) => {
                     let data = {
-                        index:index+1,
-                        fileName:item.file_name,
-                        fileId:item.file_id,
-                        fileUrl:item.file_partial_url,
-                        fileTime:item.send_time
+                        index: index + 1,
+                        fileName: item.file_name,
+                        file_id: item.file_id,
+                        file_partial_url: item.file_partial_url,
+                        send_time: item.send_time,
+                        a_file: item.a_file,
+                        download_url: item.download_url,
+                        misc:item.misc,
+                        mime_type:item.mime_type,
                     }
                     newdata.push(data)
                 })
-                this.setState({newFileLists,TreatmentData:newdata})
-				postUploadFilesAc(newFileLists)
-			
-			}
-		},
-	};
+                this.setState({ newFileLists, TreatmentData: newdata })
+                postUploadFilesAc(newFileLists)
+
+            }
+        },
+    };
     // 修改备注
 
     //删除文件表格中的某行
-    deleteTreatmentFile = (record,index) => {
+    deleteTreatmentFile = (record, index) => {
         let newFileLists = this.state.newFileLists;
         let newdata = [];
         newFileLists.splice(index, 1);
-        newFileLists.map((item,index)=>{
+        newFileLists.map((item, index) => {
             let data = {
-                index:index+1,
-                fileName:item.file_name,
-                fileId:item.file_id,
-                fileUrl:item.file_partial_url,
-                fileTime:item.send_time
+                index: index + 1,
+                fileName: item.file_name,
+                fileId: item.file_id,
+                fileUrl: item.file_partial_url,
+                fileTime: item.send_time
             }
             newdata.push(data)
         })
-        this.setState({newFileLists,TreatmentData:newdata})
+        this.setState({ newFileLists, TreatmentData: newdata })
     }
-	render() {
-		const { selectedRowKeys, } = this.state;
+    render() {
+        const { selectedRowKeys, } = this.state;
         const {
             form: { getFieldDecorator },
             fileList = [],
@@ -354,14 +356,22 @@ class All extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 },
         }
-		return (
-			<div>
-				<SearchInfo {...this.props}/>
-				<Button onClick={this.addClick.bind(this)}>新增</Button>
+        return (
+            <div>
+                {
+                    this.state.totlevisible &&
+                    <TotleModal {...this.props}
+                        oncancel={this.totleCancle.bind(this)}
+                        onok={this.totleOk.bind(this)}
+                    />
+                }
+                <SearchInfo {...this.props} />
+                <Button onClick={this.addClick.bind(this)}>新增</Button>
                 <Button onClick={this.deleteClick.bind(this)}>删除</Button>
                 <Table
                     columns={this.columns}
-                    rowSelection={rowSelection} />
+                    rowSelection={rowSelection}
+                    dataSource={this.state.totolData} />
                 <Modal
                     title="新增文档"
                     width={800}
@@ -383,7 +393,7 @@ class All extends Component {
                                                             { required: true, message: '请选择单位工程' }
                                                         ]
                                                     })
-                                                        (<Select placeholder='请选择区域' allowClear>
+                                                        (<Select placeholder='请选择单位工程' allowClear>
                                                             <Option value='单位工程一'>单位工程一</Option>
                                                             <Option value='单位工程二'>单位工程二</Option>
                                                             <Option value='单位工程三'>单位工程三</Option>
@@ -394,7 +404,7 @@ class All extends Component {
                                         <Col span={8}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
-                                                    getFieldDecorator('number', {
+                                                    getFieldDecorator('numbercode', {
                                                         rules: [
                                                             { required: true, message: '请输入编号' }
                                                         ]
@@ -405,22 +415,22 @@ class All extends Component {
                                         </Col>
                                     </Row>
                                     <Row>
-										<Col span={8}>
-											<FormItem {...FormItemLayout} label='监理单位'>
-											{
-											getFieldDecorator('superunit', {
-												rules: [
-													{ required: true, message: '请输入监理单位' }
-												]
-											})
-												(<Input placeholder='请输入监理单位' />)
-											}
-											</FormItem>
-										</Col>
+                                        <Col span={8}>
+                                            <FormItem {...FormItemLayout} label='监理单位'>
+                                                {
+                                                    getFieldDecorator('superunit', {
+                                                        rules: [
+                                                            { required: true, message: '请输入监理单位' }
+                                                        ]
+                                                    })
+                                                        (<Input placeholder='请输入监理单位' />)
+                                                }
+                                            </FormItem>
+                                        </Col>
                                         <Col span={8} offset={4}>
-											<FormItem {...FormItemLayout}>
-												<Button type='Primary'>模板下载</Button>
-											</FormItem>
+                                            <FormItem {...FormItemLayout}>
+                                                <Button type='Primary'>模板下载</Button>
+                                            </FormItem>
                                         </Col>
                                     </Row>
                                     <Row>
@@ -450,11 +460,11 @@ class All extends Component {
                                                 {
                                                     getFieldDecorator('dataReview', {
                                                         rules: [
-                                                            {  required: true, message: '请选择审核人员' }
+                                                            { required: true, message: '请选择审核人员' }
                                                         ]
                                                     })
                                                         (
-                                                            <PerSearch selectMember={this.selectMember.bind(this)}/>
+                                                        <PerSearch selectMember={this.selectMember.bind(this)} />
                                                         )
                                                 }
                                             </FormItem>
@@ -469,129 +479,126 @@ class All extends Component {
                         </Form>
                     </div>
                 </Modal>
-			</div>
-		)
-	}
-	
+            </div>
+        )
+    }
 
-	//选择人员
+
+    //选择人员
     selectMember(memberInfo) {
-        const{
-            form:{
+        const {
+            form: {
                 setFieldsValue
             }
-        }=this.props
+        } = this.props
         this.member = null;
-        if(memberInfo){
+        if (memberInfo) {
             let memberValue = memberInfo.toString().split('#');
-            if(memberValue[0] === 'C_PER'){
+            if (memberValue[0] === 'C_PER') {
                 this.member = {
                     "username": memberValue[4],
                     "person_code": memberValue[1],
                     "person_name": memberValue[2],
-                    "id": parseInt(memberValue[3])
+                    "id": parseInt(memberValue[3]),
+                    org:memberValue[5],
                 }
             }
-        }else{
+        } else {
             this.member = null
         }
 
         setFieldsValue({
-            dataReview: this.member
+            dataReview: this.member,
+            superunit:this.member.org
         });
-        console.log('this.member',this.member)
     }
-	
-	columns = [
-		{
-			title:'单位工程',
-			dataIndex:'unit',
-			key: 'unit',
-			width: '15%'
-		},{
-			title:'进度类型',
-			dataIndex:'type',
-			key: 'type',
-			width: '10%'
-		},{
-			title:'编号',
-			dataIndex:'number',
-			key: 'number',
-			width: '10%'
-		},{
-			title:'备注',
-			dataIndex:'remarks',
-			key: 'remarks',
-			width: '10%'
-		},{
-			title:'提交人',
-			dataIndex:'submitperson',
-			key: 'submitperson',
-			width: '10%'
-		},{
-			title:'提交时间',
-			dataIndex:'submittime',
-			key: 'submittime',
-			width: '10%',
-			sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
-			render: text => {
-                return moment(text).format('YYYY-MM-DD')
+
+    columns = [
+        {
+            title: '单位工程',
+            dataIndex: 'unit',
+            key: 'unit',
+            width: '15%'
+        }, {
+            title: '进度类型',
+            dataIndex: 'type',
+            key: 'type',
+            width: '10%'
+        }, {
+            title: '编号',
+            dataIndex: 'numbercode',
+            key: 'numbercode',
+            width: '10%'
+        }, {
+            title: '备注',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            width: '10%'
+        }, {
+            title: '提交人',
+            dataIndex: 'submitperson',
+            key: 'submitperson',
+            width: '10%'
+        }, {
+            title: '提交时间',
+            dataIndex: 'submittime',
+            key: 'submittime',
+            width: '10%',
+        }, {
+            title: '流程状态',
+            dataIndex: 'status',
+            key: 'status',
+            width: '15%',
+        }, {
+            title: '操作',
+            render: record => {
+                return (
+                    <span>
+                        <a onClick={this.clickInfo.bind(this, record)}>查看</a>
+                    </span>
+                )
             }
-		},{
-			title:'流程状态',
-			dataIndex:'status',
-			key: 'status',
-			width: '15%',
-		},{
-		title: '操作',
-		render: record => {
-            return (
-                <span>
-                    <a onClick={this.clickInfo.bind(this, record, 'VIEW')}>查看</a>
-                </span>
-            )
-        }
         },
-	];
-	columns1 = [{
-		title: '序号',
-		dataIndex: 'index',
-		key: 'index',
-		width: '10%',
-	}, {
-		title: '文件名称',
-		dataIndex: 'fileName',
-		key: 'fileName',
-		width: '35%',
-	}, {
-		title: '备注',
-		dataIndex: 'remarks',
-		key: 'remarks',
-		width: '30%',
-		render: (text, record, index) => {
-					return <Input value={record.remarks || ""} onChange={ele => {
-						record.remarks = ele.target.value
-						this.forceUpdate();
-					}} />
-				}           
-	}, {
-		title: '操作',
-		dataIndex: 'operation',
-		key: 'operation',
-		width: '10%',
-		render: (text, record, index) => {
-			return <div>
-				<Popconfirm
-					placement="rightTop"
-					title="确定删除吗？"
-					onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
-					okText="确认"
-					cancelText="取消">
-					<a>删除</a>
-				</Popconfirm>
-			</div>
-		}
-	}]
+    ];
+    columns1 = [{
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index',
+        width: '10%',
+    }, {
+        title: '文件名称',
+        dataIndex: 'fileName',
+        key: 'fileName',
+        width: '35%',
+    }, {
+        title: '备注',
+        dataIndex: 'remarks',
+        key: 'remarks',
+        width: '30%',
+        render: (text, record, index) => {
+            return <Input value={record.remarks || ""} onChange={ele => {
+                record.remarks = ele.target.value
+                this.forceUpdate();
+            }} />
+        }
+    }, {
+        title: '操作',
+        dataIndex: 'operation',
+        key: 'operation',
+        width: '10%',
+        render: (text, record, index) => {
+            return <div>
+                <Popconfirm
+                    placement="rightTop"
+                    title="确定删除吗？"
+                    onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
+                    okText="确认"
+                    cancelText="取消">
+                    <a>删除</a>
+                </Popconfirm>
+            </div>
+        }
+    }]
 }
 
 export default Form.create()(All)

@@ -16,7 +16,8 @@ class ReceivePage extends Component {
 		super(props);
 		this.state = {
 			visible: false,
-			showInfo: {}
+			showInfo: {},
+			code_id:""
 		}
 	}
 
@@ -34,6 +35,10 @@ class ReceivePage extends Component {
 
 	//查看信息详情
 	_viewClick(id) {
+		this.setState({code_id:id})
+		console.log(id)
+		console.log(getUser().org)
+
 		//	获取详情
 		const { actions: { getReceiveDetailAc } } = this.props;
 		this.setState({
@@ -98,14 +103,17 @@ class ReceivePage extends Component {
 		// const user = getUser();
 		this.props.form.validateFields(async (err, values) => {
 			// console.log('values',values)
+			console.log(values.title)
 			let conditions = {
-
+				
 				// executor:user.id,
-				title: values.title || "",
+				user: values.title || "",
+				// user: values.title || "",
 
 			}
-
-			await getReceiveInfoAc({ user: encodeURIComponent(getUser().org) }, conditions);
+			// console.log(getUser().org)
+			// console.log(this.state.code_id)
+			await getReceiveInfoAc(conditions);
 
 		})
 	}
@@ -132,11 +140,13 @@ class ReceivePage extends Component {
 
 
 	render() {
+		// console.log(this.props.receiveInfo)
 		const rowSelection = {
 			// selectedRowKeys,
 			onChange: this.onSelectChange,
 		};
 		const {
+			actions: { getReceiveInfoAc },
 			receiveInfo = {},
 			form: { getFieldDecorator },
 			toggleData: toggleData = {
@@ -144,6 +154,8 @@ class ReceivePage extends Component {
 				visible: false,
 			},
 		} = this.props;
+		
+		console.log("receiveInfo", receiveInfo)
 		const { showInfo = {} } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
 		const { notifications = [] } = receiveInfo;
@@ -324,21 +336,38 @@ class ReceivePage extends Component {
 	}
 	_getNewArrFunc(list = []) {
 
+		// let arr = list || [];
 		let arr = list;
-
+		console.log("list",list)
 		list.map((itm, index) => {
 			itm.index = index + 1;
-			if (item.external_attachments.backTo_id === item.pk) {
-
-			}
-
 		});
-		// return [arr];
+		// console.log(this.props)
+		// for (var i = 0; i < arr.length; i++) {
+			// console.log(arr[i]._id)
+		// }
 
-		return [{
-			index: '1', key: 1, notification_title: '花开', from_whom: '嘻嘻北苑',
-			children: [{ index: '2', key: 11, notification_title: '富贵', from_whom: '嘻嘻北苑' }]
-		}, { index: '3', key: 3, notification_title: '花开', from_whom: '嘻嘻北苑', }]
+		// const orgLists=this.props.orgList || []
+		// for(var i=0;i<orgLists.length;i++){
+		// 	// console.log(orgLists[i])
+		// 	const orgLi=orgLists[i].children
+		// 	for(var j=0;j<orgLi.length;j++){
+		// 		// console.log(orgLi[j].code)
+		// 		list.map((itm, index) => {
+		// 			itm.index = index + 1;
+		// 			// if (item.external_attachments.backTo_id === orgLi[j].code) {
+		// 			// }
+
+		// 		});
+		// 	}
+		// }
+
+		return arr;
+
+		// return [{
+		// 	index: '1', key: 1, notification_title: '花开', from_whom: '嘻嘻北苑',
+		// 	children: [{ index: '2', key: 11, notification_title: '富贵', from_whom: '嘻嘻北苑' }]
+		// }, { index: '3', key: 3, notification_title: '花开', from_whom: '嘻嘻北苑', }]
 
 
 

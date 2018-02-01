@@ -63,7 +63,7 @@ export default class Dashboard extends Component {
 
 	static menus = [{
 		key: 'ONSITE',
-		id: 'DASHBOARD.DASHBOARD',
+		id: 'DASHBOARD.ONSITE',
 		path: '/dashboard/onsite',
 		name: '二维展示',
         icon: <Icon name="map-o"/>,
@@ -72,7 +72,7 @@ export default class Dashboard extends Component {
 		id: 'DASHBOARD.PLAN',
 		path: '/dashboard/plan',
 		name: '巡检路线',
-        icon: <Icon name="university"/>,
+        icon: <Icon name="line-chart"/>,
 		
 	}, {
 		key: 'danger',

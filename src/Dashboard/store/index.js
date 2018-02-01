@@ -1,8 +1,13 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
+
+
 import { SERVICE_API,base,USER_API,WORKFLOW_API,FOREST_API} from '_platform/api';
 
+
 export const getAreaOK = createAction('获取组织机构树');
+export const getTreeOK = createAction(`first_getTreeOK`);
+export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]);
 export const getArea = createFetchAction(`${SERVICE_API}/loc-tree/code/LOC_ROOT/`, [getAreaOK]);
 export const getTrack = createFetchAction(`${base}/main/api/user/{{ID}}/location/`,[]);
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`,[]);
@@ -22,7 +27,7 @@ export const getWKsOk = createAction('获取流程成功');
 export const getWks = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[]);
 const getDesignStage = createFetchAction(`${SERVICE_API}/metalist/designstage/`,[]);
 //批量获取设计成果
-const getDocumentList = createFetchAction(`${SERVICE_API}/documentgetlist/`,[]);
+const getDocumentList = createFetchAction(`${SERVICE_API}/documentgetlist/`,[])
 //批量模型下载地址
 const getImodelInfoAc = createFetchAction(`${SERVICE_API}/documents/code/{{pk}}/?all=true`,[]);
 //获取安全规则制度
@@ -38,7 +43,13 @@ export const fetchDefectDataByLoc = createFetchAction(`${base}/main/api/quality-
 //获取360全景图地址
 const getVideo360List = createFetchAction(`${SERVICE_API}/metalist/video360list/`, []);
 
+//获取巡检路线
+const getMapRouter = createFetchAction(`http://120.24.210.86:227/tree/patrolroutes`, []);
+//获取轨迹列表
+const getMapList = createFetchAction(`http://120.24.210.86:227/tree/patrolpositions`, []);
 export const actions = {
+	getTreeOK,
+	getTree,
 	getAreaOK,
 	getArea,
 	getTrack,
@@ -64,8 +75,17 @@ export const actions = {
 	getChildrenOrgTree,
 	fetchDefectDataByLoc,
 	getVideo360List,
+	
+	getMapRouter,
+	getMapList
 };
 export default handleActions({
+	[getTreeOK]: (state, {payload}) => {
+		return {
+			...state,
+			treeLists: [payload]
+		}
+	},
 	[getAreaOK]: (state, {payload}) => {
 		return {
 			...state,

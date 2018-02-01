@@ -1,15 +1,15 @@
-import {injectReducer} from '../store';
-import React, {Component} from 'react';
-import {Route} from 'react-router-dom';
-import {Main, Aside, Body} from '_platform/components/layout';
+import { injectReducer } from '../store';
+import React, { Component } from 'react';
+import { Route } from 'react-router-dom';
+import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import ContainerRouters from '_platform/components/panels/ContainerRouters';
-import {Icon} from 'react-fa';
+import { Icon } from 'react-fa';
 
 export default class Project extends Component {
 
 	async componentDidMount() {
-		const {default: reducer} = await import('./store');
+		const { default: reducer } = await import('./store');
 		const Containers = await import('./containers');
 		injectReducer('project', reducer);
 		this.setState({
@@ -18,14 +18,14 @@ export default class Project extends Component {
 	}
 
 	render() {
-		const {Create} = this.state || {};
+		const { Create } = this.state || {};
 		return (
 			<Body>
 				<Aside>
-					<Submenu {...this.props} menus={Project.menus} defaultOpenKeys={Project.defaultOpenKeys}/>
+					<Submenu {...this.props} menus={Project.menus} defaultOpenKeys={Project.defaultOpenKeys} />
 				</Aside>
 				<Main>
-					<ContainerRouters menus={Project.menus} containers={this.state}/>
+					<ContainerRouters menus={Project.menus} containers={this.state} />
 				</Main>
 			</Body>
 		);
@@ -34,222 +34,230 @@ export default class Project extends Component {
 	static menus = [
 		{
 			key: 'landArea',
+			id: 'PROJECT.LANDAREA',
 			name: '地块区域',
-			icon: <Icon name="won"/>,
+			icon: <Icon name="won" />,
 			children: [{
 				key: 'PlotManage',
-				id: 'PLOTMAGE',
+				id: 'PROJECT.PLOTMAGE',
 				name: '地块管理',
 				path: '/project',
 				exact: true,
-				icon: <Icon name="retweet"/>,
+				icon: <Icon name="retweet" />,
 			}, {
 				key: 'AreaManage',
-				id: 'AREAMANAGE',
+				id: 'PROJECT.AREAMANAGE',
 				name: '区域管理',
 				path: '/project/areaManage',
-				icon: <Icon name="code"/>
+				icon: <Icon name="code" />
 			}, {
 				key: 'SectionManage',
-				id: 'SECTIONMANAGE',
+				id: 'PROJECT.SECTIONMANAGE',
 				name: '标段管理',
 				path: '/project/sectionManage',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}, {
 				key: 'Smallclass',
-				id: 'SMALLCLASS',
+				id: 'PROJECT.SMALLCLASS',
 				name: '小班管理',
 				path: '/project/smallclass',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}, {
 				key: 'Thinclass',
-				id: 'THINCLASS',
+				id: 'PROJECT.THINCLASS',
 				name: '细班管理',
 				path: '/project/thinclass',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}]
 		}, {
+			id: 'PROJECT.PROMANAGE',
 			key: 'proManage',
 			name: '工程管理',
-			icon: <Icon name="won"/>,
+			icon: <Icon name="won" />,
 			children: [{
 				key: 'PlotSet',
-				id: 'PLOTSET',
+				id: 'PROJECT.PLOTSET',
 				name: '地块设置',
 				path: '/project/plotSet',
 				exact: true,
-				icon: <Icon name="retweet"/>,
+				icon: <Icon name="retweet" />,
 			}, {
 				key: 'AreaSet',
-				id: 'AREASET',
+				id: 'PROJECT.AREASET',
 				name: '区域设置',
 				path: '/project/areaSet',
-				icon: <Icon name="code"/>
+				icon: <Icon name="code" />
 			}, {
 				key: 'UnitPro',
-				id: 'UNITPRO',
+				id: 'PROJECT.UNITPRO',
 				name: '单位工程',
 				path: '/project/unitPro',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}, {
 				key: 'SubunitPro',
-				id: 'SUBUNITPRO',
+				id: 'PROJECT.SUBUNITPRO',
 				name: '子单位工程',
 				path: '/project/subunitPro',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}, {
 				key: 'SubPro',
-				id: 'SUBPRO',
+				id: 'PROJECT.SUBPRO',
 				name: '分部工程',
 				path: '/project/subpro',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}, {
 				key: 'ItemPro',
-				id: 'ITEMPRO',
+				id: 'PROJECT.ITEMPRO',
 				name: '分项工程',
 				path: '/project/itemPro',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}]
 		}, {
 			key: 'org',
+			id: 'PROJECT.ORG',
 			name: '组织机构',
-			icon: <Icon name="won"/>,
+			icon: <Icon name="won" />,
 			children: [{
 				key: 'OrgType',
-				id: 'ORGTYPE',
+				id: 'PROJECT.ORGTYPE',
 				name: '类型管理',
 				path: '/project/orgType',
 				exact: true,
-				icon: <Icon name="retweet"/>,
+				icon: <Icon name="retweet" />,
 			}, {
 				key: 'UnitManage',
-				id: 'UNITMANAGE',
+				id: 'PROJECT.UNITMANAGE',
 				name: '单位管理',
 				path: '/project/unitManage',
-				icon: <Icon name="code"/>
+				icon: <Icon name="code" />
 			}, {
 				key: 'BranchManage',
-				id: 'BRANCHMANAGE',
+				id: 'PROJECT.BRANCHMANAGE',
 				name: '部门管理',
 				path: '/project/branchManage',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}]
 		}, {
 			key: 'dataManage',
+			id: 'PROJECT.DATAMANAGE',
 			name: '资料管理',
-			icon: <Icon name="won"/>,
+			icon: <Icon name="won" />,
 			children: [{
 				key: 'Standard',
-				id: 'STANDARD',
+				id: 'PROJECT.STANDARD',
 				name: '制度标准',
 				path: '/project/standard',
 				exact: true,
-				icon: <Icon name="retweet"/>,
-			},{
+				icon: <Icon name="retweet" />,
+			}, {
 				key: 'EngineeringImage',
-				id: 'ENGINEERINGIMAGE',
+				id: 'PROJECT.ENGINEERINGIMAGE',
 				name: '工程影像',
 				path: '/project/engineeringImage',
 				exact: true,
-				icon: <Icon name="retweet"/>,
+				icon: <Icon name="retweet" />,
 			}, {
 				key: 'ProDoc',
-				id: 'PRODOC',
+				id: 'PROJECT.PRODOC',
 				name: '工程文档',
 				path: '/project/proDoc',
-				icon: <Icon name="code"/>
+				icon: <Icon name="code" />
 			}, {
 				key: 'Keyword',
-				id: 'KEYWORD',
+				id: 'PROJECT.KEYWORD',
 				name: '工程字段',
 				path: '/project/keyword',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}, {
 				key: 'Template',
-				id: 'TEMPLATE',
+				id: 'PROJECT.TEMPLATE',
 				name: '模板配置',
 				path: '/project/template',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}, {
 				key: 'Dictionaries',
-				id: 'DICTIONARIES',
+				id: 'PROJECT.DICTIONARIES',
 				name: '工程文档字典',
 				path: '/project/dictionaries',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}]
 		}, {
 			key: 'OverallManage',
 			name: '综合管理',
-			icon: <Icon name="won"/>,
+			id: 'PROJECT.OVERALLMANAGE',			
+			icon: <Icon name="won" />,
 			children: [{
 				key: 'Material',
-				id: 'MATERIAL',
+				id: 'PROJECT.MATERIAL',
 				name: '物资管理',
 				path: '/project/material',
 				exact: true,
-				icon: <Icon name="retweet"/>,
+				icon: <Icon name="retweet" />,
 			},
 			{
 				key: 'FormManage',
-				id: 'FORM',
+				id: 'PROJECT.FORM',
 				name: '表单管理',
 				path: '/project/formmanage',
 				exact: true,
-				icon: <Icon name="retweet"/>,
+				icon: <Icon name="retweet" />,
 			}]
-		},{
+		}, {
 			key: 'safetyManage',
-			name: '安全管理',
-			icon: <Icon name="won"/>,
+			name: '安环管理',
+			id: 'PROJECT.SAFETYMANAGE',			
+			icon: <Icon name="won" />,
 			children: [{
 				key: 'SafetySystem',
-				id: 'SAFETYSYSTEM',
+				id: 'PROJECT.SAFETYSYSTEM',
 				name: '安全体系目录',
 				path: '/project/safetySystem',
 				exact: true,
-				icon: <Icon name="retweet"/>,
+				icon: <Icon name="retweet" />,
 			}, {
 				key: 'Danger',
-				id: 'DANGER',
+				id: 'PROJECT.DANGER',
 				name: '危险源',
 				path: '/project/danger',
-				icon: <Icon name="code"/>
+				icon: <Icon name="code" />
 			}, {
 				key: 'Hazard',
-				id: 'HAZARD',
+				id: 'PROJECT.HAZARD',
 				name: '安全隐患',
 				path: '/project/hazard',
-				icon: <Icon name="money"/>
+				icon: <Icon name="money" />
 			}]
 		}, {
 			key: 'massManage',
 			name: '质量管理',
-			icon: <Icon name="won"/>,
+			id: 'PROJECT.MASSMANAGE',			
+			icon: <Icon name="won" />,
 			children: [{
 				key: 'Defects',
-				id: 'DEFECTS',
+				id: 'PROJECT.DEFECTS',
 				name: '质量缺陷',
 				path: '/project/defects',
 				exact: true,
-				icon: <Icon name="retweet"/>,
+				icon: <Icon name="retweet" />,
 			}]
 		}, {
 			key: 'nursery',
 			name: '苗木管理',
-			icon: <Icon name="won"/>,
+			id: 'PROJECT.NURSERY',			
+			icon: <Icon name="won" />,
 			children: [{
 				key: 'NurseryType',
-				id: 'NURSERYTYPE',
+				id: 'PROJECT.NURSERYTYPE',
 				name: '类型管理',
 				path: '/project/nurseryType',
 				exact: true,
-				icon: <Icon name="retweet"/>,
+				icon: <Icon name="retweet" />,
 			}, {
 				key: 'TreeManage',
-				id: 'TREEMANAGE',
+				id: 'PROJECT.TREEMANAGE',
 				name: '树种管理',
 				path: '/project/treeManage',
-				icon: <Icon name="code"/>
+				icon: <Icon name="code" />
 			}]
 		}
 	];
