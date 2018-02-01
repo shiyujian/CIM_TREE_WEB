@@ -45,66 +45,7 @@ export default class Progress extends Component {
 					{
 						actions.map((action, index) => {
 							let url;
-							if (code === WORKFLOW_CODE.设计计划填报流程) {
-								//填报计划
-								if (currentStateCode === 'START') {
-									url = `/design/plan/3?workflowID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//审查计划
-									url = `/design/plan/4?workflowID=${id}`
-								}
-								//交付计划变更
-							} else if (code === WORKFLOW_CODE.设计计划变更流程) {
-								// 计划变更
-								if (currentStateCode === 'START') {
-									url = `/design/plan/5?workflowID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//计划变更审查
-									url = `/design/plan/6?workflowID=${id}`
-								}
-								//设计成果上报
-							} else if (code === WORKFLOW_CODE.设计成果上报流程) {
-								//设计上报
-								if (currentStateCode === 'START') {
-									url = `/design/reportResult?workflowID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//设计审查
-									url = `/design/approvalResult?workflowID=${id}`
-								}
-								//设计成果变更
-							} else if (code === WORKFLOW_CODE.设计成果一般变更流程 || code === WORKFLOW_CODE.设计成果重大变更流程) {
-								// 设计成果变更
-								if (currentStateCode === 'START') {
-									url = `/design/modify?workflowID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//设计成果变更审查
-									url = `/design/modifyApproval?workflowID=${id}`
-								}
-							} else if (code === 'TEMPLATE_022') { // 报批
-									url = `/overall/approval#${subject[0].unitInfo}&${subject[0].blockId}`
-								//总进度进度填报/审批
-							} else if (code === WORKFLOW_CODE.总进度计划报批流程) {
-								// 进度填报
-								if (currentStateCode === 'START') {
-									url = `/schedule/totalreport?totalReportID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//进度审批
-									url = `/schedule/totalapproval?totalApprovalID=${id}`
-								}
-								//总进度进度填报
-							} else if (code === WORKFLOW_CODE.每日进度填报流程) {
-								// 进度填报
-								
-								//总进度进度填报
-							} else if (code === WORKFLOW_CODE.进度管控审批流程) {
-								// 进度填报
-								if (currentStateCode === 'START') {
-									url = `/schedule/stagereport?stageReportID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//进度审批
-									url = `/schedule/stageapproval?stageApprovalID=${id}`
-								}
-							} else if (code === WORKFLOW_CODE.数据报送流程) {
+							if (code === WORKFLOW_CODE.数据报送流程) {
 								// 数据报送流程
 								if(action === '通过'){
 									action = '审核';
@@ -127,8 +68,6 @@ export default class Progress extends Component {
 					}
 				</div>
 				{
-					(code === WORKFLOW_CODE.设计计划填报流程 || code === WORKFLOW_CODE.设计计划变更流程 || code === WORKFLOW_CODE.设计成果上报流程 || code === WORKFLOW_CODE.设计成果一般变更流程
-						|| code === WORKFLOW_CODE.设计成果重大变更流程 || code === WORKFLOW_CODE.总进度计划报批流程 || code === WORKFLOW_CODE.进度管控审批流程 || code === 'TEMPLATE_022'|| code === WORKFLOW_CODE.每日进度填报流程 ) ||
 					this.renderContent()
 				}
 			</div>
@@ -147,6 +86,7 @@ export default class Progress extends Component {
 		if (!action) {
 			action = first;
 		}
+		console.log('renderContent')
 		const finish = this.isFinish();
 		const transitions = this.getTransitions(action, state.id);
 		const nextStates = this.getNextStates(transitions);
@@ -234,6 +174,7 @@ export default class Progress extends Component {
 	}
 
 	changeDelegateUser(users) {
+
 	}
 
 	changeNote(event) {
