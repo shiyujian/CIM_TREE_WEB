@@ -193,14 +193,14 @@ class Login extends Component {
 									<Form onSubmit={this.handleSubmit.bind(this)}
 										className='login-form' id="loginForm">
 
-										<p style={{ fontSize: '25', color: '#108EE9', textAlign: 'center', marginTop: "20", marginLeft: "5" }}>森林大数据建设管理平台</p>
+										<p style={{ fontSize: '25px', color: '#108EE9', textAlign: 'center', marginTop: "20px", marginLeft: "5px" }}>森林大数据建设管理平台</p>
 										{/* <FormItem style={{ marginTop: '10' }}>
 											<Select placeholder="项目选择">
 												<Option value='二'>二</Option>
 												<Option value='一'>一</Option>
 											</Select>
 										</FormItem> */}
-										<FormItem style={{ marginTop: '20', marginLeft: "24" }}>
+										<FormItem style={{ marginTop: '20px', marginLeft: "24px" }}>
 											{getFieldDecorator('username', {
 												rules: [{ required: true, message: '请输入用户名' }],
 											})(
@@ -208,7 +208,7 @@ class Login extends Component {
 													placeholder="用户名/手机号" />,
 											)}
 										</FormItem>
-										<FormItem style={{ marginTop: '50', marginLeft: "24" }}>
+										<FormItem style={{ marginTop: '50px', marginLeft: "24px" }}>
 											{getFieldDecorator('password', {
 												rules: [{ required: true, message: '请输入密码' }],
 											})(
@@ -224,7 +224,7 @@ class Login extends Component {
 												</div>,
 											)}
 										</FormItem>
-										<FormItem style={{ marginTop: '40', marginLeft: "10" }}>
+										<FormItem style={{ marginTop: '40px', marginLeft: "10px" }}>
 											{getFieldDecorator('remember', {
 												valuePropName: 'checked',
 												initialValue: false,
@@ -247,7 +247,7 @@ class Login extends Component {
 									<Form onSubmit={this.sureSubmit.bind(this)}
 										className='login-form' id="loginForm">
 
-										<FormItem style={{ marginTop: '40', marginLeft: "24" }}>
+										<FormItem style={{ marginTop: '40px', marginLeft: "24px" }}>
 											{getFieldDecorator('nickname', {
 												rules: [{ required: true, message: '请输入用户名' }],
 											})(
@@ -257,7 +257,7 @@ class Login extends Component {
 											)}
 										</FormItem>
 
-										<FormItem style={{ marginTop: '30', marginLeft: "24" }}>
+										<FormItem style={{ marginTop: '30px', marginLeft: "24px" }}>
 											{getFieldDecorator('phone', {
 												rules: [{ required: true, message: '请输入手机号' }],
 											})(
@@ -278,7 +278,7 @@ class Login extends Component {
 							</div> :
 							appDownload ? <div className="imgbox">
 								<a className="Imgtitle"><img src={appImg} /></a>
-								<p onClick={this.backLogin.bind(this)} style={{ fontSize: 16, color: 'white', marginTop: '10', color: 'red', cursor: 'pointer', textDecoration: 'underline', textAlign: 'center' }}>返回扫码登录</p>
+								<p onClick={this.backLogin.bind(this)} style={{ fontSize: 16, color: 'white', marginTop: '10px', color: 'red', cursor: 'pointer', textDecoration: 'underline', textAlign: 'center' }}>返回扫码登录</p>
 							</div> :
 								<div className="picture-box">
 									<QRCode {...this.props}
@@ -287,8 +287,8 @@ class Login extends Component {
 										bgColor={bgColor}
 										fgColor={fgColor}
 										value={QRUrl} />
-									<p style={{ fontSize: 16, color: 'white', marginTop: '10' }}>请打开移动端"扫一扫"</p>
-									<p style={{ fontSize: 16, color: 'white', marginTop: '10' }}>还没有移动端?<span onClick={this.nowDownload.bind(this)} style={{ fontSize: 16, color: 'red', marginTop: '10', textDecoration: 'underline', cursor: 'pointer' }}>立即下载</span></p>
+									<p style={{ fontSize: 16, color: 'white', marginTop: '10px' }}>请打开移动端"扫一扫"</p>
+									<p style={{ fontSize: 16, color: 'white', marginTop: '10px' }}>还没有移动端?<span onClick={this.nowDownload.bind(this)} style={{ fontSize: 16, color: 'red', marginTop: '10', textDecoration: 'underline', cursor: 'pointer' }}>立即下载</span></p>
 								</div>
 					}
 				</div>
