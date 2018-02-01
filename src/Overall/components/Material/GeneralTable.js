@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon} from 'antd';
-import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { base, STATIC_DOWNLOAD_API,SOURCE_API } from '../../../_platform/api';
 import moment from 'moment';
 import './index.less';
+import Preview from '../../../_platform/components/layout/Preview';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 
 const FormItem = Form.Item;
@@ -41,9 +42,7 @@ class GeneralTable extends Component {
 			return (
 				<div>
 					<a onClick={this.previewFile.bind(this,record)}>预览</a>
-					<a  style={{ marginLeft: 10 }}  
-						>下载
-					</a>
+					<a  style={{ marginLeft: 10 }} onClick={this.downloadFile.bind(this,record)}>下载</a>
 				</div>
 			)
 		}
@@ -155,6 +154,7 @@ class GeneralTable extends Component {
 	                            	
 	                        </Col>
 	                    </Row>
+						<Preview />
 					</div>
 		        </Modal>
 			}
@@ -286,60 +286,55 @@ class GeneralTable extends Component {
             dataIndex: 'extra_params.equipRemark',
             key: 'extra_params.equipRemark',
         }
-    ];
+	];
+	
+	//下载
+	downloadFile(record){
+        console.log('TreatmentData',record)
+        let link = document.createElement("a");
+        if(record && record.download_url){
+            link.href = STATIC_DOWNLOAD_API + record.download_url;
+            link.setAttribute('download', this);
+            link.setAttribute('target', '_blank');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }else{
+            notification.error({
+                message: '文件下载失败',
+                duration: 2
+            })
+            return;
+        }
+    }
 
-    // rowSelection = {
-    //     onChange: (selectedRowKeys) => {
-    //         const {actions: {selectDocuments}} = this.props;
-    //         selectDocuments(selectedRowKeys);
-    //     },
-    // };
-
- //    //文件下载
-	// createLink = (name, url) => {    //下载
-	// 	let link = document.createElement("a");
-	// 	link.href = url;
-	// 	link.setAttribute('download', this);
-	// 	link.setAttribute('target', '_blank');
-	// 	document.body.appendChild(link);
-	// 	link.click();
-	// 	document.body.removeChild(link);
-	// }
-	// download(index, key, e) {
-	// 	const { selected = [], file = [], files = [], down_file = [] } = this.props;
-
-	// 	if (selected.length == 0) {
-	// 		message.warning('没有选择无法下载');
-	// 	}
-	// 	for (var j = 0; j < selected.length; j++) {
-	// 		if (selected[j].code == index.code) {
-
-	// 			selected.map(rst => {
-	// 				file.push(rst.basic_params.files);
-	// 			});
-	// 			file.map(value => {
-	// 				value.map(cot => {
-	// 					files.push(cot.download_url)
-	// 				})
-	// 			});
-	// 			files.map(down => {
-	// 				let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-	// 				this.createLink(this, down_load);
-	// 			});
-	// 		}
-	// 	}
-	// }
+    
 
 	//文件预览
-	previewFile(file) {
+	previewFile(record, index) {
 		const { actions: { openPreview } } = this.props;
-		if (JSON.stringify(file.basic_params) == "{}") {
-			return
-		} else {
-			const filed = file.basic_params.files[0];
-			openPreview(filed);
+
+		console.log('record',record)
+		let filed = {};
+		if (record && record.file_id) {
+			
+			filed.misc = "file";
+			filed.a_file = `${SOURCE_API}` + record.a_file;
+			filed.download_url = `${STATIC_DOWNLOAD_API}` + record.download_url;
+			filed.name = record.fileName;
+			filed.id = record.file_id;
+			let type = record.a_file.split('.')[1];
+			if (type == 'xlsx' || type == 'docx' || type == 'xls' || type == 'doc' || type == 'pptx' || type == 'ppt') {
+				filed.mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+			}
+			if (type == 'pdf') {
+				filed.mime_type = "application/pdf";
+			}
 		}
+		openPreview(filed);
 	}
+
+	
 
 	static layoutT = {
       labelCol: {span: 8},

@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,DatePicker,Popconfirm} from 'antd';
-import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { base, STATIC_DOWNLOAD_API,SOURCE_API } from '../../../_platform/api';
 import moment from 'moment';
 import './index.less';
 import { WORKFLOW_CODE } from '../../../_platform/api';
+import Preview from '../../../_platform/components/layout/Preview';
 
 const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
@@ -46,13 +47,16 @@ class ResourceTable extends Component {
 			return (
 				<div>
 					<a onClick={this.previewFile.bind(this,record)}>预览</a>
-					<a  style={{ marginLeft: 10 }}  
-						>下载
-					</a>
+					<a  style={{ marginLeft: 10 }} onClick={this.downloadFile.bind(this,record)}>下载</a>
 				</div>
 			)
 		}
-    }]
+	}]
+	
+	static layoutT = {
+		labelCol: {span: 8},
+		wrapperCol: {span: 16},
+	};
 	
 	componentDidMount(){
 		const {
@@ -179,6 +183,7 @@ class ResourceTable extends Component {
 									
 							</Col>
 	                    </Row>
+						<Preview />
 					</div>
 		        </Modal>
 			}	
@@ -284,9 +289,6 @@ class ResourceTable extends Component {
 				return(
 					<div>
 						<a type="primary" onClick={this.showModal.bind(this,index,record)}>查看</a>
-						{/*<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
-						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>*/
-						}
 					</div>
 				)	
 			}
@@ -316,61 +318,52 @@ class ResourceTable extends Component {
             dataIndex: 'extra_params.equipPlace',
             key: 'extra_params.equipPlace', 
         }
-    ];
-
-	createLink = (name, url) => {    //下载
-		let link = document.createElement("a");
-		link.href = url;
-		link.setAttribute('download', this);
-		link.setAttribute('target', '_blank');
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	}
-	download(index, key, e) {
-		const { selected = [], file = [], files = [], down_file = [] } = this.props;
-
-		if (selected.length == 0) {
-			message.warning('没有选择无法下载');
-		}
-		for (var j = 0; j < selected.length; j++) {
-			if (selected[j].code == index.code) {
-
-				selected.map(rst => {
-					file.push(rst.basic_params.files);
-				});
-				file.map(value => {
-					value.map(cot => {
-						files.push(cot.download_url)
-					})
-				});
-				files.map(down => {
-					let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-					this.createLink(this, down_load);
-				});
-			}
-		}
-	}
+	];
+	
+	//下载
+	downloadFile(record){
+        console.log('TreatmentData',record)
+        let link = document.createElement("a");
+        if(record && record.download_url){
+            link.href = STATIC_DOWNLOAD_API + record.download_url;
+            link.setAttribute('download', this);
+            link.setAttribute('target', '_blank');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }else{
+            notification.error({
+                message: '文件下载失败',
+                duration: 2
+            })
+            return;
+        }
+    }
 
 	//文件预览
-	previewFile(file) {
-		const { actions: { openPreview } } = this.props;
-		if (JSON.stringify(file.basic_params) == "{}") {
-			return
-		} else { 
-			const filed = file.basic_params.files[0];
-			openPreview(filed);
-		}
-	}
+	previewFile(record, index) {
+        const { actions: { openPreview } } = this.props;
+    
+        console.log('record',record)
+        let filed = {};
+        if (record && record.file_id) {
+            
+            filed.misc = "file";
+            filed.a_file = `${SOURCE_API}` + record.a_file;
+            filed.download_url = `${STATIC_DOWNLOAD_API}` + record.download_url;
+            filed.name = record.fileName;
+            filed.id = record.file_id;
+            let type = record.a_file.split('.')[1];
+            if (type == 'xlsx' || type == 'docx' || type == 'xls' || type == 'doc' || type == 'pptx' || type == 'ppt') {
+                filed.mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            }
+            if (type == 'pdf') {
+                filed.mime_type = "application/pdf";
+            }
+        }
+        openPreview(filed);
+    }
 
-	update(file) {
-		const { actions: { updatevisible, setoldfile } } = this.props;
-		updatevisible(true);
-		setoldfile(file);
-	}
-	static layoutT = {
-      labelCol: {span: 8},
-      wrapperCol: {span: 16},
-    };
+	
 }
 export default Form.create()(ResourceTable)
