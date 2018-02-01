@@ -57,14 +57,14 @@ class ResourceTable extends Component {
 	componentDidMount(){
 		const {
 			actions:{
-				getWorkflows
+				getWorkflows2
 			}
 		} = this.props
 
 		let code = {
 			code:WORKFLOW_CODE.工程材料报批流程
 		}
-		getWorkflows(code)
+		getWorkflows2(code)
 	}
 	render() {
 		let {
@@ -75,11 +75,11 @@ class ResourceTable extends Component {
 		const { 
 			Doc = [],
 			form: { getFieldDecorator },
-			workflows 
+			workflows2 
 		} = this.props;
 		let dataSource = []
-		if(workflows && Array.isArray(workflows) && workflows.length>0){
-			dataSource = this.getTable(workflows)
+		if(workflows2 && Array.isArray(workflows2) && workflows2.length>0){
+			dataSource = this.getTable(workflows2)
 		}
 		return (
 			<div>
@@ -281,16 +281,14 @@ class ResourceTable extends Component {
 		}, {
 			title: '操作',
 			render: (text,record, index) => {
-				const { Doc = [] } = this.props;
-				let nodes = [];
-				nodes.push(
+				return(
 					<div>
 						<a type="primary" onClick={this.showModal.bind(this,index,record)}>查看</a>
-						{/* <a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
-						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a> */}
+						{/*<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>*/
+						}
 					</div>
-				);
-				return nodes;
+				)	
 			}
 		}
 	];

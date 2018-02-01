@@ -16,8 +16,12 @@ const documentReducer = documentFactory(ID);
 // 流程详情
 export const getWorkflowByIdOK = createAction('获取流程详情');
 export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
-export const getWorkflowsOK = createAction('获取某类流程的全部流程实例');
-export const getWorkflows = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[getWorkflowsOK],'GET');
+export const getWorkflows1OK = createAction('获取机械设备流程的全部流程实例');
+export const getWorkflows1 = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[getWorkflows1OK],'GET');
+export const getWorkflows2OK = createAction('获取工程材料流程的全部流程实例');
+export const getWorkflows2 = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[getWorkflows2OK],'GET');
+export const getWorkflows3OK = createAction('获取苗木资料流程的全部流程实例');
+export const getWorkflows3 = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[getWorkflows3OK],'GET');
 
 
 export const setTabActive = createAction(`${ID}设置当前选中的tab`);
@@ -41,8 +45,12 @@ export const actions = {
     // getdirTreeOK,
     getWorkflowByIdOK,
     getWorkflowById,
-    getWorkflowsOK,
-    getWorkflows,
+    getWorkflows1OK,
+    getWorkflows1,
+    getWorkflows2OK,
+    getWorkflows2,
+    getWorkflows3OK,
+    getWorkflows3,
 
 
     setTabActive,
@@ -83,9 +91,17 @@ export default handleActions({
         ...state,
         follow: followReducer(state.follow, action)
     }),
-    [getWorkflowsOK]: (state, {payload}) => ( {
+    [getWorkflows1OK]: (state, {payload}) => ( {
         ...state,
-        workflows: payload
+        workflows1: payload
+    }),
+    [getWorkflows2OK]: (state, {payload}) => ( {
+        ...state,
+        workflows2: payload
+    }),
+    [getWorkflows3OK]: (state, {payload}) => ( {
+        ...state,
+        workflows3: payload
     }),
     
     [setTabActive]: (state, {payload}) => ( {

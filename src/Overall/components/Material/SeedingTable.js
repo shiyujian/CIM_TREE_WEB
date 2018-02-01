@@ -51,14 +51,14 @@ class SeedingTable extends Component {
 	componentDidMount(){
 		const {
 			actions:{
-				getWorkflows
+				getWorkflows3
 			}
 		} = this.props
 
 		let code = {
 			code:WORKFLOW_CODE.苗木资料报批流程
 		}
-		getWorkflows(code)
+		getWorkflows3(code)
 	}
 	render() {
 		let {
@@ -69,11 +69,11 @@ class SeedingTable extends Component {
 		const { 
 			Doc = [],
 			form: { getFieldDecorator },
-			workflows 
+			workflows3 
 		} = this.props;
 		let dataSource = []
-		if(workflows && Array.isArray(workflows) && workflows.length>0){
-			dataSource = this.getTable(workflows)
+		if(workflows3 && Array.isArray(workflows3) && workflows3.length>0){
+			dataSource = this.getTable(workflows3)
 		}
 		return (
 			<div>
@@ -274,16 +274,14 @@ class SeedingTable extends Component {
 		}, {
 			title: '操作',
 			render: (text,record, index) => {
-				const { Doc = [] } = this.props;
-				let nodes = [];
-				nodes.push(
+				return(
 					<div>
 						<a type="primary" onClick={this.showModal.bind(this,index,record)}>查看</a>
-						{/* <a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
-						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a> */}
+						{/*<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>*/
+						}
 					</div>
-				);
-				return nodes;
+				)	
 			}
 		}
 	];

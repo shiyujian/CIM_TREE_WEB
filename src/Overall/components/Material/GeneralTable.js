@@ -55,14 +55,14 @@ class GeneralTable extends Component {
 	componentDidMount(){
 		const {
 			actions:{
-				getWorkflows
+				getWorkflows1
 			}
 		} = this.props
 
 		let code = {
 			code:WORKFLOW_CODE.机械设备报批流程
 		}
-		getWorkflows(code)
+		getWorkflows1(code)
 	}
 	render() {
 		let {
@@ -73,12 +73,12 @@ class GeneralTable extends Component {
 		const { 
 			Doc = [],
 			docs = [],
-			workflows,
+			workflows1,
 			form: { getFieldDecorator }
 		 } = this.props;
 		let dataSource = []
-		if(workflows && Array.isArray(workflows) && workflows.length>0){
-			dataSource = this.getTable(workflows)
+		if(workflows1 && Array.isArray(workflows1) && workflows1.length>0){
+			dataSource = this.getTable(workflows1)
 		}
 		return (
 			<div>
@@ -109,7 +109,7 @@ class GeneralTable extends Component {
 	                            <Row gutter={15} style={{marginTop:'2em'}} >
 	                                <Col span={10}>
 	                                    <FormItem   {...GeneralTable.layoutT} label="单位工程:">
-										{getFieldDecorator('unit', {
+										{getFieldDecorator('form1_unit', {
                                             initialValue: `${record.unit?record.unit:''}`,
                                             rules: [{ required: true, message: '请输入单位工程' }]
                                         })(<Input readOnly />)}
@@ -117,7 +117,7 @@ class GeneralTable extends Component {
 	                                </Col>
 	                                <Col span={10}>
 	                                    <FormItem {...GeneralTable.layoutT} label="编号:">
-										{getFieldDecorator('code', {
+										{getFieldDecorator('form1_code', {
                                             initialValue: `${record.code?record.code:''}`,
                                             rules: [{ required: true, message: '请输入编号' }]
                                         })(<Input readOnly />)}
@@ -127,7 +127,7 @@ class GeneralTable extends Component {
 	                            <Row gutter={15}>
 	                                <Col span={20}>
 	                                    <FormItem  {...GeneralTable.layout} label="审批单位:">
-										{getFieldDecorator('reviewUnit', {
+										{getFieldDecorator('form1_reviewUnit', {
                                             initialValue: `${record.reviewUnit?record.reviewUnit:''}`,
                                             rules: [{ required: true, message: '请输入审批单位' }]
                                         })(<Input readOnly />)}
@@ -247,21 +247,14 @@ class GeneralTable extends Component {
 		}, 	{
 			title: '操作',
 			render: (text,record, index) => {
-				const { Doc = [] } = this.props;
-				// console.log('doc222',Doc)
-				console.log('record22',record)
-				let nodes = [];
-				nodes.push(
-				// return (
+				return(
 					<div>
 						<a type="primary" onClick={this.showModal.bind(this,index,record)}>查看</a>
 						{/*<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>*/
 						}
 					</div>
-				// )
-				);
-				return nodes;
+				)	
 			}
 		}
 	];

@@ -24,7 +24,7 @@ const EditableCell = ({ editable, value, onChange }) => (
           </div>
         );
 
-class Addition extends Component {
+class GeneralAddition extends Component {
 
     static propTypes = {};
     state={
@@ -170,7 +170,7 @@ class Addition extends Component {
                         <Col span={24} style={{paddingLeft:'3em'}}>
                             <Row gutter={15} >
                                 <Col span={10}>
-                                    <FormItem   {...Addition.layoutT} label="单位工程:">
+                                    <FormItem   {...GeneralAddition.layoutT} label="单位工程:">
                                     {
                                         getFieldDecorator('unit', {
                                             rules: [
@@ -191,7 +191,7 @@ class Addition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={10}>
-                                    <FormItem {...Addition.layoutT} label="编号:">
+                                    <FormItem {...GeneralAddition.layoutT} label="编号:">
                                     {
                                         getFieldDecorator('code', {
                                             rules: [
@@ -217,7 +217,7 @@ class Addition extends Component {
                             </Row>
                             <Row gutter={15}>
                                 <Col span={20}>
-                                    <FormItem  {...Addition.layout} label="审批单位:">
+                                    <FormItem  {...GeneralAddition.layout} label="审批单位:">
                                     {
                                         getFieldDecorator('reviewUnit', {
                                             rules: [
@@ -282,7 +282,7 @@ class Addition extends Component {
 					</Row>
                     <Row style={{marginTop: 15}}>
                         <Col span={10} >
-                            <FormItem {...Addition.layoutT} label='审核人'>
+                            <FormItem {...GeneralAddition.layoutT} label='审核人'>
                                 {
                                     getFieldDecorator('dataReview', {
                                         rules: [
@@ -719,4 +719,4 @@ class Addition extends Component {
     };
 
 }
-export default Form.create()(Addition)
+export default Form.create()(GeneralAddition)
