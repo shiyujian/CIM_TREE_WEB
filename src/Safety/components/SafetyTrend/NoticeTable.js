@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Tabs, Button, Row, Col, message, Modal, Popconfirm } from 'antd';
+import { Table, Tabs, Button, Row, Col, message, Modal, Form, Popconfirm, Input, DatePicker, Select } from 'antd';
 import NoticeText from './NoticeText';
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
@@ -7,9 +7,10 @@ import '../../../Datum/components/Datum/index.less'
 
 const TabPane = Tabs.TabPane;
 const user_id = getUser().id;
+const FormItem = Form.Item;
+const { RangePicker } = DatePicker;
 
-
-export default class NoticeTable extends Component {
+class NoticeTable extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {}
@@ -120,6 +121,79 @@ export default class NoticeTable extends Component {
 		}
 
 	}
+	query() {
+		const {
+			actions: { getTipsList },
+			filter = {}
+		} = this.props;
+		// const user = getUser();
+		this.props.form.validateFields(async (err, values) => {
+			let conditions = {
+
+				title: values.theme || "",
+				pub_time_begin:"",
+				pub_time_end:"",
+			}
+			if (values && values.worktime && values.worktime.length > 0) {
+				conditions.pub_time_begin = moment(values.worktime[0]).format('YYYY-MM-DD 00:00:00');
+				conditions.pub_time_end = moment(values.worktime[1]).format('YYYY-MM-DD 23:59:59');
+			}
+			for (const key in conditions) {
+				if (!conditions[key] || conditions[key] == "") {
+					delete conditions[key];
+				}
+			}
+
+			await getTipsList({}, conditions);
+		})
+	}
+	query1() {
+
+		const {
+					actions: { getDraftTipsList },
+			filter = {}
+				} = this.props;
+
+		this.props.form.validateFields(async (err, values) => {
+			let conditions = {
+				// task: filter.type || "processing",
+				title: values.title1 || "",
+				pub_time_begin:"",
+				pub_time_end:"",
+			}
+			if (values && values.worktimes && values.worktimes.length > 0) {
+				conditions.pub_time_begin = moment(values.worktimes[0]).format('YYYY-MM-DD 00:00:00');
+				conditions.pub_time_end = moment(values.worktimes[1]).format('YYYY-MM-DD 23:59:59');
+			}
+			for (const key in conditions) {
+				if (!conditions[key] || conditions[key] == "") {
+					delete conditions[key];
+				}
+			}
+			await getDraftTipsList({}, conditions);
+		})
+	}
+	clear() {
+		const {
+			noticeTabValue = '1'
+		} = this.props;
+		this.props.form.setFieldsValue({
+
+			theme: undefined,
+			worktime: undefined,
+			workunit: undefined,
+
+		});
+	}
+	clear1() {
+
+		this.props.form.setFieldsValue({
+			title1: undefined,
+			worktimes: undefined,
+			workunits: undefined,
+
+		});
+	}
 
 	//发布公告
 	publishTipsClick() {
@@ -146,12 +220,18 @@ export default class NoticeTable extends Component {
 		const {
 			tipsList = [],
 			draftTipsList = [],
+			form: { getFieldDecorator },
 			toggleData: toggleData = {
 				type: 'TIPS',
 				visible: false,
 			},
 			noticeTabValue = '1'
 		} = this.props;
+		console.log(this.props)
+		const formItemLayout = {
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
+		};
 		return (
 			<Row>
 				<Col span={22} offset={1}>
@@ -163,6 +243,58 @@ export default class NoticeTable extends Component {
 							}
 						</div>}>
 						<TabPane tab="发布的项目安全公告" key="1">
+							<Row >
+								{/* <Col span={4}>
+									<Icon type='exception' style={{ fontSize: 32 }} />
+								</Col> */}
+								<Col span={18}>
+									<Row>
+										<Col span={12} >
+											<FormItem {...formItemLayout} label="公告标题">
+												{
+													getFieldDecorator('theme', {
+														rules: [
+															{ required: false, message: '请输入公告标题' },
+														]
+													})
+														(<Input placeholder="请输入公告标题" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={12} >
+											<FormItem {...formItemLayout} label="发布时间">
+
+												{
+													getFieldDecorator('worktime', {
+														rules: [
+															{ required: false, message: '请选择发布时间' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '100%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
+										</Col>
+									</Row>
+									<Row>
+
+									</Row>
+								</Col>
+								<Col span={2} offset={1}>
+									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
+								</Col>
+								<Col span={2} >
+									<Button icon='reload' onClick={this.clear.bind(this)}>清空</Button>
+								</Col>
+							</Row>
 							<Table
 								rowSelection={rowSelection}
 								bordered
@@ -173,6 +305,55 @@ export default class NoticeTable extends Component {
 							/>
 						</TabPane>
 						<TabPane tab="暂存的项目安全公告" key="2">
+							<Row >
+								{/* <Col span={4}>
+									<Icon type='exception' style={{ fontSize: 32 }} />
+								</Col> */}
+								<Col span={18}>
+									<Row>
+										<Col span={12} >
+											<FormItem {...formItemLayout} label="公告标题">
+												{
+													getFieldDecorator('title1', {
+														rules: [
+															{ required: false, message: '请输入公告标题' },
+														]
+													})
+														(<Input placeholder="请输入公告标题" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={12} >
+											<FormItem {...formItemLayout} label="暂存时间">
+
+												{
+													getFieldDecorator('worktimes', {
+														rules: [
+															{ required: false, message: '请选择暂存时间' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '100%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
+										</Col>
+									</Row>
+								</Col>
+								<Col span={2} offset={1}>
+									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
+								</Col>
+								<Col span={2}>
+									<Button icon='reload' onClick={this.clear1.bind(this)}>清空</Button>
+								</Col>
+							</Row>
 							<Table dataSource={draftTipsList}
 								rowSelection={rowSelection}
 								className="foresttables"
@@ -274,3 +455,4 @@ export default class NoticeTable extends Component {
 		}
 	];
 }
+export default Form.create()(NoticeTable)

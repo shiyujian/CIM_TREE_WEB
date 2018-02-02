@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Tabs, Button, Row, Col, Modal, message, Popconfirm } from 'antd';
+import { Table, Tabs, Button,Form,Input, Row, Col, Modal, message, Popconfirm, DatePicker, Select } from 'antd';
 import VideoText from './VideoText';
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
@@ -7,8 +7,11 @@ import '../../../Datum/components/Datum/index.less'
 
 const TabPane = Tabs.TabPane;
 const user_id = getUser().id;
+const FormItem = Form.Item;
+const { RangePicker } = DatePicker;
 
-export default class VideoTables extends Component {
+class VideoTables extends Component {
+	
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -40,6 +43,86 @@ export default class VideoTables extends Component {
 			}
 		}
 	}
+	query() {
+		const {
+			actions: { getVideoList },
+			filter = {}
+		} = this.props;
+		// const user = getUser();
+		console.log(this.props)
+		this.props.form.validateFields(async (err, values) => {
+			console.log(values.keyzi)
+			let conditions = {
+
+				title: values.dynamictitle || "",
+				pub_time_begin: "",
+				pub_time_end: "",
+				abstract:values.keyzis || ""
+			}
+			if (values && values.releasetimes && values.releasetimes.length > 0) {
+				conditions.pub_time_begin = moment(values.releasetimes[0]).format('YYYY-MM-DD 00:00:00');
+				conditions.pub_time_end = moment(values.releasetimes[1]).format('YYYY-MM-DD 23:59:59');
+			}
+			for (const key in conditions) {
+				if (!conditions[key] || conditions[key] == "") {
+					delete conditions[key];
+				}
+			}
+
+			await getVideoList({}, conditions);
+		})
+	}
+	query1() {
+
+		const {
+					actions: { getVideosList },
+			filter = {}
+				} = this.props;
+
+		this.props.form.validateFields(async (err, values) => {
+			let conditions = {
+				// task: filter.type || "processing",
+				title: values.dynamictitles || "",
+				pub_time_begin: "",
+				pub_time_end: "",
+				abstract:values.keyzis1 || "",
+			}
+			if (values && values.releasetimes1 && values.releasetimes1.length > 0) {
+				conditions.pub_time_begin = moment(values.releasetimes1[0]).format('YYYY-MM-DD 00:00:00');
+				conditions.pub_time_end = moment(values.releasetimes1[1]).format('YYYY-MM-DD 23:59:59');
+			}
+			for (const key in conditions) {
+				if (!conditions[key] || conditions[key] == "") {
+					delete conditions[key];
+				}
+			}
+			await getVideosList({}, conditions);
+		})
+	}
+	clear() {
+		const {
+			noticeTabValue = '1'
+		} = this.props;
+		this.props.form.setFieldsValue({
+
+			dynamictitle: undefined,
+			releasetimes: undefined,
+			workunit: undefined,
+			keyzis:undefined,
+
+		});
+	}
+	clear1() {
+
+		this.props.form.setFieldsValue({
+			dynamictitles: undefined,
+			releasetimes1: undefined,
+			workunits: undefined,
+			keyzis1:undefined,
+
+		});
+	}
+
 
 	//新闻操作按钮
 	clickNews(record, type) {
@@ -150,12 +233,17 @@ export default class VideoTables extends Component {
 		const {
 			videoList = [],
 			videosList = [],
+			form: { getFieldDecorator },			
 			toggleData: toggleData = {
 				type: 'NEWS',
 				visible: false,
 			},
 			bulletinTabValue = '1'
 		} = this.props;
+		const formItemLayout = {
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
+		};
 		return (
 			<Row>
 				<Col span={22} offset={1}>
@@ -167,6 +255,70 @@ export default class VideoTables extends Component {
 							}
 						</div>}>
 						<TabPane tab="发布的安全生产视频" key="1">
+						<Row >
+								{/* <Col span={4}>
+									<Icon type='exception' style={{ fontSize: 32 }} />
+								</Col> */}
+								<Col span={18}>
+									<Row>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="视频名称">
+												{
+													getFieldDecorator('dynamictitle', {
+														rules: [
+															{ required: false, message: '请输入视频名称' },
+														]
+													})
+														(<Input placeholder="请输入视频名称" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="关键字">
+												{
+													getFieldDecorator('keyzis', {
+														rules: [
+															{ required: false, message: '请输入关键字' },
+														]
+													})
+														(<Input placeholder="请输入关键字" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="发布时间">
+
+												{
+													getFieldDecorator('releasetimes', {
+														rules: [
+															{ required: false, message: '请选择发布时间' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '100%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
+										</Col>
+									</Row>
+									<Row>
+
+									</Row>
+								</Col>
+								<Col span={2} offset={1}>
+									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
+								</Col>
+								<Col span={2} >
+									<Button icon='reload' onClick={this.clear.bind(this)}>清空</Button>
+								</Col>
+							</Row>
 							<Table dataSource={videoList}
 								columns={this.columns}
 								rowKey="id"
@@ -176,6 +328,67 @@ export default class VideoTables extends Component {
 							/>
 						</TabPane>
 						<TabPane tab="暂存的安全生产视频" key="2">
+						<Row >
+								{/* <Col span={4}>
+									<Icon type='exception' style={{ fontSize: 32 }} />
+								</Col> */}
+								<Col span={18}>
+									<Row>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="视频名称">
+												{
+													getFieldDecorator('dynamictitles', {
+														rules: [
+															{ required: false, message: '请输入视频名称' },
+														]
+													})
+														(<Input placeholder="请输入视频名称" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="关键字">
+												{
+													getFieldDecorator('keyzis1', {
+														rules: [
+															{ required: false, message: '请输入关键字' },
+														]
+													})
+														(<Input placeholder="请输入关键字" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="暂存时间">
+
+												{
+													getFieldDecorator('releasetimes1', {
+														rules: [
+															{ required: false, message: '请选择暂存时间' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '100%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
+										</Col>
+									</Row>
+								</Col>
+								<Col span={2} offset={1}>
+									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
+								</Col>
+								<Col span={2}>
+									<Button icon='reload' onClick={this.clear1.bind(this)}>清空</Button>
+								</Col>
+							</Row>
 							<Table dataSource={videosList}
 								columns={this.draftColumns}
 								rowKey="id"
@@ -305,3 +518,4 @@ export default class VideoTables extends Component {
 		}
 	];
 }
+export default Form.create()(VideoTables)

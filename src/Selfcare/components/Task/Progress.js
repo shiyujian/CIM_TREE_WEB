@@ -6,7 +6,8 @@ import { getUser } from '_platform/auth';
 import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
-
+import OverallMaterialHandle from './OverallMaterialHandle';
+import OverallMaterialDeal from './OverallMaterialDeal';
 const FormItem = Form.Item;
 @connect(
 	state => {
@@ -39,104 +40,68 @@ export default class Progress extends Component {
 		const { state_id = '0' } = queryString.parse(location.search) || {};
 		const currentStates = states.find(state => state.id === +state_id) || {};
 		const currentStateCode = currentStates.code;
-		return (
-			<div>
-				<div>
-					{
-						actions.map((action, index) => {
-							let url;
-							if (code === WORKFLOW_CODE.设计计划填报流程) {
-								//填报计划
-								if (currentStateCode === 'START') {
-									url = `/design/plan/3?workflowID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//审查计划
-									url = `/design/plan/4?workflowID=${id}`
-								}
-								//交付计划变更
-							} else if (code === WORKFLOW_CODE.设计计划变更流程) {
-								// 计划变更
-								if (currentStateCode === 'START') {
-									url = `/design/plan/5?workflowID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//计划变更审查
-									url = `/design/plan/6?workflowID=${id}`
-								}
-								//设计成果上报
-							} else if (code === WORKFLOW_CODE.设计成果上报流程) {
-								//设计上报
-								if (currentStateCode === 'START') {
-									url = `/design/reportResult?workflowID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//设计审查
-									url = `/design/approvalResult?workflowID=${id}`
-								}
-								//设计成果变更
-							} else if (code === WORKFLOW_CODE.设计成果一般变更流程 || code === WORKFLOW_CODE.设计成果重大变更流程) {
-								// 设计成果变更
-								if (currentStateCode === 'START') {
-									url = `/design/modify?workflowID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//设计成果变更审查
-									url = `/design/modifyApproval?workflowID=${id}`
-								}
-							} else if (code === 'TEMPLATE_022') { // 报批
-									url = `/overall/approval#${subject[0].unitInfo}&${subject[0].blockId}`
-								//总进度进度填报/审批
-							} else if (code === WORKFLOW_CODE.总进度计划报批流程) {
-								// 进度填报
-								if (currentStateCode === 'START') {
-									url = `/schedule/totalreport?totalReportID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//进度审批
-									url = `/schedule/totalapproval?totalApprovalID=${id}`
-								}
-								//总进度进度填报
-							} else if (code === WORKFLOW_CODE.每日进度填报流程) {
-								// 进度填报
-								
-								//总进度进度填报
-							} else if (code === WORKFLOW_CODE.进度管控审批流程) {
-								// 进度填报
-								if (currentStateCode === 'START') {
-									url = `/schedule/stagereport?stageReportID=${id}`
-								} else if (currentStateCode === 'STATE02') {
-									//进度审批
-									url = `/schedule/stageapproval?stageApprovalID=${id}`
-								}
-							} else if (code === WORKFLOW_CODE.数据报送流程) {
-								// 数据报送流程
-								if(action === '通过'){
-									action = '审核';
-									url = <Button onClick={this.openModal.bind(this,name,id)}>{action}</Button>
-								}
-							} else {
-								url = action;
-							}
+		let stateName = task.current ? task.current[0].name : '';
 
-							if(url != action){
-								if(action === '审核'){
-									return url
-								}else{
-									return (url && <Link to={url}><Button onClick={this.toggleAction.bind(this, action)} key={index} style={{marginRight:20}}>{action}</Button></Link>)
+		if (code === WORKFLOW_CODE.机械设备报批流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.工程材料报批流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.苗木资料报批流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.机械设备报批流程 &&  stateName == '复审'){
+			return (
+				<OverallMaterialDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.工程材料报批流程 &&  stateName == '复审'){
+			return (
+				<OverallMaterialDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.苗木资料报批流程 &&  stateName == '复审'){
+			return (
+				<OverallMaterialDeal {...this.props} {...this.state}/>
+			)
+		}else {
+			return (
+				<div>
+					<div>
+						{
+							actions.map((action, index) => {
+								let url;
+								if (code === WORKFLOW_CODE.数据报送流程) {
+									// 数据报送流程
+									if(action === '通过'){
+										action = '审核';
+										url = <Button onClick={this.openModal.bind(this,name,id)}>{action}</Button>
+									}
+								} else {
+									url = action;
 								}
-							}else{
-								return (url && <Button onClick={this.toggleAction.bind(this, action)} key={index} style={{marginRight:20}}>{action}</Button>)
-							}
-						})
+	
+								if(url != action){
+									if(action === '审核'){
+										return url
+									}else{
+										return (url && <Link to={url}><Button onClick={this.toggleAction.bind(this, action)} key={index} style={{marginRight:20}}>{action}</Button></Link>)
+									}
+								}else{
+									return (url && <Button onClick={this.toggleAction.bind(this, action)} key={index} style={{marginRight:20}}>{action}</Button>)
+								}
+							})
+						}
+					</div>
+					{
+						this.renderContent()
 					}
 				</div>
-				{
-					code === WORKFLOW_CODE.申请推迟总进度计划填报流程
-						?
-						this.renderDelay()
-						:
-						(code === WORKFLOW_CODE.设计计划填报流程 || code === WORKFLOW_CODE.设计计划变更流程 || code === WORKFLOW_CODE.设计成果上报流程 || code === WORKFLOW_CODE.设计成果一般变更流程
-							|| code === WORKFLOW_CODE.设计成果重大变更流程 || code === WORKFLOW_CODE.总进度计划报批流程 || code === WORKFLOW_CODE.进度管控审批流程 || code === 'TEMPLATE_022'|| code === WORKFLOW_CODE.每日进度填报流程 ) ||
-						this.renderContent()
-				}
-			</div>
-		);
+			);
+		}
+		
 	}
 
 	async openModal(name,id){
@@ -151,6 +116,7 @@ export default class Progress extends Component {
 		if (!action) {
 			action = first;
 		}
+		console.log('renderContent')
 		const finish = this.isFinish();
 		const transitions = this.getTransitions(action, state.id);
 		const nextStates = this.getNextStates(transitions);
@@ -231,231 +197,14 @@ export default class Progress extends Component {
 
 		}
 	}
-	renderDelay() {
-		const { state = {}, actions = [], task = {} } = this.props;
-		const { actions: [first = ''] = [] } = state;
-		let { action } = this.state;
-		if (!action) {
-			action = first;
-		}
-
-		const transitions = this.getTransitions(action, state.id);
-		switch (action) {
-			case '通过':
-				return (
-					<div>
-						<Row style={{ marginTop: 10 }}>
-							<FormItem {...Progress.layout} label="处理意见">
-								<Input placeholder="请输入处理意见" onChange={this.changeNote.bind(this)} value={this.state.note} />
-							</FormItem>
-						</Row>
-						<Row style={{ marginTop: 10 }}>
-							<Col span={2}>
-								<Popconfirm title="确定通过吗？" onConfirm={this.handleDelay.bind(this, transitions, task)}>
-									<Button>确认通过</Button>
-								</Popconfirm>
-							</Col>
-						</Row>
-					</div>);
-			case '不通过':
-				return (
-					<div>
-						<Row style={{ marginTop: 10 }}>
-							<FormItem {...Progress.layout} label="处理意见">
-								<Input placeholder="请输入处理意见" onChange={this.changeNote.bind(this)} value={this.state.note} />
-							</FormItem>
-						</Row>
-						<Row style={{ marginTop: 10 }}>
-							<Col span={2}>
-								<Popconfirm title="确定不通过吗？" onConfirm={this.handleCancel.bind(this, transitions, task)}>
-									<Button>确认不通过</Button>
-								</Popconfirm>
-							</Col>
-						</Row>
-					</div>);
-			default:
-				return;
-		}
-	}
-	handleDelay(transitions = [], task = {}) {
-		const {
-            actions: {
-                putFlow,
-			patchDeadline,
-			postSubject,
-			getWorkflowById
-            }
-		} = this.props;
-		const {
-			note
-		} = this.state
-		let me = this;
-		let subject = task.subject[0];
-		const user = getUser();
-		let state = transitions[0].from_state;
-		let executor = {
-			"username": user.username,
-			"person_code": user.code,
-			"person_name": user.name,
-			"id": parseInt(user.id)
-		};
-		let action = "不通过";
-		let attachment = null;
-		let postdata = {
-			state: state,
-			executor: executor,
-			action: action,
-			note: note,
-			attachment: attachment
-		};
-		let data = {
-			pk: task.id
-		}
-		let reReportTimeData = subject.reReportTimeData ? JSON.parse(subject.reReportTimeData) : {};
-		let reReportTime = subject.delayReportTime ? JSON.parse(subject.delayReportTime) : {};
-		let patchReportTime = {
-			deadline: reReportTime,
-		}
-
-		let reApprovalTimeData = subject.reApprovalTimeData ? JSON.parse(subject.reApprovalTimeData) : {};
-		let reApprovalTime = subject.delayApprovalTime ? JSON.parse(subject.delayApprovalTime) : {};
-		let patchApprovalTime = {
-			deadline: reApprovalTime,
-		}
-
-		//修改填报时间
-		patchDeadline(reReportTimeData, patchReportTime).then(value => {
-			if (value && value.deadline) {
-				//修改审核时间
-				patchDeadline(reApprovalTimeData, patchApprovalTime).then(value => {
-					if (value && value.deadline) {
-						let changeData = {
-							pk: reReportTimeData.ppk
-						}
-						getWorkflowById(changeData).then((rst) => {
-							if (rst && rst.subject) {
-								let oldSubject = rst.subject[0];
-								let newSubject = [{
-									"project": oldSubject.project,
-									"unit": oldSubject.unit,
-									"constructionUnit": oldSubject.constructionUnit,
-									"reportTime": JSON.stringify(reReportTime),
-									"approvalLimit": oldSubject.approvalLimit,
-									"constructionMember": oldSubject.constructionMember,
-									"supervisionUnit": oldSubject.supervisionUnit,
-									"supervisionMember": oldSubject.supervisionMember,
-									"approvalTime": JSON.stringify(reApprovalTime),
-									"remark": oldSubject.remark,
-									"attachment": oldSubject.attachment,
-									"uploadModelFile": oldSubject.uploadModelFile,
-									"file": oldSubject.file,
-									"fdbConnectStr": oldSubject.fdbConnectStr
-								}];
-								let changeSubject = {
-									subject: newSubject
-								}
-
-								//修改subject
-								postSubject(changeData, changeSubject).then(sub => {
-									if (sub && sub[0]) {
-										putFlow(data, postdata).then(rst => {
-											if (rst && rst.creator) {
-												notification.success({
-													message: '流程提交成功',
-													duration: 2
-												})
-											} else {
-												notification.error({
-													message: '流程提交失败',
-													duration: 2
-												})
-												return;
-											}
-										})
-
-									} else {
-										notification.error({
-											message: '流程提交失败',
-											duration: 2
-										})
-										return;
-									}
-								})
-							}
-						})
-
-					} else {
-						notification.error({
-							message: '流程提交失败',
-							duration: 2
-						})
-						return;
-					}
-				})
-
-			} else {
-				notification.error({
-					message: '流程提交失败',
-					duration: 2
-				})
-				return;
-			}
-		})
-	}
-	handleCancel(transitions = [], task = {}) {
-		const {
-            actions: {
-                putFlow,
-            }
-		} = this.props;
-		const {
-			note
-		} = this.state
-		let me = this;
-		const user = getUser();
-		let state = transitions[0].from_state;
-		let executor = {
-			"username": user.username,
-			"person_code": user.code,
-			"person_name": user.name,
-			"id": parseInt(user.id)
-		};
-		let action = "通过";
-		let attachment = null;
-		let postdata = {
-			state: state,
-			executor: executor,
-			action: action,
-			note: note,
-			attachment: attachment
-		};
-		let data = {
-			pk: task.id
-		}
-
-		putFlow(data, postdata).then(rst => {
-			if (rst && rst.creator) {
-				notification.success({
-					message: '流程提交成功',
-					duration: 2
-				})
-			} else {
-				notification.error({
-					message: '流程提交失败',
-					duration: 2
-				})
-				return;
-			}
-		})
-
-
-	}
+	
 	closeTab() {
 		//关闭当前标签页
 		document.querySelector('.ant-tabs-tab-active.ant-tabs-tab .anticon-close').click();
 	}
 
 	changeDelegateUser(users) {
+
 	}
 
 	changeNote(event) {

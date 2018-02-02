@@ -26,4 +26,4 @@ export EngineeringImage from './EngineeringImage';
 export Material from './Material';
 export FormManage from './FormManage';
 export Unbearable from './Unbearable';
-
+export EducationRegister from './EducationRegister'

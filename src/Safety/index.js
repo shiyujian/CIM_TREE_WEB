@@ -85,11 +85,19 @@ export default class Safety extends Component {
 			// 	icon: <Icon name="bar- chart-o"/>
 			// }
 		]
-	}, {
-		key: 'EducationRegister',
+	}
+	// ,{
+	// 	key: 'EducationRegister',
+	// 	id: 'SAFETY.EDUCATIONREGISTER',
+	// 	name: '安全教育',
+	// 	path: '/safety/educationRegister',
+	// 	icon: <Icon name="tag" />
+	// }
+	, {
+		key: 'EducationRegisters',
 		id: 'SAFETY.EDUCATIONREGISTER',
 		name: '安全教育',
-		path: '/safety/educationRegister',
+		path: '/safety/educationRegisters',
 		icon: <Icon name="tag" />
 	}, {
 		key: 'SafetyTrend',

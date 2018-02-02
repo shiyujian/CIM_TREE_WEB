@@ -58,9 +58,7 @@ export default class SendPage1 extends Component {
 			},
 		} = this.props;
 		const { notifications = [] } = sendInfo;
-		// console.log("notifications",notifications)
-		// console.log(this.props)
-		// console.log("sendInfo",sendInfo)
+
 		const { showInfo = {} } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
 		// console.log(111111,sendInfo)

@@ -233,6 +233,12 @@ export default class Project extends Component {
 				path: '/project/unbearable',
 				exact: true,
 				icon: <Icon name="star-half-empty" />
+			},{
+				key: 'EducationRegister',
+				id: 'SAFETY.EDUCATIONREGISTER',
+				name: '安全教育',
+				path: '/project/educationRegister',
+				icon: <Icon name="tag" />
 			}]
 	  	},
 			// {

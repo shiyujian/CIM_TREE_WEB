@@ -9,6 +9,7 @@ import { getUser } from '../../../_platform/auth';
 import PerSearch from './PerSearch';
 import SearchInfo from './SearchInfo';
 import queryString from 'query-string';
+import DayModal from './DayModal';
 moment.locale('zh-cn');
 const { RangePicker } = DatePicker;
 const FormItem = Form.Item;
@@ -18,9 +19,15 @@ class Stagereporttab extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			daydata:[
+				{
+					unit:'1111'
+				}
+			],
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			visible: false,
+			dayvisible: false,
 			isCopyMsg: false, //接收人员是否发短信
 			treedataSource: [],
 			treetype: [],//树种
@@ -67,11 +74,55 @@ class Stagereporttab extends Component {
 				})
 				this.setState({ treetype });
 			})
+		this.gettaskSchedule();
 	}
-
+	// 获取日实际进度流程信息
+    gettaskSchedule = async ()=>{
+        const { actions: { getTaskSchedule } } = this.props;
+		let task = await getTaskSchedule({ code: 'TEMPLATE_003', name:'每日实际进度填报流程' });
+		console.log('task',task)
+        let subject = [];
+        let totledata = [];
+        let arrange = {};
+        task.map((item,index)=>{
+            let itemdata = item.workflowactivity.subject[0];
+            let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
+            let itemtreedatasource = itemdata.treedataSource ? JSON.parse(itemdata.treedataSource) : null;
+            let itemarrange = {
+                index:index+1,
+                id:item.workflowactivity.id,
+                unit: itempostdata.unit,
+                type: itempostdata.type,
+                numbercode:itempostdata.numbercode,
+                submitperson:item.workflowactivity.creator.person_name,
+                submittime:item.workflowactivity.real_start_time,
+                status:item.workflowactivity.status,
+				daysuperunit:itempostdata.superunit,
+				timedate:itempostdata.timedate,
+				TreedataSource:itemtreedatasource,
+                dataReview:itempostdata.dataReview.person_name
+            }
+            totledata.push(itemarrange);
+        })
+        this.setState({
+            daydata:totledata
+        })
+    }
 	onSelectChange = (selectedRowKeys, selectedRows) => {
 		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
 	}
+	// 操作--查看
+    clickInfo(record) {
+        this.setState({ dayvisible: true });
+    }
+    // 取消
+    totleCancle() {
+        this.setState({ dayvisible: false });
+    }
+    // 确定
+    totleOk() {
+        this.setState({ dayvisible: false });
+    }
 	// 删除
 	deleteClick = () => {
 		const { selectedRowKeys } = this.state
@@ -312,7 +363,8 @@ class Stagereporttab extends Component {
                                     notification.success({
                                         message: '流程提交成功',
                                         duration: 2
-                                    });
+									});
+									this.gettaskSchedule();
                                     this.setState({
                                         visible:false
                                     })
@@ -348,12 +400,23 @@ class Stagereporttab extends Component {
 		}
 		return (
 			<div>
+				{
+                    this.state.dayvisible &&
+                    <DayModal {...this.props}
+                        oncancel={this.totleCancle.bind(this)}
+                        onok={this.totleOk.bind(this)}
+                    />
+                }
 				<SearchInfo {...this.props} />
 				<Button onClick={this.addClick.bind(this)}>新增</Button>
 				<Button onClick={this.deleteClick.bind(this)}>删除</Button>
 				<Table
 					columns={this.columns}
-					rowSelection={rowSelection} />
+					rowSelection={rowSelection} 
+					dataSource={this.state.daydata}
+					className='foresttable'
+					bordered
+					rowKey='index'/>
 				<Modal
 					title="新增每日实际进度"
 					width={800}
@@ -426,6 +489,7 @@ class Stagereporttab extends Component {
 										<Table
 											columns={this.columns1}
 											dataSource={this.state.treedataSource}
+											className='foresttable'
 										/>
 										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10 }} type="primary" ghost>添加</Button>
 									</Row>
@@ -495,6 +559,17 @@ class Stagereporttab extends Component {
 			dataIndex: 'status',
 			key: 'status',
 			width: '15%',
+			render:(record,index)=>{
+                if(record===1){
+                    return '已提交'
+                }else if(record===2){
+                    return '执行中'
+                }else if(record===3){
+                    return '已完成'
+                }else{
+                    return ''
+                }
+            }
 		}, {
 			title: '操作',
 			render: record => {
