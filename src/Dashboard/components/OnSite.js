@@ -42,7 +42,7 @@ export default class Lmap extends Component {
 		this.state = {
 			treeLists: [],
 			leftkeycode: '',
-			
+			tree:'',
 			mapLayerBtnType:true,
 			isNotThree: true,
 			isNotDisplay: {
@@ -124,11 +124,33 @@ export default class Lmap extends Component {
 			userList: {}
 		}
 	}
+	
+		async gettreedata(rst) {
+			const {actions: {getTree}} = this.props;
+			for(var i = 0; i < rst.length; ++i) {
+				let children = await getTree({}, {parent: rst[i].No});
+				if(children.length) {
+					children = await this.gettreedata(children);
+				}
+				rst[i].children = children
+			}
+			return rst;
+    };
 
-	componentDidMount() {
+
+
+
+	 async componentDidMount() {
 		const {actions: {getTree}} = this.props;
         //地块树
-        // debugger;
+      
+        // getTree({},{parent:'root'}).then(async rst=>{
+        // 	let res = await this.gettreedata(rst);
+        // 	this.setState({tree:res});
+        // })
+        
+
+
        try {
             getTree({},{parent:'root'})
             .then(rst => {
@@ -152,29 +174,24 @@ export default class Lmap extends Component {
                                     })
                                     // getNewTreeData(rst1,rst1[0].No,rst2)
                                     getTree({},{parent:rst2[0].No})
+
                                     .then(rst3=>{
                                     	 if(rst3 instanceof Array && rst3.length > 0){
                                     	 	 getNewTreeData(rst2,rst2[0].No,rst3)
 		                                    this.setState({treeLists:rst},() => {
 		                                        this.onSelect([rst3[0].No])
 		                                    })
-		                                    // getNewTreeData(rst2,rst3[0].No,rst3)
-		                                    console.log(rst3,"vacaca");
 		                                    for(let i = 0 ; i<=rst3.length-1; i++){
 		                                    	getTree({},{parent:rst3[i].No}).then(rst4=>{
 		                                    		getNewTreeData(rst3,rst3[i].No,rst4);
-				                                    this.setState({treeLists:rst},() => {
-				                                        this.onSelect([rst3[i].No])
-				                                    })
-                                                    // getNewTreeData(rst3,rst3[i].No,rst4)
+		                                    		this.setState({treeLists:rst})
+				                                    // this.setState({treeLists:rst},() => {
+				                                    //     this.onSelect([rst4[0].No])
+				                                    // })
 		                                    	})
-		                                    }
-		                                    // getTree({},{parent:rst3[0].No}).then(rst4=>{
-		                                    // 	getNewTreeData(rst,rst3[0].No,rst4)
-		                                    // 	this.setState({treeLists:rst});
-		                                    // 	console.log(rst4);
 
-		                                    // })
+		                                    }
+		                                  
 		                                     
                                  	 }else{
                                               this.setState({treeLists:rst})
@@ -358,35 +375,8 @@ export default class Lmap extends Component {
 				let latlng = area.getBounds().getCenter();
 				let label = L.marker([latlng.lat, latlng.lng], {
 					icon: L.divIcon({
-						className: 'label-text',
-						html: geo.properties.name,
-						iconSize: [48, 20]
-					})
-				});
-				area.addLayer(label);
-				//点击预览
-				area.on({
-					click: function (event) {
-						me.previewFile(geo.file_info, geo.properties);
-					}
-				});
-				return area;
-			}else{
-				let area = L.geoJSON(geo, {
-					style: {
-						fillColor: this.fillAreaColor(geo.key),
-						weight: 0,
-						opacity: 0,
-						color: '#201ffd',
-						fillOpacity: 0,
-					},
-					title: geo.properties.name,
-				}).addTo(this.map);
-				//地块标注
-				let latlng = area.getBounds().getCenter();
-				let label = L.marker([latlng.lat, latlng.lng], {
-					icon: L.divIcon({
-						className: 'label-text',
+						className: this.getIconType('people'),
+						// className: 'label-text',
 						html: geo.properties.name,
 						iconSize: [48, 20]
 					})
@@ -712,13 +702,14 @@ export default class Lmap extends Component {
 	/*渲染菜单panel*/
 	renderPanel(option) {
 		let content = this.getPanelData(option.value);
+		
 		return (
 			<PkCodeTree treeData={content}
                         selectedKeys={this.state.leftkeycode}
                         onSelect={this.onSelect.bind(this)}
                         onExpand={this.onExpand.bind(this)}
-                        // checkable
-                        // showIcon={true}
+                        checkable
+                        showIcon={true}
                         onCheck={this.onCheck.bind(this,option.value)}
                             />
 
