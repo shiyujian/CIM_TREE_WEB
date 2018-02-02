@@ -63,7 +63,7 @@ class Addition extends Component {
                                 }, {})(
                                     <Select onClick={this.gender.bind(this)} type="text" placeholder="请选择安全教育">
                                         <Option value="入场三级安全教育">入场三级安全教育</Option>
-                                        <Option value="作业人员安全教育">入场三级安全教育</Option>
+                                        <Option value="作业人员安全教育">作业人员安全教育</Option>
                                         <Option value="管理人员安全教育">管理人员安全教育</Option>
                                     </Select>
                                     )}
