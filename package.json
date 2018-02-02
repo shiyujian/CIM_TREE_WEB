@@ -16,7 +16,8 @@
     "build_qh_in": "rimraf dist/dist_qh && cross-env proj=qh branch=dev node env/build/prod",
     "build_xa_in": "rimraf dist/dist_xa && cross-env proj=xa branch=dev node env/build/prod",
     "build_air_in": "rimraf dist/dist_air && cross-env proj=air branch=dev node env/build/prod",
-    "start_tree": "cross-env proj=tree branch=dev node env/server"
+    "start_tree": "cross-env proj=tree branch=dev node env/server",
+    "build_tree": "rimraf dist/dist_tree && cross-env proj=tree branch=dev node env/build/prod"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.0",

@@ -55,7 +55,7 @@ export default class EducationRegisters extends Component {
 		return (
 			<Body>
 				<Main>
-					<DynamicTitle title="安全教育1" {...this.props} />
+					<DynamicTitle title="安全教育" {...this.props} />
 					<Sidebar>
 						<DatumTree treeData={list}
 							selectedKeys={keycode}

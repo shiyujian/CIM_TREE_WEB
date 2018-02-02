@@ -201,7 +201,7 @@ export default class Project extends Component {
 				path: '/project/formmanage',
 				exact: true,
 				icon: <Icon name="retweet" />,
-			}]
+			}] 
 		}, {
 			key: 'safetyManage',
 			name: '安环管理',
@@ -227,13 +227,49 @@ export default class Project extends Component {
 				path: '/project/hazard',
 				icon: <Icon name="money" />
 			}, {
+				key: 'Unbearable',
+				id: 'PROJECT.UNBEARABLE',
+				name: '环境保护',
+				path: '/project/unbearable',
+				exact: true,
+				icon: <Icon name="star-half-empty" />
+			},{
 				key: 'EducationRegister',
 				id: 'SAFETY.EDUCATIONREGISTER',
 				name: '安全教育',
 				path: '/project/educationRegister',
 				icon: <Icon name="tag" />
 			}]
-		}, {
+	  	},
+			// {
+			// 	key: 'dangerousSourceManagement',
+			// 	id: 'PROJECT.DANGEROUSSOURCEMANAGEMENT',
+			// 	name: '安全文明施工',
+			// 	path: '/project/dangerousSourceManagement',
+			// 	icon: <Icon name="retweet" />,
+			// 	children: [
+			// 		{
+			// 			key: 'RiskEvaluation',
+			// 			id: 'PROJECT.RISKEVALUATION',
+			// 			name: '危险源风险评价',
+			// 			path: '/project/dangerousSourceManagement/riskEvaluation',
+			// 			icon: <Icon name="minus-square-o" />
+			// 		}, {
+			// 			key: 'Unbearable',
+			// 			id: 'PROJECT.UNBEARABLE',
+			// 			name: '环境保护',
+			// 			path: '/project/dangerousSourceManagement/unbearable',
+			// 			icon: <Icon name="star-half-empty" />
+			// 		}, {
+			// 			key: 'RiskFactor',
+			// 			id: 'PROJECT.RISKFACTOR',
+			// 			name: '文明施工',
+			// 			path: '/project/dangerousSourceManagement/riskFactor',
+			// 			icon: <Icon name="plus-square-o" />
+			// 		}
+			// 	]
+	  // 		}
+		 {
 			key: 'massManage',
 			name: '质量管理',
 			id: 'PROJECT.MASSMANAGE',			
