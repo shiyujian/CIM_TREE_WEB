@@ -7,7 +7,6 @@ export default class GeneralTable extends Component {
 
 	render() {
 		const { Doc = [] } = this.props;
-		console.log('ttt',this.props)
 		return (
 			<Table rowSelection={this.rowSelection}
 				dataSource={Doc}
@@ -46,7 +45,7 @@ export default class GeneralTable extends Component {
 			key: 'extra_params.time',
 			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
 		}, {
-			title: '备注',
+			title: '安全教育',
 			dataIndex: 'extra_params.remark',
 			key: 'extra_params.remark'
 		}, {
