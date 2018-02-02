@@ -6,7 +6,8 @@ import { getUser } from '_platform/auth';
 import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
-
+import OverallMaterialHandle from './OverallMaterialHandle';
+import OverallMaterialDeal from './OverallMaterialDeal';
 const FormItem = Form.Item;
 @connect(
 	state => {
@@ -39,39 +40,68 @@ export default class Progress extends Component {
 		const { state_id = '0' } = queryString.parse(location.search) || {};
 		const currentStates = states.find(state => state.id === +state_id) || {};
 		const currentStateCode = currentStates.code;
-		return (
-			<div>
-				<div>
-					{
-						actions.map((action, index) => {
-							let url;
-							if (code === WORKFLOW_CODE.数据报送流程) {
-								// 数据报送流程
-								if(action === '通过'){
-									action = '审核';
-									url = <Button onClick={this.openModal.bind(this,name,id)}>{action}</Button>
-								}
-							} else {
-								url = action;
-							}
+		let stateName = task.current ? task.current[0].name : '';
 
-							if(url != action){
-								if(action === '审核'){
-									return url
-								}else{
-									return (url && <Link to={url}><Button onClick={this.toggleAction.bind(this, action)} key={index} style={{marginRight:20}}>{action}</Button></Link>)
+		if (code === WORKFLOW_CODE.机械设备报批流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.工程材料报批流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.苗木资料报批流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.机械设备报批流程 &&  stateName == '复审'){
+			return (
+				<OverallMaterialDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.工程材料报批流程 &&  stateName == '复审'){
+			return (
+				<OverallMaterialDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.苗木资料报批流程 &&  stateName == '复审'){
+			return (
+				<OverallMaterialDeal {...this.props} {...this.state}/>
+			)
+		}else {
+			return (
+				<div>
+					<div>
+						{
+							actions.map((action, index) => {
+								let url;
+								if (code === WORKFLOW_CODE.数据报送流程) {
+									// 数据报送流程
+									if(action === '通过'){
+										action = '审核';
+										url = <Button onClick={this.openModal.bind(this,name,id)}>{action}</Button>
+									}
+								} else {
+									url = action;
 								}
-							}else{
-								return (url && <Button onClick={this.toggleAction.bind(this, action)} key={index} style={{marginRight:20}}>{action}</Button>)
-							}
-						})
+	
+								if(url != action){
+									if(action === '审核'){
+										return url
+									}else{
+										return (url && <Link to={url}><Button onClick={this.toggleAction.bind(this, action)} key={index} style={{marginRight:20}}>{action}</Button></Link>)
+									}
+								}else{
+									return (url && <Button onClick={this.toggleAction.bind(this, action)} key={index} style={{marginRight:20}}>{action}</Button>)
+								}
+							})
+						}
+					</div>
+					{
+						this.renderContent()
 					}
 				</div>
-				{
-					this.renderContent()
-				}
-			</div>
-		);
+			);
+		}
+		
 	}
 
 	async openModal(name,id){

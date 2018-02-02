@@ -41,7 +41,19 @@ export default class TaskStep extends Component {
 				return this.renderResource(task);
 			} else if (code === WORKFLOW_CODE.每日进度填报流程 && name === '复审') {
 				return this.renderResource(task);
-			} else {
+			} else if (code === WORKFLOW_CODE.机械设备报批流程 && name == '填报'){
+				return (
+					null
+				)
+			}else if (code === WORKFLOW_CODE.工程材料报批流程 && name == '填报'){
+				return (
+					null
+				)
+			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && name == '填报'){
+				return (
+					null
+				)
+			}else {
 				return (
 					<div>
 						<h3 style={{ marginBottom: 20 }}>审批流程</h3>
@@ -61,7 +73,7 @@ export default class TaskStep extends Component {
 												</div>}
 												description={
 													userID === +user.id && <Progress state={state} states={states} transitions={transitions} props={this.props}
-														actions={actions} task={task} location={location} />} key={index} />
+														actions={actions} task={task} location={location}  {...this.props} {...this.state}/>} key={index} />
 
 										)
 									} else {
@@ -245,7 +257,7 @@ export default class TaskStep extends Component {
 		let nextStates = getNextStates(task, Number(state_id));
 		console.log('nextStates', nextStates)
 		for (var i = 0; i < nextStates.length; i++) {
-			if (nextStates[i].action_name = '通过') {
+			if (nextStates[i].action_name === '通过') {
 				action_name = nextStates[i].action_name
 			}
 		}
@@ -353,7 +365,7 @@ export default class TaskStep extends Component {
 				let nextStates = getNextStates(task, Number(state_id));
 				let stateid = nextStates[0].to_state[0].id
 				for (var i = 0; i < nextStates.length; i++) {
-					if (nextStates[i].action_name = '通过') {
+					if (nextStates[i].action_name === '通过') {
 						action_name = nextStates[i].action_name
 					}
 				}
@@ -428,7 +440,7 @@ export default class TaskStep extends Component {
 		let action_name = '';
 		let nextStates = getNextStates(task, Number(state_id));
 		for (var i = 0; i < nextStates.length; i++) {
-			if (nextStates[i].action_name == '退回') {
+			if (nextStates[i].action_name === '退回') {
 				action_name = nextStates[i].action_name
 			}
 		}

@@ -26,6 +26,10 @@ export const downloadFilesLink = createFetchAction(`${base}/pf/api/file-link/{{i
 // 日进度存储
 export const addDaySchedule = createFetchAction(`${FOREST_API}/tree/progress`, [], 'post');
 
+const changeDocs = createAction(`${ID}_22CHANGE_DOCS`);
+const selectDocuments = createAction(`${ID}_22SELECTDOUMENT`);
+
+
 export const actions = {
 	...parameterReducer,
 	setTaskDetailLoading,
@@ -37,7 +41,9 @@ export const actions = {
 	getWorkflowById,
 	changeDatareportVisible,
 	downloadFilesLink,
-	addDaySchedule
+	addDaySchedule,
+	changeDocs,
+	selectDocuments
 };
 
 export default handleActions({
@@ -51,6 +57,14 @@ export default handleActions({
 		res[key] = value
 		return res
 	},
+	[changeDocs]: (state, {payload}) => ({
+        ...state,
+        docs: payload
+	}),
+	[selectDocuments]: (state, {payload}) => ({
+        ...state,
+        selected: payload
+    }),
 	[combineActions(...actionsMap(parameterReducer))]: (state, action) => ({
 		...state,
 		parameter: parameterReducer(state.parameter, action),
