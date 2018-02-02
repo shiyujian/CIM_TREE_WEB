@@ -87,6 +87,7 @@ export default class Query extends Component {
 			onChange: this.onSelectChange,
 		};
 		const {checkList = []} = this.props;
+		console.log('checklist',checkList)
 		const newChecks = this.renderChecks(checkList);
 		return (
 			<div>
