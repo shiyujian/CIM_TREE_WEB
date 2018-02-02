@@ -61,7 +61,7 @@ export default class TaskStep extends Component {
 												</div>}
 												description={
 													userID === +user.id && <Progress state={state} states={states} transitions={transitions} props={this.props}
-														actions={actions} task={task} location={location} />} key={index} />
+														actions={actions} task={task} location={location}  {...this.props} {...this.state}/>} key={index} />
 
 										)
 									} else {
