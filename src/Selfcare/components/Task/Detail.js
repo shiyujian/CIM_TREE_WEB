@@ -8,6 +8,9 @@ import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import OverallMaterialGeneral from './OverallMaterialGeneral';
 import OverallMaterialResource from './OverallMaterialResource';
+import GeneralAddition from './GeneralAddition';
+import ResourceAddition from './ResourceAddition';
+
 const FormItem = Form.Item;
 export default class Detail extends Component {
 	render() {
@@ -38,6 +41,19 @@ export default class Detail extends Component {
 			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && (name == '初审' || name == '复审')){
 				return (
 					<OverallMaterialResource {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.机械设备报批流程 && name == '填报'){
+				console.log('sssssssssssssssssssssss')
+				return (
+					<GeneralAddition {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.工程材料报批流程 && name == '填报'){
+				return (
+					<ResourceAddition {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && name == '填报'){
+				return (
+					<ResourceAddition {...this.props} {...this.state}/>
 				)
 			}else {
 				return <div>待定流程</div>

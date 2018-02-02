@@ -41,7 +41,19 @@ export default class TaskStep extends Component {
 				return this.renderResource(task);
 			} else if (code === WORKFLOW_CODE.每日进度填报流程 && name === '复审') {
 				return this.renderResource(task);
-			} else {
+			} else if (code === WORKFLOW_CODE.机械设备报批流程 && name == '填报'){
+				return (
+					null
+				)
+			}else if (code === WORKFLOW_CODE.工程材料报批流程 && name == '填报'){
+				return (
+					null
+				)
+			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && name == '填报'){
+				return (
+					null
+				)
+			}else {
 				return (
 					<div>
 						<h3 style={{ marginBottom: 20 }}>审批流程</h3>
