@@ -3,14 +3,14 @@ import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
-import Addition from './Addition';
+import GeneralAddition from './GeneralAddition';
 
 const FormItem = Form.Item;
 const Search = Input.Search;
 const TabPane=Tabs.TabPane;
 const {RangePicker}=DatePicker;
 
-export default class Filter extends Component {
+export default class GeneralFilter extends Component {
 
 	static propTypes = {};
 	render() {
@@ -29,7 +29,7 @@ export default class Filter extends Component {
 					<Col span={24} style={{paddingLeft:'5em'}}>
 						<Row gutter={15}  style={{marginTop: 5}}>
 							<Col span={8}>
-								<FormItem   {...Filter.layoutT} label="单位工程:">
+								<FormItem   {...GeneralFilter.layoutT} label="单位工程:">
                                      <Select>
                                           <Option value='第一阶段'>第一阶段</Option>
                                           <Option value='第二阶段'>第二阶段</Option>
@@ -37,7 +37,7 @@ export default class Filter extends Component {
                                 </FormItem>
 							</Col>
 							<Col span={8}>
-								<FormItem {...Filter.layoutT} label="编号:">
+								<FormItem {...GeneralFilter.layoutT} label="编号:">
 									<Input />
                                 </FormItem>
 							</Col>
@@ -47,12 +47,12 @@ export default class Filter extends Component {
 						</Row>
 						<Row gutter={15}  style={{marginTop: 5}}>
 							<Col span={8}>
-								<FormItem {...Filter.layoutT} label="日期:">
+								<FormItem {...GeneralFilter.layoutT} label="日期:">
 									<RangePicker/>
                                 </FormItem>
 							</Col>
 							<Col span={8}>
-								<FormItem {...Filter.layoutT} label="流程状态:">
+								<FormItem {...GeneralFilter.layoutT} label="流程状态:">
 									<Select>
                                           <Option value='待提交'>待提交</Option>
                                           <Option value='审批中'>审批中</Option>
@@ -72,7 +72,7 @@ export default class Filter extends Component {
 							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
 						}
 						{
-							toggleData.type == 'equipment' && <Addition {...this.props} />
+							toggleData.type == 'equipment' && <GeneralAddition {...this.props} />
 						}
 						{
 							(Doc.length === 0) ?

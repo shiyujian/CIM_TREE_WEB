@@ -7,39 +7,44 @@ export default class PkCodeTree extends Component {
 	static propTypes = {};
 
 	static loop(data = []) {
-		return data.map((item) => {
-			if (item.children && item.children.length) {
+		return data.map((item,index) => {
+			// const {attrs = {} = item;
+			// console.log('item',item)
+			// console.log('attrs',attrs)
+			if (item.children) {
 				return (
-					<TreeNode key={`${item.pk}--${item.code}--children`} data={data}
-					          title={item.name}>
+					<TreeNode key={item.No}
+					          title={item.Name}>
 						{
 							PkCodeTree.loop(item.children)
 						}
 					</TreeNode>
 				);
 			}
-			return <TreeNode key={`${item.pk}--${item.code}--${item.obj_type_hum}`} data={data}
-			                 title={item.name}/>;
+			return <TreeNode key={item.No}
+			                 title={item.Name}/>;
 		});
 	};
 
 	render() {
 		const {treeData = []} = this.props;
-	    // console.log(this.props.onSelect)
 		return (
-            <div>
-                {treeData.length?
-        			<Tree showLine
-        			      selectedKeys={[this.props.selectedKeys]}
-                          defaultExpandAll={false}
-        			      onSelect={this.props.onSelect}>
-        				{
-        					PkCodeTree.loop(treeData)
-        				}
-        			</Tree>
-                :''
-                }
-            </div>
+			<div>
+				{treeData.length?
+					<Tree showLine
+					      selectedKeys={[this.props.selectedKeys]}
+					      defaultExpandAll={true}
+					      autoExpandParent ={true}
+					      onSelect={this.props.onSelect}
+					      onExpand={this.props.onExpand}
+					>
+						{
+							PkCodeTree.loop(treeData)
+						}
+					</Tree>
+					:''
+				}
+			</div>
 		);
 	}
 }

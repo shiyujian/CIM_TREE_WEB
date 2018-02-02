@@ -99,15 +99,16 @@ export default class Addition extends Component {
 			addition = {}, sidebar: {node} = {},
 			actions: {postUser, clearAdditionField, getUsers, putUser}
 		} = this.props;
-		console.log(this.props)
-		console.log(addition)
 		const roles = addition.roles || [];
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
 		} else if (!addition.person_name) {
 			message.warn('请输入姓名');
 		} else {
+			console.log("addition",addition)
+			console.log("roles",roles)			
 			if (addition.id) {
+				console.log("addition",addition)
 				putUser({id: addition.id}, {
 					username: addition.username,
 					email: addition.email ,
@@ -131,6 +132,9 @@ export default class Addition extends Component {
 							'电话': addition.person_telephone || '',
 							'性别': addition.gender || '',
 							'技术职称': addition.title || '',
+							'phone':addition.person_telephone || '',
+							'sex':addition.gender || '',
+							'duty':''
 						}
 					},
 					extra_params: {},
@@ -139,6 +143,7 @@ export default class Addition extends Component {
 					if (rst.id) {
 						clearAdditionField();
 						const codes = Addition.collect(node);
+						console.log("codes",codes)
 						getUsers({}, {org_code: codes});
 					} else {
 						console.log("111")						
@@ -146,7 +151,10 @@ export default class Addition extends Component {
 					}
 				})
 			} else {
+				console.log("addition",addition)
+				console.log("roles",roles)		
 				postUser({}, {
+					
 					username: addition.username,
 					email: addition.email,
 					password: addition.password,
@@ -169,6 +177,9 @@ export default class Addition extends Component {
 							'电话': addition.person_telephone || '',
 							'性别': addition.gender || '',
 							'技术职称': addition.title || '',
+							'phone':addition.person_telephone || '',
+							'sex':addition.gender || '',
+							'duty':''
 						}
 					},
 					extra_params: {},

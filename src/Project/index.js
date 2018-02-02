@@ -226,6 +226,12 @@ export default class Project extends Component {
 				name: '安全隐患',
 				path: '/project/hazard',
 				icon: <Icon name="money" />
+			}, {
+				key: 'EducationRegister',
+				id: 'SAFETY.EDUCATIONREGISTER',
+				name: '安全教育',
+				path: '/project/educationRegister',
+				icon: <Icon name="tag" />
 			}]
 		}, {
 			key: 'massManage',

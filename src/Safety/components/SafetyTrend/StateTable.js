@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Tabs, Button, Row, Col, Modal, message, Popconfirm } from 'antd';
+import { Table, Tabs, Button, Row, Col, Modal, Form,Input, message, Popconfirm, DatePicker, Select } from 'antd';
 import StateText from './StateText';
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
@@ -7,8 +7,10 @@ import '../../../Datum/components/Datum/index.less'
 
 const TabPane = Tabs.TabPane;
 const user_id = getUser().id;
+const FormItem = Form.Item;
+const { RangePicker } = DatePicker;
 
-export default class StateTable extends Component {
+class StateTable extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -99,6 +101,86 @@ export default class StateTable extends Component {
 
 	}
 
+	query() {
+		const {
+			actions: { getNewsList },
+			filter = {}
+		} = this.props;
+		// const user = getUser();
+		console.log(this.props)
+		this.props.form.validateFields(async (err, values) => {
+			console.log(values.keyzi)
+			let conditions = {
+
+				title: values.dynamic || "",
+				pub_time_begin: "",
+				pub_time_end: "",
+				abstract:values.keyzi || ""
+			}
+			if (values && values.releasetime && values.releasetime.length > 0) {
+				conditions.pub_time_begin = moment(values.releasetime[0]).format('YYYY-MM-DD 00:00:00');
+				conditions.pub_time_end = moment(values.releasetime[1]).format('YYYY-MM-DD 23:59:59');
+			}
+			for (const key in conditions) {
+				if (!conditions[key] || conditions[key] == "") {
+					delete conditions[key];
+				}
+			}
+
+			await getNewsList({}, conditions);
+		})
+	}
+	query1() {
+
+		const {
+					actions: { getDraftNewsList },
+			filter = {}
+				} = this.props;
+
+		this.props.form.validateFields(async (err, values) => {
+			let conditions = {
+				// task: filter.type || "processing",
+				title: values.dynamic1 || "",
+				pub_time_begin: "",
+				pub_time_end: "",
+				abstract:values.keyzi1 || "",
+			}
+			if (values && values.releasetime1 && values.releasetime1.length > 0) {
+				conditions.pub_time_begin = moment(values.releasetime1[0]).format('YYYY-MM-DD 00:00:00');
+				conditions.pub_time_end = moment(values.releasetime1[1]).format('YYYY-MM-DD 23:59:59');
+			}
+			for (const key in conditions) {
+				if (!conditions[key] || conditions[key] == "") {
+					delete conditions[key];
+				}
+			}
+			await getDraftNewsList({}, conditions);
+		})
+	}
+	clear() {
+		const {
+			noticeTabValue = '1'
+		} = this.props;
+		this.props.form.setFieldsValue({
+
+			dynamic: undefined,
+			releasetime: undefined,
+			workunit: undefined,
+			keyzi:undefined,
+
+		});
+	}
+	clear1() {
+
+		this.props.form.setFieldsValue({
+			dynamic1: undefined,
+			releasetime1: undefined,
+			workunits: undefined,
+			keyzi1:undefined,
+
+		});
+	}
+
 	//发布新闻
 	publishNewsClick() {
 		const { actions: { toggleModal } } = this.props;
@@ -132,12 +214,17 @@ export default class StateTable extends Component {
 		const {
 			newsList = [],
 			draftNewsLis = [],
+			form: { getFieldDecorator },
 			toggleData: toggleData = {
 				type: 'NEWS',
 				visible: false,
 			},
 			stateTabValue = '1'
 		} = this.props;
+		const formItemLayout = {
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
+		};
 		return (
 			<Row>
 				<Col span={22} offset={1}>
@@ -149,6 +236,70 @@ export default class StateTable extends Component {
 							}
 						</div>}>
 						<TabPane tab="发布的国内安全动态" key="1">
+							<Row >
+								{/* <Col span={4}>
+									<Icon type='exception' style={{ fontSize: 32 }} />
+								</Col> */}
+								<Col span={18}>
+									<Row>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="动态标题">
+												{
+													getFieldDecorator('dynamic', {
+														rules: [
+															{ required: false, message: '请输入动态标题' },
+														]
+													})
+														(<Input placeholder="请输入动态标题" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="关键字">
+												{
+													getFieldDecorator('keyzi', {
+														rules: [
+															{ required: false, message: '请输入关键字' },
+														]
+													})
+														(<Input placeholder="请输入关键字" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="发布时间">
+
+												{
+													getFieldDecorator('releasetime', {
+														rules: [
+															{ required: false, message: '请选择发布时间' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '100%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
+										</Col>
+									</Row>
+									<Row>
+
+									</Row>
+								</Col>
+								<Col span={2} offset={1}>
+									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
+								</Col>
+								<Col span={2} >
+									<Button icon='reload' onClick={this.clear.bind(this)}>清空</Button>
+								</Col>
+							</Row>
 							<Table
 								rowSelection={rowSelection}
 								className="foresttables"
@@ -158,6 +309,67 @@ export default class StateTable extends Component {
 								rowKey="id" />
 						</TabPane>
 						<TabPane tab="暂存的国内安全动态" key="2">
+							<Row >
+								{/* <Col span={4}>
+									<Icon type='exception' style={{ fontSize: 32 }} />
+								</Col> */}
+								<Col span={18}>
+									<Row>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="公告标题">
+												{
+													getFieldDecorator('dynamic1', {
+														rules: [
+															{ required: false, message: '请输入公告标题' },
+														]
+													})
+														(<Input placeholder="请输入公告标题" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="关键字">
+												{
+													getFieldDecorator('keyzi1', {
+														rules: [
+															{ required: false, message: '请输入关键字' },
+														]
+													})
+														(<Input placeholder="请输入关键字" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="暂存时间">
+
+												{
+													getFieldDecorator('releasetime1', {
+														rules: [
+															{ required: false, message: '请选择暂存时间' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '100%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
+
+											</FormItem>
+
+										</Col>
+									</Row>
+								</Col>
+								<Col span={2} offset={1}>
+									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
+								</Col>
+								<Col span={2}>
+									<Button icon='reload' onClick={this.clear1.bind(this)}>清空</Button>
+								</Col>
+							</Row>
 							<Table
 								rowSelection={rowSelection}
 								className="foresttables"
@@ -278,3 +490,4 @@ export default class StateTable extends Component {
 		}
 	];
 }
+export default Form.create()(StateTable)

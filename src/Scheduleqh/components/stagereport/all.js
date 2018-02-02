@@ -11,6 +11,7 @@ import { getNextStates } from '../../../_platform/components/Progress/util';
 import queryString from 'query-string';
 import SearchInfo from './SearchInfo';
 import TotleModal from './TotleModal';
+import './index.less';
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
 moment.locale('zh-cn');
@@ -21,11 +22,8 @@ class All extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            totolData: [
-                {
-                    unit: "1111"
-                }
-            ],
+            totolData: [],
+            TotleModaldata:[],
             selectedRowKeys: [],
             dataSourceSelected: [],
             visible: false,
@@ -36,13 +34,46 @@ class All extends Component {
             newFileLists: [],
         };
     }
-
+    async componentDidMount() {
+        this.gettaskSchedule();
+    }
+    // 获取总进度进度计划流程信息
+    gettaskSchedule = async ()=>{
+        const { actions: { getTaskSchedule } } = this.props;
+        let task = await getTaskSchedule({ code: 'TEMPLATE_001' });
+        let subject = [];
+        let totledata = [];
+        let arrange = {};
+        task.map((item,index)=>{
+            let itemdata = item.workflowactivity.subject[0];
+            let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
+            let itemtreatmentdata = itemdata.TreatmentData ? JSON.parse(itemdata.TreatmentData) : null;
+            let itemarrange = {
+                index:index+1,
+                id:item.workflowactivity.id,
+                unit: itempostdata.unit,
+                type: itempostdata.type,
+                numbercode:itempostdata.numbercode,
+                remarks:itemtreatmentdata[0].remarks||"--",
+                submitperson:item.workflowactivity.creator.person_name,
+                submittime:item.workflowactivity.real_start_time,
+                status:item.workflowactivity.status,
+                totlesuperunit:itempostdata.superunit,
+                treatmentdata:itemtreatmentdata,
+                dataReview:itempostdata.dataReview.person_name
+            }
+            totledata.push(itemarrange);
+        })
+        this.setState({
+            totolData:totledata
+        })
+    }
     onSelectChange = (selectedRowKeys, selectedRows) => {
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     }
-    // 操作
+    // 操作--查看
     clickInfo(record) {
-        this.setState({ totlevisible: true });
+        this.setState({ totlevisible: true ,TotleModaldata:record});
     }
     // 取消
     totleCancle() {
@@ -220,6 +251,7 @@ class All extends Component {
                                         message: '流程提交成功',
                                         duration: 2
                                     });
+                                    this.gettaskSchedule();//重新更新流程列表
                                     this.setState({
                                         visible: false
                                     })
@@ -290,7 +322,6 @@ class All extends Component {
             let newdata = [];
             if (status === 'done') {
                 const { actions: { postUploadFilesAc } } = this.props;
-                console.log('fileList',fileList)
                 let newFileLists = fileList.map(item => {
                     return {
                         file_id: item.response.id,
@@ -299,8 +330,8 @@ class All extends Component {
                         file_partial_url: '/media' + item.response.a_file.split('/media')[1],
                         download_url: '/media' + item.response.download_url.split('/media')[1],
                         a_file: '/media' + item.response.a_file.split('/media')[1],
-                        misc:item.response.misc,
-                        mime_type:item.response.mime_type,
+                        misc: item.response.misc,
+                        mime_type: item.response.mime_type,
                     }
                 })
                 newFileLists.map((item, index) => {
@@ -312,8 +343,8 @@ class All extends Component {
                         send_time: item.send_time,
                         a_file: item.a_file,
                         download_url: item.download_url,
-                        misc:item.misc,
-                        mime_type:item.mime_type,
+                        misc: item.misc,
+                        mime_type: item.mime_type,
                     }
                     newdata.push(data)
                 })
@@ -361,6 +392,7 @@ class All extends Component {
                 {
                     this.state.totlevisible &&
                     <TotleModal {...this.props}
+                        {...this.state.TotleModaldata}
                         oncancel={this.totleCancle.bind(this)}
                         onok={this.totleOk.bind(this)}
                     />
@@ -371,7 +403,10 @@ class All extends Component {
                 <Table
                     columns={this.columns}
                     rowSelection={rowSelection}
-                    dataSource={this.state.totolData} />
+                    dataSource={this.state.totolData} 
+                    bordered
+                    rowKey='index'
+                    className='foresttable'/>
                 <Modal
                     title="新增文档"
                     width={800}
@@ -451,6 +486,7 @@ class All extends Component {
                                             pagination={true}
                                             dataSource={this.state.TreatmentData}
                                             rowKey='index'
+                                            className='foresttable'
                                         />
                                     </Row>
                                     <Row>
@@ -500,7 +536,7 @@ class All extends Component {
                     "person_code": memberValue[1],
                     "person_name": memberValue[2],
                     "id": parseInt(memberValue[3]),
-                    org:memberValue[5],
+                    org: memberValue[5],
                 }
             }
         } else {
@@ -509,7 +545,7 @@ class All extends Component {
 
         setFieldsValue({
             dataReview: this.member,
-            superunit:this.member.org
+            superunit: this.member.org
         });
     }
 
@@ -544,11 +580,26 @@ class All extends Component {
             dataIndex: 'submittime',
             key: 'submittime',
             width: '10%',
+            sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
+			render: text => {
+				return moment(text).format('YYYY-MM-DD');
+			}
         }, {
             title: '流程状态',
             dataIndex: 'status',
             key: 'status',
             width: '15%',
+            render:(record,index)=>{
+                if(record===1){
+                    return '已提交'
+                }else if(record===2){
+                    return '执行中'
+                }else if(record===3){
+                    return '已完成'
+                }else{
+                    return ''
+                }
+            }
         }, {
             title: '操作',
             render: record => {

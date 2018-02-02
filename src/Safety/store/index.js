@@ -8,6 +8,7 @@ import unbearableReducer, {actions as unbearableActions} from './unbearable';
 import riskEvaluationReducer, {actions as riskEvaluationActions} from './riskEvaluation';
 import safetyTrendReducer, {actions as  safetyTrendActions} from './safetyTrend';
 import educationRegisterReducer, {actions as educationRegisterActions} from './educationRegister';
+import educationRegistersReducer, {actions as educationRegistersActions} from './educationRegisters';
 import hiddenDangerReducer, {actions as hiddenDangerActions} from './hiddenDanger';
 import trendReducer, {actions as trendActions} from './trend';
 
@@ -39,6 +40,10 @@ export default handleActions({
 	[combineActions(...actionsMap(educationRegisterActions))]: (state = {}, action) => ({
 		...state,
 		educationRegister: educationRegisterReducer(state.educationRegister, action),
+	}),
+	[combineActions(...actionsMap(educationRegistersActions))]: (state = {}, action) => ({
+		...state,
+		educationRegisters: educationRegistersReducer(state.educationRegisters, action),
 	}),
 	[combineActions(...actionsMap(hiddenDangerActions))]: (state, action) => ({
 		...state,

@@ -1,6 +1,6 @@
 {
   "name": "CIM_WEB",
-  "description": "建设管理数字平台1.10.1",
+  "description": "森林大数据建设管理平台1.10.1",
   "version": "4.0.0",
   "main": "src/index.js",
   "author": "ECIDI",

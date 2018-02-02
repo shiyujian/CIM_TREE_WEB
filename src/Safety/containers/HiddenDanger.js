@@ -1,16 +1,7 @@
-/**
-* Copyright (c) 2016-present, ecidi.
-* All rights reserved.
-* 
-* This source code is licensed under the GPL-2.0 license found in the
-* LICENSE file in the root directory of this source tree.
-*/
-
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import reducer, { actions } from '../store/hiddenDanger';
-//import cookie from 'component-cookie';
 import { actions as platformActions } from '_platform/store/global';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import {
@@ -25,14 +16,10 @@ import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from
 import './Register.css';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { divIcon } from 'leaflet';
-import { Map, TileLayer, Marker, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import './HiddenDanger.less';
 moment.locale('zh-cn');
 const Option = Select.Option;
-const Step = Steps.Step;
-const URL = window.config.VEC_W;
-const leafletCenter = window.config.initLeaflet.center;
 @connect(
     state => {
         const { safety: { hiddenDanger = {} } = {}, platform } = state;
@@ -52,38 +39,71 @@ export default class HiddenDanger extends Component {
             currentSteps: 0,
             detailObj: {},
             currentSelectValue: '',
+            modalVisible: false,
+            dataSous: {},
             leafletCenter: [22.516818, 113.868495],
             data: [
                 {
                     o: 1,
-                    riskContent: "斤斤计较",
-                    unitName: "123",
+                    riskContent: "侧枝折断",
+                    unitName: "1标段",
+                    smallName: "1小班",
+                    thinName: "12细班",
                     level: "V",
                     timeLimit: "2016-11-01",
                     status: "jj",
-                    resPeople: "嘻嘻嘻",
+                    resPeople: "张三",
+                    fsPeople: "小明",
+                    jlPeople: "小王",
+                    zgcuoshi: "随便",
+                    x: "22.5202031353",
+                    y: "113.893730454",
+                    geometry: {coordinates: [22.5202031353,113.893730454],type: "Point"},
+                    type: "danger",
+                    properties: {},
+                    key: "b5d535a8-9b52-4d8b-8e64-e68d96857ce2",
                 }, {
                     o: 2,
-                    riskContent: "dddd",
-                    unitName: "123",
+                    riskContent: "车辆停靠",
+                    unitName: "12标段",
+                    smallName: "2小班",
+                    thinName: "13细班",
                     level: "V",
                     timeLimit: "2016-11-01",
                     status: "hh",
-                    resPeople: "jjjjj",
+                    resPeople: "李四",
+                    fsPeople: "小明11",
+                    jlPeople: "小王11",
+                    zgcuoshi: "随便11",
+                    x: "22.5202031353",
+                    y: "113.893730454",
+                    geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
+                    type: "danger",
+                    properties: {},
                 }, {
                     o: 3,
-                    riskContent: "ssss",
-                    unitName: "123",
+                    riskContent: "苗木枯萎",
+                    unitName: "123标段",
+                    smallName: "3小班",
+                    thinName: "14细班",
                     level: "V",
                     timeLimit: "2016-11-01",
                     status: "aaa",
-                    resPeople: "dfdf",
+                    resPeople: "王五",
+                    fsPeople: "小明22",
+                    jlPeople: "小王22",
+                    zgcuoshi: "随便22",
+                    x: "22.5202031353",
+                    y: "113.893730454",
+                    geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
+                    type: "danger",
+                    properties: {},
                 }
             ]
         }
     }
     componentDidMount() {
-
+        
     }
 
     onSearch = (value) => {
@@ -259,44 +279,20 @@ export default class HiddenDanger extends Component {
     }
 
     onDetailClick = (record, index) => {
-        const code = WORKFLOW_CODE.安全隐患上报流程;
-        const {
-            actions: {
-                getWrokflowByID
-            }
-        } = this.props;
-        let detailObj = {};
-        let array = [];
-        const location = record.coordinate;
-        // array.push(location.latitude);
-        array.push(location.longitude);
-        this.setState({ leafletCenter: array })
-        detailObj.riskName = record.riskContent;
-        detailObj.projectName = record.projectName;
-        detailObj.unitName = record.unitName;
-        detailObj.images = record.images;
-        this.setState({ currentSteps: this.getRiskState(record.status) });
-        getWrokflowByID({ id: record.id, code: code }).then(rst => {
-            let len = rst[0].workflow.states.length;
-            for (let i = 0; i < len; i++) {
-                debugger
-                if (rst[0].workflow.states[i].name === "隐患上报" && rst[0].workflow.states[i].participants.length !== 0) {
-                    detailObj.finder = rst[0].workflow.states[i].participants[0].executor.person_name;
-                } else if (rst[0].workflow.states[i].name === "隐患核查" && rst[0].workflow.states[i].participants.length !== 0) {
-                    detailObj.supervision = rst[0].workflow.states[i].participants[0].executor.person_name;
-                } else if (rst[0].workflow.states[i].name === "隐患整改" && rst[0].workflow.states[i].participants.length !== 0) {
-                    detailObj.charger = rst[0].workflow.states[i].participants[0].executor.person_name;
-                }
-            }
-            this.setState({ detailObj });
-        });
+        const {dataSous} = this.state;
+        this.setState({ dataSous: record, modalVisible: true });
     }
+
+    cancel() {
+        this.setState({modalVisible: false})
+    }
+
     render() {
         const columns = [
             {
                 title: '编号',
                 dataIndex: 'o',
-                width: '8%',
+                width: '5%',
                 render: (text, record, index) => {
                     return <div>{index + 1}</div>;
                 }
@@ -309,13 +305,21 @@ export default class HiddenDanger extends Component {
                 dataIndex: 'unitName',
                 width: '10%'
             }, {
+                title: '小班',
+                dataIndex: 'smallName',
+                width: '10%'
+            }, {
+                title: '细班',
+                dataIndex: 'thinName',
+                width: '10%'
+            }, {
                 title: '等级',
                 dataIndex: 'level',
                 width: '10%'
             }, {
                 title: '整改期限',
                 dataIndex: 'timeLimit',
-                width: '25%'
+                width: '10%'
             }, {
                 title: '状态',
                 dataIndex: 'status',
@@ -339,24 +343,6 @@ export default class HiddenDanger extends Component {
                 }
             }
         ];
-        const { detailObj } = this.state;
-        detailObj.riskName = detailObj.riskName ? detailObj.riskName : '';
-        detailObj.projectName = detailObj.projectName ? detailObj.projectName : '';
-        detailObj.unitName = detailObj.unitName ? detailObj.unitName : '';
-        detailObj.finder = detailObj.finder ? detailObj.finder : '';
-        detailObj.supervision = detailObj.supervision ? detailObj.supervision : '无';
-        detailObj.charger = detailObj.charger ? detailObj.charger : '无';
-        detailObj.images = detailObj.images ? detailObj.images : [];
-        let array = [];
-        for (let i = 0; i < detailObj.images.length; i++) {
-            array.push(<Col span={6}>
-                <Card>
-                    <div>
-                        <img style={{ width: 115, height: 72 }} src={`${SOURCE_API}${detailObj.images[i]}`} />
-                    </div>
-                </Card>
-            </Col>);
-        }
 
         return (
             <div>
@@ -391,16 +377,23 @@ export default class HiddenDanger extends Component {
                                 </Col>
                             </Row>
                             <Table
+                                className = 'foresttable'
                                 columns={columns}
-                                // dataSource={this.state.dataSet}
                                 dataSource = {this.state.data}
                                 bordered
                                 style={{ marginTop: 20 }}
                             />
                         </Col>
                     </Row>
+                    {this.state.modalVisible && 
+                     <HiddenModle 
+                        {...this.props} 
+                        onok = {this.onDetailClick.bind(this)} 
+                        oncancel = {this.cancel.bind(this)}
+                        data = {this.state.data}
+                        dataSous = {this.state.dataSous}
+                    />}
                 </Content>
-                {/*<HiddenModle {...this.props}/>*/}
             </div>
 
         );

@@ -52,7 +52,6 @@ class Stage extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props, "46546");
         const { actions: { getTree, gettreetype, getTreeList, } } = this.props;
         //地块树
         try {
@@ -199,7 +198,6 @@ class Stage extends Component {
         //树种
         gettreetype({}, { no: keycode, paginate: false })
             .then(rst => {
-                console.log('rst', rst)
                 this.setTreeTypeOption(rst)
             })
     }
