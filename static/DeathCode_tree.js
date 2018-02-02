@@ -18,6 +18,7 @@ window.DeathCode = {
     DATUM_DATUM:"QH01" ,//资料管理制度规范编码
 	OVERALL_MATERIAL:"MATERIAL01",//综合管理物资管理编码
 	OVERALL_FORM:"FORMMANAGE01",//综合管理表单管理编码
+	SAFETY_UNBEARABLE:"UNBEARABLE01",//安环管理环境保护编码
 	DATUM_DATUM:"QH01" ,//资料管理制度规范编码
 	DATUM_GCYX:"TREE_GCYX" ,//工程影像目录名称
 	SAFETY_AQJY:"TREE_AQJY" ,//安全教育目录名称

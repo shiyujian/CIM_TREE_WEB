@@ -3,7 +3,10 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import reducer, { actions } from '../store/educationRegisters';
 //import PkCodeTree from '../../Quality/components/PkCodeTree';
+import { actions as fileActions } from '../store/staticFile';
 import { actions as platformActions } from '_platform/store/global';
+import { actions as supportActions } from '../store/supportActions';
+
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { Filter, Table, Addition, Updatemodal, DatumTree } from '../components/EducationRegisters'
 import Preview from '_platform/components/layout/Preview';
@@ -26,7 +29,7 @@ export const Datumcode = window.DeathCode.SAFETY_AQJY;
 		return { ...educationRegisters, platform };
 	},
 	dispatch => ({
-		actions: bindActionCreators({ ...actions, ...platformActions,...previewActions }, dispatch),
+		actions: bindActionCreators({...actions, ...platformActions, ...previewActions,...fileActions,...supportActions}, dispatch),
 	}),
 )
 
