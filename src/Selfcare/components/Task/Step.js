@@ -353,7 +353,7 @@ export default class TaskStep extends Component {
 				let nextStates = getNextStates(task, Number(state_id));
 				let stateid = nextStates[0].to_state[0].id
 				for (var i = 0; i < nextStates.length; i++) {
-					if (nextStates[i].action_name = '通过') {
+					if (nextStates[i].action_name === '通过') {
 						action_name = nextStates[i].action_name
 					}
 				}
