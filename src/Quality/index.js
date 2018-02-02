@@ -83,7 +83,7 @@ import {message} from 'antd'
 			HuaFen,DanweiJL,DanweiJLAsk,Monitoring,
 			TianBao,TianBao2, Fenbu, Danwei, FenbuRecord,
 			Query,FenbuPreview,Subitem,DanWeiAsk,FenbuCheck,
-			Score,Search,Appraising,Faithanalyze} = this.state || {};
+			Score,Search,Appraising,Faithanalyze,Qualityanalyze} = this.state || {};
 
 		let dwys = this.state.dwysjl?DanweiJL:Danwei;
 		let jyptb = this.state.dwysjl?TianBaoJL:TianBao;
@@ -116,6 +116,7 @@ import {message} from 'antd'
 				{Search && <Route path="/quality/score/search" component={Score}/>}
 				{Appraising && <Route path="/quality/appraising" component={Appraising}/>}
 				{Faithanalyze && <Route path="/quality/faithanalyze" component={Faithanalyze}/>}
+				{Qualityanalyze && <Route path="/quality/qualityanalyze" component={Qualityanalyze}/>}
 
 			</Main>
 			</Body>);
@@ -260,12 +261,16 @@ const menus = [
     	name: '质量缺陷',
     	path: '/quality/defect',
     	icon: <Icon name="life-buoy"/>
-    }, 
- //    {
-	// 	key: 'faithanalyze',
-	// 	id: 'QUALITY.FAITHANALYZE',
-	// 	name: '诚信供应商分析',
-	// 	path: '/quality/faithanalyze',
-	// 	icon: <Icon name="crosshairs"/>
-	// }
+    }, {
+		key: 'qualityanalyze',
+		id: 'QUALITY.QUALITYANALYZE',
+		path: '/quality/qualityanalyze',
+		name: '种植质量分析',
+	}, {
+		key: 'faithanalyze',
+		id: 'QUALITY.FAITHANALYZE',
+		name: '诚信供应商分析',
+		path: '/quality/faithanalyze',
+		icon: <Icon name="crosshairs"/>
+	}
 	];
