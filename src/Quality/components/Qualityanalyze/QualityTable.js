@@ -339,8 +339,9 @@ export default class QualityTable extends Component {
         }
     }
     qury(index,param) {
+    	console.log('param',param)
 		const {actions: {getquality,getreturn,getreturnowner,getreturnsupervision},leftkeycode} = this.props;
-		param.no = leftkeycode;
+		param.no = 'P009';
     	if(index === 1 ){
     		this.setState({loading1:true})
 			getquality({},param)

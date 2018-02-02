@@ -1,16 +1,7 @@
-/**
-* Copyright (c) 2016-present, ecidi.
-* All rights reserved.
-* 
-* This source code is licensed under the GPL-2.0 license found in the
-* LICENSE file in the root directory of this source tree.
-*/
-
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import reducer, { actions } from '../store/hiddenDanger';
-//import cookie from 'component-cookie';
 import { actions as platformActions } from '_platform/store/global';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import {
@@ -25,15 +16,10 @@ import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from
 import './Register.css';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-// import { divIcon } from 'leaflet';
-// import { Map, TileLayer, Marker, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './HiddenDanger.less';
 moment.locale('zh-cn');
 const Option = Select.Option;
-// const Step = Steps.Step;
-// const URL = window.config.VEC_W;
-// const leafletCenter = window.config.initLeaflet.center;
 @connect(
     state => {
         const { safety: { hiddenDanger = {} } = {}, platform } = state;
@@ -56,7 +42,6 @@ export default class HiddenDanger extends Component {
             modalVisible: false,
             dataSous: {},
             leafletCenter: [22.516818, 113.868495],
-            // hazards: [],//安全隐患
             data: [
                 {
                     o: 1,
@@ -118,58 +103,8 @@ export default class HiddenDanger extends Component {
         }
     }
     componentDidMount() {
-        // this.getRisk();
+        
     }
-
-    /*获取安全隐患点*/
-    // getRisk() {
-    //     const {getRisk} = this.props.actions;
-    //     let me = this;
-    //     getRisk().then(data => {
-    //         //安全隐患数据处理
-    //         let datas = data.content;
-    //         let riskObj = {}
-    //         datas.forEach((v, index) => {
-    //             // let levelNode = v["risk_level"];
-    //             let level = v["EventType"];
-    //             let name = v["Problem"];
-    //             let response_org = v['ReorganizerObj'];
-    //             // let measure = levelNode["风险控制措施"];
-    //             let content = v["ProblemType"];
-    //             //位置
-    //             let coordinates = ["22.5202031353", "113.893730454"];
-    //             riskObj[level] = riskObj[level] || {
-    //                 key: level,
-    //                 'properties': {
-    //                     name: level
-    //                 },
-    //                 children: []
-    //             };
-    //             riskObj[level].children.push({
-    //                 'type': 'danger',
-    //                 key: v.ID,
-    //                 'properties': {
-    //                     'content': content,
-    //                     'level': level,
-    //                     'measure': '',
-    //                     'name': name,
-    //                     'response_org':response_org?response_org.Full_Name:'',
-    //                     // beforeImgs: v['rectify_before'] ? v['rectify_before'].images : [],
-    //                     // afterImgs: v['rectify_after'] ? v['rectify_after'].images : []
-    //                 },
-    //                 'geometry': {
-    //                     'type': 'Point',
-    //                     'coordinates': coordinates
-    //                 }
-    //             });
-    //         });
-    //         let risks = [];
-    //         for (let i in riskObj) {
-    //             risks.push(riskObj[i]);
-    //         }
-    //         me.setState({hazards: risks});
-    //     });
-    // }
 
     onSearch = (value) => {
         const { currentUnitCode, currentSelectValue } = this.state;
@@ -344,50 +279,8 @@ export default class HiddenDanger extends Component {
     }
 
     onDetailClick = (record, index) => {
-        // debugger
-        console.log('record',record)
         const {dataSous} = this.state;
         this.setState({ dataSous: record, modalVisible: true });
-        // let dataes = {};
-        // dataes.o = record.o;
-        // dataes.level = record.level;
-        // dataes.resPeople = record.resPeople;
-        // dataes.riskContent = record.riskContent;
-        // dataes.status = record.status;
-        // dataes.timeLimit = record.timeLimit;
-        // dataes.unitName = record.unitName;
-        // dataes = {...record};
-        // console.log('dataes',dataes)
-        // const code = WORKFLOW_CODE.安全隐患上报流程;
-        // const {
-        //     actions: {
-        //         getWrokflowByID
-        //     }
-        // } = this.props;
-        // let detailObj = {};
-        // let array = [];
-        // const location = record.coordinate;
-        // // array.push(location.latitude);
-        // // array.push(location.longitude);
-        // this.setState({ leafletCenter: array })
-        // detailObj.riskName = record.riskContent;
-        // detailObj.projectName = record.projectName;
-        // detailObj.unitName = record.unitName;
-        // detailObj.images = record.images;
-        // this.setState({ currentSteps: this.getRiskState(record.status) });
-        // getWrokflowByID({ id: record.id, code: code }).then(rst => {
-        //     let len = rst[0].workflow.states.length;
-        //     for (let i = 0; i < len; i++) {
-        //         // debugger
-        //         if (rst[0].workflow.states[i].name === "隐患上报" && rst[0].workflow.states[i].participants.length !== 0) {
-        //             detailObj.finder = rst[0].workflow.states[i].participants[0].executor.person_name;
-        //         } else if (rst[0].workflow.states[i].name === "隐患核查" && rst[0].workflow.states[i].participants.length !== 0) {
-        //             detailObj.supervision = rst[0].workflow.states[i].participants[0].executor.person_name;
-        //         } else if (rst[0].workflow.states[i].name === "隐患整改" && rst[0].workflow.states[i].participants.length !== 0) {
-        //             detailObj.charger = rst[0].workflow.states[i].participants[0].executor.person_name;
-        //         }
-        //     }
-        // });
     }
 
     cancel() {
@@ -450,24 +343,6 @@ export default class HiddenDanger extends Component {
                 }
             }
         ];
-        const { detailObj } = this.state;
-        detailObj.riskName = detailObj.riskName ? detailObj.riskName : '';
-        detailObj.projectName = detailObj.projectName ? detailObj.projectName : '';
-        detailObj.unitName = detailObj.unitName ? detailObj.unitName : '';
-        detailObj.finder = detailObj.finder ? detailObj.finder : '';
-        detailObj.supervision = detailObj.supervision ? detailObj.supervision : '无';
-        detailObj.charger = detailObj.charger ? detailObj.charger : '无';
-        detailObj.images = detailObj.images ? detailObj.images : [];
-        let array = [];
-        for (let i = 0; i < detailObj.images.length; i++) {
-            array.push(<Col span={6}>
-                <Card>
-                    <div>
-                        <img style={{ width: 115, height: 72 }} src={`${SOURCE_API}${detailObj.images[i]}`} />
-                    </div>
-                </Card>
-            </Col>);
-        }
 
         return (
             <div>
@@ -504,7 +379,6 @@ export default class HiddenDanger extends Component {
                             <Table
                                 className = 'foresttable'
                                 columns={columns}
-                                // dataSource={this.state.dataSet}
                                 dataSource = {this.state.data}
                                 bordered
                                 style={{ marginTop: 20 }}
@@ -518,7 +392,6 @@ export default class HiddenDanger extends Component {
                         oncancel = {this.cancel.bind(this)}
                         data = {this.state.data}
                         dataSous = {this.state.dataSous}
-                        /*hazards = {this.state.hazards}*/
                     />}
                 </Content>
             </div>

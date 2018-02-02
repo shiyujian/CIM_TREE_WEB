@@ -126,9 +126,6 @@ export default class Danger extends Component {
 		this.getRisk();
 		this.getVedio();
 		this.getSafeMonitor();
-		this.getAllOrgs();
-		this.getUserOnline();
-		this.get360ViewTree();
 	}
 
 	componentWillUnmount() {
@@ -139,42 +136,6 @@ export default class Danger extends Component {
 			$('#showCityMarkerId')[0].contentWindow.terminateRender &&
 			$('#showCityMarkerId')[0].contentWindow.terminateRender();
 		}
-	}
-
-	getUserOnline() {
-		const {getUsersOnline} = this.props.actions;
-		let me = this;
-		return new Promise((resolve,reject)=>{
-			getUsersOnline(this.state.fullExtent).then((us = []) => {
-				me.setState({
-					userOnlineNumber: us.length,
-					userOnline: us
-				},()=>{
-					resolve();
-				});
-			});
-		})
-	}
-
-	/*定期更新人员坐标*/
-	timingUpdateUserLoc() {
-		let me = this;
-		const {getUsersOnline} = this.props.actions;
-		this.timeInteval = setInterval(function () {
-			getUsersOnline(this.state.fullExtent).then((users = []) => {
-				let checkItems = this.checkMarkers ? this.checkMarkers['geojsonFeature_people'] : {};
-				users.forEach((u) => {
-					let account = u.account;
-					let user = me.user.userList[u.id];
-					if (user)
-						user.geometry.coordinates = [account.lat, account.lng];
-					//更新地图图标
-					checkItems[u.id] &&
-					checkItems[u.id].setLatLng(L.latLng(account.lat, account.lng));
-				});
-				me.setState({userOnlineNumber: users.length,userOnline: users});
-			});
-		}, 60000 * 15);
 	}
 
 	/*解析组织树*/
@@ -203,142 +164,6 @@ export default class Danger extends Component {
 			orgTrees: root,
 			leafs
 		};
-	}
-
-	/*查询组织树*/
-	getAllOrgs() {
-		let me = this;
-		const {getOrgsByCode, getOrgs} = this.props.actions;
-		getOrgs().then((orgs) => {
-			let orgArr = orgs.children.map(or => {
-				return {
-					key: or.code,
-					properties: {
-						name: or.name
-					}
-				}
-			});
-			me.setState({users: orgArr});
-			orgs.children.forEach(o => {
-				//加载子组织
-				getOrgsByCode({CODE: o.code}).then(corgs => {
-					let orgRes = me.loopOrg(corgs);
-					me.user.orgs[o.code] = orgRes;
-					let isFind = false;
-					for (let i = 0; i < me.state.users.length; i++) {
-						if (me.state.users[i].key == o.code) {
-							me.state.users[i] = orgRes.orgTrees;
-							isFind = true;
-						}
-					}
-					if (!isFind)
-						me.state.users.push(orgRes.orgTrees);
-					me.setState({users: me.state.users});
-				});
-			});
-			/*定期更新人员坐标*/
-			me.timingUpdateUserLoc();
-		})
-	}
-
-	/*把人员填充到组织树*/
-	fillUserToOrgTrees(org, userMap) {
-		let users = userMap[org.key];
-		if (users) {
-			if(!org.children)
-				org.children = users;
-			else{
-				//清空原有叶子界面
-				for(let i = org.children.length-1;i>=0;i--){
-					if(org.children[i].isLeaf)
-						org.children.splice(i,1);
-				}
-				org.children = org.children.concat(users)
-			}
-		}
-		if (org.children && org.children.length) {
-			org.children.forEach(o => {
-				this.fillUserToOrgTrees(o, userMap)
-			});
-		}
-	}
-
-	/*按部门请求组织人员*/
-	getUsersByOrg(key) {
-		const {
-			userOnline = [],
-		} =this.state
-		let me = this;
-		return new Promise(resolve => {
-			const {getUsers} = me.props.actions;
-		
-			let orgNode = me.state.users.find(us => us.key == key);
-			if (orgNode.userLoaded) {//已加载不用重复加载
-				resolve();
-				return;
-			}
-			let org = me.user.orgs[key];
-			if (!org) {
-				resolve();
-				return;
-			}
-			getUsers({}, {'org_code': org.leafs.map(l => l.key).join()}).then(users => {
-				let usersObj = {};
-				let keys = [];
-				users.forEach((u) => {
-					let account = u.account;
-					let orgCode = account["org_code"];
-					if (!orgCode) {
-						return;
-					}
-					let user = {};
-				
-					usersObj[orgCode] = usersObj[orgCode] || [];
-					user = wrapperMapUser(u);
-					usersObj[orgCode].push(user);
-					me.user.userList[u.id] = user;
-					keys.push(u.id);
-				});
-				//填入组织树
-				if (orgNode) {
-					me.fillUserToOrgTrees(orgNode, usersObj);
-					orgNode.userLoaded = true;
-					me.setState({users: me.state.users});
-				}
-				resolve(keys);
-			})
-		});
-	}
-
-	/*异步加载人员信息*/
-	loadUsersByOrg(treeNode) {
-		let key = treeNode.props.eventKey;
-		return this.getUsersByOrg(key);
-	}
-
-	//查看在线人员按钮点击
-	userOnlineState(e){
-		this.setState({
-			userOnlineState:e.target.checked
-		})
-		this.OnlineState = e.target.checked
-		let me = this;
-
-		if(e.target.checked){
-			const {getUsersOnline} = this.props.actions;
-			getUsersOnline(this.state.fullExtent).then((us=[])=>{
-				let keys = us.map(u=>{
-					//测试坐标
-					// u.account.lat = 22.517946;
-					// u.account.lng = 113.891754;
-					let user = wrapperMapUser(u);
-					me.user.userList[u.id] = user;
-					return u.id.toString();
-				});
-
-				me.onCheck(keys,'geojsonFeature_people');
-			})
-		}
 	}
 
 	/*获取区域数据*/
@@ -419,51 +244,8 @@ export default class Danger extends Component {
 	getVedio() {
 		let me = this;
 		const {getVedio} = this.props.actions;
-		// getVedio().then(data => {
-		// 	let vedioArr = [];
-		// 	data.children.forEach(pv => {
-		// 		let vedioData = {
-		// 			key: pv.pk,
-		// 			'properties': {
-		// 				name: pv.name,
-		// 			},
-		// 			children: []
-		// 		};
-		// 		pv.children.forEach((v, index) => {
-		// 			let name = v.name;
-		// 			let coord = [v.extra_params.lat, v.extra_params.lng];
-		// 			let vType = v.obj_type;
-		// 			let exParams = v.extra_params;
-		// 			let vedio = {
-		// 				'type': 'monitor',
-		// 				key: v.pk,
-		// 				'properties': {
-		// 					name,
-		// 					vType,
-		// 					pk: v.pk,
-		// 					ip: exParams.ip,
-		// 					port: exParams.port,
-		// 					password: exParams.password,
-		// 					username: exParams.username,
-		// 					description: exParams.description
-		// 				},
-		// 				'geometry': {
-		// 					'type': 'Point',
-		// 					'coordinates': coord
-		// 				}
-		// 			}
-		// 			vedioData.children.push(vedio);
-		// 		});
-		// 		vedioArr.push(vedioData);
-		// 	});
-		// 	me.setState({vedios: vedioArr});
-		// });
-
 		const { getCameraTree } = this.props.actions
         getCameraTree().then(res => {
-			console.log(res);
-            // const tmp = res.children
-            // const treeData = tmp[0].children.map(project => {
 			const treeData = res.children.map(project => {
 				const engineerings = project.children;
                 return engineerings ? {
@@ -592,45 +374,6 @@ export default class Danger extends Component {
 		})
 	}
 
-	/*获取360全景*/
-	get360ViewTree(){
-		
-		let me = this;
-		const {getVideo360List} = this.props.actions;
-		getVideo360List().then(data => {
-			let metalist = data.metalist;
-			let panorama = [];
-			//panorama = panorama_360; // 测试数据
-			if(metalist && metalist.length > 0 ){
-				metalist.map(meta => {
-					panorama.push({
-						type: 'panorama',
-						key: meta.panoID,
-						properties: {
-							name: meta.name,
-					        type:"panorama",
-							link: meta.link
-						},
-						geometry: {
-							type: 'Point',
-							coordinates: [meta.latitude,meta.longitude]
-						}
-					})
-				});
-			}
-			let panoramaFir = {
-				key:32423432432423,
-				properties:{
-					name:'360全景点'
-				},
-				children:panorama
-			};
-			let panoramaArr = [];
-			panoramaArr.push(panoramaFir);
-			me.setState({panorama:panoramaArr});
-		})
-	}
-
 	//解构得到的区域数据
 	loop(data = [], resAreas = []) {
 		let me = this;
@@ -664,12 +407,6 @@ export default class Danger extends Component {
 
 	WMSTileLayerUrl = window.config.WMSTileLayerUrl;
 	subDomains = ['7'];
-
-	// tileUrls = {
-	// 	1: "http://t{s}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}",
-	// 	2: "http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}"
-	// };
-
 	tileUrls = {
 		1: window.config.IMG_W,
 		2: window.config.VEC_W
@@ -697,17 +434,6 @@ export default class Danger extends Component {
 
 		document.querySelector('.leaflet-popup-pane').addEventListener('click', function (e) {
 			let target = e.target;
-			//绑定轨迹查看点击事件
-			if (target.getAttribute('class') == 'btnViewTrack') {
-				let id = target.getAttribute('data-id');
-				//拿到人员信息
-				let user = me.user.userList[id];
-				let name = user.properties.name;
-
-				//开始显示轨迹
-				me.setState({isShowTrack: false});
-				me.setState({isShowTrack: true, trackId: id, trackUser: name});
-			}
 			//绑定隐患详情点击事件
 			if (target.getAttribute('class') == 'btnViewRisk') {
 				let idRisk = target.getAttribute('data-id');
@@ -731,19 +457,6 @@ export default class Danger extends Component {
 	genPopUpContent(geo) {
 		const {properties = {}} = geo;
 		switch (geo.type) {
-			case 'people': {
-				return (
-					`<div class="popupBox">
-						<h2><span>姓名：</span>${properties.name}</h2>
-						<h2><span>所属单位：</span>${properties.org}</h2>
-						<h2><span>联系方式：</span>${properties.phone}</h2>
-						<h2><span>职务：</span>${properties.job}</h2>
-						<h2 class="btnRow">
-						<a href="javascript:;" class="btnViewTrack" data-id=${geo.key}>轨迹查看</a>
-						</h2>
-					</div>`
-				)
-			}
 			case 'danger': {
 				return (
 					`<div>
@@ -1469,7 +1182,7 @@ export default class Danger extends Component {
 			           onSelect={this.onSelect.bind(this)}
 			           content={content}
 					   userCheckKeys={this.state.userCheckedKeys}
-			           loadData={this.loadUsersByOrg.bind(this)}
+			           // loadData={this.loadUsersByOrg.bind(this)}
 			           featureName={option.value}/>
 		)
 	}

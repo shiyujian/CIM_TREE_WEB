@@ -221,12 +221,14 @@ export default class FaithTable extends Component {
             this.setState({loading1:true})
             getHonestyNewTreetype({},param)
             .then(rst => {
+                rst.sort(sorting)
+                console.log('rst',rst)
                 this.setState({loading1:false})
                 if(!rst)
                     return
                 try {
                     let myChart1 = echarts.getInstanceByDom(document.getElementById('section1'));
-                    // let rank = ['第五名', '第四名', '第三名', '第二名', '第一名']
+                    // let rank = ['第一名', '第二名', '第三名', '第四名', '第五名'];
                     let rankData = rst.slice(0,5);
                     let integrity = [];
                     let nurseryname = [];
@@ -311,5 +313,18 @@ export default class FaithTable extends Component {
                 } 
             })
         }
+    }
+}
+
+//按照某个元素排序
+function sorting(val1, val2) {
+    let ele1 = val1.Sincerity;
+    let ele2 = val2.Sincerity;
+    if(ele1 > ele2) {
+        return -1;
+    } else if(ele1 < ele2) {
+        return 1;
+    } else {
+        return 0;
     }
 }
