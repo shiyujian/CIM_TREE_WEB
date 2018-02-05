@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Button,Icon} from 'antd';
-export const Datumcode = window.DeathCode.SAFETY_UNBEARABLE;
+export const Datumcode = window.DeathCode.SAFETY_HJBH;
 
 export default class DelDirPanel extends Component {
 	constructor(props) {
