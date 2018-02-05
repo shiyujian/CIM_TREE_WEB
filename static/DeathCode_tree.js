@@ -21,6 +21,7 @@ window.DeathCode = {
 	SAFETY_UNBEARABLE:"UNBEARABLE01",//安环管理环境保护编码
 	DATUM_DATUM:"QH01" ,//资料管理制度规范编码
 	DATUM_GCYX:"TREE_GCYX" ,//工程影像目录名称
+	DATUM_GCWD:"TREE_GCWD" ,//工程影像目录名称
 	SAFETY_AQJY:"TREE_AQJY" ,//安全教育目录名称
     DATUM_PK:"3407341485020",
 	SETUP_KEYWORD:"Keyword",  //系统设置工程文档关键字编码

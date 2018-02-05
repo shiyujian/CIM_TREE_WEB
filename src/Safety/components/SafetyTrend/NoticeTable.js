@@ -227,7 +227,6 @@ class NoticeTable extends Component {
 			},
 			noticeTabValue = '1'
 		} = this.props;
-		console.log(this.props)
 		const formItemLayout = {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },

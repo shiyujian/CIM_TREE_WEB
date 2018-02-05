@@ -1,80 +1,81 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Table, Spin, Input, Select, Popover, Modal, Button, message } from 'antd';
-import { SOURCE_API, STATIC_DOWNLOAD_API } from '_platform/api';
+import { Table, Spin, message } from 'antd';
+import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import moment from 'moment';
-import '../Datum/index.less'
-const Option = Select.Option;
-
-
+import './index.less';
 export default class GeneralTable extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			visible: false,
-			imgurl: null
-		};
-	}
+
 	render() {
-		const { newkey = [], Doc = [] } = this.props;
-		
-		const columns = newkey.map(rst => {
-			if (rst.name === "文件名" || rst.name === "卷册名" || rst.name === "事件" || rst.name === "名称") {
-				return {
-					title: rst.name,
-					dataIndex: 'extra_params.name',
-					key: rst.name
-				}
-			}
-			else if (rst.name !== "操作") {
-				return {
-					title: rst.name,
-					key: rst.name,
-					dataIndex: `extra_params[${rst.code}]`
-				}
-			} else {
-				return {
-					title: '操作',
-					key: '操作',
-					render: (record,index) => {
-						let nodes = [];
-						nodes.push(
-							<div>
-								{/*<a onClick={this.previewFile.bind(this,record)}>预览</a>*/}
-								<Popover content={this.genDownload(record.basic_params.files)}
-									placement="right">
-									<a>预览</a>
-								</Popover>
-								<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this,index)}>下载</a>
-								{/* <a href={`${STATIC_DOWNLOAD_API}`}>下载222</a> */}
-
-								<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>
-							</div>
-						);
-						return nodes;
-					}
-				}
-			}
-		});
-
-		columns.splice(-1, 0, { title: '状态', dataIndex: 'extra_params.state' });
-
+		const { Doc = [] } = this.props;
+		console.log('ttt',this.props)
 		return (
-			<div>
-				<Table rowSelection={this.rowSelection}
-					dataSource={Doc}
-					className='foresttable'
-					columns={columns}
-					bordered rowKey="code" />
-				<Modal title="图片预览"
-					width='70%'
-					closable={false}
-					visible={this.state.visible}
-					footer={[<Button key="back" size="large" onClick={this.cancel.bind(this)}>关闭查看</Button>]}>
-					<img src={`${SOURCE_API}` + this.state.imgurl} alt="图片" />
-				</Modal>
-			</div>
+			<Table rowSelection={this.rowSelection}
+				dataSource={Doc}
+				columns={this.columns}
+				className='foresttables'
+				bordered rowKey="code" />
 		);
+	}
+
+	rowSelection = {
+		onChange: (selectedRowKeys, selectedRows) => {
+			const { actions: { selectDocuments } } = this.props;
+			selectDocuments(selectedRows);
+		},
+	};
+
+	columns = [
+		{
+			title: '名称',
+			dataIndex: 'name',
+			key: 'name',
+			// sorter: (a, b) => a.name.length - b.name.length
+		}, {
+			title: '编号',
+			dataIndex: 'extra_params.number',
+			key: 'extra_params.number',
+			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
+		}, {
+			title: '发布单位',
+			dataIndex: 'extra_params.company',
+			key: 'extra_params.company',
+			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
+		}, {
+			title: '实施日期',
+			dataIndex: 'extra_params.time',
+			key: 'extra_params.time',
+			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
+		}, {
+			title: '备注',
+			dataIndex: 'extra_params.remark',
+			key: 'extra_params.remark'
+		}, {
+			title: '文档状态',
+			dataIndex: 'extra_params.state',
+			key: 'extra_params.state'
+		}, {
+			title: '操作',
+			render: (record, index) => {
+				let nodes = [];
+				nodes.push(
+					<div>
+						<a onClick={this.previewFile.bind(this, record)}>预览</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
+						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+					</div>
+				);
+				return nodes;
+			}
+		}
+	];
+	createLink = (name, url) => {    //下载
+		let link = document.createElement("a");
+		link.href = url;
+		link.setAttribute('download', this);
+		link.setAttribute('target', '_blank');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
 	}
 	download(index, key, e) {
 		const { selected = [], file = [], files = [], down_file = [] } = this.props;
@@ -100,53 +101,15 @@ export default class GeneralTable extends Component {
 			}
 		}
 	}
-	createLink = (name, url) => {    //下载
-        let link = document.createElement("a");
-        link.href = url;
-        link.setAttribute('download', this);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-	cancel() {
-		this.setState({
-			visible: false
-		})
-	}
-	rowSelection = {
-		onChange: (selectedRowKeys, selectedRows) => {
-			const { actions: { selectDocuments } } = this.props;
-			selectDocuments(selectedRows);
-		}
-	};
-
-	genDownload = (text) => {
-		return (
-			text.map((rst) => {
-				return (
-					<div>
-						<a onClick={this.previewFile.bind(this, rst)}>{rst.name}</a>
-					</div>)
-			})
-		)
-	};
-
 
 	previewFile(file) {
 		const { actions: { openPreview } } = this.props;
-		let imgurl = file.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-		if (file.mime_type == "image/png" || file.mime_type == "image/jpg" || file.mime_type == "image/jpeg") {
-			this.setState({ visible: true, imgurl: imgurl })
-		} else {
-			if (JSON.stringify(file) === "{}") {
-				return
-			} else {
-				const filed = file;
-				openPreview(filed);
-			}
+		if (JSON.stringify(file.basic_params) == "{}") {
+			return
+		} else { 
+			const filed = file.basic_params.files[0];
+			openPreview(filed);
 		}
-
 	}
 
 	update(file) {

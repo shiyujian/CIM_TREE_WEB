@@ -36,7 +36,6 @@ class Addition extends Component {
             form: { getFieldDecorator },
             docs = []
         } = this.props;
-        console.log('add.props', this.props);
         let { progress, isUploading } = this.state;
         let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
         <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];

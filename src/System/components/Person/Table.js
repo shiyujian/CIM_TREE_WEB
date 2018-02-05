@@ -4,7 +4,6 @@ import { Table, Button, Popconfirm, message } from 'antd';
 export default class Users extends Component {
 	render() {
 		const { platform: { users = [] } } = this.props;
-		console.log(this.props);
 		return (
 			<div>
 				<div>

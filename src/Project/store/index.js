@@ -17,6 +17,7 @@ import itemProReducer, {actions as itemProActions} from './itemPro';
 // import siteReducer, {actions as sitenActions} from './site';
 import safetySystemReducer, {actions as safetySystemActions} from './safetySystem';
 import standardReducer, {actions as standardActions} from './standard';
+import proDocReducer, {actions as proDocActions} from './proDoc';
 import educationRegisterReducer, {actions as educationRegisterActions} from './educationRegister';
 import materialReducer, {actions as materialActions} from './material';
 import unbearableReducer, {actions as unbearableActions} from './unbearable';
@@ -118,6 +119,10 @@ export default handleActions({
 	[combineActions(...actionsMap(standardActions))]: (state = {}, action) => ({
 		...state,
 		standard: standardReducer(state.standard, action),
+	}),
+	[combineActions(...actionsMap(proDocActions))]: (state = {}, action) => ({
+		...state,
+		proDoc: proDocReducer(state.proDoc, action),
 	}),
 	[combineActions(...actionsMap(educationRegisterActions))]: (state = {}, action) => ({
 		...state,
