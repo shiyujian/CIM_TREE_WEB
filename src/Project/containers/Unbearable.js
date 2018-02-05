@@ -9,7 +9,7 @@ import reducer, { actions } from '../store/unbearable';
 import Button from "antd/es/button/button";
 import AddDirPanel from "../components/Unbearable/AddDirPanel";
 import DelDirPanel from "../components/Unbearable/DelDirPanel";
-export const Datumcode = window.DeathCode.SAFETY_UNBEARABLE;
+export const Datumcode = window.DeathCode.SAFETY_HJBH;
 
 @connect(
 	state => {
@@ -53,7 +53,7 @@ export default class Unbearable extends Component {
 		hadSelectDir: false,
 	};
 
-	selectUnbearableDir(value=[],node) {
+	selectStandardDir(value=[],node) {
 		console.log(node)
 		let data = node.node.props.data[0].children ? node.node.props.data[0].children : "undefined";
 		this.setState({
@@ -75,7 +75,10 @@ export default class Unbearable extends Component {
 			refreshPanelTo('NOR')
 		}
 	}
+
+
 	render() {
+		console.log(this.props)
 		const
 			{
 				platform: {dir: {list = [],} = {}} = {},
@@ -93,7 +96,7 @@ export default class Unbearable extends Component {
 		return (
 
 			<div>
-				<DynamicTitle title="环境保护" {...this.props} />
+				<DynamicTitle title="安全教育" {...this.props} />
 				<Sidebar>
 					<div style={{borderBottom: 'solid 1px #999', paddingBottom: 8,}}>
 						<Button style={this.state.data === "undefined" ? this.state.hidden : this.state.show} onClick={() => {refreshPanelTo('ADD');}}>新增目录</Button>
@@ -101,7 +104,7 @@ export default class Unbearable extends Component {
 					</div>
 					<PkCodeTree treeData={list}
 					            selectedKeys={keycode}
-					            onSelect={this.selectUnbearableDir.bind(this)} />
+					            onSelect={this.selectStandardDir.bind(this)} />
 				</Sidebar>
 				<Content>
 				{adddelpanel==='NOR'?

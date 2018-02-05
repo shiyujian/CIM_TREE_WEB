@@ -18,7 +18,6 @@
 4.在src/_platform/API.js和src下所有源码当中,不能出现IP和端口固定的情况;
 */
 window.config = window.config || {};
-
 let DOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
 
 DOMAIN = window.config.DOMAIN;

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Form, Input, Button ,message,Row,Col} from 'antd';
-export const Datumcode = window.DeathCode.SAFETY_UNBEARABLE;
+export const Datumcode = window.DeathCode.SAFETY_HJBH;
 const FormItem = Form.Item;
 
 class AddDirPanel extends Component {
@@ -81,7 +81,6 @@ class AddDirPanel extends Component {
 	}
 
 	render() {
-
 		let { form: { getFieldDecorator }, filter={},adddocs={},currentcode={},currentpk={}} = this.props;
 		console.log(currentcode);
 

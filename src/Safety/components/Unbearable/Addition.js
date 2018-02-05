@@ -99,7 +99,7 @@ export default class Addition extends Component {
                                                         docs = [],
                                                         actions: {changeDocs}
                                                     } = this.props;
-                                                    this.state.engineerNumber = event.target.value;
+                                                    this.state.engineerTheme = event.target.value;
                                                     changeDocs(docs);
                                                 }}
                                         />
@@ -132,7 +132,7 @@ export default class Addition extends Component {
                                                         docs = [],
                                                         actions: {changeDocs}
                                                     } = this.props;
-                                                    this.state.engineerTheme = event.target.value;
+                                                    this.state.engineerNumber = event.target.value;
                                                     changeDocs(docs);
                                                 }}
                                         />

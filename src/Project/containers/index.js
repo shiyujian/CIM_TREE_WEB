@@ -25,6 +25,10 @@ export SafetySystem from './SafetySystem'
 export EngineeringImage from './EngineeringImage';
 export Material from './Material';
 export FormManage from './FormManage';
+export EducationRegister from './EducationRegister';
 export Unbearable from './Unbearable';
+<<<<<<< HEAD
 export EducationRegister from './EducationRegister'
 export ProDoc from './ProDoc'
+=======
+>>>>>>> 3d850a795cf68d05f87ab859a9a7f6b9d0754a58

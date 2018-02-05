@@ -9,7 +9,7 @@ import {Filter, Table,Updatemodal,DatumTree,Addition} from '../components/Unbear
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import moment from 'moment';
-export const Datumcode = window.DeathCode.OVERALL_MATERIAL;
+export const Datumcode = window.DeathCode.SAFETY_HJBH;
 
 
 @connect(
@@ -27,7 +27,7 @@ export default class Unbearable extends Component {
         this.state = {
             isTreeSelected: false,
             loading:false
-        }
+        } 
     }
 
     render() {
