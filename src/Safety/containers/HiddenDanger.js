@@ -42,64 +42,64 @@ export default class HiddenDanger extends Component {
             modalVisible: false,
             dataSous: {},
             leafletCenter: [22.516818, 113.868495],
-            data: [
-                {
-                    o: 1,
-                    riskContent: "侧枝折断",
-                    unitName: "1标段",
-                    smallName: "1小班",
-                    thinName: "12细班",
-                    level: "V",
-                    timeLimit: "2016-11-01",
-                    status: "jj",
-                    resPeople: "张三",
-                    fsPeople: "小明",
-                    jlPeople: "小王",
-                    zgcuoshi: "随便",
-                    x: "22.5202031353",
-                    y: "113.893730454",
-                    geometry: {coordinates: [22.5202031353,113.893730454],type: "Point"},
-                    type: "danger",
-                    properties: {},
-                    key: "b5d535a8-9b52-4d8b-8e64-e68d96857ce2",
-                }, {
-                    o: 2,
-                    riskContent: "车辆停靠",
-                    unitName: "12标段",
-                    smallName: "2小班",
-                    thinName: "13细班",
-                    level: "V",
-                    timeLimit: "2016-11-01",
-                    status: "hh",
-                    resPeople: "李四",
-                    fsPeople: "小明11",
-                    jlPeople: "小王11",
-                    zgcuoshi: "随便11",
-                    x: "22.5202031353",
-                    y: "113.893730454",
-                    geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
-                    type: "danger",
-                    properties: {},
-                }, {
-                    o: 3,
-                    riskContent: "苗木枯萎",
-                    unitName: "123标段",
-                    smallName: "3小班",
-                    thinName: "14细班",
-                    level: "V",
-                    timeLimit: "2016-11-01",
-                    status: "aaa",
-                    resPeople: "王五",
-                    fsPeople: "小明22",
-                    jlPeople: "小王22",
-                    zgcuoshi: "随便22",
-                    x: "22.5202031353",
-                    y: "113.893730454",
-                    geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
-                    type: "danger",
-                    properties: {},
-                }
-            ]
+            // data: [
+                // {
+                //     o: 1,
+                //     riskContent: "侧枝折断",
+                //     unitName: "1标段",
+                //     smallName: "1小班",
+                //     thinName: "12细班",
+                //     level: "V",
+                //     timeLimit: "2016-11-01",
+                //     status: "jj",
+                //     resPeople: "张三",
+                //     fsPeople: "小明",
+                //     jlPeople: "小王",
+                //     zgcuoshi: "随便",
+                //     x: "22.5202031353",
+                //     y: "113.893730454",
+                //     geometry: {coordinates: [22.5202031353,113.893730454],type: "Point"},
+                //     type: "danger",
+                //     properties: {},
+                //     key: "b5d535a8-9b52-4d8b-8e64-e68d96857ce2",
+                // }, {
+                //     o: 2,
+                //     riskContent: "车辆停靠",
+                //     unitName: "12标段",
+                //     smallName: "2小班",
+                //     thinName: "13细班",
+                //     level: "V",
+                //     timeLimit: "2016-11-01",
+                //     status: "hh",
+                //     resPeople: "李四",
+                //     fsPeople: "小明11",
+                //     jlPeople: "小王11",
+                //     zgcuoshi: "随便11",
+                //     x: "22.5202031353",
+                //     y: "113.893730454",
+                //     geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
+                //     type: "danger",
+                //     properties: {},
+                // }, {
+                //     o: 3,
+                //     riskContent: "苗木枯萎",
+                //     unitName: "123标段",
+                //     smallName: "3小班",
+                //     thinName: "14细班",
+                //     level: "V",
+                //     timeLimit: "2016-11-01",
+                //     status: "aaa",
+                //     resPeople: "王五",
+                //     fsPeople: "小明22",
+                //     jlPeople: "小王22",
+                //     zgcuoshi: "随便22",
+                //     x: "22.5202031353",
+                //     y: "113.893730454",
+                //     geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
+                //     type: "danger",
+                //     properties: {},
+                // }
+            // ]
         }
     }
     componentDidMount() {
@@ -110,31 +110,38 @@ export default class HiddenDanger extends Component {
         const { currentUnitCode, currentSelectValue } = this.state;
         const {
             actions: {
-                getPotentialRiskByCode,
+                getRisk,
             }
         } = this.props;
-        getPotentialRiskByCode({ code: currentUnitCode, status: currentSelectValue, keyword: value }).then(rst => {
+        getRisk({status:currentSelectValue}).then(rst => {
             const { dataSet } = this.state;
             let datas = [];
-            debugger
-            if (rst.length === 0) {
+            // debugger
+            if (rst.content.length === 0) {
                 notification.info({
                     message: '未查询到数据',
                     duration: 2
                 });
                 return;
             }
-            for (let i = 0; i < rst.length; i++) {
+            for (let i = 0; i < rst.content.length; i++) {
                 let data = {};
-                data.riskContent = rst[i].risk_content;
-                data.projectName = rst[i].project_location.project_name;
-                data.unitName = rst[i].project_location.unit_name;
-                data.level = rst[i].risk_level["风险级别"];
-                data.status = this.getRiskState(rst[i].status);
-                data.resPeople = rst[i].response_org.name;
-                data.coordinate = rst[i].coordinate;
-                data.images = rst[i].rectify_before.images ? rst[i].rectify_before.images : [];
-                data.id = rst[i].id;
+                data.problemType=rst.content[i].ProblemType;
+                data.level='V';
+                data.createTime=rst.content[i].CreateTime;
+                data.status = this.getRiskState(rst.content[i].Status);
+                data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+
+
+                // data.riskContent = rst[i].risk_content;
+                // data.projectName = rst[i].project_location.project_name;
+                // data.unitName = rst[i].project_location.unit_name;
+                // data.level = rst[i].risk_level["风险级别"];
+                // data.status = this.getRiskState(rst[i].status);
+                // data.resPeople = rst[i].response_org.name;
+                // data.coordinate = rst[i].coordinate;
+                // data.images = rst[i].rectify_before.images ? rst[i].rectify_before.images : [];
+                data.id = rst.content[i].id;
                 datas.push(data);
             }
             this.setState({ dataSet: datas });
@@ -170,27 +177,28 @@ export default class HiddenDanger extends Component {
         openPreview(filed);
     }
 
-    getRiskState = (status) => {
-        debugger
+    getRiskState(status){
+        console.log('status',status)
+        // debugger
         switch (status) {
+            case -1:
+                return "提交";
+            case 0:
+                return "整改中";
             case 1:
-                return "发起";
+                return "整改完成";
             case 2:
-                return "确认";
-            case 3:
-                return "整改";
-            case 4:
-                return "审核";
-            case "发起":
+                return "确认完成";
+            case "提交":
+                return -1;
+            case "整改中":
+                return 0;
+            case "整改完成":
                 return 1;
-            case "确认":
+            case "确认完成":
                 return 2;
-            case "整改":
-                return 3;
-            case "审核":
-                return 4;
             default:
-                return "发起";
+                return "提交";
         }
     }
 
@@ -202,25 +210,30 @@ export default class HiddenDanger extends Component {
         this.setState({ currentUnitCode: selectedKeys });
         const {
             actions: {
-                getPotentialRiskByCode,
+                getRisk,
             }
         } = this.props;
 
         const { currentSelectValue } = this.state;
-        getPotentialRiskByCode({ code: selectedKeys, status: currentSelectValue }).then(rst => {
+         getRisk( ).then(rst => {
             const { dataSet } = this.state;
             let datas = [];
-            for (let i = 0; i < rst.length; i++) {
+            // debugger
+            if (rst.content.length === 0) {
+                notification.info({
+                    message: '未查询到数据',
+                    duration: 2
+                });
+                return;
+            }
+            for (let i = 0; i < rst.content.length; i++) {
                 let data = {};
-                data.riskContent = rst[i].risk_content;
-                data.projectName = rst[i].project_location.project_name;
-                data.unitName = rst[i].project_location.unit_name;
-                data.level = rst[i].risk_level["风险级别"];
-                data.status = this.getRiskState(rst[i].status);
-                data.resPeople = rst[i].response_org.name;
-                data.coordinate = rst[i].coordinate;
-                data.images = rst[i].rectify_before.images;
-                data.id = rst[i].id;
+                data.problemType=rst.content[i].ProblemType;
+                data.level='V';
+                data.createTime=rst.content[i].CreateTime;
+                data.status = this.getRiskState(rst.content[i].Status);
+                data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                data.id = rst.content[i].id;
                 datas.push(data);
             }
             this.setState({ dataSet: datas });
@@ -248,30 +261,32 @@ export default class HiddenDanger extends Component {
     }
 
     onSelectChange = (value) => {
+        console.log('select',value)
         this.setState({ currentSelectValue: value });
-        const { currentUnitCode } = this.state;
         const {
             actions: {
-                getPotentialRiskByCode
+                getRisk
             }
         } = this.props;
-        getPotentialRiskByCode({ code: currentUnitCode, status: value }).then(rst => {
+         getRisk({status:value}).then(rst => {
             const { dataSet } = this.state;
             let datas = [];
-            for (let i = 0; i < rst.length; i++) {
+            // debugger
+            if (rst.content.length === 0) {
+                notification.info({
+                    message: '未查询到数据',
+                    duration: 2
+                });
+                return;
+            }
+            for (let i = 0; i < rst.content.length; i++) {
                 let data = {};
-                data.riskContent = rst[i].risk_content;
-                data.projectName = rst[i].project_location.project_name;
-                data.unitName = rst[i].project_location.unit_name;
-                data.level = rst[i].risk_level["风险级别"];
-                data.status = this.getRiskState(rst[i].status);
-                data.resPeople = rst[i].response_org.name;
-                if (rst[i].rectify_before && rst[i].rectify_before.images) {
-                    data.images = rst[i].rectify_before.images;
-                } else {
-                    data.images = [];
-                }
-                data.id = rst[i].id;
+                data.problemType=rst.content[i].ProblemType;
+                data.level='V';
+                data.createTime=rst.content[i].CreateTime;
+                data.status = this.getRiskState(rst.content[i].Status);
+                data.resPeople= rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                data.id = rst.content[i].id;
                 datas.push(data);
             }
             this.setState({ dataSet: datas });
@@ -292,25 +307,17 @@ export default class HiddenDanger extends Component {
             {
                 title: '编号',
                 dataIndex: 'o',
-                width: '5%',
+                width: '10%',
                 render: (text, record, index) => {
                     return <div>{index + 1}</div>;
                 }
             }, {
                 title: '隐患内容',
-                dataIndex: 'riskContent',
+                dataIndex: 'problemType',
                 width: '10%'
             }, {
                 title: '工程部位',
                 dataIndex: 'unitName',
-                width: '10%'
-            }, {
-                title: '小班',
-                dataIndex: 'smallName',
-                width: '10%'
-            }, {
-                title: '细班',
-                dataIndex: 'thinName',
                 width: '10%'
             }, {
                 title: '等级',
@@ -318,20 +325,20 @@ export default class HiddenDanger extends Component {
                 width: '10%'
             }, {
                 title: '整改期限',
-                dataIndex: 'timeLimit',
+                dataIndex: 'createTime',
                 width: '10%'
             }, {
                 title: '状态',
                 dataIndex: 'status',
                 width: '10%'
             }, {
-                title: '负责人',
+                title: '负责人',  
                 dataIndex: 'resPeople',
                 width: '10%'
             }, {
                 title: '操作',
                 dataIndex: 'opt',
-                width: '8%',
+                width: '15%',
                 render: (text, record, index) => {
                     return <div>
                         {/*<a href='avascript:;' onClick={this.onViewClick.bind(this,record,index)}>预览</a>
@@ -366,20 +373,20 @@ export default class HiddenDanger extends Component {
                                     <span style={{ fontSize: 16 }}>状态</span>
                                     <Select
                                         defaultValue=""
-                                        style={{ width: '70px', marginLeft: 5 }}
+                                        style={{ width: '100px', marginLeft: 5 }}
                                         onChange={(value) => this.onSelectChange(value)}>
-                                        <Option value={1}>发起</Option>
-                                        <Option value={2}>确认</Option>
-                                        <Option value={3}>整改</Option>
-                                        <Option value={4}>审核</Option>
-                                        <Option value="">全部</Option>
+                                        <Option value={-1}>提交</Option>
+                                        <Option value={0}>整改中</Option>
+                                        <Option value={1}>整改完成</Option>
+                                        <Option value={2}>确认完成</Option>
+                                        <Option value=''>全部</Option>
                                     </Select>
                                 </Col>
                             </Row>
                             <Table
                                 className = 'foresttable'
                                 columns={columns}
-                                dataSource = {this.state.data}
+                                dataSource = {this.state.dataSet}
                                 bordered
                                 style={{ marginTop: 20 }}
                             />

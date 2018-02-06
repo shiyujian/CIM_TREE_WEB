@@ -10,7 +10,7 @@ export const ID = 'HIDDENDANGER';
 const setIsAddPlan =  createAction (`${ID}安全隐患-设置新增状态`);
 //export const setCurrentAcc =  createAction ('事故登记-设置当前事故');
 const setAddModalVisiblePlan = createAction(`${ID}安全隐患-设置添加内容操作窗可视性`);
-export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`,[]);
+export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents?eventtype=1&status={{status}}`,);
 
 //上传文件
 const getPotentialRiskByCode = createFetchAction(`${base}/main/api/potential-risk/?unit_code={{code}}&status={{status}}&keyword={{keyword}}`,[],'GET');

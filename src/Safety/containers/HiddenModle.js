@@ -84,7 +84,7 @@ export default class HiddenModle extends Component {
             >
                 <Row><h2 style={{ textAlign: 'center' }}>安全隐患详情</h2></Row>
                 <Row style={{ marginTop: 15 }}>
-                    <Col span={8}><span style={{ fontSize: 16 }}>{`隐患内容：${detail.riskContent}`}</span></Col>
+                    <Col span={8}><span style={{ fontSize: 16 }}>{`隐患内容：${detail.problemType}`}</span></Col>
                     <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`发现人员：${detail.fsPeople}`}</span></Col>
                 </Row>
                 <Row>
