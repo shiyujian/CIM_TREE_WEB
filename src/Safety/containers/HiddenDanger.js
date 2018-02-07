@@ -6,10 +6,11 @@ import { actions as platformActions } from '_platform/store/global';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import {
     Table, Button, Row, Col, Icon, Modal, Input, message,
-    notification, DatePicker, Select, InputNumber, Form, Upload, Card, Steps
+    notification, DatePicker, Select, Form, Upload, Steps
 } from 'antd';
 import HiddenModle from './HiddenModle';
-import WorkPackageTree from '../components/WorkPackageTree';
+// import WorkPackageTree from '../components/WorkPackageTree';
+import DatumTree from '../components/DatumTree';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from '_platform/api';
@@ -18,8 +19,10 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import 'leaflet/dist/leaflet.css';
 import './HiddenDanger.less';
+export const Datumcode = window.DeathCode.SAFETY_AQYH;
 moment.locale('zh-cn');
 const Option = Select.Option;
+
 @connect(
     state => {
         const { safety: { hiddenDanger = {} } = {}, platform } = state;
@@ -34,6 +37,8 @@ export default class HiddenDanger extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isTreeSelected: false,
+            loading:false,
             dataSet: [],
             currentUnitCode: '',
             currentSteps: 0,
@@ -41,108 +46,52 @@ export default class HiddenDanger extends Component {
             currentSelectValue: '',
             modalVisible: false,
             dataSous: {},
-            leafletCenter: [22.516818, 113.868495],
-            // data: [
-                // {
-                //     o: 1,
-                //     riskContent: "侧枝折断",
-                //     unitName: "1标段",
-                //     smallName: "1小班",
-                //     thinName: "12细班",
-                //     level: "V",
-                //     timeLimit: "2016-11-01",
-                //     status: "jj",
-                //     resPeople: "张三",
-                //     fsPeople: "小明",
-                //     jlPeople: "小王",
-                //     zgcuoshi: "随便",
-                //     x: "22.5202031353",
-                //     y: "113.893730454",
-                //     geometry: {coordinates: [22.5202031353,113.893730454],type: "Point"},
-                //     type: "danger",
-                //     properties: {},
-                //     key: "b5d535a8-9b52-4d8b-8e64-e68d96857ce2",
-                // }, {
-                //     o: 2,
-                //     riskContent: "车辆停靠",
-                //     unitName: "12标段",
-                //     smallName: "2小班",
-                //     thinName: "13细班",
-                //     level: "V",
-                //     timeLimit: "2016-11-01",
-                //     status: "hh",
-                //     resPeople: "李四",
-                //     fsPeople: "小明11",
-                //     jlPeople: "小王11",
-                //     zgcuoshi: "随便11",
-                //     x: "22.5202031353",
-                //     y: "113.893730454",
-                //     geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
-                //     type: "danger",
-                //     properties: {},
-                // }, {
-                //     o: 3,
-                //     riskContent: "苗木枯萎",
-                //     unitName: "123标段",
-                //     smallName: "3小班",
-                //     thinName: "14细班",
-                //     level: "V",
-                //     timeLimit: "2016-11-01",
-                //     status: "aaa",
-                //     resPeople: "王五",
-                //     fsPeople: "小明22",
-                //     jlPeople: "小王22",
-                //     zgcuoshi: "随便22",
-                //     x: "22.5202031353",
-                //     y: "113.893730454",
-                //     geometry: {coordinates: ["22.5202031353","113.893730454"],type: "Point"},
-                //     type: "danger",
-                //     properties: {},
-                // }
-            // ]
+            leafletCenter: [22.516818, 113.868495]
         }
     }
     componentDidMount() {
+        const {actions: {getDir}} = this.props;
+        this.setState({loading:true});
+        getDir({code:Datumcode}).then(({children}) => {
+            this.setState({loading:false});
+        });
+        if(this.props.Doc){
+            this.setState({isTreeSelected:true})
+        }
         
     }
 
     onSearch = (value) => {
-        const { currentUnitCode, currentSelectValue } = this.state;
         const {
             actions: {
                 getRisk,
             }
-        } = this.props;
-        getRisk({status:currentSelectValue}).then(rst => {
+        } = this.props; 
+        getRisk( ).then(rst => {
+            console.log('rst',rst)
             const { dataSet } = this.state;
             let datas = [];
             // debugger
-            if (rst.content.length === 0) {
-                notification.info({
-                    message: '未查询到数据',
-                    duration: 2
-                });
-                return;
-            }
             for (let i = 0; i < rst.content.length; i++) {
                 let data = {};
-                data.problemType=rst.content[i].ProblemType;
-                data.level='V';
-                data.createTime=rst.content[i].CreateTime;
-                data.status = this.getRiskState(rst.content[i].Status);
-                data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                if(rst.content[i].ProblemType.indexOf(value) >= 0){
+                    data.problemType=rst.content[i].ProblemType;
+                    data.level='V';
+                    data.createTime=rst.content[i].CreateTime;
+                    data.status = this.getRiskState(rst.content[i].Status);
+                    data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
 
-
-                // data.riskContent = rst[i].risk_content;
-                // data.projectName = rst[i].project_location.project_name;
-                // data.unitName = rst[i].project_location.unit_name;
-                // data.level = rst[i].risk_level["风险级别"];
-                // data.status = this.getRiskState(rst[i].status);
-                // data.resPeople = rst[i].response_org.name;
-                // data.coordinate = rst[i].coordinate;
-                // data.images = rst[i].rectify_before.images ? rst[i].rectify_before.images : [];
-                data.id = rst.content[i].id;
-                datas.push(data);
+                    // data.riskContent = rst[i].risk_content;
+                    // data.projectName = rst[i].project_location.project_name;
+                    // data.unitName = rst[i].project_location.unit_name;
+                    // data.level = rst[i].risk_level["风险级别"];
+                    // data.status = this.getRiskState(rst[i].status);
+                    // data.resPeople = rst[i].response_org.name;
+                    // data.coordinate = rst[i].coordinate;
+                    // data.images = rst[i].rectify_before.images ? rst[i].rectify_before.images : [];
+                    data.id = rst.content[i].id;
+                    datas.push(data);
+                }
             }
             this.setState({ dataSet: datas });
         });
@@ -178,7 +127,6 @@ export default class HiddenDanger extends Component {
     }
 
     getRiskState(status){
-        console.log('status',status)
         // debugger
         switch (status) {
             case -1:
@@ -202,43 +150,54 @@ export default class HiddenDanger extends Component {
         }
     }
 
-    onSelect(selectedKeys, e) {
-        console.log('selectedKeys',selectedKeys,e)
-        if (!e.selected) {
+    onSelect(value = [],e) {
+        const [code] = value;
+        const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
+        setkeycode(code);
+        if(code === undefined){
             return
         }
-        this.setState({ currentUnitCode: selectedKeys });
-        const {
-            actions: {
-                getRisk,
-            }
-        } = this.props;
-
-        const { currentSelectValue } = this.state;
-         getRisk( ).then(rst => {
-            const { dataSet } = this.state;
-            let datas = [];
-            // debugger
-            if (rst.content.length === 0) {
-                notification.info({
-                    message: '未查询到数据',
-                    duration: 2
-                });
-                return;
-            }
-            for (let i = 0; i < rst.content.length; i++) {
-                let data = {};
-                data.problemType=rst.content[i].ProblemType;
-                data.level='V';
-                data.createTime=rst.content[i].CreateTime;
-                data.status = this.getRiskState(rst.content[i].Status);
-                data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
-                data.id = rst.content[i].id;
-                datas.push(data);
-            }
-            this.setState({ dataSet: datas });
-        });
+        this.setState({isTreeSelected:e.selected})
+        setcurrentcode({code:code.split("--")[1]});
+        getdocument({code:code.split("--")[1]});
     }
+    // onSelect(selectedKeys, e) {
+    //     console.log('selectedKeys',selectedKeys,e)
+    //     if (!e.selected) {
+    //         return
+    //     }
+    //     this.setState({ currentUnitCode: selectedKeys });
+    //     const {
+    //         actions: {
+    //             getRisk,
+    //         }
+    //     } = this.props;
+
+    //     const { currentSelectValue } = this.state;
+    //      getRisk( ).then(rst => {
+    //         const { dataSet } = this.state;
+    //         let datas = [];
+    //         // debugger
+    //         if (rst.content.length === 0) {
+    //             notification.info({
+    //                 message: '未查询到数据',
+    //                 duration: 2
+    //             });
+    //             return;
+    //         }
+    //         for (let i = 0; i < rst.content.length; i++) {
+    //             let data = {};
+    //             data.problemType=rst.content[i].ProblemType;
+    //             data.level='V';
+    //             data.createTime=rst.content[i].CreateTime;
+    //             data.status = this.getRiskState(rst.content[i].Status);
+    //             data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+    //             data.id = rst.content[i].id;
+    //             datas.push(data);
+    //         }
+    //         this.setState({ dataSet: datas }); 
+    //     });
+    // }
     createLink = (name, url) => {    //下载
         let link = document.createElement("a");
         link.href = url;
@@ -261,7 +220,6 @@ export default class HiddenDanger extends Component {
     }
 
     onSelectChange = (value) => {
-        console.log('select',value)
         this.setState({ currentSelectValue: value });
         const {
             actions: {
@@ -303,6 +261,15 @@ export default class HiddenDanger extends Component {
     }
 
     render() {
+        const {
+            platform: {
+                dir:{
+                    list = []
+                } = {}
+            } = {},
+            Doc=[],
+            keycode,
+        } = this.props;
         const columns = [
             {
                 title: '编号',
@@ -354,9 +321,15 @@ export default class HiddenDanger extends Component {
         return (
             <div>
                 <DynamicTitle title="安全隐患" {...this.props} />
-                <Sidebar>
+                {/*<Sidebar>
                     <WorkPackageTree {...this.props}
                         onSelect={this.onSelect.bind(this)} />
+                </Sidebar>*/}
+                <Sidebar>
+                    <DatumTree treeData={list}
+                                selectedKeys={keycode}
+                                onSelect={this.onSelect.bind(this)}
+                                {...this.state}/>
                 </Sidebar>
                 <Content>
                     <Row>
@@ -397,7 +370,7 @@ export default class HiddenDanger extends Component {
                         {...this.props} 
                         onok = {this.onDetailClick.bind(this)} 
                         oncancel = {this.cancel.bind(this)}
-                        data = {this.state.data}
+                        data = {this.state.dataSet}
                         dataSous = {this.state.dataSous}
                     />}
                 </Content>

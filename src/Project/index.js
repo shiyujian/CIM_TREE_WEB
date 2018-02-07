@@ -233,6 +233,12 @@ export default class Project extends Component {
 				path: '/project/unbearable',
 				icon: <Icon name="tag" />
 			},{
+				key: 'HiddenDanger',
+				id: 'PROJECT.HIDDENDANGER',
+				name: '安全隐患',
+				path: '/project/hiddendanger',
+				icon: <Icon name="money" />
+			},{
 				key: 'EducationRegister',
 				id: 'SAFETY.EDUCATIONREGISTER',
 				name: '安全教育',

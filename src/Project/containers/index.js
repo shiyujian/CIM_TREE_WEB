@@ -27,4 +27,5 @@ export Material from './Material';
 export FormManage from './FormManage';
 export EducationRegister from './EducationRegister';
 export Unbearable from './Unbearable';
+export HiddenDanger from './HiddenDanger';
 export ProDoc from './ProDoc'
