@@ -707,7 +707,7 @@ export default class Lmap extends Component {
 			<PkCodeTree treeData={content}
                         selectedKeys={this.state.leftkeycode}
                         onSelect={this.onSelect.bind(this)}
-                        onExpand={this.onExpand.bind(this)}
+                        // onExpand={this.onExpand.bind(this)}
                         checkable
                         showIcon={true}
                         onCheck={this.onCheck.bind(this,option.value)}
@@ -716,24 +716,25 @@ export default class Lmap extends Component {
 			
 		)
 	}
-	onExpand(expandedKeys,info) {
-        const treeNode = info.node;
-        const {actions: {getTree}} = this.props;
-        const {treeLists} = this.state;
-        const keycode = treeNode.props.eventKey;
-        getTree({},{parent:keycode,paginate:false})
-        .then(rst => {
-            if(rst instanceof Array){
-                if(rst.length > 0 && rst[0].wptype != '子单位工程') {
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
-                }
-                getNewTreeData(treeLists,keycode,rst)
-                this.setState({treeLists:treeLists})
-            }
-        })
-    }
+	// onExpand(expandedKeys,info) {
+	// 	debugger;
+ //        const treeNode = info.node;
+ //        const {actions: {getTree}} = this.props;
+ //        const {treeLists} = this.state;
+ //        const keycode = treeNode.props.eventKey;
+ //        getTree({},{parent:keycode,paginate:false})
+ //        .then(rst => {
+ //            if(rst instanceof Array){
+ //                if(rst.length > 0 && rst[0].wptype != '子单位工程') {
+ //                    rst.forEach((item,index) => {
+ //                        rst[index].children = []
+ //                    })
+ //                }
+ //                getNewTreeData(treeLists,keycode,rst)
+ //                this.setState({treeLists:treeLists})
+ //            }
+ //        })
+ //    }
 
   
 
@@ -743,6 +744,9 @@ export default class Lmap extends Component {
 	}
 
 	}
+
+
+	// getNewTreeData(rst3,rst3[i].No,rst4);
  function getNewTreeData(treeData, curKey, child) {
     const loop = (data) => {
         data.forEach((item) => {
@@ -750,6 +754,8 @@ export default class Lmap extends Component {
 
                 item.children = child;
             }else{
+
+            	
                 if(item.children)
                     loop(item.children);
             }

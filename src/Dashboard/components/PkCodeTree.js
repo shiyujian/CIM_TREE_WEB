@@ -34,7 +34,7 @@ export default class PkCodeTree extends Component {
 					      defaultExpandAll={true}
 					      autoExpandParent ={true}
 					      onSelect={this.props.onSelect}
-					      onExpand={this.props.onExpand}
+					      // onExpand={this.props.onExpand}
 					      checkable
                           showIcon={true}
                           onCheck={this.props.onCheck}

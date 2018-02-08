@@ -13,8 +13,9 @@ export default class Warning extends Component {
     constructor(props){
         super(props);
         this.state={
-            stime1: moment().format('2017-11-17 00:00:00'),
-            etime1: moment().format('2017-11-24 23:59:59'),
+            stime1: moment().format('2018/2/26 00:00:00'),
+            etime1: moment().format('2018/2/26 23:59:59'),
+            project:"便道施工",
             departOptions:"",
             data: [
                 { value: 50, name: '一般安全隐患', selected: true },
@@ -32,31 +33,20 @@ export default class Warning extends Component {
 
         const myChart = echarts.init(document.getElementById('AccumulativeCompletion'));
 
-        this.optionLine = {
-            // backgroundColor: '#666',
-            // title: {
-            //     text: '安全隐患数量',
-            //     textStyle: {
-            //         color: '#000',
-            //         // color: '#000',
-            //     }
-            // },
+        let optionLine = {
             tooltip: {
                 trigger: 'item',
                 formatter: "{a} <br/>{b} : {c} ({d}%)"
             },
             legend: {
-                // orient: 'vertical',
                 right: 'right',
-                // data: ['一般安全隐患', '较大安全事故', '重大安全事故', '一般安全事故', '重大安全隐患']
-                data: ['-', '-', '-', '-', '-']
+                // data: ['-', '-', '-', '-', '-']
             },
             series: [
                 {
                     name: '访问来源',
                     type: 'pie',
                     radius: '40%',
-                    // center: ['50%', '60%'],
                     data: this.state.data,
                     selectedMode: 'single'
                     ,
@@ -64,7 +54,6 @@ export default class Warning extends Component {
                         normal: {
                             label: {
                                 show: true,
-                                // formatter: '{d}%'
                             },
                             labelLine: {
                                 show: true
@@ -102,7 +91,7 @@ export default class Warning extends Component {
 
         
 
-        myChart.setOption(this.optionLine,true);
+        myChart.setOption(optionLine);
     }
     
     
@@ -114,7 +103,7 @@ export default class Warning extends Component {
                     <DatePicker  
                      style={{textAlign:"center"}} 
                      showTime
-                     defaultValue={moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')} 
+                     defaultValue={moment(this.state.etime1, 'YYYY/MM/DD HH:mm:ss')} 
                      format={'YYYY/MM/DD HH:mm:ss'}
                      onChange={this.datepick.bind(this)}
                      onOk={this.datepickok.bind(this)}
@@ -125,19 +114,7 @@ export default class Warning extends Component {
                           placeholder="请选择部门"
                           notFoundContent="暂无数据"
                           defaultValue="1"
-                          onSelect={this.onDepartments.bind(this,'departments') }>
-                          <Option value="1">全部</Option>
-                          <Option value="2">一标</Option>
-                          <Option value="3">二标</Option>
-                          <Option value="4">三标</Option>
-                          <Option value="5">四标</Option>
-                          <Option value="6">五标</Option>
-                    </Select>
-                    <Select 
-                          placeholder="请选择部门"
-                          notFoundContent="暂无数据"
-                          defaultValue="1"
-                          onSelect={this.onDepartments.bind(this,'departments') }>
+                          onSelect={this.onDepartments.bind(this)}>
                           <Option value="1">便道施工</Option>
                           <Option value="2">给排水沟开挖</Option>
                           <Option value="3">常绿乔木</Option>
@@ -152,6 +129,30 @@ export default class Warning extends Component {
         );
     }
     datepick(){}
-    datepickok(){}
-    onDepartments(){}
+    datepickok(value){
+      this.setState({etime1:value?moment(value).format('YYYY/MM/DD HH:mm:s'):'',
+                  })
+      
+      const {actions: {progressstat4pie}} = this.props;
+      progressstat4pie({},{project:this.state.project,etime:this.state.etime1}).then(rst=>{
+        this.getdata(rst);
+      })
+
+    }
+    
+    onDepartments(value){
+      console.log(value);
+      const {actions: {progressstat4pie}} = this.props;
+      this.setState({
+        project:value,
+      })
+      progressstat4pie({},{project:value,etime:this.state.etime1}).then(rst=>{
+        this.getdata(rst);
+      })
+
+    }
+
+    getdata(rst){
+      console.log(rst);
+    }
 }

@@ -63,6 +63,12 @@ window.config = {
 	'WMSTileLayerUrl':'http://t{s}.tianditu.cn/DataServer?T=cva_w&X={x}&Y={y}&L={z}',
 	'IMG_W':'http://t{s}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}',
 	'VEC_W':'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
+	'IMG_1':'http://47.104.159.127:200/1?T=img_1&X={x}&Y={y}&L={z}',
+	'IMG_2':'http://47.104.159.127:200/2?T=img_2&X={x}&Y={y}&L={z}',
+	'IMG_3':'http://47.104.159.127:200/3?T=img_3&X={x}&Y={y}&L={z}',
+	'IMG_4':'http://47.104.159.127:200/4?T=img_4&X={x}&Y={y}&L={z}',
+	'IMG_5':'http://47.104.159.127:200/5?T=img_5&X={x}&Y={y}&L={z}',
+
 	//视频监控插件下载配置
 	'Video_PLUGIN_URL':'http://47.104.160.65:6512/media/documents/meta/WebComponentsKithas_rem_cfg.exe',
 
