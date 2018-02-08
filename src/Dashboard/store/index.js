@@ -8,6 +8,7 @@ import { SERVICE_API,base,USER_API,WORKFLOW_API,FOREST_API} from '_platform/api'
 export const getAreaOK = createAction('获取组织机构树');
 export const getTreeOK = createAction(`first_getTreeOK`);
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]);
+export const getTreearea =createFetchAction(`${FOREST_API}/route/thinclasses?`);
 export const getArea = createFetchAction(`${SERVICE_API}/loc-tree/code/LOC_ROOT/`, [getAreaOK]);
 export const getTrack = createFetchAction(`${base}/main/api/user/{{ID}}/location/`,[]);
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`,[]);
@@ -22,6 +23,7 @@ export const getRiskProcess = createFetchAction(`${WORKFLOW_API}/instance/`,[]);
 export const getRiskProcessDetail = createFetchAction(`${WORKFLOW_API}/instance/{{ID}}`,[]);//获取隐患工单详情
 export const getRiskContactSheet = createFetchAction(`${base}/main/api/potential-risk/{{ID}}/contact-sheet/`,[]);
 export const getCameraTree = createFetchAction(`${SERVICE_API}/project-tree/?depth=3`, []);
+
 // 获取设计图纸信息流程
 export const getWKsOk = createAction('获取流程成功');
 export const getWks = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[]);
@@ -50,6 +52,7 @@ const getMapList = createFetchAction(`http://120.24.210.86:227/tree/patrolpositi
 export const actions = {
 	getTreeOK,
 	getTree,
+	getTreearea,
 	getAreaOK,
 	getArea,
 	getTrack,
