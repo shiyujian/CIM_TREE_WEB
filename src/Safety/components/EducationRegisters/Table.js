@@ -11,6 +11,7 @@ export default class GeneralTable extends Component {
 			<Table rowSelection={this.rowSelection}
 				dataSource={Doc}
 				columns={this.columns}
+				expandedRowRender={record=> <p>{record.extra_params.trainnr}</p>}
 				className='foresttables'
 				bordered rowKey="code" />
 		);
@@ -31,19 +32,29 @@ export default class GeneralTable extends Component {
 			key: 'name',
 			// sorter: (a, b) => a.name.length - b.name.length
 		}, {
-			title: '编号',
+			title: '参加人数',
 			dataIndex: 'extra_params.number',
 			key: 'extra_params.number',
 			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
 		}, {
-			title: '发布单位',
+			title: '培训单位',
 			dataIndex: 'extra_params.company',
 			key: 'extra_params.company',
 			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
-			title: '实施日期',
+			title: '培训日期',
 			dataIndex: 'extra_params.time',
 			key: 'extra_params.time',
+			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
+		}, {
+			title: '培训学时',
+			dataIndex: 'extra_params.trainxs',
+			key: 'extra_params.trainxs',
+			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
+		}, {
+			title: '合格率',
+			dataIndex: 'extra_params.qualification',
+			key: 'extra_params.qualification',
 			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
 		}, {
 			title: '安全教育',

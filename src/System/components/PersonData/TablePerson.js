@@ -18,6 +18,13 @@ export default class TablePerson extends Component{
 		}
 	}
     render(){
+		const { platform: { users = [] } } = this.props;
+		console.log("this.props",this.props)
+
+		// const {actions: {getPersonList }} = this.props;
+		
+		// let rst =  getPersonList({pagesize:10,offset:0});
+	
          return (
             <div>
                 <div>
@@ -36,7 +43,7 @@ export default class TablePerson extends Component{
 					rowKey = "index"
 					onChange = {this.changePage.bind(this)}
 					pagination = {this.state.pagination}
-                    loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
+                    // loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
                 >
                 </Table>
 				
@@ -50,45 +57,40 @@ export default class TablePerson extends Component{
 			const {actions: {getOrgList,getAllUsers,getOrgDetail,getPeople,getPersonList,getOrgReverse,is_fresh }} = this.props;
 			// 分页获取数据
 			let rst = await getPersonList({pagesize:10,offset:0});
-			let personlist = rst.result.result;
-			let total = rst.result.total;
+			let personlist = rst
+			// let total = rst.result.total;
 			let persons=[];
 			for (let i = 0; i < personlist.length; i++) {
 				const element = personlist[i];
-				let ret = await getPeople({code:element.code});
-				persons.push(ret)
+				// let ret = await getPeople({code:element.code});
+				persons.push(element)
 			}
 			let pagination = {
 				current:1,
-				total:total,
+				// total:total,
 			};
 			this.setState({
 				pagination:pagination
 			})
-			let type = [];
-			for (let i = 0; i < persons.length; i++) {
-				let ret = await getOrgReverse({code:persons[i].organisation.code})
-				type.push(ret.children[0].name)
-			}
+			// let type = [];
+			// for (let i = 0; i < persons.length; i++) {
+			// 	let ret = await getOrgReverse({code:persons[i].organisation.code})
+			// 	type.push(ret.children[0].name)
+			// }
 			let data_person = 
 				persons.map((item, index) => {
 					return {
 						index: index + 1,
-						code: item.code,
-						name: item.name || '',
-						type: type[index] || '',
-						orgcode: item.organisation.code || '',
-						orgpk: item.organisation.pk,
-						orgname: item.organisation.name,
-						job: item.title || '',
-						sex: item.basic_params.info.性别 || '',
-						tel: item.basic_params.info.电话 || '',
-						email: item.basic_params.info.邮箱 || '',
-						signature: item.signature,
-						is_user: item.extra_params.is_users,
-						usernames: false,
-						editing: false,
-						personPk: item.pk
+						code: item.account.person_code || '',
+						name: item.account.person_name || '',
+						orgname: item.account.organization || '',
+						job: item.account.title || '',
+						sex: item.account.gender || '',
+						tel: item.account.person_telephone || '',
+						email: item.email || '',
+						is_user: true,
+						usernames:item.username,
+						passwords:111111,
 					}
 			})
 				
@@ -211,48 +213,43 @@ export default class TablePerson extends Component{
 		// 分页获取数据
 		let pageSize = 10;
 		let rst = await getPersonList({pagesize:pageSize,offset:(obj.current-1)*pageSize});
-		let personlist = rst.result.result;
-		let total = rst.result.total;
+		let personlist = rst
+		// let total = rst.result.total;
 		let persons=[];
 		for (let i = 0; i < personlist.length; i++) {
 			const element = personlist[i];
-			let ret = await getPeople({code:element.code});
-			persons.push(ret)
+			// let ret = await getPeople({code:element.code});
+			persons.push(element)
 		}
 		let pagination = {
 			current:obj.current,
-			total:total,
+			// total:total,
 		};
 	
 
 		this.setState({
 			pagination:pagination
 		})
-		let type = [];
-		for (let i = 0; i < persons.length; i++) {
-			// console.log("persons:",persons)
-			let ret = await getOrgReverse({code:persons[i].organisation.code})
-			type.push(ret.children[0].name)
-		}
+		// let type = [];
+		// for (let i = 0; i < persons.length; i++) {
+		// 	// console.log("persons:",persons)
+		// 	let ret = await getOrgReverse({code:persons[i].organisation.code})
+		// 	type.push(ret.children[0].name)
+		// }
 		let data_person = 
 			persons.map((item, index) => {
 				return {
 					index: index + 1,
-					code: item.code || '',
-					name: item.name || '',
-					type: type[index] || '',
-					orgcode: item.organisation.code || '',
-					orgpk: item.organisation.pk,
-					orgname: item.organisation.name,
-					job: item.title || '',
-					sex: item.basic_params.info.性别 || '',
-					tel: item.basic_params.info.电话 || '',
-					email: item.basic_params.info.邮箱 || '',
-					signature: item.signature,
-					is_user: item.extra_params.is_users,
-					usernames: false,
-					editing: false,
-					personPk: item.pk
+					code: item.account.person_code || '',
+					name: item.account.person_name || '',
+					orgname: item.account.organization || '',
+					job: item.account.title || '',
+					sex: item.account.gender || '',
+					tel: item.account.person_telephone || '',
+					email: item.email || '',
+					is_user: true,
+					usernames:item.username,
+					passwords:111111,
 				}
 		})
 			
@@ -263,17 +260,21 @@ export default class TablePerson extends Component{
 		const {actions: {getOrgList,getAllUsers,getOrgDetail,getPeople,getPersonList,getOrgReverse }} = this.props;
 		// 分页获取数据
 		let rst = await getPersonList({pagesize:10,offset:0});
-		let personlist = rst.result.result;
-		let total = rst.result.total;
+		let personlist = rst
+		// let total = rst.result.total;
 		let persons=[];
 		for (let i = 0; i < personlist.length; i++) {
 			const element = personlist[i];
-			let ret = await getPeople({code:element.code});
-			persons.push(ret)
+			// console.log(element)
+			// let ret = await getPeople({code:element.code});
+			// console.log(ret)
+			
+			persons.push(element)
 		}
+		
 		let pagination = {
 			current:1,
-			total:total,
+			// total:total,
 		};
 	
 
@@ -281,29 +282,30 @@ export default class TablePerson extends Component{
 			pagination:pagination
 		})
 		let type = [];
-		for (let i = 0; i < persons.length; i++) {
-			let ret = await getOrgReverse({code:persons[i].organisation.code})
-			type.push(ret.children[0].name)
-		}
+		// for (let i = 0; i < persons.length; i++) {
+		// 	console.log(persons[i])
+		// 	let ret = await getOrgReverse({code:persons[i].organisation.code})
+		// 	console.log("ret",ret)
+			
+		// 	type.push(ret.children[0].name)
+		// }
 		let data_person = 
 			persons.map((item, index) => {
+				// console.log(item)
+				// console.log(item.account.person_name)
 				return {
+					id:item.id,
 					index: index + 1,
-					code: item.code || '',
-					name: item.name || '',
-					type: type[index] || '',
-					orgcode: item.organisation.code || '',
-					orgpk: item.organisation.pk,
-					orgname: item.organisation.name,
-					job: item.title || '',
-					sex: item.basic_params.info.性别 || '',
-					tel: item.basic_params.info.电话 || '',
-					email: item.basic_params.info.邮箱 || '',
-					signature: item.signature,
-					is_user: item.extra_params.is_users,
-					usernames: false,
-					editing: false,
-					personPk: item.pk
+					code: item.account.person_code || '',
+					name: item.account.person_name || '',
+					orgname: item.account.organization || '',
+					job: item.account.title || '',
+					sex: item.account.gender || '',
+					tel: item.account.person_telephone || '',
+					email: item.email || '',
+					is_user: true,
+					usernames:item.username,
+					passwords:111111,
 				}
 		})
 		this.setState({dataSource:data_person,tempData:data_person,loading:false});
@@ -386,6 +388,7 @@ export default class TablePerson extends Component{
 		dataSource.splice(index, 1);
 		let dataSources = [];
 		dataSource.map((item,key)=>{
+			console.log(item)
 		  dataSources.push({
 			key: key + 1,
 			person_code: item.code,
@@ -408,7 +411,11 @@ export default class TablePerson extends Component{
 		const { actions: { deleteUserList, reverseFind, is_fresh,deletePerson } } = this.props;
 		if (record.is_user) {
 			// 当前是用户
+			console.log("record",record.is_user)
+			
 			let rst = await reverseFind({ pk: record.personPk })
+			console.log("rst",rst)
+			console.log("deleteUserList",deleteUserList)
 			deleteUserList({ pk: rst[0].user.id }).then(async (re) => {
 				if (re === '') {
 					Notification.success({
@@ -450,7 +457,7 @@ export default class TablePerson extends Component{
 	}, {
 		title: '姓名',
 		dataIndex: 'name',
-		key: 'Name',
+		key: 'name',
 	 }, {
 		title: '所在组织机构单位',
 		dataIndex: 'type',
@@ -475,6 +482,14 @@ export default class TablePerson extends Component{
 		title: '邮箱',
 		dataIndex: 'email',
 		key: 'email'
+	}, {
+		title: '用户名',
+		dataIndex: 'usernames',
+		key: 'usernames'
+	}, {
+		title: '密码',
+		dataIndex: 'passwords',
+		key: 'passwords'
 	}, {
 		title: '二维码',
 		render:(record) => {

@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {Table,Button,Popconfirm,Notification,Input,Icon,Modal,Upload,Select,Divider,Switch} from 'antd';
-import {UPLOAD_API,SERVICE_API,FILE_API,DataReportTemplate_PersonInformation} from '_platform/api';
+import React, { Component } from 'react';
+import { Table, Button, Popconfirm, Notification, Input, Icon, Modal, Upload, Select, Divider, Switch } from 'antd';
+import { UPLOAD_API, SERVICE_API, FILE_API, DataReportTemplate_PersonInformation } from '_platform/api';
 const Search = Input.Search;
-export default class ToggleModal extends Component{
-    constructor(props){
+export default class ToggleModal extends Component {
+    constructor(props) {
         super(props);
         this.state = {
             dataSource: [],
@@ -12,13 +12,13 @@ export default class ToggleModal extends Component{
             org: [],
             subErr: true,
             flag_code: true,
-            repeatCode:[],
-            editing:false,
-            tempData:[],
+            repeatCode: [],
+            editing: false,
+            tempData: [],
         }
     }
-    render(){
-        const {visible, actions: {getOrgReverse}} = this.props;
+    render() {
+        const { visible, actions: { getOrgReverse } } = this.props;
         let jthis = this;
         let accept = 'image/jpg, image/jpeg, image/png';
         const props = {
@@ -31,7 +31,7 @@ export default class ToggleModal extends Component{
                 }
                 if (info.file.status === 'done') {
                     let importData = info.file.response.Sheet1;
-                    if(importData.length===1){
+                    if (importData.length === 1) {
                         Notification.error({
                             message: `${info.file.name}上传失败`
                         });
@@ -49,194 +49,224 @@ export default class ToggleModal extends Component{
             },
         };
         const columns = [{
-                title: '序号',
-                dataIndex: 'index',
-                key: 'Index',
-            }, {
-                title: '人员编码',
-                dataIndex: 'code',
-                key: 'Code'
-            }, {
-                title: '姓名',
-                dataIndex: 'record.name',
-                key: 'Name',
-                render:(text, record, index) =>{
-                    if(record.editing === true) {
-                        return <Input style={{width: '60px'}} value = {record.name || ""} onChange={ele => {
-                            record.name = ele.target.value
-                            this.forceUpdate();
-                        }}/>
-                    }else {
-                        return <span>{record.name}</span>
-                    }
+            title: '序号',
+            dataIndex: 'index',
+            key: 'Index',
+        }, {
+            title: '人员编码',
+            dataIndex: 'code',
+            key: 'Code'
+        }, {
+            title: '姓名',
+            dataIndex: 'record.name',
+            key: 'Name',
+            render: (text, record, index) => {
+                if (record.editing === true) {
+                    return <Input style={{ width: '60px' }} value={record.name || ""} onChange={ele => {
+                        record.name = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                } else {
+                    return <span>{record.name}</span>
                 }
-            }, {
-                title: '所在组织机构单位',
-                dataIndex: 'record.org',
-                key: 'Org',
-                render:(text, record, index) =>{
-                    if(record.account) {
-                        return record.org = record.account.org
-                    }else {
-                        return record.org = record.org
-                    }
+            }
+        }, {
+            title: '用户名',
+            dataIndex: 'record.usernames',
+            key: 'Usernamess',
+            render: (text, record, index) => {
+                console.log("record", record)
+                if (record.editing === true) {
+                    return <Input style={{ width: '60px' }} value={record.usernames || ""} onChange={ele => {
+                        record.usernames = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                } else {
+                    return <span>{record.usernames}</span>
                 }
-            }, {
-                title: '所属部门',
-                // dataIndex: 'account.org_code',
-                key: 'Depart',
-                render:(text, record, index) =>{
-                    if(record.editing === true) {
-                        if(record.org) {
-                            return <Input
-                                style={{width: '60px'}} 
-                                value = {record.depart || ""}
-                                onChange={this.tableDataChange.bind(this,index)}
-                                // onBlur={this.fixOrg.bind(this,index)}
-                            />
-                        }else {
-                            return <Input
-                                style={{width: '60px', color: 'red'}} 
-                                value = {record.depart || ""}
-                                onChange={this.tableDataChange.bind(this,index)}
-                                // onBlur={this.fixOrg.bind(this,index)}
-                            />
+            }
+        },{
+            title: '密码',
+            dataIndex: 'record.passwords',
+            key: 'Passwords',
+            render: (text, record, index) => {
+                console.log("record", record)
+                if (record.editing === true) {
+                    return <Input style={{ width: '60px' }} value={record.passwords || ""} onChange={ele => {
+                        record.passwords = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                } else {
+                    return <span>{record.passwords}</span>
+                }
+            }
+        }, {
+            title: '所在组织机构单位',
+            dataIndex: 'record.org',
+            key: 'Org',
+            render: (text, record, index) => {
+                if (record.account) {
+                    return record.org = record.account.org
+                } else {
+                    return record.org = record.org
+                }
+            }
+        }, {
+            title: '所属部门',
+            // dataIndex: 'account.org_code',
+            key: 'Depart',
+            render: (text, record, index) => {
+                if (record.editing === true) {
+                    if (record.org) {
+                        return <Input
+                            style={{ width: '60px' }}
+                            value={record.depart || ""}
+                            onChange={this.tableDataChange.bind(this, index)}
+                        // onBlur={this.fixOrg.bind(this,index)}
+                        />
+                    } else {
+                        return <Input
+                            style={{ width: '60px', color: 'red' }}
+                            value={record.depart || ""}
+                            onChange={this.tableDataChange.bind(this, index)}
+                        // onBlur={this.fixOrg.bind(this,index)}
+                        />
+                    }
+                } else {
+                    return <span>{record.depart}</span>
+                }
+            }
+        }, {
+            title: '职务',
+            dataIndex: 'record.job',
+            key: 'Job',
+            render: (text, record, index) => {
+                if (record.editing === true) {
+                    return <Input value={record.job || ""} onChange={ele => {
+                        record.job = ele.target.value
+                        this.forceUpdate();
+                    }} />
+                } else {
+                    return <span>{record.job}</span>
+                }
+            }
+        }, {
+            title: '性别',
+            dataIndex: 'record.sex',
+            key: 'Sex',
+            render: (text, record, index) => {
+                if (record.editing === true) {
+                    return <Select style={{ width: 42 }} value={record.sex} onChange={ele => {
+                        record.sex = ele
+                        this.forceUpdate();
+                    }}>
+                        <Option value="男">男</Option>
+                        <Option value="女">女</Option>
+                    </Select>
+                } else {
+                    return <span>{record.sex}</span>
+                }
+            }
+        }, {
+            title: '手机号码',
+            dataIndex: 'record.tel',
+            key: 'Tel',
+            render: (text, record, index) => {
+                if (record.editing === true) {
+                    return <Input style={{ color: record.tel_red }} value={record.tel || ""} onChange={ele => {
+                        record.tel = ele.target.value
+                        let regTel = /^1[3|4|5|7|8][0-9]{9}$/
+                        if (!regTel.test(record.tel)) {
+                            record.tel_red = "red";
+                        } else {
+                            record.tel_red = "";
                         }
-                    }else {
-                        return <span>{record.depart}</span>
-                    }
+                        this.forceUpdate();
+                    }} />
+                } else {
+                    return <span style={{ color: record.tel_red }} >{record.tel}</span>
                 }
-            }, {
-                title: '职务',
-                dataIndex: 'record.job',
-                key: 'Job',
-                render:(text, record, index) =>{
-                    if(record.editing === true) {
-                        return <Input value = {record.job || ""} onChange={ele => {
-                            record.job = ele.target.value
-                            this.forceUpdate();
-                        }}/>
-                    }else {
-                        return <span>{record.job}</span>
-                    }
-                }
-            }, {
-                title: '性别',
-                dataIndex: 'record.sex',
-                key: 'Sex',
-                render:(text, record, index) =>{
-                    if(record.editing === true) {
-                        return <Select style={{width: 42}} value = {record.sex} onChange={ele => {
-                            record.sex = ele
-                            this.forceUpdate();
-                        }}>
-                            <Option value="男">男</Option>
-                            <Option value="女">女</Option>
-                        </Select> 
-                    }else {
-                        return <span>{record.sex}</span>
-                    }
-                }
-            }, {
-                title: '手机号码',
-                dataIndex: 'record.tel',
-                key: 'Tel',
-                render:(text, record, index) =>{
-                    if(record.editing === true) {
-                        return <Input style={{color:record.tel_red}} value = {record.tel || ""} onChange={ele => {
-                            record.tel = ele.target.value
-                            let regTel = /^1[3|4|5|7|8][0-9]{9}$/
-                            if (!regTel.test(record.tel)) {
-                                record.tel_red = "red";
-                            }else{
-                                record.tel_red = "";
-                            }
-                            this.forceUpdate();
-                        }}/>  
-                    }else {
-                        return <span style={{color:record.tel_red}} >{record.tel}</span>
-                    }
-                }
-            }, {
-                title: '邮箱',
-                dataIndex: 'record.email',
-                key: 'Email',
-                render:(text, record, index) =>{
-                    if(record.editing === true) {
-                        return <Input style={{color:record.email_red}} value = {record.email || ""} onChange={ele => {
-                            record.email = ele.target.value
-                            let regEmail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-                            if (!regEmail.test(record.email)) {
-                                record.email_red = "red";
-                            }else{
-                                record.email_red = "";
-                            }
-                            this.forceUpdate();
-                        }}/>
-                    }else {
-                        return <span style={{color:record.email_red}}>{record.email}</span>
-                    }
-                }
-            }, {
-                title: '是否为用户',
-                // dataIndex:"usernames",
-                key: 'Usernames',
-                render: (text, record, index) => {
-                    console.log('record:',record)
-                    return (
-                        <Switch checkedChildren = "是" unCheckedChildren = "否" checked = {record.usernames} onChange = {(e) => {
-                            console.log("e:",e);
-                            record.usernames = e;
-                            this.forceUpdate();
-                        }}/>
-                    )
-                }
-            }, {
-                title:'二维码',
-                render:(record) => {
-                    return (
-                        <Upload
-                            beforeUpload={this.beforeUploadPic.bind(this, record)}
-                            accept={accept}
-                        >
-                            <a>{record.signature ? record.signature.name : '点击上传'}</a>
-                        </Upload>
-                    )
-                }
-            },{
-                title:'操作',
-                width:"7%",
-                render:(text,record,index) => {
-                    return <span>
-                        {
-                            record.editing 
-                            ||
-                            <span>
-                                <a><Icon type="edit" onClick={(e) => {
-                                    record.editing = true
-                                    this.forceUpdate();
-                                 }} /></a>
-                                <Popconfirm
-                                    title="确认删除吗"
-                                    onConfirm={this.delete.bind(this, record.index - 1)}
-                                    okText="确认"
-                                    onCancel="取消"
-                                >
-                                    <span style={{ "margin": "7px" }}>|</span>
-                                    <a><Icon type="delete" /></a>
-                                </Popconfirm>
-                            </span>
+            }
+        }, {
+            title: '邮箱',
+            dataIndex: 'record.email',
+            key: 'Email',
+            render: (text, record, index) => {
+                if (record.editing === true) {
+                    return <Input style={{ color: record.email_red }} value={record.email || ""} onChange={ele => {
+                        record.email = ele.target.value
+                        let regEmail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                        if (!regEmail.test(record.email)) {
+                            record.email_red = "red";
+                        } else {
+                            record.email_red = "";
                         }
-                        {
-                            record.editing 
-                            &&
-                            <a onClick={(e) => {
-                                record.editing = false
+                        this.forceUpdate();
+                    }} />
+                } else {
+                    return <span style={{ color: record.email_red }}>{record.email}</span>
+                }
+            }
+        }, {
+            title: '是否为用户',
+            // dataIndex:"usernames",
+            key: 'Usernames',
+            render: (text, record, index) => {
+                console.log('record:', record)
+                return (
+                    <Switch checkedChildren="是" unCheckedChildren="否" checked={record.usernames} onChange={(e) => {
+                        console.log("e:", e);
+                        record.usernames = e;
+                        this.forceUpdate();
+                    }} />
+                )
+            }
+        }, {
+            title: '二维码',
+            render: (record) => {
+                return (
+                    <Upload
+                        beforeUpload={this.beforeUploadPic.bind(this, record)}
+                        accept={accept}
+                    >
+                        <a>{record.signature ? record.signature.name : '点击上传'}</a>
+                    </Upload>
+                )
+            }
+        }, {
+            title: '操作',
+            width: "7%",
+            render: (text, record, index) => {
+                return <span>
+                    {
+                        record.editing
+                        ||
+                        <span>
+                            <a><Icon type="edit" onClick={(e) => {
+                                record.editing = true
                                 this.forceUpdate();
-                            }}>完成</a>
-                        }
-                    </span>
-                }
+                            }} /></a>
+                            <Popconfirm
+                                title="确认删除吗"
+                                onConfirm={this.delete.bind(this, record.index - 1)}
+                                okText="确认"
+                                onCancel="取消"
+                            >
+                                <span style={{ "margin": "7px" }}>|</span>
+                                <a><Icon type="delete" /></a>
+                            </Popconfirm>
+                        </span>
+                    }
+                    {
+                        record.editing
+                        &&
+                        <a onClick={(e) => {
+                            record.editing = false
+                            this.forceUpdate();
+                        }}>完成</a>
+                    }
+                </span>
+            }
         }]
         // console.log("this.state.dataSource:",this.state.dataSource);
         return (
@@ -250,9 +280,9 @@ export default class ToggleModal extends Component{
                 <div>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
-                        dataSource = {this.state.tempData}
+                        dataSource={this.state.tempData}
                         bordered />
-                    <Button style={{ margin: '10px 10px 10px 0px' }} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button>
+                    <Button style={{ margin: '10px 10px 10px 0px' }} onClick={this.createLink.bind(this, 'muban', `${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button>
                     <Upload {...props}>
                         <Button style={{ margin: '10px 10px 10px 0px' }}>
                             <Icon type="upload" />上传并预览
@@ -278,14 +308,14 @@ export default class ToggleModal extends Component{
             </Modal>
         )
     }
-    submit(){
+    submit() {
 
     }
-    selectChecker(){
+    selectChecker() {
 
     }
 
-    validateCode(record,e){
+    validateCode(record, e) {
         let codes = [];
         record.code = e.target.value;
         this.forceUpdate();
@@ -295,17 +325,17 @@ export default class ToggleModal extends Component{
         let repeatCode = this.isRepeat(codes);
         if (repeatCode.length > 1) {
             this.setState({ flag_code: false })
-        }else{
+        } else {
             this.setState({ flag_code: true })
         }
-        this.setState({repeatCode});
+        this.setState({ repeatCode });
     }
 
     covertURLRelative = (originUrl) => {
-    	return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        return originUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
     }
 
-    beforeUploadPic(record,file){
+    beforeUploadPic(record, file) {
         const fileName = file.name;
         const imageType = 'image/jpg, image/jpeg, image/png';
         const isJPG = imageType.indexOf(file.type) >= 0;
@@ -316,18 +346,18 @@ export default class ToggleModal extends Component{
             return false;
         }
         // 上传到静态服务器
-        const { actions:{uploadStaticFile} } = this.props;
-		const formdata = new FormData();
-		formdata.append('a_file', file);
+        const { actions: { uploadStaticFile } } = this.props;
+        const formdata = new FormData();
+        formdata.append('a_file', file);
         formdata.append('name', fileName);
         let myHeaders = new Headers();
-        let myInit = { 
+        let myInit = {
             method: 'POST',
             headers: myHeaders,
             body: formdata
         };
         //uploadStaticFile({}, formdata)
-        fetch(`${FILE_API}/api/user/files/`,myInit).then(async resp => {
+        fetch(`${FILE_API}/api/user/files/`, myInit).then(async resp => {
             let loadedFile = await resp.json();
             loadedFile.a_file = this.covertURLRelative(loadedFile.a_file);
             loadedFile.download_url = this.covertURLRelative(loadedFile.download_url);
@@ -337,34 +367,36 @@ export default class ToggleModal extends Component{
         return false;
     }
     async onok() {
-        if(this.state.dataSource.length===0){
+        if (this.state.dataSource.length === 0) {
             Notification.warning({
-                message:"请上传人员信息"
+                message: "请上传人员信息"
             })
             return;
         }
+        console.log("this.state.dataSource", this.state.dataSource)
         for (let i = 0; i < this.state.dataSource.length; i++) {
-            const element = this.state.dataSource[i];     
+            const element = this.state.dataSource[i];
+            console.log("element", element)
             if (element.org === "") {
                 Notification.warning({
-                    message:"该部门不存在"
+                    message: "该部门不存在"
                 })
                 return;
             }
             if (element.tel_red === "red") {
                 Notification.warning({
-                    message:"存在错误的手机号"
+                    message: "存在错误的手机号"
                 })
                 return;
             }
             if (element.email_red === "red") {
                 Notification.warning({
-                    message:"存在错误的邮箱号"
+                    message: "存在错误的邮箱号"
                 })
                 return;
             }
         }
-        const { actions: { PostPeople, getOrgName, ModalVisible,is_fresh } } = this.props;
+        const { actions: { PostPeople, getOrgName, ModalVisible, is_fresh } } = this.props;
         let data_list = [];
         let pks = [];
         for (let i = 0; i < this.state.dataSource.length; i++) {
@@ -373,46 +405,84 @@ export default class ToggleModal extends Component{
         }
         let arrr = this.state.dataSource;
         arrr.map((item, index) => {
-            data_list.push({
-                "name": item.name,
-                "code": item.code,
-                "obj_type": "C_PER",
-                "basic_params": {
-                    "info": {
-                        "电话": "" + item.tel,
-                        "性别": item.sex,
-                        '邮箱': item.email
+            console.log("item", item)
+            data_list.push(
+                {
+                    "username": item.usernames,
+                    "password": item.passwords,
+                    "name": item.name,
+                    "code": item.code,
+                    "obj_type": "C_PER",
+                    "basic_params": {
+                        "info": {
+                            "电话": "" + item.tel,
+                            "性别": item.sex,
+                            '邮箱': item.email
+                        },
+                        "signature": item.signature.a_file || "",
+                        "photo": ""
                     },
-                    "signature": item.signature.a_file || "",
-                    "photo": ""
-                },
-                "org": {
-                    "code": item.depart,
-                    "pk": pks[index],
-                    "obj_type": "C_ORG",
-                    "rel_type": "member"
-                },
-                "extra_params": {
-                    "is_users": item.usernames,
-                    "code": item.depart,
-                    "pk": pks[index],
-                    "obj_type": "C_ORG",
-                    "rel_type": "member"
-                },
-                "status": "A",
-                "title": item.job,
-                "first_name": "",
-                "last_name": "",
-                "is_user": item.usernames
-            })
+                    "org": {
+                        "code": item.depart,
+                        "pk": pks[index],
+                        "obj_type": "C_ORG",
+                        "rel_type": "member"
+                    },
+                    "extra_params": {
+                        // "is_users": item.usernames,
+                        "usernames": item.usernames,
+                        "code": item.depart,
+                        "pk": pks[index],
+                        "obj_type": "C_ORG",
+                        "rel_type": "member"
+                    },
+                    "status": "A",
+                    "title": item.job,
+                    "first_name": "",
+                    "last_name": "",
+                    "is_user": true,
+                }
+                // {
+                //     username: item.item,
+                //     email: item.email ,
+                //     // password: addition.password, // 密码不能变？信息中没有密码
+                //     account: {
+                //         person_name: item.person_name,
+                //         person_type: "C_PER",
+                //         person_avatar_url: "",
+                //         organization: {
+                //             pk: pks[index],
+                //             code: item.code,
+                //             obj_type: "C_ORG",
+                //             rel_type: "member",
+                //             name: item.name
+                //         },
+                //     },
+                //     groups: roles.map(role => +role),
+                //     is_active: true,
+                //     basic_params: {
+                //         info: {
+                //             '电话': item.person_telephone || '',
+                //             '性别': item.gender || '',
+                //             '技术职称': item.title || '',
+                //             'phone':item.person_telephone || '',
+                //             'sex':item.gender || '',
+                //             'duty':''
+                //         }
+                //     },
+                //     extra_params: {},
+                //     title: addition.title || ''
+                // }
+            )
         })
+        console.log("data_list", data_list)
         PostPeople({}, { "data_list": data_list }).then(item => {
             console.log("item:", item)
             ModalVisible(false);
             is_fresh(true);
         });
         Notification.success({
-            message:"创建人员成功"
+            message: "创建人员成功"
         })
     }
     cancel() {
@@ -431,37 +501,43 @@ export default class ToggleModal extends Component{
         document.body.removeChild(link);
     }
 
-    tableDataChange(index ,e ){
-        const {actions: {getOrgReverse}} = this.props;
+    tableDataChange(index, e) {
+        const { actions: { getOrgReverse } } = this.props;
         const { dataSource } = this.state;
+        console.log("dataSource", dataSource)
+        console.log("index", index)
+        console.log("e", e)
         dataSource[index].depart = e.target.value;
-        getOrgReverse({code:dataSource[index].depart}).then(rst => {
-            if(rst.children.length !== 0) {
+        console.log("dataSource[index].depart", dataSource[index].depart)
+
+        getOrgReverse({ code: dataSource[index].depart }).then(rst => {
+            console.log("rst", rst)
+            if (rst.children.length !== 0) {
                 dataSource[index]['account'] = {
                     org: rst.children[0].name
                 }
-            }else {
+            } else {
                 dataSource[index]['account'] = {
                     org: ''
                 }
             }
-            this.setState({dataSource});
+            this.setState({ dataSource });
         })
     }
-    delete(index){
+    delete(index) {
         let dataSource = this.state.dataSource;
-        dataSource.splice(index,1);
-        this.setState({flag_code:true, subErr:true})
+        dataSource.splice(index, 1);
+        this.setState({ flag_code: true, subErr: true })
         this.delData(dataSource);
-        this.setState({dataSource})
+        this.setState({ dataSource })
     }
 
     //判断数据重复
     isRepeat(arr) {
         var hash = {};
         let repeatCode = [];
-        for(var i in arr) {
-            if(hash[arr[i]]) {
+        for (var i in arr) {
+            if (hash[arr[i]]) {
                 repeatCode.push(arr[i])
             }
             hash[arr[i]] = true;
@@ -470,27 +546,27 @@ export default class ToggleModal extends Component{
     }
     // 处理数据删除之后的校验
     delData(data) {
-        const {actions: {getOrgReverse}} = this.props;
+        const { actions: { getOrgReverse } } = this.props;
         let codes = [];
         let promises = data.map(item => {
             codes.push(item.code)
-            return getOrgReverse({code: item.depart});
+            return getOrgReverse({ code: item.depart });
         })
         let repeatCode = this.isRepeat(codes);
-        if(repeatCode.length > 1) {
-            this.setState({flag_code: false})
+        if (repeatCode.length > 1) {
+            this.setState({ flag_code: false })
         }
-        this.setState({repeatCode})
+        this.setState({ repeatCode })
         let res, orgname = [];
         Promise.all(promises).then(rst => {
             rst.map(item => {
-                if(item.children.length === 0) {
+                if (item.children.length === 0) {
                     orgname.push('');
                     this.setState({
                         subErr: false
                     })
                 }
-                else{
+                else {
                     orgname.push(item.children[0].name);
                 }
             })
@@ -506,32 +582,36 @@ export default class ToggleModal extends Component{
                     tel: item.tel || '',
                     usernames: item.usernames || '',
                     email: item.email || '',
+                    passwords: 111111,
                 }
             })
             this.setState({
-                dataSource:res
+                dataSource: res
             })
         })
     }
     //处理上传excel的数据
     async handleExcelData(data) {
-        const {actions: {getOrgReverse,getOrgName}} = this.props;
+        const { actions: { getOrgReverse, getOrgName } } = this.props;
+        console.log("111", this.props)
         data.splice(0, 1);
-        let data_person, orgname = [],orgpk = [], orgcode=[], orgReverse = [],codes = [],org_names = [];
+        let data_person, orgname = [], orgpk = [], orgcode = [], orgReverse = [], codes = [], org_names = [];
         for (let i = 0; i < data.length; i++) {
             codes.push(data[i][0])
-            let result_names = await getOrgName({code:data[i][2]})
+            let result_names = await getOrgName({ code: data[i][2] })
             org_names.push(result_names.name);
-            let rst = await getOrgReverse({code: data[i][2]})
+            let rst = await getOrgReverse({ code: data[i][2] })
             orgReverse.push(rst);
         }
         let repeatCode = this.isRepeat(codes);
-        if(repeatCode.length > 1) {
-            this.setState({flag_code: false})
+        if (repeatCode.length > 1) {
+            this.setState({ flag_code: false })
         }
-        this.setState({repeatCode})
+        this.setState({ repeatCode })
+        console.log(orgReverse)
+
         orgReverse.map(item => {
-            if(item.children.length === 0) {
+            if (item.children.length === 0) {
                 orgname.push('');
                 orgpk.push('');
                 orgcode.push('')
@@ -539,7 +619,7 @@ export default class ToggleModal extends Component{
                     subErr: false
                 })
             }
-            else{
+            else {
                 orgname.push(item.children[0].name);
                 orgpk.push(item.children[0].pk);
                 orgcode.push(item.children[0].code)
@@ -556,6 +636,7 @@ export default class ToggleModal extends Component{
             if (!regEmail.test(item[6])) {
                 email_red = "red";
             }
+            console.log("item", item)
             return {
                 index: index + 1,
                 code: item[0] || '',
@@ -568,21 +649,22 @@ export default class ToggleModal extends Component{
                 job: item[3] || '',
                 sex: item[4] || '',
                 tel: item[5] || '',
-                tel_red:tel_red,
+                tel_red: tel_red,
                 email: item[6] || '',
-                email_red:email_red,
-                signature:'',
-                usernames:false,
+                email_red: email_red,
+                signature: '',
+                usernames: item[7] || '',
+                passwords: item[8] || '',
                 editing: false,
             }
         })
         this.setState({
-            dataSource:data_person,
-            tempData:data_person
+            dataSource: data_person,
+            tempData: data_person
         })
     }
-    componentDidMount(){
-        const {actions:{getAllUsers, getOrgList}} = this.props;
+    componentDidMount() {
+        const { actions: { getAllUsers, getOrgList } } = this.props;
         getAllUsers().then(rst => {
             let users = [];
             if (rst.length) {
@@ -591,9 +673,9 @@ export default class ToggleModal extends Component{
                         <Option value={JSON.stringify(o)}>{o.account.person_name}</Option>
                     )
                 })
-                this.setState({checkers})
+                this.setState({ checkers })
             }
         });
     }
-    
+
 }
