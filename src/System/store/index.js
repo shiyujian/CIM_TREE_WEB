@@ -20,6 +20,10 @@ import tagReducer, {actions as tagActions} from './tag';
 import quantitiesReducer, {actions as quantitiesActions} from './quantities';
 import personReducer, {actions as personActions} from './person';
 import orgReducer, {actions as orgActions} from './org';
+import orgdataReducer, {actions as orgdataActions} from './orgdata';
+import qualityDataReducer, {actions as qualityDataActions} from './quality';
+import persondataReducer, {actions as persondataActions} from './persondata';
+import persondata1Reducer, {actions as persondata1Actions} from './persondata1';
 
 
 export default handleActions({
@@ -103,5 +107,25 @@ export default handleActions({
 	[combineActions(...actionsMap(orgActions))]: (state = {}, action) => ({
 		...state,
 		org: orgReducer(state.org, action),
+	}),
+	// 组织机构
+	[combineActions(...actionsMap(orgdataActions))]: (state = {}, action) => ({
+		...state,
+		orgdata: orgdataReducer(state.orgdata, action),
+	}),
+	//质量信息
+	[combineActions(...actionsMap(qualityDataActions))]: (state = {}, action) => ({
+		...state,
+		qualityData: qualityDataReducer(state.qualityData, action),
+	}),
+	//人员信息
+	[combineActions(...actionsMap(persondataActions))]: (state = {}, action) => ({
+		...state,
+		persondata: persondataReducer(state.persondata, action),
+	}),
+	//人员信息1
+	[combineActions(...actionsMap(persondata1Actions))]: (state = {}, action) => ({
+		...state,
+		persondata1: persondata1Reducer(state.persondata1, action),
 	}),
 }, {});

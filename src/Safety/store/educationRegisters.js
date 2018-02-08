@@ -1,7 +1,8 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API, WORKFLOW_API} from '_platform/api';
+import {createFetchActionWithHeaders} from './fetchAction'
+import { SERVICE_API, WORKFLOW_API,FILE_API} from '_platform/api';
 import dirFactory from '_platform/store/higher-order/dir';
 import fieldFactory from '_platform/store/service/field';
 import booleanFactory from '_platform/store/higher-order/bool';
@@ -28,6 +29,12 @@ const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
 const selectDocuments = createAction(`${ID}_SELECTDOUMENT`);
 const updatevisible = createAction(`${ID}_updatevisible`);
 const setoldfile = createAction(`${ID}setoldfile`);
+
+//上传文件
+export const getStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [])
+export const uploadStaticFile = createFetchActionWithHeaders(`${FILE_API}/api/user/files/`, [], 'POST')
+export const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [], 'DELETE')
+
 export const setkeycode =createAction(`${ID}_setkeycode`);
 export const actions = {
 	// getdirTree,
@@ -43,7 +50,10 @@ export const actions = {
     Search,
     updatevisible,
     setoldfile,
-	setkeycode,
+    setkeycode,
+    getStaticFile,
+    uploadStaticFile,
+    deleteStaticFile,
     ...dirReducer,
     ...documentReducer,
     ...additionReducer,

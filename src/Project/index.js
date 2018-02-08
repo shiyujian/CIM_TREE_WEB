@@ -201,7 +201,7 @@ export default class Project extends Component {
 				path: '/project/formmanage',
 				exact: true,
 				icon: <Icon name="retweet" />,
-			}]
+			}] 
 		}, {
 			key: 'safetyManage',
 			name: '安环管理',
@@ -226,14 +226,26 @@ export default class Project extends Component {
 				name: '安全隐患',
 				path: '/project/hazard',
 				icon: <Icon name="money" />
-			}, {
+			},{
+				key: 'Unbearable',
+				id: 'PROJECT.UNBEARABLE',
+				name: '环境保护',
+				path: '/project/unbearable',
+				icon: <Icon name="tag" />
+			},{
+				key: 'HiddenDanger',
+				id: 'PROJECT.HIDDENDANGER',
+				name: '安全隐患',
+				path: '/project/hiddendanger',
+				icon: <Icon name="money" />
+			},{
 				key: 'EducationRegister',
 				id: 'SAFETY.EDUCATIONREGISTER',
 				name: '安全教育',
 				path: '/project/educationRegister',
 				icon: <Icon name="tag" />
 			}]
-		}, {
+	  	}, {
 			key: 'massManage',
 			name: '质量管理',
 			id: 'PROJECT.MASSMANAGE',			

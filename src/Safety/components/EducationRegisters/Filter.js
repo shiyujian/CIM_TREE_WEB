@@ -16,14 +16,21 @@ export default class Filter extends Component {
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
 					<FormItem>
-						<Col span={14} style={{float:"left"}}>
+						<Col span={14} style={{ float: "left" }}>
 							<Search placeholder="输入内容"
 								onSearch={this.query.bind(this)} />
 						</Col>
-						<Col span={4} style={{float:"right"}}>
+						<Col span={4} style={{ float: "right" }}>
 							{!this.props.isTreeSelected ?
 								<Button style={{ marginRight: 10 }} disabled>新增</Button> :
 								<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
+							}
+							{
+								(Doc.length === 0) ?
+									<Button style={{ marginRight: 10 }} disabled>删除</Button> :
+									<Popconfirm title="确定要删除文件吗？" onConfirm={this.confirm.bind(this)} onCancel={this.cancel.bind(this)} okText="Yes" cancelText="No">
+										<Button style={{ marginRight: 10 }} type="primary" onClick={this.delete.bind(this)}>删除</Button>
+									</Popconfirm>
 							}
 
 						</Col>

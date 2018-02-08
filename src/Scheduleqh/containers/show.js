@@ -137,7 +137,7 @@ export default class Proprogress extends Component {
         } = this.state;
 		return (
 			<div>
-                <DynamicTitle title="项目进度" {...this.props}/>
+                <DynamicTitle title="种植进度展示" {...this.props}/>
                 <Sidebar>
                     <div style={{ overflow: 'hidden' }} className="project-tree">
                     <PkCodeTree treeData={treeLists}

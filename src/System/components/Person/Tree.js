@@ -5,7 +5,6 @@ export default class Tree extends Component {
 	static propTypes = {};
 
 	render() {
-		console.log(this.props)
 		const {
 			platform: {org: {children = []} = {}},
 			sidebar: {node = {}} = {},

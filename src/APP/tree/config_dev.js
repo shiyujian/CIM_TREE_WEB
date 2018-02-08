@@ -30,7 +30,7 @@ window.config = {
 	//静态文件存储服务预览端口
 	'STATIC_PREVIEW_PORT':'6510',
 	//静态文件存储服务上传端口 
-	'STATIC_UPLOAD_PORT':'6511',
+	'STATIC_UPLOAD_PORT':'6511', 
 	//静态文件存储服务下载端口
 	'STATIC_DOWNLOAD_PORT':'6512',
 	//静态文件存储服务访问用户和密码

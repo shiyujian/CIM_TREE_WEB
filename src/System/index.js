@@ -109,11 +109,25 @@ export default class System extends Component {
 			name: '流程设置',
 			path: '/system/workflow',
 			icon: <Icon name="object-group"/>
-		},{
+		},
+		{
 			key: 'Org',
 			id: 'SYSTEM.ORG',
 			name: '组织机构',
 			path: '/system/org',
+			icon: <Icon name="street-view"/>
+		},{
+			key: 'Orgdata',
+			id: 'SYSTEM.ORGDATA',
+			name: '组织机构1',
+			path: '/system/orgdata',
+			icon: <Icon name="street-view"/>
+		},
+		{
+			key: 'Personsdata',
+			id: 'SYSTEM.PERSONSDATA',
+			name: '人员信息1',
+			path: '/system/personsdata',
 			icon: <Icon name="street-view"/>
 		},
 		// ,{

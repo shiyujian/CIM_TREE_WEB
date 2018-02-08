@@ -17,7 +17,10 @@ import itemProReducer, {actions as itemProActions} from './itemPro';
 // import siteReducer, {actions as sitenActions} from './site';
 import safetySystemReducer, {actions as safetySystemActions} from './safetySystem';
 import standardReducer, {actions as standardActions} from './standard';
+import proDocReducer, {actions as proDocActions} from './proDoc';
 import educationRegisterReducer, {actions as educationRegisterActions} from './educationRegister';
+import unbearableReducer, {actions as unbearableActions} from './unbearable';
+import hiddenDangerReducer, {actions as hiddenDangerActions} from './hiddenDanger';
 import materialReducer, {actions as materialActions} from './material';
 import formmanageReducer, {actions as formmanageActions} from './formmanage';
 import engineeringImageReducer, {actions as engineeringImageActions} from './engineeringImage';
@@ -118,9 +121,21 @@ export default handleActions({
 		...state,
 		standard: standardReducer(state.standard, action),
 	}),
+	[combineActions(...actionsMap(proDocActions))]: (state = {}, action) => ({
+		...state,
+		proDoc: proDocReducer(state.proDoc, action),
+	}),
 	[combineActions(...actionsMap(educationRegisterActions))]: (state = {}, action) => ({
 		...state,
 		educationRegister: educationRegisterReducer(state.educationRegister, action),
+	}),
+	[combineActions(...actionsMap(unbearableActions))]: (state = {}, action) => ({
+		...state,
+		unbearable: unbearableReducer(state.unbearable, action),
+	}),
+	[combineActions(...actionsMap(hiddenDangerActions))]: (state = {}, action) => ({
+		...state,
+		hiddenDanger: hiddenDangerReducer(state.hiddenDanger, action),
 	}),
 	[combineActions(...actionsMap(materialActions))]: (state = {}, action) => ({
 		...state,

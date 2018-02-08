@@ -7,11 +7,11 @@ export default class GeneralTable extends Component {
 
 	render() {
 		const { Doc = [] } = this.props;
-		console.log('ttt',this.props)
 		return (
 			<Table rowSelection={this.rowSelection}
 				dataSource={Doc}
 				columns={this.columns}
+				expandedRowRender={record=> <p>{record.extra_params.trainnr}</p>}
 				className='foresttables'
 				bordered rowKey="code" />
 		);
@@ -20,6 +20,7 @@ export default class GeneralTable extends Component {
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
 			const { actions: { selectDocuments } } = this.props;
+			console.log("selectedRows",selectedRows)
 			selectDocuments(selectedRows);
 		},
 	};
@@ -31,22 +32,32 @@ export default class GeneralTable extends Component {
 			key: 'name',
 			// sorter: (a, b) => a.name.length - b.name.length
 		}, {
-			title: '编号',
+			title: '参加人数',
 			dataIndex: 'extra_params.number',
 			key: 'extra_params.number',
 			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
 		}, {
-			title: '发布单位',
+			title: '培训单位',
 			dataIndex: 'extra_params.company',
 			key: 'extra_params.company',
 			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
-			title: '实施日期',
+			title: '培训日期',
 			dataIndex: 'extra_params.time',
 			key: 'extra_params.time',
 			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
 		}, {
-			title: '备注',
+			title: '培训学时',
+			dataIndex: 'extra_params.trainxs',
+			key: 'extra_params.trainxs',
+			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
+		}, {
+			title: '合格率',
+			dataIndex: 'extra_params.qualification',
+			key: 'extra_params.qualification',
+			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
+		}, {
+			title: '安全教育',
 			dataIndex: 'extra_params.remark',
 			key: 'extra_params.remark'
 		}, {
@@ -55,52 +66,61 @@ export default class GeneralTable extends Component {
 			key: 'extra_params.state'
 		}, {
 			title: '操作',
-			render: (record, index) => {
+			render: (record, index,e) => {
+				const { Doc = [] } = this.props;
 				let nodes = [];
 				nodes.push(
+					
 					<div>
 						<a onClick={this.previewFile.bind(this, record)}>预览</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
-						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+						{/* <a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a> */}
+						
+							<a  style={{ marginLeft: 10 }}  
+								href={Doc[e].basic_params.files[0].a_file}>下载
+					  		</a>
+						
 					</div>
 				);
 				return nodes;
 			}
 		}
 	];
-	createLink = (name, url) => {    //下载
-		let link = document.createElement("a");
-		link.href = url;
-		link.setAttribute('download', this);
-		link.setAttribute('target', '_blank');
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	}
-	download(index, key, e) {
-		const { selected = [], file = [], files = [], down_file = [] } = this.props;
+	// createLink = (name, url) => {    //下载
+	// 	let link = document.createElement("a");
+	// 	link.href = url;
+	// 	link.setAttribute('download', this);
+	// 	link.setAttribute('target', '_blank');
+	// 	document.body.appendChild(link);
+	// 	link.click();
+	// 	document.body.removeChild(link);
+	// }
+	// download(index, key, e) {
+	// 	const { selected = [], file = [], files = [], down_file = [] } = this.props;
+	// 	console.log(index)
+	// 	console.log(key)
+	// 	console.log(e)
+	// 	if (selected.length == 0) {
+	// 		message.warning('没有选择无法下载');
+	// 	}
+	// 	for (var j = 0; j < selected.length; j++) {
+	// 		if (selected[j].code == index.code) {
 
-		if (selected.length == 0) {
-			message.warning('没有选择无法下载');
-		}
-		for (var j = 0; j < selected.length; j++) {
-			if (selected[j].code == index.code) {
-
-				selected.map(rst => {
-					file.push(rst.basic_params.files);
-				});
-				file.map(value => {
-					value.map(cot => {
-						files.push(cot.download_url)
-					})
-				});
-				files.map(down => {
-					let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-					this.createLink(this, down_load);
-				});
-			}
-		}
-	}
+	// 			selected.map(rst => {
+	// 				file.push(rst.basic_params.files);
+	// 			});
+	// 			file.map(value => {
+	// 				value.map(cot => {
+	// 					files.push(cot.download_url)
+	// 				})
+	// 			});
+	// 			files.map(down => {
+	// 				let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
+	// 				this.createLink(this, down_load);
+	// 			});
+	// 		}
+	// 	}
+	// }
 
 	previewFile(file) {
 		const { actions: { openPreview } } = this.props;

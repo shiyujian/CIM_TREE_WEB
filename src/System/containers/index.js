@@ -22,3 +22,5 @@ export Document from './Document';
 export Tag from './Tag';    
 export Quantities from './Quantities';
 export Person from './Person';
+export Orgdata from './Orgdata';
+export Personsdata from './Personsdata';
