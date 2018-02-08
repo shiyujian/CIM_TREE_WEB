@@ -4,7 +4,7 @@ import {actions as platformActions} from '_platform/store/global';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import { actions } from '../store/persondata';
+import { actions } from '../store/persondata1';
 import {getUser} from '_platform/auth'
 import {getNextStates} from '_platform/components/Progress/util';
 import {actions as action2} from '../store/quality';
@@ -14,8 +14,8 @@ var moment = require('moment');
 
 @connect(
 	state => {
-		const {platform,system:{personsdata}} = state;
-		return {platform,...personsdata};
+		const {platform,system:{persondata1}} = state;
+		return {platform,...persondata1};
 	},
 	dispatch => ({
 		actions: bindActionCreators({...platformActions,...actions,...action2}, dispatch),

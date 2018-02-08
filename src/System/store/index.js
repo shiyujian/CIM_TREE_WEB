@@ -23,6 +23,7 @@ import orgReducer, {actions as orgActions} from './org';
 import orgdataReducer, {actions as orgdataActions} from './orgdata';
 import qualityDataReducer, {actions as qualityDataActions} from './quality';
 import persondataReducer, {actions as persondataActions} from './persondata';
+import persondata1Reducer, {actions as persondata1Actions} from './persondata1';
 
 
 export default handleActions({
@@ -121,5 +122,10 @@ export default handleActions({
 	[combineActions(...actionsMap(persondataActions))]: (state = {}, action) => ({
 		...state,
 		persondata: persondataReducer(state.persondata, action),
+	}),
+	//人员信息1
+	[combineActions(...actionsMap(persondata1Actions))]: (state = {}, action) => ({
+		...state,
+		persondata1: persondata1Reducer(state.persondata1, action),
 	}),
 }, {});

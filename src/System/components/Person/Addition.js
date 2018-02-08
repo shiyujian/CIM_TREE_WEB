@@ -108,7 +108,7 @@ export default class Addition extends Component {
 			console.log("addition",addition)
 			console.log("roles",roles)			
 			if (addition.id) {
-				console.log("addition",addition)
+				console.log("addition22",addition)
 				putUser({id: addition.id}, {
 					username: addition.username,
 					email: addition.email ,
@@ -151,7 +151,7 @@ export default class Addition extends Component {
 					}
 				})
 			} else {
-				console.log("addition",addition)
+				console.log("11",111)
 				console.log("roles",roles)		
 				postUser({}, {
 					

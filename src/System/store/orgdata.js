@@ -26,7 +26,8 @@ export const getOrgTree= createFetchAction(`${SERVICE_API}/org-tree/?depth=3`,[]
 export const deleteOrgList= createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "PUT"); 
 export const putOrgList = createFetchAction(`${SERVICE_API}/orgpostlist/`, [], "PUT");
 const getCanjian = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`);
-const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
+// const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
+const jsonToExcel = createFetchAction(`http://10.215.160.45:6570/api/json_to_xlsx`,[],'POST');
 
 export const actions = {
 	ModalVisible,

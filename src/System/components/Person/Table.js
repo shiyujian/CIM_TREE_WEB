@@ -4,6 +4,7 @@ import { Table, Button, Popconfirm, message } from 'antd';
 export default class Users extends Component {
 	render() {
 		const { platform: { users = [] } } = this.props;
+		console.log(users)
 		return (
 			<div>
 				<div>
@@ -118,6 +119,8 @@ export default class Users extends Component {
 		const {
 			actions: { resetAdditionField }
 		} = this.props;
+		console.log("user",user)
+		console.log("resetAdditionField",resetAdditionField)
 		resetAdditionField({
 			visible: true,
 			roles: groups.map(group => String(group.id)),
