@@ -20,6 +20,7 @@ import standardReducer, {actions as standardActions} from './standard';
 import proDocReducer, {actions as proDocActions} from './proDoc';
 import educationRegisterReducer, {actions as educationRegisterActions} from './educationRegister';
 import unbearableReducer, {actions as unbearableActions} from './unbearable';
+import hiddenDangerReducer, {actions as hiddenDangerActions} from './hiddenDanger';
 import materialReducer, {actions as materialActions} from './material';
 import formmanageReducer, {actions as formmanageActions} from './formmanage';
 import engineeringImageReducer, {actions as engineeringImageActions} from './engineeringImage';
@@ -131,6 +132,10 @@ export default handleActions({
 	[combineActions(...actionsMap(unbearableActions))]: (state = {}, action) => ({
 		...state,
 		unbearable: unbearableReducer(state.unbearable, action),
+	}),
+	[combineActions(...actionsMap(hiddenDangerActions))]: (state = {}, action) => ({
+		...state,
+		hiddenDanger: hiddenDangerReducer(state.hiddenDanger, action),
 	}),
 	[combineActions(...actionsMap(materialActions))]: (state = {}, action) => ({
 		...state,
