@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Form, Input, Button ,message,Row,Col} from 'antd';
-export const Datumcode = window.DeathCode.SAFETY_AQYH;
+export const Datumcode = window.DeathCode.SAFETY_WMSG;
 const FormItem = Form.Item;
 
 class AddDirPanel extends Component {
