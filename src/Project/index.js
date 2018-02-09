@@ -225,7 +225,7 @@ export default class Project extends Component {
 				id: 'PROJECT.HAZARD',
 				name: '安全隐患',
 				path: '/project/hazard',
-				icon: <Icon name="money" />
+				icon: <Icon name="money" />  
 			},{
 				key: 'Unbearable',
 				id: 'PROJECT.UNBEARABLE',
@@ -238,6 +238,12 @@ export default class Project extends Component {
 				name: '安全隐患',
 				path: '/project/hiddendanger',
 				icon: <Icon name="money" />
+			},{
+				key: 'RiskFactor',
+				id: 'PROJECT.RISKFACTOR',
+				name: '文明施工',
+				path: '/project/riskFactor',
+				icon: <Icon name="code" />
 			},{
 				key: 'EducationRegister',
 				id: 'SAFETY.EDUCATIONREGISTER',
