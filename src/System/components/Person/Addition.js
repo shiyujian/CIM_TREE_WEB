@@ -11,6 +11,7 @@ export default class Addition extends Component {
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
+		// console.log("addition",addition)
 		return (
 			<Modal title={addition.id ? "新增人员" : "编辑人员信息"} visible={addition.visible} className="large-modal" width={800}
 			maskClosable={false}
@@ -100,6 +101,7 @@ export default class Addition extends Component {
 			actions: {postUser, clearAdditionField, getUsers, putUser}
 		} = this.props;
 		const roles = addition.roles || [];
+		console.log("roles",roles)
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
 		} else if (!addition.person_name) {
@@ -109,6 +111,7 @@ export default class Addition extends Component {
 			console.log("roles",roles)			
 			if (addition.id) {
 				console.log("addition22",addition)
+			
 				putUser({id: addition.id}, {
 					username: addition.username,
 					email: addition.email ,

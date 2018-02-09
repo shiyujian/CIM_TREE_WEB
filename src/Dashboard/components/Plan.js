@@ -8,7 +8,7 @@ import { Icon } from 'react-fa'
 // import {users, safetys, hazards, vedios} from './geojsonFeature';
 import { panorama_360 } from './geojsonFeature';
 import { PDF_FILE_API, previewWord_API, CUS_TILEMAP, Video360_API2, DashboardVideo360API } from '_platform/api';
-import L from 'leaflet';
+import L, { LatLng } from 'leaflet';
 import 'leaflet/dist/leaflet.css'
 import './OnSite.less';
 import CityMarker from './CityMarker';
@@ -21,6 +21,7 @@ import UserSelect from '_platform/components/panels/UserSelect';
 import { wrapperMapUser } from './util';
 import DGN from '_platform/components/panels/DGN';
 import DGNProjectInfo from './DGNProjectInfo';
+import { CONSTRACTT } from '../../_platform/api';
 
 const Panel = Collapse.Panel;
 const $ = window.$;
@@ -57,6 +58,7 @@ export default class Plan extends Component {
             users: [],//人员树
             panorama: [],//全景图
             mapList: [],//轨迹列表
+            mapRould: [],//坐标
             panoramalink: '',
             panoramaModalVisble: false,
             userCheckedKeys: [],//用户被选中键值
@@ -165,7 +167,7 @@ export default class Plan extends Component {
     /*初始化地图*/
     initMap() {
         this.map = L.map('mapid', window.config.initLeaflet);
-     
+
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
         this.tileLayer = L.tileLayer(this.tileUrls[1], {
@@ -173,6 +175,9 @@ export default class Plan extends Component {
             id: 'tiandi-map',
             subdomains: this.subDomains
         }).addTo(this.map);
+
+
+
         //航拍影像
         if (CUS_TILEMAP)
             L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
@@ -220,29 +225,48 @@ export default class Plan extends Component {
         }
     }
 
-    /*在地图上添加marker和polygan*/
-    createMarker(geo, oldMarker) {
-        
-        var me = this;
-        if (geo.properties.type != 'area') {
-            if (!oldMarker) {
-                if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {
-                    return;
-                }
-                let iconType = L.divIcon({ className: this.getIconType(geo.type) });
-                let marker = L.marker(geo.geometry.coordinates);
-                // let marker = L.marker([116.03228,30.99795]);
-                console.log("marker",marker)
-                marker.bindPopup(L.popup({ maxWidth: 240 }).setContent(this.genPopUpContent(geo)));
-                marker.addTo(this.map);
-                return marker;
-            }
-            return oldMarker;
-        }
-    }
+    // /*在地图上添加marker和polygan*/
+    // createMarker(geo, oldMarker) {
+    //     var me = this;
+    //     console.log("geo", geo, )
+    //     //创建区域图形
+
+    //     //地块标注
+    //     console.log('area', area)
+
+    //     let latlng = area.getBounds().getCenter();
+
+    //     console.log('lat',latlng)
+    //     let label = L.marker([latlng.lat, latlng.lng], {
+    //         icon: L.divIcon({
+    //             className: this.getIconType('people'),
+    //             // className: 'label-text',
+    //             html: geo.properties.name,
+    //             iconSize: [48, 20]
+    //         })
+    //     });
+    //     area.addLayer(label);
+    //     //点击预览
+    //     area.on({
+    //         click: function (event) {
+    //             me.previewFile(geo.file_info, geo.properties);
+    //         }
+    //     });
+    //     return area;
+    // }
+
+    // let latlngs = geo.geometry.coordinates[0]
+    // let polyline = L.polyline(latlngs,{color:'red'}).addTo(this.map)
+    // this.map.fitBounds(polyline.getBounds())
+    // console.log('la',latlngs)
+
+
+
+
+
 
     options = [
-        { label: '巡检路线', value: 'geojsonFeature_people',IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access', },
+        { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access', },
 
     ];
     options1 = [
@@ -335,7 +359,6 @@ export default class Plan extends Component {
         switch (featureName) {
             case 'geojsonFeature_people':
                 content = this.state.users;
-                console.log("content",content)
                 break;
         }
         return content;
@@ -353,48 +376,63 @@ export default class Plan extends Component {
 
     }
 
-    findrould() {
-        let a = this.state.mapList
-        console.log("a", a)
-        const { getMapList } = this.props.actions;
-        getMapList({ routeID: a }).then((orgs) => {
-            console.log("我是", orgs)
-            let set = {}
-            orgs.forEach(item => {
+    findrould(event) {
 
-                set[item.RouteID] = []
-            })
-            orgs.forEach(item => {
-                if (set[item.RouteID]) {
-                    set[item.RouteID].push({
-                        'GPSTime': item.GPSTime, 'ID': item.ID,
-                        'Patroler': item.Patroler, 'X': item.X, 'Y': item.Y
-                    })
-                }
-            })
-            console.log("bbb", set)
-            let arr = []
-            for (var i in set) {
-                arr.push(set[i])
-
+        var event = event || window.event
+        var target = event.target || srcElement
+        let arr = this.state.mapRould
+        console.log('a', arr)
+        let brr = []
+        for (var k = 0; k < arr.length; k++) {
+            for (var i = 0; i < arr[k].length; i++) {
+                brr[i] = [arr[k][i].X, arr[k][i].Y];
             }
-            // let rows = set.GPSTime;
-            // arr.sort(function (a, b) {
-            //     return Date.parse(b.GPSTime) - Date.parse(a.GPSTime)
-            // })
-            let iconType = L.divIcon({className:'universal-access'});
-            L.marker([116.03228,30.99795],{icon:iconType}).addTo(this.map)
-            
-           
-            console.log("看一看", arr)
+        }
+        console.log("ccc", brr)
 
 
-        })
+        let latlngs = [["22.52", "113.8937304"], ["22.523", "113.893730454"], ["22.5234", "113.893730454"], ["22.523456", "113.893730454"]]
+        let polyline = L.polyline(latlngs, { color: 'red' }).addTo(this.map)
+        // this.map.fitBounds(polyline.getBounds())
+        // [116.03228, 30.99795],[116.03228, 30.99795], [116.02998, 30.99818], [116.02998, 30.99818], [116.02777, 30.99846],  [116.02777, 30.99846]
+
+
+        // marker.bindPopup(L.popup({ maxWidth: 240 }).setContent(this.genPopUpContent(geo)));
+
+        // let iconType = L.divIcon({ className: this.getIconType('people') });
+        // let marker = L.marker(["22.52", "113.893730454"],{ icon: iconType });
+        // marker.addTo(this.map);
+
+
+
+
+
+
+
+
+
+
+
+
+        // let message = {
+        //     "key": 3, "type": "Feature",
+        //     "properties": { "name": "18单元", "type": "area" },
+        //     "geometry": { "type": "Polygon", "coordinates":[[[113.877784386,22.5117639571],[113.882108643,22.5047736849],[113.882108641,22.5047736833],[113.868401504,22.5006748803],[113.866689052,22.5084447334],[113.877784386,22.5117639571]]] },
+
+        // }
+        // let area = L.geoJSON(message, {}).addTo(this.map);
+
+
+
+        //[[[113.877784386,22.5117639571],[113.882108643,22.5047736849],[113.882108641,22.5047736833],[113.868401504,22.5006748803],[113.866689052,22.5084447334],[113.877784386,22.5117639571]]]
+
 
 
     }
 
     onCheck(keys, featureName) {
+
+        
         let me = this;
         this.setState({ userCheckedKeys: keys }, () => {
             const { getMapList } = this.props.actions;
@@ -413,13 +451,19 @@ export default class Plan extends Component {
                         })
                     }
                 })
-                console.log("aaa", set)
-
                 let arr = []
                 for (var i in set) {
                     arr.push(i)
                 }
-                console.log('arr', arr)
+                // console.log('arr', arr)
+
+                let arr1 = []
+                for (var i in set) {
+                    arr1.push(set[i])
+
+                }
+                // console.log("arr1", arr1)
+                me.setState({ mapRould: arr1 })
                 me.setState({ mapList: arr });
             })
         });
@@ -487,6 +531,7 @@ export default class Plan extends Component {
 
     render() {
         let height = document.querySelector('html').clientHeight - 80 - 36 - 52;
+
         return (
             <div className="map-container">
                 <div ref="appendBody" className="l-map r-main"
@@ -501,8 +546,11 @@ export default class Plan extends Component {
                                 <UserSelect placeholder="查询人员" onChange={this.queryUser}></UserSelect>
                             </div>
                             <Collapse defaultActiveKey={[this.options[0].value]} accordion>
+
                                 {
+
                                     this.options.map((option) => {
+
                                         return (
                                             <Panel key={option.value} header={option.label}>
                                                 {this.renderPanel(option)}

@@ -28,4 +28,5 @@ export FormManage from './FormManage';
 export EducationRegister from './EducationRegister';
 export Unbearable from './Unbearable';
 export HiddenDanger from './HiddenDanger';
+export RiskFactor from './RiskFactor';
 export ProDoc from './ProDoc'

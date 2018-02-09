@@ -97,56 +97,55 @@ export default class HiddenDanger extends Component {
         });
     }
 
-    onViewClick(record, index) {
-        const { actions: { openPreview } } = this.props;
-        let data = this.state.dataSet;
-        let filed = {};
-        if (!data[index].attachment) {
-            filed = {
-                "a_file": `${SOURCE_API}/media/documents/2017/10/%E5%AE%89%E5%85%A8%E8%B4%A3%E4%BB%BB%E4%B9%A6.doc`,
-                "misc": "file",
-                "mime_type": "application/msword",
-                "download_url": `${STATIC_DOWNLOAD_API}/media/documents/2017/10/%E5%AE%89%E5%85%A8%E8%B4%A3%E4%BB%BB%E4%B9%A6.doc`,
-                "name": "安全责任书.doc"
-            }
-        } else {
-            filed.misc = "file";
-            filed.a_file = `${SOURCE_API}` + data[index].attachment[0].url;
-            filed.download_url = `${STATIC_DOWNLOAD_API}` + data[index].attachment[0].url;
-            filed.name = data[index].attachment[0].name;
-            filed.id = data[index].attachment[0].id;
-            let type = data[index].attachment[0].url.split('.')[1];
-            if (type == 'xlsx' || type == 'docx' || type == 'xls' || type == 'doc' || type == 'pptx' || type == 'ppt') {
-                filed.mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-            }
-            if (type == 'pdf') {
-                filed.mime_type = "application/pdf";
-            }
-        }
-        openPreview(filed);
-    }
+    // onViewClick(record, index) {
+    //     const { actions: { openPreview } } = this.props;
+    //     let data = this.state.dataSet;
+    //     let filed = {};
+    //     if (!data[index].attachment) {
+    //         filed = {
+    //             "a_file": `${SOURCE_API}/media/documents/2017/10/%E5%AE%89%E5%85%A8%E8%B4%A3%E4%BB%BB%E4%B9%A6.doc`,
+    //             "misc": "file",
+    //             "mime_type": "application/msword",
+    //             "download_url": `${STATIC_DOWNLOAD_API}/media/documents/2017/10/%E5%AE%89%E5%85%A8%E8%B4%A3%E4%BB%BB%E4%B9%A6.doc`,
+    //             "name": "安全责任书.doc"
+    //         }
+    //     } else {
+    //         filed.misc = "file";
+    //         filed.a_file = `${SOURCE_API}` + data[index].attachment[0].url;
+    //         filed.download_url = `${STATIC_DOWNLOAD_API}` + data[index].attachment[0].url;
+    //         filed.name = data[index].attachment[0].name;
+    //         filed.id = data[index].attachment[0].id;
+    //         let type = data[index].attachment[0].url.split('.')[1];
+    //         if (type == 'xlsx' || type == 'docx' || type == 'xls' || type == 'doc' || type == 'pptx' || type == 'ppt') {
+    //             filed.mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    //         }
+    //         if (type == 'pdf') {
+    //             filed.mime_type = "application/pdf";
+    //         }
+    //     }
+    //     openPreview(filed);
+    // }
 
     getRiskState(status){
-        // debugger
         switch (status) {
             case -1:
-                return "提交";
+                return "确认中"; 
             case 0:
                 return "整改中";
             case 1:
-                return "整改完成";
+                return "审核中";
             case 2:
-                return "确认完成";
-            case "提交":
+                return "完成";
+            case "确认中":
                 return -1;
             case "整改中":
                 return 0;
-            case "整改完成":
+            case "审核中":
                 return 1;
-            case "确认完成":
+            case "完成":
                 return 2;
             default:
-                return "提交";
+                return "确认中";
         }
     }
 
@@ -198,26 +197,26 @@ export default class HiddenDanger extends Component {
     //         this.setState({ dataSet: datas }); 
     //     });
     // }
-    createLink = (name, url) => {    //下载
-        let link = document.createElement("a");
-        link.href = url;
-        link.setAttribute('download', this);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+    // createLink = (name, url) => {    //下载
+    //     let link = document.createElement("a");
+    //     link.href = url;
+    //     link.setAttribute('download', this);
+    //     link.setAttribute('target', '_blank');
+    //     document.body.appendChild(link);
+    //     link.click();
+    //     document.body.removeChild(link);
+    // }
 
-    onDownClick(record, index) {
-        let data = this.state.dataSet;
-        if (data[index].attachment) {
-            let apiGet = `${STATIC_DOWNLOAD_API}` + data[index].attachment[0].url;
-            this.createLink(this, apiGet);
-        } else {
-            let apiGet = `${STATIC_DOWNLOAD_API}/media/documents/2017/10/%E5%AE%89%E5%85%A8%E8%B4%A3%E4%BB%BB%E4%B9%A6.doc`;
-            this.createLink(this, apiGet);
-        }
-    }
+    // onDownClick(record, index) {
+    //     let data = this.state.dataSet;
+    //     if (data[index].attachment) {
+    //         let apiGet = `${STATIC_DOWNLOAD_API}` + data[index].attachment[0].url;
+    //         this.createLink(this, apiGet);
+    //     } else {
+    //         let apiGet = `${STATIC_DOWNLOAD_API}/media/documents/2017/10/%E5%AE%89%E5%85%A8%E8%B4%A3%E4%BB%BB%E4%B9%A6.doc`;
+    //         this.createLink(this, apiGet);
+    //     }
+    // }
 
     onSelectChange = (value) => {
         this.setState({ currentSelectValue: value });
@@ -348,10 +347,10 @@ export default class HiddenDanger extends Component {
                                         defaultValue=""
                                         style={{ width: '100px', marginLeft: 5 }}
                                         onChange={(value) => this.onSelectChange(value)}>
-                                        <Option value={-1}>提交</Option>
+                                        <Option value={-1}>确认中</Option>
                                         <Option value={0}>整改中</Option>
-                                        <Option value={1}>整改完成</Option>
-                                        <Option value={2}>确认完成</Option>
+                                        <Option value={1}>审核中</Option>
+                                        <Option value={2}>完成</Option>
                                         <Option value=''>全部</Option>
                                     </Select>
                                 </Col>
