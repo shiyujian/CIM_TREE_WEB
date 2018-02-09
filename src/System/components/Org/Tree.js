@@ -11,6 +11,7 @@ export default class Tree extends Component {
 			sidebar: {node = {}} = {},
 		} = this.props;
 		const {code} = node || {};
+		console.log("code",code)
 		return (
 			<div>
 				<div style={{height: 35, paddingBottom: 5, borderBottom: '1px solid #dddddd', textAlign: 'center', marginBottom: 10}}>

@@ -260,7 +260,7 @@ export default class Orgdata extends Component {
 		console.log(this.props)
 		return (
 			<div>
-				<DynamicTitle title="组织机构2" {...this.props} />
+				<DynamicTitle title="组织机构填报" {...this.props} />
 				<Content>
 					<TableOrg2 {...this.props} {...this.state} />
 					{
