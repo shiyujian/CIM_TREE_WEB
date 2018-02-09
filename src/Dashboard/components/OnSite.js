@@ -170,7 +170,7 @@ export default class Lmap extends Component {
                                 if(rst2 instanceof Array && rst2.length > 0){
                                     getNewTreeData(rst1,rst1[0].No,rst2)
                                     this.setState({treeLists:rst},() => {
-                                        this.onSelect([rst2[0].No])
+                                        // this.onSelect([rst2[0].No])
                                     })
                                     // getNewTreeData(rst1,rst1[0].No,rst2)
                                     getTree({},{parent:rst2[0].No})
@@ -179,7 +179,7 @@ export default class Lmap extends Component {
                                     	 if(rst3 instanceof Array && rst3.length > 0){
                                     	 	 getNewTreeData(rst2,rst2[0].No,rst3)
 		                                    this.setState({treeLists:rst},() => {
-		                                        this.onSelect([rst3[0].No])
+		                                        // this.onSelect([rst3[0].No])
 		                                    })
 		                                    for(let i = 0 ; i<=rst3.length-1; i++){
 		                                    	getTree({},{parent:rst3[i].No}).then(rst4=>{
@@ -527,22 +527,58 @@ export default class Lmap extends Component {
 
 	
 	/*显示隐藏地图marker*/
-	onCheck(featureName,keys ) {
-		console.log(featureName,keys);
-		console.log(this.props);
+	// onCheck(featureName,keys ) {
+	// 	console.log(featureName,keys);
+	// 	console.log(this.props);
+	// 	const {actions: {getTreearea}} = this.props;
+ //        if (featureName === 'geojsonFeature_area'){
+	// 	    if (this.checkMarkers.toString() !=""){
+	// 			for (var i = 0; i<= this.checkMarkers.length-1; i++){
+	// 				this.checkMarkers[i].remove()
+	// 				delete  this.checkMarkers[i];
+	// 			}
+	// 		}
+	// 	}
+	// 	if (keys.length > 0){
+	// 		for(let j = 0; j<= keys.length; j++){
+	// 			// debugger;
+	// 	let treearea = [];
+ //        getTreearea({},{no:keys[j]}).then(rst=>{
+ //        	console.log(rst,"xixahoadaw");
+ //        	let str = rst.content[0].coords;
+ //        	var  target1 = str.slice(str.indexOf("(")+3,str.indexOf(")")).split(',').map(item=>{
+	// 			return item.split(' ').map(_item=>(_item-0))
+	// 		})
+	// 		console.log(target1);
+ //            treearea.push(target1);
+ //            console.log(treearea);
+ //            let message = {"key":3,"type":"Feature",
+	// 	               "properties":{"name":"18单元","type":"area"},
+	// 	               "geometry":{"type":"Polygon","coordinates":treearea},
+	// 	               "file_info":{"name":"18单元简介.pdf","misc":"file","download_url":"/media/documents/2017/06/18%E5%8D%95%E5%85%83%E7%AE%80%E4%BB%8B.pdf","a_file":"/media/documents/2017/06/18%E5%8D%95%E5%85%83%E7%AE%80%E4%BB%8B.pdf","create_time":"2017-06-22T08:40:07.500350Z","user":3,"id":1630,"mime_type":"application/pdf","size":299773}}
+ //            let oldMarker = undefined;
+ //            this.checkMarkers[0]= this.createMarker(message, this.checkMarkers[0]);
+ //            })
+ //          }
+ //        }
+	// }
+
+	/*弹出信息框*/
+	onSelect(keys,featureName) {
 		const {actions: {getTreearea}} = this.props;
-        if (featureName === 'geojsonFeature_area'){
-		    if (this.checkMarkers.toString() !=""){
-				for (var i = 0; i<= this.checkMarkers.length-1; i++){
-					this.checkMarkers[i].remove()
-					delete  this.checkMarkers[i];
-				}
+		console.log(featureName,keys);
+		
+	    
+	    if (this.checkMarkers.toString() !=""){
+			for (var i = 0; i<= this.checkMarkers.length-1; i++){
+				this.checkMarkers[i].remove()
+				delete  this.checkMarkers[i];
 			}
 		}
-		if (keys.length > 0){
-			for(let j = 0; j<= keys.length; j++){
-		let treearea = [];
-        getTreearea({},{no:keys[j]}).then(rst=>{
+		
+	    let treearea = [];
+	    console.log(keys[0]);
+        getTreearea({},{no:keys[0]}).then(rst=>{
         	console.log(rst,"xixahoadaw");
         	let str = rst.content[0].coords;
         	var  target1 = str.slice(str.indexOf("(")+3,str.indexOf(")")).split(',').map(item=>{
@@ -558,18 +594,11 @@ export default class Lmap extends Component {
             let oldMarker = undefined;
             this.checkMarkers[0]= this.createMarker(message, this.checkMarkers[0]);
             })
-          }
-        }
-	}
-
-	/*弹出信息框*/
-	onSelect(featureName,keys) {
-		console.log(featureName,keys);
-		let selItem = this.checkMarkers[0];
-		if(selItem){
-		this.map.fitBounds(selItem.getBounds(), {padding: [200, 200]});
-		selItem.openPopup();
-	    }
+	        let selItem = this.checkMarkers[0];
+			if(selItem){
+			this.map.fitBounds(selItem.getBounds(), {padding: [200, 200]});
+			selItem.openPopup();
+		    }
 	}
 
 	
@@ -722,9 +751,7 @@ export default class Lmap extends Component {
                         selectedKeys={this.state.leftkeycode}
                         onSelect={this.onSelect.bind(this)}
                         // onExpand={this.onExpand.bind(this)}
-                        checkable
                         showIcon={true}
-                        onCheck={this.onCheck.bind(this,option.value)}
                             />
 
 			
