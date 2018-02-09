@@ -245,6 +245,12 @@ export default class Project extends Component {
 				path: '/project/riskFactor',
 				icon: <Icon name="code" />
 			},{
+				key: 'RiskEvaluation',
+				id: 'PROJECT.RISKEVALUATION',
+				name: '危险源风险评价',
+				path: '/project/riskEvaluation',
+				icon: <Icon name="retweet" />
+			},{
 				key: 'EducationRegister',
 				id: 'SAFETY.EDUCATIONREGISTER',
 				name: '安全教育',
