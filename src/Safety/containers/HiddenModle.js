@@ -13,11 +13,34 @@ export default class HiddenModle extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // hazards: [],//安全隐患
+            currentStep:''
         }
     }
     componentDidMount() {
         this.initMap();
+    }
+
+    getRiskState(status){
+        switch (status) {
+            case -1:
+                return "确认中"; 
+            case 0:
+                return "整改中";
+            case 1:
+                return "审核中";
+            case 2:
+                return "完成";
+            case "确认中":
+                return -1;
+            case "整改中":
+                return 0;
+            case "审核中":
+                return 1;
+            case "完成":
+                return 2;
+            default:
+                return "确认中";
+        }
     }
 
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -75,6 +98,7 @@ export default class HiddenModle extends Component {
 
     render() {
         let detail = this.props.dataSous
+        this.state.currentStep=this.getRiskState(detail.status);
         return (
             <Modal
                 visible = {true}
@@ -96,7 +120,7 @@ export default class HiddenModle extends Component {
                     <Col span={6} style={{ float: 'right' }}><span style={{ fontSize: 16 }}>{`整改负责人：${detail.resPeople}`}</span></Col>
                 </Row>
                 <Row style={{ marginTop: 30 }}>
-                    <Steps /*current={this.state.currentSteps}*/>
+                    <Steps current={this.state.currentStep + 2}>
                         <Step title="发起" />
                         <Step title="确认" />
                         <Step title="整改" />

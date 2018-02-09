@@ -528,7 +528,9 @@ export default class Lmap extends Component {
 	
 	/*显示隐藏地图marker*/
 	onCheck(featureName,keys ) {
-        console.log(featureName,keys);
+		console.log(featureName,keys);
+		console.log(this.props);
+		const {actions: {getTreearea}} = this.props;
         if (featureName === 'geojsonFeature_area'){
 		    if (this.checkMarkers.toString() !=""){
 				for (var i = 0; i<= this.checkMarkers.length-1; i++){
@@ -538,13 +540,25 @@ export default class Lmap extends Component {
 			}
 		}
 		if (keys.length > 0){
-		let message = {"key":3,"type":"Feature",
+			for(let j = 0; j<= keys.length; j++){
+		let treearea = [];
+        getTreearea({},{no:keys[j]}).then(rst=>{
+        	console.log(rst,"xixahoadaw");
+        	let str = rst.content[0].coords;
+        	var  target1 = str.slice(str.indexOf("(")+3,str.indexOf(")")).split(',').map(item=>{
+				return item.split(' ').map(_item=>(_item-0))
+			})
+			console.log(target1);
+            treearea.push(target1);
+            console.log(treearea);
+            let message = {"key":3,"type":"Feature",
 		               "properties":{"name":"18单元","type":"area"},
-		               "geometry":{"type":"Polygon","coordinates":[[[113.877784386,22.5117639571],[113.882108643,22.5047736849],[113.882108641,22.5047736833],[113.868401504,22.5006748803],[113.866689052,22.5084447334],[113.877784386,22.5117639571]]]},
+		               "geometry":{"type":"Polygon","coordinates":treearea},
 		               "file_info":{"name":"18单元简介.pdf","misc":"file","download_url":"/media/documents/2017/06/18%E5%8D%95%E5%85%83%E7%AE%80%E4%BB%8B.pdf","a_file":"/media/documents/2017/06/18%E5%8D%95%E5%85%83%E7%AE%80%E4%BB%8B.pdf","create_time":"2017-06-22T08:40:07.500350Z","user":3,"id":1630,"mime_type":"application/pdf","size":299773}}
-		let oldMarker = undefined;
-     	this.checkMarkers[0]= this.createMarker(message, this.checkMarkers[0]);
-     	console.log(this.checkMarkers);
+            let oldMarker = undefined;
+            this.checkMarkers[0]= this.createMarker(message, this.checkMarkers[0]);
+            })
+          }
         }
 	}
 
@@ -707,7 +721,7 @@ export default class Lmap extends Component {
 			<PkCodeTree treeData={content}
                         selectedKeys={this.state.leftkeycode}
                         onSelect={this.onSelect.bind(this)}
-                        onExpand={this.onExpand.bind(this)}
+                        // onExpand={this.onExpand.bind(this)}
                         checkable
                         showIcon={true}
                         onCheck={this.onCheck.bind(this,option.value)}
@@ -716,24 +730,25 @@ export default class Lmap extends Component {
 			
 		)
 	}
-	onExpand(expandedKeys,info) {
-        const treeNode = info.node;
-        const {actions: {getTree}} = this.props;
-        const {treeLists} = this.state;
-        const keycode = treeNode.props.eventKey;
-        getTree({},{parent:keycode,paginate:false})
-        .then(rst => {
-            if(rst instanceof Array){
-                if(rst.length > 0 && rst[0].wptype != '子单位工程') {
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
-                }
-                getNewTreeData(treeLists,keycode,rst)
-                this.setState({treeLists:treeLists})
-            }
-        })
-    }
+	// onExpand(expandedKeys,info) {
+	// 	debugger;
+ //        const treeNode = info.node;
+ //        const {actions: {getTree}} = this.props;
+ //        const {treeLists} = this.state;
+ //        const keycode = treeNode.props.eventKey;
+ //        getTree({},{parent:keycode,paginate:false})
+ //        .then(rst => {
+ //            if(rst instanceof Array){
+ //                if(rst.length > 0 && rst[0].wptype != '子单位工程') {
+ //                    rst.forEach((item,index) => {
+ //                        rst[index].children = []
+ //                    })
+ //                }
+ //                getNewTreeData(treeLists,keycode,rst)
+ //                this.setState({treeLists:treeLists})
+ //            }
+ //        })
+ //    }
 
   
 
@@ -743,6 +758,9 @@ export default class Lmap extends Component {
 	}
 
 	}
+
+
+	// getNewTreeData(rst3,rst3[i].No,rst4);
  function getNewTreeData(treeData, curKey, child) {
     const loop = (data) => {
         data.forEach((item) => {
@@ -750,6 +768,8 @@ export default class Lmap extends Component {
 
                 item.children = child;
             }else{
+
+            	
                 if(item.children)
                     loop(item.children);
             }

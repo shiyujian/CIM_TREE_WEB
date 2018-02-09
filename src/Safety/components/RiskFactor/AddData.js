@@ -4,7 +4,7 @@ import {Input, Form, Spin,DatePicker} from 'antd';
 import moment from 'moment';
 const FormItem = Form.Item;
 
-export default class EditData extends Component {
+export default class AddDate extends Component {
 
 	constructor(props) {
 		super(props);

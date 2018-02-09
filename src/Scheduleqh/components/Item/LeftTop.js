@@ -13,17 +13,29 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         super(props);
         this.state={
             stime1: moment().format('2017-11-17 00:00:00'),
-            etime1: moment().format('2017-11-24 23:59:59'),
+            etime1: moment().format('2018-2-26 23:59:59'),
             departOptions:"",
-
+            data:"",
+            gpshtnum:[],
+            times:[],
+            unitproject:"",
+            project:"便道施工",
         }
+    }
+    componentWillReceiveProps(nextProps){
+      let params = {}
+      params.etime = this.state.etime1;
+      params.stime = this.state.stime1;
+      
+      params.project = this.state.project;
+      this.getdata(params);
     }
 
     componentDidMount() {
+       
+       let myChart = echarts.init(document.getElementById('lefttop'));
 
-        const myChart = echarts.init(document.getElementById('lefttop'));
-
-        this.optionLine = {
+       let optionLine = {
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
@@ -41,8 +53,9 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             xAxis: [
                 {
                     type: 'category',
-                    data: ['2017-11-13','2017-11-13','2017-11-13','2017-11-13','2017-11-13','2017-11-13','2017-11-13'],
-                    axisPointer: {
+                    data: this.state.times,
+                    axisPointer: 
+                     {
                         type: 'shadow'
                     }
                 }
@@ -51,99 +64,20 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                 {
                     type: 'value',
                     name: '长度（m）',
-                    min: 0,
-                    max: 180,
-                    interval: 20,
                     axisLabel: {
                         formatter: '{value} '
                     }
                 },
-                {
-                    type: 'value',
-                    name: '优良率（%）',
-                    min: 0,
-                    max: 100,
-                    interval: 20,
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                }
             ],
-            series: [
-                {
-                    name:'总数',
-                    type:'bar',
-                    data:[82,85,79,83,90,89,95],
-                    barWidth:'25%',
-                    itemStyle:{
-                        normal:{
-                            color:'#02e5cd',
-                            barBorderRadius:[50,50,50,50]
-                        }
-                    }
-                },
-                {
-                    name:'一标',
-                    type:'line',
-                    yAxisIndex: 1,
-                    data:[82,85,79,83,90,89,95],
-                    itemStyle:{
-                        normal:{
-                            color:'black'
-                        }
-                    }
-                },
-                {
-                    name:'二标',
-                    type:'line',
-                    yAxisIndex: 1,
-                    data:[42,45,49,43,42,45,49,43],
-                    itemStyle:{
-                        normal:{
-                            color:'orange'
-                        }
-                    }
-                },
-                {
-                    name:'三标',
-                    type:'line',
-                    yAxisIndex: 1,
-                    data:[72,75,79,63,52,75,79,73],
-                    itemStyle:{
-                        normal:{
-                            color:'yellow'
-                        }
-                    }
-                },
-                {
-                    name:'四标',
-                    type:'line',
-                    yAxisIndex: 1,
-                    data:[32,25,49,33,52,65,39,53],
-                    itemStyle:{
-                        normal:{
-                            color:'blue'
-                        }
-                    }
-                },
-                {
-                    name:'五标',
-                    type:'line',
-                    yAxisIndex: 1,
-                    data:[12,25,39,33,42,55,69,63],
-                    itemStyle:{
-                        normal:{
-                            color:'green'
-                        }
-                    }
-                }
-            ]
+            series: []
         };
-        myChart.setOption(this.optionLine,true);
+        myChart.setOption(optionLine);
     }
     
     
     render() { //todo 累计完成工程量
+        console.log(this.state.data);
+        
         return (
             <div >
             <Card>
@@ -159,24 +93,196 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                             </RangePicker>
                     <div id='lefttop' style={{ width: '100%', height: '340px' }}></div>
                     <Select 
-                          placeholder="请选择部门"
-                          notFoundContent="暂无数据"
-                          defaultValue="1"
-                          onSelect={this.onDepartments.bind(this,'departments') }>
-                          <Option value="1">便道施工</Option>
-                          <Option value="2">给排水沟开挖</Option>
-                          <Option value="3">常绿乔木</Option>
-                          <Option value="4">落叶乔木</Option>
-                          <Option value="5">亚乔木</Option>
-                          <Option value="6">灌木</Option>
-                          <Option value="7">草木</Option>
+                          style={{width:'100px'}}
+                          defaultValue="便道施工"
+                          onSelect={this.onDepartments.bind(this)}
+                          onChange={this.onChange.bind(this)}>
+                          <Option key="1" value="便道施工">便道施工</Option>
+                          <Option key="2" value="给排水沟槽开挖">给排水沟槽开挖</Option>
+                          <Option key="3" value="给排水管道安装">给排水管道安装</Option>
+                          <Option key="4" value="给排水回填">给排水回填</Option>
+                          <Option key="5" value="绿地平整">绿地平整</Option>
+                          <Option key="6" value="种植穴工程">种植穴工程</Option>
+                          <Option key="7" value="常绿乔木">常绿乔木</Option>
+                          <Option key="8" value="落叶乔木">落叶乔木</Option>
+                          <Option key="9" value="亚乔木">亚乔木</Option>
+                          <Option key="10" value="灌木">灌木</Option>
+                          <Option key="11" value="草木">草木</Option>
                     </Select>
                     <span>强度分析</span>
                 </Card>
             </div>
         );
+        
+      
     }
     datepick(){}
-    datepickok(){}
-    onDepartments(){}
+    datepickok(value){
+      this.setState({etime1:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'',
+                     stime1:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'',
+                  })
+      let params = {}
+      params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'';
+      params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'';
+      params.project = this.state.project;
+      this.getdata(params);
+    }
+    onDepartments(value){
+      this.setState({
+        project:value,
+      })
+      let params = {}
+      params.etime = this.state.etime1;
+      params.stime = this.state.stime1;
+      params.project = value;
+            this.getdata(params);
+    }
+    onChange(value){
+        console.log(value);
+        this.setState({
+            project:value,
+        })
+        
+
+    }
+    getdata(value){
+      const {actions: {progressdata,progressalldata}} = this.props;
+      let gpshtnum = [];
+      let times = [];
+      progressdata({},value).then(rst=>{
+        console.log(rst);
+        
+        for(let i = 0 ;i<=rst.length-1;i++){
+            gpshtnum.push(rst[i].Num);
+            let time = new Date(rst[i].CreateTime).toLocaleDateString()
+            times.push(time);
+        }
+        this.setState({
+          gpshtnum:gpshtnum,
+          times:times,
+        })
+        let myChart = echarts.init(document.getElementById('lefttop'));
+      let optionLine = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            legend: {
+                data:['总数','一标','二标','三标','四标','五标'],
+                left:'right'
+                
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: this.state.times,
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '长度（m）',
+                    axisLabel: {
+                        formatter: '{value} '
+                    }
+                },
+              
+            ],
+            series: [
+                {
+                    name:'总数',
+                    type:'bar',
+                    data:gpshtnum,
+                    barWidth:'25%',
+                    itemStyle:{
+                        normal:{
+                            color:'#02e5cd',
+                            barBorderRadius:[50,50,50,50]
+                        }
+                    }
+                },
+                {
+                    name:'一标',
+                    type:'line',
+                    data:gpshtnum,
+                    itemStyle:{
+                        normal:{
+                            color:'black'
+                        }
+                    }
+                },
+                {
+                    name:'二标',
+                    type:'line',
+                    data:gpshtnum,
+                    itemStyle:{
+                        normal:{
+                            color:'orange'
+                        }
+                    }
+                },
+                {
+                    name:'三标',
+                    type:'line',
+                    data:gpshtnum,
+                    itemStyle:{
+                        normal:{
+                            color:'yellow'
+                        }
+                    }
+                },
+                {
+                    name:'四标',
+                    type:'line',
+                    data:gpshtnum,
+                    itemStyle:{
+                        normal:{
+                            color:'blue'
+                        }
+                    }
+                },
+                {
+                    name:'五标',
+                    type:'line',
+                    data:gpshtnum,
+                    itemStyle:{
+                        normal:{
+                            color:'green'
+                        }
+                    }
+                }
+            ]
+        };
+        myChart.setOption(optionLine);
+      })
+      
+      // let biaoduan = ['1标段','2标段','3标段','4标段','5标段'];
+      // let numbers = [];
+      // for (let j=0; j<=biaoduan.length-1; j++){
+      //     value.unitproject = biaoduan[i];
+      //     progressdata({},value).then(rst=>{
+      //       console.log(rst);
+      //         let gpsht = rst;
+      //         let gpshtnum = [];
+      //         let times = [];
+      //         for(var i = 0; i<=gpsht.length-1; i++){
+      //             gpshtnum.push(gpsht[i].Num);
+      //             let time = new Date(gpsht[i].CreateTime).toLocaleDateString()
+      //             times.push(time);
+      //         }
+      //         numbers.push(gpshtnum);
+      //   })
+      // }
+      // console.log(numbers,"realy");
+      
+      
+    }
 }
