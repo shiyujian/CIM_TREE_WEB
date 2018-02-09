@@ -41,7 +41,7 @@ export default class Dispatch extends Component {
 			tabValue = '1',
 		} = this.props;
 		return (
-			<div>
+			<div style={{overflow: 'hidden', padding: 20}}>
 				<DynamicTitle title="现场收发文" {...this.props}/>
 				<Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
 					<TabPane tab="收文管理" key="1">
