@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import { Modal, Input, Form, Button, Notification, Table, Radio, Row, Col, Select } from 'antd';
 import { CODE_PROJECT } from '_platform/api';
-import '../index.less'; 
-import {getUser} from '_platform/auth';
-import {getNextStates} from '_platform/components/Progress/util';
-import {WORKFLOW_CODE} from '_platform/api'
-import {flattenDeep} from 'lodash';
+import '../index.less';
+import { getUser } from '_platform/auth';
+import { getNextStates } from '_platform/components/Progress/util';
+import { WORKFLOW_CODE } from '_platform/api'
+import { flattenDeep } from 'lodash';
 const RadioGroup = Radio.Group;
 const { TextArea } = Input;
 var moment = require('moment');
 
 export default class PersonModify extends Component {
-	constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             dataSource: [],
@@ -20,144 +20,172 @@ export default class PersonModify extends Component {
             checkers: [],
             defaultPro: "",
             defaultchecker: "",
-            units:[],
-            selectPro:[],
-            selectUnit:[],
+            units: [],
+            selectPro: [],
+            selectUnit: [],
             subErr: true,
             description: '',
+            id:'',
         }
     }
 
-    componentDidMount(){
-        const {Modvisible, modifyPer, actions:{getAllUsers, getProjects}} = this.props;
+    componentDidMount() {
+        const { Modvisible, modifyPer, actions: { getAllUsers, getProjects } } = this.props;
 
         this.setState({
-            dataSource:[modifyPer]
+            dataSource: [modifyPer]
         })
-        
+
     }
 
-	render() {
-		const {Modvisible, actions: {getOrgReverse}} = this.props;
-		const columns = [{
-			title: '序号',
-			dataIndex: 'index',
-			key: 'Index',
-		}, {
-			title: '人员编码',
-			dataIndex: 'code',
-			key: 'Code',
-		}, {
-			title: '姓名',
-			dataIndex: 'name',
-			key: 'Name',
-			render:(text, record, index) =>{
-	            return <Input value = {record.name || ""} onChange={ele => {
-	                record.name = ele.target.value
-	                this.forceUpdate();
-	            }}/>
-	        }
-		}, {
-			title: '所在组织机构单位',
-			// dataIndex: 'type',
-            // key: 'Org',
-            render:(text, record, index) =>{
-                if(record.type !== '') {
-                    return (<span>{record.type}</span>)
-                }else {
-                    return (<span>暂无</span>)
-                }
+    render() {
+        const { Modvisible, actions: { getOrgReverse } } = this.props;
+        const columns = [{
+            title: '序号',
+            dataIndex: 'index',
+            key: 'Index',
+        }, {
+            title: '人员编码',
+            dataIndex: 'code',
+            key: 'Code',
+        }, {
+            title: '姓名',
+            dataIndex: 'name',
+            key: 'Name',
+            render: (text, record, index) => {
+                return <Input value={record.name || ""} onChange={ele => {
+                    record.name = ele.target.value
+                    this.forceUpdate();
+                }} />
             }
-		}, {
-			title: '所属部门',
-			dataIndex: 'orgcode',
+        },
+        //  {
+        //     title: '所在组织机构单位',
+        //     dataIndex: 'type',
+        //     key: 'Org',
+        //     render: (text, record, index) => {
+        //         if (record.type !== '') {
+        //             return (<span>{record.type}</span>)
+        //         } else {
+        //             return (<span>暂无</span>)
+        //         }
+        //     }
+        // },
+         {
+            title: '所属部门',
+            dataIndex: 'orgcode',
             key: 'Depart',
-            width:"15%",
-            
-            render:(test,record,index) => {
+            width: "15%",
+
+            render: (test, record, index) => {
                 if (record.type === "") {
                     return <Input
-                    style={{ color: 'red' }}
-                    value={record.orgcode || ""}
-                    onChange={this.tableDataChange.bind(this, record,index)}
+                        style={{ color: 'red' }}
+                        value={record.orgcode || ""}
+                        onChange={this.tableDataChange.bind(this, record, index)}
                     // onBlur={this.fixOrg.bind(this, index)}
-                />
-                }else{
+                    />
+                } else {
                     return <Input
-                    value={record.orgcode || ""}
-                    onChange={this.tableDataChange.bind(this, record, index)}
+                        value={record.orgcode || ""}
+                        onChange={this.tableDataChange.bind(this, record, index)}
                     // onBlur={this.fixOrg.bind(this, index)}
-                />
+                    />
                 }
             }
-		}, {
-			title: '职务',
-			dataIndex: 'job',
-			key: 'Job',
-			render:(text, record, index) =>{
-	            return <Input value = {record.job || ""} onChange={ele => {
-	                record.job = ele.target.value
-	                this.forceUpdate();
-	            }}/>
-	        }
-		}, {
-			title: '性别',
-			dataIndex: 'sexr',
-			key: 'Sex',
-			render:(text, record, index) =>{
-	            return <Select style={{width: 42}} value = {record.sex} onChange={ele => {
-	                record.sex = ele
-	                this.forceUpdate();
-	            }}>
-	            	<Option value="男">男</Option>
-	            	<Option value="女">女</Option>
-	            </Select>
-	        }
-		}, {
-			title: '手机号码',
-			dataIndex: 'tel',
-			key: 'Tel',
-			render:(text, record, index) =>{
-	            return <Input type='number' value = {record.tel || ""} onChange={ele => {
-	                record.tel = ele.target.value
-	                this.forceUpdate();
-	            }}/>
-	        }
-		}, {
-			title: '邮箱',
-			dataIndex: 'email',
-			key: 'Email',
-			render:(text, record, index) =>{
-	            return <Input value = {record.email || ""} onChange={ele => {
-	                record.email = ele.target.value
-	                this.forceUpdate();
-	            }}/>
-	        }
+        }, {
+            title: '职务',
+            dataIndex: 'job',
+            key: 'Job',
+            render: (text, record, index) => {
+                return <Input value={record.job || ""} onChange={ele => {
+                    record.job = ele.target.value
+                    this.forceUpdate();
+                }} />
+            }
+        }, {
+            title: '性别',
+            dataIndex: 'sexr',
+            key: 'Sex',
+            render: (text, record, index) => {
+                return <Select style={{ width: 42 }} value={record.sex} onChange={ele => {
+                    record.sex = ele
+                    this.forceUpdate();
+                }}>
+                    <Option value="男">男</Option>
+                    <Option value="女">女</Option>
+                </Select>
+            }
+        }, {
+            title: '手机号码',
+            dataIndex: 'tel',
+            key: 'Tel',
+            render: (text, record, index) => {
+                return <Input type='number' value={record.tel || ""} onChange={ele => {
+                    record.tel = ele.target.value
+                    this.forceUpdate();
+                }} />
+            }
+        }, {
+            title: '邮箱',
+            dataIndex: 'email',
+            key: 'Email',
+            render: (text, record, index) => {
+                return <Input value={record.email || ""} onChange={ele => {
+                    record.email = ele.target.value
+                    this.forceUpdate();
+                }} />
+            }
         }
         // , {
-		// 	title: '二维码',
-		// 	// dataIndex: 'signature',
-		// 	// key: 'Signature',
-		// 	render:(record) => {
-	    //         if(record.signature.indexOf("document") !== -1) {
-        //             return <img style={{width: 60}} src={record.signature}/>
-        //         }else {
-        //             return <span>暂无</span>
-        //         }
-	    //     }
+        //     title: '用户名',
+        //     dataIndex: 'username',
+        //     key: 'username',
+        //     render: (text, record, index) => {
+        //         // console.log("record",record.username)
+        //         return <Input value={record.username || ""} onChange={ele => {
+        //             record.username = ele.target.value
+        //         // console.log("222",record.username)
+                
+        //             this.forceUpdate();
+        //         }} />
+        //     }
         // }
-        , {
+        // ,{
+        //     title: '密码',
+        //     dataIndex: 'passwords',
+        //     key: 'Passwords',
+        //     render: (text, record, index) => {
+        //         return <Input value={record.passwords || ""} onChange={ele => {
+        //             record.passwords = ele.target.value
+        //             this.forceUpdate();
+        //         }} />
+        //     }
+        // }
+            // , {
+            // 	title: '二维码',
+            // 	// dataIndex: 'signature',
+            // 	// key: 'Signature',
+            // 	render:(record) => {
+            //         if(record.signature.indexOf("document") !== -1) {
+            //             return <img style={{width: 60}} src={record.signature}/>
+            //         }else {
+            //             return <span>暂无</span>
+            //         }
+            //     }
+            // }
+            , {
             title: '是否为用户',
-            render:(record) => {
+            render: (record) => {
                 if (record.is_user) {
                     return (<span>是</span>)
-                }else{
+                } else {
                     return (<span>否</span>)
                 }
             }
-		}]
-		
-		return (
+        }]
+
+        return (
             <Modal
                 onCancel={this.cancel.bind(this)}
                 visible={Modvisible}
@@ -184,32 +212,33 @@ export default class PersonModify extends Component {
 		    	<TextArea rows={2} style={{margin: '10px 0'}} onChange={this.description.bind(this)} placeholder='请输入变更原因'/> */}
             </Modal>
         )
-	}
+    }
 
-	description(e) {
-		this.setState({description:e.target.value})
-	}
+    description(e) {
+        this.setState({ description: e.target.value })
+    }
 
-	onChange = (e) => {
-	    this.setState({
-	    	value: e.target.value,
-	    });
-	}
+    onChange = (e) => {
+        console.log("2222",e.target.value)
+        this.setState({
+            value: e.target.value,
+        });
+    }
 
-   async onok(id) {
+    async onok(id) {
         if (this.state.dataSource[0].type === "") {
             Notification.warning({
-                message:"该部门不存在！！"
+                message: "该部门不存在！！"
             })
             return;
         }
         const {
-			addition = {}, sidebar: {node} = {},
-			actions: {postUser, clearAdditionField, getUsers, putUser}
+			addition = {}, sidebar: { node } = {},
+            actions: { postUser, clearAdditionField, getUsers, putUser }
         } = this.props;
         console.log(this.props)
-        console.log(addition)
-        const { actions: { ModifyVisible ,PutPeople,getOrgName,putPersons,reverseFind,is_fresh} } = this.props;
+        // console.log(addition)
+        const { actions: { ModifyVisible, PutPeople, getOrgName, putPersons, reverseFind, is_fresh } } = this.props;
         let obj = this.state.dataSource;
         let data_list = {};
         let pks = [];
@@ -222,54 +251,58 @@ export default class PersonModify extends Component {
             // let rst = await reverseFind({pk:obj[0].personPk})
             console.log(obj)
             obj.map((item, index) => {
-                console.log(item)
-                data_list={
-					username: item.usernames,
-					email: item.email ,
-					// password: addition.password, // 密码不能变？信息中没有密码
-					account: {
-						person_name: item.person_name || '',
-						person_type: "C_PER",
-						person_avatar_url: "",
-						organization: {
-							// pk: "119677274701" || '',
-							code: item.code || '',
-							obj_type: "C_ORG",
-							rel_type: "member",
-							name: item.name || ''
-						},
-					},
-					// groups: roles.map(role => +role),
-					is_active: true,
-					basic_params: {
-						info: {
-							'电话': item.tel || '',
-							'性别': item.sex || '',
-							'技术职称': item.title || '',
-							'phone':item.tel || '',
-							'sex':item.sex || '',
-							'duty':''
-						}
-					},
-					extra_params: {},
-					title: item.job || ''
-				}
+                console.log("item.username",item)
+
+                putUser({ id: item.id}, {
+                    email: item.email,
+                    password: item.passwords, // 密码不能变？信息中没有密码
+                    account: {
+                        person_name: item.name || '',
+                        person_type: "C_PER",
+                        person_avatar_url: "",
+                        username: item.username,
+                        organization: {
+                            // pk: "119677274701" || '',
+                            code: item.code || '',
+                            obj_type: "C_ORG",
+                            rel_type: "member",
+                            username: item.username,
+                            // name: item.name || ''
+                        },
+                    },
+                    // groups: roles.map(role => +role),
+                    is_active: true,
+                    basic_params: {
+                        info: {
+                            '电话': item.tel || '',
+                            '性别': item.sex || '',
+                            '技术职称': item.title || '',
+                            'phone': item.tel || '',
+                            'sex': item.sex || '',
+                            'duty': ''
+                        }
+                    },
+                    extra_params: {},
+                    title: item.job || '',
+                    id: item.id,
+                    username: item.username,
+                }).then(item => {
+                    console.log(item)
+                    if (item) {
+                        is_fresh(true);
+                        // clearAdditionField();
+						// const codes = Addition.collect(node);
+						// console.log("codes",codes)
+						// getUsers({}, {org_code: item.account.org_code});
+                        Notification.success({
+                            message: "修改成功！"
+                        })
+                    }
+                })
             })
             console.log("11111", obj[0].id)
-            
-            PutPeople({id: obj[0].id }, data_list).then(item => {
-                console.log(item)
-                if (item) {
-                    is_fresh(true);
-                    // clearAdditionField();
-                    // const codes = Addition.collect(node);
-                    // console.log("codes",codes)
-                    // getUsers({}, {org_code: codes});
-                    Notification.success({
-                        message:"修改成功！"
-                    })
-                }
-            })
+
+
             // 修改人员
             // putPersons({pk:rst[0].user.id},data_list).then(rst => {
             //     obj.map((item, index) => {
@@ -305,7 +338,7 @@ export default class PersonModify extends Component {
             //         }
             //     })
             // })
-        }else{
+        } else {
             // 只修改人员
             // obj.map((item, index) => {
             //     data_list={
@@ -341,57 +374,57 @@ export default class PersonModify extends Component {
         }
         ModifyVisible(false);
     }
-    mapCodes (arr) {
-		return arr.map(item => {
-			if(item.children && item.children.length) {
-				return [
-					item.code,
-					this.mapCodes(item.children)
-				]
-			} else {
-				return item.code;
-			}
-		})
-		// if(arr.children && arr.children.length) {
-		// 	return arr.map()
-		// }
-	}
-    tableDataChange(record,index ,e ){
-        const {actions: {getOrgReverse}} = this.props;
+    mapCodes(arr) {
+        return arr.map(item => {
+            if (item.children && item.children.length) {
+                return [
+                    item.code,
+                    this.mapCodes(item.children)
+                ]
+            } else {
+                return item.code;
+            }
+        })
+        // if(arr.children && arr.children.length) {
+        // 	return arr.map()
+        // }
+    }
+    tableDataChange(record, index, e) {
+        const { actions: { getOrgReverse } } = this.props;
         const { dataSource } = this.state;
         // dataSource[index].depart = e.target.value;
         record.orgcode = e.target.value;
         this.forceUpdate();
-        getOrgReverse({code:record.orgcode}).then(rst => {
-            if(rst.children.length !== 0) {
+        getOrgReverse({ code: record.orgcode }).then(rst => {
+            if (rst.children.length !== 0) {
                 record.type = rst.children[0].name
-            }else {
+            } else {
                 record.type = ''
             }
             this.forceUpdate();
         })
     }
     //校验部门
-    fixOrg(index){
-        const {actions: {getOrgReverse}} = this.props;
-        let {dataSource} = this.state
-        getOrgReverse({code:dataSource[index].depart}).then(rst => {
-            if(rst.children.length !== 0){
+    fixOrg(index) {
+        const { actions: { getOrgReverse } } = this.props;
+        let { dataSource } = this.state
+        getOrgReverse({ code: dataSource[index].depart }).then(rst => {
+            if (rst.children.length !== 0) {
                 dataSource[index]['orgname'] = {
                     org: rst.children[0].name
                 }
-                this.setState({dataSource})
-            }else{
+                this.setState({ dataSource })
+            } else {
                 Notification.Warning("部门不存在！")
             }
         })
     }
 
-	//删除
-    delete(){
-        
+    //删除
+    delete() {
+
     }
-	cancel() {
+    cancel() {
         const { actions: { ModifyVisible } } = this.props;
         ModifyVisible(false);
     }

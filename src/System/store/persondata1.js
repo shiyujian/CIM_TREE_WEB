@@ -16,7 +16,7 @@ export const postAllUsersId = createFetchAction(`${base}/workflowapp/api/instanc
 export const postPersonList = createFetchAction(`${SERVICE_API}/personlist/`, [], "POST");
 export const putPersonList = createFetchAction(`${SERVICE_API}/personlist/`, [], "PUT");
 export const getOrgList = createFetchAction(`${SERVICE_API}/org-tree/?depth=7`);
-export const getOrgReverse = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/?reverse=true`,[], "GET");
+export const getOrgReverse = createFetchAction(`http://47.104.160.65:6530/service/construction/api/org-tree/code/{{code}}/`,[], "GET");
 export const getOrgCode = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[], "GET");
 export const deleteUserList = createFetchAction(`${USER_API}/users/{{pk}}/`, [], "DELETE");
 export const getCheckList = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`, [], "GET");

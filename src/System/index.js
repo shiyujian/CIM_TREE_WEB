@@ -119,14 +119,14 @@ export default class System extends Component {
 		},{
 			key: 'Orgdata',
 			id: 'SYSTEM.ORGDATA',
-			name: '组织机构1',
+			name: '组织机构填报',
 			path: '/system/orgdata',
 			icon: <Icon name="street-view"/>
 		},
 		{
 			key: 'Personsdata',
 			id: 'SYSTEM.PERSONSDATA',
-			name: '人员信息1',
+			name: '人员信息填报',
 			path: '/system/personsdata',
 			icon: <Icon name="street-view"/>
 		},
