@@ -5,21 +5,21 @@ import { Alert } from 'antd';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
 import PkCodeTree from '../components/PkCodeTree';
-import reducer, { actions } from '../store/unbearable';
+import reducer, { actions } from '../store/riskEvaluation';
 import Button from "antd/es/button/button";
-import AddDirPanel from "../components/Unbearable/AddDirPanel";
-import DelDirPanel from "../components/Unbearable/DelDirPanel";
-export const Datumcode = window.DeathCode.SAFETY_HJBH;
+import AddDirPanel from "../components/RiskEvaluation/AddDirPanel";
+import DelDirPanel from "../components/RiskEvaluation/DelDirPanel";
+export const Datumcode = window.DeathCode.SAFETY_FXPJ;
 
 @connect(
 	state => {
 		const {
 			project: {
-				unbearable = {}
+				riskEvaluation = {}
 			} = {},
 			platform 
 			} = state;
-			return {...unbearable, platform};
+			return {...riskEvaluation, platform};
 		},
 	dispatch => ({
 		actions: bindActionCreators(
@@ -31,7 +31,7 @@ export const Datumcode = window.DeathCode.SAFETY_HJBH;
 	})
 )
 
-export default class Unbearable extends Component {
+export default class RiskEvaluation extends Component {
 	
 	static propTypes = {};
 	constructor(props){
@@ -96,7 +96,7 @@ export default class Unbearable extends Component {
 		return (
 
 			<div>
-				<DynamicTitle title="环境保护" {...this.props} />
+				<DynamicTitle title="危险源风险评价" {...this.props} />
 				<Sidebar>
 					<div style={{borderBottom: 'solid 1px #999', paddingBottom: 8,}}>
 						<Button style={this.state.data === "undefined" ? this.state.hidden : this.state.show} onClick={() => {refreshPanelTo('ADD');}}>新增目录</Button>

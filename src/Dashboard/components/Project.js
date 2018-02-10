@@ -130,12 +130,12 @@ export default class Lmap extends Component {
 		this.initMap();
 	}
 
-	componentWillUnmount() {
-		if (this.state.iframe_key) {
-			$('#showCityMarkerId')[0].contentWindow.terminateRender &&
-			$('#showCityMarkerId')[0].contentWindow.terminateRender();
-		}
-	}
+	// componentWillUnmount() {
+	// 	if (this.state.iframe_key) {
+	// 		$('#showCityMarkerId')[0].contentWindow.terminateRender &&
+	// 		$('#showCityMarkerId')[0].contentWindow.terminateRender();
+	// 	}
+	// }
 
 	
 	
@@ -143,13 +143,13 @@ export default class Lmap extends Component {
 	subDomains = ['7'];
 
 	tileUrls = {
-		1: window.config.IMG_W,
-		2: window.config.VEC_W,
-		3: window.config.IMG_1,
-		4: window.config.IMG_2,
-		5: window.config.IMG_3,
-		6: window.config.IMG_4,
-		7: window.config.IMG_5,
+		// 1: window.config.IMG_W,
+		// 2: window.config.VEC_W,
+		1: window.config.IMG_1,
+		2: window.config.IMG_2,
+		3: window.config.IMG_3,
+		4: window.config.IMG_4,
+		5: window.config.IMG_5,
 		
 
 	};
@@ -166,45 +166,45 @@ export default class Lmap extends Component {
 			subdomains: this.subDomains
 		}).addTo(this.map);
 		//航拍影像
-		if (CUS_TILEMAP)
-			L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
+		// if (CUS_TILEMAP)
+		// 	L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
 
-		L.tileLayer.wms(this.WMSTileLayerUrl, {
-			subdomains: this.subDomains
-		}).addTo(this.map);
-		let me = this;
+		// L.tileLayer.wms(this.WMSTileLayerUrl, {
+		// 	subdomains: this.subDomains
+		// }).addTo(this.map);
+		// let me = this;
 
-		document.querySelector('.leaflet-popup-pane').addEventListener('click', function (e) {
-			let target = e.target;
-			//绑定轨迹查看点击事件
-			if (target.getAttribute('class') == 'btnViewTrack') {
-				let id = target.getAttribute('data-id');
-				//拿到人员信息
-				let user = me.user.userList[id];
-				let name = user.properties.name;
+		// document.querySelector('.leaflet-popup-pane').addEventListener('click', function (e) {
+		// 	let target = e.target;
+		// 	//绑定轨迹查看点击事件
+		// 	if (target.getAttribute('class') == 'btnViewTrack') {
+		// 		let id = target.getAttribute('data-id');
+		// 		//拿到人员信息
+		// 		let user = me.user.userList[id];
+		// 		let name = user.properties.name;
 
-				//开始显示轨迹
-				me.setState({isShowTrack: false});
-				me.setState({isShowTrack: true, trackId: id, trackUser: name});
-			}
-			//绑定隐患详情点击事件
-			if (target.getAttribute('class') == 'btnViewRisk') {
-				let idRisk = target.getAttribute('data-id');
-				let risk = null;
-				me.state.hazards.forEach(v => {
-					if (!risk)
-						risk = v.children.find(v1 => v1.key == parseInt(idRisk));
-				});
-				if (risk) {
-					let oldRisk = me.state.risk;
-					oldRisk.showRiskDetail = true;
-					oldRisk.processHistory = [];
-					oldRisk.detail = risk;
-					me.setState({risk: oldRisk});
-					me.getRiskProcess(idRisk);
-				}
-			}
-		})
+		// 		//开始显示轨迹
+		// 		me.setState({isShowTrack: false});
+		// 		me.setState({isShowTrack: true, trackId: id, trackUser: name});
+		// 	}
+		// 	//绑定隐患详情点击事件
+		// 	if (target.getAttribute('class') == 'btnViewRisk') {
+		// 		let idRisk = target.getAttribute('data-id');
+		// 		let risk = null;
+		// 		me.state.hazards.forEach(v => {
+		// 			if (!risk)
+		// 				risk = v.children.find(v1 => v1.key == parseInt(idRisk));
+		// 		});
+		// 		if (risk) {
+		// 			let oldRisk = me.state.risk;
+		// 			oldRisk.showRiskDetail = true;
+		// 			oldRisk.processHistory = [];
+		// 			oldRisk.detail = risk;
+		// 			me.setState({risk: oldRisk});
+		// 			me.getRiskProcess(idRisk);
+		// 		}
+		// 	}
+		// })
 	}
 
 
@@ -282,11 +282,11 @@ export default class Lmap extends Component {
 						this.state.isVisibleMapBtn ?
 							<div className="treeControl">
 								<div>
-									<Button onClick={this.toggleTileLayer.bind(this, 1)}>2月1日</Button>
-									<Button onClick={this.toggleTileLayer.bind(this, 2)}>2月2日</Button>
-									<Button onClick={this.toggleTileLayer.bind(this, 3)}>2月3日</Button>
-									<Button onClick={this.toggleTileLayer.bind(this, 4)}>2月4日</Button>
-									<Button onClick={this.toggleTileLayer.bind(this, 5)}>2月5日</Button>
+									<Button onClick={this.toggleTileLayer.bind(this, 1)}>2017年11月15日</Button>
+									<Button onClick={this.toggleTileLayer.bind(this, 2)}>2017年11月24日</Button>
+									<Button onClick={this.toggleTileLayer.bind(this, 3)}>2017年12月01日</Button>
+									<Button onClick={this.toggleTileLayer.bind(this, 4)}>2017年12月10日</Button>
+									<Button onClick={this.toggleTileLayer.bind(this, 5)}>2017年12月13日</Button>
 									
 								</div>
 							</div> : ''

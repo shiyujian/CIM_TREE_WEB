@@ -22,6 +22,7 @@ import educationRegisterReducer, {actions as educationRegisterActions} from './e
 import unbearableReducer, {actions as unbearableActions} from './unbearable';
 import hiddenDangerReducer, {actions as hiddenDangerActions} from './hiddenDanger';
 import riskFactorReducer, {actions as riskFactorActions} from './riskFactor';
+import riskEvaluationReducer, {actions as riskEvaluationActions} from './riskEvaluation';
 import materialReducer, {actions as materialActions} from './material';
 import formmanageReducer, {actions as formmanageActions} from './formmanage';
 import engineeringImageReducer, {actions as engineeringImageActions} from './engineeringImage';
@@ -30,7 +31,6 @@ import keywordReducer, {actions as keywordActions} from './keyword';
 import orgTypeReducer, {actions as orgTypeActions} from './orgType';
 import unitManageReducer, {actions as unitManageActions} from './unitManage';
 import branchManageReducer, {actions as branchManageActions} from './branchManage';
-
 
 import templateReducer, {actions as templateActions} from './template';
 import dictionariesReducer, {actions as dictionariesActions} from './dictionaries';
@@ -141,6 +141,10 @@ export default handleActions({
 	[combineActions(...actionsMap(riskFactorActions))]: (state = {}, action) => ({
 		...state,
 		riskFactor: riskFactorReducer(state.riskFactor, action),
+	}),
+	[combineActions(...actionsMap(riskEvaluationActions))]: (state = {}, action) => ({
+		...state,
+		riskEvaluation: riskEvaluationReducer(state.riskEvaluation, action),
 	}),
 	[combineActions(...actionsMap(materialActions))]: (state = {}, action) => ({
 		...state,
