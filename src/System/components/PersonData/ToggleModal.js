@@ -284,7 +284,7 @@ export default class ToggleModal extends Component {
                 <div>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
                         columns={columns}
-                        dataSource={this.state.tempData}
+                        dataSource={this.state.dataSource}
                         bordered />
                     <Button style={{ margin: '10px 10px 10px 0px' }} onClick={this.createLink.bind(this, 'muban', `${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button>
                     <Upload {...props}>

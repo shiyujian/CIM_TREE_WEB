@@ -37,7 +37,7 @@ export default class Users extends Component {
 							</Popconfirm>
 
 						</Col>
-						<Col span={2} style={{float:"right",marginLeft:"10px"}}>
+						<Col span={2} style={{ float: "right", marginLeft: "10px" }}>
 							<Button onClick={this.saves.bind(this)}>确定</Button>
 						</Col>
 						<Col span={8} style={{ float: "right" }}>
@@ -75,7 +75,7 @@ export default class Users extends Component {
 								</Select>
 							</FormItem>
 						</Col>
-						
+
 					</Row>
 				</div>
 				<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={users} />
@@ -93,53 +93,68 @@ export default class Users extends Component {
 		const roles = addition.roles || [];
 		console.log("roles", roles)
 		console.log("users", users)
+		if (this.selectedCodes == undefined) {
+			message.warn('请您选择需要添加角色的人');
+			return
+		}
 		for (let i = 0; i < users.length; i++) {
 			const element = users[i];
 			console.log(element)
-			if (element.id == this.selectedCodes[0]) {
-				console.log("已经选中")
-				putUser({ id: element.id }, {
-					username: element.username,
-					email: element.email,
-					// password: addition.password, // 密码不能变？信息中没有密码
-					account: {
-						person_name: element.person_name,
-						person_type: "C_PER",
-						person_avatar_url: "",
-						organization: {
-							pk: node.pk,
-							code: node.code,
-							obj_type: "C_ORG",
-							rel_type: "member",
-							name: node.name
+			console.log(this.selectedCodes)
+			for (let j = 0; j < this.selectedCodes.length; j++) {
+				const selectedCode = this.selectedCodes[j];
+				console.log("111", element)
+				if (element.id == selectedCode) {
+					console.log("已经选中")
+					putUser({ id: element.id }, {
+						username: element.username,
+						email: element.email,
+						// password: addition.password, // 密码不能变？信息中没有密码
+						account: {
+							person_name: element.person_name,
+							person_type: "C_PER",
+							person_avatar_url: "",
+							organization: {
+								pk: node.pk,
+								code: node.code,
+								obj_type: "C_ORG",
+								rel_type: "member",
+								name: node.name
+							},
 						},
-					},
-					groups: roles.map(role => +role),
-					is_active: true,
-					basic_params: {
-						info: {
-							'电话': element.person_telephone || '',
-							'性别': element.gender || '',
-							'技术职称': element.title || '',
-							'phone': element.person_telephone || '',
-							'sex': element.gender || '',
-							'duty': ''
+						groups: roles.map(role => +role),
+						is_active: true,
+						basic_params: {
+							info: {
+								'电话': element.person_telephone || '',
+								'性别': element.gender || '',
+								'技术职称': element.title || '',
+								'phone': element.person_telephone || '',
+								'sex': element.gender || '',
+								'duty': ''
+							}
+						},
+						extra_params: {},
+						title: element.title || ''
+					}).then(rst => {
+						if (rst.id) {
+							clearAdditionField();
+							console.log("element", element)
+							// console.log("Addition",Addition)
+							// const codes = element.collect(node);
+							// console.log("codes", codes)
+							getUsers({}, { org_code: element.org_code });
+						} else {
+							console.log("111")
+							message.warn('服务器端报错！');
 						}
-					},
-					extra_params: {},
-					title: element.title || ''
-				}).then(rst => {
-					if (rst.id) {
-						clearAdditionField();
-						const codes = element.collect(node);
-						console.log("codes", codes)
-						getUsers({}, { org_code: codes });
-					} else {
-						console.log("111")
-						message.warn('服务器端报错！');
-					}
-				})
+					})
+				}
+
 			}
+			// const selectedCodes=this.selectedCodes[0] || ''
+			// return;
+
 
 
 
