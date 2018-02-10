@@ -17,13 +17,17 @@ export default class Member extends Component {
 		const title = `关联用户 | ${role ? role.name : ''}`;
 
 		let { platform: { users = [] } = {} } = this.props;
+		// console.log("users",users)
 		let { inpValue='' } = this.state;
 		let users2 = users.map(ele=>{
+			// console.log(ele)
 			return {...ele};
 		});
 		if (inpValue) {
 			users2 = users2.filter(v => {
+				console.log(v.person_name)
 				if (v.person_name.indexOf(inpValue) > -1) {
+					console.log(v.person_name)
 					return true;
 				} else {
 					return false;
@@ -31,6 +35,7 @@ export default class Member extends Component {
 			})
 		}
 		this.state.orgSet && users2.forEach(ele=>{
+			console.log("ele",ele)
 			if(this.state.orgSet[ele.person_id]){
 				ele.organization = this.state.orgSet[ele.person_id];
 			}
@@ -38,7 +43,7 @@ export default class Member extends Component {
 		return (
 			<Modal title={title} visible={visible} width="90%"
 			       onOk={this.ok.bind(this)} onCancel={this.cancel.bind(this)}>
-					<Spin spinning = {this.state.loading}>
+					{/* <Spin spinning = {this.state.loading}> */}
 					<Search
 						placeholder="请输入搜索的名称"
 						style={{
@@ -51,7 +56,7 @@ export default class Member extends Component {
 						}
 					/>
 						<Table rowKey="id" columns={this.columns} dataSource={users2}/>
-					</Spin>
+					{/* </Spin> */}
 			</Modal>
 		);
 	}
@@ -84,28 +89,37 @@ export default class Member extends Component {
 		} = this.props;
 		this.setState({ loading: true });
 		id && getMembers({ id });
+		// console.log(this.props)
 		getUsers().then(rst1 => {
-			let promises = rst1.map((item, index) => {
-				return getOrgInfo({ code: item.account.org_code })
-			});
-			let users2 = rst1.map(ele => {
-				return { ...ele, ...ele.account };
-			});
-			Promise.all(promises).then(rst => {
-
-				let set = new Object();
-				if (rst && rst.length > 0) {
-					users2.map((item, index) => {
-						// console.log(item);
-						if (typeof rst[index] !== "string") {
-							set[item.person_id] = rst[index].parent ? rst[index].parent.name + "---" + item.organization : item.organization;
-						} else {
-							set[item.person_id] = item.organization;
-						}
-					})
-				}
-				this.setState({ orgSet: set, loading: false });
-			})
+		console.log("rst1",rst1)
+		
+		// 	let promises = rst1.map((item, index) => {
+		// // console.log("item",item)
+		
+		// 		return getOrgInfo({ code: item.account.org_code })
+		// 	});
+		// 	let users2 = rst1.map(ele => {
+		// // console.log("ele",ele)
+		
+		// 		return { ...ele, ...ele.account };
+		// 	});
+		// 	console.log("promises",promises)
+		// 	Promise.all(promises).then(rst => {
+		// 		console.log("rst",rst)
+		// 		let set = new Object();
+		// 		if (rst && rst.length > 0) {
+		// 			users2.map((item, index) => {
+		// 				console.log(item);
+		// 				if (typeof rst[index] !== "string") {
+		// 					set[item.person_id] = rst[index].parent ? rst[index].parent.name + "---" + item.organization : item.organization;
+							
+		// 				} else {
+		// 					set[item.person_id] = item.organization;
+		// 				}
+		// 			})
+		// 		}
+		// 		this.setState({ orgSet: set, loading: false });
+		// 	})
 		});
 
 	}

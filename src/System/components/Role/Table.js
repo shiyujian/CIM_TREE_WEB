@@ -13,6 +13,7 @@ export default class Roles extends Component {
 	render() {
 		const {platform: {roles = []}} = this.props;
 		let systemRoles;
+		console.log("this.props",this.props)
 		if (this.state.userLogin === "admin") {
 			systemRoles = roles.filter(role => role.grouptype === 0);
 		}else{
@@ -29,7 +30,7 @@ export default class Roles extends Component {
 		return (
 			<div>
 				<Tabs defaultActiveKey="1">
-					<TabPane tab="苗圃角色" key="1">
+					<TabPane tab="苗圃角色1" key="1">
 						<Card title="苗圃角色" extra={<Button type="primary" ghost onClick={this.append.bind(this, 0)}>添加苗圃角色</Button>}>
 							<Table size="middle" bordered
 								style={{ marginBottom: "10px", overflow: "hidden" }}
@@ -67,6 +68,10 @@ export default class Roles extends Component {
 		getRoles();
 		// getUser()是调用auth里面的函数，然后获取登录人的信息
 		let userid = getUser().id;
+		console.log("userid",userid)
+		console.log("getUser",getUser)
+		console.log("getRoles",getRoles)
+		console.log("this.props",this.props)
 		getLoginUser({
 			id: userid
 		}).then(rst => {

@@ -119,14 +119,17 @@ export default class TableOrg extends Component {
 		ModalVisibleCJ(true);
 	}
 	delete(index, record) {
-		// const {dataSource} = this.state
+		const {dataSource} = this.state
+		console.log("dataSource",dataSource)
 		console.log("record", record)
-		const { actions: { deleteOrgList, getOrgPk } } = this.props
+		const { actions: { deleteOrgList, getOrgPk,deleteOrgListChild } } = this.props
 		let executor = {};
 		let person = getUser();
-		console.log(record.children.length)
+		console.log(deleteOrgList)
+		console.log(deleteOrgListChild)
+		
 		if (record.children.length <= 0) {
-			console.log("可以删")
+			// console.log(deleteOrgListChild)
 			executor.id = person.id;
 			executor.username = person.username;
 			executor.person_name = person.name;
@@ -141,12 +144,20 @@ export default class TableOrg extends Component {
 				},
 				version: 'A'
 			}
+			return;
+			console.log("data_list",data_list)
 			deleteOrgList({}, { data_list: data_list }).then(rst => {
 				notification.success({
 					message: "删除成功"
 				});
-				this.fetchData();
+				console.log("record.code",record.code)
+				deleteOrgListChild({code:record.code}).then(rst=>{
+				console.log("record.code",record.code)
+				
+					this.fetchData();
+				})
 			})
+			
 		}
 		console.log("不可以删")
 		

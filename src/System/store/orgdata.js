@@ -24,6 +24,7 @@ export const getUnitAc = createFetchAction(`${SERVICE_API}/workpackages/code/{{c
 export const getOrgPk= createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`,[], "GET");
 export const getOrgTree= createFetchAction(`${SERVICE_API}/org-tree/?depth=3`,[], "GET");
 export const deleteOrgList= createFetchAction(`${SERVICE_API}/orgpostlist/`,[], "PUT"); 
+export const deleteOrgListChild= createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/?this=true&all=true`,[], "DELETE"); 
 export const putOrgList = createFetchAction(`${SERVICE_API}/orgpostlist/`, [], "PUT");
 const getCanjian = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`);
 // const jsonToExcel = createFetchAction(`${NODE_FILE_EXCHANGE_API}/api/json_to_xlsx`,[],'POST');
@@ -36,6 +37,7 @@ export const actions = {
 	postOrgList,
 	getOrgRoot,
 	getUnit,
+	deleteOrgListChild,
 	getOrgReverse,
 	putProject,
 	putUnit,
