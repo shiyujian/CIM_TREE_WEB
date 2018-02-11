@@ -8,7 +8,8 @@ import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
-const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
+const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword';
+
 
 export default class UpdateModal extends Component {
 
@@ -27,7 +28,6 @@ export default class UpdateModal extends Component {
             updatevisible = false,
             docs = []
         } = this.props;
-        console.log('add.props',this.props);
         let {progress,isUploading} = this.state;
         let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
                     <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
@@ -49,7 +49,7 @@ export default class UpdateModal extends Component {
                                 </p>
                                 <p className="ant-upload-text">点击或者拖拽开始上传</p>
                                 <p className="ant-upload-hint">
-                                    支持 pdf、doc、docx 文件
+                                    支持 pdf、doc、docx、xlsx 文件
 
                                 </p>
                             </Dragger>
@@ -101,7 +101,7 @@ export default class UpdateModal extends Component {
             const valid = fileTypes.indexOf(file.type) >= 0;
             //console.log(file);
             if (!valid) {
-                message.error('只能上传 pdf、doc、docx 文件！');
+                message.error('只支持 pdf、doc、docx、xlsx 文件！');
             }
             return valid;
             this.setState({ progress: 0 });

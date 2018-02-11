@@ -125,20 +125,20 @@ export default class Addition extends Component {
 
     docCols = [
         {
-            title:'危险源名称',
+            title:'规范名称',
             dataIndex:'name'
         },{
-            title:'风险级别',
+            title:'规范编号',
             render: (doc) => {
                 return <Input onChange={this.number.bind(this, doc)}/>;
             }
         },{
-            title:'风险控制措施',
+            title:'发布单位',
             render: (doc) => {
                 return <Input onChange={this.company.bind(this, doc)}/>;
             }
         },{
-            title:'上传日期',
+            title:'实施日期',
 		    render: (doc) => {
 			    return <DatePicker  onChange={this.time.bind(this, doc)}/>;
 		    }

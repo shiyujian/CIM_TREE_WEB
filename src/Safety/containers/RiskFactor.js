@@ -228,22 +228,24 @@ export default class RiskFactor extends Component {
                                 <Col span={6}>
                                     <Input.Search
                                         placeholder="请输入搜索关键词"
-                                        style={{ width: '300px', display: 'block' }}
+                                        style={{ width: '80%', display: 'block' }}
                                         onSearch={(value) => this.onSearch(value)}
                                     ></Input.Search>
                                 </Col>
                                 <Col span={6}>
-                                    <span style={{ fontSize: 16 }}>状态</span>
-                                    <Select
-                                        defaultValue=""
-                                        style={{ width: '100px', marginLeft: 5 }}
-                                        onChange={(value) => this.onSelectChange(value)}>
-                                        <Option value={-1}>确认中</Option>
-                                        <Option value={0}>整改中</Option>
-                                        <Option value={1}>审核中</Option>
-                                        <Option value={2}>完成</Option>
-                                        <Option value=''>全部</Option>
-                                    </Select>
+                                    <div style={{ width: '80%', marginLeft:'10%'}} >
+                                        <span style={{ fontSize: 16,marginRight:5 }}>状态</span>
+                                        <Select
+                                            defaultValue=""
+                                            style={{ width:80}}
+                                            onChange={(value) => this.onSelectChange(value)}>
+                                            <Option value={-1}>确认中</Option>
+                                            <Option value={0}>整改中</Option>
+                                            <Option value={1}>审核中</Option>
+                                            <Option value={2}>完成</Option>
+                                            <Option value=''>全部</Option>
+                                        </Select>
+                                    </div>
                                 </Col>
                             </Row>
                             <Table
