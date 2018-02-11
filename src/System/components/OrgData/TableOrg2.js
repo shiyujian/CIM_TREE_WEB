@@ -17,7 +17,48 @@ export default class TableOrg extends Component {
 			update: 0
 		}
 	}
+	// static loop = (list, code) => {
+	// 	let rst = null;
+	// 	list.forEach((item = {}) => {
+	// 		const {code: value, children = []} = item;
+	// 		if (value === code) {
+	// 			rst = item;
+	// 		} else {
+	// 			const tmp = Tree.loop(children, code);
+	// 			if (tmp) {
+	// 				rst = tmp;
+	// 			}
+	// 		}
+	// 	});
+	// 	return rst;
+	// };
+	
 	render() {
+		const loop = data => data.map((item) => {
+			if (item.children&&item.children.length>0) {
+				return (
+						loop(item.children)
+				);
+			}else{
+				delete item.children
+			}
+		});
+
+		// list.forEach((item = {}) => {
+		// 	console.log(item)
+		// 	// const {code: value, children = []} = item;
+		// 	if(item.children!=0){
+
+		// 	}
+		// 	// if (value === code) {
+		// 	// 	rst = item;
+		// 	// } else {
+		// 	// 	const tmp = Tree.loop(children, code);
+		// 	// 	if (tmp) {
+		// 	// 		rst = tmp;
+		// 	// 	}
+		// 	// }
+		// });
 		let painationInfo = {
 			showQuickJumper: true,
 			showSizeChanger: true,
@@ -32,10 +73,11 @@ export default class TableOrg extends Component {
 					<Button className="button" onClick={this.getExcel.bind(this)}>导出表格</Button>
 					<Search enterButton className="button" onSearch={this.searchOrg.bind(this)} style={{ width: "200px" }} placeholder="输入部门编码或部门名称" />
 				</div>
+				{loop(this.state.tempData)}
 				<Table
 					columns={this.columns}
 					bordered={true}
-					rowSelection={this.rowSelection}
+					// rowSelection={this.rowSelection}
 					dataSource={this.state.tempData}
 					rowKey="code"
 					pagination={painationInfo}
@@ -59,6 +101,7 @@ export default class TableOrg extends Component {
 			return;
 		}
 		this.state.dataSource.map(item => {
+			console.log("item", item)
 			if (item.name.indexOf(value) != -1 || item.code.indexOf(value) != -1) {
 				searchData.push(item);
 			}
@@ -119,17 +162,17 @@ export default class TableOrg extends Component {
 		ModalVisibleCJ(true);
 	}
 	delete(index, record) {
-		const {dataSource} = this.state
-		console.log("dataSource",dataSource)
+		const { dataSource } = this.state
+		console.log("dataSource", dataSource)
 		console.log("record", record)
-		const { actions: { deleteOrgList, getOrgPk,deleteOrgListChild } } = this.props
+		const { actions: { deleteOrgList, getOrgPk, deleteOrgListChild } } = this.props
 		let executor = {};
 		let person = getUser();
 		console.log(deleteOrgList)
 		console.log(deleteOrgListChild)
-		
-		if (record.children.length <= 0) {
-			// console.log(deleteOrgListChild)
+
+		if (!record.children) {
+			console.log("11")
 			executor.id = person.id;
 			executor.username = person.username;
 			executor.person_name = person.name;
@@ -144,23 +187,23 @@ export default class TableOrg extends Component {
 				},
 				version: 'A'
 			}
-			return;
-			console.log("data_list",data_list)
+			// return;
+			console.log("data_list", data_list)
 			deleteOrgList({}, { data_list: data_list }).then(rst => {
 				notification.success({
 					message: "删除成功"
 				});
-				console.log("record.code",record.code)
-				deleteOrgListChild({code:record.code}).then(rst=>{
-				console.log("record.code",record.code)
-				
+				console.log("record.code", record.code)
+				deleteOrgListChild({ code: record.code }).then(rst => {
+					console.log("record.code", record.code)
+
 					this.fetchData();
 				})
 			})
-			
+
 		}
 		console.log("不可以删")
-		
+
 	}
 	//下载
 	createLink = (name, url) => {    //下载
@@ -189,10 +232,13 @@ export default class TableOrg extends Component {
 		await getOrgTree().then(rst => {
 			if (rst && rst.children) {
 				rst.children.map((item, index) => {
+					console.log("item",item)
 					dataSource.push(...item.children);
 				})
 			}
 		})
+		console.log("dataSource",dataSource)
+		// return
 		dataSource.map((item, index) => {
 			item.index = index + 1
 		})
