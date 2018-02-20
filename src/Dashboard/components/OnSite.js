@@ -335,7 +335,13 @@ export default class Lmap extends Component {
 
     options = [{ label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' }]
 
-
+	options2 = [
+        { label: '现场人员', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access', },
+        { label: '安全监测', value: 'geojsonFeature_safety', IconUrl: require('./ImageIcon/camera.png'), IconName: 'shield', },
+        { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning', },
+        { label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera', },
+	];
+	
     //切换为2D
     toggleTileLayer(index) {
         this.tileLayer.setUrl(this.tileUrls[index])
@@ -564,7 +570,7 @@ export default class Lmap extends Component {
                                 className="imageControll"
                                 onClick={this.toggleIcon.bind(this)}
                             />
-                            {this.options.map((option, index) => {
+                            {this.options2.map((option, index) => {
                                 if (option.label !== '区域地块') {
                                     return (
                                         <div key={index} className="imgIcon">
