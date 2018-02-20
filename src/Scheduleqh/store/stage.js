@@ -17,7 +17,7 @@ export const getTreeOK = createAction(`${ID}_getTreeOK`);
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]);
 export const getTreeList = createFetchAction(`${FOREST_API}/trees/list/`, []);
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
-export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}&workflowactivity={{name}}`);
+export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}`);
 
 export const actions = {
     getdocumentOK,

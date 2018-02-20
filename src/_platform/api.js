@@ -159,7 +159,8 @@ export const WORKFLOW_CODE = {
 	'每日进度填报流程': 'TEMPLATE_003',
 	'机械设备报批流程': 'TEMPLATE_004',
 	'工程材料报批流程': 'TEMPLATE_005',
-	'苗木资料报批流程': 'TEMPLATE_006'
+	'苗木资料报批流程': 'TEMPLATE_006',
+	'每日进度计划填报流程': 'TEMPLATE_007'
 	// '现场安全隐患排查工作流程': 'TEMPLATE_002',
 	// '分部验收流程': 'TEMPLATE_003',
 	// '周报填写流程': 'TEMPLATE_004',
@@ -202,6 +203,15 @@ export const WORKFLOW_MAPS = {
 		code: 'TEMPLATE_012'
 	}
 };
+
+//获取单位工程
+export const UNITS = [
+	{value:'一标段'},
+	{value:'二标段'},
+	{value:'三标段'},
+	{value:'四标段'},
+	{value:'五标段'},
+]
 
 export const MODULES = [
 	{
