@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-02-20 14:08:45
+ * @Last Modified time: 2018-02-20 15:26:11
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -53,7 +53,7 @@ class All extends Component {
     // 获取总进度进度计划流程信息
     gettaskSchedule = async ()=>{
         const { actions: { getTaskSchedule } } = this.props;
-        let task = await getTaskSchedule({ code: 'TEMPLATE_001' });
+        let task = await getTaskSchedule({ code: WORKFLOW_CODE.总进度计划报批流程 });
         let subject = [];
         let totledata = [];
         let arrange = {};

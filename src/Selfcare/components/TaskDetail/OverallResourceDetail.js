@@ -8,7 +8,7 @@ const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
 
 let indexSelect='';
-class OverallMaterialResource extends Component {
+class OverallResourceDetail extends Component {
 
 	constructor(props){
          super(props);
@@ -101,7 +101,7 @@ class OverallMaterialResource extends Component {
 					<Col span={24} >
 						<Row gutter={15} >
 							<Col span={8}>
-								<FormItem   {...OverallMaterialResource.layout} label="单位工程:">
+								<FormItem   {...OverallResourceDetail.layout} label="单位工程:">
 								{getFieldDecorator('form_unit', {
 									initialValue: `${record.unit?record.unit:''}`,
 									rules: [{ required: true, message: '请输入单位工程' }]
@@ -109,7 +109,7 @@ class OverallMaterialResource extends Component {
 								</FormItem>
 							</Col>
 							<Col span={8}>
-								<FormItem {...OverallMaterialResource.layout} label="名称:">
+								<FormItem {...OverallResourceDetail.layout} label="名称:">
 								{getFieldDecorator('form_name', {
 									initialValue: `${record.name?record.name:''}`,
 									rules: [{ required: true, message: '请输入名称' }]
@@ -117,7 +117,7 @@ class OverallMaterialResource extends Component {
 								</FormItem>
 							</Col>
 							<Col span={8}>
-								<FormItem {...OverallMaterialResource.layout} label="编号:">
+								<FormItem {...OverallResourceDetail.layout} label="编号:">
 								{getFieldDecorator('form_code', {
 									initialValue: `${record.code?record.code:''}`,
 									rules: [{ required: true, message: '请输入编号' }]
@@ -127,7 +127,7 @@ class OverallMaterialResource extends Component {
 						</Row>
 						<Row gutter={15}>
 							<Col span={8}>
-								<FormItem  {...OverallMaterialResource.layout} label="审批单位:">
+								<FormItem  {...OverallResourceDetail.layout} label="审批单位:">
 								{getFieldDecorator('form_reviewUnit', {
 									initialValue: `${record.reviewUnit?record.reviewUnit:''}`,
 									rules: [{ required: true, message: '请输入审批单位' }]
@@ -135,7 +135,7 @@ class OverallMaterialResource extends Component {
 								</FormItem>
 							</Col>
 							<Col span={8}>
-								<FormItem {...OverallMaterialResource.layout} label="进场日期:">
+								<FormItem {...OverallResourceDetail.layout} label="进场日期:">
 								{getFieldDecorator('form_date', {
 									initialValue: `${record.date?record.date:''}`,
 									rules: [{ required: true, message: '请输入进场日期' }]
@@ -143,7 +143,7 @@ class OverallMaterialResource extends Component {
 								</FormItem>
 							</Col>
 							<Col span={8}>
-								<FormItem {...OverallMaterialResource.layout} label="施工部位:">
+								<FormItem {...OverallResourceDetail.layout} label="施工部位:">
 								{getFieldDecorator('form_site', {
 									initialValue: `${record.site?record.site:''}`,
 									rules: [{ required: true, message: '请输入施工部位' }]
@@ -238,4 +238,4 @@ class OverallMaterialResource extends Component {
     }
 	
 }
-export default Form.create()(OverallMaterialResource)
+export default Form.create()(OverallResourceDetail)

@@ -7,7 +7,7 @@ import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 
 let indexSelect='';
-class OverallMaterialGeneral extends Component {
+class OverallGeneralDetail extends Component {
 
 	constructor(props){
          super(props);
@@ -105,7 +105,7 @@ class OverallMaterialGeneral extends Component {
                     <Col span={24} >
                         <Row gutter={15}  >
                             <Col span={12}>
-                                <FormItem   {...OverallMaterialGeneral.layout} label="单位工程:">
+                                <FormItem   {...OverallGeneralDetail.layout} label="单位工程:">
                                 {getFieldDecorator('form1_unit', {
                                     initialValue: `${record.unit?record.unit:''}`,
                                     rules: [{ required: true, message: '请输入单位工程' }]
@@ -113,7 +113,7 @@ class OverallMaterialGeneral extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={12}>
-                                <FormItem {...OverallMaterialGeneral.layout} label="编号:">
+                                <FormItem {...OverallGeneralDetail.layout} label="编号:">
                                 {getFieldDecorator('form1_code', {
                                     initialValue: `${record.code?record.code:''}`,
                                     rules: [{ required: true, message: '请输入编号' }]
@@ -123,7 +123,7 @@ class OverallMaterialGeneral extends Component {
                         </Row>
                         <Row gutter={15}>
                             <Col span={12}>
-                                <FormItem  {...OverallMaterialGeneral.layout} label="审批单位:">
+                                <FormItem  {...OverallGeneralDetail.layout} label="审批单位:">
                                 {getFieldDecorator('form1_reviewUnit', {
                                     initialValue: `${record.reviewUnit?record.reviewUnit:''}`,
                                     rules: [{ required: true, message: '请输入审批单位' }]
@@ -221,4 +221,4 @@ class OverallMaterialGeneral extends Component {
 	
 }
 
-export default Form.create()(OverallMaterialGeneral)
+export default Form.create()(OverallGeneralDetail)

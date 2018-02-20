@@ -137,7 +137,7 @@ class TotleModal extends Component {
                                     </Row>
                                     <Row>
 
-                                        <Col span={8} style={{ marginTop: '30px' }}>
+                                        <Col span={12} style={{ marginTop: '10px' }}>
                                             <FormItem {...FormItemLayout} label='审核人'>
                                                 {
                                                     getFieldDecorator('totledataReview', {
@@ -153,7 +153,6 @@ class TotleModal extends Component {
                                     </Row>
                                 </Col>
                             </Row>
-
                         </Form>
                     </div>
                 </Modal>

@@ -6,8 +6,8 @@ import { getUser } from '_platform/auth';
 import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
-import OverallMaterialHandle from './OverallMaterialHandle';
-import OverallMaterialDeal from './OverallMaterialDeal';
+import OverallMaterialHandle from '../TaskDetail/OverallMaterialHandle';
+import OverallMaterialDeal from '../TaskDetail/OverallMaterialDeal';
 const FormItem = Form.Item;
 @connect(
 	state => {
@@ -51,6 +51,18 @@ export default class Progress extends Component {
 				<OverallMaterialHandle {...this.props} {...this.state}/>
 			)
 		}else if (code === WORKFLOW_CODE.苗木资料报批流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.总进度计划报批流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.每日进度计划填报流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.每日进度填报流程 && stateName == '初审' ){
 			return (
 				<OverallMaterialHandle {...this.props} {...this.state}/>
 			)

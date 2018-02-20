@@ -9,7 +9,7 @@ import { getUser } from '../../../_platform/auth';
 import PerSearch from './PerSearch';
 import SearchInfo from './SearchInfo';
 import queryString from 'query-string';
-import DayModal from './DayModal';
+import DayPlanModal from './DayPlanModal';
 moment.locale('zh-cn');
 const { RangePicker } = DatePicker;
 const FormItem = Form.Item;
@@ -81,7 +81,7 @@ class Plan extends Component {
 	// 获取日计划进度流程信息
     gettaskSchedule = async ()=>{
         const { actions: { getTaskSchedule } } = this.props;
-		let task = await getTaskSchedule({ code: 'TEMPLATE_003', name:'每日计划进度填报流程' });
+		let task = await getTaskSchedule({ code: WORKFLOW_CODE.每日进度计划填报流程 });
 		console.log('task',task)
         let subject = [];
         let totledata = [];
@@ -316,7 +316,7 @@ class Plan extends Component {
 				let WORKFLOW_MAP = {
 					name: "每日计划进度填报流程",
 					desc: "进度管理模块每日计划进度填报流程",
-					code: WORKFLOW_CODE.每日进度填报流程
+					code: WORKFLOW_CODE.每日进度计划填报流程
 				};
 				let workflowdata = {
 					name: WORKFLOW_MAP.name,
@@ -407,7 +407,7 @@ class Plan extends Component {
 			<div>
 				{
 					this.state.dayvisible &&
-					<DayModal 
+					<DayPlanModal 
 						{...this.state.TotleModaldata}
 						oncancel={this.totleCancle.bind(this)}
 						onok={this.totleOk.bind(this)}

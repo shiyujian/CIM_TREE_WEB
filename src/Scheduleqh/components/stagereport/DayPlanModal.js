@@ -1,7 +1,7 @@
 import React, { Component, Children } from 'react';
 import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification, } from 'antd';
 const FormItem = Form.Item;
-class DayModal extends Component {
+class DayPlanModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -67,8 +67,8 @@ class DayModal extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
-                                                    getFieldDecorator('stagedocument', {
-                                                        initialValue: `${this.props.stagedocument || '暂无文档类型'}`,
+                                                    getFieldDecorator('daydocument', {
+                                                        initialValue: `${this.props.daydocument || '暂无文档类型'}`,
                                                         rules: [
                                                             { required: false, message: '请输入文档类型' }
                                                         ]
@@ -161,5 +161,5 @@ class DayModal extends Component {
 }
 
 
-export default Form.create()(DayModal)
+export default Form.create()(DayPlanModal)
 

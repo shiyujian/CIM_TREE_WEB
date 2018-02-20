@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
-import PerSearch from './PerSearch';
+import PerSearch from '../Task/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -25,7 +25,7 @@ const EditableCell = ({ editable, value, onChange }) => (
           </div>
         );
 
-class ResourceAddition extends Component {
+class OverallResourceRefill extends Component {
 
     static propTypes = {};
 
@@ -141,7 +141,7 @@ class ResourceAddition extends Component {
                         <Col span={24} style={{paddingLeft:'2em'}}>
                             <Row gutter={15} >
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="单位工程:">
+                                    <FormItem {...OverallResourceRefill.layoutT} label="单位工程:">
                                     {
                                         getFieldDecorator('unit', {
                                             rules: [
@@ -161,7 +161,7 @@ class ResourceAddition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="名称:">
+                                    <FormItem {...OverallResourceRefill.layoutT} label="名称:">
                                     {
                                         getFieldDecorator('name', {
                                             rules: [
@@ -176,7 +176,7 @@ class ResourceAddition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="编号:">
+                                    <FormItem {...OverallResourceRefill.layoutT} label="编号:">
                                     {
                                         getFieldDecorator('code', {
                                             rules: [
@@ -192,7 +192,7 @@ class ResourceAddition extends Component {
                             </Row>
                             <Row gutter={15}>
                                 <Col span={8}>
-                                    <FormItem  {...ResourceAddition.layoutT} label="审批单位:">
+                                    <FormItem  {...OverallResourceRefill.layoutT} label="审批单位:">
                                     {
                                         getFieldDecorator('reviewUnit', {
                                             rules: [
@@ -211,7 +211,7 @@ class ResourceAddition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="进场日期:">
+                                    <FormItem {...OverallResourceRefill.layoutT} label="进场日期:">
                                     {
                                         getFieldDecorator('date', {
                                             rules: [
@@ -226,7 +226,7 @@ class ResourceAddition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="施工部位:">
+                                    <FormItem {...OverallResourceRefill.layoutT} label="施工部位:">
                                     {
                                         getFieldDecorator('site', {
                                             rules: [
@@ -285,7 +285,7 @@ class ResourceAddition extends Component {
                     </Row>
                     <Row style={{marginTop: 15}}>
                         <Col span={10} >
-                            <FormItem {...ResourceAddition.layoutT} label='审核人'>
+                            <FormItem {...OverallResourceRefill.layoutT} label='审核人'>
                                 {
                                     getFieldDecorator('dataReview', {
                                         rules: [
@@ -634,4 +634,4 @@ class ResourceAddition extends Component {
     
 
 }
-export default Form.create()(ResourceAddition)
+export default Form.create()(OverallResourceRefill)

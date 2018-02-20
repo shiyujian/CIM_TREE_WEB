@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
-import PerSearch from './PerSearch';
+import PerSearch from '../Task/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -25,7 +25,7 @@ const EditableCell = ({ editable, value, onChange }) => (
           </div>
         );
 
-class GeneralAddition extends Component {
+class OverallGeneralRefill extends Component {
 
     static propTypes = {};
     state={
@@ -167,7 +167,7 @@ class GeneralAddition extends Component {
                         <Col span={24} style={{paddingLeft:'3em'}}>
                             <Row gutter={15} >
                                 <Col span={10}>
-                                    <FormItem   {...GeneralAddition.layoutT} label="单位工程:">
+                                    <FormItem   {...OverallGeneralRefill.layoutT} label="单位工程:">
                                     {
                                         getFieldDecorator('unit', {
                                             rules: [
@@ -188,7 +188,7 @@ class GeneralAddition extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={10}>
-                                    <FormItem {...GeneralAddition.layoutT} label="编号:">
+                                    <FormItem {...OverallGeneralRefill.layoutT} label="编号:">
                                     {
                                         getFieldDecorator('code', {
                                             rules: [
@@ -205,7 +205,7 @@ class GeneralAddition extends Component {
                             </Row>
                             <Row gutter={15}>
                                 <Col span={20}>
-                                    <FormItem  {...GeneralAddition.layout} label="审批单位:">
+                                    <FormItem  {...OverallGeneralRefill.layout} label="审批单位:">
                                     {
                                         getFieldDecorator('reviewUnit', {
                                             rules: [
@@ -270,7 +270,7 @@ class GeneralAddition extends Component {
 					</Row>
                     <Row style={{marginTop: 15}}>
                         <Col span={10} >
-                            <FormItem {...GeneralAddition.layoutT} label='审核人'>
+                            <FormItem {...OverallGeneralRefill.layoutT} label='审核人'>
                                 {
                                     getFieldDecorator('dataReview', {
                                         rules: [
@@ -607,4 +607,4 @@ class GeneralAddition extends Component {
     };
 
 }
-export default Form.create()(GeneralAddition)
+export default Form.create()(OverallGeneralRefill)
