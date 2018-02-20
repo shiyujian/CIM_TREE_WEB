@@ -9,7 +9,9 @@ class DayModal extends Component {
         }
     }
     componentDidMount() {
-        
+        this.setState({
+            treeDatasource: this.props.TreedataSource
+        })
     }
     render() {
         const {
@@ -19,6 +21,7 @@ class DayModal extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 },
         }
+        console.log('this.props',this.props)
         return (
             <div>
                 <Modal
@@ -33,24 +36,11 @@ class DayModal extends Component {
                             <Row>
                                 <Col span={24}>
                                     <Row>
-                                        <Col span={8}>
-                                            <FormItem {...FormItemLayout} label='区域'>
-                                                {
-                                                    getFieldDecorator('dayarea', {
-                                                        initialValue: ``,
-                                                        rules: [
-                                                            { required: false, message: '请选择区域' }
-                                                        ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={8}>
+                                        <Col span={12}>
                                             <FormItem {...FormItemLayout} label='单位工程'>
                                                 {
                                                     getFieldDecorator('dayunit', {
-                                                        initialValue: ``,
+                                                        initialValue: `${this.props.unit || '暂无单位工程'}`,
                                                         rules: [
                                                             { required: false, message: '请选择单位工程' }
                                                         ]
@@ -59,11 +49,11 @@ class DayModal extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                        <Col span={8}>
+                                        <Col span={12}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
                                                     getFieldDecorator('daynumbercode', {
-                                                        initialValue: ``,
+                                                        initialValue: `${this.props.numbercode || '暂无编号'}`,
                                                         rules: [
                                                             { required: false, message: '请输入编号' }
                                                         ]
@@ -74,11 +64,39 @@ class DayModal extends Component {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Col span={8}>
+                                        <Col span={12}>
+                                            <FormItem {...FormItemLayout} label='文档类型'>
+                                                {
+                                                    getFieldDecorator('daydocument', {
+                                                        initialValue: `${this.props.daydocument || '暂无文档类型'}`,
+                                                        rules: [
+                                                            { required: false, message: '请输入文档类型' }
+                                                        ]
+                                                    })
+                                                        (<Input readOnly />)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={12}>
+                                            <FormItem {...FormItemLayout} label='日期'>
+                                                {
+                                                    getFieldDecorator('daytimedate', {
+                                                        initialValue: `${this.props.timedate || '暂无日期'}`,
+                                                        rules: [
+                                                            { required: false, message: '请输入日期' }
+                                                        ]
+                                                    })
+                                                        (<Input readOnly />)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={12}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
                                                     getFieldDecorator('daysuperunit', {
-                                                        initialValue: ``,
+                                                        initialValue: `${this.props.superunit || '暂无监理单位'}`,
                                                         rules: [
                                                             { required: false, message: '请输入监理单位' }
                                                         ]
@@ -89,11 +107,10 @@ class DayModal extends Component {
                                         </Col>
                                     </Row>
                                     <Row>
-
                                         <Table
                                             columns={this.columns1}
                                             pagination={true}
-                                            dataSource={this.state.TreatmentData}
+                                            dataSource={this.state.treeDatasource}
                                             rowKey='index'
                                             className='foresttable'
                                         />
@@ -104,9 +121,9 @@ class DayModal extends Component {
                                             <FormItem {...FormItemLayout} label='审核人'>
                                                 {
                                                     getFieldDecorator('daydataReview', {
-                                                        initialValue: ``,
+                                                        initialValue: `${this.props.dataReview || ''}`,
                                                         rules: [
-                                                            { required: true, message: '请输入审核人员' }
+                                                            { required: false, message: '请输入审核人员' }
                                                         ]
                                                     })
                                                         (<Input readOnly />)

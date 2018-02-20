@@ -3,7 +3,7 @@ import { Row, Col, Input, Form, Spin, Icon, Button, Table, Modal, DatePicker, Pr
 // import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
+import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
 import PerSearch from './PerSearch';
@@ -24,6 +24,7 @@ class Plan extends Component {
 					unit: '1111'
 				}
 			],
+			TotleModaldata:[],
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			visible: false,
@@ -98,8 +99,9 @@ class Plan extends Component {
                 submitperson:item.workflowactivity.creator.person_name,
                 submittime:item.workflowactivity.real_start_time,
                 status:item.workflowactivity.status,
-				daysuperunit:itempostdata.superunit,
+				superunit:itempostdata.superunit,
 				timedate:itempostdata.timedate,
+				daydocument:itempostdata.daydocument,
 				TreedataSource:itemtreedatasource,
                 dataReview:itempostdata.dataReview.person_name
             }
@@ -113,9 +115,9 @@ class Plan extends Component {
 		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
 	}
 	// 操作--查看
-	clickInfo(record) {
-		this.setState({ dayvisible: true });
-	}
+    clickInfo(record) {
+        this.setState({ dayvisible: true ,TotleModaldata:record});
+    }
 	// 取消
 	totleCancle() {
 		this.setState({ dayvisible: false });
@@ -249,7 +251,7 @@ class Plan extends Component {
 
 		setFieldsValue({
 			dataReview: this.member,
-			superunit: this.member.org
+			superunit: this.member.org,
 		});
 	}
 	// 发起填报
@@ -257,8 +259,8 @@ class Plan extends Component {
 		const {
 			actions: {
 				createFlow,
-			getWorkflowById,
-			putFlow
+				getWorkflowById,
+				putFlow
 			},
 			location,
 		} = this.props
@@ -271,7 +273,9 @@ class Plan extends Component {
 		console.log("表格信息", treedataSource)
 		me.props.form.validateFields((err, values) => {
 			console.log("表单信息", values);
+			console.log("err", err);
 			if (!err) {
+				console.log("2222222222222222222222222222222", values);
 				// 共有信息
 				for (let value in values) {
 					if (value === 'unit') {
@@ -284,6 +288,8 @@ class Plan extends Component {
 						postData.numbercode = values[value];
 					} else if (value === 'timedate') {
 						postData.timedate = values[value];
+					} else if (value === 'daydocument') {
+						postData.daydocument = values[value];
 					} else {
 						console.log(1111)
 					}
@@ -309,7 +315,7 @@ class Plan extends Component {
 				const nextUser = this.member;
 				let WORKFLOW_MAP = {
 					name: "每日计划进度填报流程",
-					desc: "综合管理模块每日计划进度填报流程",
+					desc: "进度管理模块每日计划进度填报流程",
 					code: WORKFLOW_CODE.每日进度填报流程
 				};
 				let workflowdata = {
@@ -401,7 +407,8 @@ class Plan extends Component {
 			<div>
 				{
 					this.state.dayvisible &&
-					<DayModal {...this.props}
+					<DayModal 
+						{...this.state.TotleModaldata}
 						oncancel={this.totleCancle.bind(this)}
 						onok={this.totleOk.bind(this)}
 					/>
@@ -423,13 +430,14 @@ class Plan extends Component {
 					maskClosable={false}
 					onCancel={this.closeModal.bind(this)}
 					onOk={this.sendWork.bind(this)}
+					key={Math.random}
 				>
 					<div>
 						<Form>
 							<Row>
 								<Col span={24}>
 									<Row>
-										<Col span={8}>
+										<Col span={12}>
 											<FormItem {...FormItemLayout} label='单位工程'>
 												{
 													getFieldDecorator('unit', {
@@ -437,15 +445,13 @@ class Plan extends Component {
 															{ required: true, message: '请选择单位工程' }
 														]
 													})
-														(<Select placeholder='请选择区域' allowClear>
-															<Option value='单位工程一'>单位工程一</Option>
-															<Option value='单位工程二'>单位工程二</Option>
-															<Option value='单位工程三'>单位工程三</Option>
+														(<Select placeholder='请选择单位工程' allowClear>
+															{UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
 														</Select>)
 												}
 											</FormItem>
 										</Col>
-										<Col span={8}>
+										<Col span={12}>
 											<FormItem {...FormItemLayout} label='编号'>
 												{
 													getFieldDecorator('numbercode', {
@@ -459,19 +465,22 @@ class Plan extends Component {
 										</Col>
 									</Row>
 									<Row>
-										<Col span={8}>
-											<FormItem {...FormItemLayout} label='监理单位'>
-												{
-													getFieldDecorator('superunit', {
-														rules: [
-															{ required: true, message: '请输入监理单位' }
-														]
-													})
-														(<Input placeholder='请输入监理单位' />)
-												}
-											</FormItem>
-										</Col>
-										<Col span={8}>
+										<Col span={12}>
+                                            <FormItem {...FormItemLayout} label='文档类型'>
+                                                {
+                                                    getFieldDecorator('daydocument', {
+                                                        rules: [
+                                                            { required: true, message: '请选择文档类型' }
+                                                        ]
+                                                    })
+                                                        (<Select placeholder='请选择文档类型' allowClear>
+                                                            <Option key={1} value='开发文档'>开发文档</Option>
+                                                            <Option key={2} value='测试文档'>测试文档</Option>
+                                                        </Select>)
+                                                }
+                                            </FormItem>
+                                        </Col>
+										<Col span={12}>
 											<FormItem {...FormItemLayout} label='日期'>
 												{
 													getFieldDecorator('timedate', {
@@ -482,6 +491,20 @@ class Plan extends Component {
 														(<Input placeholder='请输入日期' />)
 												}
 											</FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='监理单位'>
+                                                {
+                                                    getFieldDecorator('superunit', {
+                                                        rules: [
+                                                            { required: true, message: '请选择审核人员' }
+                                                        ]
+                                                    })
+                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
+                                                }
+                                            </FormItem>
 										</Col>
 									</Row>
 									<Row>
@@ -514,7 +537,6 @@ class Plan extends Component {
 									</Row>
 								</Col>
 							</Row>
-
 						</Form>
 					</div>
 				</Modal>

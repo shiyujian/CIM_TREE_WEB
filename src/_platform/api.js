@@ -203,6 +203,15 @@ export const WORKFLOW_MAPS = {
 	}
 };
 
+//获取单位工程
+export const UNITS = [
+	{value:'一标段'},
+	{value:'二标段'},
+	{value:'三标段'},
+	{value:'四标段'},
+	{value:'五标段'},
+]
+
 export const MODULES = [
 	{
 		id: 'HOME',

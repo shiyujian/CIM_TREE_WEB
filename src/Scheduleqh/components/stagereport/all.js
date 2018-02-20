@@ -1,10 +1,23 @@
+/**
+ *
+ * Copyright (c) 2016-present, ecidi.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @Author: ecidi.mingey
+ * @Date: 2018-02-20 10:14:05
+ * @Last Modified by: ecidi.mingey
+ * @Last Modified time: 2018-02-20 14:08:45
+ */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
-import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE,UNITS } from '../../../_platform/api';
 import PerSearch from './PerSearch';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -59,6 +72,7 @@ class All extends Component {
                 submittime:item.workflowactivity.real_start_time,
                 status:item.workflowactivity.status,
                 totlesuperunit:itempostdata.superunit,
+                totledocument:itempostdata.totledocument,
                 treatmentdata:itemtreatmentdata,
                 dataReview:itempostdata.dataReview.person_name
             }
@@ -143,6 +157,7 @@ class All extends Component {
         //专业信息
         let attrs = {};
         me.props.form.validateFields((err, values) => {
+            console.log('asdasddddddddddddddddddddd',values)
             if (!err) {
                 if (TreatmentData.length === 0) {
                     notification.error({
@@ -165,6 +180,8 @@ class All extends Component {
                         postData.dataReview = values[value];
                     } else if (value === 'numbercode') {
                         postData.numbercode = values[value];
+                    } else if (value === 'totledocument') {
+                        postData.totledocument = values[value];
                     } else {
                         console.log("attrs")
                     }
@@ -414,13 +431,14 @@ class All extends Component {
                     maskClosable={false}
                     onCancel={this.closeModal.bind(this)}
                     onOk={this.sendWork.bind(this)}
+                    key={Math.random*3}
                 >
                     <div>
                         <Form>
                             <Row>
                                 <Col span={24}>
                                     <Row>
-                                        <Col span={8}>
+                                        <Col span={12}>
                                             <FormItem {...FormItemLayout} label='单位工程'>
                                                 {
                                                     getFieldDecorator('unit', {
@@ -429,14 +447,12 @@ class All extends Component {
                                                         ]
                                                     })
                                                         (<Select placeholder='请选择单位工程' allowClear>
-                                                            <Option value='单位工程一'>单位工程一</Option>
-                                                            <Option value='单位工程二'>单位工程二</Option>
-                                                            <Option value='单位工程三'>单位工程三</Option>
-                                                        </Select>)
+                                                            {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
+                                                        </Select> )
                                                 }
                                             </FormItem>
                                         </Col>
-                                        <Col span={8}>
+                                        <Col span={12}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
                                                     getFieldDecorator('numbercode', {
@@ -450,21 +466,31 @@ class All extends Component {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Col span={8}>
+                                        <Col span={12}>
+                                            <FormItem {...FormItemLayout} label='文档类型'>
+                                                {
+                                                    getFieldDecorator('totledocument', {
+                                                        rules: [
+                                                            { required: true, message: '请选择文档类型' }
+                                                        ]
+                                                    })
+                                                        (<Select placeholder='请选择文档类型' allowClear>
+                                                            <Option key={3} value={'开发文档'}>开发文档</Option>
+                                                            <Option key={4} value={'测试文档'}>测试文档</Option>
+                                                        </Select>)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={12}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
                                                     getFieldDecorator('superunit', {
                                                         rules: [
-                                                            { required: true, message: '请输入监理单位' }
+                                                            { required: true, message: '请选择审核人员' }
                                                         ]
                                                     })
-                                                        (<Input placeholder='请输入监理单位' />)
+                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
                                                 }
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={8} offset={4}>
-                                            <FormItem {...FormItemLayout}>
-                                                <Button type='Primary'>模板下载</Button>
                                             </FormItem>
                                         </Col>
                                     </Row>
