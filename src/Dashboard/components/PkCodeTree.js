@@ -34,7 +34,7 @@ export default class PkCodeTree extends Component {
 					      defaultExpandAll={true}
 					      autoExpandParent ={true}
 					      onSelect={this.props.onSelect}
-                          showIcon={true}
+                          showIcon={this.props.showIcon}
 					>
 						{
 							PkCodeTree.loop(treeData)
