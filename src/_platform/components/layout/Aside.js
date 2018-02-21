@@ -34,7 +34,7 @@ export default class Aside extends Component {
 			}} className="platform-aside">
 				<div style={{
 					width: '100%',
-					height: '999em',
+					height: '950px',
 					position: 'absolute',
 					left: 0,
 					top: 0,
