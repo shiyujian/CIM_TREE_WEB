@@ -601,49 +601,50 @@ class Stagereporttab extends Component {
 		},
 	];
 
-	columns1 = [{
-		title: '序号',
-		dataIndex: 'key',
-		key: 'key',
-		width: '10%',
-	}, {
-		title: '项目',
-		dataIndex: 'project',
-		key: 'project',
-	}, {
-		title: '单位',
-		dataIndex: 'units',
-		key: 'units',
-	}, {
-		title: '数量',
-		dataIndex: 'number',
-		key: 'number',
-		render: (text, record, index) => {
-			return <Input value={record.number || ""} onChange={ele => {
-				record.number = ele.target.value
-				this.forceUpdate();
-			}} />
-		}
-	}, {
-		title: '操作',
-		dataIndex: 'operation',
-		key: 'operation',
-		width: '10%',
-		render: (text, record, index) => {
-			if (index >= 6) {
-				return <div>
-					<Popconfirm
-						placement="rightTop"
-						title="确定删除吗？"
-						onConfirm={this.delTreeClick.bind(this, record, index + 1)}
-						okText="确认"
-						cancelText="取消">
-						<a>删除</a>
-					</Popconfirm>
-				</div>
+	columns1 = [
+		{
+			title: '序号',
+			dataIndex: 'key',
+			key: 'key',
+			width: '10%',
+		}, {
+			title: '项目',
+			dataIndex: 'project',
+			key: 'project',
+		}, {
+			title: '单位',
+			dataIndex: 'units',
+			key: 'units',
+		}, {
+			title: '数量',
+			dataIndex: 'number',
+			key: 'number',
+			render: (text, record, index) => {
+				return <Input value={record.number || ""} onChange={ele => {
+					record.number = ele.target.value
+					this.forceUpdate();
+				}} />
+			}
+		}, {
+			title: '操作',
+			dataIndex: 'operation',
+			key: 'operation',
+			width: '10%',
+			render: (text, record, index) => {
+				if (index >= 6) {
+					return <div>
+						<Popconfirm
+							placement="rightTop"
+							title="确定删除吗？"
+							onConfirm={this.delTreeClick.bind(this, record, index + 1)}
+							okText="确认"
+							cancelText="取消">
+							<a>删除</a>
+						</Popconfirm>
+					</div>
+				}
 			}
 		}
-	}
 	];
 }
 export default Form.create()(Stagereporttab)

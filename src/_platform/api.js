@@ -160,7 +160,8 @@ export const WORKFLOW_CODE = {
 	'机械设备报批流程': 'TEMPLATE_004',
 	'工程材料报批流程': 'TEMPLATE_005',
 	'苗木资料报批流程': 'TEMPLATE_006',
-	'每日进度计划填报流程': 'TEMPLATE_007'
+	'每日进度计划填报流程': 'TEMPLATE_007',
+	'检验批验收审批流程': 'TEMPLATE_008',
 	// '现场安全隐患排查工作流程': 'TEMPLATE_002',
 	// '分部验收流程': 'TEMPLATE_003',
 	// '周报填写流程': 'TEMPLATE_004',

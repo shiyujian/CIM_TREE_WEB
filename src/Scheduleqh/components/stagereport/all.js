@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-02-20 15:26:11
+ * @Last Modified time: 2018-02-21 14:36:32
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -154,8 +154,6 @@ class All extends Component {
         let me = this;
         //共有信息
         let postData = {};
-        //专业信息
-        let attrs = {};
         me.props.form.validateFields((err, values) => {
             console.log('asdasddddddddddddddddddddd',values)
             if (!err) {
@@ -191,10 +189,6 @@ class All extends Component {
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
-                let data_list = [];
-                for (let i = 0; i < TreatmentData.length; i++) {
-                    data_list.push(TreatmentData[i].fileId)
-                }
 
                 const currentUser = {
                     "username": user.username,
@@ -205,12 +199,10 @@ class All extends Component {
                 let subject = [{
                     //共有属性
                     "postData": JSON.stringify(postData),
-                    //专业属性
-                    "attrs": JSON.stringify(attrs),
+                    
                     //数据清单
                     "TreatmentData": JSON.stringify(TreatmentData),
-                    //数据清单id
-                    "data_list": JSON.stringify(data_list),
+                    
                 }];
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {

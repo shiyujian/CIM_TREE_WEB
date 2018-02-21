@@ -13,6 +13,9 @@ import ScheduleStageDetail from '../TaskDetail/ScheduleStageDetail';
 import ScheduleDayDetail from '../TaskDetail/ScheduleDayDetail';
 import OverallGeneralRefill from '../TaskDetail/OverallGeneralRefill';
 import OverallResourceRefill from '../TaskDetail/OverallResourceRefill';
+import ScheduleTotalRefill from '../TaskDetail/ScheduleTotalRefill';
+// import ScheduleTotalRefill from '../TaskDetail/ScheduleTotalRefill';
+import ScheduleStageRefill from '../TaskDetail/ScheduleStageRefill';
 
 const FormItem = Form.Item;
 export default class Detail extends Component {
@@ -33,13 +36,13 @@ export default class Detail extends Component {
 				return (
 					<ScheduleTotalDetail {...this.props} {...this.state}/>
 				)
-			}else if (code === WORKFLOW_CODE.每日进度填报流程 && (name == '初审' || name == '复审')){
-				return (
-					<ScheduleStageDetail {...this.props} {...this.state}/>
-				)
 			}else if (code === WORKFLOW_CODE.每日进度计划填报流程 && (name == '初审' || name == '复审')){
 				return (
 					<ScheduleDayDetail {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.每日进度填报流程 && (name == '初审' || name == '复审')){
+				return (
+					<ScheduleStageDetail {...this.props} {...this.state}/>
 				)
 			}else if (code === WORKFLOW_CODE.机械设备报批流程 && (name == '初审' || name == '复审')){
 				return (
@@ -64,6 +67,18 @@ export default class Detail extends Component {
 			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && name == '填报'){
 				return (
 					<OverallResourceRefill {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.总进度计划报批流程 && name == '填报'){
+				return (
+					<ScheduleTotalRefill {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.每日进度计划填报流程 && name == '填报'){
+				return (
+					<ScheduleTotalRefill {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.每日进度填报流程 && name == '填报'){
+				return (
+					<ScheduleStageRefill {...this.props} {...this.state}/>
 				)
 			}else {
 				return <div>待定流程</div>
