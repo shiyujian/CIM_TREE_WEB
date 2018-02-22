@@ -147,19 +147,19 @@ export default class NursOverallTable extends Component {
 			title:"测量人",
 			dataIndex: 'Inputer',
 			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : '/'}</span>
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title: "监理人",
 			dataIndex: 'Supervisor',
 			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : '/'}</span>
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title: "抽查人",
 			dataIndex: 'Checker',
 			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : '/'}</span>
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title:<div><div>树高</div><div>(cm)</div></div>,

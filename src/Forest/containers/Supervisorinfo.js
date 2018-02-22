@@ -31,7 +31,11 @@ export default class Supervisorinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree}} = this.props;
+        const {actions: {getTree,getForestUsers}, users} = this.props;
+        // 避免反复获取森林用户数据，提高效率
+        if(!users){
+            getForestUsers();
+        }
         //地块树
         try {
             getTree({},{parent:'root'})

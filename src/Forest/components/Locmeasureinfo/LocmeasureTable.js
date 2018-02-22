@@ -67,7 +67,6 @@ export default class LocmeasureTable extends Component {
 		);
 	}
 	treeTable(details) {
-		console.log('details',details);
 		const {
 			treetypeoption,
 			sectionoption,
@@ -78,6 +77,7 @@ export default class LocmeasureTable extends Component {
 			keycode,
 			statusoption,
 			locationoption,
+			users
 		} = this.props;
 		const {
 			sxm, 
@@ -117,9 +117,9 @@ export default class LocmeasureTable extends Component {
 			dataIndex: 'islocation',
 		},{
 			title:"测量人",
+			dataIndex: 'Inputer',
 			render: (text,record) => {
-				return <span>{record.Inputer || '/'}</span>
-				
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title:"测量时间",

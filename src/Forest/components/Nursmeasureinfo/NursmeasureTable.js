@@ -121,7 +121,7 @@ export default class NursmeasureTable extends Component {
 			title:"填报人",
 			dataIndex: 'Inputer',
 			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : '/'}</span>
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title:"起苗时间",
