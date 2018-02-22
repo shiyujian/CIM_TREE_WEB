@@ -137,22 +137,22 @@ export default class ScheduleStageDeal extends Component {
                     duration:2
                 })
 
-                // putFlow(data, workflow).then(rst => {
-                //     if (rst && rst.creator) {
-                //         notification.success({
-                //             message: '流程提交成功',
-                //             duration: 2
-                //         })
-                //         let to = `/selfcare`;
-                //         me.props.history.push(to)
-                //     } else {
-                //         notification.error({
-                //             message: '流程提交失败',
-                //             duration: 2
-                //         })
-                //         return
-                //     }
-                // })
+                putFlow(data, workflowData).then(rst => {
+                    if (rst && rst.creator) {
+                        notification.success({
+                            message: '流程提交成功',
+                            duration: 2
+                        })
+                        let to = `/selfcare`;
+                        me.props.history.push(to)
+                    } else {
+                        notification.error({
+                            message: '流程提交失败',
+                            duration: 2
+                        })
+                        return
+                    }
+                })
 
             }else{
                 notification.error({

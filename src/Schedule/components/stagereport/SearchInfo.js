@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
-
+import {  UNITS } from '../../../_platform/api';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
-class SearchInfo extends Component {
+
+export default class SearchInfo extends Component {
     static propType = {};
     static layout = {
         labelCol: { span: 6 },
@@ -32,9 +33,7 @@ class SearchInfo extends Component {
                                             ]
                                         })
                                             (<Select placeholder='请选择单位工程' allowClear>
-                                                <Option value='单位工程一'>单位工程一</Option>
-                                                <Option value='单位工程二'>单位工程二</Option>
-                                                <Option value='单位工程三'>单位工程三</Option>
+                                                {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
                                             </Select>)
                                     }
                                 </FormItem>
@@ -73,7 +72,7 @@ class SearchInfo extends Component {
                                                 { type: 'array', required: false, message: '请选择时期' }
                                             ]
                                         })
-                                            (<RangePicker size='default' format='' YYYY年MM月DD日 />)
+                                            (<RangePicker size='default' format='YYYY-MM-DD'  />)
                                     }
                                 </FormItem>
                             </Col>
@@ -86,12 +85,12 @@ class SearchInfo extends Component {
                                             ]
                                         })
                                             (<Select placeholder='请选择流程类型' allowClear>
-                                                <Option value='0'>编辑中</Option>
-                                                <Option value='1'>已提交</Option>
-                                                <Option value='2'>执行中</Option>
-                                                <Option value='3'>已完成</Option>
-                                                <Option value='4'>已废止</Option>
-                                                <Option value='5'>异常</Option>
+                                                <Option key={Math.random*4} value={0}>编辑中</Option>
+                                                <Option key={Math.random*5} value={1}>已提交</Option>
+                                                <Option key={Math.random*6} value={2}>执行中</Option>
+                                                <Option key={Math.random*7} value={3}>已完成</Option>
+                                                <Option key={Math.random*8} value={4}>已废止</Option>
+                                                <Option key={Math.random*9} value={5}>异常</Option>
                                             </Select>)
                                     }
                                 </FormItem>
@@ -117,7 +116,7 @@ class SearchInfo extends Component {
     }
 
     query() {
-        alert('查询还未做')
+        this.props.gettaskSchedule()
     }
 
     clear() {
@@ -131,4 +130,4 @@ class SearchInfo extends Component {
     }
 }
 
-export default SearchInfo = Form.create()(SearchInfo);
+// export default SearchInfo = Form.create()(SearchInfo);

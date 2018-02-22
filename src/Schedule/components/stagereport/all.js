@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-02-21 14:36:32
+ * @Last Modified time: 2018-02-22 14:13:33
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -53,7 +53,25 @@ class All extends Component {
     // 获取总进度进度计划流程信息
     gettaskSchedule = async ()=>{
         const { actions: { getTaskSchedule } } = this.props;
-        let task = await getTaskSchedule({ code: WORKFLOW_CODE.总进度计划报批流程 });
+        let reqData={};
+        this.props.form.validateFields((err, values) => {
+			console.log("总进度进度计划流程信息", values);
+            console.log("err", err);
+            
+            values.sunitproject?reqData.subject_unit__contains = values.sunitproject : '';
+            values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
+            values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
+            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
+        })
+        
+        console.log('reqData',reqData)
+
+        let tmpData = Object.assign({}, reqData);
+
+
+        let task = await getTaskSchedule({ code: WORKFLOW_CODE.总进度计划报批流程 },tmpData);
         let subject = [];
         let totledata = [];
         let arrange = {};
@@ -64,17 +82,17 @@ class All extends Component {
             let itemarrange = {
                 index:index+1,
                 id:item.workflowactivity.id,
-                unit: itempostdata.unit,
+                unit: itemdata.unit?JSON.parse(itemdata.unit):'',
                 type: itempostdata.type,
-                numbercode:itempostdata.numbercode,
+                numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
                 remarks:itemtreatmentdata[0].remarks||"--",
                 submitperson:item.workflowactivity.creator.person_name,
                 submittime:item.workflowactivity.real_start_time,
                 status:item.workflowactivity.status,
-                totlesuperunit:itempostdata.superunit,
-                totledocument:itempostdata.totledocument,
+                totlesuperunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+                totledocument:itemdata.totledocument?JSON.parse(itemdata.totledocument):'',
                 treatmentdata:itemtreatmentdata,
-                dataReview:itempostdata.dataReview.person_name
+                dataReview:itemdata.dataReview?JSON.parse(itemdata.dataReview).person_name:''
             }
             totledata.push(itemarrange);
         })
@@ -164,26 +182,7 @@ class All extends Component {
                     })
                     return
                 }
-                // 共有信息
-                for (let value in values) {
-                    if (value === 'area') {
-                        postData.area = values[value];
-                    } else if (value === 'unit') {
-                        postData.unit = values[value];
-                    } else if (value === 'type') {
-                        postData.type = values[value];
-                    } else if (value === 'superunit') {
-                        postData.superunit = values[value];
-                    } else if (value === 'dataReview') {
-                        postData.dataReview = values[value];
-                    } else if (value === 'numbercode') {
-                        postData.numbercode = values[value];
-                    } else if (value === 'totledocument') {
-                        postData.totledocument = values[value];
-                    } else {
-                        console.log("attrs")
-                    }
-                }
+
                 postData.upload_unit = user.org ? user.org : '';
                 postData.type = '总进度计划';
                 postData.upload_person = user.name ? user.name : user.username;
@@ -197,10 +196,13 @@ class All extends Component {
                     "id": parseInt(user.id)
                 };
                 let subject = [{
-                    //共有属性
-                    "postData": JSON.stringify(postData),
-                    
-                    //数据清单
+                    "unit": JSON.stringify(values.unit),
+					"superunit": JSON.stringify(values.superunit),
+					"dataReview": JSON.stringify(values.dataReview),
+					"numbercode": JSON.stringify(values.numbercode),
+					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
+					"totledocument": JSON.stringify(values.totledocument),
+					"postData": JSON.stringify(postData),
                     "TreatmentData": JSON.stringify(TreatmentData),
                     
                 }];
@@ -406,7 +408,7 @@ class All extends Component {
                         onok={this.totleOk.bind(this)}
                     />
                 }
-                <SearchInfo {...this.props} />
+                <SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
                 <Button onClick={this.addClick.bind(this)}>新增</Button>
                 <Button onClick={this.deleteClick.bind(this)}>删除</Button>
                 <Table

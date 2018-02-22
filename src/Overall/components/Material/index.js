@@ -1,7 +1,7 @@
 export GeneralFilter from './GeneralFilter'
 export GeneralTable from './GeneralTable'
 export GeneralAddition from './GeneralAddition'
-export Updatemodal from './Updatemodal'
+// export Updatemodal from './Updatemodal'
 export DatumTree from './DatumTree'
 export ResourceFilter from './ResourceFilter'
 export ResourceTable from './ResourceTable'

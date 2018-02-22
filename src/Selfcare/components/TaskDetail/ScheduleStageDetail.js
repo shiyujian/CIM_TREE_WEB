@@ -136,11 +136,11 @@ class ScheduleStageDetail extends Component {
         let record = {
             'id':instance.id,
 			'TreatmentData':subject.treedataSource?JSON.parse(subject.treedataSource):'',
-			'unit':postData.unit?postData.unit:'',
-            'numbercode':postData.numbercode?postData.numbercode:'',
-            'stagedocument':postData.stagedocument?postData.stagedocument:'',
-			'timedate':postData.timedate?postData.timedate:'',
-			'superunit':postData.superunit?postData.superunit:''
+			'unit':subject.unit?JSON.parse(subject.unit):'',
+            'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
+            'stagedocument':subject.stagedocument?JSON.parse(subject.stagedocument):'',
+			'timedate':subject.timedate?JSON.parse(subject.timedate):'',
+			'superunit':subject.superunit?JSON.parse(subject.superunit):''
         }
 		return record
 	}
