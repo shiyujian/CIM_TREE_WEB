@@ -70,6 +70,7 @@ export default class SupervisorTable extends Component {
 			leftkeycode,
 			keycode,
 			statusoption,
+			users,
 		} = this.props;
 		const {
 			sxm, 
@@ -100,9 +101,9 @@ export default class SupervisorTable extends Component {
 			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"监理人",
+			dataIndex: 'Supervisor',
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				return <span>{attrs.supervisor || '/'}</span>
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title:"状态",

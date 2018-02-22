@@ -76,6 +76,7 @@ export default class CheckerTable extends Component {
 			keycode,
 			statusoption,
 			locationoption,
+			users,
 		} = this.props;
 		const {
 			sxm, 
@@ -106,8 +107,9 @@ export default class CheckerTable extends Component {
 			dataIndex: 'TreeTypeObj.TreeTypeNo',
 		},{
 			title:"抽查人",
+			dataIndex: 'Checker',
 			render: (text,record) => {
-				return <span>{record.Checker || '/'}</span>
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title:"状态",

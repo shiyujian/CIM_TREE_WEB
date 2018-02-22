@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import {createFetchActionWithHeaders} from './fetchAction'
 // 
 import faithInfoReducer, {actions as faithActions} from './faithInfo';
-import { FOREST_API} from '_platform/api';
+import { FOREST_API, FOREST_SYSTEM } from '_platform/api';
 import {actionsMap} from '_platform/store/util';
 const ID = 'forest';
 
@@ -13,9 +13,11 @@ export const changeNursery = createAction(`${ID}传递nurseryName`);
 export const getHonestyNewDetailOk = createAction(`${ID}存储返回的详情`);
 export const clearList = createAction(`${ID}清空列表`);
 export const nurseryName = createAction(`${ID}供苗商名字`);
-
+const getForestUsersOK = createAction('获取森林数据用户列表');
 
 /*****************************院内************************/
+export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [getForestUsersOK]);
+
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/tree/factoryAnalyse`, []);
@@ -53,6 +55,7 @@ export const getHonestyNewDetail = createFetchAction(`${FOREST_API}/tree/factory
 export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/honesty/new/?detail=true`, []);
 export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, '');
 export const actions = {
+	getForestUsers,
 	getTreeOK,
 	getTree,
 	setkeycode,
@@ -111,7 +114,16 @@ export default handleActions({
 		...state,
 		faith: faithInfoReducer(state.faith, action),
 	}),
-
+	[getForestUsersOK]: (state, {payload: {content}}) => {
+		let users = {};
+        if(content){
+            content.forEach(user => users[user.ID] = user);
+		}
+		return {
+			...state,
+			users
+		};
+    },
 	[getHonestyNewDetailOk]: (state, {payload}) => ({
 		...state,
 		honestyList: payload
@@ -120,7 +132,6 @@ export default handleActions({
 		...state,
 		honestyList: payload
 	}),
-
 	[nurseryName]: (state, {payload}) => ({
 		...state,
 		nurseryName: payload
