@@ -81,6 +81,9 @@ export default class FaithinfoTable extends Component {
 			title:"总诚信度",
 			dataIndex: 'Sincerity',
 			width: '8%',
+			render: (text,record) => {
+				return <span>{text.toFixed(2)*1}</span>
+			}
 		},{
 			title:"详情",
 			render: (record) => {
