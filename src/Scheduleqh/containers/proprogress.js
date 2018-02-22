@@ -2,11 +2,9 @@ import React, {Component} from 'react';
 import {DynamicTitle, Sidebar, Content} from '_platform/components/layout';
 
 import {connect} from 'react-redux';
-import ProjectUnitWrapper from '../components/ProjectUnitWrapper';
 
 import {bindActionCreators} from 'redux';
 import {Tabs,Table,Row,Col,Card,DatePicker} from 'antd';
-import ProceeTable from '../components/ProceeTable'
 import LeftTop from '../components/Item/LeftTop'
 import LeftBottom from '../components/Item/LeftBottom'
 import RightBottom from '../components/Item/RightBottom'
@@ -160,7 +158,6 @@ export default class Proprogress extends Component {
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                             onExpand={this.onExpand.bind(this)}/>
-                        {/*<ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)} />*/}
                     </div>
                 </Sidebar>
                 <Content>

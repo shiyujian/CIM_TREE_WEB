@@ -3,7 +3,7 @@ import { Row, Col, Input, Form, Spin, Icon, Button, Table, Modal, DatePicker, Pr
 // import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
+import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
 import PerSearch from './PerSearch';
@@ -32,6 +32,7 @@ class Stagereporttab extends Component {
 			treedataSource: [],
 			treetype: [],//树种
 			key: 6,
+			TotleModaldata:[]
 		};
 	}
 
@@ -79,7 +80,7 @@ class Stagereporttab extends Component {
 	// 获取日实际进度流程信息
     gettaskSchedule = async ()=>{
         const { actions: { getTaskSchedule } } = this.props;
-		let task = await getTaskSchedule({ code: 'TEMPLATE_003', name:'每日实际进度填报流程' });
+		let task = await getTaskSchedule({ code: WORKFLOW_CODE.每日进度填报流程 });
 		console.log('task',task)
         let subject = [];
         let totledata = [];
@@ -97,8 +98,9 @@ class Stagereporttab extends Component {
                 submitperson:item.workflowactivity.creator.person_name,
                 submittime:item.workflowactivity.real_start_time,
                 status:item.workflowactivity.status,
-				daysuperunit:itempostdata.superunit,
+				superunit:itempostdata.superunit,
 				timedate:itempostdata.timedate,
+				stagedocument:itempostdata.stagedocument,
 				TreedataSource:itemtreedatasource,
                 dataReview:itempostdata.dataReview.person_name
             }
@@ -113,7 +115,7 @@ class Stagereporttab extends Component {
 	}
 	// 操作--查看
     clickInfo(record) {
-        this.setState({ dayvisible: true });
+        this.setState({ dayvisible: true, TotleModaldata:record });
     }
     // 取消
     totleCancle() {
@@ -285,6 +287,8 @@ class Stagereporttab extends Component {
                         postData.numbercode = values[value];
                     }else if (value === 'timedate'){
                         postData.timedate = values[value];
+                    }else if (value === 'stagedocument'){
+                        postData.stagedocument = values[value];
                     }else{
                        console.log(1111)
                     }
@@ -310,7 +314,7 @@ class Stagereporttab extends Component {
 				const nextUser = this.member;
 				let WORKFLOW_MAP = {
                     name:"每日实际进度填报流程",
-                    desc:"综合管理模块每日实际进度填报流程",
+                    desc:"进度管理模块每日实际进度填报流程",
                     code:WORKFLOW_CODE.每日进度填报流程
                 };
                 let workflowdata={
@@ -402,7 +406,7 @@ class Stagereporttab extends Component {
 			<div>
 				{
                     this.state.dayvisible &&
-                    <DayModal {...this.props}
+                    <DayModal {...this.state.TotleModaldata}
                         oncancel={this.totleCancle.bind(this)}
                         onok={this.totleOk.bind(this)}
                     />
@@ -430,7 +434,7 @@ class Stagereporttab extends Component {
 							<Row>
 								<Col span={24}>
 									<Row>
-										<Col span={8}>
+										<Col span={12}>
 											<FormItem {...FormItemLayout} label='单位工程'>
 												{
 													getFieldDecorator('unit', {
@@ -438,15 +442,13 @@ class Stagereporttab extends Component {
 															{ required: true, message: '请选择单位工程' }
 														]
 													})
-														(<Select placeholder='请选择区域' allowClear>
-															<Option value='单位工程一'>单位工程一</Option>
-															<Option value='单位工程二'>单位工程二</Option>
-															<Option value='单位工程三'>单位工程三</Option>
+														(<Select placeholder='请选择单位工程' allowClear>
+															{UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
 														</Select>)
 												}
 											</FormItem>
 										</Col>
-										<Col span={8}>
+										<Col span={12}>
 											<FormItem {...FormItemLayout} label='编号'>
 												{
 													getFieldDecorator('numbercode', {
@@ -460,19 +462,22 @@ class Stagereporttab extends Component {
 										</Col>
 									</Row>
 									<Row>
-										<Col span={8}>
-											<FormItem {...FormItemLayout} label='监理单位'>
-												{
-													getFieldDecorator('superunit', {
-														rules: [
-															{ required: true, message: '请输入监理单位' }
-														]
-													})
-														(<Input placeholder='请输入监理单位' />)
-												}
-											</FormItem>
-										</Col>
-										<Col span={8}>
+										<Col span={12}>
+                                            <FormItem {...FormItemLayout} label='文档类型'>
+                                                {
+                                                    getFieldDecorator('stagedocument', {
+                                                        rules: [
+                                                            { required: true, message: '请选择文档类型' }
+                                                        ]
+                                                    })
+                                                        (<Select placeholder='请选择文档类型' allowClear>
+                                                            <Option key={1} value='开发文档'>开发文档</Option>
+                                                            <Option key={2} value='测试文档'>测试文档</Option>
+                                                        </Select>)
+                                                }
+                                            </FormItem>
+                                        </Col>
+										<Col span={12}>
 											<FormItem {...FormItemLayout} label='日期'>
 												{
 													getFieldDecorator('timedate', {
@@ -483,6 +488,20 @@ class Stagereporttab extends Component {
 														(<Input placeholder='请输入日期' />)
 												}
 											</FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='监理单位'>
+                                                {
+                                                    getFieldDecorator('superunit', {
+                                                        rules: [
+                                                            { required: true, message: '请选择审核人员' }
+                                                        ]
+                                                    })
+                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
+                                                }
+                                            </FormItem>
 										</Col>
 									</Row>
 									<Row>
@@ -582,49 +601,50 @@ class Stagereporttab extends Component {
 		},
 	];
 
-	columns1 = [{
-		title: '序号',
-		dataIndex: 'key',
-		key: 'key',
-		width: '10%',
-	}, {
-		title: '项目',
-		dataIndex: 'project',
-		key: 'project',
-	}, {
-		title: '单位',
-		dataIndex: 'units',
-		key: 'units',
-	}, {
-		title: '数量',
-		dataIndex: 'number',
-		key: 'number',
-		render: (text, record, index) => {
-			return <Input value={record.number || ""} onChange={ele => {
-				record.number = ele.target.value
-				this.forceUpdate();
-			}} />
-		}
-	}, {
-		title: '操作',
-		dataIndex: 'operation',
-		key: 'operation',
-		width: '10%',
-		render: (text, record, index) => {
-			if (index >= 6) {
-				return <div>
-					<Popconfirm
-						placement="rightTop"
-						title="确定删除吗？"
-						onConfirm={this.delTreeClick.bind(this, record, index + 1)}
-						okText="确认"
-						cancelText="取消">
-						<a>删除</a>
-					</Popconfirm>
-				</div>
+	columns1 = [
+		{
+			title: '序号',
+			dataIndex: 'key',
+			key: 'key',
+			width: '10%',
+		}, {
+			title: '项目',
+			dataIndex: 'project',
+			key: 'project',
+		}, {
+			title: '单位',
+			dataIndex: 'units',
+			key: 'units',
+		}, {
+			title: '数量',
+			dataIndex: 'number',
+			key: 'number',
+			render: (text, record, index) => {
+				return <Input value={record.number || ""} onChange={ele => {
+					record.number = ele.target.value
+					this.forceUpdate();
+				}} />
+			}
+		}, {
+			title: '操作',
+			dataIndex: 'operation',
+			key: 'operation',
+			width: '10%',
+			render: (text, record, index) => {
+				if (index >= 6) {
+					return <div>
+						<Popconfirm
+							placement="rightTop"
+							title="确定删除吗？"
+							onConfirm={this.delTreeClick.bind(this, record, index + 1)}
+							okText="确认"
+							cancelText="取消">
+							<a>删除</a>
+						</Popconfirm>
+					</div>
+				}
 			}
 		}
-	}
 	];
 }
 export default Form.create()(Stagereporttab)

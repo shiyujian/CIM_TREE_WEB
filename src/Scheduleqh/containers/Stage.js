@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { DynamicTitle, Content, Sidebar } from '_platform/components/layout';
-import ProjectUnitWrapper from '../components/ProjectUnitWrapper';
 import { getUser } from '_platform/auth';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import EditData from '../components/Stage/EditData';
 import moment from 'moment';
 import './Schedule.less';
 import { Link } from 'react-router-dom';
@@ -36,7 +34,7 @@ const CheckboxGroup = Checkbox.Group;
     })
 )
 
-class Stage extends Component {
+export default class Stage extends Component {
     static propTypes = {};
 
     constructor(props) {
@@ -149,7 +147,6 @@ class Stage extends Component {
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                             onExpand={this.onExpand.bind(this)} />
-                        {/*<ProjectUnitWrapper {...this.props} onSelect={this.onSelect.bind(this)} />*/}
                     </div>
                 </Sidebar>
                 <Content>
@@ -241,7 +238,3 @@ function getNewTreeData(treeData, curKey, child) {
         console.log(e)
     }
 }
-
-
-
-export default Form.create()(Stage);
