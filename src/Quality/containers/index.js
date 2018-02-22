@@ -1,3 +1,4 @@
+
 export Item from './Item';
 export Cell from './Cell';
 export Inspection from './Inspection';
@@ -24,6 +25,7 @@ export Subitem from './Subitem'
 export DanweiJL from './DanweiJL'
 export DanweiJLAsk from './DanweiJLAsk'
 
+export CheckAccept from './CheckAccept'
 export FenbuCheck from './FenbuCheck'
 export TianBaoJL from './TianbaoJL'
 export DanweiJLShow from './DanweiJLShow'
