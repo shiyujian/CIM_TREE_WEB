@@ -38,7 +38,11 @@ export default class Nursoverallinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList}} = this.props;
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers}, users} = this.props;
+        // 避免反复获取森林用户数据，提高效率
+        if(!users){
+            getForestUsers();
+        }
         //地块树
         try {
             getTree({},{parent:'root'})
@@ -120,7 +124,7 @@ export default class Nursoverallinfo extends Component {
             <Option key={'2'} value={'supervisor'}>监理人</Option>,
             <Option key={'3'} value={'checker'}>抽查人</Option>,
         ];
-        this.setState({roleoption})
+        this.setState({roleoption});
     }
 
 	render() {

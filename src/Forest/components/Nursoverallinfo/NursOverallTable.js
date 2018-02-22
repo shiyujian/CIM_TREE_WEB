@@ -82,7 +82,6 @@ export default class NursOverallTable extends Component {
 		);
 	}
 	treeTable(details) {
-		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -94,6 +93,7 @@ export default class NursOverallTable extends Component {
 			keycode,
 			statusoption,
 			locationoption,
+			users
 		} = this.props;
 		const {
 			sxm, 
@@ -145,21 +145,21 @@ export default class NursOverallTable extends Component {
 			dataIndex: 'Factory',
 		},{
 			title:"测量人",
+			dataIndex: 'Inputer',
 			render: (text,record) => {
-				return <span>{record.Inputer || '/'}</span>
-				
+				return <span>{users&&users[text] ? users[text].Full_Name : '/'}</span>
 			}
 		},{
 			title: "监理人",
+			dataIndex: 'Supervisor',
 			render: (text,record) => {
-				return <span>{record.Supervisor || '/'}</span>
-				
+				return <span>{users&&users[text] ? users[text].Full_Name : '/'}</span>
 			}
 		},{
 			title: "抽查人",
+			dataIndex: 'Checker',
 			render: (text,record) => {
-				return <span>{record.Checker || '/'}</span>
-				
+				return <span>{users&&users[text] ? users[text].Full_Name : '/'}</span>
 			}
 		},{
 			title:<div><div>树高</div><div>(cm)</div></div>,
@@ -732,7 +732,6 @@ export default class NursOverallTable extends Component {
     		tqzj = `${tqzj_min}-${tqzj_max}`
     	}
     	const {actions: {getNurserysTree},keycode = ''} = this.props;
-    	console.log('props',this.props)
     	let postdata = {
     		no:keycode,
     		sxm,
