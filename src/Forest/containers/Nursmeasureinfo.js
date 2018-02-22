@@ -99,13 +99,13 @@ export default class Nursmeasureinfo extends Component {
         let statusoption = [{
             value: '',
             label: '全部'
-            },{
-              value: '0',
-              label: '已种植',
-            }, {
-                value: '-1',
-                label: '未种植',
-                children: [{
+        },{
+            value: '0',
+            label: '已种植',
+        }, {
+            value: '-1',
+            label: '未种植',
+            children: [{
                 value: '1',
                 label: '进场退回',
             }, {
