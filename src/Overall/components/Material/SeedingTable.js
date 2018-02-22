@@ -14,81 +14,210 @@ let indexSelect='';
 class SeedingTable extends Component {
 
 	constructor(props){
-         super(props);
-         this.state={
-         	visible: false,
-			data:[],
-			indexSelect:'' ,
-			record:{}
-         }
-	}
-	
-	static layoutT = {
-		labelCol: {span: 8},
-		wrapperCol: {span: 16},
-	};
-
-	columns1 = [{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index',
-        width: '20%',
-    }, {
-        title: '文件名称',
-        dataIndex: 'fileName',
-        key: 'fileName',
-        width: '45%',
-    }, {
-        title: '操作',
-        dataIndex: 'operation',
-        key: 'operation',
-        width: '20%',
-        render:(text, record, index)=>{
-			const { Doc = [] } = this.props;
-			return (
-				<div>
-					<a onClick={this.previewFile.bind(this,record)}>预览</a>
-					<a  style={{ marginLeft: 10 }} onClick={this.downloadFile.bind(this,record)}>下载</a>
-				</div>
-			)
+		super(props);
+		this.state={
+			visible: false,
+		   data:[],
+		   indexSelect:'' ,
+		   record:{},
+		   workflowData:[]
 		}
-    }]
+   }
+   // state = { 
+   // 	visible: false,
+   // 	data:[],
+   // 	indexSelect:'' 
+   // }
+
+   columns = [
+	   {
+		   title: '单位工程',
+		   dataIndex: 'unit',
+		   key: 'unit',
+	   }, {
+		   title: '名称',
+		   dataIndex: 'name',
+		   key: 'name',
+	   },{
+		   title: '编号',
+		   dataIndex: 'code',
+		   key: 'code',
+	   }, {
+		   title: '文档类型',
+		   dataIndex: 'extra_params.style',
+		   key: 'extra_params.style',
+	   }, {
+		   title: '进场日期',
+		   dataIndex: 'date',
+		   key: 'date',
+	   },{
+		   title: '施工部位',
+		   dataIndex: 'site',
+		   key: 'site',
+	   }, {
+		   title: '提交人',
+		   dataIndex: 'submitPerson',
+		   key: 'submitPerson'
+	   }, {
+		   title: '提交时间',
+		   dataIndex: 'submitTime',
+		   key: 'submitTime'
+	   }, {
+		   title: '流程状态',
+		   dataIndex: 'resourceStyle',
+		   key: 'resourceStyle'
+	   }, {
+		   title: '操作',
+		   dataIndex: 'opera',
+		   key: 'opera',
+		   render: (text,record, index) => {
+			   return(
+				   <div>
+					   <a type="primary" onClick={this.showModal.bind(this,index,record)}>查看</a>
+				   </div>
+			   )	
+		   }
+	   }
+   ];
+
+   equipmentColumns=[
+	   {
+		   title: '名称',
+		   dataIndex: 'extra_params.equipName',
+		   key: 'extra_params.equipName',
+
+	   }, {
+		   title: '规格',
+		   dataIndex: 'extra_params.equipFormat',
+		   key: 'extra_params.equipFormat',
+	   },{
+		   title: '数量',
+		   dataIndex: 'extra_params.equipCount',
+		   key: 'extra_params.equipCount',
+	   }, {
+		   title: '单位',
+		   dataIndex: 'extra_params.equipUnit',
+		   key: 'extra_params.equipUnit',
+	   },{
+		   title: '产地',
+		   dataIndex: 'extra_params.equipPlace',
+		   key: 'extra_params.equipPlace', 
+	   }
+   ];
+
+   columns1 = [
+	   {
+	   title: '序号',
+	   dataIndex: 'index',
+	   key: 'index',
+	   width: '20%',
+	   }, {
+		   title: '文件名称',
+		   dataIndex: 'fileName',
+		   key: 'fileName',
+		   width: '45%',
+	   }, {
+		   title: '操作',
+		   dataIndex: 'operation',
+		   key: 'operation',
+		   width: '20%',
+		   render:(text, record, index)=>{
+			   const { Doc = [] } = this.props;
+			   return (
+				   <div>
+					   <a onClick={this.previewFile.bind(this,record)}>预览</a>
+					   <a  style={{ marginLeft: 10 }} onClick={this.downloadFile.bind(this,record)}>下载</a>
+				   </div>
+			   )
+		   }
+	   }
+   ]
+
+   static layoutT = {
+	labelCol: {span: 8},
+	wrapperCol: {span: 16},
+};
 
 	componentDidMount(){
-		const {
-			actions:{
-				getWorkflows3
-			}
-		} = this.props
-
-		let code = {
-			code:WORKFLOW_CODE.苗木资料报批流程
-		}
-		getWorkflows3(code)
+		this.gettaskSchedule()
 	}
+
+	// 获取日计划进度流程信息
+    gettaskSchedule = async ()=>{
+		const { actions: { getWorkflows } } = this.props;
+		let reqData={};
+		this.props.form.validateFields((err, values) => {
+			console.log("苗木资料报批流程", values);
+            console.log("err", err);
+            
+			values.sunit?reqData.subject_unit__contains = values.sunit : '';
+			values.sname?reqData.subject_name__contains = values.sname : '';
+            values.scode?reqData.subject_code__contains = values.scode : '';
+            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
+        })
+        
+        console.log('reqData',reqData)
+
+        let tmpData = Object.assign({}, reqData);
+
+
+        let task = await getWorkflows({ code: WORKFLOW_CODE.苗木资料报批流程 },tmpData);
+		console.log('task',task)
+        let subject = [];
+        let totledata = [];
+		let arrange = {};
+		task.map((item,index)=>{
+
+			let subject = item.workflowactivity.subject[0];
+			let creator = item.workflowactivity.creator;
+			console.log('subject',subject)
+			let data = {
+				// index:index+1,
+				'id':item.workflowactivity.id,
+				'workflow':item,
+				'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
+				'dataSource':subject.dataSource?JSON.parse(subject.dataSource):'',
+				'unit':subject.unit?JSON.parse(subject.unit):'',
+				'name':subject.name?JSON.parse(subject.name):'',
+				'code':subject.code?JSON.parse(subject.code):'',
+				'extra_params.style':'',
+				'reviewUnit':subject.reviewUnit?JSON.parse(subject.reviewUnit):'',
+				'date':subject.date?moment(JSON.parse(subject.date)).format('YYYY-MM-DD'):'',
+				'site':subject.site?JSON.parse(subject.site):'',
+				'submitOrg':subject.submitOrg?JSON.parse(subject.submitOrg):'',
+				'submitPerson':creator.person_name?creator.person_name:(creator.username?creator.username:''),
+				'submitTime':moment(item.workflowactivity.creator).format('YYYY-MM-DD'),
+				'resourceStyle':item.workflowactivity.status===2?'执行中':'已完成',
+			}
+			totledata.push(data)
+		})
+		console.log('totledata',totledata)
+        this.setState({
+            workflowData:totledata
+        })
+    }
 	render() {
 		let {
 			  visible,
 			  data,
-			  record
+			  record,
+			  workflowData
         } = this.state;
 		const { 
 			Doc = [],
-			form: { getFieldDecorator },
-			workflows3 
+			form: { getFieldDecorator }
 		} = this.props;
-		let dataSource = []
-		if(workflows3 && Array.isArray(workflows3) && workflows3.length>0){
-			dataSource = this.getTable(workflows3)
-		}
+		
 		return (
 			<div>
-				<SeedingFilter  {...this.props} {...this.state}/>
+				<SeedingFilter  {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
 				<Table 
 					// rowSelection={this.rowSelection}
-					dataSource={dataSource}
+					dataSource={workflowData}
 					columns={this.columns}
-					bordered rowKey="code" />
+					bordered />
 			{
 				this.state.visible==true &&
 				<Modal
@@ -100,11 +229,6 @@ class SeedingTable extends Component {
 		          onCancel={this.handleCancel}
 		        >
 			        <div>
-			        	<Row gutter={24}>
-			        		<Col>
-			        			<div style={{borderBottom: 'solid 1px #999'}}></div>
-			        		</Col>
-			        	</Row>
 	                    <Row gutter={24}>
 	                        <Col span={24} style={{paddingLeft:'3em'}}>
 	                            <Row gutter={15} style={{marginTop:'2em'}} >
@@ -175,6 +299,7 @@ class SeedingTable extends Component {
 							<Col span={24} style={{marginTop:'1em'}}>
 								<Table  dataSource={record.TreatmentData?record.TreatmentData:[]}
 										columns={this.columns1} 
+										bordered 
 										pagination={true}
 								/>
 									
@@ -186,34 +311,6 @@ class SeedingTable extends Component {
 			}	
 			</div>
 		);
-	}
-
-	getTable(instance){
-		let dataSource = []
-		instance.map((item)=>{
-			let subject = item.subject[0];
-			let creator = item.creator;
-			console.log('subject',subject)
-			let data = {
-				'id':item.id,
-				'workflow':item,
-				'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
-				'dataSource':subject.dataSource?JSON.parse(subject.dataSource):'',
-				'unit':subject.unit?JSON.parse(subject.unit):'',
-				'name':subject.name?JSON.parse(subject.name):'',
-				'code':subject.code?JSON.parse(subject.code):'',
-				'extra_params.style':'',
-				'reviewUnit':subject.reviewUnit?JSON.parse(subject.reviewUnit):'',
-				'date':subject.date?JSON.parse(subject.date):'',
-				'site':subject.site?JSON.parse(subject.site):'',
-				'submitPerson':creator.person_name?creator.person_name:(creator.username?creator.username:''),
-				'submitTime':moment(item.real_start_time).format('YYYY-MM-DD'),
-				'resourceStyle':item.status===2?'执行中':'已完成',
-			}
-			dataSource.push(data)
-		})
-		console.log('dataSource',dataSource)
-		return dataSource
 	}
 
 	showModal = (key,record) => {
@@ -240,81 +337,6 @@ class SeedingTable extends Component {
 	// 		selectDocuments(selectedRows);
 	// 	},
 	// };
-
-	columns = [
-		{
-			title: '单位工程',
-			dataIndex: 'unit',
-			key: 'unit',
-			// sorter: (a, b) => a.name.length - b.name.length
-		}, {
-			title: '名称',
-			dataIndex: 'name',
-			key: 'name',
-			// sorter: (a, b) => a.code.length - b.code.length
-		},{
-			title: '编号',
-			dataIndex: 'code',
-			key: 'code',
-			// sorter: (a, b) => a.code.length - b.code.length
-		}, {
-			title: '文档类型',
-			dataIndex: 'extra_params.style',
-			key: 'extra_params.style',
-			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
-		}, {
-			title: '施工部位',
-			dataIndex: 'reviewUnit',
-			key: 'reviewUnit',
-			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
-		}, {
-			title: '提交人',
-			dataIndex: 'submitPerson',
-			key: 'submitPerson'
-		}, {
-			title: '提交时间',
-			dataIndex: 'submitTime',
-			key: 'submitTime'
-		}, {
-			title: '流程状态',
-			dataIndex: 'resourceStyle',
-			key: 'resourceStyle'
-		}, {
-			title: '操作',
-			render: (text,record, index) => {
-				return(
-					<div>
-						<a type="primary" onClick={this.showModal.bind(this,index,record)}>查看</a>
-					</div>
-				)	
-			}
-		}
-	];
-
-	equipmentColumns=[
-        {
-            title: '名称',
-            dataIndex: 'extra_params.equipName',
-            key: 'extra_params.equipName',
-
-        }, {
-            title: '规格',
-            dataIndex: 'extra_params.equipFormat',
-            key: 'extra_params.equipFormat',
-        },{
-            title: '数量',
-            dataIndex: 'extra_params.equipCount',
-            key: 'extra_params.equipCount',
-        }, {
-            title: '单位',
-            dataIndex: 'extra_params.equipUnit',
-            key: 'extra_params.equipUnit',
-        },{
-            title: '产地',
-            dataIndex: 'extra_params.equipPlace',
-            key: 'extra_params.equipPlace', 
-        }
-	];
 	
 	//下载
 	downloadFile(record){
