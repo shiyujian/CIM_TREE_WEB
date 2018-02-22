@@ -22,7 +22,7 @@ export default class App extends Component {
 		const {default: Datum} = await import('../../Datum');
 		const {default: Design} = await import('../../Design');
 		const {default: Quality} = await import('../../Quality');
-		const {default: Schedule} = await import('../../Schedule');
+		// const {default: Schedule} = await import('../../Schedule');
 		const {default: System} = await import('../../System');
 		// const {default: Setup} = await import('../../Setup');
 		const {default: Contractcare} = await import('../../Contractcare');

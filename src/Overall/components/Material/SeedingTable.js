@@ -5,6 +5,7 @@ import moment from 'moment';
 import './index.less';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 import Preview from '../../../_platform/components/layout/Preview';
+import SeedingFilter from './SeedingFilter';
 
 const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
@@ -82,6 +83,7 @@ class SeedingTable extends Component {
 		}
 		return (
 			<div>
+				<SeedingFilter  {...this.props} {...this.state}/>
 				<Table 
 					// rowSelection={this.rowSelection}
 					dataSource={dataSource}

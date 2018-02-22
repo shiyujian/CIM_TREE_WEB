@@ -5,6 +5,7 @@ import moment from 'moment';
 import './index.less';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 import Preview from '../../../_platform/components/layout/Preview';
+import ResourceFilter from './ResourceFilter';
 
 const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
@@ -87,6 +88,7 @@ class ResourceTable extends Component {
 		}
 		return (
 			<div>
+				<ResourceFilter  {...this.props} {...this.state}/>
 				<Table 
 					// rowSelection={this.rowSelection}
 					dataSource={dataSource}

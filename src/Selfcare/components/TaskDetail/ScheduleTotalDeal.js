@@ -128,7 +128,7 @@ export default class ScheduleTotalDeal extends Component {
         let scheduledata = {
             DocType:'doc',
             ProgressNo:'01',
-            ProgressTime:moment(postdata.upload_time).format(YYYY-MM-DD),
+            ProgressTime:moment(postdata.upload_time).format('YYYY-MM-DD'),
             ProgressType:'总进度',
             SMS:0,
             UnitProject:postdata.unit,
@@ -144,22 +144,22 @@ export default class ScheduleTotalDeal extends Component {
                     duration:2
                 })
 
-                // putFlow(data, workflow).then(rst => {
-                //     if (rst && rst.creator) {
-                //         notification.success({
-                //             message: '流程提交成功',
-                //             duration: 2
-                //         })
-                //         let to = `/selfcare`;
-                //         me.props.history.push(to)
-                //     } else {
-                //         notification.error({
-                //             message: '流程提交失败',
-                //             duration: 2
-                //         })
-                //         return
-                //     }
-                // })
+                putFlow(data, workflowData).then(rst => {
+                    if (rst && rst.creator) {
+                        notification.success({
+                            message: '流程提交成功',
+                            duration: 2
+                        })
+                        let to = `/selfcare`;
+                        me.props.history.push(to)
+                    } else {
+                        notification.error({
+                            message: '流程提交失败',
+                            duration: 2
+                        })
+                        return
+                    }
+                })
 
             }else{
                 notification.error({

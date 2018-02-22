@@ -128,34 +128,7 @@ export default class GeneralFilter extends Component {
 				});
 		});
 	}
-	// createLink = (name, url) => {    //下载
-	// 	let link = document.createElement("a");
-	// 	link.href = url;
-	// 	link.setAttribute('download', this);
-	// 	link.setAttribute('target', '_blank');
-	// 	document.body.appendChild(link);
-	// 	link.click();
-	// 	document.body.removeChild(link);
-	// }
 
-	// download() {
-	// 	const { selected = [], file = [], files = [], down_file = [] } = this.props;
-	// 	if (selected.length == 0) {
-	// 		message.warning('没有选择无法下载');
-	// 	}
-	// 	selected.map(rst => {
-	// 		file.push(rst.basic_params.files);
-	// 	});
-	// 	file.map(value => {
-	// 		value.map(cot => {
-	// 			files.push(cot.download_url)
-	// 		})
-	// 	});
-	// 	files.map(down => {
-	// 		let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-	// 		this.createLink(this, down_load);
-	// 	});
-	// }
 	static layoutT = {
           labelCol: {span: 8},
           wrapperCol: {span: 16},

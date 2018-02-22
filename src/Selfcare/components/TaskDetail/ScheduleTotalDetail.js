@@ -141,10 +141,10 @@ class ScheduleTotalDetail extends Component {
         let record = {
             'id':instance.id,
 			'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
-			'unit':postData.unit?postData.unit:'',
-			'numbercode':postData.numbercode?postData.numbercode:'',
-			'totledocument':postData.totledocument?postData.totledocument:'',
-			'superunit':postData.superunit?postData.superunit:''
+			'unit':subject.unit?JSON.parse(subject.unit):'',
+			'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
+			'totledocument':subject.totledocument?JSON.parse(subject.totledocument):'',
+			'superunit':subject.superunit?JSON.parse(subject.superunit):''
         }
 		return record
 	}

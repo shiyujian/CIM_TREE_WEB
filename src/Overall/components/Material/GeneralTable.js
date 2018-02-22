@@ -5,6 +5,7 @@ import moment from 'moment';
 import './index.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import { WORKFLOW_CODE } from '../../../_platform/api';
+import GeneralFilter from './GeneralFilter';
 
 const FormItem = Form.Item;
 
@@ -81,6 +82,7 @@ class GeneralTable extends Component {
 		}
 		return (
 			<div>
+				<GeneralFilter {...this.props} {...this.state}/>
 				<Table
 					// rowSelection={this.rowSelection}
 					dataSource={dataSource}

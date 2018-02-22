@@ -286,7 +286,7 @@ class OverallGeneralRefill extends Component {
                                                         <span style={{ paddingLeft: 20 }}>当前执行人: </span>
                                                         <span style={{ color: '#108ee9' }}> {`${executor.person_name}` || `${executor.username}`}</span>
                                                     </div>}
-                                                description={
+                                                description={ userID === +user.id &&
                                                     <div>
                                                         <Row style={{marginTop: 15}}>
                                                             <Col span={10} >

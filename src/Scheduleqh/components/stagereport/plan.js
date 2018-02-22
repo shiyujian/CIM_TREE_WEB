@@ -11,9 +11,9 @@ import SearchInfo from './SearchInfo';
 import queryString from 'query-string';
 import DayPlanModal from './DayPlanModal';
 moment.locale('zh-cn');
-const { RangePicker } = DatePicker;
 const FormItem = Form.Item;
 const Option = Select.Option;
+const { MonthPicker, RangePicker } = DatePicker;
 class Plan extends Component {
 
 	constructor(props) {
@@ -80,8 +80,26 @@ class Plan extends Component {
 	}
 	// 获取日计划进度流程信息
     gettaskSchedule = async ()=>{
-        const { actions: { getTaskSchedule } } = this.props;
-		let task = await getTaskSchedule({ code: WORKFLOW_CODE.每日进度计划填报流程 });
+		const { actions: { getTaskSchedule } } = this.props;
+		let reqData={};
+		this.props.form.validateFields((err, values) => {
+			console.log("日计划进度流程信息", values);
+            console.log("err", err);
+            
+            values.sunitproject?reqData.subject_unit__contains = values.sunitproject : '';
+            values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
+            values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
+            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
+        })
+        
+        console.log('reqData',reqData)
+
+        let tmpData = Object.assign({}, reqData);
+
+
+        let task = await getTaskSchedule({ code: WORKFLOW_CODE.每日进度计划填报流程 },tmpData);
 		console.log('task',task)
         let subject = [];
         let totledata = [];
@@ -93,17 +111,17 @@ class Plan extends Component {
             let itemarrange = {
                 index:index+1,
                 id:item.workflowactivity.id,
-                unit: itempostdata.unit,
+                unit: itemdata.unit?JSON.parse(itemdata.unit):'',
                 type: itempostdata.type,
-                numbercode:itempostdata.numbercode,
+                numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
                 submitperson:item.workflowactivity.creator.person_name,
                 submittime:item.workflowactivity.real_start_time,
                 status:item.workflowactivity.status,
-				superunit:itempostdata.superunit,
-				timedate:itempostdata.timedate,
-				daydocument:itempostdata.daydocument,
+				superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+				timedate:itemdata.timedate?JSON.parse(itemdata.timedate):'',
+				daydocument:itemdata.daydocument?JSON.parse(itemdata.daydocument):'',
 				TreedataSource:itemtreedatasource,
-                dataReview:itempostdata.dataReview.person_name
+                dataReview:itemdata.dataReview?JSON.parse(itemdata.dataReview).person_name:''
             }
             totledata.push(itemarrange);
         })
@@ -142,31 +160,33 @@ class Plan extends Component {
 
 	// 新增按钮
 	addClick = () => {
-		let treedata = [{
+		let treedata = [
+			{
 			key: 1,
 			project: '便道施工',
 			units: 'm',
-		}, {
-			key: 2,
-			project: '给排水沟槽开挖',
-			units: 'm',
-		}, {
-			key: 3,
-			project: '给排水管道安装',
-			units: 'm',
-		}, {
-			key: 4,
-			project: '给排水回填',
-			units: 'm',
-		}, {
-			key: 5,
-			project: '绿地平整',
-			units: '亩',
-		}, {
-			key: 6,
-			project: '种植穴工程',
-			units: '个',
-		},];
+			}, {
+				key: 2,
+				project: '给排水沟槽开挖',
+				units: 'm',
+			}, {
+				key: 3,
+				project: '给排水管道安装',
+				units: 'm',
+			}, {
+				key: 4,
+				project: '给排水回填',
+				units: 'm',
+			}, {
+				key: 5,
+				project: '绿地平整',
+				units: '亩',
+			}, {
+				key: 6,
+				project: '种植穴工程',
+				units: '个',
+			},
+		];
 		this.setState({
 			visible: true,
 			treedataSource: treedata
@@ -176,7 +196,7 @@ class Plan extends Component {
 			unit: undefined,
 			dataReview: undefined,
 			numbercode: undefined,
-			timedate: moment().add(1, 'days').format('YYYY-MM-DD')
+			timedate: undefined
 		})
 
 	}
@@ -276,24 +296,7 @@ class Plan extends Component {
 			console.log("err", err);
 			if (!err) {
 				console.log("2222222222222222222222222222222", values);
-				// 共有信息
-				for (let value in values) {
-					if (value === 'unit') {
-						postData.unit = values[value];
-					} else if (value === 'superunit') {
-						postData.superunit = values[value];
-					} else if (value === 'dataReview') {
-						postData.dataReview = values[value];
-					} else if (value === 'numbercode') {
-						postData.numbercode = values[value];
-					} else if (value === 'timedate') {
-						postData.timedate = values[value];
-					} else if (value === 'daydocument') {
-						postData.daydocument = values[value];
-					} else {
-						console.log(1111)
-					}
-				}
+				
 				postData.upload_unit = user.org ? user.org : '';
 				postData.type = '每日计划进度';
 				postData.upload_person = user.name ? user.name : user.username;
@@ -306,9 +309,13 @@ class Plan extends Component {
 					"id": parseInt(user.id)
 				};
 				let subject = [{
-					//共有属性
+					"unit": JSON.stringify(values.unit),
+					"superunit": JSON.stringify(values.superunit),
+					"dataReview": JSON.stringify(values.dataReview),
+					"numbercode": JSON.stringify(values.numbercode),
+					"timedate": JSON.stringify(moment(values.timedate._d).format('YYYY-MM-DD')),
+					"daydocument": JSON.stringify(values.daydocument),
 					"postData": JSON.stringify(postData),
-					//数据清单
 					"treedataSource": JSON.stringify(treedataSource),
 				}];
 				// 准备发起流程
@@ -413,7 +420,7 @@ class Plan extends Component {
 						onok={this.totleOk.bind(this)}
 					/>
 				}
-				<SearchInfo {...this.props} />
+				<SearchInfo {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
 				<Button onClick={this.addClick.bind(this)}>新增</Button>
 				<Button onClick={this.deleteClick.bind(this)}>删除</Button>
 				<Table
@@ -488,7 +495,7 @@ class Plan extends Component {
 															{ required: true, message: '请输入日期' }
 														]
 													})
-														(<Input placeholder='请输入日期' />)
+														(<DatePicker  format={'YYYY-MM-DD'} style={{ width: '100%', height: '100%' }} />)
 												}
 											</FormItem>
 										</Col>
