@@ -311,9 +311,9 @@ class Modals extends Component {
 				<Form>
 					<Row span={22}>
 						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="主题">
+							<FormItem {...formItemLayout} label="名称">
 								{getFieldDecorator('title', {
-									rules: [{ required: true, message: '请输入公告标题' }],
+									rules: [{ required: true, message: '请输入公告名称' }],
 									initialValue: ''
 								})(
 									<Input type="text" />

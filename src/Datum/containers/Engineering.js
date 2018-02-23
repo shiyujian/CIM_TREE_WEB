@@ -50,7 +50,7 @@ export default class Engineering extends Component {
 		return (
 			<Body>
 			<Main>
-				<DynamicTitle title="制度标准" {...this.props}/>
+				<DynamicTitle title="工程文档" {...this.props}/>
 				<Sidebar>
 					<DatumTree treeData={list}
 								selectedKeys={keycode}

@@ -49,28 +49,28 @@ export default class Addition extends Component {
 						<FormItem {...Addition.layout} label="角色">
 							<Select placeholder="请选择角色" value={addition.roles} onChange={this.changeRoles.bind(this)}
 							        mode="multiple" style={{width: '100%'}}>
-								<OptGroup label="系统角色">
+								<OptGroup label="苗圃角色">
 									{
 										systemRoles.map(role => {
 											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
 										})
 									}
 								</OptGroup>
-								<OptGroup label="项目角色">
+								<OptGroup label="施工角色">
 									{
 										projectRoles.map(role => {
 											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
 										})
 									}
 								</OptGroup>
-								<OptGroup label="专业角色">
+								<OptGroup label="监理角色">
 									{
 										professionRoles.map(role => {
 											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
 										})
 									}
 								</OptGroup>
-								<OptGroup label="部门角色">
+								<OptGroup label="业主角色">
 									{
 										departmentRoles.map(role => {
 											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)

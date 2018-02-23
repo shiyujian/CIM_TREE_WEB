@@ -283,15 +283,7 @@ class TipsTable extends Component {
 															{ required: false, message: '发布单位' },
 														]
 													})
-														(<Select style={{ width: '100%' }}
-														>
-															<Option value="0">编辑中</Option>
-															<Option value="1">已提交</Option>
-															<Option value="2">执行中</Option>
-															<Option value="3">已完成</Option>
-															<Option value="4">已废止</Option>
-															<Option value="5">异常</Option>
-														</Select>)
+														(<Input placeholder="请输入发布单位" />)
 												}
 
 
@@ -306,14 +298,11 @@ class TipsTable extends Component {
 															{ required: false, message: '紧急程度' },
 														]
 													})
-														(<Select style={{ width: '100%' }}
+														(<Select defaultValue="0" style={{ width: '100%' }}
 														>
-															<Option value="0">编辑中</Option>
-															<Option value="1">已提交</Option>
-															<Option value="2">执行中</Option>
-															<Option value="3">已完成</Option>
-															<Option value="4">已废止</Option>
-															<Option value="5">异常</Option>
+															<Option value="0">平件</Option>
+															<Option value="1">加急</Option>
+															<Option value="2">特急</Option>
 														</Select>)
 												}
 
@@ -332,9 +321,9 @@ class TipsTable extends Component {
 								</Col>
 							</Row>
 							<Table
-								rowSelection={rowSelection}
+								//rowSelection={rowSelection}
 								dataSource={tipsList}
-								title={() => '通知查询'}
+								//title={() => '通知查询'}
 								className="foresttables"
 								columns={this.columns}
 								bordered
@@ -391,15 +380,7 @@ class TipsTable extends Component {
 															{ required: false, message: '发布单位' },
 														]
 													})
-														(<Select style={{ width: '100%' }}
-														>
-															<Option value="0">编辑中</Option>
-															<Option value="1">已提交</Option>
-															<Option value="2">执行中</Option>
-															<Option value="3">已完成</Option>
-															<Option value="4">已废止</Option>
-															<Option value="5">异常</Option>
-														</Select>)
+														(<Input placeholder="请输入发布单位" />)
 												}
 
 
@@ -414,14 +395,11 @@ class TipsTable extends Component {
 															{ required: false, message: '紧急程度' },
 														]
 													})
-														(<Select style={{ width: '100%' }}
+														(<Select defaultValue="0" style={{ width: '100%' }}
 														>
-															<Option value="0">编辑中</Option>
-															<Option value="1">已提交</Option>
-															<Option value="2">执行中</Option>
-															<Option value="3">已完成</Option>
-															<Option value="4">已废止</Option>
-															<Option value="5">异常</Option>
+															<Option value="0">平件</Option>
+															<Option value="1">加急</Option>
+															<Option value="2">特急</Option>
 														</Select>)
 												}
 
@@ -440,10 +418,10 @@ class TipsTable extends Component {
 								</Col>
 							</Row>
 							<Table 
-								rowSelection={rowSelection}
+								//rowSelection={rowSelection}
 								dataSource={draftTipsList}
 								columns={this.draftColumns}
-								title={() => '暂存的通知'}
+								//title={() => '暂存的通知'}
 								className="foresttables"
 								bordered
 								rowKey="id"

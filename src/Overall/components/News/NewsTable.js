@@ -304,15 +304,7 @@ class NewsTable extends Component {
 															{ required: false, message: '发布单位' },
 														]
 													})
-														(<Select style={{ width: '100%' }}
-														>
-															<Option value="0">编辑中</Option>
-															<Option value="1">已提交</Option>
-															<Option value="2">执行中</Option>
-															<Option value="3">已完成</Option>
-															<Option value="4">已废止</Option>
-															<Option value="5">异常</Option>
-														</Select>)
+														(<Input placeholder="请输入发布单位" />)
 												}
 
 
@@ -337,9 +329,9 @@ class NewsTable extends Component {
 
 								dataSource={newsList}
 								columns={this.columns}
-								title={() => '新闻查询'}
+								// title={() => '新闻查询'}
 								className="foresttables"
-								rowSelection={rowSelection}
+								// rowSelection={rowSelection}
 								bordered
 								rowKey="id" />
 						</TabPane>
@@ -392,15 +384,7 @@ class NewsTable extends Component {
 															{ required: false, message: '发布单位' },
 														]
 													})
-														(<Select style={{ width: '100%' }}
-														>
-															<Option value="0">编辑中</Option>
-															<Option value="1">已提交</Option>
-															<Option value="2">执行中</Option>
-															<Option value="3">已完成</Option>
-															<Option value="4">已废止</Option>
-															<Option value="5">异常</Option>
-														</Select>)
+													(<Input placeholder="请输入发布单位" />)
 												}
 
 
@@ -420,8 +404,7 @@ class NewsTable extends Component {
 							</Row>
 							<Table dataSource={draftNewsLis}
 
-								rowSelection={rowSelection}
-								title={() => '暂存的查询'}
+								// rowSelection={rowSelection}
 								columns={this.draftColumns}
 								className="foresttables"
 								bordered
@@ -454,18 +437,22 @@ class NewsTable extends Component {
 			title: '新闻查询ID',
 			dataIndex: 'id',
 			key: 'id',
+			width:'10%'
 		}, {
 			title: '名称',
 			dataIndex: 'title',
 			key: 'title',
+			width:'50%'
 		}, {
 			title: '发布单位',
 			dataIndex: 'abstract',
 			key: 'abstract',
+			width:'10%'
 		}, {
 			title: '发布日期',
 			dataIndex: 'pub_time',
 			key: 'pub_time',
+			width:'15%',
 			render: pub_time => {
 				return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
 			}
@@ -478,15 +465,15 @@ class NewsTable extends Component {
 			// 	}
 		}, {
 			title: '操作',
+			width:'15%',
 			render: record => {
 				return (
 					<span>
 						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
-
-
-						{/* <a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a> */}
+						&nbsp;&nbsp;|&nbsp;&nbsp;
+						<a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
 							cancelText="取消">
@@ -502,18 +489,22 @@ class NewsTable extends Component {
 			title: '暂存新闻ID',
 			dataIndex: 'id',
 			key: 'id',
+			width:'10%',
 		}, {
 			title: '名称',
 			dataIndex: 'title',
 			key: 'title',
+			width:'50%',
 		}, {
 			title: '发布单位',
 			dataIndex: 'abstract',
 			key: 'abstract',
+			width:'10%',
 		}, {
 			title: '修改时间',
 			dataIndex: 'pub_time',
 			key: 'pub_time',
+			width:'15%',
 			render: pub_time => {
 				return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
 			}
@@ -526,6 +517,7 @@ class NewsTable extends Component {
 			// 	}
 		}, {
 			title: '操作',
+			width:'15%',
 			render: record => {
 				return (
 					<span>

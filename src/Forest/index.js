@@ -121,7 +121,7 @@ export default class ForestContainer extends Component {
 	// 	}
 	// 	]
 	// },
-	{
+/*	{
 		key: 'import',
 		id: 'FOREST.IMPORT',
 		name: '数据导入',
@@ -131,6 +131,6 @@ export default class ForestContainer extends Component {
 			path: '/forest/dataimport',
 			name: '定位数据导入',
 		}]
-	}];
-	static defaultOpenKeys = ["info",'analyze','import']
+	}*/];
+	static defaultOpenKeys = ["info",'analyze'/*,'import'*/]
 };
