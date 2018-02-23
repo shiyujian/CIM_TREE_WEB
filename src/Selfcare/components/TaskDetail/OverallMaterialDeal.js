@@ -108,7 +108,7 @@ export default class OverallMaterialDeal extends Component {
 			pk: task.id
 		}
 
-        putFlow(data, workflow).then(rst => {
+        putFlow(data, workflowData).then(rst => {
             if (rst && rst.creator) {
                 notification.success({
                     message: '流程提交成功',

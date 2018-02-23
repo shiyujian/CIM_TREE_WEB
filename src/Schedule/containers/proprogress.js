@@ -180,9 +180,9 @@ export default class Proprogress extends Component {
                 </Content>
 			</div>);
 	}
-datepick(){}
-datepickok(){}
-//类型选择, 重新获取: 树种
+    datepick(){}
+    datepickok(){}
+    //类型选择, 重新获取: 树种
     typeselect(value,keycode){
         const {actions:{setkeycode,getTreeList}} =this.props;
         //树种

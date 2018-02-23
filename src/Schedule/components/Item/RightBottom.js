@@ -108,42 +108,41 @@ export default class Warning extends Component {
     }
     datepick(){}
     datepickok(value){
-      this.setState({etime1:value?moment(value).format('YYYY/MM/DD HH:mm:s'):'',
-                  })
-      
-      const {actions: {progressdata,progressalldata}} = this.props;
-      progressdata({},{unitproject:this.state.unitproject,etime:this.state.etime1}).then(rst=>{
-            this.getdata(rst);
+        this.setState({etime1:value?moment(value).format('YYYY/MM/DD HH:mm:s'):'',})
+        
+        const {actions: {progressdata,progressalldata}} = this.props;
+        progressdata({},{unitproject:this.state.unitproject,etime:this.state.etime1}).then(rst=>{
+                this.getdata(rst);
         })
     }
     onDepartments(value){
-      console.log(value);
-      const {actions: {progressdata,progressalldata}} = this.props;
-      this.setState({
-        unitproject:value,
-      })
-      progressdata({},{unitproject:value,etime:this.state.etime1}).then(rst=>{
-            this.getdata(rst);
+        console.log(value);
+        const {actions: {progressdata,progressalldata}} = this.props;
+        this.setState({
+            unitproject:value,
+        })
+        progressdata({},{unitproject:value,etime:this.state.etime1}).then(rst=>{
+                this.getdata(rst);
         })
     }
     
     getdata(rst){
-      console.log(rst,"xixixi");
-      let choose = this.state.choose;
-      let shuzhu = [];
-      // let Num = 0;
-      for (let j=0; j<=choose.length-1; j++){
-        // debugger;
-        let Num = 0;
-        for(let i=0; i<=rst.length-1; i++){
-          if(choose[j] === rst[i].Project){
-            Num = Num + rst[i].Num
-          }
+        console.log(rst,"xixixi");
+        let choose = this.state.choose;
+        let shuzhu = [];
+        // let Num = 0;
+        for (let j=0; j<=choose.length-1; j++){
+            // debugger;
+            let Num = 0;
+            for(let i=0; i<=rst.length-1; i++){
+            if(choose[j] === rst[i].Project){
+                Num = Num + rst[i].Num
+            }
+            }
+            shuzhu.push(Num);
         }
-        shuzhu.push(Num);
-      }
-      console.log(shuzhu);
-      let myChart = echarts.init(document.getElementById('rightbottom'));
+        console.log(shuzhu);
+        let myChart = echarts.init(document.getElementById('rightbottom'));
         let optionLine = {
             tooltip: {
                 trigger: 'axis',

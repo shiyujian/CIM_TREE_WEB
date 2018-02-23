@@ -141,22 +141,22 @@ export default class Warning extends Component {
     }
     datepick(){}
     datepickok(value){
-      console.log(value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'');
-      this.setState({etime1:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'',
-                     stime1:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'',
-                  })
-      const {actions: {progressdata,progressalldata}} = this.props;
-      progressdata({},{unitproject:this.state.unitproject,project:this.state.project,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
-            this.getdata(rst);
-        })
+        console.log(value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'');
+        this.setState({etime1:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'',
+                        stime1:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'',
+                    })
+        const {actions: {progressdata,progressalldata}} = this.props;
+        progressdata({},{unitproject:this.state.unitproject,project:this.state.project,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
+                this.getdata(rst);
+            })
 
     }
     onChange(){}
     onDepartments1(value){
-      const {actions: {progressdata,progressalldata}} = this.props;
+        const {actions: {progressdata,progressalldata}} = this.props;
         console.log(value,"111");
         this.setState({
-          project:value,
+        project:value,
         })
         progressdata({},{unitproject:this.state.unitproject,project:value,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
             this.getdata(rst);
@@ -164,7 +164,7 @@ export default class Warning extends Component {
 
     }
     onDepartments2(value){
-      const {actions: {progressdata,progressalldata}} = this.props;
+        const {actions: {progressdata,progressalldata}} = this.props;
         console.log(value,"111");
         this.setState({
           unitproject:value,
@@ -175,18 +175,18 @@ export default class Warning extends Component {
 
     }
     getdata(rst){
-      console.log(rst);
+        console.log(rst);
 
-      let gpsht = rst;
-      let gpshtnum = [];
-      let times = [];
-      for(var i = 0; i<=gpsht.length-1; i++){
-          gpshtnum.push(gpsht[i].Num);
-          let time = new Date(gpsht[i].CreateTime).toLocaleDateString()
-          times.push(time);
-      }
-      console.log(gpshtnum,times,"realy");
-       const myChart = echarts.init(document.getElementById('rightop'));
+        let gpsht = rst;
+        let gpshtnum = [];
+        let times = [];
+        for(var i = 0; i<=gpsht.length-1; i++){
+            gpshtnum.push(gpsht[i].Num);
+            let time = new Date(gpsht[i].CreateTime).toLocaleDateString()
+            times.push(time);
+        }
+        console.log(gpshtnum,times,"realy");
+        const myChart = echarts.init(document.getElementById('rightop'));
 
         let optionLine = {
            tooltip: {
