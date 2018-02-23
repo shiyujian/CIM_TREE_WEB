@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
-import PerSearch from '../../../Scheduleqh/components/stagereport/PerSearch';
+import PerSearch from '../Task/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -229,7 +229,7 @@ class ScheduleStageRefill extends Component {
                                                         <span style={{ paddingLeft: 20 }}>当前执行人: </span>
                                                         <span style={{ color: '#108ee9' }}> {`${executor.person_name}` || `${executor.username}`}</span>
                                                     </div>}
-                                                description={
+                                                description={userID === +user.id &&
                                                     <div>
                                                         <Row>
                                                             <Col span={8} offset={4}>

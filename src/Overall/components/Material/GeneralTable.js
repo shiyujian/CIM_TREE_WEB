@@ -5,6 +5,7 @@ import moment from 'moment';
 import './index.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import { WORKFLOW_CODE } from '../../../_platform/api';
+import GeneralFilter from './GeneralFilter';
 
 const FormItem = Form.Item;
 
@@ -17,221 +18,28 @@ class GeneralTable extends Component {
          	visible: false,
 			data:[],
 			indexSelect:'',
-			record:{}
+			record:{},
+			workflowData:[]
          }
-    }
+	}
 	
-
-	columns1 = [{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index',
-        width: '20%',
-    }, {
-        title: '文件名称',
-        dataIndex: 'fileName',
-        key: 'fileName',
-        width: '45%',
-    }, {
-        title: '操作',
-        dataIndex: 'operation',
-        key: 'operation',
-        width: '20%',
-		render:(text, record, index)=>{
-			const { Doc = [] } = this.props;
-			return (
-				<div>
-					<a onClick={this.previewFile.bind(this,record)}>预览</a>
-					<a  style={{ marginLeft: 10 }} onClick={this.downloadFile.bind(this,record)}>下载</a>
-				</div>
-			)
-		}
-           
-          
-        
-    }]
-	
-	componentDidMount(){
-		const {
-			actions:{
-				getWorkflows1
-			}
-		} = this.props
-
-		let code = {
-			code:WORKFLOW_CODE.机械设备报批流程
-		}
-		getWorkflows1(code)
-	}
-	render() {
-		let {
-			  visible,
-			  data,
-			  record
-        } = this.state;
-		const { 
-			Doc = [],
-			docs = [],
-			workflows1,
-			form: { getFieldDecorator }
-		 } = this.props;
-		let dataSource = []
-		if(workflows1 && Array.isArray(workflows1) && workflows1.length>0){
-			dataSource = this.getTable(workflows1)
-		}
-		return (
-			<div>
-				<Table
-					// rowSelection={this.rowSelection}
-					dataSource={dataSource}
-					columns={this.columns}
-					bordered rowKey="code" />
-			{
-				this.state.visible==true &&
-				<Modal
-		          title="查看流程"
-		          width={920}
-		          // footer={null}
-		          visible={this.state.visible}
-		          maskClosable={false}
-		          onOk={this.handleOk}
-		          onCancel={this.handleCancel}
-		        >
-			        <div>
-			        	<Row gutter={24}>
-			        		<Col>
-			        			<div style={{borderBottom: 'solid 1px #999'}}></div>
-			        		</Col>
-			        	</Row>
-	                    <Row gutter={24}>
-	                        <Col span={24} style={{paddingLeft:'3em'}}>
-	                            <Row gutter={15} style={{marginTop:'2em'}} >
-	                                <Col span={10}>
-	                                    <FormItem   {...GeneralTable.layoutT} label="单位工程:">
-										{getFieldDecorator('form1_unit', {
-                                            initialValue: `${record.unit?record.unit:''}`,
-                                            rules: [{ required: true, message: '请输入单位工程' }]
-                                        })(<Input readOnly />)}
-	                                    </FormItem>
-	                                </Col>
-	                                <Col span={10}>
-	                                    <FormItem {...GeneralTable.layoutT} label="编号:">
-										{getFieldDecorator('form1_code', {
-                                            initialValue: `${record.code?record.code:''}`,
-                                            rules: [{ required: true, message: '请输入编号' }]
-                                        })(<Input readOnly />)}
-	                                    </FormItem>
-	                                </Col>
-	                            </Row>
-	                            <Row gutter={15}>
-	                                <Col span={20}>
-	                                    <FormItem  {...GeneralTable.layout} label="审批单位:">
-										{getFieldDecorator('form1_reviewUnit', {
-                                            initialValue: `${record.reviewUnit?record.reviewUnit:''}`,
-                                            rules: [{ required: true, message: '请输入审批单位' }]
-                                        })(<Input readOnly />)}
-	                                    </FormItem>
-	                                </Col>
-	                            </Row>
-	                        </Col>
-	                    </Row>
-	                    <Row gutter={24}>
-	                        <Col span={24}>
-	                        	<Table 
-								   columns={this.equipmentColumns}
-								   dataSource={record.dataSource?record.dataSource:[]}
-								   bordered 
-								   pagination={true}
-								/>
-	                        </Col>
-	                    </Row>
-	                    <Row gutter={24}>
-	                        <Col span={24} style={{marginTop:'1em'}}>
-								<Table  dataSource={record.TreatmentData?record.TreatmentData:[]}
-										columns={this.columns1} 
-										pagination={true}
-								/>
-	                            	
-	                        </Col>
-	                    </Row>
-						<Preview />
-					</div>
-		        </Modal>
-			}
-			</div>
-
-		);
-	}
-
-	// rowSelection = {
-	// 	onChange: (selectedRowKeys, selectedRows) => {
-	// 		const { actions: { selectDocuments } } = this.props;
-	// 		selectDocuments(selectedRows);
-	// 	},
-	// };
-	getTable(instance){
-		let dataSource = []
-		instance.map((item)=>{
-			let subject = item.subject[0];
-			let creator = item.creator;
-			console.log('subject',subject)
-			let data = {
-				'id':item.id,
-				'workflow':item,
-				'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
-				'dataSource':subject.dataSource?JSON.parse(subject.dataSource):'',
-				'unit':subject.unit?JSON.parse(subject.unit):'',
-				'code':subject.code?JSON.parse(subject.code):'',
-				'extra_params.style':'',
-				'reviewUnit':subject.reviewUnit?JSON.parse(subject.reviewUnit):'',
-				'submitPerson':creator.person_name?creator.person_name:(creator.username?creator.username:''),
-				'submitTime':moment(item.real_start_time).format('YYYY-MM-DD'),
-				'flowStyle':item.status===2?'执行中':'已完成',
-			}
-			dataSource.push(data)
-		})
-		console.log('dataSource',dataSource)
-		return dataSource
-	}
-
-	showModal = (key,record) => {
-		this.setState({
-			record:record,
-			visible: true,
-			indexSelect:key
-		}); 
-	}
-	handleOk = (e) => {
-		this.setState({
-			visible: false,
-		});
-	}
-	handleCancel = (e) => {
-		this.setState({
-			visible: false,
-		});
-	} 
 	columns = [
 		{
 			title: '单位工程',
 			dataIndex: 'unit',
 			key: 'unit',
-			// sorter: (a, b) => a.name.length - b.name.length
 		}, {
 			title: '编号',
 			dataIndex: 'code',
 			key: 'code',
-			// sorter: (a, b) => a.code.length - b.code.length
 		}, {
 			title: '文档类型',
 			dataIndex: 'extra_params.style',
 			key: 'extra_params.style',
-			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
 			title: '提交单位',
-			dataIndex: 'reviewUnit',
-			key: 'reviewUnit',
-			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
+			dataIndex: 'submitOrg',
+			key: 'submitOrg',
 		}, {
 			title: '提交人',
 			dataIndex: 'submitPerson',
@@ -246,13 +54,12 @@ class GeneralTable extends Component {
 			key: 'flowStyle'
 		}, 	{
 			title: '操作',
+			dataIndex: 'opera',
+			key: 'opera',
 			render: (text,record, index) => {
 				return(
 					<div>
 						<a type="primary" onClick={this.showModal.bind(this,index,record)}>查看</a>
-						{/*<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
-						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>查看流程卡</a>*/
-						}
 					</div>
 				)	
 			}
@@ -287,6 +94,202 @@ class GeneralTable extends Component {
             key: 'extra_params.equipRemark',
         }
 	];
+	
+	columns1 = [
+		{
+			title: '序号',
+			dataIndex: 'index',
+			key: 'index',
+			width: '20%',
+		}, {
+			title: '文件名称',
+			dataIndex: 'fileName',
+			key: 'fileName',
+			width: '45%',
+		}, {
+			title: '操作',
+			dataIndex: 'operation',
+			key: 'operation',
+			width: '20%',
+			render:(text, record, index)=>{
+				const { Doc = [] } = this.props;
+				return (
+					<div>
+						<a onClick={this.previewFile.bind(this,record)}>预览</a>
+						<a  style={{ marginLeft: 10 }} onClick={this.downloadFile.bind(this,record)}>下载</a>
+					</div>
+				)
+			}
+		}
+	]
+	
+	componentDidMount(){
+		this.gettaskSchedule()
+	}
+
+	// 获取日计划进度流程信息
+    gettaskSchedule = async ()=>{
+		const { actions: { getWorkflows } } = this.props;
+		let reqData={};
+		this.props.form.validateFields((err, values) => {
+			console.log("机械设备报批流程", values);
+            console.log("err", err);
+            
+            values.sunit?reqData.subject_unit__contains = values.sunit : '';
+            values.scode?reqData.subject_code__contains = values.scode : '';
+            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
+        })
+        
+        console.log('reqData',reqData)
+
+        let tmpData = Object.assign({}, reqData);
+
+
+        let task = await getWorkflows({ code: WORKFLOW_CODE.机械设备报批流程 },tmpData);
+		console.log('task',task)
+        let subject = [];
+        let totledata = [];
+		let arrange = {};
+		task.map((item,index)=>{
+
+			let subject = item.workflowactivity.subject[0];
+			let creator = item.workflowactivity.creator;
+			console.log('subject',subject)
+			let data = {
+				// index:index+1,
+				id:item.workflowactivity.id,
+				'workflow':item,
+				'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
+				'dataSource':subject.dataSource?JSON.parse(subject.dataSource):'',
+				'unit':subject.unit?JSON.parse(subject.unit):'',
+				'code':subject.code?JSON.parse(subject.code):'',
+				'extra_params.style':'',
+				'submitOrg':subject.submitOrg?JSON.parse(subject.submitOrg):'',
+				'submitPerson':creator.person_name?creator.person_name:(creator.username?creator.username:''),
+				'submitTime':moment(item.workflowactivity.creator).format('YYYY-MM-DD'),
+				'flowStyle':item.workflowactivity.status===2?'执行中':'已完成',
+			}
+			totledata.push(data)
+		})
+		console.log('totledata',totledata)
+        this.setState({
+            workflowData:totledata
+        })
+    }
+	render() {
+		let {
+			  visible,
+			  data,
+			  record,
+			  workflowData
+        } = this.state;
+		const { 
+			Doc = [],
+			docs = [],
+			form: { getFieldDecorator }
+		 } = this.props;
+		
+		return (
+			<div>
+				<GeneralFilter {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+				<Table
+					// rowSelection={this.rowSelection}
+					dataSource={workflowData}
+					columns={this.columns}
+					bordered 
+					Rowkey={'code'}
+				/>
+			{
+				this.state.visible==true &&
+				<Modal
+		          title="查看流程"
+		          width={920}
+		          // footer={null}
+		          visible={this.state.visible}
+		          maskClosable={false}
+		          onOk={this.handleOk}
+		          onCancel={this.handleCancel}
+		        >
+			        <div>
+	                    <Row gutter={24}>
+	                        <Col span={24} style={{paddingLeft:'3em'}}>
+	                            <Row gutter={15} style={{marginTop:'2em'}} >
+	                                <Col span={12}>
+	                                    <FormItem   {...GeneralTable.layoutT} label="单位工程:">
+										{getFieldDecorator('form1_unit', {
+                                            initialValue: `${record.unit?record.unit:''}`,
+                                            rules: [{ required: true, message: '请输入单位工程' }]
+                                        })(<Input readOnly />)}
+	                                    </FormItem>
+	                                </Col>
+	                                <Col span={12}>
+	                                    <FormItem {...GeneralTable.layoutT} label="编号:">
+										{getFieldDecorator('form1_code', {
+                                            initialValue: `${record.code?record.code:''}`,
+                                            rules: [{ required: true, message: '请输入编号' }]
+                                        })(<Input readOnly />)}
+	                                    </FormItem>
+	                                </Col>
+	                            </Row>
+	                        </Col>
+	                    </Row>
+	                    <Row gutter={24}>
+	                        <Col span={24}>
+	                        	<Table 
+								   columns={this.equipmentColumns}
+								   dataSource={record.dataSource?record.dataSource:[]}
+								   bordered 
+								   pagination={true}
+								/>
+	                        </Col>
+	                    </Row>
+	                    <Row gutter={24}>
+	                        <Col span={24} style={{marginTop:'1em'}}>
+								<Table  dataSource={record.TreatmentData?record.TreatmentData:[]}
+										columns={this.columns1} 
+										bordered 
+										pagination={true}
+								/>
+	                            	
+	                        </Col>
+	                    </Row>
+						<Preview />
+					</div>
+		        </Modal>
+			}
+			</div>
+
+		);
+	}
+
+	// rowSelection = {
+	// 	onChange: (selectedRowKeys, selectedRows) => {
+	// 		const { actions: { selectDocuments } } = this.props;
+	// 		selectDocuments(selectedRows);
+	// 	},
+	// };
+
+
+	showModal = (key,record) => {
+		this.setState({
+			record:record,
+			visible: true,
+			indexSelect:key
+		}); 
+	}
+	handleOk = (e) => {
+		this.setState({
+			visible: false,
+		});
+	}
+	handleCancel = (e) => {
+		this.setState({
+			visible: false,
+		});
+	} 
+	
 	
 	//下载
 	downloadFile(record){

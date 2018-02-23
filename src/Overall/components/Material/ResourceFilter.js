@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { base, STATIC_DOWNLOAD_API, UNITS } from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
@@ -14,65 +14,111 @@ export default class ResourceFilter extends Component {
 
 	static propTypes = {};
 
+	static layoutT = {
+		labelCol: {span: 8},
+		wrapperCol: {span: 16},
+   	};
+
 	render() {
 		const { 
 			actions: { toggleAddition }, 
 			Doc = [],
 			toggleData: toggleData = {
 				type: 'resource',
-			}, } = this.props;
+			},
+			form: { getFieldDecorator }
+		} = this.props;
 		console.log('this.props',this.props)
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
-					<Col span={24} style={{paddingLeft:'5em'}}>
-						<Row gutter={15}  style={{marginTop: 5}}>
-							<Col span={6}>
+					<Col span={20} >
+						<Row >
+							<Col span={8}>
 								<FormItem   {...ResourceFilter.layoutT} label="单位工程:">
-                                     <Select>
-                                          <Option value='第一阶段'>第一阶段</Option>
-                                          <Option value='第二阶段'>第二阶段</Option>
-                                     </Select>
+								{
+                                        getFieldDecorator('sunit', {
+                                            rules: [
+                                                { required: false, message: '请选择单位工程' }
+                                            ]
+                                        })
+                                            (<Select placeholder='请选择单位工程' allowClear>
+                                                {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
+                                            </Select>)
+                                    }
                                 </FormItem>
 							</Col>
-							<Col span={6}>
+							<Col span={8}>
 								<FormItem {...ResourceFilter.layoutT} label="名称:">
-									<Input />
+									{
+                                        getFieldDecorator('sname', {
+                                            rules: [
+                                                { required: false, message: '请输入名称' }
+                                            ]
+                                        })
+                                            (<Input placeholder='请输入名称' />)
+                                    }
                                 </FormItem>
 							</Col>
-							<Col span={6}>
+							<Col span={8}>
 								<FormItem {...ResourceFilter.layoutT} label="编号:">
-									<Input />
+									{
+                                        getFieldDecorator('scode', {
+                                            rules: [
+                                                { required: false, message: '请输入编号' }
+                                            ]
+                                        })
+                                            (<Input placeholder='请输入编号' />)
+                                    }
                                 </FormItem>
-							</Col>
-							<Col span={6}>
-								<Button type="primary" style={{marginLeft:'100px'}}>查询</Button>
 							</Col>
 						</Row>
-						<Row gutter={15}  style={{marginTop: 5}}>
-							<Col span={6}>
-								<FormItem {...ResourceFilter.layoutT} label="审批单位:">
-									<Input />
-                                </FormItem>
-							</Col>
-							<Col span={6}>
+						<Row >
+							<Col span={8}>
 								<FormItem {...ResourceFilter.layoutT} label="进场日期:">
-									<RangePicker/>
+									{
+                                        getFieldDecorator('stimedate', {
+                                            rules: [
+                                                { type: 'array', required: false, message: '请选择时期' }
+                                            ]
+                                        })
+                                            (<RangePicker size='default' format='YYYY-MM-DD'  />)
+                                    }
                                 </FormItem>
 							</Col>
-							<Col span={6}>
+							<Col span={8}>
 								<FormItem {...ResourceFilter.layoutT} label="流程状态:">
-									<Select>
-                                          <Option value='待提交'>待提交</Option>
-                                          <Option value='审批中'>审批中</Option>
-                                     </Select>
+									{
+                                        getFieldDecorator('sstatus', {
+                                            rules: [
+                                                { required: false, message: '请选择流程状态' }
+                                            ]
+                                        })
+                                            (<Select placeholder='请选择流程类型' allowClear>
+                                                {/* <Option key={Math.random*4} value={0}>编辑中</Option> */}
+                                                {/* <Option key={Math.random*5} value={1}>已提交</Option> */}
+                                                <Option key={Math.random*6} value={2}>执行中</Option>
+                                                <Option key={Math.random*7} value={3}>已完成</Option>
+                                                {/* <Option key={Math.random*8} value={4}>已废止</Option> */}
+                                                {/* <Option key={Math.random*9} value={5}>异常</Option> */}
+                                            </Select>)
+                                    }
                                 </FormItem>
-							</Col>
-							<Col span={6}>
-								<Button type="primary" ghost style={{marginLeft:'100px'}}>清空</Button>
 							</Col>
 						</Row>
 					</Col>
+					<Col span={3} offset={1}>
+                        <Row>
+                            <FormItem>
+                                <Button type='Primary' onClick={this.query.bind(this)}>查询</Button>
+                            </FormItem>
+                        </Row>
+                        <Row>
+                            <FormItem>
+                                <Button onClick={this.clear.bind(this)}>清除</Button>
+                            </FormItem>
+                        </Row>
+                    </Col>
 				</Row>
 				<Row gutter={24}>
 					<Col span={24}>
@@ -96,13 +142,19 @@ export default class ResourceFilter extends Component {
 		);
 	}
 
-	query(value) {
-		const { actions: { getdocument }, currentcode } = this.props;
-		let search = {
-			doc_name: value
-		};
-		getdocument({ code: currentcode.code }, search);
-	}
+	query() {
+        this.props.gettaskSchedule()
+    }
+
+    clear() {
+        this.props.form.setFieldsValue({
+			sunit: undefined,
+			sname: undefined,
+            scode: undefined,
+            stimedate: undefined,
+            sstatus: undefined
+        })
+    }
 	cancel() {
 
 	}
@@ -168,9 +220,6 @@ export default class ResourceFilter extends Component {
 			this.createLink(this, down_load);
 		});
 	}
-	static layoutT = {
-          labelCol: {span: 8},
-          wrapperCol: {span: 16},
-     };
+	
 };
 

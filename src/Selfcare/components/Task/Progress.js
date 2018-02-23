@@ -8,6 +8,8 @@ import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import OverallMaterialHandle from '../TaskDetail/OverallMaterialHandle';
 import OverallMaterialDeal from '../TaskDetail/OverallMaterialDeal';
+import ScheduleTotalDeal from '../TaskDetail/ScheduleTotalDeal';
+import ScheduleDayDeal from '../TaskDetail/ScheduleDayDeal';
 import ScheduleStageDeal from '../TaskDetail/ScheduleStageDeal';
 const FormItem = Form.Item;
 @connect(
@@ -81,11 +83,11 @@ export default class Progress extends Component {
 			)
 		}else if (code === WORKFLOW_CODE.总进度计划报批流程 &&  stateName == '复审'){
 			return (
-				<ScheduleStageDeal {...this.props} {...this.state}/>
+				<ScheduleTotalDeal {...this.props} {...this.state}/>
 			)
 		}else if (code === WORKFLOW_CODE.每日进度计划填报流程 &&  stateName == '复审'){
 			return (
-				<ScheduleStageDeal {...this.props} {...this.state}/>
+				<ScheduleDayDeal {...this.props} {...this.state}/>
 			)
 		}else if (code === WORKFLOW_CODE.每日进度填报流程 &&  stateName == '复审'){
 			return (

@@ -46,6 +46,7 @@ export default class FormManage extends Component {
     onSelect(value = [],e) {
         const [code] = value;
         const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
+        console.log('value',value)
         setkeycode(code); 
         if(code === undefined){
             return
