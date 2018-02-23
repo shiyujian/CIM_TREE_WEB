@@ -46,9 +46,9 @@ export const fetchDefectDataByLoc = createFetchAction(`${base}/main/api/quality-
 const getVideo360List = createFetchAction(`${SERVICE_API}/metalist/video360list/`, []);
 
 //获取巡检路线
-const getMapRouter = createFetchAction(`http://120.24.210.86:227/tree/patrolroutes`, []);
+const getMapRouter = createFetchAction(`${FOREST_API}/tree/patrolroutes`, []);
 //获取轨迹列表
-const getMapList = createFetchAction(`http://120.24.210.86:227/tree/patrolpositions?routeid={{routeID}}`, []);
+const getMapList = createFetchAction(`${FOREST_API}/tree/patrolpositions?routeid={{routeID}}`, []);
 export const actions = {
 	getTreeOK,
 	getTree,
