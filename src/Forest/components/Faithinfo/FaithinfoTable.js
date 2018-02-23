@@ -108,12 +108,12 @@ export default class FaithinfoTable extends Component {
 								{typeoption}
 							</Select>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
+						{/* <Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>树种：</span>
 							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
 								{treetypeoption}
 							</Select>
-						</Col>
+						</Col> */}
 						<Col xl={5} lg={6} md={7} className='mrg10'>
 							<span>供苗商：</span>
 							<Input suffix={suffix} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
