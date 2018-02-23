@@ -67,7 +67,6 @@ export default class NursmeasureTable extends Component {
 		);
 	}
 	treeTable(details) {
-		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -88,7 +87,6 @@ export default class NursmeasureTable extends Component {
 			treetypename,
 			status,
 		} = this.state;
-		console.log('state', this.state)
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		const suffix3 = factory ? <Icon type="close-circle" onClick={this.emitEmpty3} /> : null;
@@ -478,7 +476,7 @@ export default class NursmeasureTable extends Component {
 	    			else if(postdata.status === '3')
 	    				statusname = '业主退回'
 	    			else
-	    				statusname = '未种植'
+	    				statusname = ''
 	    			tblData[i].statusname = statusname;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			tblData[i].liftertime1 = !!plan.LifterTime ? moment(plan.LifterTime).utc().format('YYYY-MM-DD') : '/';
