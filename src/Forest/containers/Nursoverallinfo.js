@@ -265,7 +265,7 @@ export default class Nursoverallinfo extends Component {
     //类型选择, 重新获取: 树种
     typeselect(value){
         const {treetypes} =this.props;
-        this.setState({bigType: value})
+        this.setState({bigType: value});
         //树种
         this.setTreeTypeOption(treetypes&&treetypes[value] ? treetypes[value] : []);
     }

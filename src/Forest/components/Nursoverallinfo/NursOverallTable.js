@@ -525,27 +525,27 @@ export default class NursOverallTable extends Component {
 	onsectionchange(value) {
 		const {sectionselect} = this.props;
 		sectionselect(value || '')
-		this.setState({section:value || '', smallclass:'', thinclass:'', bigType:'', treetypename:''})
+		this.setState({section:value || '', smallclass:'', thinclass:'', bigType:'', treetype: '', treetypename:''})
 	}
 
 	onsmallclasschange(value) {
 		const {smallclassselect} = this.props;
 		const {section,leftkeycode} = this.state;
 		smallclassselect(value || leftkeycode,section);
-		this.setState({smallclass:value || '',thinclass:'', bigType:'', treetypename:''})
+		this.setState({smallclass:value || '',thinclass:'', bigType:'', treetype: '', treetypename:''})
 	}
 
 	onthinclasschange(value) {
 		const {thinclassselect} = this.props;
 		const {section,smallclass} = this.state;
 		thinclassselect(value || smallclass,section);
-		this.setState({thinclass:value || '', bigType:'', treetypename:''})
+		this.setState({thinclass:value || '', bigType:'', treetype: '', treetypename:''})
 	}
 
 	ontypechange(value) {
 		const {typeselect} = this.props;
 		typeselect(value || '')
-		this.setState({bigType: value || '' , treetypename:''})
+		this.setState({bigType: value || '' , treetype: '', treetypename:''})
 	}
 
 	ontreetypechange(value) {
