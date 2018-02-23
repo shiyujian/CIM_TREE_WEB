@@ -3,16 +3,22 @@ import { Table, Input, Row, Col, Card, Select, DatePicker, Popconfirm, notificat
 import { WORKFLOW_MAPS, WORKFLOW_CODE,SOURCE_API,STATIC_DOWNLOAD_API } from '_platform/api';
 import styles from './index.css';
 import moment from 'moment';
-import PerSearch from '../../../Overall/components/FormManage/PerSearch';
+import PerSearch from '../Task/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
+//综合管理模块
 import OverallGeneralDetail from '../TaskDetail/OverallGeneralDetail';
 import OverallResourceDetail from '../TaskDetail/OverallResourceDetail';
-import ScheduleTotalDetail from '../TaskDetail/ScheduleTotalDetail';
-import ScheduleStageDetail from '../TaskDetail/ScheduleStageDetail';
-import ScheduleDayDetail from '../TaskDetail/ScheduleDayDetail';
 import OverallGeneralRefill from '../TaskDetail/OverallGeneralRefill';
 import OverallResourceRefill from '../TaskDetail/OverallResourceRefill';
+//进度管理模块
+import ScheduleTotalDetail from '../TaskDetail/ScheduleTotalDetail';
+import ScheduleTotalRefill from '../TaskDetail/ScheduleTotalRefill';
+import ScheduleDayDetail from '../TaskDetail/ScheduleDayDetail';
+import ScheduleDayRefill from '../TaskDetail/ScheduleDayRefill';
+import ScheduleStageDetail from '../TaskDetail/ScheduleStageDetail';
+import ScheduleStageRefill from '../TaskDetail/ScheduleStageRefill';
+
 
 const FormItem = Form.Item;
 export default class Detail extends Component {
@@ -21,7 +27,7 @@ export default class Detail extends Component {
 		if (task && task.workflow && task.workflow.code) {
 			console.log('task', task)
 			let code = task.workflow.code
-			let name = task.current ? task.current[0].name : '';
+			let name = task.current ? task.current[0].name : '结束';
 
 			console.log('code',code)
 			console.log('WORKFLOW_CODE.每日进度计划填报流程',WORKFLOW_CODE.每日进度计划填报流程)
@@ -29,27 +35,27 @@ export default class Detail extends Component {
 			console.log('WORKFLOW_CODE.苗木资料报批流程',WORKFLOW_CODE.苗木资料报批流程)
 			console.log('name',name)
 
-			if(code === WORKFLOW_CODE.总进度计划报批流程 && (name == '初审' || name == '复审')){
+			if(code === WORKFLOW_CODE.总进度计划报批流程 && (name == '初审' || name == '复审' || name == '结束')){
 				return (
 					<ScheduleTotalDetail {...this.props} {...this.state}/>
 				)
-			}else if (code === WORKFLOW_CODE.每日进度填报流程 && (name == '初审' || name == '复审')){
-				return (
-					<ScheduleStageDetail {...this.props} {...this.state}/>
-				)
-			}else if (code === WORKFLOW_CODE.每日进度计划填报流程 && (name == '初审' || name == '复审')){
+			}else if (code === WORKFLOW_CODE.每日进度计划填报流程 && (name == '初审' || name == '复审' || name == '结束')){
 				return (
 					<ScheduleDayDetail {...this.props} {...this.state}/>
 				)
-			}else if (code === WORKFLOW_CODE.机械设备报批流程 && (name == '初审' || name == '复审')){
+			}else if (code === WORKFLOW_CODE.每日进度填报流程 && (name == '初审' || name == '复审' || name == '结束')){
+				return (
+					<ScheduleStageDetail {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.机械设备报批流程 && (name == '初审' || name == '复审' || name == '结束')){
 				return (
 					<OverallGeneralDetail {...this.props} {...this.state}/>
 				)
-			}else if (code === WORKFLOW_CODE.工程材料报批流程 && (name == '初审' || name == '复审')){
+			}else if (code === WORKFLOW_CODE.工程材料报批流程 && (name == '初审' || name == '复审' || name == '结束')){
 				return (
 					<OverallResourceDetail {...this.props} {...this.state}/>
 				)
-			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && (name == '初审' || name == '复审')){
+			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && (name == '初审' || name == '复审' || name == '结束')){
 				return (
 					<OverallResourceDetail {...this.props} {...this.state}/>
 				)
@@ -64,6 +70,18 @@ export default class Detail extends Component {
 			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && name == '填报'){
 				return (
 					<OverallResourceRefill {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.总进度计划报批流程 && name == '填报'){
+				return (
+					<ScheduleTotalRefill {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.每日进度计划填报流程 && name == '填报'){
+				return (
+					<ScheduleDayRefill {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.每日进度填报流程 && name == '填报'){
+				return (
+					<ScheduleStageRefill {...this.props} {...this.state}/>
 				)
 			}else {
 				return <div>待定流程</div>

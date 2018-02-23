@@ -188,7 +188,8 @@ class OverallResourceDetail extends Component {
 			'name':subject.name?JSON.parse(subject.name):'',
 			'code':subject.code?JSON.parse(subject.code):'',
 			'reviewUnit':subject.reviewUnit?JSON.parse(subject.reviewUnit):'',
-			'date':subject.date?JSON.parse(subject.date):'',
+			'submitOrg':subject.submitOrg?JSON.parse(subject.submitOrg):'',
+			'date':subject.date?moment(JSON.parse(subject.date)).format('YYYY-MM-DD'):'',
 			'site':subject.site?JSON.parse(subject.site):'',
         }
 		return record

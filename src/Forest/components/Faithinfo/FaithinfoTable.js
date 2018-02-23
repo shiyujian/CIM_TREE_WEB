@@ -17,10 +17,9 @@ export default class FaithinfoTable extends Component {
         	leftkeycode: '',
         	pagination: {},
 			section: '',
-    		treety: '',
+    		bigType: '',
     		treetype: '',
     		treetypename: '',
-    		integrity: '',
     		percent:0,
     		visible: false,
     		factory: '',
@@ -58,7 +57,7 @@ export default class FaithinfoTable extends Component {
 		const {
 			factory,
 			section,
-			treety,
+			bigType,
 			treetypename,
 		} = this.state;
 		//清除
@@ -81,6 +80,9 @@ export default class FaithinfoTable extends Component {
 			title:"总诚信度",
 			dataIndex: 'Sincerity',
 			width: '8%',
+			render: (text,record) => {
+				return <span>{text.toFixed(2)*1}</span>
+			}
 		},{
 			title:"详情",
 			render: (record) => {
@@ -102,16 +104,16 @@ export default class FaithinfoTable extends Component {
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>类型：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={treety} onChange={this.ontypechange.bind(this)}>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
 								{typeoption}
 							</Select>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
+						{/* <Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>树种：</span>
 							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
 								{treetypeoption}
 							</Select>
-						</Col>
+						</Col> */}
 						<Col xl={5} lg={6} md={7} className='mrg10'>
 							<span>供苗商：</span>
 							<Input suffix={suffix} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
@@ -167,19 +169,19 @@ export default class FaithinfoTable extends Component {
     	clearList();
     	nurseryName(name);
     	changeModal1(true);
-    }
+	}
+	
 	onsectionchange(value) {
 		const {sectionselect} = this.props;
-		const {treety} = this.state;
-		sectionselect(value || '',treety)
-		this.setState({section:value || '', treetype:'', treetypename:''})
+		sectionselect(value || '')
+		this.setState({section:value || '', bigType:'', treetype: '', treetypename: ''})
 	}
-
+	
 	ontypechange(value) {
-		const {typeselect,keycode = ''} = this.props;
+		const {typeselect} = this.props;
 		const {section} = this.state;
-		typeselect(value || '',keycode,section)
-		this.setState({treety:value || '', treetype:'', treetypename:''})
+		typeselect(value || '')
+		this.setState({bigType:value || '', treetype: '', treetypename:''})
 	}
 
 	ontreetypechange(value) {
@@ -212,16 +214,14 @@ export default class FaithinfoTable extends Component {
     qury(page) {
     	const {
     		section = '',
-    		treety = '',
-    		integrity = '',
+    		bigType = '',
     		treetype = '',
     		factory = '',
     	} = this.state;
     	const {actions: {getHonestyNew},keycode = ''} = this.props;
     	let postdata = {
     		section,
-    		treety,
-    		integrity,
+    		bigType,
     		treetype,
     		factory,
     	}
@@ -252,19 +252,16 @@ export default class FaithinfoTable extends Component {
     exportexcel() {
 		const {
     		treetype = '',
-    		integrity = '',
     		factory = '',
     		section = '',
-    		treety = '',
-
+    		bigType = '',
     	} = this.state;
     	const {actions: {getHonestyNew,getexportFactoryAnalyseInfo},keycode = ''} = this.props;
     	let postdata = {
     		treetype,
-    		integrity,
     		factory,
     		section,
-    		treety,
+    		bigType,
     	}
     	this.setState({loading:true,percent:0})
     	getexportFactoryAnalyseInfo({},postdata)
@@ -278,19 +275,17 @@ export default class FaithinfoTable extends Component {
 	// exportexcel() {
 	// 	const {
  //    		treetype = '',
- //    		integrity = '',
  //    		factory = '',
  //    		section = '',
- //    		treety = '',
+ //    		bigType = '',
 
  //    	} = this.state;
  //    	const {actions: {getHonestyNew,getexportTree},keycode = ''} = this.props;
  //    	let postdata = {
  //    		treetype,
- //    		integrity,
  //    		factory,
  //    		section,
- //    		treety,
+ //    		bigType,
  //    	}
  //    	this.setState({loading:true,percent:0})
  //    	getHonestyNew({},postdata)

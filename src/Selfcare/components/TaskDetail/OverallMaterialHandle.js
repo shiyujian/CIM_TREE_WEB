@@ -86,7 +86,7 @@ export default class OverallMaterialHandle extends Component {
 			location,
 			actions: {
 					putFlow,
-					addDaySchedule
+					addSchedule
 				},
         } = this.props
         let {
@@ -238,9 +238,4 @@ export default class OverallMaterialHandle extends Component {
 			}
 		})
 	}
-
-
-
-
-	
 }

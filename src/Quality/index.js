@@ -83,7 +83,7 @@ import {message} from 'antd'
 			HuaFen,DanweiJL,DanweiJLAsk,Monitoring,
 			TianBao,TianBao2, Fenbu, Danwei, FenbuRecord,
 			Query,FenbuPreview,Subitem,DanWeiAsk,FenbuCheck,
-			Score,Search,Appraising,Faithanalyze,Qualityanalyze} = this.state || {};
+			Score,Search,Appraising,Faithanalyze,Qualityanalyze,CheckAccept} = this.state || {};
 
 		let dwys = this.state.dwysjl?DanweiJL:Danwei;
 		let jyptb = this.state.dwysjl?TianBaoJL:TianBao;
@@ -102,6 +102,7 @@ import {message} from 'antd'
                 {Defect && <Route path="/quality/defect" component={Defect}/>}
                 {Fenbu && <Route exact path="/quality/yanshou/fenbu" component={Fenbu}/>}
 				{dwys && <Route path="/quality/yanshou/danwei" component={dwys}/>}
+				{CheckAccept && <Route path="/quality/yanshou/check" component={CheckAccept}/>}
 				{DanweiJL && <Route path="/quality/yanshou/danweiJL" component={DanweiJL}/>}
                 {FenbuRecord && <Route path="/quality/yanshou/fenbu/record" component={FenbuRecord}/>}
 				{Monitoring && <Route path="/quality/monitoring" component={Monitoring}/>}
@@ -210,6 +211,13 @@ const menus = [
 		path: '/quality/yanshou',
 		icon: <Icon name="check-square-o" />,
 		children: [
+			{
+				key: 'check',
+        		id: 'QUALITY.CHECK',
+				name: '检验批验收',
+				path: '/quality/yanshou/check',
+				icon: <Icon name="anchor"/>
+			},
 			{
         		key: 'tianbao',
         		id: 'QUALITY.TIANBAO',

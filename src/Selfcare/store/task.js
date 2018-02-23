@@ -24,7 +24,8 @@ export const changeDatareportVisible = createAction("打开或关闭数据报送
 //获取资源文件下载链接
 export const downloadFilesLink = createFetchAction(`${base}/pf/api/file-link/{{id}}/`, [], 'GET');
 // 日进度存储
-export const addDaySchedule = createFetchAction(`${FOREST_API}/tree/progress`, [], 'post');
+export const addSchedule = createFetchAction(`${FOREST_API}/tree/progress`, [], 'post');
+export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
 
 const changeDocs = createAction(`${ID}_22CHANGE_DOCS`);
 const selectDocuments = createAction(`${ID}_22SELECTDOUMENT`);
@@ -41,9 +42,10 @@ export const actions = {
 	getWorkflowById,
 	changeDatareportVisible,
 	downloadFilesLink,
-	addDaySchedule,
+	addSchedule,
 	changeDocs,
-	selectDocuments
+	selectDocuments,
+	gettreetype,
 };
 
 export default handleActions({

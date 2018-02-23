@@ -22,7 +22,7 @@ export default class ContrastTable extends Component {
 			etime: moment().format('2017-11-23 23:59:59'),
 			sxm: '',
 			section: '',
-    		treety: '',
+    		bigType: '',
     		treetype: '',
     		treetypename: '',
     		factory: '',
@@ -74,7 +74,7 @@ export default class ContrastTable extends Component {
 			sxm, 
 			factory,
 			section,
-			treety,
+			bigType,
 			treetypename,
 			isstandard,
 		} = this.state;
@@ -196,7 +196,7 @@ export default class ContrastTable extends Component {
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>类型：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={treety} onChange={this.ontypechange.bind(this)}>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
 								{typeoption}
 							</Select>
 						</Col>
@@ -283,16 +283,14 @@ export default class ContrastTable extends Component {
 
 	onsectionchange(value) {
 		const {sectionselect} = this.props;
-		const {treety} = this.state;
-		sectionselect(value || '',treety)
-		this.setState({section:value || '', treetype:'', treetypename:''})
+		sectionselect(value || '')
+		this.setState({section:value || '', bigType:'', treetype:'', treetypename:''})
 	}
 
 	ontypechange(value) {
-		const {typeselect,keycode = ''} = this.props;
-		const {section} = this.state;
-		typeselect(value || '',keycode,section)
-		this.setState({treety:value || '', treetype:'', treetypename:''})
+		const {typeselect} = this.props;
+		typeselect(value || '')
+		this.setState({bigType:value || '', treetype:'', treetypename:''})
 	}
 
 	ontreetypechange(value) {
@@ -344,7 +342,7 @@ export default class ContrastTable extends Component {
     	const {
     		sxm = '',
     		section = '',
-    		treety = '',
+    		bigType = '',
     		treetype = '',
     		factory = '',
     		isstandard = '',
@@ -357,7 +355,7 @@ export default class ContrastTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		treety,
+    		bigType,
     		treetype,
     		factory,
     		isstandard,

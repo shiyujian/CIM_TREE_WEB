@@ -5,7 +5,6 @@ export const closePreview = createAction('关闭预览');
 export const closeLoading = createAction('关闭loading效果');
 export default handleActions({
 	[openPreview]: (state, {payload}) => {
-		console.log('before preview');
 		return {
 			...state,
 			...getFileData(payload)

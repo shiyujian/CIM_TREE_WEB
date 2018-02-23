@@ -6,8 +6,5 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-export QH from './qh/app';
-export XA from './xa/app';
-export Air from './air/app'; 
 export Tree from './tree/app'; 
 

@@ -84,7 +84,7 @@ export default class OverallMaterialDeal extends Component {
 		let action_name = '';
 		let nextStates = getNextStates(task, Number(state_id));
 		for (var i = 0; i < nextStates.length; i++) {
-			if (nextStates[i].action_name === '退回') {
+			if (nextStates[i].action_name === '通过') {
 				action_name = nextStates[i].action_name
 			}
         }
@@ -108,7 +108,7 @@ export default class OverallMaterialDeal extends Component {
 			pk: task.id
 		}
 
-        putFlow(data, workflow).then(rst => {
+        putFlow(data, workflowData).then(rst => {
             if (rst && rst.creator) {
                 notification.success({
                     message: '流程提交成功',
@@ -155,7 +155,7 @@ export default class OverallMaterialDeal extends Component {
 		let action_name = '';
 		let nextStates = getNextStates(task, Number(state_id));
 		for (var i = 0; i < nextStates.length; i++) {
-			if (nextStates[i].action_name === '退回') {
+			if (nextStates[i].action_name === '拒绝') {
 				action_name = nextStates[i].action_name
 			}
         }

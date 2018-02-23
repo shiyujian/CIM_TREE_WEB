@@ -2,20 +2,20 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm,notification,Card
+    Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm,notification,Card,Steps
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 import PerSearch from '../Task/PerSearch';
 import { getUser } from '../../../_platform/auth';
-import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE,UNITS,WORKFLOW_CODE } from '../../../_platform/api';
 import queryString from 'query-string';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
+const Step = Steps.Step;
 const EditableCell = ({ editable, value, onChange }) => (
           <div>
             {editable
@@ -151,154 +151,198 @@ class OverallGeneralRefill extends Component {
     wrapperCol: {span: 20},
     };
     render() {
-        const{
-            additionVisible = false,
-            form: { getFieldDecorator },
-            docs = []
-        } = this.props;
+
+        const { platform: { task = {}, users = {} } = {}, location, actions, form: { getFieldDecorator },docs = [] } = this.props;
+		const { history = [], transitions = [], states = [] } = task;
+		const user = getUser();
         let {progress,isUploading,engineerName,engineerNumber,engineerApprove,dataSource,count,
              equipName,equipNumber
             } = this.state;
         let cacheData=this.state.dataSource.map(item => ({ ...item }));
         return (
-            <Card title='流程详情'>
+            <div>
                 <Form onSubmit={this.handleSubmit.bind(this)}>
-                    <Row gutter={24}>
-                        <Col span={24} style={{paddingLeft:'3em'}}>
-                            <Row gutter={15} >
-                                <Col span={10}>
-                                    <FormItem   {...OverallGeneralRefill.layoutT} label="单位工程:">
-                                    {
-                                        getFieldDecorator('unit', {
-                                            rules: [
-                                                { required: true, message: '请选择单位工程' }
-                                            ]
-                                        })
-                                        (
-                                            <Select 
-                                            >
-                                                <Option value='第一阶段'>第一阶段</Option>
-                                                <Option value='第二阶段'>第二阶段</Option>
-                                                <Option value='第三阶段'>第三阶段</Option>
-                                                <Option value='第四阶段'>第四阶段</Option>
-                                            </Select>
-                                        )
-                                    }
-                                     
-                                    </FormItem>
-                                </Col>
-                                <Col span={10}>
-                                    <FormItem {...OverallGeneralRefill.layoutT} label="编号:">
-                                    {
-                                        getFieldDecorator('code', {
-                                            rules: [
-                                                { required: true, message: '请输入编号' }
-                                            ]
-                                        })
-                                        (
-                                            <Input   placeholder='请输入编号'/>
-                                        )
-                                    }
+                    <Card title='流程详情'>
+                        <Row gutter={24}>
+                            <Col span={24} style={{paddingLeft:'3em'}}>
+                                <Row gutter={15} >
+                                    <Col span={10}>
+                                        <FormItem   {...OverallGeneralRefill.layoutT} label="单位工程:">
+                                        {
+                                            getFieldDecorator('unit', {
+                                                rules: [
+                                                    { required: true, message: '请选择单位工程' }
+                                                ]
+                                            })
+                                            (
+                                                <Select placeholder='请选择单位工程' allowClear>
+                                                    {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
+                                                </Select>
+                                            )
+                                        }
                                         
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                            <Row gutter={15}>
-                                <Col span={20}>
-                                    <FormItem  {...OverallGeneralRefill.layout} label="审批单位:">
-                                    {
-                                        getFieldDecorator('reviewUnit', {
-                                            rules: [
-                                                { required: true, message: '请选择审核人员' }
-                                            ]
-                                        })
-                                        (
-                                            <Select 
-                                        >
-                                            <Option value='第一公司'>第一公司</Option>
-                                            <Option value='第二公司'>第二公司</Option>
-                                        </Select>
-                                        )
-                                    }
-                                        
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                        </Col>
-                    </Row>
-                    <Row gutter={24}>
-                        <Col span={24}>
-                            <Table  rowSelection={this.rowSelectionAdd}
-                                    dataSource={this.state.dataSource}
-                                    columns={this.equipment}
-                                    pagination={false}
-                                    bordered rowKey="code" />
-                        </Col>
-                    </Row>
-                    <Row gutter={24}>
-                        <Col span={24}>
-                            <Button  style={{ marginLeft: 20,marginRight: 10 }}
-                                     type="primary" ghost
-                                     onClick={this.handleAdd. bind(this)}>添加</Button>
-                            <Button type="primary" onClick={this.onDelete.bind(this)}>删除</Button>
-                        </Col>
-                    </Row>
-					<Row gutter={24}>
-						<Col span={24} style={{marginTop: 16, height: 160}}>
-                            <Dragger
-                                {...this.uploadProps}
-                            >
-								<p className="ant-upload-drag-icon">
-									<Icon type="inbox"/>
-								</p>
-								<p>点击或者拖拽开始上传</p>
-								<p className="ant-upload-hint">
-									支持 pdf、doc、docx 文件
-								</p>
-							</Dragger>
-							{/* <Progress percent={progress} strokeWidth={5} /> */}
-						</Col>
-					</Row>
-					<Row gutter={24} style={{marginTop: 15}}>
-						<Col span={24}>
-							<Table 
-                                columns={this.columns1}
-                                dataSource={this.state.TreatmentData}
-                                pagination={true}
-                            />
-						</Col>
-					</Row>
-                    <Row style={{marginTop: 15}}>
-                        <Col span={10} >
-                            <FormItem {...OverallGeneralRefill.layoutT} label='审核人'>
-                                {
-                                    getFieldDecorator('dataReview', {
-                                        rules: [
-                                            { required: true, message: '请选择审核人员' }
-                                        ]
-                                    })
-                                        (
-                                        <PerSearch selectMember={this.selectMember.bind(this)} />
-                                        )
-                                }
-                            </FormItem>
-                        </Col>
-                        <Col span={8} offset={4}>
-                            <Checkbox >短信通知</Checkbox>
-                        </Col>
-                    </Row>
-                    <FormItem>
-                        <Row>
-                            <Col span={24} style={{ textAlign: 'center' }}>
-                                <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">提交</Button>
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={10}>
+                                        <FormItem {...OverallGeneralRefill.layoutT} label="编号:">
+                                        {
+                                            getFieldDecorator('code', {
+                                                rules: [
+                                                    { required: true, message: '请输入编号' }
+                                                ]
+                                            })
+                                            (
+                                                <Input   placeholder='请输入编号'/>
+                                            )
+                                        }
+                                            
+                                        </FormItem>
+                                    </Col>
+                                </Row>
+                                <Row gutter={15}>
+                                    <Col span={20}>
+                                        <FormItem  {...OverallGeneralRefill.layout} label="审批单位:">
+                                        {
+                                            getFieldDecorator('reviewUnit', {
+                                                rules: [
+                                                    { required: true, message: '请选择审核人员' }
+                                                ]
+                                            })
+                                            (
+                                                <Input placeholder='系统自动识别，无需手输' readOnly/>
+                                            )
+                                        }
+                                            
+                                        </FormItem>
+                                    </Col>
+                                </Row>
                             </Col>
                         </Row>
-                    </FormItem>
-				</Form>
-            </Card>
+                        <Row gutter={24}>
+                            <Col span={24}>
+                                <Table  rowSelection={this.rowSelectionAdd}
+                                        dataSource={this.state.dataSource}
+                                        columns={this.equipment}
+                                        pagination={false}
+                                        bordered  />
+                            </Col>
+                        </Row>
+                        <Row gutter={24}>
+                            <Col span={24}>
+                                <Button  style={{ marginLeft: 20,marginRight: 10 }}
+                                        type="primary" ghost
+                                        onClick={this.handleAdd. bind(this)}>添加</Button>
+                                <Button type="primary" onClick={this.onDelete.bind(this)}>删除</Button>
+                            </Col>
+                        </Row>
+                        <Row gutter={24}>
+                            <Col span={24} style={{marginTop: 16, height: 160}}>
+                                <Dragger
+                                    {...this.uploadProps}
+                                >
+                                    <p className="ant-upload-drag-icon">
+                                        <Icon type="inbox"/>
+                                    </p>
+                                    <p>点击或者拖拽开始上传</p>
+                                    <p className="ant-upload-hint">
+                                        支持 pdf、doc、docx 文件
+                                    </p>
+                                </Dragger>
+                                {/* <Progress percent={progress} strokeWidth={5} /> */}
+                            </Col>
+                        </Row>
+                        <Row gutter={24} style={{marginTop: 15}}>
+                            <Col span={24}>
+                                <Table 
+                                    columns={this.columns1}
+                                    dataSource={this.state.TreatmentData}
+                                    pagination={true}
+                                />
+                            </Col>
+                        </Row>
+                    </Card>
+                    <Card title={'审批流程'} style={{marginTop:10}}>
+                        <Steps direction="vertical" size="small" current={history.length - 1}>
+                            {
+                                history.map((step, index) => {
+                                    const { state: { participants: [{ executor = {} } = {}] = [] } = {} } = step;
+                                    const { id: userID } = executor || {};
+                                    if (step.status === 'processing') { // 根据历史状态显示
+                                        const state = this.getCurrentState();
+                                        return (
+                                            <Step 
+                                                title={
+                                                    <div style={{ marginBottom: 8 }}>
+                                                        <span>{step.state.name}-(执行中)</span>
+                                                        <span style={{ paddingLeft: 20 }}>当前执行人: </span>
+                                                        <span style={{ color: '#108ee9' }}> {`${executor.person_name}` || `${executor.username}`}</span>
+                                                    </div>}
+                                                description={ userID === +user.id &&
+                                                    <div>
+                                                        <Row style={{marginTop: 15}}>
+                                                            <Col span={10} >
+                                                                <FormItem {...OverallGeneralRefill.layoutT} label='审核人'>
+                                                                    {
+                                                                        getFieldDecorator('dataReview', {
+                                                                            rules: [
+                                                                                { required: true, message: '请选择审核人员' }
+                                                                            ]
+                                                                        })
+                                                                            (
+                                                                            <PerSearch selectMember={this.selectMember.bind(this)} />
+                                                                            )
+                                                                    }
+                                                                </FormItem>
+                                                            </Col>
+                                                            <Col span={8} offset={4}>
+                                                                <Checkbox >短信通知</Checkbox>
+                                                            </Col>
+                                                        </Row>
+                                                        <FormItem>
+                                                            <Row>
+                                                                <Col span={24} style={{ textAlign: 'center' }}>
+                                                                    <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">提交</Button>
+                                                                </Col>
+                                                            </Row>
+                                                        </FormItem>
+                                                    </div>} 
+                                                key={index} 
+                                            />
+
+                                        )
+                                    } else {
+                                        const { records: [record] } = step;
+                                        const { log_on = '', participant: { executor = {} } = {}, note = '' } = record || {};
+                                        const { person_name: name = '', organization = '' } = executor;
+                                        return (
+                                            <Step key={index} title={`${step.state.name}-(${step.status})`}
+                                                description={
+                                                    <div style={{ lineHeight: 2.6 }}>
+                                                        <div>审核意见：{note}</div>
+                                                        <div>
+                                                            <span>审核人:{`${name}` || `${executor.username}`} [{organization}]</span>
+                                                            <span
+                                                                style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                        </div>
+                                                    </div>} />);
+                                    }
+                                }).filter(h => !!h)
+                            }
+                        </Steps>
+                    </Card>
+                </Form>
+            </div>
+            
 				
         );
     }
+
+    getCurrentState() {
+		const { platform: { task = {} } = {}, location = {} } = this.props;
+		const { state_id = '0' } = queryString.parse(location.search) || {};
+		const { states = [] } = task;
+		return states.find(state => state.status === 'processing' && state.id === +state_id);
+	}
 
     //上传文件
     uploadProps = {
@@ -422,6 +466,7 @@ class OverallGeneralRefill extends Component {
                     "unit":JSON.stringify(values.unit),
                     "code":JSON.stringify(values.code),
                     "reviewUnit":JSON.stringify(values.reviewUnit),
+                    "submitOrg":JSON.stringify(user.org)
                 }];
                 let newSubject = {
                     subject:subject
@@ -462,23 +507,26 @@ class OverallGeneralRefill extends Component {
                 setFieldsValue
             }
         } = this.props
-        this.member = null;
-        if (memberInfo) {
-            let memberValue = memberInfo.toString().split('#');
-            if (memberValue[0] === 'C_PER') {
-                this.member = {
-                    "username": memberValue[4],
-                    "person_code": memberValue[1],
-                    "person_name": memberValue[2],
-                    "id": parseInt(memberValue[3]),
-                }
-            }
-        } else {
-            this.member = null
-        }
+		this.member = null;
+		if (memberInfo) {
+			let memberValue = memberInfo.toString().split('#');
+			if (memberValue[0] === 'C_PER') {
+				console.log('memberValue', memberValue)
+				this.member = {
+					"username": memberValue[4],
+					"person_code": memberValue[1],
+					"person_name": memberValue[2],
+					"id": parseInt(memberValue[3]),
+					org: memberValue[5],
+				}
+			}
+		} else {
+			this.member = null
+		}
 
         setFieldsValue({
-            dataReview: this.member
+            dataReview: this.member,
+			reviewUnit: this.member.org?this.member.org:null,
         });
     }
 
