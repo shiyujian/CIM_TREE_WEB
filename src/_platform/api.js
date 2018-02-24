@@ -287,6 +287,9 @@ export const MODULES = [
 			id:'QUALITY.YANSHOU',
 			name: '质量验收',
 			children: [{
+				id: 'QUALITY.CHECK',
+				name: '检验批验收',
+			},{
 				id: 'QUALITY.TIANBAO',
 				name: '进场材料填报',
 			}, {

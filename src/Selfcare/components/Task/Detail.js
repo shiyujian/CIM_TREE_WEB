@@ -18,6 +18,9 @@ import ScheduleDayDetail from '../TaskDetail/ScheduleDayDetail';
 import ScheduleDayRefill from '../TaskDetail/ScheduleDayRefill';
 import ScheduleStageDetail from '../TaskDetail/ScheduleStageDetail';
 import ScheduleStageRefill from '../TaskDetail/ScheduleStageRefill';
+//质量管理模块
+import QulityCheckDetail from '../TaskDetail/QulityCheckDetail';
+import QulityCheckRefill from '../TaskDetail/QulityCheckRefill';
 
 
 const FormItem = Form.Item;
@@ -29,7 +32,7 @@ export default class Detail extends Component {
 			let code = task.workflow.code
 			let name = task.current ? task.current[0].name : '结束';
 
-			console.log('code',code)
+			console.log('吾问无为谓无无无无无无无无无无无无无无无无无无无无无无无无无无无无code',code)
 			console.log('WORKFLOW_CODE.每日进度计划填报流程',WORKFLOW_CODE.每日进度计划填报流程)
 			console.log('WORKFLOW_CODE.工程材料报批流程',WORKFLOW_CODE.工程材料报批流程)
 			console.log('WORKFLOW_CODE.苗木资料报批流程',WORKFLOW_CODE.苗木资料报批流程)
@@ -59,6 +62,10 @@ export default class Detail extends Component {
 				return (
 					<OverallResourceDetail {...this.props} {...this.state}/>
 				)
+			}else if(code === WORKFLOW_CODE.检验批验收审批流程 && (name == '审核' || name == '结束')){
+				return (
+					<QulityCheckDetail {...this.props} {...this.state} />
+				)
 			}else if (code === WORKFLOW_CODE.机械设备报批流程 && name == '填报'){
 				return (
 					<OverallGeneralRefill {...this.props} {...this.state}/>
@@ -82,6 +89,10 @@ export default class Detail extends Component {
 			}else if (code === WORKFLOW_CODE.每日进度填报流程 && name == '填报'){
 				return (
 					<ScheduleStageRefill {...this.props} {...this.state}/>
+				)
+			}else if(code === WORKFLOW_CODE.检验批验收审批流程 && name === '填报'){
+				return (
+					<QulityCheckRefill {...this.props} {...this.state} />
 				)
 			}else {
 				return <div>待定流程</div>
