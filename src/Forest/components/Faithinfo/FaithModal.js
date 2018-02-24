@@ -18,7 +18,7 @@ export default class FaithModal extends Component {
         	exportsize: 100,
         	leftkeycode: '',
 			section: '',
-    		treety: '',
+    		bigType: '',
     		treetype: '',
     		treetypename: '',
     		integrity: '',

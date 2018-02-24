@@ -14,6 +14,7 @@ export const getHonestyNewDetailOk = createAction(`${ID}存储返回的详情`);
 export const clearList = createAction(`${ID}清空列表`);
 export const nurseryName = createAction(`${ID}供苗商名字`);
 const getForestUsersOK = createAction('获取森林数据用户列表');
+const getTreeListOK = createAction('获取森林树种列表');
 
 /*****************************院内************************/
 export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [getForestUsersOK]);
@@ -24,7 +25,7 @@ export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/tree/factoryAn
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
 export const getNurserysTree = createFetchAction(`${FOREST_API}/tree/treenurserys`, []);
 export const getqueryTree = createFetchAction(`${FOREST_API}/tree/queryTree`, []);
-export const getTreeList = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
+export const getTreeList = createFetchAction(`${FOREST_API}/tree/treetypes`, [getTreeListOK]);
 export const getexportFactoryAnalyseInfo = createFetchAction(`${FOREST_API}/tree/exportFactoryAnalyseInfo`, []);
 export const getexportFactoryAnalyseDetailInfo = createFetchAction(`${FOREST_API}/tree/exportFactoryAnalyseDetailInfo`, []);
 export const getexportFactoryAnalyse = createFetchAction(`${FOREST_API}/tree/exportFactoryAnalyse`, []);
@@ -123,7 +124,25 @@ export default handleActions({
 			...state,
 			users
 		};
-    },
+	},
+	[getTreeListOK]: (state, {payload}) => {
+		let treetypes = {};
+        if(payload){
+			treetypes[''] = [];
+			payload.forEach(treetype => {
+				let type = treetype.TreeTypeName.slice(0, 1);
+				if(!treetypes[type]){
+					treetypes[type] = [];
+				}
+				treetypes[type].push(treetype);
+				treetypes[''].push(treetype);
+			});
+		}
+		return {
+			...state,
+			treetypes
+		};
+	},
 	[getHonestyNewDetailOk]: (state, {payload}) => ({
 		...state,
 		honestyList: payload
