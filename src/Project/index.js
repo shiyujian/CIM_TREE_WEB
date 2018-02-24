@@ -280,7 +280,6 @@ export default class Project extends Component {
 				id: 'PROJECT.NURSERYTYPE',
 				name: '类型管理',
 				path: '/project/nurseryType',
-				exact: true,
 				icon: <Icon name="retweet" />,
 			}, {
 				key: 'TreeManage',
@@ -288,6 +287,12 @@ export default class Project extends Component {
 				name: '树种管理',
 				path: '/project/treeManage',
 				icon: <Icon name="code" />
+			} ,{
+				key: 'NurseryManagement',
+				id: 'PROJECT.NURSERYMANAGEMENT',
+				name: '苗圃管理',
+				path: '/project/nurserymanagement',
+				icon: <Icon name="tag" />
 			}]
 		}
 	];

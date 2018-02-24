@@ -14,7 +14,7 @@ export default class Warning extends Component {
         super(props);
         this.state={
             stime1: moment().format('2017/11/17 00:00:00'),
-            etime1: moment().format('2017/11/24 23:59:59'),
+            etime1: moment().format('YYYY-MM-DD 23:59:59'),
             data:"",
             gpshtnum:[],
             departOptions:"",
@@ -25,15 +25,23 @@ export default class Warning extends Component {
     }
 
     componentWillReceiveProps(nextProps){
-        const {actions: {progressdata,progressalldata}} = this.props;
-        progressdata({},{unitproject:this.state.unitproject,project:this.state.project}).then(rst=>{
-            console.log(rst,"xixhia");
-            this.getdata(rst);
-        })
-        progressalldata().then(rst=>{
-            console.log(rst,"hghlgl")
-        }) 
-        console.log(this.state.data);
+        
+        let params = {}
+        params.etime = this.state.etime1;
+        params.stime = this.state.stime1;
+        params.project = this.state.project;
+        params.unitproject = this.state.unitproject;
+        this.getdata(params);
+
+        // const {actions: {progressdata,progressalldata}} = this.props;
+        // progressdata({},{unitproject:this.state.unitproject,project:this.state.project}).then(rst=>{
+        //     console.log(rst,"xixhia");
+        //     this.getdata(rst);
+        // })
+        // progressalldata().then(rst=>{
+        //     console.log(rst,"hghlgl")
+        // }) 
+        // console.log(this.state.data);
       
     }
 
@@ -68,29 +76,13 @@ export default class Warning extends Component {
             yAxis: [
                 {
                     type: 'value',
-                    min: 0,
-                    max: 50,
-                    interval: 5,
+                    // name: '长度（m）',
                     axisLabel: {
                         formatter: '{value} '
                     }
                 },
             ],
-            series: [
-               
-                {
-                    name:'一标',
-                    type:'line',
-                    yAxisIndex: 0,
-                    data:[30,40,50,20,10,30,30],
-                    itemStyle:{
-                        normal:{
-                            color:'black'
-                        }
-                    }
-                },
-              
-            ]
+            series: []
         };
         myChart.setOption(optionLine);
     }
@@ -141,95 +133,212 @@ export default class Warning extends Component {
     }
     datepick(){}
     datepickok(value){
-        console.log(value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'');
-        this.setState({etime1:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'',
-                        stime1:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'',
-                    })
-        const {actions: {progressdata,progressalldata}} = this.props;
-        progressdata({},{unitproject:this.state.unitproject,project:this.state.project,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
-                this.getdata(rst);
-            })
+
+        this.setState({
+            etime1:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'',
+            stime1:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'',
+        })
+        let params = {}
+        
+        
+        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'';
+        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'';
+        params.project = this.state.project;
+        params.unitproject = this.state.unitproject;
+        this.getdata(params);
+        // console.log(value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'');
+        // this.setState({etime1:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'',
+        //                 stime1:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'',
+        //             })
+        // const {actions: {progressdata,progressalldata}} = this.props;
+        // progressdata({},{unitproject:this.state.unitproject,project:this.state.project,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
+        //         this.getdata(rst);
+        // })
 
     }
     onChange(){}
     onDepartments1(value){
-        const {actions: {progressdata,progressalldata}} = this.props;
-        console.log(value,"111");
         this.setState({
-        project:value,
+            project:value,
         })
-        progressdata({},{unitproject:this.state.unitproject,project:value,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
-            this.getdata(rst);
-        })
+        let params = {}
+        params.etime = this.state.etime1;
+        params.stime = this.state.stime1;
+        params.unitproject = this.state.unitproject;
+        params.project = value;
+        this.getdata(params);
+
+        // const {actions: {progressdata,progressalldata}} = this.props;
+        // console.log(value,"111");
+        // this.setState({
+        // project:value,
+        // })
+        // progressdata({},{unitproject:this.state.unitproject,project:value,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
+        //     this.getdata(rst);
+        // })
 
     }
     onDepartments2(value){
-        const {actions: {progressdata,progressalldata}} = this.props;
-        console.log(value,"111");
         this.setState({
-          unitproject:value,
+            unitproject:value,
         })
-        progressdata({},{unitproject:value,project:this.state.project,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
-            this.getdata(rst);
-        })
+        let params = {}
+        params.etime = this.state.etime1;
+        params.stime = this.state.stime1;
+        params.project = this.state.project;
+        params.unitproject = value;
+        this.getdata(params);
+
+        // const {actions: {progressdata,progressalldata}} = this.props;
+        // console.log(value,"111");
+        // this.setState({
+        //   unitproject:value,
+        // })
+        // progressdata({},{unitproject:value,project:this.state.project,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
+        //     this.getdata(rst);
+        // })
 
     }
-    getdata(rst){
-        console.log(rst);
-
-        let gpsht = rst;
+    getdata(value){
+        console.log('aaaaaaaaaaaaaaaaaaaaa',value)
+        const {actions: {progressdata,progressalldata}} = this.props;
         let gpshtnum = [];
         let times = [];
-        for(var i = 0; i<=gpsht.length-1; i++){
-            gpshtnum.push(gpsht[i].Num);
-            let time = new Date(gpsht[i].CreateTime).toLocaleDateString()
-            times.push(time);
-        }
-        console.log(gpshtnum,times,"realy");
-        const myChart = echarts.init(document.getElementById('rightop'));
+        let time = [];
 
-        let optionLine = {
-           tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    crossStyle: {
-                        color: '#999'
+
+        progressalldata({},value).then(rst=>{
+            console.log(rst);
+            let datas = [];
+            if(rst && rst.content){
+
+                let content = rst.content
+                //将获取的数据按照 ProgressTime 时间排序
+                content.sort(function(a, b) {
+                    if (a.ProgressTime < b.ProgressTime ) {
+                        return -1;
+                    } else if (a.ProgressTime > b.ProgressTime ) {
+                        return 1;
+                    } else {
+                        return 0;
                     }
+                });
+                console.log('content',content)
+                //将 ProgressTime 单独列为一个数组
+                for(let i=0;i<content.length;i++){
+                    let a = moment(content[i].ProgressTime).format('YYYY/MM/DD')
+                    time.push(a)
                 }
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    data: times,
+                //时间数组去重
+                times = [...new Set(time)]
+                console.log('times',times)
+                
+                times.map((time,index)=>{
+                    datas[index] = 0;
+                    content.map((arr,a)=>{
+                        if(moment(arr.ProgressTime).format('YYYY/MM/DD') === time){
+                            let Items = arr.Items?arr.Items:[]
+                            Items.map((item,x)=>{
+                                //默认的种类
+                                if(x<6){
+                                    if(item.Project === value.project){
+                                        datas[index] = datas[index]+item.Num+0
+                                    }else{
+                                        datas[index] = datas[index]+0
+                                    }
+                                }else{//添加的数目种类
+                                    let treetype = ''
+                                    FORESTTYPE.map(forest => {
+                                        return forest.children.map(rst => {
+                                            if(rst.name === item.Project){
+                                                treetype =  forest.name
+                                            }
+                                        })
+                                    }) 
+                                    console.log('treetype',treetype)
+
+                                    if(treetype === value.project){
+                                        datas[index] = datas[index]+item.Num+0
+                                    }else{
+                                        datas[index] = datas[index]+0
+                                    }
+                                }
+                            })
+                        }
+                    })
+                })
+                console.log('datas',datas)
+
+                this.setState({
+                    gpshtnum:datas,
+                    times:times,
+                })
+            }
+            
+            //当查不出数据时，使横坐标不为空
+            let a = moment().subtract(2, 'days').format('YYYY/MM/DD');
+            let b = moment().subtract(1, 'days').format('YYYY/MM/DD');
+            let c = moment().format('YYYY/MM/DD');
+            let d = moment().add(1, 'days').format('YYYY/MM/DD');
+            let e = moment().add(2, 'days').format('YYYY/MM/DD');
+            let dates = [];
+            dates.push(a)
+            dates.push(b)
+            dates.push(c)
+            dates.push(d)
+            dates.push(e)
+            console.log('dates',dates)
+
+            const myChart = echarts.init(document.getElementById('rightop'));
+
+            let optionLine = {
+            tooltip: {
+                    trigger: 'axis',
                     axisPointer: {
-                        type: 'shadow'
-                    }
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                },
-            ],
-            series: [
-               
-                {
-                    // name:'一标',
-                    type:'line',
-                    data:gpshtnum,
-                    itemStyle:{
-                        normal:{
-                            color:'black'
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
                         }
                     }
                 },
-              
-            ]
-        };
-        myChart.setOption(optionLine);
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: times.length>0?times:dates,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        // name: '长度（m）',
+                        axisLabel: {
+                            formatter: '{value} '
+                        }
+                    },
+                ],
+                series: [
+                
+                    {
+                        // name:'一标',
+                        type:'line',
+                        data:datas,
+                        itemStyle:{
+                            normal:{
+                                color:'black'
+                            }
+                        }
+                    },
+                
+                ]
+            };
+            myChart.setOption(optionLine);
+
+        })
+
+
+        
     }
 }
