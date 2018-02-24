@@ -250,6 +250,7 @@ class CheckAccept extends Component {
         } else if (type === 'delete') {
             const { actions: { deleteTasksList } } = this.props;
             const { dataSource, selectedKeys } = this.state;
+            let promiseArr = [];
             if (selectedKeys instanceof Array && selectedKeys.length === 0) {
                 notification.warning({
                     message: '请选择至少选择一条数据！',
@@ -257,21 +258,44 @@ class CheckAccept extends Component {
                 })
                 return
             }
-            selectedKeys.map(count => {
-                let current = num + count;
-                deleteTasksList({ id: dataSource[count].id }).then(rst => {
-                    if (rst === "") {
+            promiseArr = selectedKeys.map(count => {
+                return deleteTasksList({ id: dataSource[count].id })
+            })
+            const newData = this.state.dataSource;
+            if (promiseArr.length) {
+                Promise.all(promiseArr).then(res => {
+                    let result = true;
+                    let num = 0;
+                    if(res instanceof Array){
+                        for(let i=0;i<res.length;i++){
+                            result = result && (res[i] === "")
+                            if(res[i] === ""){   //可以缓存中清除该条
+                                let current = num + selectedKeys[i];
+                                const newData = this.state.dataSource;
+                                num --;
+                                newData.splice(current,1);
+                                this.setState({dataSource:newData})
+                            }
+                        }
+                        if(result){
+                            notification.warning({
+                                message: '删除成功！',
+                                duration: 2
+                            })
+                        }else{
+                            notification.warning({
+                                message: '删除失败！',
+                                duration: 2
+                            })
+                        }
+                    }else{
                         notification.warning({
-                            message: '删除成功！',
+                            message: '删除失败！',
                             duration: 2
                         })
-                        const newData = this.state.dataSource;
-                        num --;       //按顺序删除，每删除一条，后一条位置向前移动一位
-                        newData.splice(current,1);
-                        this.setState({dataSource:newData})
                     }
                 })
-            })
+            }
         }
     }
     covertURLRelative = (originUrl) => {
