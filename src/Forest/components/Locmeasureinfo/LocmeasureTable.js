@@ -22,7 +22,7 @@ export default class LocmeasureTable extends Component {
 			etime: moment().format('2017-11-23 23:59:59'),
 			sxm: '',
     		section: '',
-    		treety: '',
+    		bigType: '',
     		treetype: '',
     		smallclass: '',
         	thinclass: '',
@@ -85,7 +85,7 @@ export default class LocmeasureTable extends Component {
 			section,
 			smallclass,
 			thinclass,
-			treety,
+			bigType,
 			treetypename,
 			status,
 			islocation,
@@ -108,7 +108,7 @@ export default class LocmeasureTable extends Component {
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeNo',
+			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
 			title:"状态",
 			dataIndex: 'statusname',
@@ -265,7 +265,7 @@ export default class LocmeasureTable extends Component {
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>类型：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={treety} onChange={this.ontypechange.bind(this)}>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
 								{typeoption}
 							</Select>
 						</Col>
@@ -358,35 +358,33 @@ export default class LocmeasureTable extends Component {
 
 	onsectionchange(value) {
 		const {sectionselect} = this.props;
-		const {treety} = this.state;
-		sectionselect(value || '',treety)
-		this.setState({section:value || '', smallclass:'', thinclass:'', treetype:'', treetypename:''})
+		sectionselect(value || '')
+		this.setState({section:value || '', smallclass:'', thinclass:'', bigType:'', treetype:'', treetypename:''})
 	}
 
 	onsmallclasschange(value) {
 		const {smallclassselect} = this.props;
-		const {treety,section,leftkeycode} = this.state;
-		smallclassselect(value || leftkeycode,treety,section);
-		this.setState({smallclass:value || '', thinclass:'', treetype:'', treetypename:''})
+		const {section,leftkeycode} = this.state;
+		smallclassselect(value || leftkeycode,section);
+		this.setState({smallclass:value || '', thinclass:'', bigType:'', treetype:'', treetypename:''})
 	}
 
 	onthinclasschange(value) {
 		const {thinclassselect} = this.props;
-		const {treety,section,smallclass} = this.state;
-		thinclassselect(value || smallclass,treety,section);
-		this.setState({thinclass:value || '', treetype:'', treetypename:''})
+		const {section,smallclass} = this.state;
+		thinclassselect(value || smallclass,section);
+		this.setState({thinclass:value || '', bigType:'', treetype:'', treetypename:''})
 	}
 
 	ontypechange(value) {
-		const {typeselect,keycode = ''} = this.props;
-		const {section} = this.state;
-		typeselect(value || '',keycode,section)
-		this.setState({treety:value || '', treetype:'', treetypename:''})
+		const {typeselect} = this.props;
+		typeselect(value || '')
+		this.setState({bigType:value || '', treetype:'', treetypename:''})
 	}
 
 	ontreetypechange(value) {
 		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.TreeTypeNo == value)
+		let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
 		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
     }
 
@@ -466,7 +464,7 @@ export default class LocmeasureTable extends Component {
     	const {
     		sxm = '',
     		section = '',
-    		treety = '',
+    		bigType = '',
     		treetype = '',
     		supervisorcheck = '',
     		checkstatus = '',
@@ -483,7 +481,7 @@ export default class LocmeasureTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		treety,
+    		bigType,
     		treetype,
     		supervisorcheck,
     		checkstatus,
@@ -546,7 +544,7 @@ export default class LocmeasureTable extends Component {
 		const {
     		sxm = '',
     		section = '',
-    		treety = '',
+    		bigType = '',
     		treetype = '',
     		supervisorcheck = '',
     		checkstatus = '',

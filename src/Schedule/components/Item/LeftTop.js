@@ -23,12 +23,12 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         }
     }
     componentWillReceiveProps(nextProps){
-      let params = {}
-      params.etime = this.state.etime1;
-      params.stime = this.state.stime1;
-      
-      params.project = this.state.project;
-      this.getdata(params);
+        let params = {}
+        params.etime = this.state.etime1;
+        params.stime = this.state.stime1;
+        
+        params.project = this.state.project;
+        this.getdata(params);
     }
 
     componentDidMount() {
@@ -118,24 +118,25 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
     }
     datepick(){}
     datepickok(value){
-      this.setState({etime1:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'',
-                     stime1:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'',
-                  })
-      let params = {}
-      params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'';
-      params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'';
-      params.project = this.state.project;
-      this.getdata(params);
+        this.setState({
+            etime1:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'',
+            stime1:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'',
+        })
+        let params = {}
+        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'';
+        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'';
+        params.project = this.state.project;
+        this.getdata(params);
     }
     onDepartments(value){
-      this.setState({
-        project:value,
-      })
-      let params = {}
-      params.etime = this.state.etime1;
-      params.stime = this.state.stime1;
-      params.project = value;
-            this.getdata(params);
+        this.setState({
+            project:value,
+        })
+        let params = {}
+        params.etime = this.state.etime1;
+        params.stime = this.state.stime1;
+        params.project = value;
+        this.getdata(params);
     }
     onChange(value){
         console.log(value);
@@ -143,146 +144,230 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             project:value,
         })
         
-
     }
     getdata(value){
-      const {actions: {progressdata,progressalldata}} = this.props;
-      let gpshtnum = [];
-      let times = [];
-      progressdata({},value).then(rst=>{
-        console.log(rst);
-        
-        for(let i = 0 ;i<=rst.length-1;i++){
-            gpshtnum.push(rst[i].Num);
-            let time = new Date(rst[i].CreateTime).toLocaleDateString()
-            times.push(time);
-        }
-        this.setState({
-          gpshtnum:gpshtnum,
-          times:times,
-        })
-        let myChart = echarts.init(document.getElementById('lefttop'));
-      let optionLine = {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    crossStyle: {
-                        color: '#999'
+        console.log('aaaaaaaaaaaaaaaaaaaaa',value)
+        const {actions: {progressdata,progressalldata}} = this.props;
+        let gpshtnum = [];
+        let times = [];
+        let time = [];
+        progressalldata({},value).then(rst=>{
+            console.log(rst);
+            
+            if(rst && rst.content){
+
+                let content = rst.content
+                //将获取的数据按照 ProgressTime 时间排序
+                content.sort(function(a, b) {
+                    if (a.ProgressTime < b.ProgressTime ) {
+                        return -1;
+                    } else if (a.ProgressTime > b.ProgressTime ) {
+                        return 1;
+                    } else {
+                        return 0;
                     }
+                });
+                console.log('content',content)
+                //将 ProgressTime 单独列为一个数组
+                for(let i=0;i<content.length;i++){
+                    let a = moment(content[i].ProgressTime).format('YYYY/MM/DD')
+                    time.push(a)
                 }
-            },
-            legend: {
-                data:['总数','一标','二标','三标','四标','五标'],
-                left:'right'
+                //时间数组去重
+                let times = [...new Set(time)]
+                console.log('times',times)
+
+                //定义一个二维数组，分为多个标段
+                let index = 0;
+                gpshtnum[0] = new Array()
+                gpshtnum[1] = new Array()
+                gpshtnum[2] = new Array()
+                gpshtnum[3] = new Array()
+                gpshtnum[4] = new Array()
+                content.map(item=>{
+                    if(item && item.UnitProject){
+                        switch(item.UnitProject){
+                            case '一标段' : 
+                                gpshtnum[0].push(item)
+                                break;
+                            case '二标段' :
+                                gpshtnum[1].push(item)
+                                break;
+                            case '三标段' :
+                                gpshtnum[2].push(item)
+                                break;
+                            case '四标段' :
+                                gpshtnum[3].push(item)
+                                break;
+                            case '五标段' :
+                                gpshtnum[4].push(item)
+                                break;
+                        }
+                    }                    
+                })
+                console.log('gpshtnum',gpshtnum)
+
+                let datas = [];
+
+                // times.map((time,index)=>{
+                    
+                    
+                // })
+
+               
                 
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    data: this.state.times,
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    name: '长度（m）',
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                },
-              
-            ],
-            series: [
-                {
-                    name:'总数',
-                    type:'bar',
-                    data:gpshtnum,
-                    barWidth:'25%',
-                    itemStyle:{
-                        normal:{
-                            color:'#02e5cd',
-                            barBorderRadius:[50,50,50,50]
+
+                // for(let i = 0 ;i<content.length-1;i++){
+                //     time = content[i].ProgressTime
+                //     data = content[i].ProgressTime
+                //     // gpshtnum.push(content[i].Num);
+                //     let time = new Date(content[i].ProgressTime).toLocaleDateString()
+                //     times.push(time);
+                // }
+                // console.log('times',times)
+                this.setState({
+                    gpshtnum:gpshtnum,
+                    times:times,
+                })
+            }
+            //当查不出数据时，使横坐标不为空
+            let a = moment().subtract(2, 'days').format('YYYY/MM/DD');
+            let b = moment().subtract(1, 'days').format('YYYY/MM/DD');
+            let c = moment().format('YYYY/MM/DD');
+            let d = moment().add(1, 'days').format('YYYY/MM/DD');
+            let e = moment().add(2, 'days').format('YYYY/MM/DD');
+            let dates = [];
+            dates.push(a)
+            dates.push(b)
+            dates.push(c)
+            dates.push(d)
+            dates.push(e)
+            console.log('dates',dates)
+
+
+            let myChart = echarts.init(document.getElementById('lefttop'));
+            let optionLine = {
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross',
+                            crossStyle: {
+                                color: '#999'
+                            }
                         }
-                    }
-                },
-                {
-                    name:'一标',
-                    type:'line',
-                    data:gpshtnum,
-                    itemStyle:{
-                        normal:{
-                            color:'black'
+                    },
+                    legend: {
+                        data:['总数','一标','二标','三标','四标','五标'],
+                        left:'right'
+                        
+                    },
+                    xAxis: [
+                        {
+                            type: 'category',
+                            data: this.state.times.length>0?this.state.times:dates,
+                            axisPointer: {
+                                type: 'shadow'
+                            }
                         }
-                    }
-                },
-                {
-                    name:'二标',
-                    type:'line',
-                    data:gpshtnum,
-                    itemStyle:{
-                        normal:{
-                            color:'orange'
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value',
+                            name: '长度（m）',
+                            axisLabel: {
+                                formatter: '{value} '
+                            }
+                        },
+                    
+                    ],
+                    series: [
+                        {
+                            name:'总数',
+                            type:'bar',
+                            data:gpshtnum,
+                            barWidth:'25%',
+                            itemStyle:{
+                                normal:{
+                                    color:'#02e5cd',
+                                    barBorderRadius:[50,50,50,50]
+                                }
+                            }
+                        },
+                        {
+                            name:'一标',
+                            type:'line',
+                            data:gpshtnum,
+                            itemStyle:{
+                                normal:{
+                                    color:'black'
+                                }
+                            }
+                        },
+                        {
+                            name:'二标',
+                            type:'line',
+                            data:gpshtnum,
+                            itemStyle:{
+                                normal:{
+                                    color:'orange'
+                                }
+                            }
+                        },
+                        {
+                            name:'三标',
+                            type:'line',
+                            data:gpshtnum,
+                            itemStyle:{
+                                normal:{
+                                    color:'yellow'
+                                }
+                            }
+                        },
+                        {
+                            name:'四标',
+                            type:'line',
+                            data:gpshtnum,
+                            itemStyle:{
+                                normal:{
+                                    color:'blue'
+                                }
+                            }
+                        },
+                        {
+                            name:'五标',
+                            type:'line',
+                            data:gpshtnum,
+                            itemStyle:{
+                                normal:{
+                                    color:'green'
+                                }
+                            }
                         }
-                    }
-                },
-                {
-                    name:'三标',
-                    type:'line',
-                    data:gpshtnum,
-                    itemStyle:{
-                        normal:{
-                            color:'yellow'
-                        }
-                    }
-                },
-                {
-                    name:'四标',
-                    type:'line',
-                    data:gpshtnum,
-                    itemStyle:{
-                        normal:{
-                            color:'blue'
-                        }
-                    }
-                },
-                {
-                    name:'五标',
-                    type:'line',
-                    data:gpshtnum,
-                    itemStyle:{
-                        normal:{
-                            color:'green'
-                        }
-                    }
-                }
-            ]
-        };
-        myChart.setOption(optionLine);
-      })
+                    ]
+                };
+                myChart.setOption(optionLine);
+            }
+        )
+            
+            
       
-      // let biaoduan = ['1标段','2标段','3标段','4标段','5标段'];
-      // let numbers = [];
-      // for (let j=0; j<=biaoduan.length-1; j++){
-      //     value.unitproject = biaoduan[i];
-      //     progressdata({},value).then(rst=>{
-      //       console.log(rst);
-      //         let gpsht = rst;
-      //         let gpshtnum = [];
-      //         let times = [];
-      //         for(var i = 0; i<=gpsht.length-1; i++){
-      //             gpshtnum.push(gpsht[i].Num);
-      //             let time = new Date(gpsht[i].CreateTime).toLocaleDateString()
-      //             times.push(time);
-      //         }
-      //         numbers.push(gpshtnum);
-      //   })
-      // }
-      // console.log(numbers,"realy");
-      
-      
+            // let biaoduan = ['1标段','2标段','3标段','4标段','5标段'];
+            // let numbers = [];
+            // for (let j=0; j<=biaoduan.length-1; j++){
+            //     value.unitproject = biaoduan[i];
+            //     progressdata({},value).then(rst=>{
+            //       console.log(rst);
+            //         let gpsht = rst;
+            //         let gpshtnum = [];
+            //         let times = [];
+            //         for(var i = 0; i<=gpsht.length-1; i++){
+            //             gpshtnum.push(gpsht[i].Num);
+            //             let time = new Date(gpsht[i].CreateTime).toLocaleDateString()
+            //             times.push(time);
+            //         }
+            //         numbers.push(gpshtnum);
+            //   })
+            // }
+            // console.log(numbers,"realy");
     }
 }

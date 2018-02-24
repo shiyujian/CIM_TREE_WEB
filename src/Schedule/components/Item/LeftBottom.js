@@ -87,10 +87,6 @@ export default class Warning extends Component {
             ],
             color: ['#0fbc7a', '#fca700', '#772fbf', '#11d0d8', '#0e8ed7']
         };
-
-
-        
-
         myChart.setOption(optionLine);
     }
     
@@ -130,29 +126,28 @@ export default class Warning extends Component {
     }
     datepick(){}
     datepickok(value){
-      this.setState({etime1:value?moment(value).format('YYYY/MM/DD HH:mm:s'):'',
-                  })
-      
-      const {actions: {progressstat4pie}} = this.props;
-      progressstat4pie({},{project:this.state.project,etime:this.state.etime1}).then(rst=>{
-        this.getdata(rst);
-      })
+        this.setState({etime1:value?moment(value).format('YYYY/MM/DD HH:mm:s'):'',})
+        
+        const {actions: {progressstat4pie}} = this.props;
+        progressstat4pie({},{project:this.state.project,etime:this.state.etime1}).then(rst=>{
+            this.getdata(rst);
+        })
 
     }
     
     onDepartments(value){
-      console.log(value);
-      const {actions: {progressstat4pie}} = this.props;
-      this.setState({
-        project:value,
-      })
-      progressstat4pie({},{project:value,etime:this.state.etime1}).then(rst=>{
-        this.getdata(rst);
-      })
+        console.log(value);
+        const {actions: {progressstat4pie}} = this.props;
+        this.setState({
+            project:value,
+        })
+        progressstat4pie({},{project:value,etime:this.state.etime1}).then(rst=>{
+            this.getdata(rst);
+        })
 
     }
 
     getdata(rst){
-      console.log(rst);
+        console.log(rst);
     }
 }

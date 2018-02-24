@@ -29,10 +29,15 @@ export default class Contrastinfo extends Component {
             standardoption: [],
             leftkeycode: '',
             resetkey: 0,
+            bigType: '',
         }
     }
     componentDidMount() {
-        const {actions: {getTree}} = this.props;
+        const {actions: {getTree,getTreeList}, treetypes} = this.props;
+        // 避免反复获取森林树种列表，提高效率
+        if(!treetypes){
+            getTreeList().then(x => this.setTreeTypeOption(x));
+        }
         //地块树
         try {
             getTree({},{parent:'root'})
@@ -108,6 +113,7 @@ export default class Contrastinfo extends Component {
             treetypelist,
             sectionoption,
             typeoption,
+            bigType,
             standardoption,
             resetkey,
         } = this.state;
@@ -128,6 +134,7 @@ export default class Contrastinfo extends Component {
                              {...this.props} 
                              sectionoption={sectionoption}
                              sectionselect={this.sectionselect.bind(this)}
+                             bigType={bigType}
                              typeoption={typeoption}
                              typeselect={this.typeselect.bind(this)}
                              treetypeoption={treetypeoption} 
@@ -142,28 +149,15 @@ export default class Contrastinfo extends Component {
                 </Body>);
     }
     //标段选择, 重新获取: 树种
-    sectionselect(value,treety) {
-        const {actions:{setkeycode,getTreeList}} =this.props;
+    sectionselect(value) {
+        const {actions:{setkeycode}} =this.props;
         const {leftkeycode} = this.state;
         setkeycode(leftkeycode)
         //树种
-        getTreeList()
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
+        this.typeselect('');
     }
 
-    //类型选择, 重新获取: 树种
-    typeselect(value,keycode,section){
-        const {actions:{setkeycode,getTreeList}} =this.props;
-        //树种
-        getTreeList()
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
-    }
-
-     //设置标段选项
+    //设置标段选项
     setSectionOption(rst){
         if(rst instanceof Array){
             let sectionList = [];
@@ -184,11 +178,19 @@ export default class Contrastinfo extends Component {
         }
     }
 
+    //类型选择, 重新获取: 树种
+    typeselect(value){
+        const {treetypes} =this.props;
+        this.setState({bigType: value});
+        //树种
+        this.setTreeTypeOption(treetypes&&treetypes[value] ? treetypes[value] : []);
+    }
+
     //设置树种选项
     setTreeTypeOption(rst) {
         if(rst instanceof Array){
             let treetypeoption = rst.map(item => {
-                return <Option key={item.TreeTypeNo} value={item.TreeTypeNo}>{item.TreeTypeNo}</Option>
+                return <Option key={item.TreeTypeNo} value={item.TreeTypeName}>{item.TreeTypeName}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({treetypeoption,treetypelist:rst})
@@ -205,7 +207,7 @@ export default class Contrastinfo extends Component {
     //树选择, 重新获取: 标段、树种并置空
     onSelect(value = []) {
         let keycode = value[0] || '';
-        const {actions:{setkeycode,gettreetype,getTreeList,getTree}} =this.props;
+        const {actions:{setkeycode,gettreetype,getTree}} =this.props;
         setkeycode(keycode);
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
         
@@ -215,12 +217,7 @@ export default class Contrastinfo extends Component {
             this.setSectionOption(rst)
         })
         //树种
-        gettreetype()
-        .then(rst => {
-            if(rst instanceof Array){
-                this.setTreeTypeOption(rst)
-            }
-        })
+        this.typeselect('');
     }
     //树展开
     onExpand(expandedKeys,info) {

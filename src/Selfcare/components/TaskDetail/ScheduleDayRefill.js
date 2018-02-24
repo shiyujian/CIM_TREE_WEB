@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
-import PerSearch from '../../../Schedule/components/stagereport/PerSearch';
+import PerSearch from '../Task/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -110,7 +110,7 @@ class ScheduleDayRefill extends Component {
 			.then(rst => {
 				let treetype = rst.map((o, index) => {
 					return (
-						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeNo}</Option>
+						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeName}</Option>
 					)
 				})
 				this.setState({ treetype });
@@ -475,7 +475,7 @@ class ScheduleDayRefill extends Component {
 	handleSelect(index, key, value) {
 		const { treedataSource } = this.state;
 		value = JSON.parse(value);
-		treedataSource[index][key] = value.TreeTypeNo;
+		treedataSource[index][key] = value.TreeTypeName;
 		this.setState({ treedataSource });
 	}
 	// 删除树列表

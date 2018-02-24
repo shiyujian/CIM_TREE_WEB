@@ -110,8 +110,7 @@ export default class Query extends Component {
 							   columns={this.columns}
 							   className="foresttables"
 							   rowSelection={rowSelection}
-							   bordered
-							   rowKey="id"/>
+							   bordered/>
 					</Row>
 				</Content>
 			</div>

@@ -199,7 +199,6 @@ class LeaveTable extends Component {
 					bordered={true}
 					className='foresttables'
 					columns={columns}
-					rowKey='order'
 					loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.state.loading }}
 					locale={{ emptyText: '当天无信息' }}
 					dataSource={details}

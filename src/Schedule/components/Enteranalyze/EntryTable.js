@@ -250,7 +250,7 @@ export default class EntryTable extends Component {
                     <div>
                     {this.state.nowmessagelist.map((item,index)=>
                             <div key={item.id}>
-                              <span>{item.CreateTime}{item.Factory}{item.Inputer}录入{item.TreeTypeObj.TreeTypeNo}</span>
+                              <span>{item.CreateTime}{item.Factory}{item.Inputer}录入{item.TreeTypeObj.TreeTypeName}</span>
                             </div>
                         )}
                     </div>
@@ -414,7 +414,7 @@ export default class EntryTable extends Component {
        
         const {treetypelist} = this.props;
         let treetype = treetypelist.find(rst => rst.ID == value)
-        this.setState({treetype:treetype?treetype.ID:'',treetypename:treetype.TreeTypeNo || ''},() => {
+        this.setState({treetype:treetype?treetype.ID:'',treetypename:treetype.TreeTypeName || ''},() => {
             this.datepickok(2)
         })
     }

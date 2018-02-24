@@ -120,7 +120,6 @@ class ScheduleDayDetail extends Component {
                             columns={this.columns1}
                             pagination={true}
                             dataSource={record.TreatmentData}
-                            rowKey='index'
                         />
 					</Col>
 				</Row>
