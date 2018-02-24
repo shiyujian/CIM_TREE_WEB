@@ -98,7 +98,7 @@ export default class SupervisorTable extends Component {
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeNo',
+			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
 			title:"监理人",
 			dataIndex: 'Supervisor',
@@ -330,7 +330,8 @@ export default class SupervisorTable extends Component {
     		console.log('rst',rst)
     		this.setState({loading:false,percent:100})
     		if(!rst)
-    			return
+				return
+			console.log('asddddddddddddddddddddddddddddddddddddd',rst)
     		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {

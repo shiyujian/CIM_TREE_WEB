@@ -104,7 +104,7 @@ export default class CheckerTable extends Component {
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeNo',
+			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
 			title:"抽查人",
 			dataIndex: 'Checker',

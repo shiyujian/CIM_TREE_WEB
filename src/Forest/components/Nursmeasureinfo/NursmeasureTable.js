@@ -107,7 +107,7 @@ export default class NursmeasureTable extends Component {
 			dataIndex: 'BD',
 		},{
 			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeNo',
+			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
 			title:"产地",
 			dataIndex: 'TreePlace',

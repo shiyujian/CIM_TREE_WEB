@@ -150,18 +150,101 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         const {actions: {progressdata,progressalldata}} = this.props;
         let gpshtnum = [];
         let times = [];
-        progressdata({},value).then(rst=>{
+        let time = [];
+        progressalldata({},value).then(rst=>{
             console.log(rst);
             
-            for(let i = 0 ;i<=rst.length-1;i++){
-                gpshtnum.push(rst[i].Num);
-                let time = new Date(rst[i].CreateTime).toLocaleDateString()
-                times.push(time);
+            if(rst && rst.content){
+
+                let content = rst.content
+                //将获取的数据按照 ProgressTime 时间排序
+                content.sort(function(a, b) {
+                    if (a.ProgressTime < b.ProgressTime ) {
+                        return -1;
+                    } else if (a.ProgressTime > b.ProgressTime ) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                console.log('content',content)
+                //将 ProgressTime 单独列为一个数组
+                for(let i=0;i<content.length;i++){
+                    let a = moment(content[i].ProgressTime).format('YYYY/MM/DD')
+                    time.push(a)
+                }
+                //时间数组去重
+                let times = [...new Set(time)]
+                console.log('times',times)
+
+                //定义一个二维数组，分为多个标段
+                let index = 0;
+                gpshtnum[0] = new Array()
+                gpshtnum[1] = new Array()
+                gpshtnum[2] = new Array()
+                gpshtnum[3] = new Array()
+                gpshtnum[4] = new Array()
+                content.map(item=>{
+                    if(item && item.UnitProject){
+                        switch(item.UnitProject){
+                            case '一标段' : 
+                                gpshtnum[0].push(item)
+                                break;
+                            case '二标段' :
+                                gpshtnum[1].push(item)
+                                break;
+                            case '三标段' :
+                                gpshtnum[2].push(item)
+                                break;
+                            case '四标段' :
+                                gpshtnum[3].push(item)
+                                break;
+                            case '五标段' :
+                                gpshtnum[4].push(item)
+                                break;
+                        }
+                    }                    
+                })
+                console.log('gpshtnum',gpshtnum)
+
+                let datas = [];
+
+                // times.map((time,index)=>{
+                    
+                    
+                // })
+
+               
+                
+
+                // for(let i = 0 ;i<content.length-1;i++){
+                //     time = content[i].ProgressTime
+                //     data = content[i].ProgressTime
+                //     // gpshtnum.push(content[i].Num);
+                //     let time = new Date(content[i].ProgressTime).toLocaleDateString()
+                //     times.push(time);
+                // }
+                // console.log('times',times)
+                this.setState({
+                    gpshtnum:gpshtnum,
+                    times:times,
+                })
             }
-            this.setState({
-            gpshtnum:gpshtnum,
-            times:times,
-            })
+            //当查不出数据时，使横坐标不为空
+            let a = moment().subtract(2, 'days').format('YYYY/MM/DD');
+            let b = moment().subtract(1, 'days').format('YYYY/MM/DD');
+            let c = moment().format('YYYY/MM/DD');
+            let d = moment().add(1, 'days').format('YYYY/MM/DD');
+            let e = moment().add(2, 'days').format('YYYY/MM/DD');
+            let dates = [];
+            dates.push(a)
+            dates.push(b)
+            dates.push(c)
+            dates.push(d)
+            dates.push(e)
+            console.log('dates',dates)
+
+
             let myChart = echarts.init(document.getElementById('lefttop'));
             let optionLine = {
                     tooltip: {
@@ -181,7 +264,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                     xAxis: [
                         {
                             type: 'category',
-                            data: this.state.times,
+                            data: this.state.times.length>0?this.state.times:dates,
                             axisPointer: {
                                 type: 'shadow'
                             }
@@ -263,7 +346,10 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                     ]
                 };
                 myChart.setOption(optionLine);
-            })
+            }
+        )
+            
+            
       
             // let biaoduan = ['1标段','2标段','3标段','4标段','5标段'];
             // let numbers = [];

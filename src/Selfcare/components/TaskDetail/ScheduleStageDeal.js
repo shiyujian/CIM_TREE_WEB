@@ -105,9 +105,10 @@ export default class ScheduleStageDeal extends Component {
         }
 
         //进度数据入库
-        console.log('task',task)
-        let postdata = task.subject[0].postData ? JSON.parse(task.subject[0].postData) : '';
-        let treedatasource = task.subject[0].treedataSource ? JSON.parse(task.subject[0].treedataSource) : '';
+		console.log('task',task)
+		let subject = task.subject[0];
+        let postdata = subject.postData ? JSON.parse(subject.postData) : '';
+        let treedatasource = subject.treedataSource ? JSON.parse(subject.treedataSource) : '';
         console.log('treedatasource',treedatasource)
         let items = [];
         treedatasource.map(item=>{
@@ -122,10 +123,10 @@ export default class ScheduleStageDeal extends Component {
             DocType:'doc',
             Items:items,
             ProgressNo:'01',
-            ProgressTime:postdata.timedate,
+            ProgressTime:subject.timedate,
             ProgressType:'日实际',
             SMS:0,
-            UnitProject:postdata.unit,
+            UnitProject:subject.unit,
             WPNo:''
         }
         // 日进度入库

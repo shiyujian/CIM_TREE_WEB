@@ -106,8 +106,9 @@ export default class ScheduleTotalDeal extends Component {
 
         //进度数据入库
         console.log('task',task)
-        let postdata = task.subject[0].postData ? JSON.parse(task.subject[0].postData) : '';
-        let TreatmentData = task.subject[0].TreatmentData ? JSON.parse(task.subject[0].TreatmentData) : '';
+        let subject = task.subject[0];
+        let postdata = subject.postData ? JSON.parse(subject.postData) : '';
+        let TreatmentData = subject.TreatmentData ? JSON.parse(subject.TreatmentData) : '';
         console.log('TreatmentData',TreatmentData)
         let items = [];
         TreatmentData.map((item)=>{
@@ -131,7 +132,7 @@ export default class ScheduleTotalDeal extends Component {
             ProgressTime:moment(postdata.upload_time).format('YYYY-MM-DD'),
             ProgressType:'总进度',
             SMS:0,
-            UnitProject:postdata.unit,
+            UnitProject:subject.unit,
             WPNo:'',
             FilePath:filePath
         }
