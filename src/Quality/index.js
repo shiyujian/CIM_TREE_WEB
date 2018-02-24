@@ -212,13 +212,6 @@ const menus = [
 		icon: <Icon name="check-square-o" />,
 		children: [
 			{
-				key: 'check',
-        		id: 'QUALITY.CHECK',
-				name: '检验批验收',
-				path: '/quality/yanshou/check',
-				icon: <Icon name="anchor"/>
-			},
-			{
         		key: 'tianbao',
         		id: 'QUALITY.TIANBAO',
 				name: '进场材料填报',
@@ -254,6 +247,12 @@ const menus = [
 				name: '单位工程验收',
 				path: '/quality/yanshou/danwei',
 				icon: <Icon name="crosshairs"/>
+			},{
+				key: 'check',
+        		id: 'QUALITY.CHECK',
+				name: '检验批验收',
+				path: '/quality/yanshou/check',
+				icon: <Icon name="anchor"/>
 			}
 		]
 	},{
