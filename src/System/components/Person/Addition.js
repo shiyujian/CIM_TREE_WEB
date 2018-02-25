@@ -6,12 +6,14 @@ const {Option, OptGroup} = Select;
 
 export default class Addition extends Component {
 	render() {
-		const {platform: {roles = []}, addition = {}, actions: {changeAdditionField}} = this.props;
+		const {platform: {roles = []}, addition = {}, actions: {changeAdditionField},tags={}} = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
-		// console.log("addition",addition)
+		const tagsOptions = this.initopthins(tags);
+		console.log("addition",addition)
+		// addition.tags=['1']
 		return (
 			<Modal title={addition.id ? "新增人员" : "编辑人员信息"} visible={addition.visible} className="large-modal" width={800}
 			maskClosable={false}
@@ -35,6 +37,16 @@ export default class Addition extends Component {
 							<Input disabled={!!addition.id} placeholder="请输入密码" value={addition.password}
 							       onChange={changeAdditionField.bind(this, 'password')}/>
 						</FormItem>
+						<FormItem {...Addition.layout} label="标段">
+							<Select placeholder="标段" value={addition.sections} onChange={changeAdditionField.bind(this, 'sections')}
+								mode="multiple" style={{ width: '100%' }}>
+								<Option key={'P009-01-01'} >1标段</Option>
+								<Option key={'P009-01-02'} >2标段</Option>
+								<Option key={'P009-01-03'} >3标段</Option>
+								<Option key={'P009-01-04'} >4标段</Option>
+								<Option key={'P009-01-05'} >5标段</Option>
+							</Select>
+						</FormItem> 
 					</Col>
 					<Col span={12}>
 						<FormItem {...Addition.layout} label="邮箱">
@@ -79,10 +91,24 @@ export default class Addition extends Component {
 								</OptGroup>
 							</Select>
 						</FormItem>
+						<FormItem {...Addition.layout} label="苗圃">
+							<Select placeholder="苗圃"  showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
+								 mode="multiple" style={{ width: '100%' }}>
+								{tagsOptions}
+							</Select>
+						</FormItem>
 					</Col>
 				</Row>
 			</Modal>
 		);
+	}
+	//初始化苗圃
+	initopthins(list){
+		const ops=[];
+		for (let i = 0; i < list.length; i++) {
+			ops.push(<Option key={list[i].ID} >{list[i].NurseryName}</Option>)
+		}
+		return ops;
 	}
 
 	componentDidMount() {
@@ -98,7 +124,7 @@ export default class Addition extends Component {
 	save() {
 		const {
 			addition = {}, sidebar: {node} = {},
-			actions: {postUser, clearAdditionField, getUsers, putUser}
+			actions: {postUser, clearAdditionField, getUsers, putUser},tags={}
 		} = this.props;
 		const roles = addition.roles || [];
 		console.log("roles",roles)
@@ -128,6 +154,8 @@ export default class Addition extends Component {
 							name: node.name
 						},
 					},
+					tags: addition.tags,
+					sections: addition.sections,
 					groups: roles.map(role => +role),
 					is_active: true,
 					basic_params: {
@@ -173,6 +201,8 @@ export default class Addition extends Component {
 							name: node.name
 						},
 					},
+					tags: addition.tags,
+					sections: addition.sections,
 					groups: roles.map(role => +role),
 					is_active: true,
 					basic_params: {

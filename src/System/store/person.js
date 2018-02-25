@@ -1,9 +1,13 @@
-import {handleActions, combineActions,} from 'redux-actions';
+import {handleActions, combineActions,createAction} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
-
+import createFetchAction from 'fetch-action';
 import fieldFactory from '_platform/store/service/field';
-
+import {FOREST_API} from '_platform/api';
 export const ID = 'SYSTEM_PERSON';
+
+
+const getTagsOK = createAction(`${ID}_GET_TAGS_OK`);
+const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
@@ -12,7 +16,9 @@ const filterReducer = fieldFactory(ID, 'filter');
 export const actions = {
 	...sidebarReducer,
 	...additionReducer,
-	...filterReducer
+	...filterReducer,
+	getTagsOK,
+	getTags
 };
 
 export default handleActions({
@@ -27,5 +33,9 @@ export default handleActions({
 	[combineActions(...actionsMap(additionReducer))]: (state, action) => ({
 		...state,
 		addition: additionReducer(state.addition, action),
+	}),
+	[getTagsOK]: (state, {payload}) => ({
+		...state,
+		tags: payload
 	}),
 }, {});
