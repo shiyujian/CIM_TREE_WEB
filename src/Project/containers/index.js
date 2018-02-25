@@ -30,4 +30,5 @@ export Unbearable from './Unbearable';
 export HiddenDanger from './HiddenDanger';
 export RiskFactor from './RiskFactor';
 export RiskEvaluation from './RiskEvaluation';
-export ProDoc from './ProDoc'
+export ProDoc from './ProDoc';
+export NurseryManagement from './NurseryManagement';
