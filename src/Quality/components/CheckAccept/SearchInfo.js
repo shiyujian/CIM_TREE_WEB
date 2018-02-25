@@ -54,9 +54,6 @@ class SearchInfo extends Component {
                                 <FormItem {...SearchInfo.layout} label='小班'>
                                     {
                                         getFieldDecorator('littleban', {
-                                            rules: [
-                                                { required: false, message: '请选择小班' }
-                                            ]
                                         })
                                             (<Select placeholder='请选择小班' onChange={this.onSelectChange.bind(this)}>
                                                 {this.state.littleBan}
@@ -68,9 +65,6 @@ class SearchInfo extends Component {
                                 <FormItem {...SearchInfo.layout} label='细班'>
                                     {
                                         getFieldDecorator('thinban', {
-                                            rules: [
-                                                { required: false, message: '请选择细班' }
-                                            ]
                                         })
                                         (<Select placeholder='请选择细班'>
                                             {this.state.thinBan}
@@ -82,9 +76,6 @@ class SearchInfo extends Component {
                                 <FormItem {...SearchInfo.layout} label='编号'>
                                     {
                                         getFieldDecorator('number', {
-                                            rules: [
-                                                { required: false, message: '请输入编号' }
-                                            ]
                                         })
                                             (<Input placeholder='请输入编号' />)
                                     }

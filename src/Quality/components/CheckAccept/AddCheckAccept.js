@@ -48,7 +48,7 @@ export default class AddCheckAccept extends Component {
         }
     }
     onSelectChange(value){
-        let data = this.props.state.rst;
+        let data = this.props.state.rst1;
         let temp = data.filter(item =>{
             return item.SmallClass === value;
         })
