@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
-import PerSearch from '../Task/PerSearch';
+import PerSearch from '../../../Schedule/components/stagereport/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -17,7 +17,7 @@ const FormItem = Form.Item;
 const Step = Steps.Step;
 
 
-class ScheduleStageRefill extends Component {
+class QulityCheckRefill extends Component {
 
     static propTypes = {};
     constructor(props) {
@@ -110,7 +110,7 @@ class ScheduleStageRefill extends Component {
 			.then(rst => {
 				let treetype = rst.map((o, index) => {
 					return (
-						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeName}</Option>
+						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeNo}</Option>
 					)
 				})
 				this.setState({ treetype });
@@ -163,7 +163,7 @@ class ScheduleStageRefill extends Component {
                                     <Col span={8}>
                                         <FormItem {...FormItemLayout} label='文档类型'>
                                             {
-                                                getFieldDecorator('stagedocument', {
+                                                getFieldDecorator('daydocument', {
                                                     rules: [
                                                         { required: true, message: '请选择文档类型' }
                                                     ]
@@ -185,7 +185,7 @@ class ScheduleStageRefill extends Component {
                                                         { required: true, message: '请输入日期' }
                                                     ]
                                                 })
-                                                    (<DatePicker placeholder='材料进场日期'/>)
+                                                    (<DatePicker placeholder='请输入日期'/>)
                                             }
                                         </FormItem>
                                     </Col>
@@ -229,7 +229,7 @@ class ScheduleStageRefill extends Component {
                                                         <span style={{ paddingLeft: 20 }}>当前执行人: </span>
                                                         <span style={{ color: '#108ee9' }}> {`${executor.person_name}` || `${executor.username}`}</span>
                                                     </div>}
-                                                description={userID === +user.id &&
+                                                description={
                                                     <div>
                                                         <Row>
                                                             <Col span={8} offset={4}>
@@ -316,34 +316,34 @@ class ScheduleStageRefill extends Component {
         me.props.form.validateFields((err, values) => {
             console.log('Received values of form: ', values);
             if (!err) {
-               // 共有信息
-                for(let value in values){
-                    if(value === 'unit'){
-                        postData.unit = values[value];
-                    }else if (value === 'superunit'){
-                        postData.superunit = values[value];
-                    }else if (value === 'dataReview'){
-                        postData.dataReview = values[value];
-                    }else if (value === 'numbercode'){
-                        postData.numbercode = values[value];
-                    }else if (value === 'timedate'){
-                        postData.timedate = values[value];
-                    }else if (value === 'stagedocument'){
-                        postData.stagedocument = values[value];
-                    }else{
-                    console.log(1111)
-                    }
-                }
-                postData.upload_unit = user.org?user.org:'';
-                postData.type = '每日实际进度';
-                postData.upload_person = user.name?user.name:user.username;
-                postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
+                // 共有信息
+                for (let value in values) {
+					if (value === 'unit') {
+						postData.unit = values[value];
+					} else if (value === 'superunit') {
+						postData.superunit = values[value];
+					} else if (value === 'dataReview') {
+						postData.dataReview = values[value];
+					} else if (value === 'numbercode') {
+						postData.numbercode = values[value];
+					} else if (value === 'timedate') {
+						postData.timedate = values[value];
+					} else if (value === 'daydocument') {
+						postData.daydocument = values[value];
+					} else {
+						console.log(1111)
+					}
+				}
+				postData.upload_unit = user.org ? user.org : '';
+				postData.type = '每日计划进度';
+				postData.upload_person = user.name ? user.name : user.username;
+				postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
                 let subject = [{
-                   //共有属性
-                   "postData":JSON.stringify(postData),
-                   //数据清单
-                   "treedataSource":JSON.stringify(treedataSource),
+                    //共有属性
+					"postData": JSON.stringify(postData),
+					//数据清单
+					"treedataSource": JSON.stringify(treedataSource),
                     
                 }];
                 let newSubject = {
@@ -475,7 +475,7 @@ class ScheduleStageRefill extends Component {
 	handleSelect(index, key, value) {
 		const { treedataSource } = this.state;
 		value = JSON.parse(value);
-		treedataSource[index][key] = value.TreeTypeName;
+		treedataSource[index][key] = value.TreeTypeNo;
 		this.setState({ treedataSource });
 	}
 	// 删除树列表
@@ -491,4 +491,4 @@ class ScheduleStageRefill extends Component {
     }
 
 }
-export default Form.create()(ScheduleStageRefill)
+export default Form.create()(QulityCheckRefill)

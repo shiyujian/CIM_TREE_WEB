@@ -58,7 +58,7 @@ class SearchInfo extends Component {
                                                 { required: false, message: '请选择小班' }
                                             ]
                                         })
-                                            (<Select placeholder='请选择小班' allowClear onChange={this.onSelectChange.bind(this)}>
+                                            (<Select placeholder='请选择小班' onChange={this.onSelectChange.bind(this)}>
                                                 {this.state.littleBan}
                                             </Select>)
                                     }
@@ -72,7 +72,7 @@ class SearchInfo extends Component {
                                                 { required: false, message: '请选择细班' }
                                             ]
                                         })
-                                        (<Select placeholder='请选择细班' allowClear>
+                                        (<Select placeholder='请选择细班'>
                                             {this.state.thinBan}
                                         </Select>)
                                     }
@@ -100,7 +100,7 @@ class SearchInfo extends Component {
                                                 { type: 'array', required: false, message: '请选择时期' }
                                             ]
                                         })
-                                            (<RangePicker size='default' format='YYYY-MM-DD'/>)
+                                            (<RangePicker size='default' format='YYYY-MM-DD' allowClear={false}/>)
                                     }
                                 </FormItem>
                             </Col>
@@ -112,13 +112,10 @@ class SearchInfo extends Component {
                                                 { required: false, message: '请选择流程状态' }
                                             ]
                                         })
-                                            (<Select placeholder='请选择流程类型' allowClear>
-                                                <Option value='0'>编辑中</Option>
-                                                <Option value='1'>已提交</Option>
-                                                <Option value='2'>执行中</Option>
-                                                <Option value='3'>已完成</Option>
-                                                <Option value='4'>已废止</Option>
-                                                <Option value='5'>异常</Option>
+                                            (<Select placeholder='请选择流程类型'>
+                                                <Option value={2}>执行中</Option>
+                                                <Option value={3}>已完成</Option>
+                                                <Option value={4}>已废止</Option>
                                             </Select>)
                                     }
                                 </FormItem>

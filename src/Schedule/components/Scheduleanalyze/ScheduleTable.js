@@ -40,7 +40,7 @@ export default class ScheduleTable extends Component {
             loading7: false,
             isShow: true,
             isOpen: [false,false,false],
-            nowmessage:{CreateTime:"",Factory:"",nowmessage:"",nowmessage:"",TreeTypeObj:{TreeTypeNo:""}},
+            nowmessage:{CreateTime:"",Factory:"",nowmessage:"",nowmessage:"",TreeTypeObj:{TreeTypeName:""}},
             nowmessagelist:[],
         }
     }
@@ -327,7 +327,7 @@ export default class ScheduleTable extends Component {
                     <div>
                     {this.state.nowmessagelist.map((item,index)=>
                             <div key={item.id}>
-                              <span>{item.CreateTime}{item.Factory}{item.Inputer}录入{item.TreeTypeObj.TreeTypeNo}</span>
+                              <span>{item.CreateTime}{item.Factory}{item.Inputer}录入{item.TreeTypeObj.TreeTypeName}</span>
                             </div>
                         )}
                     </div>

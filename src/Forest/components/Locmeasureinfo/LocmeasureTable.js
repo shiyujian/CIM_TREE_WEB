@@ -108,7 +108,7 @@ export default class LocmeasureTable extends Component {
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeNo',
+			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
 			title:"状态",
 			dataIndex: 'statusname',
@@ -384,7 +384,7 @@ export default class LocmeasureTable extends Component {
 
 	ontreetypechange(value) {
 		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.TreeTypeNo == value)
+		let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
 		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
     }
 

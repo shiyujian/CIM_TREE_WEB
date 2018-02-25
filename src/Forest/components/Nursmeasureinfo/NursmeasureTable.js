@@ -105,7 +105,7 @@ export default class NursmeasureTable extends Component {
 			dataIndex: 'BD',
 		},{
 			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeNo',
+			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
 			title:"产地",
 			dataIndex: 'TreePlace',
@@ -333,7 +333,7 @@ export default class NursmeasureTable extends Component {
 
 	ontreetypechange(value) {
     	const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.TreeTypeNo == value);
+		let treetype = treetypelist.find(rst => rst.TreeTypeName == value);
 		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
     }
 

@@ -47,7 +47,7 @@ export default class Enteranalyze extends Component {
             
             // this.setTreeTypeOption(rst);
             let treetypeoption = rst.map(item => {
-                return <Option key={item.ID} lable={item.TreeTypeNo} value={item.ID}>{item.TreeTypeNo}</Option>
+                return <Option key={item.ID} lable={item.TreeTypeName} value={item.ID}>{item.TreeTypeName}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
             

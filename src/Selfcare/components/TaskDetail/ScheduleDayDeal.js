@@ -106,8 +106,9 @@ export default class ScheduleDayDeal extends Component {
 
         //进度数据入库
         console.log('task',task)
-        let postdata = task.subject[0].postData ? JSON.parse(task.subject[0].postData) : '';
-        let treedataSource = task.subject[0].treedataSource ? JSON.parse(task.subject[0].treedataSource) : '';
+		let subject = task.subject[0];
+        let postdata = subject.postData ? JSON.parse(subject.postData) : '';
+        let treedataSource = subject.treedataSource ? JSON.parse(subject.treedataSource) : '';
         console.log('treedataSource',treedataSource)
         let items = [];
         treedataSource.map(item=>{
@@ -122,10 +123,10 @@ export default class ScheduleDayDeal extends Component {
             DocType:'doc',
             Items:items,
             ProgressNo:'01',
-            ProgressTime:postdata.timedate,
+            ProgressTime:subject.timedate,
             ProgressType:'日计划',
             SMS:0,
-            UnitProject:postdata.unit,
+            UnitProject:subject.unit,
             WPNo:''
         }
         // 日进度入库

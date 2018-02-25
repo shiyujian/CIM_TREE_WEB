@@ -71,7 +71,7 @@ class Plan extends Component {
 			.then(rst => {
 				let treetype = rst.map((o, index) => {
 					return (
-						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeNo}</Option>
+						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeName}</Option>
 					)
 				})
 				this.setState({ treetype });
@@ -235,7 +235,7 @@ class Plan extends Component {
 	handleSelect(index, key, value) {
 		const { treedataSource } = this.state;
 		value = JSON.parse(value);
-		treedataSource[index][key] = value.TreeTypeNo;
+		treedataSource[index][key] = value.TreeTypeName;
 		this.setState({ treedataSource });
 	}
 

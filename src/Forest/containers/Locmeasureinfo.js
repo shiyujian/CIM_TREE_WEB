@@ -262,7 +262,7 @@ export default class Locmeasureinfo extends Component {
     setTreeTypeOption(rst) {
         if(rst instanceof Array){
             let treetypeoption = rst.map(item => {
-                return <Option key={item.TreeTypeNo} value={item.TreeTypeNo}>{item.TreeTypeNo}</Option>
+                return <Option key={item.TreeTypeNo} value={item.TreeTypeName}>{item.TreeTypeName}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({treetypeoption,treetypelist:rst})
