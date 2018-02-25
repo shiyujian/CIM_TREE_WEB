@@ -7,16 +7,24 @@ export const ID = 'nurserymanagement';
 export const getNurseryListOK = createAction(`${ID}_getnurseryListlist`);
 export const getNurseryList =createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getNurseryListOK]);
 export const postNursery =createFetchAction(`${FOREST_API}/tree/nurseryconfig`, [],'POST');
+export const putNursery =createFetchAction(`${FOREST_API}/tree/nurseryconfig`, [],'PUT');
+export const changeEditVisible = createAction(`${ID}_changeEditVisible`);
 
 export const actions = {
     getNurseryListOK,
 	getNurseryList,
-	postNursery
+	postNursery,
+	putNursery,
+	changeEditVisible
 };
 
 export default handleActions({
 	[getNurseryListOK]: (state, {payload}) => ({
 		...state,
 		nurseryList: payload
+	}),
+	[changeEditVisible]: (state, {payload}) => ({
+		...state,
+		editVisible: payload
 	})
 }, {});

@@ -10,7 +10,8 @@ class Addition extends Component {
     constructor(props){
         super(props);
         this.state={
-            addVisible:false
+			addVisible:false,
+			newKey: Math.random()
         }
 	}
 	
@@ -39,7 +40,8 @@ class Addition extends Component {
 				<Button type='primary' onClick={this.add.bind(this)}>新增苗圃</Button>
 				<Modal title="新增苗圃"
 				       width={920} visible={addVisible}
-				       onOk={this.save.bind(this)}
+					   onOk={this.save.bind(this)}
+					//    key={this.state.newKey}
 				       onCancel={this.cancel.bind(this)}>
 					<Form>
 						<Row>
@@ -130,11 +132,23 @@ class Addition extends Component {
 
 	add(){
 		this.setState({
+			// newKey: Math.random(),
 			addVisible:true
 		})
 	}
 
 	cancel() {
+		const{
+			form:{setFieldsValue}
+		} = this.props
+		setFieldsValue({
+			'SFactory': undefined,
+			'SNurseryName': undefined,
+			'SRegionCode': undefined,
+			'SRegionName': undefined,
+			'STreePlace': undefined,
+		});
+
 		this.setState({
 			addVisible:false
 		})
@@ -145,7 +159,8 @@ class Addition extends Component {
 			actions:{
 				postNursery,
 				getNurseryList			
-			}
+			},
+			form:{setFieldsValue}
 		}= this.props
         let me = this;
         me.props.form.validateFields((err, values) => {
@@ -166,6 +181,13 @@ class Addition extends Component {
                             duration: 2
 						}) 
 						getNurseryList()
+						setFieldsValue({
+							'SFactory': undefined,
+							'SNurseryName': undefined,
+							'SRegionCode': undefined,
+							'SRegionName': undefined,
+							'STreePlace': undefined,
+						});
 						me.setState({
 							addVisible:false
 						})

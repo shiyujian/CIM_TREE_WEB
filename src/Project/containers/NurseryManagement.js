@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {actions as platformActions} from '_platform/store/global';
 import reducer, {actions} from '../store/nurseryManagement';
-import {Table,Addition,Edite} from '../components/NurseryManagement';
+import {Table} from '../components/NurseryManagement';
 @connect(
 	state => {
 		const {project:{nurseryManagement = {}}, platform} = state || {};

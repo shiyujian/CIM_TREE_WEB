@@ -1,92 +1,209 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
-	Form, Input, Modal, message,
+	Form, Input,Button, Row, Col, Modal, Upload, Icon, message, Table,notification
 } from 'antd';
 const FormItem = Form.Item;
-export const Defect = window.DeathCode.SYSTEM_DEFCT;
-export default class dangerAddition extends Component {
-	static propTypes={
-		addVisible: PropTypes.bool
-	};
+
+class Edite extends Component {
+	static propTypes = {};
+    constructor(props){
+        super(props);
+        this.state={
+			newKey: Math.random()
+        }
+	}
+	
+	static layoutT = {
+        labelCol: {span: 8},
+        wrapperCol: {span: 16},
+    };
+    static layout = {
+		labelCol: {span: 4},
+		wrapperCol: {span: 20},
+    };
 
 	render() {
-		const{
-			editevisible = false,
-			filter=[],
-			editefile ={},
+		const { 
+			form: { 
+				getFieldDecorator 
+            },
+            record={},
+            editVisible 
 		} = this.props;
-
+        console.log('record',record)
+        console.log('editVisible',editVisible)
 		return (
 			<div>
-				<Modal title="新增"
-				       width={920} visible={editevisible}
-				       onOk={this.save.bind(this)}
+				<Modal title="修改苗圃信息"
+					   width={920} 
+					   visible={editVisible}
+					   onOk={this.save.bind(this)}
+					//    key={this.state.newKey}
 				       onCancel={this.cancel.bind(this)}>
 					<Form>
-						<FormItem label="安全隐患名称">
-							<Input onChange={this.name.bind(this, filter)}
-							       value={editefile.name}/>
-						</FormItem>
-						<FormItem label="安全隐患code">
-							<Input value={editefile.code} disabled={true}/>
-						</FormItem>
+						<Row>
+							<Col span={24}>
+								<Row>
+									<Col span={12}>
+										<FormItem   {...Edite.layoutT} label="供应商:">
+											{
+												getFieldDecorator('EFactory', {
+                                                    initialValue: `${record.Factory?record.Factory:''}`,
+													rules: [
+														{ required: true, message: '请输入供应商' }
+													]
+												})
+												(
+													<Input placeholder='请输入供应商'/>
+												)
+											}
+                                        
+                                        </FormItem>
+									</Col>
+									<Col span={12}>
+										<FormItem   {...Edite.layoutT} label="苗圃名称:">
+											{
+												getFieldDecorator('ENurseryName', {
+                                                    initialValue: `${record.NurseryName?record.NurseryName:''}`,
+													rules: [
+														{ required: true, message: '请输入苗圃名称' }
+													]
+												})
+												(
+													<Input placeholder='请输入苗圃名称'/>
+												)
+											}
+                                        
+                                        </FormItem>
+									</Col>
+									<Col span={12}>
+										<FormItem   {...Edite.layoutT} label="行政区划:">
+											{
+												getFieldDecorator('ERegionName', {
+                                                    initialValue: `${record.RegionName?record.RegionName:''}`,
+													rules: [
+														{ required: true, message: '请输入行政区划' }
+													]
+												})
+												(
+													<Input placeholder='请输入行政区划'/>
+												)
+											}
+                                        
+                                        </FormItem>
+									</Col>
+									<Col span={12}>
+										<FormItem   {...Edite.layoutT} label="行政区划编码:">
+											{
+												getFieldDecorator('ERegionCode', {
+                                                    initialValue: `${record.RegionCode?record.RegionCode:''}`,
+													rules: [
+														{ required: true, message: '请输入行政区划编码' }
+													]
+												})
+												(
+													<Input placeholder='请输入行政区划编码'/>
+												)
+											}
+                                        
+                                        </FormItem>
+									</Col>
+									<Col span={12}>
+										<FormItem   {...Edite.layoutT} label="产地:">
+											{
+												getFieldDecorator('ETreePlace', {
+                                                    initialValue: `${record.TreePlace?record.TreePlace:''}`,
+													rules: [
+														{ required: true, message: '请输入产地' }
+													]
+												})
+												(
+													<Input placeholder='请输入产地'/>
+												)
+											}
+                                        </FormItem>
+									</Col>
+								</Row>
+							</Col>
+						</Row>
 					</Form>
 				</Modal>
 			</div>
-
 		);
 	}
 
-	name(filter,event){
-		let name = event.target.value;
-		const{actions:{changeeditedoc},editefile={}} = this.props;
-		let files={
-			code:editefile.code,
-			name:name,
-			on:editefile.on,
-		};
-		changeeditedoc({...files});
-	}
-
 	cancel() {
-		const {
-			actions: {leveledite,changeeditedoc},
-		} = this.props;
-		leveledite(false);
-		changeeditedoc();
+        const{
+            actions:{changeEditVisible}
+        }=this.props
+		changeEditVisible(false)
 	}
 
-	save() {
-		const {actions:{putdocument,leveledite,getdefectslist},defectslist=[],editefile={}} = this.props;
-		let onn = parseInt(editefile.on-1);
-		let k = {
-			code:editefile.code,
-			name:editefile.name,
-			on:editefile.on
-		};
-		let list = [];
-		defectslist.metalist.splice(onn,1,k);
-		defectslist.metalist.forEach(rst =>{
-			delete rst.on;
-			list.push(rst)
-		});
-		console.log(list);
-		putdocument({code:Defect},{
-			metalist:list
-		}).then(rst =>{
-			message.success('编辑文件成功！');
-			leveledite(false);
-			getdefectslist({code:Defect}).then(rst =>{
-				let newdefectslists = rst.metalist;
-				rst.metalist.map((wx,index) => {
-					newdefectslists[index].on = index+1;
-				});
-				const {actions:{setnewdefectslist}} = this.props;
-				setnewdefectslist(newdefectslists);
-			})
-		});
+	save(){
+		const{
+			actions:{
+				putNursery,
+                getNurseryList,
+                changeEditVisible			
+			},
+            form:{setFieldsValue},
+            record
+		}= this.props
+		
+		let me = this;
+        me.props.form.validateFields((err, values) => {
+			console.log('Received err of form: ', err);
+			console.log('Received values of form: ', values);
+			console.log('Received record of form: ', record);
+            if (!err) {
+				if((values.EFactory === record.Factory) && (values.ENurseryName === record.NurseryName) && (values.ERegionCode === record.RegionCode)
+					&& (values.ERegionName === record.RegionName) && (values.ETreePlace === record.TreePlace)
+				){
+					notification.info({
+						message:'请进行修改后再进行提交',
+						duration:3
+					})
+				}else{
+                    let postdata = {
+                        'Factory': values.EFactory,
+                        'NurseryName': values.ENurseryName,
+                        'RegionCode': values.ERegionCode,
+                        'RegionName': values.ERegionName,
+                        'TreePlace': values.ETreePlace,
+                        'ID' : record.ID
+                    }
+                    putNursery({},postdata).then((rst)=>{
+                        if(rst && rst.code){
+                            if(rst.msg && rst.msg === '苗圃已存在'){
+                                notification.error({
+                                    message:'名称已存在',
+                                    duration:3
+                                })
+                            }else{
+                                notification.success({
+                                    message: '更新苗圃信息成功',
+                                    duration: 2
+                                }) 
+                                getNurseryList();
+                                changeEditVisible(false)
+                            }
+                        }else{
+                            notification.error({
+                                message:'苗圃信息更改失败',
+                                duration:3
+                            })
+                        }
+                    })
 
+
+					changeEditVisible(false)
+				}
+
+			}
+		})
+		
 	}
-
 }
+
+export default Form.create()(Edite)
