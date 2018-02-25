@@ -175,22 +175,30 @@ class Addition extends Component {
 				}
 				postNursery({},postdata).then((rst)=>{
 					console.log('rst',rst)
-					if(rst && rst.msg){
-						notification.success({
-                            message: '新增苗圃成功',
-                            duration: 2
-						}) 
-						getNurseryList()
-						setFieldsValue({
-							'SFactory': undefined,
-							'SNurseryName': undefined,
-							'SRegionCode': undefined,
-							'SRegionName': undefined,
-							'STreePlace': undefined,
-						});
-						me.setState({
-							addVisible:false
-						})
+					if(rst && rst.code){
+						if(rst.msg && rst.msg === '苗圃已存在'){
+							notification.error({
+								message:'名称已存在',
+								duration:3
+							})
+						}else{
+							notification.success({
+								message: '新增苗圃成功',
+								duration: 2
+							}) 
+							getNurseryList()
+							setFieldsValue({
+								'SFactory': undefined,
+								'SNurseryName': undefined,
+								'SRegionCode': undefined,
+								'SRegionName': undefined,
+								'STreePlace': undefined,
+							});
+							me.setState({
+								addVisible:false
+							})
+						}
+						
 					}else{
 						notification.error({
                             message: '新增苗圃失败',
