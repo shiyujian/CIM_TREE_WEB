@@ -1,5 +1,5 @@
 export Filter from './Filter'
 export Table from './Table'
 export Addition from './Addition'
-export UpdateModal from './UpdateModal'
+export Updatemodal from './Updatemodal'
 export DatumTree from './DatumTree'
