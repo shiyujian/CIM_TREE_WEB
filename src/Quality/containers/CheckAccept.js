@@ -121,7 +121,7 @@ class CheckAccept extends Component {
             canopenmodel: false,
             user: {},
             dataSource: [],
-            area: [], project: [], unitProject: [], fenbu: [], fenxiang: [], selectedKeys: []
+            area: [], project: [], unitProject: [], fenbu: [], fenxiang: [], selectedKeys: [],rst:[],rst1:[]
         };
     }
     view(record) {
@@ -409,7 +409,8 @@ class CheckAccept extends Component {
                                     let { user } = this.state;
                                     let postData = {
                                         code: WORKFLOW_CODE["检验批验收审批流程"],
-                                        creator: user.username
+                                        creator: user.username,
+                                        status:2
                                     }
                                     getTasksList(postData).then(rst => {
                                         if (rst instanceof Array && rst.length > 0) {
@@ -456,9 +457,9 @@ class CheckAccept extends Component {
 
     }
     doQuery() {
-        debugger
         const { actions: { getTasksList } } = this.props;
-        const {user} = this.state;
+        const {user,fenxiang} = this.state;
+        debugger
         let dataSource = [];
         let me = this;
         this.props.form.validateFields((err, values) => {
@@ -480,7 +481,8 @@ class CheckAccept extends Component {
                     thinban:thinban,
                     number:number,
                     code: WORKFLOW_CODE["检验批验收审批流程"],
-                    creator: user.username
+                    creator: user.username,
+                    fenxiang:fenxiang[0].Name
                 }
                 getTasksList(postData).then(rst => {
                     if (rst instanceof Array && rst.length > 0) {
@@ -552,6 +554,7 @@ class CheckAccept extends Component {
                         width={800}
                         height={600}
                         title="新增文档"
+                        key = {Math.random()}
                         visible={this.state.addVisiable}
                         onOk={() => this.onAddCheck()}
                         onCancel={() => { this.setState({ addVisiable: false }) }}
@@ -597,7 +600,6 @@ class CheckAccept extends Component {
 
     //树选择
     onSelect(value = []) {
-        debugger
         const { actions: { getLittleBan } } = this.props;
         let keycode = value[0] || '';
         this.setState({ leftkeycode: keycode });
@@ -612,7 +614,7 @@ class CheckAccept extends Component {
                             littleBan.push(rst[i].SmallClass);
                         }
                     }
-                    this.setState({ littleBan, rst });
+                    this.setState({ littleBan, rst1:rst });
                 }
             })
             this.props.form.setFieldsValue({

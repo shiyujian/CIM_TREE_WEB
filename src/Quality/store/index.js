@@ -31,7 +31,7 @@ export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeO
 export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
 export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
 export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //    √
-export const getTasksList = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}&&creator={{creator}}&&subject_littleban__contains={{littleban}}&&subject_thinban__contains={{thinban}}&&subject_number__contains={{number}}&&status={{status}}&&real_start_time_begin={{real_start_time_begin}}&&real_start_time_end={{real_start_time_end}}`, [], 'GET');
+export const getTasksList = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}&&creator={{creator}}&&subject_littleban__contains={{littleban}}&&subject_thinban__contains={{thinban}}&&subject_number__contains={{number}}&&status={{status}}&&real_start_time_begin={{real_start_time_begin}}&&real_start_time_end={{real_start_time_end}}&&subject_fenxiang__contains={{fenxiang}}`, [], 'GET');
 export const deleteTasksList = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`, [], 'DELETE');
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/tree/factoryAnalyse`, []);
