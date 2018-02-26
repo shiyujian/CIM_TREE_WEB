@@ -361,7 +361,7 @@ export default class HiddenDanger extends Component {
                                 columns={columns}
                                 dataSource = {this.state.dataSet}
                                 bordered
-                                style={{ marginTop: 20 }}
+                                style={{ marginTop: 20 }} 
                             />
                         </Col>
                     </Row>

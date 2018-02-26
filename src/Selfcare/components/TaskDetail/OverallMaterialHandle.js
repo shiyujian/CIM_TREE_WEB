@@ -86,7 +86,7 @@ export default class OverallMaterialHandle extends Component {
 			location,
 			actions: {
 					putFlow,
-					addDaySchedule
+					addSchedule
 				},
         } = this.props
         let {
@@ -108,7 +108,8 @@ export default class OverallMaterialHandle extends Component {
 			"username": user.username,
 			"person_code": user.code,
 			"person_name": user.name,
-			"id": parseInt(user.id)
+            "id": parseInt(user.id),
+            "org": user.org,
 		};
 		let nextUser = {};
 		
@@ -190,7 +191,8 @@ export default class OverallMaterialHandle extends Component {
 			"username": user.username,
 			"person_code": user.code,
 			"person_name": user.name,
-			"id": parseInt(user.id)
+            "id": parseInt(user.id),
+            "org": user.org,
 		};
 
 		//获取流程的action名称
@@ -238,9 +240,4 @@ export default class OverallMaterialHandle extends Component {
 			}
 		})
 	}
-
-
-
-
-	
 }

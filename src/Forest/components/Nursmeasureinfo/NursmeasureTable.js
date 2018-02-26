@@ -22,7 +22,7 @@ export default class NursmeasureTable extends Component {
 			etime: moment().format('2017-11-23 23:59:59'),
 			sxm: '',
     		section: '',
-    		treety: '',
+    		bigType: '',
     		treetype: '',
     		treetypename: '',
     		treeplace: '',
@@ -67,7 +67,6 @@ export default class NursmeasureTable extends Component {
 		);
 	}
 	treeTable(details) {
-		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -75,6 +74,7 @@ export default class NursmeasureTable extends Component {
 			leftkeycode,
 			keycode,
 			statusoption,
+			users
 		} = this.props;
 		const {
 			sxm, 
@@ -83,11 +83,10 @@ export default class NursmeasureTable extends Component {
 			treeplace, 
 			nurseryname,
 			section,
-			treety,
+			bigType,
 			treetypename,
 			status,
 		} = this.state;
-		console.log('state', this.state)
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		const suffix3 = factory ? <Icon type="close-circle" onClick={this.emitEmpty3} /> : null;
@@ -106,7 +105,7 @@ export default class NursmeasureTable extends Component {
 			dataIndex: 'BD',
 		},{
 			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeNo',
+			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
 			title:"产地",
 			dataIndex: 'TreePlace',
@@ -119,6 +118,9 @@ export default class NursmeasureTable extends Component {
 		},{
 			title:"填报人",
 			dataIndex: 'Inputer',
+			render: (text,record) => {
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
+			}
 		},{
 			title:"起苗时间",
 			render: (text,record) => {
@@ -199,7 +201,7 @@ export default class NursmeasureTable extends Component {
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>类型：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={treety} onChange={this.ontypechange.bind(this)}>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
 								{typeoption}
 							</Select>
 						</Col>
@@ -318,22 +320,21 @@ export default class NursmeasureTable extends Component {
 
 	onsectionchange(value) {
 		const {sectionselect} = this.props;
-		const {treety} = this.state;
-		sectionselect(value || '',treety)
-		this.setState({section:value || '', treetype:'', treetypename: ''})
+		sectionselect(value || '')
+		this.setState({section:value || '', bigType:'', treetype: '', treetypename: ''})
 	}
 
 	ontypechange(value) {
-		const {typeselect,keycode = ''} = this.props;
+		const {typeselect} = this.props;
 		const {section} = this.state;
-		typeselect(value || '',keycode,section)
-		this.setState({treety:value || '', treetype:'', treetypename:''})
+		typeselect(value || '')
+		this.setState({bigType:value || '', treetype: '', treetypename:''})
 	}
 
 	ontreetypechange(value) {
     	const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.name == value)
-		this.setState({treetype:treetype?treetype.oid:'',treetypename:value || ''})
+		let treetype = treetypelist.find(rst => rst.TreeTypeName == value);
+		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
     }
 
     onstatuschange(value) {    	
@@ -422,7 +423,7 @@ export default class NursmeasureTable extends Component {
     	const {
     		sxm = '',
     		section = '',
-    		treety = '',
+    		bigType = '',
     		treetype = '',
     		factory = '',
     		treeplace = '',
@@ -441,7 +442,7 @@ export default class NursmeasureTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		treety,
+    		bigType,
     		treetype,
     		factory,
     		treeplace,
@@ -475,7 +476,7 @@ export default class NursmeasureTable extends Component {
 	    			else if(postdata.status === '3')
 	    				statusname = '业主退回'
 	    			else
-	    				statusname = '未种植'
+	    				statusname = ''
 	    			tblData[i].statusname = statusname;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			tblData[i].liftertime1 = !!plan.LifterTime ? moment(plan.LifterTime).utc().format('YYYY-MM-DD') : '/';
@@ -493,7 +494,7 @@ export default class NursmeasureTable extends Component {
 		const {
     		sxm = '',
     		section = '',
-    		treety = '',
+    		bigType = '',
     		treetype = '',
     		factory = '',
     		treeplace = '',
@@ -510,7 +511,7 @@ export default class NursmeasureTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		treety,
+    		bigType,
     		treetype,
     		factory,
     		treeplace,

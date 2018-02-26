@@ -8,9 +8,8 @@ import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 import PerSearch from './PerSearch';
 import { getUser } from '../../../_platform/auth';
-import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE, WORKFLOW_CODE,UNITS } from '../../../_platform/api';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
@@ -24,6 +23,7 @@ const EditableCell = ({ editable, value, onChange }) => (
           </div>
         );
 
+//机械设备
 class GeneralAddition extends Component {
 
     static propTypes = {};
@@ -113,34 +113,36 @@ class GeneralAddition extends Component {
 
         }
     ];
-    columns1 = [{
+    columns1 = [
+        {
         title: '序号',
         dataIndex: 'index',
         key: 'index',
         width: '20%',
-    }, {
-        title: '文件名称',
-        dataIndex: 'fileName',
-        key: 'fileName',
-        width: '45%',
-    }, {
-        title: '操作',
-        dataIndex: 'operation',
-        key: 'operation',
-        width: '20%',
-        render: (text, record, index) => {
-            return <div>
-                <Popconfirm
-                    placement="rightTop"
-                    title="确定删除吗？"
-                    onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
-                    okText="确认"
-                    cancelText="取消">
-                    <a>删除</a>
-                </Popconfirm>
-            </div>
+        }, {
+            title: '文件名称',
+            dataIndex: 'fileName',
+            key: 'fileName',
+            width: '45%',
+        }, {
+            title: '操作',
+            dataIndex: 'operation',
+            key: 'operation',
+            width: '20%',
+            render: (text, record, index) => {
+                return <div>
+                    <Popconfirm
+                        placement="rightTop"
+                        title="确定删除吗？"
+                        onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a>删除</a>
+                    </Popconfirm>
+                </div>
+            }
         }
-    }]
+    ]
     static layoutT = {
         labelCol: {span: 8},
         wrapperCol: {span: 16},
@@ -178,12 +180,8 @@ class GeneralAddition extends Component {
                                             ]
                                         })
                                         (
-                                            <Select 
-                                            >
-                                                <Option value='第一阶段'>第一阶段</Option>
-                                                <Option value='第二阶段'>第二阶段</Option>
-                                                <Option value='第三阶段'>第三阶段</Option>
-                                                <Option value='第四阶段'>第四阶段</Option>
+                                            <Select placeholder='请选择单位工程' allowClear>
+                                                {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
                                             </Select>
                                         )
                                     }
@@ -199,16 +197,7 @@ class GeneralAddition extends Component {
                                             ]
                                         })
                                         (
-                                            <Input   onChange={(event)=>{
-                                                event=(event)?event:window.event;
-                                                const {
-                                                    docs = [],
-                                                    actions: {changeDocs}
-                                                } = this.props;
-                                                this.state.engineerNumber = event.target.value;
-                                                changeDocs(docs);
-                                            }}
-                                            />
+                                            <Input placeholder='请输入编号' />
                                         )
                                     }
                                         
@@ -225,11 +214,7 @@ class GeneralAddition extends Component {
                                             ]
                                         })
                                         (
-                                            <Select 
-                                        >
-                                            <Option value='第一公司'>第一公司</Option>
-                                            <Option value='第二公司'>第二公司</Option>
-                                        </Select>
+                                            <Input placeholder='系统自动识别，无需手输' readOnly/>
                                         )
                                     }
                                         
@@ -244,7 +229,7 @@ class GeneralAddition extends Component {
                                     dataSource={this.state.dataSource}
                                     columns={this.equipment}
                                     pagination={false}
-                                    bordered rowKey="code" />
+                                    bordered />
                         </Col>
                     </Row>
                     <Row gutter={24}>
@@ -394,7 +379,8 @@ class GeneralAddition extends Component {
                     "username": user.username,
                     "person_code": user.code,
                     "person_name": user.name,
-                    "id": parseInt(user.id)
+                    "id": parseInt(user.id),
+                    "org": user.org,
                 };
                 let subject = [{
                     "dataSource":JSON.stringify(dataSource),
@@ -402,6 +388,7 @@ class GeneralAddition extends Component {
                     "unit":JSON.stringify(values.unit),
                     "code":JSON.stringify(values.code),
                     "reviewUnit":JSON.stringify(values.reviewUnit),
+                    "submitOrg":JSON.stringify(user.org)
                 }];
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {
@@ -487,23 +474,26 @@ class GeneralAddition extends Component {
                 setFieldsValue
             }
         } = this.props
-        this.member = null;
-        if (memberInfo) {
-            let memberValue = memberInfo.toString().split('#');
-            if (memberValue[0] === 'C_PER') {
-                this.member = {
-                    "username": memberValue[4],
-                    "person_code": memberValue[1],
-                    "person_name": memberValue[2],
-                    "id": parseInt(memberValue[3]),
-                }
-            }
-        } else {
-            this.member = null
-        }
+		this.member = null;
+		if (memberInfo) {
+			let memberValue = memberInfo.toString().split('#');
+			if (memberValue[0] === 'C_PER') {
+				console.log('memberValue', memberValue)
+				this.member = {
+					"username": memberValue[4],
+					"person_code": memberValue[1],
+					"person_name": memberValue[2],
+					"id": parseInt(memberValue[3]),
+					org: memberValue[5],
+				}
+			}
+		} else {
+			this.member = null
+		}
 
         setFieldsValue({
-            dataReview: this.member
+            dataReview: this.member,
+			reviewUnit: this.member.org?this.member.org:null,
         });
     }
 

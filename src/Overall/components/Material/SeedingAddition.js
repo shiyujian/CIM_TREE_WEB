@@ -8,9 +8,8 @@ import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 import PerSearch from './PerSearch';
 import { getUser } from '../../../_platform/auth';
-import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE, UNITS, WORKFLOW_CODE } from '../../../_platform/api';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
@@ -122,34 +121,36 @@ class SeedingAddition extends Component {
     //         }
     //     }
     // ];
-    columns1 = [{
+    columns1 = [
+        {
         title: '序号',
         dataIndex: 'index',
         key: 'index',
         width: '20%',
-    }, {
-        title: '文件名称',
-        dataIndex: 'fileName',
-        key: 'fileName',
-        width: '45%',
-    }, {
-        title: '操作',
-        dataIndex: 'operation',
-        key: 'operation',
-        width: '20%',
-        render: (text, record, index) => {
-            return <div>
-                <Popconfirm
-                    placement="rightTop"
-                    title="确定删除吗？"
-                    onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
-                    okText="确认"
-                    cancelText="取消">
-                    <a>删除</a>
-                </Popconfirm>
-            </div>
+        }, {
+            title: '文件名称',
+            dataIndex: 'fileName',
+            key: 'fileName',
+            width: '45%',
+        }, {
+            title: '操作',
+            dataIndex: 'operation',
+            key: 'operation',
+            width: '20%',
+            render: (text, record, index) => {
+                return <div>
+                    <Popconfirm
+                        placement="rightTop"
+                        title="确定删除吗？"
+                        onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a>删除</a>
+                    </Popconfirm>
+                </div>
+            }
         }
-    }]
+    ]
     static layoutT = {
         labelCol: {span: 8},
         wrapperCol: {span: 16},
@@ -184,12 +185,8 @@ class SeedingAddition extends Component {
                                             ]
                                         })
                                         (
-                                            <Select 
-                                            >
-                                                <Option value='第一阶段'>第一阶段</Option>
-                                                <Option value='第二阶段'>第二阶段</Option>
-                                                <Option value='第三阶段'>第三阶段</Option>
-                                                <Option value='第四阶段'>第四阶段</Option>
+                                            <Select placeholder='请选择单位工程' allowClear>
+                                                {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
                                             </Select>
                                         )
                                     }
@@ -204,17 +201,7 @@ class SeedingAddition extends Component {
                                             ]
                                         })
                                         (
-                                            <Input  placeholder='材料名称' 
-                                                onChange={(event)=>{
-                                                    event=(event)?event:window.event;
-                                                    const {
-                                                        docs = [],
-                                                        actions: {changeDocs}
-                                                    } = this.props;
-                                                    this.state.resourceName = event.target.value;
-                                                    changeDocs(docs);
-                                                }}
-                                            />
+                                            <Input  placeholder='请输入材料名称' />
                                         )
                                     }
                                         
@@ -229,17 +216,7 @@ class SeedingAddition extends Component {
                                             ]
                                         })
                                         (
-                                            <Input  placeholder='系统自动编号'
-                                                onChange={(event)=>{
-                                                    event=(event)?event:window.event;
-                                                    const {
-                                                        docs = [],
-                                                        actions: {changeDocs}
-                                                    } = this.props;
-                                                    this.state.engineerNumber = event.target.value;
-                                                    changeDocs(docs);
-                                                }}
-                                            />
+                                            <Input  placeholder='请输入编号'/>
                                         )
                                     }
                                     </FormItem>
@@ -255,11 +232,7 @@ class SeedingAddition extends Component {
                                             ]
                                         })
                                         (
-                                            <Select 
-                                            >
-                                                <Option value='第一公司'>第一公司</Option>
-                                                <Option value='第二公司'>第二公司</Option>
-                                            </Select>
+                                            <Input placeholder='系统自动识别，无需手输' readOnly/>
                                         )
                                     }
                                         
@@ -274,16 +247,7 @@ class SeedingAddition extends Component {
                                             ]
                                         })
                                         (
-                                            <DatePicker placeholder='材料进场日期'
-                                                onChange={(data,dataString)=>{
-                                                    const {
-                                                        docs = [],
-                                                        actions: {changeDocs}
-                                                    } = this.props;
-                                                    this.state.engineerTime = dataString;
-                                                    changeDocs(docs);
-                                                    }}
-                                            />
+                                            <DatePicker placeholder='材料进场日期' format={'YYYY-MM-DD'}/>
                                         )
                                     }
                                         
@@ -298,17 +262,7 @@ class SeedingAddition extends Component {
                                             ]
                                         })
                                         (
-                                            <Input  placeholder='材料具体应用部位'
-                                                onChange={(event)=>{
-                                                    event=(event)?event:window.event;
-                                                    const {
-                                                        docs = [],
-                                                        actions: {changeDocs}
-                                                    } = this.props;
-                                                    this.state.engineerBody = event.target.value;
-                                                    changeDocs(docs);
-                                                }}
-                                            />
+                                            <Input  placeholder='请输入材料具体应用部位'/>
                                         )
                                     }
                                         
@@ -323,7 +277,7 @@ class SeedingAddition extends Component {
                                     dataSource={this.state.dataSource}
                                     columns={this.equipment}
                                     pagination={false}
-                                    bordered rowKey="code" />
+                                    bordered  />
                         </Col>
                     </Row>
                     <Row gutter={24}>
@@ -469,7 +423,8 @@ class SeedingAddition extends Component {
                     "username": user.username,
                     "person_code": user.code,
                     "person_name": user.name,
-                    "id": parseInt(user.id)
+                    "id": parseInt(user.id),
+                    "org": user.org,
                 };
                 let subject = [{
                     "dataSource":JSON.stringify(dataSource),
@@ -478,8 +433,9 @@ class SeedingAddition extends Component {
                     "name":JSON.stringify(values.name),
                     "code":JSON.stringify(values.code),
                     "reviewUnit":JSON.stringify(values.reviewUnit),
-                    "date":JSON.stringify(values.date),
-                    "site":JSON.stringify(values.site)
+                    "date":JSON.stringify(moment(values.date).format('YYYY-MM-DD')),
+                    "site":JSON.stringify(values.site),
+                    "submitOrg":JSON.stringify(user.org)
                 }];
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {
@@ -565,23 +521,26 @@ class SeedingAddition extends Component {
                 setFieldsValue
             }
         } = this.props
-        this.member = null;
-        if (memberInfo) {
-            let memberValue = memberInfo.toString().split('#');
-            if (memberValue[0] === 'C_PER') {
-                this.member = {
-                    "username": memberValue[4],
-                    "person_code": memberValue[1],
-                    "person_name": memberValue[2],
-                    "id": parseInt(memberValue[3]),
-                }
-            }
-        } else {
-            this.member = null
-        }
+		this.member = null;
+		if (memberInfo) {
+			let memberValue = memberInfo.toString().split('#');
+			if (memberValue[0] === 'C_PER') {
+				console.log('memberValue', memberValue)
+				this.member = {
+					"username": memberValue[4],
+					"person_code": memberValue[1],
+					"person_name": memberValue[2],
+					"id": parseInt(memberValue[3]),
+					org: memberValue[5],
+				}
+			}
+		} else {
+			this.member = null
+		}
 
         setFieldsValue({
-            dataReview: this.member
+            dataReview: this.member,
+			reviewUnit: this.member.org?this.member.org:null,
         });
     }
 

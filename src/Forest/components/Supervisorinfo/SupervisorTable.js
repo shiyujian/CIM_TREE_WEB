@@ -70,6 +70,7 @@ export default class SupervisorTable extends Component {
 			leftkeycode,
 			keycode,
 			statusoption,
+			users,
 		} = this.props;
 		const {
 			sxm, 
@@ -97,12 +98,12 @@ export default class SupervisorTable extends Component {
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeNo',
+			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
 			title:"监理人",
+			dataIndex: 'Supervisor',
 			render: (text,record) => {
-				const {attrs = {}}= record;
-				return <span>{attrs.supervisor || '/'}</span>
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title:"状态",
@@ -329,7 +330,8 @@ export default class SupervisorTable extends Component {
     		console.log('rst',rst)
     		this.setState({loading:false,percent:100})
     		if(!rst)
-    			return
+				return
+			console.log('asddddddddddddddddddddddddddddddddddddd',rst)
     		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {

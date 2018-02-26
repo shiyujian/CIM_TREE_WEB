@@ -27,7 +27,7 @@ export default class NursOverallTable extends Component {
 			etime: moment().format('2017-11-23 23:59:59'),
 			sxm: '',
     		section: '',
-    		treety: '',
+    		bigType: '',
     		treetype: '',
     		gd_min: '',
     		gd_max: '',
@@ -82,7 +82,6 @@ export default class NursOverallTable extends Component {
 		);
 	}
 	treeTable(details) {
-		console.log('details',details)
 		const {
 			treetypeoption,
 			sectionoption,
@@ -94,6 +93,7 @@ export default class NursOverallTable extends Component {
 			keycode,
 			statusoption,
 			locationoption,
+			users,
 		} = this.props;
 		const {
 			sxm, 
@@ -103,7 +103,7 @@ export default class NursOverallTable extends Component {
 			smallclass,
 			thinclass,
 			treetypename,
-			treety,
+			bigType,
 			status,
 			islocation,
 			role,
@@ -127,7 +127,7 @@ export default class NursOverallTable extends Component {
 			dataIndex: 'place',
 		},{
 			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeNo',
+			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
 			title:"状态",
 			dataIndex: 'statusname',
@@ -145,21 +145,21 @@ export default class NursOverallTable extends Component {
 			dataIndex: 'Factory',
 		},{
 			title:"测量人",
+			dataIndex: 'Inputer',
 			render: (text,record) => {
-				return <span>{record.Inputer || '/'}</span>
-				
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title: "监理人",
+			dataIndex: 'Supervisor',
 			render: (text,record) => {
-				return <span>{record.Supervisor || '/'}</span>
-				
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title: "抽查人",
+			dataIndex: 'Checker',
 			render: (text,record) => {
-				return <span>{record.Checker || '/'}</span>
-				
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title:<div><div>树高</div><div>(cm)</div></div>,
@@ -300,7 +300,7 @@ export default class NursOverallTable extends Component {
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>类型：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={treety} onChange={this.ontypechange.bind(this)}>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
 								{typeoption}
 							</Select>
 						</Col>
@@ -524,35 +524,33 @@ export default class NursOverallTable extends Component {
 
 	onsectionchange(value) {
 		const {sectionselect} = this.props;
-		const {treety} = this.state;
-		sectionselect(value || '',treety)
-		this.setState({section:value || '', smallclass:'', thinclass:'', treetype:'', treetypename:''})
+		sectionselect(value || '')
+		this.setState({section:value || '', smallclass:'', thinclass:'', bigType:'', treetype: '', treetypename:''})
 	}
 
 	onsmallclasschange(value) {
 		const {smallclassselect} = this.props;
-		const {treety,section,leftkeycode} = this.state;
-		smallclassselect(value || leftkeycode,treety,section);
-		this.setState({smallclass:value || '',thinclass:'', treetype:'', treetypename:''})
+		const {section,leftkeycode} = this.state;
+		smallclassselect(value || leftkeycode,section);
+		this.setState({smallclass:value || '',thinclass:'', bigType:'', treetype: '', treetypename:''})
 	}
 
 	onthinclasschange(value) {
 		const {thinclassselect} = this.props;
-		const {treety,section,smallclass} = this.state;
-		thinclassselect(value || smallclass,treety,section);
-		this.setState({thinclass:value || '', treetype:'', treetypename:''})
+		const {section,smallclass} = this.state;
+		thinclassselect(value || smallclass,section);
+		this.setState({thinclass:value || '', bigType:'', treetype: '', treetypename:''})
 	}
 
 	ontypechange(value) {
-		const {typeselect,keycode = ''} = this.props;
-		const {section} = this.state;
-		typeselect(value || '',keycode,section)
-		this.setState({treety:value || '' , treetype:'', treetypename:''})
+		const {typeselect} = this.props;
+		typeselect(value || '')
+		this.setState({bigType: value || '' , treetype: '', treetypename:''})
 	}
 
 	ontreetypechange(value) {
 		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.TreeTypeNo == value)
+		let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
 		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
     }
 
@@ -687,7 +685,7 @@ export default class NursOverallTable extends Component {
     	const {
     		sxm = '',
     		section = '',
-    		treety = '',
+    		bigType = '',
     		treetype = '',
     		gd_min = '',
     		gd_max = '',
@@ -732,12 +730,11 @@ export default class NursOverallTable extends Component {
     		tqzj = `${tqzj_min}-${tqzj_max}`
     	}
     	const {actions: {getNurserysTree},keycode = ''} = this.props;
-    	console.log('props',this.props)
     	let postdata = {
     		no:keycode,
     		sxm,
     		section,
-    		treety,
+    		bigType,
     		treetype,
     		gd,
     		xj,
@@ -805,7 +802,7 @@ export default class NursOverallTable extends Component {
 		const {
     		sxm = '',
     		section = '',
-    		treety = '',
+    		bigType = '',
     		treetype = '',
     		gd_min = '',
     		gd_max = '',
@@ -834,7 +831,7 @@ export default class NursOverallTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		treety,
+    		bigType,
     		treetype,
     		gd_min,
     		gd_max,

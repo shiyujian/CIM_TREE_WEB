@@ -8,6 +8,11 @@ import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 import OverallMaterialHandle from '../TaskDetail/OverallMaterialHandle';
 import OverallMaterialDeal from '../TaskDetail/OverallMaterialDeal';
+import ScheduleTotalDeal from '../TaskDetail/ScheduleTotalDeal';
+import ScheduleDayDeal from '../TaskDetail/ScheduleDayDeal';
+import ScheduleStageDeal from '../TaskDetail/ScheduleStageDeal';
+import QulityCheckDetail from '../TaskDetail/QulityCheckDetail';
+import QulityCheckDeal from '../TaskDetail/QulityCheckDeal';
 const FormItem = Form.Item;
 @connect(
 	state => {
@@ -77,6 +82,22 @@ export default class Progress extends Component {
 		}else if (code === WORKFLOW_CODE.苗木资料报批流程 &&  stateName == '复审'){
 			return (
 				<OverallMaterialDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.总进度计划报批流程 &&  stateName == '复审'){
+			return (
+				<ScheduleTotalDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.每日进度计划填报流程 &&  stateName == '复审'){
+			return (
+				<ScheduleDayDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.每日进度填报流程 &&  stateName == '复审'){
+			return (
+				<ScheduleStageDeal {...this.props} {...this.state}/>
+			)
+		}else if(code === WORKFLOW_CODE.检验批验收审批流程 && stateName == '审核'){
+			return (
+				<QulityCheckDeal {...this.props} {...this.state} />
 			)
 		}else {
 			return (

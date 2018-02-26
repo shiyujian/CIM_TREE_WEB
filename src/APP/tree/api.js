@@ -64,13 +64,13 @@ export const tree_menus = [{
 	title: '森林大数据',
 	path: '/forest/nursoverallinfo',
 	icon: <Icon name="tree"/>,
-}, {
+},/* {
 	key: 'receive',
 	id: 'RECEIVE',
 	title: '收发货管理',
 	path: '/receive',
 	icon: <Icon name="user"/>
-}, {
+},*/ {
 	key: 'selfcare',
 	id: 'SELFCARE',
 	title: '个人中心',

@@ -32,7 +32,6 @@ export default class TaskTable extends Component {
 					rowSelection={rowSelection}
 					bordered
 					className="foresttables"
-					rowKey={(item, index) => `${item.id}-${index}`}
 					onChange={this.onChange.bind(this)}
 					pagination={pagination} />
 			</Spin>

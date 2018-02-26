@@ -32,13 +32,21 @@ export default class Nursoverallinfo extends Component {
             statusoption: [],
             locationoption: [],
             leftkeycode: '',
-            treety: '',
+            bigType: '',
             resetkey: 0,
             options: [],
         }
     }
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList}} = this.props;
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers}, users, treetypes} = this.props;
+        // 避免反复获取森林用户数据，提高效率
+        if(!users){
+            getForestUsers();
+        }
+        // 避免反复获取森林树种列表，提高效率
+        if(!treetypes){
+            getTreeList().then(x => this.setTreeTypeOption(x));
+        }
         //地块树
         try {
             getTree({},{parent:'root'})
@@ -120,7 +128,7 @@ export default class Nursoverallinfo extends Component {
             <Option key={'2'} value={'supervisor'}>监理人</Option>,
             <Option key={'3'} value={'checker'}>抽查人</Option>,
         ];
-        this.setState({roleoption})
+        this.setState({roleoption});
     }
 
 	render() {
@@ -134,7 +142,7 @@ export default class Nursoverallinfo extends Component {
             smallclassoption,
             thinclassoption,
             typeoption,
-            treety,
+            bigType,
             roleoption,
             statusoption,
             locationoption,
@@ -161,7 +169,7 @@ export default class Nursoverallinfo extends Component {
                              smallclassselect={this.smallclassselect.bind(this)}
                              thinclassoption={thinclassoption}
                              thinclassselect={this.thinclassselect.bind(this)}
-                             treety={treety}
+                             bigType={bigType}
                              typeoption={typeoption}
                              typeselect={this.typeselect.bind(this)}
                              treetypeoption={treetypeoption} 
@@ -178,8 +186,8 @@ export default class Nursoverallinfo extends Component {
 				</Body>);
 	}
     //标段选择, 重新获取: 小班、细班、树种
-    sectionselect(value,treety) {
-        const {actions:{setkeycode, getTreeList, getTree}} =this.props;
+    sectionselect(value) {
+        const {actions:{setkeycode, getTree}} =this.props;
         const {leftkeycode} = this.state;
         setkeycode(leftkeycode)
         //小班
@@ -213,15 +221,12 @@ export default class Nursoverallinfo extends Component {
             })
         })
         //树种
-        getTreeList()
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
+        this.typeselect('');
     }
 
     //小班选择, 重新获取: 细班、树种
-    smallclassselect(value,treety,section) {
-        const {actions:{setkeycode,getTree,getTreeList}} =this.props;
+    smallclassselect(value,section) {
+        const {actions:{setkeycode,getTree}} =this.props;
         setkeycode(value);
         const {leftkeycode} = this.state;
         //细班
@@ -246,39 +251,30 @@ export default class Nursoverallinfo extends Component {
             })
         })
         //树种
-        getTreeList()
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
+        this.typeselect('');
     }
 
     //细班选择, 重新获取: 树种
-    thinclassselect(value,treety,section) {
-        const {actions:{setkeycode,getTreeList}} =this.props;
+    thinclassselect(value,section) {
+        const {actions:{setkeycode}} =this.props;
         setkeycode(value);
         //树种
-        getTreeList()
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
+        this.typeselect('');
     }
 
     //类型选择, 重新获取: 树种
-    typeselect(value,keycode,section){
-        const {actions:{setkeycode,getTreeList}} =this.props;
-        this.setState({treety:value})
+    typeselect(value){
+        const {treetypes} =this.props;
+        this.setState({bigType: value});
         //树种
-        getTreeList()
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
+        this.setTreeTypeOption(treetypes&&treetypes[value] ? treetypes[value] : []);
     }
 
     //设置树种选项
     setTreeTypeOption(rst) {
         if(rst instanceof Array){
             let treetypeoption = rst.map(item => {
-                return <Option key={item.TreeTypeNo} value={item.TreeTypeNo}>{item.TreeTypeNo}</Option>
+                return <Option key={item.TreeTypeNo} value={item.TreeTypeName}>{item.TreeTypeName}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({treetypeoption,treetypelist:rst})
@@ -384,7 +380,7 @@ export default class Nursoverallinfo extends Component {
     //树选择, 重新获取: 标段、小班、细班、树种并置空
 	onSelect(value = []) {
         let keycode = value[0] || '';
-        const {actions:{setkeycode,gettreetype,getTreeList,getTree}} =this.props;
+        const {actions:{setkeycode,gettreetype,getTree}} =this.props;
 	    setkeycode(keycode);
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
         
@@ -418,12 +414,7 @@ export default class Nursoverallinfo extends Component {
         })
         
         //树种
-        gettreetype()
-        .then(rst => {
-            if(rst instanceof Array){
-                this.setTreeTypeOption(rst)
-            }
-        })
+        this.typeselect('');
     }
     //树展开
     onExpand(expandedKeys,info) {

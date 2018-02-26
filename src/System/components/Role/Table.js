@@ -30,7 +30,7 @@ export default class Roles extends Component {
 		return (
 			<div>
 				<Tabs defaultActiveKey="1">
-					<TabPane tab="苗圃角色1" key="1">
+					<TabPane tab="苗圃角色" key="1">
 						<Card title="苗圃角色" extra={<Button type="primary" ghost onClick={this.append.bind(this, 0)}>添加苗圃角色</Button>}>
 							<Table size="middle" bordered
 								style={{ marginBottom: "10px", overflow: "hidden" }}

@@ -15,7 +15,7 @@ import createFetchAction from './fetchAction';
 import {createFetchActionWithHeaders} from './fetchAction'
 // 
 import faithInfoReducer, {actions as faithActions} from './faithInfo';
-import { FOREST_API} from '_platform/api';
+import { FOREST_API,WORKFLOW_API,WORKFLOW_CODE} from '_platform/api';
 const ID = 'faithanazly';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
@@ -28,6 +28,11 @@ export const nurseryName = createAction(`${ID}供苗商名字`);
 
 /*****************************院内************************/
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
+export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
+export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
+export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //    √
+export const getTasksList = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}&&creator={{creator}}&&subject_littleban__contains={{littleban}}&&subject_thinban__contains={{thinban}}&&subject_number__contains={{number}}&&status={{status}}&&real_start_time_begin={{real_start_time_begin}}&&real_start_time_end={{real_start_time_end}}&&subject_fenxiang__contains={{fenxiang}}`, [], 'GET');
+export const deleteTasksList = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`, [], 'DELETE');
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/tree/factoryAnalyse`, []);
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
@@ -103,7 +108,12 @@ export const actions = {
     getHonestyNewSort,
     getNurserysCountFast,
     getHonestyNewTreetype,
-    getHonestyNewDetailModal
+    getHonestyNewDetailModal,
+    getTreeNodeList,
+    getLittleBan,
+    getWorkflowById,
+    getTasksList,
+    deleteTasksList
 };
 
 export default handleActions({

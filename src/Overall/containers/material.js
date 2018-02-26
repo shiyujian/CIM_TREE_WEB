@@ -62,16 +62,16 @@ export default class Material extends Component {
                 <Content>
                     <Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)} >
                         <TabPane tab="机械设备" key="1">
-                            <GeneralFilter  {...this.props} {...this.state}/>
-                            <GeneralTable {...this.props}/>
+                            {/* <GeneralFilter  {...this.props} {...this.state}/> */}
+                            <GeneralTable {...this.props} {...this.state}/>
                         </TabPane>
                         <TabPane tab="工程材料" key="2">
-                            <ResourceFilter  {...this.props} {...this.state}/>
-                            <ResourceTable {...this.props}/>
+                            {/* <ResourceFilter  {...this.props} {...this.state}/> */}
+                            <ResourceTable {...this.props} {...this.state}/>
                         </TabPane>
                         <TabPane tab="苗木资料" key="3">
-                            <SeedingFilter  {...this.props} {...this.state}/>
-                            <SeedingTable {...this.props}/>
+                            {/* <SeedingFilter  {...this.props} {...this.state}/> */}
+                            <SeedingTable {...this.props} {...this.state}/>
                         </TabPane>
                     </Tabs>
                 </Content>
