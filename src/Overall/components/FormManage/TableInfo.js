@@ -434,7 +434,6 @@ class TableInfo extends Component {
                     return
                 }
                 postData.upload_unit = user.org ? user.org : '';
-                postData.type = '总进度计划';
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 

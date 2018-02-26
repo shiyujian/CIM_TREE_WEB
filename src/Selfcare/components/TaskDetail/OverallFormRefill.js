@@ -17,7 +17,7 @@ const FormItem = Form.Item;
 const Step = Steps.Step;
 
 
-class ScheduleTotalRefill extends Component {
+class OverallFormRefill extends Component {
 
     static propTypes = {};
     constructor(props) {
@@ -29,45 +29,47 @@ class ScheduleTotalRefill extends Component {
         };
     }
 
-    columns1 = [{
+    columns1 = [
+        {
         title: '序号',
         dataIndex: 'index',
         key: 'index',
         width: '10%',
-    }, {
-        title: '文件名称',
-        dataIndex: 'fileName',
-        key: 'fileName',
-        width: '35%',
-    }, {
-        title: '备注',
-        dataIndex: 'remarks',
-        key: 'remarks',
-        width: '30%',
-        render: (text, record, index) => {
-            return <Input value={record.remarks || ""} onChange={ele => {
-                record.remarks = ele.target.value
-                this.forceUpdate();
-            }} />
+        }, {
+            title: '文件名称',
+            dataIndex: 'fileName',
+            key: 'fileName',
+            width: '35%',
+        }, {
+            title: '备注',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            width: '30%',
+            render: (text, record, index) => {
+                return <Input value={record.remarks || ""} onChange={ele => {
+                    record.remarks = ele.target.value
+                    this.forceUpdate();
+                }} />
+            }
+        }, {
+            title: '操作',
+            dataIndex: 'operation',
+            key: 'operation',
+            width: '10%',
+            render: (text, record, index) => {
+                return <div>
+                    <Popconfirm
+                        placement="rightTop"
+                        title="确定删除吗？"
+                        onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a>删除</a>
+                    </Popconfirm>
+                </div>
+            }
         }
-    }, {
-        title: '操作',
-        dataIndex: 'operation',
-        key: 'operation',
-        width: '10%',
-        render: (text, record, index) => {
-            return <div>
-                <Popconfirm
-                    placement="rightTop"
-                    title="确定删除吗？"
-                    onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
-                    okText="确认"
-                    cancelText="取消">
-                    <a>删除</a>
-                </Popconfirm>
-            </div>
-        }
-    }]
+    ]
 
     render() {
 
@@ -101,6 +103,20 @@ class ScheduleTotalRefill extends Component {
                                         </FormItem>
                                     </Col>
                                     <Col span={10}>
+                                        <FormItem {...FormItemLayout} label='名称'>
+                                            {
+                                                getFieldDecorator('name', {
+                                                    rules: [
+                                                        { required: true, message: '请输入名称' }
+                                                    ]
+                                                })
+                                                    (<Input placeholder='请输入名称' />)
+                                            }
+                                        </FormItem>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col span={10}>
                                         <FormItem {...FormItemLayout} label='编号'>
                                             {
                                                 getFieldDecorator('numbercode', {
@@ -112,32 +128,18 @@ class ScheduleTotalRefill extends Component {
                                             }
                                         </FormItem>
                                     </Col>
-                                </Row>
-                                <Row>
                                     <Col span={10}>
                                         <FormItem {...FormItemLayout} label='文档类型'>
                                             {
-                                                getFieldDecorator('totledocument', {
+                                                getFieldDecorator('document', {
                                                     rules: [
                                                         { required: true, message: '请选择文档类型' }
                                                     ]
                                                 })
                                                     (<Select placeholder='请选择文档类型' allowClear>
-                                                        <Option key={3} value={'开发文档'}>开发文档</Option>
-                                                        <Option key={4} value={'测试文档'}>测试文档</Option>
+                                                        <Option key={3} value={'施工组织设计'}>施工组织设计</Option>
+                                                        <Option key={4} value={'施工方案'}>施工方案</Option>
                                                     </Select>)
-                                            }
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={10}>
-                                        <FormItem {...FormItemLayout} label='监理单位'>
-                                            {
-                                                getFieldDecorator('superunit', {
-                                                    rules: [
-                                                        { required: true, message: '请选择审核人员' }
-                                                    ]
-                                                })
-                                                    (<Input placeholder='系统自动识别，无需手输' readOnly/>)
                                             }
                                         </FormItem>
                                     </Col>
@@ -278,20 +280,17 @@ class ScheduleTotalRefill extends Component {
                 }
                 
                 postData.upload_unit = user.org ? user.org : '';
-                postData.type = '总进度计划';
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
                 let subject = [{
                     "unit": JSON.stringify(values.unit),
-					"superunit": JSON.stringify(values.superunit),
-					"dataReview": JSON.stringify(values.dataReview),
+                    "name": JSON.stringify(values.name),
 					"numbercode": JSON.stringify(values.numbercode),
-					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
-					"totledocument": JSON.stringify(values.totledocument),
+                    "document": JSON.stringify(values.document),
+                    "dataReview": JSON.stringify(values.dataReview),
 					"postData": JSON.stringify(postData),
                     "TreatmentData": JSON.stringify(TreatmentData),
-                    
                 }];
                 let newSubject = {
                     subject:subject
@@ -467,4 +466,4 @@ class ScheduleTotalRefill extends Component {
     }
 
 }
-export default Form.create()(ScheduleTotalRefill)
+export default Form.create()(OverallFormRefill)

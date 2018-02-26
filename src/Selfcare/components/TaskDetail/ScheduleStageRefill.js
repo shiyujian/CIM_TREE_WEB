@@ -316,35 +316,21 @@ class ScheduleStageRefill extends Component {
         me.props.form.validateFields((err, values) => {
             console.log('Received values of form: ', values);
             if (!err) {
-               // 共有信息
-                for(let value in values){
-                    if(value === 'unit'){
-                        postData.unit = values[value];
-                    }else if (value === 'superunit'){
-                        postData.superunit = values[value];
-                    }else if (value === 'dataReview'){
-                        postData.dataReview = values[value];
-                    }else if (value === 'numbercode'){
-                        postData.numbercode = values[value];
-                    }else if (value === 'timedate'){
-                        postData.timedate = values[value];
-                    }else if (value === 'stagedocument'){
-                        postData.stagedocument = values[value];
-                    }else{
-                    console.log(1111)
-                    }
-                }
+               
                 postData.upload_unit = user.org?user.org:'';
                 postData.type = '每日实际进度';
                 postData.upload_person = user.name?user.name:user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
                 let subject = [{
-                   //共有属性
-                   "postData":JSON.stringify(postData),
-                   //数据清单
-                   "treedataSource":JSON.stringify(treedataSource),
-                    
+					"unit": JSON.stringify(values.unit),
+					"superunit": JSON.stringify(values.superunit),
+					"dataReview": JSON.stringify(values.dataReview),
+					"numbercode": JSON.stringify(values.numbercode),
+					"timedate": JSON.stringify(moment(values.timedate._d).format('YYYY-MM-DD')),
+					"stagedocument": JSON.stringify(values.stagedocument),
+					"postData": JSON.stringify(postData),
+                    "treedataSource":JSON.stringify(treedataSource),
                 }];
                 let newSubject = {
                     subject:subject
