@@ -12,8 +12,6 @@ import {bindActionCreators} from 'redux';
 import {actions} from '../../store/defect';
 import {Table} from 'antd';
 import {FILE_API, CUS_TILEMAP, SOURCE_API, DOWNLOAD_FILE, WMSTILELAYERURL, TILEURLS} from '../../../_platform/api';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
 @connect(
 	state => {

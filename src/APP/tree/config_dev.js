@@ -60,9 +60,12 @@ window.config = {
 
 	//地图瓦片地址
 	'cus_tilemap':'http://10.215.160.39:6580',
-	'WMSTileLayerUrl':'http://t{s}.tianditu.cn/DataServer?T=cva_w&X={x}&Y={y}&L={z}',
-	'IMG_W':'http://t{s}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}',
-	'VEC_W':'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
+	'WMSTileLayerUrl':'http://t{s}.tianditu.cn/cva_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cva&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles',
+	//'http://t{s}.tianditu.cn/DataServer?T=cva_w&X={x}&Y={y}&L={z}',
+	'IMG_W':'http://t{s}.tianditu.cn/img_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles',
+	//'http://t{s}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}',
+	'VEC_W':'http://t{s}.tianditu.cn/vec_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=vec&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles',
+	//'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
 	'IMG_1':'http://47.104.159.127:200/1',
 	'IMG_2':'http://47.104.159.127:200/2',
 	'IMG_3':'http://47.104.159.127:200/3',
@@ -75,7 +78,7 @@ window.config = {
 	/***********************单模块资源服务**************************/
 	//智慧森林
 	//智慧森林域名
-	'FORESTDOMAIN':"http://120.24.210.86",//阿里云
+	'FORESTDOMAIN':"http://120.79.72.17",//阿里云
 	// 'FORESTDOMAIN':"http://10.215.160.45",//院内
 	// 'FORESTDOMAIN':"http://192.168.3.33",
 	//智慧森林端口
@@ -92,12 +95,9 @@ window.config = {
 	/***********************临时资yu源服务**************************/
 	'initLeaflet': {
 		
-		center: [38.92, 115.98],   //前海
+		center: [38.9818, 116.03411],
 		zoomControl: false,
-		zoom: 14,
-		// maxZoom: 18,
-		// minZoom: 13,
-		// maxBounds: [[22.564885, 113.827781], [22.468466, 113.931283]]
+		zoom: 14
 	},
 	'fullExtent': {
 		minlat: 22.468466,

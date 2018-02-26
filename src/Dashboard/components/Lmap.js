@@ -4,12 +4,8 @@ import {bindActionCreators} from 'redux';
 import {actions} from '../store';
 import {Button, Modal, Spin, message, Collapse, Checkbox} from 'antd';
 import {Icon} from 'react-fa'
-// import {Icon} from 'react-fa';
-// import {users, safetys, hazards, vedios} from './geojsonFeature';
 import {panorama_360} from './geojsonFeature';
 import {PDF_FILE_API, previewWord_API, CUS_TILEMAP, Video360_API2,DashboardVideo360API} from '_platform/api';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'
 import './Lmap.less';
 import CityMarker from './CityMarker';
 import CameraVideo from '../../Video/components/CameraVideo';

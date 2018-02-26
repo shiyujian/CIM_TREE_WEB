@@ -1,8 +1,5 @@
 import React, {Component} from 'react';
 import {Row, Col, Form, Input} from 'antd';
-import {divIcon} from 'leaflet';
-import {Map, TileLayer, Marker, Polygon} from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import {DefaultZoomLevel} from '_platform/api'
 const FormItem = Form.Item;
 const URL = window.config.VEC_W;
