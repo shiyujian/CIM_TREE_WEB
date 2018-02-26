@@ -3,8 +3,7 @@
  */
 
 import EventEmitter from "wolfy87-eventemitter";
-import L from 'leaflet';
-import styles from './style.css';
+
 
 export default class Track extends EventEmitter{
     constructor(map,options={}){

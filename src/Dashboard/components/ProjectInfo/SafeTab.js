@@ -2,8 +2,6 @@
 import React, {Component} from 'react';
 import {Radio,Table,Row,Col} from 'antd';
 import {DOWNLOAD_FILE,PDF_FILE_API,DefaultZoomLevel} from '_platform/api';
-import L from 'leaflet';
-import { Map, Marker, Popup, TileLayer,WMSTileLayer } from 'react-leaflet';
 import moment from 'moment';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;

@@ -57,6 +57,10 @@ export default class TaskStep extends Component {
 				return (
 					null
 				)
+			}else if (code === WORKFLOW_CODE.表单管理流程 && name == '填报'){
+				return (
+					null
+				)
 			}else {
 				return (
 					<div>

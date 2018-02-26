@@ -13,6 +13,7 @@ import ScheduleDayDeal from '../TaskDetail/ScheduleDayDeal';
 import ScheduleStageDeal from '../TaskDetail/ScheduleStageDeal';
 import QulityCheckDetail from '../TaskDetail/QulityCheckDetail';
 import QulityCheckDeal from '../TaskDetail/QulityCheckDeal';
+import OverallFormDeal from '../TaskDetail/OverallFormDeal';
 const FormItem = Form.Item;
 @connect(
 	state => {
@@ -71,6 +72,10 @@ export default class Progress extends Component {
 			return (
 				<OverallMaterialHandle {...this.props} {...this.state}/>
 			)
+		}else if (code === WORKFLOW_CODE.表单管理流程 && stateName == '初审' ){
+			return (
+				<OverallMaterialHandle {...this.props} {...this.state}/>
+			)
 		}else if (code === WORKFLOW_CODE.机械设备报批流程 &&  stateName == '复审'){
 			return (
 				<OverallMaterialDeal {...this.props} {...this.state}/>
@@ -98,6 +103,10 @@ export default class Progress extends Component {
 		}else if(code === WORKFLOW_CODE.检验批验收审批流程 && stateName == '审核'){
 			return (
 				<QulityCheckDeal {...this.props} {...this.state} />
+			)
+		}else if (code === WORKFLOW_CODE.表单管理流程 &&  stateName == '复审'){
+			return (
+				<OverallFormDeal {...this.props} {...this.state}/>
 			)
 		}else {
 			return (
