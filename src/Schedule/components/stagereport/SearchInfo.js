@@ -69,7 +69,7 @@ export default class SearchInfo extends Component {
                                     {
                                         getFieldDecorator('stimedate', {
                                             rules: [
-                                                { type: 'array', required: false, message: '请选择时期' }
+                                                { type: 'array', required: false, message: '请选择日期' }
                                             ]
                                         })
                                             (<RangePicker size='default' format='YYYY-MM-DD'  />)

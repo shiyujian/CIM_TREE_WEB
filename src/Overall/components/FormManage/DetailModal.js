@@ -2,7 +2,7 @@ import React, { Component, Children } from 'react';
 import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification, } from 'antd';
 const FormItem = Form.Item;
 import { STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
-class TotleModal extends Component {
+class DetailModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -36,7 +36,7 @@ class TotleModal extends Component {
         return (
             <div>
                 <Modal
-                    title='总进度计划流程详情'
+                    title='表单管理流程详情'
                     width={800}
                     onOk={this.props.onok}
                     onCancel={this.props.oncancel}
@@ -50,7 +50,7 @@ class TotleModal extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='单位工程'>
                                                 {
-                                                    getFieldDecorator('totleunit', {
+                                                    getFieldDecorator('dunit', {
                                                         initialValue: `${this.props.unit || '暂无单位工程'}`,
                                                         rules: [
                                                             { required: false, message: '请选择单位工程' }
@@ -61,12 +61,40 @@ class TotleModal extends Component {
                                             </FormItem>
                                         </Col>
                                         <Col span={12}>
+                                            <FormItem {...FormItemLayout} label='名称'>
+                                                {
+                                                    getFieldDecorator('dname', {
+                                                        initialValue: `${this.props.name || '暂无名称'}`,
+                                                        rules: [
+                                                            { required: false, message: '请输入名称' }
+                                                        ]
+                                                    })
+                                                        (<Input readOnly />)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={12}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
-                                                    getFieldDecorator('totlenumbercode', {
+                                                    getFieldDecorator('dnumbercode', {
                                                         initialValue: `${this.props.numbercode || '暂无编号'}`,
                                                         rules: [
                                                             { required: false, message: '请输入编号' }
+                                                        ]
+                                                    })
+                                                        (<Input readOnly />)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={12}>
+                                            <FormItem {...FormItemLayout} label='审批单位'>
+                                                {
+                                                    getFieldDecorator('dsuperunit', {
+                                                        initialValue: `${this.props.superunit || '暂无审批单位'}`,
+                                                        rules: [
+                                                            { required: false, message: '请输入监审批单位' }
                                                         ]
                                                     })
                                                         (<Input readOnly />)
@@ -78,8 +106,8 @@ class TotleModal extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
-                                                    getFieldDecorator('totledocument', {
-                                                        initialValue: `${this.props.totledocument || '暂无文档类型'}`,
+                                                    getFieldDecorator('ddocument', {
+                                                        initialValue: `${this.props.document || '暂无文档类型'}`,
                                                         rules: [
                                                             { required: false, message: '请输入文档类型' }
                                                         ]
@@ -88,28 +116,12 @@ class TotleModal extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                        <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='监理单位'>
-                                                {
-                                                    getFieldDecorator('totlesuperunit', {
-                                                        initialValue: `${this.props.totlesuperunit || '暂无监理单位'}`,
-                                                        rules: [
-                                                            { required: false, message: '请输入监理单位' }
-                                                        ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
-                                            </FormItem>
-                                        </Col>
                                     </Row>
                                     <Row>
-
                                         <Table
                                             columns={this.columns1}
                                             pagination={true}
                                             dataSource={this.state.TreatmentData}
-                                            rowKey='index'
-                                            className='foresttable'
                                         />
                                     </Row>
                                     <Row>
@@ -117,7 +129,7 @@ class TotleModal extends Component {
                                         <Col span={12} style={{ marginTop: '10px' }}>
                                             <FormItem {...FormItemLayout} label='审核人'>
                                                 {
-                                                    getFieldDecorator('totledataReview', {
+                                                    getFieldDecorator('ddataReview', {
                                                         initialValue: `${this.props.dataReview || ''}`,
                                                         rules: [
                                                             { required: false, message: '请输入审核人员' }
@@ -167,5 +179,5 @@ class TotleModal extends Component {
 }
 
 
-export default Form.create()(TotleModal)
+export default Form.create()(DetailModal)
 
