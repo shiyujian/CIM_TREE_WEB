@@ -275,28 +275,6 @@ class NewsTable extends Component {
 											</FormItem>
 										</Col>
 										<Col span={8} >
-											<FormItem {...formItemLayout} label="发布日期">
-
-												{
-													getFieldDecorator('worktime', {
-														rules: [
-															{ required: false, message: '请选择日期' },
-														]
-													})
-														(<RangePicker
-															style={{ verticalAlign: "middle", width: '100%' }}
-															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
-															showTime={{ format: 'HH:mm:ss' }}
-															format={'YYYY/MM/DD HH:mm:ss'}
-
-														>
-														</RangePicker>)
-												}
-
-											</FormItem>
-
-										</Col>
-										<Col span={8} >
 											<FormItem {...formItemLayout} label="发布单位">
 												{
 													getFieldDecorator('workunit', {
@@ -314,7 +292,26 @@ class NewsTable extends Component {
 															<Option value="5">异常</Option>
 														</Select>)
 												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="修改日期">
 
+												{
+													getFieldDecorator('worktime', {
+														rules: [
+															{ required: false, message: '请选择日期' },
+														]
+													})
+														(<RangePicker
+															style={{ verticalAlign: "middle", width: '100%' }}
+															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+															showTime={{ format: 'HH:mm:ss' }}
+															format={'YYYY/MM/DD HH:mm:ss'}
+
+														>
+														</RangePicker>)
+												}
 
 											</FormItem>
 

@@ -75,7 +75,7 @@ export default class News extends Component {
 		} = this.props;
 
 		return (
-			<Blade title="新闻">
+			<Blade title="新闻标题">
 					<div className="tableContainer">
 						<Table bordered={false} dataSource={newsList} columns={this.columns}
 						       rowKey="id" size="small" pagination={{pageSize: 8}}/>

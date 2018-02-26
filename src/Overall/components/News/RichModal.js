@@ -259,7 +259,7 @@ class RichModal extends Component {
                     <Form>
                         <Row>
                             <Col span={8} offset={1}>
-                                <FormItem {...formItemLayout} label="主题">
+                                <FormItem {...formItemLayout} label="名称">
                                     {getFieldDecorator('title', {})(
                                         <Input type="text" placeholder="新闻标题" />
                                         )}
@@ -286,7 +286,7 @@ class RichModal extends Component {
                     <Row style={{ marginTop: 20 }}>
                         <Col span={24} offset={10} >
                             <Button onClick={this.modalClick.bind(this)}>取消</Button>
-                            <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>提交</Button>
+                            <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
                             <Button style={{ marginLeft: 20 }} onClick={this.draftDataFunc.bind(this)}>暂存</Button>
                         </Col>
                     </Row>
