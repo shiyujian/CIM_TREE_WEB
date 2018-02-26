@@ -242,7 +242,7 @@ class TipsTable extends Component {
 								<Col span={18}>
 									<Row>
 										<Col span={6} >
-											<FormItem {...formItemLayout} label="主题">
+											<FormItem {...formItemLayout} label="名称">
 												{
 													getFieldDecorator('theme', {
 														rules: [
@@ -250,6 +250,19 @@ class TipsTable extends Component {
 														]
 													})
 														(<Input placeholder="请输入主题" />)
+												}
+											</FormItem>
+										</Col>
+										
+										<Col span={6}>
+											<FormItem {...formItemLayout} label="发布单位">
+												{
+													getFieldDecorator('workunit', {
+														rules: [
+															{ required: false, message: '发布单位' },
+														]
+													})
+														(<Input placeholder="请输入发布单位" />)
 												}
 											</FormItem>
 										</Col>
@@ -271,24 +284,7 @@ class TipsTable extends Component {
 														>
 														</RangePicker>)
 												}
-
 											</FormItem>
-
-										</Col>
-										<Col span={6}>
-											<FormItem {...formItemLayout} label="发布单位">
-												{
-													getFieldDecorator('workunit', {
-														rules: [
-															{ required: false, message: '发布单位' },
-														]
-													})
-														(<Input placeholder="请输入发布单位" />)
-												}
-
-
-											</FormItem>
-
 										</Col>
 										<Col span={6}>
 											<FormItem {...formItemLayout} label="紧急程度">

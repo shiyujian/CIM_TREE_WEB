@@ -275,7 +275,19 @@ class NewsTable extends Component {
 											</FormItem>
 										</Col>
 										<Col span={8} >
-											<FormItem {...formItemLayout} label="发布日期">
+											<FormItem {...formItemLayout} label="发布单位">
+												{
+													getFieldDecorator('workunit', {
+														rules: [
+															{ required: false, message: '发布单位' },
+														]
+													})
+														(<Input placeholder="请输入发布单位" />)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
+											<FormItem {...formItemLayout} label="修改日期">
 
 												{
 													getFieldDecorator('worktime', {
@@ -292,21 +304,6 @@ class NewsTable extends Component {
 														>
 														</RangePicker>)
 												}
-
-											</FormItem>
-
-										</Col>
-										<Col span={8} >
-											<FormItem {...formItemLayout} label="发布单位">
-												{
-													getFieldDecorator('workunit', {
-														rules: [
-															{ required: false, message: '发布单位' },
-														]
-													})
-														(<Input placeholder="请输入发布单位" />)
-												}
-
 
 											</FormItem>
 
