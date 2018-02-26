@@ -138,7 +138,8 @@ export default class Addition extends Component {
 			if (addition.id) {
 				console.log("addition22",addition)
 			
-				putUser({id: addition.id}, {
+				putUser({}, {
+					id: addition.id,
 					username: addition.username,
 					email: addition.email ,
 					// password: addition.password, // 密码不能变？信息中没有密码
@@ -171,7 +172,8 @@ export default class Addition extends Component {
 					extra_params: {},
 					title: addition.title || ''
 				}).then(rst => {
-					if (rst.id) {
+					if (rst.code==1) {
+						message.info('修改人员成功');
 						clearAdditionField();
 						const codes = Addition.collect(node);
 						console.log("codes",codes)
@@ -218,12 +220,13 @@ export default class Addition extends Component {
 					extra_params: {},
 					title: addition.title || ''
 				}).then(rst => {
-					if (rst.id) {
+					if (rst.code==1) {
+						message.info('新增人员成功');
 						clearAdditionField();
 						const codes = Addition.collect(node);
 						getUsers({}, {org_code: codes});
 					} else {
-						if (rst.username) {
+						if (rst.code==2) {
 							message.warn('用户名已存在！');
 						} else {
 							console.log("222")							
