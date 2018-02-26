@@ -423,7 +423,8 @@ class SeedingAddition extends Component {
                     "username": user.username,
                     "person_code": user.code,
                     "person_name": user.name,
-                    "id": parseInt(user.id)
+                    "id": parseInt(user.id),
+                    "org": user.org,
                 };
                 let subject = [{
                     "dataSource":JSON.stringify(dataSource),

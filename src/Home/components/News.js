@@ -119,6 +119,7 @@ export default class News extends Component {
 		} = this.props;
 
 		return (
+
 			// <Blade title="新闻">
 			// 		<div className="tableContainer">
 			// 			<Table bordered={false} dataSource={newsList} columns={this.columns}
@@ -154,6 +155,8 @@ export default class News extends Component {
 						dangerouslySetInnerHTML={{ __html: this.state.container }} />
 				</Modal>
 			</Row>
+
+			
 		);
 	}
 }

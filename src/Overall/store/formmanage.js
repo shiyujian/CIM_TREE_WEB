@@ -16,6 +16,8 @@ export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}
 export const getSelectedNodeInfo = createAction(`${ID}_获取选中树节点信息`);
 const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
+
+export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}`);
 export const actions = {
     getdocumentOK,
     getdocument,
@@ -24,7 +26,8 @@ export const actions = {
     getWorkflowById,
     getSelectedNodeInfo,
     setcurrentcode,
-    setkeycode
+    setkeycode,
+    getTaskSchedule
 }
 
 export default handleActions({
