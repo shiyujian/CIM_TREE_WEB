@@ -33,4 +33,8 @@ export default class Person extends Component {
 			</div>
 		);
 	}
+	componentDidMount() {
+		const {actions:{getTags}} =this.props;
+		getTags({});
+	}
 }

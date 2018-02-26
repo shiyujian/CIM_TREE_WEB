@@ -1,6 +1,6 @@
 import {createAction, handleActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
-import {USER_API} from '../../api';
+import {USER_API,SUSER_API} from '../../api';
 import {capitalize} from '../util';
 
 export default (ID, service = '') => {
@@ -9,9 +9,9 @@ export default (ID, service = '') => {
 	const getUsersOK = createAction(`${ID}_GET_USERS_OK_${suffix}`);
 	const updateUsers = createAction(`${ID}_UPDATE_USERS_OK_${suffix}`);
 	const getUsers = createFetchAction(`${USER_API}/users/`, [getUsersOK]);
-	const postUser = createFetchAction(`${USER_API}/users/`, [], 'POST');
-	const deleteUser = createFetchAction(`${USER_API}/users/{{userID}}/`, [], 'DELETE');
-	const putUser = createFetchAction(`${USER_API}/users/{{id}}/`, [], 'PUT');
+	const postUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'POST');
+	const deleteUser = createFetchAction(`${SUSER_API}/system/user/{{userID}}`, [], 'DELETE');
+	const putUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'PUT');
 	const usersReducer = handleActions({
 		[getUsersOK]: (state, {payload}) => {
 			if(payload){

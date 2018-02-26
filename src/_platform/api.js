@@ -18,9 +18,10 @@
 4.在src/_platform/API.js和src下所有源码当中,不能出现IP和端口固定的情况;
 */
 window.config = window.config || {};
-let DOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
+let DOMAIN,SDOMAIN,USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
 
 DOMAIN = window.config.DOMAIN;
+SDOMAIN = window.config.SDOMAIN;
 USER = window.config.STATIC_FILE_USER;
 PASSWORD = window.config.STATIC_FILE_PASSWORD;
 STATIC_FILE_IP = window.config.STATIC_FILE_IP;
@@ -33,6 +34,7 @@ export const base = `${DOMAIN}`;
 export const EXCHANGE_API = `${DOMAIN}:${window.config.DOC_EXCHANGE_PORT}`;
 export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
 export const USER_API = `${base}/accounts/api`;
+export const SUSER_API = `${SDOMAIN}`;
 export const SERVICE_API = `${base}/service/construction/api`;
 export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
