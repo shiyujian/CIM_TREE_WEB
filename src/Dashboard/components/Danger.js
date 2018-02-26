@@ -8,8 +8,6 @@ import {Icon} from 'react-fa'
 // import {users, safetys, hazards, vedios} from './geojsonFeature';
 import {panorama_360} from './geojsonFeature';
 import {PDF_FILE_API, previewWord_API, CUS_TILEMAP, Video360_API2,DashboardVideo360API} from '_platform/api';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'
 import './OnSite.less';
 import CityMarker from './CityMarker';
 import CameraVideo from '../../Video/components/CameraVideo';
@@ -419,18 +417,18 @@ export default class Danger extends Component {
 		L.control.zoom({position: 'bottomright'}).addTo(this.map);
 
 		this.tileLayer = L.tileLayer(this.tileUrls[1], {
-			attribution: '&copy;<a href="">ecidi</a>',
-			id: 'tiandi-map',
-			subdomains: this.subDomains
-		}).addTo(this.map);
-		//航拍影像
-		if (CUS_TILEMAP)
-			L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
+            subdomains: [1, 2, 3],
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0
+        }).addTo(this.map)
 
-		L.tileLayer.wms(this.WMSTileLayerUrl, {
-			subdomains: this.subDomains
-		}).addTo(this.map);
-		let me = this;
+        L.tileLayer(this.WMSTileLayerUrl, {
+            subdomains: [1, 2, 3], 
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0 
+        }).addTo(this.map)
 
 		document.querySelector('.leaflet-popup-pane').addEventListener('click', function (e) {
 			let target = e.target;

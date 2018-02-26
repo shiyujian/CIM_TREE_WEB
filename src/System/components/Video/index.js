@@ -1,7 +1,5 @@
 import React,{Component} from 'react';
 import {Form,Input,Row,Col,Button,Modal,message} from 'antd';
-import {Map, TileLayer, Marker} from 'react-leaflet';
-import {divIcon,point} from 'leaflet';
 import {DefaultZoomLevel} from '_platform/api';
 import './video.less';
 const Base64 = require('js-base64').Base64;

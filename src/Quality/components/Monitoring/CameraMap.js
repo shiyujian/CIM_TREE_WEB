@@ -6,8 +6,6 @@ import {Modal, Table, Button, Input, Upload, Icon, Form, message} from 'antd'
 import moment from 'moment'
 import {FILE_API, CUS_TILEMAP, SOURCE_API, DOWNLOAD_FILE, WMSTILELAYERURL, TILEURLS} from '../../../_platform/api'
 import {getUser} from '../../../_platform/auth';
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import './CameraMap.css'
 import Camera from './Camera'
 

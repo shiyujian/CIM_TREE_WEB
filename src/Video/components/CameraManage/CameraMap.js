@@ -4,8 +4,6 @@ import {bindActionCreators} from 'redux'
 import {actions} from '../../store'
 import {Modal, Button, message} from 'antd'
 import { CUS_TILEMAP, WMSTILELAYERURL, TILEURLS} from '../../../_platform/api'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import './CameraMap.css'
 import CameraConfigModal from './CameraConfigModal'
 
