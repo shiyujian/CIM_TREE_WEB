@@ -20,6 +20,7 @@ const user_id = getUser().id;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 class NewsTable extends Component {
+	array = [];
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -32,7 +33,6 @@ class NewsTable extends Component {
 	}
 
 	componentDidMount() {
-
 		const { actions: { getNewsList, getDraftNewsList } } = this.props;
 		getNewsList({
 			user_id: user_id
@@ -41,6 +41,14 @@ class NewsTable extends Component {
 			user_id: user_id
 		})
 
+	}
+	componentDidUpdate(){
+		this.array = [];
+		if(this.props.array.length>0){
+			this.props.array.map(item=>{
+				this.array.push(<Option value={item.code}>{item.name}</Option>)
+			})
+		}
 	}
 
 	//新闻操作按钮
@@ -164,27 +172,14 @@ class NewsTable extends Component {
 		// const user = getUser();
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
-				// task: filter.type || "processing",
-				// executor: user.id,
-				title: values.theme || "",
-				// workflow:values.workflow || "",
-				// creator:values.creator || "",
-				// status:values.status || "",
-				// real_start_time_begin:"",
-				// real_start_time_end:"",
+				title:values.theme || "",
+				org:values.workunit || "",
 			}
-			// if (values && values.startTime && values.startTime.length > 0) {
-			// 	conditions.real_start_time_begin = moment(values.startTime[0]).format('YYYY-MM-DD 00:00:00');
-			// 	conditions.real_start_time_end = moment(values.startTime[1]).format('YYYY-MM-DD 23:59:59');
-			// }
-			// for (const key in conditions) {
-			// 	if (!conditions[key] || conditions[key] == "") {
-			// 		delete conditions[key];
-			// 	}
-			// }
-			// setLoadingStatus(true);
-			await getNewsList({}, conditions);
-			// setLoadingStatus(false);
+			if (values && values.worktime ) {
+				conditions.begin = moment(values.worktime [0]).format('YYYY-MM-DD');
+				conditions.end = moment(values.worktime [1]).format('YYYY-MM-DD');
+			}
+			await getNewsList(conditions);
 		})
 	}
 	publishNewsClick(record) {
@@ -206,10 +201,14 @@ class NewsTable extends Component {
 
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
-				// task: filter.type || "processing",
+				org:values.workunits || "",
 				title: values.title1 || "",
 			}
-			await getDraftNewsList({}, conditions);
+			if (values && values.worktime ) {
+				conditions.begin = moment(values.worktimes[0]).format('YYYY-MM-DD');
+				conditions.end = moment(values.worktimes[1]).format('YYYY-MM-DD');
+			}
+			await getDraftNewsList(conditions);
 		})
 	}
 
@@ -242,7 +241,7 @@ class NewsTable extends Component {
 				{
 					<div style={{ marginBottom: '10px' }}>
 						{
-							(toggleData.visible && toggleData.type === 'NEWS') && <RichModal {...this.props} />
+							(toggleData.visible && toggleData.type === 'NEWS') && <RichModal {...this.props}/>
 						}
 					</div>}
 				<Col span={22} offset={1}>
@@ -250,7 +249,7 @@ class NewsTable extends Component {
 						<div style={{ marginBottom: '10px' }}>
 							<Button type="primary" onClick={this.publishNewsClick.bind(this)}>新闻发布</Button>
 							{
-								(toggleData.visible && toggleData.type === 'NEWS') && <RichModal {...this.props} />
+								(toggleData.visible && toggleData.type === 'NEWS') && <RichModal {...this.props}/>
 							}
 						</div>
 					} >
@@ -278,11 +277,12 @@ class NewsTable extends Component {
 											<FormItem {...formItemLayout} label="发布单位">
 												{
 													getFieldDecorator('workunit', {
-														rules: [
-															{ required: false, message: '发布单位' },
-														]
 													})
-														(<Input placeholder="请输入发布单位" />)
+													(<Select allowClear style={{ width: '100%' }}>
+														{
+															this.array
+														}
+													</Select>)
 												}
 											</FormItem>
 										</Col>
@@ -352,7 +352,7 @@ class NewsTable extends Component {
 											</FormItem>
 										</Col>
 										<Col span={8} >
-											<FormItem {...formItemLayout} label="发布日期">
+											<FormItem {...formItemLayout} label="修改日期">
 
 												{
 													getFieldDecorator('worktimes', {
@@ -381,7 +381,11 @@ class NewsTable extends Component {
 															{ required: false, message: '发布单位' },
 														]
 													})
-													(<Input placeholder="请输入发布单位" />)
+													(<Select allowClear  style={{ width: '100%' }}>
+														{
+															this.array
+														}
+													</Select>)
 												}
 
 

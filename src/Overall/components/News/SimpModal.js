@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Progress } from 'antd';
+import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Progress,Select } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
@@ -11,13 +11,23 @@ moment.locale('zh-cn');
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
 const { TextArea } = Input;
+const Option = Select.Option;
 
 class Modals extends Component {
+	array = [];
 	constructor(props) {
 		super(props);
 		this.state = {
 			content: "",
 			progress: 0,
+		}
+	}
+	componentDidUpdate(){
+		debugger
+		if(this.props.array.length>0){
+			this.props.array.map(item=>{
+				this.array.push(<Option value={item.code}>{item.name}</Option>)
+			})
 		}
 	}
 
@@ -153,9 +163,9 @@ class Modals extends Component {
 				if (toggleData.status === 'ADD') {
 					let newData = {
 						"title": values['title'] || '',
-						"abstract": '',
+						"org": values['org'] || '',
 						"raw": this.state.content,
-						"content": "",
+						"mergency": values['mergency'],
 						"attachment": {
 							"fileList": fileList || [],
 						},
@@ -181,6 +191,7 @@ class Modals extends Component {
 				} else if (toggleData.status === 'EDIT') {
 					let newData = {
 						"title": values['title'] || '',
+						"org": values['org'] || '',
 						"raw": this.state.content,
 						"attachment": {
 							"fileList": fileList || [],
@@ -228,6 +239,7 @@ class Modals extends Component {
 			validateFields((err, values) => {
 				let newData = {
 					"title": values['title'] || '',
+					"org": values['org'] || '',
 					"raw": this.state.content,
 					"attachment": {
 						"fileList": fileList || [],
@@ -255,7 +267,7 @@ class Modals extends Component {
 			validateFields((err, values) => {
 				let newData = {
 					"title": values['title'] || '',
-					"abstract": '',
+					"org": values['org'] || '',
 					"raw": this.state.content,
 					"attachment": {
 						"fileList": fileList || [],
@@ -283,6 +295,12 @@ class Modals extends Component {
 	}
 
 	render() {
+		this.array = [];
+		if(this.props.array.length>0){
+			this.props.array.map(item=>{
+				this.array.push(<Option value={item.code}>{item.name}</Option>)
+			})
+		}
 		const {
 			form: { getFieldDecorator },
 			toggleData: toggleData = {
@@ -322,16 +340,24 @@ class Modals extends Component {
 						</Col>
 						<Col span={6} offset={1}>
 							<FormItem {...formItemLayout} label="发布单位">
-								{getFieldDecorator('abstract', {})(
-									<Input type="text" />
+								{getFieldDecorator('org', {})(
+									(<Select allowClear style={{ width: '100%' }}>
+										{
+											this.array
+										}
+									</Select>)
 								)}
 							</FormItem>
 						</Col>
 						<Col span={4} offset={1}>
 							<FormItem {...formItemLayout} label="紧急程度">
-
-								<Input type="text" />
-
+							{getFieldDecorator('mergency', {})(
+								(<Select allowClear>
+									<Option value="0">平件</Option>
+									<Option value="1">加急</Option>
+									<Option value="2">特急</Option>
+								</Select>)
+							)}
 							</FormItem>
 						</Col>
 						<Col span={2}>
@@ -373,9 +399,9 @@ class Modals extends Component {
 					</Row>
 					<Row style={{ marginTop: 20 }}>
 						<Col span={24} offset={10}>
-							<Button onClick={this.draftDataFunc.bind(this)}>暂存</Button>
-							<Button onClick={this.postData.bind(this)}>发布</Button>
-							<Button onClick={this.modalClick.bind(this)}>取消</Button>
+							<Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
+							<Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
+							<Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
 						</Col>
 					</Row>
 				</Form>

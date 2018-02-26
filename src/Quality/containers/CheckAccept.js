@@ -61,7 +61,7 @@ class CheckAccept extends Component {
                 dataIndex: 'fenxiang',
             }, {
                 title: '小班',
-                width: '10%',
+                width: '5%',
                 dataIndex: 'littleban',
             }, {
                 title: '细班',
@@ -77,7 +77,7 @@ class CheckAccept extends Component {
                 dataIndex: 'docType',
             }, {
                 title: '流程状态',
-                width: '10%',
+                width: '5%',
                 dataIndex: 'flow_status',
                 render: (text, record, index) => {
                     if (text === 2) {
@@ -92,17 +92,14 @@ class CheckAccept extends Component {
                 }
             }, {
                 title: '操作',
+                width: '10%',
                 render: (text, record, index) => {
                     return (
-                        <div>
-                            <Button onClick={this.view.bind(this, record)} >
-                                查看
-                            </Button>
-
-                            <Button onClick={this.download.bind(this, record)}>
-                                下载
-                            </Button>
-                        </div>
+                        <span>
+						<a onClick={this.view.bind(this, record)}>查看</a>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
+						<a onClick={this.download.bind(this, record)}>下载</a>
+					</span>
                     );
                 }
             }
