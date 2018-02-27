@@ -14,9 +14,12 @@ import DetailModal from './DetailModal';
 
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
+const Option = Select.Option;
 moment.locale('zh-cn');
 class TableInfo extends Component {
     static propTypes = {};
+    array = [];
+    code = '';
     constructor(props) {
         super(props)
         this.state = {
@@ -29,7 +32,8 @@ class TableInfo extends Component {
             TreatmentData: [],
             newFileLists:[],
             detailvisible: false,
-            DetailModaldata:[]
+            DetailModaldata:[],
+            code:'',
         }
     }
 
@@ -37,7 +41,27 @@ class TableInfo extends Component {
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     }
 
+    getSomeNode(children){
+		children.map(item =>{
+			if(item.children.length > 0){
+				this.getSomeNode(item.children);
+			}else{
+				this.array.push(<Option value={item.code}>{item.name}</Option>)
+			}
+		})
+    }
+    setUserByUnit(unit){
+        this.code = unit;
+        this.setState({code:unit})
+    }
+
     async componentDidMount() {
+        const {actions: {getPublicUnitList}} = this.props;
+        let unit = await getPublicUnitList();
+		if(unit.children){
+            this.array = [];
+			this.getSomeNode(unit.children);
+		}
         this.gettaskSchedule();
     }
     // 获取表单管理流程流程信息
@@ -373,8 +397,20 @@ class TableInfo extends Component {
                                         />
                                     </Row>
                                     <Row>
-
-                                        <Col span={8} offset={4}>
+                                        <Col span={6} offset={1}>
+                                            <FormItem {...FormItemLayout} label='单位'>
+                                                {
+                                                    getFieldDecorator('dataReviewpre', {
+                                                    })
+                                                    (<Select allowClear  style={{ width: '100%' }} onChange={this.setUserByUnit.bind(this)}>
+                                                        {
+                                                            this.array
+                                                        }
+                                                    </Select>)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={6} offset={1}>
                                             <FormItem {...FormItemLayout} label='审核人'>
                                                 {
                                                     getFieldDecorator('dataReview', {
@@ -382,13 +418,13 @@ class TableInfo extends Component {
                                                             {  required: true, message: '请选择审核人员' }
                                                         ]
                                                     })
-                                                        (
-                                                            <PerSearch selectMember={this.selectMember.bind(this)}/>
-                                                        )
+                                                    (
+                                                        <PerSearch selectMember={this.selectMember.bind(this)} code={this.state.code}/>
+                                                    )
                                                 }
                                             </FormItem>
                                         </Col>
-                                        <Col span={8} offset={4}>
+                                        <Col span={3} offset={2}>
                                             <Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
                                         </Col>
                                     </Row>

@@ -18,6 +18,8 @@ const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
 
 export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}`);
+
+const getPublicUnitList = createFetchAction(`${base}/service/construction/api/org-tree/?depth=4`, [],'GET');
 export const actions = {
     getdocumentOK,
     getdocument,
@@ -27,7 +29,8 @@ export const actions = {
     getSelectedNodeInfo,
     setcurrentcode,
     setkeycode,
-    getTaskSchedule
+    getTaskSchedule,
+    getPublicUnitList
 }
 
 export default handleActions({
