@@ -6,11 +6,14 @@ import moment from 'moment';
 import PerSearch from '../Task/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-//综合管理模块
+//综合管理模块 物资管理
 import OverallGeneralDetail from '../TaskDetail/OverallGeneralDetail';
 import OverallResourceDetail from '../TaskDetail/OverallResourceDetail';
 import OverallGeneralRefill from '../TaskDetail/OverallGeneralRefill';
 import OverallResourceRefill from '../TaskDetail/OverallResourceRefill';
+//综合管理模块 表单管理
+import OverallFormDetail from '../TaskDetail/OverallFormDetail';
+import OverallFormRefill from '../TaskDetail/OverallFormRefill';
 //进度管理模块
 import ScheduleTotalDetail from '../TaskDetail/ScheduleTotalDetail';
 import ScheduleTotalRefill from '../TaskDetail/ScheduleTotalRefill';
@@ -62,6 +65,10 @@ export default class Detail extends Component {
 				return (
 					<OverallResourceDetail {...this.props} {...this.state}/>
 				)
+			}else if (code === WORKFLOW_CODE.表单管理流程 && (name == '初审' || name == '复审' || name == '结束')){
+				return (
+					<OverallFormDetail {...this.props} {...this.state}/>
+				)
 			}else if(code === WORKFLOW_CODE.检验批验收审批流程 && (name == '审核' || name == '结束')){
 				return (
 					<QulityCheckDetail {...this.props} {...this.state} />
@@ -93,6 +100,10 @@ export default class Detail extends Component {
 			}else if(code === WORKFLOW_CODE.检验批验收审批流程 && name === '填报'){
 				return (
 					<QulityCheckRefill {...this.props} {...this.state} />
+				)
+			}else if(code === WORKFLOW_CODE.表单管理流程 && name === '填报'){
+				return (
+					<OverallFormRefill {...this.props} {...this.state} />
 				)
 			}else {
 				return <div>待定流程</div>

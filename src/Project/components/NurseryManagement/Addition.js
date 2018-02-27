@@ -37,7 +37,10 @@ class Addition extends Component {
 
 		return (
 			<div>
-				<Button type='primary' onClick={this.add.bind(this)}>新增苗圃</Button>
+				<div style={{float:'right',marginBottom:12}}>
+					<Button type='primary' onClick={this.add.bind(this)}>新增苗圃</Button>
+				</div>
+				
 				<Modal title="新增苗圃"
 				       width={920} visible={addVisible}
 					   onOk={this.save.bind(this)}

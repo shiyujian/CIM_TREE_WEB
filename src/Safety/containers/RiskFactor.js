@@ -16,7 +16,6 @@ import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from
 import './Register.css';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import 'leaflet/dist/leaflet.css';
 export const Datumcode = window.DeathCode.SAFETY_WMSG;
 moment.locale('zh-cn');
 const Option = Select.Option;

@@ -276,35 +276,20 @@ class ScheduleTotalRefill extends Component {
                     })
                     return
                 }
-                // 共有信息
-                for (let value in values) {
-                    if (value === 'area') {
-                        postData.area = values[value];
-                    } else if (value === 'unit') {
-                        postData.unit = values[value];
-                    } else if (value === 'type') {
-                        postData.type = values[value];
-                    } else if (value === 'superunit') {
-                        postData.superunit = values[value];
-                    } else if (value === 'dataReview') {
-                        postData.dataReview = values[value];
-                    } else if (value === 'numbercode') {
-                        postData.numbercode = values[value];
-                    } else if (value === 'totledocument') {
-                        postData.totledocument = values[value];
-                    } else {
-                        console.log("attrs")
-                    }
-                }
+                
                 postData.upload_unit = user.org ? user.org : '';
                 postData.type = '总进度计划';
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
                 let subject = [{
-                    //共有属性
-                    "postData": JSON.stringify(postData),
-                    //数据清单
+                    "unit": JSON.stringify(values.unit),
+					"superunit": JSON.stringify(values.superunit),
+					"dataReview": JSON.stringify(values.dataReview),
+					"numbercode": JSON.stringify(values.numbercode),
+					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
+					"totledocument": JSON.stringify(values.totledocument),
+					"postData": JSON.stringify(postData),
                     "TreatmentData": JSON.stringify(TreatmentData),
                     
                 }];
@@ -318,7 +303,8 @@ class ScheduleTotalRefill extends Component {
                     "username": user.username,
                     "person_code": user.code,
                     "person_name": user.name,
-                    "id": parseInt(user.id)
+                    "id": parseInt(user.id),
+                    "org": user.org,
                 };
                 let nextUser = {};
                 

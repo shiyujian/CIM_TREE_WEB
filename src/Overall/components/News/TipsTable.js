@@ -14,6 +14,7 @@ const { RangePicker } = DatePicker;
 const FormItem = Form.Item;
 
 class TipsTable extends Component {
+	array = [];
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -30,6 +31,14 @@ class TipsTable extends Component {
 		getDraftTipsList({
 			user_id: user_id
 		})
+	}
+	componentDidUpdate(){
+		this.array = [];
+		if(this.props.array.length>0){
+			this.props.array.map(item=>{
+				this.array.push(<Option value={item.code}>{item.name}</Option>)
+			})
+		}
 	}
 
 	//公告操作按钮
@@ -155,8 +164,13 @@ class TipsTable extends Component {
 			let conditions = {
 				executor: user.id,
 				title: values.theme || "",
+				org:values.workunit || "",
 			}
-			await getTipsList({}, conditions);
+			if (values && values.worktime ) {
+				conditions.begin = moment(values.worktime[0]).format('YYYY-MM-DD');
+				conditions.end = moment(values.worktime[1]).format('YYYY-MM-DD');
+			}
+			await getTipsList(conditions);
 		})
 	}
 
@@ -170,8 +184,13 @@ class TipsTable extends Component {
 			let conditions = {
 				executor: user.id,
 				title: values.titles || "",
+				org:values.workunits || "",
 			}
-			await getDraftTipsList({}, conditions);
+			if (values && values.worktimes ) {
+				conditions.begin = moment(values.worktimes[0]).format('YYYY-MM-DD');
+				conditions.end = moment(values.worktimes[1]).format('YYYY-MM-DD');
+			}
+			await getDraftTipsList(conditions);
 		})
 	}
 
@@ -223,7 +242,7 @@ class TipsTable extends Component {
 					<div style={{ marginBottom: '10px' }}>
 
 						{
-							(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props} />)
+							(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props}/>)
 						}
 					</div>}
 				<Col span={22} offset={1}>
@@ -231,7 +250,7 @@ class TipsTable extends Component {
 						<div style={{ marginBottom: '10px' }}>
 							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>通知发布</Button>
 							{
-								(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props} />)
+								(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props}/>)
 							}
 						</div>} >
 						<TabPane tab="通知查询" key="1">
@@ -242,7 +261,7 @@ class TipsTable extends Component {
 								<Col span={18}>
 									<Row>
 										<Col span={6} >
-											<FormItem {...formItemLayout} label="主题">
+											<FormItem {...formItemLayout} label="名称">
 												{
 													getFieldDecorator('theme', {
 														rules: [
@@ -250,6 +269,23 @@ class TipsTable extends Component {
 														]
 													})
 														(<Input placeholder="请输入主题" />)
+												}
+											</FormItem>
+										</Col>
+										
+										<Col span={6}>
+											<FormItem {...formItemLayout} label="发布单位">
+												{
+													getFieldDecorator('workunit', {
+														rules: [
+															{ required: false, message: '发布单位' },
+														]
+													})
+													(<Select allowClear style={{width:'100%'}}>
+														{
+															this.array
+														}
+													</Select>)
 												}
 											</FormItem>
 										</Col>
@@ -271,24 +307,7 @@ class TipsTable extends Component {
 														>
 														</RangePicker>)
 												}
-
 											</FormItem>
-
-										</Col>
-										<Col span={6}>
-											<FormItem {...formItemLayout} label="发布单位">
-												{
-													getFieldDecorator('workunit', {
-														rules: [
-															{ required: false, message: '发布单位' },
-														]
-													})
-														(<Input placeholder="请输入发布单位" />)
-												}
-
-
-											</FormItem>
-
 										</Col>
 										<Col span={6}>
 											<FormItem {...formItemLayout} label="紧急程度">
@@ -298,20 +317,16 @@ class TipsTable extends Component {
 															{ required: false, message: '紧急程度' },
 														]
 													})
-														(<Select defaultValue="0" style={{ width: '100%' }}
+														(<Select style={{ width: '100%' }}
 														>
 															<Option value="0">平件</Option>
 															<Option value="1">加急</Option>
 															<Option value="2">特急</Option>
 														</Select>)
 												}
-
-
 											</FormItem>
-
 										</Col>
 									</Row>
-
 								</Col>
 								<Col span={2} offset={1}>
 									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
@@ -351,7 +366,7 @@ class TipsTable extends Component {
 											</FormItem>
 										</Col>
 										<Col span={6} >
-											<FormItem {...formItemLayout} label="发布日期">
+											<FormItem {...formItemLayout} label="修改日期">
 
 												{
 													getFieldDecorator('worktimes', {
@@ -380,7 +395,11 @@ class TipsTable extends Component {
 															{ required: false, message: '发布单位' },
 														]
 													})
-														(<Input placeholder="请输入发布单位" />)
+													(<Select allowClear style={{ width: '100%' }}>
+														{
+															this.array
+														}
+													</Select>)
 												}
 
 
@@ -395,7 +414,7 @@ class TipsTable extends Component {
 															{ required: false, message: '紧急程度' },
 														]
 													})
-														(<Select defaultValue="0" style={{ width: '100%' }}
+														(<Select style={{ width: '100%' }}
 														>
 															<Option value="0">平件</Option>
 															<Option value="1">加急</Option>

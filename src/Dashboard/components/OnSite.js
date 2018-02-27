@@ -3,9 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { actions } from '../store'
 import { Button, Modal, Spin, message, Collapse, Checkbox } from 'antd'
-import { Icon } from 'react-fa'
-// import {Icon} from 'react-fa';
-// import {users, safetys, hazards, vedios} from './geojsonFeature';
+import { Icon } from 'react-fa';
 import { panorama_360 } from './geojsonFeature'
 import {
     PDF_FILE_API,
@@ -14,8 +12,6 @@ import {
     Video360_API2,
     DashboardVideo360API,
 } from '_platform/api'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import './OnSite.less'
 import CityMarker from './CityMarker'
 import CameraVideo from '../../Video/components/CameraVideo'
@@ -218,19 +214,22 @@ export default class Lmap extends Component {
         L.control.zoom({ position: 'bottomright' }).addTo(this.map)
 
         this.tileLayer = L.tileLayer(this.tileUrls[1], {
-            attribution: '&copy;<a href="">ecidi</a>',
-            id: 'tiandi-map',
-            subdomains: this.subDomains,
+            subdomains: [1, 2, 3],
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0
         }).addTo(this.map)
-        //航拍影像
-        if (CUS_TILEMAP)
-            L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map)
 
-        L.tileLayer
-            .wms(this.WMSTileLayerUrl, {
-                subdomains: this.subDomains,
-            })
-            .addTo(this.map)
+        L.tileLayer(this.WMSTileLayerUrl, {
+            subdomains: [1, 2, 3], 
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0 
+        }).addTo(this.map)
+
+        //航拍影像
+        // if (CUS_TILEMAP)
+        //     L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map)
         
     }
 

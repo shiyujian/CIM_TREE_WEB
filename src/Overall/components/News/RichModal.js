@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Row, Col, Button, message } from 'antd';
+import { Modal, Form, Input, Row, Col, Button, message,Select } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
@@ -9,14 +9,25 @@ import E from 'wangeditor'
 let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
+const Option = Select.Option;
 
 class RichModal extends Component {
+	array = [];
     constructor(props) {
-        super(props);
+		super(props);
+		debugger
         this.state = {
             content: "",
         }
-    }
+	}
+	componentDidUpdate(){
+		debugger
+		if(this.props.array.length>0){
+			this.props.array.map(item=>{
+				this.array.push(<Option value={item.code}>{item.name}</Option>)
+			})
+		}
+	}
 
     componentDidMount() {
         const elem = this.refs.editorElem;
@@ -103,7 +114,7 @@ class RichModal extends Component {
 				if (toggleData.status === 'ADD') {
 					let newData = {
 						"title": values['title'] || '',
-						"abstract": values['abstract'] || '',
+						"org": values['org'] || '',
 						"raw": this.state.content,
 						"content": "",
 						"attachment": {},
@@ -128,7 +139,7 @@ class RichModal extends Component {
 				} else if (toggleData.status === 'EDIT') {
 					let newData = {
 						"title": values['title'] || '',
-						"abstract": values['abstract'] || '',
+						"org": values['org'] || '',
 						"raw": this.state.content,
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"categories": [4],
@@ -169,7 +180,7 @@ class RichModal extends Component {
 			validateFields((err, values) => {
 				let newData = {
 					"title": values['title'] || '',
-					"abstract": values['abstract'] || '',
+					"org": values['org'] || '',
 					"raw": this.state.content,
 					"categories": [4],
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -194,7 +205,7 @@ class RichModal extends Component {
 			validateFields((err, values) => {
 				let newData = {
 					"title": values['title'] || '',
-					"abstract": values['abstract'] || '' ,
+					"org": values['org'] || '' ,
 					"raw": this.state.content || '',
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [1],
@@ -228,6 +239,13 @@ class RichModal extends Component {
 	}
 
     render() {
+		debugger
+		this.array = [];
+		if(this.props.array.length>0){
+			this.props.array.map(item=>{
+				this.array.push(<Option value={item.code}>{item.name}</Option>)
+			})
+		}
 
         const {
 			form: { getFieldDecorator },
@@ -267,8 +285,12 @@ class RichModal extends Component {
                             </Col>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label="发布单位">
-                                    {getFieldDecorator('abstract', {})(
-                                        <Input />
+                                    {getFieldDecorator('org', {})(
+                                        (<Select allowClear>
+											{
+												this.array
+											}
+										</Select>)
                                     )}
                                 </FormItem>
                             </Col>
@@ -285,9 +307,9 @@ class RichModal extends Component {
                     </Row>
                     <Row style={{ marginTop: 20 }}>
                         <Col span={24} offset={10} >
-                            <Button onClick={this.modalClick.bind(this)}>取消</Button>
-                            <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
-                            <Button style={{ marginLeft: 20 }} onClick={this.draftDataFunc.bind(this)}>暂存</Button>
+                            <Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
+							<Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
+							<Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
                         </Col>
                     </Row>
                 </div>

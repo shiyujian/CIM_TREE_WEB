@@ -18,7 +18,7 @@ export default class PermissionTable extends Component {
 				return { ...ele };
 			});
 		} else {
-			userPermi = MODULES2.map(ele => {
+			userPermi = MODULES.map(ele => {
 				return { ...ele };
 			});
 		}

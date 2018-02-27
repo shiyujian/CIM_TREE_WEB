@@ -283,7 +283,10 @@ class SimpleText extends Component {
 							<Col span={6} offset={1}>
 								<FormItem {...formItemLayout} label="发布单位">
 									{getFieldDecorator('abstract', {})(
-										<Input type="text" />
+										(<Select allowClear style={{ width: '100%' }}>
+											<Option value="0">雄安新区植树造林指挥部办公室</Option>
+											<Option value="1">河北远大工程咨询有限公司雄安新区九号地块一区造林项目监理部</Option>
+										</Select>)
 									)}
 								</FormItem>
 							</Col>

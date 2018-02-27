@@ -2,15 +2,10 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions} from '../store';
-import {Button, Modal, Spin, message, Collapse, Checkbox} from 'antd';
+import {Button, Modal, Spin, message, Collapse, Checkbox,Radio} from 'antd';
 import {Icon} from 'react-fa'
-// import {Icon} from 'react-fa';
-// import {users, safetys, hazards, vedios} from './geojsonFeature';
 import {panorama_360} from './geojsonFeature';
 import {PDF_FILE_API, previewWord_API, CUS_TILEMAP, Video360_API2,DashboardVideo360API} from '_platform/api';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'
-import './OnSite.less';
 import CityMarker from './CityMarker';
 import CameraVideo from '../../Video/components/CameraVideo';
 import DashPanel from "./DashPanel";
@@ -21,8 +16,11 @@ import UserSelect from '_platform/components/panels/UserSelect';
 import {wrapperMapUser} from './util';
 import DGN from '_platform/components/panels/DGN';
 import DGNProjectInfo from './DGNProjectInfo';
-import PkCodeTree from './PkCodeTree'
-
+import PkCodeTree from './PkCodeTree';
+import './OnSite.less';
+//import './Project.less';
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 const Panel = Collapse.Panel;
 const $ = window.$;
 window.config = window.config || {};
@@ -48,7 +46,6 @@ export default class Lmap extends Component {
 			isNotDisplay: {
 				display: ''
 			},
-			// leafletCenter: [22.516818, 113.868495],
 			leafletCenter: [38.92, 115.98], // 雄安
 			toggle: true,
 			previewUrl: '',
@@ -85,14 +82,10 @@ export default class Lmap extends Component {
 			userOnlineNumber: 0,
 			selectedMenu: '1',
 			isVisibleMapBtn: true,
+			isTwoScreenShow:1,
 			userOnlineState: false,
 			userOnline:[],
 			nowShowModel:`${model_name}`,
-			//测试选择人员功能是否好用
-			// userOnline:[{
-			// 	id:528,
-			// 	username:'18867508296'
-			// }]
 			fullExtent: window.config.fullExtent || {
 				minlat: 22.468466,
 				maxlat: 22.564885,
@@ -105,7 +98,11 @@ export default class Lmap extends Component {
 		this.OnlineState = false;
 		this.checkMarkers = [];
 		this.tileLayer = null;
+		this.tileLayer2 = null;
+		this.imgTileLayer = null;
+		this.cvaTileLayer = null;
 		this.map = null;
+		this.map2 = null;
 		this.track = null;
 		this.orgs = null;
 		this.timeInteval = null;
@@ -124,24 +121,27 @@ export default class Lmap extends Component {
 			userList: {}
 		}
 	}
-	
 
-	 async componentDidMount() {
+	async componentDidMount() {
 		this.initMap();
+		this.initMap2();
+		//地图联动
+		const maps = [this.map,this.map2];
+		//事件
+		function maplink(e){
+			let _this = this;
+			maps.map(function(t){
+				t.setView(_this.getCenter(),_this.getZoom());
+			});
+		}
+		//绑定
+		maps.map(function (t) {
+		  t.on({moveend:maplink,zoomend:maplink})
+		})
 	}
 
-	// componentWillUnmount() {
-	// 	if (this.state.iframe_key) {
-	// 		$('#showCityMarkerId')[0].contentWindow.terminateRender &&
-	// 		$('#showCityMarkerId')[0].contentWindow.terminateRender();
-	// 	}
-	// }
-
-	
-	
 	WMSTileLayerUrl = window.config.WMSTileLayerUrl;
 	subDomains = ['7'];
-
 	tileUrls = {
 		// 1: window.config.IMG_W,
 		// 2: window.config.VEC_W,
@@ -153,103 +153,106 @@ export default class Lmap extends Component {
 		
 
 	};
-	
 	/*初始化地图*/
 	initMap() {
 		this.map = L.map('mapid', window.config.initLeaflet);
 
 		L.control.zoom({position: 'bottomright'}).addTo(this.map);
-
-		this.tileLayer = L.tileLayer(this.tileUrls[3], {
-			attribution: '&copy;<a href="">ecidi</a>',
-			id: 'tiandi-map',
-			subdomains: this.subDomains
+		
+		this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
+			subdomains: [1, 2, 3],
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0 
 		}).addTo(this.map);
+
+		this.cvaTileLayer = L.tileLayer(`${window.config.WMSTileLayerUrl}`, { 
+			subdomains: [1, 2, 3], 
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0 
+		}).addTo(this.map);
+
+		this.tileLayer = L.tileLayer("http://47.104.159.127:200/3", { 
+			opacity:1.0,
+			subdomains: [1, 2, 3], 
+			minZoom: 12, 
+			maxZoom: 20, 
+			storagetype: 0,
+			tiletype:"arcgis",
+		}).addTo(this.map);
+
 		//航拍影像
-		// if (CUS_TILEMAP)
-		// 	L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
-
-		// L.tileLayer.wms(this.WMSTileLayerUrl, {
-		// 	subdomains: this.subDomains
-		// }).addTo(this.map);
-		// let me = this;
-
-		// document.querySelector('.leaflet-popup-pane').addEventListener('click', function (e) {
-		// 	let target = e.target;
-		// 	//绑定轨迹查看点击事件
-		// 	if (target.getAttribute('class') == 'btnViewTrack') {
-		// 		let id = target.getAttribute('data-id');
-		// 		//拿到人员信息
-		// 		let user = me.user.userList[id];
-		// 		let name = user.properties.name;
-
-		// 		//开始显示轨迹
-		// 		me.setState({isShowTrack: false});
-		// 		me.setState({isShowTrack: true, trackId: id, trackUser: name});
-		// 	}
-		// 	//绑定隐患详情点击事件
-		// 	if (target.getAttribute('class') == 'btnViewRisk') {
-		// 		let idRisk = target.getAttribute('data-id');
-		// 		let risk = null;
-		// 		me.state.hazards.forEach(v => {
-		// 			if (!risk)
-		// 				risk = v.children.find(v1 => v1.key == parseInt(idRisk));
-		// 		});
-		// 		if (risk) {
-		// 			let oldRisk = me.state.risk;
-		// 			oldRisk.showRiskDetail = true;
-		// 			oldRisk.processHistory = [];
-		// 			oldRisk.detail = risk;
-		// 			me.setState({risk: oldRisk});
-		// 			me.getRiskProcess(idRisk);
-		// 		}
-		// 	}
-		// })
+		//L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
+		// document.querySelector('#mapid').addEventListener('animationend', function(){
+        //     this.map.invalidateSize();
+        //     console.log('test');
+        // });
 	}
+	initMap2() {
+		this.map2 = L.map('mapid2', window.config.initLeaflet);
 
+		L.control.zoom({position: 'bottomright'}).addTo(this.map);
+		
+		this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
+			subdomains: [1, 2, 3],
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0 
+		}).addTo(this.map2);
 
-	show2DMap() {
-		this.setState({
-			isNotThree: true,
-			isNotDisplay: {display: ''},
-			selectedMenu: '1',
-			isVisibleMapBtn: true
-		});
-		if (this.state.iframe_key) {
-			$("#appendBody").css("top", "100%");
-			// $("#showCityMarkerId").css("width", "0");
-			let cityMarkerDom = $('#showCityMarkerId')[0];
-			cityMarkerDom.contentWindow.pauseRender &&
-			cityMarkerDom.contentWindow.pauseRender();
-		}
+		this.cvaTileLayer = L.tileLayer(`${window.config.WMSTileLayerUrl}`, { 
+			subdomains: [1, 2, 3], 
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0 
+		}).addTo(this.map2);
+
+		this.tileLayer2 = L.tileLayer("http://47.104.159.127:200/3", { 
+			opacity:1.0,
+			subdomains: [1, 2, 3], 
+			minZoom: 12, 
+			maxZoom: 20, 
+			storagetype: 0,
+			tiletype:"arcgis",
+		}).addTo(this.map2);
+
+		//航拍影像
+		//L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
 	}
-
-	//切换为2D
-	toggleTileLayer(index) {
-
-				
+	//切换
+	toggleTileLayer(e) {
+		const index = e.target.value;
+		console.log('index',index)
 		this.tileLayer.setUrl(this.tileUrls[index]);
-		this.setState({TileLayerUrl: this.tileUrls[index]});
-		this.show2DMap();
-
+	}
+	toggleTileLayer2(e) {
+		const index = e.target.value;
+		console.log('index',index)
+		this.tileLayer2.setUrl(this.tileUrls[index]);
+	}
+	//切换单双屏幕
+	toggleOneOrTwoScreen(e){
+		const index = e.target.value;
+		console.log('index',index)
+		this.setState({
+			isTwoScreenShow: index
+		});
+		//设置范围
+		if(index == 1)
+			return;
+		setTimeout(function(){ 
+			this.map.invalidateSize()
+		}, 2000);
 		
 	}
-
-	
-
-	
-
 	//图例的显示与否
 	toggleIcon() {
 		this.setState({
 			toggle: !this.state.toggle
 		})
 	}
-
-
-	
 	/*显示隐藏地图marker*/
-	
 	onEndResize(e) {
 		this.menu.isStart = false;
 	}
@@ -268,72 +271,86 @@ export default class Lmap extends Component {
 			this.setState({menuWidth: menuWidth});
 		}
 	}
-
-	
 	render() {
 		let height = document.querySelector('html').clientHeight - 80 - 36 - 52;
 		let treeLists = this.state.treeLists;
+		let display1 = this.state.isTwoScreenShow == 2 ? 'treeControl3' : 'treeControl2'
 		return (
 			<div className="map-container">
 				<div ref="appendBody" className="l-map r-main"
 				     onMouseUp={this.onEndResize.bind(this)}
 				     onMouseMove={this.onResizingMenu.bind(this)}>
 					{
-						this.state.isVisibleMapBtn ?
-							<div className="treeControl">
-								<div>
-									<Button onClick={this.toggleTileLayer.bind(this, 1)}>2017年11月15日</Button>
-									<Button onClick={this.toggleTileLayer.bind(this, 2)}>2017年11月24日</Button>
-									<Button onClick={this.toggleTileLayer.bind(this, 3)}>2017年12月01日</Button>
-									<Button onClick={this.toggleTileLayer.bind(this, 4)}>2017年12月10日</Button>
-									<Button onClick={this.toggleTileLayer.bind(this, 5)}>2017年12月13日</Button>
-									
-								</div>
-							</div> : ''
-					}
-					{
-						this.state.isShowTrack ?
-							<TrackPlayBack {...this.props} map={this.map} trackId={this.state.trackId}
-							               trackUser={this.state.trackUser}
-							               close={this.exitTrack.bind(this)}/>
-						: ''
-					}
-					<div>
-						<div style={(this.state.selectedMenu ==1 && this.state.isNotThree == true) ? {} : {display: 'none'}}>
-							<div id="mapid" style={{
+						<div className="treeControl" style={{"zIndex":999}}>
+							<div>
+								<RadioGroup defaultValue={1} onChange={this.toggleOneOrTwoScreen.bind(this)} size="large">
+									<RadioButton value={1}>单屏</RadioButton>
+									<RadioButton value={2}>双屏</RadioButton>
+								</RadioGroup>
+							</div>
+						</div>
+					}{
+						<div className={display1} style={{"zIndex":888}}>
+							<div>
+								<RadioGroup defaultValue={1} onChange={this.toggleTileLayer.bind(this)} size="small">
+									<RadioButton value={1}>2017年11月15日</RadioButton>
+									<RadioButton value={2}>2017年11月24日</RadioButton>
+									<RadioButton value={3}>2017年12月01日</RadioButton>
+									<RadioButton value={4}>2017年12月10日</RadioButton>
+									<RadioButton value={5}>2017年12月13日</RadioButton>
+								</RadioGroup>
+							</div>
+						</div>
+					}{
+						this.state.isTwoScreenShow == 2 ?
+						<div className="treeControl2" style={{"zIndex":888}}>
+							<div>
+								<RadioGroup defaultValue={1} onChange={this.toggleTileLayer2.bind(this)} size="small">
+									<RadioButton value={1}>2017年11月15日</RadioButton>
+									<RadioButton value={2}>2017年11月24日</RadioButton>
+									<RadioButton value={3}>2017年12月01日</RadioButton>
+									<RadioButton value={4}>2017年12月10日</RadioButton>
+									<RadioButton value={5}>2017年12月13日</RadioButton>
+								</RadioGroup>
+							</div>
+						</div> : null
+					}{
+						this.state.isTwoScreenShow == 2 ?
+						<div id="mapid" style={{
+							"position": "absolute",
+							"top": 0,
+							"bottom": 0,
+							"left": 0,
+							"right": 0,
+							"borderLeft": "1px solid #ccc",
+							"float": "left",
+							"width": "50%"
+						}}/> :
+						<div id="mapid" style={{
+							"position": "absolute",
+							"top": 0,
+							"bottom": 0,
+							"left": 0,
+							"right": 0,
+							"borderLeft": "1px solid #ccc",
+							"zIndex":777
+						}}/>
+					}{
+						<div id="mapid2" style={{
 								"position": "absolute",
 								"top": 0,
 								"bottom": 0,
-								"left": 0,
+								"left": "50%",
 								"right": 0,
-								"borderLeft": "1px solid #ccc"
-							}}>
-							</div>
-						</div>
-						<div style={ this.state.selectedMenu ==2 ? {} :{display:'none'}}>
-						{
-							(this.state.iframe_key === true) ? <CityMarker/> : null
-						}
-						</div>
-						<div style={ this.state.selectedMenu ==3 ? {} :{display:'none'}}>
-							{
-							(this.state.iframe_dgn === true ) ? 	
-								<DGNProjectInfo {...this.props}></DGNProjectInfo>
-								 : null
-							}
-						</div>
-					</div>
-
+								"borderLeft": "1px solid #ccc",
+								"float": "right",
+								"width": "50%"
+							}}/>
+					}
 				</div>
 			</div>
 		)
 	}
-
-	
-  
-
-	
-
 	}
 
 

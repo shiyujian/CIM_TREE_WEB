@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Input, Button, Select } from 'antd';
 import { CUS_TILEMAP } from '_platform/api';
-import 'leaflet/dist/leaflet.css';
+
 
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;

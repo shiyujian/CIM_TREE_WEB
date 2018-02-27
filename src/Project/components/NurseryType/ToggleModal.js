@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import {Modal, Form, Input, Upload, Icon, Row, Col, Button, Select, message} from 'antd';
 import {base, STATIC_DOWNLOAD_API,DefaultZoomLevel} from '_platform/api';
-import {Map, TileLayer, Marker, Polygon} from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import CodePicker from '_platform/components/panels/CodePicker';
 const FormItem = Form.Item;
 const Option = Select.Option;

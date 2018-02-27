@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Row, Col, Button, message } from 'antd';
+import { Modal, Form, Input, Row, Col, Button, message, Select } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
@@ -9,6 +9,7 @@ import E from 'wangeditor'
 let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
+const Option = Select.Option;
 
 class RichText extends Component {
 	constructor(props) {
@@ -229,7 +230,10 @@ class RichText extends Component {
 							<Col span={8} offset={1}>
 								<FormItem {...formItemLayout} label="发布单位">
 									{getFieldDecorator('abstract', {})(
-										<Input type="text" />
+										(<Select allowClear style={{ width: '100%' }}>
+											<Option value="0">雄安新区植树造林指挥部办公室</Option>
+											<Option value="1">河北远大工程咨询有限公司雄安新区九号地块一区造林项目监理部</Option>
+										</Select>)
 									)}
 								</FormItem>
 							</Col>
