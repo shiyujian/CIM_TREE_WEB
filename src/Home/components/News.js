@@ -1,8 +1,10 @@
-import React, {Component} from 'react';
-import {Table, Row, Col, Modal,} from 'antd';
+import React, { Component } from 'react';
+import { Table, Row, Col, Modal, Tabs } from 'antd';
 import Blade from '_platform/components/panels/Blade';
 import moment from 'moment';
 import styles from './styles.less';
+
+const TabPane = Tabs.TabPane;
 
 export default class News extends Component {
 
@@ -17,8 +19,9 @@ export default class News extends Component {
 	static propTypes = {};
 
 	componentDidMount() {
-		const {actions: {getNewsList}} = this.props;
-		getNewsList({}, {tag: '新闻', is_draft: false});
+		const { actions: { getNewsList,getTipsList } } = this.props;
+		getNewsList({}, { tag: '新闻', is_draft: false });
+		getTipsList({}, { tag: '公告', is_draft: false });
 	}
 
 	clickNews(record, type) {
@@ -28,6 +31,12 @@ export default class News extends Component {
 				container: record.raw
 			})
 		}
+	}
+
+	//新闻和通知的列表切换
+	subTabChange(tabValue) {
+		const { actions: { setTabActive } } = this.props;
+		setTabActive(tabValue);
 	}
 
 	columns = [
@@ -62,6 +71,40 @@ export default class News extends Component {
 
 	];
 
+	draftColumns = [
+		{
+			title: '通知标题',
+			dataIndex: 'title',
+			key: 'title',
+			width: 400
+		},
+
+		{
+			title: '发布时间',
+			dataIndex: 'pub_time',
+			key: 'pub_time',
+			width: 200,
+			render: pub_time => {
+				return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
+			}
+		},
+
+		{
+			title: '操作',
+			width: 100,
+			render: record => {
+				return (
+					<span>
+						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
+					</span>
+				)
+			}
+		},
+
+	];
+
+	
+
 	handleCancel() {
 		this.setState({
 			visible: false,
@@ -72,20 +115,48 @@ export default class News extends Component {
 	render() {
 		const {
 			newsList = [],
+			tipsList = []
 		} = this.props;
 
 		return (
-			<Blade title="新闻">
-					<div className="tableContainer">
-						<Table bordered={false} dataSource={newsList} columns={this.columns}
-						       rowKey="id" size="small" pagination={{pageSize: 8}}/>
-					</div>
-					<Modal title="新闻预览" width={800} visible={this.state.visible}
-						onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
-						<div style={{maxHeight: '800px', overflow: 'auto'}}
-						     dangerouslySetInnerHTML={{__html: this.state.container}}/>
-					</Modal>
-			</Blade>
+
+			// <Blade title="新闻">
+			// 		<div className="tableContainer">
+			// 			<Table bordered={false} dataSource={newsList} columns={this.columns}
+			// 			       rowKey="id" size="small" pagination={{pageSize: 8}}/>
+			// 		</div>
+			// 		<Modal title="新闻预览" width={800} visible={this.state.visible}
+			// 			onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
+			// 			<div style={{maxHeight: '800px', overflow: 'auto'}}
+			// 			     dangerouslySetInnerHTML={{__html: this.state.container}}/>
+			// 		</Modal>
+			// </Blade>
+
+			<Row>
+				<Col span={22} offset={1}>
+					<Tabs onChange={this.subTabChange.bind(this)} >
+
+						<TabPane tab="新闻" key="1">
+							<Table dataSource={newsList}
+								columns={this.columns}
+								rowKey="id" />
+						</TabPane>
+						<TabPane tab="通知" key="2">
+							<Table dataSource={tipsList}
+								columns={this.draftColumns}
+								rowKey="id" />
+						</TabPane>
+					</Tabs>
+
+				</Col>
+				<Modal title="预览" width={800} visible={this.state.visible}
+					onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
+					<div style={{ maxHeight: '800px', overflow: 'auto' }}
+						dangerouslySetInnerHTML={{ __html: this.state.container }} />
+				</Modal>
+			</Row>
+
+			
 		);
 	}
 }

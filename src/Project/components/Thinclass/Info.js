@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import { Row, Col, Form, Input, Button, Popconfirm, Table, Icon } from 'antd';
-import { divIcon } from 'leaflet';
-import { Map, TileLayer, Marker, Polygon } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { STATIC_DOWNLOAD_API, DefaultZoomLevel } from '_platform/api';
 import { CollapsePanel } from 'antd/lib/collapse/Collapse';
 

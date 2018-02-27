@@ -4,12 +4,8 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../store';
 import { Button, Modal, Spin, message, Collapse, Checkbox, DatePicker } from 'antd';
 import { Icon } from 'react-fa'
-// import {Icon} from 'react-fa';
-// import {users, safetys, hazards, vedios} from './geojsonFeature';
 import { panorama_360 } from './geojsonFeature';
 import { PDF_FILE_API, previewWord_API, CUS_TILEMAP, Video360_API2, DashboardVideo360API } from '_platform/api';
-import L, { LatLng } from 'leaflet';
-import 'leaflet/dist/leaflet.css'
 import './OnSite.less';
 import CityMarker from './CityMarker';
 import CameraVideo from '../../Video/components/CameraVideo';
@@ -121,18 +117,12 @@ export default class Plan extends Component {
     }
 
     componentDidMount() {
+        //this.getMapRouter();
         this.initMap();
-        this.getMapRouter();
     }
 
     componentWillUnmount() {
         clearInterval(this.timeInteval)
-        /*三维切换卡顿*/
-
-        if (this.state.iframe_key) {
-            $('#showCityMarkerId')[0].contentWindow.terminateRender &&
-                $('#showCityMarkerId')[0].contentWindow.terminateRender();
-        }
     }
 
     /*查询巡检路线*/
@@ -171,37 +161,23 @@ export default class Plan extends Component {
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
         this.tileLayer = L.tileLayer(this.tileUrls[1], {
-            attribution: '&copy;<a href="">ecidi</a>',
-            id: 'tiandi-map',
-            subdomains: this.subDomains
-        }).addTo(this.map);
+            subdomains: [1, 2, 3],
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0
+        }).addTo(this.map)
 
-
+        L.tileLayer(this.WMSTileLayerUrl, {
+            subdomains: [1, 2, 3], 
+			minZoom: 1, 
+			maxZoom: 20, 
+			storagetype: 0 
+        }).addTo(this.map)
 
         //航拍影像
-        if (CUS_TILEMAP)
-            L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
+        // if (CUS_TILEMAP)
+        //     L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
 
-        L.tileLayer.wms(this.WMSTileLayerUrl, {
-            subdomains: this.subDomains
-        }).addTo(this.map);
-        let me = this;
-
-        document.querySelector('.leaflet-popup-pane').addEventListener('click', function (e) {
-            let target = e.target;
-            //绑定轨迹查看点击事件
-            if (target.getAttribute('class') == 'btnViewTrack') {
-                let id = target.getAttribute('data-id');
-                //拿到人员信息
-                let user = me.user.userList[id];
-                let name = user.properties.name;
-
-                //开始显示轨迹
-                me.setState({ isShowTrack: false });
-                me.setState({ isShowTrack: true, trackId: id, trackUser: name });
-            }
-
-        })
     }
     genPopUpContent(geo) {
         const { properties = {} } = geo;
@@ -225,46 +201,6 @@ export default class Plan extends Component {
         }
     }
 
-    // /*在地图上添加marker和polygan*/
-    // createMarker(geo, oldMarker) {
-    //     var me = this;
-    //     console.log("geo", geo, )
-    //     //创建区域图形
-
-    //     //地块标注
-    //     console.log('area', area)
-
-    //     let latlng = area.getBounds().getCenter();
-
-    //     console.log('lat',latlng)
-    //     let label = L.marker([latlng.lat, latlng.lng], {
-    //         icon: L.divIcon({
-    //             className: this.getIconType('people'),
-    //             // className: 'label-text',
-    //             html: geo.properties.name,
-    //             iconSize: [48, 20]
-    //         })
-    //     });
-    //     area.addLayer(label);
-    //     //点击预览
-    //     area.on({
-    //         click: function (event) {
-    //             me.previewFile(geo.file_info, geo.properties);
-    //         }
-    //     });
-    //     return area;
-    // }
-
-    // let latlngs = geo.geometry.coordinates[0]
-    // let polyline = L.polyline(latlngs,{color:'red'}).addTo(this.map)
-    // this.map.fitBounds(polyline.getBounds())
-    // console.log('la',latlngs)
-
-
-
-
-
-
     options = [
         { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access', },
 
@@ -275,71 +211,11 @@ export default class Plan extends Component {
         { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning', },
         { label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera', },
     ];
-    //切换伟景行
-    switchToDgn() {
-        this.setState({
-            isNotThree: true,
-            isNotDisplay: { display: '' },
-            selectedMenu: '3',
-            isVisibleMapBtn: true
-        });
-        if (!this.state.iframe_dgn) {
-            this.setState({
-                iframe_dgn: true
-            });
-        }
-        if (this.state.iframe_key) {
-            $("#appendBody").css("top", "100%");
-            // $("#showCityMarkerId").css("width", "0");
-            let cityMarkerDom = $('#showCityMarkerId')[0];
-            cityMarkerDom.contentWindow.pauseRender &&
-                cityMarkerDom.contentWindow.pauseRender();
-        }
-    }
-
-    //切换为3D
-    setTrueForThree() {
-        this.setState({
-            isNotThree: false,
-            isNotDisplay: { display: 'none' },
-            selectedMenu: '2',
-            isVisibleMapBtn: false
-        });
-        if (!this.state.iframe_key) {
-            this.setState({
-                iframe_key: true
-            });
-        }
-        if (this.state.iframe_key) {
-            $("#appendBody").css("top", "0");
-            // $("#showCityMarkerId").css("width", "100%");
-            let cityMarkerDom = $('#showCityMarkerId')[0];
-            cityMarkerDom.contentWindow.resumeRender &&
-                cityMarkerDom.contentWindow.resumeRender();
-        }
-    }
-
-    show2DMap() {
-        this.setState({
-            isNotThree: true,
-            isNotDisplay: { display: '' },
-            selectedMenu: '1',
-            isVisibleMapBtn: true
-        });
-        if (this.state.iframe_key) {
-            $("#appendBody").css("top", "100%");
-            // $("#showCityMarkerId").css("width", "0");
-            let cityMarkerDom = $('#showCityMarkerId')[0];
-            cityMarkerDom.contentWindow.pauseRender &&
-                cityMarkerDom.contentWindow.pauseRender();
-        }
-    }
 
     //切换为2D
     toggleTileLayer(index) {
         this.tileLayer.setUrl(this.tileUrls[index]);
         this.setState({ TileLayerUrl: this.tileUrls[index], mapLayerBtnType: !this.state.mapLayerBtnType });
-        this.show2DMap();
     }
 
     //获取对应的ICON
@@ -394,79 +270,45 @@ export default class Plan extends Component {
         let latlngs = [["22.52", "113.8937304"], ["22.523", "113.893730454"], ["22.5234", "113.893730454"], ["22.523456", "113.893730454"]]
         let polyline = L.polyline(latlngs, { color: 'red' }).addTo(this.map)
         // this.map.fitBounds(polyline.getBounds())
-        // [116.03228, 30.99795],[116.03228, 30.99795], [116.02998, 30.99818], [116.02998, 30.99818], [116.02777, 30.99846],  [116.02777, 30.99846]
-
-
-        // marker.bindPopup(L.popup({ maxWidth: 240 }).setContent(this.genPopUpContent(geo)));
-
-        // let iconType = L.divIcon({ className: this.getIconType('people') });
-        // let marker = L.marker(["22.52", "113.893730454"],{ icon: iconType });
-        // marker.addTo(this.map);
-
-
-
-
-
-
-
-
-
-
-
-
-        // let message = {
-        //     "key": 3, "type": "Feature",
-        //     "properties": { "name": "18单元", "type": "area" },
-        //     "geometry": { "type": "Polygon", "coordinates":[[[113.877784386,22.5117639571],[113.882108643,22.5047736849],[113.882108641,22.5047736833],[113.868401504,22.5006748803],[113.866689052,22.5084447334],[113.877784386,22.5117639571]]] },
-
-        // }
-        // let area = L.geoJSON(message, {}).addTo(this.map);
-
-
-
-        //[[[113.877784386,22.5117639571],[113.882108643,22.5047736849],[113.882108641,22.5047736833],[113.868401504,22.5006748803],[113.866689052,22.5084447334],[113.877784386,22.5117639571]]]
-
-
+       
 
     }
 
     onCheck(keys, featureName) {
+        // let me = this;
+        // this.setState({ userCheckedKeys: keys }, () => {
+        //     const { getMapList } = this.props.actions;
 
-        
-        let me = this;
-        this.setState({ userCheckedKeys: keys }, () => {
-            const { getMapList } = this.props.actions;
+        //     getMapList({ routeID: this.state.userCheckedKeys[0] }).then((orgs) => {
+        //         let set = {}
+        //         orgs.forEach(item => {
 
-            getMapList({ routeID: this.state.userCheckedKeys[0] }).then((orgs) => {
-                let set = {}
-                orgs.forEach(item => {
+        //             set[item.RouteID] = []
+        //         })
+        //         orgs.forEach(item => {
+        //             if (set[item.RouteID]) {
+        //                 set[item.RouteID].push({
+        //                     'GPSTime': item.GPSTime, 'ID': item.ID,
+        //                     'Patroler': item.Patroler, 'X': item.X, 'Y': item.Y
+        //                 })
+        //             }
+        //         })
+        //         let arr = []
+        //         for (var i in set) {
+        //             arr.push(i)
+        //         }
+        //         // console.log('arr', arr)
 
-                    set[item.RouteID] = []
-                })
-                orgs.forEach(item => {
-                    if (set[item.RouteID]) {
-                        set[item.RouteID].push({
-                            'GPSTime': item.GPSTime, 'ID': item.ID,
-                            'Patroler': item.Patroler, 'X': item.X, 'Y': item.Y
-                        })
-                    }
-                })
-                let arr = []
-                for (var i in set) {
-                    arr.push(i)
-                }
-                // console.log('arr', arr)
+        //         let arr1 = []
+        //         for (var i in set) {
+        //             arr1.push(set[i])
 
-                let arr1 = []
-                for (var i in set) {
-                    arr1.push(set[i])
-
-                }
-                // console.log("arr1", arr1)
-                me.setState({ mapRould: arr1 })
-                me.setState({ mapList: arr });
-            })
-        });
+        //         }
+        //         // console.log("arr1", arr1)
+        //         me.setState({ mapRould: arr1 })
+        //         me.setState({ mapList: arr });
+        //     })
+        // });
 
     }
 
@@ -639,18 +481,6 @@ export default class Plan extends Component {
                                 "borderLeft": "1px solid #ccc"
                             }}>
                             </div>
-                        </div>
-                        <div style={this.state.selectedMenu == 2 ? {} : { display: 'none' }}>
-                            {
-                                (this.state.iframe_key === true) ? <CityMarker /> : null
-                            }
-                        </div>
-                        <div style={this.state.selectedMenu == 3 ? {} : { display: 'none' }}>
-                            {
-                                (this.state.iframe_dgn === true) ?
-                                    <DGNProjectInfo {...this.props}></DGNProjectInfo>
-                                    : null
-                            }
                         </div>
                     </div>
                     <Modal title={this.state.previewTitle} visible={this.state.previewVisible}

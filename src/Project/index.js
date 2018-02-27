@@ -210,7 +210,7 @@ export default class Project extends Component {
 			children: [{
 				key: 'SafetySystem',
 				id: 'PROJECT.SAFETYSYSTEM',
-				name: '安全体系目录',
+				name: '安全体系',
 				path: '/project/safetySystem',
 				exact: true,
 				icon: <Icon name="retweet" />,
@@ -221,12 +221,6 @@ export default class Project extends Component {
 				path: '/project/danger',
 				icon: <Icon name="code" />
 			}, {
-				key: 'Hazard',
-				id: 'PROJECT.HAZARD',
-				name: '安全隐患',
-				path: '/project/hazard',
-				icon: <Icon name="money" />  
-			},{
 				key: 'Unbearable',
 				id: 'PROJECT.UNBEARABLE',
 				name: '环境保护',
@@ -252,7 +246,7 @@ export default class Project extends Component {
 				icon: <Icon name="retweet" />
 			},{
 				key: 'EducationRegister',
-				id: 'SAFETY.EDUCATIONREGISTER',
+				id: 'PROJECT.EDUCATIONREGISTER',
 				name: '安全教育',
 				path: '/project/educationRegister',
 				icon: <Icon name="tag" />

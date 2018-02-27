@@ -14,29 +14,6 @@ class TotleModal extends Component {
             TreatmentData: this.props.treatmentdata
         })
     }
-    // //文件预览
-    // onViewClick(record, index) {
-    //     const { actions: { openPreview } } = this.props;
-    
-    //     console.log('record',record)
-    //     let filed = {};
-    //     if (record && record.file_id) {
-            
-    //         filed.misc = "file";
-    //         filed.a_file = `${SOURCE_API}` + record.a_file;
-    //         filed.download_url = `${STATIC_DOWNLOAD_API}` + record.download_url;
-    //         filed.name = record.fileName;
-    //         filed.id = record.file_id;
-    //         let type = record.a_file.split('.')[1];
-    //         if (type == 'xlsx' || type == 'docx' || type == 'xls' || type == 'doc' || type == 'pptx' || type == 'ppt') {
-    //             filed.mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    //         }
-    //         if (type == 'pdf') {
-    //             filed.mime_type = "application/pdf";
-    //         }
-    //     }
-    //     openPreview(filed);
-    // }
     onViewClick(record,index) {
 		const {actions: {openPreview}} = this.props;
         let filed = {}

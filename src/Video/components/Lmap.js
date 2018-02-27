@@ -2,12 +2,8 @@
  * Created by pans0911 on 2017/3/15.
  */
 import React, {Component} from 'react';
-import {Map, TileLayer, ZoomControl, WMSTileLayer, GeoJSON, Marker, Popup} from 'react-leaflet';
 import {Button, Card, Checkbox, Tag} from 'antd';
-
 import geoJsonFeature from './geojsonFeature';
-
-import L from 'leaflet';
 import styles from './style.css';
 import CameraVideo from './CameraVideo';
 import {DefaultZoomLevel} from '_platform/api';

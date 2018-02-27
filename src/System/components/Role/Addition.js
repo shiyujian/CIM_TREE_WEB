@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Modal, Form, Input, message} from 'antd';
 import {CUS_TILEMAP} from '_platform/api';
-import 'leaflet/dist/leaflet.css';
 
 const FormItem = Form.Item;
 

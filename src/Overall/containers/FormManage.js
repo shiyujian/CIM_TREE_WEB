@@ -74,7 +74,6 @@ export default class FormManage extends Component {
                                 {...this.state}  />
                 </Sidebar>
                 <Content>
-                    <SearchInfo {...this.props}/>
                     <TableInfo {...this.props}/>
                 </Content>
             </div>
