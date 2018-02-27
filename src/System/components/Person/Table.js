@@ -85,6 +85,7 @@ export default class Users extends Component {
 	}
 
 	render() {
+	
 		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {} } = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
@@ -98,11 +99,16 @@ export default class Users extends Component {
 			searchList,
 			search
 		}= this.state
-		let dataSource = [];
-		if(search){
-			dataSource = searchList
-		}else{
-			dataSource = users
+		var dataSource = [];
+		console.log("1113131",users)
+		if(users){
+			if(search){
+				dataSource = searchList
+				console.log("111")
+			}else{
+				dataSource = users
+				console.log("222")
+			}
 		}
 		
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -120,7 +126,7 @@ export default class Users extends Component {
 			is_active ?
 				<div>
 					<div>
-						<Row style={{marginBottom:"20px"}}>
+						{/* <Row style={{marginBottom:"20px"}}>
 							<Col span={12}>
 								<label style={{ minWidth: 60, display: 'inline-block' }}>用户名:</label>
 								<Input id='NurseryData' className='search_input' />
@@ -162,7 +168,7 @@ export default class Users extends Component {
 							<Button  type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>							
 										
 							</Col>
-						</Row>
+						</Row> */}
 						<Row>
 							<Col span={6}>
 								<Button onClick={this.append.bind(this)}>添加用户</Button>
@@ -235,7 +241,7 @@ export default class Users extends Component {
 
 						</Row>
 					</div>
-					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={dataSource} 
+					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={users} 
 					loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 									
 					/>

@@ -9,6 +9,8 @@ export const ID = 'SYSTEM_PERSON';
 const getTagsOK = createAction(`${ID}_GET_TAGS_OK`);
 const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 
+// const getTagsOK = createAction(`${ID}_GET_TAGS_OK`);
+
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
 const filterReducer = fieldFactory(ID, 'filter');
