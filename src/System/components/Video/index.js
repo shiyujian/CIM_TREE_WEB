@@ -6,7 +6,7 @@ const Base64 = require('js-base64').Base64;
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
 const URL = window.config.VEC_W;
-const icon = divIcon({className: 'videoIcon',iconSize:point(21,26)});
+// const icon = divIcon({className: 'videoIcon',iconSize:point(21,26)});
 
 class CameraForm extends Component{
 
