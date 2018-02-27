@@ -17,7 +17,17 @@ export default class ToggleModal extends Component {
             tempData: [],
         }
     }
+    initopthins(list) {
+        const ops = [];
+        for (let i = 0; i < list.length; i++) {
+            ops.push(<Option key={list[i].ID} >{list[i].NurseryName}</Option>)
+        }
+        return ops;
+    }
     render() {
+        const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
+        console.log("this.props", this.props)
+        const tagsOptions = this.initopthins(tags);
         const { visible, actions: { getOrgReverse } } = this.props;
         let jthis = this;
         let accept = 'image/jpg, image/jpeg, image/png';
@@ -85,7 +95,7 @@ export default class ToggleModal extends Component {
                     return <span>{record.usernames}</span>
                 }
             }
-        },{
+        }, {
             title: '密码',
             dataIndex: 'record.passwords',
             key: 'Passwords',
@@ -101,19 +111,19 @@ export default class ToggleModal extends Component {
                 }
             }
         }
-        // , {
-        //     title: '所在组织机构单位',
-        //     dataIndex: 'record.org',
-        //     key: 'Org',
-        //     render: (text, record, index) => {
-        //         if (record.account) {
-        //             return record.org = record.account.org
-        //         } else {
-        //             return record.org = record.org
-        //         }
-        //     }
-        // }
-        , {
+            // , {
+            //     title: '所在组织机构单位',
+            //     dataIndex: 'record.org',
+            //     key: 'Org',
+            //     render: (text, record, index) => {
+            //         if (record.account) {
+            //             return record.org = record.account.org
+            //         } else {
+            //             return record.org = record.org
+            //         }
+            //     }
+            // }
+            , {
             title: '所属部门',
             // dataIndex: 'account.org_code',
             key: 'Depart',
@@ -209,23 +219,88 @@ export default class ToggleModal extends Component {
                     return <span style={{ color: record.email_red }}>{record.email}</span>
                 }
             }
-        }, {
-            title: '是否为用户',
+        }
+            // , {
+            //     title: '是否为用户',
+            //     // dataIndex:"usernames",
+            //     key: 'Usernames',
+            //     render: (text, record, index) => {
+            //         // console.log('record:', record)
+            //         return (
+            //             <Switch checkedChildren="是" unCheckedChildren="否" checked={record.usernames} 
+            //             onChange={(e) => {
+            //                 console.log("e:", e);
+            //                 // record.usernames = e;
+            //                 this.forceUpdate();
+            //             }} 
+            //             />
+            //         )
+            //     }
+            // }
+            , {
+            title: '标段',
             // dataIndex:"usernames",
-            key: 'Usernames',
+            key: 'sections',
             render: (text, record, index) => {
                 // console.log('record:', record)
+                console.log("addition", addition)
                 return (
-                    <Switch checkedChildren="是" unCheckedChildren="否" checked={record.usernames} 
-                    onChange={(e) => {
-                        console.log("e:", e);
-                        // record.usernames = e;
-                        this.forceUpdate();
-                    }} 
-                    />
+                    // <Switch checkedChildren="是" unCheckedChildren="否" checked={record.sections} 
+                    // onChange={(e) => {
+                    //     console.log("e:", e);
+                    //     // record.sections = e;
+                    //     this.forceUpdate();
+                    // }} 
+                    // />
+                    <Select placeholder="标段" value={addition.sections || record.sections}
+                        // onChange={changeAdditionField.bind(this, 'sections')}
+                          onChange={(e) => {
+                            console.log("e:", e);
+                            record.sections = e;
+                            this.forceUpdate();
+                        }} 
+                        mode="multiple" style={{ width: '100%' }}>
+                        <Option key={'P009-01-01'} >1标段</Option>
+                        <Option key={'P009-01-02'} >2标段</Option>
+                        <Option key={'P009-01-03'} >3标段</Option>
+                        <Option key={'P009-01-04'} >4标段</Option>
+                        <Option key={'P009-01-05'} >5标段</Option>
+
+                    </Select>
+
                 )
             }
-        }, {
+        }
+            , {
+            title: '苗圃',
+            // dataIndex:"usernames",
+            key: 'tags',
+            render: (text, record, index) => {
+                console.log('record:', record)
+                console.log("addition11", addition)
+                return (
+                    // <Switch checkedChildren="是" unCheckedChildren="否" checked={record.sections} 
+                    // onChange={(e) => {
+                    //     console.log("e:", e);
+                    //     // record.sections = e;
+                    //     this.forceUpdate();
+                    // }} 
+                    // />
+                    <Select placeholder="苗圃" showSearch value={addition.tags || record.tags} 
+                    onChange={changeAdditionField.bind(this, 'tags')}
+                    // onChange={(es) => {
+                    //     console.log("es:", es);
+                    //     record.sections = es;
+                    //     this.forceUpdate();
+                    // }} 
+                        mode="multiple" style={{ width: "100%"}}>
+                        {tagsOptions}
+                    </Select>
+
+                )
+            }
+        }
+            , {
             title: '二维码',
             render: (record) => {
                 return (
@@ -380,7 +455,7 @@ export default class ToggleModal extends Component {
         console.log("this.state.dataSource", this.state.dataSource)
         for (let i = 0; i < this.state.dataSource.length; i++) {
             const element = this.state.dataSource[i];
-            console.log("element", element)
+            // console.log("element", element)
             // if (element.org === "") {
             //     Notification.warning({
             //         message: "该部门不存在"
@@ -400,7 +475,7 @@ export default class ToggleModal extends Component {
                 return;
             }
         }
-        const { actions: { PostPeople, getOrgName, ModalVisible, is_fresh } } = this.props;
+        const { actions: { PostPeople, getOrgName, ModalVisible, is_fresh,putUser } } = this.props;
         let data_list = [];
         let pks = [];
         for (let i = 0; i < this.state.dataSource.length; i++) {
@@ -413,15 +488,31 @@ export default class ToggleModal extends Component {
             data_list.push(
                 {
                     "username": item.usernames,
+                    "sections": item.sections,
+                    "tags": item.tags,
                     "password": item.passwords,
                     "name": item.name,
                     "code": item.code,
                     "obj_type": "C_PER",
+                    "account": {
+						"person_name": '',
+						"person_type": "C_PER",
+						"person_avatar_url": "",
+						"organization": {
+							"pk": pks[index],
+							"code": item.depart,
+							"obj_type": "",
+							"rel_type": "",
+							"name": ''
+						},
+					},
                     "basic_params": {
                         "info": {
                             "电话": "" + item.tel,
                             "性别": item.sex,
-                            '邮箱': item.email
+                            '邮箱': item.email,
+                            "sections": item.sections,
+                            "tags": item.tags,
                         },
                         "signature": "",
                         "photo": ""
@@ -434,6 +525,8 @@ export default class ToggleModal extends Component {
                     },
                     "extra_params": {
                         // "is_users": item.usernames,
+                        "sections": item.sections,
+                        "tags": item.tags,
                         "usernames": item.usernames,
                         "code": item.depart,
                         "pk": pks[index],
@@ -480,8 +573,9 @@ export default class ToggleModal extends Component {
             )
         })
         console.log("data_list", data_list)
-        PostPeople({}, { "data_list": data_list }).then(item => {
-            console.log("item:", item)
+        // return;
+        putUser({}, { "data_list": data_list }).then(item => {
+            // console.log("item:", item)
             ModalVisible(false);
             is_fresh(true);
         });
@@ -586,6 +680,8 @@ export default class ToggleModal extends Component {
                     sex: item.sex || '',
                     tel: item.tel || '',
                     usernames: item.usernames || '',
+                    sections: item.sections || '',
+                    tags: item.tags || '',
                     email: item.email || '',
                     // passwords: 111111,
                 }
@@ -597,10 +693,10 @@ export default class ToggleModal extends Component {
     }
     //处理上传excel的数据
     async handleExcelData(data) {
-        const {actions: {getOrgReverse,getOrgName}} = this.props;
+        const { actions: { getOrgReverse, getOrgName } } = this.props;
         data.splice(0, 1);
-        let data_person, orgname = [],orgpk = [], orgcode=[], orgReverse = [],codes = [],org_names = [];
-        console.log("data:",data);
+        let data_person, orgname = [], orgpk = [], orgcode = [], orgReverse = [], codes = [], org_names = [];
+        console.log("data:", data);
         let set = {};
         for (let i = 0; i < data.length; i++) {
             // »ñÈ¡ËùÓÐµÄ²¿ÃÅ
@@ -610,26 +706,26 @@ export default class ToggleModal extends Component {
         let repeatCode = this.isRepeat(codes);
 
         let orgCodes = Object.keys(set);
-        console.log("orgCodes",orgCodes)
-        
+        console.log("orgCodes", orgCodes)
+
         for (let i = 0; i < orgCodes.length; i++) {
-            let result_names = await getOrgName({code:orgCodes[i]})
-            console.log("result_names",result_names)
+            let result_names = await getOrgName({ code: orgCodes[i] })
+            console.log("result_names", result_names)
             let orgNames = result_names.name;
             let orgCode = orgCodes[i];
             org_names.push({
-                orgNames:orgNames,
-                orgCode:orgCode
+                orgNames: orgNames,
+                orgCode: orgCode
             });
-            let rst = await getOrgReverse({code: orgCodes[i]})
+            let rst = await getOrgReverse({ code: orgCodes[i] })
             let tempCode = orgCodes[i];
             rst["orgCode"] = tempCode
             orgReverse.push(rst);
         }
-        if(repeatCode.length > 1) {
-            this.setState({flag_code: false})
+        if (repeatCode.length > 1) {
+            this.setState({ flag_code: false })
         }
-        this.setState({repeatCode})
+        this.setState({ repeatCode })
 
         data_person = data.map((item, index) => {
             let regTel = /^1[3|4|5|7|8|9][0-9]{9}$/;
@@ -642,7 +738,7 @@ export default class ToggleModal extends Component {
             if (!regEmail.test(item[6])) {
                 email_red = "red";
             }
-            let org = '', orgcode = '', orgpk = '',partname = '';
+            let org = '', orgcode = '', orgpk = '', partname = '';
             // console.log(orgReverse)
             for (let i = 0; i < orgReverse.length; i++) {
                 if (orgReverse[i].orgCode === item[2]) {
@@ -655,7 +751,7 @@ export default class ToggleModal extends Component {
                         // console.log("orgcode",orgcode)
                         // console.log("orgpk",orgpk)
                         // console.log("partname",partname)
-                    }else{
+                    } else {
                         org = '';
                         orgcode = '';
                         orgpk = '';
@@ -663,7 +759,7 @@ export default class ToggleModal extends Component {
                     }
                 }
             }
-            // console.log(item[8])
+            console.log(item)
             return {
                 index: index + 1,
                 code: item[0] || '',
@@ -672,7 +768,7 @@ export default class ToggleModal extends Component {
                 // orgpk: orgpk[index] || '',
                 // orgcode: orgcode[index] || '',
                 // org_names: org_names[index],
-                  // »ú¹¹ÀàÐÍÃû³Æ
+                // »ú¹¹ÀàÐÍÃû³Æ
                 // org: orgname[index] || '',
                 org: org || '',
 
@@ -691,10 +787,12 @@ export default class ToggleModal extends Component {
                 signature: '',
                 usernames: item[7] || '',
                 passwords: item[8] || '',
+                sections: item[9] || '',
+                tags: item[10] || '',
                 editing: false,
             }
         })
-        console.log("data_person",data_person)
+        console.log("data_person", data_person)
         this.setState({
             dataSource: data_person,
             tempData: data_person

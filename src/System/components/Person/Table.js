@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
-import { Table, Row, Col, Form, Select, Button, Popconfirm, message } from 'antd';
+import { Table, Row, Col, Form, Select, Button, Popconfirm, message,Input } from 'antd';
 
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
+
+// class Users extends Component {
+	
 export default class Users extends Component {
 	constructor(props) {
-      super(props);
-      this.state = {
-        sections:[],
-        tag:null
-      }
-    }
+		super(props);
+		this.state = {
+			sections: [],
+			tag: null
+		}
+	}
 	static layout = {
 		labelCol: { span: 6 },
 		wrapperCol: { span: 18 },
@@ -18,28 +21,47 @@ export default class Users extends Component {
 	changeRoles(value) {
 		const { actions: { changeAdditionField } } = this.props;
 		console.log("value", value)
-		 changeAdditionField('roles', value)
+			('roles', value)
 	}
 	changeSections(value) {
 		console.log("value", value)
-		this.setState({sections:value});
+		this.setState({ sections: value });
 	}
 
-	changeTagss(value){
+	changeTagss(value) {
 		console.log("value", value)
-		this.setState({tag:value});
+		this.setState({ tag: value });
 	}
-	initopthins(list){
-		const ops=[];
+	initopthins(list) {
+		const ops = [];
 		for (let i = 0; i < list.length; i++) {
 			ops.push(<Option key={i} >{list[i].NurseryName}</Option>)
 		}
 		return ops;
 	}
+	query1(){
 
+	}
+	//人员标段和组织机构标段比较器，如果满足条件返回true
+	compare(user,l1,s){
+		if(l1==undefined||s==undefined){
+			return false
+		}
+		let l2=s.split(',')
+		for (let i = 0; i < l1.length; i++) {
+			const e1 = l1[i];
+			for (let j = 0; j < l2.length; j++) {
+				const e2 = l2[j];
+				if(e1==e2){
+					return true
+				}
+			}
+		}
+		return false;
+	}
 
 	render() {
-		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField } ,tags = {}} = this.props;
+		const { platform: { roles = [] },filter={}, addition = {}, actions: {changeFilterField, changeAdditionField }, tags = {},sidebar: {node:{extra_params:{sections}={}} = {}, parent} = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
@@ -48,12 +70,22 @@ export default class Users extends Component {
 		const tagsOptions = this.initopthins(tags);
 
 		const { platform: { users = [] } } = this.props;
+
+		const user=JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		let is_active=false
+		if(user.is_superuser){
+			is_active= true;
+		}else{
+			if(sections){
+				is_active=this.compare(user,user.account.sections,sections)
+			}
+		}
+
 		// const {platform: {roles = []}, addition = {}, actions: {changeAdditionField}} = this.props;		
-		console.log(this.props,tags,tagsOptions)
 		return (
+			is_active?
 			<div>
 				<div>
-
 					<Row>
 						<Col span={6}>
 							<Button onClick={this.append.bind(this)}>添加用户</Button>
@@ -64,7 +96,7 @@ export default class Users extends Component {
 							</Popconfirm>
 
 						</Col>
-{/*						<Col span={6}>
+						{/*<Col span={6}>
 							<FormItem {...Users.layout} label="苗圃">
 								<Select placeholder="苗圃" value={this.state.tag} showSearch onChange={this.changeTagss.bind(this)}
 									 style={{ width: '100%' }}>
@@ -128,10 +160,12 @@ export default class Users extends Component {
 				</div>
 				<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={users} />
 			</div>
+			:<h3>{'没有权限'}</h3>
+
 		);
 	}
 	saves() {
-		const { platform: { users = [] } ,tags = {} } = this.props;
+		const { platform: { users = [] }, tags = {} } = this.props;
 		const {
 			addition = {}, sidebar: { node } = {},
 			actions: { postUser, clearAdditionField, getUsers, putUser }
@@ -150,15 +184,12 @@ export default class Users extends Component {
 			const element = users[i];
 			console.log(element)
 			console.log(this.selectedCodes)
-			for (let j = 0; j < this.selectedCodes.length; j++)
-			 {
+			for (let j = 0; j < this.selectedCodes.length; j++) {
 				const selectedCode = this.selectedCodes[j];
 				console.log("111", element)
-				if (element.id == selectedCode) 
-				{
+				if (element.id == selectedCode) {
 					console.log("已经选中")
-					putUser({}, {
-						 id: element.id,
+					putUser({ id: element.id }, {
 						username: element.username,
 						email: element.email,
 						// password: addition.password, // 密码不能变？信息中没有密码
@@ -166,17 +197,17 @@ export default class Users extends Component {
 							person_name: element.person_name,
 							person_type: "C_PER",
 							person_avatar_url: "",
-							organization: {
-								pk: '229356816973',
-								code: "ORG_02_31_02",
-								obj_type: "C_ORG",
-								rel_type: "member",
-								name: '施工队'
-							},
+							// organization: {
+							// 	pk: '229356816973',
+							// 	code: "ORG_02_31_02",
+							// 	obj_type: "C_ORG",
+							// 	rel_type: "member",
+							// 	name: '施工队'
+							// },
 						},
-						tags: [],
-						sections: [],
-						groups: roles.map(role => +role),
+						tags: [{ id: tags[this.state.tag].ID, name: tags[this.state.tag].NurseryName }],
+						//sections: this.state.sections,
+						// groups: roles.map(role => +role),
 						is_active: true,
 						basic_params: {
 							info: {
@@ -352,3 +383,5 @@ export default class Users extends Component {
 		return rst;
 	}
 }
+// export default Form.create()(Users)
+

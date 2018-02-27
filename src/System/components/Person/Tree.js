@@ -26,17 +26,40 @@ export default class Tree extends Component {
 	}
 
 	select(s, node) {
+		const user=JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		const {node: {props: {eventKey = ''} = {}} = {}} = node || {};
 		const {
 			platform: {org: {children = []} = {}},
 			actions: {changeSidebarField, getUsers}
 		} = this.props;
 		const o = Tree.loop(children, eventKey);
-		changeSidebarField('node', o);
-		const codes = Tree.collect(o);
-		getUsers({}, {org_code: codes});
+		if(this.compare(user,user.account.sections,o.extra_params.sections)){
+			console.log(55555555,o)
+			changeSidebarField('node', o);
+			const codes = Tree.collect(o);
+			getUsers({}, {org_code: codes});
+		}
 	}
-
+	//人员标段和组织机构标段比较器，如果满足条件返回true
+	compare(user,l1,s){
+		if(user.is_superuser){
+			return true;
+		}
+		if(l1==undefined||s==undefined){
+			return false
+		}
+		let l2=s.split(',')
+		for (let i = 0; i < l1.length; i++) {
+			const e1 = l1[i];
+			for (let j = 0; j < l2.length; j++) {
+				const e2 = l2[j];
+				if(e1==e2){
+					return true
+				}
+			}
+		}
+		return false;
+	}
 	static loop = (list, code) => {
 		let rst = null;
 		list.forEach((item = {}) => {

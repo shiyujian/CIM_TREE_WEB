@@ -1,11 +1,17 @@
 import React, {Component} from 'react';
-import {Modal, Row, Col, Form, Input} from 'antd';
+import {Modal, Row, Col, Form, Input,Select} from 'antd';
 import {CUS_TILEMAP} from '_platform/api';
 
 const FormItem = Form.Item;
+const { Option, OptGroup } = Select;
 
 class Addition extends Component {
-
+	constructor(props) {
+		super(props);
+		this.state = {
+			Arrays:[]
+		};
+	}
 	static propTypes = {};
 
 	render() {
@@ -14,10 +20,11 @@ class Addition extends Component {
 			sidebar: {node = {}, parent} = {}, addition = {},
 			actions: {changeAdditionField}
 		} = this.props;
-
+		const { type, extra_params: extra = {}, obj_type } = node || {};
+		
 		console.log(this.props)
+		console.log("1111",addition.sections)
 
-		const {type} = node;
 		const title = Addition.getTitle(node, parent);
 		return (
 			<Modal title={parent ? `新建${title} | ${parent.name}` : `编辑${title} | ${node.name}`}
@@ -35,8 +42,18 @@ class Addition extends Component {
 					onChange={changeAdditionField.bind(this, 'code')}/>                                    )}
 					
 				</FormItem>
+				<FormItem {...Addition.layout} label={`${title}标段`}>
+					<Select placeholder="标段" value={addition.sections} onChange={changeAdditionField.bind(this, 'sections')}
+						mode="multiple" style={{ width: '100%' }}>
+						<Option key={'P009-01-01'} >1标段</Option>
+						<Option key={'P009-01-02'} >2标段</Option>
+						<Option key={'P009-01-03'} >3标段</Option>
+						<Option key={'P009-01-04'} >4标段</Option>
+						<Option key={'P009-01-05'} >5标段</Option>
+					</Select>
+				</FormItem>
 				<FormItem {...Addition.layout} label={`${title}简介`}>
-					<Input readOnly={!parent} placeholder="请输入简介" value={addition.introduction} type="textarea" rows={4}
+					<Input  placeholder="请输入简介" value={addition.introduction} type="textarea" rows={4}
 					       onChange={changeAdditionField.bind(this, 'introduction')}/>
 				</FormItem>
 			</Modal>);
@@ -49,14 +66,21 @@ class Addition extends Component {
 		} = this.props;
 		console.log(this.props)
 		console.log(addition.introduction)
+		console.log(addition.sections)
+		console.log(addition.sections.join())
+		const sections=addition.sections.join()
+		console.log(sections)
+		// return;
 		if (parent) {
 			postOrg({}, {
 				name: addition.name,
 				code: addition.code,
+				
 				obj_type: 'C_ORG',
 				status: 'A',
 				extra_params: {
-					introduction: addition.introduction
+					introduction: addition.introduction,
+					sections:sections,
 				},
 				parent: {pk: parent.pk, code: parent.code, obj_type: 'C_ORG'}
 			}).then(rst => {
@@ -67,16 +91,25 @@ class Addition extends Component {
 			});
 		} else {
 			putOrg({code: addition.code}, {
+				obj_type: 'C_ORG',
+				status: 'A',
 				name: addition.name,
 				extra_params: {
-					introduction: addition.introduction
+					introduction: addition.introduction,
+					sections:sections,
 				}
 			}).then(rst => {
+				this.forceUpdate();				
 				if (rst.pk) {
+					console.log(rst.pk)
+					console.log(addition)
+					console.log(parent)
 					changeSidebarField('addition', false);
 					parent && changeSidebarField('parent', null);
 					addition.code && clearAdditionField();
 					getOrgTree({}, {depth: 3});
+					this.forceUpdate();				
+				
 				}
 			});
 		}

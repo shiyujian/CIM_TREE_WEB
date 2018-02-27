@@ -159,8 +159,6 @@ class ToggleModal extends Component {
 		validateFields((err, values) => {
 			if (!err) {
 				if (toggleData.status === 'ADD') {
-					// console.log("getUser",getUser())
-					// console.log("this._getOrgText(sentUsers)",this._getOrgText(sentUsers)[0])
 					console.log("this._getOrgText(copyUsers)",this._getOrgText(copyUsers))
 					let sendData = {
 						"from_whom": getUser().org,
@@ -251,7 +249,6 @@ class ToggleModal extends Component {
 						})
 				} else if (toggleData.status === 'EDIT') {
 					console.log("getUser()",getUser())
-					// console.log("1111111",this.state.org_codes)
 					console.log("this._getOrgText(sentUsers)",this._getOrgText(sentUsers))					
 					let sendData = {
 						"from_whom": getUser().org,

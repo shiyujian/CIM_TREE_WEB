@@ -354,7 +354,7 @@ class TipsTable extends Component {
 								<Col span={18}>
 									<Row>
 										<Col span={6} >
-											<FormItem {...formItemLayout} label="主题">
+											<FormItem {...formItemLayout} label="名称">
 												{
 													getFieldDecorator('titles', {
 														rules: [
@@ -489,8 +489,6 @@ class TipsTable extends Component {
 						<a onClick={this.clickTips.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickTips.bind(this, record, 'EDIT')}>修改</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this.clickTips.bind(this, record, 'BACK')}>撤回</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<Popconfirm title="确定删除吗?" onConfirm={this.clickTips.bind(this, record, 'DELETE')} okText="确定"
 							cancelText="取消">

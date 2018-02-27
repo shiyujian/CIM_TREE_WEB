@@ -6,7 +6,9 @@ import {
 import Card from '_platform/components/panels/Card';
 import Addition from './Addition';
 import Edite from './Edite';
+import './index.less';
 const FormItem = Form.Item;
+
 
 
 export default class Tablelevel extends Component {
@@ -14,7 +16,8 @@ export default class Tablelevel extends Component {
     constructor(props){
         super(props);
         this.state={
-			dataSource:[]
+			searchList:[],
+			search:false
         }
 	}
 	
@@ -31,16 +34,75 @@ export default class Tablelevel extends Component {
 		const {
 			nurseryList = [],
 		} = this.props;
+		const{
+			searchList,
+			search
+		}= this.state
+		let dataSource = [];
+		if(search){
+			dataSource = searchList
+		}else{
+			dataSource = nurseryList
+		}
        
 		console.log('nurseryList',nurseryList);
 		return (
-			<Card title="苗圃列表" extra={<Addition {...this.props} {...this.state}/>}>
-				<Table dataSource={nurseryList}
-				       columns={this.columns}
-				       bordered />
-				<Edite {...this.props} {...this.state}/>
-			</Card>
+			<div>
+				<div>
+					<Row>
+						<Col span={6}>
+							<h3>苗圃列表</h3>
+						</Col>
+						<Col span={12}>
+							<label style={{minWidth: 60,display: 'inline-block'}}>苗圃名称:</label>
+							<Input id='NurseryData' className='search_input'/>
+							<Button type='primary' onClick={this.search.bind(this)} style={{minWidth: 30,display: 'inline-block',marginRight:20}}>查询</Button>
+							<Button onClick={this.clear.bind(this)} style={{minWidth: 30,display: 'inline-block'}}>清空</Button>
+						</Col>
+						<Col span={6}>
+							<Addition {...this.props} {...this.state}/>
+						</Col>
+					</Row>
+					<Row style={{marginTop:5}}>
+						<Col span={24}>
+							<Table dataSource={dataSource}
+							columns={this.columns}
+							bordered />
+							<Edite {...this.props} {...this.state}/>
+						</Col>
+					</Row>
+				</div>
+			</div>
+			
 		);
+	}
+
+	search(){
+		let text = document.getElementById("NurseryData").value;
+		console.log('text',text)
+		let searchList = []
+		const {
+			nurseryList = [],
+		} = this.props;
+		nurseryList.map((item)=>{
+			if(item && item.NurseryName){
+				if(item.NurseryName.indexOf(text) > -1){
+					searchList.push(item)
+				}
+			}
+		})
+		this.setState({
+			searchList:searchList,
+			search:true
+		})
+	}
+
+	clear(){
+		document.getElementById("NurseryData").value = ''
+		this.setState({
+			dataSource:[],
+			search:false
+		})
 	}
     
 
@@ -61,12 +123,9 @@ export default class Tablelevel extends Component {
 	}
 	columns=[
 		{
-			title:'序号',
-			key:'serial',
-            dataIndex:'serial',
-            render: (text, record, index) => {
-				return <span>{index+1}</span>;
-			}
+			title:'ID',
+			key:'ID',
+            dataIndex:'ID',
 		},{
 			title:'供应商',
 			key:'Factory',
