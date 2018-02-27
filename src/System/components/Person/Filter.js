@@ -7,9 +7,6 @@ class Filter extends Component {
 
 	// export default class Filter extends Component {
 	render() {
-		const {
-			form: { getFieldDecorator },
-		} = this.props;
 		const { platform: { roles = [] }, filter = {}, actions: { changeFilterField } } = this.props;
 		console.log("filter", filter)
 		const systemRoles = roles.filter(role => role.grouptype === 0);
@@ -82,16 +79,7 @@ class Filter extends Component {
 		const { filter = {}, sidebar: { node } = {}, actions: { getUsers } } = this.props;
 		const codes = Filter.collect(node);
 		console.log("filter", filter)
-		// getUsers({}, { org_code: codes, ...filter });
-		this.props.form.validateFields(async (err, values) => {
-			let conditions = {
-				org_code: codes,
-				// task: filter.type || "processing",
-				username: values.title1 || "",
-			}
-			await getUsers({}, conditions);
-		})
-
+		getUsers({}, { org_code: codes, ...filter });
 	}
 
 	static collect = (node = {}) => {

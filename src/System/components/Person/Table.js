@@ -4,9 +4,9 @@ import { Table, Row, Col, Form, Select, Button, Popconfirm, message,Input } from
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 
-class Users extends Component {
+// class Users extends Component {
 	
-// export default class Users extends Component {
+export default class Users extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -42,13 +42,26 @@ class Users extends Component {
 	query1(){
 
 	}
-
+	//人员标段和组织机构标段比较器，如果满足条件返回true
+	compare(user,l1,s){
+		if(l1==undefined||s==undefined){
+			return false
+		}
+		let l2=s.split(',')
+		for (let i = 0; i < l1.length; i++) {
+			const e1 = l1[i];
+			for (let j = 0; j < l2.length; j++) {
+				const e2 = l2[j];
+				if(e1==e2){
+					return true
+				}
+			}
+		}
+		return false;
+	}
 
 	render() {
-		const {
-			form: { getFieldDecorator },
-		} = this.props;
-		const { platform: { roles = [] },filter={}, addition = {}, actions: {changeFilterField, changeAdditionField }, tags = {} } = this.props;
+		const { platform: { roles = [] },filter={}, addition = {}, actions: {changeFilterField, changeAdditionField }, tags = {},sidebar: {node:{extra_params:{sections}={}} = {}, parent} = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
@@ -57,69 +70,22 @@ class Users extends Component {
 		const tagsOptions = this.initopthins(tags);
 
 		const { platform: { users = [] } } = this.props;
+
+		const user=JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		let is_active=false
+		if(user.is_superuser){
+			is_active= true;
+		}else{
+			if(sections){
+				is_active=this.compare(user,user.account.sections,sections)
+			}
+		}
+
 		// const {platform: {roles = []}, addition = {}, actions: {changeAdditionField}} = this.props;		
-		console.log(this.props, tags, tagsOptions)
 		return (
+			is_active?
 			<div>
 				<div>
-					<Row gutter={24}>
-						<Col span={7}>
-							<FormItem {...Users.layout} label="用户名">
-								{
-									getFieldDecorator('title2', {
-										rules: [
-											{ required: false, message: '请输入用户名' },
-										]
-									})
-										(<Input placeholder="请输入用户名" value={filter.username}
-											onChange={changeFilterField.bind(this, 'username')}
-										/>)
-								}
-							</FormItem>
-
-							{/* <FormItem {...Filter.layout} label="用户名">
-						<Input placeholder="请输入用户名" value={filter.username}
-							onChange={changeFilterField.bind(this, 'username')}
-						/>
-					</FormItem> */}
-						</Col>
-						<Col span={7}>
-							<Select placeholder="请选择角色" value={filter.role} onChange={changeFilterField.bind(this, 'role')}
-								mode="multiple" style={{ width: '100%' }}>
-								<OptGroup label="苗圃角色">
-									{
-										systemRoles.map(role => {
-											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-										})
-									}
-								</OptGroup>
-								<OptGroup label="施工角色">
-									{
-										projectRoles.map(role => {
-											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-										})
-									}
-								</OptGroup>
-								<OptGroup label="监理角色">
-									{
-										professionRoles.map(role => {
-											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-										})
-									}
-								</OptGroup>
-								<OptGroup label="业主角色">
-									{
-										departmentRoles.map(role => {
-											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-										})
-									}
-								</OptGroup>
-							</Select>
-						</Col>
-						<Col span={3}>
-							<Button onClick={this.query1.bind(this)}>查询</Button>
-						</Col>
-					</Row>
 					<Row>
 						<Col span={6}>
 							<Button onClick={this.append.bind(this)}>添加用户</Button>
@@ -194,6 +160,8 @@ class Users extends Component {
 				</div>
 				<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={users} />
 			</div>
+			:<h3>{'没有权限'}</h3>
+
 		);
 	}
 	saves() {
@@ -415,5 +383,5 @@ class Users extends Component {
 		return rst;
 	}
 }
-export default Form.create()(Users)
+// export default Form.create()(Users)
 
