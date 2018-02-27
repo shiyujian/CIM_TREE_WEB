@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
-import { Table, Row, Col, Form, Select, Button, Popconfirm, message } from 'antd';
+import { Table, Row, Col, Form, Select, Button, Popconfirm, message,Input } from 'antd';
 
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
-export default class Users extends Component {
+
+class Users extends Component {
+	
+// export default class Users extends Component {
 	constructor(props) {
-      super(props);
-      this.state = {
-        sections:[],
-        tag:null
-      }
-    }
+		super(props);
+		this.state = {
+			sections: [],
+			tag: null
+		}
+	}
 	static layout = {
 		labelCol: { span: 6 },
 		wrapperCol: { span: 18 },
@@ -18,28 +21,34 @@ export default class Users extends Component {
 	changeRoles(value) {
 		const { actions: { changeAdditionField } } = this.props;
 		console.log("value", value)
-		 ('roles', value)
+			('roles', value)
 	}
 	changeSections(value) {
 		console.log("value", value)
-		this.setState({sections:value});
+		this.setState({ sections: value });
 	}
 
-	changeTagss(value){
+	changeTagss(value) {
 		console.log("value", value)
-		this.setState({tag:value});
+		this.setState({ tag: value });
 	}
-	initopthins(list){
-		const ops=[];
+	initopthins(list) {
+		const ops = [];
 		for (let i = 0; i < list.length; i++) {
 			ops.push(<Option key={i} >{list[i].NurseryName}</Option>)
 		}
 		return ops;
 	}
+	query1(){
+
+	}
 
 
 	render() {
-		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField } ,tags = {}} = this.props;
+		const {
+			form: { getFieldDecorator },
+		} = this.props;
+		const { platform: { roles = [] },filter={}, addition = {}, actions: {changeFilterField, changeAdditionField }, tags = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
@@ -49,11 +58,68 @@ export default class Users extends Component {
 
 		const { platform: { users = [] } } = this.props;
 		// const {platform: {roles = []}, addition = {}, actions: {changeAdditionField}} = this.props;		
-		console.log(this.props,tags,tagsOptions)
+		console.log(this.props, tags, tagsOptions)
 		return (
 			<div>
 				<div>
+					<Row gutter={24}>
+						<Col span={7}>
+							<FormItem {...Users.layout} label="用户名">
+								{
+									getFieldDecorator('title2', {
+										rules: [
+											{ required: false, message: '请输入用户名' },
+										]
+									})
+										(<Input placeholder="请输入用户名" value={filter.username}
+											onChange={changeFilterField.bind(this, 'username')}
+										/>)
+								}
+							</FormItem>
 
+							{/* <FormItem {...Filter.layout} label="用户名">
+						<Input placeholder="请输入用户名" value={filter.username}
+							onChange={changeFilterField.bind(this, 'username')}
+						/>
+					</FormItem> */}
+						</Col>
+						<Col span={7}>
+							<Select placeholder="请选择角色" value={filter.role} onChange={changeFilterField.bind(this, 'role')}
+								mode="multiple" style={{ width: '100%' }}>
+								<OptGroup label="苗圃角色">
+									{
+										systemRoles.map(role => {
+											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+										})
+									}
+								</OptGroup>
+								<OptGroup label="施工角色">
+									{
+										projectRoles.map(role => {
+											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+										})
+									}
+								</OptGroup>
+								<OptGroup label="监理角色">
+									{
+										professionRoles.map(role => {
+											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+										})
+									}
+								</OptGroup>
+								<OptGroup label="业主角色">
+									{
+										departmentRoles.map(role => {
+											return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+										})
+									}
+								</OptGroup>
+							</Select>
+						</Col>
+						<Col span={3}>
+							<Button onClick={this.query1.bind(this)}>查询</Button>
+						</Col>
+					</Row>
 					<Row>
 						<Col span={6}>
 							<Button onClick={this.append.bind(this)}>添加用户</Button>
@@ -131,7 +197,7 @@ export default class Users extends Component {
 		);
 	}
 	saves() {
-		const { platform: { users = [] } ,tags = {} } = this.props;
+		const { platform: { users = [] }, tags = {} } = this.props;
 		const {
 			addition = {}, sidebar: { node } = {},
 			actions: { postUser, clearAdditionField, getUsers, putUser }
@@ -150,12 +216,10 @@ export default class Users extends Component {
 			const element = users[i];
 			console.log(element)
 			console.log(this.selectedCodes)
-			for (let j = 0; j < this.selectedCodes.length; j++)
-			 {
+			for (let j = 0; j < this.selectedCodes.length; j++) {
 				const selectedCode = this.selectedCodes[j];
 				console.log("111", element)
-				if (element.id == selectedCode) 
-				{
+				if (element.id == selectedCode) {
 					console.log("已经选中")
 					putUser({ id: element.id }, {
 						username: element.username,
@@ -173,7 +237,7 @@ export default class Users extends Component {
 							// 	name: '施工队'
 							// },
 						},
-						tags: [{id:tags[this.state.tag].ID,name:tags[this.state.tag].NurseryName}],
+						tags: [{ id: tags[this.state.tag].ID, name: tags[this.state.tag].NurseryName }],
 						//sections: this.state.sections,
 						// groups: roles.map(role => +role),
 						is_active: true,
@@ -351,3 +415,5 @@ export default class Users extends Component {
 		return rst;
 	}
 }
+export default Form.create()(Users)
+

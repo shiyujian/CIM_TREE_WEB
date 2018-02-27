@@ -26,6 +26,7 @@ export default class Tree extends Component {
 	}
 
 	select(s, node) {
+		console.log(s,node)
 		const {node: {props: {eventKey = ''} = {}} = {}} = node || {};
 		const {
 			platform: {org: {children = []} = {}},
