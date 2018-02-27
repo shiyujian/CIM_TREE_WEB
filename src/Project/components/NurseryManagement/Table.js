@@ -123,7 +123,7 @@ export default class Tablelevel extends Component {
 	}
 	columns=[
 		{
-			title:'ID',
+			title:'苗圃ID',
 			key:'ID',
             dataIndex:'ID',
 		},{
