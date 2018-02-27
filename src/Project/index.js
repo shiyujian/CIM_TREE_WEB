@@ -291,5 +291,5 @@ export default class Project extends Component {
 		}
 	];
 
-	static defaultOpenKeys = ['landArea']
+	static defaultOpenKeys = ['landArea','nursery']
 }
