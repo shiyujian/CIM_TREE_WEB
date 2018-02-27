@@ -7,6 +7,9 @@ class Filter extends Component {
 
 	// export default class Filter extends Component {
 	render() {
+		const {
+			form: { getFieldDecorator },
+		} = this.props;
 		const { platform: { roles = [] }, filter = {}, actions: { changeFilterField } } = this.props;
 		console.log("filter", filter)
 		const systemRoles = roles.filter(role => role.grouptype === 0);
@@ -15,27 +18,14 @@ class Filter extends Component {
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
 		return (
 			<Row gutter={24}>
-				{/* <Col span={7}>
-					<FormItem {...Filter.layout} label="用户名">
-						{
-							getFieldDecorator('title1', {
-								rules: [
-									{ required: false, message: '请输入用户名' },
-								]
-							})
-								(<Input placeholder="请输入用户名" value={filter.username}
-								onChange={changeFilterField.bind(this, 'username')}
-							/>)
-						}
-					</FormItem>
-
+				<Col span={7}>
 					<FormItem {...Filter.layout} label="用户名">
 						<Input placeholder="请输入用户名" value={filter.username}
 							onChange={changeFilterField.bind(this, 'username')}
 						/>
 					</FormItem>
-				</Col> */}
-				{/* <Col span={7}>
+				</Col>
+				<Col span={7}>
 					<Select placeholder="请选择角色" value={filter.role} onChange={changeFilterField.bind(this, 'role')}
 						mode="multiple" style={{ width: '100%' }}>
 						<OptGroup label="苗圃角色">
@@ -70,7 +60,7 @@ class Filter extends Component {
 				</Col>
 				<Col span={3}>
 					<Button onClick={this.query.bind(this)}>查询</Button>
-				</Col> */}
+				</Col>
 			</Row>
 		);
 	}
