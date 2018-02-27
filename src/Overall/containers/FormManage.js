@@ -25,6 +25,7 @@ export const Datumcode = window.DeathCode.OVERALL_FORM;
 )
 
 export default class FormManage extends Component {
+    array = [];
     constructor(props) {
         super(props);
         this.state = {
@@ -32,8 +33,8 @@ export default class FormManage extends Component {
             loading:false
         }
     }
-    componentDidMount() {
-        const {actions: {getDir}} = this.props;
+    async componentDidMount() {
+        const {actions: {getDir,getPublicUnitList}} = this.props;
         this.setState({loading:true});
         getDir({code:Datumcode}).then(({children}) => {
             this.setState({loading:false});
@@ -41,6 +42,7 @@ export default class FormManage extends Component {
         if(this.props.Doc){
             this.setState({isTreeSelected:true})
         }
+		
     }
 
     onSelect(value = [],e) {
@@ -74,7 +76,7 @@ export default class FormManage extends Component {
                                 {...this.state}  />
                 </Sidebar>
                 <Content>
-                    <TableInfo {...this.props}/>
+                    <TableInfo {...this.props} array = {this.array}/>
                 </Content>
             </div>
         )
