@@ -18,7 +18,7 @@ export default class Users extends Component {
 	changeRoles(value) {
 		const { actions: { changeAdditionField } } = this.props;
 		console.log("value", value)
-		 ('roles', value)
+		 changeAdditionField('roles', value)
 	}
 	changeSections(value) {
 		console.log("value", value)
@@ -64,7 +64,7 @@ export default class Users extends Component {
 							</Popconfirm>
 
 						</Col>
-						{/*<Col span={6}>
+{/*						<Col span={6}>
 							<FormItem {...Users.layout} label="苗圃">
 								<Select placeholder="苗圃" value={this.state.tag} showSearch onChange={this.changeTagss.bind(this)}
 									 style={{ width: '100%' }}>
@@ -157,7 +157,8 @@ export default class Users extends Component {
 				if (element.id == selectedCode) 
 				{
 					console.log("已经选中")
-					putUser({ id: element.id }, {
+					putUser({}, {
+						 id: element.id,
 						username: element.username,
 						email: element.email,
 						// password: addition.password, // 密码不能变？信息中没有密码
@@ -165,17 +166,17 @@ export default class Users extends Component {
 							person_name: element.person_name,
 							person_type: "C_PER",
 							person_avatar_url: "",
-							// organization: {
-							// 	pk: '229356816973',
-							// 	code: "ORG_02_31_02",
-							// 	obj_type: "C_ORG",
-							// 	rel_type: "member",
-							// 	name: '施工队'
-							// },
+							organization: {
+								pk: '229356816973',
+								code: "ORG_02_31_02",
+								obj_type: "C_ORG",
+								rel_type: "member",
+								name: '施工队'
+							},
 						},
-						tags: [{id:tags[this.state.tag].ID,name:tags[this.state.tag].NurseryName}],
-						//sections: this.state.sections,
-						// groups: roles.map(role => +role),
+						tags: [],
+						sections: [],
+						groups: roles.map(role => +role),
 						is_active: true,
 						basic_params: {
 							info: {

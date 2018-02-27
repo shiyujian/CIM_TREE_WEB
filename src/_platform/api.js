@@ -77,7 +77,8 @@ export const QRCODE_API = `${base}/service/appserver`;
 // export const SubItem_WordTemplate = STATIC_UPLOAD_API + '/media/documents/meta/'+encodeURI('分项工程质量验收记录模板.docx')
 
 //智慧森林
-export const FOREST_API = `${window.config.FORESTDOMAIN}:${window.config.FORESTPORT}`;
+export const FOREST_API = `${window.config.SDOMAIN}`;
+//export const FOREST_API = `${window.config.SDOMAIN}:${window.config.FORESTPORT}`;
 export const FOREST_SYSTEM = `${FOREST_API}/system`;
 //苗圃定位模板
 export const nurseryLocation_template = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('nurseryLocation.xlsx');

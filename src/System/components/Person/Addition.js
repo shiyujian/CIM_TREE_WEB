@@ -157,6 +157,7 @@ export default class Addition extends Component {
 					},
 					tags: addition.tags,
 					sections: addition.sections,
+					//groups: [7],
 					groups: roles.map(role => +role),
 					is_active: true,
 					basic_params: {
