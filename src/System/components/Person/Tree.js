@@ -14,13 +14,15 @@ export default class Tree extends Component {
 	}
 
 	componentDidMount() {
-		const {actions: {getOrgTree, changeSidebarField, getUsers}} = this.props;
+		const {actions: {getOrgTree, changeSidebarField, getUsers,getTreeModal}} = this.props;
 		getOrgTree({}, {depth: 3}).then(rst => {
 			const {children: [first] = []} = rst || {};
 			if (first) {
 				changeSidebarField('node', first);
 				const codes = Tree.collect(first);
-				getUsers({}, {org_code: codes});
+				getUsers({}, {org_code: codes}).then((e) =>{
+					getTreeModal(false)
+				});
 			}
 		});
 	}

@@ -157,15 +157,16 @@ export default class Users extends Component {
 										
 							</Col>
 						</Row>
-						<Row>
-							<Col span={6}>
+						<Row style={{marginBottom:"20px"}}>
+							<Col span={3}>
 								<Button onClick={this.append.bind(this)}>添加用户</Button>
+							</Col>
+							<Col span={3}>
 								<Popconfirm title="是否真的要删除选中用户?"
 									onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
 									<Button>批量删除</Button>
 
 								</Popconfirm>
-
 							</Col>
 							{/*<Col span={6}>
 							<FormItem {...Users.layout} label="苗圃">
