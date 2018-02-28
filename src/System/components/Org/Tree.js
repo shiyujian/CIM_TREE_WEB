@@ -15,8 +15,8 @@ export default class Tree extends Component {
 		return (
 			<div>
 				<div style={{height: 35, paddingBottom: 5, borderBottom: '1px solid #dddddd', textAlign: 'center', marginBottom: 10}}>
-					<Button style={{float: 'left'}} type="primary" ghost onClick={this.addOrg.bind(this)}>新建机构类型</Button>
-					<Popconfirm title="是否真的要删除选中组织结构?"
+					<Button style={{float: 'left'}} type="primary" ghost onClick={this.addOrg.bind(this)}>新建项目</Button>
+					<Popconfirm title="是否真的要删除选中项目?"
 					            onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
 						<Button style={{float: 'right'}} type="danger" ghost>删除</Button>
 					</Popconfirm>
@@ -30,7 +30,7 @@ export default class Tree extends Component {
 		getOrgTree({}, {depth: 4}).then(rst => {
 			const {children: [first] = []} = rst || {};
 			if (first) {
-				changeSidebarField('node', {...first, type: 'org'});
+				changeSidebarField('node', {...first, type: 'project'});
 			}
 		});
 	}
@@ -73,9 +73,12 @@ export default class Tree extends Component {
 				let type = '';
 				switch (deep) {
 					case 0:
-						type = 'org';
+						type = 'project';
 						break;
 					case 1:
+						type = 'org';
+						break;
+					case 2:
 						type = 'company';
 						break;
 					default:
