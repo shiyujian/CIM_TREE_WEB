@@ -1,6 +1,6 @@
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
+import { Route,Redirect} from 'react-router-dom';
 import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import ContainerRouters from '_platform/components/panels/ContainerRouters';
@@ -26,6 +26,7 @@ export default class Project extends Component {
 				</Aside>
 				<Main>
 					<ContainerRouters menus={Project.menus} containers={this.state} />
+					<Redirect path="/" to={{pathname: '/project/nurserymanagement'}} />
 				</Main>
 			</Body>
 		);

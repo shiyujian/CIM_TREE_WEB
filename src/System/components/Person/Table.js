@@ -49,7 +49,7 @@ export default class Users extends Component {
 	//人员标段和组织机构标段比较器，如果满足条件返回true
 	compare(user, l1, s) {
 		console.log("我执行了")
-		this.setState({ loading: true })
+
 		
 		if (l1 == undefined || s == undefined) {
 			return false
