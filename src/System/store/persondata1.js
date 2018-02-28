@@ -2,8 +2,7 @@ import {handleActions, combineActions,createAction} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import fieldFactory from '_platform/store/service/field';
-
-import { SERVICE_API,USER_API,WORKFLOW_API,base, NODE_FILE_EXCHANGE_API} from '_platform/api';
+import { SERVICE_API,USER_API,WORKFLOW_API,base, NODE_FILE_EXCHANGE_API,FOREST_API} from '_platform/api';
 
 
 export const ModalVisible = createAction('人员Modal显示隐藏');
@@ -41,10 +40,16 @@ const putPersons = createFetchAction(`http://47.104.160.65:6530/accounts/api//us
 const getPersonList = createFetchAction(`http://47.104.160.65:6530/accounts/api/users/?pagesize={{pagesize}}&offset={{offset}}&all=true`,[],"GET")
 const deletePerson = createFetchAction(`${SERVICE_API}/persons/code/{{code}}/?this=true`, [], "DELETE");
 const is_fresh = createAction("确定是否刷新")
+
+// 苗圃信息
+const getTagsOK = createAction(`${ID}_GET_TAGS_OK`);
+const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 export const actions = {
 	...sidebarReducer,
 	...additionReducer,
 	...filterReducer,
+	getTagsOK,
+	getTags,
 	ModalVisible,
 	getAllUsers,
 	postPersonList,
@@ -73,6 +78,10 @@ export const actions = {
 };
 
 export default handleActions({
+	[getTagsOK]: (state, {payload}) => ({
+		...state,
+		tags: payload
+	}),
 	[ModalVisible]: (state, {payload}) => ({
 		...state,
 		visible:payload,

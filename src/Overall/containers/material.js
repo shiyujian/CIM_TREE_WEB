@@ -69,7 +69,7 @@ export default class Material extends Component {
                             {/* <ResourceFilter  {...this.props} {...this.state}/> */}
                             <ResourceTable {...this.props} {...this.state}/>
                         </TabPane>
-                        <TabPane tab="苗木资料" key="3">
+                        <TabPane tab="苗木材料" key="3">
                             {/* <SeedingFilter  {...this.props} {...this.state}/> */}
                             <SeedingTable {...this.props} {...this.state}/>
                         </TabPane>
