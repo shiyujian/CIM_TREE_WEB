@@ -219,6 +219,57 @@ export const UNITS = [
 ]
 
 //获取单位工程
+export const PROJECT_UNITS = [
+	{
+		code:'P009',
+		value:'九号地块',
+		units:[
+			{
+				code:'P009-01-01',
+				value:'一标段'
+			},{
+				code:'P009-01-02',
+				value:'二标段'
+			},{
+				code:'P009-01-03',
+				value:'三标段'
+			},{
+				code:'P009-01-04',
+				value:'四标段'
+			},{
+				code:'P009-01-05',
+				value:'五标段'
+			},
+		]
+	},{
+		code:'P010',
+		value:'十万亩造林',
+		units:[
+			{
+				code:'P010-01-01',
+				value:'一标段'
+			},{
+				code:'P010-01-02',
+				value:'二标段'
+			},{
+				code:'P010-01-03',
+				value:'三标段'
+			},{
+				code:'P010-01-04',
+				value:'四标段'
+			},{
+				code:'P010-01-05',
+				value:'五标段'
+			},{
+				code:'P010-01-06',
+				value:'六标段'
+			}
+		]
+	}
+	
+]
+
+//获取单位工程
 export const FORESTTYPE = [
 	{	
 		id:1,

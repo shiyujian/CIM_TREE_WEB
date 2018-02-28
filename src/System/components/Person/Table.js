@@ -16,6 +16,7 @@ export default class Users extends Component {
 			searchList:[],
 			search:false,
 			loading: false,
+			percent: 0,
 		}
 	}
 	static layout = {
@@ -43,14 +44,8 @@ export default class Users extends Component {
 		}
 		return ops;
 	}
-	query1() {
-
-	}
 	//人员标段和组织机构标段比较器，如果满足条件返回true
-	compare(user, l1, s) {
-		console.log("我执行了")
-
-		
+	compare(user, l1, s) {		
 		if (l1 == undefined || s == undefined) {
 			return false
 		}
@@ -66,9 +61,9 @@ export default class Users extends Component {
 		}
 		return false;
 	}
+
 	search() {
 		let text = document.getElementById("NurseryData").value;
-		console.log('text', text)
 		let searchList = []
 		const { platform: { users = [] } } = this.props;
 		users.map((item) => {
@@ -83,9 +78,7 @@ export default class Users extends Component {
 			search: true
 		})
 	}
-
 	render() {
-	
 		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {} } = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
@@ -93,24 +86,21 @@ export default class Users extends Component {
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
 
 		const tagsOptions = this.initopthins(tags);
-
-		const { platform: { users = [] } } = this.props;
+		const { platform: { users = [] },actions: {getTreeModal} } = this.props;
 		const{
 			searchList,
 			search
 		}= this.state
-		var dataSource = [];
-		console.log("1113131",users)
-		if(users){
-			if(search){
-				dataSource = searchList
-				console.log("111")
-			}else{
-				dataSource = users
-				console.log("222")
-			}
+		let dataSource = [];
+		// if(users.length>0){
+		// 	getTreeModal(false)
+		// }
+		if(search){
+			dataSource = searchList
+			this.state.search=false
+		}else{
+			dataSource = users
 		}
-		
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		let is_active = false
 		if (user.is_superuser) {
@@ -120,13 +110,11 @@ export default class Users extends Component {
 				is_active = this.compare(user, user.account.sections, sections)
 			}
 		}
-
-		// const {platform: {roles = []}, addition = {}, actions: {changeAdditionField}} = this.props;		
 		return (
 			is_active ?
 				<div>
 					<div>
-						{/* <Row style={{marginBottom:"20px"}}>
+						<Row style={{marginBottom:"20px"}}>
 							<Col span={12}>
 								<label style={{ minWidth: 60, display: 'inline-block' }}>用户名:</label>
 								<Input id='NurseryData' className='search_input' />
@@ -168,16 +156,17 @@ export default class Users extends Component {
 							<Button  type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>							
 										
 							</Col>
-						</Row> */}
-						<Row>
-							<Col span={6}>
+						</Row>
+						<Row style={{marginBottom:"20px"}}>
+							<Col span={3}>
 								<Button onClick={this.append.bind(this)}>添加用户</Button>
+							</Col>
+							<Col span={3}>
 								<Popconfirm title="是否真的要删除选中用户?"
 									onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
 									<Button>批量删除</Button>
 
 								</Popconfirm>
-
 							</Col>
 							{/*<Col span={6}>
 							<FormItem {...Users.layout} label="苗圃">
@@ -241,8 +230,8 @@ export default class Users extends Component {
 
 						</Row>
 					</div>
-					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={users} 
-					loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
+					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={dataSource} 
+					loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.props.getTreeModals}}
 									
 					/>
 				</div>

@@ -22,9 +22,6 @@ class Addition extends Component {
 		} = this.props;
 		const { type, extra_params: extra = {}, obj_type } = node || {};
 		
-		console.log(this.props)
-		console.log("1111",addition.sections)
-
 		const title = Addition.getTitle(node, parent);
 		console.log('title',title)
 		console.log('parent',parent)

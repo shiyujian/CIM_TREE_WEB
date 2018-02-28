@@ -19,12 +19,11 @@ export default class TablePerson extends Component {
 	}
 	render() {
 		const { platform: { users = [] } } = this.props;
-		console.log("users", users)
 
 		// const {actions: {getPersonList }} = this.props;
 
 		// let rst =  getPersonList({pagesize:10,offset:0});
-
+		console.log("this.state.tempData",this.state.tempData)
 		return (
 			<div>
 				<div>
@@ -43,7 +42,7 @@ export default class TablePerson extends Component {
 					rowKey="index"
 					onChange={this.changePage.bind(this)}
 					pagination={this.state.pagination}
-				loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
+				// loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 				>
 				</Table>
 
@@ -52,7 +51,7 @@ export default class TablePerson extends Component {
 	}
 	async componentWillReceiveProps(props) {
 		const { tempData, is_fresh = false } = props
-		console.log("tempData",tempData)
+		// console.log("tempData",tempData)
 		if (is_fresh) {
 			this.setState({ loading: true })
 			const { actions: { getOrgList, getAllUsers, getOrgDetail, getPeople, getPersonList, getOrgReverse, is_fresh } } = this.props;
@@ -78,6 +77,7 @@ export default class TablePerson extends Component {
 			// 	let ret = await getOrgReverse({code:persons[i].organisation.code})
 			// 	type.push(ret.children[0].name)
 			// }
+			console.log("persons",persons)
 			let data_person =
 				persons.map((item, index) => {
 					// console.log("1111",item)
@@ -94,8 +94,8 @@ export default class TablePerson extends Component {
 						email: item.email || '',
 						is_user: true,
 						username: item.username || '',
-						sections: item.sections || '',
-						tags: item.tags || '',
+						sections: item.account.sections || '',
+						tags: item.account.tags || '',
 						// passwords:111111
 					}
 				})
@@ -244,6 +244,7 @@ export default class TablePerson extends Component {
 		// 	let ret = await getOrgReverse({code:persons[i].organisation.code})
 		// 	type.push(ret.children[0].name)
 		// }
+		console.log("persons",persons)
 		let data_person =
 			persons.map((item, index) => {
 				// console.log(item)
@@ -259,10 +260,8 @@ export default class TablePerson extends Component {
 					tel: item.account.person_telephone || '',
 					email: item.email || '',
 					is_user: true,
-					username: item.username || '',
-					sections: item.sections || '',
-					tags: item.tags || '',
-
+					sections: item.account.sections || '',
+					tags: item.account.tags || '',
 					// passwords:111111,
 				}
 			})
@@ -305,6 +304,7 @@ export default class TablePerson extends Component {
 
 		// 	type.push(ret.children[0].name)
 		// }
+		console.log("persons",persons)
 		let data_person =
 			persons.map((item, index) => {
 				// console.log(item)
@@ -322,12 +322,11 @@ export default class TablePerson extends Component {
 					email: item.email || '',
 					is_user: true,
 					username: item.username || '',
-					sections: addition.sections || '',
-					tags: addition.tags || '',
+					sections: item.account.sections || '',
+					tags: item.account.tags || '',
 					// passwords:111111,
 				}
 			})
-			console.log("data_person",data_person)
 		this.setState({ dataSource: data_person, tempData: data_person, loading: false });
 		// let arr = this.state.dataSource;
 		// let pageSize = pagination.pageSize;
@@ -477,11 +476,12 @@ export default class TablePerson extends Component {
 		// 	}
 		// },
 
-		{
-			title: '人员编码',
-			dataIndex: 'code',
-			key: 'Code',
-		}, {
+		// {
+		// 	title: '人员编码',
+		// 	dataIndex: 'code',
+		// 	key: 'Code',
+		// },
+		 {
 			title: '姓名',
 			dataIndex: 'name',
 			key: 'name',
@@ -559,10 +559,17 @@ export default class TablePerson extends Component {
 
 		}
 		, {
+			title: '角色',
+			dataIndex: "role",
+			key: 'role',
+
+		}
+		, {
 			title: "操作",
 			// dataIndex: "edit",
 			key: "Edit",
 			render: (record) => {
+				// console.log("record",record)
 				return (
 					<div>
 						<a onClick={this.edits.bind(this, record)}><Icon type="edit"></Icon></a>
