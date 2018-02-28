@@ -6,6 +6,20 @@ import { Link } from 'react-router-dom';
 import { getUser, clearUser, getPermissions, removePermissions } from '../../auth';
 import { loadMenus, loadIgnoreModules, loadHeadLogo } from 'APP/api';
 
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import * as actions from '_platform/store/global/tabs';
+
+@connect(
+	state => {
+		const {platform = {}} = state;
+		return platform;
+	},
+	dispatch => ({
+		actions: bindActionCreators(actions, dispatch),
+	}),
+)
+
 export default class Header extends Component {
 	state = {
 		dotShow: false
@@ -112,9 +126,11 @@ export default class Header extends Component {
 	}
 
 	signOut() {
+		const { history, actions: {clearTab} } = this.props;
 		clearUser();
+		clearTab();
 		removePermissions();
-		const { history } = this.props;
+		
 		let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
 		if (!remember) {
 			window.localStorage.removeItem('QH_LOGIN_USER');
@@ -132,6 +148,7 @@ export default class Header extends Component {
 
 	static menus = loadMenus;
 
+	//现在通过APP/api进行导入，不在此定义声明
 	/*static menus = [{
 		key: 'home',
 		id: 'HOME',

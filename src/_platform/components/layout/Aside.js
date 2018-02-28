@@ -18,7 +18,6 @@ export default class Aside extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {minHeight: 10};
-
 	}
 
 	static propTypes = {};
