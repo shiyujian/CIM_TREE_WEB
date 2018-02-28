@@ -13,7 +13,7 @@ export default class Roles extends Component {
 	render() {
 		const {platform: {roles = []}} = this.props;
 		let systemRoles;
-		console.log("this.props",this.props)
+		// console.log("this.props",this.props)
 		if (this.state.userLogin === "admin") {
 			systemRoles = roles.filter(role => role.grouptype === 0);
 		}else{

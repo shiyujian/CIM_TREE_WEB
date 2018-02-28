@@ -33,7 +33,7 @@ export const tree_menus = [{
 	id: 'OVERALL',
 	title: '综合管理',
 	path: '/overall/news',
-	icon: <Icon name="cubes"/>,
+	icon: <Icon name="cubes"/>
 }, {
 	key: 'datum',
 	id: 'DATUM',
@@ -63,7 +63,7 @@ export const tree_menus = [{
 	id: 'FOREST',
 	title: '森林大数据',
 	path: '/forest/nursoverallinfo',
-	icon: <Icon name="tree"/>,
+	icon: <Icon name="tree"/>
 },/* {
 	key: 'receive',
 	id: 'RECEIVE',
