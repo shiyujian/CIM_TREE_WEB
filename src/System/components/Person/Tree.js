@@ -30,14 +30,21 @@ export default class Tree extends Component {
 		const {node: {props: {eventKey = ''} = {}} = {}} = node || {};
 		const {
 			platform: {org: {children = []} = {}},
-			actions: {changeSidebarField, getUsers}
+			actions: {changeSidebarField, getUsers,getTreeModal}
 		} = this.props;
 		const o = Tree.loop(children, eventKey);
 		if(this.compare(user,user.account.sections,o.extra_params.sections)){
-			console.log(55555555,o)
+			if(o.code){
+				getTreeModal(true)
+			}else{
+				getTreeModal(false)
+				
+			}
 			changeSidebarField('node', o);
 			const codes = Tree.collect(o);
-			getUsers({}, {org_code: codes});
+			getUsers({}, {org_code: codes}).then((e) =>{
+				getTreeModal(false)
+			});
 		}
 	}
 	//人员标段和组织机构标段比较器，如果满足条件返回true

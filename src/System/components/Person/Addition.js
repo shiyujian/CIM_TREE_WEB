@@ -173,6 +173,7 @@ export default class Addition extends Component {
 					extra_params: {},
 					title: addition.title || ''
 				}).then(rst => {
+					console.log("rst",rst)
 					if (rst.code==1) {
 						message.info('修改人员成功');
 						clearAdditionField();
@@ -188,11 +189,12 @@ export default class Addition extends Component {
 				console.log("11",111)
 				console.log("roles",roles)		
 				postUser({}, {
-					
+					is_person:true,
 					username: addition.username,
-					email: addition.email,
+					email: addition.email ||'',
 					password: addition.password,
 					account: {
+						person_code:addition.code,
 						person_name: addition.person_name,
 						person_type: "C_PER",
 						person_avatar_url: "",
@@ -221,13 +223,16 @@ export default class Addition extends Component {
 					extra_params: {},
 					title: addition.title || ''
 				}).then(rst => {
+					console.log("rst",rst)
 					if (rst.code==1) {
 						message.info('新增人员成功');
 						clearAdditionField();
 						const codes = Addition.collect(node);
 						getUsers({}, {org_code: codes});
 					} else {
+						console.log(rst)
 						if (rst.code==2) {
+							
 							message.warn('用户名已存在！');
 						} else {
 							console.log("222")							
