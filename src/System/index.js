@@ -21,14 +21,14 @@ export default class System extends Component {
 		const {Create} = this.state || {};
 		return (
 			<Body>
-			<Aside>
-				<Submenu {...this.props} menus={System.menus} />
-			</Aside>
-			<Main>
-				<ContainerRouters menus={System.menus} containers={this.state}/>
-	
-			</Main>
-			</Body>);
+				<Aside>
+					<Submenu {...this.props} menus={System.menus} />
+				</Aside>
+				<Main>
+					<ContainerRouters menus={System.menus} containers={this.state}/>
+				</Main>
+			</Body>
+		);
 	}
 
 	static menus = [
@@ -96,38 +96,12 @@ export default class System extends Component {
 			name: '组织机构填报',
 			path: '/system/orgdata',
 			icon: <Icon name="street-view"/>
-		},
-		{
+		},{
 			key: 'Personsdata',
 			id: 'SYSTEM.PERSONSDATA',
 			name: '人员信息填报',
 			path: '/system/personsdata',
 			icon: <Icon name="street-view"/>
-		},
-		// ,{
-		// 	key: 'Document',
-		// 	id: 'SYSTEM.DOCUMENT',
-		// 	name: '文档设置',
-		// 	path: '/system/document',
-		// 	icon: <Icon name="tablet"/>,
-		// },
-		// {
-		// 	key: 'detailed',
-		// 	name: '清单设置',
-		// 	icon: <Icon name="book"/>,
-		// 	children: [{
-		// 		key: 'Tag',
-		// 		id: 'SYSTEM.TAG',
-		// 		name: '工程量项',
-		// 		path: '/system/tag',
-		// 		icon: <Icon name="signal"/>
-		// 	},{
-		// 		key: 'Quantities',
-		// 		id: 'SYSTEM.QUANTITIES',
-		// 		name: '分项工程量',
-		// 		path: '/system/quantities',
-		// 		icon: <Icon name="signal"/>
-		// 	}]
-		// }
-		];
+		}
+	];
 }

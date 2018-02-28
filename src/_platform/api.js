@@ -610,7 +610,7 @@ export const MODULES = [
 		name: '资料管理',
 		children: [{
 			id: 'DATUM.STANDARD',
-			name: '制度规范',
+			name: '制度规范'
 		}, {
 			id: 'DATUM.ENGINEERING',
 			name: '工程文档'
