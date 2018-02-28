@@ -26,7 +26,7 @@ export default class App extends Component {
 		const {default: Schedule} = await import('../../Schedule');
 		const {default: System} = await import('../../System');
 		// const {default: Setup} = await import('../../Setup');
-		const {default: Selfcare} = await import('../../Selfcare');
+		const {default: Selfcare} = await import('../../Selfcare'); 
 		const {default: ModelDown} = await import('../../Down');
 		const {default: Video} = await import('../../Video');
 		const {default: Cost} = await import('../../Cost');

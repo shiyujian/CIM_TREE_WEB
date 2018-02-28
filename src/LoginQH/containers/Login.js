@@ -32,11 +32,10 @@ class Login extends Component {
 			token: null,
 			QRUrl: '',
 			userMessage: null,
-			checked:''
+			checked:'',
 		};
 		this.account = [];
 		this.code = [];
-		clearUser();
 		clearUser();
 		clearUser();
 		clearUser();
@@ -172,16 +171,13 @@ class Login extends Component {
 		return (
 			<div className="login-wrap">
 				<div className="main-center">
-
-
 					<div className="main-logo">
 						<img className="main-logos" src={docDescibe} />
-						<div className="main-on"  >
+						<div className="main-on" >
 							
 						</div>
 						<a className="login-title1"><img src={loginTitle} /></a>
 					</div>
-
 
 					{
 						loginState ? !forgectState ?
@@ -244,7 +240,6 @@ class Login extends Component {
 										</FormItem>
 										<Button type="primary" htmlType="submit"
 											className="login-form-button">登录</Button>
-
 									</Form>
 								</div>
 							</div> :
@@ -253,7 +248,6 @@ class Login extends Component {
 									<h1 style={{ textAlign: 'center', color: 'red' }}></h1>
 									<Form onSubmit={this.sureSubmit.bind(this)}
 										className='login-form' id="loginForm">
-
 										<FormItem style={{ marginTop: '40px', marginLeft: "24px" }}>
 											{getFieldDecorator('nickname', {
 												rules: [{ required: true, message: '请输入用户名' }],

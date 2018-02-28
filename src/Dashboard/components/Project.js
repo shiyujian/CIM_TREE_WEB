@@ -157,7 +157,7 @@ export default class Lmap extends Component {
 	initMap() {
 		this.map = L.map('mapid', window.config.initLeaflet);
 
-		L.control.zoom({position: 'bottomright'}).addTo(this.map);
+		L.control.zoom({position: 'topleft'}).addTo(this.map);
 		
 		this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
 			subdomains: [1, 2, 3],
@@ -192,7 +192,7 @@ export default class Lmap extends Component {
 	initMap2() {
 		this.map2 = L.map('mapid2', window.config.initLeaflet);
 
-		L.control.zoom({position: 'bottomright'}).addTo(this.map);
+		L.control.zoom({position: 'topleft'}).addTo(this.map2);
 		
 		this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
 			subdomains: [1, 2, 3],
@@ -281,16 +281,16 @@ export default class Lmap extends Component {
 				     onMouseUp={this.onEndResize.bind(this)}
 				     onMouseMove={this.onResizingMenu.bind(this)}>
 					{
-						<div className="treeControl" style={{"zIndex":999}}>
-							<div>
-								<RadioGroup defaultValue={1} onChange={this.toggleOneOrTwoScreen.bind(this)} size="large">
-									<RadioButton value={1}>单屏</RadioButton>
-									<RadioButton value={2}>双屏</RadioButton>
-								</RadioGroup>
-							</div>
-						</div>
+						// <div className="treeControl" style={{"zIndex":999}}>
+						// 	<div>
+						// 		<RadioGroup defaultValue={1} onChange={this.toggleOneOrTwoScreen.bind(this)} size="large">
+						// 			<RadioButton value={1}>单屏</RadioButton>
+						// 			<RadioButton value={2}>双屏</RadioButton>
+						// 		</RadioGroup>
+						// 	</div>
+						// </div>
 					}{
-						<div className={display1} style={{"zIndex":888}}>
+						<div className="treeControl3" style={{"zIndex":888}}>
 							<div>
 								<RadioGroup defaultValue={1} onChange={this.toggleTileLayer.bind(this)} size="small">
 									<RadioButton value={1}>2017年11月15日</RadioButton>
@@ -302,7 +302,6 @@ export default class Lmap extends Component {
 							</div>
 						</div>
 					}{
-						this.state.isTwoScreenShow == 2 ?
 						<div className="treeControl2" style={{"zIndex":888}}>
 							<div>
 								<RadioGroup defaultValue={1} onChange={this.toggleTileLayer2.bind(this)} size="small">
@@ -313,30 +312,53 @@ export default class Lmap extends Component {
 									<RadioButton value={5}>2017年12月13日</RadioButton>
 								</RadioGroup>
 							</div>
-						</div> : null
+						</div>
+						// this.state.isTwoScreenShow == 2 ?
+						// <div className="treeControl2" style={{"zIndex":888}}>
+						// 	<div>
+						// 		<RadioGroup defaultValue={1} onChange={this.toggleTileLayer2.bind(this)} size="small">
+						// 			<RadioButton value={1}>2017年11月15日</RadioButton>
+						// 			<RadioButton value={2}>2017年11月24日</RadioButton>
+						// 			<RadioButton value={3}>2017年12月01日</RadioButton>
+						// 			<RadioButton value={4}>2017年12月10日</RadioButton>
+						// 			<RadioButton value={5}>2017年12月13日</RadioButton>
+						// 		</RadioGroup>
+						// 	</div>
+						// </div> : null
 					}{
-						this.state.isTwoScreenShow == 2 ?
-						<div id="mapid" style={{
-							"position": "absolute",
-							"top": 0,
-							"bottom": 0,
-							"left": 0,
-							"right": 0,
-							"borderLeft": "1px solid #ccc",
-							"float": "left",
-							"width": "50%"
-						}}/> :
-						<div id="mapid" style={{
-							"position": "absolute",
-							"top": 0,
-							"bottom": 0,
-							"left": 0,
-							"right": 0,
-							"borderLeft": "1px solid #ccc",
-							"zIndex":777
-						}}/>
+						// this.state.isTwoScreenShow == 2 ?
+						// <div id="mapid" style={{
+						// 	"position": "absolute",
+						// 	"top": 0,
+						// 	"bottom": 0,
+						// 	"left": 0,
+						// 	"right": 0,
+						// 	"borderLeft": "1px solid #ccc",
+						// 	"float": "left",
+						// 	"width": "50%"
+						// }}/> :
+						// <div id="mapid" style={{
+						// 	"position": "absolute",
+						// 	"top": 0,
+						// 	"bottom": 0,
+						// 	"left": 0,
+						// 	"right": 0,
+						// 	"borderLeft": "1px solid #ccc",
+						// 	"zIndex":777
+						// }}/>
 					}{
-						<div id="mapid2" style={{
+						<div>
+							<div id="mapid" style={{
+								"position": "absolute",
+								"top": 0,
+								"bottom": 0,
+								"left": 0,
+								"right": 0,
+								"borderLeft": "1px solid #ccc",
+								"float": "left",
+								"width": "50%"
+							}}/>
+							<div id="mapid2" style={{
 								"position": "absolute",
 								"top": 0,
 								"bottom": 0,
@@ -346,6 +368,7 @@ export default class Lmap extends Component {
 								"float": "right",
 								"width": "50%"
 							}}/>
+						</div>
 					}
 				</div>
 			</div>

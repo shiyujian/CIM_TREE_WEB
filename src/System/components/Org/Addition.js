@@ -23,6 +23,8 @@ class Addition extends Component {
 		const { type, extra_params: extra = {}, obj_type } = node || {};
 		
 		const title = Addition.getTitle(node, parent);
+		console.log('title',title)
+		console.log('parent',parent)
 		return (
 			<Modal title={parent ? `新建${title} | ${parent.name}` : `编辑${title} | ${node.name}`}
 			maskClosable={false}
@@ -121,15 +123,19 @@ class Addition extends Component {
 	static getTitle(node, parent) {
 		if (parent && parent.code) {
 			switch (parent.type) {
+				case 'project':
+					return '机构类型';
 				case 'org':
 					return '单位';
 				case 'company':
 					return '部门';
 				default:
-					return '机构类型';
+					return '项目';
 			}
 		}
 		switch (node.type) {
+			case 'project':
+				return '项目';
 			case 'org':
 				return '机构类型';
 			case 'company':
