@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Modal, Row, Col, Form, Input,Select} from 'antd';
 import {CUS_TILEMAP} from '_platform/api';
+import {getProjectUnits} from '../../../_platform/auth'
 
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
@@ -23,6 +24,9 @@ class Addition extends Component {
 		const { type, extra_params: extra = {}, obj_type } = node || {};
 		
 		const title = Addition.getTitle(node, parent);
+		let units = this.getUnits()
+		console.log('addition',addition)
+		console.log('units',units)
 		console.log('title',title)
 		console.log('parent',parent)
 		return (
@@ -44,11 +48,13 @@ class Addition extends Component {
 				<FormItem {...Addition.layout} label={`${title}标段`}>
 					<Select placeholder="标段" value={addition.sections} onChange={changeAdditionField.bind(this, 'sections')}
 						mode="multiple" style={{ width: '100%' }}>
-						<Option key={'P009-01-01'} >1标段</Option>
-						<Option key={'P009-01-02'} >2标段</Option>
-						<Option key={'P009-01-03'} >3标段</Option>
-						<Option key={'P009-01-04'} >4标段</Option>
-						<Option key={'P009-01-05'} >5标段</Option>
+						{
+							units?
+							units.map((item)=>{
+								return <Option key={item.code} value={item.code} >{item.value}</Option>
+							}):
+							''
+						}
 					</Select>
 				</FormItem>
 				<FormItem {...Addition.layout} label={`${title}简介`}>
@@ -56,6 +62,26 @@ class Addition extends Component {
 					       onChange={changeAdditionField.bind(this, 'introduction')}/>
 				</FormItem>
 			</Modal>);
+	}
+
+	//获取项目的标段
+	getUnits(){
+		const {
+			sidebar: { node = {} } = {},
+			listStore = []
+		} = this.props;
+		let projectName = ''
+		listStore.map((item,index)=>{
+			item.map((rst)=>{
+				if( (rst.name === node.name) && (rst.code === node.code)){
+					console.log('node.name',node.name)
+					projectName = listStore[index]?listStore[index][0].name:''
+				}
+			})
+			
+		})
+		console.log('projectName',projectName)
+		return getProjectUnits(projectName)
 	}
 
 	save() {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Input, Button, Select } from 'antd';
 import { CUS_TILEMAP } from '_platform/api';
+import {getProjectUnits} from '../../../_platform/auth'
 
 
 const FormItem = Form.Item;
@@ -17,7 +18,8 @@ export default class Info extends Component {
 	render() {
 		const {
 			sidebar: { node = {} } = {}, addition = {},
-			actions: { changeAdditionField }
+			actions: { changeAdditionField },
+			listStore
 		} = this.props;
 		console.log('this.props',this.props)
 		const {type, extra_params: extra = {}, obj_type} = node || {};
