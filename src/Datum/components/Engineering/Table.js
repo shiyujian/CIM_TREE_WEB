@@ -26,34 +26,38 @@ export default class GeneralTable extends Component {
 
 	columns = [
 		{
+			title: '区域',
+			dataIndex: 'extra_params.area',
+			key: 'area',
+		}, {
+			title: '单位工程',
+			dataIndex: 'extra_params.unitProject',
+			key: 'unitProject',
+		},{
 			title: '名称',
 			dataIndex: 'name',
 			key: 'name',
-			// sorter: (a, b) => a.name.length - b.name.length
-		}, {
+		},{
 			title: '编号',
 			dataIndex: 'extra_params.number',
-			key: 'extra_params.number',
-			// sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
-		}, {
-			title: '发布单位',
-			dataIndex: 'extra_params.company',
-			key: 'extra_params.company',
-			// sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
-		}, {
-			title: '实施日期',
+			key: 'number',
+		},{
+			title: '文档类型',
+			dataIndex: 'extra_params.doc_type',
+			key: 'doc_type',
+		},{
+			title: '提交单位',
+			dataIndex: 'extra_params.unit',
+			key: 'unit',
+		},{
+			title: '提交人',
+			dataIndex: 'extra_params.people',
+			key: 'people',
+		},{
+			title: '提交时间',
 			dataIndex: 'extra_params.time',
-			key: 'extra_params.time',
-			// sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
-		}, {
-			title: '备注',
-			dataIndex: 'extra_params.remark',
-			key: 'extra_params.remark'
-		}, {
-			title: '文档状态',
-			dataIndex: 'extra_params.state',
-			key: 'extra_params.state'
-		}, {
+			key: 'time',
+		},{
 			title: '操作',
 			render: (record, index) => {
 				let nodes = [];
@@ -61,7 +65,7 @@ export default class GeneralTable extends Component {
 					<div>
 						<a onClick={this.previewFile.bind(this, record)}>预览</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
-						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, record)}>下载</a>
 					</div>
 				);
 				return nodes;
@@ -77,29 +81,13 @@ export default class GeneralTable extends Component {
 		link.click();
 		document.body.removeChild(link);
 	}
-	download(index, key, e) {
-		const { selected = [], file = [], files = [], down_file = [] } = this.props;
-
-		if (selected.length == 0) {
-			message.warning('没有选择无法下载');
-		}
-		for (var j = 0; j < selected.length; j++) {
-			if (selected[j].code == index.code) {
-
-				selected.map(rst => {
-					file.push(rst.basic_params.files);
-				});
-				file.map(value => {
-					value.map(cot => {
-						files.push(cot.download_url)
-					})
-				});
-				files.map(down => {
-					let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-					this.createLink(this, down_load);
-				});
-			}
-		}
+	download(record) {
+		let array = record.basic_params.files;
+		array.map(down => {
+			debugger
+			let down_load = STATIC_DOWNLOAD_API + down.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');;
+			this.createLink(this, down_load);
+		});
 	}
 
 	previewFile(file) {
