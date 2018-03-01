@@ -191,9 +191,12 @@ export default class Tree extends Component {
 						type = 'project';
 						break;
 					case 1:
-						type = 'org';
+						type = 'subProject';
 						break;
 					case 2:
+						type = 'org';
+						break;
+					case 3:
 						type = 'company';
 						break;
 					default:

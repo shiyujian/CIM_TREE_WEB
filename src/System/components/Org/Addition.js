@@ -150,6 +150,8 @@ class Addition extends Component {
 		if (parent && parent.code) {
 			switch (parent.type) {
 				case 'project':
+					return '子项目';
+				case 'subProject':
 					return '机构类型';
 				case 'org':
 					return '单位';
@@ -162,6 +164,8 @@ class Addition extends Component {
 		switch (node.type) {
 			case 'project':
 				return '项目';
+			case 'subProject':
+				return '子项目';
 			case 'org':
 				return '机构类型';
 			case 'company':
