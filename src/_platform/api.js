@@ -222,7 +222,7 @@ export const UNITS = [
 export const PROJECT_UNITS = [
 	{
 		code:'P009',
-		value:'九号地块',
+		value:'9号地块',
 		units:[
 			{
 				code:'P009-01-01',
@@ -243,7 +243,7 @@ export const PROJECT_UNITS = [
 		]
 	},{
 		code:'P010',
-		value:'十万亩造林',
+		value:'十万亩苗景兼用林',
 		units:[
 			{
 				code:'P010-01-01',
@@ -266,7 +266,6 @@ export const PROJECT_UNITS = [
 			}
 		]
 	}
-	
 ]
 
 //获取单位工程

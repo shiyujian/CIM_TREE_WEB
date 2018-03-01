@@ -49,16 +49,21 @@ export default class Users extends Component {
 		if (l1 == undefined || s == undefined) {
 			return false
 		}
-		let l2 = s.split(',')
-		for (let i = 0; i < l1.length; i++) {
-			const e1 = l1[i];
-			for (let j = 0; j < l2.length; j++) {
-				const e2 = l2[j];
-				if (e1 == e2) {
-					return true
-				}
-			}
+		// let l2 = s.split(',')
+		// for (let i = 0; i < l1.length; i++) {
+		// 	const e1 = l1[i];
+		// 	for (let j = 0; j < l2.length; j++) {
+		// 		const e2 = l2[j];
+		// 		if (e1 == e2) {
+		// 			return true
+		// 		}
+		// 	}
+		// }
+		// if(l1>)
+		if(l1.startsWith(s)){
+				return true;	
 		}
+
 		return false;
 	}
 
@@ -79,7 +84,7 @@ export default class Users extends Component {
 		})
 	}
 	render() {
-		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {} } = {}, parent } = {} } = this.props;
+		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {} ,code} = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
@@ -102,12 +107,13 @@ export default class Users extends Component {
 			dataSource = users
 		}
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+
 		let is_active = false
 		if (user.is_superuser) {
 			is_active = true;
 		} else {
-			if (sections) {
-				is_active = this.compare(user, user.account.sections, sections)
+			if (code) {
+				is_active = this.compare(user, user.account.org_code, code)
 			}
 		}
 		return (
