@@ -21,6 +21,7 @@ var moment = require('moment');
 		actions: bindActionCreators({...platformActions,...actions,...action2}, dispatch),
 	}),
 )
+
 export default class Personsdata extends Component {
 	setData(data,participants){
 		const {actions:{ createWorkflow, logWorkflowEvent }} = this.props
@@ -199,6 +200,11 @@ export default class Personsdata extends Component {
 					}
 				});
 		});
+	}
+	componentDidMount() {
+		const {actions:{getTags,getRoles}} =this.props;
+		getTags({});
+		getRoles();
 	}
 	render() {
 		const {visible, Exvisible, Modvisible} = this.props;

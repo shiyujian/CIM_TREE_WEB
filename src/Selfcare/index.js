@@ -52,12 +52,12 @@ export default class Selfcare extends Component {
 		name: '个人请假',
 		path: '/selfcare/leave',
 		icon: <Icon name="shekel"/>
-	}, {
+	}, /*{
 		key: 'account',
 		id: 'SELFCARE.ACCOUNT',
 		name: '账号管理',
 		path: '/selfcare/account',
 		icon: <Icon name="shekel"/>
-	}
+	}*/
 	];
 }

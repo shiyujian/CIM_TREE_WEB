@@ -1,6 +1,6 @@
 import {injectReducer} from '../store';
 import React, {Component} from 'react';
-import {Route} from 'react-router-dom';
+import {Route,Redirect} from 'react-router-dom';
 import {Main, Aside, Body} from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import ContainerRouters from '_platform/components/panels/ContainerRouters';
@@ -26,7 +26,7 @@ export default class System extends Component {
 			</Aside>
 			<Main>
 				<ContainerRouters menus={System.menus} containers={this.state}/>
-	
+				<Redirect path="/" to={{pathname: '/system/person'}} />
 			</Main>
 			</Body>);
 	}
@@ -67,43 +67,17 @@ export default class System extends Component {
 			icon: <Icon name="users"/>,
 		},{
 			key: 'Permission',
-			id: 'SYSTEM.PERMISSION ',
+			id: 'SYSTEM.PERMISSION',
 			name: '权限设置',
 			path: '/system/permission',
 			icon: <Icon name="key"/>
 		},{
 			key: 'Person',
-			id: 'SYSTEM.PERSON ',
+			id: 'SYSTEM.PERSON',
 			name: '用户管理',
 			path: '/system/person',
 			icon: <Icon name="users"/>
-		}, 
-		// {
-		// 	key: 'Major',
-		// 	id: 'SYSTEM.MAJOR',
-		// 	name: '专业设置',
-		// 	path: '/system/major',
-		// 	icon: <Icon name="sign-in"/>
-		// }, {
-		// 	key: 'Project',
-		// 	id: 'SYSTEM.PROJECT',
-		// 	name: '项目设置',
-		// 	path: '/system/project',
-		// 	icon: <Icon name="sun-o"/>
-		// }, {
-		// 	key: 'Template',
-		// 	id: 'SYSTEM.TEMPLATE',
-		// 	name: '模版设置',
-		// 	path: '/system/template',
-		// 	icon: <Icon name="sort-amount-asc"/>
-		// }, {
-		// 	key: 'Icon',
-		// 	id: 'SYSTEM.ICON',
-		// 	name: '图标设置',
-		// 	path: '/system/icon',
-		// 	icon: <Icon name="terminal"/>
-		// }, 
-		{
+		},{
 			key: 'Workflow',
 			id: 'SYSTEM.WORKFLOW',
 			name: '流程设置',

@@ -14,29 +14,87 @@ export default class Tree extends Component {
 	}
 
 	componentDidMount() {
-		const {actions: {getOrgTree, changeSidebarField, getUsers}} = this.props;
+		const {actions: {getOrgTree, changeSidebarField, getUsers,getTreeModal}} = this.props;
 		getOrgTree({}, {depth: 3}).then(rst => {
 			const {children: [first] = []} = rst || {};
 			if (first) {
 				changeSidebarField('node', first);
 				const codes = Tree.collect(first);
-				getUsers({}, {org_code: codes});
+				getUsers({}, {org_code: codes}).then((e) =>{
+					getTreeModal(false)
+				});
 			}
 		});
 	}
 
 	select(s, node) {
+		const user=JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		const {node: {props: {eventKey = ''} = {}} = {}} = node || {};
 		const {
 			platform: {org: {children = []} = {}},
-			actions: {changeSidebarField, getUsers}
+			actions: {changeSidebarField, getUsers,getTreeModal}
 		} = this.props;
 		const o = Tree.loop(children, eventKey);
-		changeSidebarField('node', o);
-		const codes = Tree.collect(o);
-		getUsers({}, {org_code: codes});
+		const ucode=user.account.org_code.substring(0,9);
+		if(this.compare(user,ucode,o.code)){
+			if(o.code){
+				getTreeModal(true)
+			}else{
+				getTreeModal(false)
+				
+			}
+			changeSidebarField('node', o);
+			const codes = Tree.collect(o);
+			getUsers({}, {org_code: codes}).then((e) =>{
+				getTreeModal(false)
+			});
+		}
 	}
+	//人员标段和组织机构标段比较器，如果满足条件返回true
+	// compare(user,l1,s){
+	// 	if(user.is_superuser){
+	// 		return true;
+	// 	}
+	// 	if(l1==undefined||s==undefined){
+	// 		return false
+	// 	}
+	// 	let l2=s.split(',')
+	// 	for (let i = 0; i < l1.length; i++) {
+	// 		const e1 = l1[i];
+	// 		for (let j = 0; j < l2.length; j++) {
+	// 			const e2 = l2[j];
+	// 			if(e1==e2){
+	// 				return true
+	// 			}
+	// 		}
+	// 	}
+	// 	return false;
+	// }
+	compare(user, l1, s) {		
+		if(user.is_superuser){
+			return true;
+		}
+		console.log(11111111,l1,s)
+		if (l1 == undefined || s == undefined) {
+			return false
+		}
+		// let l2 = s.split(',')
+		// for (let i = 0; i < l1.length; i++) {
+		// 	const e1 = l1[i];
+		// 	for (let j = 0; j < l2.length; j++) {
+		// 		const e2 = l2[j];
+		// 		if (e1 == e2) {
+		// 			return true
+		// 		}
+		// 	}
+		// }
+		// if(l1>)
+		if(s.startsWith(l1)){
+				return true;	
+		}
 
+		return false;
+	}
 	static loop = (list, code) => {
 		let rst = null;
 		list.forEach((item = {}) => {

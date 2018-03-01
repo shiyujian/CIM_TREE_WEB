@@ -1,4 +1,5 @@
 import cookie from 'js-cookie';
+import {PROJECT_UNITS} from './api';
 
 export default () => {
 	return !!cookie.get('id');
@@ -76,4 +77,16 @@ export const getPermissions = () => {
 
 export const removePermissions = () => {
 	window.localStorage.removeItem('permissions');
+};
+
+export const getProjectUnits = (projectName) => {
+	let units = [];
+	PROJECT_UNITS.map((item)=>{
+		console.log('item',item)
+		console.log('projectName',projectName)
+		if(item.value === projectName){
+			units = item.units
+		}
+	})
+	return units
 };

@@ -12,7 +12,8 @@ export default class Addition extends Component {
 		const professionRoles = roles.filter(role => role.grouptype === 2);
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
 		const tagsOptions = this.initopthins(tags);
-		console.log("addition",addition)
+		// console.log("addition",addition)
+		// console.log("this.props",this.props)
 		// addition.tags=['1']
 		return (
 			<Modal title={addition.id ? "新增人员" : "编辑人员信息"} visible={addition.visible} className="large-modal" width={800}
@@ -157,6 +158,7 @@ export default class Addition extends Component {
 					},
 					tags: addition.tags,
 					sections: addition.sections,
+					//groups: [7],
 					groups: roles.map(role => +role),
 					is_active: true,
 					basic_params: {
@@ -172,6 +174,7 @@ export default class Addition extends Component {
 					extra_params: {},
 					title: addition.title || ''
 				}).then(rst => {
+					console.log("rst",rst)
 					if (rst.code==1) {
 						message.info('修改人员成功');
 						clearAdditionField();
@@ -187,11 +190,12 @@ export default class Addition extends Component {
 				console.log("11",111)
 				console.log("roles",roles)		
 				postUser({}, {
-					
+					is_person:true,
 					username: addition.username,
-					email: addition.email,
+					email: addition.email ||'',
 					password: addition.password,
 					account: {
+						person_code:addition.code,
 						person_name: addition.person_name,
 						person_type: "C_PER",
 						person_avatar_url: "",
@@ -220,13 +224,16 @@ export default class Addition extends Component {
 					extra_params: {},
 					title: addition.title || ''
 				}).then(rst => {
+					console.log("rst",rst)
 					if (rst.code==1) {
 						message.info('新增人员成功');
 						clearAdditionField();
 						const codes = Addition.collect(node);
 						getUsers({}, {org_code: codes});
 					} else {
+						console.log(rst)
 						if (rst.code==2) {
+							
 							message.warn('用户名已存在！');
 						} else {
 							console.log("222")							
