@@ -208,7 +208,6 @@ export default class Personsdata extends Component {
 	}
 	render() {
 		const {visible, Exvisible, Modvisible} = this.props;
-		console.log("222222222",this.props)
 		return (
 			<div>
 				<DynamicTitle title="人员信息填报" {...this.props} />

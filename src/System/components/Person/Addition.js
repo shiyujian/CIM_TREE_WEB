@@ -13,7 +13,7 @@ export default class Addition extends Component {
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
 		const tagsOptions = this.initopthins(tags);
 		// console.log("addition",addition)
-		console.log("this.props",this.props)
+		// console.log("this.props",this.props)
 		// addition.tags=['1']
 		return (
 			<Modal title={addition.id ? "新增人员" : "编辑人员信息"} visible={addition.visible} className="large-modal" width={800}

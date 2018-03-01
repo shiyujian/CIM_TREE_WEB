@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Table, Button, Popconfirm, Notification, Input, Icon, Modal, Upload, Select, Divider, Switch } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, DataReportTemplate_PersonInformation } from '_platform/api';
 const Search = Input.Search;
-const {Option, OptGroup} = Select;
+const { Option, OptGroup } = Select;
 export default class ToggleModal extends Component {
     constructor(props) {
         super(props);
@@ -27,12 +27,11 @@ export default class ToggleModal extends Component {
         return ops;
     }
     render() {
-        console.log("3333333333",this.props)
         const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
         const systemRoles = roles.filter(role => role.grouptype === 0);
-		const projectRoles = roles.filter(role => role.grouptype === 1);
-		const professionRoles = roles.filter(role => role.grouptype === 2);
-		const departmentRoles = roles.filter(role => role.grouptype === 3);
+        const projectRoles = roles.filter(role => role.grouptype === 1);
+        const professionRoles = roles.filter(role => role.grouptype === 2);
+        const departmentRoles = roles.filter(role => role.grouptype === 3);
         const tagsOptions = this.initopthins(tags);
         const { visible, actions: { getOrgReverse } } = this.props;
         let jthis = this;
@@ -247,11 +246,10 @@ export default class ToggleModal extends Component {
             }
             , {
                 title: '标段',
-
                 key: 'sections',
                 render: (text, record, index) => {
-                    return (
-                        <Select placeholder="标段" value={addition.sections || record.sections}
+                    if (record.editing === true) {
+                        return <Select placeholder="标段" value={addition.sections || record.sections}
                             onChange={(e) => {
                                 console.log("e:", e);
                                 record.sections = e;
@@ -264,59 +262,65 @@ export default class ToggleModal extends Component {
                             <Option key={'P009-01-04'} >4标段</Option>
                             <Option key={'P009-01-05'} >5标段</Option>
                         </Select>
-                    )
+                    } else {
+                        return <span style={{ color: record.email_red }}>{record.sections}</span>
+                    }
                 }
             }
             , {
                 title: '苗圃',
                 key: 'tags',
                 render: (text, record, index) => {
-                    return (
-                        <Select placeholder="苗圃" showSearch value={addition.tags || record.tags}
-                            onChange={this.changeTags.bind(this,record)}
+                    if (record.editing === true) {
+                        return <Select placeholder="苗圃" showSearch value={addition.tags || record.tags}
+                            onChange={this.changeTags.bind(this, record)}
                             mode="multiple" style={{ width: "100%" }}>
                             {tagsOptions}
                         </Select>
-                    )
+                    } else {
+                        return <span style={{ color: record.email_red }}>{record.tags}</span>
+                    }
                 }
             }
             , {
                 title: '角色',
                 key: 'groups',
                 render: (text, record, index) => {
-                    return (
-                        <Select placeholder="请选择角色" value={addition.groups || record.groups} onChange={this.changeRoles.bind(this,record)}
-                        mode="multiple" style={{width: '100%'}}>
-                    <OptGroup label="苗圃角色">
-                        {
-                            systemRoles.map(role => {
-                                return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-                            })
-                        }
-                    </OptGroup>
-                    <OptGroup label="施工角色">
-                        {
-                            projectRoles.map(role => {
-                                return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-                            })
-                        }
-                    </OptGroup>
-                    <OptGroup label="监理角色">
-                        {
-                            professionRoles.map(role => {
-                                return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-                            })
-                        }
-                    </OptGroup>
-                    <OptGroup label="业主角色">
-                        {
-                            departmentRoles.map(role => {
-                                return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-                            })
-                        }
-                    </OptGroup>
-                </Select>
-                    )
+                    if (record.editing === true) {
+                        return <Select placeholder="请选择角色" value={addition.groups || record.groups} onChange={this.changeRoles.bind(this, record)}
+                        mode="multiple" style={{ width: '100%' }}>
+                        <OptGroup label="苗圃角色">
+                            {
+                                systemRoles.map(role => {
+                                    return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+                                })
+                            }
+                        </OptGroup>
+                        <OptGroup label="施工角色">
+                            {
+                                projectRoles.map(role => {
+                                    return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+                                })
+                            }
+                        </OptGroup>
+                        <OptGroup label="监理角色">
+                            {
+                                professionRoles.map(role => {
+                                    return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+                                })
+                            }
+                        </OptGroup>
+                        <OptGroup label="业主角色">
+                            {
+                                departmentRoles.map(role => {
+                                    return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+                                })
+                            }
+                        </OptGroup>
+                    </Select>
+                    } else {
+                        return <span style={{ color: record.email_red }}>{record.groups}</span>
+                    }
                 }
             }
             , {
@@ -366,7 +370,6 @@ export default class ToggleModal extends Component {
                     </span>
                 }
             }]
-        // console.log("this.state.dataSource:",this.state.dataSource);
         return (
             <Modal
                 visible={visible}
@@ -403,7 +406,6 @@ export default class ToggleModal extends Component {
                     size='small'
                     dataSource={this.state.usernames}
                     bordered />
-                {/* { this.state.username+"已经存在"} */}
                 <div style={{ marginTop: 20 }}>
                     注:&emsp;1、请不要随意修改模板的列头、工作薄名称（sheet1）、列验证等内容。如某列数据有下拉列表，请按数据格式填写；<br />
                     &emsp;&emsp; 2、数值用半角阿拉伯数字，如：1.2<br />
@@ -413,24 +415,22 @@ export default class ToggleModal extends Component {
             </Modal>
         )
     }
-    changeRoles(record,value) {
-        record.groups=value;
-		const {actions: {changeAdditionField}} = this.props;
-		changeAdditionField('groups', value)
+    changeRoles(record, value) {
+        record.groups = value;
+        const { actions: { changeAdditionField } } = this.props;
+        changeAdditionField('groups', value)
     }
-    changeTags(record,value) {
-        record.tags=value;
-		const {actions: {changeAdditionField}} = this.props;
-		changeAdditionField('tags', value)
-	}
-    
+    changeTags(record, value) {
+        record.tags = value;
+        const { actions: { changeAdditionField } } = this.props;
+        changeAdditionField('tags', value)
+    }
     submit() {
 
     }
     selectChecker() {
 
     }
-
     validateCode(record, e) {
         let codes = [];
         record.code = e.target.value;
@@ -520,27 +520,10 @@ export default class ToggleModal extends Component {
             pks.push(rst.pk);
         }
         let arrr = this.state.dataSource;
-        console.log("pppppppppppp",arrr)
         let codes = [];
         let arrName = []
         arrr.map((item, index) => {
-            console.log("item", item)
             codes.push(item.code)
-            // const s1=item.tags;
-            let l2
-            const s1 = item.tags || '';
-            const s3 = item.groups || '';
-            const s2 = item.sections || '';
-            const a1 = s1.toString();
-            const a2 = s3.toString();
-            const l1 = a1.split(',')
-            const l3 = a2.split(',')
-            if (s2 instanceof Array) {
-                l2 = s2
-            } else {
-                l2 = s2.split(',')
-
-            }
             arrName.push(item.usernames)
         })
 
@@ -556,23 +539,6 @@ export default class ToggleModal extends Component {
                 let promisess = arrr.map((item, index) => {
                     console.log("item", item)
                     codes.push(item.code)
-                    // const s1=item.tags;
-                    let l2
-                    const s1 = item.tags || '';
-                    const s2 = item.sections || '';
-                    const s3 = item.groups || '';
-                    // const s3 = item.tags || '';
-                    const a1 = s1.toString();
-                    const a2 = s3.toString();
-
-                    const l1 = a1.split(',')
-                    const l3 = a2.split(',')
-                    if (s2 instanceof Array) {
-                        l2 = s2
-                    } else {
-                        l2 = s2.split(',')
-
-                    }
                     arrName.push(item.usernames)
                     return postUser({}, {
                         is_person: true,
@@ -592,8 +558,8 @@ export default class ToggleModal extends Component {
                                 name: '11'
                             },
                         },
-                        tags: l1,
-                        sections: l2,
+                        tags: item.tags,
+                        sections: item.sections,
                         groups: item.groups,
                         is_active: true,
                         basic_params: {
@@ -603,7 +569,7 @@ export default class ToggleModal extends Component {
                                 '技术职称': item.job || '',
                                 'phone': item.tel || '',
                                 'sex': item.sex || '',
-                                'duty':  '',
+                                'duty': '',
                             }
                         },
                         extra_params: {},
@@ -619,12 +585,12 @@ export default class ToggleModal extends Component {
                         if (element.code == 1) {
                             count++
                         }
-                        else{
+                        else {
                             count1++
                         }
                     }
                     Notification.success({
-                        message: "成功创建"+count+"条数据"+(count1?"失败"+count1+"条数据":'')
+                        message: "成功创建" + count + "条数据" + (count1 ? "失败" + count1 + "条数据" : '')
                     })
                     ModalVisible(false);
                     is_fresh(true);
@@ -810,12 +776,12 @@ export default class ToggleModal extends Component {
                 }
             }
             console.log(item)
-            const group= item[11].toString()
-            const tag= item[10].toString()
-            const section= item[9].toString()
-            const groups=group.split(",")
-            const tags=tag.split(",")
-            const sections=section.split(",")
+            const group = item[11].toString()
+            const tag = item[10].toString()
+            const section = item[9].toString()
+            const groups = group.split(",")
+            const tags = tag.split(",")
+            const sections = section.split(",")
             return {
                 index: index + 1,
                 name: item[1] || '',
