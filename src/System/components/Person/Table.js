@@ -46,6 +46,10 @@ export default class Users extends Component {
 	}
 	//人员标段和组织机构标段比较器，如果满足条件返回true
 	compare(user, l1, s) {		
+		if(user.is_superuser){
+			return true;
+		}
+		console.log(11111111,l1,s)
 		if (l1 == undefined || s == undefined) {
 			return false
 		}
@@ -60,11 +64,9 @@ export default class Users extends Component {
 		// 	}
 		// }
 		// if(l1>)
-		if(l1.startsWith(s)){
+		if(s.startsWith(l1)){
 				return true;	
 		}
-
-		return false;
 	}
 
 	search() {
@@ -113,7 +115,8 @@ export default class Users extends Component {
 			is_active = true;
 		} else {
 			if (code) {
-				is_active = this.compare(user, user.account.org_code, code)
+				const ucode=user.account.org_code.substring(0,9);
+				is_active = this.compare(user, ucode, code)
 			}
 		}
 		return (

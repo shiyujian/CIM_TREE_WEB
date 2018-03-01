@@ -35,7 +35,8 @@ export default class Tree extends Component {
 			actions: {changeSidebarField, getUsers,getTreeModal}
 		} = this.props;
 		const o = Tree.loop(children, eventKey);
-		if(this.compare(user,user.account.sections,o.extra_params.sections)){
+		const ucode=user.account.org_code.substring(0,9);
+		if(this.compare(user,ucode,o.code)){
 			if(o.code){
 				getTreeModal(true)
 			}else{
@@ -50,23 +51,48 @@ export default class Tree extends Component {
 		}
 	}
 	//人员标段和组织机构标段比较器，如果满足条件返回true
-	compare(user,l1,s){
+	// compare(user,l1,s){
+	// 	if(user.is_superuser){
+	// 		return true;
+	// 	}
+	// 	if(l1==undefined||s==undefined){
+	// 		return false
+	// 	}
+	// 	let l2=s.split(',')
+	// 	for (let i = 0; i < l1.length; i++) {
+	// 		const e1 = l1[i];
+	// 		for (let j = 0; j < l2.length; j++) {
+	// 			const e2 = l2[j];
+	// 			if(e1==e2){
+	// 				return true
+	// 			}
+	// 		}
+	// 	}
+	// 	return false;
+	// }
+	compare(user, l1, s) {		
 		if(user.is_superuser){
 			return true;
 		}
-		if(l1==undefined||s==undefined){
+		console.log(11111111,l1,s)
+		if (l1 == undefined || s == undefined) {
 			return false
 		}
-		let l2=s.split(',')
-		for (let i = 0; i < l1.length; i++) {
-			const e1 = l1[i];
-			for (let j = 0; j < l2.length; j++) {
-				const e2 = l2[j];
-				if(e1==e2){
-					return true
-				}
-			}
+		// let l2 = s.split(',')
+		// for (let i = 0; i < l1.length; i++) {
+		// 	const e1 = l1[i];
+		// 	for (let j = 0; j < l2.length; j++) {
+		// 		const e2 = l2[j];
+		// 		if (e1 == e2) {
+		// 			return true
+		// 		}
+		// 	}
+		// }
+		// if(l1>)
+		if(s.startsWith(l1)){
+				return true;	
 		}
+
 		return false;
 	}
 	static loop = (list, code) => {
