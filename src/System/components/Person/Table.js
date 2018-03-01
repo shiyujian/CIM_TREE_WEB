@@ -17,6 +17,7 @@ export default class Users extends Component {
 			search:false,
 			loading: false,
 			percent: 0,
+			edit:true
 		}
 	}
 	static layout = {
@@ -49,7 +50,7 @@ export default class Users extends Component {
 		if(user.is_superuser){
 			return true;
 		}
-		console.log(11111111,l1,s)
+		// console.log(11111111,l1,s)
 		if (l1 == undefined || s == undefined) {
 			return false
 		}
@@ -85,12 +86,14 @@ export default class Users extends Component {
 			search: true
 		})
 	}
+	
 	render() {
 		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {} ,code} = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
+		
 
 		const tagsOptions = this.initopthins(tags);
 		const { platform: { users = [] },actions: {getTreeModal} } = this.props;
@@ -106,8 +109,10 @@ export default class Users extends Component {
 			dataSource = searchList
 			this.state.search=false
 		}else{
+			// console.log("222222")
 			dataSource = users
 		}
+		// console.log("dataSource",dataSource)
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -432,8 +437,8 @@ export default class Users extends Component {
 		const {
 			actions: { resetAdditionField }
 		} = this.props;
-		console.log("user", user)
-		console.log("resetAdditionField", resetAdditionField)
+		// console.log("user", user)
+		// console.log("resetAdditionField", resetAdditionField)
 		resetAdditionField({
 			visible: true,
 			roles: groups.map(group => String(group.id)),

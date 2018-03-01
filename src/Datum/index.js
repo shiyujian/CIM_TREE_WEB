@@ -47,7 +47,7 @@ export default class DatumContainer extends Component {
 		key: 'redios',
 		id: 'DATUM.REDIOS',
 		path: '/datum/redios',
-		name: '工程影像',
+		name: '影像资料',
 		icon: <Icon name="file-word-o"/>
 	}
 ];
