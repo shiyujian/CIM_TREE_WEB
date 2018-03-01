@@ -46,7 +46,6 @@ export default class Users extends Component {
 	}
 	//人员标段和组织机构标段比较器，如果满足条件返回true
 	compare(user, l1, s) {		
-		console.log("333333333",user,l1,s)
 		if (l1 == undefined || s == undefined) {
 			return false
 		}
@@ -108,10 +107,7 @@ export default class Users extends Component {
 			dataSource = users
 		}
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-		console.log("111111",user)
-		// console.log("this.props",this.props)
-		console.log("code",code)
-		// console.log("2222",sections)
+
 		let is_active = false
 		if (user.is_superuser) {
 			is_active = true;
