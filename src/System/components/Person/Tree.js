@@ -74,7 +74,7 @@ export default class Tree extends Component {
 		if(user.is_superuser){
 			return true;
 		}
-		console.log(11111111,l1,s)
+		// console.log(11111111,l1,s)
 		if (l1 == undefined || s == undefined) {
 			return false
 		}

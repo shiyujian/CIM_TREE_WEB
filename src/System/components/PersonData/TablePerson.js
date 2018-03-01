@@ -46,13 +46,13 @@ export default class TablePerson extends Component {
 		const { platform: { users = [] } } = this.props;
 		// console.log("pagination",this.state.pagination)
 		const columns = [
-			// {
-			// 	title: '序号',
-			// 	dataIndex: 'index',
-			// 	render: (text, record, index) => {
-			// 		return index + 1;
-			// 	}
-			// },
+			{
+				title: '序号',
+				dataIndex: 'index',
+				render: (text, record, index) => {
+					return index + 1;
+				}
+			},
 	
 			// {
 			// 	title: '人员编码',
@@ -142,12 +142,12 @@ export default class TablePerson extends Component {
 				// dataIndex: "tags",
 				// key: 'tags',
 				render: (text, record, index) => {
-	
+					console.log()
 					return (
 						<Select disabled="disabled"  showSearch value={record.tags}
 							onChange={this.changeTags.bind(this, record)}
 							mode="multiple" style={{ width: "100%" }}>
-							{this.tagsOptions}
+							{tagsOptions}
 						</Select>
 					)
 	
@@ -158,13 +158,17 @@ export default class TablePerson extends Component {
 				title: '角色',
 				// dataIndex: "role",
 				// key: 'role',
+				key: 'groups',
 				render: (text, record, index) => {
-					// console.log("record",systemRoles)
-						return (<Select  disabled="disabled" value={record.groups} onChange={this.changeRoles.bind(this, record)}
+					// console.log("role",role)
+						return <Select  disabled="disabled" value={addition.groups || record.groups} onChange={this.changeRoles.bind(this, record)}
 						mode="multiple" style={{ width: '100%' }}>
 						<OptGroup label="苗圃角色">
 							{
+
 								systemRoles.map(role => {
+					console.log("role",role)
+					
 									return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
 								})
 							}
@@ -190,7 +194,7 @@ export default class TablePerson extends Component {
 								})
 							}
 						</OptGroup>
-					</Select>)
+					</Select>
 				}
 			}
 			, {
@@ -227,8 +231,8 @@ export default class TablePerson extends Component {
 					rowSelection={this.rowSelection}
 					dataSource={this.state.tempData}
 					rowKey="index"
-					onChange={this.changePage.bind(this)}
-					pagination={this.state.pagination}
+					// onChange={this.changePage.bind(this)}
+					// pagination={this.state.pagination}
 				// loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 				>
 				</Table>
@@ -417,8 +421,9 @@ export default class TablePerson extends Component {
 		let pageSize = 10;
 		let rst = await getPersonList({ pagesize: pageSize, offset: (obj.current - 1) * pageSize });
 		let personlist = rst
-		// console.log("rst",rst)
+		console.log("rst",rst)
 		// let total = rst.result.total;
+		// console.log("total",total)
 		let persons = [];
 		for (let i = 0; i < personlist.length; i++) {
 			const element = personlist[i];
@@ -515,12 +520,6 @@ export default class TablePerson extends Component {
 				for (let j = 0; j < groups.length; j++) {
 					 groupsId.push(groups[j].id);					
 				}
-				// console.log(item)
-				// for (let i = 0; i < item.groups.length; i++) {
-				// 	 element = item.groups[i].id;
-					
-				// }
-				// console.log(item.account.person_name)
 				return {
 					id: item.id,
 					index: index + 1,
@@ -537,7 +536,6 @@ export default class TablePerson extends Component {
 					sections: item.account.sections || '',
 					tags: item.account.tags || '',
 					groups:groupsId || []
-					// passwords:111111,
 				}
 			})
 		this.setState({ dataSource: data_person, tempData: data_person, loading: false });
