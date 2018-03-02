@@ -3,12 +3,24 @@ import SimpleTree from '_platform/components/panels/SimpleTree';
 
 export default class Tree extends Component {
 	static propTypes = {};
+	constructor(props) {
+		super(props);
+		this.state = {
+			childList:[],
+			listVisible:true
+		}
+	}
 
 	render() {
 		const {
 			platform: {org: {children = []} = {}},
 			sidebar: {node = {}} = {},
 		} = this.props;
+		const {
+			childList,
+			listVisible
+		}=this.state
+		console.log("childList",childList)
 		const {code} = node || {};
 		return (<SimpleTree dataSource={children} selectedKey={code} onSelect={this.select.bind(this)}/>);
 	}
@@ -16,6 +28,9 @@ export default class Tree extends Component {
 	componentDidMount() {
 		const {actions: {getOrgTree, changeSidebarField, getUsers,getTreeModal}} = this.props;
 		getOrgTree({}, {depth: 3}).then(rst => {
+			if(rst && rst.children){
+				this.getList(rst.children)
+			}
 			const {children: [first] = []} = rst || {};
 			if (first) {
 				changeSidebarField('node', first);
@@ -25,6 +40,70 @@ export default class Tree extends Component {
 				});
 			}
 		});
+	}
+
+	//将二维数组传入store中
+	setListStore(){
+		const{
+			actions:{getListStore}
+		}=this.props
+		const{
+			childList
+		}=this.state
+		getListStore(childList)
+		this.setState({
+			listVisible:false
+		})
+
+	}
+
+	//获取项目下的所有节点的名字和code
+	getChildrenArr(data = [],List=[]){
+		return data.map((item) => {
+			if (item.children && item.children.length) {
+				List.push({
+					code:item.code,
+					name:item.name
+				})
+				
+				return (
+					this.getChildrenArr(item.children,List)
+				);
+			}else{
+				List.push({
+					code:item.code,
+					name:item.name
+				})
+				
+				return
+			}
+		});
+	}
+	//将项目分为二维数组，以项目的个数来划分
+	getList(data = []){
+		const {
+			childList
+		}=this.state
+		return data.map((item,index)=>{
+			childList[index] = new Array()
+			if(item.children && item.children.length){
+				childList[index].push({
+					code:item.code,
+					name:item.name
+				})
+				this.getChildrenArr(item.children,childList[index])
+			}
+		})
+	}
+
+	componentDidUpdate(){
+		const {
+			childList,
+			listVisible
+		}=this.state
+		if(childList && childList.length>0 && listVisible){
+			this.setListStore()
+		}
 	}
 
 	select(s, node) {
