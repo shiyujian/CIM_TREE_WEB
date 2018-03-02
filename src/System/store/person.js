@@ -9,16 +9,22 @@ export const ID = 'SYSTEM_PERSON';
 const getTagsOK = createAction(`${ID}_GET_TAGS_OK`);
 const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 
+const getTreeModal = createAction(`${ID}设置树节点布尔值`);
+
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
 const filterReducer = fieldFactory(ID, 'filter');
+
+export const getListStore = createAction(`${ID}getListStore`);
 
 export const actions = {
 	...sidebarReducer,
 	...additionReducer,
 	...filterReducer,
 	getTagsOK,
-	getTags
+	getTags,
+	getTreeModal,
+	getListStore
 };
 
 export default handleActions({
@@ -37,5 +43,13 @@ export default handleActions({
 	[getTagsOK]: (state, {payload}) => ({
 		...state,
 		tags: payload
+	}),
+	[getTreeModal]: (state, {payload}) => ({
+		...state,
+		getTreeModals: payload
+	}),
+	[getListStore]: (state, {payload}) => ({
+		...state,
+		listStore: payload
 	}),
 }, {});

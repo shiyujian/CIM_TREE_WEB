@@ -1,16 +1,25 @@
 import React, { Component } from 'react';
-import { Table, Row, Col, Form, Select, Button, Popconfirm, message } from 'antd';
+import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input,Progress } from 'antd';
+import './index.less';
 
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
+
+// class Users extends Component {
+
 export default class Users extends Component {
 	constructor(props) {
-      super(props);
-      this.state = {
-        sections:[],
-        tag:null
-      }
-    }
+		super(props);
+		this.state = {
+			sections: [],
+			tag: null,
+			searchList:[],
+			search:false,
+			loading: false,
+			percent: 0,
+			edit:true
+		}
+	}
 	static layout = {
 		labelCol: { span: 6 },
 		wrapperCol: { span: 18 },
@@ -18,53 +27,187 @@ export default class Users extends Component {
 	changeRoles(value) {
 		const { actions: { changeAdditionField } } = this.props;
 		console.log("value", value)
-		 ('roles', value)
+			('roles', value)
 	}
 	changeSections(value) {
 		console.log("value", value)
-		this.setState({sections:value});
+		this.setState({ sections: value });
 	}
 
-	changeTagss(value){
+	changeTagss(value) {
 		console.log("value", value)
-		this.setState({tag:value});
+		this.setState({ tag: value });
 	}
-	initopthins(list){
-		const ops=[];
+	initopthins(list) {
+		const ops = [];
 		for (let i = 0; i < list.length; i++) {
 			ops.push(<Option key={i} >{list[i].NurseryName}</Option>)
 		}
 		return ops;
 	}
+	//人员标段和组织机构标段比较器，如果满足条件返回true
+	compare(user, l1, s) {		
+		if(user.is_superuser){
+			return true;
+		}
+		// console.log(11111111,l1,s)
+		if (l1 == undefined || s == undefined) {
+			return false
+		}
+		// let l2 = s.split(',')
+		// for (let i = 0; i < l1.length; i++) {
+		// 	const e1 = l1[i];
+		// 	for (let j = 0; j < l2.length; j++) {
+		// 		const e2 = l2[j];
+		// 		if (e1 == e2) {
+		// 			return true
+		// 		}
+		// 	}
+		// }
+		// if(l1>)
+		if(s.startsWith(l1)){
+				return true;	
+		}
+	}
 
-
+	search() {
+		let text = document.getElementById("NurseryData").value;
+		let searchList = []
+		const { platform: { users = [] } } = this.props;
+		users.map((item) => {
+			if (item && item.username) {
+				if (item.username.indexOf(text) > -1) {
+					searchList.push(item)
+				}
+			}
+		})
+		this.setState({
+			searchList: searchList,
+			search: true
+		})
+	}
+	
 	render() {
-		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField } ,tags = {}} = this.props;
+		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {} ,code} = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
+		
 
 		const tagsOptions = this.initopthins(tags);
+		const { platform: { users = [] },actions: {getTreeModal} } = this.props;
+		const{
+			searchList,
+			search
+		}= this.state
+		let dataSource = [];
+		// if(users.length>0){
+		// 	getTreeModal(false)
+		// }
+		if(search){
+			dataSource = searchList
+			this.state.search=false
+		}else{
+			// console.log("222222")
+			dataSource = users
+		}
+		console.log("dataSource",dataSource)
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
-		const { platform: { users = [] } } = this.props;
-		// const {platform: {roles = []}, addition = {}, actions: {changeAdditionField}} = this.props;		
-		console.log(this.props,tags,tagsOptions)
+		let is_active = false
+		if (user.is_superuser) {
+			is_active = true;
+		} else {
+			if (code) {
+				
+				const ucodes=user.account.org_code.split("_");
+				if(ucodes.length>5){
+					ucodes.pop()
+					const codeu=ucodes.join()
+					const ucode=codeu.replace(/,/g,'_')
+					is_active = this.compare(user, ucode, code)
+				}else{
+					// ucodes.pop()
+					// const codeu=ucodes.join()
+					// const ucode=codeu.replace(/,/g,'_')
+					const ucode=user.account.org_code.substring(0,9);
+					is_active = this.compare(user, ucode, code)
+				}
+				
+				// console.log(user.account.org_code.length)
+				// if(user.account.org_code.length>17){
+				// 	const ucode=user.account.org_code.substring(0,17);
+				// 	console.log("11111",ucode)
+				// 	is_active = this.compare(user, ucode, code)
+				// }else{
+				// 	const ucode=user.account.org_code.substring(0,9);
+				// 	is_active = this.compare(user, ucode, code)
+				// 	console.log("2222222",ucode)
+				// }
+				
+				
+			}
+		}
 		return (
-			<div>
+			is_active ?
 				<div>
+					<div>
+						<Row style={{marginBottom:"20px"}}>
+							<Col span={12}>
+								<label style={{ minWidth: 60, display: 'inline-block' }}>用户名:</label>
+								<Input id='NurseryData' className='search_input' />
+							</Col>
+							<Col span={7}>
+								<Select placeholder="请选择角色" value={filter.role} onChange={changeFilterField.bind(this, 'role')}
+									mode="multiple" style={{ width: '100%' }}>
+									<OptGroup label="苗圃角色">
+										{
+											systemRoles.map(role => {
+												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+											})
+										}
+									</OptGroup>
+									<OptGroup label="施工角色">
+										{
+											projectRoles.map(role => {
+												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+											})
+										}
+									</OptGroup>
+									<OptGroup label="监理角色">
+										{
+											professionRoles.map(role => {
+												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+											})
+										}
+									</OptGroup>
+									<OptGroup label="业主角色">
+										{
+											departmentRoles.map(role => {
+												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+											})
+										}
+									</OptGroup>
+								</Select>
+							</Col>
+							<Col span={4} style={{marginLeft:"20px"}}>
+							<Button  type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>							
+										
+							</Col>
+						</Row>
+						<Row style={{marginBottom:"20px"}}>
+							<Col span={3}>
+								<Button onClick={this.append.bind(this)}>添加用户</Button>
+							</Col>
+							<Col span={3}>
+								<Popconfirm title="是否真的要删除选中用户?"
+									onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
+									<Button>批量删除</Button>
 
-					<Row>
-						<Col span={6}>
-							<Button onClick={this.append.bind(this)}>添加用户</Button>
-							<Popconfirm title="是否真的要删除选中用户?"
-								onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
-								<Button>批量删除</Button>
-
-							</Popconfirm>
-
-						</Col>
-						{/*<Col span={6}>
+								</Popconfirm>
+							</Col>
+							{/*<Col span={6}>
 							<FormItem {...Users.layout} label="苗圃">
 								<Select placeholder="苗圃" value={this.state.tag} showSearch onChange={this.changeTagss.bind(this)}
 									 style={{ width: '100%' }}>
@@ -124,39 +267,33 @@ export default class Users extends Component {
 							</FormItem>
 						</Col>*/}
 
-					</Row>
+						</Row>
+					</div>
+					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={dataSource} 
+					loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.props.getTreeModals}}
+									
+					/>
 				</div>
-				<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={users} />
-			</div>
+				: <h3>{'没有权限'}</h3>
+
 		);
 	}
 	saves() {
-		const { platform: { users = [] } ,tags = {} } = this.props;
+		const { platform: { users = [] }, tags = {} } = this.props;
 		const {
 			addition = {}, sidebar: { node } = {},
 			actions: { postUser, clearAdditionField, getUsers, putUser }
 		} = this.props;
-		console.log("addition", addition)
-		console.log("this.selectedCodes", this.selectedCodes)
 		const roles = addition.roles || [];
-		console.log("2222222", this.state.sections)
-		console.log("roles", roles)
-		console.log("users", users)
 		// if (this.selectedCodes == undefined) {
 		// 	message.warn('请您选择需要添加角色的人');
 		// 	return
 		// }
 		for (let i = 0; i < users.length; i++) {
 			const element = users[i];
-			console.log(element)
-			console.log(this.selectedCodes)
-			for (let j = 0; j < this.selectedCodes.length; j++)
-			 {
+			for (let j = 0; j < this.selectedCodes.length; j++) {
 				const selectedCode = this.selectedCodes[j];
-				console.log("111", element)
-				if (element.id == selectedCode) 
-				{
-					console.log("已经选中")
+				if (element.id == selectedCode) {
 					putUser({ id: element.id }, {
 						username: element.username,
 						email: element.email,
@@ -173,7 +310,7 @@ export default class Users extends Component {
 							// 	name: '施工队'
 							// },
 						},
-						tags: [{id:tags[this.state.tag].ID,name:tags[this.state.tag].NurseryName}],
+						tags: [{ id: tags[this.state.tag].ID, name: tags[this.state.tag].NurseryName }],
 						//sections: this.state.sections,
 						// groups: roles.map(role => +role),
 						is_active: true,
@@ -316,8 +453,8 @@ export default class Users extends Component {
 		const {
 			actions: { resetAdditionField }
 		} = this.props;
-		console.log("user", user)
-		console.log("resetAdditionField", resetAdditionField)
+		// console.log("user", user)
+		// console.log("resetAdditionField", resetAdditionField)
 		resetAdditionField({
 			visible: true,
 			roles: groups.map(group => String(group.id)),
@@ -351,3 +488,5 @@ export default class Users extends Component {
 		return rst;
 	}
 }
+// export default Form.create()(Users)
+

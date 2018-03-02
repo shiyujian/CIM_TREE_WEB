@@ -140,11 +140,6 @@ class ReceivePage extends Component {
 
 
 	render() {
-		// console.log(this.props.receiveInfo)
-		const rowSelection = {
-			// selectedRowKeys,
-			onChange: this.onSelectChange,
-		};
 		const {
 			actions: { getReceiveInfoAc },
 			receiveInfo = {},
@@ -154,7 +149,6 @@ class ReceivePage extends Component {
 				visible: false,
 			},
 		} = this.props;
-		
 		console.log("receiveInfo", receiveInfo)
 		const { showInfo = {} } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
@@ -163,7 +157,6 @@ class ReceivePage extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		};
-
 		return (
 			<Row>
 				<Col span={22} offset={1}>
@@ -178,16 +171,17 @@ class ReceivePage extends Component {
 										{getFieldDecorator('mold', {
 											rules: [{ required: false, message: '请输入文件标题' }],
 											initialValue: ''
-										})(
-											<Input type="text"
-												placeholder="申请 工作联系单 监理通知" />
-											)}
+										})(<Select style={{ width: '100%' }}>
+											<Option value="申请">申请</Option>
+											<Option value="工作联系单">工作联系单</Option>
+											<Option value="监理通知">监理通知</Option>
+										</Select>)}
 									</FormItem>
 								</Col>
 								<Col span={8}>
-									<FormItem {...formItemLayout} label="主题">
+									<FormItem {...formItemLayout} label="名称">
 										{getFieldDecorator('title', {
-											rules: [{ required: false, message: '请输入主题' }],
+											rules: [{ required: false, message: '请输入名称' }],
 											initialValue: ''
 										})(
 											<Input type="text"
@@ -196,20 +190,17 @@ class ReceivePage extends Component {
 									</FormItem>
 								</Col>
 								<Col span={8} >
-									<FormItem {...formItemLayout} label="单位工程">
+									<FormItem {...formItemLayout} label="工程名称">
 										{getFieldDecorator('orgList', {
 											rules: [{ required: false, message: '请输入文件标题' }],
 											initialValue: ''
 										})(
-
 											<Input type="text"
 											/>
 											)}
-
 									</FormItem>
 								</Col>
 							</Row>
-
 							<Row>
 								<Col span={8} >
 									<FormItem {...formItemLayout} label="来文单位">
@@ -217,7 +208,6 @@ class ReceivePage extends Component {
 											rules: [{ required: false, message: '请输入文件标题' }],
 											initialValue: ''
 										})(
-
 											<Input type="text"
 											/>
 											)}
@@ -236,7 +226,6 @@ class ReceivePage extends Component {
 								</Col>
 								<Col span={8}>
 									<FormItem {...formItemLayout} label="收文日期">
-
 										{
 											getFieldDecorator('worktimes', {
 												rules: [
@@ -252,23 +241,25 @@ class ReceivePage extends Component {
 												>
 												</RangePicker>)
 										}
-
 									</FormItem>
-
 								</Col>
-
 							</Row>
 						</Col>
-						<Col span={2} offset={1}>
-							<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
-						</Col>
-						<Col span={2}>
-							<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
+						<Col span={4} offset={1}>
+							<Row>
+								<FormItem>
+									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
+								</FormItem>
+							</Row>
+							<Row>
+								<FormItem>
+									<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
+								</FormItem>
+							</Row>
 						</Col>
 					</Row>
 					{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
 					<Table
-						rowSelection={rowSelection}
 						dataSource={this._getNewArrFunc(notifications)}
 						columns={this.columns}
 						title={() => '收文查询'}
@@ -335,71 +326,42 @@ class ReceivePage extends Component {
 		);
 	}
 	_getNewArrFunc(list = []) {
-
-		// let arr = list || [];
 		let arr = list;
 		console.log("list",list)
 		list.map((itm, index) => {
 			itm.index = index + 1;
 		});
-		// console.log(this.props)
-		// for (var i = 0; i < arr.length; i++) {
-			// console.log(arr[i]._id)
-		// }
-
-		// const orgLists=this.props.orgList || []
-		// for(var i=0;i<orgLists.length;i++){
-		// 	// console.log(orgLists[i])
-		// 	const orgLi=orgLists[i].children
-		// 	for(var j=0;j<orgLi.length;j++){
-		// 		// console.log(orgLi[j].code)
-		// 		list.map((itm, index) => {
-		// 			itm.index = index + 1;
-		// 			// if (item.external_attachments.backTo_id === orgLi[j].code) {
-		// 			// }
-
-		// 		});
-		// 	}
-		// }
-
 		return arr;
-
-		// return [{
-		// 	index: '1', key: 1, notification_title: '花开', from_whom: '嘻嘻北苑',
-		// 	children: [{ index: '2', key: 11, notification_title: '富贵', from_whom: '嘻嘻北苑' }]
-		// }, { index: '3', key: 3, notification_title: '花开', from_whom: '嘻嘻北苑', }]
-
-
-
 	}
 	columns = [
 		{
-			title: '收文管理ID',
+			title: '序号',
 			dataIndex: 'index',
 			key: 'index'
+		},{
+			title: '文件类型',
+			dataIndex: 'doc_type',
+			key: 'doc_type'
 		}, {
-			title: '主题',
-			dataIndex: 'notification_title',
-			key: 'notification_title'
+			title: '名称',
+			dataIndex: 'title',
+			key:'title'
 		}, {
+			title: '工程名称',
+			dataIndex: 'project_name',
+			key: 'project_name'
+		},{
+			title: '编号',
+			dataIndex: 'number',
+			key: 'number'
+		},{
 			title: '来文单位',
-			dataIndex: 'from_whom',
-			key: 'from_whom'
-		},
-		/* {
-			title: '状态',
-			dataIndex: 'is_read',
-			render: is_read => {
-				return (is_read === false) ? "未阅" : "已阅";
-			}
-		}, */
-		{
-			title: '发送时间',
-			dataIndex: 'create_time',
-			key: 'create_time',
-			render: create_time => {
-				return moment(create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss');
-			}
+			dataIndex: 'come_unit',
+			key: 'come_unit'
+		},{
+			title: '收文日期',
+			dataIndex: 'come_date',
+			key: 'come_date'
 		}, {
 			title: '操作',
 			render: record => {
@@ -409,17 +371,16 @@ class ReceivePage extends Component {
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this._sentDoc.bind(this)}>回文</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
+						<a onClick={this._download.bind(this)}>下载</a>
+						{/* <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
 							cancelText="取消">
 							<a >删除</a>
-						</Popconfirm>
+						</Popconfirm> */}
 
 					</span>
 				)
 			},
 		}
 	];
-
-
 }
 export default Form.create()(ReceivePage)

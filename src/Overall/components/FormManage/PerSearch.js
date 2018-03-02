@@ -42,13 +42,25 @@ export default class PerSearch extends Component {
         this.put = [];
 
     }
+    async componentWillReceiveProps(props){
+        if(props.code){
+            const { actions: {
+                getUsers
+            } } = this.props
+            try {
+                await getUsers({},{org_code:this.props.code})
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    }
 
     async componentDidMount() {
         const { actions: {
             getUsers
         } } = this.props
         try {
-            await getUsers()
+            await getUsers({},{org_code:this.props.code})
         } catch (error) {
             console.log(error)
         }

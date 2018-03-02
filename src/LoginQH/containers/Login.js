@@ -31,11 +31,11 @@ class Login extends Component {
 			appDownload: false,
 			token: null,
 			QRUrl: '',
-			userMessage: null
+			userMessage: null,
+			checked:'',
 		};
 		this.account = [];
 		this.code = [];
-		clearUser();
 		clearUser();
 		clearUser();
 		clearUser();
@@ -47,17 +47,19 @@ class Login extends Component {
 		let QH_LOGIN_USER = window.localStorage.getItem('QH_LOGIN_USER');
 		console.log("QH_LOGIN_USER", QH_LOGIN_USER)
 		if (QH_LOGIN_USER) {
+			QH_LOGIN_USER = JSON.parse(QH_LOGIN_USER) || {};
 			if (QH_LOGIN_USER.username && QH_LOGIN_USER.password) {
-				console.log('QH_LOGIN_USER', QH_LOGIN_USER)
-				QH_LOGIN_USER = JSON.parse(QH_LOGIN_USER) || {};
-				const { setFieldsValue } = this.props.form;
+				const { setFieldsValue  } = this.props.form;
 				setFieldsValue({
 					'username': QH_LOGIN_USER.username,
 					'password': QH_LOGIN_USER.password,
+					'remember': QH_LOGIN_USER.remember
 				});
 
 				document.getElementById("username").value = QH_LOGIN_USER.username;
 				document.getElementById("pwdInp").value = QH_LOGIN_USER.password;
+				this.state.checked=QH_LOGIN_USER.remember;
+
 				console.log('componentDidMount=====================')
 			}
 			// this.loginFunc(QH_LOGIN_USER, 1);
@@ -169,16 +171,13 @@ class Login extends Component {
 		return (
 			<div className="login-wrap">
 				<div className="main-center">
-
-
 					<div className="main-logo">
 						<img className="main-logos" src={docDescibe} />
-						<div className="main-on"  >
+						<div className="main-on" >
 							
 						</div>
 						<a className="login-title1"><img src={loginTitle} /></a>
 					</div>
-
 
 					{
 						loginState ? !forgectState ?
@@ -204,8 +203,9 @@ class Login extends Component {
 											{getFieldDecorator('username', {
 												rules: [{ required: true, message: '请输入用户名' }],
 											})(
-												<Input style={{ color: "#000000", borderBottom: "1px solid #cccccc" }} id="username"
-													placeholder="用户名/手机号" />,
+												<Input style={{ color: "#000000", borderBottom: "1px solid #cccccc" }} 
+													id="username"
+													placeholder="用户名/手机号" />
 											)}
 										</FormItem>
 										<FormItem style={{ marginTop: '50px', marginLeft: "24px" }}>
@@ -230,14 +230,16 @@ class Login extends Component {
 												initialValue: false,
 											})(
 												<div>
-													<Checkbox style={{ color: 'gray', paddingLeft: '5%' }} onChange={this.loginRememberChange.bind(this)}>记住密码</Checkbox>
+													<Checkbox style={{ color: 'gray', paddingLeft: '5%' }} 
+															  onChange={this.loginRememberChange.bind(this)}
+															  checked={this.state.checked}
+													>记住密码</Checkbox>
 													<span className="forgetPassword" onClick={this.ForgetPassword.bind(this)}>忘记密码</span>
 												</div>
 												)}
 										</FormItem>
 										<Button type="primary" htmlType="submit"
 											className="login-form-button">登录</Button>
-
 									</Form>
 								</div>
 							</div> :
@@ -246,7 +248,6 @@ class Login extends Component {
 									<h1 style={{ textAlign: 'center', color: 'red' }}></h1>
 									<Form onSubmit={this.sureSubmit.bind(this)}
 										className='login-form' id="loginForm">
-
 										<FormItem style={{ marginTop: '40px', marginLeft: "24px" }}>
 											{getFieldDecorator('nickname', {
 												rules: [{ required: true, message: '请输入用户名' }],
@@ -297,6 +298,7 @@ class Login extends Component {
 	}
 
 	loginRememberChange(e) {
+		this.state.checked=e.target.checked;
 		if (e.target.checked) {
 			window.localStorage.setItem('QH_LOGIN_REMEMBER', true);
 		} else {
@@ -449,8 +451,10 @@ class Login extends Component {
 				console.log('values', values)
 				const data = {
 					username: values.username,
-					password: values.password
+					password: values.password,
+					remember: values.remember
 				};
+				console.log('data', data)
 				this.loginFunc(data, 0, values);
 			}
 		});
@@ -493,7 +497,7 @@ class Login extends Component {
 						if (values.remember) {
 							window.localStorage.setItem('QH_LOGIN_USER',
 								JSON.stringify(data));
-
+							// console.log('uuu',window.localStorage.getItem('QH_LOGIN_USER'));
 
 						} else {
 							window.localStorage.removeItem('QH_LOGIN_USER');

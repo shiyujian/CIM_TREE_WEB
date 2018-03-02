@@ -61,7 +61,7 @@ export default class GeneralTable extends Component {
 					<div>
 						<a onClick={this.previewFile.bind(this, record)}>预览</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
-						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, index)}>下载</a>
+						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, record)}>下载</a>
 					</div>
 				);
 				return nodes;
@@ -77,29 +77,35 @@ export default class GeneralTable extends Component {
 		link.click();
 		document.body.removeChild(link);
 	}
-	download(index, key, e) {
-		const { selected = [], file = [], files = [], down_file = [] } = this.props;
+	download(record) {
+		let array = record.basic_params.files;
+		array.map(down => {
+			debugger
+			let down_load = STATIC_DOWNLOAD_API + down.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');;
+			this.createLink(this, down_load);
+		});
+		// const { selected = [], file = [], files = [], down_file = [] } = this.props;
+		// debugger
+		// if (selected.length == 0) {
+		// 	message.warning('没有选择无法下载');
+		// }
+		// for (var j = 0; j < selected.length; j++) {
+		// 	if (selected[j].code == index.code) {
 
-		if (selected.length == 0) {
-			message.warning('没有选择无法下载');
-		}
-		for (var j = 0; j < selected.length; j++) {
-			if (selected[j].code == index.code) {
-
-				selected.map(rst => {
-					file.push(rst.basic_params.files);
-				});
-				file.map(value => {
-					value.map(cot => {
-						files.push(cot.download_url)
-					})
-				});
-				files.map(down => {
-					let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-					this.createLink(this, down_load);
-				});
-			}
-		}
+		// 		selected.map(rst => {
+		// 			file.push(rst.basic_params.files);
+		// 		});
+		// 		file.map(value => {
+		// 			value.map(cot => {
+		// 				files.push(cot.download_url)
+		// 			})
+		// 		});
+		// 		files.map(down => {
+		// 			let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
+		// 			this.createLink(this, down_load);
+		// 		});
+		// 	}
+		// }
 	}
 
 	previewFile(file) {

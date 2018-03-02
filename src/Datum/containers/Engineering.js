@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import reducer, {actions} from '../store/engineering';
+import { Form } from 'antd';
 //import PkCodeTree from '../../Quality/components/PkCodeTree';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
@@ -30,6 +31,8 @@ export const Datumcode = window.DeathCode.DATUM_GCWD;
 	})
 )
 export default class Engineering extends Component {
+	doc_type='';
+	array = [];
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -61,16 +64,16 @@ export default class Engineering extends Component {
 					<Filter  {...this.props} {...this.state}/>
 					<Table {...this.props}/>
 				</Content>
-				<Addition {...this.props}/>
+				<Addition {...this.props} doc_type = {this.doc_type} array={this.array}/>
 			</Main>
-			<Updatemodal {...this.props}/>
+			<Updatemodal {...this.props} doc_type = {this.doc_type} array={this.array}/>
 			<Preview/>
 			</Body>
 		);
 	}
 
-    componentDidMount() {
-		const {actions: {getDir}} = this.props;
+    async componentDidMount() {
+		const {actions: {getDir,getTreeNodeList}} = this.props;
 		this.setState({loading:true});
         getDir({code:Datumcode}).then(({children}) => {
 			this.setState({loading:false});
@@ -78,6 +81,7 @@ export default class Engineering extends Component {
 		if(this.props.Doc){
 			this.setState({isTreeSelected:true})
 		}
+		this.array = await getTreeNodeList();
     }
 
     onSelect(value = [],e) {
@@ -87,6 +91,7 @@ export default class Engineering extends Component {
 	    if(code === undefined){
 		    return
 		}
+		this.doc_type = e.node.props.title;
 		this.setState({isTreeSelected:e.selected})
         setcurrentcode({code:code.split("--")[1]});
         getdocument({code:code.split("--")[1]});

@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as platformActions} from '_platform/store/global';
 import {Roles, Table} from '../components/Permission';
+
 @connect(
 	state => {
 		const {system: {permission = {}} = {}, platform} = state;
@@ -19,6 +20,7 @@ export default class Permission extends Component {
 
 	render() {
 		const {} = this.props;
+
 		return (
 			<div>
 				<DynamicTitle title="权限设置" {...this.props}/>
