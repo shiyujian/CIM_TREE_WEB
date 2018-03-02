@@ -180,6 +180,8 @@ export default class Addition extends Component {
 			console.log("roles", roles)
 			if (addition.id) {
 				console.log("addition22", addition)
+				console.log("organization", addition.organization)
+				console.log("node", node)
 
 				putUser({}, {
 					id: addition.id,
@@ -192,10 +194,10 @@ export default class Addition extends Component {
 						person_avatar_url: "",
 						organization: {
 							pk: node.pk,
-							code: node.code,
+							code: addition.code,
 							obj_type: "C_ORG",
 							rel_type: "member",
-							name: node.name
+							name: addition.organization
 						},
 					},
 					tags: addition.tags,
