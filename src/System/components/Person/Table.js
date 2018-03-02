@@ -112,7 +112,7 @@ export default class Users extends Component {
 			// console.log("222222")
 			dataSource = users
 		}
-		// console.log("dataSource",dataSource)
+		console.log("dataSource",dataSource)
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -120,8 +120,33 @@ export default class Users extends Component {
 			is_active = true;
 		} else {
 			if (code) {
-				const ucode=user.account.org_code.substring(0,9);
-				is_active = this.compare(user, ucode, code)
+				
+				const ucodes=user.account.org_code.split("_");
+				if(ucodes.length>5){
+					ucodes.pop()
+					const codeu=ucodes.join()
+					const ucode=codeu.replace(/,/g,'_')
+					is_active = this.compare(user, ucode, code)
+				}else{
+					// ucodes.pop()
+					// const codeu=ucodes.join()
+					// const ucode=codeu.replace(/,/g,'_')
+					const ucode=user.account.org_code.substring(0,9);
+					is_active = this.compare(user, ucode, code)
+				}
+				
+				// console.log(user.account.org_code.length)
+				// if(user.account.org_code.length>17){
+				// 	const ucode=user.account.org_code.substring(0,17);
+				// 	console.log("11111",ucode)
+				// 	is_active = this.compare(user, ucode, code)
+				// }else{
+				// 	const ucode=user.account.org_code.substring(0,9);
+				// 	is_active = this.compare(user, ucode, code)
+				// 	console.log("2222222",ucode)
+				// }
+				
+				
 			}
 		}
 		return (
@@ -259,25 +284,16 @@ export default class Users extends Component {
 			addition = {}, sidebar: { node } = {},
 			actions: { postUser, clearAdditionField, getUsers, putUser }
 		} = this.props;
-		console.log("addition", addition)
-		console.log("this.selectedCodes", this.selectedCodes)
 		const roles = addition.roles || [];
-		console.log("2222222", this.state.sections)
-		console.log("roles", roles)
-		console.log("users", users)
 		// if (this.selectedCodes == undefined) {
 		// 	message.warn('请您选择需要添加角色的人');
 		// 	return
 		// }
 		for (let i = 0; i < users.length; i++) {
 			const element = users[i];
-			console.log(element)
-			console.log(this.selectedCodes)
 			for (let j = 0; j < this.selectedCodes.length; j++) {
 				const selectedCode = this.selectedCodes[j];
-				console.log("111", element)
 				if (element.id == selectedCode) {
-					console.log("已经选中")
 					putUser({ id: element.id }, {
 						username: element.username,
 						email: element.email,

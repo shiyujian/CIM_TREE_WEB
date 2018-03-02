@@ -114,7 +114,31 @@ export default class Tree extends Component {
 			actions: {changeSidebarField, getUsers,getTreeModal}
 		} = this.props;
 		const o = Tree.loop(children, eventKey);
-		const ucode=user.account.org_code.substring(0,9);
+		let ucode
+		console.log(user.account.org_code.length)
+		// if(user.account.org_code.length>17){
+		// 	 ucode=user.account.org_code.substring(0,17);
+
+		// }else{
+		// 	 ucode=user.account.org_code.substring(0,9);
+		// }
+
+		const ucodes=user.account.org_code.split("_");
+		console.log("33333333333",ucodes)
+		if(ucodes.length>5){
+			console.log("111111111")
+			ucodes.pop()
+			const codeu=ucodes.join()
+			ucode=codeu.replace(/,/g,'_')
+		}else{
+			console.log("22222222")
+			ucode=user.account.org_code.substring(0,9);
+			// ucodes.pop()
+			// const codeu=ucodes.join()
+			// ucode=codeu.replace(/,/g,'_')
+		}
+
+		console.log(ucode,o.code)
 		if(this.compare(user,ucode,o.code)){
 			if(o.code){
 				getTreeModal(true)
