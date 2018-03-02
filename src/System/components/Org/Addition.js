@@ -92,10 +92,8 @@ class Addition extends Component {
 		console.log(this.props)
 		console.log(addition.introduction)
 		console.log(addition.sections)
-		console.log(addition.sections.join())
-		const sections=addition.sections.join()
-		console.log(sections)
-		// return;
+		const sections=addition.sections?addition.sections.join() : []
+
 		if (parent) {
 			postOrg({}, {
 				name: addition.name,
