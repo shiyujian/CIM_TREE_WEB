@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input,Progress } from 'antd';
+import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input, Progress } from 'antd';
 import './index.less';
 
 const FormItem = Form.Item;
@@ -13,11 +13,11 @@ export default class Users extends Component {
 		this.state = {
 			sections: [],
 			tag: null,
-			searchList:[],
-			search:false,
+			searchList: [],
+			search: false,
 			loading: false,
 			percent: 0,
-			edit:true
+			edit: true
 		}
 	}
 	static layout = {
@@ -46,8 +46,8 @@ export default class Users extends Component {
 		return ops;
 	}
 	//人员标段和组织机构标段比较器，如果满足条件返回true
-	compare(user, l1, s) {		
-		if(user.is_superuser){
+	compare(user, l1, s) {
+		if (user.is_superuser) {
 			return true;
 		}
 		// console.log(11111111,l1,s)
@@ -65,8 +65,8 @@ export default class Users extends Component {
 		// 	}
 		// }
 		// if(l1>)
-		if(s.startsWith(l1)){
-				return true;	
+		if (s.startsWith(l1)) {
+			return true;
 		}
 	}
 
@@ -86,33 +86,33 @@ export default class Users extends Component {
 			search: true
 		})
 	}
-	
+
 	render() {
-		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {} ,code} = {}, parent } = {} } = this.props;
+		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {}, code } = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
-		
+
 
 		const tagsOptions = this.initopthins(tags);
-		const { platform: { users = [] },actions: {getTreeModal} } = this.props;
-		const{
+		const { platform: { users = [] }, actions: { getTreeModal } } = this.props;
+		const {
 			searchList,
 			search
-		}= this.state
+		} = this.state
 		let dataSource = [];
 		// if(users.length>0){
 		// 	getTreeModal(false)
 		// }
-		if(search){
+		if (search) {
 			dataSource = searchList
-			this.state.search=false
-		}else{
+			this.state.search = false
+		} else {
 			// console.log("222222")
 			dataSource = users
 		}
-		console.log("dataSource",dataSource)
+		console.log("dataSource", dataSource)
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -120,21 +120,21 @@ export default class Users extends Component {
 			is_active = true;
 		} else {
 			if (code) {
-				
-				const ucodes=user.account.org_code.split("_");
-				if(ucodes.length>5){
+
+				const ucodes = user.account.org_code.split("_");
+				if (ucodes.length > 5) {
 					ucodes.pop()
-					const codeu=ucodes.join()
-					const ucode=codeu.replace(/,/g,'_')
+					const codeu = ucodes.join()
+					const ucode = codeu.replace(/,/g, '_')
 					is_active = this.compare(user, ucode, code)
-				}else{
+				} else {
 					// ucodes.pop()
 					// const codeu=ucodes.join()
 					// const ucode=codeu.replace(/,/g,'_')
-					const ucode=user.account.org_code.substring(0,9);
+					const ucode = user.account.org_code.substring(0, 9);
 					is_active = this.compare(user, ucode, code)
 				}
-				
+
 				// console.log(user.account.org_code.length)
 				// if(user.account.org_code.length>17){
 				// 	const ucode=user.account.org_code.substring(0,17);
@@ -145,15 +145,15 @@ export default class Users extends Component {
 				// 	is_active = this.compare(user, ucode, code)
 				// 	console.log("2222222",ucode)
 				// }
-				
-				
+
+
 			}
 		}
 		return (
 			is_active ?
 				<div>
 					<div>
-						<Row style={{marginBottom:"20px"}}>
+						<Row style={{ marginBottom: "20px" }}>
 							<Col span={12}>
 								<label style={{ minWidth: 60, display: 'inline-block' }}>用户名:</label>
 								<Input id='NurseryData' className='search_input' />
@@ -191,12 +191,12 @@ export default class Users extends Component {
 									</OptGroup>
 								</Select>
 							</Col>
-							<Col span={4} style={{marginLeft:"20px"}}>
-							<Button  type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>							
-										
+							<Col span={4} style={{ marginLeft: "20px" }}>
+								<Button type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>
+
 							</Col>
 						</Row>
-						<Row style={{marginBottom:"20px"}}>
+						<Row style={{ marginBottom: "20px" }}>
 							<Col span={3}>
 								<Button onClick={this.append.bind(this)}>添加用户</Button>
 							</Col>
@@ -269,9 +269,9 @@ export default class Users extends Component {
 
 						</Row>
 					</div>
-					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={dataSource} 
-					loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.props.getTreeModals}}
-									
+					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={dataSource}
+						loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.props.getTreeModals }}
+
 					/>
 				</div>
 				: <h3>{'没有权限'}</h3>
@@ -451,10 +451,17 @@ export default class Users extends Component {
 		const account = user.account;
 		const groups = user.groups || [];
 		const {
+			sidebar: { node } = {},
 			actions: { resetAdditionField }
 		} = this.props;
-		// console.log("user", user)
-		// console.log("resetAdditionField", resetAdditionField)
+		// if (node.children && node.children.length > 0) {
+		// 	message.warn('请选择最下级组织结构目录');
+
+		// } else {
+		// 	// console.log("user", user)
+		// 	// console.log("resetAdditionField", resetAdditionField)
+		
+		// }
 		resetAdditionField({
 			visible: true,
 			roles: groups.map(group => String(group.id)),
@@ -462,6 +469,7 @@ export default class Users extends Component {
 			...account,
 
 		});
+
 	}
 
 	del(user) {

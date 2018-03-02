@@ -538,7 +538,7 @@ export default class ToggleModal extends Component {
                 let codes = [];
                 let arrName = []
                 let promisess = arrr.map((item, index) => {
-                    console.log("item", item.groups)
+                    console.log("item", item)
                     codes.push(item.code)
                     arrName.push(item.usernames)
                     return postUser({}, {
@@ -553,10 +553,10 @@ export default class ToggleModal extends Component {
                             person_avatar_url: "",
                             organization: {
                                 pk: pks[index],
-                                code: item.depart,
+                                code: item.orgcode,
                                 obj_type: "C_ORG",
                                 rel_type: "member",
-                                name: '11'
+                                name: item.org_names
                             },
                         },
                         tags: item.tags,
@@ -755,15 +755,18 @@ export default class ToggleModal extends Component {
             if (!regEmail.test(item[6])) {
                 email_red = "red";
             }
-            let org = '', orgcode = '', orgpk = '', partname = '';
+            let org = '', orgcode = '', orgpk = '', partname = [];
             // console.log(orgReverse)
+            console.log("orgReverse",orgReverse)
             for (let i = 0; i < orgReverse.length; i++) {
                 if (orgReverse[i].orgCode === item[2]) {
-                    if (orgReverse[i].children.length > 0) {
+                    if (orgReverse[i].children.length >0) {
                         org = orgReverse[i].children[0].name;
                         orgcode = orgReverse[i].children[0].code;
                         orgpk = orgReverse[i].children[0].pk;
-                        partname = org_names[i].orgNames
+                      
+                       
+                      
                         // console.log("org",org)
                         // console.log("orgcode",orgcode)
                         // console.log("orgpk",orgpk)
@@ -772,11 +775,11 @@ export default class ToggleModal extends Component {
                         org = '';
                         orgcode = '';
                         orgpk = '';
-                        partname = ''
+                        // partname = ''
                     }
+                    partname.push(org_names[i].orgNames) 
                 }
             }
-            console.log(item)
             const group = item[11].toString()
             const tag = item[10].toString()
             const section = item[9].toString()
@@ -788,8 +791,8 @@ export default class ToggleModal extends Component {
                 name: item[1] || '',
                 org: org || '',
                 orgpk: orgpk || '',
-                orgcode: orgcode || '',
-                org_names: partname,
+                orgcode: item[2] || '',
+                org_names: partname[0],
                 depart: item[2] || '',
                 job: item[3] || '',
                 sex: item[4] || '',
@@ -806,7 +809,6 @@ export default class ToggleModal extends Component {
                 editing: false,
             }
         })
-        console.log("1111111111data_person", data_person)
         this.setState({
             dataSource: data_person,
             tempData: data_person
