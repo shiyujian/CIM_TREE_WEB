@@ -15,13 +15,16 @@ const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
 const filterReducer = fieldFactory(ID, 'filter');
 
+export const getListStore = createAction(`${ID}getListStore`);
+
 export const actions = {
 	...sidebarReducer,
 	...additionReducer,
 	...filterReducer,
 	getTagsOK,
 	getTags,
-	getTreeModal
+	getTreeModal,
+	getListStore
 };
 
 export default handleActions({
@@ -44,5 +47,9 @@ export default handleActions({
 	[getTreeModal]: (state, {payload}) => ({
 		...state,
 		getTreeModals: payload
+	}),
+	[getListStore]: (state, {payload}) => ({
+		...state,
+		listStore: payload
 	}),
 }, {});
