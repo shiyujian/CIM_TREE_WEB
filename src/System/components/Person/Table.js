@@ -259,25 +259,16 @@ export default class Users extends Component {
 			addition = {}, sidebar: { node } = {},
 			actions: { postUser, clearAdditionField, getUsers, putUser }
 		} = this.props;
-		console.log("addition", addition)
-		console.log("this.selectedCodes", this.selectedCodes)
 		const roles = addition.roles || [];
-		console.log("2222222", this.state.sections)
-		console.log("roles", roles)
-		console.log("users", users)
 		// if (this.selectedCodes == undefined) {
 		// 	message.warn('请您选择需要添加角色的人');
 		// 	return
 		// }
 		for (let i = 0; i < users.length; i++) {
 			const element = users[i];
-			console.log(element)
-			console.log(this.selectedCodes)
 			for (let j = 0; j < this.selectedCodes.length; j++) {
 				const selectedCode = this.selectedCodes[j];
-				console.log("111", element)
 				if (element.id == selectedCode) {
-					console.log("已经选中")
 					putUser({ id: element.id }, {
 						username: element.username,
 						email: element.email,

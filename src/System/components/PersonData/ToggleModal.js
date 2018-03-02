@@ -286,6 +286,7 @@ export default class ToggleModal extends Component {
                 title: '角色',
                 key: 'groups',
                 render: (text, record, index) => {
+                    console.log("record",record)
                     if (record.editing === true) {
                         return <Select placeholder="请选择角色" value={addition.groups || record.groups} onChange={this.changeRoles.bind(this, record)}
                         mode="multiple" style={{ width: '100%' }}>
@@ -537,7 +538,7 @@ export default class ToggleModal extends Component {
                 let codes = [];
                 let arrName = []
                 let promisess = arrr.map((item, index) => {
-                    console.log("item", item)
+                    console.log("item", item.groups)
                     codes.push(item.code)
                     arrName.push(item.usernames)
                     return postUser({}, {
