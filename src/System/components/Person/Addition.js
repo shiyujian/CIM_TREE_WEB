@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Modal, Row, Col, Form, Input, Select, message } from 'antd';
-
+import {getProjectUnits} from '../../../_platform/auth'
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 
@@ -55,8 +55,12 @@ export default class Addition extends Component {
 	render() {
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
 		const tagsOptions = this.initopthins(tags);
+		console.log('this.props22222222222222222',this.props)
+		
+		let units = this.getUnits()
+		console.log('units',units)
 		return (
-			<Modal title={addition.id ? "新增人员" : "编辑人员信息"} visible={addition.visible} className="large-modal" width={800}
+			<Modal title={addition.id ? "编辑人员信息" : "新增人员"} visible={addition.visible} className="large-modal" width={800}
 				maskClosable={false}
 				onOk={this.save.bind(this)} onCancel={this.cancel.bind(this)}>
 				<Row gutter={24}>
@@ -81,11 +85,13 @@ export default class Addition extends Component {
 						<FormItem {...Addition.layout} label="标段">
 							<Select placeholder="标段" value={addition.sections} onChange={changeAdditionField.bind(this, 'sections')}
 								mode="multiple" style={{ width: '100%' }}>
-								<Option key={'P009-01-01'} >1标段</Option>
-								<Option key={'P009-01-02'} >2标段</Option>
-								<Option key={'P009-01-03'} >3标段</Option>
-								<Option key={'P009-01-04'} >4标段</Option>
-								<Option key={'P009-01-05'} >5标段</Option>
+								{
+									units?
+									units.map((item)=>{
+										return <Option key={item.code} value={item.code} >{item.value}</Option>
+									}):
+									''
+								}
 							</Select>
 						</FormItem>
 					</Col>
@@ -118,6 +124,27 @@ export default class Addition extends Component {
 			</Modal>
 		);
 	}
+
+	//获取项目的标段
+	getUnits(){
+		const {
+			sidebar: { node = {} } = {},
+			listStore = []
+		} = this.props;
+		let projectName = ''
+		listStore.map((item,index)=>{
+			item.map((rst)=>{
+				if( (rst.name === node.name) && (rst.code === node.code)){
+					console.log('node.name',node.name)
+					projectName = listStore[index]?listStore[index][0].name:''
+				}
+			})
+			
+		})
+		console.log('projectName',projectName)
+		return getProjectUnits(projectName)
+	}
+
 	//初始化苗圃
 	initopthins(list) {
 		const ops = [];

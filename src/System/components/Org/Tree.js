@@ -26,9 +26,7 @@ export default class Tree extends Component {
 		console.log("code",code)
 		console.log("children",children)
 		console.log("childList",childList)
-		if(childList && childList.length>0 && listVisible){
-			this.setListStore()
-		}
+		
 		// const list=this.filiter(children);
 		return (
 			<div>
@@ -41,6 +39,16 @@ export default class Tree extends Component {
 				</div>
 				<SimpleTree dataSource={children} selectedKey={code} onSelect={this.select.bind(this)}/>
 			</div>);
+	}
+
+	componentDidUpdate(){
+		const {
+			childList,
+			listVisible
+		}=this.state
+		if(childList && childList.length>0 && listVisible){
+			this.setListStore()
+		}
 	}
 	//将二维数组传入store中
 	setListStore(){
@@ -138,7 +146,9 @@ export default class Tree extends Component {
 	componentDidMount() {
 		const {actions: {getOrgTree, changeSidebarField}} = this.props;
 		getOrgTree({}, {depth: 4}).then(rst => {
-			this.getList(rst.children)
+			if(rst && rst.children){
+				this.getList(rst.children)
+			}
 			console.log(1111111,rst)
 			const {children: [first] = []} = rst || {};
 			this.setState({list:this.filiter(rst.children)});
