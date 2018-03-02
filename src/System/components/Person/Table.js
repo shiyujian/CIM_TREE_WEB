@@ -112,7 +112,7 @@ export default class Users extends Component {
 			// console.log("222222")
 			dataSource = users
 		}
-		// console.log("dataSource",dataSource)
+		console.log("dataSource",dataSource)
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -120,8 +120,33 @@ export default class Users extends Component {
 			is_active = true;
 		} else {
 			if (code) {
-				const ucode=user.account.org_code.substring(0,9);
-				is_active = this.compare(user, ucode, code)
+				
+				const ucodes=user.account.org_code.split("_");
+				if(ucodes.length>5){
+					ucodes.pop()
+					const codeu=ucodes.join()
+					const ucode=codeu.replace(/,/g,'_')
+					is_active = this.compare(user, ucode, code)
+				}else{
+					// ucodes.pop()
+					// const codeu=ucodes.join()
+					// const ucode=codeu.replace(/,/g,'_')
+					const ucode=user.account.org_code.substring(0,9);
+					is_active = this.compare(user, ucode, code)
+				}
+				
+				// console.log(user.account.org_code.length)
+				// if(user.account.org_code.length>17){
+				// 	const ucode=user.account.org_code.substring(0,17);
+				// 	console.log("11111",ucode)
+				// 	is_active = this.compare(user, ucode, code)
+				// }else{
+				// 	const ucode=user.account.org_code.substring(0,9);
+				// 	is_active = this.compare(user, ucode, code)
+				// 	console.log("2222222",ucode)
+				// }
+				
+				
 			}
 		}
 		return (
