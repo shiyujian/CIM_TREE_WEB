@@ -194,7 +194,7 @@ export default class Addition extends Component {
 						person_avatar_url: "",
 						organization: {
 							pk: node.pk,
-							code: addition.code,
+							code: addition.org_code,
 							obj_type: "C_ORG",
 							rel_type: "member",
 							name: addition.organization
