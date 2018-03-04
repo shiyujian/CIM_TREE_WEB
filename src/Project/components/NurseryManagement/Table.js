@@ -18,8 +18,7 @@ export default class Tablelevel extends Component {
         super(props);
         this.state={
 			searchList:[],
-			search:false,
-			searchValue:''
+			search:false
         }
 	}
 	
@@ -37,10 +36,10 @@ export default class Tablelevel extends Component {
 			nurseryList = [],
 		} = this.props;
 		const{
-			searchList,
 			search
 		}= this.state
 		let dataSource = [];
+		let searchList = this.query()
 		if(search){
 			dataSource = searchList
 		}else{
@@ -54,7 +53,7 @@ export default class Tablelevel extends Component {
 		}
 		console.log('user',user);
 		console.log('superuser',superuser);
-		console.log('nurseryList',nurseryList);
+		console.log('dataSource',dataSource);
 		return (
 			<div>
 				<div>
@@ -64,17 +63,9 @@ export default class Tablelevel extends Component {
 						</Col>
 						<Col span={12}>
 							<label style={{minWidth: 60,display: 'inline-block'}}>苗圃名称:</label>
-							<div className='search_input'>
-								<Select placeholder="请选择苗圃名称" onChange={this.search.bind(this)}
-									showSearch style={{ width: '100%' }} allowClear value={this.state.searchValue}
-								>
-									{
-										nurseryList.map((rst)=>{
-											return (<Option key={rst.ID} value={rst.NurseryName}>{rst.NurseryName}</Option>)
-										})
-									}
-								</Select>
-							</div>
+							<Input id='NurseryData' className='search_input'/>
+ 							<Button type='primary' onClick={this.search.bind(this)} style={{minWidth: 30,display: 'inline-block',marginRight:20}}>查询</Button>
+ 							<Button onClick={this.clear.bind(this)} style={{minWidth: 30,display: 'inline-block'}}>清空</Button>
 						</Col>
 						<Col span={6}>
 							<Addition {...this.props} {...this.state}/>
@@ -96,25 +87,30 @@ export default class Tablelevel extends Component {
 
 	componentWillReceiveProps(nextProps){
 		if(nextProps.nurseryList != this.props.nurseryList){
-			this.setState({
-				searchValue:''
-			})
 			this.search()
 		}
 	}
 
-	search(value){
-		console.log('value',value)
+	search(){
 		this.setState({
-			searchValue:value
+			search:true
 		})
+	}
+
+	query(){
+
+		let	text = document.getElementById("NurseryData");
+		console.log('text',text)
+		let value = ''
+		if(text && text.value){
+			value = text.value
+		}
+		console.log('value',value)
 		let searchList = []
 		const {
 			nurseryList = [],
 		} = this.props;
-		
 		if(value){
-			console.log('nurseryListnurseryListnurseryList',nurseryList)
 			nurseryList.map((item)=>{
 				if(item && item.NurseryName){
 					if(item.NurseryName.indexOf(value) > -1){
@@ -122,19 +118,18 @@ export default class Tablelevel extends Component {
 					}
 				}
 			})
-			this.setState({
-				searchList:searchList,
-				search:true
-			})
+			return searchList
 		}else{
-			this.setState({
-				dataSource:[],
-				search:false
-			})
+			return nurseryList
 		}
 		
 	}
-    
+	clear(){
+		document.getElementById("NurseryData").value = ''
+		this.setState({
+			search:false
+		})
+	}
 
     componentDidMount() {
 		const {actions:{getNurseryList}} =this.props;
@@ -154,9 +149,6 @@ export default class Tablelevel extends Component {
 				getNurseryList
 			}
 		}=this.props
-		const{
-			searchValue
-		}=this.state
 		let me = this;
 		let deleteID = {
 			ID:record.ID
@@ -175,9 +167,7 @@ export default class Tablelevel extends Component {
 				})
 			}
 			getNurseryList().then((item)=>{
-				if(searchValue){
-					me.search(searchValue)
-				}
+				me.search()
 			})
 
 		})
