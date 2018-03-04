@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {
-	Form, Input,Button, Row, Col, Modal, Upload, Icon, message, Table,notification
+	Form, Input,Button, Row, Col, Modal, Upload, Icon, message, Table,notification, Select
 } from 'antd';
 // import Button from "antd/es/button/button";
 import Card from '_platform/components/panels/Card';
@@ -8,6 +8,7 @@ import Addition from './Addition';
 import Edite from './Edite';
 import './index.less';
 const FormItem = Form.Item;
+const Option = Select.Option;
 
 
 
@@ -17,7 +18,8 @@ export default class Tablelevel extends Component {
         super(props);
         this.state={
 			searchList:[],
-			search:false
+			search:false,
+			searchValue:''
         }
 	}
 	
@@ -44,7 +46,14 @@ export default class Tablelevel extends Component {
 		}else{
 			dataSource = nurseryList
 		}
-       
+
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		let superuser = false
+		if(user && user.is_superuser){
+			superuser = true
+		}
+		console.log('user',user);
+		console.log('superuser',superuser);
 		console.log('nurseryList',nurseryList);
 		return (
 			<div>
@@ -55,9 +64,17 @@ export default class Tablelevel extends Component {
 						</Col>
 						<Col span={12}>
 							<label style={{minWidth: 60,display: 'inline-block'}}>苗圃名称:</label>
-							<Input id='NurseryData' className='search_input'/>
-							<Button type='primary' onClick={this.search.bind(this)} style={{minWidth: 30,display: 'inline-block',marginRight:20}}>查询</Button>
-							<Button onClick={this.clear.bind(this)} style={{minWidth: 30,display: 'inline-block'}}>清空</Button>
+							<div className='search_input'>
+								<Select placeholder="请选择苗圃名称" onChange={this.search.bind(this)}
+									showSearch style={{ width: '100%' }} allowClear value={this.state.searchValue}
+								>
+									{
+										nurseryList.map((rst)=>{
+											return (<Option key={rst.id} value={rst.NurseryName}>{rst.NurseryName}</Option>)
+										})
+									}
+								</Select>
+							</div>
 						</Col>
 						<Col span={6}>
 							<Addition {...this.props} {...this.state}/>
@@ -66,7 +83,7 @@ export default class Tablelevel extends Component {
 					<Row style={{marginTop:5}}>
 						<Col span={24}>
 							<Table dataSource={dataSource}
-							columns={this.columns}
+							columns={superuser?this.columns:this.columns1}
 							bordered />
 							<Edite {...this.props} {...this.state}/>
 						</Col>
@@ -77,32 +94,45 @@ export default class Tablelevel extends Component {
 		);
 	}
 
-	search(){
-		let text = document.getElementById("NurseryData").value;
-		console.log('text',text)
+	componentWillReceiveProps(nextProps){
+		if(nextProps.nurseryList != this.props.nurseryList){
+			this.setState({
+				searchValue:''
+			})
+			this.search()
+		}
+	}
+
+	search(value){
+		console.log('value',value)
+		this.setState({
+			searchValue:value
+		})
 		let searchList = []
 		const {
 			nurseryList = [],
 		} = this.props;
-		nurseryList.map((item)=>{
-			if(item && item.NurseryName){
-				if(item.NurseryName.indexOf(text) > -1){
-					searchList.push(item)
+		
+		if(value){
+			console.log('nurseryListnurseryListnurseryList',nurseryList)
+			nurseryList.map((item)=>{
+				if(item && item.NurseryName){
+					if(item.NurseryName.indexOf(value) > -1){
+						searchList.push(item)
+					}
 				}
-			}
-		})
-		this.setState({
-			searchList:searchList,
-			search:true
-		})
-	}
-
-	clear(){
-		document.getElementById("NurseryData").value = ''
-		this.setState({
-			dataSource:[],
-			search:false
-		})
+			})
+			this.setState({
+				searchList:searchList,
+				search:true
+			})
+		}else{
+			this.setState({
+				dataSource:[],
+				search:false
+			})
+		}
+		
 	}
     
 
@@ -116,10 +146,41 @@ export default class Tablelevel extends Component {
 			actions:{changeEditVisible}
 		}=this.props
 		changeEditVisible(true)
-		this.setState({
-			record:record
+	}
+	delet(record){
+		const{
+			actions:{
+				deleteNursery,
+				getNurseryList
+			}
+		}=this.props
+		const{
+			searchValue
+		}=this.state
+		let me = this;
+		let deleteID = {
+			ID:record.ID
+		}
+		deleteNursery(deleteID).then((rst)=>{
+			console.log('rst',rst)
+			if(rst && rst.code && rst.code===1){
+				notification.success({
+					message: '苗圃删除成功',
+					duration: 3
+				}) 
+			}else{
+				notification.error({
+					message:'苗圃删除失败',
+					duration:3
+				})
+			}
+			getNurseryList().then((item)=>{
+				if(searchValue){
+					me.search(searchValue)
+				}
+			})
+
 		})
-		
 	}
 	columns=[
 		{
@@ -154,8 +215,47 @@ export default class Tablelevel extends Component {
 				return(
                     <div>
                         <a onClick={this.edite.bind(this,record)}>修改</a>
-                        {/* <span className="ant-divider" />
-                        <a onClick={this.delet.bind(this,record)}>删除</a> */}
+                        <span className="ant-divider" />
+                        <a onClick={this.delet.bind(this,record)}>删除</a>
+                    </div>
+                )
+			}
+		}
+	];
+
+	columns1=[
+		{
+			title:'苗圃ID',
+			key:'ID',
+            dataIndex:'ID',
+		},{
+			title:'供应商',
+			key:'Factory',
+			dataIndex:'Factory',
+		},{
+			title:'苗圃名称',
+			key:'NurseryName',
+			dataIndex:'NurseryName',
+		},{
+			title:'行政区划编码',
+			key:'RegionCode',
+			dataIndex:'RegionCode',
+		},{
+			title:'行政区划',
+			key:'RegionName',
+			dataIndex:'RegionName',
+		},{
+			title:'产地',
+			key:'TreePlace',
+			dataIndex:'TreePlace',
+		},{
+			title:'操作',
+			key:'operate',
+			dataIndex:'operate',
+			render: (text, record, index) =>{
+				return(
+                    <div>
+                        <a onClick={this.edite.bind(this,record)}>修改</a>
                     </div>
                 )
 			}
