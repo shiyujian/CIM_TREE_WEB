@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {
-	Form, Input,Button, Row, Col, Modal, Upload, Icon, message, Table,notification, Select
+	Form, Input,Button, Row, Col, Modal, Upload, Icon, message, Table,notification, Select,Popconfirm
 } from 'antd';
 // import Button from "antd/es/button/button";
 import Card from '_platform/components/panels/Card';
@@ -216,7 +216,10 @@ export default class Tablelevel extends Component {
                     <div>
                         <a onClick={this.edite.bind(this,record)}>修改</a>
                         <span className="ant-divider" />
-                        <a onClick={this.delet.bind(this,record)}>删除</a>
+						<Popconfirm title="是否真的要删除该苗圃?"
+									onConfirm={this.delet.bind(this,record)} okText="是" cancelText="否">
+									<a>删除</a>
+						</Popconfirm>
                     </div>
                 )
 			}
