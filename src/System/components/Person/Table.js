@@ -14,11 +14,10 @@ export default class Users extends Component {
 			sections: [],
 			tag: null,
 			searchList: [],
-			search: false,
 			loading: false,
 			percent: 0,
 			edit: true,
-			roles: ''
+			roles: []
 		}
 	}
 	static layout = {
@@ -54,101 +53,50 @@ export default class Users extends Component {
 		if (user.is_superuser) {
 			return true;
 		}
-		// console.log(11111111,l1,s)
 		if (l1 == undefined || s == undefined) {
 			return false
 		}
-		// let l2 = s.split(',')
-		// for (let i = 0; i < l1.length; i++) {
-		// 	const e1 = l1[i];
-		// 	for (let j = 0; j < l2.length; j++) {
-		// 		const e2 = l2[j];
-		// 		if (e1 == e2) {
-		// 			return true
-		// 		}
-		// 	}
-		// }
-		// if(l1>)
+
 		if (s.startsWith(l1)) {
 			return true;
 		}
 	}
 
 	search() {
+		const {actions: { setUpdate} } = this.props;
 		let text = document.getElementById("NurseryData").value;
 		let searchList = []
 		const { platform: { users = [] } } = this.props;
 		users.map((item) => {
-			if (!text && (this.state.roles != '') == false) {
+			let isName=false;
+			let isRoles=false;
+			if (!text){
+				isName=true
+			}
+			else{
+				if (text && item.username.indexOf(text) > -1) {
+					isName=true		
+				}
+			}
+			
+			if(this.state.roles.length==0){
+				isRoles=true
+			}else{
+				if(this.state.roles.sort().join(',')==item.groups.map(i=>{
+					return String(i.id)
+				}).sort().join(',')){
+					isRoles=true
+				}
+			}
+
+			if(isName&&isRoles){
 				searchList.push(item)
-				this.setState({
-					searchList: searchList,
-					search: true
-				})
 			}
-			if (text && (this.state.roles != '') == false) {
-				if (item && item.username) {
-					if (item.username.indexOf(text) > -1) {
-						searchList.push(item)
-						this.setState({
-							searchList: searchList,
-							search: true
-						})
-					} else {
-						this.setState({
-							searchList: searchList,
-							search: true
-						})
-					}
-				}
-			}
-			if ((this.state.roles != '') == true && (!text)) {
-
-				for (let j = 0; j < item.groups.length; j++) {
-					const items = item.groups[j];
-					const id = items.id.toString()
-					if (items && id) {
-						if (id.indexOf(this.state.roles[0]) > -1) {
-							searchList.push(item)
-							this.setState({
-								searchList: searchList,
-								search: true
-							})
-						} else {
-							this.setState({
-								searchList: searchList,
-								search: true
-							})
-						}
-					}
-				}
-			}
-			if (text && (this.state.roles != '') == true) {
-				for (let j = 0; j < item.groups.length; j++) {
-					const items = item.groups[j];
-					const id = items.id.toString()
-					if ((items && id) && (item && item.username)) {
-						if ((item.username.indexOf(text) > -1) && (id.indexOf(this.state.roles[0]) > -1)) {
-							searchList.push(item)
-							this.setState({
-								searchList: searchList,
-								search: true
-							})
-						} else {
-							this.setState({
-								searchList: searchList,
-								search: true
-							})
-						}
-					}
-				}
-			}
-
 		})
-		// this.setState({
-		// 	searchList: searchList,
-		// 	search: true
-		// })
+		setUpdate(false);
+		this.setState({
+			searchList: searchList,
+		})
 
 	}
 	confirms() {
@@ -175,29 +123,22 @@ export default class Users extends Component {
 
 
 	render() {
-		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {}, code } = {}, parent } = {} } = this.props;
+		const {isUpdate=false, platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {}, code } = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
-
-
 		const tagsOptions = this.initopthins(tags);
 		const { platform: { users = [] }, actions: { getTreeModal } } = this.props;
 		const {
 			searchList,
-			search
 		} = this.state
 		let dataSource = [];
-		// if(users.length>0){
-		// 	getTreeModal(false)
-		// }
-		if (search) {
-			dataSource = searchList
-			this.state.search = false
-		} else {
-			// console.log("222222")
+
+		if (isUpdate) {
 			dataSource = users
+		} else {
+			dataSource = searchList
 		}
 		console.log("dataSource", dataSource)
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -215,25 +156,9 @@ export default class Users extends Component {
 					const ucode = codeu.replace(/,/g, '_')
 					is_active = this.compare(user, ucode, code)
 				} else {
-					// ucodes.pop()
-					// const codeu=ucodes.join()
-					// const ucode=codeu.replace(/,/g,'_')
 					const ucode = user.account.org_code.substring(0, 9);
 					is_active = this.compare(user, ucode, code)
 				}
-
-				// console.log(user.account.org_code.length)
-				// if(user.account.org_code.length>17){
-				// 	const ucode=user.account.org_code.substring(0,17);
-				// 	console.log("11111",ucode)
-				// 	is_active = this.compare(user, ucode, code)
-				// }else{
-				// 	const ucode=user.account.org_code.substring(0,9);
-				// 	is_active = this.compare(user, ucode, code)
-				// 	console.log("2222222",ucode)
-				// }
-
-
 			}
 		}
 		return (
@@ -241,7 +166,7 @@ export default class Users extends Component {
 				<div>
 					<div>
 						<Row style={{ marginBottom: "20px" }}>
-							<Col span={12}>
+							<Col span={10}>
 								<label style={{ minWidth: 60, display: 'inline-block' }}>用户名:</label>
 								<Input id='NurseryData' className='search_input' />
 							</Col>

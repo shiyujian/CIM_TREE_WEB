@@ -111,7 +111,7 @@ export default class Tree extends Component {
 		const {node: {props: {eventKey = ''} = {}} = {}} = node || {};
 		const {
 			platform: {org: {children = []} = {}},
-			actions: {changeSidebarField, getUsers,getTreeModal}
+			actions: {changeSidebarField, getUsers,getTreeModal,setUpdate}
 		} = this.props;
 		const o = Tree.loop(children, eventKey);
 		let ucode
@@ -150,6 +150,7 @@ export default class Tree extends Component {
 			const codes = Tree.collect(o);
 			getUsers({}, {org_code: codes}).then((e) =>{
 				getTreeModal(false)
+				setUpdate(true);
 			});
 		}
 	}
