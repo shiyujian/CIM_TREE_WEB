@@ -55,7 +55,6 @@ export default class Addition extends Component {
 	render() {
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
 		const tagsOptions = this.initopthins(tags);
-		console.log('this.props22222222222222222',this.props)
 		
 		let units = this.getUnits()
 		console.log('units',units)
@@ -102,8 +101,8 @@ export default class Addition extends Component {
 						<FormItem {...Addition.layout} label="手机号码">
 							<Input placeholder="请输入手机号码" value={addition.person_telephone} onChange={changeAdditionField.bind(this, 'person_telephone')} />
 						</FormItem>
-						<FormItem {...Addition.layout} label="职位">
-							<Input placeholder="请输入职位" value={addition.title} onChange={changeAdditionField.bind(this, 'title')} />
+						<FormItem {...Addition.layout} label="职务">
+							<Input placeholder="请输入职务" value={addition.title} onChange={changeAdditionField.bind(this, 'title')} />
 						</FormItem>
 						<FormItem {...Addition.layout} label="角色">
 							<Select placeholder="请选择角色" value={addition.roles} onChange={this.changeRoles.bind(this)}
@@ -115,7 +114,8 @@ export default class Addition extends Component {
 						</FormItem>
 						<FormItem {...Addition.layout} label="苗圃">
 							<Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
-								mode="multiple" style={{ width: '100%' }}>
+								mode="multiple" 
+								style={{ width: '100%' }}>
 								{tagsOptions}
 							</Select>
 						</FormItem>

@@ -17,7 +17,8 @@ export default class Users extends Component {
 			search: false,
 			loading: false,
 			percent: 0,
-			edit: true
+			edit: true,
+			roles: ''
 		}
 	}
 	static layout = {
@@ -26,8 +27,11 @@ export default class Users extends Component {
 	};
 	changeRoles(value) {
 		const { actions: { changeAdditionField } } = this.props;
+		changeAdditionField('roles', value)
 		console.log("value", value)
-			('roles', value)
+		this.setState({
+			roles: value
+		})
 	}
 	changeSections(value) {
 		console.log("value", value)
@@ -75,17 +79,100 @@ export default class Users extends Component {
 		let searchList = []
 		const { platform: { users = [] } } = this.props;
 		users.map((item) => {
-			if (item && item.username) {
-				if (item.username.indexOf(text) > -1) {
-					searchList.push(item)
+			if (!text && (this.state.roles != '') == false) {
+				searchList.push(item)
+				this.setState({
+					searchList: searchList,
+					search: true
+				})
+			}
+			if (text && (this.state.roles != '') == false) {
+				if (item && item.username) {
+					if (item.username.indexOf(text) > -1) {
+						searchList.push(item)
+						this.setState({
+							searchList: searchList,
+							search: true
+						})
+					} else {
+						this.setState({
+							searchList: searchList,
+							search: true
+						})
+					}
 				}
 			}
+			if ((this.state.roles != '') == true && (!text)) {
+
+				for (let j = 0; j < item.groups.length; j++) {
+					const items = item.groups[j];
+					const id = items.id.toString()
+					if (items && id) {
+						if (id.indexOf(this.state.roles[0]) > -1) {
+							searchList.push(item)
+							this.setState({
+								searchList: searchList,
+								search: true
+							})
+						} else {
+							this.setState({
+								searchList: searchList,
+								search: true
+							})
+						}
+					}
+				}
+			}
+			if (text && (this.state.roles != '') == true) {
+				for (let j = 0; j < item.groups.length; j++) {
+					const items = item.groups[j];
+					const id = items.id.toString()
+					if ((items && id) && (item && item.username)) {
+						if ((item.username.indexOf(text) > -1) && (id.indexOf(this.state.roles[0]) > -1)) {
+							searchList.push(item)
+							this.setState({
+								searchList: searchList,
+								search: true
+							})
+						} else {
+							this.setState({
+								searchList: searchList,
+								search: true
+							})
+						}
+					}
+				}
+			}
+
 		})
-		this.setState({
-			searchList: searchList,
-			search: true
-		})
+		// this.setState({
+		// 	searchList: searchList,
+		// 	search: true
+		// })
+
 	}
+	confirms() {
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		if (user.is_superuser == true) {
+			return [<Col span={3}>
+				<Button onClick={this.append.bind(this)}>添加用户</Button>
+			</Col>,
+			<Col span={3}>
+				<Popconfirm title="是否真的要删除选中用户?"
+					onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
+					<Button>批量删除</Button>
+
+				</Popconfirm>
+			</Col>]
+		} else {
+			return <Col span={3}>
+				<Button onClick={this.append.bind(this)}>添加用户</Button>
+			</Col>
+		}
+
+
+	}
+
 
 	render() {
 		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {}, code } = {}, parent } = {} } = this.props;
@@ -159,7 +246,7 @@ export default class Users extends Component {
 								<Input id='NurseryData' className='search_input' />
 							</Col>
 							<Col span={7}>
-								<Select placeholder="请选择角色" value={filter.role} onChange={changeFilterField.bind(this, 'role')}
+								<Select placeholder="请选择角色" value={this.state.roles || []} onChange={this.changeRoles.bind(this)}
 									mode="multiple" style={{ width: '100%' }}>
 									<OptGroup label="苗圃角色">
 										{
@@ -197,7 +284,10 @@ export default class Users extends Component {
 							</Col>
 						</Row>
 						<Row style={{ marginBottom: "20px" }}>
-							<Col span={3}>
+							{
+								this.confirms()
+							}
+							{/* <Col span={3}>
 								<Button onClick={this.append.bind(this)}>添加用户</Button>
 							</Col>
 							<Col span={3}>
@@ -206,7 +296,7 @@ export default class Users extends Component {
 									<Button>批量删除</Button>
 
 								</Popconfirm>
-							</Col>
+							</Col> */}
 							{/*<Col span={6}>
 							<FormItem {...Users.layout} label="苗圃">
 								<Select placeholder="苗圃" value={this.state.tag} showSearch onChange={this.changeTagss.bind(this)}
@@ -402,13 +492,18 @@ export default class Users extends Component {
 	}, {
 		title: '操作',
 		render: (user) => {
-			return [
-				<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-				<Popconfirm title="是否真的要删除用户?" key={2}
-					onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-					<a>删除</a>
-				</Popconfirm>
-			]
+			const userc = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+			if (userc.is_superuser == true) {
+				return [
+					<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+					<Popconfirm title="是否真的要删除用户?" key={2}
+						onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+						<a>删除</a>
+					</Popconfirm>
+				]
+			} else {
+				return <a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>
+			}
 		}
 	}];
 
@@ -460,7 +555,7 @@ export default class Users extends Component {
 		// } else {
 		// 	// console.log("user", user)
 		// 	// console.log("resetAdditionField", resetAdditionField)
-		
+
 		// }
 		resetAdditionField({
 			visible: true,
@@ -478,6 +573,12 @@ export default class Users extends Component {
 			actions: { deleteUser, getUsers }
 		} = this.props;
 		const codes = Users.collect(node);
+		// 		const usera = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		// console.log("usera",usera)
+		// 		let is_active = false
+		// 		if (usera.is_superuser) {
+
+		// 		}
 		if (user.id) {
 			deleteUser({ userID: user.id }).then(() => {
 				getUsers({}, { org_code: codes });
