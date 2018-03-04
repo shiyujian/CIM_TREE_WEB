@@ -103,8 +103,8 @@ export default class Addition extends Component {
 						<FormItem {...Addition.layout} label="手机号码">
 							<Input placeholder="请输入手机号码" value={addition.person_telephone} onChange={changeAdditionField.bind(this, 'person_telephone')} />
 						</FormItem>
-						<FormItem {...Addition.layout} label="职位">
-							<Input placeholder="请输入职位" value={addition.title} onChange={changeAdditionField.bind(this, 'title')} />
+						<FormItem {...Addition.layout} label="职务">
+							<Input placeholder="请输入职务" value={addition.title} onChange={changeAdditionField.bind(this, 'title')} />
 						</FormItem>
 						<FormItem {...Addition.layout} label="角色">
 							<Select placeholder="请选择角色" value={addition.roles} onChange={this.changeRoles.bind(this)}
