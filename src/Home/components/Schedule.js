@@ -10,7 +10,7 @@ export default class Schedule extends Component {
 		const sectionStatus = 0;
 		let timeType = 'M';
 		let options = {
-			color: ['#1abc9c', '#409ad0', '#f39c12'],
+			color: ['#409ad0', '#f39c12'],
 			// grid: {
 			// 	x: 60,
 			// 	y: 40,
@@ -27,13 +27,14 @@ export default class Schedule extends Component {
 				}
 			},
 			legend: {
-				data: ['计划完成', '实际完成'],
+				data: ['累计种植量', '种植比例'],
 				textStyle: {color: '#000', fontSize: 13}
 			},
 			xAxis: [
 				{
 					type: 'category',
-					data: data[sectionStatus].address,
+					// data: data[sectionStatus].address,
+					data:['一标段','二标段','三标段','四标段','五标段'],
 					axisPointer: {
 						type: 'shadow'
 					},
@@ -45,20 +46,36 @@ export default class Schedule extends Component {
 			yAxis: [
 				{
 					type: 'value',
+					name: '累计种植量',
 					min: 0,
+					position:'left',
 					// max: 2500,
 					interval: 1000,
 					axisLabel: {
-						formatter: '{value}万',
+						formatter: '{value}',
 						textStyle: {color: '#000', fontSize: 13}
 					}
-				}
+				},
+				{
+					type: 'value',
+					name: '种植比例',
+					min: 0,
+					position:'right',
+					// max: 2500,
+					interval: 1000,
+					axisLabel: {
+						formatter: '{value}',
+						textStyle: {color: '#000', fontSize: 13}
+					}
+				},
+
 			],
 			series: [
 				{
-					name: '计划完成',
+					name: '累计种植量',
 					type: 'bar',
-					data: data[sectionStatus][`plan${timeType}`],
+					// data: data[sectionStatus][`plan${timeType}`],
+					data:[1000,2000,2236,1245,4563],
 					itemStyle: {
 						normal: {
 							barBorderRadius: 5
@@ -69,9 +86,10 @@ export default class Schedule extends Component {
 					}
 				},
 				{
-					name: '实际完成',
-					type: 'bar',
-					data: data[sectionStatus][`actual${timeType}`],
+					name: '种植比例',
+					type: 'line',
+					// data: data[sectionStatus][`actual${timeType}`],
+					data:[800,1800,1500,1100,4000],
 					itemStyle: {
 						normal: {
 							barBorderRadius: 5
@@ -90,7 +108,7 @@ export default class Schedule extends Component {
 
 	render() {//todo 产量具体实现
 		return (
-			<Blade title="月度/季度产值">
+			<Blade title="进度信息统计">
 				<div id = 'homeChart2' style = {{width:'100%',height:'360px'}}>
 				</div>
 			</Blade>

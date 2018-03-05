@@ -51,12 +51,12 @@ export default class Home extends Component {
 					</Col>
 				</Row>
 
-				<Row gutter={10} style={{margin: '5px 5px 5px 5px'}}>
+				{/* <Row gutter={10} style={{margin: '5px 5px 5px 5px'}}>
 					{Safety && <Safety {...props}/>}
 				</Row>
 				<Row gutter={10} style={{margin: '5px 5px 5px 5px'}}>
 					{Quality && <Quality {...props}/>}				
-				</Row>
+				</Row> */}
 				
 
 				<Preview/>

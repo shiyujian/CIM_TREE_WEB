@@ -8,6 +8,7 @@ export const getNurseryListOK = createAction(`${ID}_getnurseryListlist`);
 export const getNurseryList =createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getNurseryListOK]);
 export const postNursery =createFetchAction(`${FOREST_API}/tree/nurseryconfig`, [],'POST');
 export const putNursery =createFetchAction(`${FOREST_API}/tree/nurseryconfig`, [],'PUT');
+export const deleteNursery =createFetchAction(`${FOREST_API}/tree/nurseryconfig/{{ID}}`, [],'DELETE');
 export const changeEditVisible = createAction(`${ID}_changeEditVisible`);
 
 export const actions = {
@@ -15,6 +16,7 @@ export const actions = {
 	getNurseryList,
 	postNursery,
 	putNursery,
+	deleteNursery,
 	changeEditVisible
 };
 

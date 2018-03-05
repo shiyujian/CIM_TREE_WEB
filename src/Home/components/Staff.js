@@ -342,10 +342,10 @@ export default class Overall extends Component {
 		const {orgAttendInfo = []} = this.props;
 		let {loading = true} = this.state;
 		return (
-			<Blade title="人员统计">
+			<Blade title="质量信息统计">
 				<Spin tip="数据加载中，请稍后..." spinning={loading}>
 					<Col>
-						<div style={{display: 'flex', alignItems: 'center'}}>
+						{/* <div style={{display: 'flex', alignItems: 'center'}}>
 							统计时间：
 							<MonthPicker
 								allowClear={false}
@@ -363,7 +363,7 @@ export default class Overall extends Component {
 								onChange={this.onEndChange.bind(this)}
 							/>
 							<Button onClick={this.lookChart.bind(this)}>查看统计</Button>
-						</div>
+						</div> */}
 					</Col>
 
 					<div id='homeChart1' style={{width: '100%', height: '360px'}}>

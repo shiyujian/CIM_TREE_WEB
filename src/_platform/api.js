@@ -258,10 +258,10 @@ export const PROJECT_UNITS = [
 				code:'P010-01-04',
 				value:'四标段'
 			},{
-				code:'P010-01-05',
+				code:'P010-02-05',
 				value:'五标段'
 			},{
-				code:'P010-01-06',
+				code:'P010-03-06',
 				value:'六标段'
 			}
 		]

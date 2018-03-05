@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input,Progress } from 'antd';
+import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input, Progress } from 'antd';
 import './index.less';
 
 const FormItem = Form.Item;
@@ -13,10 +13,11 @@ export default class Users extends Component {
 		this.state = {
 			sections: [],
 			tag: null,
-			searchList:[],
-			search:false,
+			searchList: [],
 			loading: false,
 			percent: 0,
+			edit: true,
+			roles: []
 		}
 	}
 	static layout = {
@@ -25,8 +26,11 @@ export default class Users extends Component {
 	};
 	changeRoles(value) {
 		const { actions: { changeAdditionField } } = this.props;
+		changeAdditionField('roles', value)
 		console.log("value", value)
-			('roles', value)
+		this.setState({
+			roles: value
+		})
 	}
 	changeSections(value) {
 		console.log("value", value)
@@ -45,69 +49,97 @@ export default class Users extends Component {
 		return ops;
 	}
 	//人员标段和组织机构标段比较器，如果满足条件返回true
-	compare(user, l1, s) {		
-		if(user.is_superuser){
+	compare(user, l1, s) {
+		if (user.is_superuser) {
 			return true;
 		}
-		console.log(11111111,l1,s)
 		if (l1 == undefined || s == undefined) {
 			return false
 		}
-		// let l2 = s.split(',')
-		// for (let i = 0; i < l1.length; i++) {
-		// 	const e1 = l1[i];
-		// 	for (let j = 0; j < l2.length; j++) {
-		// 		const e2 = l2[j];
-		// 		if (e1 == e2) {
-		// 			return true
-		// 		}
-		// 	}
-		// }
-		// if(l1>)
-		if(s.startsWith(l1)){
-				return true;	
+
+		if (s.startsWith(l1)) {
+			return true;
 		}
 	}
 
 	search() {
+		const { actions: { setUpdate } } = this.props;
 		let text = document.getElementById("NurseryData").value;
 		let searchList = []
 		const { platform: { users = [] } } = this.props;
 		users.map((item) => {
-			if (item && item.username) {
-				if (item.username.indexOf(text) > -1) {
-					searchList.push(item)
+			let isName = false;
+			let isRoles = false;
+			if (!text) {
+				isName = true
+			}
+			else {
+				if (text && item.username.indexOf(text) > -1) {
+					isName = true
 				}
 			}
+
+			if (this.state.roles.length == 0) {
+				isRoles = true
+			} else {
+				if (this.state.roles.sort().join(',') == item.groups.map(i => {
+					return String(i.id)
+				}).sort().join(',')) {
+					isRoles = true
+				}
+			}
+
+			if (isName && isRoles) {
+				searchList.push(item)
+			}
 		})
+		setUpdate(false);
 		this.setState({
 			searchList: searchList,
-			search: true
 		})
+
 	}
+	confirms() {
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		if (user.is_superuser == true) {
+			return [<Col span={3}>
+				<Button onClick={this.append.bind(this)}>添加用户</Button>
+			</Col>,
+			<Col span={3}>
+				<Popconfirm title="是否真的要删除选中用户?"
+					onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
+					<Button>批量删除</Button>
+
+				</Popconfirm>
+			</Col>]
+		} else {
+			return <Col span={3}>
+				<Button onClick={this.append.bind(this)}>添加用户</Button>
+			</Col>
+		}
+
+
+	}
+
+
 	render() {
-		const { platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {} ,code} = {}, parent } = {} } = this.props;
+		const { isUpdate = false, platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {}, code } = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
-
 		const tagsOptions = this.initopthins(tags);
-		const { platform: { users = [] },actions: {getTreeModal} } = this.props;
-		const{
+		const { platform: { users = [] }, actions: { getTreeModal } } = this.props;
+		const {
 			searchList,
-			search
-		}= this.state
+		} = this.state
 		let dataSource = [];
-		// if(users.length>0){
-		// 	getTreeModal(false)
-		// }
-		if(search){
-			dataSource = searchList
-			this.state.search=false
-		}else{
+		if (isUpdate) {
 			dataSource = users
+		} else {
+			dataSource = searchList
 		}
+		console.log("dataSource", dataSource)
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -115,21 +147,30 @@ export default class Users extends Component {
 			is_active = true;
 		} else {
 			if (code) {
-				const ucode=user.account.org_code.substring(0,9);
-				is_active = this.compare(user, ucode, code)
+
+				const ucodes = user.account.org_code.split("_");
+				if (ucodes.length > 5) {
+					ucodes.pop()
+					const codeu = ucodes.join()
+					const ucode = codeu.replace(/,/g, '_')
+					is_active = this.compare(user, ucode, code)
+				} else {
+					const ucode = user.account.org_code.substring(0, 9);
+					is_active = this.compare(user, ucode, code)
+				}
 			}
 		}
 		return (
 			is_active ?
 				<div>
 					<div>
-						<Row style={{marginBottom:"20px"}}>
-							<Col span={12}>
+						<Row style={{ marginBottom: "20px" }}>
+							<Col span={10}>
 								<label style={{ minWidth: 60, display: 'inline-block' }}>用户名:</label>
 								<Input id='NurseryData' className='search_input' />
 							</Col>
 							<Col span={7}>
-								<Select placeholder="请选择角色" value={filter.role} onChange={changeFilterField.bind(this, 'role')}
+								<Select placeholder="请选择角色" value={this.state.roles || []} onChange={this.changeRoles.bind(this)}
 									mode="multiple" style={{ width: '100%' }}>
 									<OptGroup label="苗圃角色">
 										{
@@ -161,13 +202,16 @@ export default class Users extends Component {
 									</OptGroup>
 								</Select>
 							</Col>
-							<Col span={4} style={{marginLeft:"20px"}}>
-							<Button  type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>							
-										
+							<Col span={4} style={{ marginLeft: "20px" }}>
+								<Button type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>
+
 							</Col>
 						</Row>
-						<Row style={{marginBottom:"20px"}}>
-							<Col span={3}>
+						<Row style={{ marginBottom: "20px" }}>
+							{
+								this.confirms()
+							}
+							{/* <Col span={3}>
 								<Button onClick={this.append.bind(this)}>添加用户</Button>
 							</Col>
 							<Col span={3}>
@@ -176,7 +220,7 @@ export default class Users extends Component {
 									<Button>批量删除</Button>
 
 								</Popconfirm>
-							</Col>
+							</Col> */}
 							{/*<Col span={6}>
 							<FormItem {...Users.layout} label="苗圃">
 								<Select placeholder="苗圃" value={this.state.tag} showSearch onChange={this.changeTagss.bind(this)}
@@ -239,9 +283,9 @@ export default class Users extends Component {
 
 						</Row>
 					</div>
-					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={dataSource} 
-					loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.props.getTreeModals}}
-									
+					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={dataSource}
+						loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.props.getTreeModals }}
+
 					/>
 				</div>
 				: <h3>{'没有权限'}</h3>
@@ -254,25 +298,16 @@ export default class Users extends Component {
 			addition = {}, sidebar: { node } = {},
 			actions: { postUser, clearAdditionField, getUsers, putUser }
 		} = this.props;
-		console.log("addition", addition)
-		console.log("this.selectedCodes", this.selectedCodes)
 		const roles = addition.roles || [];
-		console.log("2222222", this.state.sections)
-		console.log("roles", roles)
-		console.log("users", users)
 		// if (this.selectedCodes == undefined) {
 		// 	message.warn('请您选择需要添加角色的人');
 		// 	return
 		// }
 		for (let i = 0; i < users.length; i++) {
 			const element = users[i];
-			console.log(element)
-			console.log(this.selectedCodes)
 			for (let j = 0; j < this.selectedCodes.length; j++) {
 				const selectedCode = this.selectedCodes[j];
-				console.log("111", element)
 				if (element.id == selectedCode) {
-					console.log("已经选中")
 					putUser({ id: element.id }, {
 						username: element.username,
 						email: element.email,
@@ -323,18 +358,15 @@ export default class Users extends Component {
 			}
 			// const selectedCodes=this.selectedCodes[0] || ''
 			// return;
-
-
-
-
 		}
-
-
 	}
 
 	columns = [{
 		title: '序号',
 		dataIndex: 'index',
+		render: (index) => {
+			return index + 1;
+		}
 	}, {
 		title: '姓名',
 		dataIndex: 'person_name',
@@ -381,13 +413,18 @@ export default class Users extends Component {
 	}, {
 		title: '操作',
 		render: (user) => {
-			return [
-				<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-				<Popconfirm title="是否真的要删除用户?" key={2}
-					onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-					<a>删除</a>
-				</Popconfirm>
-			]
+			const userc = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+			if (userc.is_superuser == true) {
+				return [
+					<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+					<Popconfirm title="是否真的要删除用户?" key={2}
+						onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+						<a>删除</a>
+					</Popconfirm>
+				]
+			} else {
+				return <a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>
+			}
 		}
 	}];
 
@@ -402,9 +439,21 @@ export default class Users extends Component {
 	append() {
 		const {
 			sidebar: { node } = {},
-			actions: { changeAdditionField }
+			actions: { changeAdditionField, getSection }
 		} = this.props;
-		console.log(this.props)
+		console.log("node",node)
+		let sectiona = []
+		getSection(sectiona)
+		if (node.extra_params.sections) {
+			
+			if (node.extra_params.sections instanceof Array) {
+				sectiona = node.extra_params.sections
+			} else {
+				sectiona = node.extra_params.sections.split(",")
+			}
+			getSection(sectiona)
+		}
+
 		if (node.children && node.children.length > 0) {
 			message.warn('请选择最下级组织结构目录');
 		} else {
@@ -430,10 +479,17 @@ export default class Users extends Component {
 		const account = user.account;
 		const groups = user.groups || [];
 		const {
+			sidebar: { node } = {},
 			actions: { resetAdditionField }
 		} = this.props;
-		console.log("user", user)
-		console.log("resetAdditionField", resetAdditionField)
+		// if (node.children && node.children.length > 0) {
+		// 	message.warn('请选择最下级组织结构目录');
+
+		// } else {
+		// 	// console.log("user", user)
+		// 	// console.log("resetAdditionField", resetAdditionField)
+
+		// }
 		resetAdditionField({
 			visible: true,
 			roles: groups.map(group => String(group.id)),
@@ -441,6 +497,7 @@ export default class Users extends Component {
 			...account,
 
 		});
+
 	}
 
 	del(user) {
@@ -449,6 +506,12 @@ export default class Users extends Component {
 			actions: { deleteUser, getUsers }
 		} = this.props;
 		const codes = Users.collect(node);
+		// 		const usera = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		// console.log("usera",usera)
+		// 		let is_active = false
+		// 		if (usera.is_superuser) {
+
+		// 		}
 		if (user.id) {
 			deleteUser({ userID: user.id }).then(() => {
 				getUsers({}, { org_code: codes });

@@ -20,40 +20,40 @@ export default class TablePerson extends Component {
 		}
 	}
 	initopthins(list) {
-        const ops = [];
-        for (let i = 0; i < list.length; i++) {
-            ops.push(<Option key={list[i].ID} >{list[i].NurseryName}</Option>)
-        }
-        return ops;
+		const ops = [];
+		for (let i = 0; i < list.length; i++) {
+			ops.push(<Option key={list[i].ID} >{list[i].NurseryName}</Option>)
+		}
+		return ops;
 	}
 	changeTags(record, value) {
-        record.tags = value;
-        const { actions: { changeAdditionField } } = this.props;
-        changeAdditionField('tags', value)
+		record.tags = value;
+		const { actions: { changeAdditionField } } = this.props;
+		changeAdditionField('tags', value)
 	}
 	changeRoles(record, value) {
-        record.groups = value;
-        const { actions: { changeAdditionField } } = this.props;
-        changeAdditionField('groups', value)
-    }
+		record.groups = value;
+		const { actions: { changeAdditionField } } = this.props;
+		changeAdditionField('groups', value)
+	}
 	render() {
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
-        const projectRoles = roles.filter(role => role.grouptype === 1);
-        const professionRoles = roles.filter(role => role.grouptype === 2);
-        const departmentRoles = roles.filter(role => role.grouptype === 3);
+		const projectRoles = roles.filter(role => role.grouptype === 1);
+		const professionRoles = roles.filter(role => role.grouptype === 2);
+		const departmentRoles = roles.filter(role => role.grouptype === 3);
 		const tagsOptions = this.initopthins(tags);
 		const { platform: { users = [] } } = this.props;
 		// console.log("pagination",this.state.pagination)
 		const columns = [
-			// {
-			// 	title: '序号',
-			// 	dataIndex: 'index',
-			// 	render: (text, record, index) => {
-			// 		return index + 1;
-			// 	}
-			// },
-	
+			{
+				title: '序号',
+				dataIndex: 'index',
+				render: (text, record, index) => {
+					return index + 1;
+				}
+			},
+
 			// {
 			// 	title: '人员编码',
 			// 	dataIndex: 'code',
@@ -119,7 +119,7 @@ export default class TablePerson extends Component {
 				// key: 'Sections',
 				render: (text, record, index) => {
 					return (
-						<Select disabled="disabled"  value={record.sections}
+						<Select disabled value={record.sections}
 							onChange={(e) => {
 								console.log("e:", e);
 								record.sections = e;
@@ -133,38 +133,39 @@ export default class TablePerson extends Component {
 							<Option key={'P009-01-05'} >5标段</Option>
 						</Select>
 					)
-	
+
 				}
 			}
-	
+
 			, {
 				title: '苗圃',
 				// dataIndex: "tags",
 				// key: 'tags',
 				render: (text, record, index) => {
-	
+					console.log()
 					return (
-						<Select disabled="disabled"  showSearch value={record.tags}
+						<Select disabled showSearch value={record.tags}
 							onChange={this.changeTags.bind(this, record)}
 							mode="multiple" style={{ width: "100%" }}>
-							{this.tagsOptions}
+							{tagsOptions}
 						</Select>
 					)
-	
+
 				}
-	
+
 			}
 			, {
 				title: '角色',
 				// dataIndex: "role",
 				// key: 'role',
+				key: 'groups',
 				render: (text, record, index) => {
-					// console.log("record",systemRoles)
-						return (<Select  disabled="disabled" value={record.groups} onChange={this.changeRoles.bind(this, record)}
+					return <Select disabled value={record.groups} onChange={this.changeRoles.bind(this, record)}
 						mode="multiple" style={{ width: '100%' }}>
 						<OptGroup label="苗圃角色">
 							{
 								systemRoles.map(role => {
+
 									return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
 								})
 							}
@@ -190,7 +191,7 @@ export default class TablePerson extends Component {
 								})
 							}
 						</OptGroup>
-					</Select>)
+					</Select>
 				}
 			}
 			, {
@@ -227,9 +228,9 @@ export default class TablePerson extends Component {
 					rowSelection={this.rowSelection}
 					dataSource={this.state.tempData}
 					rowKey="index"
-					onChange={this.changePage.bind(this)}
-					pagination={this.state.pagination}
-				// loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
+					// onChange={this.changePage.bind(this)}
+					// pagination={this.state.pagination}
+					loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.state.loading }}
 				>
 				</Table>
 
@@ -245,7 +246,7 @@ export default class TablePerson extends Component {
 			// 分页获取数据
 			let rst = await getPersonList({ pagesize: 10, offset: 0 });
 			let personlist = rst
-			console.log("rst",rst)
+			// console.log("rst", rst)
 			// let total = rst.result.total;
 			let persons = [];
 			for (let i = 0; i < personlist.length; i++) {
@@ -258,6 +259,7 @@ export default class TablePerson extends Component {
 				// total:total,
 			};
 			console.log("pagination",pagination)
+			// console.log("pagination", pagination)
 			this.setState({
 				pagination: pagination
 			})
@@ -269,10 +271,11 @@ export default class TablePerson extends Component {
 			let data_person =
 				persons.map((item, index) => {
 					// console.log("1111",item)
-					let groupsId=[]
-					const groups=item.groups || []
+					let groupsId = []
+					const groups = item.groups || []
 					for (let j = 0; j < groups.length; j++) {
-						 groupsId.push(groups[j].id);					
+						const groupss = groups[j].id.toString()
+						groupsId.push(groupss);
 					}
 					return {
 						id: item.id,
@@ -289,7 +292,7 @@ export default class TablePerson extends Component {
 						username: item.username || '',
 						sections: item.account.sections || '',
 						tags: item.account.tags || '',
-						groups:groupsId || []
+						groups: groupsId || []
 						// passwords:111111
 					}
 				})
@@ -410,15 +413,16 @@ export default class TablePerson extends Component {
 		// }
 	}
 	async changePage(obj) {
-		console.log("obj",obj)
+		console.log("obj", obj)
 		this.setState({ loading: true })
 		const { actions: { getOrgList, getAllUsers, getOrgDetail, getPeople, getPersonList, getOrgReverse } } = this.props;
 		// 分页获取数据
 		let pageSize = 10;
 		let rst = await getPersonList({ pagesize: pageSize, offset: (obj.current - 1) * pageSize });
 		let personlist = rst
-		// console.log("rst",rst)
+		console.log("rst", rst)
 		// let total = rst.result.total;
+		// console.log("total",total)
 		let persons = [];
 		for (let i = 0; i < personlist.length; i++) {
 			const element = personlist[i];
@@ -443,10 +447,10 @@ export default class TablePerson extends Component {
 		let data_person =
 			persons.map((item, index) => {
 				// console.log(item)
-				let groupsId=[]
-				const groups=item.groups || []
+				let groupsId = []
+				const groups = item.groups || []
 				for (let j = 0; j < groups.length; j++) {
-					 groupsId.push(groups[j].id);					
+					groupsId.push(groups[j].id);
 				}
 				return {
 					id: item.id,
@@ -463,7 +467,7 @@ export default class TablePerson extends Component {
 					username: item.username || '',
 					sections: item.account.sections || '',
 					tags: item.account.tags || '',
-					groups:groupsId|| []
+					groups: groupsId || []
 					// passwords:111111,
 				}
 			})
@@ -507,20 +511,15 @@ export default class TablePerson extends Component {
 		// 	type.push(ret.children[0].name)
 		// }
 		console.log("data_person", data_person)
-		let element=''
+		let element = ''
 		let data_person =
 			persons.map((item, index) => {
-				let groupsId=[]
-				const groups=item.groups || []
+				let groupsId = []
+				const groups = item.groups || []
 				for (let j = 0; j < groups.length; j++) {
-					 groupsId.push(groups[j].id);					
+					const groupss = groups[j].id.toString()
+					groupsId.push(groupss);
 				}
-				// console.log(item)
-				// for (let i = 0; i < item.groups.length; i++) {
-				// 	 element = item.groups[i].id;
-					
-				// }
-				// console.log(item.account.person_name)
 				return {
 					id: item.id,
 					index: index + 1,
@@ -536,8 +535,7 @@ export default class TablePerson extends Component {
 					username: item.username || '',
 					sections: item.account.sections || '',
 					tags: item.account.tags || '',
-					groups:groupsId || []
-					// passwords:111111,
+					groups: groupsId || []
 				}
 			})
 		this.setState({ dataSource: data_person, tempData: data_person, loading: false });
@@ -652,8 +650,10 @@ export default class TablePerson extends Component {
 			let rst = await reverseFind({ pk: record.personPk })
 			console.log("rst", rst)
 			console.log("deleteUserList", deleteUserList)
+			console.log("record", record)
 			deleteUser({ userID: record.id }).then(async (re) => {
-				if (re === '') {
+				console.log("111", re)
+				if (re.code == '1') {
 					Notification.success({
 						message: "删除成功"
 					})
@@ -680,5 +680,5 @@ export default class TablePerson extends Component {
 	// 	showQuickJumper: true,
 	// }
 
-	
+
 }
