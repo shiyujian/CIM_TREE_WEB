@@ -18,7 +18,8 @@ export default class Tablelevel extends Component {
         super(props);
         this.state={
 			searchList:[],
-			search:false
+			search:false,
+			record:{}
         }
 	}
 	
@@ -140,7 +141,13 @@ export default class Tablelevel extends Component {
 		const{
 			actions:{changeEditVisible}
 		}=this.props
-		changeEditVisible(true)
+		console.log('editerecord',record)
+		this.setState({
+			record:record
+		},()=>{
+			changeEditVisible(true)
+		})
+		
 	}
 	delet(record){
 		const{
