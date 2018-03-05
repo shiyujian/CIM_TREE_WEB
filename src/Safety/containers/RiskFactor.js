@@ -9,8 +9,8 @@ import {
     notification, DatePicker, Select, Form, Upload, Steps
 } from 'antd';
 import RiskModle from './RiskModle';
-// import DatumTree from '../components/DatumTree';
-import DatumTree from '../components/RiskFactor/DatumTree';
+import DatumTree from '../components/DatumTree';
+// import DatumTree from '../components/RiskFactor/DatumTree';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from '_platform/api';
