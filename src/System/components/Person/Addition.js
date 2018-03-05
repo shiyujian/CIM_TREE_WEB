@@ -135,7 +135,7 @@ export default class Addition extends Component {
 								{/* {tagsOptions} */}
 								{
 									tags.map((rst)=>{
-										return (<Option key={rst.ID} value={rst.ID} title={rst.Factory}>{rst.NurseryName+'-'+rst.Factory}</Option>)
+										return (<Option key={rst.ID} value={rst.ID} title={rst.NurseryName+'-'+rst.Factory}>{rst.NurseryName+'-'+rst.Factory}</Option>)
 									})
 								}
 							</Select>
