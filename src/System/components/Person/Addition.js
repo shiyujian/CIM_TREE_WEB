@@ -5,6 +5,15 @@ const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 
 export default class Addition extends Component {
+	static propTypes = {};
+    constructor(props){
+        super(props);
+        this.state={
+			searchList:[],
+			search:false,
+			searchValue:''
+        }
+	}
 
 	renderContent() {
 
@@ -55,6 +64,12 @@ export default class Addition extends Component {
 	render() {
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = [] } = this.props;
 		const tagsOptions = this.initopthins(tags);
+		console.log('addition',addition.tags)
+		const{
+			search
+		}= this.state
+		let nurseryData = [];
+		let defaultNurse = this.query(addition)
 		let units = this.getUnits()
 		return (
 			<Modal title={addition.id ? "编辑人员信息" : "新增人员"} visible={addition.visible} className="large-modal" width={800}
@@ -115,10 +130,18 @@ export default class Addition extends Component {
 								mode="multiple" style={{ width: '100%' }} >
 								{tagsOptions}
 								{/*								{
+							<Select placeholder="苗圃" showSearch   
+							value={defaultNurse}
+							optionFilterProp = 'children'
+							filterOption={(input,option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+							onChange={this.changeNursery.bind(this)}
+							mode="multiple" style={{ width: '100%' }} >
+								{/* {tagsOptions} */}
+								{
 									tags.map((rst)=>{
-										return (<Option key={rst.ID} value={rst.NurseryName}>{rst.NurseryName}</Option>)
+										return (<Option key={rst.ID} value={rst.ID} title={rst.Factory}>{rst.NurseryName+'-'+rst.Factory}</Option>)
 									})
-								}*/}
+								}
 							</Select>
 						</FormItem>
 					</Col>
@@ -170,8 +193,50 @@ export default class Addition extends Component {
 			getSection(value)
 		changeAdditionField('sections', value)
 	}
+	//将选择的苗圃传入redux
+	changeNursery(value){
+		const { actions: { changeAdditionField }, tags = [] } = this.props;
+		let defaultTags = []
+		//对于从select组建传过来的value，进行判断，如果是ID，直接push，如果是苗圃名字，那么找到对应的ID，再push
+		value.map((item)=>{
+			let data = item.toString().split('-');
+			if(data.length===2){
+				tags.map((rst)=>{
+					if(rst && rst.ID){
+						if(rst.NurseryName === data[0] && rst.Factory === data[1]){
+							defaultTags.push(rst.ID.toString())
+						}
+					}
+				})
+			}else{
+				defaultTags.push(item.toString())
+			}
+		})
+		defaultTags = [...new Set(defaultTags)]
+		changeAdditionField('tags', defaultTags)
+	}
+	//对苗圃的id显示为苗圃的名称
+	query(value){
+		if(value && value.tags){
+			const {
+				tags = []
+			}= this.props
+			let array = value.tags || []
+			let defaultNurse = []
+			array.map((item)=>{
+				tags.map((rst)=>{
+					if(rst && rst.ID){
+						if(rst.ID.toString() === item){
+							defaultNurse.push(rst.NurseryName+'-'+rst.Factory)
+						}
+					}
+				})
+			})
+			return defaultNurse
+		}
+	}
 
-	save() {
+	async save() {
 		const {
 			addition = {}, sidebar: { node } = {},
 			actions: { postUser, clearAdditionField, getUsers, putUser ,getSection}, tags = {}
@@ -218,16 +283,17 @@ export default class Addition extends Component {
 					},
 					extra_params: {},
 					title: addition.title || ''
-				}).then(rst => {
+				}).then(async rst => {
 					console.log("rst", rst)
 					if (rst.code == 1) {
+						const codes = Addition.collect(node);
+						console.log("codes", codes);
+						console.log("codescodescodescodescodescodes", codes);
+						await getUsers({}, { org_code: codes });
 						message.info('修改人员成功');
 						let sectiona = []
 						getSection(sectiona)
 						clearAdditionField();
-						const codes = Addition.collect(node);
-						console.log("codes", codes)
-						getUsers({}, { org_code: codes });
 					} else {
 						console.log("111")
 						message.warn('服务器端报错！');
