@@ -783,9 +783,9 @@ export default class ToggleModal extends Component {
             const group = item[11].toString()
             const tag = item[10].toString()
             const section = item[9].toString()
-            const groups = group.split(",")
-            const tags = tag.split(",")
-            const sections = section.split(",")
+            const groups = group.trim()==''?[]:group.trim().split(",")
+            const tags = tag.trim()==''?[]:tag.trim().split(",")
+            const sections = section.trim()==''?[]:section.trim().split(",")
             return {
                 index: index + 1,
                 name: item[1] || '',

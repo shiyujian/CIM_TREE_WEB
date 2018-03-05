@@ -117,12 +117,12 @@ export default class Addition extends Component {
 						<FormItem {...Addition.layout} label="苗圃">
 							<Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
 								mode="multiple" style={{ width: '100%' }} >
-								{/* {tagsOptions} */}
-								{
+								{tagsOptions}
+{/*								{
 									tags.map((rst)=>{
 										return (<Option key={rst.ID} value={rst.NurseryName}>{rst.NurseryName}</Option>)
 									})
-								}
+								}*/}
 							</Select>
 						</FormItem>
 					</Col>
