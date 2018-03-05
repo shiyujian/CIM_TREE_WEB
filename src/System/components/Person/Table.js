@@ -134,7 +134,6 @@ export default class Users extends Component {
 			searchList,
 		} = this.state
 		let dataSource = [];
-
 		if (isUpdate) {
 			dataSource = users
 		} else {
@@ -359,18 +358,15 @@ export default class Users extends Component {
 			}
 			// const selectedCodes=this.selectedCodes[0] || ''
 			// return;
-
-
-
-
 		}
-
-
 	}
 
 	columns = [{
 		title: '序号',
 		dataIndex: 'index',
+		render: (index) => {
+			return index + 1;
+		}
 	}, {
 		title: '姓名',
 		dataIndex: 'person_name',
