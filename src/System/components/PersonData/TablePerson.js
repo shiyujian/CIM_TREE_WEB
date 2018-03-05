@@ -119,7 +119,7 @@ export default class TablePerson extends Component {
 				// key: 'Sections',
 				render: (text, record, index) => {
 					return (
-						<Select disabled="disabled" value={record.sections}
+						<Select disabled value={record.sections}
 							onChange={(e) => {
 								console.log("e:", e);
 								record.sections = e;
@@ -144,7 +144,7 @@ export default class TablePerson extends Component {
 				render: (text, record, index) => {
 					console.log()
 					return (
-						<Select disabled="disabled" showSearch value={record.tags}
+						<Select disabled showSearch value={record.tags}
 							onChange={this.changeTags.bind(this, record)}
 							mode="multiple" style={{ width: "100%" }}>
 							{tagsOptions}
@@ -160,7 +160,7 @@ export default class TablePerson extends Component {
 				// key: 'role',
 				key: 'groups',
 				render: (text, record, index) => {
-					return <Select disabled="disabled" value={record.groups} onChange={this.changeRoles.bind(this, record)}
+					return <Select disabled value={record.groups} onChange={this.changeRoles.bind(this, record)}
 						mode="multiple" style={{ width: '100%' }}>
 						<OptGroup label="苗圃角色">
 							{
