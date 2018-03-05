@@ -226,7 +226,7 @@ export default class Addition extends Component {
 		}
 	}
 
-	save() {
+	async save() {
 		const {
 			addition = {}, sidebar: { node } = {},
 			actions: { postUser, clearAdditionField, getUsers, putUser }, tags = {}
@@ -279,14 +279,15 @@ export default class Addition extends Component {
 					},
 					extra_params: {},
 					title: addition.title || ''
-				}).then(rst => {
+				}).then(async rst => {
 					console.log("rst", rst)
 					if (rst.code == 1) {
+						const codes = Addition.collect(node);
+						console.log("codes", codes);
+						console.log("codescodescodescodescodescodes", codes);
+						await getUsers({}, { org_code: codes });
 						message.info('修改人员成功');
 						clearAdditionField();
-						const codes = Addition.collect(node);
-						console.log("codes", codes)
-						getUsers({}, { org_code: codes });
 					} else {
 						console.log("111")
 						message.warn('服务器端报错！');
