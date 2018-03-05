@@ -31,7 +31,7 @@ class Edite extends Component {
             record={},
             editVisible 
 		} = this.props;
-        console.log('record',record)
+        console.log('renderrecord',record)
         console.log('editVisible',editVisible)
 		return (
 			<div>
@@ -39,7 +39,7 @@ class Edite extends Component {
 					   width={920} 
 					   visible={editVisible}
 					   onOk={this.save.bind(this)}
-					//    key={this.state.newKey}
+					   key={this.state.newKey}
 				       onCancel={this.cancel.bind(this)}>
 					<Form>
 						<Row>
@@ -135,8 +135,11 @@ class Edite extends Component {
 
 	cancel() {
         const{
-            actions:{changeEditVisible}
-        }=this.props
+			actions:{changeEditVisible}
+		}=this.props
+		this.setState({
+			newKey: Math.random()
+		})
 		changeEditVisible(false)
 	}
 
@@ -185,8 +188,12 @@ class Edite extends Component {
                                     message: '更新苗圃信息成功',
                                     duration: 2
                                 }) 
-                                getNurseryList();
-                                changeEditVisible(false)
+								getNurseryList();
+								
+								changeEditVisible(false)
+								this.setState({
+									newKey: Math.random()
+								})
                             }
                         }else{
                             notification.error({
