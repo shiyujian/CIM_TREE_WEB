@@ -445,9 +445,11 @@ export default class Users extends Component {
 			sidebar: { node } = {},
 			actions: { changeAdditionField, getSection }
 		} = this.props;
-		
+		console.log("node",node)
+		let sectiona = []
+		getSection(sectiona)
 		if (node.extra_params.sections) {
-			let sectiona = []
+			
 			if (node.extra_params.sections instanceof Array) {
 				sectiona = node.extra_params.sections
 			} else {
