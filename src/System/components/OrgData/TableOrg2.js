@@ -66,7 +66,7 @@ export default class TableOrg extends Component {
 		return (
 			<div>
 				<div>
-					<Button className="button" onClick={this.sendCJ.bind(this)}>新增参建单位1</Button>
+					<Button className="button" onClick={this.sendCJ.bind(this)}>新增参建单位</Button>
 					<Button className="button" onClick={this.send.bind(this)}>新增部门</Button>
 					{/* <Button className="button" onClick={this.update.bind(this)}>申请变更</Button> */}
 					{/* <Button className="button" onClick={this.delete.bind(this)}>申请删除</Button> */}

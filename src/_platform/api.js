@@ -39,7 +39,7 @@ export const SERVICE_API = `${base}/service/construction/api`;
 export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
 export const PDF_FILE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
-export const DOWNLOAD_FILE = `${STATIC_FILE_IP}:${window.config.STATIC_DOWNLOAD_PORT}`;
+export const DOWNLOAD_FILE = `${SDOMAIN}:${window.config.STATIC_DOWNLOAD_PORT}`;
 export const CUS_TILEMAP = window.config.cus_tilemap;
 export const CODE_API = window.config.DOC_EXCHANGE_URL;
 export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
@@ -77,7 +77,8 @@ export const QRCODE_API = `${base}/service/appserver`;
 // export const SubItem_WordTemplate = STATIC_UPLOAD_API + '/media/documents/meta/'+encodeURI('分项工程质量验收记录模板.docx')
 
 //智慧森林
-export const FOREST_API = `${window.config.FORESTDOMAIN}:${window.config.FORESTPORT}`;
+export const FOREST_API = `${window.config.SDOMAIN}`;
+//export const FOREST_API = `${window.config.SDOMAIN}:${window.config.FORESTPORT}`;
 export const FOREST_SYSTEM = `${FOREST_API}/system`;
 //苗圃定位模板
 export const nurseryLocation_template = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('nurseryLocation.xlsx');
@@ -221,7 +222,7 @@ export const UNITS = [
 export const PROJECT_UNITS = [
 	{
 		code:'P009',
-		value:'九号地块',
+		value:'9号地块',
 		units:[
 			{
 				code:'P009-01-01',
@@ -242,7 +243,7 @@ export const PROJECT_UNITS = [
 		]
 	},{
 		code:'P010',
-		value:'十万亩造林',
+		value:'十万亩苗景兼用林',
 		units:[
 			{
 				code:'P010-01-01',
@@ -257,15 +258,14 @@ export const PROJECT_UNITS = [
 				code:'P010-01-04',
 				value:'四标段'
 			},{
-				code:'P010-01-05',
+				code:'P010-02-05',
 				value:'五标段'
 			},{
-				code:'P010-01-06',
+				code:'P010-03-06',
 				value:'六标段'
 			}
 		]
 	}
-	
 ]
 
 //获取单位工程

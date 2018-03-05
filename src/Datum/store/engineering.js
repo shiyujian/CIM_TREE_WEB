@@ -1,7 +1,9 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API, WORKFLOW_API} from '_platform/api';
+
+import { SERVICE_API, WORKFLOW_API,FOREST_API} from '_platform/api';
+import dirFactory from '_platform/store/higher-order/dir';
 import fieldFactory from '_platform/store/service/field';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
@@ -28,6 +30,7 @@ export const setkeycode =createAction(`${ID}_setkeycode`);
 
 export const getTreeOK = createAction(`${ID}_目录树`);
 export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
+const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
 export const actions = {
     getdocumentOK,
     getdocument,
@@ -40,6 +43,7 @@ export const actions = {
     Search,
     updatevisible,
     setoldfile,
+    getTreeNodeList,
 	setkeycode,
     getTreeOK,
     getTree,

@@ -234,7 +234,7 @@ export default class FaithTable extends Component {
                     let nurseryname = [];
                     rankData.forEach((data) => {
                         integrity.push(data['Sincerity'])
-                        nurseryname.push(data['Factory'])
+                        nurseryname.push(data['TreeTypeName'])
                     })  
                     let options1 = {
                         legend: {

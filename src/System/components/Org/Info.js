@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Input, Button, Select } from 'antd';
 import { CUS_TILEMAP } from '_platform/api';
+import {getProjectUnits} from '../../../_platform/auth'
 
 
 const FormItem = Form.Item;
@@ -17,7 +18,8 @@ export default class Info extends Component {
 	render() {
 		const {
 			sidebar: { node = {} } = {}, addition = {},
-			actions: { changeAdditionField }
+			actions: { changeAdditionField },
+			listStore
 		} = this.props;
 		console.log('this.props',this.props)
 		const {type, extra_params: extra = {}, obj_type} = node || {};
@@ -27,7 +29,8 @@ export default class Info extends Component {
 			<div style={{marginBottom: 20}}>
 				<div style={{borderBottom: '1px solid #e9e9e9', paddingBottom: 5, marginBottom: 20}}>
 					<span style={{fontSize: 16, fontWeight: 'bold', paddingRight: '1em'}}>{`${title}管理`}</span>
-					{type === 'project' && <Button type="primary" ghost onClick={this.addProject.bind(this)}>新建组织机构</Button>}
+					{type === 'project' && <Button type="primary" ghost onClick={this.addProject.bind(this)}>新建子项目</Button>}
+					{type === 'subProject' && <Button type="primary" ghost onClick={this.addSubProject.bind(this)}>新建组织机构</Button>}
 					{type === 'org' && <Button type="primary" ghost onClick={this.addCompany.bind(this)}>新建单位</Button>}
 					{type === 'company' && <Button type="primary" ghost onClick={this.addDepartment.bind(this)}>新建部门</Button>}
 					<Button onClick={this.edit.bind(this)} style={{ float: 'right' }} type="primary" ghost>编辑</Button>
@@ -45,6 +48,12 @@ export default class Info extends Component {
 					<Input type="textarea" rows={4} readOnly value={extra.introduction} />
 				</FormItem>
 			</div>);
+	}
+
+	addSubProject(){
+		const {sidebar: {node = {}} = {}, actions: {changeAdditionField, changeSidebarField}} = this.props;
+		changeSidebarField('parent', node);
+		changeAdditionField('visible', true);
 	}
 
 	addProject() {
@@ -88,6 +97,8 @@ export default class Info extends Component {
 		switch (type) {
 			case 'project':
 				return '项目';
+			case 'subProject':
+				return '子项目';
 			case 'org':
 				return '机构类型';
 			case 'company':

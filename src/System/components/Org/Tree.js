@@ -7,7 +7,9 @@ export default class Tree extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			childList:[],
 			list: [],
+			listVisible:true
 		}
 	}
 
@@ -16,8 +18,15 @@ export default class Tree extends Component {
 			platform: {org: {children = []} = {}},
 			sidebar: {node = {}} = {},
 		} = this.props;
+		const {
+			childList,
+			listVisible
+		}=this.state
 		const {code} = node || {};
 		console.log("code",code)
+		console.log("children",children)
+		console.log("childList",childList)
+		
 		// const list=this.filiter(children);
 		return (
 			<div>
@@ -31,6 +40,70 @@ export default class Tree extends Component {
 				<SimpleTree dataSource={children} selectedKey={code} onSelect={this.select.bind(this)}/>
 			</div>);
 	}
+
+	componentDidUpdate(){
+		const {
+			childList,
+			listVisible
+		}=this.state
+		if(childList && childList.length>0 && listVisible){
+			this.setListStore()
+		}
+	}
+	//将二维数组传入store中
+	setListStore(){
+		const{
+			actions:{getListStore}
+		}=this.props
+		const{
+			childList
+		}=this.state
+		getListStore(childList)
+		this.setState({
+			listVisible:false
+		})
+
+	}
+
+	//获取项目下的所有节点的名字和code
+	getChildrenArr(data = [],List=[]){
+		return data.map((item) => {
+			if (item.children && item.children.length) {
+				List.push({
+					code:item.code,
+					name:item.name
+				})
+				
+				return (
+					this.getChildrenArr(item.children,List)
+				);
+			}else{
+				List.push({
+					code:item.code,
+					name:item.name
+				})
+				
+				return
+			}
+		});
+	}
+	//将项目分为二维数组，以项目的个数来划分
+	getList(data = []){
+		const {
+			childList
+		}=this.state
+		return data.map((item,index)=>{
+			childList[index] = new Array()
+			if(item.children && item.children.length){
+				childList[index].push({
+					code:item.code,
+					name:item.name
+				})
+				this.getChildrenArr(item.children,childList[index])
+			}
+		})
+	}
+
 	//根据标段信息显示组织结构，人员标段信息和组织机构标段信息要匹配
 	filiter(list){
 		const user=JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -73,9 +146,13 @@ export default class Tree extends Component {
 	componentDidMount() {
 		const {actions: {getOrgTree, changeSidebarField}} = this.props;
 		getOrgTree({}, {depth: 4}).then(rst => {
+			if(rst && rst.children){
+				this.getList(rst.children)
+			}
 			console.log(1111111,rst)
 			const {children: [first] = []} = rst || {};
 			this.setState({list:this.filiter(rst.children)});
+			console.log('first',first)
 			if (first) {
 				changeSidebarField('node', {...first, type: 'project'});
 			}
@@ -99,6 +176,7 @@ export default class Tree extends Component {
 			actions: {changeSidebarField}
 		} = this.props;
 		const org = Tree.loop(children, eventKey);
+		console.log('org',org)
 		changeSidebarField('node', org);
 	}
 
@@ -123,9 +201,12 @@ export default class Tree extends Component {
 						type = 'project';
 						break;
 					case 1:
-						type = 'org';
+						type = 'subProject';
 						break;
 					case 2:
+						type = 'org';
+						break;
+					case 3:
 						type = 'company';
 						break;
 					default:
