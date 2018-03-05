@@ -64,7 +64,7 @@ export default class Addition extends Component {
 	render() {
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = [] } = this.props;
 		const tagsOptions = this.initopthins(tags);
-		console.log('addition',addition.tags)
+		console.log('addition.tags',addition.tags)
 		const{
 			search
 		}= this.state
@@ -126,22 +126,17 @@ export default class Addition extends Component {
 							</Select>
 						</FormItem>
 						<FormItem {...Addition.layout} label="苗圃">
-							<Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
-								mode="multiple" style={{ width: '100%' }} >
-								{tagsOptions}
-								{/*								{
+							{/* <Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
+								mode="multiple" style={{ width: '100%' }} > */}
+								{/* {tagsOptions} */}
+														
 							<Select placeholder="苗圃" showSearch   
 							value={defaultNurse}
 							optionFilterProp = 'children'
 							filterOption={(input,option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
 							onChange={this.changeNursery.bind(this)}
 							mode="multiple" style={{ width: '100%' }} >
-								{/* {tagsOptions} */}
-								{
-									tags.map((rst)=>{
-										return (<Option key={rst.ID} value={rst.ID} title={rst.NurseryName+'-'+rst.Factory}>{rst.NurseryName+'-'+rst.Factory}</Option>)
-									})
-								}
+								{tagsOptions}
 							</Select>
 						</FormItem>
 					</Col>
@@ -174,7 +169,7 @@ export default class Addition extends Component {
 	initopthins(list) {
 		const ops = [];
 		for (let i = 0; i < list.length; i++) {
-			ops.push(<Option key={list[i].ID} >{list[i].NurseryName}</Option>)
+			ops.push(<Option key={list[i].ID} value={list[i].ID} title={list[i].NurseryName+'-'+list[i].Factory}>{list[i].NurseryName+'-'+list[i].Factory}</Option>)
 		}
 		return ops;
 	}
