@@ -20,6 +20,7 @@ const getTreeListOK = createAction('获取森林树种列表');
 export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [getForestUsersOK]);
 
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
+export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/tree/factoryAnalyse`, []);
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
@@ -96,7 +97,8 @@ export const actions = {
 	getHonestyNewSort,
 	getNurserysCountFast,
 	getHonestyNewTreetype,
-	getHonestyNewDetailModal
+	getHonestyNewDetailModal,
+	getTreeNodeList
 };
 export default handleActions({
 	[getTreeOK]: (state, {payload}) => {

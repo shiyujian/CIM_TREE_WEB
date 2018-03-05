@@ -3,7 +3,7 @@ import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Pro
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
-import { base, STATIC_DOWNLOAD_API, SOURCE_API } from '../../../_platform/api';
+import { base, STATIC_DOWNLOAD_API, SOURCE_API,FILE_API } from '../../../_platform/api';
 import E from 'wangeditor'
 
 let editor;
@@ -23,7 +23,6 @@ class Modals extends Component {
 		}
 	}
 	componentDidUpdate(){
-		debugger
 		if(this.props.array.length>0){
 			this.props.array.map(item=>{
 				this.array.push(<Option value={item.code}>{item.name}</Option>)
@@ -160,6 +159,7 @@ class Modals extends Component {
 		validateFields((err, values) => {
 			if (!err) {
 				//判断是发布公告还是更新公告
+				let resp = values.attachment.file.response;
 				if (toggleData.status === 'ADD') {
 					let newData = {
 						"title": values['title'] || '',
@@ -174,7 +174,16 @@ class Modals extends Component {
 						"tags": [2],
 						"categories": [4],
 						"publisher": getUser().id,
-						"is_draft": false
+						"is_draft": false,
+						"cover":{
+							"uid": resp.id,
+							"misc": resp.misc,
+							"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+							"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+							"create_time": resp.create_time,
+							"mime_type": resp.mime_type,
+							"name":resp.name
+						}
 					};
 					postData({}, newData)
 						.then(rst => {
@@ -189,6 +198,7 @@ class Modals extends Component {
 							}
 						})
 				} else if (toggleData.status === 'EDIT') {
+					let resp = values.attachment.file.response;
 					let newData = {
 						"title": values['title'] || '',
 						"org": values['org'] || '',
@@ -198,7 +208,16 @@ class Modals extends Component {
 						},
 						"categories": [4],
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-						"is_draft": false
+						"is_draft": false,
+						"cover":{
+							"uid": resp.id,
+							"misc": resp.misc,
+							"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+							"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+							"create_time": resp.create_time,
+							"mime_type": resp.mime_type,
+							"name":resp.name
+						}
 					};
 					patchData({ pk: toggleData.editData.id }, newData)
 						.then(rst => {
@@ -236,35 +255,49 @@ class Modals extends Component {
 		//判断暂存的是新增的还是编辑的暂存
 		//编辑暂存的
 		if (toggleData.status === 'EDIT') {
+			let resp = values.attachment.file.response;
 			validateFields((err, values) => {
-				let newData = {
-					"title": values['title'] || '',
-					"org": values['org'] || '',
-					"raw": this.state.content,
-					"attachment": {
-						"fileList": fileList || [],
-					},
-					"categories": [4],
-					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-					"is_draft": true
-				};
-				patchData({ pk: toggleData.editData.id }, newData)
-					.then(rst => {
-						if (rst.id) {
-							this.modalClick();
-							message.success('暂存成功');
-							//更新暂存的公告列表数据
-							getTipsList({
-								user_id: getUser().id
-							});
-							getDraftTipsList({
-								user_id: getUser().id
-							});
+				if(!err){
+					let newData = {
+						"title": values['title'] || '',
+						"org": values['org'] || '',
+						"raw": this.state.content,
+						"attachment": {
+							"fileList": fileList || [],
+						},
+						"categories": [4],
+						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+						"is_draft": true,
+						"cover":{
+							"uid": resp.id,
+							"misc": resp.misc,
+							"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+							"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+							"create_time": resp.create_time,
+							"mime_type": resp.mime_type,
+							"name":resp.name
 						}
-					})
+					};
+					patchData({ pk: toggleData.editData.id }, newData)
+						.then(rst => {
+							if (rst.id) {
+								this.modalClick();
+								message.success('暂存成功');
+								//更新暂存的公告列表数据
+								getTipsList({
+									user_id: getUser().id
+								});
+								getDraftTipsList({
+									user_id: getUser().id
+								});
+							}
+						})
+				}
 			})
 		} else if (toggleData.status === 'ADD') {
 			validateFields((err, values) => {
+				if(!err){
+					let resp = values.attachment.file.response;
 				let newData = {
 					"title": values['title'] || '',
 					"org": values['org'] || '',
@@ -276,7 +309,16 @@ class Modals extends Component {
 					"tags": [2],
 					"categories": [4],
 					"publisher": getUser().id,
-					"is_draft": true
+					"is_draft": true,
+					"cover":{
+						"uid": resp.id,
+						"misc": resp.misc,
+						"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+						"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+						"create_time": resp.create_time,
+						"mime_type": resp.mime_type,
+						"name":resp.name
+					}
 				};
 				postData({}, newData)
 					.then(rst => {
@@ -289,10 +331,44 @@ class Modals extends Component {
 							});
 						}
 					})
+				}
 			})
 		}
 		
 	}
+	coverPicFile = (e) => {
+		if (Array.isArray(e)) {
+			return e;
+        }
+		if (e.file.status === 'done' && !e.file.response.a_file) {
+			return []
+        }
+        let array = [];
+        let length = e.fileList.length - 1;
+        if(e.file.status === 'done' && e.file.response.a_file){
+            e.fileList[length].response.name = e.file.name;
+        }
+        array.push(e.fileList[length])
+		return e && array;
+	}
+	uploadProps1 = {
+        name: 'file',
+        action: `${FILE_API}/api/user/files/`,
+        showUploadList: true,
+        data(file) {
+            return {
+                name: file.fileName,
+                a_file: file,
+            };
+        },
+        beforeUpload(file) {
+            const valid = file.name.indexOf("png") === -1 && file.name.indexOf("jpg") === -1;
+            if (valid) {
+                message.error('只能上传 jpg或者png 文件！');
+            }
+            return !valid;
+        },
+    };
 
 	render() {
 		this.array = [];
@@ -369,6 +445,27 @@ class Modals extends Component {
 						</Col>
 
 
+					</Row>
+					<Row>
+						<Col span={8} offset={1}>
+							<FormItem {...formItemLayout} label="名称">
+								{getFieldDecorator('attachment', {
+									rules: [
+										{
+											required: true,
+											message: '请上传封面！',
+										}
+									],
+								})(
+									<Upload {...this.uploadProps1}
+									>
+										<Button>
+											<Icon type="upload" />添加文件
+											</Button>
+									</Upload>
+									)}
+							</FormItem>
+						</Col>
 					</Row>
 					<Row>
 						<Col span={22} offset={1}>

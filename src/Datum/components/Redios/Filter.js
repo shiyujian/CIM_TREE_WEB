@@ -57,9 +57,9 @@ class Filter extends Component {
 						{/* </Col> */}
 						{/* <Col span ={2}> */}
 						{
-							(Doc.length === 0 )?
+							/* (Doc.length === 0 )?
 								<Button style={{marginRight: 10}} disabled>下载文件</Button>:
-								<Button style={{marginRight: 10}} type="primary" onClick={this.download.bind(this)}>下载文件</Button>
+								<Button style={{marginRight: 10}} type="primary" onClick={this.download.bind(this)}>下载文件</Button> */
 						}
 						{/* </Col> */}
 						{/* <Col span ={2}> */}
