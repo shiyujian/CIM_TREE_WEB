@@ -1,38 +1,38 @@
 import React, { Component } from 'react';
 import { Modal, Row, Col, Form, Input, Select, message } from 'antd';
-import {getProjectUnits} from '../../../_platform/auth'
+import { getProjectUnits } from '../../../_platform/auth'
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 
 export default class Addition extends Component {
 
 	renderContent() {
-		
+
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		const { platform: { roles = [] } } = this.props;
 		var systemRoles = []
-		if(user.is_superuser){
-			systemRoles.push({name:'苗圃角色',value:roles.filter(role => role.grouptype === 0)});
-			systemRoles.push({name:'施工角色',value:roles.filter(role => role.grouptype === 1)});
-			systemRoles.push({name:'监理角色',value:roles.filter(role => role.grouptype === 2)});
-			systemRoles.push({name:'业主角色',value:roles.filter(role => role.grouptype === 3)});
+		if (user.is_superuser) {
+			systemRoles.push({ name: '苗圃角色', value: roles.filter(role => role.grouptype === 0) });
+			systemRoles.push({ name: '施工角色', value: roles.filter(role => role.grouptype === 1) });
+			systemRoles.push({ name: '监理角色', value: roles.filter(role => role.grouptype === 2) });
+			systemRoles.push({ name: '业主角色', value: roles.filter(role => role.grouptype === 3) });
 		}
-		else{
+		else {
 			for (let i = 0; i < user.groups.length; i++) {
 				const rolea = user.groups[i].grouptype
 				switch (rolea) {
 					case 0:
-						systemRoles.push({name:'苗圃角色',value:roles.filter(role => role.grouptype === 0)});
+						systemRoles.push({ name: '苗圃角色', value: roles.filter(role => role.grouptype === 0) });
 						break;
 					case 1:
-						systemRoles.push({name:'苗圃角色',value:roles.filter(role => role.grouptype === 0)});
-						systemRoles.push({name:'施工角色',value:roles.filter(role => role.grouptype === 1)});
+						systemRoles.push({ name: '苗圃角色', value: roles.filter(role => role.grouptype === 0) });
+						systemRoles.push({ name: '施工角色', value: roles.filter(role => role.grouptype === 1) });
 						break;
 					case 2:
-						systemRoles.push({name:'监理角色',value:roles.filter(role => role.grouptype === 2)});
+						systemRoles.push({ name: '监理角色', value: roles.filter(role => role.grouptype === 2) });
 						break;
 					case 3:
-						systemRoles.push({name:'业主角色',value:roles.filter(role => role.grouptype === 3)});
+						systemRoles.push({ name: '业主角色', value: roles.filter(role => role.grouptype === 3) });
 						break;
 					default:
 						break;
@@ -40,14 +40,14 @@ export default class Addition extends Component {
 			}
 		}
 
-		const objs=	systemRoles.map(roless => {
-			return(<OptGroup label={roless.name}>
-					{
-						roless.value.map(role => {
-							return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-						})
-					}
-					</OptGroup>)
+		const objs = systemRoles.map(roless => {
+			return (<OptGroup label={roless.name}>
+				{
+					roless.value.map(role => {
+						return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+					})
+				}
+			</OptGroup>)
 		})
 		return objs
 	}
@@ -55,11 +55,7 @@ export default class Addition extends Component {
 	render() {
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = [] } = this.props;
 		const tagsOptions = this.initopthins(tags);
-		console.log('this.props22222222222222222',this.props)
-		console.log('this.props22222222222222222',tags)
-		
 		let units = this.getUnits()
-		console.log('units',units)
 		return (
 			<Modal title={addition.id ? "编辑人员信息" : "新增人员"} visible={addition.visible} className="large-modal" width={800}
 				maskClosable={false}
@@ -84,14 +80,14 @@ export default class Addition extends Component {
 								onChange={changeAdditionField.bind(this, 'password')} />
 						</FormItem>
 						<FormItem {...Addition.layout} label="标段">
-							<Select placeholder="标段" value={addition.sections} onChange={changeAdditionField.bind(this, 'sections')}
+							<Select placeholder="标段" value={addition.id ? addition.sections : this.props.isSection} onChange={this.changeRolea.bind(this)}
 								mode="multiple" style={{ width: '100%' }}>
 								{
-									units?
-									units.map((item)=>{
-										return <Option key={item.code} value={item.code} >{item.value}</Option>
-									}):
-									''
+									units ?
+										units.map((item) => {
+											return <Option key={item.code} value={item.code} >{item.value}</Option>
+										}) :
+										''
 								}
 							</Select>
 						</FormItem>
@@ -118,7 +114,7 @@ export default class Addition extends Component {
 							<Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
 								mode="multiple" style={{ width: '100%' }} >
 								{tagsOptions}
-{/*								{
+								{/*								{
 									tags.map((rst)=>{
 										return (<Option key={rst.ID} value={rst.NurseryName}>{rst.NurseryName}</Option>)
 									})
@@ -132,22 +128,22 @@ export default class Addition extends Component {
 	}
 
 	//获取项目的标段
-	getUnits(){
+	getUnits() {
 		const {
 			sidebar: { node = {} } = {},
 			listStore = []
 		} = this.props;
 		let projectName = ''
-		listStore.map((item,index)=>{
-			item.map((rst)=>{
-				if( (rst.name === node.name) && (rst.code === node.code)){
-					console.log('node.name',node.name)
-					projectName = listStore[index]?listStore[index][0].name:''
+		listStore.map((item, index) => {
+			item.map((rst) => {
+				if ((rst.name === node.name) && (rst.code === node.code)) {
+					console.log('node.name', node.name)
+					projectName = listStore[index] ? listStore[index][0].name : ''
 				}
 			})
-			
+
 		})
-		console.log('projectName',projectName)
+		console.log('projectName', projectName)
 		return getProjectUnits(projectName)
 	}
 
@@ -169,11 +165,16 @@ export default class Addition extends Component {
 		const { actions: { changeAdditionField } } = this.props;
 		changeAdditionField('roles', value)
 	}
+	changeRolea(value) {
+		const { actions: { changeAdditionField,getSection } } = this.props;
+			getSection(value)
+		changeAdditionField('sections', value)
+	}
 
 	save() {
 		const {
 			addition = {}, sidebar: { node } = {},
-			actions: { postUser, clearAdditionField, getUsers, putUser }, tags = {}
+			actions: { postUser, clearAdditionField, getUsers, putUser ,getSection}, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
 		console.log("roles", roles)
@@ -182,13 +183,7 @@ export default class Addition extends Component {
 		} else if (!addition.person_name) {
 			message.warn('请输入姓名');
 		} else {
-			console.log("addition", addition)
-			console.log("roles", roles)
 			if (addition.id) {
-				console.log("addition22", addition)
-				console.log("organization", addition.organization)
-				console.log("node", node)
-
 				putUser({}, {
 					id: addition.id,
 					username: addition.username,
@@ -227,6 +222,8 @@ export default class Addition extends Component {
 					console.log("rst", rst)
 					if (rst.code == 1) {
 						message.info('修改人员成功');
+						let sectiona = []
+						getSection(sectiona)
 						clearAdditionField();
 						const codes = Addition.collect(node);
 						console.log("codes", codes)
@@ -237,8 +234,6 @@ export default class Addition extends Component {
 					}
 				})
 			} else {
-				console.log("11", 111)
-				console.log("roles", roles)
 				postUser({}, {
 					is_person: true,
 					username: addition.username,
@@ -258,7 +253,7 @@ export default class Addition extends Component {
 						},
 					},
 					tags: addition.tags,
-					sections: addition.sections,
+					sections: addition.id ? addition.sections : this.props.isSection,
 					groups: roles.map(role => +role),
 					is_active: true,
 					basic_params: {
@@ -277,6 +272,8 @@ export default class Addition extends Component {
 					console.log("rst", rst)
 					if (rst.code == 1) {
 						message.info('新增人员成功');
+						let sectiona = []
+						getSection(sectiona)
 						clearAdditionField();
 						const codes = Addition.collect(node);
 						getUsers({}, { org_code: codes });

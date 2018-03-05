@@ -63,33 +63,33 @@ export default class Users extends Component {
 	}
 
 	search() {
-		const {actions: { setUpdate} } = this.props;
+		const { actions: { setUpdate } } = this.props;
 		let text = document.getElementById("NurseryData").value;
 		let searchList = []
 		const { platform: { users = [] } } = this.props;
 		users.map((item) => {
-			let isName=false;
-			let isRoles=false;
-			if (!text){
-				isName=true
+			let isName = false;
+			let isRoles = false;
+			if (!text) {
+				isName = true
 			}
-			else{
+			else {
 				if (text && item.username.indexOf(text) > -1) {
-					isName=true		
-				}
-			}
-			
-			if(this.state.roles.length==0){
-				isRoles=true
-			}else{
-				if(this.state.roles.sort().join(',')==item.groups.map(i=>{
-					return String(i.id)
-				}).sort().join(',')){
-					isRoles=true
+					isName = true
 				}
 			}
 
-			if(isName&&isRoles){
+			if (this.state.roles.length == 0) {
+				isRoles = true
+			} else {
+				if (this.state.roles.sort().join(',') == item.groups.map(i => {
+					return String(i.id)
+				}).sort().join(',')) {
+					isRoles = true
+				}
+			}
+
+			if (isName && isRoles) {
 				searchList.push(item)
 			}
 		})
@@ -123,7 +123,7 @@ export default class Users extends Component {
 
 
 	render() {
-		const {isUpdate=false, platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {}, code } = {}, parent } = {} } = this.props;
+		const { isUpdate = false, platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {}, code } = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
 		const projectRoles = roles.filter(role => role.grouptype === 1);
 		const professionRoles = roles.filter(role => role.grouptype === 2);
@@ -443,9 +443,19 @@ export default class Users extends Component {
 	append() {
 		const {
 			sidebar: { node } = {},
-			actions: { changeAdditionField }
+			actions: { changeAdditionField, getSection }
 		} = this.props;
-		console.log(this.props)
+		
+		if (node.extra_params.sections) {
+			let sectiona = []
+			if (node.extra_params.sections instanceof Array) {
+				sectiona = node.extra_params.sections
+			} else {
+				sectiona = node.extra_params.sections.split(",")
+			}
+			getSection(sectiona)
+		}
+
 		if (node.children && node.children.length > 0) {
 			message.warn('请选择最下级组织结构目录');
 		} else {
