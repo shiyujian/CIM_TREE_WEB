@@ -39,22 +39,28 @@ export default class Material extends Component {
 
     render() {
         const {
-            platform: {
-                dir:{
-                    list = []
-                } = {}
-            } = {},
+            tree=[],
             Doc=[],
             keycode,
             tabValue = '1',
         } = this.props;
+        // const {
+        //     platform: {
+        //         dir:{
+        //             list = []
+        //         } = {}
+        //     } = {},
+        //     Doc=[],
+        //     keycode,
+        //     tabValue = '1',
+        // } = this.props;
         console.log('material',this.props.Doc)
         return (
             <Body>
             <Main>
                 <DynamicTitle title="物资管理" {...this.props}/>
                 <Sidebar>
-                    <DatumTree treeData={list}
+                    <DatumTree treeData={tree}
                                 selectedKeys={keycode}
                                 onSelect={this.onSelect.bind(this)}
                                 {...this.state}/>
@@ -82,9 +88,9 @@ export default class Material extends Component {
     }
 
     componentDidMount() {
-        const {actions: {getDir}} = this.props;
+        const {actions: {getTree}} = this.props;
         this.setState({loading:true});
-        getDir({code:Datumcode}).then(({children}) => {
+        getTree({code:Datumcode}).then(({children}) => {
             this.setState({loading:false});
         });
         if(this.props.Doc){

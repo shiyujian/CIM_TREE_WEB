@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import reducer, {actions} from '../store/unbearable';
-//import PkCodeTree from '../../Quality/components/PkCodeTree';
+// import PkCodeTree from '../components/PkCodeTree';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {Filter, Table,Updatemodal,DatumTree,Addition} from '../components/Unbearable';
@@ -32,11 +32,7 @@ export default class Unbearable extends Component {
 
     render() {
         const {
-            platform: {
-                dir:{
-                    list = []
-                } = {}
-            } = {},
+            tree=[],
             Doc=[],
             keycode,
         } = this.props;
@@ -45,10 +41,10 @@ export default class Unbearable extends Component {
             <Main>
                 <DynamicTitle title="环境保护" {...this.props}/>
                 <Sidebar>
-                    <DatumTree treeData={list}
+                    <DatumTree  treeData={tree}
                                 selectedKeys={keycode}
                                 onSelect={this.onSelect.bind(this)}
-                                {...this.state}/>
+                                {...this.props} {...this.state}/>
                 </Sidebar>
                 <Content>
                     <Filter  {...this.props} {...this.state}/>
@@ -62,9 +58,9 @@ export default class Unbearable extends Component {
     }
 
     componentDidMount() {
-        const {actions: {getDir}} = this.props;
+        const {actions: {getTree}} = this.props;
         this.setState({loading:true});
-        getDir({code:Datumcode}).then(({children}) => {
+        getTree({code:Datumcode}).then(({children}) => {
             this.setState({loading:false});
         });
         if(this.props.Doc){

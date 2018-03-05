@@ -2,11 +2,11 @@ import { createAction, handleActions, combineActions } from 'redux-actions';
 import { actionsMap } from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import { SERVICE_API, base } from '_platform/api';
-import dirFactory from '_platform/store/higher-order/dir';
 
 export const ID = 'engineeringImage';
+export const getworkTreeOK = createAction(`${ID}_文档目录树`);
+export const getworkTree  = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getworkTreeOK]);
 export const setcurrentcode = createAction(`${ID}_Current_Code`);
-const dirReducer = dirFactory(ID);
 
 const addDir = createFetchAction(`${SERVICE_API}/directories/`, 'POST');
 
@@ -25,7 +25,8 @@ export const setcurrentpk= createAction(`${ID}_setcurrentpk`);
 export const savepk = createAction(`${ID}_savepk`);
 
 export const actions = {
-	...dirReducer,
+	getworkTreeOK,
+	getworkTree,
 	setcurrentcode,
 	onSelectnode,
 	addDir,
@@ -38,13 +39,13 @@ export const actions = {
 };
 
 export default handleActions({
+	[getworkTreeOK]: (state, {payload: {children}}) => ({
+	    ...state,
+	    worktree: children
+    }),
 	[onSelectnode]: (state, { payload }) => ({
 		...state,
 		onSelectnode:payload,
-	}),
-	[combineActions(...actionsMap(dirReducer))]: (state, action) => ({
-		...state,
-		tree: dirReducer(state.tree, action),
 	}),
 	[setcurrentcode]: (state, { payload }) => ({
 		...state,

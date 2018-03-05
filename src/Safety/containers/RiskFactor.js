@@ -9,7 +9,8 @@ import {
     notification, DatePicker, Select, Form, Upload, Steps
 } from 'antd';
 import RiskModle from './RiskModle';
-import DatumTree from '../components/DatumTree';
+// import DatumTree from '../components/DatumTree';
+import DatumTree from '../components/RiskFactor/DatumTree';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from '_platform/api';
@@ -19,6 +20,7 @@ import 'moment/locale/zh-cn';
 export const Datumcode = window.DeathCode.SAFETY_WMSG;
 moment.locale('zh-cn');
 const Option = Select.Option;
+
 
 @connect(
     state => {
@@ -47,9 +49,9 @@ export default class RiskFactor extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getDir}} = this.props;
+        const {actions: {getTree}} = this.props;
         this.setState({loading:true});
-        getDir({code:Datumcode}).then(({children}) => {
+        getTree({code:Datumcode}).then(({children}) => {
             this.setState({loading:false});
         });
         if(this.props.Doc){
@@ -158,12 +160,17 @@ export default class RiskFactor extends Component {
     }
 
     render() {
+        // const {
+        //     platform: {
+        //         dir:{
+        //             list = []
+        //         } = {}
+        //     } = {},
+        //     Doc=[],
+        //     keycode,
+        // } = this.props; 
         const {
-            platform: {
-                dir:{
-                    list = []
-                } = {}
-            } = {},
+            tree=[],
             Doc=[],
             keycode,
         } = this.props;
@@ -215,7 +222,7 @@ export default class RiskFactor extends Component {
             <div>
                 <DynamicTitle title="文明施工" {...this.props} />
                 <Sidebar>
-                    <DatumTree treeData={list}
+                    <DatumTree treeData={tree}
                                 selectedKeys={keycode}
                                 onSelect={this.onSelect.bind(this)}
                                 {...this.state}/>

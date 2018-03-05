@@ -1,15 +1,15 @@
 import {handleActions, combineActions, createAction} from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {actionsMap} from '_platform/store/util';
-import fieldFactory from '_platform/store/service/field';
-import dirFactory from '_platform/store/higher-order/dir';
+// import dirFactory from '_platform/store/higher-order/dir';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
 import {SERVICE_API,base,WORKFLOW_API,WORKFLOW_CODE,FOREST_API} from '_platform/api'
 const code = WORKFLOW_CODE.安全隐患上报流程;
-const ID = 'HIDDENDANGER';
-const dirReducer = dirFactory(ID);
-const documentReducer = documentFactory(ID);
+const ID = 'safety_hiddenDanger';
+// const dirReducer = dirFactory(ID);
+const documentReducer = documentFactory(ID); 
+
 
 const setIsAddPlan =  createAction (`${ID}安全隐患-设置新增状态`);
 //export const setCurrentAcc =  createAction ('事故登记-设置当前事故');
@@ -29,7 +29,13 @@ const updatevisible = createAction(`${ID}_updatevisible`);
 const setoldfile = createAction(`${ID}setoldfile`);
 const setkeycode =createAction(`${ID}_setkeycode`);
 
-//获取所有安全隐
+export const getTreeOK = createAction(`${ID}_目录树`);
+export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
+// export const getProjectAcOK = createAction('PROJECT获取项目列表');
+// export const getProjectAc = createFetchAction(`${SERVICE_API}/project-tree/?depth=2`, [getProjectAcOK]);
+
+
+//获取所有安全隐患
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents?eventtype=1&status={{status}}`);
 //上传文件
 // const getPotentialRiskByCode = createFetchAction(`${base}/main/api/potential-risk/?unit_code={{code}}&status={{status}}&keyword={{keyword}}`,[],'GET');
@@ -38,7 +44,6 @@ export const actions = {
 	// getPotentialRiskByCode,
     getWrokflowByID,
     getRisk,
-
     getdocumentOK,
     getdocument,
     changeDocs,
@@ -51,16 +56,32 @@ export const actions = {
     updatevisible,
     setoldfile,
     setkeycode,
-    ...dirReducer,
+
+    getTreeOK,
+    getTree,
+    // getProjectAcOK,
+    // getProjectAc,
+
+    // ...dirReducer,
     ...documentReducer,
     ...followReducer
 };
 
 export default handleActions({
-    [combineActions(...actionsMap(dirReducer))]: (state, action) => ({
-        ...state,
-        tree: dirReducer(state.tree, action)
-    }),
+    // [combineActions(...actionsMap(dirReducer))]: (state, action) => ({
+    //     ...state,
+    //     tree: dirReducer(state.tree, action)
+    // }),
+    [getTreeOK]: (state, {payload: {children}}) => {
+        return {
+            ...state,
+            tree: children
+        }
+    },
+    // [getProjectAcOK]: (state, {payload:{children}}) => ({
+    //     ...state,
+    //     projectList: children
+    // }),
     [combineActions(...actionsMap(documentReducer))]: (state, action) => ({
         ...state,
         document: documentReducer(state.follow, action)
@@ -73,6 +94,10 @@ export default handleActions({
         ...state,
         Doc: payload.result
     }),
+    // [getDirOK]: (state, {payload}) => ({
+    //     ...state,
+    //     list: payload.result
+    // }),
     [changeDocs]: (state, {payload}) => ({
         ...state,
         docs: payload

@@ -2,7 +2,6 @@ import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import { SERVICE_API, WORKFLOW_API} from '_platform/api';
-import dirFactory from '_platform/store/higher-order/dir';
 import fieldFactory from '_platform/store/service/field';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
@@ -10,11 +9,8 @@ import documentFactory from '_platform/store/higher-order/doc';
 // import rediosReducer, {actions as rediosActions} from './redios';
 
 const ID = 'datum_engineering';
-const dirReducer = dirFactory(ID);
 const additionReducer = fieldFactory(ID, 'addition');
 const documentReducer = documentFactory(ID);
-// export const getdirTreeOK = createAction(`${ID}_获取文档结构树`);
-// export const getdirTree = createFetchAction(`${SERVICE_API}/dir-tree/code/QH01/`, [getdirTreeOK]);
 export const getdocumentOK = createAction(`${ID}_搜索目录文档`);
 export const getdocument = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [getdocumentOK]);
 export const deletedoc = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, 'DELETE');
@@ -29,9 +25,10 @@ const selectDocuments = createAction(`${ID}_SELECTDOUMENT`);
 const updatevisible = createAction(`${ID}_updatevisible`);
 const setoldfile = createAction(`${ID}setoldfile`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
+
+export const getTreeOK = createAction(`${ID}_目录树`);
+export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
 export const actions = {
-	// getdirTree,
-	// getdirTreeOK,
     getdocumentOK,
     getdocument,
     changeDocs,
@@ -44,7 +41,8 @@ export const actions = {
     updatevisible,
     setoldfile,
 	setkeycode,
-    ...dirReducer,
+    getTreeOK,
+    getTree,
     ...documentReducer,
     ...additionReducer,
     ...visibleReducer,
@@ -60,10 +58,12 @@ export default handleActions({
     //     ...state,
     //     redios: rediosReducer(state.redios, action)
     // }),
-	[combineActions(...actionsMap(dirReducer))]: (state, action) => ({
-        ...state,
-        tree: dirReducer(state.tree, action)
-    }),
+    [getTreeOK]: (state, {payload: {children}}) => {
+        return {
+            ...state,
+            tree: children
+        }
+    },
     [combineActions(...actionsMap(additionReducer))]: (state, action) => ({
         ...state,
         addition: additionReducer(state.addition, action)
@@ -76,12 +76,6 @@ export default handleActions({
         ...state,
         follow: followReducer(state.follow, action)
     }),
-    // [getdirTreeOK]: (state, {payload: {children}}) => {
-    //     return {
-    //         ...state,
-    //         tree: children
-    //     }
-    // },
     [getdocumentOK]: (state, {payload}) => ({
         ...state,
         Doc: payload.result

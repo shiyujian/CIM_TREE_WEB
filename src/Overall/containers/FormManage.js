@@ -34,9 +34,9 @@ export default class FormManage extends Component {
         }
     }
     async componentDidMount() {
-        const {actions: {getDir,getPublicUnitList}} = this.props;
+        const {actions: {getTree,getPublicUnitList}} = this.props;
         this.setState({loading:true});
-        getDir({code:Datumcode}).then(({children}) => {
+        getTree({code:Datumcode}).then(({children}) => {
             this.setState({loading:false});
         });
         if(this.props.Doc){
@@ -59,18 +59,15 @@ export default class FormManage extends Component {
     }
     render() {
         const {
-            platform: {
-                dir:{
-                    list = []
-                } = {}
-            } = {},
-            keycode
+            tree=[],
+            Doc=[],
+            keycode,
         } = this.props;
         return (
             <div>
                 <DynamicTitle title="表单管理" {...this.props}/>
                 <Sidebar>
-                    <WorkTree treeData={list}
+                    <WorkTree treeData={tree}
                                 selectedKeys={keycode}
                                 onSelect={this.onSelect.bind(this)}
                                 {...this.state}  />
