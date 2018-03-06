@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, Notification, Input, Icon, Modal, Upload, Select, Divider, Switch } from 'antd';
+import { Table, Button, Popconfirm, Notification, Input, Icon, Modal, Spin,Upload, Select, Divider, Switch } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, DataReportTemplate_PersonInformation } from '_platform/api';
 const Search = Input.Search;
 const { Option, OptGroup } = Select;
@@ -16,7 +16,8 @@ export default class ToggleModal extends Component {
             repeatCode: [],
             editing: false,
             tempData: [],
-            usernames: []
+            usernames: [],
+            loading:false
         }
     }
     initopthins(list) {
@@ -372,6 +373,7 @@ export default class ToggleModal extends Component {
                 }
             }]
         return (
+            <Spin tip="加载中" spinning={this.state.loading}>
             <Modal
                 visible={visible}
                 width={1280}
@@ -414,6 +416,7 @@ export default class ToggleModal extends Component {
                     &emsp;&emsp; 4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.<br />
                 </div>
             </Modal>
+            </Spin>
         )
     }
     changeRoles(record, value) {
@@ -484,6 +487,7 @@ export default class ToggleModal extends Component {
         return false;
     }
     async onok() {
+        this.setState({loading:true});
         if (this.state.dataSource.length === 0) {
             Notification.warning({
                 message: "请上传人员信息"
@@ -530,8 +534,12 @@ export default class ToggleModal extends Component {
 
         postName({}, { "user_list": arrName }).then(rst => {
             if (rst.length > 0) {
+                const rstL=rst.length
                 this.setState({
                     usernames: rst
+                })
+                Notification.success({
+                      message :"有"+rstL +"条重复数据已经存在"
                 })
             } else {
                     let userlist = arrr.map((item, index) => {
@@ -575,22 +583,23 @@ export default class ToggleModal extends Component {
 
                 postUsers({}, userlist).then(rst => {
                     console.log("rst", rst)
-                    // let count = 0
-                    // let count1 = 0
-                    // for (let i = 0; i < rst.length; i++) {
-                    //     const element = rst[i];
-                    //     if (element.code == 1) {
-                    //         count++
-                    //     }
-                    //     else {
-                    //         count1++
-                    //     }
-                    // }
-                    // Notification.success({
-                    //     message: "成功创建" + count + "条数据" + (count1 ? "失败" + count1 + "条数据" : '')
-                    // })
-                    // ModalVisible(false);
-                    // is_fresh(true);
+                    let count = 0
+                    let count1 = 0
+                    for (let i = 0; i < rst.codes.length; i++) {
+                        const element = rst.codes[i];
+                        if (element == 1) {
+                            count++
+                        }
+                        else {
+                            count1++
+                        }
+                    }
+                    Notification.success({
+                        message: "成功创建" + count + "条数据" + (count1 ? "失败" + count1 + "条数据" : '')
+                    })
+                    this.setState({loading:false});
+                    ModalVisible(false);
+                    is_fresh(true);
                 })
                 // let arrr = this.state.dataSource;
                 // let codes = [];
