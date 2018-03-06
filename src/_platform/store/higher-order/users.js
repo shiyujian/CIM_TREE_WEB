@@ -10,6 +10,7 @@ export default (ID, service = '') => {
 	const updateUsers = createAction(`${ID}_UPDATE_USERS_OK_${suffix}`);
 	const getUsers = createFetchAction(`${USER_API}/users/`, [getUsersOK]);
 	const postUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'POST');
+	const postUsers = createFetchAction(`${SUSER_API}/system/susers`, [], 'POST');
 	const deleteUser = createFetchAction(`${SUSER_API}/system/user/{{userID}}`, [], 'DELETE');
 	const putUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'PUT');
 	const usersReducer = handleActions({
@@ -27,6 +28,7 @@ export default (ID, service = '') => {
 	usersReducer[`get${SERVICE}UsersOK`] = getUsersOK;
 	usersReducer[`update${SERVICE}Users`] = updateUsers;
 	usersReducer[`post${SERVICE}User`] = postUser;
+	usersReducer[`post${SERVICE}Users`] = postUsers;
 	usersReducer[`put${SERVICE}User`] = putUser;
 	usersReducer[`delete${SERVICE}User`] = deleteUser;
 	return usersReducer;
