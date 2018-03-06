@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input, Progress } from 'antd';
+import { PROJECT_UNITS } from './../../../_platform/api';
 import './index.less';
 
 const FormItem = Form.Item;
@@ -120,8 +121,41 @@ export default class Users extends Component {
 
 
 	}
-
-
+	query(value) {
+		if (value && value.tags) {
+			const {
+				tags = []
+			} = this.props
+			let array = value.tags || []
+			let defaultNurse = []
+			array.map((item) => {
+				tags.map((rst) => {
+					if (rst && rst.ID) {
+						if (rst.ID.toString() === item) {
+							defaultNurse.push(rst.NurseryName + '-' + rst.Factory)
+						}
+					}
+				})
+			})
+			return defaultNurse
+		}
+	}
+	sectiontitle(record) {
+		let sectione = []
+		for (let i = 0; i < PROJECT_UNITS.length; i++) {
+			const item = PROJECT_UNITS[i];
+			for (let j = 0; j < item.units.length; j++) {
+				const element = item.units[j];
+				for (let z = 0; z < record.sections.length; z++) {
+					const items = record.sections[z];
+					if (items == element.code) {
+						sectione.push(element.value)
+					}
+				}
+			}
+		}
+		return sectione
+	}
 	render() {
 		const { isUpdate = false, platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {}, code } = {}, parent } = {} } = this.props;
 		const systemRoles = roles.filter(role => role.grouptype === 0);
@@ -129,10 +163,116 @@ export default class Users extends Component {
 		const professionRoles = roles.filter(role => role.grouptype === 2);
 		const departmentRoles = roles.filter(role => role.grouptype === 3);
 		const tagsOptions = this.initopthins(tags);
+
 		const { platform: { users = [] }, actions: { getTreeModal } } = this.props;
 		const {
 			searchList,
 		} = this.state
+		const columns = [{
+			title: '序号',
+			dataIndex: 'index',
+			render: (index) => {
+				return index + 1;
+			}
+		}, {
+			title: '姓名',
+			dataIndex: 'person_name',
+		}
+			// , {
+			// 	title: '编码',
+			// 	dataIndex: 'person_code',
+			// }
+			,
+		{
+			title: '用户名',
+			dataIndex: 'username',
+		}, {
+			title: '性别',
+			dataIndex: 'gender',
+		}, {
+			title: '角色',
+			render: (user) => {
+				const { groups = [] } = user || {};
+				const roles = groups.map(group => group.name);
+				return roles.join('、')
+			}
+		}, {
+			title: '职务',
+			dataIndex: 'title',
+		}, {
+			title: '手机号码',
+			dataIndex: 'person_telephone',
+		}
+			// , {
+			// 	title: '邮箱',
+			// 	dataIndex: 'email',
+			// }
+			, {
+			title: '所属部门',
+			dataIndex: 'organization',
+		}, {
+			title: '标段',
+			// dataIndex: "sections",
+			// key: 'Sections',
+			render: (text, record, index) => {
+				let sectiones = this.sectiontitle(record)
+				return sectiones.join()
+			}
+		}
+			// , {
+			// 	title: '苗圃',
+			// 	// dataIndex: "tags",
+			// 	// key: 'tags',
+			// 	render: (text, record, index) => {
+			// 		let defaultNurse = this.query(record)
+			// 		return defaultNurse.join()
+			// 	}
+			// }
+			, {
+			title: '角色',
+			// dataIndex: "role",
+			// key: 'role',
+			key: 'groups',
+			render: (text, record, index) => {
+				console.log(record)
+				let groupa = []
+				for (let i = 0; i < record.groups.length; i++) {
+					const groups = record.groups[i];
+					groupa.push(groups.name)
+				}
+				return groupa.join()
+			}
+		}
+			// , {
+			// 	title: '电子签章',
+			// 	dataIndex: 'relative_signature_url',
+			// 	render: (sign) => {
+			// 		return <img width={30} src={`${sign}`} alt="" />;
+			// 	}
+			// }, {
+			// 	title: '头像',
+			// 	dataIndex: 'relative_avatar_url',
+			// 	render: (avatar) => {
+			// 		return <img width={20} src={`${avatar}`} alt="" />;
+			// 	}
+			// }
+			, {
+			title: '操作',
+			render: (user) => {
+				const userc = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+				if (userc.is_superuser == true) {
+					return [
+						<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+						<Popconfirm title="是否真的要删除用户?" key={2}
+							onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+							<a>删除</a>
+						</Popconfirm>
+					]
+				} else {
+					return <a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>
+				}
+			}
+		}];
 		let dataSource = [];
 		if (isUpdate) {
 			dataSource = users
@@ -283,7 +423,7 @@ export default class Users extends Component {
 
 						</Row>
 					</div>
-					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={this.columns} dataSource={dataSource}
+					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={columns} dataSource={dataSource}
 						loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.props.getTreeModals }}
 
 					/>
@@ -361,72 +501,7 @@ export default class Users extends Component {
 		}
 	}
 
-	columns = [{
-		title: '序号',
-		dataIndex: 'index',
-		render: (index) => {
-			return index + 1;
-		}
-	}, {
-		title: '姓名',
-		dataIndex: 'person_name',
-	}, {
-		title: '编码',
-		dataIndex: 'person_code',
-	}, {
-		title: '用户名',
-		dataIndex: 'username',
-	}, {
-		title: '性别',
-		dataIndex: 'gender',
-	}, {
-		title: '角色',
-		render: (user) => {
-			const { groups = [] } = user || {};
-			const roles = groups.map(group => group.name);
-			return roles.join('、')
-		}
-	}, {
-		title: '职务',
-		dataIndex: 'title',
-	}, {
-		title: '手机号码',
-		dataIndex: 'person_telephone',
-	}, {
-		title: '邮箱',
-		dataIndex: 'email',
-	}, {
-		title: '所属部门',
-		dataIndex: 'organization',
-	}, {
-		title: '电子签章',
-		dataIndex: 'relative_signature_url',
-		render: (sign) => {
-			return <img width={30} src={`${sign}`} alt="" />;
-		}
-	}, {
-		title: '头像',
-		dataIndex: 'relative_avatar_url',
-		render: (avatar) => {
-			return <img width={20} src={`${avatar}`} alt="" />;
-		}
-	}, {
-		title: '操作',
-		render: (user) => {
-			const userc = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-			if (userc.is_superuser == true) {
-				return [
-					<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-					<Popconfirm title="是否真的要删除用户?" key={2}
-						onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-						<a>删除</a>
-					</Popconfirm>
-				]
-			} else {
-				return <a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>
-			}
-		}
-	}];
+
 
 	rowSelection = {
 
@@ -435,17 +510,22 @@ export default class Users extends Component {
 			this.selectedCodes = selectedRowKeys;
 		}
 	};
+	changeTags(record, value) {
+		record.tags = value;
+		const { actions: { changeAdditionField } } = this.props;
+		changeAdditionField('tags', value)
+	}
 
 	append() {
 		const {
 			sidebar: { node } = {},
 			actions: { changeAdditionField, getSection }
 		} = this.props;
-		console.log("node",node)
+		console.log("node", node)
 		let sectiona = []
 		getSection(sectiona)
 		if (node.extra_params.sections) {
-			
+
 			if (node.extra_params.sections instanceof Array) {
 				sectiona = node.extra_params.sections
 			} else {

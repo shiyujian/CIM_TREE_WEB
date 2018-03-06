@@ -64,7 +64,7 @@ export default class Addition extends Component {
 	render() {
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = [] } = this.props;
 		const tagsOptions = this.initopthins(tags);
-		console.log('addition.tags',addition.tags)
+		console.log('1111111111addition.tags',addition)
 		const{
 			search
 		}= this.state
