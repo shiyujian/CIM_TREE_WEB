@@ -70,7 +70,7 @@ export default class GeneralTable extends Component {
 			key: 'extra_params.company',
 			sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
 		}, {
-			title: '实施日期',
+			title: '拍摄日期',
 			dataIndex: 'extra_params.time',
 			key: 'extra_params.time',
 			sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()

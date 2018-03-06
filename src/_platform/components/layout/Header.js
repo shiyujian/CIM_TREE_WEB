@@ -17,7 +17,7 @@ import * as actions from '_platform/store/global/tabs';
 	},
 	dispatch => ({
 		actions: bindActionCreators(actions, dispatch),
-	}),
+	})
 )
 
 export default class Header extends Component {
@@ -38,6 +38,7 @@ export default class Header extends Component {
 			dotShow: false
 		})
 	}
+
 
 	render() {
 		console.log('header');

@@ -80,7 +80,8 @@ export default class EngineeringImage extends Component {
 	render() {
 		const
 			{
-				platform: {dir: {list = [],} = {}} = {},
+				// platform: {dir: {list = [],} = {}} = {},
+				worktree = [],
 				adddelpanel='NOR',
 				keycode =[]
 			} = this.props;
@@ -101,7 +102,7 @@ export default class EngineeringImage extends Component {
 						<Button style={this.state.data === "undefined" ? this.state.hidden : this.state.show} onClick={() => {refreshPanelTo('ADD');}}>新增目录</Button>
 						<Button onClick={() => {refreshPanelTo('DEL');}}>删除目录</Button>
 					</div>
-					<PkCodeTree treeData={list}
+					<PkCodeTree treeData={worktree}
 					            selectedKeys={keycode}
 					            onSelect={this.selectStandardDir.bind(this)} />
 				</Sidebar>
@@ -116,8 +117,8 @@ export default class EngineeringImage extends Component {
 	}
 
 	componentDidMount() {
-	    const {actions: {getDir,savepk,addDir}} = this.props;
-		getDir({code:Datumcode}).then(rst=>{
+	    const {actions: {getworkTree,savepk,addDir}} = this.props;
+		getworkTree({code:Datumcode}).then(rst=>{
 			if(!rst.pk){
 				addDir({},{
 					"status": "A",

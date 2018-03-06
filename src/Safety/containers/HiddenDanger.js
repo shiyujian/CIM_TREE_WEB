@@ -49,11 +49,22 @@ export default class HiddenDanger extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getDir}} = this.props;
+        const {
+            // platform: {
+            //     dir:{
+            //         list = []
+            //     } = {}
+            // } = {},
+            // Doc=[],
+            keycode,
+            actions: {getTree}
+        } = this.props;
         this.setState({loading:true});
-        getDir({code:Datumcode}).then(({children}) => {
+        getTree({code:Datumcode}).then(({children}) => {
             this.setState({loading:false});
         });
+        // let cccc=getDir({code:Datumcode});
+        // console.log('cccc',cccc)
         if(this.props.Doc){
             this.setState({isTreeSelected:true})
         }
@@ -260,11 +271,7 @@ export default class HiddenDanger extends Component {
 
     render() {
         const {
-            platform: {
-                dir:{
-                    list = []
-                } = {}
-            } = {},
+            tree=[],
             Doc=[],
             keycode,
         } = this.props;
@@ -324,7 +331,7 @@ export default class HiddenDanger extends Component {
                         onSelect={this.onSelect.bind(this)} />
                 </Sidebar>*/}
                 <Sidebar>
-                    <DatumTree treeData={list}
+                    <DatumTree treeData={tree}
                                 selectedKeys={keycode}
                                 onSelect={this.onSelect.bind(this)}
                                 {...this.state}/>

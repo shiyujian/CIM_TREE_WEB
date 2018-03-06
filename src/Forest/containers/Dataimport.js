@@ -62,7 +62,8 @@ export default class Dataimport extends Component {
 				</Body>);
 	}
     onDownloadClick(){
-        document.querySelector('#root').insertAdjacentHTML('afterend', '<iframe src="'+`${nurseryLocation_template}`+'" style="display: none"></iframe>')
+        let a = "http://bimcd.ecidi.com:6540/media/documents/2017/11/nurseryLocation.xlsx";
+        document.querySelector('#root').insertAdjacentHTML('afterend', '<iframe src="'+`${a}`+'" style="display: none"></iframe>')
     }
     beforeUpload(file) {
         message.warning('上传失败，请稍后再试');

@@ -76,12 +76,12 @@ export default class HiddenDanger extends Component {
 		}
 	}
 
-
 	render() {
 		console.log(this.props)
 		const
 			{
-				platform: {dir: {list = [],} = {}} = {},
+				// platform: {dir: {list = [],} = {}} = {},
+				worktree = [],
 				adddelpanel='NOR',
 				keycode =[]
 			} = this.props;
@@ -94,7 +94,7 @@ export default class HiddenDanger extends Component {
 		let { actions:{refreshPanelTo}} = this.props;
 
 		return (
-
+ 
 			<div>
 				<DynamicTitle title="安全隐患" {...this.props} />
 				<Sidebar>
@@ -102,7 +102,7 @@ export default class HiddenDanger extends Component {
 						<Button style={this.state.data === "undefined" ? this.state.hidden : this.state.show} onClick={() => {refreshPanelTo('ADD');}}>新增目录</Button>
 						<Button onClick={() => {refreshPanelTo('DEL');}}>删除目录</Button>
 					</div>
-					<PkCodeTree treeData={list}
+					<PkCodeTree treeData={worktree}
 					            selectedKeys={keycode}
 					            onSelect={this.selectStandardDir.bind(this)} />
 				</Sidebar>
@@ -117,8 +117,8 @@ export default class HiddenDanger extends Component {
 	}
 
 	componentDidMount() {
-	    const {actions: {getDir,savepk,addDir}} = this.props;
-		getDir({code:Datumcode}).then(rst=>{
+	    const {actions: {getworkTree,savepk,addDir}} = this.props;
+		getworkTree({code:Datumcode}).then(rst=>{
 			if(!rst.pk){
 				addDir({},{
 					"status": "A",

@@ -2,17 +2,13 @@ import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import { SERVICE_API, WORKFLOW_API} from '_platform/api';
-import dirFactory from '_platform/store/higher-order/dir';
 import fieldFactory from '_platform/store/service/field';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
 
-const ID = 'unbearable';
-const dirReducer = dirFactory(ID);
+const ID = 'safety_unbearable';
 const additionReducer = fieldFactory(ID, 'addition');
 const documentReducer = documentFactory(ID);
-// export const getdirTreeOK = createAction(`${ID}_获取文档结构树`);
-// export const getdirTree = createFetchAction(`${SERVICE_API}/dir-tree/code/QH01/`, [getdirTreeOK]);
 // 流程详情
 export const getWorkflowByIdOK = createAction('获取流程详情');
 export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
@@ -32,9 +28,9 @@ const selectDocuments = createAction(`${ID}_SELECTDOUMENT`);
 const updatevisible = createAction(`${ID}_updatevisible`);
 const setoldfile = createAction(`${ID}setoldfile`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
+export const getTreeOK = createAction(`${ID}_目录树`);
+export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
 export const actions = {
-	// getdirTree,
-    // getdirTreeOK,
     getWorkflowByIdOK,
     getWorkflowById,
     setTabActive,
@@ -51,7 +47,8 @@ export const actions = {
     updatevisible,
     setoldfile,
 	setkeycode,
-    ...dirReducer,
+    getTreeOK,
+    getTree,
     ...documentReducer,
     ...additionReducer,
     ...visibleReducer,
@@ -59,10 +56,12 @@ export const actions = {
 };
 
 export default handleActions({
-	[combineActions(...actionsMap(dirReducer))]: (state, action) => ({
-        ...state,
-        tree: dirReducer(state.tree, action)
-    }),
+    [getTreeOK]: (state, {payload: {children}}) => {
+        return {
+            ...state,
+            tree: children
+        }
+    },
     [combineActions(...actionsMap(additionReducer))]: (state, action) => ({
         ...state,
         addition: additionReducer(state.addition, action)

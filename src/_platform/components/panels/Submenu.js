@@ -58,6 +58,7 @@ export default class Submenu extends Component {
 	selectKey() {
 		const {menus = [], location: {pathname = ''} = {}} = this.props;
 		const selectedKeys = [];
+		console.log('menus',menus)
 
 		menus.forEach(menu => {
 			const {children = []} = menu;
@@ -69,6 +70,7 @@ export default class Submenu extends Component {
 			}
 		});
 
+		console.log('selectedKeys',selectedKeys)
 		return selectedKeys;
 	}
 };
