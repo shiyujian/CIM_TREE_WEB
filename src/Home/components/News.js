@@ -12,7 +12,9 @@ export default class News extends Component {
 		super(props);
 		this.state = {
 			visible: false,
-			container: null
+			container: null,
+			title:'',
+			source:''
 		}
 	}
 
@@ -28,7 +30,9 @@ export default class News extends Component {
 		if (type === 'VIEW') {
 			this.setState({
 				visible: true,
-				container: record.raw
+				container: record.raw,
+				title:record.title,
+				source:record.source ? record.source.name : '无'
 			})
 		}
 	}
@@ -149,10 +153,16 @@ export default class News extends Component {
 					</Tabs>
 
 				</Col>
-				<Modal title="预览" width={800} visible={this.state.visible}
+				<Modal title={<p style={{fontSize:16}}>{this.state.title}</p>} width={800} visible={this.state.visible}
 					onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
-					<div style={{ maxHeight: '800px', overflow: 'auto' }}
+					<div>
+					{
+						this.state.source === '无' ? null : <p>{`来源 ：${this.state.source}`}</p>
+					}
+					<div style={{ maxHeight: '800px', overflow: 'auto',marginTop:'5px' }}
 						dangerouslySetInnerHTML={{ __html: this.state.container }} />
+					</div>
+					
 				</Modal>
 			</Row>
 

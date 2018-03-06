@@ -183,6 +183,9 @@ class Modals extends Component {
 							"create_time": resp.create_time,
 							"mime_type": resp.mime_type,
 							"name":resp.name
+						},
+						"source":{
+							"name":values.source
 						}
 					};
 					postData({}, newData)
@@ -217,6 +220,9 @@ class Modals extends Component {
 							"create_time": resp.create_time,
 							"mime_type": resp.mime_type,
 							"name":resp.name
+						},
+						"source":{
+							"name":values.source
 						}
 					};
 					patchData({ pk: toggleData.editData.id }, newData)
@@ -276,6 +282,9 @@ class Modals extends Component {
 							"create_time": resp.create_time,
 							"mime_type": resp.mime_type,
 							"name":resp.name
+						},
+						"source":{
+							"name":values.source
 						}
 					};
 					patchData({ pk: toggleData.editData.id }, newData)
@@ -318,6 +327,9 @@ class Modals extends Component {
 						"create_time": resp.create_time,
 						"mime_type": resp.mime_type,
 						"name":resp.name
+					},
+					"source":{
+						"name":values.source
 					}
 				};
 				postData({}, newData)
@@ -448,7 +460,7 @@ class Modals extends Component {
 					</Row>
 					<Row>
 						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="名称">
+							<FormItem {...formItemLayout} label="封面图片">
 								{getFieldDecorator('attachment', {
 									rules: [
 										{
@@ -463,6 +475,19 @@ class Modals extends Component {
 											<Icon type="upload" />添加文件
 											</Button>
 									</Upload>
+									)}
+							</FormItem>
+						</Col>
+						<Col span={8} offset={1}>
+							<FormItem {...formItemLayout} label="消息来源">
+								{getFieldDecorator('source', {
+									rules: [
+										{
+											required: true,
+										}
+									],
+								})(
+									<Input />
 									)}
 							</FormItem>
 						</Col>
