@@ -85,7 +85,6 @@ export default class HiddenDanger extends Component {
 				adddelpanel='NOR',
 				keycode =[]
 			} = this.props;
-
 		const
 			{
 				hadSelectDir
