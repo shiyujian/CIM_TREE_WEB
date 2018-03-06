@@ -228,21 +228,6 @@ export default class Users extends Component {
 			// 		return defaultNurse.join()
 			// 	}
 			// }
-			, {
-			title: '角色',
-			// dataIndex: "role",
-			// key: 'role',
-			key: 'groups',
-			render: (text, record, index) => {
-				console.log(record)
-				let groupa = []
-				for (let i = 0; i < record.groups.length; i++) {
-					const groups = record.groups[i];
-					groupa.push(groups.name)
-				}
-				return groupa.join()
-			}
-		}
 			// , {
 			// 	title: '电子签章',
 			// 	dataIndex: 'relative_signature_url',
