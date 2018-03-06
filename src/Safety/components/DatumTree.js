@@ -32,7 +32,9 @@ export default class DatumTree extends Component {
                         <Tree showLine
                             selectedKeys={[this.props.selectedKeys]}
                             defaultExpandAll={true}
-                            onSelect={this.props.onSelect}>
+                           /* autoExpandParent ={true}*/
+                            onSelect={this.props.onSelect}
+                        >
                             {
                                 DatumTree.loop(treeData)
                             }

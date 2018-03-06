@@ -3,7 +3,6 @@ import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import {createFetchActionWithHeaders} from './fetchAction'
 import { SERVICE_API, WORKFLOW_API,FILE_API} from '_platform/api';
-import dirFactory from '_platform/store/higher-order/dir';
 import fieldFactory from '_platform/store/service/field';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
@@ -11,11 +10,8 @@ import documentFactory from '_platform/store/higher-order/doc';
 // import rediosReducer, {actions as rediosActions} from './redios';
 
 const ID = 'safety_educationRegisters';
-const dirReducer = dirFactory(ID);
 const additionReducer = fieldFactory(ID, 'addition');
 const documentReducer = documentFactory(ID);
-// export const getdirTreeOK = createAction(`${ID}_获取文档结构树`);
-// export const getdirTree = createFetchAction(`${SERVICE_API}/dir-tree/code/QH01/`, [getdirTreeOK]);
 export const getdocumentOK = createAction(`${ID}_搜索目录文档`);
 export const getdocument = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [getdocumentOK]);
 export const deletedoc = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, 'DELETE');
@@ -34,11 +30,11 @@ const setoldfile = createAction(`${ID}setoldfile`);
 export const getStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [])
 export const uploadStaticFile = createFetchActionWithHeaders(`${FILE_API}/api/user/files/`, [], 'POST')
 export const deleteStaticFile = createFetchAction(`${FILE_API}/api/user/files/{{id}}`, [], 'DELETE')
-
 export const setkeycode =createAction(`${ID}_setkeycode`);
+
+export const getTreeOK = createAction(`${ID}_目录树`);
+export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
 export const actions = {
-	// getdirTree,
-	// getdirTreeOK,
     getdocumentOK,
     getdocument,
     changeDocs,
@@ -54,7 +50,9 @@ export const actions = {
     getStaticFile,
     uploadStaticFile,
     deleteStaticFile,
-    ...dirReducer,
+    getTreeOK,
+    getTree,
+
     ...documentReducer,
     ...additionReducer,
     ...visibleReducer,
@@ -62,18 +60,12 @@ export const actions = {
 };
 
 export default handleActions({
-	// [combineActions(...actionsMap(engineeringActions))]: (state, action) => ({
-	// 		...state,
-	// 		engineering: engineeringReducer(state.engineering, action)
-    // }),
-    // [combineActions(...actionsMap(rediosActions))]: (state, action) => ({
-    //     ...state,
-    //     redios: rediosReducer(state.redios, action)
-    // }),
-	[combineActions(...actionsMap(dirReducer))]: (state, action) => ({
-        ...state,
-        tree: dirReducer(state.tree, action)
-    }),
+    [getTreeOK]: (state, {payload: {children}}) => {
+        return {
+            ...state,
+            tree: children
+        }
+    },
     [combineActions(...actionsMap(additionReducer))]: (state, action) => ({
         ...state,
         addition: additionReducer(state.addition, action)
@@ -86,12 +78,6 @@ export default handleActions({
         ...state,
         follow: followReducer(state.follow, action)
     }),
-    // [getdirTreeOK]: (state, {payload: {children}}) => {
-    //     return {
-    //         ...state,
-    //         tree: children
-    //     }
-    // },
     [getdocumentOK]: (state, {payload}) => ({
         ...state,
         Doc: payload.result

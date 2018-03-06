@@ -16,6 +16,8 @@ export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}
 export const getSelectedNodeInfo = createAction(`${ID}_获取选中树节点信息`);
 const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
+export const getTreeOK = createAction(`${ID}_目录树`);
+export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
 
 export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}`);
 
@@ -30,10 +32,18 @@ export const actions = {
     setcurrentcode,
     setkeycode,
     getTaskSchedule,
-    getPublicUnitList
+    getPublicUnitList,
+    getTreeOK,
+    getTree
 }
 
 export default handleActions({
+    [getTreeOK]: (state, {payload: {children}}) => {
+        return {
+            ...state,
+            tree: children
+        }
+    },
     [postUploadFilesAc]: (state, {payload}) => ( {
 		...state,
 		fileList: payload

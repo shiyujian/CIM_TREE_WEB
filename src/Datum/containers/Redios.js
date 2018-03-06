@@ -43,19 +43,16 @@ export default class Redios extends Component {
 
 	render() {
 		const {
-            platform: {
-                dir: {
-                    list = []
-                } = {}
-            } = {},
-			keycode
+            tree=[],
+            Doc=[],
+            keycode,
         } = this.props;
 		return (
 			<Body>
 				<Main>
 				<DynamicTitle title="工程影像" {...this.props}/>
 				<Sidebar>
-					<DatumTree treeData={list}
+					<DatumTree treeData={tree}
 								selectedKeys={keycode}
 								onSelect={this.onSelect.bind(this)}
 								{...this.state}/>
@@ -72,9 +69,9 @@ export default class Redios extends Component {
 		)
 	}
 	componentDidMount() {
-		const { actions: { getDir } } = this.props;
+		const { actions: { getTree } } = this.props;
 		this.setState({ loading: true });
-		getDir({ code: Datumcode }).then(({ children }) => {
+		getTree({ code: Datumcode }).then(({ children }) => {
 			this.setState({ loading: false });
 		});
 		if (this.props.Doc) {

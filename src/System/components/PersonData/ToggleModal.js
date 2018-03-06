@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, Notification, Input, Icon, Modal, Upload, Select, Divider, Switch } from 'antd';
+import { Table, Button, Popconfirm, Notification, Input, Icon, Modal, Spin,Upload, Select, Divider, Switch } from 'antd';
 import { UPLOAD_API, SERVICE_API, FILE_API, DataReportTemplate_PersonInformation } from '_platform/api';
 const Search = Input.Search;
 const { Option, OptGroup } = Select;
@@ -16,7 +16,8 @@ export default class ToggleModal extends Component {
             repeatCode: [],
             editing: false,
             tempData: [],
-            usernames: []
+            usernames: [],
+            loading:false
         }
     }
     initopthins(list) {
@@ -371,13 +372,15 @@ export default class ToggleModal extends Component {
                     </span>
                 }
             }]
-        return (
+        return (           
             <Modal
                 visible={visible}
                 width={1280}
+                maskClosable={false}
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
+             <Spin tip="加载中" percent={this.state.percent} status="active" strokeWidth={5}  spinning={this.state.loading}>
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
                 <div>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
@@ -413,7 +416,9 @@ export default class ToggleModal extends Component {
                     &emsp;&emsp; 3、日期必须带年月日，如2017年1月1日<br />
                     &emsp;&emsp; 4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.<br />
                 </div>
+                </Spin>
             </Modal>
+           
         )
     }
     changeRoles(record, value) {
@@ -484,6 +489,7 @@ export default class ToggleModal extends Component {
         return false;
     }
     async onok() {
+        this.setState({loading:true});
         if (this.state.dataSource.length === 0) {
             Notification.warning({
                 message: "请上传人员信息"
@@ -513,7 +519,7 @@ export default class ToggleModal extends Component {
                 return;
             }
         }
-        const { actions: { PostPeople, getOrgName, ModalVisible, is_fresh, putUser, postUser, getUsers, postName } } = this.props;
+        const { actions: { PostPeople, getOrgName, ModalVisible, is_fresh, putUser, postUser,postUsers, getUsers, postName } } = this.props;
         let data_list = [];
         let pks = [];
         for (let i = 0; i < this.state.dataSource.length; i++) {
@@ -530,18 +536,16 @@ export default class ToggleModal extends Component {
 
         postName({}, { "user_list": arrName }).then(rst => {
             if (rst.length > 0) {
+                const rstL=rst.length
                 this.setState({
                     usernames: rst
                 })
+                Notification.success({
+                      message :"有"+rstL +"条重复数据已经存在"
+                })
             } else {
-                let arrr = this.state.dataSource;
-                let codes = [];
-                let arrName = []
-                let promisess = arrr.map((item, index) => {
-                    console.log("item", item)
-                    codes.push(item.code)
-                    arrName.push(item.usernames)
-                    return postUser({}, {
+                    let userlist = arrr.map((item, index) => {
+                    return  {
                         is_person: true,
                         username: item.usernames || '',
                         email: item.email || '',
@@ -575,15 +579,17 @@ export default class ToggleModal extends Component {
                         },
                         extra_params: {},
                         title: item.job || ''
-                    });
+                    };
                 })
-                Promise.all(promisess).then(rst => {
+                console.log(11111111,userlist)
+
+                postUsers({}, userlist).then(rst => {
                     console.log("rst", rst)
                     let count = 0
                     let count1 = 0
-                    for (let i = 0; i < rst.length; i++) {
-                        const element = rst[i];
-                        if (element.code == 1) {
+                    for (let i = 0; i < rst.codes.length; i++) {
+                        const element = rst.codes[i];
+                        if (element == 1) {
                             count++
                         }
                         else {
@@ -593,9 +599,72 @@ export default class ToggleModal extends Component {
                     Notification.success({
                         message: "成功创建" + count + "条数据" + (count1 ? "失败" + count1 + "条数据" : '')
                     })
+                    this.setState({loading:false});
                     ModalVisible(false);
                     is_fresh(true);
                 })
+                // let arrr = this.state.dataSource;
+                // let codes = [];
+                // let arrName = []
+                // let promisess = arrr.map((item, index) => {
+                //     console.log("item", item)
+                //     codes.push(item.code)
+                //     arrName.push(item.usernames)
+                //     return postUser({}, {
+                //         is_person: true,
+                //         username: item.usernames || '',
+                //         email: item.email || '',
+                //         password: item.passwords,
+                //         account: {
+                //             person_code: '',
+                //             person_name: item.name,
+                //             person_type: "C_PER",
+                //             person_avatar_url: "",
+                //             organization: {
+                //                 pk: pks[index],
+                //                 code: item.orgcode,
+                //                 obj_type: "C_ORG",
+                //                 rel_type: "member",
+                //                 name: item.org_names
+                //             },
+                //         },
+                //         tags: item.tags,
+                //         sections: item.sections,
+                //         groups: item.groups,
+                //         is_active: true,
+                //         basic_params: {
+                //             info: {
+                //                 '电话': "11" + item.tel,
+                //                 '性别': item.sex || '',
+                //                 '技术职称': item.job || '',
+                //                 'phone': item.tel || '',
+                //                 'sex': item.sex || '',
+                //                 'duty': '',
+                //             }
+                //         },
+                //         extra_params: {},
+                //         title: item.job || ''
+                //     });
+                // })
+                // Promise.all(promisess).then(rst => {
+                //     console.log("rst", rst)
+                //     let count = 0
+                //     let count1 = 0
+                //     for (let i = 0; i < rst.length; i++) {
+                //         const element = rst[i];
+                //         if (element.code == 1) {
+                //             count++
+                //         }
+                //         else {
+                //             count1++
+                //         }
+                //     }
+                //     Notification.success({
+                //         message: "成功创建" + count + "条数据" + (count1 ? "失败" + count1 + "条数据" : '')
+                //     })
+                //     ModalVisible(false);
+                //     is_fresh(true);
+                // })
             }
 
         })

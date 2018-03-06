@@ -42,20 +42,17 @@ export default class Engineering extends Component {
     }
 
 	render() {
-        const {
-            platform: {
-                dir:{
-                    list = []
-                } = {}
-            } = {},
-	        keycode
+       const {
+            tree=[],
+            Doc=[],
+            keycode,
         } = this.props;
 		return (
 			<Body>
 			<Main>
 				<DynamicTitle title="工程文档" {...this.props}/>
 				<Sidebar>
-					<DatumTree treeData={list}
+					<DatumTree treeData={tree}
 								selectedKeys={keycode}
 								onSelect={this.onSelect.bind(this)}
 								{...this.state}/>
@@ -73,9 +70,9 @@ export default class Engineering extends Component {
 	}
 
     async componentDidMount() {
-		const {actions: {getDir,getTreeNodeList}} = this.props;
+		const {actions: {getTree,getTreeNodeList}} = this.props;
 		this.setState({loading:true});
-        getDir({code:Datumcode}).then(({children}) => {
+        getTree({code:Datumcode}).then(({children}) => {
 			this.setState({loading:false});
 		});
 		if(this.props.Doc){

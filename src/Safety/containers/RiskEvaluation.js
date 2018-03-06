@@ -31,19 +31,16 @@ export default class RiskEvaluation extends Component {
 
     render() {
         const {
-            platform: {
-                dir:{
-                    list = []
-                } = {}
-            } = {},
-            keycode
+            tree=[],
+            Doc=[],
+            keycode,
         } = this.props;
         return (
             <Body>
             <Main>
                 <DynamicTitle title="危险源风险评价" {...this.props}/>
                 <Sidebar>
-                    <DatumTree treeData={list}
+                    <DatumTree treeData={tree}
                                 selectedKeys={keycode}
                                 onSelect={this.onSelect.bind(this)}
                                 {...this.state}/>
@@ -61,9 +58,9 @@ export default class RiskEvaluation extends Component {
     }
 
     componentDidMount() {
-        const {actions: {getDir}} = this.props;
+        const {actions: {getTree}} = this.props;
         this.setState({loading:true});
-        getDir({code:Datumcode}).then(({children}) => {
+        getTree({code:Datumcode}).then(({children}) => {
             this.setState({loading:false});
         });
         if(this.props.Doc){

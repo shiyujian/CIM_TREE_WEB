@@ -2,13 +2,13 @@ import {handleActions, combineActions, createAction} from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {actionsMap} from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
-import dirFactory from '_platform/store/higher-order/dir';
+// import dirFactory from '_platform/store/higher-order/dir';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
 import {SERVICE_API,base,WORKFLOW_API,WORKFLOW_CODE,FOREST_API} from '_platform/api'
 const code = WORKFLOW_CODE.安全隐患上报流程;
 const ID = 'RISKFACTOR';
-const dirReducer = dirFactory(ID);
+// const dirReducer = dirFactory(ID);
 const documentReducer = documentFactory(ID);
 
 const setIsAddPlan =  createAction (`${ID}文明施工-设置新增状态`);
@@ -28,6 +28,9 @@ const selectDocuments = createAction(`${ID}_SELECTDOUMENT`);
 const updatevisible = createAction(`${ID}_updatevisible`);
 const setoldfile = createAction(`${ID}setoldfile`);
 const setkeycode =createAction(`${ID}_setkeycode`);
+
+export const getTreeOK = createAction(`${ID}_目录树`);
+export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
 
 //获取所有安全隐
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents?eventtype=2&status={{status}}`);
@@ -51,16 +54,24 @@ export const actions = {
     updatevisible,
     setoldfile,
     setkeycode,
-    ...dirReducer,
+    getTreeOK,
+    getTree,
+    // ...dirReducer,
     ...documentReducer,
     ...followReducer
 };
 
 export default handleActions({
-    [combineActions(...actionsMap(dirReducer))]: (state, action) => ({
-        ...state,
-        tree: dirReducer(state.tree, action)
-    }),
+    // [combineActions(...actionsMap(dirReducer))]: (state, action) => ({
+    //     ...state,
+    //     tree: dirReducer(state.tree, action)
+    // }),
+    [getTreeOK]: (state, {payload: {children}}) => {
+        return {
+            ...state,
+            tree: children
+        }
+    },
     [combineActions(...actionsMap(documentReducer))]: (state, action) => ({
         ...state,
         document: documentReducer(state.follow, action)
