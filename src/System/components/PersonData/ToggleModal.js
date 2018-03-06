@@ -538,7 +538,7 @@ export default class ToggleModal extends Component {
                 this.setState({
                     usernames: rst
                 })
-                Notification.success({
+                Notification.warning({
                       message :"有"+rstL +"条重复数据已经存在"
                 })
             } else {
@@ -579,7 +579,6 @@ export default class ToggleModal extends Component {
                         title: item.job || ''
                     };
                 })
-                console.log(11111111,userlist)
 
                 postUsers({}, userlist).then(rst => {
                     console.log("rst", rst)
@@ -601,68 +600,6 @@ export default class ToggleModal extends Component {
                     ModalVisible(false);
                     is_fresh(true);
                 })
-                // let arrr = this.state.dataSource;
-                // let codes = [];
-                // let arrName = []
-                // let promisess = arrr.map((item, index) => {
-                //     console.log("item", item)
-                //     codes.push(item.code)
-                //     arrName.push(item.usernames)
-                //     return postUser({}, {
-                //         is_person: true,
-                //         username: item.usernames || '',
-                //         email: item.email || '',
-                //         password: item.passwords,
-                //         account: {
-                //             person_code: '',
-                //             person_name: item.name,
-                //             person_type: "C_PER",
-                //             person_avatar_url: "",
-                //             organization: {
-                //                 pk: pks[index],
-                //                 code: item.orgcode,
-                //                 obj_type: "C_ORG",
-                //                 rel_type: "member",
-                //                 name: item.org_names
-                //             },
-                //         },
-                //         tags: item.tags,
-                //         sections: item.sections,
-                //         groups: item.groups,
-                //         is_active: true,
-                //         basic_params: {
-                //             info: {
-                //                 '电话': "11" + item.tel,
-                //                 '性别': item.sex || '',
-                //                 '技术职称': item.job || '',
-                //                 'phone': item.tel || '',
-                //                 'sex': item.sex || '',
-                //                 'duty': '',
-                //             }
-                //         },
-                //         extra_params: {},
-                //         title: item.job || ''
-                //     });
-                // })
-                // Promise.all(promisess).then(rst => {
-                //     console.log("rst", rst)
-                //     let count = 0
-                //     let count1 = 0
-                //     for (let i = 0; i < rst.length; i++) {
-                //         const element = rst[i];
-                //         if (element.code == 1) {
-                //             count++
-                //         }
-                //         else {
-                //             count1++
-                //         }
-                //     }
-                //     Notification.success({
-                //         message: "成功创建" + count + "条数据" + (count1 ? "失败" + count1 + "条数据" : '')
-                //     })
-                //     ModalVisible(false);
-                //     is_fresh(true);
-                // })
             }
 
         })
