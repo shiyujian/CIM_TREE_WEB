@@ -197,7 +197,7 @@ export default class TablePerson extends Component {
 					{/* <Button className = {style.button} onClick = {this.modify.bind(this)}>申请变更</Button>
                     <Button className = {style.button} onClick = {this.expurgate.bind(this)}>申请删除</Button> */}
 					<Button className={style.button} onClick={this.getExcel.bind(this)}>导出表格</Button>
-					<Search enterButton className={style.button} onSearch={this.searchPerson.bind(this)} style={{ width: "240px" }} placeholder="请输入人员编码或姓名或组织机构单位" />
+					<Search enterButton className={style.button} onSearch={this.searchPerson.bind(this)} style={{ width: "240px" }} placeholder="请输入所属部门" />
 				</div>
 				<Table
 					columns={columns}
@@ -333,7 +333,6 @@ export default class TablePerson extends Component {
 				}
 			}
 			let excontent = this.state.excelData.map(data => {
-				console.log("data",data)
 				return [
 					data.orgcode || '',
 					data.name || '',
