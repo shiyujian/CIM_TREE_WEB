@@ -31,29 +31,14 @@ export default class Checkerinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users} = this.props;
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();
         }
-        getTreeNodeList().then(rst => {
-            let nodeLevel = [];
-            if (rst instanceof Array && rst.length > 0) {
-                let root, level2 = [];
-                root = rst.filter(node => {
-                    return node.Type === '项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
-                })
-                level2 = rst.filter(node => {
-                    return node.Type === '子项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
-                })
-                for (let i = 0; i<root.length; i++){
-                    root[i].children = level2.filter(node => {
-                        return node.Parent === root[i].No;
-                    })
-                }
-                this.setState({ treeLists:root, rst });
-            }
-        })
+        if(!tree.treeList){
+            getTreeNodeList()
+        }
         //地块树
         // try {
         //     getTree({},{parent:'root'})
@@ -121,7 +106,11 @@ export default class Checkerinfo extends Component {
             statusoption,
             resetkey,
         } = this.state;
-        const {treeList} = this.props;
+        const {platform:{tree={}}} = this.props;
+        let treeList = [];
+        if(tree.treeList){
+            treeList = tree.treeList
+        }
         return (
                 <Body>
                     <Main>

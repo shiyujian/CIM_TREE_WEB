@@ -36,7 +36,7 @@ export default class Locmeasureinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users, treetypes} = this.props;
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();
@@ -45,7 +45,9 @@ export default class Locmeasureinfo extends Component {
         if(!treetypes){
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        getTreeNodeList()
+        if(!tree.treeList){
+            getTreeNodeList()
+        }
         //地块树
         // try {
         //     getTree({},{parent:'root'})
@@ -137,7 +139,11 @@ export default class Locmeasureinfo extends Component {
             locationoption,
             resetkey,
         } = this.state;
-        const {treeList} = this.props;
+        const {platform:{tree={}}} = this.props;
+        let treeList = [];
+        if(tree.treeList){
+            treeList = tree.treeList
+        }
         return (
                 <Body>
                     <Main>

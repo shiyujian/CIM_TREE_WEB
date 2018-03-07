@@ -33,16 +33,19 @@ export default class Nursmeasureinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users, treetypes} = this.props;
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();
         }
         // 避免反复获取森林树种列表，提高效率
+        debugger
         if(!treetypes){
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        getTreeNodeList();
+        if(!tree.treeList){
+            getTreeNodeList()
+        }
         // getTreeNodeList().then(rst => {
         //     let nodeLevel = [];
         //     if (rst instanceof Array && rst.length > 0) {
@@ -155,7 +158,11 @@ export default class Nursmeasureinfo extends Component {
             resetkey,
             statusoption,
         } = this.state;
-        const {treeList} = this.props;
+        const {platform:{tree={}}} = this.props;
+        let treeList = [];
+        if(tree.treeList){
+            treeList = tree.treeList
+        }
         return (
                 <Body>
                     <Main>

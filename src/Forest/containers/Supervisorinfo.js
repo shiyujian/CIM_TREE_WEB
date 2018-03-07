@@ -31,12 +31,14 @@ export default class Supervisorinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree,getForestUsers,getTreeNodeList}, users} = this.props;
+        const {actions: {getTree,getForestUsers,getTreeNodeList}, users,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();
         }
-        getTreeNodeList()
+        if(!tree.treeList){
+            getTreeNodeList()
+        }
         //地块树
         // try {
         //     getTree({},{parent:'root'})
@@ -104,7 +106,11 @@ export default class Supervisorinfo extends Component {
             statusoption,
             resetkey,
         } = this.state;
-        const {treeList} = this.props;
+        const {platform:{tree={}}} = this.props;
+        let treeList = [];
+        if(tree.treeList){
+            treeList = tree.treeList
+        }
 		return (
 				<Body>
 					<Main>

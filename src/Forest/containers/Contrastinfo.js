@@ -33,12 +33,14 @@ export default class Contrastinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree,getTreeList,getTreeNodeList}, treetypes} = this.props;
+        const {actions: {getTree,getTreeList,getTreeNodeList}, treetypes,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林树种列表，提高效率
         if(!treetypes){
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        getTreeNodeList()
+        if(!tree.treeList){
+            getTreeNodeList()
+        }
         //地块树
         // try {
         //     getTree({},{parent:'root'})
@@ -117,7 +119,11 @@ export default class Contrastinfo extends Component {
             standardoption,
             resetkey,
         } = this.state;
-        const {treeList} = this.props;
+        const {platform:{tree={}}} = this.props;
+        let treeList = [];
+        if(tree.treeList){
+            treeList = tree.treeList
+        }
         return (
                 <Body>
                     <Main>
