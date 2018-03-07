@@ -650,7 +650,7 @@ export default class ToggleModal extends Component {
         let dataSource = this.state.dataSource;
         dataSource.splice(index, 1);
         this.setState({ flag_code: true, subErr: true })
-        this.delData(dataSource);
+        // this.delData(dataSource);
         this.setState({ dataSource })
     }
 
@@ -681,6 +681,7 @@ export default class ToggleModal extends Component {
         this.setState({ repeatCode })
         let res, orgname = [];
         Promise.all(promises).then(rst => {
+            console.log("rst",rst)
             rst.map(item => {
                 if (item.children.length === 0) {
                     orgname.push('');
@@ -693,10 +694,10 @@ export default class ToggleModal extends Component {
                 }
             })
             res = data.map((item, index) => {
-                // console.log("item",item)
+                console.log("item",item)
                 return {
                     index: index + 1,
-                    code: item.code || '',
+                    code: item.orgcode || '',
                     name: item.name || '',
                     org: orgname[index] || '',
                     depart: item.depart || '',
@@ -711,6 +712,7 @@ export default class ToggleModal extends Component {
                     // passwords: 111111,
                 }
             })
+            console.log("res",res)
             this.setState({
                 dataSource: res
             })

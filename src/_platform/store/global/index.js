@@ -2,6 +2,7 @@ import asideReducer, * as asideActions from './aside';
 import locationReducer, * as locationActions from './location';
 import previewReducer, * as previewActions from './preview';
 import tabsReducer, * as tabsActions from './tabs';
+import treeReducer, * as treeActions from './tree';
 // import progressReducer, * as progressActions from '../../components/Progress/store';
 
 import {handleActions, combineActions} from 'redux-actions';
@@ -49,6 +50,7 @@ export const actions = {
 	...docTypeReducer,
 	...workflowAction,
 	...locsReducer,
+	...treeActions
 	// ...progressActions
 };
 
@@ -68,6 +70,10 @@ export default handleActions({
 	[combineActions(...actionsMap(tabsActions))]: (state, action) => ({
 		...state,
 		tabs: tabsReducer(state.tabs, action),
+	}),
+	[combineActions(...actionsMap(treeActions))]: (state, action) => ({
+		...state,
+		tree: treeReducer(state.tree, action),
 	}),
 	[combineActions(...actionsMap(dirReducer))]: (state, action) => ({
 		...state,

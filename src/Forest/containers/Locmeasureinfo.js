@@ -36,7 +36,7 @@ export default class Locmeasureinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers}, users, treetypes} = this.props;
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();
@@ -45,53 +45,56 @@ export default class Locmeasureinfo extends Component {
         if(!treetypes){
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        //地块树
-        try {
-            getTree({},{parent:'root'})
-            .then(rst => {
-                if(rst instanceof Array && rst.length > 0){
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
-                    getTree({},{parent:rst[0].No})
-                    .then(rst1 => {
-                        if(rst1 instanceof Array && rst1.length > 0){
-                            rst1.forEach((item,index) => {
-                                rst1[index].children = []
-                            })
-                            getNewTreeData(rst,rst[0].No,rst1)
-                            getTree({},{parent:rst1[0].No})
-                            .then(rst2 => {
-                                if(rst2 instanceof Array && rst2.length > 0){
-                                    getNewTreeData(rst,rst1[0].No,rst2)
-                                    this.setState({treeLists:rst},() => {
-                                        this.onSelect([rst2[0].No])
-                                    })
-                                    // getNewTreeData(rst,rst[0].No,rst2)
-                                    // getTree({},{parent:rst2[0].No})
-                                    // .then(rst3 => {
-                                    //     if(rst3 instanceof Array && rst3.length > 0){
-                                    //         getNewTreeData(rst,rst2[0].No,rst3)
-                                    //         this.setState({treeLists:rst},() => {
-                                    //             this.onSelect([rst3[0].No])
-                                    //         })
-                                    //     } else {
-                                    //         this.setState({treeLists:rst})
-                                    //     }
-                                    // })
-                                } else {
-                                    this.setState({treeLists:rst})
-                                }
-                            })
-                        }else {
-                            this.setState({treeLists:rst})
-                        }
-                    })
-                }
-            })
-        } catch(e){
-            console.log(e)
+        if(!tree.treeList){
+            getTreeNodeList()
         }
+        //地块树
+        // try {
+        //     getTree({},{parent:'root'})
+        //     .then(rst => {
+        //         if(rst instanceof Array && rst.length > 0){
+        //             rst.forEach((item,index) => {
+        //                 rst[index].children = []
+        //             })
+        //             getTree({},{parent:rst[0].No})
+        //             .then(rst1 => {
+        //                 if(rst1 instanceof Array && rst1.length > 0){
+        //                     rst1.forEach((item,index) => {
+        //                         rst1[index].children = []
+        //                     })
+        //                     getNewTreeData(rst,rst[0].No,rst1)
+        //                     getTree({},{parent:rst1[0].No})
+        //                     .then(rst2 => {
+        //                         if(rst2 instanceof Array && rst2.length > 0){
+        //                             getNewTreeData(rst,rst1[0].No,rst2)
+        //                             this.setState({treeLists:rst},() => {
+        //                                 this.onSelect([rst2[0].No])
+        //                             })
+        //                             // getNewTreeData(rst,rst[0].No,rst2)
+        //                             // getTree({},{parent:rst2[0].No})
+        //                             // .then(rst3 => {
+        //                             //     if(rst3 instanceof Array && rst3.length > 0){
+        //                             //         getNewTreeData(rst,rst2[0].No,rst3)
+        //                             //         this.setState({treeLists:rst},() => {
+        //                             //             this.onSelect([rst3[0].No])
+        //                             //         })
+        //                             //     } else {
+        //                             //         this.setState({treeLists:rst})
+        //                             //     }
+        //                             // })
+        //                         } else {
+        //                             this.setState({treeLists:rst})
+        //                         }
+        //                     })
+        //                 }else {
+        //                     this.setState({treeLists:rst})
+        //                 }
+        //             })
+        //         }
+        //     })
+        // } catch(e){
+        //     console.log(e)
+        // }
         //类型
         let typeoption = [
             <Option key={'-1'} value={''}>全部</Option>,
@@ -125,7 +128,6 @@ export default class Locmeasureinfo extends Component {
         const {keycode} = this.props;
         const {
             leftkeycode,
-            treeLists,
             treetypeoption,
             treetypelist,
             sectionoption,
@@ -137,15 +139,20 @@ export default class Locmeasureinfo extends Component {
             locationoption,
             resetkey,
         } = this.state;
+        const {platform:{tree={}}} = this.props;
+        let treeList = [];
+        if(tree.treeList){
+            treeList = tree.treeList
+        }
         return (
                 <Body>
                     <Main>
                         <DynamicTitle title="现场测量信息" {...this.props}/>
                         <Sidebar>
-                            <PkCodeTree treeData={treeLists}
+                            <PkCodeTree treeData={treeList}
                                 selectedKeys={leftkeycode}
                                 onSelect={this.onSelect.bind(this)}
-                                onExpand={this.onExpand.bind(this)}
+                                // onExpand={this.onExpand.bind(this)}
                             />
                         </Sidebar>
                         <Content>
