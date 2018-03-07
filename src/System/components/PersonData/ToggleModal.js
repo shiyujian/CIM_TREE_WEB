@@ -17,7 +17,8 @@ export default class ToggleModal extends Component {
             editing: false,
             tempData: [],
             usernames: [],
-            loading:false
+            loading:false,
+            percent: 0,
         }
     }
     initopthins(list) {

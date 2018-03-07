@@ -48,6 +48,7 @@ export default class Nursoverallinfo extends Component {
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
         getTreeNodeList().then(rst => {
+            console.log('getTreeNodeList',rst)
             let nodeLevel = [];
             if (rst instanceof Array && rst.length > 0) {
                 let root, level2 = [];

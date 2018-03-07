@@ -46,6 +46,7 @@ export default class Nursmeasureinfo extends Component {
         try {
             getTree({},{parent:'root'})
             .then(rst => {
+                console.log('getTree',rst)
                 if(rst instanceof Array && rst.length > 0){
                     rst.forEach((item,index) => {
                         rst[index].children = []
