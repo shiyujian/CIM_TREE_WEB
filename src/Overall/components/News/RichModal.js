@@ -133,6 +133,9 @@ class RichModal extends Component {
 							"create_time": resp.create_time,
 							"mime_type": resp.mime_type,
 							"name":resp.name
+						},
+						"source":{
+							"name":values.source
 						}
 					};
 					postData({}, newData)
@@ -163,6 +166,9 @@ class RichModal extends Component {
 							"create_time": resp.create_time,
 							"mime_type": resp.mime_type,
 							"name":resp.name
+						},
+						"source":{
+							"name":values.source
 						}
 					};
 					patchData({pk: toggleData.editData.id}, newData)
@@ -214,6 +220,9 @@ class RichModal extends Component {
 						"create_time": resp.create_time,
 						"mime_type": resp.mime_type,
 						"name":resp.name
+					},
+					"source":{
+						"name":values.source
 					}
 				};
 				patchData({pk: toggleData.editData.id}, newData)
@@ -251,6 +260,9 @@ class RichModal extends Component {
 						"create_time": resp.create_time,
 						"mime_type": resp.mime_type,
 						"name":resp.name
+					},
+					"source":{
+						"name":values.source
 					}
 				};
 				postData({}, newData)
@@ -386,6 +398,19 @@ class RichModal extends Component {
 										</Upload>
                                         )}
                                 </FormItem>
+							</Col>
+							<Col span={8} offset={1}>
+								<FormItem {...formItemLayout} label="消息来源">
+									{getFieldDecorator('source', {
+										rules: [
+											{
+												required: true,
+											}
+										],
+									})(
+										<Input />
+										)}
+								</FormItem>
 							</Col>
 						</Row>
                     </Form>
