@@ -15,12 +15,13 @@ export const clearList = createAction(`${ID}清空列表`);
 export const nurseryName = createAction(`${ID}供苗商名字`);
 const getForestUsersOK = createAction('获取森林数据用户列表');
 const getTreeListOK = createAction('获取森林树种列表');
+const getTreeNodeListOK = createAction('获取森林大数据树节点')
 
 /*****************************院内************************/
 export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [getForestUsersOK]);
 
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
-export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
+export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getTreeNodeListOK]); //    √
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/tree/factoryAnalyse`, []);
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
@@ -156,6 +157,28 @@ export default handleActions({
 	[nurseryName]: (state, {payload}) => ({
 		...state,
 		nurseryName: payload
-	})
+	}),
+	[getTreeNodeListOK]: (state, {payload}) => {
+		let nodeLevel = [];
+		let root = [];
+		if (payload instanceof Array && payload.length > 0) {
+			let level2 = [];
+			root = payload.filter(node => {
+				return node.Type === '项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
+			})
+			level2 = payload.filter(node => {
+				return node.Type === '子项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
+			})
+			for (let i = 0; i<root.length; i++){
+				root[i].children = level2.filter(node => {
+					return node.Parent === root[i].No;
+				})
+			}
+		}
+		return {
+			...state,
+			treeList: root
+		}
+	}
 
 }, {});

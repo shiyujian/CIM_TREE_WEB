@@ -115,19 +115,19 @@ export default class Checkerinfo extends Component {
         const {keycode} = this.props;
         const {
             leftkeycode,
-            treeLists,
             sectionoption,
             smallclassoption,
             thinclassoption,
             statusoption,
             resetkey,
         } = this.state;
+        const {treeList} = this.props;
         return (
                 <Body>
                     <Main>
                         <DynamicTitle title="业主抽查信息" {...this.props}/>
                         <Sidebar>
-                            <PkCodeTree treeData={treeLists}
+                            <PkCodeTree treeData={treeList}
                                 selectedKeys={leftkeycode}
                                 onSelect={this.onSelect.bind(this)}
                                 // onExpand={this.onExpand.bind(this)}

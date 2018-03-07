@@ -38,24 +38,7 @@ export default class Contrastinfo extends Component {
         if(!treetypes){
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        getTreeNodeList().then(rst => {
-            let nodeLevel = [];
-            if (rst instanceof Array && rst.length > 0) {
-                let root, level2 = [];
-                root = rst.filter(node => {
-                    return node.Type === '项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
-                })
-                level2 = rst.filter(node => {
-                    return node.Type === '子项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
-                })
-                for (let i = 0; i<root.length; i++){
-                    root[i].children = level2.filter(node => {
-                        return node.Parent === root[i].No;
-                    })
-                }
-                this.setState({ treeLists:root, rst });
-            }
-        })
+        getTreeNodeList()
         //地块树
         // try {
         //     getTree({},{parent:'root'})
@@ -126,7 +109,6 @@ export default class Contrastinfo extends Component {
         const {keycode} = this.props;
         const {
             leftkeycode,
-            treeLists,
             treetypeoption,
             treetypelist,
             sectionoption,
@@ -135,12 +117,13 @@ export default class Contrastinfo extends Component {
             standardoption,
             resetkey,
         } = this.state;
+        const {treeList} = this.props;
         return (
                 <Body>
                     <Main>
                         <DynamicTitle title="苗木对比信息" {...this.props}/>
                         <Sidebar>
-                            <PkCodeTree treeData={treeLists}
+                            <PkCodeTree treeData={treeList}
                                 selectedKeys={leftkeycode}
                                 onSelect={this.onSelect.bind(this)}
                                 // onExpand={this.onExpand.bind(this)}
