@@ -333,15 +333,16 @@ export default class TablePerson extends Component {
 				}
 			}
 			let excontent = this.state.excelData.map(data => {
+				console.log("data",data)
 				return [
-					data.account.person_code || '',
-					data.account.person_name || '',
-					data.account.organization || '',
-					data.account.org_code || '',
-					data.account.user_name || '',
-					data.account.title || '',
-					data.account.gender || '',
-					data.account.person_telephone || '',
+					data.orgcode || '',
+					data.name || '',
+					data.orgname || '',
+					// data.account.org_code || '',
+					// data.account.user_name || '',
+					data.job || '',
+					data.sex || '',
+					data.tel || '',
 					data.email || '',
 					data.username || '',
 					data.sections || '',
@@ -556,9 +557,10 @@ export default class TablePerson extends Component {
 		let searchData = [];
 		let searchPer = this.state.dataSource
 		searchPer.forEach(rst => {
+			// console.log("rst",rst)
 			if (
-				rst.code.indexOf(value) != -1 ||
-				rst.name.indexOf(value) != -1 ||
+				// rst.code.indexOf(value) != -1 ||
+				// rst.name.indexOf(value) != -1 ||
 				rst.orgname.indexOf(value) != -1
 			) {
 				searchData.push(rst);
