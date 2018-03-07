@@ -4,6 +4,7 @@ import style from './TableOrg.css'
 import DelPer from './PersonExpurgate';
 import { DataReportTemplate_PersonInformation, NODE_FILE_EXCHANGE_API, STATIC_DOWNLOAD_API } from '_platform/api';
 import { flattenDeep } from 'lodash';
+import { PROJECT_UNITS } from './../../../_platform/api';
 const Search = Input.Search;
 const { Option, OptGroup } = Select;
 
@@ -26,25 +27,57 @@ export default class TablePerson extends Component {
 		}
 		return ops;
 	}
-	changeTags(record, value) {
-		record.tags = value;
-		const { actions: { changeAdditionField } } = this.props;
-		changeAdditionField('tags', value)
+	sectiontitle(record) {
+		let sectione = []
+		for (let i = 0; i < PROJECT_UNITS.length; i++) {
+			const item = PROJECT_UNITS[i];
+			for (let j = 0; j < item.units.length; j++) {
+				const element = item.units[j];
+				for (let z = 0; z < record.sections.length; z++) {
+					const items = record.sections[z];
+					if (items == element.code) {
+						sectione.push(element.value)
+					}
+				}
+			}
+		}
+		return sectione
 	}
-	changeRoles(record, value) {
-		record.groups = value;
-		const { actions: { changeAdditionField } } = this.props;
-		changeAdditionField('groups', value)
+	query(value) {
+		if (value && value.tags) {
+			const {
+				tags = []
+			} = this.props
+			let array = value.tags || []
+			let defaultNurse = []
+			array.map((item) => {
+				tags.map((rst) => {
+					if (rst && rst.ID) {
+						if (rst.ID.toString() === item) {
+							defaultNurse.push(rst.NurseryName + '-' + rst.Factory)
+						}
+					}
+				})
+			})
+			return defaultNurse
+		}
 	}
+	renderContent(record) {
+				const { platform: { roles = [] } } = this.props;
+				let groups=[]
+				for (let i = 0; i < roles.length; i++) {
+					for (let j = 0; j < record.groups.length; j++) {
+						if(roles[i].id==record.groups[j]){
+							groups.push(roles[i].name)
+						}
+					}	
+				}
+				return groups
+			}
+	
 	render() {
-		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
-		const systemRoles = roles.filter(role => role.grouptype === 0);
-		const projectRoles = roles.filter(role => role.grouptype === 1);
-		const professionRoles = roles.filter(role => role.grouptype === 2);
-		const departmentRoles = roles.filter(role => role.grouptype === 3);
-		const tagsOptions = this.initopthins(tags);
-		const { platform: { users = [] } } = this.props;
-		// console.log("pagination",this.state.pagination)
+		const { platform: { roles = [],users = []}, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
+
 		const columns = [
 			{
 				title: '序号',
@@ -118,80 +151,24 @@ export default class TablePerson extends Component {
 				// dataIndex: "sections",
 				// key: 'Sections',
 				render: (text, record, index) => {
-					return (
-						<Select disabled value={record.sections}
-							onChange={(e) => {
-								console.log("e:", e);
-								record.sections = e;
-								this.forceUpdate();
-							}}
-							mode="multiple" style={{ width: '100%' }}>
-							<Option key={'P009-01-01'} >1标段</Option>
-							<Option key={'P009-01-02'} >2标段</Option>
-							<Option key={'P009-01-03'} >3标段</Option>
-							<Option key={'P009-01-04'} >4标段</Option>
-							<Option key={'P009-01-05'} >5标段</Option>
-						</Select>
-					)
-
+					let sectiones = this.sectiontitle(record)
+					return sectiones.join()
 				}
 			}
-
-			, {
-				title: '苗圃',
-				// dataIndex: "tags",
-				// key: 'tags',
-				render: (text, record, index) => {
-					console.log()
-					return (
-						<Select disabled showSearch value={record.tags}
-							onChange={this.changeTags.bind(this, record)}
-							mode="multiple" style={{ width: "100%" }}>
-							{tagsOptions}
-						</Select>
-					)
-
-				}
-
-			}
+			// , {
+			// 	title: '苗圃',
+			// 	// dataIndex: "tags",
+			// 	// key: 'tags',
+			// 	render: (text, record, index) => {
+			// 		let defaultNurse = this.query(record)
+			// 		return defaultNurse.join()
+			// 	}
+			// }
 			, {
 				title: '角色',
-				// dataIndex: "role",
-				// key: 'role',
-				key: 'groups',
-				render: (text, record, index) => {
-					return <Select disabled value={record.groups} onChange={this.changeRoles.bind(this, record)}
-						mode="multiple" style={{ width: '100%' }}>
-						<OptGroup label="苗圃角色">
-							{
-								systemRoles.map(role => {
-
-									return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-								})
-							}
-						</OptGroup>
-						<OptGroup label="施工角色">
-							{
-								projectRoles.map(role => {
-									return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-								})
-							}
-						</OptGroup>
-						<OptGroup label="监理角色">
-							{
-								professionRoles.map(role => {
-									return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-								})
-							}
-						</OptGroup>
-						<OptGroup label="业主角色">
-							{
-								departmentRoles.map(role => {
-									return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-								})
-							}
-						</OptGroup>
-					</Select>
+				render: (record) => {
+					let groups = this.renderContent(record)
+					return groups.join()
 				}
 			}
 			, {
@@ -258,7 +235,7 @@ export default class TablePerson extends Component {
 				current: 1,
 				// total:total,
 			};
-			console.log("pagination",pagination)
+			console.log("pagination", pagination)
 			// console.log("pagination", pagination)
 			this.setState({
 				pagination: pagination
@@ -268,9 +245,9 @@ export default class TablePerson extends Component {
 			// 	let ret = await getOrgReverse({code:persons[i].organisation.code})
 			// 	type.push(ret.children[0].name)
 			// }
+			// console.log("persons",persons)
 			let data_person =
 				persons.map((item, index) => {
-					// console.log("1111",item)
 					let groupsId = []
 					const groups = item.groups || []
 					for (let j = 0; j < groups.length; j++) {
@@ -280,7 +257,7 @@ export default class TablePerson extends Component {
 					return {
 						id: item.id,
 						index: index + 1,
-						code: item.account.person_code || '',
+						// code: item.account.person_code || '',
 						name: item.account.person_name || '',
 						orgcode: item.account.orgcode || '',
 						orgname: item.account.organization || '',
@@ -455,7 +432,7 @@ export default class TablePerson extends Component {
 				return {
 					id: item.id,
 					index: index + 1,
-					code: item.account.person_code || '',
+					// code: item.account.person_code || '',
 					name: item.account.person_name || '',
 					orgcode: item.account.orgcode || '',
 					orgname: item.account.organization || '',
@@ -523,7 +500,7 @@ export default class TablePerson extends Component {
 				return {
 					id: item.id,
 					index: index + 1,
-					code: item.account.person_code || '',
+					// code: item.account.person_code || '',
 					name: item.account.person_name || '',
 					orgcode: item.account.orgcode || '',
 					orgname: item.account.organization || '',

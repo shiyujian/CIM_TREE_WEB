@@ -192,8 +192,10 @@ export default class Users extends Component {
 		}, {
 			title: '角色',
 			render: (user) => {
+				console.log("333333333",user)
 				const { groups = [] } = user || {};
 				const roles = groups.map(group => group.name);
+				console.log("roles",roles)
 				return roles.join('、')
 			}
 		}, {
