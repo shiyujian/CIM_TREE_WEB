@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input, Progress } from 'antd';
+import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input, Progress,Spin } from 'antd';
 import { PROJECT_UNITS } from './../../../_platform/api';
 import './index.less';
 
@@ -18,7 +18,8 @@ export default class Users extends Component {
 			loading: false,
 			percent: 0,
 			edit: true,
-			roles: []
+			roles: [],
+			selectedRowKeys:[]
 		}
 	}
 	static layout = {
@@ -109,7 +110,7 @@ export default class Users extends Component {
 			<Col span={3}>
 				<Popconfirm title="是否真的要删除选中用户?"
 					onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
-					<Button>批量删除</Button>
+					<Button >批量删除</Button>
 
 				</Popconfirm>
 			</Col>]
@@ -192,8 +193,10 @@ export default class Users extends Component {
 		}, {
 			title: '角色',
 			render: (user) => {
+				console.log("333333333",user)
 				const { groups = [] } = user || {};
 				const roles = groups.map(group => group.name);
+				console.log("roles",roles)
 				return roles.join('、')
 			}
 		}, {
@@ -408,10 +411,12 @@ export default class Users extends Component {
 
 						</Row>
 					</div>
+					<Spin tip="加载中" percent={this.state.percent} status="active" strokeWidth={5}  spinning={this.state.loading}>
 					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={columns} dataSource={dataSource}
 						loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.props.getTreeModals }}
 
 					/>
+					</Spin>
 				</div>
 				: <h3>{'没有权限'}</h3>
 
@@ -492,6 +497,7 @@ export default class Users extends Component {
 
 		onChange: (selectedRowKeys) => {
 			console.log("selectedRowKeys", selectedRowKeys)
+			this.setState({selectedRowKeys:selectedRowKeys})
 			this.selectedCodes = selectedRowKeys;
 		}
 	};
@@ -527,16 +533,24 @@ export default class Users extends Component {
 	}
 
 	remove() {
-		const {
-			sidebar: { node } = {},
-			actions: { deleteUser, getUsers }
-		} = this.props;
-		const codes = Users.collect(node);
-		this.selectedCodes.map((userId) => {
-			return deleteUser({ userID: userId }).then(() => {
-				getUsers({}, { org_code: codes });
+		console.log('this.state.selectedRowKeys',this.state.selectedRowKeys)
+		if (this.state.selectedRowKeys.length == 0) {
+			message.warn('请选择需要删除的数据！');
+		} else{
+			this.setState({loading:true});
+			const {
+				sidebar: { node } = {},
+				actions: { deleteUser, getUsers }
+			} = this.props;
+			const codes = Users.collect(node);
+			this.selectedCodes.map((userId) => {
+				return deleteUser({ userID: userId }).then(() => {
+					getUsers({}, { org_code: codes }).then(() => {
+						this.setState({loading:false,selectedRowKeys:[]});
+						});
+				});
 			});
-		});
+		}
 	}
 
 	edit(user, event) {
