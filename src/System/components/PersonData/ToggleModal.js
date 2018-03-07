@@ -373,13 +373,13 @@ export default class ToggleModal extends Component {
                 }
             }]
         return (
-            <Spin tip="加载中" spinning={this.state.loading}>
             <Modal
                 visible={visible}
                 width={1280}
                 onOk={this.onok.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
+            <Spin tip="加载中" spinning={this.state.loading}>
                 <h1 style={{ textAlign: "center", marginBottom: "20px" }}>发起填报</h1>
                 <div>
                     <Table style={{ marginTop: '10px', marginBottom: '10px' }}
@@ -415,8 +415,8 @@ export default class ToggleModal extends Component {
                     &emsp;&emsp; 3、日期必须带年月日，如2017年1月1日<br />
                     &emsp;&emsp; 4、部分浏览器由于缓存原因未能在导入后正常显示导入数据，请尝试重新点击菜单打开页面并刷新。最佳浏览器为IE11.<br />
                 </div>
-            </Modal>
             </Spin>
+            </Modal>
         )
     }
     changeRoles(record, value) {
