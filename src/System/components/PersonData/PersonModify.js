@@ -46,7 +46,6 @@ export default class PersonModify extends Component {
 			listStore = []
 		} = this.props;
         let projectName = ''
-        console.log("this.props", this.props)
         listStore.map((item, index) => {
             item.map((rst) => {
                 if ((rst.name === record.orgname) && (rst.code === record.orgcode)) {
@@ -55,18 +54,15 @@ export default class PersonModify extends Component {
             })
 
         })
-        console.log('projectName', projectName)
         return getProjectUnits(projectName)
     }
     changeRolea(record, value) {
         const { actions: { changeAdditionField } } = this.props;
-        console.log("value", value)
         record.sections = value
         changeAdditionField('sections', value)
     }
     changeRoles(record, value) {
         const { actions: { changeAdditionField } } = this.props;
-        console.log("value111111", value)
         record.groups = value
         changeAdditionField('groups', value)
     }
@@ -272,9 +268,7 @@ export default class PersonModify extends Component {
             dataIndex: 'sections',
             key: 'sections',
             render: (text, record, index) => {
-                console.log("record", record)
                 let units = this.getUnits(record)
-                console.log("units", units)
                 return <Select   value={record.sections} onChange={this.changeRolea.bind(this, record)}
                     mode="multiple" style={{ width: '100%',minWidth:"50px" }}>
                     {
@@ -416,28 +410,19 @@ export default class PersonModify extends Component {
 			addition = {}, sidebar: { node } = {},
             actions: { postUser, clearAdditionField, getUsers, putUser }
         } = this.props;
-        console.log(this.props)
-
-        // console.log(addition)
         const { actions: { ModifyVisible, PutPeople, getOrgName, putPersons, reverseFind, is_fresh } } = this.props;
         let obj = this.state.dataSource;
         let data_list = {};
         let pks = [];
         for (let i = 0; i < this.state.dataSource.length; i++) {
             let rst = await getOrgName({ code: this.state.dataSource[i].orgcode })
-            console.log("rst", rst)
             pks.push(rst.pk);
         }
-        console.log("pks", pks)
         // 是用户
         if (obj[0].is_user) {
             // let rst = await reverseFind({pk:obj[0].personPk})
-            console.log(obj)
-            console.log("addition", addition)
             // return
             obj.map((item, index) => {
-                console.log("item.username", item)
-
                 putUser({}, {
                     id: item.id,
                     username: item.username,
@@ -486,7 +471,6 @@ export default class PersonModify extends Component {
                     }
                 })
             })
-            console.log("11111", obj[0].id)
 
 
             // 修改人员
