@@ -82,8 +82,6 @@ export const removePermissions = () => {
 export const getProjectUnits = (projectName) => {
 	let units = [];
 	PROJECT_UNITS.map((item)=>{
-		console.log('item',item)
-		console.log('projectName',projectName)
 		if(item.value === projectName){
 			units = item.units
 		}
