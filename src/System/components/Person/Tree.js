@@ -219,10 +219,10 @@ export default class Tree extends Component {
 		const {children = [], code} = node;
 		let rst = [];
 		rst.push(code);
-		children.forEach(n => {
-			const codes = Tree.collect(n);
-			rst = rst.concat(codes);
-		});
+		// children.forEach(n => {
+		// 	const codes = Tree.collect(n);
+		// 	rst = rst.concat(codes);
+		// });
 		return rst;
 	}
 }

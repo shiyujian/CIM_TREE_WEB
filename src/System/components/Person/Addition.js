@@ -68,9 +68,11 @@ export default class Addition extends Component {
 		const{
 			search
 		}= this.state
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		let nurseryData = [];
 		let defaultNurse = this.query(addition)
 		let units = this.getUnits()
+
 		return (
 			<Modal title={addition.id ? "编辑人员信息" : "新增人员"} visible={addition.visible} className="large-modal" width={800}
 				maskClosable={false}
@@ -90,6 +92,11 @@ export default class Addition extends Component {
 								<Option value="男">男</Option>
 							</Select>
 						</FormItem>
+						{user.is_superuser?
+							<FormItem {...Addition.layout} label="部门编码">
+								<Input placeholder="部门编码" value={addition.org_code} onChange={changeAdditionField.bind(this, 'org_code')} />
+							</FormItem>:''
+						}
 						<FormItem {...Addition.layout} label="密码">
 							<Input disabled={!!addition.id} placeholder="请输入密码" value={addition.password}
 								onChange={changeAdditionField.bind(this, 'password')} />
@@ -117,6 +124,11 @@ export default class Addition extends Component {
 						<FormItem {...Addition.layout} label="职务">
 							<Input placeholder="请输入职务" value={addition.title} onChange={changeAdditionField.bind(this, 'title')} />
 						</FormItem>
+						{user.is_superuser?
+							<FormItem {...Addition.layout} label="部门名称">
+								<Input placeholder="部门名称" value={addition.organization} onChange={changeAdditionField.bind(this, 'organization')} />
+							</FormItem>:''
+						}
 						<FormItem {...Addition.layout} label="角色">
 							<Select placeholder="请选择角色" value={addition.roles} onChange={this.changeRoles.bind(this)}
 								mode="multiple" style={{ width: '100%' }}>
@@ -362,10 +374,10 @@ export default class Addition extends Component {
 		const { children = [], code } = node;
 		let rst = [];
 		rst.push(code);
-		children.forEach(n => {
-			const codes = Addition.collect(n);
-			rst = rst.concat(codes);
-		});
+		// children.forEach(n => {
+		// 	const codes = Addition.collect(n);
+		// 	rst = rst.concat(codes);
+		// });
 		return rst;
 	}
 
