@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Select} from 'antd';
 import * as actions from '../store';
+import {PROJECT_UNITS} from '_platform/api';
 import {actions as actions2} from '../store/faithInfo'
 import {PkCodeTree} from '../components';
 import {FaithinfoTable, FaithModal} from '../components/Faithinfo';
@@ -19,6 +20,7 @@ const Option = Select.Option;
     }),
 )
 export default class Faithinfo extends Component {
+    biaoduan = [];
     constructor(props) {
         super(props)
         this.state = {
@@ -32,13 +34,23 @@ export default class Faithinfo extends Component {
             bigType: '',
         }
     }
+    componentWillUnmount(){
+		console.log('oh why you got destroy11111')
+	}
     componentDidMount() {
         const {actions: {getTree,getTreeList,getTreeNodeList}, treetypes,platform:{tree = {}}} = this.props; 
+        this.biaoduan = [];
+        PROJECT_UNITS[0].units.map(item => {
+            this.biaoduan.push(item);
+        })
+        PROJECT_UNITS[1].units.map(item => {
+            this.biaoduan.push(item);
+        })
         // 避免反复获取森林树种列表，提高效率
         if(!treetypes){
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        if(!tree.treeList){
+        if(!tree.bigTreeList){
             getTreeNodeList()
         }
         //地块树
@@ -113,9 +125,10 @@ export default class Faithinfo extends Component {
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.treeList){
-            treeList = tree.treeList
+        if(tree.bigTreeList){
+            treeList = tree.bigTreeList
         }
+        debugger
         return (
                 <Body>
                     <Main>
@@ -158,9 +171,9 @@ export default class Faithinfo extends Component {
     }
     //标段选择, 重新获取: 树种
     sectionselect(value) {
-        const {actions:{setkeycode}} =this.props;
-        const {leftkeycode} = this.state;
-        setkeycode(leftkeycode)
+        // const {actions:{setkeycode}} =this.props;
+        // const {leftkeycode} = this.state;
+        // setkeycode(leftkeycode)
         //树种
         this.typeselect('');
     }
@@ -171,15 +184,12 @@ export default class Faithinfo extends Component {
             let sectionList = [];
             let sectionOptions = [];
             let sectionoption = rst.map((item, index) => {
-                if(item.Section) {
-                    let sections = item.Section;
-                    sectionList.push(sections);
-                }
+                sectionList.push(item);
             })
             let sectionData = [...new Set(sectionList)];
             sectionData.sort();
             sectionData.map(sec => {
-                sectionOptions.push(<Option key={sec} value={sec}>{sec}</Option>)
+                sectionOptions.push(<Option key={sec.code} value={sec.code}>{sec.value}</Option>)
             })
             sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({sectionoption: sectionOptions})
@@ -212,18 +222,18 @@ export default class Faithinfo extends Component {
         })
     }
 
-    //树选择, 重新获取: 标段、树种并置空
-    onSelect(value = []) {
+    //树选择, 重新获取: 标段、小班、细班、树种并置空
+	onSelect(value = []) {
         let keycode = value[0] || '';
-        const {actions:{setkeycode,gettreetype,getTree}} =this.props;
-        setkeycode(keycode);
+        const {actions:{setkeycode,gettreetype,getTree,getLittleBan}} =this.props;
+	    setkeycode(keycode);
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
         
         //标段
-        getTree({},{parent:keycode})
-        .then(rst => {
-            this.setSectionOption(rst)
+        let rst = this.biaoduan.filter(item =>{
+            return item.code.indexOf(keycode) !== -1;
         })
+        this.setSectionOption(rst)
         //树种
         this.typeselect('');
     }

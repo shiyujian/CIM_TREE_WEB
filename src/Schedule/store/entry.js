@@ -23,7 +23,6 @@ export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/trees/analyse/
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys/`, []);
 export const getqueryTree = createFetchAction(`${FOREST_API}/tree/queryTree`, []);
 export const getexportTree = createFetchAction(`${FOREST_API}/tree/xlsx/`, [],'POST');
-export const getTreeList = createFetchAction(`${FOREST_API}/trees/list/`, []);
 export const getNurserysCount = createFetchAction(`${FOREST_API}/tree/nurserys/count/`, []);
 export const getNurserysCountFast = createFetchAction(`${FOREST_API}/tree/nurserystat?no=P009`, []);
 export const getfactory = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, []);
