@@ -34,13 +34,13 @@ export default class ContrastTable extends Component {
     	
     }
     componentWillReceiveProps(nextProps){
-    	if(nextProps.leftkeycode != this.state.leftkeycode) {
-			this.setState({
-				leftkeycode: nextProps.leftkeycode,
-    		},()=> {
-    			this.qury(1);
-    		})
-    	} 
+    	// if(nextProps.leftkeycode != this.state.leftkeycode) {
+		// 	this.setState({
+		// 		leftkeycode: nextProps.leftkeycode,
+    	// 	},()=> {
+    	// 		this.qury(1);
+    	// 	})
+    	// } 
     }
 	render() {
 		const {tblData} = this.state;
@@ -178,7 +178,7 @@ export default class ContrastTable extends Component {
 		},{
 			title:"监理人",
 			render: (text,record) => {
-				return <span>{record.SupervisorUser.Full_Name || '/'}</span>
+				return <span>{record.SupervisorUser ? record.SupervisorUser.Full_Name : '/'}</span>
 				
 			}
 		}];

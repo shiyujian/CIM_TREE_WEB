@@ -26,23 +26,26 @@ export default class FaithinfoTable extends Component {
         }
     }
     componentDidMount() {
-    	
-    }
+    	console.log('hi man i am here again!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+	}
+	componentWillUnmount(){
+		console.log('oh why you got destroy')
+	}
     componentWillReceiveProps(nextProps){
-    	if(nextProps.leftkeycode != this.state.leftkeycode) {
-			this.setState({
-				leftkeycode: nextProps.leftkeycode,
-    		},()=> {
-    			this.qury(1);
-    		})
-    	} 
+    	// if(nextProps.leftkeycode != this.state.leftkeycode) {
+		// 	this.setState({
+		// 		leftkeycode: nextProps.leftkeycode,
+    	// 	},()=> {
+    	// 		this.qury(1);
+    	// 	})
+    	// } 
     }
     
 	render() {
 		const {tblData} = this.state;
 		return (
 			<div>
-				{this.treeTable(tblData)}
+			{this.treeTable(tblData)}
 			</div>
 		);
 	}

@@ -35,13 +35,13 @@ export default class SupervisorTable extends Component {
     	
     }
     componentWillReceiveProps(nextProps){
-    	if(nextProps.leftkeycode != this.state.leftkeycode) {
-			this.setState({
-				leftkeycode: nextProps.leftkeycode,
-    		},()=> {
-    			this.qury(1);
-    		})
-    	} 
+    	// if(nextProps.leftkeycode != this.state.leftkeycode) {
+		// 	this.setState({
+		// 		leftkeycode: nextProps.leftkeycode,
+    	// 	},()=> {
+    	// 		this.qury(1);
+    	// 	})
+    	// } 
     }
 	render() {
 		const {tblData} = this.state;

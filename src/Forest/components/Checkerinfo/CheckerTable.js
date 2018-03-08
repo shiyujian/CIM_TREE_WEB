@@ -38,13 +38,13 @@ export default class CheckerTable extends Component {
     	
     }
     componentWillReceiveProps(nextProps){
-    	if(nextProps.leftkeycode != this.state.leftkeycode) {
-			this.setState({
-				leftkeycode: nextProps.leftkeycode,
-    		},()=> {
-    			this.qury(1);
-    		})
-    	} 
+    	// if(nextProps.leftkeycode != this.state.leftkeycode) {
+		// 	this.setState({
+		// 		leftkeycode: nextProps.leftkeycode,
+    	// 	},()=> {
+    	// 		this.qury(1);
+    	// 	})
+    	// } 
     }
 	render() {
 		const {tblData} = this.state;
@@ -311,7 +311,9 @@ export default class CheckerTable extends Component {
     		rolename = '',
     		stime = '',
     		etime = '',
-    		size,
+			size,
+			smallclass,
+			thinclass
     	} = this.state;
     	const {actions: {getqueryTree},keycode = ''} = this.props;
     	let postdata = {
@@ -322,7 +324,9 @@ export default class CheckerTable extends Component {
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
-    		size
+			size,
+			smallclass,
+			thinclass
     	}
     	if(!!role)
     		postdata[role] = rolename;
@@ -372,7 +376,9 @@ export default class CheckerTable extends Component {
     		rolename = '',
     		stime = '',
     		etime = '',
-    		exportsize,
+			exportsize,
+			smallclass,
+			thinclass
     	} = this.state;
     	const {actions: {getqueryTree,getexportTree4Checker},keycode = ''} = this.props;
     	let postdata = {
@@ -383,7 +389,9 @@ export default class CheckerTable extends Component {
     		stime:stime&&moment(stime).unix(),
     		etime:etime&&moment(etime).unix(),
     		page:1,
-    		size:exportsize
+			size:exportsize,
+			smallclass,
+			thinclass
     	}
     	if(!!role)
     		postdata[role] = rolename;
