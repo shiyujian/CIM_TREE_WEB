@@ -487,7 +487,6 @@ export default class TablePerson extends Component {
 
 		// 	type.push(ret.children[0].name)
 		// }
-		console.log("data_person", data_person)
 		let element = ''
 		let data_person =
 			persons.map((item, index) => {
