@@ -18,8 +18,8 @@ export default class ContrastTable extends Component {
         	size:10,
         	exportsize: 100,
         	leftkeycode: '',
-        	stime: moment().format('2017-11-23 00:00:00'),
-			etime: moment().format('2017-11-23 23:59:59'),
+        	stime: moment().format('YYYY-MM-DD 00:00:00'),
+			etime: moment().format('YYYY-MM-DD 23:59:59'),
 			sxm: '',
 			section: '',
     		bigType: '',
@@ -34,13 +34,13 @@ export default class ContrastTable extends Component {
     	
     }
     componentWillReceiveProps(nextProps){
-    	if(nextProps.leftkeycode != this.state.leftkeycode) {
-			this.setState({
-				leftkeycode: nextProps.leftkeycode,
-    		},()=> {
-    			this.qury(1);
-    		})
-    	} 
+    	// if(nextProps.leftkeycode != this.state.leftkeycode) {
+		// 	this.setState({
+		// 		leftkeycode: nextProps.leftkeycode,
+    	// 	},()=> {
+    	// 		this.qury(1);
+    	// 	})
+    	// } 
     }
 	render() {
 		const {tblData} = this.state;
@@ -178,7 +178,7 @@ export default class ContrastTable extends Component {
 		},{
 			title:"监理人",
 			render: (text,record) => {
-				return <span>{record.SupervisorUser.Full_Name || '/'}</span>
+				return <span>{record.SupervisorUser ? record.SupervisorUser.Full_Name : '/'}</span>
 				
 			}
 		}];

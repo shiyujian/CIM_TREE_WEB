@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import { Modal, Input, Form, Button, Notification, Table, Radio, Row, Col, Select } from 'antd';
 import { CODE_PROJECT } from '_platform/api';
+// import { getProjectUnits } from '../../../_platform/auth'
 import '../index.less';
-import { getUser } from '_platform/auth';
+import { getUser, getProjectUnits } from '_platform/auth';
 import { getNextStates } from '_platform/components/Progress/util';
 import { WORKFLOW_CODE } from '_platform/api'
 import { flattenDeep } from 'lodash';
 const RadioGroup = Radio.Group;
+const { Option, OptGroup } = Select;
+
 const { TextArea } = Input;
 var moment = require('moment');
 
@@ -20,12 +23,12 @@ export default class PersonModify extends Component {
             checkers: [],
             defaultPro: "",
             defaultchecker: "",
-            units: [],
+            // units: [],
             selectPro: [],
             selectUnit: [],
             subErr: true,
             description: '',
-            id:'',
+            id: '',
         }
     }
 
@@ -37,18 +40,145 @@ export default class PersonModify extends Component {
         })
 
     }
+    //获取项目的标段
+    getUnits(record) {
+        const {
+			listStore = []
+		} = this.props;
+        let projectName = ''
+        console.log("this.props", this.props)
+        listStore.map((item, index) => {
+            item.map((rst) => {
+                if ((rst.name === record.orgname) && (rst.code === record.orgcode)) {
+                    projectName = listStore[index] ? listStore[index][0].name : ''
+                }
+            })
 
+        })
+        console.log('projectName', projectName)
+        return getProjectUnits(projectName)
+    }
+    changeRolea(record, value) {
+        const { actions: { changeAdditionField } } = this.props;
+        console.log("value", value)
+        record.sections = value
+        changeAdditionField('sections', value)
+    }
+    changeRoles(record, value) {
+        const { actions: { changeAdditionField } } = this.props;
+        console.log("value111111", value)
+        record.groups = value
+        changeAdditionField('groups', value)
+    }
+    renderContent() {
+
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const { platform: { roles = [] } } = this.props;
+        var systemRoles = []
+        if (user.is_superuser) {
+            systemRoles.push({ name: '苗圃角色', value: roles.filter(role => role.grouptype === 0) });
+            systemRoles.push({ name: '施工角色', value: roles.filter(role => role.grouptype === 1) });
+            systemRoles.push({ name: '监理角色', value: roles.filter(role => role.grouptype === 2) });
+            systemRoles.push({ name: '业主角色', value: roles.filter(role => role.grouptype === 3) });
+        }
+        else {
+            for (let i = 0; i < user.groups.length; i++) {
+                const rolea = user.groups[i].grouptype
+                switch (rolea) {
+                    case 0:
+                        systemRoles.push({ name: '苗圃角色', value: roles.filter(role => role.grouptype === 0) });
+                        break;
+                    case 1:
+                        systemRoles.push({ name: '苗圃角色', value: roles.filter(role => role.grouptype === 0) });
+                        systemRoles.push({ name: '施工角色', value: roles.filter(role => role.grouptype === 1) });
+                        break;
+                    case 2:
+                        systemRoles.push({ name: '监理角色', value: roles.filter(role => role.grouptype === 2) });
+                        break;
+                    case 3:
+                        systemRoles.push({ name: '业主角色', value: roles.filter(role => role.grouptype === 3) });
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        const objs = systemRoles.map(roless => {
+            return (<OptGroup label={roless.name}>
+                {
+                    roless.value.map(role => {
+                        return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+                    })
+                }
+            </OptGroup>)
+        })
+        return objs
+    }
+    changeNursery(value,record){
+		const { actions: { changeAdditionField }, tags = [] } = this.props;
+		let defaultTags = []
+		//对于从select组建传过来的value，进行判断，如果是ID，直接push，如果是苗圃名字，那么找到对应的ID，再push
+		record.map((item)=>{
+			let data = item.toString().split('-');
+			if(data.length===2){
+				tags.map((rst)=>{
+					if(rst && rst.ID){
+						if(rst.NurseryName === data[0] && rst.Factory === data[1]){
+							defaultTags.push(rst.ID.toString())
+						}
+					}
+				})
+			}else{
+				defaultTags.push(item.toString())
+			}
+        })
+        defaultTags = [...new Set(defaultTags)]
+        value.tags=defaultTags
+		changeAdditionField('tags', defaultTags)
+	}
+    query(record){
+		if(record && record.tags){
+			const {
+				tags = []
+			}= this.props
+            let array = record.tags || []
+			let defaultNurse = []
+			array.map((item)=>{
+				tags.map((rst)=>{
+					if(rst && rst.ID){
+						if(rst.ID.toString() === item){
+							defaultNurse.push(rst.NurseryName+'-'+rst.Factory)
+						}
+					}
+				})
+			})
+			return defaultNurse
+		}
+	}
+    //初始化苗圃
+    initopthins(list) {
+        const ops = [];
+        for (let i = 0; i < list.length; i++) {
+            ops.push(<Option key={list[i].ID} value={list[i].ID} title={list[i].NurseryName + '-' + list[i].Factory}>{list[i].NurseryName + '-' + list[i].Factory}</Option>)
+        }
+        return ops;
+    }
     render() {
-        const { Modvisible, actions: { getOrgReverse } } = this.props;
+        const { Modvisible, actions: { getOrgReverse }, tags = [] } = this.props;
+        const { platform: { roles = [] } } = this.props;
+        const tagsOptions = this.initopthins(tags);
         const columns = [{
             title: '序号',
             dataIndex: 'index',
             key: 'Index',
-        }, {
-            title: '人员编码',
-            dataIndex: 'code',
-            key: 'Code',
-        }, {
+        }
+            // , {
+            //     title: '人员编码',
+            //     dataIndex: 'code',
+            //     key: 'Code',
+            // }
+            , {
             title: '姓名',
             dataIndex: 'name',
             key: 'Name',
@@ -71,7 +201,7 @@ export default class PersonModify extends Component {
         //         }
         //     }
         // },
-         {
+        {
             title: '所属部门',
             dataIndex: 'orgcode',
             key: 'Depart',
@@ -137,31 +267,80 @@ export default class PersonModify extends Component {
                 }} />
             }
         }
-        // , {
-        //     title: '用户名',
-        //     dataIndex: 'username',
-        //     key: 'username',
+            , {
+            title: '标段',
+            dataIndex: 'sections',
+            key: 'sections',
+            render: (text, record, index) => {
+                console.log("record", record)
+                let units = this.getUnits(record)
+                console.log("units", units)
+                return <Select   value={record.sections} onChange={this.changeRolea.bind(this, record)}
+                    mode="multiple" style={{ width: '100%',minWidth:"50px" }}>
+                    {
+                        units ?
+                            units.map((item) => {
+                                return <Option key={item.code} value={item.code} >{item.value}</Option>
+                            }) :
+                            ''
+                    }
+                </Select>
+            }
+        }
+            , {
+            title: '角色',
+            dataIndex: 'groups',
+            key: 'groups',
+            render: (text, record, index) => {
+                return <Select  value={record.groups} onChange={this.changeRoles.bind(this, record)}
+                    mode="multiple" style={{ width: '100%' ,minWidth:"50px"}}>
+                    {
+                        this.renderContent()
+                    }
+                </Select>
+            }
+        }
+        //     , {
+        //     title: '苗圃',
+        //     dataIndex: 'tags',
+        //     key: 'tags',
         //     render: (text, record, index) => {
-        //         // console.log("record",record.username)
-        //         return <Input value={record.username || ""} onChange={ele => {
-        //             record.username = ele.target.value
-        //         // console.log("222",record.username)
-                
-        //             this.forceUpdate();
-        //         }} />
+        //         let defaultNurse = this.query(record)
+        //         return <Select placeholder="苗圃" showSearch
+        //             value={defaultNurse}
+        //             optionFilterProp='children'
+        //             filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+        //             onChange={this.changeNursery.bind(this,record)}
+        //             mode="multiple" style={{ width: '100%' }} >
+        //             {tagsOptions}
+        //         </Select>
         //     }
         // }
-        // ,{
-        //     title: '密码',
-        //     dataIndex: 'passwords',
-        //     key: 'Passwords',
-        //     render: (text, record, index) => {
-        //         return <Input value={record.passwords || ""} onChange={ele => {
-        //             record.passwords = ele.target.value
-        //             this.forceUpdate();
-        //         }} />
-        //     }
-        // }
+            // , {
+            //     title: '用户名',
+            //     dataIndex: 'username',
+            //     key: 'username',
+            //     render: (text, record, index) => {
+            //         // console.log("record",record.username)
+            //         return <Input value={record.username || ""} onChange={ele => {
+            //             record.username = ele.target.value
+            //         // console.log("222",record.username)
+
+            //             this.forceUpdate();
+            //         }} />
+            //     }
+            // }
+            // ,{
+            //     title: '密码',
+            //     dataIndex: 'passwords',
+            //     key: 'Passwords',
+            //     render: (text, record, index) => {
+            //         return <Input value={record.passwords || ""} onChange={ele => {
+            //             record.passwords = ele.target.value
+            //             this.forceUpdate();
+            //         }} />
+            //     }
+            // }
             // , {
             // 	title: '二维码',
             // 	// dataIndex: 'signature',
@@ -174,16 +353,17 @@ export default class PersonModify extends Component {
             //         }
             //     }
             // }
-            , {
-            title: '是否为用户',
-            render: (record) => {
-                if (record.is_user) {
-                    return (<span>是</span>)
-                } else {
-                    return (<span>否</span>)
-                }
-            }
-        }]
+            //     , {
+            //     title: '是否为用户',
+            //     render: (record) => {
+            //         if (record.is_user) {
+            //             return (<span>是</span>)
+            //         } else {
+            //             return (<span>否</span>)
+            //         }
+            //     }
+            // }
+        ]
 
         return (
             <Modal
@@ -219,7 +399,7 @@ export default class PersonModify extends Component {
     }
 
     onChange = (e) => {
-        console.log("2222",e.target.value)
+        console.log("2222", e.target.value)
         this.setState({
             value: e.target.value,
         });
@@ -237,40 +417,48 @@ export default class PersonModify extends Component {
             actions: { postUser, clearAdditionField, getUsers, putUser }
         } = this.props;
         console.log(this.props)
+
         // console.log(addition)
         const { actions: { ModifyVisible, PutPeople, getOrgName, putPersons, reverseFind, is_fresh } } = this.props;
         let obj = this.state.dataSource;
         let data_list = {};
         let pks = [];
-        // for(let i = 0; i < this.state.dataSource.length;i++){
-        //     let rst = await getOrgName({code:this.state.dataSource[i].orgcode})
-        //     pks.push(rst.pk);
-        // }
+        for (let i = 0; i < this.state.dataSource.length; i++) {
+            let rst = await getOrgName({ code: this.state.dataSource[i].orgcode })
+            console.log("rst", rst)
+            pks.push(rst.pk);
+        }
+        console.log("pks", pks)
         // 是用户
         if (obj[0].is_user) {
             // let rst = await reverseFind({pk:obj[0].personPk})
             console.log(obj)
+            console.log("addition", addition)
+            // return
             obj.map((item, index) => {
-                console.log("item.username",item)
+                console.log("item.username", item)
 
-                putUser({ id: item.id}, {
+                putUser({}, {
+                    id: item.id,
+                    username: item.username,
                     email: item.email,
-                    password: item.passwords, // 密码不能变？信息中没有密码
+                    // password: item.passwords, // 密码不能变？信息中没有密码
                     account: {
                         person_name: item.name || '',
                         person_type: "C_PER",
                         person_avatar_url: "",
-                        username: item.username,
                         organization: {
-                            // pk: "119677274701" || '',
-                            code: item.code || '',
+                            pk: pks[0],
+                            code: item.orgcode || '',
                             obj_type: "C_ORG",
                             rel_type: "member",
-                            username: item.username,
+                            name: item.orgname,
                             // name: item.name || ''
                         },
                     },
-                    // groups: roles.map(role => +role),
+                    tags: item.tags,
+                    sections: item.sections,
+                    groups: item.groups,
                     is_active: true,
                     basic_params: {
                         info: {
@@ -284,16 +472,14 @@ export default class PersonModify extends Component {
                     },
                     extra_params: {},
                     title: item.job || '',
-                    id: item.id,
-                    username: item.username,
                 }).then(item => {
                     console.log(item)
                     if (item) {
                         is_fresh(true);
                         // clearAdditionField();
-						// const codes = Addition.collect(node);
-						// console.log("codes",codes)
-						// getUsers({}, {org_code: item.account.org_code});
+                        // const codes = Addition.collect(node);
+                        // console.log("codes",codes)
+                        // getUsers({}, {org_code: item.account.org_code});
                         Notification.success({
                             message: "修改成功！"
                         })

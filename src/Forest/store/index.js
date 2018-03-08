@@ -23,6 +23,7 @@ export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeO
 // export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getTreeNodeListOK]); //    √
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/tree/factoryAnalyse`, []);
+export const getForestTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
 export const getNurserysTree = createFetchAction(`${FOREST_API}/tree/treenurserys`, []);
 export const getqueryTree = createFetchAction(`${FOREST_API}/tree/queryTree`, []);
@@ -56,6 +57,7 @@ export const postFile = createFetchAction(`${FOREST_API}/db/import_location/`, [
 export const getHonestyNewDetail = createFetchAction(`${FOREST_API}/tree/factoryAnalyseDetailInfo?factory={{name}}`, [getHonestyNewDetailOk], 'GET');
 export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/honesty/new/?detail=true`, []);
 export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, '');
+export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //    √
 export const actions = {
 	getForestUsers,
 	getTreeOK,
@@ -98,6 +100,8 @@ export const actions = {
 	getNurserysCountFast,
 	getHonestyNewTreetype,
 	getHonestyNewDetailModal,
+	getLittleBan,
+	getForestTreeNodeList
 	// getTreeNodeList
 };
 export default handleActions({
