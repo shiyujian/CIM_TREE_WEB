@@ -353,7 +353,7 @@ export default class ToggleModal extends Component {
                                 }} /></a>
                                 <Popconfirm
                                     title="确认删除吗"
-                                    onConfirm={this.delete.bind(this, record.index - 1)}
+                                    onConfirm={this.delete.bind(this, record,record.index)}
                                     okText="确认"
                                     onCancel="取消"
                                 >
@@ -646,9 +646,16 @@ export default class ToggleModal extends Component {
             this.setState({ dataSource });
         })
     }
-    delete(index) {
-        let dataSource = this.state.dataSource;
-        dataSource.splice(index, 1);
+    delete(record,index) {
+        // console.log('record00',record)
+        // console.log('index00',index)
+        let dataSource = this.state.dataSource; 
+        dataSource.map(item => {
+            if(item.index===index){
+                let arrIndex=dataSource.indexOf(record)
+               dataSource.splice(arrIndex, 1); 
+            }
+        })
         this.setState({ flag_code: true, subErr: true })
         // this.delData(dataSource);
         this.setState({ dataSource })
