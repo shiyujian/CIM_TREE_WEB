@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Select} from 'antd';
 import * as actions from '../store';
 import {PkCodeTree} from '../components';
-import {PROJECT_UNITS} from '_platform/api';
+import {PROJECT_UNITS,FORESTTYPE} from '_platform/api';
 import {LocmeasureTable} from '../components/Locmeasureinfo';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
@@ -35,6 +35,22 @@ export default class Locmeasureinfo extends Component {
             leftkeycode: '',
             resetkey: 0,
             bigType: '',
+        }
+    }
+    getbigTypeName(type){
+        switch(type){
+            case '1':
+                return '常绿乔木'
+            case '2':
+                return '落叶乔木'
+            case '3':
+                return '亚乔木'
+            case '4':
+                return '灌木'
+            case '5':
+                return '草本'
+            default :
+            return ''
         }
     }
     componentDidMount() {
@@ -232,15 +248,33 @@ export default class Locmeasureinfo extends Component {
     typeselect(value){
         const {treetypes} =this.props;
         this.setState({bigType: value});
-        //树种
-        this.setTreeTypeOption(treetypes&&treetypes[value] ? treetypes[value] : []);
+        let newValue = this.getbigTypeName(value);
+        let selectTreeType = [];
+        if(newValue === ''){
+            FORESTTYPE.map((rst =>{
+                let children = rst.children
+                children.map(item =>{
+                    selectTreeType.push(treetypes.find((tree)=> tree.TreeTypeName === item.name))
+                })
+            }))
+        }else{
+            FORESTTYPE.map((rst =>{
+                if (rst.name === newValue){
+                    let children = rst.children
+                    children.map(item =>{
+                        selectTreeType.push(treetypes.find((tree)=> tree.TreeTypeName === item.name))
+                    })
+                }
+            }))
+        }
+        this.setTreeTypeOption(selectTreeType);
     }
 
     //设置树种选项
     setTreeTypeOption(rst) {
         if(rst instanceof Array){
             let treetypeoption = rst.map(item => {
-                return <Option key={item.TreeTypeNo} value={item.TreeTypeName}>{item.TreeTypeName}</Option>
+                return <Option key={item.id} value={item.ID}>{item.TreeTypeName}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({treetypeoption,treetypelist:rst})
