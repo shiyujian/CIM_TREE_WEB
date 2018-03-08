@@ -45,6 +45,8 @@ const getPersonList = createFetchAction(`${USER_API}/users/?pagesize={{pagesize}
 const deletePerson = createFetchAction(`${SERVICE_API}/persons/code/{{code}}/?this=true`, [], "DELETE");
 const is_fresh = createAction("确定是否刷新")
 
+export const getListStore = createAction(`${ID}getListStore`);
+
 // 苗圃信息
 const getTagsOK = createAction(`${ID}_GET_TAGS_OK`);
 const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
@@ -79,7 +81,8 @@ export const actions = {
 	postName,
 	reverseFind,
 	is_fresh,
-	deletePerson
+	deletePerson,
+	getListStore
 };
 
 export default handleActions({
@@ -110,6 +113,10 @@ export default handleActions({
 	[is_fresh]: (state, {payload}) => ({
 		...state,
 		is_fresh:payload,
+	}),
+	[getListStore]: (state, {payload}) => ({
+		...state,
+		listStore: payload
 	}),
 	[combineActions(...actionsMap(sidebarReducer))]: (state, action) => ({
 		...state,

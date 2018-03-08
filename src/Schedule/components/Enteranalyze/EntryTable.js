@@ -575,8 +575,12 @@ export default class EntryTable extends Component {
             <Option key={Math.random()*4} value={'灌木'}>灌木</Option>,
             <Option key={Math.random()*5} value={'草本'}>草本</Option>,
         ];
-        this.setState({treetyoption})
-
+        this.setState({
+            treetyoption,
+            loading5:true,
+            loading4:true,
+            loading3:true
+        })
         this.query(1)
         this.search()
         
@@ -584,23 +588,24 @@ export default class EntryTable extends Component {
         const {actions: {getfactory,nowmessage}} = this.props;
         //实时种植信息
         nowmessage().then(rst=>{
-            console.log(rst.content,"xionsui");
-            this.setState({
-                nowmessagelist:rst.content,
-            })
+            if(rst && rst.content){
+                console.log(rst.content,"xionsui");
+                this.setState({
+                    nowmessagelist:rst.content,
+                })
+            }
         })
-        this.setState({
-            loading5:true,
-            loading4:true,
-            loading3:true
-        })
+        
        
         getfactory().then(rst=>{
             this.setState({loading5:false})
-            var factorynum = rst.length;
-            this.setState({
-                nurserys:factorynum,
-            }) 
+            if(rst && rst instanceof Array ){
+                let factorynum = rst.length;
+                this.setState({
+                    nurserys:factorynum,
+                }) 
+            }
+            
         })
         
     }

@@ -6,13 +6,13 @@ const { Option, OptGroup } = Select;
 
 export default class Addition extends Component {
 	static propTypes = {};
-    constructor(props){
-        super(props);
-        this.state={
-			searchList:[],
-			search:false,
-			searchValue:''
-        }
+	constructor(props) {
+		super(props);
+		this.state = {
+			searchList: [],
+			search: false,
+			searchValue: ''
+		}
 	}
 
 	renderContent() {
@@ -64,13 +64,14 @@ export default class Addition extends Component {
 	render() {
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = [] } = this.props;
 		const tagsOptions = this.initopthins(tags);
-		console.log('1111111111addition.tags',addition)
-		const{
+		const {
 			search
 		}= this.state
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		let nurseryData = [];
 		let defaultNurse = this.query(addition)
 		let units = this.getUnits()
+
 		return (
 			<Modal title={addition.id ? "编辑人员信息" : "新增人员"} visible={addition.visible} className="large-modal" width={800}
 				maskClosable={false}
@@ -90,6 +91,11 @@ export default class Addition extends Component {
 								<Option value="男">男</Option>
 							</Select>
 						</FormItem>
+						{user.is_superuser?
+							<FormItem {...Addition.layout} label="部门编码">
+								<Input placeholder="部门编码" value={addition.org_code} onChange={changeAdditionField.bind(this, 'org_code')} />
+							</FormItem>:''
+						}
 						<FormItem {...Addition.layout} label="密码">
 							<Input disabled={!!addition.id} placeholder="请输入密码" value={addition.password}
 								onChange={changeAdditionField.bind(this, 'password')} />
@@ -117,6 +123,11 @@ export default class Addition extends Component {
 						<FormItem {...Addition.layout} label="职务">
 							<Input placeholder="请输入职务" value={addition.title} onChange={changeAdditionField.bind(this, 'title')} />
 						</FormItem>
+						{user.is_superuser?
+							<FormItem {...Addition.layout} label="部门名称">
+								<Input placeholder="部门名称" value={addition.organization} onChange={changeAdditionField.bind(this, 'organization')} />
+							</FormItem>:''
+						}
 						<FormItem {...Addition.layout} label="角色">
 							<Select placeholder="请选择角色" value={addition.roles} onChange={this.changeRoles.bind(this)}
 								mode="multiple" style={{ width: '100%' }}>
@@ -128,14 +139,14 @@ export default class Addition extends Component {
 						<FormItem {...Addition.layout} label="苗圃">
 							{/* <Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
 								mode="multiple" style={{ width: '100%' }} > */}
-								{/* {tagsOptions} */}
-														
-							<Select placeholder="苗圃" showSearch   
-							value={defaultNurse}
-							optionFilterProp = 'children'
-							filterOption={(input,option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-							onChange={this.changeNursery.bind(this)}
-							mode="multiple" style={{ width: '100%' }} >
+							{/* {tagsOptions} */}
+
+							<Select placeholder="苗圃" showSearch
+								value={defaultNurse}
+								optionFilterProp='children'
+								filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+								onChange={this.changeNursery.bind(this)}
+								mode="multiple" style={{ width: '100%' }} >
 								{tagsOptions}
 							</Select>
 						</FormItem>
@@ -155,13 +166,11 @@ export default class Addition extends Component {
 		listStore.map((item, index) => {
 			item.map((rst) => {
 				if ((rst.name === node.name) && (rst.code === node.code)) {
-					console.log('node.name', node.name)
 					projectName = listStore[index] ? listStore[index][0].name : ''
 				}
 			})
 
 		})
-		console.log('projectName', projectName)
 		return getProjectUnits(projectName)
 	}
 
@@ -169,7 +178,7 @@ export default class Addition extends Component {
 	initopthins(list) {
 		const ops = [];
 		for (let i = 0; i < list.length; i++) {
-			ops.push(<Option key={list[i].ID} value={list[i].ID} title={list[i].NurseryName+'-'+list[i].Factory}>{list[i].NurseryName+'-'+list[i].Factory}</Option>)
+			ops.push(<Option key={list[i].ID} value={list[i].ID} title={list[i].NurseryName + '-' + list[i].Factory}>{list[i].NurseryName + '-' + list[i].Factory}</Option>)
 		}
 		return ops;
 	}
@@ -184,26 +193,26 @@ export default class Addition extends Component {
 		changeAdditionField('roles', value)
 	}
 	changeRolea(value) {
-		const { actions: { changeAdditionField,getSection } } = this.props;
-			getSection(value)
+		const { actions: { changeAdditionField, getSection } } = this.props;
+		getSection(value)
 		changeAdditionField('sections', value)
 	}
 	//将选择的苗圃传入redux
-	changeNursery(value){
+	changeNursery(value) {
 		const { actions: { changeAdditionField }, tags = [] } = this.props;
 		let defaultTags = []
 		//对于从select组建传过来的value，进行判断，如果是ID，直接push，如果是苗圃名字，那么找到对应的ID，再push
-		value.map((item)=>{
+		value.map((item) => {
 			let data = item.toString().split('-');
-			if(data.length===2){
-				tags.map((rst)=>{
-					if(rst && rst.ID){
-						if(rst.NurseryName === data[0] && rst.Factory === data[1]){
+			if (data.length === 2) {
+				tags.map((rst) => {
+					if (rst && rst.ID) {
+						if (rst.NurseryName === data[0] && rst.Factory === data[1]) {
 							defaultTags.push(rst.ID.toString())
 						}
 					}
 				})
-			}else{
+			} else {
 				defaultTags.push(item.toString())
 			}
 		})
@@ -211,18 +220,18 @@ export default class Addition extends Component {
 		changeAdditionField('tags', defaultTags)
 	}
 	//对苗圃的id显示为苗圃的名称
-	query(value){
-		if(value && value.tags){
+	query(value) {
+		if (value && value.tags) {
 			const {
 				tags = []
-			}= this.props
+			} = this.props
 			let array = value.tags || []
 			let defaultNurse = []
-			array.map((item)=>{
-				tags.map((rst)=>{
-					if(rst && rst.ID){
-						if(rst.ID.toString() === item){
-							defaultNurse.push(rst.NurseryName+'-'+rst.Factory)
+			array.map((item) => {
+				tags.map((rst) => {
+					if (rst && rst.ID) {
+						if (rst.ID.toString() === item) {
+							defaultNurse.push(rst.NurseryName + '-' + rst.Factory)
 						}
 					}
 				})
@@ -234,10 +243,9 @@ export default class Addition extends Component {
 	async save() {
 		const {
 			addition = {}, sidebar: { node } = {},
-			actions: { postUser, clearAdditionField, getUsers, putUser ,getSection}, tags = {}
+			actions: { postUser, clearAdditionField, getUsers, putUser, getSection }, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
-		console.log("roles", roles)
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
 		} else if (!addition.person_name) {
@@ -279,18 +287,14 @@ export default class Addition extends Component {
 					extra_params: {},
 					title: addition.title || ''
 				}).then(async rst => {
-					console.log("rst", rst)
 					if (rst.code == 1) {
 						const codes = Addition.collect(node);
-						console.log("codes", codes);
-						console.log("codescodescodescodescodescodes", codes);
 						await getUsers({}, { org_code: codes });
 						message.info('修改人员成功');
 						let sectiona = []
 						getSection(sectiona)
 						clearAdditionField();
 					} else {
-						console.log("111")
 						message.warn('服务器端报错！');
 					}
 				})
@@ -330,7 +334,6 @@ export default class Addition extends Component {
 					extra_params: {},
 					title: addition.title || ''
 				}).then(rst => {
-					console.log("rst", rst)
 					if (rst.code == 1) {
 						message.info('新增人员成功');
 						let sectiona = []
@@ -339,12 +342,9 @@ export default class Addition extends Component {
 						const codes = Addition.collect(node);
 						getUsers({}, { org_code: codes });
 					} else {
-						console.log(rst)
 						if (rst.code == 2) {
-
 							message.warn('用户名已存在！');
 						} else {
-							console.log("222")
 							message.warn('服务器端报错！');
 						}
 					}
@@ -362,10 +362,10 @@ export default class Addition extends Component {
 		const { children = [], code } = node;
 		let rst = [];
 		rst.push(code);
-		children.forEach(n => {
-			const codes = Addition.collect(n);
-			rst = rst.concat(codes);
-		});
+		// children.forEach(n => {
+		// 	const codes = Addition.collect(n);
+		// 	rst = rst.concat(codes);
+		// });
 		return rst;
 	}
 
