@@ -162,21 +162,21 @@ export default class Proprogress extends Component {
                 </Sidebar>
                 <Content>
                     <Row gutter={10} style={{margin: '10px 5px'}}>
-					<Col span={12}>
-					     <LeftTop  {...this.props} {...this.state}/>
-					</Col>
-					<Col span={12}>
-						<RightTop  {...this.props} {...this.state}/>
-					</Col>
-				</Row>
-				<Row gutter={10} style={{margin: '10px 5px'}}>
-					<Col span={12}>
-						<LeftBottom   {...this.props} {...this.state}/>
-					</Col>
-					<Col span={12}>
-						 <RightBottom  {...this.props} {...this.state}/>
-					</Col>
-				</Row>
+                        <Col span={12}>
+                            <LeftTop  {...this.props} {...this.state}/>
+                        </Col>
+                        <Col span={12}>
+                            <RightTop  {...this.props} {...this.state}/>
+                        </Col>
+                    </Row>
+                    <Row gutter={10} style={{margin: '10px 5px'}}>
+                        <Col span={12}>
+                            <LeftBottom   {...this.props} {...this.state}/>
+                        </Col>
+                        <Col span={12}>
+                            <RightBottom  {...this.props} {...this.state}/>
+                        </Col>
+                    </Row>
                 </Content>
 			</div>);
 	}

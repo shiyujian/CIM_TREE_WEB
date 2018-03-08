@@ -9,6 +9,11 @@ import {ScheduleTable} from '../components/Scheduleanalyze';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {groupBy} from 'lodash';
+import LeftTop from '../components/Scheduleanalyze/LeftTop';
+import RightTop from '../components/Scheduleanalyze/RightTop';
+import MiddleTop from '../components/Scheduleanalyze/MiddleTop';
+import Bottom from '../components/Scheduleanalyze/Bottom';
+
 
 var echarts = require('echarts');
 const {RangePicker} = DatePicker;
@@ -41,78 +46,74 @@ export default class Scheduleanalyze extends Component {
         }
     }
 
-    componentDidMount () {
-          
 
-        const {actions: {setkeycode,getTree,getTreeList}} = this.props;
+    componentDidMount () {
+        const {actions: {getTree,getTreeList,getTreeNodeList,setkeycode}, treetypes,platform:{tree = {}}} = this.props; 
         
-        const {leftkeycode} = this.state;
-           getTree({},{parent:leftkeycode})
-            .then(rst => {
-                this.setSectionOption(rst);
-                this.setSmallClassOption(rst,"1标段");
-                // this.sectionselect(rst);
-            });
-        //地块树
-         try {
-            getTree({},{parent:'root'})
-            .then(rst => {
-                if(rst instanceof Array && rst.length > 0){
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
-                    getTree({},{parent:rst[0].No})
-                    .then(rst1 => {
-                        if(rst1 instanceof Array && rst1.length > 0){
-                            rst1.forEach((item,index) => {
-                                rst1[index].children = []
-                            })
-                            getNewTreeData(rst,rst[0].No,rst1)
-                            getTree({},{parent:rst1[0].No})
-                            .then(rst2 => {
-                                if(rst2 instanceof Array && rst2.length > 0){
-                                    getNewTreeData(rst,rst1[0].No,rst2)
-                                    this.setState({treeLists:rst},() => {
-                                        this.onSelect([rst2[0].No])
-                                    })
-                                   
-                                } else {
-                                    this.setState({treeLists:rst})
-                                }
-                            })
-                        }else {
-                            this.setState({treeLists:rst})
-                        }
-                    })
-                }
-            })
-        } catch(e){
-            console.log(e)
+        if(!tree.treeList){
+            getTreeNodeList()
         }
+        const {leftkeycode} = this.state;
+        getTree({},{parent:leftkeycode}).then(rst => {
+            this.setSectionOption(rst);
+            this.setSmallClassOption(rst,"1标段");
+            // this.sectionselect(rst);
+        });
+        this.setState({
+            leftkeycode:"P009-01"
+        })
+    }
+    //树选择, 重新获取: 标段、树种并置空
+    onSelect(value = []) {
+        console.log('onSelect  value',value)
+        let keycode = value[0] || '';
+        const {actions:{setkeycode,gettreetype,getTree}} =this.props;
+        setkeycode(keycode);
+        this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
     }
 
     render() {
-        const {keycode} = this.props;
         const {
-            treeLists,
             sectionoption,
             leftkeycode,
             smallclassoption,
             section,
             smallclass,
         } = this.state;
+        const {platform:{tree={}},keycode} = this.props;
+        let treeList = [];
+        if(tree.treeList){
+            treeList = tree.treeList
+        }
+        console.log('tree',tree)
         return (
             <Body>
                 <Main>
                     <DynamicTitle title="种植进度分析" {...this.props}/>
                     <Sidebar>
-                        <PkCodeTree treeData={treeLists}
+                        <PkCodeTree treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
-                            onExpand={this.onExpand.bind(this)}
+                            // onExpand={this.onExpand.bind(this)}
                         />
                     </Sidebar>
                     <Content>
+                        {/* <Row gutter={10} style={{margin: '10px 5px'}}>
+                            <Col span={8}>
+                                <LeftTop  {...this.props} {...this.state}/>
+                            </Col>
+                            <Col span={8}>
+                                <MiddleTop  {...this.props} {...this.state}/>
+                            </Col>
+                            <Col span={8}>
+                                <RightTop  {...this.props} {...this.state}/>
+                            </Col>
+                        </Row>
+                        <Row gutter={10} style={{margin: '10px 5px'}}>
+                            <Col span={24}>
+                                <Bottom   {...this.props} {...this.state}/>
+                            </Col>
+                        </Row> */}
                         <ScheduleTable
                             key={leftkeycode}
                             {...this.props} 
@@ -195,53 +196,5 @@ export default class Scheduleanalyze extends Component {
             })
             this.setState({smallclassoption: smallclassOptions, smallclass: smallclassList[0]})
         }
-    }
-     //树选择
-    onSelect(value) {
-        console.log(value);
-        let keycode = value[0] || '';
-        
-        this.setState({leftkeycode:value})
-        console.log(keycode);
-      console.log(this.state.leftkeycode);
-    }
-    
-    //树展开
-    onExpand(expandedKeys,info) {
-        const treeNode = info.node;
-        const {actions: {getTree}} = this.props;
-        const {treeLists} = this.state;
-        const keycode = treeNode.props.eventKey;
-        getTree({},{parent:keycode,paginate:false})
-        .then(rst => {
-            if(rst instanceof Array){
-                if(rst.length > 0 && rst[0].wptype != '子单位工程') {
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
-                }
-                getNewTreeData(treeLists,keycode,rst)
-                this.setState({treeLists:treeLists})
-            }
-        })
-    }
-}
-
-//连接树children
-function getNewTreeData(treeData, curKey, child) {
-    const loop = (data) => {
-        data.forEach((item) => {
-            if (curKey == item.No) {
-                item.children = child;
-            }else{
-                if(item.children)
-                    loop(item.children);
-            }
-        });
-    };
-    try {
-       loop(treeData);
-    } catch(e) {
-        console.log(e)
     }
 }

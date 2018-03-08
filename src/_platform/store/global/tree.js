@@ -4,6 +4,10 @@ import {FOREST_API} from '../../api';
 
 export const getTreeNodeListOK = createAction('获取森林大数据树节点')
 export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getTreeNodeListOK]); //    √
+export const getLittleClassOK = createAction('获取森林大数据树小班细班信息')
+export const getLittleClass = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`,[getLittleClassOK])
+
+
 export default handleActions({
     [getTreeNodeListOK]: (state, {payload}) => {
 		let nodeLevel = [];
@@ -26,5 +30,11 @@ export default handleActions({
 			...state,
 			treeList: root
 		}
-	}
+	},
+	[getLittleClassOK]: (state, {payload}) => {
+	    return {
+	    	...state,
+	    	littleClass: payload
+	    }
+    }
 }, []);
