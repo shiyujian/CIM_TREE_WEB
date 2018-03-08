@@ -82,8 +82,8 @@ export default class Scheduleanalyze extends Component {
         } = this.state;
         const {platform:{tree={}},keycode} = this.props;
         let treeList = [];
-        if(tree.treeList){
-            treeList = tree.treeList
+        if(tree.bigTreeList){
+            treeList = tree.bigTreeList
         }
         console.log('tree',tree)
         return (
