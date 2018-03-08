@@ -708,7 +708,9 @@ export default class NursOverallTable extends Component {
     		stime = '',
     		etime = '',
     		status = '',
-    		size,
+			size,
+			smallclass = '',
+			thinclass
     	} = this.state;
     	let gd = '', xj = '', gf = '', dj = '', tqhd = '', tqzj = ''; 
     	if(gd_min !== '' && gd_max !== '') {
@@ -741,7 +743,9 @@ export default class NursOverallTable extends Component {
     		gf,
     		dj,
     		tqhd,
-    		tqzj,
+			tqzj,
+			smallclass,
+			thinclass,
     		SupervisorCheck,
     		CheckStatus,
     		status,

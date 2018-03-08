@@ -145,7 +145,7 @@ class CheckAccept extends Component {
         this.createLink(this, apiGet);
     }
     componentDidMount() {
-        const { actions: { getTreeNodeList, getTasksList } } = this.props;
+        const { actions: { getQualityTreeNodeList, getTasksList } } = this.props;
         let user = getUser();//当前登录用户
         let dataSource = [];
         this.setState({ user });
@@ -176,7 +176,7 @@ class CheckAccept extends Component {
                 this.setState({ dataSource })
             }
         })
-        getTreeNodeList().then(rst => {
+        getQualityTreeNodeList().then(rst => {
             let nodeLevel = [];
             if (rst instanceof Array && rst.length > 0) {
                 let root, level2, level3, level4, level5, level6 = [];
@@ -218,7 +218,11 @@ class CheckAccept extends Component {
                         return node.Parent === level2[i].No;
                     })
                 }
-                root[0].children = level2;
+                for (let i = 0; i < root.length; i++) {
+                    root[i].children = level2.filter(node => {
+                        return node.Parent === root[i].No;
+                    })
+                }
                 this.setState({ root, rst });
             }
         })

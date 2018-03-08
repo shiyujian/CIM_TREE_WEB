@@ -474,7 +474,9 @@ export default class LocmeasureTable extends Component {
     		stime = '',
     		etime = '',
     		status = '',
-    		size,
+			size,
+			thinclass = '',
+			smallclass = ''
     	} = this.state;
     	const {actions: {getqueryTree},keycode = ''} = this.props;
     	let postdata = {
@@ -490,7 +492,9 @@ export default class LocmeasureTable extends Component {
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		status,
     		page,
-    		size:size
+			size:size,
+			thinclass,
+			smallclass
     	}
     	if(!!role)
     		postdata[role] = rolename;
@@ -553,7 +557,9 @@ export default class LocmeasureTable extends Component {
     		rolename = '',
     		stime = '',
     		etime = '',
-    		exportsize,
+			exportsize,
+			thinclass = '',
+			smallclass = ''
     	} = this.state;
     	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
     	let postdata = {
@@ -567,7 +573,9 @@ export default class LocmeasureTable extends Component {
     		stime:stime&&moment(stime).add(8, 'h').unix(),
     		etime:etime&&moment(etime).add(8, 'h').unix(),
     		page:1,
-    		size:exportsize
+			size:exportsize,
+			thinclass,
+			smallclass
     	}
     	if(!!role)
     		postdata[role] = rolename;

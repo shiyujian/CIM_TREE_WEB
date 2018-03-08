@@ -2,11 +2,13 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Select} from 'antd';
+import {PROJECT_UNITS} from '_platform/api';
 import * as actions from '../store';
 import {PkCodeTree} from '../components';
 import {CheckerTable} from '../components/Checkerinfo';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
+
 const Option = Select.Option;
 @connect(
     state => {
@@ -36,7 +38,7 @@ export default class Checkerinfo extends Component {
         if(!users){
             getForestUsers();
         }
-        if(!tree.treeList){
+        if(!tree.bigTreeList){
             getTreeNodeList()
         }
         //地块树
@@ -108,8 +110,8 @@ export default class Checkerinfo extends Component {
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.treeList){
-            treeList = tree.treeList
+        if(tree.bigTreeList){
+            treeList = tree.bigTreeList
         }
         return (
                 <Body>
@@ -283,7 +285,7 @@ export default class Checkerinfo extends Component {
     //树选择, 重新获取: 标段、小班、细班 并置空
     onSelect(value = []) {
         let keycode = value[0] || '';
-        const {actions:{setkeycode,gettreetype,getTreeList,getTree}} =this.props;
+        const {actions:{setkeycode,gettreetype,getTreeList,getTree,getLittleBan}} =this.props;
         setkeycode(keycode);
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
         

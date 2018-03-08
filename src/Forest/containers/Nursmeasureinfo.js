@@ -6,6 +6,7 @@ import * as actions from '../store';
 import {PkCodeTree} from '../components';
 import {NursmeasureTable} from '../components/Nursmeasureinfo';
 import {actions as platformActions} from '_platform/store/global';
+import {PROJECT_UNITS} from '_platform/api';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 const Option = Select.Option;
 @connect(
@@ -18,6 +19,7 @@ const Option = Select.Option;
     }),
 )
 export default class Nursmeasureinfo extends Component {
+    biaoduan = [];
     constructor(props) {
         super(props)
         this.state = {
@@ -33,17 +35,23 @@ export default class Nursmeasureinfo extends Component {
         }
     }
     componentDidMount() {
+        this.biaoduan = [];
+        PROJECT_UNITS[0].units.map(item => {
+            this.biaoduan.push(item);
+        })
+        PROJECT_UNITS[1].units.map(item => {
+            this.biaoduan.push(item);
+        })
         const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();
         }
         // 避免反复获取森林树种列表，提高效率
-        debugger
         if(!treetypes){
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        if(!tree.treeList){
+        if(!tree.bigTreeList){
             getTreeNodeList()
         }
         // getTreeNodeList().then(rst => {
@@ -160,8 +168,8 @@ export default class Nursmeasureinfo extends Component {
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.treeList){
-            treeList = tree.treeList
+        if(tree.bigTreeList){
+            treeList = tree.bigTreeList
         }
         return (
                 <Body>
@@ -203,21 +211,17 @@ export default class Nursmeasureinfo extends Component {
         this.typeselect('');
     }
 
-    //设置标段选项
     setSectionOption(rst){
         if(rst instanceof Array){
             let sectionList = [];
             let sectionOptions = [];
             let sectionoption = rst.map((item, index) => {
-                if(item.Section) {
-                    let sections = item.Section;
-                    sectionList.push(sections);
-                }
+                sectionList.push(item);
             })
             let sectionData = [...new Set(sectionList)];
             sectionData.sort();
             sectionData.map(sec => {
-                sectionOptions.push(<Option key={sec} value={sec}>{sec}</Option>)
+                sectionOptions.push(<Option key={sec.code} value={sec.code}>{sec.value}</Option>)
             })
             sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({sectionoption: sectionOptions})
@@ -257,10 +261,11 @@ export default class Nursmeasureinfo extends Component {
         setkeycode(keycode);
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
         //标段
-        getTree({},{parent:keycode})
-        .then(rst => {
-            this.setSectionOption(rst)
+        //标段
+        let rst = this.biaoduan.filter(item =>{
+            return item.code.indexOf(keycode) !== -1;
         })
+        this.setSectionOption(rst)
         //树种
         this.typeselect('');
     }

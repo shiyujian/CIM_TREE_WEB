@@ -36,7 +36,7 @@ export default class Supervisorinfo extends Component {
         if(!users){
             getForestUsers();
         }
-        if(!tree.treeList){
+        if(!tree.bigTreeList){
             getTreeNodeList()
         }
         //地块树
@@ -108,8 +108,8 @@ export default class Supervisorinfo extends Component {
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.treeList){
-            treeList = tree.treeList
+        if(tree.bigTreeList){
+            treeList = tree.bigTreeList
         }
 		return (
 				<Body>

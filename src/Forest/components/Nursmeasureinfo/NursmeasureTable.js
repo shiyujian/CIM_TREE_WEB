@@ -441,7 +441,7 @@ export default class NursmeasureTable extends Component {
     	let postdata = {
     		no:keycode,
     		sxm,
-    		section,
+    		bd:section,
     		bigType,
     		treetype,
     		factory,
@@ -510,7 +510,7 @@ export default class NursmeasureTable extends Component {
     	let postdata = {
     		no:keycode,
     		sxm,
-    		section,
+    		bd:section,
     		bigType,
     		treetype,
     		factory,

@@ -38,7 +38,7 @@ export default class Faithinfo extends Component {
         if(!treetypes){
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        if(!tree.treeList){
+        if(!tree.bigTreeList){
             getTreeNodeList()
         }
         //地块树
@@ -113,8 +113,8 @@ export default class Faithinfo extends Component {
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.treeList){
-            treeList = tree.treeList
+        if(tree.bigTreeList){
+            treeList = tree.bigTreeList
         }
         return (
                 <Body>

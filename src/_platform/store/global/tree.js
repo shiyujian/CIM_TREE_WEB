@@ -24,7 +24,7 @@ export default handleActions({
 		}
 		return {
 			...state,
-			treeList: root
+			bigTreeList: root
 		}
 	}
 }, []);
