@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Row, Col, Input, Icon, DatePicker, Select, Spin} from 'antd';
 import {Cards, SumTotal, DateImg} from '../../components';
-import { FOREST_API} from '../../../_platform/api';
+import { FOREST_API, FORESTTYPE} from '../../../_platform/api';
 import moment from 'moment';
 import {groupBy} from 'lodash';
 var echarts = require('echarts');
@@ -13,18 +13,25 @@ export default class EntryTable extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            treetypeoption: [],
+            //树种的list
+            selectTreeType:[],
+            //所有的树种类型
+            treetypeAll:[],
+            //树类型option数组
             treetyoption: [],
+            //选择树种类型的值
+            treeTypeSelect : '全部',
+            //选择的树种的值
+            treeSelect :'全部',
+            //累计进场总数
             amount: '',
+            //今日进场总数
             today: '',
             nurserys: '',
             section: '',
-            stime: moment().format('YYYY/MM/DD'),
             etime: moment().format('YYYY/MM/DD'),
-            stime1: moment().format('YYYY/MM/DD'),
+            stime1: moment().format('2017/01/01'),
             etime1: moment().format('YYYY/MM/DD'),
-            stime2: moment().format('2017/11/10'),
-            etime2: moment().format('2017/11/30'),
             etime3: moment().unix(),
             loading1: false,
             loading2: false,
@@ -41,81 +48,406 @@ export default class EntryTable extends Component {
             shuzhi:[],
             nowmessage:[],
             nowmessagelist:[],
+            treetypelist:[]
         }
     }
-    componentWillReceiveProps(nextProps){
-      // this.setState({
-      //   amount:nextProps.account,
-      //   biaoduan:nextProps.biaoduan,
-      //   shuzhi:nextProps.shuzhi,
-      // })
+
+    componentDidUpdate(prevProps, prevState) {
+        const{
+            etime,
+            stime1,
+            etime1,
+            selectTreeType,
+            treeSelect
+        }=this.state
+        const {
+            leftkeycode
+        }=this.props
+        if( stime1 != prevState.stime1 || etime1 != prevState.etime1 || selectTreeType != prevState.selectTreeType || 
+            treeSelect != prevState.treeSelect 
+        ){
+            this.search()
+        }
+        if( etime != prevState.etime){
+            this.query()
+        }
+        if(leftkeycode != prevProps.leftkeycode){
+            this.search()
+            this.query()
+        }
+    }
+    async query(no){
+        const{
+            leftkeycode,
+            actions:{
+                gettreetype
+            }
+        }=this.props
+        const{
+            etime 
+        }=this.state
+        if (!leftkeycode)
+        return 
+        let postdata = {}
+        
+
+        postdata.no = leftkeycode
+        postdata.etime = etime
+        let rst = await gettreetype({},postdata)
+        console.log('aaaaaaaaaaaaaarst',rst)
+        let units = ['一标段','二标段','三标段','四标段','五标段']
+        let data = [];
+        let amount = 0;
+        let today = 0;
+        let date = moment().format('YYYY/MM/DD');
+        console.log('date',date)
+        console.log('date',date === etime)
+        if(rst && rst instanceof Array){
+            data[0] = data[1] = data[2] = data[3] = data[4] = data[5]  = 0
+            if(leftkeycode.indexOf('P009')>-1){
+                rst.map(item=>{
+                    if(item && item.Section){
+                        if(no === 1){
+                            amount = amount + item.Num
+                            if(date === item.Time){
+                                today = today + item.Num
+                            }
+                        }
+                        switch(item.Section){
+                            case 'P009-01-01' : 
+                                data[0] = data[0] + item.Num
+                                break;
+                            case 'P009-01-02' :
+                                data[1] = data[1] + item.Num
+                                break;
+                            case 'P009-01-03' :
+                                data[2] = data[2] + item.Num
+                                break;
+                            case 'P009-01-04' :
+                                data[3] = data[3] + item.Num
+                                break;
+                            case 'P009-01-05' :
+                                data[4] = data[4] + item.Num
+                                break;
+                        }
+                    }                    
+                })
+            }else if(leftkeycode.indexOf('P010') >-1){
+                units = ['一标段','二标段','三标段','四标段','五标段','六标段']
+                rst.map(item=>{
+                    if(item && item.Section){
+                        if(no === 1){
+                            amount = amount + item.Num
+                            if(date === item.Time){
+                                today = today + item.Num
+                            }
+                        }
+                        switch(item.Section){
+                            case 'P010-01-01' : 
+                                data[0] = data[0] + item.Num
+                                break;
+                            case 'P010-01-02' :
+                                data[1] = data[1] + item.Num
+                                break;
+                            case 'P010-01-03' :
+                                data[2] = data[2] + item.Num
+                                break;
+                            case 'P010-01-04' :
+                                data[3] = data[3] + item.Num
+                                break;
+                            case 'P010-02-05' :
+                                data[4] = data[4] + item.Num
+                                break;
+                            case 'P010-03-06' :
+                                data[5] = data[5] + item.Num
+                                break;
+                        }
+                    }                    
+                })
+            }
+        }
+        console.log('today',today)
+        console.log('amount',amount)
+        console.log('data',data)
+        this.setState({
+            amount,
+            today,
+            loading4:false,
+            loading3:false
+        })
+        let myChart1 = echarts.init(document.getElementById('king'));
+        let option1 = {
+            
+            xAxis: [
+                {
+                    data: units
+                }
+            ],
+            series: [
+                {
+                    data: data
+                },
+            ]
+        };
+        myChart1.setOption(option1);
+
+    }
+    async search(no){
+        const{
+            leftkeycode,
+            actions:{
+                gettreetype
+            }
+        }=this.props
+        const{
+            stime1,
+            etime1,
+            selectTreeType,
+            treeTypeSelect,
+            treeSelect,
+            treetypeAll
+        }=this.state
+        let postdata = {}
+        
+        postdata.no = leftkeycode
+        let treetype = []
+        if(treeSelect === '全部'){
+            selectTreeType.map(rst=>{
+                treetype.push(rst.ID)
+            })
+        }else{
+            treetype.push(treeSelect)
+            postdata.treetype = treetype
+        }
+        
+        postdata.stime = stime1
+        postdata.etime = etime1
+        let rst = await gettreetype({},postdata)
+        console.log('wwwwwwwwwrst',rst)
+        let total = [];
+        let data = [];
+        let gpshtnum = [];
+        let times = [];
+        let time = [];
+        data[0] = new Array()
+        data[1] = new Array()
+        data[2] = new Array()
+        data[3] = new Array()
+        data[4] = new Array()
+        if(leftkeycode.indexOf('P010') >-1){
+            data[5] = new Array()
+        }
+        
+
+        
+        if(rst && rst instanceof Array){
+            //将 Time 单独列为一个数组
+            for(let i=0;i<rst.length;i++){
+                if(rst[i].Section){
+                    time.push(rst[i].Time)
+                }
+            }
+            console.log('time',time)
+            //时间数组去重
+            times = [...new Set(time)]
+            console.log('times',times)
 
 
-        if(nextProps.leftkeycode != this.state.leftkeycode) {
-            this.setState({
-                leftkeycode: nextProps.leftkeycode,
-            }, () => {
-                this.datepickok(1);
-                this.datepickok(2);
+            //定义一个二维数组，分为多个标段
+            gpshtnum[0] = new Array()
+            gpshtnum[1] = new Array()
+            gpshtnum[2] = new Array()
+            gpshtnum[3] = new Array()
+            gpshtnum[4] = new Array()
+            
+
+            if(leftkeycode.indexOf('P009')>-1){
+                rst.map(item=>{
+                    if(item && item.Section){
+                        switch(item.Section){
+                            case 'P009-01-01' : 
+                            gpshtnum[0].push(item)
+                                break;
+                            case 'P009-01-02' :
+                            gpshtnum[1].push(item)
+                                break;
+                            case 'P009-01-03' :
+                            gpshtnum[2].push(item)
+                                break;
+                            case 'P009-01-04' :
+                            gpshtnum[3].push(item)
+                                break;
+                            case 'P009-01-05' :
+                            gpshtnum[4].push(item)
+                                break;
+                        }
+                    }                    
+                })
+            }else if(leftkeycode.indexOf('P010') >-1){
+                gpshtnum[5] = new Array()
+                rst.map(item=>{
+                    if(item && item.Section){
+                        switch(item.Section){
+                            case 'P010-01-01' : 
+                                gpshtnum[0].push(item)
+                                break;
+                            case 'P010-01-02' :
+                                gpshtnum[1].push(item)
+                                break;
+                            case 'P010-01-03' :
+                                gpshtnum[2].push(item)
+                                break;
+                            case 'P010-01-04' :
+                                gpshtnum[3].push(item)
+                                break;
+                            case 'P010-02-05' :
+                                gpshtnum[4].push(item)
+                                break;
+                            case 'P010-03-06' :
+                                gpshtnum[5].push(item)
+                                break;
+                        }
+                    }                    
+                })
+            }
+            console.log('gpshtnum',gpshtnum)
+            debugger
+            times.map((time,index)=>{
+                data[0][index]=0;
+                data[1][index]=0;
+                data[2][index]=0;
+                data[3][index]=0;
+                data[4][index]=0;
+                if(leftkeycode.indexOf('P010') >-1){
+                    data[5][index]=0;
+                }
+                
+                
+                gpshtnum.map((test,i)=>{
+                    test.map((arr,a)=>{
+                        if(moment(arr.Time).format('YYYY/MM/DD') === time){
+                            data[i][index] = data[i][index]+arr.Num+0
+                        }
+                    })
+                })
                 
             })
-        }   
+            for(let i=0;i<times.length;i++){
+                if(leftkeycode.indexOf('P010') >-1){
+                    total[i]=data[0][i]+data[1][i]+data[2][i]+data[3][i]+data[4][i]+data[5][i]
+                }else{
+                    total[i]=data[0][i]+data[1][i]+data[2][i]+data[3][i]+data[4][i]
+                }
+               
+            }
+            console.log('total',total)
+            console.log('data',data)
+
+        }
+
+        let legend = ['总数','一标段','二标段','三标段','四标段','五标段'];
+        let series= [
+            {
+                name:'总数',
+                type:'bar',
+                data:total,
+                barWidth:'25%',
+                itemStyle:{
+                    normal:{
+                        color:'#02e5cd',
+                        barBorderRadius:[50,50,50,50]
+                    }
+                }
+            },
+            {
+                name:'一标段',
+                type:'line',
+                data:data[0],
+                itemStyle:{
+                    normal:{
+                        color:'black'
+                    }
+                }
+            },
+            {
+                name:'二标段',
+                type:'line',
+                data:data[1],
+                itemStyle:{
+                    normal:{
+                        color:'orange'
+                    }
+                }
+            },
+            {
+                name:'三标段',
+                type:'line',
+                data:data[2],
+                itemStyle:{
+                    normal:{
+                        color:'yellow'
+                    }
+                }
+            },
+            {
+                name:'四标段',
+                type:'line',
+                data:data[3],
+                itemStyle:{
+                    normal:{
+                        color:'blue'
+                    }
+                }
+            },
+            {
+                name:'五标段',
+                type:'line',
+                data:data[4],
+                itemStyle:{
+                    normal:{
+                        color:'green'
+                    }
+                }
+            }
+        ]
+        if (leftkeycode.indexOf('P010') >-1){
+            series.push(
+                {
+                    name:'六标段',
+                    type:'line',
+                    data:data[5],
+                    itemStyle:{
+                        normal:{
+                            color:'purple'
+                        }
+                    }
+                }
+            )
+            legend.push('六标段')
+        }
+        
+        let myChart2 = echarts.init(document.getElementById('stock'));
+        let options2 = {
+            
+            legend: {
+                data:legend,
+            },
+            xAxis: [
+                {
+                    data: times,
+                }
+            ],
+            series: series
+        };
+        myChart2.setOption(options2);
     }
 
     componentDidMount(){
-
-        const {actions: {getNurserysCountFast,getfactory,gettreeevery,nowmessage}} = this.props;
-           nowmessage().then(rst=>{
-                console.log(rst.content,"xionsui");
-                this.setState({
-                    nowmessagelist:rst.content,
-                })
-            })
-            this.setState({loading5:true})
-            this.setState({loading4:true})
-            this.setState({loading3:true})
-        getfactory().then(rst=>{
-            this.setState({loading5:false})
-            var factorynum = rst.length;
-            this.setState({
-                nurserys:factorynum,
-            }) 
-        })
-        // const param = {stime:this.state.stime,etime:this.state.etime};
-        const param = {etime:this.state.etime};
-         getNurserysCountFast({},param)
-         .then(rst=>{
-            this.setState({loading3:false})
-            let allnum = 0;
-            
-            for(let key=0;key<=rst.length-1; key++){
-                
-                allnum = allnum + rst[key].Num;
-                
-            }
-            
-            this.setState({
-                 amount:allnum,
-            })
-         })
-        const params = {stime:this.state.stime,etime:this.state.etime};
-         getNurserysCountFast({},params)
-         .then(rst=>{
-            let todaynum = 0;
-            this.setState({loading4:false})
-            for(let key=0;key<=rst.length-1; key++){
-                
-                todaynum = todaynum + rst[key].Num;
-                
-            }
-            
-            this.setState({
-                 today:todaynum,
-            })
-         })
-        
-        var myChart1 = echarts.init(document.getElementById('king'));
+        let myChart1 = echarts.init(document.getElementById('king'));
         let option1 = {
+            title: {
+                text: '苗木进场总数',
+            },
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
@@ -161,12 +493,28 @@ export default class EntryTable extends Component {
                     }
                 }
             ],
-            series: []
+            series: [
+                {
+                    name: '苗木进场总数',
+                    type: 'bar',
+                    markPoint: {
+                        data: [
+                            {type: 'max', name: '最大值'},
+                            {type: 'min', name: '最小值'}
+                        ]
+                    },
+                    markLine: {
+                        data: [
+                            {type: 'average', name: '平均值'}
+                        ]
+                    }
+                },
+            ]
         };
         myChart1.setOption(option1);
 
-        var myChart2 = echarts.init(document.getElementById('stock'));
-        let option2 = {
+        let myChart2 = echarts.init(document.getElementById('stock'));
+        let options2 = {
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
@@ -176,16 +524,15 @@ export default class EntryTable extends Component {
                     }
                 }
             },
-            toolbox: {
-                feature: {
-                    saveAsImage: {show: true}
-                }
-            },
             grid: {
                 left: '3%',
                 right: '4%',
                 bottom: '3%',
                 containLabel: true
+            },
+            legend: {
+                left:'right'
+                
             },
             xAxis: [
                 {
@@ -198,24 +545,67 @@ export default class EntryTable extends Component {
             yAxis: [
                 {
                     type: 'value',
-                    name: '',
+                    name: '长度（m）',
                     axisLabel: {
-                        formatter: '{value} 棵'
+                        formatter: '{value} '
                     }
                 },
-                {
-                    type: 'value',
-                    name: '',
-                    axisLabel: {
-                        formatter: '{value} 棵'
-                    }
-                }
+            
             ],
             series: []
         };
-        myChart2.setOption(option2);
+        myChart2.setOption(options2);
+        const {actions: {gettreeevery}} = this.props;
+        gettreeevery().then(rst=>{
+            console.log('gettreeeveryrst',rst)
+            if(rst && rst instanceof Array){
+                this.setState({
+                    treetypeAll:rst,
+                    selectTreeType:rst
+                })
+            }
+        });
+
+        //类型
+        let treetyoption = [
+            <Option key={Math.random()} value={'全部'}>全部</Option>,
+            <Option key={Math.random()*2} value={'常绿乔木'}>常绿乔木</Option>,
+            <Option key={Math.random()*6} value={'落叶乔木'}>落叶乔木</Option>,
+            <Option key={Math.random()*3} value={'亚乔木'}>亚乔木</Option>,
+            <Option key={Math.random()*4} value={'灌木'}>灌木</Option>,
+            <Option key={Math.random()*5} value={'草本'}>草本</Option>,
+        ];
+        this.setState({treetyoption})
+
+        this.query(1)
+        this.search()
+        
+
+        const {actions: {getfactory,nowmessage}} = this.props;
+        //实时种植信息
+        nowmessage().then(rst=>{
+            console.log(rst.content,"xionsui");
+            this.setState({
+                nowmessagelist:rst.content,
+            })
+        })
+        this.setState({
+            loading5:true,
+            loading4:true,
+            loading3:true
+        })
+       
+        getfactory().then(rst=>{
+            this.setState({loading5:false})
+            var factorynum = rst.length;
+            this.setState({
+                nurserys:factorynum,
+            }) 
+        })
         
     }
+
+
 
     render() {
         let {amount} = this.state;
@@ -260,7 +650,7 @@ export default class EntryTable extends Component {
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
                     <Col span={12} >
                         <Spin spinning={this.state.loading1}>
-                            <Cards search={this.search(1)} title='苗木进场总数'>
+                            <Cards search={this.searchRender(1)} title='苗木进场总数'>
                                 <div id = 'king' style = {{width:'100%',height:'400px'}}>
                                 </div>
                             </Cards>
@@ -268,7 +658,7 @@ export default class EntryTable extends Component {
                     </Col>
                     <Col span={12} >
                         <Spin spinning={this.state.loading2}>
-                            <Cards search={this.search(2)} title={`${this.state.treetypetitlename}进场强度分析`}>
+                            <Cards search={this.searchRender(2)} title={`${this.state.treetypetitlename}进场强度分析`}>
                                 <div id = 'stock' style = {{width:'100%',height:'400px'}}>
                                 </div>
                             </Cards>
@@ -283,19 +673,12 @@ export default class EntryTable extends Component {
         return(
             <div>
                 <div style={{cursor:'pointer'}} onClick = {this.handleIsOpen.bind(this,index)}><img style={{height:'36px'}} src={DateImg}/></div>
-                {/*<DatePicker
-                    style={{textAlign:"center",visibility:"hidden"}}
-                    defaultValue={moment(new Date(), 'YYYY/MM/DD')}
-                    format={'YYYY/MM/DD'}
-                    onChange={this.datepick1.bind(this,index)}
-                    open={this.state.isOpen[index]}
-                >
-                </DatePicker>*/}
             </div>
         )
     }
 
-    search(index) {
+    searchRender(index) {
+        
         if(index === 1) {
             return <div>
                 <span>截止时间：</span>
@@ -310,20 +693,26 @@ export default class EntryTable extends Component {
                     </DatePicker>
             </div>
         } else {
-            const {treetyoption = [],treetypeoption = []} = this.props;
-            const {treetypename,treety} = this.state;
-            
+            const {treetypename,treety,treetyoption = [],treetypeAll = []} = this.state;
+            let treetypeoption = this.setTreeType()
             return (
                 <Row>
                     <Col xl={4} lg={10}>
                         <span>类型：</span>
-                        <Select allowClear className="forestcalcw2 mxw100" defaultValue='全部' value={treety} onChange={this.ontypechange.bind(this)}>
+                        <Select allowClear className="forestcalcw2 mxw100" defaultValue={'全部'} onChange={this.ontypechange.bind(this)}>
                             {treetyoption}
                         </Select>
                     </Col>
                     <Col xl={5} lg={10}>
                         <span>树种：</span>
-                        <Select style={{width:"100px"}} allowClear showSearch className="forestcalcw2 mxw100" defaultValue='全部' onSelect={() =>this.select()} onChange={this.ontreetypechange.bind(this)}>
+                        <Select   
+							value={this.state.treeSelect}
+							optionFilterProp = 'children'
+							filterOption={(input,option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+							onChange={this.ontreetypechange.bind(this)}
+                            style={{width:"100px"}} 
+                            allowClear showSearch 
+                            className="forestcalcw2 mxw100" >
                             {treetypeoption}
                         </Select>
                     </Col>
@@ -331,7 +720,7 @@ export default class EntryTable extends Component {
                         <span>起苗时间：</span>
                         <RangePicker 
                          style={{verticalAlign:"middle"}} 
-                         defaultValue={[moment(this.state.stime2, 'YYYY/MM/DD'),moment(this.state.etime2, 'YYYY/MM/DD')]} 
+                         defaultValue={[moment(this.state.stime1, 'YYYY/MM/DD'),moment(this.state.etime1, 'YYYY/MM/DD')]} 
                          showTime
                          format={'YYYY/MM/DD'}
                          onChange={this.datepick.bind(this,index)}
@@ -343,13 +732,57 @@ export default class EntryTable extends Component {
             )
         }
     }
-    close(){
+
+    setTreeType(){
+        const{
+            selectTreeType = []
+        }=this.state
+        let treetypeoption = [];
+        treetypeoption.push(<Option key={-1} value={'全部'}>全部</Option>)
+        selectTreeType.map(rst =>{
+            treetypeoption.push(<Option key={rst.ID} value={rst.ID}>{rst.TreeTypeName}</Option>)
+        })
+        return treetypeoption
         
     }
 
-    
-    select(e) {
-        console.log(e)
+    //选择树种类型
+    ontypechange(value) {
+        const {
+            treetypeAll = [],
+        } = this.state
+        if(value === '全部'){
+            this.setState({
+                selectTreeType:treetypeAll,
+                treeTypeSelect:value,
+                treeSelect:'全部'
+            })
+        }else{
+            let selectTreeType = [];
+            FORESTTYPE.map((rst =>{
+                if (rst.name === value){
+                    let children = rst.children
+                    children.map(item =>{
+                        selectTreeType.push( treetypeAll.find((tree)=> tree.TreeTypeName === item.name))
+                    })
+                }
+            }))
+            console.log('selectTreeType',selectTreeType)
+            this.setState({
+                selectTreeType,
+                treeTypeSelect:value,
+                treeSelect:'全部'
+            },()=>{
+                this.search()
+            })
+        }
+
+    }
+    //选择树种
+    ontreetypechange(value){
+       this.setState({
+            treeSelect:value
+       })
     }
     //点击图片出现日期选择
     handleIsOpen(index) {
@@ -362,11 +795,11 @@ export default class EntryTable extends Component {
     datepick(index,value){
         if(index == 1) {
             
-            this.setState({etime1:value?moment(value).format('YYYY/MM/DD'):''});
+            this.setState({etime:value?moment(value).format('YYYY/MM/DD'):''});
         }
         if(index == 2){
-            this.setState({stime2:value[0]?moment(value[0]).format('YYYY/MM/DD'):''})
-            this.setState({etime2:value[1]?moment(value[1]).format('YYYY/MM/DD'):''})
+            this.setState({stime1:value[0]?moment(value[0]).format('YYYY/MM/DD'):''})
+            this.setState({etime1:value[1]?moment(value[1]).format('YYYY/MM/DD'):''})
         }
     }
     //总数时间点击
@@ -381,438 +814,10 @@ export default class EntryTable extends Component {
         })
     }
     datepickok(index) {
-       
-        if(index == 1) {
-            const {stime1,etime1} = this.state;
-          
-            let param = {
-                etime:etime1
-            }
-            this.qury(index,param);
-        }
-        if(index == 2) {
-            const {stime2,etime2,treetype,treety} = this.state;
-            let param = {
-                treetype:treetype,
-                stime:stime2,
-                etime:etime2,
-            }
-            this.qury(index,param);
-        }
-    }
-
-    ontypechange(value) {
-        
-        const {typeselect,leftkeycode = ''} = this.props;
-        typeselect(value || '',leftkeycode)
-        this.setState({treety:value || ''}, () => {
-            this.ontreetypechange('')
-        })
-    }
-
-    ontreetypechange(value,children) {
-       
-        const {treetypelist} = this.props;
-        let treetype = treetypelist.find(rst => rst.ID == value)
-        this.setState({treetype:treetype?treetype.ID:'',treetypename:treetype.TreeTypeName || ''},() => {
-            this.datepickok(2)
-        })
-    }
-
     
-
-    qury(index,param) {
-        const {actions: {getNurserysCount, getNurserysCountFast}} = this.props;
-       
-        if(index === 1) {
-            this.setState({loading1:true})
-            getNurserysCountFast({},{etime:param.etime})
-            .then(rst => {
-                 this.setState({loading1:false})
-                 let object = groupBy(rst, function(n){
-                return n.Section
-            });
-                var dic =object;
-                var sdic = Object.keys(dic).sort();
-                let res = {};
-                let sub ='';
-                for(let a = 0 ; a< sdic.length;a++){
-                 sub += `"${sdic[a]}":${JSON.stringify(dic[sdic[a]])},`;
-                if(a===sdic.length-1){
-                    sub = '{'+sub.substr(0,sub.length-1)+'}'
-                res = JSON.parse(sub);
-                }
-                }
-                console.log(res,"dadadadadadadd");
-            let biaoduan = Object.keys(res);
-            let trees = [];
-            let wsx = [];
-            trees = Object.entries(res);
-            for(var j = 0 ; j<=trees.length-1; j++){
-            var abc = trees[j][1];
-            let qaz = 0;
-            for(var k = 0 ; k<=abc.length-1; k++){
-            qaz = qaz + abc[k].Num;
-            }
-            wsx.push(qaz);
-            }
-            let Num1 = 0;
-            for(var i = 0; i<=rst.length-1; i++){
-            Num1 = Num1 + rst[i].Num;
-            }
-               
-                if(!rst)
-                    return
-                try {
-                    let myChart1 = echarts.getInstanceByDom(document.getElementById('king'));
-                    let options1 = {
-                        legend: {
-                            data:['进场总数']
-                        },
-                        xAxis: [
-                            {
-                                type: 'category',
-                                data: biaoduan,
-                            }
-                        ],
-                        series: [
-                            {
-                                name: '进场总数',
-                                type: 'bar',
-                                data: wsx,
-                                markPoint: {
-                                    data: [
-                                        {type: 'max', name: '最大值'},
-                                        {type: 'min', name: '最小值'}
-                                    ]
-                                },
-                                markLine: {
-                                    data: [
-                                        {type: 'average', name: '平均值'}
-                                    ]
-                                }
-                            },
-                        ]
-                    }
-                    myChart1.setOption(options1);
-                } catch(e) {
-                    console.log(e)
-                }
-               
-            })
-         }
-        else  if(index === 2 ){
-            this.setState({loading2:true})
-            getNurserysCountFast({},param)
-            .then(rst => {
-                console.log('rst',rst)
-                 let object = groupBy(rst, function(n){
-                    return n.Section
-                });
-                 let sectionList = Object.keys(object);
-                 console.log(sectionList,"xixiahah")
-                this.setState({loading2:false})
-                if(!rst)
-                    return
-                try {
-                    let myChart2 = echarts.getInstanceByDom(document.getElementById('stock'));
-                    let totledata = [],series = [],legend = ['种植总数'],timeData = [];
-                    
-                    rst.map((res, index) => {
-                        timeData.push(rst[index].Time)
-                    })
-                    timeData = [...new Set(timeData)]
-                    console.log('timeData',timeData)
-                    for(let i = 0; i < timeData.length; i++) {
-                        let sum = 0;
-                        for(let j = 0; j < rst.length; j++) {
-                            if(timeData[i] == rst[j].Time) {
-                                sum += rst[j].Num;
-                            }
-                        }
-                        totledata.push(sum);
-                        console.log('totledata',totledata)
-                    }
-                    let sectionObj = {};
-                    for(let o = 0; o < sectionList.length; o++) {
-                        let sectionTimeData = rst.filter(n => {
-                            return n.Section == sectionList[o];
-                        });
-                        sectionObj[sectionList[o]] = sectionTimeData;
-                    }
-                    console.log('sectionObj',sectionObj)
-                    let totalDataObj = {};
-                    for(let section in sectionObj){
-                        let cTimeData = sectionObj[section];
-                        let serieData = [];
-                        for(let k = 0;k < timeData.length;k++){
-                            let value = 0;
-                            for(let l = 0;l < cTimeData.length;l++){
-                                if(timeData[k] == cTimeData[l].Time){
-                                    value = cTimeData[l].Num;
-                                    if(totalDataObj[timeData[k]]){
-                                        totalDataObj[timeData[k]] += value;
-                                    }else{
-                                        totalDataObj[timeData[k]] = value;
-                                    }
-                                    break;
-                                }
-                            }
-                            serieData.push(value);
-                            console.log(serieData);
-                        }
-                        series.push({
-                            name: section,
-                            type: 'line',
-                            yAxisIndex: 1,
-                            data: serieData
-                        });
-                        console.log('serieData',serieData)
-                    }
-                    series.unshift({
-                        name:'种植总数',
-                        type:'bar',
-                        data:totledata
-                    });
-                    let options2 = {
-                        legend: {
-                            data:legend
-                        },
-                        xAxis : [
-                            {
-                                data: timeData,
-                            }
-                        ],
-                        series: series
-                    };
-                    myChart2.setOption(options2);
-                }catch(e) {
-                    console.log(e)
-                }
-               
-            })
-        }
-        //  else if(index === 2) {
-        //     this.setState({loading2:true})
-            
-        //    getNurserysCountFast({},param)
-        //     .then(rst => {
-                
-        //        let res = groupBy(rst, function(n){
-        //         return n.Time
-        //     });
-        //        let biaoduan1 = [];
-        //        let biaoduan2 = [];
-        //        let biaoduan3 = [];
-        //        let biaoduan4 = [];
-        //        let biaoduan5 = [];
-        //        let bytime = Object.values(res);
-               
-        //        for(var x = 0 ; x <= bytime.length-1; x++){
-        //            let number1 = 0;
-        //            let number2 = 0;
-        //            let number3 = 0;
-        //            let number4 = 0;
-        //            let number5 = 0;
-        //            for(var y = 0; y <= bytime[x].length-1;y++){
-        //                if(bytime[x][y].Section === "1标段"){
-        //                      number1 = bytime[x][y].Num
-        //                      biaoduan1[x]= number1;
-        //                }else if(number1!=0){
-        //                      biaoduan1[x]=number1;
-        //                }else{
-        //                      biaoduan1[x]=0;
-        //                }
-        //                 if(bytime[x][y].Section === "2标段"){
-        //                      number2 = bytime[x][y].Num
-        //                      biaoduan2[x]= number2;
-        //                }else if(number2!=0){
-        //                      biaoduan2[x]=number2;
-        //                }else{
-        //                      biaoduan2[x]=0;
-        //                }
-        //                 if(bytime[x][y].Section === "3标段"){
-        //                      number3 = bytime[x][y].Num
-        //                      biaoduan3[x]= number3;
-        //                }else if(number3!=0){
-        //                      biaoduan3[x]=number3;
-        //                }else{
-        //                      biaoduan3[x]=0;
-        //                }
-        //                 if(bytime[x][y].Section === "4标段"){
-        //                      number4 = bytime[x][y].Num
-        //                      biaoduan4[x]= number4;
-        //                }else if(number4!=0){
-        //                      biaoduan4[x]=number4;
-        //                }else{
-        //                      biaoduan4[x]=0;
-        //                }
-        //                 if(bytime[x][y].Section === "5标段"){
-        //                      number5 = bytime[x][y].Num
-        //                      biaoduan5[x]= number5;
-        //                }else if(number5!=0){
-        //                      biaoduan5[x]=number5;
-        //                }else{
-        //                      biaoduan5[x]=0;
-        //                }
-        //            }
-        //        } 
-              
-        //        let lastshuzhu =[];
-        //        lastshuzhu = [biaoduan1,biaoduan2,biaoduan3,biaoduan4,biaoduan5];
-               
-        //     let time = Object.keys(res);
-        //     let value = Object.values(res);
-        //     let biaoduan = Object.keys(res);
-        //     let trees = [];
-        //     let wsx = [];
-        //     trees = Object.entries(res);
-        //     for(var j = 0 ; j<=trees.length-1; j++){
-        //     var abc = trees[j][1];
-        //     let qaz = 0;
-        //     for(var k = 0 ; k<=abc.length-1; k++){
-        //     qaz = qaz + abc[k].Num;
-        //     }
-        //     wsx.push(qaz);
-        //     }
-            
-       
-           
-        //         this.setState({loading2:false})
-        //         if(!rst)
-        //             return
-        //         this.setState({treetypetitlename:this.state.treetypename || '全部'})
-        //         try {
-        //                let myChart2 = echarts.getInstanceByDom(document.getElementById('stock'));
-        //             let options2 = {
-
-        //                         tooltip: {
-        //                             trigger: 'axis'
-        //                         },
-        //                         legend: {
-        //                             data:['总数','1标段','2标段','3标段','4标段','5标段']
-        //                         },
-        //                         grid: {
-        //                             left: '3%',
-        //                             right: '4%',
-        //                             bottom: '3%',
-        //                             containLabel: true
-        //                         },
-        //                         // toolbox: {
-        //                         //     feature: {
-        //                         //         saveAsImage: {}
-        //                         //     }
-        //                         // },
-        //                         xAxis: {
-        //                             type: 'category',
-        //                             // boundaryGap: false,
-        //                             data: time,
-        //                             axisPointer: {
-        //                                   type: 'shadow'
-        //                                 }
-        //                         },
-        //                         yAxis: [
-        //                             // type: 'value'
-        //                                 {
-        //                                     type: 'value',
-        //                                     name: '',
-        //                                     axisLabel: {
-        //                                         formatter: '{value} 棵'
-        //                                     }
-        //                                 },
-        //                                 {
-        //                                     type: 'value',
-        //                                     name: '',
-        //                                     axisLabel: {
-        //                                         formatter: '{value} 棵'
-        //                                     }
-        //                                 }
-        //                         ],
-        //                         series: [
-        //                             {
-        //                                 name:'总数',
-        //                                 type:'bar',
-        //                                 data:wsx,
-        //                                 barWidth:'25%',
-        //                                 // itemStyle:{
-        //                                 //     normal:{
-        //                                 //         color:'#02e5cd',
-        //                                 //         barBorderRadius:[50,50,50,50]
-        //                                 //     }
-        //                                 // }
-        //                             },
-        //                             {
-        //                                 name:'1标段',
-        //                                 type:'line',
-        //                                 yAxisIndex: 1,
-        //                                 data:lastshuzhu[0]
-        //                             },
-        //                             {
-        //                                 name:'2标段',
-        //                                 type:'line',
-        //                                 yAxisIndex: 1,
-        //                                 data:lastshuzhu[1]
-        //                             },
-        //                             {
-        //                                 name:'3标段',
-        //                                 type:'line',
-        //                                 yAxisIndex: 1,
-        //                                 data:lastshuzhu[2]
-        //                             },
-        //                             {
-        //                                 name:'4标段',
-        //                                 type:'line',
-        //                                 yAxisIndex: 1,
-        //                                 data:lastshuzhu[3]
-        //                             },
-        //                             {
-        //                                 name:'5标段',
-        //                                 type:'line',
-        //                                 yAxisIndex: 1,
-        //                                 data:lastshuzhu[4]
-        //                             },
-        //                         ]
-        //                     };
-
-        //             myChart2.setOption(options2);
-
-                   
-        //         } catch(e) {
-        //             console.log(e)
-        //         }
-        //     })
-        // }
     }
 }
 
-//数组数值相加
-function arraynumadd(arr1, arr2) {
-    if(arr1 instanceof Array && arr2 instanceof Array) {
-        let arr = arr1.map((rst,index) => {
-            return arr1[index] + arr2[index]
-        })
-        return arr
-    }
-}
-
-//总数
-function addNum(arr){
-    let total = 0;
-    arr.map( item =>{
-        total += item;
-    })
-    return total;
-}
 
 
-// function sorting(val1, val2) {
-//     let ele1 = val1.Label;
-//     let ele2 = val2.Label;
-//     if(ele1 < ele2) {
-//         return -1;
-//     } else if(ele1 > ele2) {
-//         return 1;
-//     } else {
-//         return 0;
-//     }
-// }
+

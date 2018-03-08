@@ -486,7 +486,7 @@ export const FORESTTYPE = [
 	},
 	{	
 		id:4,
-		name:'落叶乔木',
+		name:'灌木',
 		children:[
 			{
 				id:4002,

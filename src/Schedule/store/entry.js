@@ -14,8 +14,8 @@ export const changeNursery = createAction(`${ID}传递nurseryName`);
 
 /*****************************院内************************/
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
-export const gettreetype = createFetchAction(`${FOREST_API}/tree/nurserystat?no=P009{{etime}}`, []);
-export const gettreetypeAll = createFetchAction(`${FOREST_API}/tree/treestat?`, []);
+export const gettreetype = createFetchAction(`${FOREST_API}/tree/nurserystat?`, []);
+export const gettreetypeAll = createFetchAction(`${FOREST_API}/tree/treestat`, []);
 export const gettreetypeSection = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
 export const gettreetypeSmallClass = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass{{params}}`, []);
 export const gettreetypeThinClass = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass{{params}}`, []);
