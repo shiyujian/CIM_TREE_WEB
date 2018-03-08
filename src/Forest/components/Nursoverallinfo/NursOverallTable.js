@@ -23,8 +23,8 @@ export default class NursOverallTable extends Component {
         	treetypename: '',
         	status: '',
         	keycode: '-1',
-        	stime: moment().format('2017-11-23 00:00:00'),
-			etime: moment().format('2017-11-23 23:59:59'),
+        	stime: moment().format('YYYY-MM-DD 00:00:00'),
+			etime: moment().format('YYYY-MM-DD 23:59:59'),
 			sxm: '',
     		section: '',
     		bigType: '',
@@ -55,13 +55,13 @@ export default class NursOverallTable extends Component {
     	
     }
     componentWillReceiveProps(nextProps){
-    	if(nextProps.leftkeycode != this.state.leftkeycode) {
-			this.setState({
-				leftkeycode: nextProps.leftkeycode,
-    		},() => {
-    			this.qury(1);
-    		})
-    	} 
+    	// if(nextProps.leftkeycode != this.state.leftkeycode) {
+		// 	this.setState({
+		// 		leftkeycode: nextProps.leftkeycode,
+    	// 	},() => {
+    	// 		this.qury(1);
+    	// 	})
+    	// } 
     }
 	render() {
 		const {tblData} = this.state;
@@ -708,7 +708,9 @@ export default class NursOverallTable extends Component {
     		stime = '',
     		etime = '',
     		status = '',
-    		size,
+			size,
+			smallclass = '',
+			thinclass
     	} = this.state;
     	let gd = '', xj = '', gf = '', dj = '', tqhd = '', tqzj = ''; 
     	if(gd_min !== '' && gd_max !== '') {
@@ -741,7 +743,9 @@ export default class NursOverallTable extends Component {
     		gf,
     		dj,
     		tqhd,
-    		tqzj,
+			tqzj,
+			smallclass,
+			thinclass,
     		SupervisorCheck,
     		CheckStatus,
     		status,

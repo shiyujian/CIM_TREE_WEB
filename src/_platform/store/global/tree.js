@@ -28,7 +28,7 @@ export default handleActions({
 		}
 		return {
 			...state,
-			treeList: root
+			bigTreeList: root
 		}
 	},
 	[getLittleClassOK]: (state, {payload}) => {

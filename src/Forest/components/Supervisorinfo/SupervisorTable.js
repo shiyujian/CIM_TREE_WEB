@@ -18,8 +18,8 @@ export default class SupervisorTable extends Component {
         	size:10,
         	exportsize:100,
         	leftkeycode: '',
-        	stime: moment().format('2017-11-25 00:00:00'),
-			etime: moment().format('2017-11-25 23:59:59'),
+        	stime: moment().format('YYYY-MM-DD 00:00:00'),
+			etime: moment().format('YYYY-MM-DD 23:59:59'),
 			sxm: '',
     		section: '',
     		smallclass: '',
@@ -35,13 +35,13 @@ export default class SupervisorTable extends Component {
     	
     }
     componentWillReceiveProps(nextProps){
-    	if(nextProps.leftkeycode != this.state.leftkeycode) {
-			this.setState({
-				leftkeycode: nextProps.leftkeycode,
-    		},()=> {
-    			this.qury(1);
-    		})
-    	} 
+    	// if(nextProps.leftkeycode != this.state.leftkeycode) {
+		// 	this.setState({
+		// 		leftkeycode: nextProps.leftkeycode,
+    	// 	},()=> {
+    	// 		this.qury(1);
+    	// 	})
+    	// } 
     }
 	render() {
 		const {tblData} = this.state;
