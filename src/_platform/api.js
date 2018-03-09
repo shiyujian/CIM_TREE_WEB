@@ -268,7 +268,70 @@ export const PROJECT_UNITS = [
 	}
 ]
 
-//获取单位工程
+
+//获取子项目下的标段
+export const SUBPROJECT_UNITS = [
+	{
+		code:'P009-01',
+		value:'9号地块',
+		units:[
+			{
+				code:'P009-01-01',
+				value:'一标段'
+			},{
+				code:'P009-01-02',
+				value:'二标段'
+			},{
+				code:'P009-01-03',
+				value:'三标段'
+			},{
+				code:'P009-01-04',
+				value:'四标段'
+			},{
+				code:'P009-01-05',
+				value:'五标段'
+			},
+		]
+	},{
+		code:'P010-01',
+		value:'一号区块',
+		units:[
+			{
+				code:'P010-01-01',
+				value:'一标段'
+			},{
+				code:'P010-01-02',
+				value:'二标段'
+			},{
+				code:'P010-01-03',
+				value:'三标段'
+			},{
+				code:'P010-01-04',
+				value:'四标段'
+			}
+		]
+	},{
+		code:'P010-02',
+		value:'二号区块',
+		units:[
+			{
+				code:'P010-02-05',
+				value:'五标段'
+			}
+		]
+	},{
+		code:'P010-03',
+		value:'三号区块',
+		units:[
+			{
+				code:'P010-03-06',
+				value:'六标段'
+			}
+		]
+	}
+]
+
+//获取树种
 export const FORESTTYPE = [
 	{	
 		id:1,

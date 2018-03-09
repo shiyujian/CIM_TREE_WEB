@@ -36,7 +36,7 @@ export default class Scheduleanalyze extends Component {
             treeLists: [],
             sectionoption: [],
             smallclassoption: [],
-            leftkeycode: '',
+            leftkeycode: 'P009-01',
             section: '',
             smallclass: '',
             data:[],
@@ -48,17 +48,13 @@ export default class Scheduleanalyze extends Component {
 
 
     componentDidMount () {
-        const {actions: {getTree,getTreeList,getTreeNodeList,setkeycode}, treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTreeList,getTreeNodeList,setkeycode}, treetypes,platform:{tree = {}}} = this.props; 
         
-        if(!tree.treeList){
+        if(!tree.bigTreeList){
             getTreeNodeList()
         }
         const {leftkeycode} = this.state;
-        getTree({},{parent:leftkeycode}).then(rst => {
-            this.setSectionOption(rst);
-            this.setSmallClassOption(rst,"1标段");
-            // this.sectionselect(rst);
-        });
+    
         this.setState({
             leftkeycode:"P009-01"
         })
@@ -67,8 +63,9 @@ export default class Scheduleanalyze extends Component {
     onSelect(value = []) {
         console.log('onSelect  value',value)
         let keycode = value[0] || '';
-        const {actions:{setkeycode,gettreetype,getTree}} =this.props;
+        const {actions:{setkeycode,gettreetype}} =this.props;
         setkeycode(keycode);
+        console.log('ScheduleanalyzeScheduleanalyze',keycode)
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
     }
 
@@ -98,7 +95,17 @@ export default class Scheduleanalyze extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        {/* <Row gutter={10} style={{margin: '10px 5px'}}>
+                        <ScheduleTable
+                            key={leftkeycode}
+                            {...this.props} 
+                            sectionoption={sectionoption}
+                            section={section}
+                            leftkeycode={leftkeycode}
+                            smallclassoption={smallclassoption}
+                            sectionselect={this.sectionselect.bind(this)}
+                            smallclass={smallclass}
+                        />
+                        <Row gutter={10} style={{margin: '10px 5px'}}>
                             <Col span={8}>
                                 <LeftTop  {...this.props} {...this.state}/>
                             </Col>
@@ -113,17 +120,9 @@ export default class Scheduleanalyze extends Component {
                             <Col span={24}>
                                 <Bottom   {...this.props} {...this.state}/>
                             </Col>
-                        </Row> */}
-                        <ScheduleTable
-                            key={leftkeycode}
-                            {...this.props} 
-                            sectionoption={sectionoption}
-                            section={section}
-                            leftkeycode={leftkeycode}
-                            smallclassoption={smallclassoption}
-                            sectionselect={this.sectionselect.bind(this)}
-                            smallclass={smallclass}
-                        />
+                        </Row>
+                        
+                        
                     </Content>
                 </Main>
             </Body>
@@ -133,25 +132,11 @@ export default class Scheduleanalyze extends Component {
 
     //标段选择, 重新获取: 小班、细班、树种
     sectionselect(value,treety) {
-        const {actions:{setkeycode, getTreeList, getTree}} =this.props;
+        const {actions:{setkeycode, getTreeList}} =this.props;
         const {leftkeycode} = this.state;
         setkeycode(leftkeycode)
         //小班
         this.setState({section:value});
-        getTree({},{parent:leftkeycode})
-        .then(rst => {
-            let smallclasses = [];
-            rst.map((item, index) => {
-                if(rst[index].Section == value) {
-                    let smallclassName = rst[index].Name.replace("号小班","");
-                    let smallname = {
-                        Name: smallclassName,
-                    }
-                    smallclasses.push(smallname)
-                }
-            })
-            this.setSmallClassOption(smallclasses)
-        })
     }
 
 
