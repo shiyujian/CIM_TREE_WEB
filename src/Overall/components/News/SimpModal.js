@@ -3,6 +3,7 @@ import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Pro
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
+import { DEPARTMENT } from '_platform/api';
 import { base, STATIC_DOWNLOAD_API, SOURCE_API,FILE_API } from '../../../_platform/api';
 import E from 'wangeditor'
 
@@ -20,17 +21,16 @@ class Modals extends Component {
 		this.state = {
 			content: "",
 			progress: 0,
+			array:[]
 		}
 	}
 	componentDidUpdate(){
-		if(this.props.array.length>0){
-			this.props.array.map(item=>{
-				this.array.push(<Option value={item.code}>{item.name}</Option>)
-			})
-		}
 	}
 
 	componentDidMount() {
+		DEPARTMENT.map(item =>{
+			this.array.push(<Option value={item.name}>{item.name}</Option>)
+		})
 		const elem = this.refs.editorElem;
 		editor = new E(elem);
 		// 使用 onchange 函数监听内容的变化，并实时更新到 state 中
@@ -107,7 +107,7 @@ class Modals extends Component {
 	uploadProps = {
 		name: 'a_file',
 		multiple: true,
-		showUploadList: false,
+		showUploadList: true,
 		action: base + "/service/fileserver/api/user/files/",
 		beforeUpload: () => {
 			this.setState({ progress: 0 });
@@ -123,6 +123,8 @@ class Modals extends Component {
 				};
 				newFileList = newFileList.concat(newFile);
 				postUploadFiles(newFileList)
+				message.info('上传附件成功');
+				
 			}
 			if (event) {
 				let { percent } = event;
@@ -383,12 +385,6 @@ class Modals extends Component {
     };
 
 	render() {
-		this.array = [];
-		if(this.props.array.length>0){
-			this.props.array.map(item=>{
-				this.array.push(<Option value={item.code}>{item.name}</Option>)
-			})
-		}
 		const {
 			form: { getFieldDecorator },
 			toggleData: toggleData = {
@@ -460,12 +456,11 @@ class Modals extends Component {
 					</Row>
 					<Row>
 						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="封面图片">
+							<FormItem {...formItemLayout} label="封面">
 								{getFieldDecorator('attachment', {
 									rules: [
 										{
-											required: true,
-											message: '请上传封面！',
+											required: false,
 										}
 									],
 								})(

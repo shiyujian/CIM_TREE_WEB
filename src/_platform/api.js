@@ -1339,3 +1339,28 @@ export const DOMAIN_CODES = {
 	dir: '文档222',
 	workPackage: '施工包111'
 };
+//获取新闻发布单位
+export const DEPARTMENT = [
+	{
+		code:'ORG_01_19',
+		name:'雄安新区造林指挥部'
+	},{
+		code:'ORG_03_32',
+		name:'河北远大工程咨询有限公司'
+	},{
+		code:'ORG_P010_01_02_02',
+		name:'北京政泰隆工程管理有限公司'
+	},{
+		code:'ORG_P010_01_02_03',
+		name:'北京中城建建设监理有限公司'
+	},{
+		code:'ORG_P010_01_02_04',
+		name:'浙江江南工程管理股份有限公司'
+	},{
+		code:'ORG_P010_02_02_01',
+		name:'北京中林华联建设工程监理有限公司'
+	},{
+		code:'ORG_P010_03_02_01',
+		name:'天津市源天工程咨询有限公司'
+	}
+]
