@@ -51,17 +51,16 @@ export default class Bottom extends Component {
             xAxis : [
                 {
                     type : 'category',
-                    name: '种指数',
-                    yAxisIndex: 1,
-                    position: 'left',
-                    axisLabel: {
-                        formatter: '{value} 棵'
-                    }
+                    
                 }
             ],
             yAxis : [
                 {
-                    type : 'value'
+                    type : 'value',
+                    name: '种植数',
+                    axisLabel: {
+                        formatter: '{value} 棵'
+                    }
                 }
             ],
             series : []

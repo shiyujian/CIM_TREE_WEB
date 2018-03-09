@@ -55,7 +55,11 @@ export default class RightTop extends Component {
             ],
             yAxis : [
                 {
-                    type : 'value'
+                    type : 'value',
+                    name: '种植数',
+                    axisLabel: {
+                        formatter: '{value} 棵'
+                    }
                 }
             ],  
             series : []

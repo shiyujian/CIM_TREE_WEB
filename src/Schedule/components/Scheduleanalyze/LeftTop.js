@@ -42,7 +42,7 @@ export default class LeftTop extends Component {
             },
             grid: {
                 left: '3%',
-                right: '10%',
+                right: '3%',
                 bottom: '3%',
                 containLabel: true
             },

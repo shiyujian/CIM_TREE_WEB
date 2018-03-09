@@ -53,7 +53,11 @@ export default class MiddleTop extends Component {
             ],
             yAxis : [
                 {
-                    type : 'value'
+                    type : 'value',
+                    name: '种植数',
+                    axisLabel: {
+                        formatter: '{value} 棵'
+                    }
                 }
             ],
             series : []

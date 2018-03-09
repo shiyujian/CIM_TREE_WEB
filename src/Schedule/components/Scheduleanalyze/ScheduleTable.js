@@ -43,8 +43,8 @@ export default class ScheduleTable extends Component {
         let message = await nowmessage()
         console.log('ScheduleTableScheduleTable',message)
         let nowmessagelist = []
-        if(nowmessage && nowmessage.content){
-            nowmessagelist = nowmessage.content
+        if(message && message.content){
+            nowmessagelist = message.content
         }
 
         this.setState({
@@ -113,7 +113,7 @@ export default class ScheduleTable extends Component {
         let asd = this.state.nowmessage;
         console.log(asd);
         
-        console.log(this.state.nowmessagelist,"xiaoxiao")
+        console.log(this.state.nowmessagelist,"nowmessagelistnowmessagelistnowmessagelist")
 		return (
 			<div>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
