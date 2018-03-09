@@ -193,10 +193,8 @@ export default class Users extends Component {
 		}, {
 			title: '角色',
 			render: (user) => {
-				console.log("333333333",user)
 				const { groups = [] } = user || {};
 				const roles = groups.map(group => group.name);
-				console.log("roles",roles)
 				return roles.join('、')
 			}
 		}, {
@@ -267,7 +265,6 @@ export default class Users extends Component {
 		} else {
 			dataSource = searchList
 		}
-		console.log("dataSource", dataSource)
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -408,13 +405,11 @@ export default class Users extends Component {
 								</Select>
 							</FormItem>
 						</Col>*/}
-
 						</Row>
 					</div>
 					<Spin tip="加载中" percent={this.state.percent} status="active" strokeWidth={5}  spinning={this.state.loading}>
 					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={columns} dataSource={dataSource}
 						loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.props.getTreeModals }}
-
 					/>
 					</Spin>
 				</div>
@@ -491,10 +486,7 @@ export default class Users extends Component {
 		}
 	}
 
-
-
 	rowSelection = {
-
 		onChange: (selectedRowKeys) => {
 			console.log("selectedRowKeys", selectedRowKeys)
 			this.setState({selectedRowKeys:selectedRowKeys})
@@ -512,7 +504,6 @@ export default class Users extends Component {
 			sidebar: { node } = {},
 			actions: { changeAdditionField, getSection }
 		} = this.props;
-		console.log("node", node)
 		let sectiona = []
 		getSection(sectiona)
 		if (node.extra_params.sections) {

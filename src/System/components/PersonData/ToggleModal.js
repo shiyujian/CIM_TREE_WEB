@@ -93,7 +93,7 @@ export default class ToggleModal extends Component {
             //     key: 'Code'
             // }, 
             {
-                title: '姓名',
+                title: '姓名', 
                 dataIndex: 'record.name',
                 key: 'Name',
                 render: (text, record, index) => {
@@ -288,7 +288,6 @@ export default class ToggleModal extends Component {
                 title: '角色',
                 key: 'groups',
                 render: (text, record, index) => {
-                    console.log("record",record)
                     if (record.editing === true) {
                         return <Select placeholder="请选择角色" value={addition.groups || record.groups} onChange={this.changeRoles.bind(this, record)}
                         mode="multiple" style={{ width: '100%' }}>
@@ -353,7 +352,7 @@ export default class ToggleModal extends Component {
                                 }} /></a>
                                 <Popconfirm
                                     title="确认删除吗"
-                                    onConfirm={this.delete.bind(this, record.index - 1)}
+                                    onConfirm={this.delete.bind(this, record,record.index)}
                                     okText="确认"
                                     onCancel="取消"
                                 >
@@ -584,7 +583,6 @@ export default class ToggleModal extends Component {
                 })
 
                 postUsers({}, userlist).then(rst => {
-                    console.log("rst", rst)
                     let count = 0
                     let count1 = 0
                     for (let i = 0; i < rst.codes.length; i++) {
@@ -646,9 +644,16 @@ export default class ToggleModal extends Component {
             this.setState({ dataSource });
         })
     }
-    delete(index) {
-        let dataSource = this.state.dataSource;
-        dataSource.splice(index, 1);
+    delete(record,index) {
+        // console.log('record00',record)
+        // console.log('index00',index)
+        let dataSource = this.state.dataSource; 
+        dataSource.map(item => {
+            if(item.index===index){
+                let arrIndex=dataSource.indexOf(record)
+               dataSource.splice(arrIndex, 1); 
+            }
+        })
         this.setState({ flag_code: true, subErr: true })
         // this.delData(dataSource);
         this.setState({ dataSource })
@@ -723,7 +728,6 @@ export default class ToggleModal extends Component {
         const { actions: { getOrgReverse, getOrgName } } = this.props;
         data.splice(0, 1);
         let data_person, orgname = [], orgpk = [], orgcode = [], orgReverse = [], codes = [], org_names = [];
-        console.log("data:", data);
         let set = {};
         for (let i = 0; i < data.length; i++) {
             set[data[i][2]] = data[i][2]
@@ -732,11 +736,9 @@ export default class ToggleModal extends Component {
         let repeatCode = this.isRepeat(codes);
 
         let orgCodes = Object.keys(set);
-        console.log("orgCodes", orgCodes)
 
         for (let i = 0; i < orgCodes.length; i++) {
             let result_names = await getOrgName({ code: orgCodes[i] })
-            console.log("result_names", result_names)
             let orgNames = result_names.name;
             let orgCode = orgCodes[i];
             org_names.push({
@@ -765,8 +767,6 @@ export default class ToggleModal extends Component {
                 email_red = "red";
             }
             let org = '', orgcode = '', orgpk = '', partname = [];
-            // console.log(orgReverse)
-            console.log("orgReverse",orgReverse)
             for (let i = 0; i < orgReverse.length; i++) {
                 if (orgReverse[i].orgCode === item[2]) {
                     if (orgReverse[i].children.length >0) {
@@ -774,12 +774,6 @@ export default class ToggleModal extends Component {
                         orgcode = orgReverse[i].children[0].code;
                         orgpk = orgReverse[i].children[0].pk;
                       
-                       
-                      
-                        // console.log("org",org)
-                        // console.log("orgcode",orgcode)
-                        // console.log("orgpk",orgpk)
-                        // console.log("partname",partname)
                     } else {
                         org = '';
                         orgcode = '';

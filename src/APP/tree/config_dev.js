@@ -86,7 +86,7 @@ window.config = {
 	'FORESTPORT':"227",//阿里云
 	// 'FORESTPORT':"6540",//院内
 	//苗圃定位模板
-	'nurseryLocation':"http://47.104.160.65:6510/media/documents/2017/11/nurseryLocation.xlsx",
+	'nurseryLocation':"http://47.104.160.65:6512/media/documents/meta/nurseryLocation.xlsx",
 
 	//720云
 	'PANORAMAGRAM_LOC_CODE': 'PANORAMA_ROOT',//全景图位置树根节点编码值
