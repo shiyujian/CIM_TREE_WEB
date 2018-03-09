@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Table, Tabs, Button, Row, Col, Modal, message, Popconfirm, Form, Input, DatePicker, Icon, Select } from 'antd';
 import RichText from './RichText';
 import RichModal from './RichModal';
-
+import { DEPARTMENT } from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
@@ -40,15 +40,13 @@ class NewsTable extends Component {
 		getDraftNewsList({
 			user_id: user_id
 		})
-
+		this.array = [];
+		DEPARTMENT.map(item =>{
+			this.array.push(<Option value={item.code}>{item.name}</Option>)
+		})
 	}
 	componentDidUpdate(){
-		this.array = [];
-		if(this.props.array.length>0){
-			this.props.array.map(item=>{
-				this.array.push(<Option value={item.code}>{item.name}</Option>)
-			})
-		}
+		
 	}
 
 	//新闻操作按钮
@@ -81,7 +79,9 @@ class NewsTable extends Component {
 		} else if (type === 'VIEW') {
 			this.setState({
 				visible: true,
-				container: record.raw
+				container: record.raw,
+				title:record.title,
+				source:record.source ? record.source.name : '无'
 			})
 		} else if (type === 'BACK') {
 			let newData = {
@@ -426,8 +426,14 @@ class NewsTable extends Component {
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 					footer={null}>
-					<div style={{ maxHeight: '800px', overflow: 'auto' }}
-						dangerouslySetInnerHTML={{ __html: this.state.container }} />
+					<div>
+						{
+							this.state.source === '无' ? null : <p>{`来源 ：${this.state.source}`}</p>
+						}
+						<div style={{ maxHeight: '800px', overflow: 'auto' }}
+							dangerouslySetInnerHTML={{ __html: this.state.container }} />
+					</div>
+					
 				</Modal>
 			</Row>
 		);
