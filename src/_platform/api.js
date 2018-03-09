@@ -81,7 +81,7 @@ export const FOREST_API = `${window.config.SDOMAIN}`;
 //export const FOREST_API = `${window.config.SDOMAIN}:${window.config.FORESTPORT}`;
 export const FOREST_SYSTEM = `${FOREST_API}/system`;
 //苗圃定位模板
-export const nurseryLocation_template = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('nurseryLocation.xlsx');
+export const nurseryLocation_template = STATIC_DOWNLOAD_API + '/media/documents/2017/11/' + encodeURI('nurseryLocation.xlsx');
 
 export const SubItem_WordTemplate = `${window.config.NODE_FILE_STATIC_URL}` + '/media/documents/meta/' + encodeURI('分项工程质量验收记录模板.docx')
 export const Fenbu_WordTemplate = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('分部子分部工程质量验收记录_ibqFgFg.docx')

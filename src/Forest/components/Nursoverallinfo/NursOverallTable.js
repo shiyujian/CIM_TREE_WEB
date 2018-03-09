@@ -854,9 +854,9 @@ export default class NursOverallTable extends Component {
     		supervisorcheck,
     		checkstatus,
     		locationstatus,
-    		factory,
-    		createtime_min:stime&&moment(stime).add(8, 'h').unix(),
-    		createtime_max:etime&&moment(etime).add(8, 'h').unix(),
+			factory,
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:stime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page: 1,
     		size: exportsize
     	}
@@ -865,8 +865,14 @@ export default class NursOverallTable extends Component {
     	this.setState({loading:true,percent:0})
     	getexportTreeNurserys({},postdata)
 		.then(rst3 => {
+			debugger
+			if(rst3 === ''){
+				message.info('没有符合条件的信息');
+			}else{
+				this.createLink(this,`${FOREST_API}/${rst3}`)
+				// window.location.href = `${FOREST_API}/${rst3}`
+			}
 			this.setState({loading:false})
-			window.location.href = `${FOREST_API}/${rst3}`
 		})
 	}
 

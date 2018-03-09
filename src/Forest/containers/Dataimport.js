@@ -3,12 +3,14 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as actions from '../store';
 import {PkCodeTree,TreeTable} from '../components';
-import {Table,Row,Col,Select,DatePicker,Button,Modal,Upload,Icon,message} from 'antd';
+import {Table,Row,Col,Select,DatePicker,Button,Modal,Upload,Icon,message,Notification} from 'antd';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {nurseryLocation_template} from '_platform/api';
+import { FOREST_API,SERVICE_API } from '_platform/api';
 const { Option} = Select;
 var moment = require('moment');
+var download = window.config.nurseryLocation;
 @connect(
 	state => {
 		const {forest,platform} = state;
@@ -31,6 +33,41 @@ export default class Dataimport extends Component {
     }
 
 	render() {
+        let jthis = this;
+        const props = {
+            action: `${SERVICE_API}/excel/upload-api/`,
+            headers: {
+            },
+            showUploadList: false,
+            beforeUpload(file) {
+                if(file.name.indexOf('xls') !== -1 || file.name.indexOf('xlxs') !== -1){
+                    return true
+                }else{
+                    message.warning('只能上传excel文件')
+                }
+            },
+            onChange(info) {
+                if (info.file.status !== 'uploading') {
+                }
+                if (info.file.status === 'done') {
+                    let importData = info.file.response.Sheet1;
+                    if (importData.length === 1) {
+                        Notification.error({
+                            message: `${info.file.name}上传失败`
+                        });
+                        return
+                    }
+                    jthis.handleExcelData(importData);
+                    Notification.success({
+                        message: `${info.file.name}上传成功`
+                    });
+                } else if (info.file.status === 'error') {
+                    Notification.error({
+                        message: `${info.file.name}解析失败，请检查输入`
+                    });
+                }
+            },
+        };
 		return (
 				<Body>
 					<Main>
@@ -42,12 +79,7 @@ export default class Dataimport extends Component {
                         </Row>
                         <Row style={{fontSize:"20px", marginTop:'20px'}}>
                             <Col span={2}>
-                                <Upload  
-                                 style={{marginLeft: '20px'}}
-                                 showUploadList={true}
-                                 action='http://www.baidu.com'
-                                 beforeUpload={this.beforeUpload.bind(this)}
-                                >
+                                <Upload  {...props}>
                                     <Button type='primary' style={{fontSize: '14px'}}>
                                         点击上传
                                     </Button>
@@ -60,25 +92,36 @@ export default class Dataimport extends Component {
                         </Row>
 					</Main>
 				</Body>);
-	}
+    }
+    async handleExcelData(data) {
+        const { actions: { getOrgReverse, getOrgName } } = this.props;
+        data.splice(0, 1);
+        let generateData = [];
+        data.map(item => {
+            let single = {
+                index:item[0] || '',
+                code:item[1] || '',
+                x:item[2] || '',
+                y:item[3] || '',
+                h:item[4] || '',
+            };
+            generateData.push(single);
+        })
+        debugger
+    }
     onDownloadClick(){
-        let a = "http://bimcd.ecidi.com:6540/media/documents/2017/11/nurseryLocation.xlsx";
-        document.querySelector('#root').insertAdjacentHTML('afterend', '<iframe src="'+`${a}`+'" style="display: none"></iframe>')
+        document.querySelector('#root').insertAdjacentHTML('afterend', '<iframe src="'+`${download}`+'" style="display: none"></iframe>')
     }
     beforeUpload(file) {
-        message.warning('上传失败，请稍后再试');
-        // const {actions: {postFile}} = this.props;
-        // let formdata = new FormData();
-        // formdata.append('a_file',file);
-        // formdata.append('name',file.name);
-        // console.log(formdata)
-        // postFile({},formdata).then(rst=>{
-        //     if(rst.indexOf('error') == -1){
-        //         message.success('上传成功');
-        //     } else {
-        //         message.error(`上传失败:${rst}`,3);
-        //     }
-        // });
-        return false;
+        if(file.name.indexOf('xls') !== -1 || file.name.indexOf('xlxs') !== -1){
+            return true
+        }else{
+            message.warning('只能上传excel文件')
+        }
+    }
+    onFileChangeChange(file){
+        if(file.status === 'done'){
+            debugger
+        }
     }
 }
