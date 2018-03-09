@@ -110,7 +110,8 @@ export default class Dataimport extends Component {
         debugger
     }
     onDownloadClick(){
-        document.querySelector('#root').insertAdjacentHTML('afterend', '<iframe src="'+`${download}`+'" style="display: none"></iframe>')
+        window.open(download)
+        // document.querySelector('#root').insertAdjacentHTML('afterend', '<iframe src="'+`${download}`+'" style="display: none"></iframe>')
     }
     beforeUpload(file) {
         if(file.name.indexOf('xls') !== -1 || file.name.indexOf('xlxs') !== -1){
