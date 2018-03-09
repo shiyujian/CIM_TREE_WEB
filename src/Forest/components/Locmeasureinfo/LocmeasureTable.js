@@ -383,9 +383,7 @@ export default class LocmeasureTable extends Component {
 	}
 
 	ontreetypechange(value) {
-		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
-		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
+		this.setState({treetype:value,treetypename:value})
     }
 
 	onstatuschange(value) {

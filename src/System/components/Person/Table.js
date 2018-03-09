@@ -193,10 +193,8 @@ export default class Users extends Component {
 		}, {
 			title: '角色',
 			render: (user) => {
-				console.log("333333333",user)
 				const { groups = [] } = user || {};
 				const roles = groups.map(group => group.name);
-				console.log("roles",roles)
 				return roles.join('、')
 			}
 		}, {
@@ -267,7 +265,6 @@ export default class Users extends Component {
 		} else {
 			dataSource = searchList
 		}
-		console.log("dataSource", dataSource)
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -507,7 +504,6 @@ export default class Users extends Component {
 			sidebar: { node } = {},
 			actions: { changeAdditionField, getSection }
 		} = this.props;
-		console.log("node", node)
 		let sectiona = []
 		getSection(sectiona)
 		if (node.extra_params.sections) {

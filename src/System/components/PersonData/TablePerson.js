@@ -487,7 +487,6 @@ export default class TablePerson extends Component {
 
 		// 	type.push(ret.children[0].name)
 		// }
-		console.log("data_person", data_person)
 		let element = ''
 		let data_person =
 			persons.map((item, index) => {
@@ -623,14 +622,8 @@ export default class TablePerson extends Component {
 		const { actions: { deleteUserList, reverseFind, is_fresh, deletePerson } } = this.props;
 		if (record.is_user) {
 			// 当前是用户
-			console.log("record", record)
-
 			let rst = await reverseFind({ pk: record.personPk })
-			console.log("rst", rst)
-			console.log("deleteUserList", deleteUserList)
-			console.log("record", record)
 			deleteUser({ userID: record.id }).then(async (re) => {
-				console.log("111", re)
 				if (re.code == '1') {
 					Notification.success({
 						message: "删除成功"
