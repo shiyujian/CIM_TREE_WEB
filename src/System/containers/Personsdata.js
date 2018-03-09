@@ -19,7 +19,7 @@ var moment = require('moment');
 	},
 	dispatch => ({
 		actions: bindActionCreators({...platformActions,...actions,...action2}, dispatch),
-	}),
+	}), 
 )
 
 export default class Personsdata extends Component {

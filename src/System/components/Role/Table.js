@@ -13,7 +13,7 @@ export default class Roles extends Component {
 	render() {
 		const {platform: {roles = []}} = this.props;
 		let systemRoles;
-		// console.log("this.props",this.props)
+		console.log("this.props",this.props)
 		if (this.state.userLogin === "admin") {
 			systemRoles = roles.filter(role => role.grouptype === 0);
 		}else{
@@ -119,8 +119,8 @@ export default class Roles extends Component {
 	}
 
 	columns = [{
-		title: '序号',
-		dataIndex: 'index',
+		title: '角色ID',
+		dataIndex: 'id',
 	}, {
 		title: '角色名称',
 		dataIndex: 'name',

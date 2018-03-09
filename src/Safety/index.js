@@ -32,7 +32,7 @@ export default class Safety extends Component {
 	}
 
 	static menus = [{
-		key: 'SafetyTrend',
+		key: 'Trend',
 		id: 'SAFETY.TREND',
 		exact: true,
 		name: '安全动态',
