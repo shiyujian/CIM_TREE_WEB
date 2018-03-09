@@ -102,7 +102,7 @@ export default class RiskEvaluation extends Component {
 						<Button style={this.state.data === "undefined" ? this.state.hidden : this.state.show} onClick={() => {refreshPanelTo('ADD');}}>新增目录</Button>
 						<Button onClick={() => {refreshPanelTo('DEL');}}>删除目录</Button>
 					</div>
-					<PkCodeTree treeData={workTree}
+					<PkCodeTree treeData={worktree}
 					            selectedKeys={keycode}
 					            onSelect={this.selectStandardDir.bind(this)} />
 				</Sidebar>
