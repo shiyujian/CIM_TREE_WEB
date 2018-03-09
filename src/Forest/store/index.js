@@ -131,24 +131,10 @@ export default handleActions({
 			users
 		};
 	},
-	[getTreeListOK]: (state, {payload}) => {
-		let treetypes = {};
-        if(payload){
-			treetypes[''] = [];
-			payload.forEach(treetype => {
-				let type = treetype.TreeTypeName.slice(0, 1);
-				if(!treetypes[type]){
-					treetypes[type] = [];
-				}
-				treetypes[type].push(treetype);
-				treetypes[''].push(treetype);
-			});
-		}
-		return {
+	[getTreeListOK]: (state, {payload}) => ({
 			...state,
-			treetypes
-		};
-	},
+			treetypes:payload
+	}),
 	[getHonestyNewDetailOk]: (state, {payload}) => ({
 		...state,
 		honestyList: payload

@@ -549,9 +549,11 @@ export default class NursOverallTable extends Component {
 	}
 
 	ontreetypechange(value) {
-		const {treetypelist} = this.props;
-		let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
-		this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
+		// debugger
+		// const {treetypelist} = this.props;
+		// let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
+		// this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
+		this.setState({treetype:value,treetypename:value})
     }
 
 	gdminchange(value) {
@@ -736,7 +738,7 @@ export default class NursOverallTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		bigType,
+    		bigtype:bigType,
     		treetype,
     		gd,
     		xj,
