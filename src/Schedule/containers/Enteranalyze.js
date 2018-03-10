@@ -40,9 +40,9 @@ export default class Enteranalyze extends Component {
     }
 
     componentDidMount () {
-        const {actions: {getTree,getTreeList,getTreeNodeList}, treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTreeList,getTreeNodeList}, treetypes,platform:{tree = {}}} = this.props; 
     
-        if(!tree.treeList){
+        if(!tree.bigTreeList){
             getTreeNodeList()
         }
         this.setState({
@@ -87,15 +87,11 @@ export default class Enteranalyze extends Component {
             </Body>
         );
     }
-
-   
-
-     //树选择
     //树选择, 重新获取: 标段、树种并置空
     onSelect(value = []) {
         console.log('onSelect  value',value)
         let keycode = value[0] || '';
-        const {actions:{setkeycode,gettreetype,getTree}} =this.props;
+        const {actions:{setkeycode,gettreetype}} =this.props;
         setkeycode(keycode);
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
     }

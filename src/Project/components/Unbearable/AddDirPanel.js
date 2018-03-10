@@ -11,7 +11,7 @@ class AddDirPanel extends Component {
 
 	createNewDir() {
 		let {
-			actions: { addDir, refreshPanelTo, getDir, changeadddocs},
+			actions: { addDir, refreshPanelTo, getworkTree, changeadddocs},
 			form: { validateFields },
 			adddocs={},
 			datumpk={},
@@ -37,7 +37,7 @@ class AddDirPanel extends Component {
 				}else {
 					message.success('新增目录成功！');
 					refreshPanelTo('NOR');
-					getDir({code: Datumcode});
+					getworkTree({code: Datumcode});
 					changeadddocs();
 				}
 			});
@@ -58,7 +58,7 @@ class AddDirPanel extends Component {
 				}else {
 					message.success('新增目录成功！');
 					refreshPanelTo('NOR');
-					getDir({code: Datumcode});
+					getworkTree({code: Datumcode});
 					changeadddocs();
 				}
 			});

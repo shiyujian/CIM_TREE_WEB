@@ -704,7 +704,7 @@ export default class EntryTable extends Component {
                 <Row>
                     <Col xl={4} lg={10}>
                         <span>类型：</span>
-                        <Select allowClear className="forestcalcw2 mxw100" defaultValue={'全部'} onChange={this.ontypechange.bind(this)}>
+                        <Select className="forestcalcw2 mxw100" defaultValue={'全部'} onChange={this.ontypechange.bind(this)}>
                             {treetyoption}
                         </Select>
                     </Col>
@@ -716,7 +716,7 @@ export default class EntryTable extends Component {
 							filterOption={(input,option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
 							onChange={this.ontreetypechange.bind(this)}
                             style={{width:"100px"}} 
-                            allowClear showSearch 
+                            showSearch 
                             className="forestcalcw2 mxw100" >
                             {treetypeoption}
                         </Select>

@@ -47,54 +47,20 @@ export default class Proprogress extends Component {
     }
     componentDidMount () {
         console.log(this.props,"46546");
-        const {actions: {getTree,gettreetype,getTreeList,getNurserysCount}} = this.props;
-        //地块树
-       try {
-            getTree({},{parent:'root'})
-            .then(rst => {
-                if(rst instanceof Array && rst.length > 0){
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
-                    getTree({},{parent:rst[0].No})
-                    .then(rst1 => {
-                        if(rst1 instanceof Array && rst1.length > 0){
-                            rst1.forEach((item,index) => {
-                                rst1[index].children = []
-                            })
-                            getNewTreeData(rst,rst[0].No,rst1)
-                            getTree({},{parent:rst1[0].No})
-                            .then(rst2 => {
-                                if(rst2 instanceof Array && rst2.length > 0){
-                                    getNewTreeData(rst,rst1[0].No,rst2)
-                                    this.setState({treeLists:rst},() => {
-                                        this.onSelect([rst2[0].No])
-                                    })
-                                    // getNewTreeData(rst,rst[0].No,rst2)
-                                    // getTree({},{parent:rst2[0].No})
-                                    // .then(rst3 => {
-                                    //     if(rst3 instanceof Array && rst3.length > 0){
-                                    //         getNewTreeData(rst,rst2[0].No,rst3)
-                                    //         this.setState({treeLists:rst},() => {
-                                    //             this.onSelect([rst3[0].No])
-                                    //         })
-                                    //     } else {
-                                    //         this.setState({treeLists:rst})
-                                    //     }
-                                    // })
-                                } else {
-                                    this.setState({treeLists:rst})
-                                }
-                            })
-                        }else {
-                            this.setState({treeLists:rst})
-                        }
-                    })
-                }
-            })
-        } catch(e){
-            console.log(e)
+        const {
+            actions: {
+            gettreetype,getTreeList,getTreeNodeList,getNurserysCount
+            },
+            treetypes,
+            platform:{tree = {}}
+        } = this.props;
+    
+        if(!tree.bigTreeList){
+            getTreeNodeList()
         }
+        this.setState({
+            leftkeycode:"P009-01"
+        })
         //类型
         let treetyoption = [
             <Option key={'-1'} value={''}>全部</Option>,
@@ -121,21 +87,7 @@ export default class Proprogress extends Component {
 			})
 		}
     };
-    
-	// onSelect = (project,unitProjecte)=>{
-	// 	console.log('project',project);
-	// 	console.log('unitProjecte',unitProjecte);
-	// 	let me = this;
-	// 	//选择最下级的工程
-	// 	if(unitProjecte){
-	// 		this.setState({
-	// 			item:{
-	// 				unitProjecte:unitProjecte,
-	// 				project:project
-	// 			}
-	// 		})
-	// 	}
- //    };
+
 
 	render() {
 		const {keycode} = this.props;
@@ -143,21 +95,26 @@ export default class Proprogress extends Component {
             treetypeoption,
             treetypelist,
             treetyoption,
-            treeLists,
             sectionoption,
             leftkeycode,
         } = this.state;
-
+        const {platform:{tree={}}} = this.props;
+        let treeList = [];
+        if(tree.bigTreeList){
+            treeList = tree.bigTreeList
+        }
+        console.log('tree',tree)
 	    
 		return (
 			<div>
                 <DynamicTitle title="项目进度" {...this.props}/>
                 <Sidebar>
                     <div style={{ overflow: 'hidden' }} className="project-tree">
-                       <PkCodeTree treeData={treeLists}
+                       <PkCodeTree treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
-                            onExpand={this.onExpand.bind(this)}/>
+                            // onExpand={this.onExpand.bind(this)}
+                            />
                     </div>
                 </Sidebar>
                 <Content>
@@ -203,36 +160,13 @@ export default class Proprogress extends Component {
         }
     }
 
-     //树选择
+    //树选择, 重新获取: 标段、树种并置空
     onSelect(value = []) {
+        console.log('onSelect  value',value)
         let keycode = value[0] || '';
-        const {actions:{getTreeList,gettreetype}} =this.props;
-        this.setState({leftkeycode:keycode})
-        //树种
-        gettreetype({},{no:keycode,paginate:false})
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
-    }
-
-    //树展开
-    onExpand(expandedKeys,info) {
-        const treeNode = info.node;
-        const {actions: {getTree}} = this.props;
-        const {treeLists} = this.state;
-        const keycode = treeNode.props.eventKey;
-        getTree({},{parent:keycode,paginate:false})
-        .then(rst => {
-            if(rst instanceof Array){
-                if(rst.length > 0 && rst[0].wptype != '子单位工程') {
-                    rst.forEach((item,index) => {
-                        rst[index].children = []
-                    })
-                }
-                getNewTreeData(treeLists,keycode,rst)
-                this.setState({treeLists:treeLists})
-            }
-        })
+        const {actions:{setkeycode,gettreetype}} =this.props;
+        setkeycode(keycode);
+        this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
     }
 }
 

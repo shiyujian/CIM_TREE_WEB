@@ -386,21 +386,27 @@ export default class CheckerTable extends Component {
     		sxm,
     		section,
     		// CheckStatus,
-    		stime:stime&&moment(stime).unix(),
-    		etime:etime&&moment(etime).unix(),
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
 			size:exportsize,
 			smallclass,
 			thinclass
     	}
     	if(!!role)
-    		postdata[role] = rolename;
+			postdata[role] = rolename;
+			debugger
     	this.setState({loading:true,percent:0})
     	getexportTree4Checker({},postdata)
 		.then(rst3 => {
+			debugger
 			console.log('rst3',rst3)
 			this.setState({loading:false})
-			window.location.href = `${FOREST_API}/${rst3}`
+			if(rst3 === ''){
+				message.info('最近日期没有抽查的数据');
+			}else{
+				window.location.href = `${FOREST_API}/${rst3}`
+			}
 		})
 	}
 
