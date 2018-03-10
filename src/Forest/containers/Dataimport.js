@@ -53,13 +53,13 @@ export default class Dataimport extends Component {
                     let importData = info.file.response.Sheet1;
                     if (importData.length === 1) {
                         Notification.error({
-                            message: `${info.file.name}上传失败`
+                            message: `${info.file.name}解析失败`
                         });
                         return
                     }
                     jthis.handleExcelData(importData);
                     Notification.success({
-                        message: `${info.file.name}上传成功`
+                        message: `${info.file.name}解析成功`
                     });
                 } else if (info.file.status === 'error') {
                     Notification.error({
@@ -94,20 +94,26 @@ export default class Dataimport extends Component {
 				</Body>);
     }
     async handleExcelData(data) {
-        const { actions: { getOrgReverse, getOrgName } } = this.props;
+        const { actions: { postPositionData } } = this.props;
         data.splice(0, 1);
         let generateData = [];
         data.map(item => {
             let single = {
-                index:item[0] || '',
-                code:item[1] || '',
-                x:item[2] || '',
-                y:item[3] || '',
-                h:item[4] || '',
+                // index:item[0] || '',
+                SXM:item[1] || '',
+                X:item[2] || '',
+                Y:item[3] || '',
+                H:item[4] || '',
             };
             generateData.push(single);
         })
         debugger
+        postPositionData({},generateData).then(rst => {
+            debugger
+            if(rst.code){
+                message.info('定位数据导入成功')
+            }
+        })
     }
     onDownloadClick(){
         window.open(download)
