@@ -93,7 +93,7 @@ export default class ToggleModal extends Component {
             //     key: 'Code'
             // }, 
             {
-                title: '姓名',
+                title: '姓名', 
                 dataIndex: 'record.name',
                 key: 'Name',
                 render: (text, record, index) => {

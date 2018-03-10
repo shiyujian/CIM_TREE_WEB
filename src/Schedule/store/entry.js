@@ -15,10 +15,6 @@ export const changeNursery = createAction(`${ID}传递nurseryName`);
 /*****************************院内************************/
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]); //    √
 export const gettreetype = createFetchAction(`${FOREST_API}/tree/nurserystat?`, []);
-export const gettreetypeAll = createFetchAction(`${FOREST_API}/tree/treestat`, []);
-export const gettreetypeSection = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
-export const gettreetypeSmallClass = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass{{params}}`, []);
-export const gettreetypeThinClass = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass{{params}}`, []);
 export const getfactoryAnalyse = createFetchAction(`${FOREST_API}/trees/analyse/`, []);
 export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys/`, []);
 export const getqueryTree = createFetchAction(`${FOREST_API}/tree/queryTree`, []);
@@ -28,6 +24,17 @@ export const getNurserysCountFast = createFetchAction(`${FOREST_API}/tree/nurser
 export const getfactory = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, []);
 export const gettreeevery = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
 export const nowmessage = createFetchAction(`${FOREST_API}/tree/queryTree?page=1&size=5`,[]);
+
+
+
+
+
+export const gettreetypeAll = createFetchAction(`${FOREST_API}/tree/treestat`, []);
+export const gettreetypeSection = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
+export const gettreetypeSmallClass = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass`, []);
+export const gettreetypeThinClass = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass`, []);
+export const getSmallClassList = createFetchAction(`${FOREST_API}/tree/wpunit4apps?parent={{no}}`, []);
+
 
 
 
@@ -43,6 +50,7 @@ export const actions = {
 	getTree,
 	setkeycode,
 	gettreetype,
+	getSmallClassList
 	
 };
 export default handleActions({

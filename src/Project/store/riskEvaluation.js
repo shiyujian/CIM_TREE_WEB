@@ -5,7 +5,7 @@ import { SERVICE_API, base } from '_platform/api';
 // import dirFactory from '_platform/store/higher-order/dir';
 
 export const ID = 'riskEvaluation';
-export const getworkTreeOK = createAction(`${ID}_工程施工包`);
+export const getworkTreeOK = createAction(`${ID}_文档目录树`);
 export const getworkTree  = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getworkTreeOK]);
 export const setcurrentcode = createAction(`${ID}_Current_Code`);
 // const dirReducer = dirFactory(ID);
