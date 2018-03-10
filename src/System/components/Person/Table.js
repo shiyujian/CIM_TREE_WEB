@@ -111,7 +111,6 @@ export default class Users extends Component {
 				<Popconfirm title="是否真的要删除选中用户?"
 					onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
 					<Button >批量删除</Button>
-
 				</Popconfirm>
 			</Col>]
 		} else {
@@ -332,10 +331,13 @@ export default class Users extends Component {
 
 							</Col>
 						</Row>
+
+				
 						<Row style={{ marginBottom: "20px" }}>
 							{
 								this.confirms()
 							}
+						{/*	<Button onClick={this.saves.bind(this)}>确定</Button>*/}
 							{/* <Col span={3}>
 								<Button onClick={this.append.bind(this)}>添加用户</Button>
 							</Col>
@@ -433,8 +435,8 @@ export default class Users extends Component {
 			for (let j = 0; j < this.selectedCodes.length; j++) {
 				const selectedCode = this.selectedCodes[j];
 				if (element.id == selectedCode) {
-					putUser({ id: element.id }, {
-						username: element.username,
+					putUser({  }, {
+/*						username: element.username,
 						email: element.email,
 						// password: addition.password, // 密码不能变？信息中没有密码
 						account: {
@@ -464,19 +466,54 @@ export default class Users extends Component {
 							}
 						},
 						extra_params: {},
-						title: element.title || ''
-					}).then(rst => {
-						if (rst.id) {
-							clearAdditionField();
-							console.log("element", element)
-							// console.log("Addition",Addition)
-							// const codes = element.collect(node);
-							// console.log("codes", codes)
-							// getUsers({}, { org_code: element.org_code });
-						} else {
-							console.log("111")
-							message.warn('服务器端报错！');
+						title: element.title || ''*/
+
+											id: element.id,
+					username: element.username,
+					email: element.email,
+					// password: addition.password, // 密码不能变？信息中没有密码
+					account: {
+						person_name: element.person_name,
+						person_type: "C_PER",
+						person_avatar_url: "",
+						organization: {
+							pk: node.pk,
+							code: element.org_code,
+							obj_type: "C_ORG",
+							rel_type: "member",
+							name: element.organization
+						},
+					},
+					tags: element.tags,
+					sections: element.sections,
+					//groups: [7],
+					groups: [1],
+					is_active: true,
+					basic_params: {
+						info: {
+							'电话': element.person_telephone || '',
+							'性别': element.gender || '',
+							'技术职称': element.title || '',
+							'phone': element.person_telephone || '',
+							'sex': element.gender || '',
+							'duty': ''
 						}
+					},
+					extra_params: {},
+					title: element.title || ''
+
+					}).then(rst => {
+						// if (rst.id) {
+						// 	clearAdditionField();
+						// 	console.log("element", element)
+						// 	// console.log("Addition",Addition)
+						// 	// const codes = element.collect(node);
+						// 	// console.log("codes", codes)
+						// 	// getUsers({}, { org_code: element.org_code });
+						// } else {
+						// 	console.log("111")
+						// 	message.warn('服务器端报错！');
+						// }
 					})
 				}
 
