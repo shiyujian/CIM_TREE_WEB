@@ -888,61 +888,63 @@ export const MODULES = [
 		id: 'PROJECT',
 		name: '项目管理',
 		children: [
-			{	
-				id:'PROJECT.LANDAREA',
-				name: '地块区域',
-				children: [{
-					id: 'PROJECT.PLOTMAGE',
-					name: '地块管理',
-				}, {
-					id: 'PROJECT.AREAMANAGE',
-					name: '区域管理',
-				}, {
-					id: 'PROJECT.SECTIONMANAGE',
-					name: '标段管理',
-				}, {
-					id: 'PROJECT.SMALLCLASS',
-					name: '小班管理',
-				}, {
-					id: 'PROJECT.THINCLASS',
-					name: '细班管理',
-				}]
-			}, {
-				id:'PROJECT.PROMANAGE',
-				name: '工程管理',
-				children: [{
-					id: 'PROJECT.PLOTSET',
-					name: '地块设置',
-				}, {
-					id: 'PROJECT.AREASET',
-					name: '区域设置',
-				}, {
-					id: 'PROJECT.UNITPRO',
-					name: '单位工程',
-				}, {
-					id: 'PROJECT.SUBUNITPRO',
-					name: '子单位工程',
-				}, {
-					id: 'PROJECT.SUBPRO',
-					name: '分部工程',
-				}, {
-					id: 'PROJECT.ITEMPRO',
-					name: '分项工程',
-				}]
-			}, {
-				id:'PROJECT.ORG',
-				name: '组织机构',
-				children: [{
-					id: 'PROJECT.ORGTYPE',
-					name: '类型管理',
-				}, {
-					id: 'PROJECT.UNITMANAGE',
-					name: '单位管理',
-				}, {
-					id: 'PROJECT.BRANCHMANAGE',
-					name: '部门管理',
-				}]
-			}, {
+			// {	
+			// 	id:'PROJECT.LANDAREA',
+			// 	name: '地块区域',
+			// 	children: [{
+			// 		id: 'PROJECT.PLOTMAGE',
+			// 		name: '地块管理',
+			// 	}, {
+			// 		id: 'PROJECT.AREAMANAGE',
+			// 		name: '区域管理',
+			// 	}, {
+			// 		id: 'PROJECT.SECTIONMANAGE',
+			// 		name: '标段管理',
+			// 	}, {
+			// 		id: 'PROJECT.SMALLCLASS',
+			// 		name: '小班管理',
+			// 	}, {
+			// 		id: 'PROJECT.THINCLASS',
+			// 		name: '细班管理',
+			// 	}]
+			// }, {
+			// 	id:'PROJECT.PROMANAGE',
+			// 	name: '工程管理',
+			// 	children: [{
+			// 		id: 'PROJECT.PLOTSET',
+			// 		name: '地块设置',
+			// 	}, {
+			// 		id: 'PROJECT.AREASET',
+			// 		name: '区域设置',
+			// 	}, {
+			// 		id: 'PROJECT.UNITPRO',
+			// 		name: '单位工程',
+			// 	}, {
+			// 		id: 'PROJECT.SUBUNITPRO',
+			// 		name: '子单位工程',
+			// 	}, {
+			// 		id: 'PROJECT.SUBPRO',
+			// 		name: '分部工程',
+			// 	}, {
+			// 		id: 'PROJECT.ITEMPRO',
+			// 		name: '分项工程',
+			// 	}]
+			// }, {
+			// 	id:'PROJECT.ORG',
+			// 	name: '组织机构',
+			// 	children: [{
+			// 		id: 'PROJECT.ORGTYPE',
+			// 		name: '类型管理',
+			// 	}, {
+			// 		id: 'PROJECT.UNITMANAGE',
+			// 		name: '单位管理',
+			// 	}, {
+			// 		id: 'PROJECT.BRANCHMANAGE',
+			// 		name: '部门管理',
+			// 	}]
+			// }, 
+
+			{
 				id:'PROJECT.DATAMANAGE',
 				name: '资料管理',
 				children: [{
@@ -954,16 +956,19 @@ export const MODULES = [
 				}, {
 					id: 'PROJECT.PRODOC',
 					name: '工程文档',
-				}, {
-					id: 'PROJECT.KEYWORD',
-					name: '工程字段',
-				}, {
-					id: 'PROJECT.TEMPLATE',
-					name: '模板配置',
-				}, {
-					id: 'PROJECT.DICTIONARIES',
-					name: '工程文档字典',
-				}]
+				}
+
+				// , {
+				// 	id: 'PROJECT.KEYWORD',
+				// 	name: '工程字段',
+				// }, {
+				// 	id: 'PROJECT.TEMPLATE',
+				// 	name: '模板配置',
+				// }, {
+				// 	id: 'PROJECT.DICTIONARIES',
+				// 	name: '工程文档字典',
+				// }
+				]
 			}, {
 				id:'PROJECT.OVERALLMANAGE',
 				name: '综合管理',

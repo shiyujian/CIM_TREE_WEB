@@ -18,7 +18,7 @@ export default class MiddleTop extends Component {
         this.state={
             loading:false,
             stime: moment().format('2017/01/01'),
-            etime: moment().format('YYYY/MM/DD'),
+            etime: moment().add(1, 'days').format('YYYY/MM/DD'),
         }
     }
 

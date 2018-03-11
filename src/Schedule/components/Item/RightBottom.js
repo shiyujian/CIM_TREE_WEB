@@ -13,8 +13,8 @@ export default class Warning extends Component {
     constructor(props){
         super(props);
         this.state={
-            stime1: moment().format('2017/11/17 00:00:00'),
-            etime1: moment().format('YYYY-MM-DD 23:59:59'),
+            stime1: moment().format('2017/01/01'),
+            etime1: moment().add(1, 'days').format('YYYY-MM-DD'),
             departOptions:"",
             unitproject:"1标段",
             choose:["灌木","亚乔木","落叶乔木","常绿乔木","种植穴工程","绿地平整","给排水回填","给排水管道安装","给排水沟槽开挖","便道施工"],
@@ -107,8 +107,8 @@ export default class Warning extends Component {
                    <DatePicker  
                      style={{textAlign:"center"}} 
                      showTime
-                     defaultValue={moment(this.state.etime1, 'YYYY/MM/DD HH:mm:ss')} 
-                     format={'YYYY/MM/DD HH:mm:ss'}
+                     defaultValue={moment(this.state.etime1, 'YYYY/MM/DD')} 
+                     format={'YYYY/MM/DD'}
                      onChange={this.datepick.bind(this)}
                      onOk={this.datepickok.bind(this)}
                     >
@@ -131,17 +131,17 @@ export default class Warning extends Component {
     datepickok(value){
 
         this.setState({
-            etime1:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'',
-            stime1:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'',
+            etime1:value[1]?moment(value[1]).format('YYYY/MM/DD'):'',
+            stime1:value[0]?moment(value[0]).format('YYYY/MM/DD'):'',
         })
         let params = {}
-        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:s'):'';
-        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:s'):'';
+        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD'):'';
+        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD'):'';
         params.unitproject = this.state.unitproject;
         this.getdata(params);
 
 
-        // this.setState({etime1:value?moment(value).format('YYYY/MM/DD HH:mm:s'):'',})
+        // this.setState({etime1:value?moment(value).format('YYYY/MM/DD'):'',})
         
         // const {actions: {progressdata,progressalldata}} = this.props;
         // progressdata({},{unitproject:this.state.unitproject,etime:this.state.etime1}).then(rst=>{
