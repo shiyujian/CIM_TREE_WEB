@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Modal, Table, Checkbox, Spin, Input } from 'antd';
-import { defineLocale } from 'antd/node_modules/moment';
 
 export default class Member extends Component {
 	constructor(props) {
