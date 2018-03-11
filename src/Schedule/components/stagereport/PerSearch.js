@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions as platformActions } from '../../../_platform/store/global';
 import { getUser } from '../../../_platform/auth';
+import reducer, { actions } from '../../store/stage';
 
 const Option = Select.Option;
 
@@ -22,7 +23,7 @@ const Option = Select.Option;
         return { platform };
     },
     dispatch => ({
-        actions: bindActionCreators({ ...platformActions, }, dispatch)
+        actions: bindActionCreators({ ...platformActions, ...actions  }, dispatch)
     })
 )
 
@@ -45,7 +46,8 @@ export default class PerSearch extends Component {
 
     async componentDidMount() {
         const { actions: {
-            getUsers
+            getUsers,
+            getUserList
         } } = this.props
         try {
             await getUsers()
@@ -66,13 +68,19 @@ export default class PerSearch extends Component {
             userList.push(user)
         })
         for (var i = 0;i <userList.length;i++){
-            tree.push({
-                pk:userList[i].id,
-                code:userList[i].account.person_code,
-                name: userList[i].account.person_name,
-                username: userList[i].username,
-                org:userList[i].organization,
-            })
+            if(!(userList[i].id) || !(userList[i].account.person_code) || !(userList[i].account.person_name) || !(userList[i].username) || !(userList[i].organization)){
+                console.log('sssssssssssssssssssssssssss',userList[i])
+            }
+            if( userList[i].id && userList[i].account.person_code && userList[i].account.person_name && userList[i].organization){
+                tree.push({
+                    pk:userList[i].id,
+                    code:userList[i].account.person_code,
+                    name: userList[i].account.person_name,
+                    username: userList[i].username,
+                    org:userList[i].organization,
+                })
+            }
+            
         }
         dataList = tree.map(node=>({
             text:node.name,
@@ -83,6 +91,7 @@ export default class PerSearch extends Component {
                 username: node.username,
                 org:node.org,
             }),
+            // value: 'C_PER' + '#' + node.code + '#' + node.name + '#' + node.pk + '#' + node.username,
             value: 'C_PER' + '#' + node.code + '#' + node.name + '#' + node.pk + '#' + node.username + '#' + node.org,
             fetching: false
         }));
@@ -93,9 +102,10 @@ export default class PerSearch extends Component {
                         showSearch
                         id="CarbonSearchText"
                         placeholder="请输入人员姓名"
-                        filterOption={(inputValue, option) => option.props.children.toLowerCase().indexOf(inputValue.toLowerCase()) >=0}
+                        optionFilterProp="children"
+						filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                         style={{ width: '100%' }}
-                        defaultActiveFirstOption={false}
+                        // defaultActiveFirstOption={false}
                         onChange={this.handleChange}
                         value={this.state.text}
                     >

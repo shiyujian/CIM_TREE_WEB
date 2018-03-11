@@ -66,13 +66,15 @@ export default class PerSearch extends Component {
             userList.push(user)
         })
         for (var i = 0;i <userList.length;i++){
-            tree.push({
-                pk:userList[i].id,
-                code:userList[i].account.person_code,
-                name: userList[i].account.person_name,
-                username: userList[i].username,
-                org:userList[i].organization,
-            })
+            if( userList[i].id && userList[i].account.person_code && userList[i].account.person_name && userList[i].organization){
+                tree.push({
+                    pk:userList[i].id,
+                    code:userList[i].account.person_code,
+                    name: userList[i].account.person_name,
+                    username: userList[i].username,
+                    org:userList[i].organization,
+                })
+            }
         }
         dataList = tree.map(node=>({
             text:node.name,
