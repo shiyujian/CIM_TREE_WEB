@@ -173,7 +173,7 @@ export default class Lmap extends Component {
 			storagetype: 0 
 		}).addTo(this.map);
 
-		this.tileLayer = L.tileLayer("http://47.104.159.127:200/3", { 
+		this.tileLayer = L.tileLayer(this.tileUrls[1], { 
 			opacity:1.0,
 			subdomains: [1, 2, 3], 
 			minZoom: 12, 
@@ -208,7 +208,7 @@ export default class Lmap extends Component {
 			storagetype: 0 
 		}).addTo(this.map2);
 
-		this.tileLayer2 = L.tileLayer("http://47.104.159.127:200/3", { 
+		this.tileLayer2 = L.tileLayer(this.tileUrls[1], { 
 			opacity:1.0,
 			subdomains: [1, 2, 3], 
 			minZoom: 12, 

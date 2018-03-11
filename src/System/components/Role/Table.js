@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {Table, Button, Popconfirm, Tabs} from 'antd';
+import React, { Component } from 'react';
+import { Table, Button, Popconfirm, Tabs } from 'antd';
 import Card from '_platform/components/panels/Card';
-import {getUser} from '_platform/auth';
+import { getUser } from '_platform/auth';
 export default class Roles extends Component {
-	constructor(props){
+	constructor(props) {
 		super(props);
 		this.state = {
 			userLogin: ""
@@ -11,12 +11,11 @@ export default class Roles extends Component {
 	}
 	static propTypes = {};
 	render() {
-		const {platform: {roles = []}} = this.props;
+		const { platform: { roles = [] } } = this.props;
 		let systemRoles;
-		console.log("this.props",this.props)
 		if (this.state.userLogin === "admin") {
 			systemRoles = roles.filter(role => role.grouptype === 0);
-		}else{
+		} else {
 			systemRoles = roles.filter(role => {
 				if (role.grouptype === 0 && role.name !== "超级管理员") {
 					return true;
@@ -64,14 +63,14 @@ export default class Roles extends Component {
 	}
 
 	componentDidMount() {
-		const { actions: { getRoles, getLoginUser}} = this.props;
+		const { actions: { getRoles, getLoginUser } } = this.props;
 		getRoles();
 		// getUser()是调用auth里面的函数，然后获取登录人的信息
 		let userid = getUser().id;
-		console.log("userid",userid)
-		console.log("getUser",getUser)
-		console.log("getRoles",getRoles)
-		console.log("this.props",this.props)
+		console.log("userid", userid)
+		console.log("getUser", getUser)
+		console.log("getRoles", getRoles)
+		console.log("this.props", this.props)
 		getLoginUser({
 			id: userid
 		}).then(rst => {
@@ -97,7 +96,7 @@ export default class Roles extends Component {
 
 	append(type) {
 		const {
-			actions: {changeAdditionField}
+			actions: { changeAdditionField }
 		} = this.props;
 		changeAdditionField('visible', true);
 		changeAdditionField('type', type);
@@ -106,14 +105,14 @@ export default class Roles extends Component {
 
 	edit(role) {
 		const {
-			actions: {resetAdditionField}
+			actions: { resetAdditionField }
 		} = this.props;
-		resetAdditionField({...role, visible: true, type: role.grouptype});
+		resetAdditionField({ ...role, visible: true, type: role.grouptype });
 	}
 
 	remove(roleId) {
-		const {actions: {deleteRole, getRoles}} = this.props;
-		deleteRole({id: roleId}).then(rst => {
+		const { actions: { deleteRole, getRoles } } = this.props;
+		deleteRole({ id: roleId }).then(rst => {
 			getRoles();
 		});
 	}
@@ -131,9 +130,9 @@ export default class Roles extends Component {
 		title: '操作',
 		render: (role) => {
 			return [
-				<a key="0" onClick={this.edit.bind(this, role)} style={{marginRight: '1em'}}>编辑</a>,
+				<a key="0" onClick={this.edit.bind(this, role)} style={{ marginRight: '1em' }}>编辑</a>,
 				<Popconfirm key="1" title="确认删除角色吗?" okText="是" cancelText="否"
-				            onConfirm={this.remove.bind(this, role.id)}>
+					onConfirm={this.remove.bind(this, role.id)}>
 					<a onClick={event => event.preventDefault()}>删除</a>
 				</Popconfirm>
 			]
@@ -148,12 +147,33 @@ export default class Roles extends Component {
 	associate(role, event) {
 		event.preventDefault();
 		const {
-			actions: {changeMemberField, getMembers}
+			actions: { changeMemberField, getUserLoading,getMembers, getUserOK,getUsersPage,getUserFristData, getUserFristPage }
 		} = this.props;
+		let pagination = {
+			current: 0,
+			total: 0,
+		};
+		getUserOK()
+		getUserFristData()
+		getUserFristPage(pagination)
 		changeMemberField('visible', true);
 		changeMemberField('role', role);
-		getMembers({id: role.id}).then(({members = []}) => {
+		getUserLoading(true)
+		getMembers({ id: role.id }).then(({ members = [] }) => {
+			console.log("members", members)
+			getUserOK(members)
 			changeMemberField('members', members.map(member => member.id))
+			// getUserFristPage()
+			getUsersPage({page:1}).then(rst1=>{
+				let pagination = {
+					current: 1,
+					total:rst1.count,
+				};
+				// this.setState({infoList:rst1,pagination:pagination})
+				getUserFristPage(pagination)
+				getUserFristData(rst1)
+				getUserLoading(false)
+			})
 		});
 	}
 }
