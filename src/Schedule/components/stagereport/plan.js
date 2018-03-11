@@ -103,31 +103,34 @@ class Plan extends Component {
 		console.log('task',task)
         let subject = [];
         let totledata = [];
-        let arrange = {};
-        task.map((item,index)=>{
-            let itemdata = item.workflowactivity.subject[0];
-            let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
-            let itemtreedatasource = itemdata.treedataSource ? JSON.parse(itemdata.treedataSource) : null;
-            let itemarrange = {
-                index:index+1,
-                id:item.workflowactivity.id,
-                unit: itemdata.unit?JSON.parse(itemdata.unit):'',
-                type: itempostdata.type,
-                numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
-                submitperson:item.workflowactivity.creator.person_name,
-                submittime:item.workflowactivity.real_start_time,
-                status:item.workflowactivity.status,
-				superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
-				timedate:itemdata.timedate?JSON.parse(itemdata.timedate):'',
-				daydocument:itemdata.daydocument?JSON.parse(itemdata.daydocument):'',
-				TreedataSource:itemtreedatasource,
-                dataReview:itemdata.dataReview?JSON.parse(itemdata.dataReview).person_name:''
-            }
-            totledata.push(itemarrange);
-        })
-        this.setState({
-            daydata:totledata
-        })
+		let arrange = {};
+		if(task && task instanceof Array){
+			task.map((item,index)=>{
+				let itemdata = item.workflowactivity.subject[0];
+				let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
+				let itemtreedatasource = itemdata.treedataSource ? JSON.parse(itemdata.treedataSource) : null;
+				let itemarrange = {
+					index:index+1,
+					id:item.workflowactivity.id,
+					unit: itemdata.unit?JSON.parse(itemdata.unit):'',
+					type: itempostdata.type,
+					numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
+					submitperson:item.workflowactivity.creator.person_name,
+					submittime:item.workflowactivity.real_start_time,
+					status:item.workflowactivity.status,
+					superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+					timedate:itemdata.timedate?JSON.parse(itemdata.timedate):'',
+					daydocument:itemdata.daydocument?JSON.parse(itemdata.daydocument):'',
+					TreedataSource:itemtreedatasource,
+					dataReview:itemdata.dataReview?JSON.parse(itemdata.dataReview).person_name:''
+				}
+				totledata.push(itemarrange);
+			})
+			this.setState({
+				daydata:totledata
+			})
+		}
+        
     }
 	onSelectChange = (selectedRowKeys, selectedRows) => {
 		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
@@ -420,7 +423,7 @@ class Plan extends Component {
 						onok={this.totleOk.bind(this)}
 					/>
 				}
-				<SearchInfo {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+				<SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
 				<Button onClick={this.addClick.bind(this)}>新增</Button>
 				<Button onClick={this.deleteClick.bind(this)}>删除</Button>
 				<Table
@@ -476,14 +479,12 @@ class Plan extends Component {
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
                                                     getFieldDecorator('daydocument', {
+														initialValue: `每日计划进度`,
                                                         rules: [
                                                             { required: true, message: '请选择文档类型' }
                                                         ]
                                                     })
-                                                        (<Select placeholder='请选择文档类型' allowClear>
-                                                            <Option key={1} value='开发文档'>开发文档</Option>
-                                                            <Option key={2} value='测试文档'>测试文档</Option>
-                                                        </Select>)
+                                                        (<Input readOnly/>)
                                                 }
                                             </FormItem>
                                         </Col>

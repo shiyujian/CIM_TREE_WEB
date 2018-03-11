@@ -3,32 +3,31 @@ import { Modal, Form, Input, Row, Col, Button, message,Select,Upload,Icon } from
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
-import { base, SOURCE_API,FILE_API} from '../../../_platform/api';
+import { base, STATIC_DOWNLOAD_API, SOURCE_API,FILE_API } from '../../../_platform/api';
 import E from 'wangeditor'
+import { DEPARTMENT } from '_platform/api';
 
 let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
 const Option = Select.Option;
+const Dragger = Upload.Dragger;
 
 class RichModal extends Component {
 	array = [];
     constructor(props) {
 		super(props);
-		debugger
         this.state = {
             content: "",
         }
 	}
 	componentDidUpdate(){
-		if(this.props.array.length>0){
-			this.props.array.map(item=>{
-				this.array.push(<Option value={item.code}>{item.name}</Option>)
-			})
-		}
 	}
 
     componentDidMount() {
+		DEPARTMENT.map(item =>{
+			this.array.push(<Option value={item.name}>{item.name}</Option>)
+		})
         const elem = this.refs.editorElem;
         editor = new E(elem);
         // 使用 onchange 函数监听内容的变化，并实时更新到 state 中
@@ -98,14 +97,15 @@ class RichModal extends Component {
    //发布新闻
 	postData() {
 		const {
-			actions: {postData, getNewsList, patchData, getDraftNewsList},
+			actions: {postData, getNewsList, patchData, getDraftNewsList,postUploadFiles},
 			form: {validateFields},
 			toggleData: toggleData = {
 				type: 'NEWS',
 				status: 'ADD',
 				visible: false,
 				editData: null
-			}
+			},
+			fileList = []
 		} = this.props;
 		validateFields((err, values) => {
 			if (!err) {
@@ -123,6 +123,9 @@ class RichModal extends Component {
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"tags": [1],
 						"categories": [4],
+						"attachment": {
+							"fileList": fileList || [],
+						},
 						"publisher": getUser().id,
 						"is_draft": false,
 						"cover":{
@@ -147,6 +150,7 @@ class RichModal extends Component {
 								getNewsList({
 									user_id: getUser().id
 								});
+								postUploadFiles([]);
 							}
 						})
 				} else if (toggleData.status === 'EDIT') {
@@ -157,6 +161,9 @@ class RichModal extends Component {
 						"raw": this.state.content,
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"categories": [4],
+						"attachment": {
+							"fileList": fileList || [],
+						},
 						"is_draft": false,
 						"cover":{
 							"uid": resp.id,
@@ -183,6 +190,7 @@ class RichModal extends Component {
 								getDraftNewsList({
 									user_id: getUser().id
 								});
+								postUploadFiles([]);
 							}
 						})
 				}
@@ -193,12 +201,13 @@ class RichModal extends Component {
 	//暂存新闻
 	draftDataFunc() {
 		const {
-			actions: {postData, patchData, getNewsList, getDraftNewsList},
+			actions: {postData, patchData, getNewsList, getDraftNewsList,postUploadFiles},
 			form: {validateFields},
 			toggleData: toggleData = {
 				status: 'ADD',
 				editData: null,
-			}
+			},
+			fileList = []
 		} = this.props;
 		//判断暂存的是新增的还是编辑的暂存
 		//编辑暂存的
@@ -212,6 +221,9 @@ class RichModal extends Component {
 					"categories": [4],
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"is_draft": true,
+					"attachment": {
+						"fileList": fileList || [],
+					},
 					"cover":{
 						"uid": resp.id,
 						"misc": resp.misc,
@@ -237,6 +249,7 @@ class RichModal extends Component {
 							getDraftNewsList({
 								user_id: getUser().id
 							});
+							postUploadFiles([]);
 						}
 					})
 			})
@@ -250,6 +263,9 @@ class RichModal extends Component {
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [1],
 					"categories": [4],
+					"attachment": {
+						"fileList": fileList || [],
+					},
 					"publisher": getUser().id,
 					"is_draft": true,
 					"cover":{
@@ -274,6 +290,7 @@ class RichModal extends Component {
 							getDraftNewsList({
 								user_id: getUser().id
 							});
+							postUploadFiles([]);
 						}
 					})
 			})
@@ -304,6 +321,34 @@ class RichModal extends Component {
         array.push(e.fileList[length])
 		return e && array;
 	}
+	uploadProps1 = {
+		name: 'a_file',
+		multiple: true,
+		showUploadList: true,
+		action: base + "/service/fileserver/api/user/files/",
+		beforeUpload: () => {
+			this.setState({ progress: 0 });
+		},
+		onChange: ({ file, event }) => {
+			const status = file.status;
+			if (status === 'done') {
+				const { actions: { postUploadFiles }, fileList = [] } = this.props;
+				let newFileList = fileList;
+				let newFile = {
+					name: file.name,
+					down_file: STATIC_DOWNLOAD_API + "/media" + file.response.download_url.split('/media')[1]
+				};
+				newFileList = newFileList.concat(newFile);
+				postUploadFiles(newFileList)
+				message.info('上传附件成功');
+			}
+			if (event) {
+				let { percent } = event;
+				if (percent !== undefined)
+					this.setState({ progress: parseFloat(percent.toFixed(1)) });
+			}
+		},
+	};
 
 	uploadProps = {
         name: 'file',
@@ -325,13 +370,6 @@ class RichModal extends Component {
     };
 
     render() {
-		this.array = [];
-		if(this.props.array.length>0){
-			this.props.array.map(item=>{
-				this.array.push(<Option value={item.code}>{item.name}</Option>)
-			})
-		}
-
         const {
 			form: { getFieldDecorator },
             toggleData: toggleData = {
@@ -377,11 +415,18 @@ class RichModal extends Component {
 										</Select>)
                                     )}
                                 </FormItem>
-                            </Col>
+							</Col>
+							<Col span={2}>
+								<Dragger {...this.uploadProps1}>
+									<Button >
+										<Icon type='upload' />上传
+									</Button>
+								</Dragger>
+							</Col>
 						</Row>
 						<Row>
                             <Col span={8} offset={1}>
-                                <FormItem {...formItemLayout} label="名称">
+                                <FormItem {...formItemLayout} label="封面">
                                     {getFieldDecorator('attachment', {
 										rules: [
 											{
@@ -404,7 +449,7 @@ class RichModal extends Component {
 									{getFieldDecorator('source', {
 										rules: [
 											{
-												required: true,
+												required: false,
 											}
 										],
 									})(

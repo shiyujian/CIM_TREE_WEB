@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Table, Tabs, Button, Row, Col, Modal, message, Popconfirm, Form, Input, DatePicker, Icon, Select } from 'antd';
 import SimpleText from './SimpleText';
 import Modals from './SimpModal';
-
+import { DEPARTMENT } from '_platform/api';
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
 import '../../../Datum/components/Datum/index.less'
@@ -31,18 +31,18 @@ class TipsTable extends Component {
 		getDraftTipsList({
 			user_id: user_id
 		})
+		this.array = [];
+		DEPARTMENT.map(item =>{
+			this.array.push(<Option value={item.code}>{item.name}</Option>)
+		})
 	}
 	componentDidUpdate(){
-		this.array = [];
-		if(this.props.array.length>0){
-			this.props.array.map(item=>{
-				this.array.push(<Option value={item.code}>{item.name}</Option>)
-			})
-		}
+		
 	}
 
 	//公告操作按钮
 	clickTips(record, type) {
+		debugger
 		const {
 			actions: { deleteData, getTipsList, getDraftTipsList, toggleModal, patchData },
 			tipsTabValue = '1'
@@ -69,12 +69,16 @@ class TipsTable extends Component {
 				editData: record,
 			})
 		} else if (type === 'VIEW') {
+			debugger
 			Modal.info({
 				title: <h1>公告标题：{record.title}</h1>,
 				okText: '知道了',
 				width: '800px',
 				content: (
 					<div>
+						{
+							record.source && record.source.name && <p>{`来源 ：${record.source.name}`}</p>
+						}
 						<h2>公告正文：
 							<div style={{ maxHeight: '600px', overflow: 'auto', border: '1px solid #ccc' }}
 								dangerouslySetInnerHTML={{ __html: record.raw }} />
@@ -317,7 +321,7 @@ class TipsTable extends Component {
 															{ required: false, message: '紧急程度' },
 														]
 													})
-														(<Select style={{ width: '100%' }}
+														(<Select allowClear style={{ width: '100%' }}
 														>
 															<Option value="0">平件</Option>
 															<Option value="1">加急</Option>

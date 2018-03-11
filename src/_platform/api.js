@@ -81,7 +81,7 @@ export const FOREST_API = `${window.config.SDOMAIN}`;
 //export const FOREST_API = `${window.config.SDOMAIN}:${window.config.FORESTPORT}`;
 export const FOREST_SYSTEM = `${FOREST_API}/system`;
 //苗圃定位模板
-export const nurseryLocation_template = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('nurseryLocation.xlsx');
+export const nurseryLocation_template = STATIC_DOWNLOAD_API + '/media/documents/2017/11/' + encodeURI('nurseryLocation.xlsx');
 
 export const SubItem_WordTemplate = `${window.config.NODE_FILE_STATIC_URL}` + '/media/documents/meta/' + encodeURI('分项工程质量验收记录模板.docx')
 export const Fenbu_WordTemplate = STATIC_DOWNLOAD_API + '/media/documents/meta/' + encodeURI('分部子分部工程质量验收记录_ibqFgFg.docx')
@@ -268,7 +268,70 @@ export const PROJECT_UNITS = [
 	}
 ]
 
-//获取单位工程
+
+//获取子项目下的标段
+export const SUBPROJECT_UNITS = [
+	{
+		code:'P009-01',
+		value:'9号地块',
+		units:[
+			{
+				code:'P009-01-01',
+				value:'一标段'
+			},{
+				code:'P009-01-02',
+				value:'二标段'
+			},{
+				code:'P009-01-03',
+				value:'三标段'
+			},{
+				code:'P009-01-04',
+				value:'四标段'
+			},{
+				code:'P009-01-05',
+				value:'五标段'
+			},
+		]
+	},{
+		code:'P010-01',
+		value:'一号区块',
+		units:[
+			{
+				code:'P010-01-01',
+				value:'一标段'
+			},{
+				code:'P010-01-02',
+				value:'二标段'
+			},{
+				code:'P010-01-03',
+				value:'三标段'
+			},{
+				code:'P010-01-04',
+				value:'四标段'
+			}
+		]
+	},{
+		code:'P010-02',
+		value:'二号区块',
+		units:[
+			{
+				code:'P010-02-05',
+				value:'五标段'
+			}
+		]
+	},{
+		code:'P010-03',
+		value:'三号区块',
+		units:[
+			{
+				code:'P010-03-06',
+				value:'六标段'
+			}
+		]
+	}
+]
+
+//获取树种
 export const FORESTTYPE = [
 	{	
 		id:1,
@@ -825,61 +888,63 @@ export const MODULES = [
 		id: 'PROJECT',
 		name: '项目管理',
 		children: [
-			{	
-				id:'PROJECT.LANDAREA',
-				name: '地块区域',
-				children: [{
-					id: 'PROJECT.PLOTMAGE',
-					name: '地块管理',
-				}, {
-					id: 'PROJECT.AREAMANAGE',
-					name: '区域管理',
-				}, {
-					id: 'PROJECT.SECTIONMANAGE',
-					name: '标段管理',
-				}, {
-					id: 'PROJECT.SMALLCLASS',
-					name: '小班管理',
-				}, {
-					id: 'PROJECT.THINCLASS',
-					name: '细班管理',
-				}]
-			}, {
-				id:'PROJECT.PROMANAGE',
-				name: '工程管理',
-				children: [{
-					id: 'PROJECT.PLOTSET',
-					name: '地块设置',
-				}, {
-					id: 'PROJECT.AREASET',
-					name: '区域设置',
-				}, {
-					id: 'PROJECT.UNITPRO',
-					name: '单位工程',
-				}, {
-					id: 'PROJECT.SUBUNITPRO',
-					name: '子单位工程',
-				}, {
-					id: 'PROJECT.SUBPRO',
-					name: '分部工程',
-				}, {
-					id: 'PROJECT.ITEMPRO',
-					name: '分项工程',
-				}]
-			}, {
-				id:'PROJECT.ORG',
-				name: '组织机构',
-				children: [{
-					id: 'PROJECT.ORGTYPE',
-					name: '类型管理',
-				}, {
-					id: 'PROJECT.UNITMANAGE',
-					name: '单位管理',
-				}, {
-					id: 'PROJECT.BRANCHMANAGE',
-					name: '部门管理',
-				}]
-			}, {
+			// {	
+			// 	id:'PROJECT.LANDAREA',
+			// 	name: '地块区域',
+			// 	children: [{
+			// 		id: 'PROJECT.PLOTMAGE',
+			// 		name: '地块管理',
+			// 	}, {
+			// 		id: 'PROJECT.AREAMANAGE',
+			// 		name: '区域管理',
+			// 	}, {
+			// 		id: 'PROJECT.SECTIONMANAGE',
+			// 		name: '标段管理',
+			// 	}, {
+			// 		id: 'PROJECT.SMALLCLASS',
+			// 		name: '小班管理',
+			// 	}, {
+			// 		id: 'PROJECT.THINCLASS',
+			// 		name: '细班管理',
+			// 	}]
+			// }, {
+			// 	id:'PROJECT.PROMANAGE',
+			// 	name: '工程管理',
+			// 	children: [{
+			// 		id: 'PROJECT.PLOTSET',
+			// 		name: '地块设置',
+			// 	}, {
+			// 		id: 'PROJECT.AREASET',
+			// 		name: '区域设置',
+			// 	}, {
+			// 		id: 'PROJECT.UNITPRO',
+			// 		name: '单位工程',
+			// 	}, {
+			// 		id: 'PROJECT.SUBUNITPRO',
+			// 		name: '子单位工程',
+			// 	}, {
+			// 		id: 'PROJECT.SUBPRO',
+			// 		name: '分部工程',
+			// 	}, {
+			// 		id: 'PROJECT.ITEMPRO',
+			// 		name: '分项工程',
+			// 	}]
+			// }, {
+			// 	id:'PROJECT.ORG',
+			// 	name: '组织机构',
+			// 	children: [{
+			// 		id: 'PROJECT.ORGTYPE',
+			// 		name: '类型管理',
+			// 	}, {
+			// 		id: 'PROJECT.UNITMANAGE',
+			// 		name: '单位管理',
+			// 	}, {
+			// 		id: 'PROJECT.BRANCHMANAGE',
+			// 		name: '部门管理',
+			// 	}]
+			// }, 
+
+			{
 				id:'PROJECT.DATAMANAGE',
 				name: '资料管理',
 				children: [{
@@ -891,16 +956,19 @@ export const MODULES = [
 				}, {
 					id: 'PROJECT.PRODOC',
 					name: '工程文档',
-				}, {
-					id: 'PROJECT.KEYWORD',
-					name: '工程字段',
-				}, {
-					id: 'PROJECT.TEMPLATE',
-					name: '模板配置',
-				}, {
-					id: 'PROJECT.DICTIONARIES',
-					name: '工程文档字典',
-				}]
+				}
+
+				// , {
+				// 	id: 'PROJECT.KEYWORD',
+				// 	name: '工程字段',
+				// }, {
+				// 	id: 'PROJECT.TEMPLATE',
+				// 	name: '模板配置',
+				// }, {
+				// 	id: 'PROJECT.DICTIONARIES',
+				// 	name: '工程文档字典',
+				// }
+				]
 			}, {
 				id:'PROJECT.OVERALLMANAGE',
 				name: '综合管理',
@@ -1339,3 +1407,28 @@ export const DOMAIN_CODES = {
 	dir: '文档222',
 	workPackage: '施工包111'
 };
+//获取新闻发布单位
+export const DEPARTMENT = [
+	{
+		code:'ORG_01_19',
+		name:'雄安新区造林指挥部'
+	},{
+		code:'ORG_03_32',
+		name:'河北远大工程咨询有限公司'
+	},{
+		code:'ORG_P010_01_02_02',
+		name:'北京政泰隆工程管理有限公司'
+	},{
+		code:'ORG_P010_01_02_03',
+		name:'北京中城建建设监理有限公司'
+	},{
+		code:'ORG_P010_01_02_04',
+		name:'浙江江南工程管理股份有限公司'
+	},{
+		code:'ORG_P010_02_02_01',
+		name:'北京中林华联建设工程监理有限公司'
+	},{
+		code:'ORG_P010_03_02_01',
+		name:'天津市源天工程咨询有限公司'
+	}
+]

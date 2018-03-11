@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-02-22 14:13:33
+ * @Last Modified time: 2018-03-10 10:35:22
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -75,30 +75,32 @@ class All extends Component {
         let subject = [];
         let totledata = [];
         let arrange = {};
-        task.map((item,index)=>{
-            let itemdata = item.workflowactivity.subject[0];
-            let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
-            let itemtreatmentdata = itemdata.TreatmentData ? JSON.parse(itemdata.TreatmentData) : null;
-            let itemarrange = {
-                index:index+1,
-                id:item.workflowactivity.id,
-                unit: itemdata.unit?JSON.parse(itemdata.unit):'',
-                type: itempostdata.type,
-                numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
-                remarks:itemtreatmentdata[0].remarks||"--",
-                submitperson:item.workflowactivity.creator.person_name,
-                submittime:item.workflowactivity.real_start_time,
-                status:item.workflowactivity.status,
-                totlesuperunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
-                totledocument:itemdata.totledocument?JSON.parse(itemdata.totledocument):'',
-                treatmentdata:itemtreatmentdata,
-                dataReview:itemdata.dataReview?JSON.parse(itemdata.dataReview).person_name:''
-            }
-            totledata.push(itemarrange);
-        })
-        this.setState({
-            totolData:totledata
-        })
+        if(task && task instanceof Array){
+            task.map((item,index)=>{
+                let itemdata = item.workflowactivity.subject[0];
+                let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
+                let itemtreatmentdata = itemdata.TreatmentData ? JSON.parse(itemdata.TreatmentData) : null;
+                let itemarrange = {
+                    index:index+1,
+                    id:item.workflowactivity.id,
+                    unit: itemdata.unit?JSON.parse(itemdata.unit):'',
+                    type: itempostdata.type,
+                    numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
+                    remarks:itemtreatmentdata[0].remarks||"--",
+                    submitperson:item.workflowactivity.creator.person_name,
+                    submittime:item.workflowactivity.real_start_time,
+                    status:item.workflowactivity.status,
+                    totlesuperunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+                    totledocument:itemdata.totledocument?JSON.parse(itemdata.totledocument):'',
+                    treatmentdata:itemtreatmentdata,
+                    dataReview:itemdata.dataReview?JSON.parse(itemdata.dataReview).person_name:''
+                }
+                totledata.push(itemarrange);
+            })
+            this.setState({
+                totolData:totledata
+            })
+        }
     }
     onSelectChange = (selectedRowKeys, selectedRows) => {
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
@@ -464,14 +466,12 @@ class All extends Component {
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
                                                     getFieldDecorator('totledocument', {
+                                                        initialValue: `总计划进度`,
                                                         rules: [
                                                             { required: true, message: '请选择文档类型' }
                                                         ]
                                                     })
-                                                        (<Select placeholder='请选择文档类型' allowClear>
-                                                            <Option key={3} value={'开发文档'}>开发文档</Option>
-                                                            <Option key={4} value={'测试文档'}>测试文档</Option>
-                                                        </Select>)
+                                                        (<Input readOnly/>)
                                                 }
                                             </FormItem>
                                         </Col>

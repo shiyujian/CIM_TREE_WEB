@@ -517,8 +517,8 @@ export default class NursmeasureTable extends Component {
     		factory,
     		treeplace,
     		nurseryname,
-    		liftime_min:stime&&moment(stime).add(8, 'h').unix(),
-    		liftime_max:etime&&moment(etime).add(8, 'h').unix(),
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page: 1,
     		size: exportsize,
     		status,
@@ -528,7 +528,13 @@ export default class NursmeasureTable extends Component {
     	this.setState({loading:true,percent:0})
     	getexportNurserys({},postdata)
 		.then(rst3 => {
-			window.location.href = `${FOREST_API}/${rst3}`
+			debugger
+			if(rst3 === ''){
+				message.info('没有符合条件的信息');
+			}else{
+				createLink('',`${FOREST_API}/${rst3}`)
+				// window.location.href = `${FOREST_API}/${rst3}`
+			}
 			this.setState({loading:false})
 		})
 	}

@@ -13,8 +13,8 @@ export default class Warning extends Component {
     constructor(props){
         super(props);
         this.state={
-            stime1: moment().format('2017/11/17 00:00:00'),
-            etime1: moment().format('YYYY-MM-DD 23:59:59'),
+            stime1: moment().format('2017/01/01'),
+            etime1: moment().add(1, 'days').format('YYYY-MM-DD'),
             project:"便道施工",
             departOptions:"",
             data: [
@@ -99,8 +99,8 @@ export default class Warning extends Component {
                     <DatePicker  
                      style={{textAlign:"center"}} 
                      showTime
-                     defaultValue={moment(this.state.etime1, 'YYYY/MM/DD HH:mm:ss')} 
-                     format={'YYYY/MM/DD HH:mm:ss'}
+                     defaultValue={moment(this.state.etime1, 'YYYY/MM/DD')} 
+                     format={'YYYY/MM/DD'}
                      onChange={this.datepick.bind(this)}
                      onOk={this.datepickok.bind(this)}
                     >
@@ -126,7 +126,7 @@ export default class Warning extends Component {
     }
     datepick(){}
     datepickok(value){
-        this.setState({etime1:value?moment(value).format('YYYY/MM/DD HH:mm:s'):'',})
+        this.setState({etime1:value?moment(value).format('YYYY/MM/DD'):'',})
         
         const {actions: {progressstat4pie}} = this.props;
         progressstat4pie({},{project:this.state.project,etime:this.state.etime1}).then(rst=>{
