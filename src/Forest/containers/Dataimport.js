@@ -49,6 +49,7 @@ export default class Dataimport extends Component {
                     return true
                 }else{
                     message.warning('只能上传excel文件')
+                    return false
                 }
             },
             onChange(info) {
@@ -113,26 +114,21 @@ export default class Dataimport extends Component {
             generateData.push(single);
         })
         postPositionData({id:this.user.id},generateData).then(rst => {
-            debugger
             if(rst.code){
                 message.info('定位数据导入成功')
+            }else{
+                message.error('定位信息导入失败，请确认模板正确！')
             }
         })
     }
     onDownloadClick(){
         window.open(download)
-        // document.querySelector('#root').insertAdjacentHTML('afterend', '<iframe src="'+`${download}`+'" style="display: none"></iframe>')
     }
     beforeUpload(file) {
         if(file.name.indexOf('xls') !== -1 || file.name.indexOf('xlxs') !== -1){
             return true
         }else{
             message.warning('只能上传excel文件')
-        }
-    }
-    onFileChangeChange(file){
-        if(file.status === 'done'){
-            debugger
         }
     }
 }
