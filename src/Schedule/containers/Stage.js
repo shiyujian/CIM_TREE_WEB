@@ -166,6 +166,7 @@ export default class Stage extends Component {
 
     //树选择
     onSelect(value = []) {
+        console.log('stagestage选择的树节点',value)
         let keycode = value[0] || '';
         const { actions: { getTreeList, gettreetype } } = this.props;
         this.setState({ leftkeycode: keycode })
