@@ -405,11 +405,10 @@ export default class CheckerTable extends Component {
 			if(rst3 === ''){
 				message.info('最近日期没有抽查的数据');
 			}else{
-				window.location.href = `${FOREST_API}/${rst3}`
+				this.createLink(this,`${FOREST_API}/${rst3}`)
 			}
 		})
 	}
-
 	createLink(name,url) {
         let link = document.createElement("a");
         // link.download = name;

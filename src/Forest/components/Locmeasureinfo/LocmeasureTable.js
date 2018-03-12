@@ -529,8 +529,8 @@ export default class LocmeasureTable extends Component {
 					tblData[i].statusname = statusname;
 					let islocation = !!plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].islocation = islocation;
-					let createtime1 = !!plan.CreateTime ? moment(plan.CreateTime).utc().format('YYYY-MM-DD') : '/';
-					let createtime2 = !!plan.CreateTime ? moment(plan.CreateTime).utc().format('HH:mm:ss') : '/';
+					let createtime1 = !!plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
+					let createtime2 = !!plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
 					tblData[i].createtime1 = createtime1;
 					tblData[i].createtime2 = createtime2;
 	    		})
@@ -580,8 +580,12 @@ export default class LocmeasureTable extends Component {
     	this.setState({loading:true,percent:0})
     	getexportTree({},postdata)
 		.then(rst3 => {
+			if(rst3 === ''){
+				message.info('没有符合条件的信息');
+			}else{
+				this.createLink(this,`${FOREST_API}/${rst3}`)
+			}
 			this.setState({loading:false})
-			window.location.href = `${FOREST_API}/${rst3}`
 		})
 	}
 

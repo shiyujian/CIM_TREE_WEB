@@ -407,15 +407,19 @@ export default class ContrastTable extends Component {
     		treetype,
     		factory,
     		isstandard,
-    		liftime_min:stime&&moment(stime).add(8, 'h').unix(),
-    		liftime_max:etime&&moment(etime).add(8, 'h').unix(),
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
     		size:exportsize
     	}
     	this.setState({loading:true,percent:0})
     	getexportFactoryAnalyse({},postdata)
 		.then(rst3 => {
-			window.location.href = `${FOREST_API}/${rst3}`
+			if(rst3 === ''){
+				message.info('没有符合条件的信息');
+			}else{
+				this.createLink(this,`${FOREST_API}/${rst3}`)
+			}
 			this.setState({loading:false})
 		})
 	}

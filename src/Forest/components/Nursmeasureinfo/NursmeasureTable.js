@@ -480,8 +480,8 @@ export default class NursmeasureTable extends Component {
 	    				statusname = ''
 	    			tblData[i].statusname = statusname;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			tblData[i].liftertime1 = !!plan.LifterTime ? moment(plan.LifterTime).utc().format('YYYY-MM-DD') : '/';
-					tblData[i].liftertime2 = !!plan.LifterTime ? moment(plan.LifterTime).utc().format('HH:mm:ss') : '/';
+	    			tblData[i].liftertime1 = !!plan.LifterTime ? moment(plan.LifterTime).format('YYYY-MM-DD') : '/';
+					tblData[i].liftertime2 = !!plan.LifterTime ? moment(plan.LifterTime).format('HH:mm:ss') : '/';
 	    		})
 		    	const pagination = { ...this.state.pagination };
 				pagination.total = rst.pageinfo.total;
@@ -528,12 +528,10 @@ export default class NursmeasureTable extends Component {
     	this.setState({loading:true,percent:0})
     	getexportNurserys({},postdata)
 		.then(rst3 => {
-			debugger
 			if(rst3 === ''){
 				message.info('没有符合条件的信息');
 			}else{
-				createLink('',`${FOREST_API}/${rst3}`)
-				// window.location.href = `${FOREST_API}/${rst3}`
+				this.createLink(this,`${FOREST_API}/${rst3}`)
 			}
 			this.setState({loading:false})
 		})
