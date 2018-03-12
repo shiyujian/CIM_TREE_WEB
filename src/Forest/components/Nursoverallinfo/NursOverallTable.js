@@ -865,12 +865,10 @@ export default class NursOverallTable extends Component {
     	this.setState({loading:true,percent:0})
     	getexportTreeNurserys({},postdata)
 		.then(rst3 => {
-			debugger
 			if(rst3 === ''){
 				message.info('没有符合条件的信息');
 			}else{
 				this.createLink(this,`${FOREST_API}/${rst3}`)
-				// window.location.href = `${FOREST_API}/${rst3}`
 			}
 			this.setState({loading:false})
 		})

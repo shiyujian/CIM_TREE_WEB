@@ -8,6 +8,7 @@ import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {nurseryLocation_template} from '_platform/api';
 import { FOREST_API,SERVICE_API } from '_platform/api';
+import {getUser} from '_platform/auth'
 const { Option} = Select;
 var moment = require('moment');
 var download = window.config.nurseryLocation;
@@ -21,6 +22,7 @@ var download = window.config.nurseryLocation;
 	}),
 )
 export default class Dataimport extends Component {
+    user = {}
 	constructor(props) {
         super(props)
         this.state = {
@@ -30,6 +32,9 @@ export default class Dataimport extends Component {
         }
     }
     componentDidMount() {
+        if(!this.user.id){
+            this.user = getUser();
+        }
     }
 
 	render() {
@@ -107,8 +112,7 @@ export default class Dataimport extends Component {
             };
             generateData.push(single);
         })
-        debugger
-        postPositionData({},generateData).then(rst => {
+        postPositionData({id:this.user.id},generateData).then(rst => {
             debugger
             if(rst.code){
                 message.info('定位数据导入成功')

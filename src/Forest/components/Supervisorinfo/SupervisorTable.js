@@ -298,7 +298,7 @@ export default class SupervisorTable extends Component {
     	const {
     		sxm = '',
     		section = '',
-    		// SupervisorCheck = '',
+    		SupervisorCheck = '',
     		smallclass = '',
     		thinclass = '',
     		role = '',
@@ -316,9 +316,9 @@ export default class SupervisorTable extends Component {
     		smallclass,
     		thinclass,
     		status,
-    		// SupervisorCheck,
-    		// stime:stime&&moment(stime).add(8, 'h').unix(),
-    		// etime:etime&&moment(etime).add(8, 'h').unix(),
+    		SupervisorCheck,
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
     		size
     	}
@@ -331,7 +331,6 @@ export default class SupervisorTable extends Component {
     		this.setState({loading:false,percent:100})
     		if(!rst)
 				return
-			console.log('asddddddddddddddddddddddddddddddddddddd',rst)
     		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
@@ -379,8 +378,8 @@ export default class SupervisorTable extends Component {
     		sxm,
     		section,
     		// SupervisorCheck,
-    		stime:stime&&moment(stime).add(8, 'h').unix(),
-    		etime:etime&&moment(etime).add(8, 'h').unix(),
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
     		size:exportsize
     	}
@@ -390,10 +389,9 @@ export default class SupervisorTable extends Component {
     	getexportTree4Supervisor({},postdata)
 		.then(rst3 => {
 			this.setState({loading:false})
-			window.location.href = `${FOREST_API}/${rst3}`
+			this.createLink(this,`${FOREST_API}/${rst3}`)
 		})
 	}
-
 	createLink(name,url) {
         let link = document.createElement("a");
         // link.download = name;

@@ -228,14 +228,14 @@ export default class Tablelevel extends Component {
 			dataIndex:'GrowthHabit',
 			width:'55%'
 		},{
-			title:'现场图',
+			title:'Pics',
 			width:'5%',
 			render: (text,record) => {
 				if(record.Pics != null)
 					return 	<div style={{textAlign:'center'}}>
 								<a  disabled={!record.Pics} 
 									onClick={this.onImgClick.bind(this,record.Pics)}>
-								Img
+								查看
 								</a>
 							</div>
 				else {
