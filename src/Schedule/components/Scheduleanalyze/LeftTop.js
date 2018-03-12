@@ -256,7 +256,7 @@ export default class LeftTop extends Component {
             console.log('data',data)
         }
     
-        let myChart1 = echarts.getInstanceByDom(document.getElementById('leftTop'));    
+        let myChart1 = echarts.init(document.getElementById('leftTop'));    
         let legend = ['总数','一标段','二标段','三标段','四标段','五标段'];
         let series= [
             {

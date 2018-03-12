@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Modal, Table, Checkbox, Spin, Input } from 'antd';
+import { Modal, Table, Checkbox, Spin, Input, Row, Col } from 'antd';
+import { Button } from 'antd/lib/radio';
 
 export default class Member extends Component {
 	constructor(props) {
@@ -11,15 +12,16 @@ export default class Member extends Component {
 			search: false,
 			searchUser: [],
 			objIndex: {},
-			personIndex: {}
+			personIndex: {},
+			checkeds: ''
 		}
 	}
 	search(value) {
 		let searchList = []
 		const users = this.props.getUserList || []
 		users.map((item) => {
-			if (item.account.person_name) {
-				if (value && item.account.person_name.indexOf(value) > -1) {
+			if (item.username) {
+				if (value && item.username.indexOf(value) > -1) {
 					searchList.push(item)
 				}
 			}
@@ -70,44 +72,57 @@ export default class Member extends Component {
 			}
 		});
 		return (
-			<Modal title={title} visible={visible} width="90%"
+			<Modal title={title} style={{ top: 0 }} visible={visible} width="90%"
 
 				onOk={this.ok.bind(this)} onCancel={this.cancel.bind(this)}>
 				<Spin spinning={this.props.getUserLoadings}>
-					<div style={{ overflow: "scroll", height: "600px" }}>
-						<h2 style={{ marginLeft: "10px", marginBottom: "20px" }}>已经关联的用户</h2>
-						<Search
-							placeholder="请输入搜索的名称"
-							style={{
-								width: "200px",
-								margin: "0 0 20px 5px"
-							}}
-							onSearch={value => {
-								this.search.bind(this, value)()
-							}
-							}
-						/>
-						<Table bordered rowKey="id" size='small' columns={this.columns1} dataSource={dataSource}
-						/>
-						<h2 style={{ marginLeft: "10px", marginBottom: "20px" }}>所有用户</h2>
-						<Search
-							placeholder="请输入搜索的用户名"
-							style={{
-								width: "200px",
-								margin: "0 0 20px 5px"
-							}}
-							onSearch={value => {
-								this.searchByName.bind(this, value)()
-							}
-							}
-						/>
-						<Table bordered rowKey="id" size='small' columns={this.columns} dataSource={this.state.searchUser ? (this.state.searchUser.length > 0 ? this.state.searchUser : users2) : users2}
-							onChange={this.changePage.bind(this)}
-							pagination={
-								this.state.searchUser ? (this.state.searchUser.length > 0 ? { current: 1, total: 1 } : this.props.getUserFristPages) : this.props.getUserFristPages
-							}
-						/>
-					</div>
+					{/* <div style={{ overflow: "scroll", height: "600px" }}> */}
+					<Row style={{ marginBottom: '10px' }}>
+						<Col span={6}>
+							<h2 style={{ marginLeft: "10px" }}>已经关联的用户</h2>
+						</Col>
+						<Col span={6}>
+							<Search
+								placeholder="请输入搜索的用户名"
+								style={{
+									width: "200px",
+									margin: "0 0 0 5px"
+								}}
+								onSearch={value => {
+									this.search.bind(this, value)()
+								}
+								}
+							/>
+						</Col>
+					</Row>
+					<Table bordered rowKey="id" size='small' columns={this.columns1} dataSource={dataSource}
+					/>
+
+					<Row style={{ marginBottom: '10px' }}>
+						<Col span={6}>
+							<h2 style={{ marginLeft: "10px" }}>所有用户</h2>
+						</Col>
+						<Col span={6} >
+							<Search
+								placeholder="请输入搜索的用户名"
+								style={{
+									width: "200px",
+									margin: "0 0 0 5px"
+								}}
+								onSearch={value => {
+									this.searchByName.bind(this, value)()
+								}
+								}
+							/>
+						</Col>
+					</Row>
+					<Table bordered rowKey="id" size='small' columns={this.columns} dataSource={this.state.searchUser ? (this.state.searchUser.length > 0 ? this.state.searchUser : users2) : users2}
+						onChange={this.changePage.bind(this)}
+						pagination={
+							this.state.searchUser ? (this.state.searchUser.length > 0 ? { current: 1, total: 1 } : this.props.getUserFristPages) : this.props.getUserFristPages
+						}
+					/>
+					{/* </div> */}
 				</Spin>
 			</Modal>
 		);
@@ -119,8 +134,6 @@ export default class Member extends Component {
 		if (value) {
 			getUsers({}, { "username": value }).then(item => {
 				if (item.length > 0) {
-					console.log("1111111", item)
-
 					if (value == item[0].username) {
 						this.setState({ searchUser: item, objIndex: '' })
 					}
@@ -136,16 +149,20 @@ export default class Member extends Component {
 			member: { members = [], role = {} } = {}
 		} = this.props;
 
-		// changeMemberField('visible', false);
-		if (this.props.getUserFristDatas) {
-			// changeMemberField('members', undefined);
-			console.log("11111111")
-			putMembers({ id: role.id }, { members }).then(rsts => {
-				getUserOK(rsts.members)
-				changeMemberField('members', rsts.members.map(member => member.id))
-			})
-		}
+		changeMemberField('visible', false);
+		// if (this.props.getUserFristDatas) {
+		// 	// changeMemberField('members', undefined);
+		// 	console.log("11111111")
+		// 	putMembers({ id: role.id }, { members }).then(rsts => {
+		// 		getUserOK(rsts.members)
+		// 		changeMemberField('members', rsts.members.map(member => member.id))
+		// 	})
+		// }
 	}
+	// cancelRelation() {
+
+
+	// }
 	cancel() {
 		const {
 			actions: { changeMemberField, getUserOK, getUsersPage, getUserFristPage, getUserFristData }
@@ -247,7 +264,7 @@ export default class Member extends Component {
 		dataIndex: 'account.organization',
 	}, {
 		title: '职务',
-		dataIndex: 'account.job',
+		dataIndex: 'account.title',
 	}, {
 		title: '手机号码',
 		dataIndex: 'account.person_telephone',
@@ -277,22 +294,158 @@ export default class Member extends Component {
 		dataIndex: 'account.organization',
 	}, {
 		title: '职务',
-		dataIndex: 'account.job',
+		dataIndex: 'account.title',
 	}, {
 		title: '手机号码',
 		dataIndex: 'account.person_telephone',
+	}, {
+		title: '取消关联',
+		render: (user) => {
+			const { member = {} } = this.props;
+			const members = member.members || [];
+			const checked = members.some(member => member === user.id);
+			return <Checkbox checked={checked} onChange={this.cancelRelation.bind(this, user)} />
+
+		},
 	}];
 	// user是关联用户里面的其中一行记录
 
 	check(user) {
-		const { actions: { changeMemberField }, member: { members = [] } } = this.props;
+		console.log("22222222",user)
+		const { actions: { changeMemberField }, member: {role = [], members = [] } } = this.props;
 		const has = members.some(member => member === user.id);
 		let rst = [];
-		if (has) {
-			rst = members.filter(member => member !== user.id)
-		} else {
-			rst = [...members, user.id]
+		let groupsa = []
+		for (let i = 0; i < user.groups.length; i++) {
+			const element = user.groups[i];
+			if (has) {
+				rst = members.filter(member => member !== user.id)
+				if (element.id == role.id) {
+					
+				} else {
+					groupsa.push(element.id)
+				}
+			} else {
+				rst = [...members, user.id]
+				groupsa.push(role.id)
+				groupsa.push(element.id)
+			}
+			changeMemberField('members', rst);
 		}
-		changeMemberField('members', rst);
+		console.log("groupsa", groupsa)
+		let setGroups =Array.from(new Set(groupsa))
+		console.log("7777777777",setGroups)
+		const {
+			actions: { putUser, getOrgName }
+		} = this.props;
+		// return
+		getOrgName({ code: user.account.org_code }).then(items => {
+			putUser({}, {
+				id: user.id,
+				username: user.username,
+				email: user.email,
+				// password: addition.password, // 密码不能变？信息中没有密码
+				account: {
+					person_name: user.person_name,
+					person_type: "C_PER",
+					person_avatar_url: "",
+					organization: {
+						pk: items.pk,
+						code: user.account.org_code,
+						obj_type: "C_ORG",
+						rel_type: "member",
+						name: user.account.organization
+					},
+				},
+				tags: user.account.tags,
+				sections: user.account.sections,
+				//groups: [7],
+				groups: setGroups,
+				is_active: true,
+				basic_params: {
+					info: {
+						'电话': user.account.person_telephone || '',
+						'性别': user.account.gender || '',
+						'技术职称': user.account.title || '',
+						'phone': user.account.person_telephone || '',
+						'sex': user.account.gender || '',
+						'duty': ''
+					}
+				},
+				extra_params: {},
+				title: user.account.title || ''
+
+			}).then(rst => {
+
+			})
+		})
+
+	}
+	cancelRelation(user) {
+		const { actions: { changeMemberField }, member: { role = [], members = [] } } = this.props;
+		const has = members.some(member => member === user.id);
+		let rst = [];
+		let groupsa = []
+		for (let i = 0; i < user.groups.length; i++) {
+			const element = user.groups[i];
+			if (has) {
+				rst = members.filter(member => member !== user.id)
+				if (element.id == role.id) {
+
+				} else {
+					groupsa.push(element.id)
+				}
+			} else {
+				rst = [...members, user.id]
+				groupsa.push(element.id)
+			}
+			changeMemberField('members', rst);
+
+		}
+		console.log("groupsa", groupsa)
+		const {
+			actions: { putUser, getOrgName }
+		} = this.props;
+		// return
+		getOrgName({ code: user.account.org_code }).then(items => {
+			putUser({}, {
+				id: user.id,
+				username: user.username,
+				email: user.email,
+				// password: addition.password, // 密码不能变？信息中没有密码
+				account: {
+					person_name: user.person_name,
+					person_type: "C_PER",
+					person_avatar_url: "",
+					organization: {
+						pk: items.pk,
+						code: user.account.org_code,
+						obj_type: "C_ORG",
+						rel_type: "member",
+						name: user.account.organization
+					},
+				},
+				tags: user.account.tags,
+				sections: user.account.sections,
+				//groups: [7],
+				groups: groupsa,
+				is_active: true,
+				basic_params: {
+					info: {
+						'电话': user.account.person_telephone || '',
+						'性别': user.account.gender || '',
+						'技术职称': user.account.title || '',
+						'phone': user.account.person_telephone || '',
+						'sex': user.account.gender || '',
+						'duty': ''
+					}
+				},
+				extra_params: {},
+				title: user.account.title || ''
+
+			}).then(rst => {
+
+			})
+		})
 	}
 }

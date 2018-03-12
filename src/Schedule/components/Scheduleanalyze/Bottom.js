@@ -257,7 +257,7 @@ export default class Bottom extends Component {
         console.log('BottomunCompleteunComplete',unComplete)
         console.log('Bottomlabellabel',label)
     
-        let myChart4 = echarts.getInstanceByDom(document.getElementById('bottom'));
+        let myChart4 = echarts.init(document.getElementById('bottom'));
         let options4 = {
             legend: {
                 data: ['未种植','已种植']

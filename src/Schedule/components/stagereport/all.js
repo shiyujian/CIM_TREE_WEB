@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-10 10:35:22
+ * @Last Modified time: 2018-03-12 15:39:51
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -412,10 +412,10 @@ class All extends Component {
                 }
                 <SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
                 <Button onClick={this.addClick.bind(this)}>新增</Button>
-                <Button onClick={this.deleteClick.bind(this)}>删除</Button>
+                {/* <Button onClick={this.deleteClick.bind(this)}>删除</Button> */}
                 <Table
                     columns={this.columns}
-                    rowSelection={rowSelection}
+                    // rowSelection={rowSelection}
                     dataSource={this.state.totolData} 
                     bordered
                     rowKey='index'

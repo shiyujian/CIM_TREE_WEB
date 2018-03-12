@@ -50,7 +50,10 @@ export default class PerSearch extends Component {
             getUserList
         } } = this.props
         try {
-            await getUsers()
+            let postdata = {
+                org_code : '003'
+            }
+            await getUsers({},postdata)
         } catch (error) {
             console.log(error)
         }

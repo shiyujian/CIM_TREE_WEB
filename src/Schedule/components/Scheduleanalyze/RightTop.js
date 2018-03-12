@@ -170,7 +170,7 @@ export default class RightTop extends Component {
         console.log('RightTopunCompleteunComplete',unComplete)
         console.log('RightToplabellabel',label)
     
-        let myChart3 = echarts.getInstanceByDom(document.getElementById('rightTop'));
+        let myChart3 = echarts.init(document.getElementById('rightTop'));
         let options3 = {
             legend: {
                 data: ['未种植','已种植']

@@ -269,9 +269,12 @@ export default class FaithinfoTable extends Component {
     	this.setState({loading:true,percent:0})
     	getexportFactoryAnalyseInfo({},postdata)
 		.then(rst3 => {
-			console.log('rst3',rst3)
-			window.location.href = `${FOREST_API}/${rst3}`
-			this.setState({loading:false,percent:100})
+			if(rst3 === ''){
+				message.info('没有符合条件的信息');
+			}else{
+				this.createLink(this,`${FOREST_API}/${rst3}`)
+			}
+			this.setState({loading:false})
 		})
 	}
 

@@ -759,7 +759,6 @@ export default class EntryTable extends Component {
         let treetypeoption = [];
         treetypeoption.push(<Option key={-1} value={'全部'}>全部</Option>)
         selectTreeType.map(rst =>{
-            console.log('rsttttttttttttttttttt',rst)
             treetypeoption.push(<Option key={rst.ID} value={rst.ID}>{rst.TreeTypeName}</Option>)
         })
         return treetypeoption
