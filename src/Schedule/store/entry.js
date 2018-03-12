@@ -22,7 +22,7 @@ export const getexportTree = createFetchAction(`${FOREST_API}/tree/xlsx/`, [],'P
 export const getNurserysCount = createFetchAction(`${FOREST_API}/tree/nurserys/count/`, []);
 export const getNurserysCountFast = createFetchAction(`${FOREST_API}/tree/nurserystat?no=P009`, []);
 export const getfactory = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, []);
-export const gettreeevery = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
+export const gettreeevery = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
 export const nowmessage = createFetchAction(`${FOREST_API}/tree/queryTree?page=1&size=5`,[]);
 
 

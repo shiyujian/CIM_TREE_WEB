@@ -1,4 +1,17 @@
 /**
+ *
+ * Copyright (c) 2016-present, ecidi.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @Author: ecidi.mingey
+ * @Date: 2018-03-12 20:06:03
+ * @Last Modified by: ecidi.mingey
+ * @Last Modified time: 2018-03-12 20:14:19
+ */
+/**
 *
 * Copyright (c) 2016-present, ecidi.
 * All rights reserved.
@@ -329,6 +342,29 @@ export const SUBPROJECT_UNITS = [
 			}
 		]
 	}
+]
+
+export const TREETYPENO = [
+	{
+		id:'1',
+		name:'常绿乔木'
+	},
+	{
+		id:'2',
+		name:'落叶乔木'
+	},
+	{
+		id:'3',
+		name:'亚乔木'
+	},
+	{
+		id:'4',
+		name:'灌木'
+	},
+	{
+		id:'5',
+		name:'草本'
+	},
 ]
 
 //获取树种

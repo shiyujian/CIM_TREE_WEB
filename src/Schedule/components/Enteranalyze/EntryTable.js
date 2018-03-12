@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Row, Col, Input, Icon, DatePicker, Select, Spin} from 'antd';
 import {Cards, SumTotal, DateImg} from '../../components';
-import { FOREST_API, FORESTTYPE} from '../../../_platform/api';
+import { FOREST_API, FORESTTYPE,TREETYPENO} from '../../../_platform/api';
 import moment from 'moment';
 import {groupBy} from 'lodash';
 var echarts = require('echarts');
@@ -75,6 +75,175 @@ export default class EntryTable extends Component {
             this.search()
             this.query()
         }
+    }
+
+    componentDidMount(){
+        let myChart1 = echarts.init(document.getElementById('king'));
+        let option1 = {
+            title: {
+                text: '苗木进场总数',
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {show: true}
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                   
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '',
+                    axisLabel: {
+                        formatter: '{value} 棵'
+                    }
+                },
+                {
+                    type: 'value',
+                    name: '',
+                    axisLabel: {
+                        formatter: '{value} 棵'
+                    }
+                }
+            ],
+            series: [
+                {
+                    name: '苗木进场总数',
+                    type: 'bar',
+                    markPoint: {
+                        data: [
+                            {type: 'max', name: '最大值'},
+                            {type: 'min', name: '最小值'}
+                        ]
+                    },
+                    markLine: {
+                        data: [
+                            {type: 'average', name: '平均值'}
+                        ]
+                    }
+                },
+            ]
+        };
+        myChart1.setOption(option1);
+
+        let myChart2 = echarts.init(document.getElementById('stock'));
+        let options2 = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            legend: {
+                left:'right'
+                
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '长度（m）',
+                    axisLabel: {
+                        formatter: '{value} '
+                    }
+                },
+            
+            ],
+            series: []
+        };
+        myChart2.setOption(options2);
+        const {actions: {gettreeevery}} = this.props;
+        //获取全部树种信息
+        gettreeevery().then(rst=>{
+            console.log('gettreeeveryrst',rst)
+            if(rst && rst instanceof Array){
+                this.setState({
+                    treetypeAll:rst,
+                    selectTreeType:rst
+                })
+            }
+        });
+
+        //类型
+        let treetyoption = [];
+        treetyoption.push(<Option key={'全部'} value={'全部'}>全部</Option>)
+        TREETYPENO.map((tree)=>{
+            console.log('tree',tree)
+            treetyoption.push(<Option key={tree.name} value={tree.id}>{tree.name}</Option>)
+        })
+        console.log('treetyoption',treetyoption)
+        
+        this.setState({
+            treetyoption,
+            loading5:true,
+            loading4:true,
+            loading3:true
+        })
+        this.query(1)
+        this.search()
+        
+
+        const {actions: {getfactory,nowmessage}} = this.props;
+        //实时种植信息
+        nowmessage().then(rst=>{
+            if(rst && rst.content){
+                console.log(rst.content,"xionsui");
+                this.setState({
+                    nowmessagelist:rst.content,
+                })
+            }
+        })
+        
+       
+        getfactory().then(rst=>{
+            this.setState({loading5:false})
+            if(rst && rst instanceof Array ){
+                let factorynum = rst.length;
+                this.setState({
+                    nurserys:factorynum,
+                }) 
+            }
+            
+        })
+        
     }
     //苗木进场总数
     async query(no){
@@ -456,173 +625,7 @@ export default class EntryTable extends Component {
         })
     }
 
-    componentDidMount(){
-        let myChart1 = echarts.init(document.getElementById('king'));
-        let option1 = {
-            title: {
-                text: '苗木进场总数',
-            },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    crossStyle: {
-                        color: '#999'
-                    }
-                }
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: {show: true}
-                }
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    axisPointer: {
-                        type: 'shadow'
-                    },
-                   
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    name: '',
-                    axisLabel: {
-                        formatter: '{value} 棵'
-                    }
-                },
-                {
-                    type: 'value',
-                    name: '',
-                    axisLabel: {
-                        formatter: '{value} 棵'
-                    }
-                }
-            ],
-            series: [
-                {
-                    name: '苗木进场总数',
-                    type: 'bar',
-                    markPoint: {
-                        data: [
-                            {type: 'max', name: '最大值'},
-                            {type: 'min', name: '最小值'}
-                        ]
-                    },
-                    markLine: {
-                        data: [
-                            {type: 'average', name: '平均值'}
-                        ]
-                    }
-                },
-            ]
-        };
-        myChart1.setOption(option1);
-
-        let myChart2 = echarts.init(document.getElementById('stock'));
-        let options2 = {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    crossStyle: {
-                        color: '#999'
-                    }
-                }
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            legend: {
-                left:'right'
-                
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    name: '长度（m）',
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                },
-            
-            ],
-            series: []
-        };
-        myChart2.setOption(options2);
-        const {actions: {gettreeevery}} = this.props;
-        gettreeevery().then(rst=>{
-            console.log('gettreeeveryrst',rst)
-            if(rst && rst instanceof Array){
-                this.setState({
-                    treetypeAll:rst,
-                    selectTreeType:rst
-                })
-            }
-        });
-
-        //类型
-        let treetyoption = [
-            <Option key={Math.random()} value={'全部'}>全部</Option>,
-            <Option key={Math.random()*2} value={'常绿乔木'}>常绿乔木</Option>,
-            <Option key={Math.random()*6} value={'落叶乔木'}>落叶乔木</Option>,
-            <Option key={Math.random()*3} value={'亚乔木'}>亚乔木</Option>,
-            <Option key={Math.random()*4} value={'灌木'}>灌木</Option>,
-            <Option key={Math.random()*5} value={'草本'}>草本</Option>,
-        ];
-        this.setState({
-            treetyoption,
-            loading5:true,
-            loading4:true,
-            loading3:true
-        })
-        this.query(1)
-        this.search()
-        
-
-        const {actions: {getfactory,nowmessage}} = this.props;
-        //实时种植信息
-        nowmessage().then(rst=>{
-            if(rst && rst.content){
-                console.log(rst.content,"xionsui");
-                this.setState({
-                    nowmessagelist:rst.content,
-                })
-            }
-        })
-        
-       
-        getfactory().then(rst=>{
-            this.setState({loading5:false})
-            if(rst && rst instanceof Array ){
-                let factorynum = rst.length;
-                this.setState({
-                    nurserys:factorynum,
-                }) 
-            }
-            
-        })
-        
-    }
+    
 
 
 
@@ -718,7 +721,7 @@ export default class EntryTable extends Component {
                 <Row>
                     <Col xl={4} lg={10}>
                         <span>类型：</span>
-                        <Select className="forestcalcw2 mxw100" defaultValue={'全部'} onChange={this.ontypechange.bind(this)}>
+                        <Select className="forestcalcw2 mxw100" defaultValue={'全部'} style={{width:"85px"}} onChange={this.ontypechange.bind(this)}>
                             {treetyoption}
                         </Select>
                     </Col>
@@ -759,7 +762,7 @@ export default class EntryTable extends Component {
         let treetypeoption = [];
         treetypeoption.push(<Option key={-1} value={'全部'}>全部</Option>)
         selectTreeType.map(rst =>{
-            treetypeoption.push(<Option key={rst.ID} value={rst.ID}>{rst.TreeTypeName}</Option>)
+            treetypeoption.push(<Option key={rst.ID} title={rst.TreeTypeName} value={rst.ID}>{rst.TreeTypeName}</Option>)
         })
         return treetypeoption
         
@@ -770,6 +773,7 @@ export default class EntryTable extends Component {
         const {
             treetypeAll = [],
         } = this.state
+        console.log('value',value)
         if(value === '全部'){
             this.setState({
                 selectTreeType:treetypeAll,
@@ -778,19 +782,15 @@ export default class EntryTable extends Component {
             })
         }else{
             let selectTreeType = [];
-            FORESTTYPE.map((rst =>{
-                if (rst.name === value){
-                    let children = rst.children
-                    children.map(item =>{
-                        treetypeAll.map((tree)=>{
-                            if(tree.TreeTypeName === item.name){
-                                selectTreeType.push(tree)
-                            }
-                        })
-                        // selectTreeType.push( treetypeAll.find((tree)=> tree.TreeTypeName === item.name))
-                    })
+            treetypeAll.map((tree)=>{
+                //获取树种cdoe的首个数字，找到对应的类型
+                let code = tree.TreeTypeNo.substr(0, 1)
+                console.log('code',code)
+                if(code === value){
+                    console.log('treetreetree',tree)
+                    selectTreeType.push(tree)
                 }
-            }))
+            })
             console.log('selectTreeType',selectTreeType)
             this.setState({
                 selectTreeType,
