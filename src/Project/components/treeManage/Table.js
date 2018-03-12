@@ -22,7 +22,7 @@ export default class Tablelevel extends Component {
 			search:false,
 			record:{},
 			imgvisible:false,
-			imgSrc:''
+			imgSrc:false
         }
 	}
 	
@@ -233,20 +233,23 @@ export default class Tablelevel extends Component {
 			title:'Pics',
 			width:'5%', 
 			render: (text,record) => {
-				if(record.Pics != null && record.Pics.indexOf("&") == -1 ){
+				if(record.Pics != null  ){
 					let img =  `${FOREST_API}/${record.Pics.replace(/\/\//g,'/')}`
 					// console.log('pppp',record.Pics)
 					console.log('img',img)
-					return 	<div style={{textAlign:'center',height:'30px'}}>
+					return 	<div style={{textAlign:'center',height:'32px'}}>
 								<a  disabled={!record.Pics} 
 									onClick={this.onImgClick.bind(this,record.Pics)}>
 								{/*<Icon type="picture" style={{fontSize:30}} />*/}
 								<Avatar shape="square" src={img}></Avatar>
+								{/*<img src={img} 
+									 onerror="this.src=''"
+									 style={{width:'32px',height:'32px'}}/>*/}
 								</a>
 							</div>
 				}
 				else {
-					return <div style={{textAlign:'center',height:'30px'}}>
+					return <div style={{textAlign:'center',height:'32px'}}>
 						<Avatar shape="square" icon="picture"></Avatar>
 					</div>
 				}
@@ -300,8 +303,8 @@ export default class Tablelevel extends Component {
 		},{
 			title:'Pics',
 			width:'5%',
-			render: (text,record) => {
-				if(record.Pics != null && record.Pics.indexOf("&") == -1 ){
+			render: (text,record) => { 
+				if(record.Pics != null ){
 					let img =  `${FOREST_API}/${record.Pics.replace(/\/\//g,'/')}`
 					console.log('pppp',record.Pics)
 					return 	<div style={{textAlign:'center',height:'30px'}}>
