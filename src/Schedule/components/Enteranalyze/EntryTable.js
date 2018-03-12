@@ -29,9 +29,9 @@ export default class EntryTable extends Component {
             today: '',
             nurserys: '',
             section: '',
-            etime: moment().format('YYYY/MM/DD'),
+            etime: moment().add(1, 'days').format('YYYY/MM/DD'),
             stime1: moment().format('2017/01/01'),
-            etime1: moment().format('YYYY/MM/DD'),
+            etime1: moment().add(1, 'days').format('YYYY/MM/DD'),
             etime3: moment().unix(),
             loading1: false,
             loading2: false,
@@ -76,6 +76,7 @@ export default class EntryTable extends Component {
             this.query()
         }
     }
+    //苗木进场总数
     async query(no){
         const{
             leftkeycode,
@@ -89,7 +90,9 @@ export default class EntryTable extends Component {
         if (!leftkeycode)
         return 
         let postdata = {}
-        
+        this.setState({
+            loading1:true
+        })
 
         postdata.no = leftkeycode
         postdata.etime = etime
@@ -190,8 +193,12 @@ export default class EntryTable extends Component {
             ]
         };
         myChart1.setOption(option1);
+        this.setState({
+            loading1:false
+        })
 
     }
+    //进场强度分析
     async search(no){
         const{
             leftkeycode,
@@ -219,6 +226,10 @@ export default class EntryTable extends Component {
             treetype.push(treeSelect)
             postdata.treetype = treetype
         }
+
+        this.setState({
+            loading2:true
+        })
         
         postdata.stime = stime1
         postdata.etime = etime1
@@ -440,6 +451,9 @@ export default class EntryTable extends Component {
             series: series
         };
         myChart2.setOption(options2);
+        this.setState({
+            loading2:false
+        })
     }
 
     componentDidMount(){
@@ -745,6 +759,7 @@ export default class EntryTable extends Component {
         let treetypeoption = [];
         treetypeoption.push(<Option key={-1} value={'全部'}>全部</Option>)
         selectTreeType.map(rst =>{
+            console.log('rsttttttttttttttttttt',rst)
             treetypeoption.push(<Option key={rst.ID} value={rst.ID}>{rst.TreeTypeName}</Option>)
         })
         return treetypeoption
@@ -768,7 +783,12 @@ export default class EntryTable extends Component {
                 if (rst.name === value){
                     let children = rst.children
                     children.map(item =>{
-                        selectTreeType.push( treetypeAll.find((tree)=> tree.TreeTypeName === item.name))
+                        treetypeAll.map((tree)=>{
+                            if(tree.TreeTypeName === item.name){
+                                selectTreeType.push(tree)
+                            }
+                        })
+                        // selectTreeType.push( treetypeAll.find((tree)=> tree.TreeTypeName === item.name))
                     })
                 }
             }))
