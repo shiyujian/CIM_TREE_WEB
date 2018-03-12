@@ -159,6 +159,7 @@ export default class Roles extends Component {
 		changeMemberField('visible', true);
 		changeMemberField('role', role);
 		getUserLoading(true)
+		console.log("role11111111111",role)
 		getMembers({ id: role.id }).then(({ members = [] }) => {
 			console.log("members", members)
 			getUserOK(members)

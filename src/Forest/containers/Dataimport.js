@@ -8,6 +8,7 @@ import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {nurseryLocation_template} from '_platform/api';
 import { FOREST_API,SERVICE_API } from '_platform/api';
+import {getUser} from '_platform/auth'
 const { Option} = Select;
 var moment = require('moment');
 var download = window.config.nurseryLocation;
@@ -21,6 +22,7 @@ var download = window.config.nurseryLocation;
 	}),
 )
 export default class Dataimport extends Component {
+    user = {}
 	constructor(props) {
         super(props)
         this.state = {
@@ -30,6 +32,9 @@ export default class Dataimport extends Component {
         }
     }
     componentDidMount() {
+        if(!this.user.id){
+            this.user = getUser();
+        }
     }
 
 	render() {
@@ -44,6 +49,7 @@ export default class Dataimport extends Component {
                     return true
                 }else{
                     message.warning('只能上传excel文件')
+                    return false
                 }
             },
             onChange(info) {
@@ -107,28 +113,22 @@ export default class Dataimport extends Component {
             };
             generateData.push(single);
         })
-        debugger
-        postPositionData({},generateData).then(rst => {
-            debugger
+        postPositionData({id:this.user.id},generateData).then(rst => {
             if(rst.code){
                 message.info('定位数据导入成功')
+            }else{
+                message.error('定位信息导入失败，请确认模板正确！')
             }
         })
     }
     onDownloadClick(){
         window.open(download)
-        // document.querySelector('#root').insertAdjacentHTML('afterend', '<iframe src="'+`${download}`+'" style="display: none"></iframe>')
     }
     beforeUpload(file) {
         if(file.name.indexOf('xls') !== -1 || file.name.indexOf('xlxs') !== -1){
             return true
         }else{
             message.warning('只能上传excel文件')
-        }
-    }
-    onFileChangeChange(file){
-        if(file.status === 'done'){
-            debugger
         }
     }
 }

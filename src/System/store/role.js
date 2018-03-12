@@ -1,10 +1,11 @@
 import {handleActions, combineActions,createAction} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
-import { base } from '_platform/api';
+import { base,SERVICE_API } from '_platform/api';
 import createFetchAction from 'fetch-action';
 import fieldFactory from '_platform/store/service/field';
 
 const getLoginUser = createFetchAction(`${base}/accounts/api/users/{{id}}`, [], 'GET');
+const getOrgName = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`, [], "GET");
 export const actions3 = {
 	getLoginUser
 };
@@ -21,6 +22,7 @@ export const actions = {
 	...memberReducer,
 	...additionReducer,
 	getUserOK,
+	getOrgName,
 	getUserFristPage,
 	getUserFristData,
 	getUserLoading

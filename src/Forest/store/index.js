@@ -58,7 +58,7 @@ export const getHonestyNewDetail = createFetchAction(`${FOREST_API}/tree/factory
 export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/honesty/new/?detail=true`, []);
 export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, '');
 export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //    √
-export const postPositionData = createFetchAction(`${FOREST_API}/tree/importLocations`, [],'POST'); //    √
+export const postPositionData = createFetchAction(`${FOREST_API}/tree/importLocations?user={{id}}`, [],'POST'); //    √
 export const actions = {
 	getForestUsers,
 	getTreeOK,

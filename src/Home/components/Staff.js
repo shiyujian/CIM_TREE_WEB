@@ -5,7 +5,7 @@ import ReactEcharts from 'react-echarts';
 
 import {VictoryChart, VictoryGroup, VictoryBar} from 'victory';
 // import data from './people.json';
-import {getUser} from '_platform/auth';
+// import {getUser} from '_platform/auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 
@@ -26,7 +26,7 @@ export default class Overall extends Component {
 			openEndChose: false,
 			startValue: moment(),
 			endValue: moment(),
-			loading: true
+			// loading: true
 		}
 	}
 
@@ -49,7 +49,8 @@ export default class Overall extends Component {
 			tomonth: moment().month() + 1,
 		});
 
-		let {id} = getUser();
+		// let {id} = getUser();
+
 
 		// getCurrentUserOrgCode({userId:id}).then((rst)=>{
 		// 	console.log('# rst : ',rst);
@@ -178,34 +179,34 @@ export default class Overall extends Component {
 	}
 
 	lookChart() {
-		this.setState({
-			loading:true
-		})
-		let {
-			thisOrgCode,
-			monthSection,
-			actions: {getOrgAttendInfo,setCountInfoAc,getOrgAttendInfoT}
-		} = this.props;
-		let allMonth=this._getOptionsArr(monthSection.fromyear,monthSection.frommonth,monthSection.toyear,monthSection.tomonth)
-		let allPromises=allMonth.map((item)=>{
-			return getOrgAttendInfoT(item)
-		})
-		Promise.all(allPromises).then(rst=>{
-			let allData=[]
-			rst.map((itm)=>{
-				allData=allData.concat(itm)
-			})
-			setCountInfoAc(allData)
-			this.setState({
-				loading:false
-			})
-			this.makeData()
-		}).catch(()=>{
-			setCountInfoAc([])
-			this.setState({
-				loading:false
-			})
-		})
+		// this.setState({
+		// 	loading:true
+		// })
+		// let {
+		// 	thisOrgCode,
+		// 	monthSection,
+		// 	actions: {getOrgAttendInfo,setCountInfoAc,getOrgAttendInfoT}
+		// } = this.props;
+		// let allMonth=this._getOptionsArr(monthSection.fromyear,monthSection.frommonth,monthSection.toyear,monthSection.tomonth)
+		// let allPromises=allMonth.map((item)=>{
+		// 	return getOrgAttendInfoT(item)
+		// })
+		// Promise.all(allPromises).then(rst=>{
+		// 	let allData=[]
+		// 	rst.map((itm)=>{
+		// 		allData=allData.concat(itm)
+		// 	})
+		// 	setCountInfoAc(allData)
+		// 	this.setState({
+		// 		loading:false
+		// 	})
+		// 	this.makeData()
+		// }).catch(()=>{
+		// 	setCountInfoAc([])
+		// 	this.setState({
+		// 		loading:false
+		// 	})
+		// })
 	}
 
 	getEchartsOption() {
@@ -340,10 +341,10 @@ export default class Overall extends Component {
 
 	render() {//todo 人员统计具体实现
 		const {orgAttendInfo = []} = this.props;
-		let {loading = true} = this.state;
+		// let {loading = true} = this.state;
 		return (
 			<Blade title="质量信息统计">
-				<Spin tip="数据加载中，请稍后..." spinning={loading}>
+				{/* <Spin tip="数据加载中，请稍后..." spinning={loading}> */}
 					<Col>
 						{/* <div style={{display: 'flex', alignItems: 'center'}}>
 							统计时间：
@@ -374,7 +375,7 @@ export default class Overall extends Component {
 							/>
 						}
 					</div>
-				</Spin>
+				{/* </Spin> */}
 			</Blade>
 
 		);
