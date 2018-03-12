@@ -12,6 +12,7 @@ export default class Filter extends Component {
 
 	render() {
 		const { actions: { toggleAddition }, Doc = [] } = this.props;
+		// console.log('sssss',this.props.isTreeSelected)
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>

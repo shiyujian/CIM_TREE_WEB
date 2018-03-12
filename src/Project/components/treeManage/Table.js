@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {
-	Form, Input,Button, Row, Col, Modal, Upload, Icon, message, Table,notification, Select,Popconfirm
+	Form, Input,Button, Row, Col, Modal, Upload,Avatar, 
+	Icon, message, Table,notification, Select,Popconfirm
 } from 'antd';
 // import Button from "antd/es/button/button";
 import Card from '_platform/components/panels/Card';
@@ -20,7 +21,8 @@ export default class Tablelevel extends Component {
 			searchList:[],
 			search:false,
 			record:{},
-			imgvisible:false
+			imgvisible:false,
+			imgSrc:''
         }
 	}
 	
@@ -84,17 +86,17 @@ export default class Tablelevel extends Component {
 
 				<Modal
 						width={522}
-						title='详细信息'
+						title='Picture'
 						style={{textAlign:'center'}}
 						visible={this.state.imgvisible}
-						onOk={this.handleCancel.bind(this)}
-						onCancel={this.handleCancel.bind(this)}
+						footer={null}
+						// onOk={this.handleCancel.bind(this)}
+						onCancel={this.handleCancel.bind(this)} 
 					>
 					<img style={{width:"490px"}} src={this.state.src} alt="图片"/>
 				</Modal>
 				</div>
-			</div>
-			
+			</div>			
 		);
 	}
 
@@ -211,7 +213,7 @@ export default class Tablelevel extends Component {
 			title:'树种学名',
 			key:'TreeTypeName',
 			dataIndex:'TreeTypeName',
-			width:'5%'
+			width:'10%'
 		},{
 			title:'所属类型',
 			key:'TreeTypeGenera',
@@ -221,7 +223,7 @@ export default class Tablelevel extends Component {
 			title:'编码',
 			key:'TreeTypeNo',
 			dataIndex:'TreeTypeNo',
-			width:'10%'
+			width:'5%'
 		},{
 			title:'习性',
 			key:'GrowthHabit',
@@ -229,17 +231,24 @@ export default class Tablelevel extends Component {
 			width:'55%'
 		},{
 			title:'Pics',
-			width:'5%',
+			width:'5%', 
 			render: (text,record) => {
-				if(record.Pics != null)
-					return 	<div style={{textAlign:'center'}}>
+				if(record.Pics != null && record.Pics.indexOf("&") == -1 ){
+					let img =  `${FOREST_API}/${record.Pics.replace(/\/\//g,'/')}`
+					// console.log('pppp',record.Pics)
+					console.log('img',img)
+					return 	<div style={{textAlign:'center',height:'30px'}}>
 								<a  disabled={!record.Pics} 
 									onClick={this.onImgClick.bind(this,record.Pics)}>
-								查看
+								{/*<Icon type="picture" style={{fontSize:30}} />*/}
+								<Avatar shape="square" src={img}></Avatar>
 								</a>
 							</div>
+				}
 				else {
-					return <span>/</span>
+					return <div style={{textAlign:'center',height:'30px'}}>
+						<Avatar shape="square" icon="picture"></Avatar>
+					</div>
 				}
 			}
 		},{
@@ -267,35 +276,53 @@ export default class Tablelevel extends Component {
 			title:'树种ID',
 			key:'ID',
             dataIndex:'ID',
+            width:'5%'
 		},{
 			title:'树种学名',
 			key:'TreeTypeName',
 			dataIndex:'TreeTypeName',
+			width:'10%'
 		},{
 			title:'所属类型',
 			key:'TreeTypeGenera',
 			dataIndex:'TreeTypeGenera',
+			width:'10%'
 		},{
 			title:'编码',
 			key:'TreeTypeNo',
 			dataIndex:'TreeTypeNo',
+			width:'5%'
 		},{
 			title:'习性',
 			key:'GrowthHabit',
 			dataIndex:'GrowthHabit',
+			width:'55%'
 		},{
-			title:'现场图',
+			title:'Pics',
+			width:'5%',
 			render: (text,record) => {
-				if(record.Pics != 0)
-					return <a disabled={!record.Pics} onClick={this.onImgClick.bind(this,record.Pics)}>img</a>
+				if(record.Pics != null && record.Pics.indexOf("&") == -1 ){
+					let img =  `${FOREST_API}/${record.Pics.replace(/\/\//g,'/')}`
+					console.log('pppp',record.Pics)
+					return 	<div style={{textAlign:'center',height:'30px'}}>
+								<a  disabled={!record.Pics} 
+									onClick={this.onImgClick.bind(this,record.Pics)}>
+								{/*<Icon type="picture" style={{fontSize:30}} />*/}
+								<Avatar shape="square" src={img}></Avatar>
+								</a>
+							</div>
+				}
 				else {
-					return <span>/</span>
+					return <div style={{textAlign:'center',height:'30px'}}>
+						<Avatar shape="square" icon="picture"></Avatar>
+					</div>
 				}
 			}
 		},{
 			title:'操作',
 			key:'operate',
 			dataIndex:'operate',
+			width:'10%',
 			render: (text, record, index) =>{
 				return(
                     <div>
