@@ -20,8 +20,8 @@ export default class Member extends Component {
 		let searchList = []
 		const users = this.props.getUserList || []
 		users.map((item) => {
-			if (item.account.person_name) {
-				if (value && item.account.person_name.indexOf(value) > -1) {
+			if (item.username) {
+				if (value && item.username.indexOf(value) > -1) {
 					searchList.push(item)
 				}
 			}
@@ -83,7 +83,7 @@ export default class Member extends Component {
 						</Col>
 						<Col span={6}>
 							<Search
-								placeholder="请输入搜索的名称"
+								placeholder="请输入搜索的用户名"
 								style={{
 									width: "200px",
 									margin: "0 0 0 5px"
@@ -134,8 +134,6 @@ export default class Member extends Component {
 		if (value) {
 			getUsers({}, { "username": value }).then(item => {
 				if (item.length > 0) {
-					console.log("1111111", item)
-
 					if (value == item[0].username) {
 						this.setState({ searchUser: item, objIndex: '' })
 					}
@@ -321,19 +319,13 @@ export default class Member extends Component {
 		for (let i = 0; i < user.groups.length; i++) {
 			const element = user.groups[i];
 			if (has) {
-					console.log("1111111111")
 				rst = members.filter(member => member !== user.id)
 				if (element.id == role.id) {
-					console.log("222222")
 					
 				} else {
-					console.log("333333")
-					
 					groupsa.push(element.id)
 				}
 			} else {
-				console.log("4444444444")
-				
 				rst = [...members, user.id]
 				groupsa.push(role.id)
 				groupsa.push(element.id)
@@ -341,6 +333,52 @@ export default class Member extends Component {
 			changeMemberField('members', rst);
 		}
 		console.log("groupsa", groupsa)
+		let setGroups =Array.from(new Set(groupsa))
+		console.log("7777777777",setGroups)
+		const {
+			actions: { putUser, getOrgName }
+		} = this.props;
+		// return
+		getOrgName({ code: user.account.org_code }).then(items => {
+			putUser({}, {
+				id: user.id,
+				username: user.username,
+				email: user.email,
+				// password: addition.password, // 密码不能变？信息中没有密码
+				account: {
+					person_name: user.person_name,
+					person_type: "C_PER",
+					person_avatar_url: "",
+					organization: {
+						pk: items.pk,
+						code: user.account.org_code,
+						obj_type: "C_ORG",
+						rel_type: "member",
+						name: user.account.organization
+					},
+				},
+				tags: user.account.tags,
+				sections: user.account.sections,
+				//groups: [7],
+				groups: setGroups,
+				is_active: true,
+				basic_params: {
+					info: {
+						'电话': user.account.person_telephone || '',
+						'性别': user.account.gender || '',
+						'技术职称': user.account.title || '',
+						'phone': user.account.person_telephone || '',
+						'sex': user.account.gender || '',
+						'duty': ''
+					}
+				},
+				extra_params: {},
+				title: user.account.title || ''
+
+			}).then(rst => {
+
+			})
+		})
 
 	}
 	cancelRelation(user) {
