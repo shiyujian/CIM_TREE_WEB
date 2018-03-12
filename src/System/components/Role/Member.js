@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Table, Checkbox, Spin, Input } from 'antd';
+import { Modal, Table, Checkbox, Spin, Input,Row,Col } from 'antd';
 
 export default class Member extends Component {
 	constructor(props) {
@@ -70,44 +70,57 @@ export default class Member extends Component {
 			}
 		});
 		return (
-			<Modal title={title} visible={visible} width="90%"
+			<Modal title={title} style={{top:0}} visible={visible} width="90%"
 
 				onOk={this.ok.bind(this)} onCancel={this.cancel.bind(this)}>
 				<Spin spinning={this.props.getUserLoadings}>
-					<div style={{ overflow: "scroll", height: "600px" }}>
-						<h2 style={{ marginLeft: "10px", marginBottom: "20px" }}>已经关联的用户</h2>
-						<Search
-							placeholder="请输入搜索的名称"
-							style={{
-								width: "200px",
-								margin: "0 0 20px 5px"
-							}}
-							onSearch={value => {
-								this.search.bind(this, value)()
-							}
-							}
+					{/* <div style={{ overflow: "scroll", height: "600px" }}> */}
+						<Row style={{marginBottom:'10px'}}>
+							<Col span={6}>
+								<h2 style={{ marginLeft: "10px"}}>已经关联的用户</h2>
+							</Col>
+							<Col span={6}>
+								<Search
+									placeholder="请输入搜索的名称"
+									style={{
+										width: "200px",
+										margin: "0 0 0 5px"
+									}}
+									onSearch={value => {
+										this.search.bind(this, value)()
+									}
+									}
+								/>
+							</Col>
+						</Row>
+						<Table bordered rowKey="id" style={{position:'relative'}} size='small' columns={this.columns1} dataSource={dataSource}
 						/>
-						<Table bordered rowKey="id" size='small' columns={this.columns1} dataSource={dataSource}
-						/>
-						<h2 style={{ marginLeft: "10px", marginBottom: "20px" }}>所有用户</h2>
-						<Search
-							placeholder="请输入搜索的用户名"
-							style={{
-								width: "200px",
-								margin: "0 0 20px 5px"
-							}}
-							onSearch={value => {
-								this.searchByName.bind(this, value)()
-							}
-							}
-						/>
+
+						<Row style={{position:'absolute',top:'400px',width:'100%'}}>
+							<Col span={6}>
+								<h2 style={{marginLeft: "10px"}}>所有用户</h2>
+							</Col>
+							<Col span={6} >
+								<Search
+									placeholder="请输入搜索的用户名"
+									style={{
+										width: "200px",
+										margin: "0 0 0 5px"
+									}}
+									onSearch={value => {
+										this.searchByName.bind(this, value)()
+									}
+									}
+								/>
+							</Col>
+						</Row>
 						<Table bordered rowKey="id" size='small' columns={this.columns} dataSource={this.state.searchUser ? (this.state.searchUser.length > 0 ? this.state.searchUser : users2) : users2}
 							onChange={this.changePage.bind(this)}
 							pagination={
 								this.state.searchUser ? (this.state.searchUser.length > 0 ? { current: 1, total: 1 } : this.props.getUserFristPages) : this.props.getUserFristPages
 							}
 						/>
-					</div>
+					{/* </div> */}
 				</Spin>
 			</Modal>
 		);
@@ -247,7 +260,7 @@ export default class Member extends Component {
 		dataIndex: 'account.organization',
 	}, {
 		title: '职务',
-		dataIndex: 'account.job',
+		dataIndex: 'account.title',
 	}, {
 		title: '手机号码',
 		dataIndex: 'account.person_telephone',
@@ -277,7 +290,7 @@ export default class Member extends Component {
 		dataIndex: 'account.organization',
 	}, {
 		title: '职务',
-		dataIndex: 'account.job',
+		dataIndex: 'account.title',
 	}, {
 		title: '手机号码',
 		dataIndex: 'account.person_telephone',
