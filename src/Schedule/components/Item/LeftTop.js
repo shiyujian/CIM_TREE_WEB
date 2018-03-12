@@ -13,8 +13,8 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
     constructor(props){
         super(props);
         this.state={
-            stime1: moment().format('2017/01/01'),
-            etime1: moment().add(1, 'days').format('YYYY/MM/DD'),
+            stime: moment().format('2017/01/01'),
+            etime: moment().add(1, 'days').format('YYYY/MM/DD'),
             departOptions:"",
             data:"",
             gpshtnum:[],
@@ -23,57 +23,80 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             project:"便道施工",
         }
     }
+
+    componentDidMount() {
+       
+        let myChart = echarts.init(document.getElementById('lefttop'));
+ 
+        let optionLine = {
+             tooltip: {
+                 trigger: 'axis',
+                 axisPointer: {
+                     type: 'cross',
+                     crossStyle: {
+                         color: '#999'
+                     }
+                 }
+             },
+             legend: {
+                 data:['总数','一标','二标','三标','四标','五标'],
+                 left:'right'
+                 
+             },
+             xAxis: [
+                 {
+                     type: 'category',
+                     data: this.state.times,
+                     axisPointer: 
+                      {
+                         type: 'shadow'
+                     }
+                 }
+             ],
+             yAxis: [
+                 {
+                     type: 'value',
+                     name: '长度（m）',
+                     axisLabel: {
+                         formatter: '{value} '
+                     }
+                 },
+             ],
+             series: []
+         };
+         myChart.setOption(optionLine);
+     }
+
+    componentDidUpdate(prevProps, prevState){
+        const {
+            stime,
+            etime
+        } = this.state
+        const {
+            leftkeycode
+        }=this.props
+        try{
+            if(leftkeycode.split('-')[0] != prevProps.leftkeycode.split('-')[0]){
+                this.query()
+            }
+        }catch(e){
+            console.log(e)
+        }
+        if(stime != prevState.stime || etime != prevState.etime){
+            this.query()
+        }
+    }
+
     componentWillReceiveProps(nextProps){
         let params = {}
-        params.etime = this.state.etime1;
-        params.stime = this.state.stime1;
+        params.etime = this.state.etime;
+        params.stime = this.state.stime;
         
         params.project = this.state.project;
         this.getdata(params);
     }
 
-    componentDidMount() {
-       
-       let myChart = echarts.init(document.getElementById('lefttop'));
-
-       let optionLine = {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    crossStyle: {
-                        color: '#999'
-                    }
-                }
-            },
-            legend: {
-                data:['总数','一标','二标','三标','四标','五标'],
-                left:'right'
-                
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    data: this.state.times,
-                    axisPointer: 
-                     {
-                        type: 'shadow'
-                    }
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    name: '长度（m）',
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                },
-            ],
-            series: []
-        };
-        myChart.setOption(optionLine);
-    }
+    
     
     
     render() { //todo 累计完成工程量
@@ -85,7 +108,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             施工时间：
                 <RangePicker 
                              style={{verticalAlign:"middle"}} 
-                             defaultValue={[moment(this.state.stime1, 'YYYY/MM/DD'),moment(this.state.etime1, 'YYYY/MM/DD')]} 
+                             defaultValue={[moment(this.state.stime, 'YYYY/MM/DD'),moment(this.state.etime, 'YYYY/MM/DD')]} 
                              showTime
                              format={'YYYY/MM/DD'}
                              onChange={this.datepick.bind(this)}
@@ -120,8 +143,8 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
     datepick(){}
     datepickok(value){
         this.setState({
-            etime1:value[1]?moment(value[1]).format('YYYY/MM/DD'):'',
-            stime1:value[0]?moment(value[0]).format('YYYY/MM/DD'):'',
+            etime:value[1]?moment(value[1]).format('YYYY/MM/DD'):'',
+            stime:value[0]?moment(value[0]).format('YYYY/MM/DD'):'',
         })
         let params = {}
         params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD'):'';
@@ -134,8 +157,8 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             project:value,
         })
         let params = {}
-        params.etime = this.state.etime1;
-        params.stime = this.state.stime1;
+        params.etime = this.state.etime;
+        params.stime = this.state.stime;
         params.project = value;
         this.getdata(params);
     }

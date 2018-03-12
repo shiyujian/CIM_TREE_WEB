@@ -166,7 +166,7 @@ export default class MiddleTop extends Component {
 
         }
        
-        let myChart2 = echarts.getInstanceByDom(document.getElementById('middleTop'));
+        let myChart2 = echarts.init(document.getElementById('middleTop'));
         let options2 = {
             legend: {
                 data: ['未种植','已种植']

@@ -15,10 +15,9 @@ export default class ScheduleTable extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            amount: '',
-            today: '',
-            pers: '',
-            score: '',
+            amount: 0,
+            today: 0,
+            total:0,
             loading5: false,
             loading6: false,
             loading7: false,
@@ -33,12 +32,16 @@ export default class ScheduleTable extends Component {
         const {
             actions: {
                 gettreetypeAll,
-                nowmessage
+                nowmessage,
+                gettreetypeSection
             }
         } = this.props;
 
-        this.setState({loading5:true});
-        this.setState({loading6:true});
+        this.setState({
+            loading5:true,
+            loading6:true,
+            loading7:true
+        });
 
         let message = await nowmessage()
         console.log('ScheduleTableScheduleTable',message)
@@ -50,13 +53,16 @@ export default class ScheduleTable extends Component {
         this.setState({
             nowmessagelist:nowmessagelist
         })
-
+        //获取当前种树信息
         let rst = await gettreetypeAll()
         console.log('ScheduleTableScheduleTable',rst)
 
-
+        //一共种植棵数
         let amount = 0;
+        //今日种植棵数
         let today = 0;
+        //一共需要种植棵数
+        let total = 0;
         let date = moment().format('YYYY/MM/DD');
         if(rst && rst instanceof Array){
             rst.map((item)=>{
@@ -66,14 +72,22 @@ export default class ScheduleTable extends Component {
                 }
             })
         }
-
-        this.setState({loading5:false});
+        //获取所有需要种植的总数
+        let totalTrees = await gettreetypeSection()
+        console.log('ScheduleTabletotalTrees',totalTrees)
+        if(totalTrees && totalTrees instanceof Array){
+            totalTrees.map((tree)=>{
+                total = tree.Complete + tree.UnComplete
+            })
+        }
     
         this.setState({
             amount:amount,
             today:today,
+            total:total,
             loading5:false,
-            loading6:false
+            loading6:false,
+            loading7:false
         })
 
 
@@ -91,26 +105,27 @@ export default class ScheduleTable extends Component {
         // page：页码，选填
         // size：每页数量，选填
     }
-    
-    async query(){
-        const {
-            actions: {
-                gettreetypeAll,
-                gettreetypeSection,
-                gettreetypeSmallClass,
-                gettreetypeThinClass
-            },
-            leftkeycode,
-        } = this.props;
-        
-
-        this.setState({loading5:true,loading6:true})
-       
-
-    }
 
 	render() {
+        const{
+            amount,
+            today,
+            total,
+            isShow
+        }=this.state
         let asd = this.state.nowmessage;
+        let score 
+        if(isShow){
+            if(amount === 0 && total === 0){
+                score = '0.0%'
+            }else{
+                score = (amount/total*100).toFixed(1)+'%'
+            }
+            
+        }else{
+            score = amount + '/' + total
+        }
+
         console.log(asd);
         
         console.log(this.state.nowmessagelist,"nowmessagelistnowmessagelistnowmessagelist")
@@ -136,9 +151,9 @@ export default class ScheduleTable extends Component {
                             <SumTotal search={this.searchSum(2)} title='种植完工率' title1='Plant completion rate'>
                                 <div onClick ={this.handleclick.bind(this)} style={{cursor:'pointer'}}>
                                     {
-                                        this.state.isShow ? <div className="per">{this.state.pers}</div>
+                                        this.state.isShow ? <div className="per">{score}</div>
                                         :
-                                        <div className='score' style={{fontSize: '20px'}}>{this.state.score}</div>
+                                        <div className='score' style={{fontSize: '20px'}}>{score}</div>
                                     }
                                 </div>
                             </SumTotal>
