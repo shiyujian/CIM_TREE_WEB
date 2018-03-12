@@ -64,7 +64,7 @@ class Addition extends Component {
 			labelCol: { span: 6 },
 			wrapperCol: { span: 14 },
         };
-        debugger
+        // debugger
         let { progress, isUploading } = this.state;
         let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
         <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
@@ -189,7 +189,7 @@ class Addition extends Component {
         this.props.form.validateFields((err, values) => {
             if(!err){
                 let user = getUser();
-                debugger
+                // debugger
                 let resp = values.attachment[0].response;
                 let postData = {
                     code: `${currentcode.code}_${resp.id}`,

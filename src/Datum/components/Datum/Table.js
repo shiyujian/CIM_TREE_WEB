@@ -80,7 +80,7 @@ export default class GeneralTable extends Component {
 	download(record) {
 		let array = record.basic_params.files;
 		array.map(down => {
-			debugger
+			// debugger
 			let down_load = STATIC_DOWNLOAD_API + down.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');;
 			this.createLink(this, down_load);
 		});

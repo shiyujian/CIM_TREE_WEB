@@ -66,7 +66,7 @@ class Updatemodal extends Component {
         const{
             updatevisible = false
         } = this.props;
-        debugger
+        // debugger
         let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
                     <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
         let footer = arr;
@@ -189,7 +189,7 @@ class Updatemodal extends Component {
         this.props.form.validateFields((err, values) => {
             if(!err){
                 let user = getUser();
-                debugger
+                // debugger
                 let resp = values.attachment1[0].response ? values.attachment1[0].response : values.attachment1[0];
                 let postData = {
                     name: values.name1,
