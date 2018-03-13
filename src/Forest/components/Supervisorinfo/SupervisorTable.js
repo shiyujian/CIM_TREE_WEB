@@ -103,11 +103,85 @@ export default class SupervisorTable extends Component {
 			title:"监理人",
 			dataIndex: 'Supervisor',
 			render: (text,record) => {
+				if(text === 0){
+					return <p> / </p>
+				}
 				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title:"状态",
 			dataIndex: 'statusname',
+		},{
+			title:"高度",
+			dataIndex: 'GD',
+			render:(text)=>{
+				if(text === 0){
+					return <p> / </p>
+				}else{
+					return <p>{text}</p>
+				}
+			}
+		},{
+			title:"地径",
+			dataIndex: 'DJ',
+			render:(text)=>{
+				if(text === 0){
+					return <p> / </p>
+				}else{
+					return <p>{text}</p>
+				}
+			}
+		},{
+			title:"是否截干",
+			dataIndex: 'JG',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+		},{
+			title:"干皮损伤",
+			dataIndex: 'GP',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+		},{
+			title:"冠型完整",
+			dataIndex: 'GXWZ',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+		},{
+			title:"健壮",
+			dataIndex: 'SZJZ',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+		},{
+			title:"病虫害",
+			dataIndex: 'BCH',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+
 		},{
 			title:"定位",
 			dataIndex: 'locationstatus',
