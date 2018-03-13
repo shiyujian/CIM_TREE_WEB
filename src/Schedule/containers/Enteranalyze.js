@@ -9,6 +9,8 @@ import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import moment from 'moment';
 import {groupBy} from 'lodash';
+import Left from '../components/Enteranalyze/Left';
+import Right from '../components/Enteranalyze/Right';
 
 var echarts = require('echarts');
 const Option = Select.Option;
@@ -31,7 +33,7 @@ export default class Enteranalyze extends Component {
             treetypelist: [],
             treeLists: [],
             sectionoption: [],
-            leftkeycode: '',
+            leftkeycode: 'P009',
             data:[],
             account:"",
             biaoduan:[],
@@ -40,13 +42,13 @@ export default class Enteranalyze extends Component {
     }
 
     componentDidMount () {
-        const {actions: {getTreeList,getTreeNodeList}, treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTreeList,getTreeNodeList,getProjectList}, treetypes,platform:{tree = {}}} = this.props; 
     
-        if(!tree.bigTreeList){
-            getTreeNodeList()
+        if(!tree.projectList){
+            getProjectList()
         }
         this.setState({
-            leftkeycode:"P009-01"
+            leftkeycode:"P009"
         })
        
     }
@@ -61,8 +63,8 @@ export default class Enteranalyze extends Component {
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.bigTreeList){
-            treeList = tree.bigTreeList
+        if(tree.projectList){
+            treeList = tree.projectList
         }
         console.log('tree',tree)
 		return (
@@ -77,11 +79,15 @@ export default class Enteranalyze extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        <EntryTable
-                         key={leftkeycode}
-                         {...this.props}
-                         {...this.state}
-                        />
+                        <EntryTable {...this.props} {...this.state}/>
+                        <Row gutter={10} style={{margin: '10px 5px'}}>
+                            <Col span={12}>
+                                <Left {...this.props} {...this.state}/>
+                            </Col>
+                            <Col span={12}>
+                                <Right {...this.props} {...this.state}/>
+                            </Col>
+                        </Row>
                     </Content>
                 </Main>
             </Body>

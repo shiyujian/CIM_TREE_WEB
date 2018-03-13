@@ -6,6 +6,8 @@ export const getTreeNodeListOK = createAction('获取森林大数据树节点')
 export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getTreeNodeListOK]); //    √
 export const getLittleClassOK = createAction('获取森林大数据树小班细班信息')
 export const getLittleClass = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`,[getLittleClassOK])
+export const getProjectListOK = createAction('获取进度管理左侧项目工程节点信息')
+export const getProjectList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getProjectListOK]); //    √
 
 
 export default handleActions({
@@ -29,6 +31,19 @@ export default handleActions({
 		return {
 			...state,
 			bigTreeList: root
+		}
+	},
+	[getProjectListOK]: (state, {payload}) => {
+		let nodeLevel = [];
+		let root = [];
+		if (payload instanceof Array && payload.length > 0) {
+			root = payload.filter(node => {
+				return node.Type === '项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
+			})
+		}
+		return {
+			...state,
+			projectList: root
 		}
 	},
 	[getLittleClassOK]: (state, {payload}) => {

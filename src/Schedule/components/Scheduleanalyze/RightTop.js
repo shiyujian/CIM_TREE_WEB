@@ -17,8 +17,8 @@ export default class RightTop extends Component {
         super(props);
         this.state={
             loading:false,
-            stime: moment().format('2017/01/01'),
-            etime: moment().add(1, 'days').format('YYYY/MM/DD'),
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
             section: 'P009-01-01',
             sectionoption:[]
         }
@@ -108,7 +108,8 @@ export default class RightTop extends Component {
     componentDidUpdate(prevProps, prevState){
         const {
             etime,
-            section
+            section,
+            stime
         } = this.state
         const {
             leftkeycode
@@ -119,7 +120,7 @@ export default class RightTop extends Component {
         if(section != prevState.section){
             this.query()
         }
-        if(etime != prevState.etime){
+        if(etime != prevState.etime || stime != prevState.stime){
             console.log('RightTopRightTopsection',section)
             console.log('RightTopRightTopetime',etime)
             console.log('RightTopRightTopetime',leftkeycode)
@@ -139,12 +140,14 @@ export default class RightTop extends Component {
             leftkeycode
         } = this.props;
         const {
+            stime,
             etime,
             section
         } = this.state
         let param = {}
 
         param.section = section;
+        param.stime = stime;
         param.etime = etime;
         this.setState({loading:true})
 
@@ -233,29 +236,23 @@ export default class RightTop extends Component {
     search() {
             return (
                 <div>
-                    <span>截止时间：</span>
-                    <DatePicker  
-                        style={{textAlign:"center"}} 
-                        showTime
-                        defaultValue={moment(this.state.etime, 'YYYY/MM/DD')} 
-                        format={'YYYY/MM/DD'}
+                    <span>种植时间：</span>
+                    <RangePicker 
+                        style={{verticalAlign:"middle"}} 
+                        defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]} 
+                        showTime={{ format: 'HH:mm:ss' }}
+                        format={'YYYY/MM/DD HH:mm:ss'}
                         onChange={this.datepick.bind(this)}
-                        onOk={this.datepickok.bind(this)}
+                        onOk={this.datepick.bind(this)}
                     >
-                    </DatePicker>
+                    </RangePicker>
                 </div>
             ) 
     }
 
     datepick(value){
-        
-        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD'):''})
-        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD'):''})
-        
-    }
-
-    datepickok(){
-
+        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
+        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
     }
     
     

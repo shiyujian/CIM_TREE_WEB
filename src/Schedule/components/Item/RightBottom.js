@@ -13,7 +13,7 @@ export default class Warning extends Component {
     constructor(props){
         super(props);
         this.state={
-            stime1: moment().format('2017/01/01'),
+            stime1: moment().format('2018/01/01'),
             etime1: moment().add(1, 'days').format('YYYY-MM-DD'),
             departOptions:"",
             unitproject:"1标段",

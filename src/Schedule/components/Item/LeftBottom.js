@@ -13,16 +13,17 @@ export default class Warning extends Component {
     constructor(props){
         super(props);
         this.state={
-            stime1: moment().format('2017/01/01'),
+            stime1: moment().format('2018/01/01'),
             etime1: moment().add(1, 'days').format('YYYY-MM-DD'),
             project:"便道施工",
             departOptions:"",
             data: [
-                { value: 50, name: '一般安全隐患', selected: true },
-                { value: 10, name: '较大安全事故' },
-                { value: 10, name: '重大安全事故' },
-                { value: 10, name: '一般安全事故' },
-                { value: 20, name: '重大安全隐患' },
+                { value: 0, name: '一标段', selected: true },
+                { value: 0, name: '二标段' },
+                { value: 0, name: '三标段' },
+                { value: 0, name: '四标段' },
+                { value: 0, name: '五标段' },
+                { value: 100, name: '未完成' },
             ],
 
 
@@ -85,7 +86,7 @@ export default class Warning extends Component {
                     },
                 }
             ],
-            color: ['#0fbc7a', '#fca700', '#772fbf', '#11d0d8', '#0e8ed7']
+            color: ['#0fbc7a', '#fca700', '#772fbf', '#11d0d8', '#0e8ed7','#ff0033']
         };
         myChart.setOption(optionLine);
     }
@@ -144,7 +145,6 @@ export default class Warning extends Component {
         progressstat4pie({},{project:value,etime:this.state.etime1}).then(rst=>{
             this.getdata(rst);
         })
-
     }
 
     getdata(rst){

@@ -13,8 +13,8 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
     constructor(props){
         super(props);
         this.state={
-            stime: moment().format('2017/01/01'),
-            etime: moment().add(1, 'days').format('YYYY/MM/DD'),
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
             departOptions:"",
             data:"",
             gpshtnum:[],
@@ -77,27 +77,15 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         }=this.props
         try{
             if(leftkeycode.split('-')[0] != prevProps.leftkeycode.split('-')[0]){
-                this.query()
+                this.getdata()
             }
         }catch(e){
             console.log(e)
         }
         if(stime != prevState.stime || etime != prevState.etime){
-            this.query()
+            this.getdata()
         }
     }
-
-    componentWillReceiveProps(nextProps){
-        let params = {}
-        params.etime = this.state.etime;
-        params.stime = this.state.stime;
-        
-        params.project = this.state.project;
-        this.getdata(params);
-    }
-
-    
-    
     
     render() { //todo 累计完成工程量
         console.log(this.state.data);
@@ -106,15 +94,16 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             <div >
             <Card>
             施工时间：
+
                 <RangePicker 
-                             style={{verticalAlign:"middle"}} 
-                             defaultValue={[moment(this.state.stime, 'YYYY/MM/DD'),moment(this.state.etime, 'YYYY/MM/DD')]} 
-                             showTime
-                             format={'YYYY/MM/DD'}
-                             onChange={this.datepick.bind(this)}
-                             onOk={this.datepickok.bind(this)}
-                            >
-                            </RangePicker>
+                    style={{verticalAlign:"middle"}} 
+                    defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]}  
+                    showTime={{ format: 'HH:mm:ss' }}
+                    format={'YYYY/MM/DD HH:mm:ss'}
+                    onChange={this.datepick.bind(this)}
+                    onOk={this.datepick.bind(this)}
+                >
+                </RangePicker>
                     <div id='lefttop' style={{ width: '100%', height: '340px' }}></div>
                     <Select 
                           style={{width:'100px'}}
@@ -140,27 +129,15 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         
       
     }
-    datepick(){}
-    datepickok(value){
-        this.setState({
-            etime:value[1]?moment(value[1]).format('YYYY/MM/DD'):'',
-            stime:value[0]?moment(value[0]).format('YYYY/MM/DD'):'',
-        })
-        let params = {}
-        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD'):'';
-        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD'):'';
-        params.project = this.state.project;
-        this.getdata(params);
+    datepick(value){
+        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
+        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
     }
+
     onDepartments(value){
         this.setState({
             project:value,
         })
-        let params = {}
-        params.etime = this.state.etime;
-        params.stime = this.state.stime;
-        params.project = value;
-        this.getdata(params);
     }
     onChange(value){
         console.log(value);
@@ -169,13 +146,23 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         })
         
     }
-    getdata(value){
-        console.log('aaaaaaaaaaaaaaaaaaaaa',value)
+    getdata(){
+        const{
+            etime,
+            stime,
+            project
+        }=this.state
+        let patams = {
+            etime:etime,
+            stime:stime,
+            project:project
+        }
+        console.log('aaaaaaaaaaaaaaaaaaaaa',patams)
         const {actions: {progressdata,progressalldata}} = this.props;
         let gpshtnum = [];
         let times = [];
         let time = [];
-        progressalldata({},value).then(rst=>{
+        progressalldata({},patams).then(rst=>{
             console.log(rst);
             
             let total = [];
@@ -251,7 +238,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                                 Items.map((item,x)=>{
                                     //默认的种类
                                     if(x<6){
-                                        if(item.Project === value.project){
+                                        if(item.Project === patams.project){
                                             datas[a][index] = datas[a][index]+item.Num+0
                                         }else{
                                             datas[a][index] = datas[a][index]+0
@@ -269,7 +256,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                                         }) 
                                         console.log('treetype',treetype)
 
-                                        if(treetype === value.project){
+                                        if(treetype === patams.project){
                                             datas[a][index] = datas[a][index]+item.Num+0
                                         }else{
                                             datas[a][index] = datas[a][index]+0
@@ -419,8 +406,8 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             // let biaoduan = ['1标段','2标段','3标段','4标段','5标段'];
             // let numbers = [];
             // for (let j=0; j<=biaoduan.length-1; j++){
-            //     value.unitproject = biaoduan[i];
-            //     progressdata({},value).then(rst=>{
+            //     patams.unitproject = biaoduan[i];
+            //     progressdata({},patams).then(rst=>{
             //       console.log(rst);
             //         let gpsht = rst;
             //         let gpshtnum = [];
