@@ -42,6 +42,8 @@ const putPersons = createFetchAction(`${USER_API}/users/{{code}}/`,[],"PUT")
 // const postName = createFetchAction(`${base}/accounts/api/judge-exist`,[],"POST")
 // const getPersonList = createFetchAction(`${SERVICE_API}/personlist/?pagesize={{pagesize}}&offset={{offset}}&all=true`,[],"GET")
 const getPersonList = createFetchAction(`${USER_API}/users/?pagesize={{pagesize}}&offset={{offset}}&all=true`,[],"GET")
+const getPersonInfo = createFetchAction(`${USER_API}/users/?page={{page}}`,[],"GET")
+
 const deletePerson = createFetchAction(`${SERVICE_API}/persons/code/{{code}}/?this=true`, [], "DELETE");
 const is_fresh = createAction("确定是否刷新")
 
@@ -77,6 +79,7 @@ export const actions = {
 	getOrgDetail,
 	getPeople,
 	getPersonList,
+	getPersonInfo,
 	putPersons,
 	postName,
 	reverseFind,
