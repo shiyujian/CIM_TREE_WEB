@@ -95,6 +95,7 @@ export default class NursOverallTable extends Component {
 			locationoption,
 			users,
 		} = this.props;
+		debugger
 		const {
 			sxm, 
 			factory, 
@@ -147,18 +148,27 @@ export default class NursOverallTable extends Component {
 			title:"测量人",
 			dataIndex: 'Inputer',
 			render: (text,record) => {
+				if(text === 0){
+					return <span> / </span>
+				}
 				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title: "监理人",
 			dataIndex: 'Supervisor',
 			render: (text,record) => {
+				if(text === 0){
+					return <span> / </span>
+				}
 				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
 			title: "抽查人",
 			dataIndex: 'Checker',
 			render: (text,record) => {
+				if(text === 0){
+					return <span> / </span>
+				}
 				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{

@@ -159,7 +159,8 @@ export default class Supervisorinfo extends Component {
             let smallclasses = [];
             rst.map((item, index) => {
                 let smallname = {
-                    Name: rst[index].SmallClass,
+                    code: rst[index].SmallClass,
+                    name:rst[index].SmallClassName ? rst[index].SmallClassName : rst[index].SmallClass,
                 }
                 smallclasses.push(smallname)
             })
@@ -175,13 +176,16 @@ export default class Supervisorinfo extends Component {
             rst.map((item, index) => {
                 if(item.SmallClass === value){
                     let smallname = {
-                        Name: rst[index].ThinClass,
+                        code: rst[index].ThinClass,
+                        name:rst[index].ThinClassName ? rst[index].ThinClassName : rst[index].ThinClass
                     }
                     smallclasses.push(smallname)
                 }
             })
             this.setThinClassOption(smallclasses)
         })
+        //树种
+        this.typeselect('');
     }
 
     //细班选择, 重新获取: 树种
@@ -211,15 +215,24 @@ export default class Supervisorinfo extends Component {
             let smallclassList = [];
             let smallclassOptions = [];
             let smallclassoption = rst.map(item => {
-                if(item.Name) {
-                    let smalls = item.Name;
+                if(item.name) {
+                    let smalls = {
+                        name: item.name,
+                        code:item.code,
+                    }
                     smallclassList.push(smalls);
                 }
             })
-            let smallclassData = [...new Set(smallclassList)];
-            smallclassData.sort();
-            smallclassData.map(small => {
-                smallclassOptions.push(<Option key={small} value={small}>{small}</Option>)
+            let smalls = [];
+            let array = [];
+            smallclassList.map(item =>{
+                if(array.indexOf(item.code) === -1){
+                    smalls.push(item);
+                    array.push(item.code)
+                }
+            })
+            smalls.map(small => {
+                smallclassOptions.push(<Option key={small.code} value={small.code}>{small.name}</Option>)
             })
             smallclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({smallclassoption: smallclassOptions})
@@ -232,15 +245,20 @@ export default class Supervisorinfo extends Component {
             let thinclassList = [];
             let thinclassOptions = [];
             let thinclassoption = rst.map(item => {
-                if(item.Name) {
-                    let thins = item.Name;
+                if(item.name) {
+                    let thins = {
+                        code:item.code,
+                        name:item.name
+                    };
                     thinclassList.push(thins);
                 }
             })
             let thinclassData = [...new Set(thinclassList)];
             thinclassData.sort();
+            let i = 0;
             thinclassData.map(thin => {
-                thinclassOptions.push(<Option key={thin} value={thin}>{thin}</Option>)
+                thinclassOptions.push(<Option key={i} value={thin.code}>{thin.name}</Option>)
+                i++
             })
             thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({thinclassoption: thinclassOptions})
