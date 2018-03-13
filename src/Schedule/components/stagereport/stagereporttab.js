@@ -500,16 +500,9 @@ class Stagereporttab extends Component {
 	addTreeClick() {
 		const { treedataSource } = this.state;
 		let key = treedataSource.length
-		let project = [
-			<Select style={{ width: '200px' }} placeholder='请选择树种' onSelect={this.handleSelect.bind(this, key, 'project')}>
-				{
-					this.state.treetype
-				}
-			</Select>
-		]
 		let addtree = {
 			key: key,
-			project: project,
+			project: '',
 			units: '棵',
 			canDelete:true
 		}
@@ -519,12 +512,12 @@ class Stagereporttab extends Component {
 	}
 	
 	//下拉框选择变化
-	handleSelect(index, key, value) {
-		console.log('index','key','value',index, key, value)
-		const { treedataSource } = this.state;
-		value = JSON.parse(value);
-		treedataSource[index][key] = value.TreeTypeName;
-		this.setState({ treedataSource });
+	handleSelect(record, project, value) {
+        const { treedataSource } = this.state;
+        console.log('record','project','value',record, project, value)
+        console.log('treedataSource',treedataSource)
+        value = JSON.parse(value);
+        record[project] = value.TreeTypeName;
 	}
 	// 删除树列表
 	delTreeClick(record,index) {
@@ -617,7 +610,20 @@ class Stagereporttab extends Component {
 		}, {
 			title: '项目',
 			dataIndex: 'project',
-			key: 'project',
+            key: 'project',
+            render:(text,record,index) =>{
+                if(record.project){
+                    return text
+                }else{
+                    return (
+                        <Select style={{ width: '200px' }} placeholder='请选择树种' onSelect={this.handleSelect.bind(this, record, 'project')}>
+                            {
+                                this.state.treetype
+                            }
+                        </Select>
+                    )
+                }
+            }
 		}, {
 			title: '单位',
 			dataIndex: 'units',
