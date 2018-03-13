@@ -95,6 +95,7 @@ export default class NursOverallTable extends Component {
 			locationoption,
 			users,
 		} = this.props;
+		debugger
 		const {
 			sxm, 
 			factory, 

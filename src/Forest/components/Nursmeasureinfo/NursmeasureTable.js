@@ -440,9 +440,9 @@ export default class NursmeasureTable extends Component {
     	} = this.state;
     	const {actions: {getnurserys},keycode = ''} = this.props;
     	let postdata = {
-    		no:keycode,
+    		// no:keycode,
     		sxm,
-    		bd:section,
+    		bd:section === '' ? keycode : section,
     		bigType,
     		treetype,
     		factory,
@@ -480,8 +480,8 @@ export default class NursmeasureTable extends Component {
 	    				statusname = ''
 	    			tblData[i].statusname = statusname;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			tblData[i].liftertime1 = !!plan.LifterTime ? moment(plan.LifterTime).format('YYYY-MM-DD') : '/';
-					tblData[i].liftertime2 = !!plan.LifterTime ? moment(plan.LifterTime).format('HH:mm:ss') : '/';
+	    			tblData[i].liftertime1 = !!plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
+					tblData[i].liftertime2 = !!plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
 	    		})
 		    	const pagination = { ...this.state.pagination };
 				pagination.total = rst.pageinfo.total;
@@ -509,9 +509,9 @@ export default class NursmeasureTable extends Component {
     	} = this.state;
     	const {actions: {getnurserys,getexportNurserys},keycode = ''} = this.props;
     	let postdata = {
-    		no:keycode,
+    		// no:keycode,
     		sxm,
-    		bd:section,
+    		bd:section === '' ? keycode : section,
     		bigType,
     		treetype,
     		factory,
