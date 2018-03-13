@@ -36,10 +36,26 @@ class ScheduleStageRefill extends Component {
 			dataIndex: 'key',
 			key: 'key',
 			width: '10%',
+			render:(text, record, index) => {
+				return <span>{record.key+1}</span>
+			}
 		}, {
 			title: '项目',
 			dataIndex: 'project',
-			key: 'project',
+            key: 'project',
+            render:(text,record,index) =>{
+                if(record.project){
+                    return text
+                }else{
+                    return (
+                        <Select style={{ width: '200px' }} placeholder='请选择树种' onSelect={this.handleSelect.bind(this, record, 'project')}>
+                            {
+                                this.state.treetype
+                            }
+                        </Select>
+                    )
+                }
+            }
 		}, {
 			title: '单位',
 			dataIndex: 'units',
@@ -60,7 +76,7 @@ class ScheduleStageRefill extends Component {
 			key: 'operation',
 			width: '10%',
 			render: (text, record, index) => {
-				if (index >= 6) {
+				if (record.canDelete) {
 					return <div>
 						<Popconfirm
 							placement="rightTop"
@@ -74,7 +90,7 @@ class ScheduleStageRefill extends Component {
 				}
 			}
 		}
-    ];
+	];
     
     componentDidMount() {
 		const { actions: { gettreetype } } = this.props;
@@ -164,14 +180,12 @@ class ScheduleStageRefill extends Component {
                                         <FormItem {...FormItemLayout} label='文档类型'>
                                             {
                                                 getFieldDecorator('stagedocument', {
+                                                    initialValue: `每日实际进度`,
                                                     rules: [
                                                         { required: true, message: '请选择文档类型' }
                                                     ]
                                                 })
-                                                    (<Select placeholder='请选择文档类型' allowClear>
-                                                        <Option key={1} value='开发文档'>开发文档</Option>
-                                                        <Option key={2} value='测试文档'>测试文档</Option>
-                                                    </Select>)
+                                                    (<Input readOnly/>)
                                             }
                                         </FormItem>
                                     </Col>
@@ -439,35 +453,46 @@ class ScheduleStageRefill extends Component {
 
     // 添加树列表
 	addTreeClick() {
-		const { treedataSource, key } = this.state;
-		let num = key + 1;
-		let project = [
-			<Select style={{ width: '200px' }} placeholder='请选择树种' onSelect={this.handleSelect.bind(this, key, 'project')}>
-				{
-					this.state.treetype
-				}
-			</Select>
-		]
+		const { treedataSource } = this.state;
+		let key = treedataSource.length
 		let addtree = {
-			key: num,
-			project: project,
-			units: '棵'
+			key: key,
+			project: '',
+			units: '棵',
+			canDelete:true
 		}
 		treedataSource.push(addtree);
 		console.log('treedataSource', treedataSource)
-		this.setState({ treedataSource, key: num })
-    }
-    
-    //下拉框选择变化
-	handleSelect(index, key, value) {
-		const { treedataSource } = this.state;
-		value = JSON.parse(value);
-		treedataSource[index][key] = value.TreeTypeName;
-		this.setState({ treedataSource });
+		this.setState({ treedataSource })
 	}
+	
+	//下拉框选择变化
+	handleSelect(record, project, value) {
+        const { treedataSource } = this.state;
+        console.log('record','project','value',record, project, value)
+        console.log('treedataSource',treedataSource)
+        value = JSON.parse(value);
+        record[project] = value.TreeTypeName;
+	}
+
 	// 删除树列表
-	delTreeClick(index) {
-		alert('暂时无法删除')
+	delTreeClick(record,index) {
+		const{
+			treedataSource
+		}=this.state
+		console.log('index',index)
+		console.log('record',record)
+        treedataSource.splice(record.key,1)
+
+        for(let i=0;i<treedataSource.length;i++){
+            if(i>=record.key){
+                treedataSource[i].key = treedataSource[i].key - 1;
+            }
+		}
+		this.setState({
+			treedataSource:treedataSource
+		})
+
 	}
 
     // 短信

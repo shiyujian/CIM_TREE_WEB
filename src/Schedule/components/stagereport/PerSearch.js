@@ -12,7 +12,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions as platformActions } from '../../../_platform/store/global';
 import { getUser } from '../../../_platform/auth';
-import reducer, { actions } from '../../store/stage';
 
 const Option = Select.Option;
 
@@ -23,7 +22,7 @@ const Option = Select.Option;
         return { platform };
     },
     dispatch => ({
-        actions: bindActionCreators({ ...platformActions, ...actions  }, dispatch)
+        actions: bindActionCreators({ ...platformActions  }, dispatch)
     })
 )
 
@@ -46,8 +45,7 @@ export default class PerSearch extends Component {
 
     async componentDidMount() {
         const { actions: {
-            getUsers,
-            getUserList
+            getUsers
         } } = this.props
         try {
             let postdata = {
