@@ -28,7 +28,7 @@ export default class EntryTable extends Component {
 
     componentDidMount(){
         
-        const {actions: {getfactory,nowmessage,gettreetype}} = this.props;
+        const {actions: {getfactory,nowmessage,gettreetype,getTotalSat}} = this.props;
         //实时种植信息
         nowmessage().then(rst=>{
             if(rst && rst.content){
@@ -52,19 +52,28 @@ export default class EntryTable extends Component {
         //入场总数和今日入场数
         let amount = 0;
         let today = 0;
-        let date = moment().format('YYYY/MM/DD');
-        gettreetype().then((rst)=>{
+
+        let postdata = {
+            statType:'nursery' 
+        }
+        getTotalSat(postdata).then((rst)=>{
+            this.setState({
+                amount:rst
+            })
+        })
+
+        let params ={
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
+        }
+        gettreetype({},params).then((rst)=>{
             if(rst && rst instanceof Array){
                 rst.map(item=>{
                     if(item && item.Section){
-                        amount = amount + item.Num
-                        if(date === item.Time){
-                            today = today + item.Num
-                        }
+                        today = today + item.Num
                     }                    
                 })
                 this.setState({
-                    amount,
                     today
                 })
             }
