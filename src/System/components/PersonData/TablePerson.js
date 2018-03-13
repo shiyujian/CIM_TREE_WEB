@@ -85,7 +85,7 @@ export default class TablePerson extends Component {
 			{
 				title: '序号',
 				// dataIndex: 'index',
-				width:45,
+				width:'5%',
 				render: (text, record, index) => {
 					const current = this.state.serialNumber.current
 					const pageSize = this.state.serialNumber.pageSize
@@ -106,7 +106,7 @@ export default class TablePerson extends Component {
 			{
 				title: '姓名',
 				dataIndex: 'name',
-				width:54,
+				width:'5%',
 				key: 'name',
 			}
 			//  , {
@@ -117,21 +117,23 @@ export default class TablePerson extends Component {
 			, {
 				title: '所属部门',
 				dataIndex: 'orgname',
+				width:'12%',
 				key: 'Depart',
 			}, {
 				title: '职务',
 				dataIndex: 'job',
+				width:'12%',
 				key: 'Job',
 			}, {
 				title: '性别',
 				dataIndex: 'sex',
-				width:42,
+				width:'4%',
 				key: 'Sex'
 				
 			}, {
 				title: '手机号码',
 				dataIndex: 'tel',
-				width:90,				
+				width:'10%',				
 				key: 'Tel'
 			}
 			// , {
@@ -142,6 +144,7 @@ export default class TablePerson extends Component {
 			, {
 				title: '用户名',
 				dataIndex: 'username',
+				width:'10%',
 				key: 'username'
 			}
 			// , {
@@ -166,6 +169,7 @@ export default class TablePerson extends Component {
 			, {
 				title: '标段',
 				// dataIndex: "sections",
+				width:'10%',
 				// key: 'Sections',
 				render: (text, record, index) => {
 					let sectiones = this.sectiontitle(record)
@@ -176,7 +180,7 @@ export default class TablePerson extends Component {
 				title: '苗圃',
 				// dataIndex: "tags",
 				// key: 'tags',
-				width:200,
+				// width:'20%',
 				render: (text, record, index) => {
 					let defaultNurse = this.query(record)
 					return defaultNurse.join()
@@ -184,6 +188,7 @@ export default class TablePerson extends Component {
 			}
 			, {
 				title: '角色',
+				width:'10%',
 				render: (record) => {
 					let groups = this.renderContent(record)
 					return groups.join()
