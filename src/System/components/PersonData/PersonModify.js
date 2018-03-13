@@ -70,6 +70,7 @@ export default class PersonModify extends Component {
 
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         const { platform: { roles = [] } } = this.props;
+        console.log("1111111",roles)
         var systemRoles = []
         if (user.is_superuser) {
             systemRoles.push({ name: '苗圃角色', value: roles.filter(role => role.grouptype === 0) });
