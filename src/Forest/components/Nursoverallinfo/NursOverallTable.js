@@ -149,7 +149,7 @@ export default class NursOverallTable extends Component {
 			dataIndex: 'Inputer',
 			render: (text,record) => {
 				if(text === 0){
-					return <span></span>
+					return <span> / </span>
 				}
 				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
@@ -158,7 +158,7 @@ export default class NursOverallTable extends Component {
 			dataIndex: 'Supervisor',
 			render: (text,record) => {
 				if(text === 0){
-					return <span></span>
+					return <span> / </span>
 				}
 				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
@@ -167,7 +167,7 @@ export default class NursOverallTable extends Component {
 			dataIndex: 'Checker',
 			render: (text,record) => {
 				if(text === 0){
-					return <span></span>
+					return <span> / </span>
 				}
 				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
