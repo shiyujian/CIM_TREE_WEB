@@ -150,6 +150,9 @@ export default class Bottom extends Component {
         let param = {
             no:leftkeycode
         }
+        this.setState({
+            loading:true
+        })
         
         let SmallClassList = [];
         let lists = await getSmallClassList(param)
@@ -158,7 +161,8 @@ export default class Bottom extends Component {
             SmallClassList = lists
         }
         this.setState({
-            SmallClassList
+            SmallClassList,
+            loading:false
         })
     }
     async selectSmallClass(){
@@ -170,6 +174,7 @@ export default class Bottom extends Component {
             SmallClassList
         }=this.state
         let code = '';
+        //根据标段筛选不同的小班
         let selectSmallClassList = [];
         if(section){
             try{
@@ -201,16 +206,24 @@ export default class Bottom extends Component {
         }
         console.log('SmallClassList',SmallClassList)
         console.log('selectSmallClassListselectSmallClassList',selectSmallClassList)
+
+        
+        //将小班的code获取到，进行去重
         let uniqueSmallClass = [];
+        //进行数组去重的数组
+        let array = [];
         let smallClassSelect = ''
         selectSmallClassList.map((list)=>{
-            uniqueSmallClass.push(list.SmallClass)
+            if(array.indexOf(list.SmallClass) === -1){
+                uniqueSmallClass.push(list);
+                array.push(list.SmallClass)
+            }
         })
         console.log('uniqueSmallClass',uniqueSmallClass)
-        uniqueSmallClass = [...new Set(uniqueSmallClass)]
-        console.log('uniqueSmallClassuniqueSmallClass',uniqueSmallClass)
+
+
         if(uniqueSmallClass.length>0){
-            smallClassSelect = uniqueSmallClass[0]
+            smallClassSelect = uniqueSmallClass[0].SmallClass
         }
         this.setState({
             uniqueSmallClass,
@@ -323,7 +336,7 @@ export default class Bottom extends Component {
         let smallclassoption = []
         uniqueSmallClass.map((rst)=>{
             smallclassoption.push(
-                <Option key={rst} value={rst}>{rst+'号小班'}</Option>
+                <Option key={rst.SmallClass} value={rst.SmallClass}>{rst.SmallClassName}</Option>
             )
         })
         return smallclassoption
