@@ -27,7 +27,8 @@ export default class ContrastTable extends Component {
     		treetypename: '',
     		factory: '',
     		isstandard: '',
-    		percent:0,
+			percent:0,
+			nursery:''
         }
     }
     componentDidMount() {
@@ -73,6 +74,7 @@ export default class ContrastTable extends Component {
 		const {
 			sxm, 
 			factory,
+			nursery,
 			section,
 			bigType,
 			treetypename,
@@ -81,6 +83,7 @@ export default class ContrastTable extends Component {
 		//清除
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = factory ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
+		const suffix3 = nursery ? <Icon type="close-circle" onClick={this.emitEmpty3} /> : null;
 		let columns = [];
 		let header = '';
 		columns = [{
@@ -99,7 +102,7 @@ export default class ContrastTable extends Component {
 			title:"树种",
 			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
-			title:"供苗商",
+			title:"供应商",
 			dataIndex: 'Factory',
 		},{
 			title:"苗圃名称",
@@ -111,7 +114,7 @@ export default class ContrastTable extends Component {
 				return <div><div>{liftertime1}</div><div>{liftertime2}</div></div>
 			}
 		},{
-			title:<div><div>树高</div><div>(供苗商)</div></div>,
+			title:<div><div>高度</div><div>(供苗商)</div></div>,
 			render: (text,record) => {
 				if(record.FGD && record.FGD != 0)
 					return <a disabled={!record.FGDFJ} onClick={this.onImgClick.bind(this,record.FGDFJ)}>{record.FGD}</a>
@@ -120,7 +123,7 @@ export default class ContrastTable extends Component {
 				}
 			}
 		},{
-			title:<div><div>土球高度</div><div>(供苗商)</div></div>,
+			title:<div><div>土球厚度</div><div>(供苗商)</div></div>,
 			render: (text,record) => {
 				if(record.FTQHD && record.FTQHD != 0)
 					return <a disabled={!record.FTQHDFJ} onClick={this.onImgClick.bind(this,record.FTQHDFJ)}>{record.FTQHD}</a>
@@ -216,7 +219,11 @@ export default class ContrastTable extends Component {
 								{standardoption}
 							</Select>
 						</Col>
-						<Col xl={10} lg={12} md={14} className='mrg10'>
+						<Col xl={5} lg={6} md={7} className='mrg10'>
+							<span>供苗商：</span>
+							<Input suffix={suffix3} value={nursery} className='forestcalcw3 mxw200' onChange={this.nurserychange.bind(this)}/>
+						</Col>
+						{/*<Col xl={10} lg={12} md={14} className='mrg10'>
 							<span>起苗时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
@@ -227,7 +234,7 @@ export default class ContrastTable extends Component {
 							 onOk={this.datepick.bind(this)}
 							>
 							</RangePicker>
-						</Col>
+						</Col>*/}
 					</Row>
 					<Row >
 						<Col span={2} className='mrg10'>
@@ -277,6 +284,9 @@ export default class ContrastTable extends Component {
 	    this.setState({factory: ''});
   	}
 
+	emitEmpty3 = () => {
+	    this.setState({nursery: ''});
+  	}
 	sxmchange(value) {
 		this.setState({sxm:value.target.value})
 	}
@@ -299,6 +309,10 @@ export default class ContrastTable extends Component {
 
     factorychange(value) {
 		this.setState({factory: value.target.value})
+	}
+
+	nurserychange(value) {
+		this.setState({nursery:value.target.value})
 	}
 
 	standardchange(value) {
@@ -342,7 +356,8 @@ export default class ContrastTable extends Component {
     		section = '',
     		bigType = '',
     		treetype = '',
-    		factory = '',
+			factory = '',
+			nursery = '',
     		isstandard = '',
     		stime = '',
     		etime = '',
@@ -355,10 +370,11 @@ export default class ContrastTable extends Component {
     		section,
     		bigType,
     		treetype,
-    		factory,
+			factory,
+			nurseryname:nursery,
     		isstandard,
-    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+    		// stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		// etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
     		size
     	}
@@ -393,7 +409,8 @@ export default class ContrastTable extends Component {
 			sxm = '',
     		section = '',
     		treetype = '',
-    		factory = '',
+			factory = '',
+			nurseryname:nursery,
     		isstandard = '',
     		stime = '',
     		etime = '',
@@ -405,10 +422,11 @@ export default class ContrastTable extends Component {
     		sxm,
     		section,
     		treetype,
-    		factory,
+			factory,
+			nurseryname:nursery,
     		isstandard,
-    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+    		// stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		// etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
     		size:exportsize
     	}
