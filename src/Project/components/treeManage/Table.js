@@ -203,6 +203,10 @@ export default class Tablelevel extends Component {
 	handleCancel(){
     	this.setState({imgvisible:false})
     }
+    imgError(){
+    	console.log('error')
+    	document.getElementById("TreeImg").replaceWith("<Avatar shape='square' icon='picture'></Avatar>")
+    }
 	columns=[
 		{
 			title:'树种ID',
@@ -229,22 +233,25 @@ export default class Tablelevel extends Component {
 			key:'GrowthHabit',
 			dataIndex:'GrowthHabit',
 			width:'55%'
-		},{
+		},{  
 			title:'Pics',
+			key:'Pics',
+			dataIndex:'Pics',
 			width:'5%', 
 			render: (text,record) => {
-				if(record.Pics != null  ){
+				if(record.Pics != null){
 					let img =  `${FOREST_API}/${record.Pics.replace(/\/\//g,'/')}`
-					// console.log('pppp',record.Pics)
+					// console.log('Pics',record.Pics)
 					console.log('img',img)
 					return 	<div style={{textAlign:'center',height:'32px'}}>
 								<a  disabled={!record.Pics} 
 									onClick={this.onImgClick.bind(this,record.Pics)}>
-								{/*<Icon type="picture" style={{fontSize:30}} />*/}
-								<Avatar shape="square" src={img}></Avatar>
-								{/*<img src={img} 
-									 onerror="this.src=''"
-									 style={{width:'32px',height:'32px'}}/>*/}
+								{/*<Avatar shape="square" src={img}></Avatar>*/}
+									<img id='TreeImg'
+										 src={img}  
+										 onerror={this.imgError.bind(this)}
+										 style={{width:'32px',height:'32px',borderRadius:'4px'}}
+									/>
 								</a>
 							</div>
 				}
@@ -254,7 +261,7 @@ export default class Tablelevel extends Component {
 					</div>
 				}
 			}
-		},{
+		},{ 
 			title:'操作',
 			key:'operate',
 			dataIndex:'operate',
@@ -310,7 +317,6 @@ export default class Tablelevel extends Component {
 					return 	<div style={{textAlign:'center',height:'30px'}}>
 								<a  disabled={!record.Pics} 
 									onClick={this.onImgClick.bind(this,record.Pics)}>
-								{/*<Icon type="picture" style={{fontSize:30}} />*/}
 								<Avatar shape="square" src={img}></Avatar>
 								</a>
 							</div>
