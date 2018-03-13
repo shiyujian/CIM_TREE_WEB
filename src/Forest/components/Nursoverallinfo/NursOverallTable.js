@@ -95,7 +95,6 @@ export default class NursOverallTable extends Component {
 			locationoption,
 			users,
 		} = this.props;
-		debugger
 		const {
 			sxm, 
 			factory, 
@@ -135,13 +134,15 @@ export default class NursOverallTable extends Component {
 		},{
 			title:"定位",
 			dataIndex: 'islocation',
-		},{
-			title:"定位时间",
-			render: (text,record) => {
-				const {locationtime1 = '',locationtime2 = '' } = record;
-				return <div><div>{locationtime1}</div><div>{locationtime2}</div></div>
-			}
-		},{
+		},
+		// {
+		// 	title:"定位时间",
+		// 	render: (text,record) => {
+		// 		const {locationtime1 = '',locationtime2 = '' } = record;
+		// 		return <div><div>{locationtime1}</div><div>{locationtime2}</div></div>
+		// 	}
+		// },
+		{
 			title:"供苗商",
 			dataIndex: 'Factory',
 		},{
@@ -326,7 +327,7 @@ export default class NursOverallTable extends Component {
 								{statusoption}
 							</Select>
 						</Col>
-						<Col xl={4} lg={6} md={8} className='mrg10'>
+						{/*<Col xl={4} lg={6} md={8} className='mrg10'>
 							<span>高度(cm)：</span>
 							<InputNumber
 							  className='forestcalcw4-1 mxw80'
@@ -445,7 +446,7 @@ export default class NursOverallTable extends Component {
 						      precision={1}
 						      onChange={this.tqzjmaxchange.bind(this)}
 						    />
-						</Col>
+	</Col>*/}
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>定位：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={islocation} onChange={this.onlocationchange.bind(this)}>
@@ -770,7 +771,7 @@ export default class NursOverallTable extends Component {
     	}
     	if(!!role)
     		postdata[role] = rolename;
-    	this.setState({loading:true,percent:0})
+		this.setState({loading:true,percent:0})
     	getNurserysTree({},postdata)
     	.then(rst => {
     		this.setState({loading:false,percent:100})
@@ -782,7 +783,7 @@ export default class NursOverallTable extends Component {
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
 	    			tblData[i].place = place;
-	    			let statusname = '';
+					let statusname = '';
 					if(plan.SupervisorCheck == -1)
 						statusname = "待审批"
 					else if(plan.SupervisorCheck == 0) 

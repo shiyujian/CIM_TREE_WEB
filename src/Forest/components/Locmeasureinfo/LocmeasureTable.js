@@ -128,7 +128,7 @@ export default class LocmeasureTable extends Component {
 				return <div><div>{createtime1}</div><div>{createtime2}</div></div>
 			}
 		},{
-			title:<div><div>树高</div><div>(cm)</div></div>,
+			title:<div><div>高度</div><div>(cm)</div></div>,
 			render: (text,record) => {
 				if(record.GD != 0)
 					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
@@ -164,7 +164,7 @@ export default class LocmeasureTable extends Component {
 				}
 			}
 		},{
-			title:<div><div>土球高度</div><div>(cm)</div></div>,
+			title:<div><div>土球厚度</div><div>(cm)</div></div>,
 			dataIndex: 'tqhd',
 			render: (text,record) => {
 				if(record.TQHD != 0)

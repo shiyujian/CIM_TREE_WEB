@@ -77,7 +77,7 @@ export default class Nursmeasureinfo extends Component {
             <Option key={'2'} value={'2'}>落叶乔木</Option>,
             <Option key={'3'} value={'3'}>亚乔木</Option>,
             <Option key={'4'} value={'4'}>灌木</Option>,
-            <Option key={'5'} value={'5'}>草本</Option>,
+            <Option key={'5'} value={'5'}>地被</Option>,
         ];
         this.setState({typeoption})
 
@@ -130,7 +130,6 @@ export default class Nursmeasureinfo extends Component {
                             <PkCodeTree treeData={treeList}
                                 selectedKeys={leftkeycode}
                                 onSelect={this.onSelect.bind(this)}
-                                // onExpand={this.onExpand.bind(this)}
                             />
                         </Sidebar>
                         <Content>
