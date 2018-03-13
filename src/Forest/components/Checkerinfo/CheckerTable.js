@@ -115,6 +115,77 @@ export default class CheckerTable extends Component {
 			title:"状态",
 			dataIndex: 'statusname',
 		},{
+			title:"高度",
+			dataIndex: 'GD',
+			render:(text)=>{
+				if(text === 0){
+					return <p> / </p>
+				}else{
+					return <p>{text}</p>
+				}
+			}
+		},{
+			title:"地径",
+			dataIndex: 'DJ',
+			render:(text)=>{
+				if(text === 0){
+					return <p> / </p>
+				}else{
+					return <p>{text}</p>
+				}
+			}
+		},{
+			title:"是否截干",
+			dataIndex: 'JG',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+		},{
+			title:"干皮损伤",
+			dataIndex: 'GP',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+		},{
+			title:"冠型完整",
+			dataIndex: 'GXWZ',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+		},{
+			title:"健壮",
+			dataIndex: 'SZJZ',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+		},{
+			title:"病虫害",
+			dataIndex: 'BCH',
+			render:(text) =>{
+				if(text === 0){
+					return <p>否</p>
+				}else{
+					return <p>是</p>
+				}
+			}
+
+		},{
 			title:"定位",
 			dataIndex: 'locationstatus',
 		},{
@@ -411,7 +482,6 @@ export default class CheckerTable extends Component {
 	}
 	createLink(name,url) {
         let link = document.createElement("a");
-        // link.download = name;
         link.href = url;
         link.setAttribute('download', name);
         link.setAttribute('target', '_blank');

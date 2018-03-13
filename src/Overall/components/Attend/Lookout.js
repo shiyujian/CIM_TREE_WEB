@@ -491,7 +491,7 @@ class Lookout extends Component {
 		countInfo.map((info) => {
 			options.xAxis[0].data.push(info.month);
 			options.series[0].data.push(info.in === -1 ? 0 : info.in);
-			options.series[1].data.push(info.leave === -1 ? 0 : info.leave*10);
+			options.series[1].data.push(info.leave === -1 ? 0 : info.leave);
 			options.series[2].data.push(info.stay === -1 ? 0 : info.stay);
 			// options.series[3].data.push(info.stay_days === -1 ? 0 : info.stay_days);
 			// (info.leave*10/info.leave+info.in+info.stay)*100+'%')

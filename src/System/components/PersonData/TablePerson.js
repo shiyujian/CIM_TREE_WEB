@@ -19,7 +19,8 @@ export default class TablePerson extends Component {
 			percent: 0,
 			pagination: {},
 			pages:'',
-			resultInfo:{}
+			resultInfo:{},
+			serialNumber:{},
 		}
 	}
 	initopthins(list) {
@@ -83,10 +84,18 @@ export default class TablePerson extends Component {
 		const columns = [
 			{
 				title: '序号',
-				dataIndex: 'index',
+				// dataIndex: 'index',
+				width:'5%',
 				render: (text, record, index) => {
-					return index + 1;
+					const current = this.state.serialNumber.current
+					const pageSize = this.state.serialNumber.pageSize
+					if (current != undefined && pageSize != undefined) {
+						return (index + 1) + (current - 1) * pageSize;
+					} else {
+						return index + 1
+					}
 				}
+				
 			},
 
 			// {
@@ -97,6 +106,7 @@ export default class TablePerson extends Component {
 			{
 				title: '姓名',
 				dataIndex: 'name',
+				width:'5%',
 				key: 'name',
 			}
 			//  , {
@@ -107,26 +117,34 @@ export default class TablePerson extends Component {
 			, {
 				title: '所属部门',
 				dataIndex: 'orgname',
+				width:'12%',
 				key: 'Depart',
 			}, {
 				title: '职务',
 				dataIndex: 'job',
+				width:'12%',
 				key: 'Job',
 			}, {
 				title: '性别',
 				dataIndex: 'sex',
+				width:'4%',
 				key: 'Sex'
+				
 			}, {
 				title: '手机号码',
 				dataIndex: 'tel',
+				width:'10%',				
 				key: 'Tel'
-			}, {
-				title: '邮箱',
-				dataIndex: 'email',
-				key: 'email'
-			}, {
+			}
+			// , {
+			// 	title: '邮箱',
+			// 	dataIndex: 'email',
+			// 	key: 'email'
+			// }
+			, {
 				title: '用户名',
 				dataIndex: 'username',
+				width:'10%',
 				key: 'username'
 			}
 			// , {
@@ -134,40 +152,43 @@ export default class TablePerson extends Component {
 			// 	dataIndex: 'passwords',
 			// 	key: 'Passwords'
 			// }
-			, {
-				title: '二维码',
-				render: (record) => {
-					if (record.signature) {
-						if (record.signature.indexOf("documents") !== -1) {
-							return <img style={{ width: 60 }} src={record.signature} />
-						} else {
-							return <span>暂无</span>
-						}
-					} else {
-						return (<span>暂无</span>)
-					}
-				}
-			}
+			// , {
+			// 	title: '二维码',
+			// 	render: (record) => {
+			// 		if (record.signature) {
+			// 			if (record.signature.indexOf("documents") !== -1) {
+			// 				return <img style={{ width: 60 }} src={record.signature} />
+			// 			} else {
+			// 				return <span>暂无</span>
+			// 			}
+			// 		} else {
+			// 			return (<span>暂无</span>)
+			// 		}
+			// 	}
+			// }
 			, {
 				title: '标段',
 				// dataIndex: "sections",
+				width:'10%',
 				// key: 'Sections',
 				render: (text, record, index) => {
 					let sectiones = this.sectiontitle(record)
 					return sectiones.join()
 				}
 			}
-			// , {
-			// 	title: '苗圃',
-			// 	// dataIndex: "tags",
-			// 	// key: 'tags',
-			// 	render: (text, record, index) => {
-			// 		let defaultNurse = this.query(record)
-			// 		return defaultNurse.join()
-			// 	}
-			// }
+			, {
+				title: '苗圃',
+				// dataIndex: "tags",
+				// key: 'tags',
+				// width:'20%',
+				render: (text, record, index) => {
+					let defaultNurse = this.query(record)
+					return defaultNurse.join()
+				}
+			}
 			, {
 				title: '角色',
+				width:'10%',
 				render: (record) => {
 					let groups = this.renderContent(record)
 					return groups.join()
@@ -393,6 +414,8 @@ export default class TablePerson extends Component {
 		// let rst = await getPersonList({ pagesize: pageSize, offset: (obj.current - 1) * pageSize });
 		let rst=await getPersonInfo({page:obj.current})
 		let personlist = rst.results
+		console.log("rst",rst)
+		this.setState({serialNumber:obj})
 		// let total = rst.result.total;
 		// console.log("total",total)
 		let persons = [];
