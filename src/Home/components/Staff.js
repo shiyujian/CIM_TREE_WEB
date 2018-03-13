@@ -34,7 +34,7 @@ export default class Overall extends Component {
 
 		let {
 			actions: {
-				getOrgAttendInfo,
+				// getOrgAttendInfo,
 				getCurrentUserOrgCode,
 				setMonthSection
 			},
@@ -54,24 +54,24 @@ export default class Overall extends Component {
 
 		// getCurrentUserOrgCode({userId:id}).then((rst)=>{
 		// 	console.log('# rst : ',rst);
-		getOrgAttendInfo({
-			//TOFIX:管理员账户无法获取当前用户组织名称,当管理员登录时写死
-			// org_code:rst.account?
-			// rst.account.org_code?rst.account.org_code:window.DeathCode.OVERALL_APPROVAL_UNIT_CODE
-			// :window.DeathCode.OVERALL_APPROVAL_UNIT_CODE,
+		// getOrgAttendInfo({
+		// 	//TOFIX:管理员账户无法获取当前用户组织名称,当管理员登录时写死
+		// 	// org_code:rst.account?
+		// 	// rst.account.org_code?rst.account.org_code:window.DeathCode.OVERALL_APPROVAL_UNIT_CODE
+		// 	// :window.DeathCode.OVERALL_APPROVAL_UNIT_CODE,
 
-			fromyear: moment().year(),
-			frommonth: moment().month() + 1,
-			toyear: moment().year(),
-			tomonth: moment().month() + 1,
-		}).then(
-			() => {
-				this.makeData()
-				this.setState({
-					loading:false
-				})
-			}
-		);
+		// 	fromyear: moment().year(),
+		// 	frommonth: moment().month() + 1,
+		// 	toyear: moment().year(),
+		// 	tomonth: moment().month() + 1,
+		// }).then(
+		// 	() => {
+		// 		this.makeData()
+		// 		this.setState({
+		// 			loading:false
+		// 		})
+		// 	}
+		// );
 		// }).then(
 		// 	()=>{this.lookChart()}
 		// );
