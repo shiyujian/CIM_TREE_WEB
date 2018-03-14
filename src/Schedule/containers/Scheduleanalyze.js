@@ -36,7 +36,7 @@ export default class Scheduleanalyze extends Component {
             treeLists: [],
             sectionoption: [],
             smallclassoption: [],
-            leftkeycode: 'P009-01',
+            leftkeycode: 'P009',
             section: '',
             smallclass: '',
             data:[],
@@ -48,15 +48,15 @@ export default class Scheduleanalyze extends Component {
 
 
     componentDidMount () {
-        const {actions: {getTreeList,getTreeNodeList,setkeycode}, treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTreeList,getTreeNodeList,setkeycode,getProjectList}, treetypes,platform:{tree = {}}} = this.props; 
         
-        if(!tree.bigTreeList){
-            getTreeNodeList()
+        if(!tree.projectList){
+            getProjectList()
         }
         const {leftkeycode} = this.state;
     
         this.setState({
-            leftkeycode:"P009-01"
+            leftkeycode:"P009"
         })
     }
     //树选择, 重新获取: 标段、树种并置空
@@ -79,8 +79,8 @@ export default class Scheduleanalyze extends Component {
         } = this.state;
         const {platform:{tree={}},keycode} = this.props;
         let treeList = [];
-        if(tree.bigTreeList){
-            treeList = tree.bigTreeList
+        if(tree.projectList){
+            treeList = tree.projectList
         }
         console.log('tree',tree)
         return (

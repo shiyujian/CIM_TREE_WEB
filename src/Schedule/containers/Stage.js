@@ -49,18 +49,6 @@ export default class Stage extends Component {
         };
     }
 
-    componentDidMount () {
-        const {actions: {getTreeList,getTreeNodeList}, treetypes,platform:{tree = {}}} = this.props; 
-    
-        if(!tree.treeList){
-            getTreeNodeList()
-        }
-        this.setState({
-            leftkeycode:"P009-01"
-        })
-       
-    }
-
     componentDidMount() {
         const {actions: {getTreeList,getTreeNodeList,gettreetype}, treetypes,platform:{tree = {}}} = this.props; 
     
@@ -81,23 +69,6 @@ export default class Stage extends Component {
         ];
         this.setState({ treetyoption })
     }
-
-    // onSelect = (project,unitProjecte)=>{
-    // 	console.log('project',project);
-    // 	console.log('unitProjecte',unitProjecte);
-    // 	let me = this;
-    // 	//选择最下级的工程
-    // 	if(unitProjecte){
-    // 		this.setState({
-    // 			item:{
-    // 				unitProjecte:unitProjecte,
-    // 				project:project
-    // 			}
-    // 		})
-    // 	}
-    //    };
-
-    // onSelect(){}
 
     render() {
         const { keycode } = this.props;

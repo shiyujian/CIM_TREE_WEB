@@ -33,7 +33,8 @@ export default class ScheduleTable extends Component {
             actions: {
                 gettreetypeAll,
                 nowmessage,
-                gettreetypeSection
+                gettreetypeSection,
+                getTotalSat 
             }
         } = this.props;
 
@@ -53,23 +54,26 @@ export default class ScheduleTable extends Component {
         this.setState({
             nowmessagelist:nowmessagelist
         })
+        
+        let postdata = {
+            statType:'tree' 
+        }
         //获取当前种树信息
-        let rst = await gettreetypeAll()
-        console.log('ScheduleTableScheduleTable',rst)
+        let amount = await getTotalSat(postdata)
 
-        //一共种植棵数
-        let amount = 0;
+        let params ={
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
+        }
+        let rst = await gettreetypeAll({},params)
         //今日种植棵数
         let today = 0;
         //一共需要种植棵数
         let total = 0;
-        let date = moment().format('YYYY/MM/DD');
+       
         if(rst && rst instanceof Array){
             rst.map((item)=>{
-                amount = amount + item.Num
-                if(date === item.Time){
-                    today = today + item.Num
-                }
+                today = today + item.Num
             })
         }
         //获取所有需要种植的总数

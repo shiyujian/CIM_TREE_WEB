@@ -478,39 +478,43 @@ class Login extends Component {
 		removePermissions();
 		removePermissions();
 		login({}, data).then(rst => {
-			if (rst && rst.id) {
-				getTasks({}, { task: 'processing', executor: rst.id }).then((tasks = []) => {
-					notification.open({
-						message: loginType ? '自动登录成功' : '登录成功',
-						description: rst.username
-					});
-					window.localStorage.setItem('QH_USER_DATA',
-						JSON.stringify(rst));
-
-					const { username, id, account = {}, all_permissions: permissions = [], is_superuser = false } = rst;
-					const { person_name: name, organization: org, person_code: code, org_code } = account;
-					setUser(username, id, name, org, tasks.length, data.password, code, is_superuser, org_code);
-
-					setPermissions(permissions);
-
-					if (loginType === 0) {
-						if (values.remember) {
-							window.localStorage.setItem('QH_LOGIN_USER',
-								JSON.stringify(data));
-							// console.log('uuu',window.localStorage.getItem('QH_LOGIN_USER'));
-
-						} else {
-							window.localStorage.removeItem('QH_LOGIN_USER');
-
+			if(rst.status=='Nonactived'){
+				message.error('用户没有被激活');
+			}else{
+				if (rst && rst.id) {
+					getTasks({}, { task: 'processing', executor: rst.id }).then((tasks = []) => {
+						notification.open({
+							message: loginType ? '自动登录成功' : '登录成功',
+							description: rst.username
+						});
+						window.localStorage.setItem('QH_USER_DATA',
+							JSON.stringify(rst));
+	
+						const { username, id, account = {}, all_permissions: permissions = [], is_superuser = false } = rst;
+						const { person_name: name, organization: org, person_code: code, org_code } = account;
+						setUser(username, id, name, org, tasks.length, data.password, code, is_superuser, org_code);
+	
+						setPermissions(permissions);
+	
+						if (loginType === 0) {
+							if (values.remember) {
+								window.localStorage.setItem('QH_LOGIN_USER',
+									JSON.stringify(data));
+								// console.log('uuu',window.localStorage.getItem('QH_LOGIN_USER'));
+	
+							} else {
+								window.localStorage.removeItem('QH_LOGIN_USER');
+	
+							}
 						}
-					}
-					setTimeout(() => {
-						replace('/');
-					}, 500);
-				});
-
-			} else {
-				message.error('用户名或密码错误！');
+						setTimeout(() => {
+							replace('/');
+						}, 500);
+					});
+	
+				} else {
+					message.error('用户名或密码错误！');
+				}
 			}
 		});
 	}

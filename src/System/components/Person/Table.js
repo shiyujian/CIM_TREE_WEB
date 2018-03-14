@@ -191,6 +191,7 @@ export default class Users extends Component {
 			dataIndex: 'gender',
 		}, {
 			title: '角色',
+			width:'15%',
 			render: (user) => {
 				const { groups = [] } = user || {};
 				const roles = groups.map(group => group.name);
@@ -242,28 +243,27 @@ export default class Users extends Component {
 			// 	}
 			// }
 			, {
-				title: '是否禁用',
-				render: (user) => {
-						if (user.is_active==true) {
-							return <a onClick={this.disable.bind(this, user)}>禁用</a>
-						}else{
-							return <a style={{color:'red'}} onClick={this.disable.bind(this, user)}>启用</a>
-						}
-				}
-			}
-			, {
 			title: '操作',
 			render: (user) => {
 				const userc = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 				if (userc.is_superuser == true) {
-
-						return [
-							<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+					if (user.is_active==true) {
+						return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
 							<Popconfirm title="是否真的要删除用户?" key={2}
 								onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
 								<a>删除</a>
-							</Popconfirm>
+							</Popconfirm>,
+							<a style={{ marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>禁用</a>
 						]
+					}else{
+						return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+							<Popconfirm title="是否真的要删除用户?" key={2}
+								onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+								<a>删除</a>
+							</Popconfirm>,
+							 <a style={{color:'red',marginLeft: '.5em'}} onClick={this.disable.bind(this, user)}>启用</a>
+						]
+					}
 				} else {
 					return <a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>
 				}
