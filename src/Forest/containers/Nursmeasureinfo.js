@@ -223,9 +223,16 @@ export default class Nursmeasureinfo extends Component {
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
         let sections = JSON.parse(user.sections);
         //标段
-        let rst = this.biaoduan.filter(item =>{
-            return item.code.indexOf(keycode) !== -1 && sections.indexOf(item.code) !== -1;
-        })
+        let rst = [];
+        if(sections.length === 0){   //是admin
+            rst = this.biaoduan.filter(item =>{
+                return item.code.indexOf(keycode) !== -1;
+            })
+        }else{
+            rst = this.biaoduan.filter(item =>{
+                return item.code.indexOf(keycode) !== -1 && sections.indexOf(item.code) !== -1;
+            })
+        }
         this.setSectionOption(rst)
         //树种
         this.typeselect('');

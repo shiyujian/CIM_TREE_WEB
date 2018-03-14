@@ -14,7 +14,7 @@ export const getProjectList = createFetchAction(`${FOREST_API}/tree/wpunittree`,
 export default handleActions({
     [getTreeNodeListOK]: (state, {payload}) => {
 		let user = getUser();
-		if(JSON.parse(user.sections) === []){
+		if(JSON.parse(user.sections).length === 0){
 			let root = [];
 			if (payload instanceof Array && payload.length > 0) {
 				let level2 = [];
