@@ -3,6 +3,7 @@ import {Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumbe
 import moment from 'moment';
 import { FOREST_API} from '../../../_platform/api';
 import '../index.less';
+import {getUser} from '_platform/auth'
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const {RangePicker} = DatePicker;
@@ -52,7 +53,8 @@ export default class NursOverallTable extends Component {
         }
     }
     componentDidMount() {
-    	
+		let user = getUser()
+		this.sections = JSON.parse(user.sections)
     }
     componentWillReceiveProps(nextProps){
     	// if(nextProps.leftkeycode != this.state.leftkeycode) {
@@ -293,7 +295,7 @@ export default class NursOverallTable extends Component {
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>标段：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={section} onChange={this.onsectionchange.bind(this)}>
+							<Select allowClear className='forestcalcw2 mxw100' value={section} onChange={this.onsectionchange.bind(this)}>
 								{sectionoption}
 							</Select>
 						</Col>
@@ -744,7 +746,13 @@ export default class NursOverallTable extends Component {
     	if(tqzj_min !== '' && tqzj_max !== '') {
     		tqzj = `${tqzj_min}-${tqzj_max}`
     	}
-    	const {actions: {getNurserysTree},keycode = ''} = this.props;
+		const {actions: {getNurserysTree},keycode = ''} = this.props;
+		if(this.sections.length !== 0){  //不是admin，要做查询判断了
+			if( section === ''){
+				message.info('请选择标段信息');
+				return;
+			}
+		}
     	let postdata = {
     		no:keycode,
     		sxm,
@@ -870,7 +878,13 @@ export default class NursOverallTable extends Component {
     		etime:stime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page: 1,
     		size: exportsize
-    	}
+		}
+		if(this.sections.length !== 0){  //不是admin，要做查询判断了
+			if(section === ''){
+				message.info('请选择标段信息');
+				return;
+			}
+		}
     	if(!!role)
     		postdata[role] = rolename;
     	this.setState({loading:true,percent:0})

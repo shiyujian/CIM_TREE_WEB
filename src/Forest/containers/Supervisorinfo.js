@@ -8,6 +8,7 @@ import {PROJECT_UNITS} from '_platform/api';
 import {SupervisorTable} from '../components/Supervisorinfo';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
+import {getUser} from '_platform/auth'
 const Option = Select.Option;
 @connect(
 	state => {
@@ -145,6 +146,8 @@ export default class Supervisorinfo extends Component {
     
     //设置标段选项
     setSectionOption(rst){
+        let user = getUser();
+        let section = JSON.parse(user.sections);
         if(rst instanceof Array){
             let sectionList = [];
             let sectionOptions = [];
@@ -156,7 +159,9 @@ export default class Supervisorinfo extends Component {
             sectionData.map(sec => {
                 sectionOptions.push(<Option key={sec.code} value={sec.code}>{sec.value}</Option>)
             })
-            sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            if(section.length === 0){   //admin用户赋给全部的查阅权限
+                sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            }
             this.setState({sectionoption: sectionOptions})
         }
     }
@@ -225,15 +230,23 @@ export default class Supervisorinfo extends Component {
 
     //树选择, 重新获取: 标段、小班、细班、树种并置空
 	onSelect(value = []) {
+        let user = getUser()
         let keycode = value[0] || '';
-        const {actions:{setkeycode}} =this.props;
+        const {actions:{setkeycode,gettreetype,getTree,getLittleBan}} =this.props;
 	    setkeycode(keycode);
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
-        
+        let sections = JSON.parse(user.sections);
         //标段
-        let rst = this.biaoduan.filter(item =>{
-            return item.code.indexOf(keycode) !== -1;
-        })
+        let rst = [];
+        if(sections.length === 0){   //是admin
+            rst = this.biaoduan.filter(item =>{
+                return item.code.indexOf(keycode) !== -1;
+            })
+        }else{
+            rst = this.biaoduan.filter(item =>{
+                return item.code.indexOf(keycode) !== -1 && sections.indexOf(item.code) !== -1;
+            })
+        }
         this.setSectionOption(rst)
     }
 }
