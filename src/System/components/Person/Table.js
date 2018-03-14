@@ -191,6 +191,7 @@ export default class Users extends Component {
 			dataIndex: 'gender',
 		}, {
 			title: '角色',
+			width:'15%',
 			render: (user) => {
 				const { groups = [] } = user || {};
 				const roles = groups.map(group => group.name);
@@ -246,13 +247,23 @@ export default class Users extends Component {
 			render: (user) => {
 				const userc = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 				if (userc.is_superuser == true) {
-					return [
-						<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-						<Popconfirm title="是否真的要删除用户?" key={2}
-							onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-							<a>删除</a>
-						</Popconfirm>
-					]
+					if (user.is_active==true) {
+						return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+							<Popconfirm title="是否真的要删除用户?" key={2}
+								onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+								<a>删除</a>
+							</Popconfirm>,
+							<a style={{ marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>禁用</a>
+						]
+					}else{
+						return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+							<Popconfirm title="是否真的要删除用户?" key={2}
+								onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+								<a>删除</a>
+							</Popconfirm>,
+							 <a style={{color:'red',marginLeft: '.5em'}} onClick={this.disable.bind(this, user)}>启用</a>
+						]
+					}
 				} else {
 					return <a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>
 				}
@@ -579,6 +590,69 @@ export default class Users extends Component {
 				});
 			});
 		}
+	}
+	disable(user,event){
+		const {
+			addition = {}, sidebar: { node } = {},
+			actions: { putUser }
+		} = this.props;
+		let actives
+			if(user.is_active==true){
+				user.is_active=false
+				actives=false
+			}else{
+				user.is_active=true
+				actives=true
+			}
+			let groupe=[]
+			for (let j = 0; j < user.groups.length; j++) {
+				const element = user.groups[j];
+				groupe.push(element.id)
+			}
+			console.log("is_actives0",actives)
+			console.log("groupe",groupe,user)
+					putUser({ }, {
+					id: user.id,
+					username: user.username,
+					email: user.email,
+					// password: addition.password, // 密码不能变？信息中没有密码
+					account: {
+						person_name: user.person_name,
+						person_type: "C_PER",
+						person_avatar_url: "",
+						organization: {
+							pk: node.pk,
+							code: user.org_code,
+							obj_type: "C_ORG",
+							rel_type: "member",
+							name: user.organization
+						},
+					},
+					tags: user.tags,
+					sections: user.sections,
+					//groups: [7],
+					groups: groupe,
+					is_active: actives,
+					basic_params: {
+						info: {
+							'电话': user.person_telephone || '',
+							'性别': user.gender || '',
+							'技术职称': user.title || '',
+							'phone': user.person_telephone || '',
+							'sex': user.gender || '',
+							'duty': ''
+						}
+					},
+					extra_params: {},
+					title: user.title || ''
+					}).then(rst => {
+						this.forceUpdate();
+						console.log("rst",rst)
+						console.log("333333333",JSON.parse(rst.msg))
+					})
+				
+			
+		
 	}
 
 	edit(user, event) {

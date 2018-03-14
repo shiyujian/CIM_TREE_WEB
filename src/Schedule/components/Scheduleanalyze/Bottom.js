@@ -17,8 +17,8 @@ export default class Bottom extends Component {
         super(props);
         this.state={
             loading:false,
-            stime: moment().format('2017/01/01'),
-            etime: moment().add(1, 'days').format('YYYY/MM/DD'),
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
             section: 'P009-01-01',
             sectionoption:[],
             SmallClassList:[],
@@ -75,6 +75,7 @@ export default class Bottom extends Component {
     async componentDidUpdate(prevProps, prevState){
         const {
             etime,
+            stime,
             section,
             smallClassSelect
         } = this.state
@@ -92,7 +93,7 @@ export default class Bottom extends Component {
             this.selectSmallClass()
         }
         //小班和时间修改，查询数据
-        if(etime != prevState.etime || smallClassSelect != prevState.smallClassSelect){
+        if(etime != prevState.etime || smallClassSelect != prevState.smallClassSelect || stime != prevState.stime ){
             console.log('Bottomsection',section)
             console.log('Bottometime',smallClassSelect)
             console.log('Bottomleftkeycode',leftkeycode)
@@ -244,12 +245,23 @@ export default class Bottom extends Component {
         } = this.props;
         const{
             smallClassSelect,
-            section,etime
+            section,
+            etime,
+            stime
         }= this.state
         this.setState({loading:true})
         let param = {};
-        param.no = leftkeycode + "-" +smallClassSelect;
+        let code = ''
+        try{
+            code = section.split('-')
+            code = code[0]+'-'+code[1]
+        }catch(e){
+            console.log(e)
+        }
+        
+        param.no = code + "-" +smallClassSelect;
         param.section = section;
+        param.stime = stime;
         param.etime = etime;
         let rst = await gettreetypeThinClass({},param)
 
@@ -360,33 +372,22 @@ export default class Bottom extends Component {
     search() {
             return (
                 <div>
-                    <span>截止时间：</span>
-                    <DatePicker  
-                        style={{textAlign:"center"}} 
-                        showTime
-                        defaultValue={moment(this.state.etime, 'YYYY/MM/DD')} 
-                        format={'YYYY/MM/DD'}
+                    <span>种植时间：</span>
+                    <RangePicker 
+                        style={{verticalAlign:"middle"}} 
+                        defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]} 
+                        showTime={{ format: 'HH:mm:ss' }}
+                        format={'YYYY/MM/DD HH:mm:ss'}
                         onChange={this.datepick.bind(this)}
-                        onOk={this.datepickok.bind(this)}
+                        onOk={this.datepick.bind(this)}
                     >
-                    </DatePicker>
+                    </RangePicker>
                 </div>
             ) 
     }
-
     datepick(value){
-        
-        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD'):''})
-        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD'):''})
-        
-    }
-
-    datepickok(){
-        const {stime,etime} = this.state;
-        let param = {
-            stime:this.state.stime,
-            etime:this.state.etime1,
-        }
+        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
+        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
     }
     
     

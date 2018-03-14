@@ -13,8 +13,8 @@ export default class Warning extends Component {
     constructor(props){
         super(props);
         this.state={
-            stime1: moment().format('2017/01/01'),
-            etime1: moment().add(1, 'days').format('YYYY/MM/DD'),
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
             data:"",
             gpshtnum:[],
             departOptions:"",
@@ -94,14 +94,14 @@ export default class Warning extends Component {
                 <Card>
                 施工时间：
                  <RangePicker 
-                             style={{verticalAlign:"middle"}} 
-                             defaultValue={[moment(this.state.stime1, 'YYYY/MM/DD'),moment(this.state.etime1, 'YYYY/MM/DD')]} 
-                             showTime
-                             format={'YYYY/MM/DD'}
-                             onChange={this.datepick.bind(this)}
-                             onOk={this.datepickok.bind(this)}
-                            >
-                            </RangePicker>
+                    style={{verticalAlign:"middle"}} 
+                    defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]} 
+                    showTime={{ format: 'HH:mm:ss' }}
+                    format={'YYYY/MM/DD HH:mm:ss'}
+                    onChange={this.datepick.bind(this)}
+                    onOk={this.datepick.bind(this)}
+                >
+                </RangePicker>
                     <div id='rightop' style={{ width: '100%', height: '340px' }}></div>
                     <Select 
                           defaultValue="便道施工"
@@ -131,30 +131,18 @@ export default class Warning extends Component {
             </div>
         );
     }
-    datepick(){}
-    datepickok(value){
+    datepick(value){
 
-        this.setState({
-            etime1:value[1]?moment(value[1]).format('YYYY/MM/DD'):'',
-            stime1:value[0]?moment(value[0]).format('YYYY/MM/DD'):'',
-        })
+        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
+        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
         let params = {}
         
         
-        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD'):'';
-        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD'):'';
+        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):'';
+        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):'';
         params.project = this.state.project;
         params.unitproject = this.state.unitproject;
         this.getdata(params);
-        // console.log(value[0]?moment(value[0]).format('YYYY/MM/DD'):'');
-        // this.setState({etime1:value[1]?moment(value[1]).format('YYYY/MM/DD'):'',
-        //                 stime1:value[0]?moment(value[0]).format('YYYY/MM/DD'):'',
-        //             })
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // progressdata({},{unitproject:this.state.unitproject,project:this.state.project,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
-        //         this.getdata(rst);
-        // })
-
     }
     onChange(){}
     onDepartments1(value){
