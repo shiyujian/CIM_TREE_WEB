@@ -1,6 +1,7 @@
 import {createAction, handleActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {FOREST_API} from '../../api';
+import {getUser} from '_platform/auth'
 
 export const getTreeNodeListOK = createAction('获取森林大数据树节点')
 export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getTreeNodeListOK]); //    √
@@ -12,25 +13,53 @@ export const getProjectList = createFetchAction(`${FOREST_API}/tree/wpunittree`,
 
 export default handleActions({
     [getTreeNodeListOK]: (state, {payload}) => {
-		let nodeLevel = [];
-		let root = [];
-		if (payload instanceof Array && payload.length > 0) {
-			let level2 = [];
-			root = payload.filter(node => {
-				return node.Type === '项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
-			})
-			level2 = payload.filter(node => {
-				return node.Type === '子项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
-			})
-			for (let i = 0; i<root.length; i++){
-				root[i].children = level2.filter(node => {
-					return node.Parent === root[i].No;
+		let user = getUser();
+		if(JSON.parse(user.sections) === []){
+			let root = [];
+			if (payload instanceof Array && payload.length > 0) {
+				let level2 = [];
+				root = payload.filter(node => {
+					return node.Type === '项目工程' ;
 				})
+				level2 = payload.filter(node => {
+					return node.Type === '子项目工程' ;
+				})
+				for (let i = 0; i<root.length; i++){
+					root[i].children = level2.filter(node => {
+						return node.Parent === root[i].No;
+					})
+				}
 			}
-		}
-		return {
-			...state,
-			bigTreeList: root
+			return {
+				...state,
+				bigTreeList: root
+			}
+		}else{
+			let sections = JSON.parse(user.sections);
+			let proj = sections[0].substr(0,4);
+			let unitProj = [];
+			sections.map(item => {
+				unitProj.push(item.substr(0,7))
+			})
+			let root = [];
+			if (payload instanceof Array && payload.length > 0) {
+				let level2 = [];
+				root = payload.filter(node => {
+					return node.Type === '项目工程' && node.No === proj;
+				})
+				level2 = payload.filter(node => {
+					return node.Type === '子项目工程' && unitProj.indexOf(node.No) !== -1;
+				})
+				for (let i = 0; i<root.length; i++){
+					root[i].children = level2.filter(node => {
+						return node.Parent === root[i].No;
+					})
+				}
+			}
+			return {
+				...state,
+				bigTreeList: root
+			}
 		}
 	},
 	[getProjectListOK]: (state, {payload}) => {

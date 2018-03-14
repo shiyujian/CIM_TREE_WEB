@@ -1,21 +1,22 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {Select} from 'antd';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Select } from 'antd';
 import * as actions from '../store';
-import {PkCodeTree} from '../components';
-import {PROJECT_UNITS,FORESTTYPE} from '_platform/api';
-import {LocmeasureTable} from '../components/Locmeasureinfo';
-import {actions as platformActions} from '_platform/store/global';
-import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
+import { PkCodeTree } from '../components';
+import { PROJECT_UNITS, FORESTTYPE } from '_platform/api';
+import { LocmeasureTable } from '../components/Locmeasureinfo';
+import { actions as platformActions } from '_platform/store/global';
+import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
+import {getUser} from '_platform/auth'
 const Option = Select.Option;
 @connect(
     state => {
-        const {forest,platform} = state;
-        return {...forest,platform};
+        const { forest, platform } = state;
+        return { ...forest, platform };
     },
     dispatch => ({
-        actions: bindActionCreators({...actions, ...platformActions}, dispatch),
+        actions: bindActionCreators({ ...actions, ...platformActions }, dispatch),
     }),
 )
 export default class Locmeasureinfo extends Component {
@@ -37,8 +38,8 @@ export default class Locmeasureinfo extends Component {
             bigType: '',
         }
     }
-    getbigTypeName(type){
-        switch(type){
+    getbigTypeName(type) {
+        switch (type) {
             case '1':
                 return '常绿乔木'
             case '2':
@@ -49,8 +50,8 @@ export default class Locmeasureinfo extends Component {
                 return '灌木'
             case '5':
                 return '草本'
-            default :
-            return ''
+            default:
+                return ''
         }
     }
     componentDidMount() {
@@ -61,16 +62,16 @@ export default class Locmeasureinfo extends Component {
         PROJECT_UNITS[1].units.map(item => {
             this.biaoduan.push(item);
         })
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
+        const { actions: { getTree, gettreetype, getTreeList, getForestUsers, getTreeNodeList }, users, treetypes, platform: { tree = {} } } = this.props;
         // 避免反复获取森林用户数据，提高效率
-        if(!users){
+        if (!users) {
             getForestUsers();
         }
         // 避免反复获取森林树种列表，提高效率
-        if(!treetypes){
+        if (!treetypes) {
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        if(!tree.bigTreeList){
+        if (!tree.bigTreeList) {
             getTreeNodeList()
         }
         //类型
@@ -82,7 +83,7 @@ export default class Locmeasureinfo extends Component {
             <Option key={'4'} value={'4'}>灌木</Option>,
             <Option key={'5'} value={'5'}>地被</Option>,
         ];
-        this.setState({typeoption})
+        this.setState({ typeoption })
         //状态
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
@@ -92,18 +93,18 @@ export default class Locmeasureinfo extends Component {
             <Option key={'4'} value={"2"}>抽检未通过</Option>,
             <Option key={'5'} value={"3"}>抽检通过</Option>,
         ]
-        this.setState({statusoption})
+        this.setState({ statusoption })
         //定位 
         let locationoption = [
             <Option key={'-1'} value={''}>全部</Option>,
             <Option key={'1'} value={"1"}>已定位</Option>,
             <Option key={'2'} value={"0"}>未定位</Option>,
         ]
-        this.setState({locationoption})
+        this.setState({ locationoption })
     }
 
     render() {
-        const {keycode} = this.props;
+        const { keycode } = this.props;
         const {
             leftkeycode,
             treetypeoption,
@@ -117,55 +118,55 @@ export default class Locmeasureinfo extends Component {
             locationoption,
             resetkey,
         } = this.state;
-        const {platform:{tree={}}} = this.props;
+        const { platform: { tree = {} } } = this.props;
         let treeList = [];
-        if(tree.bigTreeList){
+        if (tree.bigTreeList) {
             treeList = tree.bigTreeList
         }
         return (
-                <Body>
-                    <Main>
-                        <DynamicTitle title="现场测量信息" {...this.props}/>
-                        <Sidebar>
-                            <PkCodeTree treeData={treeList}
-                                selectedKeys={leftkeycode}
-                                onSelect={this.onSelect.bind(this)}
-                            />
-                        </Sidebar>
-                        <Content>
-                            <LocmeasureTable  
-                             key={resetkey}
-                             {...this.props} 
-                             sectionoption={sectionoption}
-                             sectionselect={this.sectionselect.bind(this)}
-                             smallclassoption={smallclassoption}
-                             smallclassselect={this.smallclassselect.bind(this)}
-                             thinclassoption={thinclassoption}
-                             thinclassselect={this.thinclassselect.bind(this)}
-                             bigType={bigType}
-                             typeoption={typeoption}
-                             typeselect={this.typeselect.bind(this)}
-                             treetypeoption={treetypeoption} 
-                             treetypelist={treetypelist}
-                             statusoption={statusoption}
-                             locationoption={locationoption}
-                             leftkeycode={leftkeycode}
-                             keycode={keycode}
-                             resetinput={this.resetinput.bind(this)}
-                            />
-                        </Content>
-                    </Main>
-                </Body>);
+            <Body>
+                <Main>
+                    <DynamicTitle title="现场测量信息" {...this.props} />
+                    <Sidebar>
+                        <PkCodeTree treeData={treeList}
+                            selectedKeys={leftkeycode}
+                            onSelect={this.onSelect.bind(this)}
+                        />
+                    </Sidebar>
+                    <Content>
+                        <LocmeasureTable
+                            key={resetkey}
+                            {...this.props}
+                            sectionoption={sectionoption}
+                            sectionselect={this.sectionselect.bind(this)}
+                            smallclassoption={smallclassoption}
+                            smallclassselect={this.smallclassselect.bind(this)}
+                            thinclassoption={thinclassoption}
+                            thinclassselect={this.thinclassselect.bind(this)}
+                            bigType={bigType}
+                            typeoption={typeoption}
+                            typeselect={this.typeselect.bind(this)}
+                            treetypeoption={treetypeoption}
+                            treetypelist={treetypelist}
+                            statusoption={statusoption}
+                            locationoption={locationoption}
+                            leftkeycode={leftkeycode}
+                            keycode={keycode}
+                            resetinput={this.resetinput.bind(this)}
+                        />
+                    </Content>
+                </Main>
+            </Body>);
     }
     sectionselect(value) {
-        const {actions:{setkeycode, getTree,getLittleBan}} =this.props;
+        const { actions: { setkeycode, getTree, getLittleBan } } = this.props;
         this.currentSection = value;
-        getLittleBan({no:value}).then(rst =>{
+        getLittleBan({ no: value }).then(rst => {
             let smallclasses = [];
             rst.map((item, index) => {
                 let smallname = {
                     code: rst[index].SmallClass,
-                    name:rst[index].SmallClassName ? rst[index].SmallClassName : rst[index].SmallClass,
+                    name: rst[index].SmallClassName ? rst[index].SmallClassName : rst[index].SmallClass,
                 }
                 smallclasses.push(smallname)
             })
@@ -175,14 +176,14 @@ export default class Locmeasureinfo extends Component {
 
     //小班选择, 重新获取: 细班、树种
     smallclassselect(value) {
-        const {actions:{setkeycode,getTree,getLittleBan}} =this.props;
-        getLittleBan({no:this.currentSection}).then(rst =>{
+        const { actions: { setkeycode, getTree, getLittleBan } } = this.props;
+        getLittleBan({ no: this.currentSection }).then(rst => {
             let smallclasses = [];
             rst.map((item, index) => {
-                if(item.SmallClass === value){
+                if (item.SmallClass === value) {
                     let smallname = {
                         code: rst[index].ThinClass,
-                        name:rst[index].ThinClassName ? rst[index].ThinClassName : rst[index].ThinClass
+                        name: rst[index].ThinClassName ? rst[index].ThinClassName : rst[index].ThinClass
                     }
                     smallclasses.push(smallname)
                 }
@@ -194,18 +195,18 @@ export default class Locmeasureinfo extends Component {
     }
 
     //细班选择, 重新获取: 树种
-    thinclassselect(value,section) {
+    thinclassselect(value, section) {
         this.typeselect('');
     }
 
     //类型选择, 重新获取: 树种
-    typeselect(value){
-        const {treetypes} =this.props;
-        this.setState({bigType: value});
+    typeselect(value) {
+        const { treetypes } = this.props;
+        this.setState({ bigType: value });
         let selectTreeType = [];
-        treetypes.map(item =>{
-            let code = item.TreeTypeNo.substr(0,1);
-            if(code === value){
+        treetypes.map(item => {
+            let code = item.TreeTypeNo.substr(0, 1);
+            if (code === value) {
                 selectTreeType.push(item);
             }
         })
@@ -214,17 +215,19 @@ export default class Locmeasureinfo extends Component {
 
     //设置树种选项
     setTreeTypeOption(rst) {
-        if(rst instanceof Array){
+        if (rst instanceof Array) {
             let treetypeoption = rst.map(item => {
                 return <Option key={item.id} value={item.ID}>{item.TreeTypeName}</Option>
             })
             treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({treetypeoption,treetypelist:rst})
+            this.setState({ treetypeoption, treetypelist: rst })
         }
     }
 
-     //设置标段选项
-     setSectionOption(rst){
+    //设置标段选项
+    setSectionOption(rst){
+        let user = getUser();
+        let section = JSON.parse(user.sections);
         if(rst instanceof Array){
             let sectionList = [];
             let sectionOptions = [];
@@ -236,28 +239,30 @@ export default class Locmeasureinfo extends Component {
             sectionData.map(sec => {
                 sectionOptions.push(<Option key={sec.code} value={sec.code}>{sec.value}</Option>)
             })
-            sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            if(section.length === 0){   //admin用户赋给全部的查阅权限
+                sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            }
             this.setState({sectionoption: sectionOptions})
         }
     }
     //设置小班选项
-    setSmallClassOption(rst){
-        if(rst instanceof Array){
+    setSmallClassOption(rst) {
+        if (rst instanceof Array) {
             let smallclassList = [];
             let smallclassOptions = [];
             let smallclassoption = rst.map(item => {
-                if(item.name) {
+                if (item.name) {
                     let smalls = {
                         name: item.name,
-                        code:item.code,
+                        code: item.code,
                     }
                     smallclassList.push(smalls);
                 }
             })
             let smalls = [];
             let array = [];
-            smallclassList.map(item =>{
-                if(array.indexOf(item.code) === -1){
+            smallclassList.map(item => {
+                if (array.indexOf(item.code) === -1) {
                     smalls.push(item);
                     array.push(item.code)
                 }
@@ -266,20 +271,20 @@ export default class Locmeasureinfo extends Component {
                 smallclassOptions.push(<Option key={small.code} value={small.code}>{small.name}</Option>)
             })
             smallclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({smallclassoption: smallclassOptions})
+            this.setState({ smallclassoption: smallclassOptions })
         }
     }
 
     // 设置细班选项
-    setThinClassOption(rst){
-        if(rst instanceof Array){
+    setThinClassOption(rst) {
+        if (rst instanceof Array) {
             let thinclassList = [];
             let thinclassOptions = [];
             let thinclassoption = rst.map(item => {
-                if(item.name) {
+                if (item.name) {
                     let thins = {
-                        code:item.code,
-                        name:item.name
+                        code: item.code,
+                        name: item.name
                     };
                     thinclassList.push(thins);
                 }
@@ -292,27 +297,28 @@ export default class Locmeasureinfo extends Component {
                 i++
             })
             thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({thinclassoption: thinclassOptions})
+            this.setState({ thinclassoption: thinclassOptions })
         }
     }
 
     //重置
     resetinput(leftkeycode) {
-        this.setState({resetkey:++this.state.resetkey},() => {
+        this.setState({ resetkey: ++this.state.resetkey }, () => {
             this.onSelect([leftkeycode])
         })
     }
 
-   //树选择, 重新获取: 标段、小班、细班、树种并置空
-	onSelect(value = []) {
+    //树选择, 重新获取: 标段、小班、细班、树种并置空
+    onSelect(value = []) {
+        let user = getUser()
         let keycode = value[0] || '';
-        const {actions:{setkeycode}} =this.props;
-	    setkeycode(keycode);
-        this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
-        
+        const { actions: { setkeycode, gettreetype, getTree, getLittleBan } } = this.props;
+        setkeycode(keycode);
+        this.setState({ leftkeycode: keycode, resetkey: ++this.state.resetkey })
+        let sections = JSON.parse(user.sections);
         //标段
-        let rst = this.biaoduan.filter(item =>{
-            return item.code.indexOf(keycode) !== -1;
+        let rst = this.biaoduan.filter(item => {
+            return item.code.indexOf(keycode) !== -1 && sections.indexOf(item.code) !== -1;
         })
         this.setSectionOption(rst)
         //树种
