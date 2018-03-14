@@ -199,12 +199,15 @@ export default class Danger extends Component {
 			datas.forEach((v, index) => {
 				// let levelNode = v["risk_level"];
 				let level = v["EventType"];
-				let name = v["Problem"];
+				let name = v["ProblemType"];
 				let response_org = v['ReorganizerObj'];
 				// let measure = levelNode["风险控制措施"];
 				let content = v["ProblemType"];
 				//位置
-				let coordinates = ["22.5202031353", "113.893730454"];
+				// let coordinates = ["22.5202031353", "113.893730454"];
+				let locationX = v["X"];
+				let locationY = v["Y"];
+				let coordinates = [locationX, locationY];
 				riskObj[level] = riskObj[level] || {
 					key: level,
 					'properties': {
@@ -1005,6 +1008,7 @@ export default class Danger extends Component {
 							<Collapse defaultActiveKey={[this.options[0].value]} accordion>
 								{
 									this.options.map((option) => {
+										console.log('this.options',this.options)
 										if(option.label === '现场人员'){
 											return (
 												<Panel key={option.value} header={option.label}>
@@ -1165,8 +1169,7 @@ export default class Danger extends Component {
 							>
 							</iframe>
 						</div>
-					</Modal>
-					
+					</Modal>	
 				</div>
 			</div>
 		)
@@ -1175,6 +1178,7 @@ export default class Danger extends Component {
 	/*渲染菜单panel*/
 	renderPanel(option) {
 		let content = this.getPanelData(option.value);
+		console.log('content',content)
 		return (
 			<DashPanel onCheck={this.onCheck.bind(this)}
 			           onSelect={this.onSelect.bind(this)}
@@ -1182,6 +1186,7 @@ export default class Danger extends Component {
 					   userCheckKeys={this.state.userCheckedKeys}
 			           // loadData={this.loadUsersByOrg.bind(this)}
 			           featureName={option.value}/>
+
 		)
 	}
 
