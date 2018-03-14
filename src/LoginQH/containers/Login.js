@@ -106,8 +106,8 @@ class Login extends Component {
 							window.localStorage.setItem('QH_USER_DATA',
 								JSON.stringify(rst));
 							const { username, id, account = {}, all_permissions: permissions = [], is_superuser = false } = rst;
-							const { person_name: name, organization: org, person_code: code, org_code } = account;
-							setUser(username, id, name, org, tasks.length, data.password, code, is_superuser, org_code);
+							const { person_name: name, organization: org, person_code: code, org_code,sections } = account;
+							setUser(username, id, name, org, tasks.length, data.password, code, is_superuser, org_code,sections);
 							// cookie('QH_USER_DATA', JSON.stringify(userMessage));
 							setPermissions(permissions);
 							window.localStorage.setItem('QH_LOGIN_USER', JSON.stringify(data));
@@ -491,8 +491,8 @@ class Login extends Component {
 							JSON.stringify(rst));
 	
 						const { username, id, account = {}, all_permissions: permissions = [], is_superuser = false } = rst;
-						const { person_name: name, organization: org, person_code: code, org_code } = account;
-						setUser(username, id, name, org, tasks.length, data.password, code, is_superuser, org_code);
+						const { person_name: name, organization: org, person_code: code, org_code,sections } = account;
+						setUser(username, id, name, org, tasks.length, data.password, code, is_superuser, org_code,sections);
 	
 						setPermissions(permissions);
 	

@@ -16,12 +16,12 @@ export const getUser = () => {
 		password: cookie.get('password'),
 		code: cookie.get('code'),
 		is_superuser: cookie.get('is_superuser') !== 'false',
-		org_code: cookie.get('org_code')
-
+		org_code: cookie.get('org_code'),
+		sections:cookie.get('sections')
 	};
 };
 
-export const setUser = (username, id, name, org, tasks, password, code, is_superuser, org_code) => {
+export const setUser = (username, id, name, org, tasks, password, code, is_superuser, org_code,sections) => {
 	cookie.set('username', username);
 	cookie.set('id', id);
 	cookie.set('name', name);
@@ -31,6 +31,7 @@ export const setUser = (username, id, name, org, tasks, password, code, is_super
 	cookie.set('code', code);
 	cookie.set('is_superuser', is_superuser);
 	cookie.set('org_code', org_code);
+	cookie.set('sections',sections)
 };
 
 export const clearUser = () => {
@@ -43,6 +44,7 @@ export const clearUser = () => {
 	cookie.remove('code');
 	cookie.remove('is_superuser');
 	cookie.remove('org_code');
+	cookie.remove('sections')
 };
 
 export const clearCookies = () => {
