@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Icon, Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message} from 'antd';
 import moment from 'moment';
 import { FOREST_API} from '../../../_platform/api';
+import {getUser} from '_platform/auth'
 import '../index.less';
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -32,7 +33,8 @@ export default class ContrastTable extends Component {
         }
     }
     componentDidMount() {
-    	
+    	let user = getUser()
+		this.sections = JSON.parse(user.sections)
     }
     componentWillReceiveProps(nextProps){
     	// if(nextProps.leftkeycode != this.state.leftkeycode) {
@@ -362,7 +364,13 @@ export default class ContrastTable extends Component {
     		stime = '',
     		etime = '',
     		size,
-    	} = this.state;
+		} = this.state;
+		if(this.sections.length !== 0){  //不是admin，要做查询判断了
+			if(section === ''){
+				message.info('请选择标段信息');
+				return;
+			}
+		}
     	const {actions: {getfactoryAnalyse},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
@@ -415,7 +423,13 @@ export default class ContrastTable extends Component {
     		stime = '',
     		etime = '',
     		exportsize,
-    	} = this.state;
+		} = this.state;
+		if(this.sections.length !== 0){  //不是admin，要做查询判断了
+			if(section === ''){
+				message.info('请选择标段信息');
+				return;
+			}
+		}
     	const {actions: {getfactoryAnalyse,getexportFactoryAnalyse},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,

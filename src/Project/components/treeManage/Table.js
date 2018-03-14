@@ -258,7 +258,7 @@ export default class Tablelevel extends Component {
 				else {
 					return <div style={{textAlign:'center',height:'32px'}}>
 						<Avatar shape="square" icon="picture"></Avatar>
-					</div>
+					</div> 
 				}
 			}
 		},{ 
