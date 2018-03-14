@@ -13,8 +13,8 @@ export default class Warning extends Component {
     constructor(props){
         super(props);
         this.state={
-            stime1: moment().format('2018/01/01'),
-            etime1: moment().add(1, 'days').format('YYYY-MM-DD'),
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
             departOptions:"",
             unitproject:"1标段",
             choose:["灌木","亚乔木","落叶乔木","常绿乔木","种植穴工程","绿地平整","给排水回填","给排水管道安装","给排水沟槽开挖","便道施工"],
@@ -27,12 +27,6 @@ export default class Warning extends Component {
     }
 
     componentDidMount() {
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // progressdata({},{unitproject:this.state.unitproject,etime:this.state.etime1}).then(rst=>{
-        //       this.getdata(rst);
-        //   })
-
-        
         let myChart = echarts.init(document.getElementById('rightbottom'));
 
         let optionLine = {
@@ -75,44 +69,44 @@ export default class Warning extends Component {
             ]
         };
         myChart.setOption(optionLine);
+        this.getdata()
     }
 
-
-    componentWillReceiveProps(nextProps){
-        
-        let params = {}
-        params.etime = this.state.etime1;
-        params.stime = this.state.stime1;
-        params.unitproject = this.state.unitproject;
-        this.getdata(params);
-
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // progressdata({},{unitproject:this.state.unitproject,project:this.state.project}).then(rst=>{
-        //     console.log(rst,"xixhia");
-        //     this.getdata(rst);
-        // })
-        // progressalldata().then(rst=>{
-        //     console.log(rst,"hghlgl")
-        // }) 
-        // console.log(this.state.data);
-      
+    componentDidUpdate(prevProps, prevState){
+        const {
+            stime,
+            etime,
+            unitproject
+        } = this.state
+        const {
+            leftkeycode
+        }=this.props
+        try{
+            if(leftkeycode.split('-')[0] != prevProps.leftkeycode.split('-')[0]){
+                this.getdata()
+            }
+        }catch(e){
+            console.log(e)
+        }
+        if(stime != prevState.stime || etime != prevState.etime || unitproject != prevState.unitproject){
+            this.getdata()
+        }
     }
-    
-    
+
     render() { //todo 累计完成工程量
         return (
             <div >
                 <Card>
-                截止日期：
-                   <DatePicker  
-                     style={{textAlign:"center"}} 
-                     showTime
-                     defaultValue={moment(this.state.etime1, 'YYYY/MM/DD')} 
-                     format={'YYYY/MM/DD'}
-                     onChange={this.datepick.bind(this)}
-                     onOk={this.datepickok.bind(this)}
+                施工时间：
+                    <RangePicker 
+                        style={{textAlign:"center"}} 
+                        defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]}  
+                        showTime={{ format: 'HH:mm:ss' }}
+                        format={'YYYY/MM/DD HH:mm:ss'}
+                        onChange={this.datepick.bind(this)}
+                        onOk={this.datepick.bind(this)}
                     >
-                    </DatePicker>
+                    </RangePicker>
                     <div id='rightbottom' style={{ width: '100%', height: '340px' }}></div>
                     <Select 
                           placeholder="请选择部门"
@@ -127,56 +121,36 @@ export default class Warning extends Component {
             </div>
         );
     }
-    datepick(){}
-    datepickok(value){
-
-        this.setState({
-            etime1:value[1]?moment(value[1]).format('YYYY/MM/DD'):'',
-            stime1:value[0]?moment(value[0]).format('YYYY/MM/DD'):'',
-        })
-        let params = {}
-        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD'):'';
-        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD'):'';
-        params.unitproject = this.state.unitproject;
-        this.getdata(params);
-
-
-        // this.setState({etime1:value?moment(value).format('YYYY/MM/DD'):'',})
-        
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // progressdata({},{unitproject:this.state.unitproject,etime:this.state.etime1}).then(rst=>{
-        //         this.getdata(rst);
-        // })
+    datepick(value){
+        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
+        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
     }
+    
     onDepartments(value){
         this.setState({
             unitproject:value,
         })
-        let params = {}
-        params.etime = this.state.etime1;
-        params.stime = this.state.stime1;
-        params.unitproject = value;
-        this.getdata(params);
-
-        // console.log(value);
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // this.setState({
-        //     unitproject:value,
-        // })
-        // progressdata({},{unitproject:value,etime:this.state.etime1}).then(rst=>{
-        //         this.getdata(rst);
-        // })
     }
     
-    getdata(value){
-        console.log('aaaaaaaaaaaaaaaaaaaaa',value)
+    getdata(){
+        const{
+            etime,
+            stime,
+            unitproject
+        }=this.state
+        let params = {
+            etime:etime,
+            stime:stime,
+            unitproject:unitproject
+        }
+        console.log('RightBottomaaaaaaaaaaaaaaaaaaaaa',params)
         const {actions: {progressdata,progressalldata}} = this.props;
         let gpshtnum = [];
         let times = [];
         let time = [];
 
-        progressalldata({},value).then(rst=>{
-            console.log(rst);
+        progressalldata({},params).then(rst=>{
+            console.log('RightBottom',rst);
             let datas = Array(10).fill(0);
             if(rst && rst.content){
 
@@ -215,7 +189,7 @@ export default class Warning extends Component {
                                     }
                                 })
                             }) 
-                            console.log('treetype',treetype)
+                            console.log('RightBottomtreetype',treetype)
 
                             switch(treetype){
                                 case '常绿乔木' : 
@@ -235,12 +209,11 @@ export default class Warning extends Component {
                     })
                 })
                 
-                console.log('datas',datas)
+                console.log('RightBottomdatas',datas)
 
                
             }
-            
-
+        
             let myChart = echarts.init(document.getElementById('rightbottom'));
             let optionLine = {
                 tooltip: {

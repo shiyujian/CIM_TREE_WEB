@@ -24,27 +24,6 @@ export default class Warning extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps){
-        
-        let params = {}
-        params.etime = this.state.etime1;
-        params.stime = this.state.stime1;
-        params.project = this.state.project;
-        params.unitproject = this.state.unitproject;
-        this.getdata(params);
-
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // progressdata({},{unitproject:this.state.unitproject,project:this.state.project}).then(rst=>{
-        //     console.log(rst,"xixhia");
-        //     this.getdata(rst);
-        // })
-        // progressalldata().then(rst=>{
-        //     console.log(rst,"hghlgl")
-        // }) 
-        // console.log(this.state.data);
-      
-    }
-
     componentDidMount() {
 
         const myChart = echarts.init(document.getElementById('rightop'));
@@ -85,6 +64,29 @@ export default class Warning extends Component {
             series: []
         };
         myChart.setOption(optionLine);
+        this.getdata()
+    }
+
+    componentDidUpdate(prevProps, prevState){
+        const {
+            stime,
+            etime,
+            project,
+            unitproject
+        } = this.state
+        const {
+            leftkeycode
+        }=this.props
+        try{
+            if(leftkeycode.split('-')[0] != prevProps.leftkeycode.split('-')[0]){
+                this.getdata()
+            }
+        }catch(e){
+            console.log(e)
+        }
+        if(stime != prevState.stime || etime != prevState.etime || project != prevState.project || unitproject != prevState.unitproject ){
+            this.getdata()
+        }
     }
     
     
@@ -135,68 +137,40 @@ export default class Warning extends Component {
 
         this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
         this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
-        let params = {}
-        
-        
-        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):'';
-        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):'';
-        params.project = this.state.project;
-        params.unitproject = this.state.unitproject;
-        this.getdata(params);
     }
     onChange(){}
     onDepartments1(value){
         this.setState({
             project:value,
         })
-        let params = {}
-        params.etime = this.state.etime1;
-        params.stime = this.state.stime1;
-        params.unitproject = this.state.unitproject;
-        params.project = value;
-        this.getdata(params);
-
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // console.log(value,"111");
-        // this.setState({
-        // project:value,
-        // })
-        // progressdata({},{unitproject:this.state.unitproject,project:value,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
-        //     this.getdata(rst);
-        // })
-
     }
     onDepartments2(value){
         this.setState({
             unitproject:value,
         })
-        let params = {}
-        params.etime = this.state.etime1;
-        params.stime = this.state.stime1;
-        params.project = this.state.project;
-        params.unitproject = value;
-        this.getdata(params);
-
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // console.log(value,"111");
-        // this.setState({
-        //   unitproject:value,
-        // })
-        // progressdata({},{unitproject:value,project:this.state.project,etime:this.state.etime1,stime:this.state.stime1}).then(rst=>{
-        //     this.getdata(rst);
-        // })
-
     }
-    getdata(value){
-        console.log('aaaaaaaaaaaaaaaaaaaaa',value)
+    getdata(){
+        const {
+            stime,
+            etime,
+            project,
+            unitproject
+        } = this.state
+        let params = {
+            stime:stime,
+            etime:etime,
+            project:project,
+            unitproject:unitproject
+        }
+        console.log('RightTopaaaaaaaaaaaaaaaaaaaaa',params)
         const {actions: {progressdata,progressalldata}} = this.props;
         let gpshtnum = [];
         let times = [];
         let time = [];
 
 
-        progressalldata({},value).then(rst=>{
-            console.log(rst);
+        progressalldata({},params).then(rst=>{
+            console.log('RightTop',rst);
             let datas = [];
             if(rst && rst.content){
 
@@ -211,7 +185,7 @@ export default class Warning extends Component {
                         return 0;
                     }
                 });
-                console.log('content',content)
+                console.log('RightTopcontent',content)
                 //将 ProgressTime 单独列为一个数组
                 for(let i=0;i<content.length;i++){
                     let a = moment(content[i].ProgressTime).format('YYYY/MM/DD')
@@ -219,7 +193,7 @@ export default class Warning extends Component {
                 }
                 //时间数组去重
                 times = [...new Set(time)]
-                console.log('times',times)
+                console.log('RightToptimes',times)
                 
                 times.map((time,index)=>{
                     datas[index] = 0;
@@ -229,7 +203,7 @@ export default class Warning extends Component {
                             Items.map((item,x)=>{
                                 //默认的种类
                                 if(x<6){
-                                    if(item.Project === value.project){
+                                    if(item.Project === params.project){
                                         datas[index] = datas[index]+item.Num+0
                                     }else{
                                         datas[index] = datas[index]+0
@@ -243,9 +217,9 @@ export default class Warning extends Component {
                                             }
                                         })
                                     }) 
-                                    console.log('treetype',treetype)
+                                    console.log('RightToptreetype',treetype)
 
-                                    if(treetype === value.project){
+                                    if(treetype === params.project){
                                         datas[index] = datas[index]+item.Num+0
                                     }else{
                                         datas[index] = datas[index]+0
@@ -255,7 +229,7 @@ export default class Warning extends Component {
                         }
                     })
                 })
-                console.log('datas',datas)
+                console.log('RightTopdatas',datas)
 
                 this.setState({
                     gpshtnum:datas,
@@ -275,7 +249,7 @@ export default class Warning extends Component {
             dates.push(c)
             dates.push(d)
             dates.push(e)
-            console.log('dates',dates)
+            console.log('RightTopdates',dates)
 
             const myChart = echarts.init(document.getElementById('rightop'));
 
@@ -325,8 +299,5 @@ export default class Warning extends Component {
             myChart.setOption(optionLine);
 
         })
-
-
-        
     }
 }

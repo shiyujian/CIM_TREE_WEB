@@ -22,13 +22,16 @@ import * as actions from '_platform/store/global/tabs';
 
 export default class Header extends Component {
 	state = {
-		dotShow: false
+		dotShow: false,
+		tasks:0
 	}
 	componentDidMount() {
 		const { tasks = 0 } = getUser();
 		if (tasks > 0) {
+			console.log('tasks',tasks)
 			this.setState({
-				dotShow: true
+				dotShow: true,
+				tasks:tasks
 			})
 		}
 	}
@@ -103,14 +106,14 @@ export default class Header extends Component {
 						<a className="user">{name ? name : username}</a>
 						<Icon name="sign-out" title="退出登录" onClick={this.signOut.bind(this)} />
 					</div>
-					<div className="head-fn">
-						<Badge dot={this.state.dotShow}>
+					<div className="head-fn" >
+						<Badge  count={this.state.tasks}>
 							<Link to='/selfcare'>
 								<Icon style={{ marginTop: "4px" }} name="tasks" title="个人任务" onClick={this.onClickDot.bind(this)} />
 							</Link>
 						</Badge>
 						<Link to='/modeldown'>
-							<Icon name="download" title="下载模型" />
+							<Icon name="download" title="下载模型" style={{marginLeft:10}}/>
 						</Link>
 					</div>
 				</div>
