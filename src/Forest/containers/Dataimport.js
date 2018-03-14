@@ -110,6 +110,7 @@ export default class Dataimport extends Component {
                 X:item[2] || '',
                 Y:item[3] || '',
                 H:item[4] || '',
+                CreateTime:item[5] || ''
             };
             generateData.push(single);
         })
