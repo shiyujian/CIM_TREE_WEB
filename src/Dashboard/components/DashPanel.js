@@ -13,6 +13,7 @@ export default class DashPanel extends Component {
     }
 
     onCheck(keys){
+        console.log("111111",keys,this.featureName)
         this.originOnCheck(keys,this.featureName);
     }
 
@@ -23,6 +24,7 @@ export default class DashPanel extends Component {
     genIconClass(){
         let icClass = "";
         let featureName = this.featureName;
+        console.log("featureName",featureName)
         switch(featureName){
             case 'geojsonFeature_people':
                 icClass = "tr-people";
@@ -48,47 +50,69 @@ export default class DashPanel extends Component {
 
     loop(p){
         let me = this;
-        if(p.disabled){
-            return (<TreeNode title={p.properties.name} key={p.key} isLeaf={p.isLeaf} disabled={true}>
-                {
-                    p.children && p.children.map((m)=> {
-                        return me.loop(m);
-                    })
-                }
-            </TreeNode>);
-        }else{
-            return (<TreeNode title={p.properties.name} key={p.key} isLeaf={p.isLeaf}>
-                {
-                    p.children && p.children.map((m)=> {
-                        return me.loop(m);
-                    })
-                }
-            </TreeNode>);
+        if(p){
+            if(p.disabled){
+                return (<TreeNode title={p.properties.name} key={p.key} isLeaf={p.isLeaf} disabled={true}>
+                    {
+                        p.children && p.children.map((m)=> {
+                            return me.loop(m);
+                        })
+                    }
+                </TreeNode>);
+            }else{
+                return (<TreeNode title={p.properties.name} 
+                key={p.key}
+                 isLeaf={p.isLeaf}>
+                    {
+                        p.children && p.children.map((m)=> {
+                            return me.loop(m);
+                        })
+                    }
+                </TreeNode>);
+            }
         }
-        
     }
 
     render() {
         let {content = [],loadData,userCheckKeys} = this.props;
+        // console.log("loadData",loadData)
+        // console.log("content",content)
+        let contents=[]
+        for (let j = 0; j < content.length; j++) {
+            const element = content[j];
+            if(element!=undefined){
+                contents.push(element)
+            }
+        }
+        // console.log("contents",contents)
         return (
             <div className={this.genIconClass()}>
                 {
                     this.featureName == 'geojsonFeature_people'?(
-                        <Tree checkable showIcon={true} onCheck={this.onCheck.bind(this)} showLine
+                        <Tree style={{"height":'200px'}}
+                            checkable
+                            showIcon={true}
+                             onCheck={this.onCheck.bind(this)} showLine
                               onSelect={this.onSelect.bind(this)} defaultExpandAll={true}
-                              checkedKeys={userCheckKeys}
+                            //   checkedKeys={userCheckKeys}
                               loadData={loadData}
                     >
                         {
-                            content.map((p) => {
+                            contents.map((p) => {
                                 return this.loop(p);
                             })
                         }
-                    </Tree>):(<Tree checkable showIcon={true} onCheck={this.onCheck.bind(this)} showLine
-                                    onSelect={this.onSelect.bind(this)} defaultExpandAll={true}
+                    </Tree>
+                    ):(<Tree 
+                        checkable 
+                        showIcon={true} 
+                        onCheck={this.onCheck.bind(this)} 
+                        showLine
+                        onSelect={this.onSelect.bind(this)} 
+                        defaultExpandAll={true}
                     >
                         {
-                            content.map((p) => {
+                            contents.map((p) => {
                                 return this.loop(p);
                             })
                         }
