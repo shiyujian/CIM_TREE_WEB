@@ -263,7 +263,7 @@ class ScheduleDayRefill extends Component {
                                                                             ]
                                                                         })
                                                                             (
-                                                                            <PerSearch selectMember={this.selectMember.bind(this)} />
+                                                                            <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
                                                                             )
                                                                     }
                                                                 </FormItem>

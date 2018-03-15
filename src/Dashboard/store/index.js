@@ -11,7 +11,8 @@ export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeO
 export const getTreearea =createFetchAction(`${FOREST_API}/route/thinclasses?`);
 export const getArea = createFetchAction(`${SERVICE_API}/loc-tree/code/LOC_ROOT/`, [getAreaOK]);
 export const getTrack = createFetchAction(`${base}/main/api/user/{{ID}}/location/`,[]);
-export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`,[]);
+export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`,[getRiskOK]);
+export const getRiskOK = createAction(`获取安全隐患`);
 export const getVedio = createFetchAction(`${SERVICE_API}/loc-tree/code/CAM_ROOT/`,[]);
 export const getSafeMonitor = createFetchAction(`${SERVICE_API}/monitors/code/`,[]);
 export const getUsers = createFetchAction(`${USER_API}/users/`,[]);
@@ -57,6 +58,7 @@ export const actions = {
 	getArea,
 	getTrack,
 	getRisk,
+	getRiskOK,
 	getVedio,
 	getSafeMonitor,
 	getUsers,
@@ -93,6 +95,12 @@ export default handleActions({
 		return {
 			...state,
 			areaLists: payload.children
+		}
+	},
+	[getRiskOK]: (state, {payload}) => {
+		return {
+			...state,
+			RiskLists: [payload]
 		}
 	},
 	getWKsOk:(state,{payload})=>{

@@ -31,7 +31,8 @@ class Stagereporttab extends Component {
 			isCopyMsg: false, //接收人员是否发短信
 			treedataSource: [],
 			treetype: [],//树种
-			TotleModaldata:[]
+			TotleModaldata:[],
+			key:Math.random()
 		};
 	}
 
@@ -168,7 +169,8 @@ class Stagereporttab extends Component {
 		];
 		this.setState({
 			visible: true,
-			treedataSource: treedata
+			treedataSource: treedata,
+			key:Math.random()
 		})
 		this.props.form.setFieldsValue({
 			superunit: undefined,
@@ -384,6 +386,7 @@ class Stagereporttab extends Component {
 					maskClosable={false}
 					onCancel={this.closeModal.bind(this)}
 					onOk={this.sendWork.bind(this)}
+					key={this.state.key}
 				>
 					<div>
 						<Form>
@@ -477,7 +480,7 @@ class Stagereporttab extends Component {
 														]
 													})
 														(
-														<PerSearch selectMember={this.selectMember.bind(this)} />
+														<PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.每日进度填报流程}/>
 														)
 												}
 											</FormItem>

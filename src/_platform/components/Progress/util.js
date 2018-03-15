@@ -119,3 +119,81 @@ export function getNextStates(flowDetail,stateID) {
 
 	return nextStates;
 }
+
+//根据当前节点获取流程下一步节点集合
+export function getTemplateOrg(flowDetail) {
+	let states = flowDetail.states;
+	let transitions = flowDetail.transitions;
+	let participants = [];
+	//当前节点的action
+	let currentActions = [];
+	//各个节点的id和name的对应
+	let stateRespond = [];
+	//结束节点
+	let endState = {};
+	let currentId = states[0].id;;
+	let currentName = states[0].name;
+
+	for(var i=0;i<states[0].actions.length;i++){
+		currentActions.push(states[0].actions[i])
+	}
+	console.log('currentActions',currentActions)
+	for(var i=0;i<states.length;i++) {
+		//找到结束节点
+		if(states[i].state_type === 0){
+			endState = {
+				id: states[i].id,
+				name: states[i].name
+			}
+		}
+		//获取各个id对应的state情况
+		stateRespond.push({
+			id: states[i].id,
+			name: states[i].name,
+			roles: states[i].roles,
+			orgs: states[i].orgs
+		})
+	}
+
+	let nextStates = [];
+	let action_name = '';
+	let member_number = 0;
+	let to_state = [];
+	for(var c=0;c<currentActions.length;c++){
+		//在新一个的action来之前，对数组进行清空
+		member_number = 0;
+		to_state = [];
+
+		action_name = currentActions[c];
+
+		for(var t=0;t<transitions.length;t++){
+			if( (transitions[t].from_state === currentId) && (transitions[t].name === action_name) ){
+				//结束节点不需要人员
+				if(transitions[t].to_state === endState.id){
+					member_number = 0;
+				}else{
+					//某个action对应的人员数
+					member_number++;
+					for(var s=0;s<stateRespond.length;s++){
+						if(transitions[t].to_state === stateRespond[s].id ){
+							to_state.push({
+								id:transitions[t].to_state,
+								name:stateRespond[s].name,
+								roles: stateRespond[s].roles,
+								orgs: stateRespond[s].orgs
+							});
+						}
+					}
+				}
+			}
+		}
+
+		nextStates.push({
+			member_number:member_number,
+			to_state:to_state,
+			action_name:action_name
+		})
+	}
+
+	return nextStates;
+}

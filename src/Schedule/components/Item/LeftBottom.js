@@ -137,7 +137,7 @@ export default class Warning extends Component {
     }
     
     onDepartments(value){
-        console.log(value);
+        console.log('LeftBottom',value);
         const {actions: {progressstat4pie}} = this.props;
         this.setState({
             project:value,

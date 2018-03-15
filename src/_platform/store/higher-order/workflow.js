@@ -10,6 +10,7 @@ export const putFlow = createFetchAction( `${WORKFLOW_API}/instance/{{pk}}/logev
 export const abolishFlow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/abolish/`, [], 'POST');
 export const delegateFlow = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/delegate/`, [], 'POST');
 export const carbonCopy = createFetchAction(`${WORKFLOW_API}/instance/{{pk}}/carbon-copy/`, [], 'POST');
+export const getWorkflowTemplate = createFetchAction(`${WORKFLOW_API}/template/code/{{code}}/`, [], 'GET');
 
 
 export default {
@@ -20,5 +21,6 @@ export default {
 	putFlow,
 	abolishFlow,
 	delegateFlow,
-	carbonCopy
+	carbonCopy,
+	getWorkflowTemplate
 };

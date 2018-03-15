@@ -43,7 +43,7 @@ export default class OverallMaterialHandle extends Component {
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
                         <FormItem {...OverallMaterialHandle.layout} label="复审执行人">
-                            <PerSearch selectMember={this.selectMember.bind(this)} />
+                            <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
                         </FormItem>
                     </Col>
                 </Row>
