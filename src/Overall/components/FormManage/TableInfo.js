@@ -5,7 +5,8 @@ import 'moment/locale/zh-cn';
 import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
 import { base, SOURCE_API, DATASOURCECODE, UNITS, WORKFLOW_CODE } from '../../../_platform/api';
-import PerSearch from './PerSearch';
+// import PerSearch from './PerSearch';
+import PerSearch from '../../../_platform/components/panels/PerSearch';
 import {getNextStates} from '../../../_platform/components/Progress/util';
 import queryString from 'query-string';
 import '../../../Datum/components/Datum/index.less'

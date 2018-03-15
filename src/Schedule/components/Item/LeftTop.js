@@ -65,6 +65,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
              series: []
          };
          myChart.setOption(optionLine);
+         this.getdata()
      }
 
     componentDidUpdate(prevProps, prevState){
@@ -140,7 +141,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         })
     }
     onChange(value){
-        console.log(value);
+        console.log('LeftTop',value);
         this.setState({
             project:value,
         })
@@ -157,13 +158,13 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             stime:stime,
             project:project
         }
-        console.log('aaaaaaaaaaaaaaaaaaaaa',patams)
+        console.log('LeftTopaaaaa',patams)
         const {actions: {progressdata,progressalldata}} = this.props;
         let gpshtnum = [];
         let times = [];
         let time = [];
         progressalldata({},patams).then(rst=>{
-            console.log(rst);
+            console.log('LeftTop',rst);
             
             let total = [];
             let datas = [];
@@ -185,7 +186,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                         return 0;
                     }
                 });
-                console.log('content',content)
+                console.log('LeftTopcontent',content)
                 //将 ProgressTime 单独列为一个数组
                 for(let i=0;i<content.length;i++){
                     let a = moment(content[i].ProgressTime).format('YYYY/MM/DD')
@@ -193,7 +194,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                 }
                 //时间数组去重
                 times = [...new Set(time)]
-                console.log('times',times)
+                console.log('LeftToptimes',times)
 
                 //定义一个二维数组，分为多个标段
                 gpshtnum[0] = new Array()
@@ -222,7 +223,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                         }
                     }                    
                 })
-                console.log('gpshtnum',gpshtnum)
+                console.log('LeftTopgpshtnum',gpshtnum)
 
                 
                 times.map((time,index)=>{
@@ -254,7 +255,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                                             )
                                 
                                         }) 
-                                        console.log('treetype',treetype)
+                                        console.log('LeftToptreetype',treetype)
 
                                         if(treetype === patams.project){
                                             datas[a][index] = datas[a][index]+item.Num+0
@@ -274,8 +275,8 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                 for(let i=0;i<times.length;i++){
                     total[i]=datas[0][i]+datas[1][i]+datas[2][i]+datas[3][i]+datas[4][i]
                 }
-                console.log('total',total)
-                console.log('datas',datas)
+                console.log('LeftToptotal',total)
+                console.log('LeftTopdatas',datas)
 
                 this.setState({
                     gpshtnum:gpshtnum,
@@ -294,7 +295,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             dates.push(c)
             dates.push(d)
             dates.push(e)
-            console.log('dates',dates)
+            console.log('LeftTopdates',dates)
 
 
             let myChart = echarts.init(document.getElementById('lefttop'));

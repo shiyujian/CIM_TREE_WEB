@@ -3,7 +3,6 @@ import { Table, Input, Row, Col, Card, Select, DatePicker, Popconfirm, notificat
 import { WORKFLOW_MAPS, WORKFLOW_CODE,SOURCE_API,STATIC_DOWNLOAD_API } from '_platform/api';
 import styles from './index.css';
 import moment from 'moment';
-import PerSearch from '../Task/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 //综合管理模块 物资管理

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-12 15:39:51
+ * @Last Modified time: 2018-03-15 09:38:14
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -18,7 +18,8 @@ import 'moment/locale/zh-cn';
 import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
 import { base, SOURCE_API, DATASOURCECODE,UNITS } from '../../../_platform/api';
-import PerSearch from './PerSearch';
+// import PerSearch from './PerSearch';
+import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import queryString from 'query-string';
@@ -45,6 +46,7 @@ class All extends Component {
             isCopyMsg: false, //接收人员是否发短信
             TreatmentData: [],
             newFileLists: [],
+            key:Math.random()
         };
     }
     async componentDidMount() {
@@ -138,6 +140,7 @@ class All extends Component {
         this.setState({
             visible: true,
             TreatmentData: [],
+            key:Math.random()
         })
         this.props.form.setFieldsValue({
             superunit: undefined,
@@ -427,7 +430,7 @@ class All extends Component {
                     maskClosable={false}
                     onCancel={this.closeModal.bind(this)}
                     onOk={this.sendWork.bind(this)}
-                    key={Math.random*3}
+                    key={this.state.key}
                 >
                     <div>
                         <Form>
@@ -520,7 +523,7 @@ class All extends Component {
                                                         ]
                                                     })
                                                         (
-                                                        <PerSearch selectMember={this.selectMember.bind(this)} />
+                                                        <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.总进度计划报批流程}/>
                                                         )
                                                 }
                                             </FormItem>

@@ -3,7 +3,8 @@ import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,DatePi
 import { base, STATIC_DOWNLOAD_API,SOURCE_API,WORKFLOW_CODE } from '../../../_platform/api';
 import moment from 'moment';
 import Preview from '../../../_platform/components/layout/Preview';
-import PerSearch from '../Task/PerSearch';
+// import PerSearch from '../Task/PerSearch';
+import PerSearch from '../../../_platform/components/panels/PerSearch';
 import queryString from 'query-string';
 import { getUser } from '_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -43,7 +44,7 @@ export default class OverallMaterialHandle extends Component {
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
                         <FormItem {...OverallMaterialHandle.layout} label="复审执行人">
-                            <PerSearch selectMember={this.selectMember.bind(this)} />
+                            <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
                         </FormItem>
                     </Col>
                 </Row>

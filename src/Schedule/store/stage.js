@@ -20,6 +20,7 @@ export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`,
 export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}`);
 const getUserList = createFetchAction(`${USER_API}/users/?page=1&page_sise=5`,[]);
 
+
 export const actions = {
     getdocumentOK,
     postUploadFilesAc,
@@ -31,7 +32,7 @@ export const actions = {
     getTreeList,
     gettreetype,
     getTaskSchedule,
-    getUserList
+    getUserList,
 }
 
 export default handleActions({
@@ -50,5 +51,5 @@ export default handleActions({
 			...state,
 			treeLists: [payload]
 		}
-	},
+    },
 },{});

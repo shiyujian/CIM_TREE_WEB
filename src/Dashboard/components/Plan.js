@@ -6,6 +6,8 @@ import { Button, Modal, Spin, message, Collapse, Checkbox, DatePicker } from 'an
 import { Icon } from 'react-fa'
 import { panorama_360 } from './geojsonFeature';
 import { PDF_FILE_API, previewWord_API, CUS_TILEMAP, Video360_API2, DashboardVideo360API } from '_platform/api';
+// import './Plan.less';
+
 import './OnSite.less';
 import CityMarker from './CityMarker';
 import CameraVideo from '../../Video/components/CameraVideo';
@@ -117,7 +119,7 @@ export default class Plan extends Component {
     }
 
     componentDidMount() {
-        //this.getMapRouter();
+        this.getMapRouter();
         this.initMap();
     }
 
@@ -131,10 +133,12 @@ export default class Plan extends Component {
         const { getMapRouter } = this.props.actions;
         getMapRouter().then((orgs) => {
             let orgArr = orgs.map(or => {
-                return {
-                    key: or.ID,
-                    properties: {
-                        name: or.PatrolerUser.Full_Name
+                if(or.PatrolerUser!=undefined){
+                    return {
+                        key: or.ID,
+                        properties: {
+                            name: or.PatrolerUser.Full_Name
+                        }
                     }
                 }
             });
@@ -275,51 +279,65 @@ export default class Plan extends Component {
     }
 
     onCheck(keys, featureName) {
-        // let me = this;
-        // this.setState({ userCheckedKeys: keys }, () => {
-        //     const { getMapList } = this.props.actions;
-
-        //     getMapList({ routeID: this.state.userCheckedKeys[0] }).then((orgs) => {
-        //         let set = {}
-        //         orgs.forEach(item => {
-
-        //             set[item.RouteID] = []
-        //         })
-        //         orgs.forEach(item => {
-        //             if (set[item.RouteID]) {
-        //                 set[item.RouteID].push({
-        //                     'GPSTime': item.GPSTime, 'ID': item.ID,
-        //                     'Patroler': item.Patroler, 'X': item.X, 'Y': item.Y
-        //                 })
-        //             }
-        //         })
-        //         let arr = []
-        //         for (var i in set) {
-        //             arr.push(i)
-        //         }
-        //         // console.log('arr', arr)
-
-        //         let arr1 = []
-        //         for (var i in set) {
-        //             arr1.push(set[i])
-
-        //         }
-        //         // console.log("arr1", arr1)
-        //         me.setState({ mapRould: arr1 })
-        //         me.setState({ mapList: arr });
-        //     })
-        // });
+        console.log("keys1111111",keys)
+        console.log("featureName111111",featureName)
+        let me = this;
+        this.setState({ userCheckedKeys: keys }, () => {
+            const { getMapList } = this.props.actions;
+            console.log("this.state.userCheckedKeys",this.state.userCheckedKeys)
+            for (let i = 0; i < this.state.userCheckedKeys.length; i++) {
+                const element = this.state.userCheckedKeys[i];
+                getMapList({ routeID: element }).then((orgs) => {
+                    console.log("orgs222222222",orgs)
+                    
+                        let set = {}
+                        orgs.forEach(item => {
+        
+                            set[item.RouteID] = []
+                        })
+                        orgs.forEach(item => {
+                            if (set[item.RouteID]) {
+                                set[item.RouteID].push({
+                                    'GPSTime': item.GPSTime, 'ID': item.ID,
+                                    'Patroler': item.Patroler, 'X': item.X, 'Y': item.Y
+                                })
+                            }
+                        })
+                        let arr = []
+                        for (var i in set) {
+                            arr.push(i)
+                        }
+                        // console.log('arr', arr)
+        
+                        let arr1 = []
+                        for (var i in set) {
+                            arr1.push(set[i])
+        
+                        }
+                        // console.log("arr1", arr1)
+                        me.setState({ mapRould: arr1 })
+                        me.setState({ mapList: arr });
+                    })
+            }
+        
+        });
 
     }
 
 
     onSelect(keys, featureName) {
+        console.log("keys",keys)
+        console.log("featureName",featureName)
         let me = this;
+        console.log("me",me)
         this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
         let checkItems = this.checkMarkers[featureName];
+        console.log("this.checkMarkers",this.checkMarkers)
+        
         let key = keys.length > 0 && keys[0];
         if (key) {
             let selItem = checkItems[key];
+            console.log("selItem",selItem)
             if (selItem) {
                 if (featureName != 'geojsonFeature_area')
                     this.map.setView(selItem.getLatLng());
@@ -373,7 +391,7 @@ export default class Plan extends Component {
 
     render() {
         let height = document.querySelector('html').clientHeight - 80 - 36 - 52;
-
+// console.log("this.state.mapList",this.state.mapList)
         return (
             <div className="map-container">
                 <div ref="appendBody" className="l-map r-main"
@@ -394,7 +412,7 @@ export default class Plan extends Component {
                                     this.options.map((option) => {
 
                                         return (
-                                            <Panel key={option.value} header={option.label}>
+                                            <Panel  key={option.value} header={option.label}>
                                                 {this.renderPanel(option)}
                                                 <div>
                                                     <RangePicker
@@ -506,7 +524,8 @@ export default class Plan extends Component {
     renderPanel(option) {
         let content = this.getPanelData(option.value);
         return (
-            <DashPanel onCheck={this.onCheck.bind(this)}
+            <DashPanel style={{height:'200px'}} 
+                onCheck={this.onCheck.bind(this)}
                 onSelect={this.onSelect.bind(this)}
                 content={content}
                 userCheckKeys={this.state.userCheckedKeys}

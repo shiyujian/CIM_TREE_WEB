@@ -6,7 +6,8 @@ import 'moment/locale/zh-cn';
 import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
-import PerSearch from './PerSearch';
+// import PerSearch from './PerSearch';
+import PerSearch from '../../../_platform/components/panels/PerSearch';
 import SearchInfo from './SearchInfo';
 import queryString from 'query-string';
 import DayPlanModal from './DayPlanModal';
@@ -32,11 +33,13 @@ class Plan extends Component {
 			isCopyMsg: false, //接收人员是否发短信
 			treedataSource: [],
 			treetype: [],//树种
+			key:Math.random()
 
 		};
 	}
 
 	componentDidMount() {
+		console.log('this.props.actions',this.props.actions)
 		const { actions: { gettreetype } } = this.props;
 		gettreetype({})
 			.then(rst => {
@@ -169,7 +172,8 @@ class Plan extends Component {
 		];
 		this.setState({
 			visible: true,
-			treedataSource: treedata
+			treedataSource: treedata,
+			key:Math.random()
 		})
 		this.props.form.setFieldsValue({
 			superunit: undefined,
@@ -195,6 +199,159 @@ class Plan extends Component {
 			isCopyMsg: e.target.checked,
 		})
 	}
+	
+	render() {
+		const { selectedRowKeys, } = this.state;
+		const {
+            form: { getFieldDecorator },
+        } = this.props;
+		const rowSelection = {
+			selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
+		const FormItemLayout = {
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
+		}
+		return (
+			<div>
+				{
+					this.state.dayvisible &&
+					<DayPlanModal 
+						{...this.state.TotleModaldata}
+						oncancel={this.totleCancle.bind(this)}
+						onok={this.totleOk.bind(this)}
+					/>
+				}
+				<SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+				<Button onClick={this.addClick.bind(this)}>新增</Button>
+				{/* <Button onClick={this.deleteClick.bind(this)}>删除</Button> */}
+				<Table
+					columns={this.columns}
+					// rowSelection={rowSelection}
+					dataSource={this.state.daydata}
+					className='foresttable'
+					bordered 
+					rowKey='index'/>
+				<Modal
+					title="新增每日计划进度"
+					width={800}
+					visible={this.state.visible}
+					maskClosable={false}
+					onCancel={this.closeModal.bind(this)}
+					onOk={this.sendWork.bind(this)}
+					key={this.state.key}
+				>
+					<div>
+						<Form>
+							<Row>
+								<Col span={24}>
+									<Row>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='单位工程'>
+												{
+													getFieldDecorator('unit', {
+														rules: [
+															{ required: true, message: '请选择单位工程' }
+														]
+													})
+														(<Select placeholder='请选择单位工程' allowClear>
+															{UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
+														</Select>)
+												}
+											</FormItem>
+										</Col>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='编号'>
+												{
+													getFieldDecorator('numbercode', {
+														rules: [
+															{ required: true, message: '请输入编号' }
+														]
+													})
+														(<Input placeholder='请输入编号' />)
+												}
+											</FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+                                            <FormItem {...FormItemLayout} label='文档类型'>
+                                                {
+                                                    getFieldDecorator('daydocument', {
+														initialValue: `每日计划进度`,
+                                                        rules: [
+                                                            { required: true, message: '请选择文档类型' }
+                                                        ]
+                                                    })
+                                                        (<Input readOnly/>)
+                                                }
+                                            </FormItem>
+                                        </Col>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='日期'>
+												{
+													getFieldDecorator('timedate', {
+														rules: [
+															{ required: true, message: '请输入日期' }
+														]
+													})
+														(<DatePicker  format={'YYYY-MM-DD'} style={{ width: '100%', height: '100%' }} />)
+												}
+											</FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='监理单位'>
+                                                {
+                                                    getFieldDecorator('superunit', {
+                                                        rules: [
+                                                            { required: true, message: '请选择审核人员' }
+                                                        ]
+                                                    })
+                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
+                                                }
+                                            </FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Table
+											columns={this.columns1}
+											dataSource={this.state.treedataSource}
+											className='foresttable'
+										/>
+										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10 }} type="primary" ghost>添加</Button>
+									</Row>
+									<Row>
+
+										<Col span={8} offset={4}>
+											<FormItem {...FormItemLayout} label='审核人'>
+												{
+													getFieldDecorator('dataReview', {
+														rules: [
+															{ required: true, message: '请选择审核人员' }
+														]
+													})
+														(
+														<PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.每日进度计划填报流程}/>
+														)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} offset={4}>
+											<Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
+										</Col>
+									</Row>
+								</Col>
+							</Row>
+						</Form>
+					</div>
+				</Modal>
+			</div>
+		)
+	}
+
 	//选择人员
 	selectMember(memberInfo) {
 		const {
@@ -346,157 +503,6 @@ class Plan extends Component {
 				});
 			}
 		})
-	}
-	render() {
-		const { selectedRowKeys, } = this.state;
-		const {
-            form: { getFieldDecorator },
-        } = this.props;
-		const rowSelection = {
-			selectedRowKeys,
-			onChange: this.onSelectChange,
-		};
-		const FormItemLayout = {
-			labelCol: { span: 8 },
-			wrapperCol: { span: 16 },
-		}
-		return (
-			<div>
-				{
-					this.state.dayvisible &&
-					<DayPlanModal 
-						{...this.state.TotleModaldata}
-						oncancel={this.totleCancle.bind(this)}
-						onok={this.totleOk.bind(this)}
-					/>
-				}
-				<SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
-				<Button onClick={this.addClick.bind(this)}>新增</Button>
-				{/* <Button onClick={this.deleteClick.bind(this)}>删除</Button> */}
-				<Table
-					columns={this.columns}
-					// rowSelection={rowSelection}
-					dataSource={this.state.daydata}
-					className='foresttable'
-					bordered 
-					rowKey='index'/>
-				<Modal
-					title="新增每日计划进度"
-					width={800}
-					visible={this.state.visible}
-					maskClosable={false}
-					onCancel={this.closeModal.bind(this)}
-					onOk={this.sendWork.bind(this)}
-					key={Math.random}
-				>
-					<div>
-						<Form>
-							<Row>
-								<Col span={24}>
-									<Row>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='单位工程'>
-												{
-													getFieldDecorator('unit', {
-														rules: [
-															{ required: true, message: '请选择单位工程' }
-														]
-													})
-														(<Select placeholder='请选择单位工程' allowClear>
-															{UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-														</Select>)
-												}
-											</FormItem>
-										</Col>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='编号'>
-												{
-													getFieldDecorator('numbercode', {
-														rules: [
-															{ required: true, message: '请输入编号' }
-														]
-													})
-														(<Input placeholder='请输入编号' />)
-												}
-											</FormItem>
-										</Col>
-									</Row>
-									<Row>
-										<Col span={12}>
-                                            <FormItem {...FormItemLayout} label='文档类型'>
-                                                {
-                                                    getFieldDecorator('daydocument', {
-														initialValue: `每日计划进度`,
-                                                        rules: [
-                                                            { required: true, message: '请选择文档类型' }
-                                                        ]
-                                                    })
-                                                        (<Input readOnly/>)
-                                                }
-                                            </FormItem>
-                                        </Col>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='日期'>
-												{
-													getFieldDecorator('timedate', {
-														rules: [
-															{ required: true, message: '请输入日期' }
-														]
-													})
-														(<DatePicker  format={'YYYY-MM-DD'} style={{ width: '100%', height: '100%' }} />)
-												}
-											</FormItem>
-										</Col>
-									</Row>
-									<Row>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='监理单位'>
-                                                {
-                                                    getFieldDecorator('superunit', {
-                                                        rules: [
-                                                            { required: true, message: '请选择审核人员' }
-                                                        ]
-                                                    })
-                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
-                                                }
-                                            </FormItem>
-										</Col>
-									</Row>
-									<Row>
-										<Table
-											columns={this.columns1}
-											dataSource={this.state.treedataSource}
-											className='foresttable'
-										/>
-										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10 }} type="primary" ghost>添加</Button>
-									</Row>
-									<Row>
-
-										<Col span={8} offset={4}>
-											<FormItem {...FormItemLayout} label='审核人'>
-												{
-													getFieldDecorator('dataReview', {
-														rules: [
-															{ required: true, message: '请选择审核人员' }
-														]
-													})
-														(
-														<PerSearch selectMember={this.selectMember.bind(this)} />
-														)
-												}
-											</FormItem>
-										</Col>
-										<Col span={8} offset={4}>
-											<Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
-										</Col>
-									</Row>
-								</Col>
-							</Row>
-						</Form>
-					</div>
-				</Modal>
-			</div>
-		)
 	}
 
 	// 添加树列表
