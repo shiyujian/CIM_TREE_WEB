@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-14 16:53:52
+ * @Last Modified time: 2018-03-15 09:38:14
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -18,7 +18,8 @@ import 'moment/locale/zh-cn';
 import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
 import { base, SOURCE_API, DATASOURCECODE,UNITS } from '../../../_platform/api';
-import PerSearch from './PerSearch';
+// import PerSearch from './PerSearch';
+import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import queryString from 'query-string';
