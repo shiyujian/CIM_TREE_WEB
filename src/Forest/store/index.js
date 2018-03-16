@@ -12,7 +12,7 @@ export const getTreeOK = createAction(`${ID}_getTreeOK`);
 export const changeNursery = createAction(`${ID}传递nurseryName`);
 export const getHonestyNewDetailOk = createAction(`${ID}存储返回的详情`);
 export const clearList = createAction(`${ID}清空列表`);
-export const nurseryName = createAction(`${ID}供苗商名字`);
+export const nurseryName = createAction(`${ID}供应商名字`);
 const getForestUsersOK = createAction('获取森林数据用户列表');
 const getTreeListOK = createAction('获取森林树种列表');
 

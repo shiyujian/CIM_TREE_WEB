@@ -174,7 +174,7 @@ export default class EnterTable extends Component {
                     </Col>
                     <Col span={6}>
                         <Spin spinning={this.state.loading5}>
-                            <SumTotal search={this.searchSum(2)} title='供苗商总数' title1='Total number of nursery'>
+                            <SumTotal search={this.searchSum(2)} title='供应商总数' title1='Total number of nursery'>
                                 <div>{this.state.nurserys}</div>
                             </SumTotal>
                         </Spin>

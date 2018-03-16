@@ -119,7 +119,7 @@ export default class NursOverallTable extends Component {
 			title:"序号",
 			dataIndex: 'order',
 		},{
-			title:"编码",
+			title:"顺序码",
 			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
@@ -145,7 +145,7 @@ export default class NursOverallTable extends Component {
 		// 	}
 		// },
 		{
-			title:"供苗商",
+			title:"供应商",
 			dataIndex: 'Factory',
 		},{
 			title:"测量人",
@@ -175,7 +175,7 @@ export default class NursOverallTable extends Component {
 				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
-			title:<div><div>树高</div><div>(cm)</div></div>,
+			title:<div><div>高度</div><div>(cm)</div></div>,
 			render: (text,record) => {
 				if(record.GD != 0)
 					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
@@ -289,8 +289,8 @@ export default class NursOverallTable extends Component {
 		}];
 		header = <div >
 					<Row >
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>编码：</span>
+					<Col  xl={4} lg={5} md={6} className='mrg10'>
+							<span>顺序码：</span>
 							<Input suffix={suffix} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
@@ -456,7 +456,7 @@ export default class NursOverallTable extends Component {
 							</Select>
 						</Col>
 						<Col xl={6} lg={7} md={8} className='mrg10'>
-							<span>供苗商：</span>
+							<span>供应商：</span>
 							<Input suffix={suffix1} value={factory} className='forestcalcw3 mxw250' onChange={this.factorychange.bind(this)}/>
 						</Col>
 						<Col xl={5} lg={6} md={7} className='mrg10'>
@@ -757,7 +757,7 @@ export default class NursOverallTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		bigtype:bigType,
+    		bigType,
     		treetype,
     		gd,
     		xj,
