@@ -52,9 +52,9 @@ export default class Stage extends Component {
     componentDidMount() {
         const {actions: {getTreeList,getTreeNodeList,gettreetype}, treetypes,platform:{tree = {}}} = this.props; 
     
-        if(!tree.bigTreeList){
-            getTreeNodeList()
-        }
+        // if(!tree.bigTreeList){
+        //     getTreeNodeList()
+        // }
         this.setState({
             leftkeycode:"P009-01"
         })
@@ -88,7 +88,7 @@ export default class Stage extends Component {
         return (
             <div>
                 <DynamicTitle title="进度填报" {...this.props} />
-                <Sidebar>
+                {/* <Sidebar>
                     <div style={{ overflow: 'hidden' }} className="project-tree">
                         <PkCodeTree treeData={treeList}
                             selectedKeys={leftkeycode}
@@ -96,7 +96,7 @@ export default class Stage extends Component {
                             // onExpand={this.onExpand.bind(this)} 
                             />
                     </div>
-                </Sidebar>
+                </Sidebar> */}
                 <Content>
                     <div>
                         <Tabs>
@@ -113,15 +113,6 @@ export default class Stage extends Component {
                     </div>
                 </Content>
             </div>);
-    }
-    //类型选择, 重新获取: 树种
-    typeselect(value, keycode) {
-        const { actions: { setkeycode, getTreeList } } = this.props;
-        //树种
-        getTreeList({}, { field: 'treetype', no: keycode, treety: value, paginate: false })
-            .then(rst => {
-                this.setTreeTypeOption(rst)
-            })
     }
 
     //设置树种选项

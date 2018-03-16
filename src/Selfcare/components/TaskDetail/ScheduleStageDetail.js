@@ -56,16 +56,17 @@ class ScheduleStageDetail extends Component {
 		if(task && task.subject){
 			record = this.getTable(task)
 		}
+		
 		return (
 			<Card title={'流程详情'}>
 				<Row gutter={24}>
 					<Col span={24} >
 						<Row gutter={15} >
 							<Col span={8}>
-								<FormItem   {...ScheduleStageDetail.layout} label="单位工程:">
-								{getFieldDecorator('stageunit', {
-									initialValue: `${record.unit ? record.unit : '暂无单位工程'}`,
-									rules: [{ required: false, message: '请输入单位工程' }]
+								<FormItem   {...ScheduleStageDetail.layout} label="标段:">
+								{getFieldDecorator('stagesection', {
+									initialValue: `${record.sectionName ? record.sectionName : '暂无标段'}`,
+									rules: [{ required: false, message: '请输入标段' }]
 								})(<Input readOnly />)}
 								</FormItem>
 							</Col>
@@ -135,7 +136,8 @@ class ScheduleStageDetail extends Component {
         let record = {
             'id':instance.id,
 			'TreatmentData':subject.treedataSource?JSON.parse(subject.treedataSource):'',
-			'unit':subject.unit?JSON.parse(subject.unit):'',
+			'section':subject.section?JSON.parse(subject.section):'',
+			'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
             'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
             'stagedocument':subject.stagedocument?JSON.parse(subject.stagedocument):'',
 			'timedate':subject.timedate?JSON.parse(subject.timedate):'',
