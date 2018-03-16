@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-12 20:14:19
+ * @Last Modified time: 2018-03-16 15:17:11
  */
 /**
 *
@@ -229,6 +229,7 @@ export const UNITS = [
 	{value:'三标段'},
 	{value:'四标段'},
 	{value:'五标段'},
+	{value:'六标段'},
 ]
 
 //获取单位工程

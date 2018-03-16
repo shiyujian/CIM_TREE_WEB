@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-15 09:38:14
+ * @Last Modified time: 2018-03-16 14:27:43
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -46,11 +46,13 @@ class All extends Component {
             isCopyMsg: false, //接收人员是否发短信
             TreatmentData: [],
             newFileLists: [],
-            key:Math.random()
+            key:Math.random(),
+            sectionSchedule:[], //当前用户的标段信息
         };
     }
     async componentDidMount() {
         this.gettaskSchedule();
+        this.getSection()
     }
     // 获取总进度进度计划流程信息
     gettaskSchedule = async ()=>{
@@ -60,11 +62,11 @@ class All extends Component {
 			console.log("总进度进度计划流程信息", values);
             console.log("err", err);
             
-            values.sunitproject?reqData.subject_unit__contains = values.sunitproject : '';
+            values.sunitproject?reqData.subject_sectionName__contains = values.sunitproject : '';
             values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
             values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
-            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD HH:MM:SS') : '';
-            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
+            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
         })
         
@@ -85,7 +87,8 @@ class All extends Component {
                 let itemarrange = {
                     index:index+1,
                     id:item.workflowactivity.id,
-                    unit: itemdata.unit?JSON.parse(itemdata.unit):'',
+                    section: itemdata.section?JSON.parse(itemdata.section):'',
+                    sectionName: itemdata.sectionName?JSON.parse(itemdata.sectionName):'',
                     type: itempostdata.type,
                     numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
                     remarks:itemtreatmentdata[0].remarks||"--",
@@ -104,293 +107,68 @@ class All extends Component {
             })
         }
     }
-    onSelectChange = (selectedRowKeys, selectedRows) => {
-        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
-    }
-    // 操作--查看
-    clickInfo(record) {
-        this.setState({ totlevisible: true ,TotleModaldata:record});
-    }
-    // 取消
-    totleCancle() {
-        this.setState({ totlevisible: false });
-    }
-    // 确定
-    totleOk() {
-        this.setState({ totlevisible: false });
-    }
-    // 删除
-    deleteClick = () => {
-        const { selectedRowKeys } = this.state
-        if (selectedRowKeys.length === 0) {
-            notification.warning({
-                message: '请先选择数据！',
-                duration: 2
-            });
-            return
-        } else {
-            alert('还未做删除功能')
+    //获取当前登陆用户的标段
+    getSection(){
+        let user = getUser()
+        console.log('user',user)
+        let sections = user.sections
+        let sectionSchedule = []
+        let name = ''
+        console.log('sections',sections)
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            sections.map((section)=>{
+                let code = section.split('-')
+                if(code && code.length === 3){
+                    switch(code[2]){
+                        case '01':
+                            name = '一标段'
+                            break;
+                        case '02':
+                            name = '二标段'
+                            break;
+                        case '03':
+                            name = '三标段'
+                            break;
+                        case '04':
+                            name = '四标段'
+                            break;
+                        case '05':
+                            name = '五标段'
+                            break;
+                        case '06':
+                            name = '六标段'
+                            break;
+                    }
+                }
+                sectionSchedule.push({
+                    value:section,
+                    name:name
+                })
+            })
+            
+            console.log('sectionSchedule',sectionSchedule)
+            this.setState({
+                sectionSchedule
+            })
+
+
         }
     }
-
-    // 新增按钮
-    addClick = () => {
-        const { actions: { postUploadFilesAc } } = this.props;
-        postUploadFilesAc([]);
-        this.setState({
-            visible: true,
-            TreatmentData: [],
-            key:Math.random()
-        })
-        this.props.form.setFieldsValue({
-            superunit: undefined,
-            unit: undefined,
-            dataReview: undefined,
-            numbercode: undefined
-        })
-
-    }
-    // 关闭弹框
-    closeModal() {
-        const { actions: { postUploadFilesAc } } = this.props;
-        postUploadFilesAc([]);
-
-        this.setState({
-            visible: false,
-            TreatmentData: [],
-        })
-    }
-    // 确认提交
-    sendWork() {
-        const {
-            actions: {
-                createFlow,
-            getWorkflowById,
-            putFlow
-            },
-            location,
-        } = this.props
-        const {
-            TreatmentData,
+    //获取当前登陆用户的标段的下拉选项
+    getSectionOption(){
+        const{
+            sectionSchedule
         } = this.state
-        let user = getUser();//当前登录用户
-        let me = this;
-        //共有信息
-        let postData = {};
-        me.props.form.validateFields((err, values) => {
-            console.log('asdasddddddddddddddddddddd',values)
-            if (!err) {
-                if (TreatmentData.length === 0) {
-                    notification.error({
-                        message: '请上传文件',
-                        duration: 5
-                    })
-                    return
-                }
-
-                postData.upload_unit = user.org ? user.org : '';
-                postData.type = '总进度计划';
-                postData.upload_person = user.name ? user.name : user.username;
-                postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
-
-
-                const currentUser = {
-                    "username": user.username,
-                    "person_code": user.code,
-                    "person_name": user.name,
-                    "id": parseInt(user.id)
-                };
-                let subject = [{
-                    "unit": JSON.stringify(values.unit),
-					"superunit": JSON.stringify(values.superunit),
-					"dataReview": JSON.stringify(values.dataReview),
-					"numbercode": JSON.stringify(values.numbercode),
-					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
-					"totledocument": JSON.stringify(values.totledocument),
-					"postData": JSON.stringify(postData),
-                    "TreatmentData": JSON.stringify(TreatmentData),
-                    
-                }];
-                const nextUser = this.member;
-                let WORKFLOW_MAP = {
-                    name: "总进度计划报批流程",
-                    desc: "进度管理模块总进度计划报批流程",
-                    code: WORKFLOW_CODE.总进度计划报批流程
-                };
-                let workflowdata = {
-                    name: WORKFLOW_MAP.name,
-                    description: WORKFLOW_MAP.desc,
-                    subject: subject,
-                    code: WORKFLOW_MAP.code,
-                    creator: currentUser,
-                    plan_start_time: null,
-                    deadline: null,
-                    "status": 2
-                }
-                createFlow({}, workflowdata).then((instance) => {
-                    if (!instance.id) {
-                        notification.error({
-                            message: '数据提交失败',
-                            duration: 2
-                        })
-                        return;
-                    }
-                    const { id, workflow: { states = [] } = {} } = instance;
-                    const [{ id: state_id, actions: [action] }] = states;
-
-
-
-                    getWorkflowById({ id: id }).then(instance => {
-                        if (instance && instance.current) {
-                            let currentStateId = instance.current[0].id;
-                            let nextStates = getNextStates(instance, currentStateId);
-                            let stateid = nextStates[0].to_state[0].id;
-
-                            let postInfo = {
-                                next_states: [{
-                                    state: stateid,
-                                    participants: [nextUser],
-                                    deadline: null,
-                                    remark: null
-                                }],
-                                state: instance.workflow.states[0].id,
-                                executor: currentUser,
-                                action: nextStates[0].action_name,
-                                note: "提交",
-                                attachment: null
-                            }
-                            let data = { pk: id };
-                            //提交流程到下一步
-                            putFlow(data, postInfo).then(rst => {
-                                if (rst && rst.creator) {
-                                    notification.success({
-                                        message: '流程提交成功',
-                                        duration: 2
-                                    });
-                                    this.gettaskSchedule();//重新更新流程列表
-                                    this.setState({
-                                        visible: false
-                                    })
-                                } else {
-                                    notification.error({
-                                        message: '流程提交失败',
-                                        duration: 2
-                                    });
-                                    return;
-                                }
-                            });
-
-
-                        }
-                    });
-
-                });
-
-
-            }
+        let option = []
+        sectionSchedule.map((section)=>{
+            option.push(<Option key={section.value} value={section.value}>{section.name}</Option>)
         })
+        return option
+    }   
 
-
-    }
-    // 短信
-    _cpoyMsgT(e) {
-        this.setState({
-            isCopyMsg: e.target.checked,
-        })
-    }
-    //选择审核人员
-    selectMember(memberInfo) {
-        const {
-            form: {
-                setFieldsValue
-            }
-        } = this.props
-        this.member = null;
-        if (memberInfo) {
-            let memberValue = memberInfo.toString().split('#');
-            if (memberValue[0] === 'C_PER') {
-                this.member = {
-                    "username": memberValue[4],
-                    "person_code": memberValue[1],
-                    "person_name": memberValue[2],
-                    "id": parseInt(memberValue[3])
-                }
-            }
-        } else {
-            this.member = null
-        }
-
-        setFieldsValue({
-            dataReview: this.member,
-            // superunit:
-        });
-    }
-    //上传文件
-    uploadProps = {
-        name: 'a_file',
-        multiple: true,
-        showUploadList: false,
-        action: base + "/service/fileserver/api/user/files/",
-        onChange: ({ file, fileList, event }) => {
-
-            const status = file.status;
-            const { newFileLists } = this.state;
-            let newdata = [];
-            if (status === 'done') {
-                const { actions: { postUploadFilesAc } } = this.props;
-                let newFileLists = fileList.map(item => {
-                    return {
-                        file_id: item.response.id,
-                        file_name: item.name,
-                        send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-                        file_partial_url: '/media' + item.response.a_file.split('/media')[1],
-                        download_url: '/media' + item.response.download_url.split('/media')[1],
-                        a_file: '/media' + item.response.a_file.split('/media')[1],
-                        misc: item.response.misc,
-                        mime_type: item.response.mime_type,
-                    }
-                })
-                newFileLists.map((item, index) => {
-                    let data = {
-                        index: index + 1,
-                        fileName: item.file_name,
-                        file_id: item.file_id,
-                        file_partial_url: item.file_partial_url,
-                        send_time: item.send_time,
-                        a_file: item.a_file,
-                        download_url: item.download_url,
-                        misc: item.misc,
-                        mime_type: item.mime_type,
-                    }
-                    newdata.push(data)
-                })
-                this.setState({ newFileLists, TreatmentData: newdata })
-                postUploadFilesAc(newFileLists)
-
-            }
-        },
-    };
-    // 修改备注
-
-    //删除文件表格中的某行
-    deleteTreatmentFile = (record, index) => {
-        let newFileLists = this.state.newFileLists;
-        let newdata = [];
-        newFileLists.splice(index, 1);
-        newFileLists.map((item, index) => {
-            let data = {
-                index: index + 1,
-                fileName: item.file_name,
-                fileId: item.file_id,
-                fileUrl: item.file_partial_url,
-                fileTime: item.send_time
-            }
-            newdata.push(data)
-        })
-        this.setState({ newFileLists, TreatmentData: newdata })
-    }
     render() {
-        const { selectedRowKeys, } = this.state;
+        const { selectedRowKeys,sectionSchedule=[] } = this.state;
         const {
             form: { getFieldDecorator },
             fileList = [],
@@ -403,6 +181,12 @@ class All extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 },
         }
+        // let sectionOption =[]
+        // if(sectionSchedule && sectionSchedule.length>0){
+        //     sectionOption = this.getSectionOption()
+        // }
+
+        let sectionOption = this.getSectionOption()
         return (
             <div>
                 {
@@ -438,15 +222,15 @@ class All extends Component {
                                 <Col span={24}>
                                     <Row>
                                         <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='单位工程'>
+                                            <FormItem {...FormItemLayout} label='标段'>
                                                 {
-                                                    getFieldDecorator('unit', {
+                                                    getFieldDecorator('section', {
                                                         rules: [
-                                                            { required: true, message: '请选择单位工程' }
+                                                            { required: true, message: '请选择标段' }
                                                         ]
                                                     })
-                                                        (<Select placeholder='请选择单位工程' allowClear>
-                                                            {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
+                                                        (<Select placeholder='请选择标段' allowClear>
+                                                            {sectionOption}
                                                         </Select> )
                                                 }
                                             </FormItem>
@@ -542,6 +326,309 @@ class All extends Component {
         )
     }
 
+    //获取当前标段的名字
+    getSectionName(section){
+		let name = ''
+		if(section){
+			let code = section.split('-')
+			if(code && code.length === 3){
+				switch(code[2]){
+					case '01':
+						name = '一标段'
+						break;
+					case '02':
+						name = '二标段'
+						break;
+					case '03':
+						name = '三标段'
+						break;
+					case '04':
+						name = '四标段'
+						break;
+					case '05':
+						name = '五标段'
+						break;
+					case '06':
+						name = '六标段'
+						break;
+				}
+			}
+		}
+		console.log('name',name)
+		return name 
+    }
+
+    // 确认提交
+    sendWork() {
+        const {
+            actions: {
+                createFlow,
+                getWorkflowById,
+                putFlow
+            },
+            location,
+        } = this.props
+        const {
+            TreatmentData,
+            sectionSchedule
+        } = this.state
+
+        let user = getUser();//当前登录用户
+        console.log('user',user)
+        let sections = user.sections || []
+
+
+        if(!sections || sections.length === 0 ){
+            notification.error({
+                message:'当前用户未关联标段，不能创建流程',
+                duration:3
+            })
+            return
+        }
+       
+       
+        let me = this;
+        //共有信息
+        let postData = {};
+        me.props.form.validateFields((err, values) => {
+            console.log('asdasddddddddddddddddddddd',values)
+            if (!err) {
+                if (TreatmentData.length === 0) {
+                    notification.error({
+                        message: '请上传文件',
+                        duration: 5
+                    })
+                    return
+                }
+
+                postData.upload_unit = user.org ? user.org : '';
+                postData.type = '总进度计划';
+                postData.upload_person = user.name ? user.name : user.username;
+                postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
+
+                 
+                const currentUser = {
+                    "username": user.username,
+                    "person_code": user.code,
+                    "person_name": user.name,
+                    "id": parseInt(user.id)
+                };
+                
+                let sectionName = me.getSectionName(values.section)
+                let subject = [{
+                    "section": JSON.stringify(values.section),
+                    "sectionName":JSON.stringify(sectionName),
+					"superunit": JSON.stringify(values.superunit),
+					"dataReview": JSON.stringify(values.dataReview),
+					"numbercode": JSON.stringify(values.numbercode),
+					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
+					"totledocument": JSON.stringify(values.totledocument),
+					"postData": JSON.stringify(postData),
+                    "TreatmentData": JSON.stringify(TreatmentData),
+                    
+                }];
+                const nextUser = this.member;
+                let WORKFLOW_MAP = {
+                    name: "总进度计划报批流程",
+                    desc: "进度管理模块总进度计划报批流程",
+                    code: WORKFLOW_CODE.总进度计划报批流程
+                };
+                let workflowdata = {
+                    name: WORKFLOW_MAP.name,
+                    description: WORKFLOW_MAP.desc,
+                    subject: subject,
+                    code: WORKFLOW_MAP.code,
+                    creator: currentUser,
+                    plan_start_time: null,
+                    deadline: null,
+                    "status": 2
+                }
+                createFlow({}, workflowdata).then((instance) => {
+                    if (!instance.id) {
+                        notification.error({
+                            message: '数据提交失败',
+                            duration: 2
+                        })
+                        return;
+                    }
+                    const { id, workflow: { states = [] } = {} } = instance;
+                    const [{ id: state_id, actions: [action] }] = states;
+
+                    getWorkflowById({ id: id }).then(instance => {
+                        if (instance && instance.current) {
+                            let currentStateId = instance.current[0].id;
+                            let nextStates = getNextStates(instance, currentStateId);
+                            let stateid = nextStates[0].to_state[0].id;
+
+                            let postInfo = {
+                                next_states: [{
+                                    state: stateid,
+                                    participants: [nextUser],
+                                    deadline: null,
+                                    remark: null
+                                }],
+                                state: instance.workflow.states[0].id,
+                                executor: currentUser,
+                                action: nextStates[0].action_name,
+                                note: "提交",
+                                attachment: null
+                            }
+                            let data = { pk: id };
+                            //提交流程到下一步
+                            putFlow(data, postInfo).then(rst => {
+                                if (rst && rst.creator) {
+                                    notification.success({
+                                        message: '流程提交成功',
+                                        duration: 2
+                                    });
+                                    this.gettaskSchedule();//重新更新流程列表
+                                    this.setState({
+                                        visible: false
+                                    })
+                                } else {
+                                    notification.error({
+                                        message: '流程提交失败',
+                                        duration: 2
+                                    });
+                                    return;
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        })
+    }
+
+    onSelectChange = (selectedRowKeys, selectedRows) => {
+        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+    }
+    // 操作--查看
+    clickInfo(record) {
+        this.setState({ totlevisible: true ,TotleModaldata:record});
+    }
+    // 取消
+    totleCancle() {
+        this.setState({ totlevisible: false });
+    }
+    // 确定
+    totleOk() {
+        this.setState({ totlevisible: false });
+    }
+    // 删除
+    deleteClick = () => {
+        const { selectedRowKeys } = this.state
+        if (selectedRowKeys.length === 0) {
+            notification.warning({
+                message: '请先选择数据！',
+                duration: 2
+            });
+            return
+        } else {
+            alert('还未做删除功能')
+        }
+    }
+
+    // 新增按钮
+    addClick = () => {
+        const { actions: { postUploadFilesAc } } = this.props;
+        postUploadFilesAc([]);
+        this.setState({
+            visible: true,
+            TreatmentData: [],
+            key:Math.random()
+        })
+        this.props.form.setFieldsValue({
+            superunit: undefined,
+            section: undefined,
+            dataReview: undefined,
+            numbercode: undefined
+        })
+
+    }
+    // 关闭弹框
+    closeModal() {
+        const { actions: { postUploadFilesAc } } = this.props;
+        postUploadFilesAc([]);
+
+        this.setState({
+            visible: false,
+            TreatmentData: [],
+        })
+    }
+    
+    // 短信
+    _cpoyMsgT(e) {
+        this.setState({
+            isCopyMsg: e.target.checked,
+        })
+    }
+    
+    //上传文件
+    uploadProps = {
+        name: 'a_file',
+        multiple: true,
+        showUploadList: false,
+        action: base + "/service/fileserver/api/user/files/",
+        onChange: ({ file, fileList, event }) => {
+
+            const status = file.status;
+            const { newFileLists } = this.state;
+            let newdata = [];
+            if (status === 'done') {
+                const { actions: { postUploadFilesAc } } = this.props;
+                let newFileLists = fileList.map(item => {
+                    return {
+                        file_id: item.response.id,
+                        file_name: item.name,
+                        send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                        file_partial_url: '/media' + item.response.a_file.split('/media')[1],
+                        download_url: '/media' + item.response.download_url.split('/media')[1],
+                        a_file: '/media' + item.response.a_file.split('/media')[1],
+                        misc: item.response.misc,
+                        mime_type: item.response.mime_type,
+                    }
+                })
+                newFileLists.map((item, index) => {
+                    let data = {
+                        index: index + 1,
+                        fileName: item.file_name,
+                        file_id: item.file_id,
+                        file_partial_url: item.file_partial_url,
+                        send_time: item.send_time,
+                        a_file: item.a_file,
+                        download_url: item.download_url,
+                        misc: item.misc,
+                        mime_type: item.mime_type,
+                    }
+                    newdata.push(data)
+                })
+                this.setState({ newFileLists, TreatmentData: newdata })
+                postUploadFilesAc(newFileLists)
+
+            }
+        },
+    };
+    // 修改备注
+
+    //删除文件表格中的某行
+    deleteTreatmentFile = (record, index) => {
+        let newFileLists = this.state.newFileLists;
+        let newdata = [];
+        newFileLists.splice(index, 1);
+        newFileLists.map((item, index) => {
+            let data = {
+                index: index + 1,
+                fileName: item.file_name,
+                fileId: item.file_id,
+                fileUrl: item.file_partial_url,
+                fileTime: item.send_time
+            }
+            newdata.push(data)
+        })
+        this.setState({ newFileLists, TreatmentData: newdata })
+    }
+
 
     //选择人员
     selectMember(memberInfo) {
@@ -574,9 +661,9 @@ class All extends Component {
 
     columns = [
         {
-            title: '单位工程',
-            dataIndex: 'unit',
-            key: 'unit',
+            title: '标段',
+            dataIndex: 'sectionName',
+            key: 'sectionName',
             width: '15%'
         }, {
             title: '进度类型',

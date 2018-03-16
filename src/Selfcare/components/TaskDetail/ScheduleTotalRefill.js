@@ -27,6 +27,7 @@ class ScheduleTotalRefill extends Component {
             isCopyMsg: false, //接收人员是否发短信
             TreatmentData: [],
             newFileLists: [],
+            sectionSchedule:[]
         };
     }
 
@@ -69,17 +70,82 @@ class ScheduleTotalRefill extends Component {
             </div>
         }
     }]
+    componentDidMount(){
+        this.getSection()
+    }
+
+    //获取当前登陆用户的标段
+    getSection(){
+        let user = getUser()
+        console.log('user',user)
+        let sections = user.sections
+        let sectionSchedule = []
+        let name = ''
+        console.log('sections',sections)
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            sections.map((section)=>{
+                let code = section.split('-')
+                if(code && code.length === 3){
+                    switch(code[2]){
+                        case '01':
+                            name = '一标段'
+                            break;
+                        case '02':
+                            name = '二标段'
+                            break;
+                        case '03':
+                            name = '三标段'
+                            break;
+                        case '04':
+                            name = '四标段'
+                            break;
+                        case '05':
+                            name = '五标段'
+                            break;
+                        case '06':
+                            name = '六标段'
+                            break;
+                    }
+                }
+                sectionSchedule.push({
+                    value:section,
+                    name:name
+                })
+            })
+            
+            console.log('sectionSchedule',sectionSchedule)
+            this.setState({
+                sectionSchedule
+            })
+        }
+	}
+	//获取当前登陆用户的标段的下拉选项
+    getSectionOption(){
+        const{
+            sectionSchedule
+        } = this.state
+        let option = []
+        sectionSchedule.map((section)=>{
+            option.push(<Option key={section.value} value={section.value}>{section.name}</Option>)
+        })
+        return option
+    }   
 
     render() {
 
         const { platform: { task = {}, users = {} } = {}, location, actions, form: { getFieldDecorator } } = this.props;
-		const { history = [], transitions = [], states = [] } = task;
+        const { history = [], transitions = [], states = [] } = task;
+        const{
+            sectionSchedule
+        } = this.state
 		const user = getUser();
         
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 },
         }
+        let sectionOption = this.getSectionOption()
         return (
             <div>
                 <Form onSubmit={this.handleSubmit.bind(this)}>
@@ -88,17 +154,17 @@ class ScheduleTotalRefill extends Component {
                             <Col span={24}>
                                 <Row>
                                     <Col span={10}>
-                                        <FormItem {...FormItemLayout} label='单位工程'>
+                                        <FormItem {...FormItemLayout} label='标段'>
                                             {
-                                                getFieldDecorator('unit', {
-                                                    rules: [
-                                                        { required: true, message: '请选择单位工程' }
-                                                    ]
-                                                })
-                                                    (<Select placeholder='请选择单位工程' allowClear>
-                                                        {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-                                                    </Select> )
-                                            }
+													getFieldDecorator('section', {
+														rules: [
+															{ required: true, message: '请选择标段' }
+														]
+													})
+														(<Select placeholder='请选择标段' allowClear>
+														{sectionOption}
+													</Select>)
+												}
                                         </FormItem>
                                     </Col>
                                     <Col span={10}>
@@ -119,14 +185,12 @@ class ScheduleTotalRefill extends Component {
                                         <FormItem {...FormItemLayout} label='文档类型'>
                                             {
                                                 getFieldDecorator('totledocument', {
+                                                    initialValue: `总计划进度`,
                                                     rules: [
-                                                        { required: true, message: '请选择文档类型' }
+                                                        { required: true, message: '请输入文档类型' }
                                                     ]
                                                 })
-                                                    (<Select placeholder='请选择文档类型' allowClear>
-                                                        <Option key={3} value={'开发文档'}>开发文档</Option>
-                                                        <Option key={4} value={'测试文档'}>测试文档</Option>
-                                                    </Select>)
+                                                    (<Input placeholder='请输入文档类型' />)
                                             }
                                         </FormItem>
                                     </Col>
@@ -247,7 +311,39 @@ class ScheduleTotalRefill extends Component {
 		const { state_id = '0' } = queryString.parse(location.search) || {};
 		const { states = [] } = task;
 		return states.find(state => state.status === 'processing' && state.id === +state_id);
-	}
+    }
+    
+    //获取当前标段的名字
+    getSectionName(section){
+		let name = ''
+		if(section){
+			let code = section.split('-')
+			if(code && code.length === 3){
+				switch(code[2]){
+					case '01':
+						name = '一标段'
+						break;
+					case '02':
+						name = '二标段'
+						break;
+					case '03':
+						name = '三标段'
+						break;
+					case '04':
+						name = '四标段'
+						break;
+					case '05':
+						name = '五标段'
+						break;
+					case '06':
+						name = '六标段'
+						break;
+				}
+			}
+		}
+		console.log('name',name)
+		return name 
+    }
 
 
     handleSubmit = (e) =>{
@@ -283,8 +379,10 @@ class ScheduleTotalRefill extends Component {
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
+                let sectionName = me.getSectionName(values.section)
                 let subject = [{
-                    "unit": JSON.stringify(values.unit),
+                    "section": JSON.stringify(values.section),
+                    "sectionName":JSON.stringify(sectionName),
 					"superunit": JSON.stringify(values.superunit),
 					"dataReview": JSON.stringify(values.dataReview),
 					"numbercode": JSON.stringify(values.numbercode),
