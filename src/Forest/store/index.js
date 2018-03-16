@@ -59,6 +59,8 @@ export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/h
 export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, '');
 export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //    √
 export const postPositionData = createFetchAction(`${FOREST_API}/tree/importLocations?user={{id}}`, [],'POST'); //    √
+export const getcarpackage = createFetchAction(`${FOREST_API}/tree/carpacks`, []);
+export const getexportcarpackage = createFetchAction(`${FOREST_API}/tree/exportFactoryAnalyseInfo`, []);
 export const actions = {
 	getForestUsers,
 	getTreeOK,
@@ -103,7 +105,9 @@ export const actions = {
 	getHonestyNewDetailModal,
 	getLittleBan,
 	getForestTreeNodeList,
-	postPositionData
+	postPositionData,
+	getcarpackage,
+	getexportcarpackage
 	// getTreeNodeList
 };
 export default handleActions({
