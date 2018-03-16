@@ -17,7 +17,8 @@ export default class SupervisorTable extends Component {
         	pagination: {},
         	loading: false,
         	size:10,
-        	exportsize:100,
+			exportsize:100,
+			treetypename: '',
         	leftkeycode: '',
         	stime: moment().format('YYYY-MM-DD 00:00:00'),
 			etime: moment().format('YYYY-MM-DD 23:59:59'),
@@ -68,11 +69,13 @@ export default class SupervisorTable extends Component {
 		const {
 			sectionoption,
 			smallclassoption,
+			treetypeoption,
 			thinclassoption,
 			leftkeycode,
 			keycode,
 			statusoption,
 			users,
+			typeoption
 		} = this.props;
 		const {
 			sxm, 
@@ -81,126 +84,128 @@ export default class SupervisorTable extends Component {
 			smallclass,
 			thinclass,
 			status,
+			bigType,
+			treetypename,
 		} = this.state;
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		let columns = [];
 		let header = '';
 		columns = [{
-			title:"序号",
-			dataIndex: 'order',
-		},{
-			title:"编码",
-			dataIndex: 'ZZBM',
-		},{
-			title:"标段",
-			dataIndex: 'Section',
-		},{
-			title:"位置",
-			dataIndex: 'place',
-		},{
-			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeName',
-		},{
-			title:"监理人",
-			dataIndex: 'Supervisor',
-			render: (text,record) => {
-				if(text === 0){
-					return <p> / </p>
+				title:"序号",
+				dataIndex: 'order',
+			},{
+				title:"顺序码",
+				dataIndex: 'ZZBM',
+			},{
+				title:"标段",
+				dataIndex: 'Section',
+			},{
+				title:"位置",
+				dataIndex: 'place',
+			},{
+				title:"树种",
+				dataIndex: 'TreeTypeObj.TreeTypeName',
+			},{
+				title:"监理人",
+				dataIndex: 'Supervisor',
+				render: (text,record) => {
+					if(text === 0){
+						return <p> / </p>
+					}
+					return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 				}
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
-			}
-		},{
-			title:"状态",
-			dataIndex: 'statusname',
-		},{
-			title:"高度",
-			dataIndex: 'GD',
-			render:(text)=>{
-				if(text === 0){
-					return <p> / </p>
-				}else{
-					return <p>{text}</p>
+			},{
+				title:"状态",
+				dataIndex: 'statusname',
+			},{
+				title:"高度(cm)",
+				dataIndex: 'GD',
+				render:(text)=>{
+					if(text === 0){
+						return <p> / </p>
+					}else{
+						return <p>{text}</p>
+					}
 				}
-			}
-		},{
-			title:"地径",
-			dataIndex: 'DJ',
-			render:(text)=>{
-				if(text === 0){
-					return <p> / </p>
-				}else{
-					return <p>{text}</p>
+			},{
+				title:"地径",
+				dataIndex: 'DJ',
+				render:(text)=>{
+					if(text === 0){
+						return <p> / </p>
+					}else{
+						return <p>{text}</p>
+					}
 				}
-			}
-		},{
-			title:"是否截干",
-			dataIndex: 'JG',
-			render:(text) =>{
-				if(text === 0){
-					return <p>否</p>
-				}else{
-					return <p>是</p>
+			},{
+				title:"是否截干",
+				dataIndex: 'JG',
+				render:(text) =>{
+					if(text === 0){
+						return <p>否</p>
+					}else{
+						return <p>是</p>
+					}
 				}
-			}
-		},{
-			title:"干皮损伤",
-			dataIndex: 'GP',
-			render:(text) =>{
-				if(text === 0){
-					return <p>否</p>
-				}else{
-					return <p>是</p>
+			},{
+				title:"干皮损伤",
+				dataIndex: 'GP',
+				render:(text) =>{
+					if(text === 0){
+						return <p>否</p>
+					}else{
+						return <p>是</p>
+					}
 				}
-			}
-		},{
-			title:"冠型完整",
-			dataIndex: 'GXWZ',
-			render:(text) =>{
-				if(text === 0){
-					return <p>否</p>
-				}else{
-					return <p>是</p>
+			},{
+				title:"冠型完整",
+				dataIndex: 'GXWZ',
+				render:(text) =>{
+					if(text === 0){
+						return <p>否</p>
+					}else{
+						return <p>是</p>
+					}
 				}
-			}
-		},{
-			title:"健壮",
-			dataIndex: 'SZJZ',
-			render:(text) =>{
-				if(text === 0){
-					return <p>否</p>
-				}else{
-					return <p>是</p>
+			},{
+				title:"健壮",
+				dataIndex: 'SZJZ',
+				render:(text) =>{
+					if(text === 0){
+						return <p>否</p>
+					}else{
+						return <p>是</p>
+					}
 				}
-			}
-		},{
-			title:"病虫害",
-			dataIndex: 'BCH',
-			render:(text) =>{
-				if(text === 0){
-					return <p>否</p>
-				}else{
-					return <p>是</p>
+			},{
+				title:"病虫害",
+				dataIndex: 'BCH',
+				render:(text) =>{
+					if(text === 0){
+						return <p>否</p>
+					}else{
+						return <p>是</p>
+					}
 				}
-			}
 
-		},{
-			title:"定位",
-			dataIndex: 'locationstatus',
-		},{
-			title:"状态信息",
-			dataIndex: 'SupervisorInfo',
-		},{
-			title:"状态时间",
-			render: (text,record) => {
-				const {yssj1 = '',yssj2 = '' } = record;
-				return <div><div>{yssj1}</div><div>{yssj2}</div></div>
-			}
+			},{
+				title:"定位",
+				dataIndex: 'locationstatus',
+			},{
+				title:"状态信息",
+				dataIndex: 'SupervisorInfo',
+			},{
+				title:"状态时间",
+				render: (text,record) => {
+					const {yssj1 = '',yssj2 = '' } = record;
+					return <div><div>{yssj1}</div><div>{yssj2}</div></div>
+				}
 		}];
 		header = <div >
 					<Row>
-						<Col  xl={3} lg={4} md={5} className='mrg10'>
-							<span>编码：</span>
+						<Col  xl={4} lg={5} md={6} className='mrg10'>
+							<span>顺序码：</span>
 							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col s xl={3} lg={4} md={5} className='mrg10'>
@@ -219,6 +224,18 @@ export default class SupervisorTable extends Component {
 							<span>细班：</span>
 							<Select allowClear className='forestcalcw2 mxw170' defaultValue='全部' value={thinclass} onChange={this.onthinclasschange.bind(this)}>
 								{thinclassoption}
+							</Select>
+						</Col>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
+							<span>类型：</span>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
+								{typeoption}
+							</Select>
+						</Col>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
+							<span>树种：</span>
+							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
+								{treetypeoption}
 							</Select>
 						</Col>
 						<Col  xl={4} lg={5} md={6} className='mrg10'>
@@ -315,6 +332,19 @@ export default class SupervisorTable extends Component {
 		thinclassselect(value || smallclass,section);
 		this.setState({thinclass:value || ''})
 	}
+	ontypechange(value) {
+		const {typeselect} = this.props;
+		typeselect(value || '')
+		this.setState({bigType: value || '' , treetype: '', treetypename:''})
+	}
+
+	ontreetypechange(value) {
+		// debugger
+		// const {treetypelist} = this.props;
+		// let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
+		// this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
+		this.setState({treetype:value,treetypename:value})
+    }
 
 	onstatuschange(value) {
 		let SupervisorCheck = '';
@@ -382,7 +412,9 @@ export default class SupervisorTable extends Component {
     		stime = '',
     		etime = '',
     		status = '',
-    		size,
+			size,
+			bigType = '',
+    		treetype = '',
 		} = this.state;
 		if(this.sections.length !== 0){  //不是admin，要做查询判断了
 			if(section === ''){
@@ -402,7 +434,9 @@ export default class SupervisorTable extends Component {
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
-    		size
+			size,
+			bigType,
+    		treetype,
     	}
     	if(!!role)
     		postdata[role] = rolename;
@@ -421,11 +455,11 @@ export default class SupervisorTable extends Component {
 	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;	    			tblData[i].place = place;
 	    			let statusname = '';
 					if(plan.SupervisorCheck == -1)
-						statusname = "待审批"
+						statusname = "未抽查"
 					else if(plan.SupervisorCheck == 0) 
-						statusname = "审批未通过"
+						statusname = "抽查未通过"
 					else {
-						statusname = "审批通过"
+						statusname = "抽查通过"
 					}
 					tblData[i].statusname = statusname;
 					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';
@@ -452,7 +486,9 @@ export default class SupervisorTable extends Component {
     		rolename = '',
     		stime = '',
     		etime = '',
-    		exportsize,
+			exportsize,
+			bigType = '',
+    		treetype = '',
 		} = this.state;
 		if(this.sections.length !== 0){  //不是admin，要做查询判断了
 			if(section === ''){
@@ -469,7 +505,9 @@ export default class SupervisorTable extends Component {
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
-    		size:exportsize
+			size:exportsize,
+			bigType,
+    		treetype,
     	}
     	if(!!role)
     		postdata[role] = rolename;

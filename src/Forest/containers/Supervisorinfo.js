@@ -31,6 +31,7 @@ export default class Supervisorinfo extends Component {
             statusoption: [],
             leftkeycode: '',
             resetkey: 0,
+            treetypeoption: [],
         }
     }
     componentDidMount() {
@@ -41,14 +42,26 @@ export default class Supervisorinfo extends Component {
         PROJECT_UNITS[1].units.map(item => {
             this.biaoduan.push(item);
         })
-        const {actions: {getTree,getForestUsers,getTreeNodeList}, users,platform:{tree = {}}} = this.props; 
+        const {actions: {getTree,getForestUsers,getTreeNodeList,getTreeList}, users,treetypes,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();
         }
+        if(!treetypes){
+            getTreeList();
+        }
         if(!tree.bigTreeList){
             getTreeNodeList()
         }
+        //类型
+        let typeoption = [
+            <Option key={'-1'} value={''}>全部</Option>,
+            <Option key={'1'} value={'1'}>常绿乔木</Option>,
+            <Option key={'2'} value={'2'}>落叶乔木</Option>,
+            <Option key={'3'} value={'3'}>亚乔木</Option>,
+            <Option key={'4'} value={'4'}>灌木</Option>,
+            <Option key={'5'} value={'5'}>地被</Option>,
+        ];
         //状态
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
@@ -56,7 +69,7 @@ export default class Supervisorinfo extends Component {
             <Option key={'2'} value={"0"}>抽查未通过</Option>,
             <Option key={'3'} value={"1"}>抽查通过</Option>,
         ]
-        this.setState({statusoption})
+        this.setState({statusoption,typeoption})
     }
 
 	render() {
@@ -68,6 +81,10 @@ export default class Supervisorinfo extends Component {
             thinclassoption,
             statusoption,
             resetkey,
+            treetypeoption,
+            typeoption,
+            treetypelist,
+            bigType
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
@@ -93,6 +110,10 @@ export default class Supervisorinfo extends Component {
                              smallclassoption={smallclassoption}
                              smallclassselect={this.smallclassselect.bind(this)}
                              thinclassoption={thinclassoption}
+                             typeselect={this.typeselect.bind(this)}
+                             bigType={bigType}
+                             typeoption={typeoption}
+                             treetypeoption={treetypeoption} 
                              thinclassselect={this.thinclassselect.bind(this)}
                              statusoption={statusoption}
                              leftkeycode={leftkeycode}
@@ -142,6 +163,30 @@ export default class Supervisorinfo extends Component {
 
     //细班选择, 重新获取: 树种
     thinclassselect(value,section) {
+    }
+    //类型选择, 重新获取: 树种
+    typeselect(value){
+        const {treetypes} =this.props;
+        this.setState({bigType: value});
+        let selectTreeType = [];
+        treetypes.map(item =>{
+            let code = item.TreeTypeNo.substr(0,1);
+            if(code === value){
+                selectTreeType.push(item);
+            }
+        })
+        this.setTreeTypeOption(selectTreeType);
+    }
+
+    //设置树种选项
+    setTreeTypeOption(rst) {
+        if(rst instanceof Array){
+            let treetypeoption = rst.map(item => {
+                return <Option key={item.id} value={item.ID}>{item.TreeTypeName}</Option>
+            })
+            treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
+            this.setState({treetypeoption,treetypelist:rst})
+        }
     }
     
     //设置标段选项

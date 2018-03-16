@@ -102,7 +102,7 @@ export default class NursmeasureTable extends Component {
 			title:"序号",
 			dataIndex: 'order',
 		},{
-			title:"编码",
+			title:"顺序码",
 			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
@@ -124,7 +124,7 @@ export default class NursmeasureTable extends Component {
 			title:"产地",
 			dataIndex: 'TreePlace',
 		},{
-			title:"供苗商",
+			title:"供应商",
 			dataIndex: 'Factory',
 		},{
 			title:"苗圃名称",
@@ -203,8 +203,8 @@ export default class NursmeasureTable extends Component {
 		}];
 		header = <div >
 					<Row >
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>编码：</span>
+					<Col  xl={4} lg={5} md={6} className='mrg10'>
+							<span>顺序码：</span>
 							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
@@ -234,7 +234,7 @@ export default class NursmeasureTable extends Component {
 							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw150' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
 						<Col xl={5} lg={6} md={7} className='mrg10'>
-							<span>供苗商：</span>
+							<span>供应商：</span>
 							<Input suffix={suffix3} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
 						</Col>
 						<Col xl={5} lg={6} md={7} className='mrg10'>
