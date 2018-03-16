@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-16 15:17:11
+ * @Last Modified time: 2018-03-16 22:47:46
  */
 /**
 *
@@ -343,6 +343,34 @@ export const SUBPROJECT_UNITS = [
 			}
 		]
 	}
+]
+
+//获取子项目下的标段
+export const SECTIONNAME = [
+	{
+		code:'01',
+		name:'一标段'
+	},
+	{
+		code:'02',
+		name:'二标段'
+	},
+	{
+		code:'03',
+		name:'三标段'
+	},
+	{
+		code:'04',
+		name:'四标段'
+	},
+	{
+		code:'05',
+		name:'五标段'
+	},
+	{
+		code:'06',
+		name:'六标段'
+	},
 ]
 
 export const TREETYPENO = [

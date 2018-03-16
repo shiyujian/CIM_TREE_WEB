@@ -11,7 +11,7 @@ import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE,PROJECT_UNITS,SECTIONNAME } from '../../../_platform/api';
 import queryString from 'query-string';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
@@ -27,7 +27,8 @@ class ScheduleTotalRefill extends Component {
             isCopyMsg: false, //接收人员是否发短信
             TreatmentData: [],
             newFileLists: [],
-            sectionSchedule:[]
+            sectionSchedule:[],
+            projectName:''
         };
     }
 
@@ -80,46 +81,43 @@ class ScheduleTotalRefill extends Component {
         console.log('user',user)
         let sections = user.sections
         let sectionSchedule = []
-        let name = ''
+        let sectionName = ''
+        let projectName = ''
         console.log('sections',sections)
         sections = JSON.parse(sections)
         if(sections && sections instanceof Array && sections.length>0){
             sections.map((section)=>{
                 let code = section.split('-')
                 if(code && code.length === 3){
-                    switch(code[2]){
-                        case '01':
-                            name = '一标段'
-                            break;
-                        case '02':
-                            name = '二标段'
-                            break;
-                        case '03':
-                            name = '三标段'
-                            break;
-                        case '04':
-                            name = '四标段'
-                            break;
-                        case '05':
-                            name = '五标段'
-                            break;
-                        case '06':
-                            name = '六标段'
-                            break;
-                    }
+                    //获取当前标段的名字
+                    SECTIONNAME.map((item)=>{
+                        if(code[2] === item.code){
+                            sectionName = item.name
+                        }
+                    })
+                    //获取当前标段所在的项目
+                    PROJECT_UNITS.map((item)=>{
+                        if(code[0] === item.code){
+                            projectName = item.value
+                        }
+                    })
                 }
                 sectionSchedule.push({
                     value:section,
-                    name:name
+                    name:sectionName
                 })
+
+               
             })
             
-            console.log('sectionSchedule',sectionSchedule)
+			console.log('sectionSchedule',sectionSchedule)
+			console.log('projectName',projectName)
             this.setState({
-                sectionSchedule
+                sectionSchedule,
+                projectName
             })
         }
-	}
+    }
 	//获取当前登陆用户的标段的下拉选项
     getSectionOption(){
         const{
@@ -315,34 +313,20 @@ class ScheduleTotalRefill extends Component {
     
     //获取当前标段的名字
     getSectionName(section){
-		let name = ''
+		let sectionName = ''
 		if(section){
 			let code = section.split('-')
 			if(code && code.length === 3){
-				switch(code[2]){
-					case '01':
-						name = '一标段'
-						break;
-					case '02':
-						name = '二标段'
-						break;
-					case '03':
-						name = '三标段'
-						break;
-					case '04':
-						name = '四标段'
-						break;
-					case '05':
-						name = '五标段'
-						break;
-					case '06':
-						name = '六标段'
-						break;
-				}
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        sectionName = item.name
+                    }
+                })
 			}
 		}
-		console.log('name',name)
-		return name 
+		console.log('sectionName',sectionName)
+		return sectionName 
     }
 
 
@@ -357,7 +341,8 @@ class ScheduleTotalRefill extends Component {
             location
         } = this.props;
         const{
-            TreatmentData
+            TreatmentData,
+            projectName
         } = this.state
         let user = getUser();//当前登录用户
         let me = this;
@@ -366,13 +351,13 @@ class ScheduleTotalRefill extends Component {
             console.log('Received values of form: ', values);
             if (!err) {
                 //存储新的流程详情
-                if (TreatmentData.length === 0) {
-                    notification.error({
-                        message: '请上传文件',
-                        duration: 5
-                    })
-                    return
-                }
+                // if (TreatmentData.length === 0) {
+                //     notification.error({
+                //         message: '请上传文件',
+                //         duration: 5
+                //     })
+                //     return
+                // }
                 
                 postData.upload_unit = user.org ? user.org : '';
                 postData.type = '总进度计划';
@@ -383,6 +368,7 @@ class ScheduleTotalRefill extends Component {
                 let subject = [{
                     "section": JSON.stringify(values.section),
                     "sectionName":JSON.stringify(sectionName),
+                    "projectName":JSON.stringify(projectName),
 					"superunit": JSON.stringify(values.superunit),
 					"dataReview": JSON.stringify(values.dataReview),
 					"numbercode": JSON.stringify(values.numbercode),

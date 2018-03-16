@@ -11,7 +11,7 @@ import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE ,PROJECT_UNITS,SECTIONNAME,SCHEDULETREEDATA} from '../../../_platform/api';
 import queryString from 'query-string';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
@@ -28,7 +28,8 @@ class ScheduleStageRefill extends Component {
 			treedataSource: [],
             treetype: [],//树种
             key:6,
-            sectionSchedule:[]
+            sectionSchedule:[],
+            projectName:''
         };
     }
 
@@ -96,31 +97,39 @@ class ScheduleStageRefill extends Component {
     
     componentDidMount() {
 		const { actions: { gettreetype } } = this.props;
-		let treedata = [{
-			key: 1,
-			project: '便道施工',
-			units: 'm',
-		}, {
-			key: 2,
-			project: '给排水沟槽开挖',
-			units: 'm',
-		}, {
-			key: 3,
-			project: '给排水管道安装',
-			units: 'm',
-		}, {
-			key: 4,
-			project: '给排水回填',
-			units: 'm',
-		}, {
-			key: 5,
-			project: '绿地平整',
-			units: '亩',
-		}, {
-			key: 6,
-			project: '种植穴工程',
-			units: '个',
-		},];
+		let treedata = [
+            {
+                key:0,
+                project: '便道施工',
+                units: 'm',
+                canDelete: false
+            }, {
+                key:1,
+                project: '给排水沟槽开挖',
+                units: 'm',
+                canDelete: false
+            }, {
+                key:2,
+                project: '给排水管道安装',
+                units: 'm',
+                canDelete: false
+            }, {
+                key:3,
+                project: '给排水回填',
+                units: 'm',
+                canDelete: false
+            }, {
+                key:4,
+                project: '绿地平整',
+                units: '亩',
+                canDelete: false
+            }, {
+                key:5,
+                project: '种植穴工程',
+                units: '个',
+                canDelete: false
+            },
+        ];
 		this.setState({
 			treedataSource: treedata
 		})
@@ -142,46 +151,43 @@ class ScheduleStageRefill extends Component {
         console.log('user',user)
         let sections = user.sections
         let sectionSchedule = []
-        let name = ''
+        let sectionName = ''
+        let projectName = ''
         console.log('sections',sections)
         sections = JSON.parse(sections)
         if(sections && sections instanceof Array && sections.length>0){
             sections.map((section)=>{
                 let code = section.split('-')
                 if(code && code.length === 3){
-                    switch(code[2]){
-                        case '01':
-                            name = '一标段'
-                            break;
-                        case '02':
-                            name = '二标段'
-                            break;
-                        case '03':
-                            name = '三标段'
-                            break;
-                        case '04':
-                            name = '四标段'
-                            break;
-                        case '05':
-                            name = '五标段'
-                            break;
-                        case '06':
-                            name = '六标段'
-                            break;
-                    }
+                    //获取当前标段的名字
+                    SECTIONNAME.map((item)=>{
+                        if(code[2] === item.code){
+                            sectionName = item.name
+                        }
+                    })
+                    //获取当前标段所在的项目
+                    PROJECT_UNITS.map((item)=>{
+                        if(code[0] === item.code){
+                            projectName = item.value
+                        }
+                    })
                 }
                 sectionSchedule.push({
                     value:section,
-                    name:name
+                    name:sectionName
                 })
+
+               
             })
             
-            console.log('sectionSchedule',sectionSchedule)
+			console.log('sectionSchedule',sectionSchedule)
+			console.log('projectName',projectName)
             this.setState({
-                sectionSchedule
+                sectionSchedule,
+                projectName
             })
         }
-	}
+    }
 	//获取当前登陆用户的标段的下拉选项
     getSectionOption(){
         const{
@@ -377,34 +383,20 @@ class ScheduleStageRefill extends Component {
     
     //获取当前标段的名字
     getSectionName(section){
-		let name = ''
+		let sectionName = ''
 		if(section){
 			let code = section.split('-')
 			if(code && code.length === 3){
-				switch(code[2]){
-					case '01':
-						name = '一标段'
-						break;
-					case '02':
-						name = '二标段'
-						break;
-					case '03':
-						name = '三标段'
-						break;
-					case '04':
-						name = '四标段'
-						break;
-					case '05':
-						name = '五标段'
-						break;
-					case '06':
-						name = '六标段'
-						break;
-				}
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        sectionName = item.name
+                    }
+                })
 			}
 		}
-		console.log('name',name)
-		return name 
+		console.log('sectionName',sectionName)
+		return sectionName 
     }
 
 
@@ -419,7 +411,8 @@ class ScheduleStageRefill extends Component {
             location
         } = this.props;
         const{
-            treedataSource
+            treedataSource,
+            projectName
         } = this.state
         let user = getUser();//当前登录用户
         let me = this;
@@ -435,7 +428,8 @@ class ScheduleStageRefill extends Component {
 
                 let sectionName = me.getSectionName(values.section)
                 let subject = [{
-					"section": JSON.stringify(values.section),
+                    "section": JSON.stringify(values.section),
+                    "projectName":JSON.stringify(projectName),
                     "superunit": JSON.stringify(values.superunit),
                     "sectionName":JSON.stringify(sectionName),
 					"dataReview": JSON.stringify(values.dataReview),

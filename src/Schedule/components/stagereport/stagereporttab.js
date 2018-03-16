@@ -3,7 +3,7 @@ import { Row, Col, Input, Form, Spin, Icon, Button, Table, Modal, DatePicker, Pr
 // import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS } from '../../../_platform/api';
+import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS, PROJECT_UNITS,SECTIONNAME ,SCHEDULETREEDATA} from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
 // import PerSearch from './PerSearch';
@@ -34,7 +34,9 @@ class Stagereporttab extends Component {
 			treetype: [],//树种
 			TotleModaldata:[],
 			key:Math.random(),
-			sectionSchedule:[]
+			sectionSchedule:[],
+			projectName:'',
+			filterData:[], //对流程信息根据项目进行过滤
 		};
 	}
 
@@ -53,6 +55,15 @@ class Stagereporttab extends Component {
 		this.gettaskSchedule();
 		this.getSection()
 	}
+
+	async componentDidUpdate(prevProps,prevState){
+        const{
+            leftkeycode
+        } = this.props
+        if(leftkeycode != prevProps.leftkeycode){
+            this.filterTask()
+        }
+    }
 	// 获取日实际进度流程信息
     gettaskSchedule = async ()=>{
 		const { actions: { getTaskSchedule } } = this.props;
@@ -89,6 +100,7 @@ class Stagereporttab extends Component {
 					id:item.workflowactivity.id,
 					section: itemdata.section?JSON.parse(itemdata.section):'',
 					sectionName: itemdata.sectionName?JSON.parse(itemdata.sectionName):'',
+					projectName: itemdata.projectName?JSON.parse(itemdata.projectName):'',
 					type: itempostdata.type,
 					numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
 					submitperson:item.workflowactivity.creator.person_name,
@@ -104,55 +116,103 @@ class Stagereporttab extends Component {
 			})
 			this.setState({
 				daydata:totledata
-			})
+			},()=>{
+                this.filterTask()
+            })
 		}
 	}
+	    //对流程信息根据选择项目进行过滤
+		filterTask(){
+			const {
+				daydata 
+			}=this.state
+			const{
+				leftkeycode
+			}=this.props
+			let filterData = []
+			let user = getUser()
+			console.log('user',user)
+			let sections = user.sections
+			console.log('sections',sections)
+			sections = JSON.parse(sections)
+			
+			let selectCode = ''
+			//关联标段的人只能看自己项目的进度流程
+			if(sections && sections instanceof Array && sections.length>0){
+				let code = sections[0].split('-')
+				selectCode = code[0] || ''
+			}else{
+				//不关联标段的人可以看选择项目的进度流程
+				selectCode = leftkeycode
+			}      
+			console.log('selectCode',selectCode)
+			daydata.map((task)=>{
+				console.log('task',task)
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				if(projectCode === selectCode){
+					filterData.push(task);
+				}
+			})
+			console.log('filterData',filterData)
+			this.setState({
+				filterData
+			})
+		}
+		//获取项目code
+		getProjectCode(projectName){
+			let projectCode = ''
+			PROJECT_UNITS.map((item)=>{
+				if(projectName === item.value){
+					projectCode = item.code
+				}
+			})
+			console.log('projectCode',projectCode)
+			return projectCode 
+		}
 	//获取当前登陆用户的标段
     getSection(){
         let user = getUser()
         console.log('user',user)
         let sections = user.sections
         let sectionSchedule = []
-        let name = ''
+        let sectionName = ''
+        let projectName = ''
         console.log('sections',sections)
         sections = JSON.parse(sections)
         if(sections && sections instanceof Array && sections.length>0){
             sections.map((section)=>{
                 let code = section.split('-')
                 if(code && code.length === 3){
-                    switch(code[2]){
-                        case '01':
-                            name = '一标段'
-                            break;
-                        case '02':
-                            name = '二标段'
-                            break;
-                        case '03':
-                            name = '三标段'
-                            break;
-                        case '04':
-                            name = '四标段'
-                            break;
-                        case '05':
-                            name = '五标段'
-                            break;
-                        case '06':
-                            name = '六标段'
-                            break;
-                    }
+                    //获取当前标段的名字
+                    SECTIONNAME.map((item)=>{
+                        if(code[2] === item.code){
+                            sectionName = item.name
+                        }
+                    })
+                    //获取当前标段所在的项目
+                    PROJECT_UNITS.map((item)=>{
+                        if(code[0] === item.code){
+                            projectName = item.value
+                        }
+                    })
                 }
                 sectionSchedule.push({
                     value:section,
-                    name:name
+                    name:sectionName
                 })
+
+               
             })
             
-            console.log('sectionSchedule',sectionSchedule)
+			console.log('sectionSchedule',sectionSchedule)
+			console.log('projectName',projectName)
             this.setState({
-                sectionSchedule
+                sectionSchedule,
+                projectName
             })
         }
-	}
+    }
 	//获取当前登陆用户的标段的下拉选项
     getSectionOption(){
         const{
@@ -167,7 +227,11 @@ class Stagereporttab extends Component {
 
 	
 	render() {
-		const { selectedRowKeys, sectionSchedule=[]} = this.state;
+		const { 
+			selectedRowKeys, 
+			sectionSchedule=[],
+			filterData
+		} = this.state;
 		const {
             form: { getFieldDecorator },
         } = this.props;
@@ -195,7 +259,7 @@ class Stagereporttab extends Component {
 				<Table
 					columns={this.columns}
 					// rowSelection={rowSelection} 
-					dataSource={this.state.daydata}
+					dataSource={filterData}
 					className='foresttable'
 					bordered
 					rowKey='index'/>
@@ -351,34 +415,20 @@ class Stagereporttab extends Component {
 	
 	//获取当前标段的名字
     getSectionName(section){
-		let name = ''
+		let sectionName = ''
 		if(section){
 			let code = section.split('-')
 			if(code && code.length === 3){
-				switch(code[2]){
-					case '01':
-						name = '一标段'
-						break;
-					case '02':
-						name = '二标段'
-						break;
-					case '03':
-						name = '三标段'
-						break;
-					case '04':
-						name = '四标段'
-						break;
-					case '05':
-						name = '五标段'
-						break;
-					case '06':
-						name = '六标段'
-						break;
-				}
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        sectionName = item.name
+                    }
+                })
 			}
 		}
-		console.log('name',name)
-		return name 
+		console.log('sectionName',sectionName)
+		return sectionName 
     }
 	// 发起填报
 	sendWork(){
@@ -390,7 +440,10 @@ class Stagereporttab extends Component {
 			},
 			location,
 		} = this.props
-		const{treedataSource} = this.state
+		const{
+			treedataSource,
+			projectName
+		} = this.state
 		let user = getUser();//当前登录用户
 		let me = this;
 		//共有信息
@@ -417,6 +470,7 @@ class Stagereporttab extends Component {
 				let sectionName = me.getSectionName(values.section)
 				let subject = [{
 					"section": JSON.stringify(values.section),
+					"projectName":JSON.stringify(projectName),
 					"sectionName":JSON.stringify(sectionName),
 					"superunit": JSON.stringify(values.superunit),
 					"dataReview": JSON.stringify(values.dataReview),
@@ -625,13 +679,13 @@ class Stagereporttab extends Component {
 			numbercode: undefined,
 			timedate: undefined
 		})
-
 	}
 	// 关闭弹框
 	closeModal() {
 
 		this.setState({
 			visible: false,
+			treedataSource:[]
 		})
 	}
 	
@@ -646,20 +700,26 @@ class Stagereporttab extends Component {
 
 	columns = [
 		{
+			title: '项目',
+			dataIndex: 'projectName',
+			key: 'projectName',
+			width: '15%'
+		},
+		{
 			title: '标段',
 			dataIndex: 'sectionName',
 			key: 'sectionName',
-			width: '15%'
+			width: '10%'
 		}, {
 			title: '进度类型',
 			dataIndex: 'type',
 			key: 'type',
-			width: '10%'
+			width: '15%'
 		}, {
 			title: '编号',
 			dataIndex: 'numbercode',
 			key: 'numbercode',
-			width: '10%'
+			width: '15%'
 		}, {
 			title: '提交人',
 			dataIndex: 'submitperson',
@@ -669,7 +729,7 @@ class Stagereporttab extends Component {
 			title: '提交时间',
 			dataIndex: 'submittime',
 			key: 'submittime',
-			width: '10%',
+			width: '15%',
 			sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
 			render: text => {
 				return moment(text).format('YYYY-MM-DD')
@@ -678,7 +738,7 @@ class Stagereporttab extends Component {
 			title: '流程状态',
 			dataIndex: 'status',
 			key: 'status',
-			width: '15%',
+			width: '10%',
 			render:(record,index)=>{
                 if(record===1){
                     return '已提交'
