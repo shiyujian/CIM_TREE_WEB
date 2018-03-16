@@ -6,7 +6,8 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
-import PerSearch from '../../../Schedule/components/stagereport/PerSearch';
+// import PerSearch from '../../../Schedule/components/stagereport/PerSearch';
+import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
