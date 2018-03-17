@@ -66,7 +66,7 @@ export default class MiddleTop extends Component {
         this.query()
     }
 
-    componnetDidUpdate(prevProps, prevState){
+    componentDidUpdate(prevProps, prevState){
         const {
             etime,
             stime
