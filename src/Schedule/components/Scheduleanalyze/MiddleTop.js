@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
-import { FORESTTYPE } from '../../../_platform/api';
+import { FORESTTYPE,PROJECT_UNITS } from '../../../_platform/api';
 import {Cards, SumTotal, DateImg} from '../../components';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
@@ -98,76 +98,39 @@ export default class MiddleTop extends Component {
         let param = {}
 
         param.no = leftkeycode;
-        param.stime = stime;
+        // param.stime = stime;
         param.etime = etime;
         this.setState({loading:true})
 
-        let rst = await gettreetypeAll({},param)
+        let rst = await gettreetypeSection({},param)
         
         console.log('MiddleTopMiddleTopMiddleTop',rst)
 
         let units = ['一标段','二标段','三标段','四标段','五标段']
 
-        let gpshtnum = [];
-        let times = [];
-        let time = [];
-        let total = []
+        let complete = [];
+        let unComplete = [];
+        let label = [];
        
         if(rst && rst instanceof Array){
-            gpshtnum[0] = gpshtnum[1] = gpshtnum[2] = gpshtnum[3] = gpshtnum[4] = gpshtnum[5] = 0
-
-            if(leftkeycode.indexOf('P009')>-1){
-                rst.map(item=>{
-                    if(item && item.Section){
-                        switch(item.Section){
-                            case 'P009-01-01' : 
-                            gpshtnum[0] = gpshtnum[0] + item.Num
-                                break;
-                            case 'P009-01-02' :
-                            gpshtnum[1] = gpshtnum[1] + item.Num
-                                break;
-                            case 'P009-01-03' :
-                            gpshtnum[2] = gpshtnum[2] + item.Num
-                                break;
-                            case 'P009-01-04' :
-                            gpshtnum[3] = gpshtnum[3] + item.Num
-                                break;
-                            case 'P009-01-05' :
-                            gpshtnum[4] = gpshtnum[4] + item.Num
-                                break;
-                        }
-                    }                    
+            rst.map((item)=>{
+                complete.push(item.Complete)
+                unComplete.push(item.UnComplete)
+                PROJECT_UNITS.map((project)=>{
+                    //获取正确的项目    
+                    if(leftkeycode.indexOf(project.code)>-1){
+                         //获取项目下的标段
+                        let sections = project.units
+                        sections.map((section,index)=>{
+                            if(section.code === item.Label){
+                                label.push(section.value)
+                            }
+                        })
+                    }
                 })
-            }else if(leftkeycode.indexOf('P010') >-1){
-                units = ['一标段','二标段','三标段','四标段','五标段','六标段']
-                rst.map(item=>{
-                    if(item && item.Section){
-                        switch(item.Section){
-                            case 'P010-01-01' : 
-                                gpshtnum[0] = gpshtnum[0] + item.Num
-                                break;
-                            case 'P010-01-02' :
-                                gpshtnum[1] = gpshtnum[1] + item.Num
-                                break;
-                            case 'P010-01-03' :
-                                gpshtnum[2] = gpshtnum[2] + item.Num
-                                break;
-                            case 'P010-01-04' :
-                                gpshtnum[3] = gpshtnum[3] + item.Num
-                                break;
-                            case 'P010-02-05' :
-                                gpshtnum[4] = gpshtnum[4] + item.Num
-                                break;
-                            case 'P010-03-06' :
-                                gpshtnum[5] = gpshtnum[5] + item.Num
-                                break;
-                        }
-                    }                    
-                })
-            }
-            console.log('gpshtnum',gpshtnum)
-
+            })
         }
+        
        
         let myChart2 = echarts.init(document.getElementById('middleTop'));
         let options2 = {
@@ -176,7 +139,7 @@ export default class MiddleTop extends Component {
             },
             xAxis: [
                 {
-                    data: units
+                    data: label.length>0?label:units
                 }
             ],
             series: [
@@ -185,14 +148,14 @@ export default class MiddleTop extends Component {
                     type: 'bar',
                     stack: '总量',
                     label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
-                    data: gpshtnum
+                    data: unComplete
                 },
                 {
                     name: '已种植',
                     type: 'bar',
                     stack: '总量',
                     label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
-                    data: gpshtnum
+                    data: complete
                 }
             ]
         };
@@ -221,23 +184,22 @@ export default class MiddleTop extends Component {
     search() {
             return (
                 <div>
-                    <span>种植时间：</span>
-                    <RangePicker 
+                    <span>截止时间：</span>
+                    <DatePicker 
                         style={{verticalAlign:"middle"}} 
-                        defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]} 
+                        defaultValue={moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')} 
                         showTime={{ format: 'HH:mm:ss' }}
                         format={'YYYY/MM/DD HH:mm:ss'}
                         onChange={this.datepick.bind(this)}
                         onOk={this.datepick.bind(this)}
                     >
-                    </RangePicker>
+                    </DatePicker>
                 </div>
             ) 
     }
 
     datepick(value){
-        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
-        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
+        this.setState({etime:value?moment(value).format('YYYY/MM/DD'):'',})
     }
     
     

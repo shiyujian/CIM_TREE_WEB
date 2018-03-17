@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Row, Col, Input, Icon, DatePicker, Select, Spin} from 'antd';
 import {Cards, SumTotal, DateImg} from '../../components';
-import { FOREST_API, FORESTTYPE,TREETYPENO} from '../../../_platform/api';
+import { FOREST_API, FORESTTYPE,TREETYPENO,PROJECT_UNITS} from '../../../_platform/api';
 import moment from 'moment';
 import {groupBy} from 'lodash';
 var echarts = require('echarts');
@@ -134,61 +134,35 @@ export default class Left extends Component {
         postdata.etime = etime
         let rst = await gettreetype({},postdata)
         console.log('aaaaaaaaaaaaaarst',rst)
-        let units = ['一标段','二标段','三标段','四标段','五标段']
+        let units = []
         let data = [];
     
         if(rst && rst instanceof Array){
-            data[0] = data[1] = data[2] = data[3] = data[4] = data[5]  = 0
-            if(leftkeycode.indexOf('P009')>-1){
-                rst.map(item=>{
-                    if(item && item.Section){
-                        switch(item.Section){
-                            case 'P009-01-01' : 
-                                data[0] = data[0] + item.Num
-                                break;
-                            case 'P009-01-02' :
-                                data[1] = data[1] + item.Num
-                                break;
-                            case 'P009-01-03' :
-                                data[2] = data[2] + item.Num
-                                break;
-                            case 'P009-01-04' :
-                                data[3] = data[3] + item.Num
-                                break;
-                            case 'P009-01-05' :
-                                data[4] = data[4] + item.Num
-                                break;
+            PROJECT_UNITS.map((project)=>{
+                //获取正确的项目    
+                if(leftkeycode.indexOf(project.code)>-1){
+                    //获取项目下的标段
+                    let sections = project.units
+                    //将各个标段的数据设置为0
+                    sections.map((section,index)=>{
+                        data[index] = 0
+                        units.push(section.value)
+                    })
+
+                    rst.map(item=>{
+                        if(item && item.Section){
+                            sections.map((section,index)=>{
+                               if(item.Section === section.code){
+                                data[index] = data[index] + item.Num
+                               }
+                            })
                         }
-                    }                    
-                })
-            }else if(leftkeycode.indexOf('P010') >-1){
-                units = ['一标段','二标段','三标段','四标段','五标段','六标段']
-                rst.map(item=>{
-                    if(item && item.Section){
-                        switch(item.Section){
-                            case 'P010-01-01' : 
-                                data[0] = data[0] + item.Num
-                                break;
-                            case 'P010-01-02' :
-                                data[1] = data[1] + item.Num
-                                break;
-                            case 'P010-01-03' :
-                                data[2] = data[2] + item.Num
-                                break;
-                            case 'P010-01-04' :
-                                data[3] = data[3] + item.Num
-                                break;
-                            case 'P010-02-05' :
-                                data[4] = data[4] + item.Num
-                                break;
-                            case 'P010-03-06' :
-                                data[5] = data[5] + item.Num
-                                break;
-                        }
-                    }                    
-                })
-            }
+                    })
+                }
+            })
         }
+        console.log('data',data)
+        console.log('units',units)
         let myChart1 = echarts.init(document.getElementById('king'));
         let option1 = {
             

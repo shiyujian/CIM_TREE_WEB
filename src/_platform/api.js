@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-16 22:47:46
+ * @Last Modified time: 2018-03-17 10:53:05
  */
 /**
 *
@@ -282,6 +282,9 @@ export const PROJECT_UNITS = [
 	}
 ]
 
+//echarts图表的颜色
+export const ECHARTSCOLOR = ['black','orange','yellow','blue','green','purple']
+
 
 //获取子项目下的标段
 export const SUBPROJECT_UNITS = [
@@ -370,6 +373,34 @@ export const SECTIONNAME = [
 	{
 		code:'06',
 		name:'六标段'
+	},
+]
+
+//获取子项目下的标段
+export const SECTIONNUMBERNAME = [
+	{
+		code:'01',
+		name:'1标段'
+	},
+	{
+		code:'02',
+		name:'2标段'
+	},
+	{
+		code:'03',
+		name:'3标段'
+	},
+	{
+		code:'04',
+		name:'4标段'
+	},
+	{
+		code:'05',
+		name:'5标段'
+	},
+	{
+		code:'06',
+		name:'6标段'
 	},
 ]
 
