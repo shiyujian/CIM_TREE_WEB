@@ -23,7 +23,7 @@ export default class Warning extends Component {
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
         const {actions: {gettreeevery}} = this.props;
         //获取全部树种信息
