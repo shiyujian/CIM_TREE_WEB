@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
-import { FORESTTYPE,PROJECT_UNITS,SECTIONNUMBERNAME } from '../../../_platform/api';
+import { PROJECT_UNITS,SECTIONNUMBERNAME } from '../../../_platform/api';
 import {Cards, SumTotal, DateImg} from '../../components';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;

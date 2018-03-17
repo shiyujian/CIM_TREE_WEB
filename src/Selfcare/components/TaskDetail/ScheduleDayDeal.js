@@ -123,10 +123,10 @@ export default class ScheduleDayDeal extends Component {
             DocType:'doc',
             Items:items,
             ProgressNo:'01',
-            ProgressTime:subject.timedate,
+            ProgressTime: subject.timedate?JSON.parse(subject.timedate):'',
             ProgressType:'日计划',
             SMS:0,
-            UnitProject:subject.unit,
+            UnitProject:subject.section?JSON.parse(subject.section):'',
             WPNo:''
         }
         // 日进度入库

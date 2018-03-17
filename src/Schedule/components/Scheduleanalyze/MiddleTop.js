@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
-import { FORESTTYPE,PROJECT_UNITS } from '../../../_platform/api';
+import { PROJECT_UNITS } from '../../../_platform/api';
 import {Cards, SumTotal, DateImg} from '../../components';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
@@ -171,7 +171,7 @@ export default class MiddleTop extends Component {
         
         return (
             <Spin spinning={this.state.loading}>
-                <Cards search={this.search()} title='各标段种植强度分析'>
+                <Cards search={this.search()} title='各标段种植进度分析'>
                     <div id = 'middleTop' style = {{width:'100%',height:'260px'}}>
                     </div>
                 </Cards>

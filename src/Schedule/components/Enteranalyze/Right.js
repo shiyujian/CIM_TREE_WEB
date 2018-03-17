@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Row, Col, Input, Icon, DatePicker, Select, Spin} from 'antd';
 import {Cards, SumTotal, DateImg} from '../../components';
-import { FOREST_API, FORESTTYPE,TREETYPENO,PROJECT_UNITS,ECHARTSCOLOR} from '../../../_platform/api';
+import { FOREST_API,TREETYPENO,PROJECT_UNITS,ECHARTSCOLOR} from '../../../_platform/api';
 import moment from 'moment';
 import {groupBy} from 'lodash';
 var echarts = require('echarts');

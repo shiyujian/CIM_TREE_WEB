@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
+import { PROJECT_UNITS ,TREETYPENO,ECHARTSCOLOR} from '../../../_platform/api';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
@@ -18,15 +19,23 @@ export default class Warning extends Component {
             departOptions:"",
             unitproject:"1标段",
             choose:["灌木","亚乔木","落叶乔木","常绿乔木","种植穴工程","绿地平整","给排水回填","给排水管道安装","给排水沟槽开挖","便道施工"],
-            treetypelist:[<Option key="1" value="1标段">1标段</Option>,
-                          <Option key="2" value="2标段">2标段</Option>,
-                          <Option key="3" value="3标段">3标段</Option>,
-                          <Option key="4" value="4标段">4标段</Option>,
-                          <Option key="5" value="5标段">5标段</Option>],
+            treetypeAll:[]
         }
     }
 
     componentDidMount() {
+
+        const {actions: {gettreeevery}} = this.props;
+        //获取全部树种信息
+        let rst = await gettreeevery()
+        console.log('gettreeeveryrst',rst)
+        if(rst && rst instanceof Array){
+            this.setState({
+                treetypeAll:rst
+            })
+        }
+
+        this.getSection()
         let myChart = echarts.init(document.getElementById('rightbottom'));
 
         let optionLine = {
@@ -72,6 +81,24 @@ export default class Warning extends Component {
         this.getdata()
     }
 
+    getSection(){
+        const{
+            leftkeycode
+        }=this.props
+        let sections = []
+        PROJECT_UNITS.map((project)=>{
+            if(project.code === leftkeycode){
+                let units = project.units
+                units.map((unit)=>{
+                    sections.push(<Option key={unit.code} value={unit.value}>{unit.value}</Option>)
+                })
+            }
+        })
+        this.setState({
+            sections
+        })
+    }
+
     componentDidUpdate(prevProps, prevState){
         const {
             stime,
@@ -82,7 +109,8 @@ export default class Warning extends Component {
             leftkeycode
         }=this.props
         try{
-            if(leftkeycode.split('-')[0] != prevProps.leftkeycode.split('-')[0]){
+            if(leftkeycode != prevProps.leftkeycode){
+                this.getSection()
                 this.getdata()
             }
         }catch(e){
@@ -93,7 +121,10 @@ export default class Warning extends Component {
         }
     }
 
-    render() { //todo 累计完成工程量
+    render() { 
+        const{
+            sections
+        }=this.state
         return (
             <div >
                 <Card>
@@ -109,12 +140,11 @@ export default class Warning extends Component {
                     </RangePicker>
                     <div id='rightbottom' style={{ width: '100%', height: '340px' }}></div>
                     <Select 
-                          placeholder="请选择部门"
-                          notFoundContent="暂无数据"
-                          defaultValue="1标段"
-                          onSelect={this.onDepartments.bind(this) }>
-                          {this.state.treetypelist}
-                          
+                     placeholder="请选择部门"
+                     notFoundContent="暂无数据"
+                     defaultValue="一标段"
+                     onSelect={this.onDepartments.bind(this) }>
+                        {sections}
                     </Select>
                     <span>进度分析</span>
                 </Card>
@@ -138,6 +168,9 @@ export default class Warning extends Component {
             stime,
             unitproject
         }=this.state
+        const{
+            leftkeycode
+        }=this.props
         let params = {
             etime:etime,
             stime:stime,
@@ -182,13 +215,18 @@ export default class Warning extends Component {
                             }
                         }else{//添加的数目种类
                             let treetype = ''
-                            FORESTTYPE.map(forest => {
-                                return forest.children.map(rst => {
-                                    if(rst.name === item.Project){
-                                        treetype =  forest.name
-                                    }
-                                })
-                            }) 
+                            treetypeAll.map((tree)=>{
+                                if(tree.TreeTypeName === rst.name){
+                                    //获取树种cdoe的首个数字，找到对应的类型
+                                    let code = tree.TreeTypeNo.substr(0, 1)
+                                    console.log('code',code)
+                                    TREETYPENO.map((forest)=>{
+                                        if(forest.id === code){
+                                            treetype = forest.name
+                                        }
+                                    })
+                                }
+                            })
                             console.log('RightBottomtreetype',treetype)
 
                             switch(treetype){

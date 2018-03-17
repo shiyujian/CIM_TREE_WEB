@@ -3,7 +3,7 @@ import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,DatePicker,Spin} from 'antd';
 import {Cards, SumTotal, DateImg} from '../../components';
-import { FOREST_API, FORESTTYPE,TREETYPENO,PROJECT_UNITS,ECHARTSCOLOR} from '../../../_platform/api';
+import { FOREST_API, TREETYPENO,PROJECT_UNITS,ECHARTSCOLOR} from '../../../_platform/api';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;

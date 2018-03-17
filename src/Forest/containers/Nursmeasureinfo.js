@@ -6,7 +6,7 @@ import * as actions from '../store';
 import {PkCodeTree} from '../components';
 import {NursmeasureTable} from '../components/Nursmeasureinfo';
 import {actions as platformActions} from '_platform/store/global';
-import {PROJECT_UNITS,FORESTTYPE} from '_platform/api';
+import {PROJECT_UNITS} from '_platform/api';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {getUser} from '_platform/auth'
 const Option = Select.Option;

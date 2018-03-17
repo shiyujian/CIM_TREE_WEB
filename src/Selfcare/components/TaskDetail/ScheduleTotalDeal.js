@@ -132,7 +132,7 @@ export default class ScheduleTotalDeal extends Component {
             ProgressTime:moment(postdata.upload_time).format('YYYY-MM-DD'),
             ProgressType:'总进度',
             SMS:0,
-            UnitProject:subject.unit,
+            UnitProject:subject.section?JSON.parse(subject.section):'',
             WPNo:'',
             FilePath:filePath
         }

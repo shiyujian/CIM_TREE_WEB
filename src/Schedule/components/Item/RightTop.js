@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
+import { PROJECT_UNITS ,TREETYPENO,ECHARTSCOLOR} from '../../../_platform/api';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
@@ -20,12 +21,23 @@ export default class Warning extends Component {
             departOptions:"",
             unitproject:"1标段",
             project:"便道施工",
-
+            sections:[],
+            treetypeAll:[]
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        const {actions: {gettreeevery}} = this.props;
+        //获取全部树种信息
+        let rst = await gettreeevery()
+        console.log('gettreeeveryrst',rst)
+        if(rst && rst instanceof Array){
+            this.setState({
+                treetypeAll:rst
+            })
+        }
 
+        this.getSection()
         const myChart = echarts.init(document.getElementById('rightop'));
 
         let optionLine = {
@@ -38,11 +50,6 @@ export default class Warning extends Component {
                     }
                 }
             },
-            // legend: {
-            //     data:['一标'],
-            //     left:'right'
-                
-            // },
             xAxis: [
                 {
                     type: 'category',
@@ -72,25 +79,48 @@ export default class Warning extends Component {
             stime,
             etime,
             project,
-            unitproject
+            unitproject,
+            treetypeAll
         } = this.state
         const {
             leftkeycode
         }=this.props
         try{
-            if(leftkeycode.split('-')[0] != prevProps.leftkeycode.split('-')[0]){
+            if(leftkeycode != prevProps.leftkeycode){
+                this.getSection()
                 this.getdata()
             }
         }catch(e){
             console.log(e)
         }
-        if(stime != prevState.stime || etime != prevState.etime || project != prevState.project || unitproject != prevState.unitproject ){
+        if(stime != prevState.stime || etime != prevState.etime || project != prevState.project || unitproject != prevState.unitproject || treetypeAll != prevState.treetypeAll ){
             this.getdata()
         }
+    }
+
+    getSection(){
+        const{
+            leftkeycode
+        }=this.props
+        let sections = []
+        PROJECT_UNITS.map((project)=>{
+            if(project.code === leftkeycode){
+                let units = project.units
+                units.map((unit)=>{
+                    sections.push(<Option key={unit.code} value={unit.value}>{unit.value}</Option>)
+                })
+            }
+        })
+        this.setState({
+            sections
+        })
     }
     
     
     render() { //todo 累计完成工程量
+        const{
+            sections
+        }=this.state
         return (
             <div >
                 <Card>
@@ -106,28 +136,30 @@ export default class Warning extends Component {
                 </RangePicker>
                     <div id='rightop' style={{ width: '100%', height: '340px' }}></div>
                     <Select 
-                          defaultValue="便道施工"
-                          onSelect={this.onDepartments1.bind(this) }
-                          onChange={this.onChange.bind(this)}>
-                          <Option key="1" value="便道施工">便道施工</Option>
-                          <Option key="2" value="给排水水沟挖槽">给排水水沟挖槽</Option>
+                     placeholder="请选择标段"
+                     notFoundContent="暂无数据"
+                     defaultValue="一标段"
+                     onSelect={this.onDepartments2.bind(this)}
+                     onChange={this.onChange.bind(this)}>
+                        {sections}
+                    </Select>
+                    <Select 
+                     defaultValue="便道施工"
+                     onSelect={this.onDepartments1.bind(this) }
+                     onChange={this.onChange.bind(this)}>
+                        <Option key="1" value="便道施工">便道施工</Option>
+                          <Option key="2" value="给排水沟槽开挖">给排水沟槽开挖</Option>
                           <Option key="3" value="给排水管道安装">给排水管道安装</Option>
                           <Option key="4" value="给排水回填">给排水回填</Option>
                           <Option key="5" value="绿地平整">绿地平整</Option>
                           <Option key="6" value="种植穴工程">种植穴工程</Option>
+                          <Option key="7" value="常绿乔木">常绿乔木</Option>
+                          <Option key="8" value="落叶乔木">落叶乔木</Option>
+                          <Option key="9" value="亚乔木">亚乔木</Option>
+                          <Option key="10" value="灌木">灌木</Option>
+                          <Option key="11" value="草木">草木</Option>
                     </Select>
-                    <Select 
-                          placeholder="请选择部门"
-                          notFoundContent="暂无数据"
-                          defaultValue="一标段"
-                          onSelect={this.onDepartments2.bind(this)}
-                          onChange={this.onChange.bind(this)}>
-                          <Option key="8" value="1标段">1标段</Option>
-                          <Option key="9" value="2标段">2标段</Option>
-                          <Option key="10" value="3标段">3标段</Option>
-                          <Option key="11" value="4标段">4标段</Option>
-                          <Option key="12" value="5标段">5标段</Option>
-                    </Select>
+                    
                     <span>强度分析</span>
                 </Card>
             </div>
@@ -154,7 +186,8 @@ export default class Warning extends Component {
             stime,
             etime,
             project,
-            unitproject
+            unitproject,
+            treetypeAll
         } = this.state
         let params = {
             stime:stime,
@@ -174,7 +207,7 @@ export default class Warning extends Component {
             let datas = [];
             if(rst && rst.content){
 
-                let content = rst.content
+                let content = rst.content.filter((item)=> item.ProgressType && item.ProgressType==='日实际')
                 //将获取的数据按照 ProgressTime 时间排序
                 content.sort(function(a, b) {
                     if (a.ProgressTime < b.ProgressTime ) {
@@ -194,6 +227,33 @@ export default class Warning extends Component {
                 //时间数组去重
                 times = [...new Set(time)]
                 console.log('RightToptimes',times)
+
+                if(content && content instanceof Array){
+                    PROJECT_UNITS.map((project)=>{
+                        //获取正确的项目    
+                        if(leftkeycode.indexOf(project.code)>-1){
+                            //获取项目下的标段
+                            let sections = project.units
+                            //将各个标段的数据设置为0
+                            sections.map((section,index)=>{
+                                //定义一个二维数组，分为多个标段
+                                gpshtnum[index] = new Array()
+                                datas[index] = new Array()
+                                legend.push(section.value)
+                            })
+        
+                            content.map(item=>{
+                                if(item && item.UnitProject){
+                                    sections.map((section,index)=>{
+                                        if(item.UnitProject === section.value){
+                                            gpshtnum[index].push(item)
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
                 
                 times.map((time,index)=>{
                     datas[index] = 0;
@@ -210,13 +270,18 @@ export default class Warning extends Component {
                                     }
                                 }else{//添加的数目种类
                                     let treetype = ''
-                                    FORESTTYPE.map(forest => {
-                                        return forest.children.map(rst => {
-                                            if(rst.name === item.Project){
-                                                treetype =  forest.name
+                                        treetypeAll.map((tree)=>{
+                                            if(tree.TreeTypeName === rst.name){
+                                                //获取树种cdoe的首个数字，找到对应的类型
+                                                let code = tree.TreeTypeNo.substr(0, 1)
+                                                console.log('code',code)
+                                                TREETYPENO.map((forest)=>{
+                                                    if(forest.id === code){
+                                                        treetype = forest.name
+                                                    }
+                                                })
                                             }
                                         })
-                                    }) 
                                     console.log('RightToptreetype',treetype)
 
                                     if(treetype === params.project){
@@ -230,11 +295,6 @@ export default class Warning extends Component {
                     })
                 })
                 console.log('RightTopdatas',datas)
-
-                this.setState({
-                    gpshtnum:datas,
-                    times:times,
-                })
             }
             
             //当查不出数据时，使横坐标不为空

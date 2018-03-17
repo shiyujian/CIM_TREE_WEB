@@ -108,17 +108,21 @@ export default class Warning extends Component {
                     </DatePicker>
                     <div id='AccumulativeCompletion' style={{ width: '100%', height: '340px' }}></div>
                     <Select 
-                          placeholder="请选择部门"
-                          notFoundContent="暂无数据"
-                          defaultValue="1"
-                          onSelect={this.onDepartments.bind(this)}>
-                          <Option value="1">便道施工</Option>
-                          <Option value="2">给排水沟开挖</Option>
-                          <Option value="3">常绿乔木</Option>
-                          <Option value="4">落叶乔木</Option>
-                          <Option value="5">亚乔木</Option>
-                          <Option value="6">灌木</Option>
-                          <Option value="7">草木</Option>
+                     placeholder="请选择部门"
+                     notFoundContent="暂无数据"
+                     defaultValue="1"
+                     onSelect={this.onDepartments.bind(this)}>
+                        <Option key="1" value="便道施工">便道施工</Option>
+                        <Option key="2" value="给排水沟槽开挖">给排水沟槽开挖</Option>
+                        <Option key="3" value="给排水管道安装">给排水管道安装</Option>
+                        <Option key="4" value="给排水回填">给排水回填</Option>
+                        <Option key="5" value="绿地平整">绿地平整</Option>
+                        <Option key="6" value="种植穴工程">种植穴工程</Option>
+                        <Option key="7" value="常绿乔木">常绿乔木</Option>
+                        <Option key="8" value="落叶乔木">落叶乔木</Option>
+                        <Option key="9" value="亚乔木">亚乔木</Option>
+                        <Option key="10" value="灌木">灌木</Option>
+                        <Option key="11" value="草木">草木</Option>
                     </Select>
                     <span>强度分析</span>
                 </Card>
