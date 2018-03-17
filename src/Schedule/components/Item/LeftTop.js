@@ -118,21 +118,21 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                 </RangePicker>
                     <div id='lefttop' style={{ width: '100%', height: '340px' }}></div>
                     <Select 
-                     style={{width:'100px'}}
+                     style={{width:'120px'}}
                      defaultValue="便道施工"
                      onSelect={this.onDepartments.bind(this)}
                      onChange={this.onChange.bind(this)}>
-                        <Option key="1" value="便道施工">便道施工</Option>
-                        <Option key="2" value="给排水沟槽开挖">给排水沟槽开挖</Option>
-                        <Option key="3" value="给排水管道安装">给排水管道安装</Option>
-                        <Option key="4" value="给排水回填">给排水回填</Option>
-                        <Option key="5" value="绿地平整">绿地平整</Option>
-                        <Option key="6" value="种植穴工程">种植穴工程</Option>
-                        <Option key="7" value="常绿乔木">常绿乔木</Option>
-                        <Option key="8" value="落叶乔木">落叶乔木</Option>
-                        <Option key="9" value="亚乔木">亚乔木</Option>
-                        <Option key="10" value="灌木">灌木</Option>
-                        <Option key="11" value="草木">草木</Option>
+                        <Option key="1" value="便道施工" title="便道施工">便道施工</Option>
+                        <Option key="2" value="给排水沟槽开挖" title="给排水沟槽开挖">给排水沟槽开挖</Option>
+                        <Option key="3" value="给排水管道安装" title="给排水管道安装">给排水管道安装</Option>
+                        <Option key="4" value="给排水回填" title="给排水回填">给排水回填</Option>
+                        <Option key="5" value="绿地平整" title="绿地平整">绿地平整</Option>
+                        <Option key="6" value="种植穴工程" title="种植穴工程">种植穴工程</Option>
+                        <Option key="7" value="常绿乔木" title="常绿乔木">常绿乔木</Option>
+                        <Option key="8" value="落叶乔木" title="落叶乔木">落叶乔木</Option>
+                        <Option key="9" value="亚乔木" title="亚乔木">亚乔木</Option>
+                        <Option key="10" value="灌木" title="灌木">灌木</Option>
+                        <Option key="11" value="草木" title="草木">草木</Option>
                     </Select>
                     <span>强度分析</span>
                 </Card>
