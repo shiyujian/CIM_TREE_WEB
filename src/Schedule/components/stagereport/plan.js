@@ -3,7 +3,7 @@ import { Row, Col, Input, Form, Spin, Icon, Button, Table, Modal, DatePicker, Pr
 // import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS } from '../../../_platform/api';
+import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS, PROJECT_UNITS,SECTIONNAME,SCHEDULETREEDATA } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
 // import PerSearch from './PerSearch';
@@ -33,7 +33,10 @@ class Plan extends Component {
 			isCopyMsg: false, //接收人员是否发短信
 			treedataSource: [],
 			treetype: [],//树种
-			key:Math.random()
+			key:Math.random(),
+			sectionSchedule:[],
+			projectName:'',
+			filterData:[], //对流程信息根据项目进行过滤
 
 		};
 	}
@@ -51,7 +54,17 @@ class Plan extends Component {
 				this.setState({ treetype });
 			})
 		this.gettaskSchedule();
+		this.getSection()
 	}
+
+	async componentDidUpdate(prevProps,prevState){
+        const{
+            leftkeycode
+        } = this.props
+        if(leftkeycode != prevProps.leftkeycode){
+            this.filterTask()
+        }
+    }
 	// 获取日计划进度流程信息
     gettaskSchedule = async ()=>{
 		const { actions: { getTaskSchedule } } = this.props;
@@ -60,11 +73,11 @@ class Plan extends Component {
 			console.log("日计划进度流程信息", values);
             console.log("err", err);
             
-            values.sunitproject?reqData.subject_unit__contains = values.sunitproject : '';
+            values.sunitproject?reqData.subject_sectionName__contains = values.sunitproject : '';
             values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
             values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
-            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD HH:MM:SS') : '';
-            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
+            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
         })
         
@@ -86,7 +99,9 @@ class Plan extends Component {
 				let itemarrange = {
 					index:index+1,
 					id:item.workflowactivity.id,
-					unit: itemdata.unit?JSON.parse(itemdata.unit):'',
+					section: itemdata.section?JSON.parse(itemdata.section):'',
+					sectionName: itemdata.sectionName?JSON.parse(itemdata.sectionName):'',
+					projectName: itemdata.projectName?JSON.parse(itemdata.projectName):'',
 					type: itempostdata.type,
 					numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
 					submitperson:item.workflowactivity.creator.person_name,
@@ -102,106 +117,122 @@ class Plan extends Component {
 			})
 			this.setState({
 				daydata:totledata
-			})
+			},()=>{
+                this.filterTask()
+            })
 		}
         
-    }
-	onSelectChange = (selectedRowKeys, selectedRows) => {
-		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
 	}
-	// 操作--查看
-    clickInfo(record) {
-        this.setState({ dayvisible: true ,TotleModaldata:record});
-    }
-	// 取消
-	totleCancle() {
-		this.setState({ dayvisible: false });
-	}
-	// 确定
-	totleOk() {
-		this.setState({ dayvisible: false });
-	}
-	// 删除
-	deleteClick = () => {
-		const { selectedRowKeys } = this.state
-		if (selectedRowKeys.length === 0) {
-			notification.warning({
-				message: '请先选择数据！',
-				duration: 2
-			});
-			return
-		} else {
-			alert('还未做删除功能')
+	    //对流程信息根据选择项目进行过滤
+		filterTask(){
+			const {
+				daydata 
+			}=this.state
+			const{
+				leftkeycode
+			}=this.props
+			let filterData = []
+			let user = getUser()
+			console.log('user',user)
+			let sections = user.sections
+			console.log('sections',sections)
+			sections = JSON.parse(sections)
+
+			let selectCode = ''
+			//关联标段的人只能看自己项目的进度流程
+			if(sections && sections instanceof Array && sections.length>0){
+				let code = sections[0].split('-')
+				selectCode = code[0] || ''
+			}else{
+				//不关联标段的人可以看选择项目的进度流程
+				selectCode = leftkeycode
+			}
+			console.log('selectCode',selectCode)
+			daydata.map((task)=>{
+				console.log('task',task)
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				if(projectCode === selectCode){
+					filterData.push(task);
+				}
+			})    
+			console.log('filterData',filterData)
+			this.setState({
+				filterData
+			})
 		}
-	}
+		//获取项目code
+		getProjectCode(projectName){
+			let projectCode = ''
+			PROJECT_UNITS.map((item)=>{
+				if(projectName === item.value){
+					projectCode = item.code
+				}
+			})
+			console.log('projectCode',projectCode)
+			return projectCode 
+		}
+	//获取当前登陆用户的标段
+    getSection(){
+        let user = getUser()
+        console.log('user',user)
+        let sections = user.sections
+        let sectionSchedule = []
+        let sectionName = ''
+        let projectName = ''
+        console.log('sections',sections)
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            sections.map((section)=>{
+                let code = section.split('-')
+                if(code && code.length === 3){
+                    //获取当前标段的名字
+                    SECTIONNAME.map((item)=>{
+                        if(code[2] === item.code){
+                            sectionName = item.name
+                        }
+                    })
+                    //获取当前标段所在的项目
+                    PROJECT_UNITS.map((item)=>{
+                        if(code[0] === item.code){
+                            projectName = item.value
+                        }
+                    })
+                }
+                sectionSchedule.push({
+                    value:section,
+                    name:sectionName
+                })
 
-	// 新增按钮
-	addClick = () => {
-		let treedata = [
-			{
-				key:0,
-				project: '便道施工',
-				units: 'm',
-				canDelete: false
-			}, {
-				key:1,
-				project: '给排水沟槽开挖',
-				units: 'm',
-				canDelete: false
-			}, {
-				key:2,
-				project: '给排水管道安装',
-				units: 'm',
-				canDelete: false
-			}, {
-				key:3,
-				project: '给排水回填',
-				units: 'm',
-				canDelete: false
-			}, {
-				key:4,
-				project: '绿地平整',
-				units: '亩',
-				canDelete: false
-			}, {
-				key:5,
-				project: '种植穴工程',
-				units: '个',
-				canDelete: false
-			},
-		];
-		this.setState({
-			visible: true,
-			treedataSource: treedata,
-			key:Math.random()
-		})
-		this.props.form.setFieldsValue({
-			superunit: undefined,
-			unit: undefined,
-			dataReview: undefined,
-			numbercode: undefined,
-			timedate: undefined
-		})
-
-	}
-	// 关闭弹框
-	closeModal() {
-
-		this.setState({
-			visible: false,
-		})
-	}
+               
+            })
+            
+            console.log('sectionSchedule',sectionSchedule)
+            this.setState({
+                sectionSchedule,
+                projectName
+            })
+        }
+    }
+	//获取当前登陆用户的标段的下拉选项
+    getSectionOption(){
+        const{
+            sectionSchedule
+        } = this.state
+        let option = []
+        sectionSchedule.map((section)=>{
+            option.push(<Option key={section.value} value={section.value}>{section.name}</Option>)
+        })
+        return option
+    }   
 	
-
-	// 短信
-	_cpoyMsgT(e) {
-		this.setState({
-			isCopyMsg: e.target.checked,
-		})
-	}
 	
 	render() {
-		const { selectedRowKeys, } = this.state;
+		const { 
+			selectedRowKeys, 
+			sectionSchedule=[],
+			filterData
+		} = this.state;
 		const {
             form: { getFieldDecorator },
         } = this.props;
@@ -213,6 +244,7 @@ class Plan extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		}
+		let sectionOption = this.getSectionOption()
 		return (
 			<div>
 				{
@@ -229,7 +261,7 @@ class Plan extends Component {
 				<Table
 					columns={this.columns}
 					// rowSelection={rowSelection}
-					dataSource={this.state.daydata}
+					dataSource={filterData}
 					className='foresttable'
 					bordered 
 					rowKey='index'/>
@@ -248,16 +280,16 @@ class Plan extends Component {
 								<Col span={24}>
 									<Row>
 										<Col span={12}>
-											<FormItem {...FormItemLayout} label='单位工程'>
+											<FormItem {...FormItemLayout} label='标段'>
 												{
-													getFieldDecorator('unit', {
+													getFieldDecorator('section', {
 														rules: [
-															{ required: true, message: '请选择单位工程' }
+															{ required: true, message: '请选择标段' }
 														]
 													})
-														(<Select placeholder='请选择单位工程' allowClear>
-															{UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-														</Select>)
+														(<Select placeholder='请选择标段' allowClear>
+														{sectionOption}
+													</Select>)
 												}
 											</FormItem>
 										</Col>
@@ -381,6 +413,24 @@ class Plan extends Component {
 			superunit: this.member.org,
 		});
 	}
+
+	//获取当前标段的名字
+    getSectionName(section){
+		let sectionName = ''
+		if(section){
+			let code = section.split('-')
+			if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        sectionName = item.name
+                    }
+                })
+			}
+		}
+		console.log('sectionName',sectionName)
+		return sectionName 
+    }
 	// 发起填报
 	sendWork() {
 		const {
@@ -391,7 +441,10 @@ class Plan extends Component {
 			},
 			location,
 		} = this.props
-		const { treedataSource } = this.state
+		const { 
+			treedataSource,
+			projectName
+		} = this.state
 		let user = getUser();//当前登录用户
 		let me = this;
 		//共有信息
@@ -415,8 +468,12 @@ class Plan extends Component {
 					"person_name": user.name,
 					"id": parseInt(user.id)
 				};
+
+				let sectionName = me.getSectionName(values.section)
 				let subject = [{
-					"unit": JSON.stringify(values.unit),
+					"section": JSON.stringify(values.section),
+					"projectName":JSON.stringify(projectName),
+					"sectionName":JSON.stringify(sectionName),
 					"superunit": JSON.stringify(values.superunit),
 					"dataReview": JSON.stringify(values.dataReview),
 					"numbercode": JSON.stringify(values.numbercode),
@@ -549,22 +606,123 @@ class Plan extends Component {
 
 	}
 
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+	}
+	// 操作--查看
+    clickInfo(record) {
+        this.setState({ dayvisible: true ,TotleModaldata:record});
+    }
+	// 取消
+	totleCancle() {
+		this.setState({ dayvisible: false });
+	}
+	// 确定
+	totleOk() {
+		this.setState({ dayvisible: false });
+	}
+	// 删除
+	deleteClick = () => {
+		const { selectedRowKeys } = this.state
+		if (selectedRowKeys.length === 0) {
+			notification.warning({
+				message: '请先选择数据！',
+				duration: 2
+			});
+			return
+		} else {
+			alert('还未做删除功能')
+		}
+	}
+
+	// 新增按钮
+	addClick = () => {
+		let treedata = [
+			{
+				key:0,
+				project: '便道施工',
+				units: 'm',
+				canDelete: false
+			}, {
+				key:1,
+				project: '给排水沟槽开挖',
+				units: 'm',
+				canDelete: false
+			}, {
+				key:2,
+				project: '给排水管道安装',
+				units: 'm',
+				canDelete: false
+			}, {
+				key:3,
+				project: '给排水回填',
+				units: 'm',
+				canDelete: false
+			}, {
+				key:4,
+				project: '绿地平整',
+				units: '亩',
+				canDelete: false
+			}, {
+				key:5,
+				project: '种植穴工程',
+				units: '个',
+				canDelete: false
+			},
+		];
+		this.setState({
+			visible: true,
+			treedataSource: treedata,
+			key:Math.random()
+		})
+		this.props.form.setFieldsValue({
+			superunit: undefined,
+			section: undefined,
+			dataReview: undefined,
+			numbercode: undefined,
+			timedate: undefined
+		})
+
+	}
+	// 关闭弹框
+	closeModal() {
+
+		this.setState({
+			visible: false,
+			treedataSource:[]
+		})
+	}
+	
+
+	// 短信
+	_cpoyMsgT(e) {
+		this.setState({
+			isCopyMsg: e.target.checked,
+		})
+	}
+
 	columns = [
 		{
-			title: '单位工程',
-			dataIndex: 'unit',
-			key: 'unit',
+			title: '项目',
+			dataIndex: 'projectName',
+			key: 'projectName',
 			width: '15%'
+		},
+		{
+			title: '标段',
+			dataIndex: 'sectionName',
+			key: 'sectionName',
+			width: '10%'
 		}, {
 			title: '进度类型',
 			dataIndex: 'type',
 			key: 'type',
-			width: '10%'
+			width: '15%'
 		}, {
 			title: '编号',
 			dataIndex: 'numbercode',
 			key: 'numbercode',
-			width: '10%'
+			width: '15%'
 		}, {
 			title: '提交人',
 			dataIndex: 'submitperson',
@@ -574,7 +732,7 @@ class Plan extends Component {
 			title: '提交时间',
 			dataIndex: 'submittime',
 			key: 'submittime',
-			width: '10%',
+			width: '15%',
 			sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
 			render: text => {
 				return moment(text).format('YYYY-MM-DD')
@@ -583,7 +741,7 @@ class Plan extends Component {
 			title: '流程状态',
 			dataIndex: 'status',
 			key: 'status',
-			width: '15%',
+			width: '10%',
 			render:(record,index)=>{
                 if(record===1){
                     return '已提交'

@@ -1,6 +1,7 @@
 export Dataimport from './Dataimport';
 export Nursoverallinfo from './Nursoverallinfo';
 export Nursmeasureinfo from './Nursmeasureinfo';
+export CarPackage from './Carpackage';
 export Locmeasureinfo from './Locmeasureinfo';
 export Supervisorinfo from './Supervisorinfo';
 export Checkerinfo from './Checkerinfo';

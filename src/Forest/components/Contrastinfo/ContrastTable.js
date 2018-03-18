@@ -92,7 +92,7 @@ export default class ContrastTable extends Component {
 			title:"序号",
 			dataIndex: 'order',
 		},{
-			title:"编码",
+			title:"顺序码",
 			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
@@ -116,7 +116,7 @@ export default class ContrastTable extends Component {
 				return <div><div>{liftertime1}</div><div>{liftertime2}</div></div>
 			}
 		},{
-			title:<div><div>高度</div><div>(供苗商)</div></div>,
+			title:<div><div>高度</div><div>(供应商)</div></div>,
 			render: (text,record) => {
 				if(record.FGD && record.FGD != 0)
 					return <a disabled={!record.FGDFJ} onClick={this.onImgClick.bind(this,record.FGDFJ)}>{record.FGD}</a>
@@ -125,7 +125,7 @@ export default class ContrastTable extends Component {
 				}
 			}
 		},{
-			title:<div><div>土球厚度</div><div>(供苗商)</div></div>,
+			title:<div><div>土球厚度</div><div>(供应商)</div></div>,
 			render: (text,record) => {
 				if(record.FTQHD && record.FTQHD != 0)
 					return <a disabled={!record.FTQHDFJ} onClick={this.onImgClick.bind(this,record.FTQHDFJ)}>{record.FTQHD}</a>
@@ -134,7 +134,7 @@ export default class ContrastTable extends Component {
 				}
 			}
 		},{
-			title:<div><div>土球直径</div><div>(供苗商)</div></div>,
+			title:<div><div>土球直径</div><div>(供应商)</div></div>,
 			render: (text,record) => {
 				if(record.FTQZJ && record.FTQZJ != 0)
 					return <a disabled={!record.FTQZJFJ} onClick={this.onImgClick.bind(this,record.FTQZJFJ)}>{record.FTQZJ}</a>
@@ -143,7 +143,7 @@ export default class ContrastTable extends Component {
 				}
 			}
 		},{
-			title:<div><div>树高</div><div>(监理)</div></div>,
+			title:<div><div>高度</div><div>(监理)</div></div>,
 			render: (text,record) => {
 				if(record.GD && record.GD != 0)
 					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
@@ -189,8 +189,8 @@ export default class ContrastTable extends Component {
 		}];
 		header = <div >
 					<Row>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>编码：</span>
+						<Col  xl={4} lg={5} md={6} className='mrg10'>
+							<span>顺序码：</span>
 							<Input suffix={suffix1} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
@@ -212,7 +212,7 @@ export default class ContrastTable extends Component {
 							</Select>
 						</Col>
 						<Col xl={5} lg={6} md={7} className='mrg10'>
-							<span>供苗商：</span>
+							<span>供应商：</span>
 							<Input suffix={suffix2} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
@@ -222,7 +222,7 @@ export default class ContrastTable extends Component {
 							</Select>
 						</Col>
 						<Col xl={5} lg={6} md={7} className='mrg10'>
-							<span>供苗商：</span>
+							<span>供应商：</span>
 							<Input suffix={suffix3} value={nursery} className='forestcalcw3 mxw200' onChange={this.nurserychange.bind(this)}/>
 						</Col>
 						{/*<Col xl={10} lg={12} md={14} className='mrg10'>

@@ -1796,6 +1796,24 @@ GooFlow.prototype={
 		}
 		return {start:sp,m1:m1,m2:m2,end:ep};
 	},
+	// 
+	calcMultiEdgePos:function(edge, scale){
+		if(edge.type == 'sl') {
+			return {
+				start:[edge.fromX * scale,edge.fromY * scale],
+				end:[edge.toX * scale , edge.toY * scale]
+			};
+		} else {
+			return {
+				start:[edge.fromX * scale ,edge.fromY * scale],
+				m1: [edge.m1[0] * scale, edge.m1[1] * scale], 
+				m2: [edge.m2[0] * scale, edge.m2[1] * scale],
+				end:[edge.toX * scale , edge.toY * scale ]
+			};
+	
+		}
+		return null;
+	},
 	//初始化折线中段的X/Y坐标,mType='rb'时为X坐标,mType='tb'时为Y坐标
 	getMValue:function(n1,n2,mType,scale){
         if(!scale)	scale=1.0;
@@ -1812,10 +1830,14 @@ GooFlow.prototype={
 		if(!n1||!n2)	return;
 		//开始计算线端点坐标
 		var res;
-		if(lineData.type&&lineData.type!="sl")
-			res=GooFlow.prototype.calcPolyPoints(n1,n2,lineData.type,lineData.M, this.$scale);
-		else
-			res=GooFlow.prototype.calcStartEnd(n1,n2, this.$scale);
+		if(lineData.isMultiEdge) {
+			res = this.calcMultiEdgePos(lineData, this.$scale);
+		} else {
+			if(lineData.type&&lineData.type!="sl")
+				res=GooFlow.prototype.calcPolyPoints(n1,n2,lineData.type,lineData.M, this.$scale);
+			else
+				res=GooFlow.prototype.calcStartEnd(n1,n2, this.$scale);
+		}
 		if(!res)	return;
 		
 		if(lineData.type=="sl")
@@ -1853,10 +1875,10 @@ GooFlow.prototype={
 		var n1=this.$nodeData[json.from],n2=this.$nodeData[json.to];//获取开始/结束结点的数据
 		if(!n1||!n2)	return;
 		//避免两个节点间不能有一条以上同向接连线
-		for(var k in this.$lineData){
-			if((json.from==this.$lineData[k].from&&json.to==this.$lineData[k].to))
-				return;
-		}
+		// for(var k in this.$lineData){
+		// 	if((json.from==this.$lineData[k].from&&json.to==this.$lineData[k].to))
+		// 		return;
+		// }
 		//设置$lineData[id]
 		this.$lineData[id]=json;
 		if(json.type){
@@ -1873,18 +1895,229 @@ GooFlow.prototype={
         else	this.$lineData[id].dash=false;
 		//设置$lineData[id]完毕
 		
-		this.addLineDom(id,this.$lineData[id]);
-		
+		// 获取相同 节点 连线，重新设置 线段的 类型，设置M值
+		var multiEdges = this.getMultiEdgesById(id);
+		if(multiEdges.length >= 2) {
+			// 重新布局 多个线段
+			this.reLayoutMultiEdges(json.from,json.to,multiEdges);
+		} else {
+			this.addLineDom(id,this.$lineData[id]);
+		}
+
 		++this.$lineCount;
 		if(this.$editable){
 			this.$lineData[id].alt=true;
 			if(this.$deletedItem[id])	delete this.$deletedItem[id];//在回退删除操作时,去掉该元素的删除记录
 		}
 	},
+	//获取当前连线 两个节点之间 是否有多个连线
+	getMultiEdgesById:function(id){
+		var currEdge = this.$lineData[id];
+		var resultEdges = [];
+		for(var k in this.$lineData){
+			this.$lineData[k].id = k;
+			if(currEdge.from==this.$lineData[k].from && currEdge.to==this.$lineData[k].to){
+				resultEdges.push(this.$lineData[k]);
+			}
+			if(currEdge.from==this.$lineData[k].to && currEdge.to==this.$lineData[k].from){
+				resultEdges.push(this.$lineData[k]);
+			}
+		}
+		return resultEdges;
+	},
+	reLayoutMultiEdges: function(nodeId1, nodeId2, multiEdges) {
+		if(!this.$nodeData || !multiEdges)
+			return;
+		
+		var scale = 1.0;
+		
+		var startNode = this.$nodeData[nodeId1];
+		var endNode = this.$nodeData[nodeId2];
+
+		var slArray = [];
+		var lrArray = [];
+		var tbArray = [];
+		for(var index in multiEdges){
+			switch(multiEdges[index].type){
+				case 'sl':
+					slArray.push(multiEdges[index]);
+					break;
+				case 'lr':
+					lrArray.push(multiEdges[index]);
+					break;
+				case 'tb':
+					tbArray.push(multiEdges[index]);
+					break;
+				default: break;
+			}
+		}
+
+		var res = this.calcStartEnd(startNode, endNode, scale);
+		var deltaX = (res.end[0] - res.start[0]);
+		var deltaY = (res.end[1] - res.start[1]);
+		var edgeLength = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+		var gap = 25 * scale; // 线段之间 间距
+
+		// 重新计算 直线 的布局
+		var middleEdgeIndex = Math.floor(slArray.length / 2);
+		var isUneven = (slArray.length % 2) !== 0;
+		var offset = isUneven ? 0 : (gap * 0.5);
+		
+		var vectorX = deltaY / edgeLength; // 垂直向量坐标
+		var vectorY = - deltaX / edgeLength; // 垂直向量坐标
+
+		for(var index in slArray){
+			var startN = slArray[index].from == nodeId1 ? res.start : res.end;
+			var endN = slArray[index].to == nodeId2 ? res.end : res.start;
+			var spanDistance = 0;
+			if(isUneven){
+				spanDistance = (middleEdgeIndex - index) * gap;
+			} else {
+				spanDistance = (middleEdgeIndex - index) * gap - offset;
+			}
+			slArray[index].fromX = spanDistance * vectorX  + startN[0];
+			slArray[index].fromY = spanDistance * vectorY  + startN[1];
+			slArray[index].toX = spanDistance * vectorX + endN[0];
+			slArray[index].toY = spanDistance * vectorY + endN[1];
+			slArray[index].isMultiEdge = true;
+		}
+
+		// 重新计算 lr 布局
+		var M = this.getMValue(startNode,endNode,'lr',scale);
+		var lrRes = this.calcPolyPoints(startNode, endNode,'lr',M,scale);	
+		
+		middleEdgeIndex = Math.floor(lrArray.length / 2);
+		isUneven = (lrArray.length % 2) !== 0;
+		offset = isUneven ? 0 : (gap * 0.5);
+
+		vectorX = deltaX > 0 ? 1 : -1;
+		vectorY = 0;
+
+		for(var index in lrArray){
+			var startN = lrArray[index].from == nodeId1 ? lrRes.start : lrRes.end;
+			var endN = lrArray[index].to == nodeId2 ? lrRes.end : lrRes.start;
+			var spanDistance = 0;
+			if(isUneven){
+				spanDistance = (middleEdgeIndex - index) * gap;
+			} else {
+				spanDistance = (middleEdgeIndex - index) * gap - offset;
+			}
+			lrArray[index].fromX = startN[0];
+			lrArray[index].fromY = startN[1];
+			lrArray[index].toX = endN[0];
+			lrArray[index].toY = endN[1];
+			var m1 = [spanDistance * vectorX + lrRes.m1[0], lrRes.m1[1]];
+			var m2 = [spanDistance * vectorX + lrRes.m2[0], lrRes.m2[1]];
+			lrArray[index].m1 = lrArray[index].from == nodeId1 ? m1 : m2;
+			lrArray[index].m2 = lrArray[index].from == nodeId1 ? m2 : m1;
+			lrArray[index].isMultiEdge = true;
+		}
+
+
+		// 重新计算 tb 布局
+		var M = this.getMValue(startNode,endNode,'tb',scale);
+		var tbRes = this.calcPolyPoints(startNode, endNode,'tb',M,scale);	
+		
+		middleEdgeIndex = Math.floor(tbArray.length / 2);
+		isUneven = (tbArray.length % 2) !== 0;
+		offset = isUneven ? 0 : (gap * 0.5);
+
+		vectorY = deltaY > 0 ? 1 : -1;
+		vectorX = 0;
+
+		for(var index in tbArray){
+			var startN = tbArray[index].from == nodeId1 ? tbRes.start : tbRes.end;
+			var endN = tbArray[index].to == nodeId2 ? tbRes.end : tbRes.start;
+			var spanDistance = 0;
+			if(isUneven){
+				spanDistance = (middleEdgeIndex - index) * gap;
+			} else {
+				spanDistance = (middleEdgeIndex - index) * gap - offset;
+			}
+			tbArray[index].fromX = startN[0];
+			tbArray[index].fromY = startN[1];
+			tbArray[index].toX = endN[0];
+			tbArray[index].toY = endN[1];
+			var m1 = [tbRes.m1[0], spanDistance * vectorY + tbRes.m1[1]];
+			var m2 = [tbRes.m2[0], spanDistance * vectorY + tbRes.m2[1]];
+			tbArray[index].m1 = tbArray[index].from == nodeId1 ? m1 : m2;
+			tbArray[index].m2 = tbArray[index].from == nodeId1 ? m2 : m1;
+			tbArray[index].isMultiEdge = true;
+		}
+
+
+		// resetLines
+		for(var index in multiEdges){
+			this.resetMultiLineById(multiEdges[index].id);
+		}
+
+
+	},
+	resetMultiLineById:function(i) {
+		if(this.$lineDom[i]) {
+			this.$draw.removeChild(this.$lineDom[i]);
+		}
+		var res = null;
+		if(this.$lineData[i].isMultiEdge) {
+			res = this.calcMultiEdgePos(this.$lineData[i], this.$scale);
+		} else {
+			if(this.$lineData[i].type&&this.$lineData[i].type!="sl")
+				res=GooFlow.prototype.calcPolyPoints(n1,n2,this.$lineData[i].type,this.$lineData[i].M, this.$scale);
+			else
+				res=GooFlow.prototype.calcStartEnd(n1,n2, this.$scale);
+		}
+		if(!res)	return;
+
+		if(this.$lineData[i].type=="sl"){
+			this.$lineDom[i]=GooFlow.prototype.drawLine(i,res.start,res.end,this.$lineData[i].marked,this.$lineData[i].dash, this.$scale);
+		}
+		else{
+		  this.$lineDom[i]=GooFlow.prototype.drawPoly(i,res.start,res.m1,res.m2,res.end,this.$lineData[i].marked,this.$lineData[i].dash, this.$scale);
+		}
+		this.$draw.appendChild(this.$lineDom[i]);
+		if(GooFlow.prototype.useSVG==""){
+		  this.$lineDom[i].childNodes[1].innerHTML=this.$lineData[i].name;
+		  if(this.$lineData[i].type!="sl"){
+			  var Min=(res.start[0]>res.end[0]? res.end[0]:res.start[0]);
+			  if(Min>res.m2[0])	Min=res.m2[0];
+			  if(Min>res.m1[0])	Min=res.m1[0];
+			  this.$lineDom[i].childNodes[1].style.left = (res.m2[0]+res.m1[0])/2-Min-this.$lineDom[i].childNodes[1].offsetWidth/2+4;
+			  Min=(res.start[1]>res.end[1]? res.end[1]:res.start[1]);
+			  if(Min>res.m2[1])	Min=res.m2[1];
+			  if(Min>res.m1[1])	Min=res.m1[1];
+			  this.$lineDom[i].childNodes[1].style.top = (res.m2[1]+res.m1[1])/2-Min-this.$lineDom[i].childNodes[1].offsetHeight/2-4;
+		  }else
+			  this.$lineDom[i].childNodes[1].style.left=
+			  ((res.end[0]-res.start[0])*(res.end[0]>res.start[0]? 1:-1)-this.$lineDom[i].childNodes[1].offsetWidth)/2+4;
+		}
+		else	this.$lineDom[i].childNodes[2].textContent=this.$lineData[i].name;
+	},
 	//重构所有连向某个结点的线的显示，传参结构为$nodeData数组的一个单元结构
 	resetLines:function(id,node){
+		var multiEdge = [];
 		for(var i in this.$lineData){
-		  var other=null;//获取结束/开始结点的数据
+
+			var currEdge = this.$lineData[i];
+			if(currEdge.isMultiEdge) {
+				if(currEdge.from == id || currEdge.to == id){
+					var hashIndex = currEdge.from + currEdge.to;
+					var hashIndex2 = currEdge.to + currEdge.from;
+					if(multiEdge[hashIndex2]) {
+						multiEdge[hashIndex2].push(currEdge);
+					} else if(multiEdge[hashIndex]) {
+						multiEdge[hashIndex].push(currEdge);
+					} else {
+						multiEdge[hashIndex] = [];
+						multiEdge[hashIndex].push(currEdge);
+					}
+				}
+				continue;
+			}
+
+			var other=null;//获取结束/开始结点的数据
+
+
 		  var res;
 		  if(this.$lineData[i].from==id){//找结束点
 			other=this.$nodeData[this.$lineData[i].to]||null;
@@ -1930,6 +2163,13 @@ GooFlow.prototype={
 		  }
 		  else	this.$lineDom[i].childNodes[2].textContent=this.$lineData[i].name;
 		}
+
+		for(var hashIndex in multiEdge){
+			var currMultiEdges = multiEdge[hashIndex];
+			if(currMultiEdges.length>1){
+				this.reLayoutMultiEdges(currMultiEdges[0].from, currMultiEdges[0].to, currMultiEdges);
+			}
+		}
 	},
 	//重新设置连线的样式 newType= "sl":直线, "lr":中段可左右移动型折线, "tb":中段可上下移动型折线
 	setLineType:function(id,newType,M){
@@ -1939,9 +2179,21 @@ GooFlow.prototype={
 			var paras=[id,this.$lineData[id].type,this.$lineData[id].M];
 			this.pushOper("setLineType",paras);
 		}
+
 		var from=this.$lineData[id].from;
 		var to=this.$lineData[id].to;
 		this.$lineData[id].type=newType;
+
+		// 如果是 多个平行线
+		if(this.$lineData[id].isMultiEdge) {
+			var multiEdges = this.getMultiEdgesById(id);
+			if(multiEdges.length >= 2) {
+				// 重新布局 多个线段
+				this.reLayoutMultiEdges(this.$lineData[id].from,this.$lineData[id].to,multiEdges);
+			}
+			return;
+		}
+
 		var res;
 		//如果是变成折线
 		if(newType!="sl"){

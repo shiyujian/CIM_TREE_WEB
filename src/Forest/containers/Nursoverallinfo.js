@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Select} from 'antd';
 import * as actions from '../store';
 import {PkCodeTree} from '../components';
-import {PROJECT_UNITS,FORESTTYPE} from '_platform/api';
+import {PROJECT_UNITS} from '_platform/api';
 import {NursOverallTable} from '../components/Nursoverallinfo';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
@@ -41,22 +41,7 @@ export default class Nursoverallinfo extends Component {
             options: [],
         }
     }
-    getbigTypeName(type){
-        switch(type){
-            case '1':
-                return '常绿乔木'
-            case '2':
-                return '落叶乔木'
-            case '3':
-                return '亚乔木'
-            case '4':
-                return '灌木'
-            case '5':
-                return '草本'
-            default :
-            return ''
-        }
-    }
+
     componentDidMount() {
         const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList,getForestTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
         this.biaoduan = [];
