@@ -50,7 +50,8 @@ export default class PerSearch extends Component {
             },
             code,
             roleSearch = false,
-            task
+            task,
+            visible
         } = this.props
         if(task != prevProps.task ){
             console.log('componentDidUpdatetask',task)
@@ -61,6 +62,12 @@ export default class PerSearch extends Component {
             console.log('componentDidUpdatecode',code)
             console.log('prevPropscode',code)
             this.query()
+        }
+        if(visible != prevProps.visible){
+            console.log('visiblevisiblevisiblevisiblevisiblevisible')
+            this.setState({
+                text:''
+            })
         }
     }
 

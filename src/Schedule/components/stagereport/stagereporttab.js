@@ -20,11 +20,7 @@ class Stagereporttab extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			daydata:[
-				{
-					unit:'1111'
-				}
-			],
+			daydata:[],
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			visible: false,
@@ -248,7 +244,9 @@ class Stagereporttab extends Component {
 			<div>
 				{
                     this.state.dayvisible &&
-                    <DayModal {...this.state.TotleModaldata}
+					<DayModal 
+						{...this.props}
+						{...this.state.TotleModaldata}
                         oncancel={this.totleCancle.bind(this)}
                         onok={this.totleOk.bind(this)}
                     />
@@ -270,7 +268,7 @@ class Stagereporttab extends Component {
 					maskClosable={false}
 					onCancel={this.closeModal.bind(this)}
 					onOk={this.sendWork.bind(this)}
-					key={this.state.key}
+					// key={this.state.key}
 				>
 					<div>
 						<Form>
@@ -280,7 +278,7 @@ class Stagereporttab extends Component {
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='标段'>
 											{
-													getFieldDecorator('section', {
+													getFieldDecorator('Ssection', {
 														rules: [
 															{ required: true, message: '请选择标段' }
 														]
@@ -294,7 +292,7 @@ class Stagereporttab extends Component {
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='编号'>
 												{
-													getFieldDecorator('numbercode', {
+													getFieldDecorator('Snumbercode', {
 														rules: [
 															{ required: true, message: '请输入编号' }
 														]
@@ -308,7 +306,7 @@ class Stagereporttab extends Component {
 										<Col span={12}>
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
-                                                    getFieldDecorator('stagedocument', {
+                                                    getFieldDecorator('Sstagedocument', {
 														initialValue: `每日实际进度`,
                                                         rules: [
                                                             { required: true, message: '请选择文档类型' }
@@ -321,7 +319,7 @@ class Stagereporttab extends Component {
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='日期'>
 												{
-													getFieldDecorator('timedate', {
+													getFieldDecorator('Stimedate', {
 														rules: [
 															{ required: true, message: '请输入日期' }
 														]
@@ -335,7 +333,7 @@ class Stagereporttab extends Component {
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='监理单位'>
                                                 {
-                                                    getFieldDecorator('superunit', {
+                                                    getFieldDecorator('Ssuperunit', {
                                                         rules: [
                                                             { required: true, message: '请选择审核人员' }
                                                         ]
@@ -358,13 +356,16 @@ class Stagereporttab extends Component {
 										<Col span={8} offset={4}>
 											<FormItem {...FormItemLayout} label='审核人'>
 												{
-													getFieldDecorator('dataReview', {
+													getFieldDecorator('SdataReview', {
 														rules: [
 															{ required: true, message: '请选择审核人员' }
 														]
 													})
 														(
-														<PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.每日进度填报流程}/>
+														<PerSearch selectMember={this.selectMember.bind(this)} 
+														code={WORKFLOW_CODE.每日进度填报流程}
+														visible={this.state.visible}
+														/>
 														)
 												}
 											</FormItem>
@@ -408,8 +409,8 @@ class Stagereporttab extends Component {
         }
 
         setFieldsValue({
-            dataReview: this.member,
-            superunit:this.member.org
+            SdataReview: this.member,
+            Ssuperunit:this.member.org
         });
 	}
 	
@@ -467,16 +468,16 @@ class Stagereporttab extends Component {
                     "id": parseInt(user.id)
 				};
 
-				let sectionName = me.getSectionName(values.section)
+				let sectionName = me.getSectionName(values.Ssection)
 				let subject = [{
-					"section": JSON.stringify(values.section),
+					"section": JSON.stringify(values.Ssection),
 					"projectName":JSON.stringify(projectName),
 					"sectionName":JSON.stringify(sectionName),
-					"superunit": JSON.stringify(values.superunit),
-					"dataReview": JSON.stringify(values.dataReview),
-					"numbercode": JSON.stringify(values.numbercode),
-					"timedate": JSON.stringify(moment(values.timedate._d).format('YYYY-MM-DD')),
-					"stagedocument": JSON.stringify(values.stagedocument),
+					"superunit": JSON.stringify(values.Ssuperunit),
+					"dataReview": JSON.stringify(values.SdataReview),
+					"numbercode": JSON.stringify(values.Snumbercode),
+					"timedate": JSON.stringify(moment(values.Stimedate._d).format('YYYY-MM-DD')),
+					"stagedocument": JSON.stringify(values.Sstagedocument),
 					"postData": JSON.stringify(postData),
                     "treedataSource":JSON.stringify(treedataSource),
                 }];
@@ -673,11 +674,11 @@ class Stagereporttab extends Component {
 			key:Math.random()
 		})
 		this.props.form.setFieldsValue({
-			superunit: undefined,
-			section: undefined,
-			dataReview: undefined,
-			numbercode: undefined,
-			timedate: undefined
+			Ssuperunit: undefined,
+			Ssection: undefined,
+			SdataReview: undefined,
+			Snumbercode: undefined,
+			Stimedate: undefined
 		})
 	}
 	// 关闭弹框

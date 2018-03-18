@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-16 22:19:42
+ * @Last Modified time: 2018-03-18 22:12:20
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -256,7 +256,8 @@ class All extends Component {
             <div>
                 {
                     this.state.totlevisible &&
-                    <TotleModal {...this.props}
+                    <TotleModal
+                        {...this.props}
                         {...this.state.TotleModaldata}
                         oncancel={this.totleCancle.bind(this)}
                         onok={this.totleOk.bind(this)}
@@ -279,7 +280,7 @@ class All extends Component {
                     maskClosable={false}
                     onCancel={this.closeModal.bind(this)}
                     onOk={this.sendWork.bind(this)}
-                    key={this.state.key}
+                    // key={this.state.key}
                 >
                     <div>
                         <Form>
@@ -289,7 +290,7 @@ class All extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='标段'>
                                                 {
-                                                    getFieldDecorator('section', {
+                                                    getFieldDecorator('Tsection', {
                                                         rules: [
                                                             { required: true, message: '请选择标段' }
                                                         ]
@@ -303,7 +304,7 @@ class All extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
-                                                    getFieldDecorator('numbercode', {
+                                                    getFieldDecorator('Tnumbercode', {
                                                         rules: [
                                                             { required: true, message: '请输入编号' }
                                                         ]
@@ -317,7 +318,7 @@ class All extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
-                                                    getFieldDecorator('totledocument', {
+                                                    getFieldDecorator('Ttotledocument', {
                                                         initialValue: `总计划进度`,
                                                         rules: [
                                                             { required: true, message: '请选择文档类型' }
@@ -330,7 +331,7 @@ class All extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
-                                                    getFieldDecorator('superunit', {
+                                                    getFieldDecorator('Tsuperunit', {
                                                         rules: [
                                                             { required: true, message: '请选择审核人员' }
                                                         ]
@@ -369,13 +370,15 @@ class All extends Component {
                                         <Col span={8} offset={4}>
                                             <FormItem {...FormItemLayout} label='审核人'>
                                                 {
-                                                    getFieldDecorator('dataReview', {
+                                                    getFieldDecorator('TdataReview', {
                                                         rules: [
                                                             { required: true, message: '请选择审核人员' }
                                                         ]
                                                     })
                                                         (
-                                                        <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.总进度计划报批流程}/>
+                                                        <PerSearch selectMember={this.selectMember.bind(this)} 
+                                                         code={WORKFLOW_CODE.总进度计划报批流程} 
+                                                         visible={this.state.visible}/>
                                                         )
                                                 }
                                             </FormItem>
@@ -554,16 +557,16 @@ class All extends Component {
                     "id": parseInt(user.id)
                 };
                 
-                let sectionName = me.getSectionName(values.section)
+                let sectionName = me.getSectionName(values.Tsection)
                 let subject = [{
-                    "section": JSON.stringify(values.section),
+                    "section": JSON.stringify(values.Tsection),
                     "sectionName":JSON.stringify(sectionName),
                     "projectName":JSON.stringify(projectName),
-					"superunit": JSON.stringify(values.superunit),
-					"dataReview": JSON.stringify(values.dataReview),
-					"numbercode": JSON.stringify(values.numbercode),
+					"superunit": JSON.stringify(values.Tsuperunit),
+					"dataReview": JSON.stringify(values.TdataReview),
+					"numbercode": JSON.stringify(values.Tnumbercode),
 					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
-					"totledocument": JSON.stringify(values.totledocument),
+					"totledocument": JSON.stringify(values.Ttotledocument),
 					"postData": JSON.stringify(postData),
                     "TreatmentData": JSON.stringify(TreatmentData),
                     
@@ -680,10 +683,10 @@ class All extends Component {
             key:Math.random()
         })
         this.props.form.setFieldsValue({
-            superunit: undefined,
-            section: undefined,
-            dataReview: undefined,
-            numbercode: undefined
+            Tsuperunit: undefined,
+            Tsection: undefined,
+            TdataReview: undefined,
+            Tnumbercode: undefined
         })
 
     }
@@ -795,8 +798,8 @@ class All extends Component {
         }
 
         setFieldsValue({
-            dataReview: this.member,
-            superunit: this.member.org
+            TdataReview: this.member,
+            Tsuperunit: this.member.org
         });
     }
 
