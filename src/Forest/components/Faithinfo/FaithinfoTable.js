@@ -134,7 +134,7 @@ export default class FaithinfoTable extends Component {
 							</Button>
 						</Col>
 						<Col span={2} push={18} className='mrg10'>
-							<Button type='primary' onClick={this.exportexcel.bind(this)}>
+							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
 								导出
 							</Button>
 						</Col>
@@ -153,6 +153,7 @@ export default class FaithinfoTable extends Component {
 						 locale={{emptyText:'当天无信息'}}
 						 dataSource={details}
 						 pagination={this.state.pagination}
+						 onChange={this.handleTableChange.bind(this)}
 						/>
 					</Row>
 				</div>

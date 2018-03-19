@@ -474,7 +474,7 @@ class Modals extends Component {
 							</FormItem>
 						</Col>
 						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="消息来源">
+							<FormItem {...formItemLayout} label="新闻来源">
 								{getFieldDecorator('source', {
 									rules: [
 										{

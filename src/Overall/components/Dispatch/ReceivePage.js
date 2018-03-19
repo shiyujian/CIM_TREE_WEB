@@ -172,7 +172,7 @@ class ReceivePage extends Component {
 											rules: [{ required: false, message: '请输入文件标题' }],
 											initialValue: ''
 										})(<Select style={{ width: '100%' }}>
-											<Option value="申请">申请</Option>
+											<Option value="申请">删除申请</Option>
 											<Option value="工作联系单">工作联系单</Option>
 											<Option value="监理通知">监理通知</Option>
 										</Select>)}
@@ -370,9 +370,9 @@ class ReceivePage extends Component {
 						<a onClick={this._viewClick.bind(this, record._id)}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this._sentDoc.bind(this)}>回文</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp;
+						{/*&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this._download.bind(this)}>下载</a>
-						{/* <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
+						 <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
 							cancelText="取消">
 							<a >删除</a>
 						</Popconfirm> */}
