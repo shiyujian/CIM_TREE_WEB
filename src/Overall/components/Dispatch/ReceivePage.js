@@ -370,9 +370,9 @@ class ReceivePage extends Component {
 						<a onClick={this._viewClick.bind(this, record._id)}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this._sentDoc.bind(this)}>回文</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp;
+						{/*&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this._download.bind(this)}>下载</a>
-						{/* <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
+						 <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
 							cancelText="取消">
 							<a >删除</a>
 						</Popconfirm> */}

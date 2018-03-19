@@ -102,7 +102,7 @@ export default class CarPackageTable extends Component {
 			dataIndex: 'LicensePlate',
 		},{
 			title:"苗木类型",
-            dataIndex: 'isShrub',
+            dataIndex: 'IsShrub',
             render:(text,record) => {
                 if(text === 0){
                     return <p>乔灌</p>

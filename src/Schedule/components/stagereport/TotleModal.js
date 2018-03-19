@@ -2,7 +2,7 @@ import React, { Component, Children } from 'react';
 import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification, } from 'antd';
 const FormItem = Form.Item;
 import { STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
-class TotleModal extends Component {
+export default class TotleModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -48,12 +48,12 @@ class TotleModal extends Component {
                                 <Col span={24}>
                                     <Row>
                                         <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='单位工程'>
+                                            <FormItem {...FormItemLayout} label='标段'>
                                                 {
-                                                    getFieldDecorator('totleunit', {
-                                                        initialValue: `${this.props.unit || '暂无单位工程'}`,
+                                                    getFieldDecorator('totlesection', {
+                                                        initialValue: `${this.props.sectionName || '暂无标段'}`,
                                                         rules: [
-                                                            { required: false, message: '请选择单位工程' }
+                                                            { required: false, message: '请选择标段' }
                                                         ]
                                                     })
                                                         (<Input readOnly />)
@@ -167,5 +167,5 @@ class TotleModal extends Component {
 }
 
 
-export default Form.create()(TotleModal)
+// export default Form.create()(TotleModal)
 

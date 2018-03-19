@@ -250,6 +250,7 @@ class Plan extends Component {
 				{
 					this.state.dayvisible &&
 					<DayPlanModal 
+						{...this.props}
 						{...this.state.TotleModaldata}
 						oncancel={this.totleCancle.bind(this)}
 						onok={this.totleOk.bind(this)}
@@ -272,7 +273,7 @@ class Plan extends Component {
 					maskClosable={false}
 					onCancel={this.closeModal.bind(this)}
 					onOk={this.sendWork.bind(this)}
-					key={this.state.key}
+					// key={this.state.key}
 				>
 					<div>
 						<Form>
@@ -282,7 +283,7 @@ class Plan extends Component {
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='标段'>
 												{
-													getFieldDecorator('section', {
+													getFieldDecorator('Psection', {
 														rules: [
 															{ required: true, message: '请选择标段' }
 														]
@@ -296,7 +297,7 @@ class Plan extends Component {
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='编号'>
 												{
-													getFieldDecorator('numbercode', {
+													getFieldDecorator('Pnumbercode', {
 														rules: [
 															{ required: true, message: '请输入编号' }
 														]
@@ -310,7 +311,7 @@ class Plan extends Component {
 										<Col span={12}>
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
-                                                    getFieldDecorator('daydocument', {
+                                                    getFieldDecorator('Pdaydocument', {
 														initialValue: `每日计划进度`,
                                                         rules: [
                                                             { required: true, message: '请选择文档类型' }
@@ -323,7 +324,7 @@ class Plan extends Component {
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='日期'>
 												{
-													getFieldDecorator('timedate', {
+													getFieldDecorator('Ptimedate', {
 														rules: [
 															{ required: true, message: '请输入日期' }
 														]
@@ -337,7 +338,7 @@ class Plan extends Component {
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='监理单位'>
                                                 {
-                                                    getFieldDecorator('superunit', {
+                                                    getFieldDecorator('Psuperunit', {
                                                         rules: [
                                                             { required: true, message: '请选择审核人员' }
                                                         ]
@@ -360,13 +361,16 @@ class Plan extends Component {
 										<Col span={8} offset={4}>
 											<FormItem {...FormItemLayout} label='审核人'>
 												{
-													getFieldDecorator('dataReview', {
+													getFieldDecorator('PdataReview', {
 														rules: [
 															{ required: true, message: '请选择审核人员' }
 														]
 													})
 														(
-														<PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.每日进度计划填报流程}/>
+														<PerSearch selectMember={this.selectMember.bind(this)} 
+														code={WORKFLOW_CODE.每日进度计划填报流程}
+														visible={this.state.visible}
+														/>
 														)
 												}
 											</FormItem>
@@ -409,8 +413,8 @@ class Plan extends Component {
 		}
 
 		setFieldsValue({
-			dataReview: this.member,
-			superunit: this.member.org,
+			PdataReview: this.member,
+			Psuperunit: this.member.org,
 		});
 	}
 
@@ -469,16 +473,16 @@ class Plan extends Component {
 					"id": parseInt(user.id)
 				};
 
-				let sectionName = me.getSectionName(values.section)
+				let sectionName = me.getSectionName(values.Psection)
 				let subject = [{
-					"section": JSON.stringify(values.section),
+					"section": JSON.stringify(values.Psection),
 					"projectName":JSON.stringify(projectName),
 					"sectionName":JSON.stringify(sectionName),
-					"superunit": JSON.stringify(values.superunit),
-					"dataReview": JSON.stringify(values.dataReview),
-					"numbercode": JSON.stringify(values.numbercode),
-					"timedate": JSON.stringify(moment(values.timedate._d).format('YYYY-MM-DD')),
-					"daydocument": JSON.stringify(values.daydocument),
+					"superunit": JSON.stringify(values.Psuperunit),
+					"dataReview": JSON.stringify(values.PdataReview),
+					"numbercode": JSON.stringify(values.Pnumbercode),
+					"timedate": JSON.stringify(moment(values.Ptimedate._d).format('YYYY-MM-DD')),
+					"daydocument": JSON.stringify(values.Pdaydocument),
 					"postData": JSON.stringify(postData),
 					"treedataSource": JSON.stringify(treedataSource),
 				}];
@@ -676,11 +680,11 @@ class Plan extends Component {
 			key:Math.random()
 		})
 		this.props.form.setFieldsValue({
-			superunit: undefined,
-			section: undefined,
-			dataReview: undefined,
-			numbercode: undefined,
-			timedate: undefined
+			Psuperunit: undefined,
+			Psection: undefined,
+			PdataReview: undefined,
+			Pnumbercode: undefined,
+			Ptimedate: undefined
 		})
 
 	}

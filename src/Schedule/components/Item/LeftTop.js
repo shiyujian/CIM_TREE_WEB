@@ -95,9 +95,13 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         }catch(e){
             console.log(e)
         }
-        if(stime != prevState.stime || etime != prevState.etime || project != prevState.project || treetypeAll != prevState.treetypeAll){
+        if(stime != prevState.stime || etime != prevState.etime){
             this.getdata()
         }
+        if(project != prevState.project || treetypeAll != prevState.treetypeAll){
+            this.filterProjectData()
+        }
+        
     }
     
     render() { //todo 累计完成工程量
@@ -169,9 +173,9 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             leftkeycode
         }=this.props
         let patams = {
-            etime:etime,
-            stime:stime,
-            project:project
+            // etime:etime,
+            // stime:stime,
+            // project:project
         }
         console.log('LeftTopaaaaa',patams)
         const {actions: {progressdata,progressalldata}} = this.props;
@@ -181,199 +185,213 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         let legend = ['总数']
         let total = [];
         let datas = [];
-        progressalldata({},patams).then(rst=>{
+        progressdata({},patams).then(rst=>{
             console.log('LeftTop',rst);
-            if(rst && rst.content){
-
-                let content = rst.content.filter((item)=> item.ProgressType && item.ProgressType==='日实际')
-                //将获取的数据按照 ProgressTime 时间排序
+            if(rst && rst instanceof Array){
+                let content = []
+                rst.map((item)=>{
+                    if(item.ProgressType && item.ProgressType==='日实际'){
+                        content.push(item)
+                    }
+                })
+                // let content = rst.filter((item)=> item.ProgressType && item.ProgressType==='日实际')
+                //将获取的数据按照 CreateTime 时间排序
                 content.sort(function(a, b) {
-                    if (a.ProgressTime < b.ProgressTime ) {
+                    if (a.CreateTime < b.CreateTime ) {
                         return -1;
-                    } else if (a.ProgressTime > b.ProgressTime ) {
+                    } else if (a.CreateTime > b.CreateTime ) {
                         return 1;
                     } else {
                         return 0;
                     }
                 });
                 console.log('LeftTopcontent',content)
-                //将 ProgressTime 单独列为一个数组
+                //将 CreateTime 单独列为一个数组
                 for(let i=0;i<content.length;i++){
-                    let a = moment(content[i].ProgressTime).format('YYYY/MM/DD')
+                    let a = moment(content[i].CreateTime).format('YYYY/MM/DD')
                     time.push(a)
                 }
                 //时间数组去重
                 times = [...new Set(time)]
                 console.log('LeftToptimes',times)
 
-                if(content && content instanceof Array){
-                    PROJECT_UNITS.map((project)=>{
-                        //获取正确的项目    
-                        if(leftkeycode.indexOf(project.code)>-1){
-                            //获取项目下的标段
-                            let sections = project.units
-                            //将各个标段的数据设置为0
-                            sections.map((section,index)=>{
-                                //定义一个二维数组，分为多个标段
-                                gpshtnum[index] = new Array()
-                                datas[index] = new Array()
-                                legend.push(section.value)
-                            })
-        
-                            content.map(item=>{
-                                if(item && item.UnitProject){
-                                    sections.map((section,index)=>{
-                                        if(item.UnitProject === section.value){
-                                            gpshtnum[index].push(item)
-                                        }
-                                    })
-                                }
-                            })
-                        }
-                    })
-                }
-
-                console.log('LeftTopgpshtnum',gpshtnum)
-
-                times.map((time,index)=>{
-                    datas.map((sectionData)=>{
-                        sectionData[index] = 0
-                    })
-                    console.log('sectionData',datas)
-                    gpshtnum.map((data,i)=>{
-                        data.map((arr,a)=>{
-                            if(moment(arr.ProgressTime).format('YYYY/MM/DD') === time){
-                                let Items = arr.Items
-                                Items.map((item,x)=>{
-                                    //默认的种类
-                                    if(x<6){
-                                        if(item.Project === project){
-                                            datas[a][index] = datas[a][index]+item.Num+0
-                                        }else{
-                                            datas[a][index] = datas[a][index]+0
-                                        }
-                                    }else{//添加的数目种类
-                                        let treetype = ''
-                                        treetypeAll.map((tree)=>{
-                                            if(tree.TreeTypeName === rst.name){
-                                                //获取树种cdoe的首个数字，找到对应的类型
-                                                let code = tree.TreeTypeNo.substr(0, 1)
-                                                console.log('code',code)
-                                                TREETYPENO.map((forest)=>{
-                                                    if(forest.id === code){
-                                                        treetype = forest.name
-                                                    }
-                                                })
-                                            }
-                                        })
-                                        console.log('LeftToptreetype',treetype)
-
-                                        if(treetype === project){
-                                            datas[a][index] = datas[a][index]+item.Num+0
-                                        }else{
-                                            datas[a][index] = datas[a][index]+0
-                                        }
+                
+                PROJECT_UNITS.map((project)=>{
+                    //获取正确的项目    
+                    if(leftkeycode.indexOf(project.code)>-1){
+                        //获取项目下的标段
+                        let sections = project.units
+                        //将各个标段的数据设置为0
+                        sections.map((section,index)=>{
+                            //定义一个二维数组，分为多个标段
+                            gpshtnum[index] = new Array()
+                            datas[index] = new Array()
+                            legend.push(section.value)
+                        })
+    
+                        content.map(item=>{
+                            if(item && item.WPNo){
+                                sections.map((section,index)=>{
+                                    //找到对应的标段，然后对标段的数组进行push
+                                    if(item.WPNo === section.code){
+                                        gpshtnum[index].push(item)
                                     }
                                 })
                             }
                         })
-                    })
+                    }
                 })
-                
-                for(let i=0;i<times.length;i++){
-                    total[i] = 0
-                    datas.map((sectionData)=>{
-                        total[i] = total[i] + sectionData[i]
-                    })
-                }
-     
-                console.log('LeftToptotal',total)
-                console.log('LeftTopdatas',datas)
+                console.log('LeftTopgpshtnum',gpshtnum)
+                this.setState({
+                    gpshtnum,
+                    times,
+                    datas,
+                    legend
+                },()=>{
+                    this.filterProjectData()
+                })
             }
-            //当查不出数据时，使横坐标不为空
-            let a = moment().subtract(2, 'days').format('YYYY/MM/DD');
-            let b = moment().subtract(1, 'days').format('YYYY/MM/DD');
-            let c = moment().format('YYYY/MM/DD');
-            let d = moment().add(1, 'days').format('YYYY/MM/DD');
-            let e = moment().add(2, 'days').format('YYYY/MM/DD');
-            let dates = [];
-            dates.push(a)
-            dates.push(b)
-            dates.push(c)
-            dates.push(d)
-            dates.push(e)
-            console.log('LeftTopdates',dates)
+            
+        }) 
+    }
 
+    filterProjectData(){
+        const{
+            times,
+            gpshtnum,
+            datas,
+            project,
+            treetypeAll,
+            legend
+        }=this.state
 
-            let myChart = echarts.init(document.getElementById('lefttop'));
-            let series = [
-                {
-                    name:'总数',
-                    type:'bar',
-                    data:total,
-                    barWidth:'25%',
-                    itemStyle:{
-                        normal:{
-                            color:'#02e5cd',
-                            barBorderRadius:[50,50,50,50]
+        times.map((time,index)=>{
+            datas.map((sectionData)=>{
+                sectionData[index] = 0
+            })
+            console.log('sectionData',datas)
+            gpshtnum.map((filterData,i)=>{
+                filterData.map((arr,a)=>{
+                    if(moment(arr.CreateTime).format('YYYY/MM/DD') === time){
+                        if(arr.Project === project){
+                            datas[i][index] = datas[i][index]+arr.Num+0
+                        }else{
+                            //获取树种的name
+                            let treetype = ''
+                            treetypeAll.map((tree)=>{
+                                if(tree.TreeTypeName === arr.Project){
+                                    //获取树种cdoe的首个数字，找到对应的类型
+                                    let code = tree.TreeTypeNo.substr(0, 1)
+                                    console.log('code',code)
+                                    TREETYPENO.map((forest)=>{
+                                        if(forest.id === code){
+                                            treetype = forest.name
+                                        }
+                                    })
+                                }
+                            })
+                            if(treetype === project){
+                                datas[i][index] = datas[i][index]+arr.Num+0
+                            }
+
                         }
                     }
-                }
-            ]
-            datas.map((sectionData,index)=>{
-                series.push(
-                    {
-                        name:legend[index+1],
-                        type:'line',
-                        data:sectionData,
-                        itemStyle:{
-                            normal:{
-                                color:ECHARTSCOLOR[index]
-                            }
-                        }
-                    },
-                )
+                })
             })
-            let optionLine = {
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'cross',
-                            crossStyle: {
-                                color: '#999'
-                            }
-                        }
-                    },
-                    legend: {
-                        data:legend,
-                        left:'right'
-                        
-                    },
-                    xAxis: [
-                        {
-                            type: 'category',
-                            data: times.length>0?times:dates,
-                            axisPointer: {
-                                type: 'shadow'
-                            }
-                        }
-                    ],
-                    yAxis: [
-                        {
-                            type: 'value',
-                            name: '长度（m）',
-                            axisLabel: {
-                                formatter: '{value} '
-                            }
-                        },
-                    
-                    ],
-                    series: series
-                };
-                myChart.setOption(optionLine);
+        })
+        let total = []
+
+        for(let i=0;i<times.length;i++){
+            total[i] = 0
+            datas.map((sectionData)=>{
+                total[i] = total[i] + sectionData[i]
+            })
+        }
+
+        console.log('LeftToptotal',total)
+        console.log('LeftTopdatas',datas)
+
+        //当查不出数据时，使横坐标不为空
+        let a = moment().subtract(2, 'days').format('YYYY/MM/DD');
+        let b = moment().subtract(1, 'days').format('YYYY/MM/DD');
+        let c = moment().format('YYYY/MM/DD');
+        let d = moment().add(1, 'days').format('YYYY/MM/DD');
+        let e = moment().add(2, 'days').format('YYYY/MM/DD');
+        let dates = [];
+        dates.push(a)
+        dates.push(b)
+        dates.push(c)
+        dates.push(d)
+        dates.push(e)
+        console.log('LeftTopdates',dates)
+
+
+        let myChart = echarts.init(document.getElementById('lefttop'));
+        let series = [
+            {
+                name:'总数',
+                type:'bar',
+                data:total,
+                barWidth:'25%',
+                itemStyle:{
+                    normal:{
+                        color:'#02e5cd',
+                        barBorderRadius:[50,50,50,50]
+                    }
+                }
             }
-        )
+        ]
+        datas.map((sectionData,index)=>{
+            series.push(
+                {
+                    name:legend[index+1],
+                    type:'line',
+                    data:sectionData,
+                    itemStyle:{
+                        normal:{
+                            color:ECHARTSCOLOR[index]
+                        }
+                    }
+                },
+            )
+        })
+        let optionLine = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            legend: {
+                data:legend,
+                left:'right'
+                
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: times.length>0?times:dates,
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '长度（m）',
+                    axisLabel: {
+                        formatter: '{value} '
+                    }
+                },
             
-            
+            ],
+            series: series
+        };
+        myChart.setOption(optionLine);
+
     }
 }
