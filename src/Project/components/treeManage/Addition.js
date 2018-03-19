@@ -110,21 +110,6 @@ class Addition extends Component {
 													/>
 												)
 											}
-                                        
-                                        </FormItem>
-									</Col>
-									<Col span={24}>
-										<FormItem   {...Addition.layout} label="多余的:">
-											{
-												getFieldDecorator('STreePlace', {
-													rules: [
-														{ required: true, message: '请输入多余的' }
-													]
-												})
-												(
-													<Input placeholder='请输入多余的'/>
-												)
-											}
                                         </FormItem>
 									</Col>
 								</Row>
