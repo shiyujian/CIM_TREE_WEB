@@ -63,7 +63,7 @@ export default class LocmeasureTable extends Component {
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 				>
-					<img style={{width:"490px",height:"300px"}} src={this.state.src} alt="图片"/>
+					<img style={{width:"490px"}} src={this.state.src} alt="图片"/>
 				</Modal>
 			</div>
 		);
@@ -321,7 +321,7 @@ export default class LocmeasureTable extends Component {
 							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.exportexcel.bind(this)}>
+							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
 								导出
 							</Button>
 						</Col>
@@ -565,7 +565,8 @@ export default class LocmeasureTable extends Component {
     		etime = '',
 			exportsize,
 			thinclass = '',
-			smallclass = ''
+			smallclass = '',
+			status = ''
 		} = this.state;
 		if(this.sections.length !== 0){  //不是admin，要做查询判断了
 			if( section === ''){
@@ -578,12 +579,13 @@ export default class LocmeasureTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		treetype,
+			treetype,
+			status,
     		// supervisorcheck,
     		// checkstatus,
     		// locationstatus,
-    		stime:stime&&moment(stime).add(8, 'h').unix(),
-    		etime:etime&&moment(etime).add(8, 'h').unix(),
+    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
 			size:exportsize,
 			thinclass,

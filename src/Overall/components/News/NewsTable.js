@@ -287,8 +287,7 @@ class NewsTable extends Component {
 											</FormItem>
 										</Col>
 										<Col span={8} >
-											<FormItem {...formItemLayout} label="修改日期">
-
+											<FormItem {...formItemLayout} label="发布日期">
 												{
 													getFieldDecorator('worktime', {
 														rules: [
@@ -454,7 +453,18 @@ class NewsTable extends Component {
 			title: '发布单位',
 			dataIndex: 'abstract',
 			key: 'abstract',
-			width:'10%'
+			width:'10%',
+			render:(text,record)=>{
+				if(record.abstract){
+					return <p>{record.abstract}</p>
+				}else{
+					if(record.pub_unit && record.pub_unit.name){
+						return <p>{record.pub_unit.name}</p>
+					}else{
+						return <p> / </p>
+					}
+				}
+			}
 		}, {
 			title: '发布日期',
 			dataIndex: 'pub_time',
@@ -479,8 +489,6 @@ class NewsTable extends Component {
 						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<a onClick={this.clickNews.bind(this, record, 'EDIT')}>修改</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this.clickNews.bind(this, record, 'BACK')}>撤回</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<Popconfirm title="确定删除吗?" onConfirm={this.clickNews.bind(this, record, 'DELETE')} okText="确定"
 							cancelText="取消">

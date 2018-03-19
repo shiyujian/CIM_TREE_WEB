@@ -62,7 +62,7 @@ export default class CheckerTable extends Component {
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 				>
-					<img style={{width:"490px",height:"300px"}} src={this.state.src} alt="图片"/>
+					<img style={{width:"490px"}} src={this.state.src} alt="图片"/>
 				</Modal>
 			</div>
 		);
@@ -277,7 +277,7 @@ export default class CheckerTable extends Component {
 							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.exportexcel.bind(this)}>
+							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
 								导出
 							</Button>
 						</Col>

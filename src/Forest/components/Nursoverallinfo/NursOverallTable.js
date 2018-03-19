@@ -71,13 +71,14 @@ export default class NursOverallTable extends Component {
 			<div>
 				{this.treeTable(tblData)}
 				<Modal
+					width={522}
 					title='详细信息'
 					style={{textAlign:'center',overflow:'auto'}}
 					visible={this.state.imgvisible}
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 				>
-					<img style ={{height:'500px'}} src={this.state.src} alt="图片"/>
+					<img style ={{width:'490px'}} src={this.state.src} alt="图片"/>
 				</Modal>
 			</div>
 		);
@@ -493,7 +494,7 @@ export default class NursOverallTable extends Component {
 							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.exportexcel.bind(this)}>
+							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
 								导出
 							</Button>
 						</Col>
