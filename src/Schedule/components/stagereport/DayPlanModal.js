@@ -1,7 +1,7 @@
 import React, { Component, Children } from 'react';
 import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification, } from 'antd';
 const FormItem = Form.Item;
-class DayPlanModal extends Component {
+export default class DayPlanModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -37,12 +37,12 @@ class DayPlanModal extends Component {
                                 <Col span={24}>
                                     <Row>
                                         <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='单位工程'>
+                                            <FormItem {...FormItemLayout} label='标段'>
                                                 {
-                                                    getFieldDecorator('dayunit', {
-                                                        initialValue: `${this.props.unit || '暂无单位工程'}`,
+                                                    getFieldDecorator('daysection', {
+                                                        initialValue: `${this.props.sectionName || '暂无标段'}`,
                                                         rules: [
-                                                            { required: false, message: '请选择单位工程' }
+                                                            { required: false, message: '请选择标段' }
                                                         ]
                                                     })
                                                         (<Input readOnly />)
@@ -161,5 +161,5 @@ class DayPlanModal extends Component {
 }
 
 
-export default Form.create()(DayPlanModal)
+// export default Form.create()(DayPlanModal)
 

@@ -72,7 +72,7 @@ export default class FaithinfoTable extends Component {
 			dataIndex: 'order',
 			width: '5%',
 		},{
-			title:"供苗商",
+			title:"供应商",
 			dataIndex: 'Factory',
 			width: '26%',
 		},{
@@ -118,7 +118,7 @@ export default class FaithinfoTable extends Component {
 							</Select>
 						</Col> */}
 						<Col xl={5} lg={6} md={7} className='mrg10'>
-							<span>供苗商：</span>
+							<span>供应商：</span>
 							<Input suffix={suffix} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
 						</Col>
 					</Row>
@@ -311,7 +311,7 @@ export default class FaithinfoTable extends Component {
  //    				]
  //    			})
 	//     		const postdata = {
-	//     			keys: ["序号", "供苗商", "树种" , "总诚信度"],
+	//     			keys: ["序号", "供应商", "树种" , "总诚信度"],
 	//     			values: data
 	//     		}
 	//     		getexportTree({},postdata)

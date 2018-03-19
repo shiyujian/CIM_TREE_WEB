@@ -50,13 +50,13 @@ export default class Stage extends Component {
     }
 
     componentDidMount() {
-        const {actions: {getTreeList,getTreeNodeList,gettreetype}, treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTreeList,getTreeNodeList,gettreetype,getProjectList}, treetypes,platform:{tree = {}}} = this.props; 
     
-        if(!tree.bigTreeList){
-            getTreeNodeList()
+        if(!tree.projectList){
+            getProjectList()
         }
         this.setState({
-            leftkeycode:"P009-01"
+            leftkeycode:"P009"
         })
         //类型
         let treetyoption = [
@@ -81,8 +81,8 @@ export default class Stage extends Component {
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.bigTreeList){
-            treeList = tree.bigTreeList
+        if(tree.projectList){
+            treeList = tree.projectList
         }
         console.log('tree',tree)
         return (
@@ -101,39 +101,21 @@ export default class Stage extends Component {
                     <div>
                         <Tabs>
                             <TabPane tab="总计划进度" key="1">
-                                <All {...this.props} />
+                                <All {...this.props} {...this.state}/>
                             </TabPane>
                             <TabPane tab="每日计划进度" key="2">
-                                <Plan {...this.props} />
+                                <Plan {...this.props } {...this.state}/>
                             </TabPane>
                             <TabPane tab="每日实际进度" key="3">
-                                <Stagereporttab {...this.props} />
+                                <Stagereporttab {...this.props} {...this.state}/>
                             </TabPane>
                         </Tabs>
                     </div>
                 </Content>
             </div>);
     }
-    //类型选择, 重新获取: 树种
-    typeselect(value, keycode) {
-        const { actions: { setkeycode, getTreeList } } = this.props;
-        //树种
-        getTreeList({}, { field: 'treetype', no: keycode, treety: value, paginate: false })
-            .then(rst => {
-                this.setTreeTypeOption(rst)
-            })
-    }
 
-    //设置树种选项
-    setTreeTypeOption(rst) {
-        if (rst instanceof Array) {
-            let treetypeoption = rst.map(item => {
-                return <Option key={item.name} value={item.name}>{item.name}</Option>
-            })
-            treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({ treetypeoption, treetypelist: rst })
-        }
-    }
+   
 
     //树选择
     onSelect(value = []) {
@@ -141,31 +123,6 @@ export default class Stage extends Component {
         let keycode = value[0] || '';
         const { actions: { getTreeList, gettreetype } } = this.props;
         this.setState({ leftkeycode: keycode })
-        //树种
-        gettreetype({}, { no: keycode, paginate: false })
-            .then(rst => {
-                this.setTreeTypeOption(rst)
-            })
-    }
-
-    //树展开
-    onExpand(expandedKeys, info) {
-        const treeNode = info.node;
-        const { actions: { getTree } } = this.props;
-        const { treeLists } = this.state;
-        const keycode = treeNode.props.eventKey;
-        getTree({}, { parent: keycode, paginate: false })
-            .then(rst => {
-                if (rst instanceof Array) {
-                    if (rst.length > 0 && rst[0].wptype != '子单位工程') {
-                        rst.forEach((item, index) => {
-                            rst[index].children = []
-                        })
-                    }
-                    getNewTreeData(treeLists, keycode, rst)
-                    this.setState({ treeLists: treeLists })
-                }
-            })
     }
 }
 

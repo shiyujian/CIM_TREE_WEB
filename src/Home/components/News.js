@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Table, Row, Col, Modal, Tabs } from 'antd';
 import Blade from '_platform/components/panels/Blade';
 import moment from 'moment';
+import { Link } from 'react-router-dom';
+
 import styles from './styles.less';
 
 const TabPane = Tabs.TabPane;
@@ -13,15 +15,15 @@ export default class News extends Component {
 		this.state = {
 			visible: false,
 			container: null,
-			title:'',
-			source:''
+			title: '',
+			source: ''
 		}
 	}
 
 	static propTypes = {};
 
 	componentDidMount() {
-		const { actions: { getNewsList,getTipsList } } = this.props;
+		const { actions: { getNewsList, getTipsList } } = this.props;
 		getNewsList({}, { tag: '新闻', is_draft: false });
 		getTipsList({}, { tag: '公告', is_draft: false });
 	}
@@ -31,8 +33,8 @@ export default class News extends Component {
 			this.setState({
 				visible: true,
 				container: record.raw,
-				title:record.title,
-				source:record.source ? record.source.name : '无'
+				title: record.title,
+				source: record.source ? record.source.name : '无'
 			})
 		}
 	}
@@ -107,7 +109,7 @@ export default class News extends Component {
 
 	];
 
-	
+
 
 	handleCancel() {
 		this.setState({
@@ -137,9 +139,11 @@ export default class News extends Component {
 			// </Blade>
 
 			<Row>
-				<Col span={22} offset={1}>
+				<Col style={{position:'relative'}} span={22} offset={1}>
+					<Link  to='/overall/news'>
+						<span style={{position:'absolute', top: "10px",right:'0',zIndex:'200' }} >MORE</span>
+					</Link>
 					<Tabs onChange={this.subTabChange.bind(this)} >
-
 						<TabPane tab="新闻" key="1">
 							<Table dataSource={newsList}
 								columns={this.columns}
@@ -153,23 +157,23 @@ export default class News extends Component {
 					</Tabs>
 
 				</Col>
-				<Modal title={<p style={{fontSize:16}}>{this.state.title}</p>} width={800} visible={this.state.visible}
+				<Modal title={<p style={{ fontSize: 16 }}>{this.state.title}</p>} width={800} visible={this.state.visible}
 					onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
 					<div>
-					{
-						this.state.source === '无' ? null : <p>{`来源 ：${this.state.source}`}</p>
-					}
-					<div style={{ maxHeight: '800px', overflow: 'auto',marginTop:'5px' }}
-						dangerouslySetInnerHTML={{ __html: this.state.container }} />
+						{
+							this.state.source === '无' ? null : <p>{`来源 ：${this.state.source}`}</p>
+						}
+						<div style={{ maxHeight: '800px', overflow: 'auto', marginTop: '5px' }}
+							dangerouslySetInnerHTML={{ __html: this.state.container }} />
 					</div>
-					
+
 				</Modal>
 			</Row>
 
-			
+
 		);
 	}
-	
+
 }
 
 

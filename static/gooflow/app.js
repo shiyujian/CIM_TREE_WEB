@@ -378,10 +378,19 @@ $(function(){
             var item = data.nodes[i].detail;
 
             if(item.orgs.length>0) {
+                
                 var orgs = getOrgs(item.orgs.join(','),ORGS);
+                console.log('orgs',orgs)
+                console.log('item.orgs',item.orgs)
                 item.orgs = orgs.map(function(o){
-                    delete o.children;
-                    return o;
+                    // delete o.children;
+                    return {
+                        code:o.code || null,
+                        id:o.id || null,
+                        pk:o.pk || null,
+                        name:o.name || null,
+                        text:o.text || null
+                    };
                 });
             }
             if(item.participants.length>0) {
@@ -795,6 +804,9 @@ $(function(){
     }
 
     function getOrgs(values, data) {
+        console.log('getOrgsvalue',values)
+        console.log('getOrgsdata',data)
+        console.log('getOrgsORG',ORGS)
         let target = values.split(','),result = [];
         var loop = function(items){
             items.forEach(function(o){

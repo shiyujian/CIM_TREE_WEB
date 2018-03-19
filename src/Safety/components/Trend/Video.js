@@ -7,6 +7,7 @@ import moment from 'moment';
 import $ from 'jquery';
 import { Icon } from 'react-fa';
 import './video.less'
+import { Link } from 'react-router-dom';
 export default class Video extends Component {
 
 	constructor(props) {
@@ -98,7 +99,6 @@ export default class Video extends Component {
 		const newsListT = this.props.videoList || []
 		for (var k = 0; k < newsListT.length; k++) {
 			const newsListTT = newsListT[k].attachment.fileList[0] || {}
-			console.log(newsListTT)
 			if (k < 3) {
 				videoa.push(
 					<div className="video box ">
@@ -127,6 +127,9 @@ export default class Video extends Component {
 		}
 		return (
 			<Blade style={{ height: "300px", background: "#eee" }} title="安全生产视频">
+				<Link to='/safety/safetyTrend'>
+					<span style={{ float: "right", marginTop: "-30px" }} >MORE</span>
+				</Link>
 				<div className="container">
 					{videoa}
 				</div>

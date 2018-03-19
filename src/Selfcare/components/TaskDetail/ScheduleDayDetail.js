@@ -45,7 +45,7 @@ class ScheduleDayDetail extends Component {
 		key: 'number',
 	},];
 
-	
+
 	render() {
 		const { 
 			
@@ -56,16 +56,17 @@ class ScheduleDayDetail extends Component {
 		if(task && task.subject){
 			record = this.getTable(task)
 		}
+		
 		return (
 			<Card title={'流程详情'}>
 				<Row gutter={24}>
 					<Col span={24} >
 						<Row gutter={15} >
 							<Col span={8}>
-								<FormItem   {...ScheduleDayDetail.layout} label="单位工程:">
-								{getFieldDecorator('dayunit', {
-									initialValue: `${record.unit ? record.unit : '暂无单位工程'}`,
-									rules: [{ required: false, message: '请输入单位工程' }]
+								<FormItem   {...ScheduleDayDetail.layout} label="标段:">
+								{getFieldDecorator('daysection', {
+									initialValue: `${record.sectionName? record.sectionName : '暂无标段'}`,
+									rules: [{ required: false, message: '请输入标段' }]
 								})(<Input readOnly />)}
 								</FormItem>
 							</Col>
@@ -135,7 +136,8 @@ class ScheduleDayDetail extends Component {
         let record = {
             'id':instance.id,
 			'TreatmentData':subject.treedataSource?JSON.parse(subject.treedataSource):'',
-			'unit':subject.unit?JSON.parse(subject.unit):'',
+			'section':subject.section?JSON.parse(subject.section):'',
+			'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
             'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
             'daydocument':subject.daydocument?JSON.parse(subject.daydocument):'',
 			'timedate':subject.timedate?JSON.parse(subject.timedate):'',

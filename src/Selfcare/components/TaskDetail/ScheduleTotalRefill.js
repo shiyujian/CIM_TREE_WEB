@@ -6,11 +6,12 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
-import PerSearch from '../Task/PerSearch';
+// import PerSearch from '../Task/PerSearch';
+import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE,PROJECT_UNITS,SECTIONNAME } from '../../../_platform/api';
 import queryString from 'query-string';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
@@ -26,6 +27,8 @@ class ScheduleTotalRefill extends Component {
             isCopyMsg: false, //接收人员是否发短信
             TreatmentData: [],
             newFileLists: [],
+            sectionSchedule:[],
+            projectName:''
         };
     }
 
@@ -68,17 +71,79 @@ class ScheduleTotalRefill extends Component {
             </div>
         }
     }]
+    componentDidMount(){
+        this.getSection()
+    }
+
+    //获取当前登陆用户的标段
+    getSection(){
+        let user = getUser()
+        console.log('user',user)
+        let sections = user.sections
+        let sectionSchedule = []
+        let sectionName = ''
+        let projectName = ''
+        console.log('sections',sections)
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            sections.map((section)=>{
+                let code = section.split('-')
+                if(code && code.length === 3){
+                    //获取当前标段的名字
+                    SECTIONNAME.map((item)=>{
+                        if(code[2] === item.code){
+                            sectionName = item.name
+                        }
+                    })
+                    //获取当前标段所在的项目
+                    PROJECT_UNITS.map((item)=>{
+                        if(code[0] === item.code){
+                            projectName = item.value
+                        }
+                    })
+                }
+                sectionSchedule.push({
+                    value:section,
+                    name:sectionName
+                })
+
+               
+            })
+            
+			console.log('sectionSchedule',sectionSchedule)
+			console.log('projectName',projectName)
+            this.setState({
+                sectionSchedule,
+                projectName
+            })
+        }
+    }
+	//获取当前登陆用户的标段的下拉选项
+    getSectionOption(){
+        const{
+            sectionSchedule
+        } = this.state
+        let option = []
+        sectionSchedule.map((section)=>{
+            option.push(<Option key={section.value} value={section.value}>{section.name}</Option>)
+        })
+        return option
+    }   
 
     render() {
 
         const { platform: { task = {}, users = {} } = {}, location, actions, form: { getFieldDecorator } } = this.props;
-		const { history = [], transitions = [], states = [] } = task;
+        const { history = [], transitions = [], states = [] } = task;
+        const{
+            sectionSchedule
+        } = this.state
 		const user = getUser();
         
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 },
         }
+        let sectionOption = this.getSectionOption()
         return (
             <div>
                 <Form onSubmit={this.handleSubmit.bind(this)}>
@@ -87,17 +152,17 @@ class ScheduleTotalRefill extends Component {
                             <Col span={24}>
                                 <Row>
                                     <Col span={10}>
-                                        <FormItem {...FormItemLayout} label='单位工程'>
+                                        <FormItem {...FormItemLayout} label='标段'>
                                             {
-                                                getFieldDecorator('unit', {
-                                                    rules: [
-                                                        { required: true, message: '请选择单位工程' }
-                                                    ]
-                                                })
-                                                    (<Select placeholder='请选择单位工程' allowClear>
-                                                        {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-                                                    </Select> )
-                                            }
+													getFieldDecorator('section', {
+														rules: [
+															{ required: true, message: '请选择标段' }
+														]
+													})
+														(<Select placeholder='请选择标段' allowClear>
+														{sectionOption}
+													</Select>)
+												}
                                         </FormItem>
                                     </Col>
                                     <Col span={10}>
@@ -118,14 +183,12 @@ class ScheduleTotalRefill extends Component {
                                         <FormItem {...FormItemLayout} label='文档类型'>
                                             {
                                                 getFieldDecorator('totledocument', {
+                                                    initialValue: `总计划进度`,
                                                     rules: [
-                                                        { required: true, message: '请选择文档类型' }
+                                                        { required: true, message: '请输入文档类型' }
                                                     ]
                                                 })
-                                                    (<Select placeholder='请选择文档类型' allowClear>
-                                                        <Option key={3} value={'开发文档'}>开发文档</Option>
-                                                        <Option key={4} value={'测试文档'}>测试文档</Option>
-                                                    </Select>)
+                                                    (<Input placeholder='请输入文档类型' />)
                                             }
                                         </FormItem>
                                     </Col>
@@ -246,7 +309,25 @@ class ScheduleTotalRefill extends Component {
 		const { state_id = '0' } = queryString.parse(location.search) || {};
 		const { states = [] } = task;
 		return states.find(state => state.status === 'processing' && state.id === +state_id);
-	}
+    }
+    
+    //获取当前标段的名字
+    getSectionName(section){
+		let sectionName = ''
+		if(section){
+			let code = section.split('-')
+			if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        sectionName = item.name
+                    }
+                })
+			}
+		}
+		console.log('sectionName',sectionName)
+		return sectionName 
+    }
 
 
     handleSubmit = (e) =>{
@@ -260,7 +341,8 @@ class ScheduleTotalRefill extends Component {
             location
         } = this.props;
         const{
-            TreatmentData
+            TreatmentData,
+            projectName
         } = this.state
         let user = getUser();//当前登录用户
         let me = this;
@@ -269,21 +351,24 @@ class ScheduleTotalRefill extends Component {
             console.log('Received values of form: ', values);
             if (!err) {
                 //存储新的流程详情
-                if (TreatmentData.length === 0) {
-                    notification.error({
-                        message: '请上传文件',
-                        duration: 5
-                    })
-                    return
-                }
+                // if (TreatmentData.length === 0) {
+                //     notification.error({
+                //         message: '请上传文件',
+                //         duration: 5
+                //     })
+                //     return
+                // }
                 
                 postData.upload_unit = user.org ? user.org : '';
                 postData.type = '总进度计划';
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
+                let sectionName = me.getSectionName(values.section)
                 let subject = [{
-                    "unit": JSON.stringify(values.unit),
+                    "section": JSON.stringify(values.section),
+                    "sectionName":JSON.stringify(sectionName),
+                    "projectName":JSON.stringify(projectName),
 					"superunit": JSON.stringify(values.superunit),
 					"dataReview": JSON.stringify(values.dataReview),
 					"numbercode": JSON.stringify(values.numbercode),

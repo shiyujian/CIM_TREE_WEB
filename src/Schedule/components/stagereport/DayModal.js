@@ -1,7 +1,7 @@
 import React, { Component, Children } from 'react';
 import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification, } from 'antd';
 const FormItem = Form.Item;
-class DayModal extends Component {
+export default class DayModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -37,12 +37,12 @@ class DayModal extends Component {
                                 <Col span={24}>
                                     <Row>
                                         <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='单位工程'>
+                                            <FormItem {...FormItemLayout} label='标段'>
                                                 {
-                                                    getFieldDecorator('dayunit', {
-                                                        initialValue: `${this.props.unit || '暂无单位工程'}`,
+                                                    getFieldDecorator('stagesection', {
+                                                        initialValue: `${this.props.sectionName || '暂无标段'}`,
                                                         rules: [
-                                                            { required: false, message: '请选择单位工程' }
+                                                            { required: false, message: '请选择标段' }
                                                         ]
                                                     })
                                                         (<Input readOnly />)
@@ -52,7 +52,7 @@ class DayModal extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
-                                                    getFieldDecorator('daynumbercode', {
+                                                    getFieldDecorator('stagenumbercode', {
                                                         initialValue: `${this.props.numbercode || '暂无编号'}`,
                                                         rules: [
                                                             { required: false, message: '请输入编号' }
@@ -80,7 +80,7 @@ class DayModal extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='日期'>
                                                 {
-                                                    getFieldDecorator('daytimedate', {
+                                                    getFieldDecorator('stagetimedate', {
                                                         initialValue: `${this.props.timedate || '暂无日期'}`,
                                                         rules: [
                                                             { required: false, message: '请输入日期' }
@@ -95,7 +95,7 @@ class DayModal extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
-                                                    getFieldDecorator('daysuperunit', {
+                                                    getFieldDecorator('stagesuperunit', {
                                                         initialValue: `${this.props.superunit || '暂无监理单位'}`,
                                                         rules: [
                                                             { required: false, message: '请输入监理单位' }
@@ -120,7 +120,7 @@ class DayModal extends Component {
                                         <Col span={12} style={{ marginTop: '10px' }}>
                                             <FormItem {...FormItemLayout} label='审核人'>
                                                 {
-                                                    getFieldDecorator('daydataReview', {
+                                                    getFieldDecorator('stagedataReview', {
                                                         initialValue: `${this.props.dataReview || ''}`,
                                                         rules: [
                                                             { required: false, message: '请输入审核人员' }
@@ -161,5 +161,5 @@ class DayModal extends Component {
 }
 
 
-export default Form.create()(DayModal)
+// export default Form.create()(DayModal)
 

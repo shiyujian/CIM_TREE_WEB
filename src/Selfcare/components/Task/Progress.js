@@ -60,18 +60,6 @@ export default class Progress extends Component {
 			return (
 				<OverallMaterialHandle {...this.props} {...this.state}/>
 			)
-		}else if (code === WORKFLOW_CODE.总进度计划报批流程 && stateName == '初审' ){
-			return (
-				<OverallMaterialHandle {...this.props} {...this.state}/>
-			)
-		}else if (code === WORKFLOW_CODE.每日进度计划填报流程 && stateName == '初审' ){
-			return (
-				<OverallMaterialHandle {...this.props} {...this.state}/>
-			)
-		}else if (code === WORKFLOW_CODE.每日进度填报流程 && stateName == '初审' ){
-			return (
-				<OverallMaterialHandle {...this.props} {...this.state}/>
-			)
 		}else if (code === WORKFLOW_CODE.表单管理流程 && stateName == '初审' ){
 			return (
 				<OverallMaterialHandle {...this.props} {...this.state}/>
@@ -88,15 +76,15 @@ export default class Progress extends Component {
 			return (
 				<OverallMaterialDeal {...this.props} {...this.state}/>
 			)
-		}else if (code === WORKFLOW_CODE.总进度计划报批流程 &&  stateName == '复审'){
+		}else if (code === WORKFLOW_CODE.总进度计划报批流程 &&  stateName == '审核'){
 			return (
 				<ScheduleTotalDeal {...this.props} {...this.state}/>
 			)
-		}else if (code === WORKFLOW_CODE.每日进度计划填报流程 &&  stateName == '复审'){
+		}else if (code === WORKFLOW_CODE.每日进度计划填报流程 &&  stateName == '审核'){
 			return (
 				<ScheduleDayDeal {...this.props} {...this.state}/>
 			)
-		}else if (code === WORKFLOW_CODE.每日进度填报流程 &&  stateName == '复审'){
+		}else if (code === WORKFLOW_CODE.每日进度填报流程 &&  stateName == '审核'){
 			return (
 				<ScheduleStageDeal {...this.props} {...this.state}/>
 			)

@@ -15,7 +15,8 @@ export default class CheckerTable extends Component {
         	imgvisible:false,
         	tblData: [],
         	pagination: {},
-        	loading: false,
+			loading: false,
+			treetypename: '',
         	size:10,
         	exportsize: 100,
         	leftkeycode: '',
@@ -84,9 +85,11 @@ export default class CheckerTable extends Component {
 			sxm, 
 			rolename,
 			section,
+			bigType,
 			smallclass,
 			thinclass,
 			status,
+			treetypename,
 		} = this.state;
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
@@ -96,7 +99,7 @@ export default class CheckerTable extends Component {
 			title:"序号",
 			dataIndex: 'order',
 		},{
-			title:"编码",
+			title:"顺序码",
 			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
@@ -202,8 +205,8 @@ export default class CheckerTable extends Component {
 		}];
 		header = <div >
 					<Row>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>编码：</span>
+						<Col  xl={4} lg={5} md={6} className='mrg10'>
+							<span>顺序码：</span>
 							<Input  suffix={suffix1} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
@@ -222,6 +225,18 @@ export default class CheckerTable extends Component {
 							<span>细班：</span>
 							<Select allowClear className='forestcalcw2 mxw170' defaultValue='全部' value={thinclass} onChange={this.onthinclasschange.bind(this)}>
 								{thinclassoption}
+							</Select>
+						</Col>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
+							<span>类型：</span>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
+								{typeoption}
+							</Select>
+						</Col>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
+							<span>树种：</span>
+							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
+								{treetypeoption}
 							</Select>
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
@@ -319,6 +334,19 @@ export default class CheckerTable extends Component {
 		thinclassselect(value || smallclass,section);
 		this.setState({thinclass:value || ''})
 	}
+	ontypechange(value) {
+		const {typeselect} = this.props;
+		typeselect(value || '')
+		this.setState({bigType: value || '' , treetype: '', treetypename:''})
+	}
+
+	ontreetypechange(value) {
+		// debugger
+		// const {treetypelist} = this.props;
+		// let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
+		// this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
+		this.setState({treetype:value,treetypename:value})
+    }
 
 	onstatuschange(value) {
 		console.log('value',value)
@@ -387,7 +415,9 @@ export default class CheckerTable extends Component {
     		etime = '',
 			size,
 			smallclass,
-			thinclass
+			thinclass,
+			bigType = '',
+    		treetype = '',
 		} = this.state;
 		if(this.sections.length !== 0){  //不是admin，要做查询判断了
 			if(section === ''){
@@ -406,7 +436,9 @@ export default class CheckerTable extends Component {
     		page,
 			size,
 			smallclass,
-			thinclass
+			thinclass,
+			bigType,
+    		treetype,
     	}
     	if(!!role)
     		postdata[role] = rolename;
@@ -458,7 +490,9 @@ export default class CheckerTable extends Component {
     		etime = '',
 			exportsize,
 			smallclass,
-			thinclass
+			thinclass,
+			bigType = '',
+    		treetype = '',
 		} = this.state;
 		if(this.sections.length !== 0){  //不是admin，要做查询判断了
 			if(section === ''){
@@ -477,7 +511,9 @@ export default class CheckerTable extends Component {
     		page:1,
 			size:exportsize,
 			smallclass,
-			thinclass
+			thinclass,
+			bigType,
+    		treetype,
     	}
     	if(!!role)
 			postdata[role] = rolename;

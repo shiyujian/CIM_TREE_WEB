@@ -215,9 +215,10 @@ export default class SendPage1 extends Component {
 			render: record => {
 				return (
 					<div>
-						<Button onClick={this._viewClick.bind(this, record._id)}>查看</Button>
+						<a onClick={this._viewClick.bind(this, record._id)}>查看</a>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
 						<Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定" cancelText="取消">
-							<Button type="danger">删除</Button>
+							<a>删除</a>
 						</Popconfirm>
 					</div>
 				)

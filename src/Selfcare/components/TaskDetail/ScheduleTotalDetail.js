@@ -59,7 +59,6 @@ class ScheduleTotalDetail extends Component {
         labelCol: {span: 4},
         wrapperCol: {span: 20},
     };
-
 	
 	render() {
 		const { 
@@ -70,17 +69,18 @@ class ScheduleTotalDetail extends Component {
 		let record = {}
 		if(task && task.subject){
 			record = this.getTable(task)
-		}
+        }
+
 		return (
 			<Card title={'流程详情'}>
 				<Row gutter={24}>
 					<Col span={24} >
 						<Row gutter={15} >
 							<Col span={8}>
-								<FormItem   {...ScheduleTotalDetail.layout} label="单位工程:">
-								{getFieldDecorator('totalunit', {
-									initialValue: `${record.unit ? record.unit : '暂无单位工程'}`,
-									rules: [{ required: false, message: '请输入单位工程' }]
+								<FormItem   {...ScheduleTotalDetail.layout} label="标段:">
+								{getFieldDecorator('totalsection', {
+									initialValue: `${record.sectionName ? record.sectionName : '暂无标段'}`,
+									rules: [{ required: false, message: '请输入标段' }]
 								})(<Input readOnly />)}
 								</FormItem>
 							</Col>
@@ -140,7 +140,8 @@ class ScheduleTotalDetail extends Component {
         let record = {
             'id':instance.id,
 			'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
-			'unit':subject.unit?JSON.parse(subject.unit):'',
+            'section':subject.section?JSON.parse(subject.section):'',
+            'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
 			'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
 			'totledocument':subject.totledocument?JSON.parse(subject.totledocument):'',
 			'superunit':subject.superunit?JSON.parse(subject.superunit):''

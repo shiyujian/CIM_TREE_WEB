@@ -30,6 +30,7 @@ export default class ForestContainer extends Component {
 			Scheduleanalyze = null,
 			Dataimport = null,
 			Contrastinfo = null,
+			CarPackage = null
 		} = this.state || {};
 		return (
 				<Body >
@@ -39,6 +40,7 @@ export default class ForestContainer extends Component {
 					<Main>
 						{Nursoverallinfo && <Route path="/forest/nursoverallinfo" component={Nursoverallinfo}/>}
 						{Nursmeasureinfo && <Route path="/forest/nursmeasureinfo" component={Nursmeasureinfo}/>}
+						{CarPackage && <Route path="/forest/carpackage" component={CarPackage}/>}
 						{Locmeasureinfo && <Route path="/forest/locmeasureinfo" component={Locmeasureinfo}/>}
 						{Supervisorinfo && <Route path="/forest/supervisorinfo" component={Supervisorinfo}/>}
 						{Checkerinfo && <Route path="/forest/checkerinfo" component={Checkerinfo}/>}
@@ -67,6 +69,11 @@ export default class ForestContainer extends Component {
 			id: 'FOREST.NURSMEASUREINFO',
 			path: '/forest/nursmeasureinfo',
 			name: '苗圃测量信息',
+		},{
+			key: 'carpackage',
+			id: 'FOREST.CARPACKAGE',
+			path: '/forest/carpackage',
+			name: '车辆打包信息',
 		},{
 			key: 'locmeasureinfo',
 			id: 'FOREST.LOCMEASUREINFO',

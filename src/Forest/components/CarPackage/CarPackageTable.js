@@ -8,7 +8,7 @@ const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const {RangePicker} = DatePicker;
 
-export default class NursmeasureTable extends Component {
+export default class CarPackageTable extends Component {
 	constructor(props) {
         super(props)
         this.state = {
@@ -56,14 +56,14 @@ export default class NursmeasureTable extends Component {
 			<div>
 				{this.treeTable(tblData)}
 				<Modal
-					width={522}
-					title='详细信息'
+					width={1280}
+					title='详情'
 					style={{textAlign:'center'}}
 					visible={this.state.imgvisible}
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 				>
-					<img style={{width:"490px",height:"300px"}} src={this.state.src} alt="图片"/>
+					<p>123</p>
 				</Modal>
 			</div>
 		);
@@ -92,167 +92,90 @@ export default class NursmeasureTable extends Component {
 			mmtype
 		} = this.state;
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
-		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
-		const suffix3 = factory ? <Icon type="close-circle" onClick={this.emitEmpty3} /> : null;
-		const suffix4 = treeplace ? <Icon type="close-circle" onClick={this.emitEmpty4} /> : null;
-		const suffix5 = nurseryname ? <Icon type="close-circle" onClick={this.emitEmpty5} /> : null;
 		let columns = [];
 		let header = '';
 		columns = [{
 			title:"序号",
 			dataIndex: 'order',
 		},{
-			title:"顺序码",
-			dataIndex: 'ZZBM',
+			title:"车牌号",
+			dataIndex: 'LicensePlate',
 		},{
-			title:"标段",
-			dataIndex: 'BD',
+			title:"苗木类型",
+            dataIndex: 'IsShrub',
+            render:(text,record) => {
+                if(text === 0){
+                    return <p>乔灌</p>
+                }else{
+                    return <p>地被</p>
+                }
+            }
 		},{
-			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeName',
+			title:"苗木规格",
+			dataIndex: 'Standard',
 		},{
-			title:"苗龄",
-			dataIndex: 'Age',
-			render:(text,record) => {
-				if(record.BD.indexOf('P010') !== -1){
-					return <p>{text}</p>
-				}else{
-					return <p> / </p>
-				}
-			}
-		},{
-			title:"产地",
-			dataIndex: 'TreePlace',
-		},{
-			title:"供应商",
-			dataIndex: 'Factory',
-		},{
-			title:"苗圃名称",
-			dataIndex: 'NurseryName',
-		},{
-			title:"填报人",
-			dataIndex: 'Inputer',
-			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
-			}
-		},{
-			title:"起苗时间",
+			title:"创建时间",
 			render: (text,record) => {
 				const {liftertime1 = '',liftertime2 = '' } = record;
 				return <div><div>{liftertime1}</div><div>{liftertime2}</div></div>
 			}
 		},{
+			title:"总数",
+			dataIndex: 'NurseryNum',
+		},{
+			title:"进场抽检退苗量",
+			dataIndex: 'UnQualifiedNum',
+		},{
 			title:"状态",
-			dataIndex: 'statusname',
+            dataIndex: 'Status',
+            render:(text,record) => {
+                if(text === -1){
+                    return <p>打包</p>
+                }else if(text === 0){
+                    return <p>施工提交</p>
+                }else if(text === 1){
+                    return <p>监理合格</p>
+                }else if(text === 2){
+                    return <p>监理退苗</p>
+                }else if(text === 3){
+                    return <p>监理合格施工同意</p>
+                }else if(text === 4){
+                    return <p>监理合格施工不同意</p>
+                }else if(text === 5){
+                    return <p>监理退苗施工同意</p>
+                }else if(text === 6){
+                    return <p>监理退苗施工不同意</p>
+                }else if(text === 7){
+                    return <p>业主合格</p>
+                }else if(text === 8){
+                    return <p>业主退苗</p>
+                }else {
+                    return <p> / </p>
+                }
+            }
 		},{
-			title:<div><div>高度</div><div>(cm)</div></div>,
+			title:'操作',
 			render: (text,record) => {
-				if(record.GD != 0)
-					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>胸径</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.XJ != 0)
-					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>冠幅</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.GF != 0)
-					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>地径</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.DJ != 0)
-					return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>土球厚度</div><div>(cm)</div></div>,
-			dataIndex: 'tqhd',
-			render: (text,record) => {
-				if(record.TQHD != 0)
-					return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>土球直径</div><div>(cm)</div></div>,
-			dataIndex: 'tqzj',
-			render: (text,record) => {
-				if(record.TQZJ != 0)
-					return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
-				else {
-					return <span>/</span>
-				}
+				return <a href='javascript:;' onClick={this.onViewClick.bind(this,record)}>详情</a>
 			}
 		}];
 		header = <div >
 					<Row >
-					<Col  xl={4} lg={5} md={6} className='mrg10'>
-							<span>顺序码：</span>
+						<Col xl={4} lg={5} md={6} className='mrg10'>
+							<span>车牌号：</span>
 							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
+						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>标段：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={section} onChange={this.onsectionchange.bind(this)}>
 								{sectionoption}
 							</Select>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>类型：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
-								{typeoption}
+						<Col xl={10} lg={11} md={12} className='mrg10'>
+                            <span>状态：</span>
+                            <Select allowClear className='forestcalcw2 mxw150' defaultValue='全部' value={status} onChange={this.onstatuschange.bind(this)} style={{width:150}}>
+								{statusoption}
 							</Select>
-						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>树种：</span>
-							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
-								{treetypeoption}
-							</Select>
-						</Col>
-						<Col xl={5} lg={6} md={7} className='mrg10'>
-							<span>苗圃：</span>
-							<Input suffix={suffix5} value={nurseryname} className='forestcalcw2 mxw200' onChange={this.nurschange.bind(this)}/>
-						</Col>
-						<Col xl={4} lg={5} md={6} className='mrg10'>
-							<span>填报人：</span>
-							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw150' onChange={this.onrolenamechange.bind(this)}/>
-						</Col>
-						<Col xl={5} lg={6} md={7} className='mrg10'>
-							<span>供应商：</span>
-							<Input suffix={suffix3} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
-						</Col>
-						<Col xl={5} lg={6} md={7} className='mrg10'>
-							<span>产地：</span>
-							<Input suffix={suffix4} value={treeplace} className='forestcalcw2 mxw200' onChange={this.placechange.bind(this)}/>
-						</Col>
-						<Col xl={4} lg={5} md={6} className='mrg10'>
-							<span>状态：</span>
-							<Cascader 
-								allowClear
-								className='forestcalcw2 mxw150' 
-								defaultValue={['']}
-								// value={[status]}
-								options={statusoption} 
-								expandTrigger='hover' 
-								onChange={this.onstatuschange.bind(this)} 
-								changeOnSelect 
-							/>
 						</Col>
 						<Col xl={10} lg={11} md={12} className='mrg10'>
 							<span>起苗时间：</span>
@@ -266,15 +189,12 @@ export default class NursmeasureTable extends Component {
 							>
 							</RangePicker>
 						</Col>
-						{
-							keycode === '' ? null : keycode.indexOf('P010') === -1 ? null :
-							<Col xl={4} lg={5} md={6} className='mrg10'>
-								<span>苗木类型：</span>
-								<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={mmtype} onChange={this.onmmtypechange.bind(this)}>
-									{mmtypeoption}
-								</Select>
-							</Col>
-						}
+                        <Col xl={4} lg={5} md={6} className='mrg10'>
+                            <span>苗木类型：</span>
+                            <Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={mmtype} onChange={this.onmmtypechange.bind(this)}>
+                                {mmtypeoption}
+                            </Select>
+                        </Col>
 					</Row>
 					<Row>
 						<Col span={2} className='mrg10'>
@@ -315,26 +235,13 @@ export default class NursmeasureTable extends Component {
 					</Row>
 					
 				</div>
-	}
+    }
+    onViewClick = () => {
+        this.setState({imgvisible:true})
+    }
 
 	emitEmpty1 = () => {
 	    this.setState({sxm: ''});
-  	}
-
-  	emitEmpty2 = () => {
-	    this.setState({rolename: ''});
-  	}
-
-  	emitEmpty3 = () => {
-	    this.setState({factory: ''});
-  	}
-
-  	emitEmpty4 = () => {
-	    this.setState({treeplace: ''});
-  	}
-
-  	emitEmpty5 = () => {
-	    this.setState({nurseryname: ''});
   	}
 
 	sxmchange(value) {
@@ -347,74 +254,14 @@ export default class NursmeasureTable extends Component {
 		this.setState({section:value || '', bigType:'', treetype: '', treetypename: ''})
 	}
 
-	ontypechange(value) {
-		const {typeselect} = this.props;
-		const {section} = this.state;
-		typeselect(value || '')
-		this.setState({bigType:value || '', treetype: '', treetypename:''})
-	}
 	onmmtypechange(value){
 		this.setState({mmtype:value})
 	}
 
-	ontreetypechange(value) {
-    	// const {treetypelist} = this.props;
-		// let treetype = treetypelist.find(rst => rst.TreeTypeName == value);
-		// this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
-		this.setState({treetype:value,treetypename:value})
-    }
-
     onstatuschange(value) {    	
-    	let status = '';
-    	if (value.length === 2) {
-    		switch(value[1]){
-    			// 进场退回
-				case "1": 
-					status = 1;
-					break;
-				// 监理退回
-				case "2": 
-					status = 2;
-					break;
-				// 业主退回
-				case "3": 
-					status = 3;
-					break;
-				default:
-					break;
-			}
-    	} else {
-    		switch(value[0]) {
-    			//已种植
-    			case "0":
-    				status = 0;
-    				break;
-    			//未种植
-    			case "-1":
-    				status = -1;
-    				break;
-    			default:
-    				break;
-    		}
-    	}
-		this.setState({status: value[1] || value[0] || ''})
+		this.setState({status: value})
 	}
 
-	onrolenamechange(value) {
-		this.setState({rolename:value.target.value})
-	}
-
-	factorychange(value) {
-		this.setState({factory: value.target.value})
-	}
-
-	placechange(value) {
-		this.setState({treeplace: value.target.value})
-	}
-	
-	nurschange(value) {
-		this.setState({nurseryname: value.target.value})
-	} 
 	datepick(value){
 		this.setState({stime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
 		this.setState({etime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
@@ -429,14 +276,6 @@ export default class NursmeasureTable extends Component {
         this.qury(pagination.current);
     }
 
-	onImgClick(src) {
-		src = src.replace(/\/\//g,'/')
-		src =  `${FOREST_API}/${src}`
-		this.setState({src},() => {
-			this.setState({imgvisible:true,})
-		})
-	}
-
 	handleCancel(){
     	this.setState({imgvisible:false})
     }
@@ -450,37 +289,22 @@ export default class NursmeasureTable extends Component {
     	const {
     		sxm = '',
     		section = '',
-    		bigType = '',
     		treetype = '',
-    		factory = '',
-    		treeplace = '',
-    		nurseryname = '',
-    		role = '',
-    		rolename = '',
     		stime = '',
     		etime = '',
     		size,
-    		supervisorcheck = '',
-    		checkstatus = '',
 			status = '',
 			mmtype = ''
     	} = this.state;
-    	const {actions: {getnurserys},keycode = ''} = this.props;
+    	const {actions: {getcarpackage},keycode = ''} = this.props;
     	let postdata = {
-    		// no:keycode,
-    		sxm,
-    		bd:section === '' ? keycode : section,
-    		bigType,
-    		treetype,
-    		factory,
-    		treeplace,
-    		nurseryname,
+    		licenseplate:sxm,
+    		section:section === '' ? keycode : section,
+    		treetype:mmtype,
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
     		size,
-    		supervisorcheck,
-    		checkstatus,
     		status,
 		}
 		if(this.sections.length !== 0){  //不是admin，要做查询判断了
@@ -492,10 +316,9 @@ export default class NursmeasureTable extends Component {
 		if(keycode!== ''&& keycode.indexOf('P010') !== -1){   //有苗木类型选项
 			postdata.foresttype = mmtype
 		}
-    	if(!!role)
-    		postdata[role] = rolename;
+    	
     	this.setState({loading:true,percent:0})
-    	getnurserys({},postdata)
+    	getcarpackage({},postdata)
     	.then(rst => {
     		this.setState({loading:false,percent:100})
     		if(!rst)
@@ -503,7 +326,7 @@ export default class NursmeasureTable extends Component {
     		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
-	    			tblData[i].statusname = plan.IsPack === 0 ? '未打包' : '已打包';
+	    			let statusname = plan.statusname;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			tblData[i].liftertime1 = !!plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
 					tblData[i].liftertime2 = !!plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';

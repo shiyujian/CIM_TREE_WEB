@@ -151,7 +151,7 @@ export default class FaithTable extends Component {
         )} else {
             const {factory} = this.state;
             return <div>
-                <span>供苗商：</span>
+                <span>供应商：</span>
                 <Input className='forestcalcw3 mxw200' onPressEnter={this.factorychange.bind(this)}/>
             </div>
         }
@@ -164,7 +164,7 @@ export default class FaithTable extends Component {
             <Select value={section} onSelect={this.onsectionchange.bind(this)} style={{width: '63px'}}>
                 {sectionoption}
             </Select>
-            <span>最诚信供苗商</span>
+            <span>最诚信供应商</span>
         </div>
     }
     //图1点击事件
