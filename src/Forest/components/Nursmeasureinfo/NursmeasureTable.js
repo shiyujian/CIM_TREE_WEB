@@ -503,18 +503,7 @@ export default class NursmeasureTable extends Component {
     		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
-	    			let statusname = plan.statusname;
-	    			if(postdata.status === '0') 
-	    				statusname = '已种植'
-	    			else if(postdata.status === '1')
-	    				statusname = '进场退回'
-	    			else if(postdata.status === '2')
-	    				statusname = '监理退回'
-	    			else if(postdata.status === '3')
-	    				statusname = '业主退回'
-	    			else
-	    				statusname = ''
-	    			tblData[i].statusname = statusname;
+	    			tblData[i].statusname = plan.IsPack === 0 ? '未打包' : '已打包';
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			tblData[i].liftertime1 = !!plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
 					tblData[i].liftertime2 = !!plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
