@@ -123,11 +123,11 @@ export default class ScheduleStageDeal extends Component {
             DocType:'doc',
             Items:items,
             ProgressNo:'01',
-            ProgressTime:subject.timedate,
+            ProgressTime:subject.timedate?JSON.parse(subject.timedate):'',
             ProgressType:'日实际',
             SMS:0,
-            UnitProject:subject.unit,
-            WPNo:''
+            UnitProject:subject.section?JSON.parse(subject.section):'',
+            WPNo:subject.section?JSON.parse(subject.section):'',
         }
         // 日进度入库
         addSchedule({},scheduledata).then(item=>{

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
-import { FORESTTYPE } from '../../../_platform/api';
+import { PROJECT_UNITS,SECTIONNUMBERNAME } from '../../../_platform/api';
 import {Cards, SumTotal, DateImg} from '../../components';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
@@ -106,32 +106,19 @@ export default class Bottom extends Component {
             leftkeycode
         } = this.props
         let sectionoption=[]
-        if(leftkeycode.indexOf('P009')>-1){
-        
-            sectionoption = [
-                <Option key={'P009-01-01'} value={'P009-01-01'}>一标段</Option>,
-                <Option key={'P009-01-02'} value={'P009-01-02'}>二标段</Option>,
-                <Option key={'P009-01-03'} value={'P009-01-03'}>三标段</Option>,
-                <Option key={'P009-01-04'} value={'P009-01-04'}>四标段</Option>,
-                <Option key={'P009-01-05'} value={'P009-01-05'}>五标段</Option>
-            ];
-
-            this.setState({
-                section:'P009-01-01'
-            })
-        }else if(leftkeycode.indexOf('P010')>-1){
-            sectionoption = [
-                <Option key={'P010-01-01'} value={'P010-01-01'}>一标段</Option>,
-                <Option key={'P010-01-02'} value={'P010-01-02'}>二标段</Option>,
-                <Option key={'P010-01-03'} value={'P010-01-03'}>三标段</Option>,
-                <Option key={'P010-01-04'} value={'P010-01-04'}>四标段</Option>,
-                <Option key={'P010-02-05'} value={'P010-02-05'}>五标段</Option>,
-                <Option key={'P010-03-06'} value={'P010-03-06'}>六标段</Option>,
-            ];
-            this.setState({
-                section:'P010-01-01'
-            })
-        }
+        PROJECT_UNITS.map((project)=>{
+            //获取正确的项目    
+            if(leftkeycode.indexOf(project.code)>-1){
+                 //获取项目下的标段
+                let sections = project.units
+                sections.map((section,index)=>{
+                    sectionoption.push(<Option key={section.code} value={section.code}>{section.value}</Option>)
+                })
+                this.setState({
+                    section:sections && sections[0] && sections[0].code
+                })
+            }
+        })
         this.setState({
             sectionoption
         })
@@ -185,26 +172,11 @@ export default class Bottom extends Component {
             }
             
         }
-        switch(code){
-            case '01':
-                selectSmallClassList = SmallClassList.filter(list => list.UnitProject === '1标段')
-                break;
-            case '02':
-                selectSmallClassList = SmallClassList.filter(list => list.UnitProject === '2标段')
-                break;
-            case '03':
-                selectSmallClassList = SmallClassList.filter(list => list.UnitProject === '3标段')
-                break;
-            case '04':
-                selectSmallClassList = SmallClassList.filter(list => list.UnitProject === '4标段')
-                break;
-            case '05':
-                selectSmallClassList = SmallClassList.filter(list => list.UnitProject === '5标段')
-                break;
-            case '06':
-                selectSmallClassList = SmallClassList.filter(list => list.UnitProject === '6标段')
-                break;
-        }
+        SECTIONNUMBERNAME.map((section)=>{
+            if(code === section.code){
+                selectSmallClassList = SmallClassList.filter(list => list.UnitProject === section.name)
+            }
+        })
         console.log('SmallClassList',SmallClassList)
         console.log('selectSmallClassListselectSmallClassList',selectSmallClassList)
 
@@ -261,7 +233,7 @@ export default class Bottom extends Component {
         
         param.no = code + "-" +smallClassSelect;
         param.section = section;
-        param.stime = stime;
+        // param.stime = stime;
         param.etime = etime;
         let rst = await gettreetypeThinClass({},param)
 
@@ -372,24 +344,20 @@ export default class Bottom extends Component {
     search() {
             return (
                 <div>
-                    <span>种植时间：</span>
-                    <RangePicker 
+                    <span>截止时间：</span>
+                    <DatePicker 
                         style={{verticalAlign:"middle"}} 
-                        defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]} 
+                        defaultValue={moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')} 
                         showTime={{ format: 'HH:mm:ss' }}
                         format={'YYYY/MM/DD HH:mm:ss'}
                         onChange={this.datepick.bind(this)}
                         onOk={this.datepick.bind(this)}
                     >
-                    </RangePicker>
+                    </DatePicker>
                 </div>
             ) 
     }
     datepick(value){
-        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
-        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
+        this.setState({etime:value?moment(value).format('YYYY/MM/DD'):'',})
     }
-    
-    
-    
 }

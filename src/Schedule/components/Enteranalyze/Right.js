@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Row, Col, Input, Icon, DatePicker, Select, Spin} from 'antd';
 import {Cards, SumTotal, DateImg} from '../../components';
-import { FOREST_API, FORESTTYPE,TREETYPENO} from '../../../_platform/api';
+import { FOREST_API,TREETYPENO,PROJECT_UNITS,ECHARTSCOLOR} from '../../../_platform/api';
 import moment from 'moment';
 import {groupBy} from 'lodash';
 var echarts = require('echarts');
@@ -163,14 +163,8 @@ export default class Right extends Component {
         let gpshtnum = [];
         let times = [];
         let time = [];
-        data[0] = new Array()
-        data[1] = new Array()
-        data[2] = new Array()
-        data[3] = new Array()
-        data[4] = new Array()
-        if(leftkeycode.indexOf('P010') >-1){
-            data[5] = new Array()
-        }
+        let legend = ['总数']
+        
         
         if(rst && rst instanceof Array){
             //将 Time 单独列为一个数组
@@ -184,76 +178,39 @@ export default class Right extends Component {
             times = [...new Set(time)]
             console.log('times',times)
 
-
-            //定义一个二维数组，分为多个标段
-            gpshtnum[0] = new Array()
-            gpshtnum[1] = new Array()
-            gpshtnum[2] = new Array()
-            gpshtnum[3] = new Array()
-            gpshtnum[4] = new Array()
-            
-
-            if(leftkeycode.indexOf('P009')>-1){
-                rst.map(item=>{
-                    if(item && item.Section){
-                        switch(item.Section){
-                            case 'P009-01-01' : 
-                            gpshtnum[0].push(item)
-                                break;
-                            case 'P009-01-02' :
-                            gpshtnum[1].push(item)
-                                break;
-                            case 'P009-01-03' :
-                            gpshtnum[2].push(item)
-                                break;
-                            case 'P009-01-04' :
-                            gpshtnum[3].push(item)
-                                break;
-                            case 'P009-01-05' :
-                            gpshtnum[4].push(item)
-                                break;
-                        }
-                    }                    
-                })
-            }else if(leftkeycode.indexOf('P010') >-1){
-                gpshtnum[5] = new Array()
-                rst.map(item=>{
-                    if(item && item.Section){
-                        switch(item.Section){
-                            case 'P010-01-01' : 
-                                gpshtnum[0].push(item)
-                                break;
-                            case 'P010-01-02' :
-                                gpshtnum[1].push(item)
-                                break;
-                            case 'P010-01-03' :
-                                gpshtnum[2].push(item)
-                                break;
-                            case 'P010-01-04' :
-                                gpshtnum[3].push(item)
-                                break;
-                            case 'P010-02-05' :
-                                gpshtnum[4].push(item)
-                                break;
-                            case 'P010-03-06' :
-                                gpshtnum[5].push(item)
-                                break;
-                        }
-                    }                    
+            if(rst && rst instanceof Array){
+                PROJECT_UNITS.map((project)=>{
+                    //获取正确的项目    
+                    if(leftkeycode.indexOf(project.code)>-1){
+                        //获取项目下的标段
+                        let sections = project.units
+                        //将各个标段的数据设置为0
+                        sections.map((section,index)=>{
+                            //定义一个二维数组，分为多个标段
+                            gpshtnum[index] = new Array()
+                            data[index] = new Array()
+                            legend.push(section.value)
+                        })
+    
+                        rst.map(item=>{
+                            if(item && item.Section){
+                                sections.map((section,index)=>{
+                                    if(item.Section === section.code){
+                                        gpshtnum[index].push(item)
+                                    }
+                                })
+                            }
+                        })
+                    }
                 })
             }
+            
             console.log('gpshtnum',gpshtnum)
             times.map((time,index)=>{
-                data[0][index]=0;
-                data[1][index]=0;
-                data[2][index]=0;
-                data[3][index]=0;
-                data[4][index]=0;
-                if(leftkeycode.indexOf('P010') >-1){
-                    data[5][index]=0;
-                }
-                
-                
+                data.map((sectionData)=>{
+                    sectionData[index] = 0
+                })
+                console.log('sectionData',data)
                 gpshtnum.map((test,i)=>{
                     test.map((arr,a)=>{
                         if(moment(arr.Time).format('YYYY/MM/DD') === time){
@@ -264,20 +221,17 @@ export default class Right extends Component {
                 
             })
             for(let i=0;i<times.length;i++){
-                if(leftkeycode.indexOf('P010') >-1){
-                    total[i]=data[0][i]+data[1][i]+data[2][i]+data[3][i]+data[4][i]+data[5][i]
-                }else{
-                    total[i]=data[0][i]+data[1][i]+data[2][i]+data[3][i]+data[4][i]
-                }
-               
+                total[i] = 0
+                data.map((sectionData)=>{
+                    total[i] = total[i] + sectionData[i]
+                })
             }
             console.log('total',total)
             console.log('data',data)
 
         }
 
-        let legend = ['总数','一标段','二标段','三标段','四标段','五标段'];
-        let series= [
+        let series = [
             {
                 name:'总数',
                 type:'bar',
@@ -289,73 +243,23 @@ export default class Right extends Component {
                         barBorderRadius:[50,50,50,50]
                     }
                 }
-            },
-            {
-                name:'一标段',
-                type:'line',
-                data:data[0],
-                itemStyle:{
-                    normal:{
-                        color:'black'
-                    }
-                }
-            },
-            {
-                name:'二标段',
-                type:'line',
-                data:data[1],
-                itemStyle:{
-                    normal:{
-                        color:'orange'
-                    }
-                }
-            },
-            {
-                name:'三标段',
-                type:'line',
-                data:data[2],
-                itemStyle:{
-                    normal:{
-                        color:'yellow'
-                    }
-                }
-            },
-            {
-                name:'四标段',
-                type:'line',
-                data:data[3],
-                itemStyle:{
-                    normal:{
-                        color:'blue'
-                    }
-                }
-            },
-            {
-                name:'五标段',
-                type:'line',
-                data:data[4],
-                itemStyle:{
-                    normal:{
-                        color:'green'
-                    }
-                }
             }
         ]
-        if (leftkeycode.indexOf('P010') >-1){
+        data.map((sectionData,index)=>{
             series.push(
                 {
-                    name:'六标段',
+                    name:legend[index+1],
                     type:'line',
-                    data:data[5],
+                    data:sectionData,
                     itemStyle:{
                         normal:{
-                            color:'purple'
+                            color:ECHARTSCOLOR[index]
                         }
                     }
-                }
+                },
             )
-            legend.push('六标段')
-        }
+        })
+
         
         let myChart2 = echarts.init(document.getElementById('stock'));
         let options2 = {

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Select } from 'antd';
 import * as actions from '../store';
-import { PROJECT_UNITS, FORESTTYPE } from '_platform/api';
+import { PROJECT_UNITS } from '_platform/api';
 import { PkCodeTree } from '../components';
 import { ContrastTable } from '../components/Contrastinfo';
 import { actions as platformActions } from '_platform/store/global';

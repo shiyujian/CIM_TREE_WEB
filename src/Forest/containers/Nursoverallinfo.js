@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {Select} from 'antd';
 import * as actions from '../store';
 import {PkCodeTree} from '../components';
-import {PROJECT_UNITS,FORESTTYPE} from '_platform/api';
+import {PROJECT_UNITS} from '_platform/api';
 import {NursOverallTable} from '../components/Nursoverallinfo';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';

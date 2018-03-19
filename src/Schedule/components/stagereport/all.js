@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-16 14:27:43
+ * @Last Modified time: 2018-03-18 22:12:20
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -17,7 +17,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
-import { base, SOURCE_API, DATASOURCECODE,UNITS } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE,UNITS,SERVICE_API,PROJECT_UNITS,SECTIONNAME } from '../../../_platform/api';
 // import PerSearch from './PerSearch';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { WORKFLOW_CODE } from '../../../_platform/api';
@@ -48,15 +48,27 @@ class All extends Component {
             newFileLists: [],
             key:Math.random(),
             sectionSchedule:[], //当前用户的标段信息
+            file:'',
+            projectName:'', //当前用户的项目信息
+            filterData:[], //对流程信息根据项目进行过滤
         };
     }
     async componentDidMount() {
         this.gettaskSchedule();
         this.getSection()
     }
+
+    async componentDidUpdate(prevProps,prevState){
+        const{
+            leftkeycode
+        } = this.props
+        if(leftkeycode != prevProps.leftkeycode){
+            this.filterTask()
+        }
+    }
     // 获取总进度进度计划流程信息
     gettaskSchedule = async ()=>{
-        const { actions: { getTaskSchedule } } = this.props;
+        const { actions: { getTaskSchedule },leftkeycode } = this.props;
         let reqData={};
         this.props.form.validateFields((err, values) => {
 			console.log("总进度进度计划流程信息", values);
@@ -81,17 +93,21 @@ class All extends Component {
         let arrange = {};
         if(task && task instanceof Array){
             task.map((item,index)=>{
+
                 let itemdata = item.workflowactivity.subject[0];
                 let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
                 let itemtreatmentdata = itemdata.TreatmentData ? JSON.parse(itemdata.TreatmentData) : null;
+                
+               
                 let itemarrange = {
                     index:index+1,
                     id:item.workflowactivity.id,
                     section: itemdata.section?JSON.parse(itemdata.section):'',
                     sectionName: itemdata.sectionName?JSON.parse(itemdata.sectionName):'',
+                    projectName: itemdata.projectName?JSON.parse(itemdata.projectName):'',
                     type: itempostdata.type,
                     numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
-                    remarks:itemtreatmentdata[0].remarks||"--",
+                    // remarks:itemtreatmentdata[0].remarks||"--",
                     submitperson:item.workflowactivity.creator.person_name,
                     submittime:item.workflowactivity.real_start_time,
                     status:item.workflowactivity.status,
@@ -104,8 +120,58 @@ class All extends Component {
             })
             this.setState({
                 totolData:totledata
+            },()=>{
+                this.filterTask()
             })
         }
+    }
+    //对流程信息根据选择项目进行过滤
+    filterTask(){
+        const {
+            totolData 
+        }=this.state
+        const{
+            leftkeycode
+        }=this.props
+        let filterData = []
+        let user = getUser()
+        console.log('user',user)
+        let sections = user.sections
+        console.log('sections',sections)
+        sections = JSON.parse(sections)
+        let selectCode = ''
+        //关联标段的人只能看自己项目的进度流程
+        if(sections && sections instanceof Array && sections.length>0){
+            let code = sections[0].split('-')
+            selectCode = code[0] || ''
+        }else{
+            //不关联标段的人可以看选择项目的进度流程
+            selectCode = leftkeycode
+        }
+        console.log('selectCode',selectCode)
+        totolData.map((task)=>{
+            console.log('task',task)
+            let projectName = task.projectName
+            let projectCode = this.getProjectCode(projectName)
+            if(projectCode === selectCode){
+                filterData.push(task);
+            }
+        })   
+        console.log('filterData',filterData)
+        this.setState({
+            filterData
+        })
+    }
+    //获取项目code
+    getProjectCode(projectName){
+        let projectCode = ''
+        PROJECT_UNITS.map((item)=>{
+            if(projectName === item.value){
+                projectCode = item.code
+            }
+        })
+		console.log('projectCode',projectCode)
+		return projectCode 
     }
     //获取当前登陆用户的标段
     getSection(){
@@ -113,46 +179,40 @@ class All extends Component {
         console.log('user',user)
         let sections = user.sections
         let sectionSchedule = []
-        let name = ''
+        let sectionName = ''
+        let projectName = ''
         console.log('sections',sections)
         sections = JSON.parse(sections)
         if(sections && sections instanceof Array && sections.length>0){
             sections.map((section)=>{
                 let code = section.split('-')
                 if(code && code.length === 3){
-                    switch(code[2]){
-                        case '01':
-                            name = '一标段'
-                            break;
-                        case '02':
-                            name = '二标段'
-                            break;
-                        case '03':
-                            name = '三标段'
-                            break;
-                        case '04':
-                            name = '四标段'
-                            break;
-                        case '05':
-                            name = '五标段'
-                            break;
-                        case '06':
-                            name = '六标段'
-                            break;
-                    }
+                    //获取当前标段的名字
+                    SECTIONNAME.map((item)=>{
+                        if(code[2] === item.code){
+                            sectionName = item.name
+                        }
+                    })
+                    //获取当前标段所在的项目
+                    PROJECT_UNITS.map((item)=>{
+                        if(code[0] === item.code){
+                            projectName = item.value
+                        }
+                    })
                 }
                 sectionSchedule.push({
                     value:section,
-                    name:name
+                    name:sectionName
                 })
+
+               
             })
             
             console.log('sectionSchedule',sectionSchedule)
             this.setState({
-                sectionSchedule
+                sectionSchedule,
+                projectName
             })
-
-
         }
     }
     //获取当前登陆用户的标段的下拉选项
@@ -168,7 +228,12 @@ class All extends Component {
     }   
 
     render() {
-        const { selectedRowKeys,sectionSchedule=[] } = this.state;
+        const { 
+            selectedRowKeys,
+            sectionSchedule=[],
+            filterData,
+            TotleModaldata
+        } = this.state;
         const {
             form: { getFieldDecorator },
             fileList = [],
@@ -181,17 +246,18 @@ class All extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 },
         }
-        // let sectionOption =[]
-        // if(sectionSchedule && sectionSchedule.length>0){
-        //     sectionOption = this.getSectionOption()
-        // }
+        let fileName = '暂无文件';
+        if(this.state.file){
+            fileName = this.state.file.name;
+        }
 
         let sectionOption = this.getSectionOption()
         return (
             <div>
                 {
                     this.state.totlevisible &&
-                    <TotleModal {...this.props}
+                    <TotleModal
+                        {...this.props}
                         {...this.state.TotleModaldata}
                         oncancel={this.totleCancle.bind(this)}
                         onok={this.totleOk.bind(this)}
@@ -203,7 +269,7 @@ class All extends Component {
                 <Table
                     columns={this.columns}
                     // rowSelection={rowSelection}
-                    dataSource={this.state.totolData} 
+                    dataSource={filterData} 
                     bordered
                     rowKey='index'
                     className='foresttable'/>
@@ -214,7 +280,7 @@ class All extends Component {
                     maskClosable={false}
                     onCancel={this.closeModal.bind(this)}
                     onOk={this.sendWork.bind(this)}
-                    key={this.state.key}
+                    // key={this.state.key}
                 >
                     <div>
                         <Form>
@@ -224,7 +290,7 @@ class All extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='标段'>
                                                 {
-                                                    getFieldDecorator('section', {
+                                                    getFieldDecorator('Tsection', {
                                                         rules: [
                                                             { required: true, message: '请选择标段' }
                                                         ]
@@ -238,7 +304,7 @@ class All extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
-                                                    getFieldDecorator('numbercode', {
+                                                    getFieldDecorator('Tnumbercode', {
                                                         rules: [
                                                             { required: true, message: '请输入编号' }
                                                         ]
@@ -252,7 +318,7 @@ class All extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
-                                                    getFieldDecorator('totledocument', {
+                                                    getFieldDecorator('Ttotledocument', {
                                                         initialValue: `总计划进度`,
                                                         rules: [
                                                             { required: true, message: '请选择文档类型' }
@@ -265,7 +331,7 @@ class All extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
-                                                    getFieldDecorator('superunit', {
+                                                    getFieldDecorator('Tsuperunit', {
                                                         rules: [
                                                             { required: true, message: '请选择审核人员' }
                                                         ]
@@ -276,17 +342,20 @@ class All extends Component {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Dragger
-                                            {...this.uploadProps}
-                                        >
+                                        <Dragger  
+                                            style={{ margin: '10px' }}
+                                            onChange={this.uplodachange.bind(this)}
+                                            name='file'
+                                            showUploadList={false}
+                                            action={`${SERVICE_API}/excel/upload-api/`}
+                                            beforeUpload = {this.beforeUpload.bind(this)}
+                                            >
                                             <p className="ant-upload-drag-icon">
-                                                <Icon type="inbox" />
+                                                    <Icon type="inbox" />
                                             </p>
-                                            <p className="ant-upload-text">点击或者拖拽开始上传</p>
-                                            <p className="ant-upload-hint">
-                                                支持 pdf、doc、docx 文件
-								            </p>
-                                        </Dragger>
+                                            <p className="ant-upload-text">上传进度表(文件名需为英文)</p>
+                                            <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
+                                        </Dragger >
 
                                         <Table
                                             columns={this.columns1}
@@ -301,13 +370,15 @@ class All extends Component {
                                         <Col span={8} offset={4}>
                                             <FormItem {...FormItemLayout} label='审核人'>
                                                 {
-                                                    getFieldDecorator('dataReview', {
+                                                    getFieldDecorator('TdataReview', {
                                                         rules: [
                                                             { required: true, message: '请选择审核人员' }
                                                         ]
                                                     })
                                                         (
-                                                        <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.总进度计划报批流程}/>
+                                                        <PerSearch selectMember={this.selectMember.bind(this)} 
+                                                         code={WORKFLOW_CODE.总进度计划报批流程} 
+                                                         visible={this.state.visible}/>
                                                         )
                                                 }
                                             </FormItem>
@@ -328,35 +399,106 @@ class All extends Component {
 
     //获取当前标段的名字
     getSectionName(section){
-		let name = ''
+		let sectionName = ''
 		if(section){
 			let code = section.split('-')
 			if(code && code.length === 3){
-				switch(code[2]){
-					case '01':
-						name = '一标段'
-						break;
-					case '02':
-						name = '二标段'
-						break;
-					case '03':
-						name = '三标段'
-						break;
-					case '04':
-						name = '四标段'
-						break;
-					case '05':
-						name = '五标段'
-						break;
-					case '06':
-						name = '六标段'
-						break;
-				}
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        sectionName = item.name
+                    }
+                })
 			}
 		}
-		console.log('name',name)
-		return name 
+		console.log('sectionName',sectionName)
+		return sectionName 
     }
+
+    //上传excel文件
+    beforeUpload(file){
+        let {
+            actions:{
+                postScheduleFile
+            }
+        } = this.props;
+        let type  =  file.name.toString().split('.');
+        console.log('type',type)
+        let len = type.length
+        if(type[len-1]==='xlsx' || type[len-1]==='xls'){
+            const formdata = new FormData();
+            formdata.append('a_file',file);
+            formdata.append('name',file.name);
+            let downloadState = true
+            postScheduleFile({},formdata).then(rst=>{
+                if(rst && rst.id){
+                    rst.a_file = (rst.a_file) && (rst.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                    rst.download_url = (rst.download_url) && (rst.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                    rst.preview_url = (rst.preview_url) && (rst.preview_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                    console.log('rst.a_file',rst.a_file);
+                    console.log('rst.download_url',rst.download_url);
+                    console.log('rst.preview_url',rst.preview_url);
+                    console.log('文件',rst)
+                    this.setState({file:rst});
+                    return true;
+                }else{
+                    notification.error({
+                        message: '文件上传失败',
+                        duration: 2
+                    })
+                    downloadState = false
+                    return false;
+                }
+            });
+        }else{
+            notification.error({
+                message: '请上传excel文件',
+                duration: 2
+            })
+            return false;
+        }
+    }
+    //解析文件
+    uplodachange(info){
+        console.log('解析文件',info)
+        if (info && info.file && info.file.status !== 'uploading') {
+			//console.log(info.file, info.fileList);
+        }
+        if (info && info.file && info.file.status === 'done') {
+            let name = Object.keys(info.file.response)
+            let dataList = info.file.response[name[0]]
+            console.log('dataList',dataList)
+            let scheduleMaster = [];
+            for(var i=1;i<dataList.length;i++){
+                scheduleMaster.push({
+                    key: i,
+                    code: dataList[i][0]?dataList[i][0]:'',
+                    name: dataList[i][1]?dataList[i][1]:'',
+                    type: dataList[i][2]?dataList[i][2]:'',
+                    company: dataList[i][3]?dataList[i][3]:'',
+                    quantity: dataList[i][4]?dataList[i][4]:'',
+                    output: dataList[i][5]?dataList[i][5]:'',
+                    schedule: dataList[i][8]?dataList[i][8]:'',
+                    path: dataList[i][9]?dataList[i][9]:'',
+                    milestone: dataList[i][10]?dataList[i][10]:'',
+                    site: dataList[i][11]?dataList[i][11]:'',
+                })
+            }
+            console.log('scheduleMaster',scheduleMaster)
+            
+            notification.success({
+                message: '文件上传成功',
+                duration: 2
+            })
+		}else if (info && info.file && info.file.status === 'error') {
+            this.setState({file:null});
+			notification.error({
+                message: '文件上传失败',
+                duration: 2
+            })
+            return;
+		}
+	};
 
     // 确认提交
     sendWork() {
@@ -370,7 +512,8 @@ class All extends Component {
         } = this.props
         const {
             TreatmentData,
-            sectionSchedule
+            sectionSchedule,
+            projectName
         } = this.state
 
         let user = getUser();//当前登录用户
@@ -393,13 +536,13 @@ class All extends Component {
         me.props.form.validateFields((err, values) => {
             console.log('asdasddddddddddddddddddddd',values)
             if (!err) {
-                if (TreatmentData.length === 0) {
-                    notification.error({
-                        message: '请上传文件',
-                        duration: 5
-                    })
-                    return
-                }
+                // if (TreatmentData.length === 0) {
+                //     notification.error({
+                //         message: '请上传文件',
+                //         duration: 5
+                //     })
+                //     return
+                // }
 
                 postData.upload_unit = user.org ? user.org : '';
                 postData.type = '总进度计划';
@@ -414,15 +557,16 @@ class All extends Component {
                     "id": parseInt(user.id)
                 };
                 
-                let sectionName = me.getSectionName(values.section)
+                let sectionName = me.getSectionName(values.Tsection)
                 let subject = [{
-                    "section": JSON.stringify(values.section),
+                    "section": JSON.stringify(values.Tsection),
                     "sectionName":JSON.stringify(sectionName),
-					"superunit": JSON.stringify(values.superunit),
-					"dataReview": JSON.stringify(values.dataReview),
-					"numbercode": JSON.stringify(values.numbercode),
+                    "projectName":JSON.stringify(projectName),
+					"superunit": JSON.stringify(values.Tsuperunit),
+					"dataReview": JSON.stringify(values.TdataReview),
+					"numbercode": JSON.stringify(values.Tnumbercode),
 					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
-					"totledocument": JSON.stringify(values.totledocument),
+					"totledocument": JSON.stringify(values.Ttotledocument),
 					"postData": JSON.stringify(postData),
                     "TreatmentData": JSON.stringify(TreatmentData),
                     
@@ -539,10 +683,10 @@ class All extends Component {
             key:Math.random()
         })
         this.props.form.setFieldsValue({
-            superunit: undefined,
-            section: undefined,
-            dataReview: undefined,
-            numbercode: undefined
+            Tsuperunit: undefined,
+            Tsection: undefined,
+            TdataReview: undefined,
+            Tnumbercode: undefined
         })
 
     }
@@ -654,52 +798,53 @@ class All extends Component {
         }
 
         setFieldsValue({
-            dataReview: this.member,
-            superunit: this.member.org
+            TdataReview: this.member,
+            Tsuperunit: this.member.org
         });
     }
 
     columns = [
-        {
-            title: '标段',
-            dataIndex: 'sectionName',
-            key: 'sectionName',
-            width: '15%'
-        }, {
-            title: '进度类型',
-            dataIndex: 'type',
-            key: 'type',
-            width: '10%'
-        }, {
-            title: '编号',
-            dataIndex: 'numbercode',
-            key: 'numbercode',
-            width: '10%'
-        }, {
-            title: '备注',
-            dataIndex: 'remarks',
-            key: 'remarks',
-            width: '10%'
-        }, {
-            title: '提交人',
-            dataIndex: 'submitperson',
-            key: 'submitperson',
-            width: '10%'
-        }, {
-            title: '提交时间',
-            dataIndex: 'submittime',
-            key: 'submittime',
-            width: '10%',
-            sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
+		{
+			title: '项目',
+			dataIndex: 'projectName',
+			key: 'projectName',
+			width: '15%'
+		},
+		{
+			title: '标段',
+			dataIndex: 'sectionName',
+			key: 'sectionName',
+			width: '10%'
+		}, {
+			title: '进度类型',
+			dataIndex: 'type',
+			key: 'type',
+			width: '15%'
+		}, {
+			title: '编号',
+			dataIndex: 'numbercode',
+			key: 'numbercode',
+			width: '15%'
+		}, {
+			title: '提交人',
+			dataIndex: 'submitperson',
+			key: 'submitperson',
+			width: '10%'
+		}, {
+			title: '提交时间',
+			dataIndex: 'submittime',
+			key: 'submittime',
+			width: '15%',
+			sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
 			render: text => {
-				return moment(text).format('YYYY-MM-DD');
+				return moment(text).format('YYYY-MM-DD')
 			}
-        }, {
-            title: '流程状态',
-            dataIndex: 'status',
-            key: 'status',
-            width: '15%',
-            render:(record,index)=>{
+		}, {
+			title: '流程状态',
+			dataIndex: 'status',
+			key: 'status',
+			width: '10%',
+			render:(record,index)=>{
                 if(record===1){
                     return '已提交'
                 }else if(record===2){
@@ -710,17 +855,17 @@ class All extends Component {
                     return ''
                 }
             }
-        }, {
-            title: '操作',
-            render: record => {
-                return (
-                    <span>
-                        <a onClick={this.clickInfo.bind(this, record)}>查看</a>
-                    </span>
-                )
-            }
-        },
-    ];
+		}, {
+			title: '操作',
+			render: record => {
+				return (
+					<span>
+						<a onClick={this.clickInfo.bind(this, record, 'VIEW')}>查看</a>
+					</span>
+				)
+			}
+		},
+	];
     columns1 = [{
         title: '序号',
         dataIndex: 'index',
