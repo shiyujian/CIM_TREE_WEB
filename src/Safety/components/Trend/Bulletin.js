@@ -1,7 +1,9 @@
-import React, {Component} from 'react';
-import {Table, Row, Col, Modal,} from 'antd';
+import React, { Component } from 'react';
+import { Table, Row, Col, Modal, } from 'antd';
 import Blade from '_platform/components/panels/Blade';
 import moment from 'moment';
+import { Link } from 'react-router-dom';
+
 
 export default class Bulletin extends Component {
 
@@ -16,8 +18,8 @@ export default class Bulletin extends Component {
 	static propTypes = {};
 
 	componentDidMount() {
-		const {actions: {getTrenList}} = this.props;
-		getTrenList({}, {tag: '公告', is_draft: false});
+		const { actions: { getTrenList } } = this.props;
+		getTrenList({}, { tag: '公告', is_draft: false });
 	}
 
 	clickNews(record, type) {
@@ -72,17 +74,20 @@ export default class Bulletin extends Component {
 
 		return (
 			<Blade title="安全事故快报">
-					<Table 
-						bordered={false} 
-						dataSource={trenList} 
-						columns={this.columns}
-				        rowKey="id" size="small" pagination={{pageSize: 8}}
-				    />
-					<Modal title="新闻预览" width={800} visible={this.state.visible}
-						onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
-						<div style={{maxHeight: '800px', overflow: 'auto'}}
-						     dangerouslySetInnerHTML={{__html: this.state.container}}/>
-					</Modal>
+				<Link to='/safety/safetyTrend'>
+					<span style={{ float: "right", marginTop: "-30px" }} >MORE</span>
+				</Link>
+				<Table
+					bordered={false}
+					dataSource={trenList}
+					columns={this.columns}
+					rowKey="id" size="small" pagination={{ pageSize: 8 }}
+				/>
+				<Modal title="新闻预览" width={800} visible={this.state.visible}
+					onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
+					<div style={{ maxHeight: '800px', overflow: 'auto' }}
+						dangerouslySetInnerHTML={{ __html: this.state.container }} />
+				</Modal>
 			</Blade>
 		);
 	}
