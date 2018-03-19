@@ -3,7 +3,6 @@ import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,DatePi
 import { base, STATIC_DOWNLOAD_API,SOURCE_API,WORKFLOW_CODE } from '../../../_platform/api';
 import moment from 'moment';
 import Preview from '../../../_platform/components/layout/Preview';
-import PerSearch from '../Task/PerSearch';
 import queryString from 'query-string';
 import { getUser } from '_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';

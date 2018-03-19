@@ -12,7 +12,7 @@ export const getTreeOK = createAction(`${ID}_getTreeOK`);
 export const changeNursery = createAction(`${ID}传递nurseryName`);
 export const getHonestyNewDetailOk = createAction(`${ID}存储返回的详情`);
 export const clearList = createAction(`${ID}清空列表`);
-export const nurseryName = createAction(`${ID}供苗商名字`);
+export const nurseryName = createAction(`${ID}供应商名字`);
 const getForestUsersOK = createAction('获取森林数据用户列表');
 const getTreeListOK = createAction('获取森林树种列表');
 
@@ -59,6 +59,8 @@ export const getHonestyNewDetailModal = createFetchAction(`${FOREST_API}/trees/h
 export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/tree/factoryanalysebytreetype`, '');
 export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //    √
 export const postPositionData = createFetchAction(`${FOREST_API}/tree/importLocations?user={{id}}`, [],'POST'); //    √
+export const getcarpackage = createFetchAction(`${FOREST_API}/tree/carpacks`, []);
+export const getexportcarpackage = createFetchAction(`${FOREST_API}/tree/exportFactoryAnalyseInfo`, []);
 export const actions = {
 	getForestUsers,
 	getTreeOK,
@@ -103,7 +105,9 @@ export const actions = {
 	getHonestyNewDetailModal,
 	getLittleBan,
 	getForestTreeNodeList,
-	postPositionData
+	postPositionData,
+	getcarpackage,
+	getexportcarpackage
 	// getTreeNodeList
 };
 export default handleActions({

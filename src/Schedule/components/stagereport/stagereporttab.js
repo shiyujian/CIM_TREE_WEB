@@ -3,10 +3,11 @@ import { Row, Col, Input, Form, Spin, Icon, Button, Table, Modal, DatePicker, Pr
 // import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS } from '../../../_platform/api';
+import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS, PROJECT_UNITS,SECTIONNAME ,SCHEDULETREEDATA} from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
-import PerSearch from './PerSearch';
+// import PerSearch from './PerSearch';
+import PerSearch from '../../../_platform/components/panels/PerSearch';
 import SearchInfo from './SearchInfo';
 import queryString from 'query-string';
 import DayModal from './DayModal';
@@ -19,11 +20,7 @@ class Stagereporttab extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			daydata:[
-				{
-					unit:'1111'
-				}
-			],
+			daydata:[],
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			visible: false,
@@ -31,7 +28,11 @@ class Stagereporttab extends Component {
 			isCopyMsg: false, //接收人员是否发短信
 			treedataSource: [],
 			treetype: [],//树种
-			TotleModaldata:[]
+			TotleModaldata:[],
+			key:Math.random(),
+			sectionSchedule:[],
+			projectName:'',
+			filterData:[], //对流程信息根据项目进行过滤
 		};
 	}
 
@@ -48,7 +49,17 @@ class Stagereporttab extends Component {
 				this.setState({ treetype });
 			})
 		this.gettaskSchedule();
+		this.getSection()
 	}
+
+	async componentDidUpdate(prevProps,prevState){
+        const{
+            leftkeycode
+        } = this.props
+        if(leftkeycode != prevProps.leftkeycode){
+            this.filterTask()
+        }
+    }
 	// 获取日实际进度流程信息
     gettaskSchedule = async ()=>{
 		const { actions: { getTaskSchedule } } = this.props;
@@ -57,11 +68,11 @@ class Stagereporttab extends Component {
 			console.log("日实际进度流程信息", values);
             console.log("err", err);
             
-            values.sunitproject?reqData.subject_unit__contains = values.sunitproject : '';
+            values.sunitproject?reqData.subject_sectionName__contains = values.sunitproject : '';
             values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
             values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
-            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD HH:MM:SS') : '';
-            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
+            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
         })
         
@@ -83,7 +94,9 @@ class Stagereporttab extends Component {
 				let itemarrange = {
 					index:index+1,
 					id:item.workflowactivity.id,
-					unit: itemdata.unit?JSON.parse(itemdata.unit):'',
+					section: itemdata.section?JSON.parse(itemdata.section):'',
+					sectionName: itemdata.sectionName?JSON.parse(itemdata.sectionName):'',
+					projectName: itemdata.projectName?JSON.parse(itemdata.projectName):'',
 					type: itempostdata.type,
 					numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
 					submitperson:item.workflowactivity.creator.person_name,
@@ -99,101 +112,278 @@ class Stagereporttab extends Component {
 			})
 			this.setState({
 				daydata:totledata
+			},()=>{
+                this.filterTask()
+            })
+		}
+	}
+	    //对流程信息根据选择项目进行过滤
+		filterTask(){
+			const {
+				daydata 
+			}=this.state
+			const{
+				leftkeycode
+			}=this.props
+			let filterData = []
+			let user = getUser()
+			console.log('user',user)
+			let sections = user.sections
+			console.log('sections',sections)
+			sections = JSON.parse(sections)
+			
+			let selectCode = ''
+			//关联标段的人只能看自己项目的进度流程
+			if(sections && sections instanceof Array && sections.length>0){
+				let code = sections[0].split('-')
+				selectCode = code[0] || ''
+			}else{
+				//不关联标段的人可以看选择项目的进度流程
+				selectCode = leftkeycode
+			}      
+			console.log('selectCode',selectCode)
+			daydata.map((task)=>{
+				console.log('task',task)
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				if(projectCode === selectCode){
+					filterData.push(task);
+				}
+			})
+			console.log('filterData',filterData)
+			this.setState({
+				filterData
 			})
 		}
-    }
-	onSelectChange = (selectedRowKeys, selectedRows) => {
-		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
-	}
-	// 操作--查看
-    clickInfo(record) {
-        this.setState({ dayvisible: true, TotleModaldata:record });
-    }
-    // 取消
-    totleCancle() {
-        this.setState({ dayvisible: false });
-    }
-    // 确定
-    totleOk() {
-        this.setState({ dayvisible: false });
-    }
-	// 删除
-	deleteClick = () => {
-		const { selectedRowKeys } = this.state
-		if (selectedRowKeys.length === 0) {
-			notification.warning({
-				message: '请先选择数据！',
-				duration: 2
-			});
-			return
-		} else {
-			alert('还未做删除功能')
+		//获取项目code
+		getProjectCode(projectName){
+			let projectCode = ''
+			PROJECT_UNITS.map((item)=>{
+				if(projectName === item.value){
+					projectCode = item.code
+				}
+			})
+			console.log('projectCode',projectCode)
+			return projectCode 
 		}
-	}
+	//获取当前登陆用户的标段
+    getSection(){
+        let user = getUser()
+        console.log('user',user)
+        let sections = user.sections
+        let sectionSchedule = []
+        let sectionName = ''
+        let projectName = ''
+        console.log('sections',sections)
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            sections.map((section)=>{
+                let code = section.split('-')
+                if(code && code.length === 3){
+                    //获取当前标段的名字
+                    SECTIONNAME.map((item)=>{
+                        if(code[2] === item.code){
+                            sectionName = item.name
+                        }
+                    })
+                    //获取当前标段所在的项目
+                    PROJECT_UNITS.map((item)=>{
+                        if(code[0] === item.code){
+                            projectName = item.value
+                        }
+                    })
+                }
+                sectionSchedule.push({
+                    value:section,
+                    name:sectionName
+                })
 
-	// 新增按钮
-	addClick = () => {
-		let treedata = [
-			{
-				key:0,
-				project: '便道施工',
-				units: 'm',
-				canDelete: false
-			}, {
-				key:1,
-				project: '给排水沟槽开挖',
-				units: 'm',
-				canDelete: false
-			}, {
-				key:2,
-				project: '给排水管道安装',
-				units: 'm',
-				canDelete: false
-			}, {
-				key:3,
-				project: '给排水回填',
-				units: 'm',
-				canDelete: false
-			}, {
-				key:4,
-				project: '绿地平整',
-				units: '亩',
-				canDelete: false
-			}, {
-				key:5,
-				project: '种植穴工程',
-				units: '个',
-				canDelete: false
-			},
-		];
-		this.setState({
-			visible: true,
-			treedataSource: treedata
-		})
-		this.props.form.setFieldsValue({
-			superunit: undefined,
-			unit: undefined,
-			dataReview: undefined,
-			numbercode: undefined,
-			timedate: undefined
-		})
+               
+            })
+            
+			console.log('sectionSchedule',sectionSchedule)
+			console.log('projectName',projectName)
+            this.setState({
+                sectionSchedule,
+                projectName
+            })
+        }
+    }
+	//获取当前登陆用户的标段的下拉选项
+    getSectionOption(){
+        const{
+            sectionSchedule
+        } = this.state
+        let option = []
+        sectionSchedule.map((section)=>{
+            option.push(<Option key={section.value} value={section.value}>{section.name}</Option>)
+        })
+        return option
+    }  
 
-	}
-	// 关闭弹框
-	closeModal() {
-
-		this.setState({
-			visible: false,
-		})
-	}
 	
+	render() {
+		const { 
+			selectedRowKeys, 
+			sectionSchedule=[],
+			filterData
+		} = this.state;
+		const {
+            form: { getFieldDecorator },
+        } = this.props;
+		const rowSelection = {
+			selectedRowKeys,
+			onChange: this.onSelectChange,
+		};
+		const FormItemLayout = {
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
+		}
+		let sectionOption = this.getSectionOption()
+		return (
+			<div>
+				{
+                    this.state.dayvisible &&
+					<DayModal 
+						{...this.props}
+						{...this.state.TotleModaldata}
+                        oncancel={this.totleCancle.bind(this)}
+                        onok={this.totleOk.bind(this)}
+                    />
+                }
+				<SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+				<Button onClick={this.addClick.bind(this)}>新增</Button>
+				{/* <Button onClick={this.deleteClick.bind(this)}>删除</Button> */}
+				<Table
+					columns={this.columns}
+					// rowSelection={rowSelection} 
+					dataSource={filterData}
+					className='foresttable'
+					bordered
+					rowKey='index'/>
+				<Modal
+					title="新增每日实际进度"
+					width={800}
+					visible={this.state.visible}
+					maskClosable={false}
+					onCancel={this.closeModal.bind(this)}
+					onOk={this.sendWork.bind(this)}
+					// key={this.state.key}
+				>
+					<div>
+						<Form>
+							<Row>
+								<Col span={24}>
+									<Row>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='标段'>
+											{
+													getFieldDecorator('Ssection', {
+														rules: [
+															{ required: true, message: '请选择标段' }
+														]
+													})
+														(<Select placeholder='请选择标段' allowClear>
+														{sectionOption}
+													</Select>)
+												}
+											</FormItem>
+										</Col>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='编号'>
+												{
+													getFieldDecorator('Snumbercode', {
+														rules: [
+															{ required: true, message: '请输入编号' }
+														]
+													})
+														(<Input placeholder='请输入编号' />)
+												}
+											</FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+                                            <FormItem {...FormItemLayout} label='文档类型'>
+                                                {
+                                                    getFieldDecorator('Sstagedocument', {
+														initialValue: `每日实际进度`,
+                                                        rules: [
+                                                            { required: true, message: '请选择文档类型' }
+                                                        ]
+                                                    })
+                                                        (<Input readOnly/>)
+                                                }
+                                            </FormItem>
+                                        </Col>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='日期'>
+												{
+													getFieldDecorator('Stimedate', {
+														rules: [
+															{ required: true, message: '请输入日期' }
+														]
+													})
+														(<DatePicker  format={'YYYY-MM-DD'} style={{ width: '100%', height: '100%' }} />)
+												}
+											</FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											<FormItem {...FormItemLayout} label='监理单位'>
+                                                {
+                                                    getFieldDecorator('Ssuperunit', {
+                                                        rules: [
+                                                            { required: true, message: '请选择审核人员' }
+                                                        ]
+                                                    })
+                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
+                                                }
+                                            </FormItem>
+										</Col>
+									</Row>
+									<Row>
+										<Table
+											columns={this.columns1}
+											dataSource={this.state.treedataSource}
+											className='foresttable'
+										/>
+										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10 }} type="primary" ghost>添加</Button>
+									</Row>
+									<Row>
 
-	// 短信
-	_cpoyMsgT(e) {
-		this.setState({
-			isCopyMsg: e.target.checked,
-		})
+										<Col span={8} offset={4}>
+											<FormItem {...FormItemLayout} label='审核人'>
+												{
+													getFieldDecorator('SdataReview', {
+														rules: [
+															{ required: true, message: '请选择审核人员' }
+														]
+													})
+														(
+														<PerSearch selectMember={this.selectMember.bind(this)} 
+														code={WORKFLOW_CODE.每日进度填报流程}
+														visible={this.state.visible}
+														/>
+														)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} offset={4}>
+											<Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
+										</Col>
+									</Row>
+								</Col>
+							</Row>
+
+						</Form>
+					</div>
+				</Modal>
+			</div>
+		)
 	}
+
 	//选择人员
     selectMember(memberInfo) {
         const {
@@ -219,9 +409,27 @@ class Stagereporttab extends Component {
         }
 
         setFieldsValue({
-            dataReview: this.member,
-            superunit:this.member.org
+            SdataReview: this.member,
+            Ssuperunit:this.member.org
         });
+	}
+	
+	//获取当前标段的名字
+    getSectionName(section){
+		let sectionName = ''
+		if(section){
+			let code = section.split('-')
+			if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        sectionName = item.name
+                    }
+                })
+			}
+		}
+		console.log('sectionName',sectionName)
+		return sectionName 
     }
 	// 发起填报
 	sendWork(){
@@ -233,7 +441,10 @@ class Stagereporttab extends Component {
 			},
 			location,
 		} = this.props
-		const{treedataSource} = this.state
+		const{
+			treedataSource,
+			projectName
+		} = this.state
 		let user = getUser();//当前登录用户
 		let me = this;
 		//共有信息
@@ -256,13 +467,17 @@ class Stagereporttab extends Component {
                     "person_name": user.name,
                     "id": parseInt(user.id)
 				};
+
+				let sectionName = me.getSectionName(values.Ssection)
 				let subject = [{
-					"unit": JSON.stringify(values.unit),
-					"superunit": JSON.stringify(values.superunit),
-					"dataReview": JSON.stringify(values.dataReview),
-					"numbercode": JSON.stringify(values.numbercode),
-					"timedate": JSON.stringify(moment(values.timedate._d).format('YYYY-MM-DD')),
-					"stagedocument": JSON.stringify(values.stagedocument),
+					"section": JSON.stringify(values.Ssection),
+					"projectName":JSON.stringify(projectName),
+					"sectionName":JSON.stringify(sectionName),
+					"superunit": JSON.stringify(values.Ssuperunit),
+					"dataReview": JSON.stringify(values.SdataReview),
+					"numbercode": JSON.stringify(values.Snumbercode),
+					"timedate": JSON.stringify(moment(values.Stimedate._d).format('YYYY-MM-DD')),
+					"stagedocument": JSON.stringify(values.Sstagedocument),
 					"postData": JSON.stringify(postData),
                     "treedataSource":JSON.stringify(treedataSource),
                 }];
@@ -345,156 +560,6 @@ class Stagereporttab extends Component {
 			}
 		})
 	}
-	render() {
-		const { selectedRowKeys, } = this.state;
-		const {
-            form: { getFieldDecorator },
-        } = this.props;
-		const rowSelection = {
-			selectedRowKeys,
-			onChange: this.onSelectChange,
-		};
-		const FormItemLayout = {
-			labelCol: { span: 8 },
-			wrapperCol: { span: 16 },
-		}
-		return (
-			<div>
-				{
-                    this.state.dayvisible &&
-                    <DayModal {...this.state.TotleModaldata}
-                        oncancel={this.totleCancle.bind(this)}
-                        onok={this.totleOk.bind(this)}
-                    />
-                }
-				<SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
-				<Button onClick={this.addClick.bind(this)}>新增</Button>
-				{/* <Button onClick={this.deleteClick.bind(this)}>删除</Button> */}
-				<Table
-					columns={this.columns}
-					// rowSelection={rowSelection} 
-					dataSource={this.state.daydata}
-					className='foresttable'
-					bordered
-					rowKey='index'/>
-				<Modal
-					title="新增每日实际进度"
-					width={800}
-					visible={this.state.visible}
-					maskClosable={false}
-					onCancel={this.closeModal.bind(this)}
-					onOk={this.sendWork.bind(this)}
-				>
-					<div>
-						<Form>
-							<Row>
-								<Col span={24}>
-									<Row>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='单位工程'>
-												{
-													getFieldDecorator('unit', {
-														rules: [
-															{ required: true, message: '请选择单位工程' }
-														]
-													})
-														(<Select placeholder='请选择单位工程' allowClear>
-															{UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-														</Select>)
-												}
-											</FormItem>
-										</Col>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='编号'>
-												{
-													getFieldDecorator('numbercode', {
-														rules: [
-															{ required: true, message: '请输入编号' }
-														]
-													})
-														(<Input placeholder='请输入编号' />)
-												}
-											</FormItem>
-										</Col>
-									</Row>
-									<Row>
-										<Col span={12}>
-                                            <FormItem {...FormItemLayout} label='文档类型'>
-                                                {
-                                                    getFieldDecorator('stagedocument', {
-														initialValue: `每日实际进度`,
-                                                        rules: [
-                                                            { required: true, message: '请选择文档类型' }
-                                                        ]
-                                                    })
-                                                        (<Input readOnly/>)
-                                                }
-                                            </FormItem>
-                                        </Col>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='日期'>
-												{
-													getFieldDecorator('timedate', {
-														rules: [
-															{ required: true, message: '请输入日期' }
-														]
-													})
-														(<DatePicker  format={'YYYY-MM-DD'} style={{ width: '100%', height: '100%' }} />)
-												}
-											</FormItem>
-										</Col>
-									</Row>
-									<Row>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='监理单位'>
-                                                {
-                                                    getFieldDecorator('superunit', {
-                                                        rules: [
-                                                            { required: true, message: '请选择审核人员' }
-                                                        ]
-                                                    })
-                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
-                                                }
-                                            </FormItem>
-										</Col>
-									</Row>
-									<Row>
-										<Table
-											columns={this.columns1}
-											dataSource={this.state.treedataSource}
-											className='foresttable'
-										/>
-										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10 }} type="primary" ghost>添加</Button>
-									</Row>
-									<Row>
-
-										<Col span={8} offset={4}>
-											<FormItem {...FormItemLayout} label='审核人'>
-												{
-													getFieldDecorator('dataReview', {
-														rules: [
-															{ required: true, message: '请选择审核人员' }
-														]
-													})
-														(
-														<PerSearch selectMember={this.selectMember.bind(this)} />
-														)
-												}
-											</FormItem>
-										</Col>
-										<Col span={8} offset={4}>
-											<Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
-										</Col>
-									</Row>
-								</Col>
-							</Row>
-
-						</Form>
-					</div>
-				</Modal>
-			</div>
-		)
-	}
 
 	// 添加树列表
 	addTreeClick() {
@@ -539,23 +604,123 @@ class Stagereporttab extends Component {
 
 	}
 
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+	}
+	// 操作--查看
+    clickInfo(record) {
+        this.setState({ dayvisible: true, TotleModaldata:record });
+    }
+    // 取消
+    totleCancle() {
+        this.setState({ dayvisible: false });
+    }
+    // 确定
+    totleOk() {
+        this.setState({ dayvisible: false });
+    }
+	// 删除
+	deleteClick = () => {
+		const { selectedRowKeys } = this.state
+		if (selectedRowKeys.length === 0) {
+			notification.warning({
+				message: '请先选择数据！',
+				duration: 2
+			});
+			return
+		} else {
+			alert('还未做删除功能')
+		}
+	}
+
+	// 新增按钮
+	addClick = () => {
+		let treedata = [
+			{
+				key:0,
+				project: '便道施工',
+				units: 'm',
+				canDelete: false
+			}, {
+				key:1,
+				project: '给排水沟槽开挖',
+				units: 'm',
+				canDelete: false
+			}, {
+				key:2,
+				project: '给排水管道安装',
+				units: 'm',
+				canDelete: false
+			}, {
+				key:3,
+				project: '给排水回填',
+				units: 'm',
+				canDelete: false
+			}, {
+				key:4,
+				project: '绿地平整',
+				units: '亩',
+				canDelete: false
+			}, {
+				key:5,
+				project: '种植穴工程',
+				units: '个',
+				canDelete: false
+			},
+		];
+		this.setState({
+			visible: true,
+			treedataSource: treedata,
+			key:Math.random()
+		})
+		this.props.form.setFieldsValue({
+			Ssuperunit: undefined,
+			Ssection: undefined,
+			SdataReview: undefined,
+			Snumbercode: undefined,
+			Stimedate: undefined
+		})
+	}
+	// 关闭弹框
+	closeModal() {
+
+		this.setState({
+			visible: false,
+			treedataSource:[]
+		})
+	}
+	
+
+	// 短信
+	_cpoyMsgT(e) {
+		this.setState({
+			isCopyMsg: e.target.checked,
+		})
+	}
+
 
 	columns = [
 		{
-			title: '单位工程',
-			dataIndex: 'unit',
-			key: 'unit',
+			title: '项目',
+			dataIndex: 'projectName',
+			key: 'projectName',
 			width: '15%'
+		},
+		{
+			title: '标段',
+			dataIndex: 'sectionName',
+			key: 'sectionName',
+			width: '10%'
 		}, {
 			title: '进度类型',
 			dataIndex: 'type',
 			key: 'type',
-			width: '10%'
+			width: '15%'
 		}, {
 			title: '编号',
 			dataIndex: 'numbercode',
 			key: 'numbercode',
-			width: '10%'
+			width: '15%'
 		}, {
 			title: '提交人',
 			dataIndex: 'submitperson',
@@ -565,7 +730,7 @@ class Stagereporttab extends Component {
 			title: '提交时间',
 			dataIndex: 'submittime',
 			key: 'submittime',
-			width: '10%',
+			width: '15%',
 			sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
 			render: text => {
 				return moment(text).format('YYYY-MM-DD')
@@ -574,7 +739,7 @@ class Stagereporttab extends Component {
 			title: '流程状态',
 			dataIndex: 'status',
 			key: 'status',
-			width: '15%',
+			width: '10%',
 			render:(record,index)=>{
                 if(record===1){
                     return '已提交'

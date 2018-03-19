@@ -71,14 +71,13 @@ export default class NursOverallTable extends Component {
 			<div>
 				{this.treeTable(tblData)}
 				<Modal
-					width={522}
 					title='详细信息'
-					style={{textAlign:'center'}}
+					style={{textAlign:'center',overflow:'auto'}}
 					visible={this.state.imgvisible}
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 				>
-					<img style={{width:"490px",height:"300px"}} src={this.state.src} alt="图片"/>
+					<img style ={{height:'500px'}} src={this.state.src} alt="图片"/>
 				</Modal>
 			</div>
 		);
@@ -119,7 +118,7 @@ export default class NursOverallTable extends Component {
 			title:"序号",
 			dataIndex: 'order',
 		},{
-			title:"编码",
+			title:"顺序码",
 			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
@@ -145,7 +144,7 @@ export default class NursOverallTable extends Component {
 		// 	}
 		// },
 		{
-			title:"供苗商",
+			title:"供应商",
 			dataIndex: 'Factory',
 		},{
 			title:"测量人",
@@ -175,7 +174,7 @@ export default class NursOverallTable extends Component {
 				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 			}
 		},{
-			title:<div><div>树高</div><div>(cm)</div></div>,
+			title:<div><div>高度</div><div>(cm)</div></div>,
 			render: (text,record) => {
 				if(record.GD != 0)
 					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
@@ -289,8 +288,8 @@ export default class NursOverallTable extends Component {
 		}];
 		header = <div >
 					<Row >
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>编码：</span>
+					<Col  xl={4} lg={5} md={6} className='mrg10'>
+							<span>顺序码：</span>
 							<Input suffix={suffix} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
@@ -456,7 +455,7 @@ export default class NursOverallTable extends Component {
 							</Select>
 						</Col>
 						<Col xl={6} lg={7} md={8} className='mrg10'>
-							<span>供苗商：</span>
+							<span>供应商：</span>
 							<Input suffix={suffix1} value={factory} className='forestcalcw3 mxw250' onChange={this.factorychange.bind(this)}/>
 						</Col>
 						<Col xl={5} lg={6} md={7} className='mrg10'>
@@ -757,7 +756,7 @@ export default class NursOverallTable extends Component {
     		no:keycode,
     		sxm,
     		section,
-    		bigtype:bigType,
+    		bigType,
     		treetype,
     		gd,
     		xj,
@@ -791,23 +790,7 @@ export default class NursOverallTable extends Component {
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
 	    			tblData[i].place = place;
-					let statusname = '';
-					if(plan.SupervisorCheck == -1)
-						statusname = "待审批"
-					else if(plan.SupervisorCheck == 0) 
-						statusname = "审批未通过"
-					else {
-						if(plan.CheckStatus == 0)
-							statusname = "抽检不通过"
-						else if(plan.CheckStatus == 1)
-							statusname = "抽检通过"
-						// else if(plan.CheckStatus == 2)
-							
-						else {
-							statusname = "审批通过"
-						}
-					}
-					tblData[i].statusname = statusname;
+					tblData[i].statusname = this.getStatusName(plan.Status);
 					let islocation = !!plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].islocation = islocation;
 					let locationtime1 = !!plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
@@ -821,7 +804,21 @@ export default class NursOverallTable extends Component {
 				this.setState({ tblData,pagination:pagination });	
 	    	}
     	})
-    }
+	}
+	getStatusName(status){
+		switch(status){
+			case -1 :
+			 return '未确认'
+			case 0:
+			 return '监理抽查通过'
+			case 1:
+			 return '监理抽查退回'
+			case 2:
+			 return '业主抽查通过'
+			case 3:
+			 return '业主抽查通过'
+		}
+	}
 
 	exportexcel() {
 		const {

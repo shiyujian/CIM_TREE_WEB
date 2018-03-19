@@ -34,66 +34,44 @@ export default class Proprogress extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-            item:null,
-            stime1: moment().format('2017-11-17 00:00:00'),
-            etime1: moment().format('2017-11-24 23:59:59'),
-             treetypeoption: [],
-            treetyoption: [],
-            treetypelist: [],
-            treeLists: [],
-            sectionoption: [],
             leftkeycode: '',
 		};
     }
     componentDidMount () {
-        console.log(this.props,"46546");
         const {
             actions: {
-            gettreetype,getTreeList,getTreeNodeList,getNurserysCount
+            gettreetype,getTreeList,getProjectList,getNurserysCount
             },
             treetypes,
             platform:{tree = {}}
         } = this.props;
     
-        if(!tree.bigTreeList){
-            getTreeNodeList()
+        if(!tree.projectList){
+            getProjectList()
         }
         this.setState({
-            leftkeycode:"P009-01"
+            leftkeycode:"P009"
         })
-        //类型
-        let treetyoption = [
-            <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={'1'}>常绿乔木</Option>,
-            <Option key={'2'} value={'2'}>落叶乔木</Option>,
-            <Option key={'3'} value={'3'}>亚乔木</Option>,
-            <Option key={'4'} value={'4'}>灌木</Option>,
-            <Option key={'5'} value={'5'}>草本</Option>,
-        ];
-        this.setState({treetyoption})
     }
     
 	//树选择
     onSelect(value = []) {
-        console.log('proprogress选择的树节点',value)
+        console.log('onSelect  value',value)
         let keycode = value[0] || '';
-        this.setState({ leftkeycode: keycode })
+        const {actions:{setkeycode,gettreetype}} =this.props;
+        setkeycode(keycode);
+        this.setState({leftkeycode:keycode})
     }
 
 
 	render() {
-		const {keycode} = this.props;
         const {
-            treetypeoption,
-            treetypelist,
-            treetyoption,
-            sectionoption,
             leftkeycode,
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.bigTreeList){
-            treeList = tree.bigTreeList
+        if(tree.projectList){
+            treeList = tree.projectList
         }
         console.log('tree',tree)
 	    
@@ -129,57 +107,8 @@ export default class Proprogress extends Component {
                 </Content>
 			</div>);
 	}
-    datepick(){}
-    datepickok(){}
-    //类型选择, 重新获取: 树种
-    typeselect(value,keycode){
-        const {actions:{setkeycode,getTreeList}} =this.props;
-        //树种
-        getTreeList({},{field:'treetype',no:keycode,treety:value,paginate:false})
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
-    }
-
-    //设置树种选项
-    setTreeTypeOption(rst) {
-        if(rst instanceof Array){
-            let treetypeoption = rst.map(item => {
-                return <Option key={item.name} value={item.name}>{item.name}</Option>
-            })
-            treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({treetypeoption,treetypelist:rst})
-        }
-    }
-
-    //树选择, 重新获取: 标段、树种并置空
-    onSelect(value = []) {
-        console.log('onSelect  value',value)
-        let keycode = value[0] || '';
-        const {actions:{setkeycode,gettreetype}} =this.props;
-        setkeycode(keycode);
-        this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
-    }
 }
 
-//连接树children
-function getNewTreeData(treeData, curKey, child) {
-    const loop = (data) => {
-        data.forEach((item) => {
-            if (curKey == item.No) {
-                item.children = child;
-            }else{
-                if(item.children)
-                    loop(item.children);
-            }
-        });
-    };
-    try {
-       loop(treeData);
-    } catch(e) {
-        console.log(e)
-    }
-}
 
 
 

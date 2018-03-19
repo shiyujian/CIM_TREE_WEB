@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
+import { PROJECT_UNITS ,TREETYPENO,ECHARTSCOLOR} from '../../../_platform/api';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
@@ -13,26 +14,28 @@ export default class Warning extends Component {
     constructor(props){
         super(props);
         this.state={
-            stime1: moment().format('2018/01/01'),
-            etime1: moment().add(1, 'days').format('YYYY-MM-DD'),
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
             departOptions:"",
             unitproject:"1标段",
             choose:["灌木","亚乔木","落叶乔木","常绿乔木","种植穴工程","绿地平整","给排水回填","给排水管道安装","给排水沟槽开挖","便道施工"],
-            treetypelist:[<Option key="1" value="1标段">1标段</Option>,
-                          <Option key="2" value="2标段">2标段</Option>,
-                          <Option key="3" value="3标段">3标段</Option>,
-                          <Option key="4" value="4标段">4标段</Option>,
-                          <Option key="5" value="5标段">5标段</Option>],
+            treetypeAll:[]
         }
     }
 
-    componentDidMount() {
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // progressdata({},{unitproject:this.state.unitproject,etime:this.state.etime1}).then(rst=>{
-        //       this.getdata(rst);
-        //   })
+    async componentDidMount() {
 
-        
+        const {actions: {gettreeevery}} = this.props;
+        //获取全部树种信息
+        let rst = await gettreeevery()
+        console.log('gettreeeveryrst',rst)
+        if(rst && rst instanceof Array){
+            this.setState({
+                treetypeAll:rst
+            })
+        }
+
+        this.getSection()
         let myChart = echarts.init(document.getElementById('rightbottom'));
 
         let optionLine = {
@@ -75,108 +78,112 @@ export default class Warning extends Component {
             ]
         };
         myChart.setOption(optionLine);
+        this.getdata()
     }
 
-
-    componentWillReceiveProps(nextProps){
-        
-        let params = {}
-        params.etime = this.state.etime1;
-        params.stime = this.state.stime1;
-        params.unitproject = this.state.unitproject;
-        this.getdata(params);
-
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // progressdata({},{unitproject:this.state.unitproject,project:this.state.project}).then(rst=>{
-        //     console.log(rst,"xixhia");
-        //     this.getdata(rst);
-        // })
-        // progressalldata().then(rst=>{
-        //     console.log(rst,"hghlgl")
-        // }) 
-        // console.log(this.state.data);
-      
+    getSection(){
+        const{
+            leftkeycode
+        }=this.props
+        let sections = []
+        PROJECT_UNITS.map((project)=>{
+            if(project.code === leftkeycode){
+                let units = project.units
+                units.map((unit)=>{
+                    sections.push(<Option key={unit.code} value={unit.value}>{unit.value}</Option>)
+                })
+            }
+        })
+        this.setState({
+            sections
+        })
     }
-    
-    
-    render() { //todo 累计完成工程量
+
+    componentDidUpdate(prevProps, prevState){
+        const {
+            stime,
+            etime,
+            unitproject
+        } = this.state
+        const {
+            leftkeycode
+        }=this.props
+        try{
+            if(leftkeycode != prevProps.leftkeycode){
+                this.getSection()
+                this.getdata()
+            }
+        }catch(e){
+            console.log(e)
+        }
+        if(stime != prevState.stime || etime != prevState.etime || unitproject != prevState.unitproject){
+            this.getdata()
+        }
+    }
+
+    render() { 
+        const{
+            sections
+        }=this.state
         return (
             <div >
                 <Card>
-                截止日期：
-                   <DatePicker  
-                     style={{textAlign:"center"}} 
-                     showTime
-                     defaultValue={moment(this.state.etime1, 'YYYY/MM/DD')} 
-                     format={'YYYY/MM/DD'}
-                     onChange={this.datepick.bind(this)}
-                     onOk={this.datepickok.bind(this)}
+                施工时间：
+                    <RangePicker 
+                        style={{textAlign:"center"}} 
+                        defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]}  
+                        showTime={{ format: 'HH:mm:ss' }}
+                        format={'YYYY/MM/DD HH:mm:ss'}
+                        onChange={this.datepick.bind(this)}
+                        onOk={this.datepick.bind(this)}
                     >
-                    </DatePicker>
+                    </RangePicker>
                     <div id='rightbottom' style={{ width: '100%', height: '340px' }}></div>
                     <Select 
-                          placeholder="请选择部门"
-                          notFoundContent="暂无数据"
-                          defaultValue="1标段"
-                          onSelect={this.onDepartments.bind(this) }>
-                          {this.state.treetypelist}
-                          
+                     placeholder="请选择部门"
+                     notFoundContent="暂无数据"
+                     defaultValue="一标段"
+                     onSelect={this.onDepartments.bind(this) }>
+                        {sections}
                     </Select>
                     <span>进度分析</span>
                 </Card>
             </div>
         );
     }
-    datepick(){}
-    datepickok(value){
-
-        this.setState({
-            etime1:value[1]?moment(value[1]).format('YYYY/MM/DD'):'',
-            stime1:value[0]?moment(value[0]).format('YYYY/MM/DD'):'',
-        })
-        let params = {}
-        params.etime = value[1]?moment(value[1]).format('YYYY/MM/DD'):'';
-        params.stime = value[0]?moment(value[0]).format('YYYY/MM/DD'):'';
-        params.unitproject = this.state.unitproject;
-        this.getdata(params);
-
-
-        // this.setState({etime1:value?moment(value).format('YYYY/MM/DD'):'',})
-        
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // progressdata({},{unitproject:this.state.unitproject,etime:this.state.etime1}).then(rst=>{
-        //         this.getdata(rst);
-        // })
+    datepick(value){
+        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
+        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
     }
+    
     onDepartments(value){
         this.setState({
             unitproject:value,
         })
-        let params = {}
-        params.etime = this.state.etime1;
-        params.stime = this.state.stime1;
-        params.unitproject = value;
-        this.getdata(params);
-
-        // console.log(value);
-        // const {actions: {progressdata,progressalldata}} = this.props;
-        // this.setState({
-        //     unitproject:value,
-        // })
-        // progressdata({},{unitproject:value,etime:this.state.etime1}).then(rst=>{
-        //         this.getdata(rst);
-        // })
     }
     
-    getdata(value){
-        console.log('aaaaaaaaaaaaaaaaaaaaa',value)
+    getdata(){
+        const{
+            etime,
+            stime,
+            unitproject
+        }=this.state
+        const{
+            leftkeycode
+        }=this.props
+        let params = {
+            etime:etime,
+            stime:stime,
+            unitproject:unitproject
+        }
+        console.log('RightBottomaaaaaaaaaaaaaaaaaaaaa',params)
         const {actions: {progressdata,progressalldata}} = this.props;
         let gpshtnum = [];
         let times = [];
         let time = [];
 
-        progressalldata({},value).then(rst=>{
-            console.log(rst);
+        progressalldata({},params).then(rst=>{
+            console.log('RightBottom',rst);
             let datas = Array(10).fill(0);
             if(rst && rst.content){
 
@@ -208,14 +215,19 @@ export default class Warning extends Component {
                             }
                         }else{//添加的数目种类
                             let treetype = ''
-                            FORESTTYPE.map(forest => {
-                                return forest.children.map(rst => {
-                                    if(rst.name === item.Project){
-                                        treetype =  forest.name
-                                    }
-                                })
-                            }) 
-                            console.log('treetype',treetype)
+                            treetypeAll.map((tree)=>{
+                                if(tree.TreeTypeName === rst.name){
+                                    //获取树种cdoe的首个数字，找到对应的类型
+                                    let code = tree.TreeTypeNo.substr(0, 1)
+                                    console.log('code',code)
+                                    TREETYPENO.map((forest)=>{
+                                        if(forest.id === code){
+                                            treetype = forest.name
+                                        }
+                                    })
+                                }
+                            })
+                            console.log('RightBottomtreetype',treetype)
 
                             switch(treetype){
                                 case '常绿乔木' : 
@@ -235,12 +247,11 @@ export default class Warning extends Component {
                     })
                 })
                 
-                console.log('datas',datas)
+                console.log('RightBottomdatas',datas)
 
                
             }
-            
-
+        
             let myChart = echarts.init(document.getElementById('rightbottom'));
             let optionLine = {
                 tooltip: {

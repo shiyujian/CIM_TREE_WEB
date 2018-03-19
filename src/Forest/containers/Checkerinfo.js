@@ -32,10 +32,11 @@ export default class Checkerinfo extends Component {
             statusoption: [],
             leftkeycode: '',
             resetkey: 0,
+            treetypeoption: [],
         }
     }
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users,platform:{tree = {}}} = this.props; 
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users,treetypes,platform:{tree = {}}} = this.props; 
         this.biaoduan = [];
         PROJECT_UNITS[0].units.map(item => {
             this.biaoduan.push(item);
@@ -47,9 +48,21 @@ export default class Checkerinfo extends Component {
         if(!users){
             getForestUsers();
         }
+        if(!treetypes){
+            getTreeList();
+        }
         if(!tree.bigTreeList){
             getTreeNodeList()
         }
+        //类型
+        let typeoption = [
+            <Option key={'-1'} value={''}>全部</Option>,
+            <Option key={'1'} value={'1'}>常绿乔木</Option>,
+            <Option key={'2'} value={'2'}>落叶乔木</Option>,
+            <Option key={'3'} value={'3'}>亚乔木</Option>,
+            <Option key={'4'} value={'4'}>灌木</Option>,
+            <Option key={'5'} value={'5'}>地被</Option>,
+        ];
         //状态
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
@@ -57,7 +70,7 @@ export default class Checkerinfo extends Component {
             <Option key={'2'} value={"3"}>抽检通过</Option>,
             <Option key={'3'} value={"0"}>业主未抽查</Option>,
         ]
-        this.setState({statusoption})
+        this.setState({statusoption,typeoption})
     }
 
     render() {
@@ -69,6 +82,10 @@ export default class Checkerinfo extends Component {
             thinclassoption,
             statusoption,
             resetkey,
+            treetypeoption,
+            typeoption,
+            treetypelist,
+            bigType
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
@@ -94,6 +111,10 @@ export default class Checkerinfo extends Component {
                              smallclassoption={smallclassoption}
                              smallclassselect={this.smallclassselect.bind(this)}
                              thinclassoption={thinclassoption}
+                             typeselect={this.typeselect.bind(this)}
+                             bigType={bigType}
+                             treetypeoption={treetypeoption} 
+                             typeoption={typeoption}
                              thinclassselect={this.thinclassselect.bind(this)}
                              statusoption={statusoption}
                              leftkeycode={leftkeycode}
@@ -143,6 +164,30 @@ export default class Checkerinfo extends Component {
 
     //细班选择, 重新获取: 树种
     thinclassselect(value,section) {
+    }
+    //类型选择, 重新获取: 树种
+    typeselect(value){
+        const {treetypes} =this.props;
+        this.setState({bigType: value});
+        let selectTreeType = [];
+        treetypes.map(item =>{
+            let code = item.TreeTypeNo.substr(0,1);
+            if(code === value){
+                selectTreeType.push(item);
+            }
+        })
+        this.setTreeTypeOption(selectTreeType);
+    }
+
+    //设置树种选项
+    setTreeTypeOption(rst) {
+        if(rst instanceof Array){
+            let treetypeoption = rst.map(item => {
+                return <Option key={item.id} value={item.ID}>{item.TreeTypeName}</Option>
+            })
+            treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
+            this.setState({treetypeoption,treetypelist:rst})
+        }
     }
     
     //设置标段选项

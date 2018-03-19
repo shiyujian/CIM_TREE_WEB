@@ -5,7 +5,7 @@ import {Select} from 'antd';
 import PkCodeTree from '../components/PkCodeTree.js';
 import {SafetyTable, AddModal} from '../components/SafetySystem';
 import {actions as platformActions} from '_platform/store/global';
-import {PROJECT_UNITS,FORESTTYPE} from '_platform/api';
+import {PROJECT_UNITS} from '_platform/api';
 import {actions} from '../store/safetySystem'
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 const Option = Select.Option;

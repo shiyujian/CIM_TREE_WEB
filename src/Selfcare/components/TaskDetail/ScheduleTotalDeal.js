@@ -3,7 +3,6 @@ import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,DatePi
 import { base, STATIC_DOWNLOAD_API,SOURCE_API,WORKFLOW_CODE } from '../../../_platform/api';
 import moment from 'moment';
 import Preview from '../../../_platform/components/layout/Preview';
-import PerSearch from '../Task/PerSearch';
 import queryString from 'query-string';
 import { getUser } from '_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -42,7 +41,7 @@ export default class ScheduleTotalDeal extends Component {
                 <Row>
                     <div style={{ textAlign: 'center', marginTop: 10 }}>
                         <Button type='primary' onClick={this.handleSubmit.bind(this, task)} style={{ marginRight: 20 }}>提交</Button>
-                        <Button onClick={this.handleReject.bind(this, task)}>拒绝</Button>
+                        <Button onClick={this.handleReject.bind(this, task)}>退回</Button>
                     </div>
                 </Row>
             </div>
@@ -133,7 +132,7 @@ export default class ScheduleTotalDeal extends Component {
             ProgressTime:moment(postdata.upload_time).format('YYYY-MM-DD'),
             ProgressType:'总进度',
             SMS:0,
-            UnitProject:subject.unit,
+            UnitProject:subject.section?JSON.parse(subject.section):'',
             WPNo:'',
             FilePath:filePath
         }
@@ -195,15 +194,15 @@ export default class ScheduleTotalDeal extends Component {
 			"username": user.username,
 			"person_code": user.code,
 			"person_name": user.name,
-			"id": parseInt(user.id),
-			"org": user.org,
+            "id": parseInt(user.id),
+            "org": user.org,
 		};
 
 		//获取流程的action名称
 		let action_name = '';
 		let nextStates = getNextStates(task, Number(state_id));
 		for (var i = 0; i < nextStates.length; i++) {
-			if (nextStates[i].action_name === '拒绝') {
+			if (nextStates[i].action_name === '退回') {
 				action_name = nextStates[i].action_name
 			}
         }
@@ -231,14 +230,14 @@ export default class ScheduleTotalDeal extends Component {
 			console.log('rst', rst)
 			if (rst && rst.creator) {
 				notification.success({
-					message: '流程拒绝成功',
+					message: '流程退回成功',
 					duration: 2
 				})
 				let to = `/selfcare`;
 				me.props.history.push(to)
 			} else {
 				notification.error({
-					message: '流程拒绝失败',
+					message: '流程退回失败',
 					duration: 2
 				})
 			}

@@ -42,10 +42,8 @@ export default class PerSearch extends Component {
         this.query()
     }
 
-    componentDidUpdate(prevProps,prevState){
-        debugger
-        const { 
-            actions: 
+    async componentDidUpdate(prevProps,prevState){
+        const { actions: 
             {
                 getUsers,
                 getWorkflowTemplate
@@ -55,7 +53,6 @@ export default class PerSearch extends Component {
             task,
             visible
         } = this.props
-        console.log('visiblevisiblevisiblevisible',visible)
         if(task != prevProps.task ){
             console.log('componentDidUpdatetask',task)
             console.log('prevPropstask',prevProps.task)
@@ -86,7 +83,6 @@ export default class PerSearch extends Component {
         } = this.props
         let org_code = ['003']
         let role_code = ['001']
-        debugger
         //如果是开始创建流程时  使用code来查找人员
         if(code){
             let params = {
@@ -244,7 +240,6 @@ export default class PerSearch extends Component {
         if (memberValue[0] === 'C_PER') {
             text = memberValue[2]
         }
-        debugger
         this.setState({
             value: value,
             text: text

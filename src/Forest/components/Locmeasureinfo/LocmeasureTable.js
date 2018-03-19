@@ -100,7 +100,7 @@ export default class LocmeasureTable extends Component {
 			title:"序号",
 			dataIndex: 'order',
 		},{
-			title:"编码",
+			title:"顺序码",
 			dataIndex: 'ZZBM',
 		},{
 			title:"标段",
@@ -243,8 +243,8 @@ export default class LocmeasureTable extends Component {
 		}];
 		header = <div >
 					<Row >
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>编码：</span>
+					<Col  xl={4} lg={5} md={6} className='mrg10'>
+							<span>顺序码：</span>
 							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>

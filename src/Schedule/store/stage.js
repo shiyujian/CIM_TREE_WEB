@@ -1,7 +1,8 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API, WORKFLOW_API, FOREST_API,base, USER_API} from '_platform/api';
+import { SERVICE_API, WORKFLOW_API, FOREST_API,base, USER_API, FILE_API} from '_platform/api';
+import {createFetchActionWithHeaders as myFetch} from './fetchAction'
 
 const ID = 'STAGE';
 //上传的文件列表
@@ -20,6 +21,10 @@ export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`,
 export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}`);
 const getUserList = createFetchAction(`${USER_API}/users/?page=1&page_sise=5`,[]);
 
+//上传文件
+export const postScheduleFile = myFetch(`${FILE_API}/api/user/files/`,[],'POST');
+
+
 export const actions = {
     getdocumentOK,
     postUploadFilesAc,
@@ -31,7 +36,8 @@ export const actions = {
     getTreeList,
     gettreetype,
     getTaskSchedule,
-    getUserList
+    getUserList,
+    postScheduleFile
 }
 
 export default handleActions({
@@ -50,5 +56,5 @@ export default handleActions({
 			...state,
 			treeLists: [payload]
 		}
-	},
+    },
 },{});
