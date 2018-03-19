@@ -3,6 +3,7 @@ import { Table, Row, Col, Modal, Popover } from 'antd';
 import Blade from '_platform/components/panels/Blade';
 import moment from 'moment';
 import { base, PDF_FILE_API } from '_platform/api';
+import { Link } from 'react-router-dom';
 import styles from './styles.less';
 
 
@@ -122,6 +123,9 @@ export default class News extends Component {
 
 		return (
 			<Blade title="待办任务">
+			<Link to='/selfcare'>
+					<span style={{ float: "right", marginTop: "-30px" }} >MORE</span>
+				</Link>
 				<div className="tableContainer">
 					<Table
 						bordered={false}
