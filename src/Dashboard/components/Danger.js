@@ -207,7 +207,7 @@ export default class Danger extends Component {
 				// let coordinates = ["22.5202031353", "113.893730454"];
 				let locationX = v["X"];
 				let locationY = v["Y"];
-				let coordinates = [locationX, locationY];
+				let coordinates = [locationY, locationX];
 				riskObj[level] = riskObj[level] || {
 					key: level,
 					'properties': {
@@ -1169,7 +1169,7 @@ export default class Danger extends Component {
 							>
 							</iframe>
 						</div>
-					</Modal>	
+					</Modal> 	
 				</div>
 			</div>
 		)
