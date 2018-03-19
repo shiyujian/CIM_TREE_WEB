@@ -254,7 +254,7 @@ class ToggleModal extends Component {
 									initialValue: ''
 								})(
 									<Input type="text" style={{ width: '80%' }}
-										placeholder="申请 工作联系单 监理通知" />
+										placeholder="删除申请 工作联系单 监理通知" />
 									)}
 							</FormItem>
 						</Col>

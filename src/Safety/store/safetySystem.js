@@ -16,14 +16,14 @@ export const getForestTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpuni
 export const getNurserysTree = createFetchAction(`${FOREST_API}/tree/treenurserys`, []);
 export const getForestUsersOK = createAction('获取森林数据用户列表');
 export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [getForestUsersOK]);
-
+const changeDocs = createAction(`${ID}_CHANGE_DOCS`);
 
 export const actions = {
 	AddVisible,
 	getTree,
 	getTreeOK,
 	setkeycode,
-
+	changeDocs,
 	gettreetype,
 	getTreeList,
 	getNurserysTree,
@@ -31,6 +31,10 @@ export const actions = {
 	getForestUsers,
 };
 export default handleActions({
+	[changeDocs]: (state, {payload}) => ({
+        ...state,
+        docs: payload
+    }),
 	[AddVisible]: (state, {payload}) => ( {
 		...state,
 		addVisible: payload

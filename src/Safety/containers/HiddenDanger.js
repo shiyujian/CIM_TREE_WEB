@@ -159,54 +159,56 @@ export default class HiddenDanger extends Component {
         }
     }
 
-    onSelect(value = [],e) {
-        const [code] = value;
-        const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
-        setkeycode(code);
-        if(code === undefined){
-            return
-        }
-        this.setState({isTreeSelected:e.selected})
-        setcurrentcode({code:code.split("--")[1]});
-        getdocument({code:code.split("--")[1]});
-    }
-    // onSelect(selectedKeys, e) {
-    //     console.log('selectedKeys',selectedKeys,e)
-    //     if (!e.selected) {
+    // onSelect(value = [],e) {
+    //     const [code] = value;
+    //     const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
+    //     setkeycode(code);
+    //     if(code === undefined){
     //         return
     //     }
-    //     this.setState({ currentUnitCode: selectedKeys });
-    //     const {
-    //         actions: {
-    //             getRisk,
-    //         }
-    //     } = this.props;
-
-    //     const { currentSelectValue } = this.state;
-    //      getRisk( ).then(rst => {
-    //         const { dataSet } = this.state;
-    //         let datas = [];
-    //         // debugger
-    //         if (rst.content.length === 0) {
-    //             notification.info({
-    //                 message: '未查询到数据',
-    //                 duration: 2
-    //             });
-    //             return;
-    //         }
-    //         for (let i = 0; i < rst.content.length; i++) {
-    //             let data = {};
-    //             data.problemType=rst.content[i].ProblemType;
-    //             data.level='V';
-    //             data.createTime=rst.content[i].CreateTime;
-    //             data.status = this.getRiskState(rst.content[i].Status);
-    //             data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
-    //             data.id = rst.content[i].id;
-    //             datas.push(data);
-    //         }
-    //         this.setState({ dataSet: datas }); 
-    //     });
+    //     this.setState({isTreeSelected:e.selected})
+    //     setcurrentcode({code:code.split("--")[1]});
+    //     getdocument({code:code.split("--")[1]});
     // }
+    onSelect(selectedKeys, e) {
+        console.log('selectedKeys',selectedKeys,e)
+        if (!e.selected) {
+            return
+        }
+        this.setState({ currentUnitCode: selectedKeys });
+        const {
+            actions: {
+                getRisk,
+            }
+        } = this.props;
+
+        const { currentSelectValue } = this.state;
+         getRisk( ).then(rst => {
+            const { dataSet } = this.state;
+            let datas = [];
+            // debugger
+            if (rst.content.length === 0) {
+                notification.info({
+                    message: '未查询到数据',
+                    duration: 2
+                });
+                this.setState({ dataSet: datas });
+                return;
+            }else{
+                for (let i = 0; i < rst.content.length; i++) {
+                    let data = {};
+                    data.problemType=rst.content[i].ProblemType;
+                    data.level='V';
+                    data.createTime=rst.content[i].CreateTime;
+                    data.status = this.getRiskState(rst.content[i].Status);
+                    data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                    data.id = rst.content[i].id;
+                    datas.push(data);
+                }   
+                this.setState({ dataSet: datas }); 
+            }
+        });
+    }
     // createLink = (name, url) => {    //下载
     //     let link = document.createElement("a");
     //     link.href = url;
@@ -244,19 +246,21 @@ export default class HiddenDanger extends Component {
                     message: '未查询到数据',
                     duration: 2
                 });
+                this.setState({ dataSet: datas });
                 return;
+            }else{
+                for (let i = 0; i < rst.content.length; i++) {
+                    let data = {};
+                    data.problemType=rst.content[i].ProblemType;
+                    data.level='V';
+                    data.createTime=rst.content[i].CreateTime;
+                    data.status = this.getRiskState(rst.content[i].Status);
+                    data.resPeople= rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                    data.id = rst.content[i].id;
+                    datas.push(data);
+                }
+                this.setState({ dataSet: datas });
             }
-            for (let i = 0; i < rst.content.length; i++) {
-                let data = {};
-                data.problemType=rst.content[i].ProblemType;
-                data.level='V';
-                data.createTime=rst.content[i].CreateTime;
-                data.status = this.getRiskState(rst.content[i].Status);
-                data.resPeople= rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
-                data.id = rst.content[i].id;
-                datas.push(data);
-            }
-            this.setState({ dataSet: datas });
         });
     }
 
@@ -351,7 +355,7 @@ export default class HiddenDanger extends Component {
                                     <div style={{ width: '80%', marginLeft:'10%'}} >
                                         <span style={{ fontSize: 16,marginRight:5 }}>状态</span>
                                         <Select
-                                            defaultValue=""
+                                            defaultValue=''
                                             style={{ width:80}}
                                             onChange={(value) => this.onSelectChange(value)}>
                                             <Option value={-1}>确认中</Option>
