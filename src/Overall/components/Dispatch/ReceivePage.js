@@ -172,7 +172,7 @@ class ReceivePage extends Component {
 											rules: [{ required: false, message: '请输入文件标题' }],
 											initialValue: ''
 										})(<Select style={{ width: '100%' }}>
-											<Option value="申请">申请</Option>
+											<Option value="申请">删除申请</Option>
 											<Option value="工作联系单">工作联系单</Option>
 											<Option value="监理通知">监理通知</Option>
 										</Select>)}
