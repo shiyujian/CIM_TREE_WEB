@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-18 22:12:20
+ * @Last Modified time: 2018-03-19 11:08:29
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -342,7 +342,16 @@ class All extends Component {
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Dragger  
+                                        <Dragger
+                                             {...this.uploadProps}
+                                         >
+                                            <Icon type="inbox" />
+                                            <p className="ant-upload-text">点击或者拖拽开始上传</p>
+                                            <p className="ant-upload-hint">
+                                                支持 pdf、doc、docx 文件
+ 								            </p>
+                                        </Dragger>
+                                        {/* <Dragger  
                                             style={{ margin: '10px' }}
                                             onChange={this.uplodachange.bind(this)}
                                             name='file'
@@ -355,7 +364,7 @@ class All extends Component {
                                             </p>
                                             <p className="ant-upload-text">上传进度表(文件名需为英文)</p>
                                             <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
-                                        </Dragger >
+                                        </Dragger > */}
 
                                         <Table
                                             columns={this.columns1}
@@ -536,13 +545,13 @@ class All extends Component {
         me.props.form.validateFields((err, values) => {
             console.log('asdasddddddddddddddddddddd',values)
             if (!err) {
-                // if (TreatmentData.length === 0) {
-                //     notification.error({
-                //         message: '请上传文件',
-                //         duration: 5
-                //     })
-                //     return
-                // }
+                if (TreatmentData.length === 0) {
+                    notification.error({
+                        message: '请上传文件',
+                        duration: 5
+                    })
+                    return
+                }
 
                 postData.upload_unit = user.org ? user.org : '';
                 postData.type = '总进度计划';

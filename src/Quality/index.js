@@ -51,11 +51,18 @@ import {message} from 'antd'
 			let {fetchRootOrg} = this.props.hyjActions;
 			fetchRootOrg({code:orgcode}).then(rst=>{
 				console.log('当前用户组织结构反转', rst);
-				if (rst.children[0].name.indexOf('监理')>=0) {
+				// if (rst.children[0].name.indexOf('监理')>=0) {
+				// 	this.setState({ dwysjl: true });
+				// 	//message.info('当前登录为监理单位');
+				// }
+				if (rst.name.indexOf('监理')>=0) {
 					this.setState({ dwysjl: true });
 					//message.info('当前登录为监理单位');
 				}
-				if (rst.children[0].name.indexOf('施工')>=0) {
+				// if (rst.children[0].name.indexOf('施工')>=0) {
+				// 	//message.info('当前登录为施工单位');
+				// }
+				if (rst.name.indexOf('施工')>=0) {
 					//message.info('当前登录为施工单位');
 				}
 			});
@@ -113,8 +120,8 @@ import {message} from 'antd'
 				{DanweiJLAsk && <Route path="/quality/yanshou/danweijlask" component={DanweiJLAsk}/>}
 				{Subitem && <Route path="/quality/yanshou/subitem" component={Subitem}/>}
 				{FenbuCheck && <Route path="/quality/yanshou/fenbu/check" component={FenbuCheck}/>}
-				{Score && <Route path="/quality/score" component={Score}/>}
-				{Search && <Route path="/quality/score/search" component={Score}/>}
+				{/* {Score && <Route path="/quality/score" component={Score}/>} */}
+				{Search && <Route path="/quality/score/search" component={Search}/>}
 				{Appraising && <Route path="/quality/appraising" component={Appraising}/>}
 				{Faithanalyze && <Route path="/quality/faithanalyze" component={Faithanalyze}/>}
 				{Qualityanalyze && <Route path="/quality/qualityanalyze" component={Qualityanalyze}/>}
@@ -177,13 +184,14 @@ export default connect(
 // }];
 
 const menus = [
+	// {
+	// 	key: 'tongji',
+	// 	id: 'QUALITY.TONGJI',
+	// 	name: '质量分析',
+	// 	path: '/quality',
+	// 	icon: <Icon name="tasks" />
+	// },
 	{
-		key: 'tongji',
-		id: 'QUALITY.TONGJI',
-		name: '质量分析',
-		path: '/quality',
-		icon: <Icon name="tasks" />
-	},{
 		key: 'score',
 		name: '质量评分',
 		id:'QUALITY.SCORE',
@@ -191,7 +199,7 @@ const menus = [
 		icon: <Icon name="tasks" />,
 		children: [
 			{
-        		key: 'query',
+        		key: 'search',
         		id: 'QUALITY.SCORE.SEARCH',
 				name: '质量管理检查记录',
 				path: '/quality/score/search',
@@ -204,58 +212,60 @@ const menus = [
 		path: '/quality/appraising',
 		icon: <Icon name="tasks" />,
 		
-	},{
-		key: 'yanshou',
-		name: '质量验收',
-		id: 'QUALITY.YANSHOU',		
-		path: '/quality/yanshou',
-		icon: <Icon name="check-square-o" />,
-		children: [
-			{
-        		key: 'tianbao',
-        		id: 'QUALITY.TIANBAO',
-				name: '进场材料填报',
-				path: '/quality/yanshou/tianbao',
-				icon: <Icon name="anchor"/>
-			},{
-        		key: 'query',
-        		id: 'QUALITY.QUERY',
-				name: '验收查询',
-				path: '/quality/yanshou/query',
-				icon: <Icon name="bullseye"/>
-			},{
-        		key: 'huafen',
-        		id: 'QUALITY.HUAFEN',
-				name: '检验批划分',
-				path: '/quality/yanshou/huafen',
-				icon: <Icon name="asterisk"/>
-			},  {
-        		key: 'subitem',
-        		id: 'QUALITY.SUBITEM',
-				name: '分项验收',
-				path: '/quality/yanshou/subitem',
-				icon: <Icon name="arrows"/>
-			}, {
-        		key: 'fenbu',
-        		id: 'QUALITY.FENBU',
-				name: '分部验收',
-				path: '/quality/yanshou/fenbu',
-				icon: <Icon name="certificate"/>
-			}, {
-        		key: 'danwei',
-        		id: 'QUALITY.DANWEI',
-				name: '单位工程验收',
-				path: '/quality/yanshou/danwei',
-				icon: <Icon name="crosshairs"/>
-			},{
-				key: 'check',
-        		id: 'QUALITY.CHECK',
-				name: '检验批验收',
-				path: '/quality/yanshou/check',
-				icon: <Icon name="anchor"/>
-			}
-		]
-	},{
+	},
+	// {
+	// 	key: 'yanshou',
+	// 	name: '质量验收',
+	// 	id: 'QUALITY.YANSHOU',		
+	// 	path: '/quality/yanshou',
+	// 	icon: <Icon name="check-square-o" />,
+	// 	children: [
+	// 		{
+    //     		key: 'tianbao',
+    //     		id: 'QUALITY.TIANBAO',
+	// 			name: '进场材料填报',
+	// 			path: '/quality/yanshou/tianbao',
+	// 			icon: <Icon name="anchor"/>
+	// 		},{
+    //     		key: 'query',
+    //     		id: 'QUALITY.QUERY',
+	// 			name: '验收查询',
+	// 			path: '/quality/yanshou/query',
+	// 			icon: <Icon name="bullseye"/>
+	// 		},{
+    //     		key: 'huafen',
+    //     		id: 'QUALITY.HUAFEN',
+	// 			name: '检验批划分',
+	// 			path: '/quality/yanshou/huafen',
+	// 			icon: <Icon name="asterisk"/>
+	// 		},  {
+    //     		key: 'subitem',
+    //     		id: 'QUALITY.SUBITEM',
+	// 			name: '分项验收',
+	// 			path: '/quality/yanshou/subitem',
+	// 			icon: <Icon name="arrows"/>
+	// 		}, {
+    //     		key: 'fenbu',
+    //     		id: 'QUALITY.FENBU',
+	// 			name: '分部验收',
+	// 			path: '/quality/yanshou/fenbu',
+	// 			icon: <Icon name="certificate"/>
+	// 		}, {
+    //     		key: 'danwei',
+    //     		id: 'QUALITY.DANWEI',
+	// 			name: '单位工程验收',
+	// 			path: '/quality/yanshou/danwei',
+	// 			icon: <Icon name="crosshairs"/>
+	// 		},{
+	// 			key: 'check',
+    //     		id: 'QUALITY.CHECK',
+	// 			name: '检验批验收',
+	// 			path: '/quality/yanshou/check',
+	// 			icon: <Icon name="anchor"/>
+	// 		}
+	// 	]
+	// },
+	{
 	// }, {
 	// 	key: 'monitoring',
 	// 	id: 'QUALITY.MONITORING',

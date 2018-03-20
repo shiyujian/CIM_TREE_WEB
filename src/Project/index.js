@@ -274,13 +274,15 @@ export default class Project extends Component {
 			name: '苗木管理',
 			id: 'PROJECT.NURSERY',			
 			icon: <Icon name="won" />,
-			children: [{
-				key: 'NurseryType',
-				id: 'PROJECT.NURSERYTYPE',
-				name: '类型管理',
-				path: '/project/nurseryType',
-				icon: <Icon name="retweet" />,
-			}, {
+			children: [
+			// 	{
+			// 	key: 'NurseryType',
+			// 	id: 'PROJECT.NURSERYTYPE',
+			// 	name: '类型管理',
+			// 	path: '/project/nurseryType',
+			// 	icon: <Icon name="retweet" />,
+			// }, 
+			{
 				key: 'TreeManage',
 				id: 'PROJECT.TREEMANAGE',
 				name: '树种管理',
