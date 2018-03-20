@@ -144,10 +144,10 @@ class ToggleModal extends Component {
 			isSentMsg = false,
 			isCopyMsg = false,
 		} = this.state;
-		// if (sentUsers.length === 0) {
-		// 	message.warning("请添加接收单位！");
-		// 	return
-		// }
+		if (sentUsers.length === 0) {
+			message.warning("请添加接收单位！");
+			return
+		}
 		// if (copyUsers.length === 0) {
 		// 	message.warning("请添加抄送单位！");
 		// 	return
@@ -163,8 +163,8 @@ class ToggleModal extends Component {
 					let sendData = {
 						"from_whom": getUser().org,
 						"from_whom_department": getUser().org,
-						"to_whom": this._getOrgText(sentUsers),
-						"cc": this._getOrgText(copyUsers),
+						"to_whom": this.getBottomUnit(sentUsers),
+						"cc": this.getBottomUnit(copyUsers),
 						"title": values['title3'],
 						"body_rich": this.state.content,
 						"is_draft": false,
@@ -349,8 +349,8 @@ class ToggleModal extends Component {
 		// console.log("arr",arr)
 		let tmpArr = [];
 				
-				arr.map((itm) => {
-					console.log(itm)
+		arr.map((itm) => {
+			console.log(itm)
 			if (tmpArr.filter(item => item == itm.split('--')[1]).length === 0) {
 				// console.log(itm)
 				tmpArr.push(itm.split('--')[1])
@@ -507,19 +507,60 @@ class ToggleModal extends Component {
 		);
 	}
 
+	getBottomUnit = (data)=>{
+		//如果选择上级单位工程，返回其最低下所有单位工程
+		//let n = ["ORG_01--业主单位","ORG_P00--9号地块"];	//测试数据
+
+		const {orgList} = this.props;
+		return data.reduce((pre,cur)=>{
+			let code = cur.split("--")[0],
+				rightUnit = this.getRightUnit(orgList,code),
+				result = rightUnit? this.getAllUnit(rightUnit) : [code];
+
+			return pre.concat(result);
+		},[])
+	}
+	getRightUnit = (orgList,code)=>{
+		//获得当前code对应的Unit的所有信息
+		for(let i=0;i<orgList.length;i++){
+			if(orgList[i].code == code){
+				return orgList[i];
+			}
+
+			if(orgList[i].children.length != 0){
+				let x = this.getRightUnit(orgList[i].children, code);
+				if(x) return x;
+			}
+		}
+	}
+	getAllUnit = (data,parameter="code")=>{
+		//获得本单位工程最底层所有单位工程的code
+		let child = data.children;
+
+		return child.length == 0
+			? [ data[parameter] ]
+			: child.reduce((pre,cur)=>{
+				return pre.concat( this.getAllUnit(cur) );
+			},[]);	
+	}
+
+
 	_orgChange(value) {
+		//接受单位选择
 		this.setState({
 			selectSentUser: value
 		});
 	}
 
 	_orgChangeT(value) {
+		//抄送单位选择
 		this.setState({
 			selectCopyUser: value
 		});
 	}
 
 	_addSentUser() {
+		//接受单位添加
 		if (this.state.selectSentUser === '') {
 			message.warning('请选择接受单位！');
 			return
