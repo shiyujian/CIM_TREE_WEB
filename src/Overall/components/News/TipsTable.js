@@ -32,17 +32,16 @@ class TipsTable extends Component {
 			user_id: user_id
 		})
 		this.array = [];
-		DEPARTMENT.map(item =>{
+		DEPARTMENT.map(item => {
 			this.array.push(<Option value={item.code}>{item.name}</Option>)
 		})
 	}
-	componentDidUpdate(){
-		
+	componentDidUpdate() {
+
 	}
 
 	//公告操作按钮
 	clickTips(record, type) {
-		debugger
 		const {
 			actions: { deleteData, getTipsList, getDraftTipsList, toggleModal, patchData },
 			tipsTabValue = '1'
@@ -69,7 +68,6 @@ class TipsTable extends Component {
 				editData: record,
 			})
 		} else if (type === 'VIEW') {
-			debugger
 			Modal.info({
 				title: <h1>公告标题：{record.title}</h1>,
 				okText: '知道了',
@@ -168,9 +166,10 @@ class TipsTable extends Component {
 			let conditions = {
 				executor: user.id,
 				title: values.theme || "",
-				org:values.workunit || "",
+				org: values.workunit || "",
+				degree:values.degree || ""
 			}
-			if (values && values.worktime ) {
+			if (values && values.worktime) {
 				conditions.begin = moment(values.worktime[0]).format('YYYY-MM-DD');
 				conditions.end = moment(values.worktime[1]).format('YYYY-MM-DD');
 			}
@@ -188,9 +187,10 @@ class TipsTable extends Component {
 			let conditions = {
 				executor: user.id,
 				title: values.titles || "",
-				org:values.workunits || "",
+				org: values.workunits || "",
+				degree:values.degree || ""
 			}
-			if (values && values.worktimes ) {
+			if (values && values.worktimes) {
 				conditions.begin = moment(values.worktimes[0]).format('YYYY-MM-DD');
 				conditions.end = moment(values.worktimes[1]).format('YYYY-MM-DD');
 			}
@@ -246,7 +246,7 @@ class TipsTable extends Component {
 					<div style={{ marginBottom: '10px' }}>
 
 						{
-							(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props}/>)
+							(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props} />)
 						}
 					</div>}
 				<Col span={22} offset={1}>
@@ -254,91 +254,85 @@ class TipsTable extends Component {
 						<div style={{ marginBottom: '10px' }}>
 							<Button type="primary" onClick={this.publishTipsClick.bind(this)}>通知发布</Button>
 							{
-								(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props}/>)
+								(toggleData.visible && toggleData.type === 'TIPS') && (<Modals {...this.props} />)
 							}
 						</div>} >
 						<TabPane tab="通知查询" key="1">
-							<Row >
-								{/* <Col span={4}>
-									<Icon type='exception' style={{ fontSize: 32 }} />
-								</Col> */}
-								<Col span={18}>
-									<Row>
-										<Col span={6} >
-											<FormItem {...formItemLayout} label="名称">
-												{
-													getFieldDecorator('theme', {
-														rules: [
-															{ required: false, message: '请输入主题' },
-														]
-													})
-														(<Input placeholder="请输入主题" />)
-												}
-											</FormItem>
-										</Col>
-										
-										<Col span={6}>
-											<FormItem {...formItemLayout} label="发布单位">
-												{
-													getFieldDecorator('workunit', {
-														rules: [
-															{ required: false, message: '发布单位' },
-														]
-													})
-													(<Select allowClear style={{width:'100%'}}>
-														{
-															this.array
-														}
-													</Select>)
-												}
-											</FormItem>
-										</Col>
-										<Col span={6} >
-											<FormItem {...formItemLayout} label="发布日期">
-
-												{
-													getFieldDecorator('worktime', {
-														rules: [
-															{ required: false, message: '请选择日期' },
-														]
-													})
-														(<RangePicker
-															style={{ verticalAlign: "middle", width: '100%' }}
-															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
-															showTime={{ format: 'HH:mm:ss' }}
-															format={'YYYY/MM/DD HH:mm:ss'}
-
-														>
-														</RangePicker>)
-												}
-											</FormItem>
-										</Col>
-										<Col span={6}>
-											<FormItem {...formItemLayout} label="紧急程度">
-												{
-													getFieldDecorator('degree', {
-														rules: [
-															{ required: false, message: '紧急程度' },
-														]
-													})
-														(<Select allowClear style={{ width: '100%' }}
-														>
-															<Option value="0">平件</Option>
-															<Option value="1">加急</Option>
-															<Option value="2">特急</Option>
-														</Select>)
-												}
-											</FormItem>
-										</Col>
-									</Row>
+							<Row gutter={50}>
+								<Col span={10} >
+									<FormItem {...formItemLayout} label="名称">
+										{
+											getFieldDecorator('theme', {
+												rules: [
+													{ required: false, message: '请输入主题' },
+												]
+											})
+												(<Input placeholder="请输入主题" />)
+										}
+									</FormItem>
 								</Col>
-								<Col span={2} offset={1}>
+								<Col span={8}>
+									<FormItem {...formItemLayout} label="发布单位">
+										{
+											getFieldDecorator('workunit', {
+												rules: [
+													{ required: false, message: '发布单位' },
+												]
+											})
+												(<Select allowClear style={{ width: '100%' }}>
+													{
+														this.array
+													}
+												</Select>)
+										}
+									</FormItem>
+								</Col>
+								<Col span={2}>
 									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
+								</Col>
+							</Row>
+							<Row gutter={50}>
+								<Col span={10} >
+									<FormItem {...formItemLayout} label="发布日期">
+										{
+											getFieldDecorator('worktime', {
+												rules: [
+													{ required: false, message: '请选择日期' },
+												]
+											})
+												(<RangePicker
+													style={{ verticalAlign: "middle", width: '100%' }}
+													// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+													showTime={{ format: 'HH:mm:ss' }}
+													format={'YYYY/MM/DD HH:mm:ss'}
+												>
+												</RangePicker>)
+										}
+									</FormItem>
+								</Col>
+								<Col span={8}>
+									<FormItem {...formItemLayout} label="紧急程度">
+										{
+											getFieldDecorator('degree', {
+												rules: [
+													{ required: false, message: '紧急程度' },
+												]
+											})
+												(<Select allowClear style={{ width: '100%' }}
+												>
+													<Option value="0">平件</Option>
+													<Option value="1">加急</Option>
+													<Option value="2">特急</Option>
+												</Select>)
+										}
+									</FormItem>
 								</Col>
 								<Col span={2} >
 									<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
 								</Col>
 							</Row>
+
+
 							<Table
 								//rowSelection={rowSelection}
 								dataSource={tipsList}
@@ -351,96 +345,81 @@ class TipsTable extends Component {
 							/>
 						</TabPane>
 						<TabPane tab="暂存的通知" key="2">
-							<Row >
-								{/* <Col span={4}>
-									<Icon type='exception' style={{ fontSize: 32 }} />
-								</Col> */}
-								<Col span={18}>
-									<Row>
-										<Col span={6} >
-											<FormItem {...formItemLayout} label="名称">
-												{
-													getFieldDecorator('titles', {
-														rules: [
-															{ required: false, message: '请输入主题' },
-														]
-													})
-														(<Input placeholder="请输入主题" />)
-												}
-											</FormItem>
-										</Col>
-										<Col span={6} >
-											<FormItem {...formItemLayout} label="修改日期">
-
-												{
-													getFieldDecorator('worktimes', {
-														rules: [
-															{ required: false, message: '请选择日期' },
-														]
-													})
-														(<RangePicker
-															style={{ verticalAlign: "middle", width: '100%' }}
-															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
-															showTime={{ format: 'HH:mm:ss' }}
-															format={'YYYY/MM/DD HH:mm:ss'}
-
-														>
-														</RangePicker>)
-												}
-
-											</FormItem>
-
-										</Col>
-										<Col span={6}>
-											<FormItem {...formItemLayout} label="发布单位">
-												{
-													getFieldDecorator('workunits', {
-														rules: [
-															{ required: false, message: '发布单位' },
-														]
-													})
-													(<Select allowClear style={{ width: '100%' }}>
-														{
-															this.array
-														}
-													</Select>)
-												}
-
-
-											</FormItem>
-
-										</Col>
-										<Col span={6}>
-											<FormItem {...formItemLayout} label="紧急程度">
-												{
-													getFieldDecorator('degrees', {
-														rules: [
-															{ required: false, message: '紧急程度' },
-														]
-													})
-														(<Select style={{ width: '100%' }}
-														>
-															<Option value="0">平件</Option>
-															<Option value="1">加急</Option>
-															<Option value="2">特急</Option>
-														</Select>)
-												}
-
-
-											</FormItem>
-
-										</Col>
-									</Row>
-
+							<Row gutter={50}>
+								<Col span={10} >
+									<FormItem {...formItemLayout} label="名称">
+										{
+											getFieldDecorator('titles', {
+												rules: [
+													{ required: false, message: '请输入主题' },
+												]
+											})
+												(<Input placeholder="请输入主题" />)
+										}
+									</FormItem>
 								</Col>
-								<Col span={2} offset={1}>
+								<Col span={8}>
+									<FormItem {...formItemLayout} label="发布单位">
+										{
+											getFieldDecorator('workunits', {
+												rules: [
+													{ required: false, message: '发布单位' },
+												]
+											})
+												(<Select allowClear style={{ width: '100%' }}>
+													{
+														this.array
+													}
+												</Select>)
+										}
+									</FormItem>
+								</Col>
+								<Col span={2} >
 									<Button icon='search' onClick={this.query1.bind(this)}>查找</Button>
+								</Col>
+							</Row>
+							<Row gutter={50}>
+								<Col span={10} >
+									<FormItem {...formItemLayout} label="修改日期">
+										{
+											getFieldDecorator('worktimes', {
+												rules: [
+													{ required: false, message: '请选择日期' },
+												]
+											})
+												(<RangePicker
+													style={{ verticalAlign: "middle", width: '100%' }}
+													// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+													showTime={{ format: 'HH:mm:ss' }}
+													format={'YYYY/MM/DD HH:mm:ss'}
+
+												>
+												</RangePicker>)
+										}
+									</FormItem>
+								</Col>
+								<Col span={8}>
+									<FormItem {...formItemLayout} label="紧急程度">
+										{
+											getFieldDecorator('degrees', {
+												rules: [
+													{ required: false, message: '紧急程度' },
+												]
+											})
+												(<Select style={{ width: '100%' }}
+												>
+													<Option value="0">平件</Option>
+													<Option value="1">加急</Option>
+													<Option value="2">特急</Option>
+												</Select>)
+										}
+									</FormItem>
 								</Col>
 								<Col span={2}>
 									<Button icon='reload' onClick={this.clear1.bind(this)}>清除</Button>
 								</Col>
 							</Row>
-							<Table 
+							<Table
 								//rowSelection={rowSelection}
 								dataSource={draftTipsList}
 								columns={this.draftColumns}
@@ -468,10 +447,19 @@ class TipsTable extends Component {
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '公告标题',
+			title: '名称',
 			dataIndex: 'title',
 			key: 'title',
 		}, {
+			title:'发布单位',
+			render:(text ,record) => {
+				if(record.pub_unit){
+					return <p>{record.pub_unit.name}</p>
+				}else{
+					return <p> / </p>
+				}
+			}
+		},{
 			title: '发布时间',
 			dataIndex: 'pub_time',
 			key: 'pub_time',
@@ -479,11 +467,19 @@ class TipsTable extends Component {
 				return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
 			}
 		}, {
-			title: '更新时间',
-			dataIndex: 'update_time',
-			key: 'update_time',
-			render: update_time => {
-				return moment(update_time).utc().format('YYYY-MM-DD HH:mm:ss');
+			title: '紧急程度',
+			dataIndex: 'degree',
+			key: 'degree',
+			render: (text) => {
+				if(text === 0){
+					return <p>平件</p>
+				}else if(text === 1){
+					return <p>加急</p>
+				}else if(text === 2){
+					return <p>特急</p>
+				}else{
+					return <p> / </p>
+				}
 			}
 		}, {
 			title: '操作',
@@ -509,22 +505,39 @@ class TipsTable extends Component {
 			dataIndex: 'id',
 			key: 'id',
 		}, {
-			title: '公告标题',
+			title: '主题',
 			dataIndex: 'title',
 			key: 'title',
 		}, {
-			title: '暂存时间',
+			title:'发布单位',
+			render:(text ,record) => {
+				if(record.pub_unit){
+					return <p>{record.pub_unit.name}</p>
+				}else{
+					return <p> / </p>
+				}
+			}
+		}, {
+			title: '紧急程度',
+			dataIndex: 'degree',
+			key: 'degree',
+			render: (text) => {
+				if(text === 0){
+					return <p>平件</p>
+				}else if(text === 1){
+					return <p>加急</p>
+				}else if(text === 2){
+					return <p>特急</p>
+				}else{
+					return <p> / </p>
+				}
+			}
+		}, {
+			title: '修改时间',
 			dataIndex: 'pub_time',
 			key: 'pub_time',
 			render: pub_time => {
 				return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
-			}
-		}, {
-			title: '撤回时间',
-			dataIndex: 'update_time',
-			key: 'update_time',
-			render: update_time => {
-				return moment(update_time).utc().format('YYYY-MM-DD HH:mm:ss');
 			}
 		}, {
 			title: '操作',

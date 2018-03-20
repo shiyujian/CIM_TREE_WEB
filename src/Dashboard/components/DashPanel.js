@@ -13,7 +13,7 @@ export default class DashPanel extends Component {
     }
 
     onCheck(keys){
-        console.log("111111",keys,this.featureName)
+        // console.log("111111",keys,this.featureName)
         this.originOnCheck(keys,this.featureName);
     }
 
@@ -24,7 +24,7 @@ export default class DashPanel extends Component {
     genIconClass(){
         let icClass = "";
         let featureName = this.featureName;
-        console.log("featureName",featureName)
+        // console.log("featureName",featureName)
         switch(featureName){
             case 'geojsonFeature_people':
                 icClass = "tr-people";

@@ -28,7 +28,7 @@ export default class Appraising extends Component {
 
 		return (
 			<Main>
-				<DynamicTitle title="检验批填报" {...this.props}/>
+				<DynamicTitle title="质量评优" {...this.props}/>
 				<Sidebar>
 					<PkCodeTree treeData={tree}
 					            selectedKeys={currentNode.code}

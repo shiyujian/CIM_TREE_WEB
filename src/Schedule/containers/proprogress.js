@@ -83,7 +83,7 @@ export default class Proprogress extends Component {
                        <PkCodeTree treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
-                            // onExpand={this.onExpand.bind(this)}
+                            //  onExpand={this.onExpand.bind(this)}
                             />
                     </div>
                 </Sidebar>
@@ -97,10 +97,10 @@ export default class Proprogress extends Component {
                         </Col>
                     </Row>
                     <Row gutter={10} style={{margin: '10px 5px'}}>
-                        <Col span={12}>
+                        {/* <Col span={12}>
                             <LeftBottom   {...this.props} {...this.state}/>
-                        </Col>
-                        <Col span={12}>
+                        </Col> */}
+                        <Col span={24}>
                             <RightBottom  {...this.props} {...this.state}/>
                         </Col>
                     </Row>
