@@ -28,7 +28,9 @@ export default class Type extends Component {
 		const user = getUser();
 		const { actions: { changeFilterField, getTasks, setLoadingStatus, setTablePage } } = this.props;
 		const value = event.target.value;
+		console.log('value222',value)
 		changeFilterField('type', value);
+
 		setLoadingStatus(true);
 		await getTasks({}, { task: value, executor: user.id, order_by: "-real_start_time" });
 		setLoadingStatus(false);
