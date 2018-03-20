@@ -11,7 +11,6 @@ let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
 const Option = Select.Option;
-const Dragger = Upload.Dragger;
 
 class RichModal extends Component {
 	array = [];
@@ -76,10 +75,25 @@ class RichModal extends Component {
             this.setState({
                 content: toggleData.editData.raw
             });
-            editor.txt.html(toggleData.editData.raw)
+			editor.txt.html(toggleData.editData.raw)
+			let attachment = [];
+			toggleData.editData.cover ? attachment.push(toggleData.editData.cover) : null
+			if(toggleData.editData.cover){
+				attachment[0].uid = '1'
+				attachment[0].status = 'done'
+			}
+			let atta = toggleData.editData.attachment && toggleData.editData.attachment.fileList ? toggleData.editData.attachment.fileList : [];
+			if(atta.length > 0){
+				atta.map((item,index) =>{
+					item.uid = index;
+					item.status = 'done';
+				})
+			}
             setFieldsValue({
                 'title': toggleData.editData.title || '',
-                'abstract': toggleData.editData.abstract
+				'attachment': attachment,
+				'attachment1': atta,
+				'source':toggleData.editData.source && toggleData.editData.source.name ? toggleData.editData.source.name : ''
             })
         }
     }
@@ -111,14 +125,11 @@ class RichModal extends Component {
 			if (!err) {
 				//判断是发布新闻还是更新新闻
 				if (toggleData.status === 'ADD') {
-					debugger
-					let resp = values.attachment.file.response;
+					let resp = values.attachment[0].response;
 					let newData = {
 						"title": values['title'] || '',
-						"org": values['org'] || '',
 						"raw": this.state.content,
 						"content": "",
-						"attachment": {},
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"tags": [1],
@@ -129,7 +140,7 @@ class RichModal extends Component {
 						"publisher": getUser().id,
 						"is_draft": false,
 						"cover":{
-							"uid": resp.id,
+							// "uid": resp.id,
 							"misc": resp.misc,
 							"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
 							"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
@@ -154,19 +165,19 @@ class RichModal extends Component {
 							}
 						})
 				} else if (toggleData.status === 'EDIT') {
-					let resp = values.attachment.file.response;
+					let resp = values.attachment[0].response ? values.attachment[0].response : values.attachment[0];
+					let newFileList = fileList.length !== 0 ? fileList : values.attachment1;
 					let newData = {
 						"title": values['title'] || '',
-						"org": values['org'] || '',
 						"raw": this.state.content,
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"categories": [4],
 						"attachment": {
-							"fileList": fileList || [],
+							"fileList": newFileList,
 						},
 						"is_draft": false,
 						"cover":{
-							"uid": resp.id,
+							// "uid": resp.id,
 							"misc": resp.misc,
 							"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
 							"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
@@ -212,20 +223,20 @@ class RichModal extends Component {
 		//判断暂存的是新增的还是编辑的暂存
 		//编辑暂存的
 		if (toggleData.status === 'EDIT') {
-			let resp = values.attachment.file.response;
 			validateFields((err, values) => {
+				let resp = values.attachment[0].response ? values.attachment[0].response : values.attachment[0];
+				let newFileList = fileList.length !== 0 ? fileList : values.attachment1;
 				let newData = {
 					"title": values['title'] || '',
-					"org": values['org'] || '',
 					"raw": this.state.content,
 					"categories": [4],
 					"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"is_draft": true,
 					"attachment": {
-						"fileList": fileList || [],
+						"fileList": newFileList,
 					},
 					"cover":{
-						"uid": resp.id,
+						// "uid": resp.id,
 						"misc": resp.misc,
 						"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
 						"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
@@ -255,10 +266,9 @@ class RichModal extends Component {
 			})
 		} else if (toggleData.status === 'ADD') {
 			validateFields((err, values) => {
-				let resp = values.attachment.file.response;
+				let resp = values.attachment[0].response;
 				let newData = {
 					"title": values['title'] || '',
-					"org": values['org'] || '' ,
 					"raw": this.state.content || '',
 					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 					"tags": [1],
@@ -269,7 +279,7 @@ class RichModal extends Component {
 					"publisher": getUser().id,
 					"is_draft": true,
 					"cover":{
-						"uid": resp.id,
+						// "uid": resp.id,
 						"misc": resp.misc,
 						"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
 						"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
@@ -309,7 +319,10 @@ class RichModal extends Component {
 	coverPicFile = (e) => {
 		if (Array.isArray(e)) {
 			return e;
-        }
+		}
+		if(e.file.status === 'removed'){
+			return []
+		}
 		if (e.file.status === 'done' && !e.file.response.a_file) {
 			return []
         }
@@ -318,8 +331,13 @@ class RichModal extends Component {
         if(e.file.status === 'done' && e.file.response.a_file){
             e.fileList[length].response.name = e.file.name;
         }
-        array.push(e.fileList[length])
-		return e && array;
+		array.push(e.fileList[length])
+		if(e.file.status){
+			return e && array;
+		}else{
+			return []
+		}
+		
 	}
 	uploadProps1 = {
 		name: 'a_file',
@@ -405,29 +423,28 @@ class RichModal extends Component {
                                         )}
                                 </FormItem>
                             </Col>
-                            <Col span={8} offset={1}>
-                                <FormItem {...formItemLayout} label="发布单位">
-                                    {getFieldDecorator('org', {})(
-                                        (<Select allowClear>
-											{
-												this.array
-											}
-										</Select>)
-                                    )}
-                                </FormItem>
-							</Col>
-							<Col span={2}>
-								<Dragger {...this.uploadProps1}>
-									<Button >
-										<Icon type='upload' />上传
-									</Button>
-								</Dragger>
+							<Col span={8} offset={1}>
+								<FormItem {...formItemLayout} label="附件">
+									{getFieldDecorator('attachment1', {
+										valuePropName:'fileList',
+										getValueFromEvent:this.coverPicFile,
+									})(
+										<Upload {...this.uploadProps1}
+										>
+											<Button>
+												<Icon type="upload" />上传附件
+												</Button>
+										</Upload>
+										)}
+								</FormItem>
 							</Col>
 						</Row>
 						<Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label="封面">
                                     {getFieldDecorator('attachment', {
+										valuePropName:'fileList',
+										getValueFromEvent:this.coverPicFile,
 										rules: [
 											{
 												required: true,
