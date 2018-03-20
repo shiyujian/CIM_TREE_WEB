@@ -512,13 +512,15 @@ class ToggleModal extends Component {
 		//let n = ["ORG_01--业主单位","ORG_P00--9号地块"];	//测试数据
 
 		const {orgList} = this.props;
-		return data.reduce((pre,cur)=>{
+		let ret = data.reduce((pre,cur)=>{
 			let code = cur.split("--")[0],
 				rightUnit = this.getRightUnit(orgList,code),
 				result = rightUnit? this.getAllUnit(rightUnit) : [code];
 
 			return pre.concat(result);
 		},[])
+
+		return [...new Set(ret)];
 	}
 	getRightUnit = (orgList,code)=>{
 		//获得当前code对应的Unit的所有信息
@@ -533,7 +535,7 @@ class ToggleModal extends Component {
 			}
 		}
 	}
-	getAllUnit = (data,parameter="code")=>{
+	getAllUnit = (data,parameter="name")=>{
 		//获得本单位工程最底层所有单位工程的code
 		let child = data.children;
 
