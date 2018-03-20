@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Progress,Select } from 'antd';
+import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Table, message, Progress, Select } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
 import { DEPARTMENT } from '_platform/api';
-import { base, STATIC_DOWNLOAD_API, SOURCE_API,FILE_API } from '../../../_platform/api';
+import { base, STATIC_DOWNLOAD_API, SOURCE_API, FILE_API } from '../../../_platform/api';
 import E from 'wangeditor'
 
 let editor;
@@ -21,14 +21,14 @@ class Modals extends Component {
 		this.state = {
 			content: "",
 			progress: 0,
-			array:[]
+			array: []
 		}
 	}
-	componentDidUpdate(){
+	componentDidUpdate() {
 	}
 
 	componentDidMount() {
-		DEPARTMENT.map(item =>{
+		DEPARTMENT.map(item => {
 			this.array.push(<Option value={item.name}>{item.name}</Option>)
 		})
 		const elem = this.refs.editorElem;
@@ -93,13 +93,22 @@ class Modals extends Component {
 			form: { setFieldsValue }
 		} = this.props;
 		if (toggleData.type === 'TIPS' && toggleData.status === 'EDIT') {
-			postUploadFiles(toggleData.editData.attachment.fileList)
+			// postUploadFiles(toggleData.editData.attachment.fileList)
 			this.setState({
 				content: toggleData.editData.raw
 			});
 			editor.txt.html(toggleData.editData.raw)
+			let atta = toggleData.editData.attachment && toggleData.editData.attachment.fileList ? toggleData.editData.attachment.fileList : [];
+			if(atta.length > 0){
+				atta.map((item,index) =>{
+					item.uid = index;
+					item.status = 'done';
+				})
+			}
 			setFieldsValue({
 				'title': toggleData.editData.title || '',
+				'mergency':toggleData.editData.degree+'' || '',
+				'attachment1': atta,
 			})
 		}
 	}
@@ -124,7 +133,7 @@ class Modals extends Component {
 				newFileList = newFileList.concat(newFile);
 				postUploadFiles(newFileList)
 				message.info('上传附件成功');
-				
+
 			}
 			if (event) {
 				let { percent } = event;
@@ -161,13 +170,11 @@ class Modals extends Component {
 		validateFields((err, values) => {
 			if (!err) {
 				//判断是发布公告还是更新公告
-				let resp = values.attachment.file.response;
 				if (toggleData.status === 'ADD') {
 					let newData = {
 						"title": values['title'] || '',
-						"org": values['org'] || '',
 						"raw": this.state.content,
-						"mergency": values['mergency'],
+						"degree": values['mergency'],
 						"attachment": {
 							"fileList": fileList || [],
 						},
@@ -177,18 +184,6 @@ class Modals extends Component {
 						"categories": [4],
 						"publisher": getUser().id,
 						"is_draft": false,
-						"cover":{
-							"uid": resp.id,
-							"misc": resp.misc,
-							"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-							"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-							"create_time": resp.create_time,
-							"mime_type": resp.mime_type,
-							"name":resp.name
-						},
-						"source":{
-							"name":values.source
-						}
 					};
 					postData({}, newData)
 						.then(rst => {
@@ -203,29 +198,16 @@ class Modals extends Component {
 							}
 						})
 				} else if (toggleData.status === 'EDIT') {
-					let resp = values.attachment.file.response;
+					let newFileList = fileList.length !== 0 ? fileList : values.attachment1;
 					let newData = {
 						"title": values['title'] || '',
-						"org": values['org'] || '',
 						"raw": this.state.content,
 						"attachment": {
-							"fileList": fileList || [],
+							"fileList": newFileList,
 						},
 						"categories": [4],
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"is_draft": false,
-						"cover":{
-							"uid": resp.id,
-							"misc": resp.misc,
-							"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-							"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-							"create_time": resp.create_time,
-							"mime_type": resp.mime_type,
-							"name":resp.name
-						},
-						"source":{
-							"name":values.source
-						}
 					};
 					patchData({ pk: toggleData.editData.id }, newData)
 						.then(rst => {
@@ -245,14 +227,12 @@ class Modals extends Component {
 				}
 			}
 		});
-		
 	}
 
 	//暂存公告
 	draftDataFunc() {
-
 		const {
-			actions: {postData, patchData, getTipsList, getDraftTipsList },
+			actions: { postData, patchData, getTipsList, getDraftTipsList,postUploadFiles },
 			form: { validateFields },
 			toggleData: toggleData = {
 				status: 'ADD',
@@ -263,31 +243,18 @@ class Modals extends Component {
 		//判断暂存的是新增的还是编辑的暂存
 		//编辑暂存的
 		if (toggleData.status === 'EDIT') {
-			let resp = values.attachment.file.response;
 			validateFields((err, values) => {
-				if(!err){
+				let newFileList = fileList.length !== 0 ? fileList : values.attachment1;
+				if (!err) {
 					let newData = {
 						"title": values['title'] || '',
-						"org": values['org'] || '',
 						"raw": this.state.content,
 						"attachment": {
-							"fileList": fileList || [],
+							"fileList": newFileList,
 						},
 						"categories": [4],
 						"update_time": moment().format('YYYY-MM-DD HH:mm:ss'),
 						"is_draft": true,
-						"cover":{
-							"uid": resp.id,
-							"misc": resp.misc,
-							"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-							"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-							"create_time": resp.create_time,
-							"mime_type": resp.mime_type,
-							"name":resp.name
-						},
-						"source":{
-							"name":values.source
-						}
 					};
 					patchData({ pk: toggleData.editData.id }, newData)
 						.then(rst => {
@@ -301,88 +268,60 @@ class Modals extends Component {
 								getDraftTipsList({
 									user_id: getUser().id
 								});
+								postUploadFiles([])
 							}
 						})
 				}
 			})
 		} else if (toggleData.status === 'ADD') {
 			validateFields((err, values) => {
-				if(!err){
-					let resp = values.attachment.file.response;
-				let newData = {
-					"title": values['title'] || '',
-					"org": values['org'] || '',
-					"raw": this.state.content,
-					"attachment": {
-						"fileList": fileList || [],
-					},
-					"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-					"tags": [2],
-					"categories": [4],
-					"publisher": getUser().id,
-					"is_draft": true,
-					"cover":{
-						"uid": resp.id,
-						"misc": resp.misc,
-						"download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-						"a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-						"create_time": resp.create_time,
-						"mime_type": resp.mime_type,
-						"name":resp.name
-					},
-					"source":{
-						"name":values.source
-					}
-				};
-				postData({}, newData)
-					.then(rst => {
-						if (rst.id) {
-							this.modalClick();
-							message.success('暂存成功！');
-							//更新暂存的公告列表数据
-							getDraftTipsList({
-								user_id: getUser().id
-							});
-						}
-					})
+				if (!err) {
+					let newData = {
+						"title": values['title'] || '',
+						"raw": this.state.content,
+						"attachment": {
+							"fileList": fileList || [],
+						},
+						"pub_time": moment().format('YYYY-MM-DD HH:mm:ss'),
+						"tags": [2],
+						"categories": [4],
+						"publisher": getUser().id,
+						"is_draft": true,
+					};
+					postData({}, newData)
+						.then(rst => {
+							if (rst.id) {
+								this.modalClick();
+								message.success('暂存成功！');
+								//更新暂存的公告列表数据
+								getDraftTipsList({
+									user_id: getUser().id
+								});
+								postUploadFiles([])
+							}
+						})
 				}
 			})
 		}
-		
 	}
 	coverPicFile = (e) => {
 		if (Array.isArray(e)) {
 			return e;
-        }
+		}
+		if(e.file.status === 'removed'){
+			return []
+		}
 		if (e.file.status === 'done' && !e.file.response.a_file) {
 			return []
-        }
-        let array = [];
-        let length = e.fileList.length - 1;
-        if(e.file.status === 'done' && e.file.response.a_file){
-            e.fileList[length].response.name = e.file.name;
-        }
-        array.push(e.fileList[length])
+		}
+		let array = [];
+		let length = e.fileList.length - 1;
+		if (e.file.status === 'done' && e.file.response.a_file) {
+			e.fileList[length].response.name = e.file.name;
+		}
+		array.push(e.fileList[length])
 		return e && array;
 	}
-	uploadProps1 = {
-        name: 'file',
-        action: `${FILE_API}/api/user/files/`,
-        showUploadList: true,
-        data(file) {
-            return {
-                name: file.fileName,
-                a_file: file,
-            };
-        },
-        beforeUpload(file) {
-            const valid = file.name.indexOf("png") === -1 && file.name.indexOf("jpg") === -1;
-            if (valid) {
-                message.error('只能上传 jpg或者png 文件！');
-            }
-            return !valid;
-        },
-    };
 
 	render() {
 		const {
@@ -403,144 +342,73 @@ class Modals extends Component {
 		};
 		return (
 			<Modal
-            visible={toggleData.visible}
-            onOk={this.modalClick.bind(this)}
-            onCancel={this.modalClick.bind(this)}
-            footer={null}
-            width="80%"
-            >
-			<div>
-				<Form>
-					<Row span={22}>
-						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="名称">
-								{getFieldDecorator('title', {
-									rules: [{ required: true, message: '请输入公告名称' }],
-									initialValue: ''
-								})(
-									<Input type="text" />
+				visible={toggleData.visible}
+				onOk={this.modalClick.bind(this)}
+				onCancel={this.modalClick.bind(this)}
+				footer={null}
+				width="80%"
+			>
+				<div>
+					<Form>
+						<Row span={22}>
+							<Col span={8} offset={1}>
+								<FormItem {...formItemLayout} label="名称">
+									{getFieldDecorator('title', {
+										rules: [{ required: true, message: '请输入公告名称' }],
+										initialValue: ''
+									})(
+										<Input type="text" />
+										)}
+								</FormItem>
+							</Col>
+							<Col span={6} offset={1}>
+								<FormItem {...formItemLayout} label="紧急程度">
+									{getFieldDecorator('mergency', {
+										rules: [{ required: true, message: '请选择紧急程度' }],
+									})(
+										(<Select allowClear>
+											<Option value="0">平件</Option>
+											<Option value="1">加急</Option>
+											<Option value="2">特急</Option>
+										</Select>)
 									)}
-							</FormItem>
-						</Col>
-						<Col span={6} offset={1}>
-							<FormItem {...formItemLayout} label="发布单位">
-								{getFieldDecorator('org', {})(
-									(<Select allowClear style={{ width: '100%' }}>
-										{
-											this.array
-										}
-									</Select>)
-								)}
-							</FormItem>
-						</Col>
-						<Col span={4} offset={1}>
-							<FormItem {...formItemLayout} label="紧急程度">
-							{getFieldDecorator('mergency', {})(
-								(<Select allowClear>
-									<Option value="0">平件</Option>
-									<Option value="1">加急</Option>
-									<Option value="2">特急</Option>
-								</Select>)
-							)}
-							</FormItem>
-						</Col>
-						<Col span={2}>
-							<Dragger {...this.uploadProps}>
-								<Button >
-									<Icon type='upload' />上传
-								</Button>
-							</Dragger>
-						</Col>
-
-
-					</Row>
-					<Row>
-						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="封面">
-								{getFieldDecorator('attachment', {
-									rules: [
-										{
-											required: false,
-										}
-									],
-								})(
-									<Upload {...this.uploadProps1}
-									>
-										<Button>
-											<Icon type="upload" />添加文件
-											</Button>
-									</Upload>
-									)}
-							</FormItem>
-						</Col>
-						<Col span={8} offset={1}>
-							<FormItem {...formItemLayout} label="新闻来源">
-								{getFieldDecorator('source', {
-									rules: [
-										{
-											required: true,
-										}
-									],
-								})(
-									<Input />
-									)}
-							</FormItem>
-						</Col>
-					</Row>
-					<Row>
-						<Col span={22} offset={1}>
-							<div ref="editorElem"></div>
-						</Col>
-						{/* <Col span={10} offset={1}>
-							<Row>
-								<Col>
-									<Dragger {...this.uploadProps}>
-										<p className="ant-upload-drag-icon">
-											<Icon type="inbox" />
-										</p>
-										<p className="ant-upload-text">
-											点击或者拖拽开始上传</p>
-									</Dragger>
-								</Col>
-								<Col>
-									<Progress percent={progress} />
-								</Col>
-								<Col>
-									<Table columns={this.columns}
-										dataSource={fileList}
-										pagination={false}
-										bordered rowKey="down_file" />
-								</Col>
-							</Row>
-						</Col> */}
-					</Row>
-					<Row style={{ marginTop: 20 }}>
-						<Col span={24} offset={10}>
-							<Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
-							<Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
-							<Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
-						</Col>
-					</Row>
-				</Form>
-			</div>
+								</FormItem>
+							</Col>
+							<Col span={5} offset={1}>
+								<FormItem {...formItemLayout} label="附件">
+									{getFieldDecorator('attachment1', {
+										valuePropName:'fileList',
+										getValueFromEvent:this.coverPicFile,
+									})(
+										<Upload {...this.uploadProps}
+										>
+											<Button>
+												<Icon type="upload" />上传附件
+												</Button>
+										</Upload>
+										)}
+								</FormItem>
+							</Col>
+						</Row>
+						<Row>
+							<Col span={22} offset={1}>
+								<div ref="editorElem"></div>
+							</Col>
+						</Row>
+						<Row style={{ marginTop: 20 }}>
+							<Col span={24} offset={10}>
+								<Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
+								<Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
+								<Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
+							</Col>
+						</Row>
+					</Form>
+				</div>
 			</Modal>
 
 		);
 	}
 
-	columns = [
-		{
-			title: '文件名称',
-			dataIndex: 'name',
-		}, {
-			title: '操作',
-			render: (file) => {
-				return (
-					<a onClick={this.removeFile.bind(this, file)}>删除</a>
-				);
-			},
-		}
-	];
 	removeFile(file) {
 		const { actions: { postUploadFiles }, fileList = [] } = this.props;
 		let newFileList = fileList.filter(f => f.down_file !== file.down_file);

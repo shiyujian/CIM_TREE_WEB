@@ -280,7 +280,7 @@ class SimpleText extends Component {
 										)}
 								</FormItem>
 							</Col>
-							<Col span={6} offset={1}>
+							{/*<Col span={6} offset={1}>
 								<FormItem {...formItemLayout} label="发布单位">
 									{getFieldDecorator('abstract', {})(
 										(<Select allowClear style={{ width: '100%' }}>
@@ -289,7 +289,7 @@ class SimpleText extends Component {
 										</Select>)
 									)}
 								</FormItem>
-							</Col>
+								</Col>*/}
 							<Col span={4} offset={1}>
 								<FormItem {...formItemLayout} label="紧急程度">
 									{

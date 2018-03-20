@@ -28,7 +28,7 @@ export default class Search extends Component {
 
 		return (
 			<Main>
-				<DynamicTitle title="检验批填报" {...this.props}/>
+				<DynamicTitle title="质量管理检查记录" {...this.props}/>
 				<Sidebar>
 					<PkCodeTree treeData={tree}
 					            selectedKeys={currentNode.code}
