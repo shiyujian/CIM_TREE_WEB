@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Row, Col} from 'antd';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {actions as platformActions} from '_platform/store/global';
+import { actions as platformActions } from '_platform/store/global';
 import {News, Datum, Safety, Staff, Schedule, Quality} from '../components';
 import * as previewActions from '_platform/store/global/preview';
 import Preview from '_platform/components/layout/Preview';
