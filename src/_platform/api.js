@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-17 16:41:40
+ * @Last Modified time: 2018-03-20 09:43:27
  */
 /**
 *
@@ -423,6 +423,43 @@ export const TREETYPENO = [
 	},
 	{
 		id:'5',
+		name:'草本'
+	},
+]
+
+export const SCHEDULRPROJECT = [
+	{
+		id:6,
+		name:'便道施工'
+	},{
+		id:7,
+		name:'给排水沟槽开挖'
+	},{
+		id:8,
+		name:'给排水管道安装'
+	},{
+		id:9,
+		name:'给排水回填'
+	},{
+		id:10,
+		name:'绿地平整'
+	},{
+		id:11,
+		name:'种植穴工程'
+	},{
+		id:1,
+		name:'常绿乔木'
+	},{
+		id:2,
+		name:'落叶乔木'
+	},{
+		id:3,
+		name:'亚乔木'
+	},{
+		id:4,
+		name:'灌木'
+	},{
+		id:5,
 		name:'草本'
 	},
 ]

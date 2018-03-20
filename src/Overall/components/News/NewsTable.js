@@ -46,7 +46,6 @@ class NewsTable extends Component {
 		})
 	}
 	componentDidUpdate(){
-		
 	}
 
 	//新闻操作按钮
@@ -123,9 +122,6 @@ class NewsTable extends Component {
 
 	}
 
-
-
-
 	handleCancel() {
 		this.setState({
 			visible: false,
@@ -133,11 +129,8 @@ class NewsTable extends Component {
 		})
 	}
 
-
-
 	//新闻列表和暂存的新闻列表切换
 	subTabChange(newsTabValue) {
-
 		const { actions: { setNewsTabActive } } = this.props;
 		setNewsTabActive(newsTabValue);
 	}
@@ -147,16 +140,13 @@ class NewsTable extends Component {
 			newsTabValue = '1'
 		} = this.props;
 		this.props.form.setFieldsValue({
-
 			theme: undefined,
 			worktime: undefined,
 			workunit: undefined,
-
 		});
 	}
 
 	clear1() {
-
 		this.props.form.setFieldsValue({
 			title1: undefined,
 			worktimes: undefined,
@@ -169,7 +159,6 @@ class NewsTable extends Component {
 			actions: { getNewsList },
 			filter = {}
 		} = this.props;
-		// const user = getUser();
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
 				title:values.theme || "",
@@ -193,12 +182,10 @@ class NewsTable extends Component {
 	}
 
 	query1() {
-
 		const {
 			actions: { getDraftNewsList },
 			filter = {}
 		} = this.props;
-
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
 				org:values.workunits || "",
@@ -211,13 +198,10 @@ class NewsTable extends Component {
 			await getDraftNewsList(conditions);
 		})
 	}
-
 	render() {
 		const rowSelection = {
-			// selectedRowKeys,
 			onChange: this.onSelectChange,
 		};
-
 		const {
 			newsList = [],
 			draftNewsLis = [],
@@ -233,9 +217,6 @@ class NewsTable extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		};
-
-
-
 		return (
 			<Row>
 				{
@@ -253,12 +234,8 @@ class NewsTable extends Component {
 							}
 						</div>
 					} >
-
 						<TabPane tab="新闻查询" key="1">
 							<Row >
-								{/* <Col span={4}>
-									<Icon type='exception' style={{ fontSize: 32 }} />
-								</Col> */}
 								<Col span={18}>
 									<Row>
 										<Col span={8} >
@@ -299,17 +276,13 @@ class NewsTable extends Component {
 															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
 															showTime={{ format: 'HH:mm:ss' }}
 															format={'YYYY/MM/DD HH:mm:ss'}
-
 														>
 														</RangePicker>)
 												}
-
 											</FormItem>
-
 										</Col>
 									</Row>
 									<Row>
-
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
@@ -319,23 +292,15 @@ class NewsTable extends Component {
 									<Button icon='reload' onClick={this.clear.bind(this)}>清空</Button>
 								</Col>
 							</Row>
-
 							<Table
-
-
 								dataSource={newsList}
 								columns={this.columns}
-								// title={() => '新闻查询'}
 								className="foresttables"
-								// rowSelection={rowSelection}
 								bordered
 								rowKey="id" />
 						</TabPane>
 						<TabPane tab="暂存的新闻" key="2">
 							<Row >
-								{/* <Col span={4}>
-									<Icon type='exception' style={{ fontSize: 32 }} />
-								</Col> */}
 								<Col span={18}>
 									<Row>
 										<Col span={8} >
@@ -352,7 +317,6 @@ class NewsTable extends Component {
 										</Col>
 										<Col span={8} >
 											<FormItem {...formItemLayout} label="修改日期">
-
 												{
 													getFieldDecorator('worktimes', {
 														rules: [
@@ -364,13 +328,10 @@ class NewsTable extends Component {
 															// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
 															showTime={{ format: 'HH:mm:ss' }}
 															format={'YYYY/MM/DD HH:mm:ss'}
-
 														>
 														</RangePicker>)
 												}
-
 											</FormItem>
-
 										</Col>
 										<Col span={8} >
 											<FormItem {...formItemLayout} label="发布单位">
@@ -386,13 +347,8 @@ class NewsTable extends Component {
 														}
 													</Select>)
 												}
-
-
 											</FormItem>
-
 										</Col>
-
-
 									</Row>
 								</Col>
 								<Col span={2} offset={1}>
@@ -403,20 +359,12 @@ class NewsTable extends Component {
 								</Col>
 							</Row>
 							<Table dataSource={draftNewsLis}
-
-								// rowSelection={rowSelection}
 								columns={this.draftColumns}
 								className="foresttables"
 								bordered
 								rowKey="id" />
 						</TabPane>
-
-						{/* <TabPane tab="新闻发布" key="3">
-							<RichText {...this.props} />
-						</TabPane> */}
-
 					</Tabs>
-
 				</Col>
 				<Modal
 					title="新闻预览"
@@ -515,6 +463,17 @@ class NewsTable extends Component {
 			dataIndex: 'abstract',
 			key: 'abstract',
 			width:'10%',
+			render:(text,record)=>{
+				if(record.abstract){
+					return <p>{record.abstract}</p>
+				}else{
+					if(record.pub_unit && record.pub_unit.name){
+						return <p>{record.pub_unit.name}</p>
+					}else{
+						return <p> / </p>
+					}
+				}
+			}
 		}, {
 			title: '修改时间',
 			dataIndex: 'pub_time',
