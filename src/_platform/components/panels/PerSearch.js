@@ -81,8 +81,17 @@ export default class PerSearch extends Component {
             roleSearch = false,
             task
         } = this.props
+        let user = getUser()
+        console.log('user',user)
+        let sections = user.sections
+        console.log('sections',sections)
+        sections = JSON.parse(sections)
         let org_code = ['003']
-        let role_code = ['001']
+        let roles = []
+        if(!(sections && sections instanceof Array && sections.length>0)){
+            return 
+        }
+        
         //如果是开始创建流程时  使用code来查找人员
         if(code){
             let params = {
@@ -105,11 +114,14 @@ export default class PerSearch extends Component {
                         })
 
 
-                        let roles = nextMess[0].to_state[0].roles
-                        role_code = []
-                        roles.map((rst)=>{
-                            role_code.push(rst.code)
+                        let role = nextMess[0].to_state[0].roles
+                        roles = []
+                        role.map((item)=>{
+                            roles.push(item.id)
                         })
+                        // if(roles.length>0){
+                        //     role.push(roles[0]&&roles[0].name)
+                        // }
                     }catch(e){
                         console.log(e)
                         
@@ -133,11 +145,14 @@ export default class PerSearch extends Component {
                                 })
         
         
-                                let roles = rst.to_state[0].roles
-                                role_code = []
-                                roles.map((role)=>{
-                                    role_code.push(role.code)
+                                let role = rst.to_state[0].roles
+                                roles = []
+                                role.map((item)=>{
+                                    roles.push(item.id)
                                 })
+                                // if(roles.length>0){
+                                //     role.push(roles[0]&&roles[0].name)
+                                // }
                             }catch(e){
                                 console.log(e)
                                 
@@ -149,19 +164,24 @@ export default class PerSearch extends Component {
         }
 
         console.log('org_code',org_code)
+        console.log('roles',roles)
 
         try {
             let postdata = {}
             //是按照部门搜索  还是按照角色搜索
             if(!roleSearch){
                 postdata = {
-                    org_code : org_code
+                    org_code : org_code,
+                    sections: sections,
+                    roles : roles,
                 }
             }else{
                 postdata = {
-                    role_code : role_code
+                    roles : roles,
+                    sections: sections
                 }
             }
+            console.log('postdata',postdata)
             
             let users = await getUsers({},postdata)
             //因多个组件公用此组件，不能放在redux里
@@ -199,7 +219,7 @@ export default class PerSearch extends Component {
             
         }
         dataList = tree.map(node=>({
-            text:node.name,
+            text:node.name+'('+ node.username + ')',
             obj: JSON.stringify({
                 code: node.code,
                 name: node.name,
@@ -226,7 +246,7 @@ export default class PerSearch extends Component {
                         onChange={this.handleChange}
                         value={this.state.text}
                     >
-                        {dataList.map(d => <Option key={d.text} value={d.value}>{d.text}</Option>)}
+                        {dataList.map(d => <Option key={d.text} title={d.text} value={d.value}>{d.text}</Option>)}
                     </Select>
                 </div>
             </div>

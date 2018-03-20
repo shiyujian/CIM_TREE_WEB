@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
-import { PROJECT_UNITS ,TREETYPENO,ECHARTSCOLOR} from '../../../_platform/api';
+import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
+import { PROJECT_UNITS ,TREETYPENO,ECHARTSCOLOR,SCHEDULRPROJECT} from '../../../_platform/api';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
@@ -13,15 +13,20 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
     constructor(props){
         super(props);
         this.state={
-            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            stime: moment().subtract(10, 'days').format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             departOptions:"",
             data:"",
-            gpshtnum:[],
-            times:[],
+            
             unitproject:"",
             project:"便道施工",
-            treetypeAll:[]
+            treetypeAll:[],
+            gpshtnum:[],
+            times:[],
+            datas:[],
+            legend:[],
+            loading:false
+
         }
     }
 
@@ -95,13 +100,12 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         }catch(e){
             console.log(e)
         }
-        if(stime != prevState.stime || etime != prevState.etime){
+        if(stime != prevState.stime || etime != prevState.etime  || treetypeAll != prevState.treetypeAll){
             this.getdata()
         }
-        if(project != prevState.project || treetypeAll != prevState.treetypeAll){
+        if(project != prevState.project){
             this.filterProjectData()
         }
-        
     }
     
     render() { //todo 累计完成工程量
@@ -109,37 +113,31 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         
         return (
             <div >
-            <Card>
-            施工时间：
-                <RangePicker 
-                    style={{verticalAlign:"middle"}} 
-                    defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]}  
-                    showTime={{ format: 'HH:mm:ss' }}
-                    format={'YYYY/MM/DD HH:mm:ss'}
-                    onChange={this.datepick.bind(this)}
-                    onOk={this.datepick.bind(this)}
-                >
-                </RangePicker>
-                    <div id='lefttop' style={{ width: '100%', height: '340px' }}></div>
-                    <Select 
-                     style={{width:'120px'}}
-                     defaultValue="便道施工"
-                     onSelect={this.onDepartments.bind(this)}
-                     onChange={this.onChange.bind(this)}>
-                        <Option key="1" value="便道施工" title="便道施工">便道施工</Option>
-                        <Option key="2" value="给排水沟槽开挖" title="给排水沟槽开挖">给排水沟槽开挖</Option>
-                        <Option key="3" value="给排水管道安装" title="给排水管道安装">给排水管道安装</Option>
-                        <Option key="4" value="给排水回填" title="给排水回填">给排水回填</Option>
-                        <Option key="5" value="绿地平整" title="绿地平整">绿地平整</Option>
-                        <Option key="6" value="种植穴工程" title="种植穴工程">种植穴工程</Option>
-                        <Option key="7" value="常绿乔木" title="常绿乔木">常绿乔木</Option>
-                        <Option key="8" value="落叶乔木" title="落叶乔木">落叶乔木</Option>
-                        <Option key="9" value="亚乔木" title="亚乔木">亚乔木</Option>
-                        <Option key="10" value="灌木" title="灌木">灌木</Option>
-                        <Option key="11" value="草木" title="草木">草木</Option>
-                    </Select>
-                    <span>强度分析</span>
-                </Card>
+                <Spin spinning={this.state.loading}>
+                    <Card>
+                    施工时间：
+                        <RangePicker 
+                            style={{verticalAlign:"middle"}} 
+                            defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]}  
+                            showTime={{ format: 'HH:mm:ss' }}
+                            format={'YYYY/MM/DD HH:mm:ss'}
+                            onChange={this.datepick.bind(this)}
+                            onOk={this.datepick.bind(this)}
+                        >
+                        </RangePicker>
+                        <div id='lefttop' style={{ width: '100%', height: '340px' }}></div>
+                        <Select 
+                        style={{width:'120px'}}
+                        defaultValue="便道施工"
+                        onSelect={this.onDepartments.bind(this)}
+                        onChange={this.onChange.bind(this)}>
+                            {SCHEDULRPROJECT.map((rst)=>{
+                                return   <Option key={rst.id} value={rst.name} title={rst.name}>{rst.name}</Option>
+                            })}
+                        </Select>
+                        <span>强度分析</span>
+                    </Card>
+                </Spin>
             </div>
         );
         
@@ -166,18 +164,21 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         const{
             etime,
             stime,
-            project,
+            // project,
             treetypeAll
         }=this.state
         const{
             leftkeycode
         }=this.props
         let patams = {
-            // etime:etime,
-            // stime:stime,
+            etime:etime,
+            stime:stime,
             // project:project
         }
         console.log('LeftTopaaaaa',patams)
+        this.setState({
+            loading:true
+        })
         const {actions: {progressdata,progressalldata}} = this.props;
         let gpshtnum = [];
         let times = [];
@@ -185,76 +186,159 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
         let legend = ['总数']
         let total = [];
         let datas = [];
-        progressdata({},patams).then(rst=>{
+        progressalldata({},patams).then(rst=>{
             console.log('LeftTop',rst);
-            if(rst && rst instanceof Array){
+            if(rst && rst.content){
                 let content = []
-                rst.map((item)=>{
+                rst.content.map((item)=>{
                     if(item.ProgressType && item.ProgressType==='日实际'){
                         content.push(item)
                     }
                 })
-                // let content = rst.filter((item)=> item.ProgressType && item.ProgressType==='日实际')
-                //将获取的数据按照 CreateTime 时间排序
+                // let content = rst.content.filter((item)=> item.ProgressType && item.ProgressType==='日实际')
+                //将获取的数据按照 ProgressTime 时间排序
                 content.sort(function(a, b) {
-                    if (a.CreateTime < b.CreateTime ) {
+                    if (a.ProgressTime < b.ProgressTime ) {
                         return -1;
-                    } else if (a.CreateTime > b.CreateTime ) {
+                    } else if (a.ProgressTime > b.ProgressTime ) {
                         return 1;
                     } else {
                         return 0;
                     }
                 });
                 console.log('LeftTopcontent',content)
-                //将 CreateTime 单独列为一个数组
+                //将 ProgressTime 单独列为一个数组
                 for(let i=0;i<content.length;i++){
-                    let a = moment(content[i].CreateTime).format('YYYY/MM/DD')
+                    let a = moment(content[i].ProgressTime).format('YYYY/MM/DD')
                     time.push(a)
                 }
                 //时间数组去重
                 times = [...new Set(time)]
                 console.log('LeftToptimes',times)
 
+                SCHEDULRPROJECT.map((item,index)=>{
+                    datas[index] = new Object();
+                    datas[index].project = item.name;
+                    datas[index].value = new Array()
+                })
+
+                console.log('LeftTopdatas',datas)
+
+                if(content && content instanceof Array){
+                    PROJECT_UNITS.map((project)=>{
+                        //获取正确的项目    
+                        if(leftkeycode.indexOf(project.code)>-1){
+                            //获取项目下的标段
+                            let sections = project.units
+                            //将各个标段的数据设置为0
+                            sections.map((section,index)=>{
+                                //定义一个二维数组，分为多个标段
+                                gpshtnum[index] = new Array()
+                                datas.map((projectData)=>{
+                                    projectData.value[index] = new Array()
+                                })
+                                legend.push(section.value)
+                            })
+        
+                            content.map(item=>{
+                                if(item && item.UnitProject){
+                                    sections.map((section,index)=>{
+                                        if(item.UnitProject === section.code){
+                                            gpshtnum[index].push(item)
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+
+                console.log('LeftTopdatas',datas)
+                console.log('LeftTopgpshtnum',gpshtnum)
                 
-                PROJECT_UNITS.map((project)=>{
-                    //获取正确的项目    
-                    if(leftkeycode.indexOf(project.code)>-1){
-                        //获取项目下的标段
-                        let sections = project.units
-                        //将各个标段的数据设置为0
-                        sections.map((section,index)=>{
-                            //定义一个二维数组，分为多个标段
-                            gpshtnum[index] = new Array()
-                            datas[index] = new Array()
-                            legend.push(section.value)
+
+                times.map((time,index)=>{
+                    datas.map((projectData)=>{
+                        projectData.value.map((sectionData)=>{
+                            sectionData[index] = 0
                         })
-    
-                        content.map(item=>{
-                            if(item && item.WPNo){
-                                sections.map((section,index)=>{
-                                    //找到对应的标段，然后对标段的数组进行push
-                                    if(item.WPNo === section.code){
-                                        gpshtnum[index].push(item)
+                    })
+                   
+                    console.log('sectionData',datas)
+                    gpshtnum.map((data,i)=>{
+                        data.map((arr,a)=>{
+                            if(moment(arr.ProgressTime).format('YYYY/MM/DD') === time){
+                                let Items = arr.Items
+                                Items.map((item,x)=>{
+                                    //默认的种类
+                                    if(x<6){
+                                        SCHEDULRPROJECT.map((project,serial)=>{
+                                            if(item.Project === project.name){
+                                                let reg = isNaN(item.Num);
+                                                console.log('reg',reg)
+                                                if(!reg){
+                                                    if(item.Num > 0){
+                                                        datas[serial].value[i][index] = datas[serial].value[i][index] + item.Num + 0
+                                                    }
+                                                }
+                                                // datas[serial].value[index] = datas[serial].value[index] + item.Num + 0
+                                            }
+                                        })
+                                    
+                                    }else{//添加的数目种类
+                                        let treetype = ''
+                                        treetypeAll.map((tree)=>{
+                                            if(tree.TreeTypeName === rst.name){
+                                                //获取树种cdoe的首个数字，找到对应的类型
+                                                let code = tree.TreeTypeNo.substr(0, 1)
+                                                console.log('code',code)
+                                                TREETYPENO.map((forest)=>{
+                                                    if(forest.id === code){
+                                                        treetype = forest.name
+                                                    }
+                                                })
+                                            }
+                                        })
+                                        console.log('LeftToptreetype',treetype)
+                                        SCHEDULRPROJECT.map((project,serial)=>{
+                                            if(treetype === project.name){
+                                                let reg = isNaN(item.Num);
+                                                console.log('reg',reg)
+                                                if(!reg){
+                                                    if(item.Num > 0){
+                                                        datas[serial].value[i][index] = datas[serial].value[i][index] + item.Num + 0
+                                                    }
+                                                }
+                                            }
+                                        })
                                     }
                                 })
                             }
                         })
-                    }
+                    })
                 })
-                console.log('LeftTopgpshtnum',gpshtnum)
+                console.log('LeftTopdatas',datas)
+
                 this.setState({
-                    gpshtnum,
-                    times,
-                    datas,
-                    legend
+                    legend:legend,
+                    datas:datas,
+                    gpshtnum:gpshtnum,
+                    times:times
                 },()=>{
                     this.filterProjectData()
                 })
+            }else{
+                this.setState({
+                    loading:false
+                })
+                this.filterProjectData()
             }
             
-        }) 
+        })
+            
+            
     }
-
+    //根据项目筛选数据
     filterProjectData(){
         const{
             times,
@@ -264,52 +348,22 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             treetypeAll,
             legend
         }=this.state
-
-        times.map((time,index)=>{
-            datas.map((sectionData)=>{
-                sectionData[index] = 0
-            })
-            console.log('sectionData',datas)
-            gpshtnum.map((filterData,i)=>{
-                filterData.map((arr,a)=>{
-                    if(moment(arr.CreateTime).format('YYYY/MM/DD') === time){
-                        if(arr.Project === project){
-                            datas[i][index] = datas[i][index]+arr.Num+0
-                        }else{
-                            //获取树种的name
-                            let treetype = ''
-                            treetypeAll.map((tree)=>{
-                                if(tree.TreeTypeName === arr.Project){
-                                    //获取树种cdoe的首个数字，找到对应的类型
-                                    let code = tree.TreeTypeNo.substr(0, 1)
-                                    console.log('code',code)
-                                    TREETYPENO.map((forest)=>{
-                                        if(forest.id === code){
-                                            treetype = forest.name
-                                        }
-                                    })
-                                }
-                            })
-                            if(treetype === project){
-                                datas[i][index] = datas[i][index]+arr.Num+0
-                            }
-
-                        }
-                    }
-                })
-            })
+        let currentData = []
+        datas.map((data)=>{
+            if(data.project === project){
+                currentData = data.value
+            }
         })
+        console.log('currentData',currentData)
         let total = []
 
         for(let i=0;i<times.length;i++){
             total[i] = 0
-            datas.map((sectionData)=>{
+            currentData.map((sectionData)=>{
                 total[i] = total[i] + sectionData[i]
             })
         }
 
-        console.log('LeftToptotal',total)
-        console.log('LeftTopdatas',datas)
 
         //当查不出数据时，使横坐标不为空
         let a = moment().subtract(2, 'days').format('YYYY/MM/DD');
@@ -341,7 +395,7 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
                 }
             }
         ]
-        datas.map((sectionData,index)=>{
+        currentData.map((sectionData,index)=>{
             series.push(
                 {
                     name:legend[index+1],
@@ -392,6 +446,9 @@ const {RangePicker} = DatePicker;export default class Warning extends Component 
             series: series
         };
         myChart.setOption(optionLine);
-
+        this.setState({
+            loading:false
+        })
     }
+
 }
