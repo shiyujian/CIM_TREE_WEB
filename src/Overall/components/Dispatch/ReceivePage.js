@@ -160,10 +160,7 @@ class ReceivePage extends Component {
 		return (
 			<Row>
 				<Col span={22} offset={1}>
-					<Row >
-						{/* <Col span={2}>
-							<Icon type='exception' style={{ fontSize: 32 }} />
-						</Col> */}
+					{/*<Row >
 						<Col span={18}>
 							<Row>
 								<Col span={8}>
@@ -257,7 +254,7 @@ class ReceivePage extends Component {
 								</FormItem>
 							</Row>
 						</Col>
-					</Row>
+									</Row>*/}
 					{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
 					<Table
 						dataSource={this._getNewArrFunc(notifications)}
@@ -335,52 +332,91 @@ class ReceivePage extends Component {
 	}
 	columns = [
 		{
-			title: '序号',
+			title: 'ID',
 			dataIndex: 'index',
-			key: 'index'
-		},{
-			title: '文件类型',
-			dataIndex: 'doc_type',
-			key: 'doc_type'
 		}, {
-			title: '名称',
-			dataIndex: 'title',
-			key:'title'
+			title: '标题',
+			dataIndex: 'notification_title',
 		}, {
-			title: '工程名称',
-			dataIndex: 'project_name',
-			key: 'project_name'
-		},{
-			title: '编号',
-			dataIndex: 'number',
-			key: 'number'
-		},{
 			title: '来文单位',
-			dataIndex: 'come_unit',
-			key: 'come_unit'
-		},{
-			title: '收文日期',
-			dataIndex: 'come_date',
-			key: 'come_date'
+			dataIndex: 'from_whom'
+		},
+		/* {
+			title: '状态',
+			dataIndex: 'is_read',
+			render: is_read => {
+				return (is_read === false) ? "未阅" : "已阅";
+			}
+		}, */
+		{
+			title: '发送时间',
+			dataIndex: 'create_time',
+			render: create_time => {
+				return moment(create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss');
+			}
 		}, {
 			title: '操作',
 			render: record => {
 				return (
 					<span>
-						<a onClick={this._viewClick.bind(this, record._id)}>查看</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this._sentDoc.bind(this)}>回文</a>
-						{/*&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this._download.bind(this)}>下载</a>
-						 <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
-							cancelText="取消">
-							<a >删除</a>
-						</Popconfirm> */}
-
+						<Button onClick={this._viewClick.bind(this, record._id)}>查看</Button>
+						<Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
+									cancelText="取消">
+							<Button type="danger">删除</Button>
+						</Popconfirm>
 					</span>
 				)
 			},
 		}
 	];
+	// columns = [
+	// 	{
+	// 		title: '序号',
+	// 		dataIndex: 'index',
+	// 		key: 'index'
+	// 	},{
+	// 		title: '文件类型',
+	// 		dataIndex: 'doc_type',
+	// 		key: 'doc_type'
+	// 	}, {
+	// 		title: '名称',
+	// 		dataIndex: 'title',
+	// 		key:'title'
+	// 	}, {
+	// 		title: '工程名称',
+	// 		dataIndex: 'project_name',
+	// 		key: 'project_name'
+	// 	},{
+	// 		title: '编号',
+	// 		dataIndex: 'number',
+	// 		key: 'number'
+	// 	},{
+	// 		title: '来文单位',
+	// 		dataIndex: 'come_unit',
+	// 		key: 'come_unit'
+	// 	},{
+	// 		title: '收文日期',
+	// 		dataIndex: 'come_date',
+	// 		key: 'come_date'
+	// 	}, {
+	// 		title: '操作',
+	// 		render: record => {
+	// 			return (
+	// 				<span>
+	// 					<a onClick={this._viewClick.bind(this, record._id)}>查看</a>
+	// 					&nbsp;&nbsp;|&nbsp;&nbsp;
+	// 					<a onClick={this._sentDoc.bind(this)}>回文</a>
+	// 					{/*&nbsp;&nbsp;|&nbsp;&nbsp;
+	// 					<a onClick={this._download.bind(this)}>下载</a>
+	// 					 <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
+	// 						cancelText="取消">
+	// 						<a >删除</a>
+	// 					</Popconfirm> */}
+
+	// 				</span>
+	// 			)
+	// 		},
+	// 	}
+	// ];
 }
 export default Form.create()(ReceivePage)
