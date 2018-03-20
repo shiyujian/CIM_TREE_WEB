@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import { FOREST_API,SERVICE_API,FILE_API} from '../../../_platform/api';
 import {
-	Form, Input,Button, Row, Col, Modal, Upload, Icon, message, Table,notification
+	Form, Input,Button, Row, Col, Modal, Upload, Icon,
+	 message, Table,notification
 } from 'antd';
 const FormItem = Form.Item;
 const InputTextArea = Input.TextArea;
@@ -22,7 +24,7 @@ class Addition extends Component {
     };
     static layout = {
 		labelCol: {span: 3},
-		wrapperCol: {span: 21},
+		wrapperCol: {span: 20},
     };
 
 	render() {
@@ -51,6 +53,21 @@ class Addition extends Component {
 						<Row>
 							<Col span={24}>
 								<Row>
+									<Col span={24}>
+										<FormItem   {...Addition.layout} label="树种ID:">
+											{
+												getFieldDecorator('SID', {
+													rules: [
+														{ required: true, message: '请输入树种ID' }
+													]
+												})
+												(
+													<Input placeholder='请输入树种ID'/>
+												)
+											}
+                                        
+                                        </FormItem>
+									</Col>
 									<Col span={24}>
 										<FormItem   {...Addition.layout} label="树种学名:">
 											{
@@ -112,6 +129,22 @@ class Addition extends Component {
 											}
                                         </FormItem>
 									</Col>
+									<Col span={24}>
+										<FormItem   {...Addition.layout} label="Pics:">
+											{
+												getFieldDecorator('SPics', {
+													rules: [
+														{ required: true, message: '请输入Pics' }
+													]
+												})
+												(
+													<Upload {...this.uploadProps}>
+														<Button><Icon type="upload"/>上传图片</Button>
+													</Upload>
+												)
+											}
+                                        </FormItem>
+									</Col>
 								</Row>
 							</Col>
 						</Row>
@@ -127,6 +160,18 @@ class Addition extends Component {
 			addVisible:true
 		})
 	}
+
+	uploadProps={
+			name:'file',
+			action:`${FOREST_API}/upload/treetype/`,
+			headers:{
+				//Access-Control-Allow-Headers: "Origin, X-Requested-With, Content-Type, Accept"			
+				// authorization:'authorization-text',
+			},
+			beforeUpload() {
+
+        	},
+		}
 
 	cancel() {
 		const{

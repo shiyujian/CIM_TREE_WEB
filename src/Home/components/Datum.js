@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import styles from './styles.less';
 
 
-export default class News extends Component {
+export default class Datum extends Component {
 
 	static propTypes = {};
 
@@ -32,15 +32,18 @@ export default class News extends Component {
 		// 	setnewdoc(a)
 		// });
 
-		const { actions: { getNewsList } } = this.props;
+		const { actions: { getNewsList,getTasks} } = this.props;
+		console.log('this.props',this.props)
 		getNewsList();
+		getTasks();
+
 	}
 
 	clickNews(record, type) {
 		if (type === 'VIEW') {
 			this.setState({
 				visible: true,
-				container: record.raw
+				container: record.description
 			})
 		}
 	}
@@ -78,8 +81,8 @@ export default class News extends Component {
 	columns = [
 		{
 			title: '任务标题',
-			dataIndex: 'title',
-			key: 'title',
+			dataIndex: 'name',
+			key: 'name',
 			width: 400
 		},
 
@@ -117,9 +120,9 @@ export default class News extends Component {
 
 
 	render() {
-
-		const { newsList = [] } = this.props;
-
+		const { platform: { tasks = [] } } = this.props;
+		// const { task = [] } = this.props;
+		console.log('task222',tasks)
 
 		return (
 			<Blade title="待办任务">
@@ -129,7 +132,7 @@ export default class News extends Component {
 				<div className="tableContainer">
 					<Table
 						bordered={false}
-						dataSource={newsList}
+						dataSource={tasks}
 						columns={this.columns}
 						rowKey="pk" size="small" pagination={{ pageSize: 8 }} />
 				</div>

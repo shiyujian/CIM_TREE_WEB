@@ -4,6 +4,7 @@ import {
 	Form, Input,Button, Row, Col, Modal, Upload, Icon, message, Table,notification
 } from 'antd';
 const FormItem = Form.Item;
+const InputTextArea = Input.TextArea;
 
 class Edite extends Component {
 	static propTypes = {};
@@ -19,7 +20,7 @@ class Edite extends Component {
         wrapperCol: {span: 16},
     };
     static layout = {
-		labelCol: {span: 4},
+		labelCol: {span: 3},
 		wrapperCol: {span: 20},
     };
 
@@ -33,6 +34,15 @@ class Edite extends Component {
 		} = this.props;
         console.log('renderrecord',record)
         console.log('editVisible',editVisible)
+        const uploadProps={
+			name:'file',
+			action:'http://47.104.159.127/upload/treetype',	
+			headers:{
+				authorization:'authorization-text',
+
+			}
+
+		}
 		return (
 			<div>
 				<Modal title="修改树种信息"
@@ -45,81 +55,99 @@ class Edite extends Component {
 						<Row>
 							<Col span={24}>
 								<Row>
-									<Col span={12}>
-										<FormItem   {...Edite.layoutT} label="供应商:">
+									<Col span={24}>
+										<FormItem   {...Edite.layout} label="树种ID:">
 											{
-												getFieldDecorator('EFactory', {
-                                                    initialValue: `${record.Factory?record.Factory:''}`,
+												getFieldDecorator('EID', {
+                                                    initialValue: `${record.ID?record.ID:''}`,
 													rules: [
-														{ required: true, message: '请输入供应商' }
+														{ required: true, message: '树种ID' }
 													]
 												})
 												(
-													<Input placeholder='请输入供应商'/>
+													<Input placeholder='请输入树种ID'/>
 												)
 											}
                                         
                                         </FormItem>
 									</Col>
-									<Col span={12}>
-										<FormItem   {...Edite.layoutT} label="苗圃名称:">
+									<Col span={24}>
+										<FormItem   {...Edite.layout} label="树种学名:">
 											{
-												getFieldDecorator('ENurseryName', {
-                                                    initialValue: `${record.NurseryName?record.NurseryName:''}`,
+												getFieldDecorator('ETreeTypeName', {
+                                                    initialValue: `${record.TreeTypeName?record.TreeTypeName:''}`,
 													rules: [
-														{ required: true, message: '请输入苗圃名称' }
+														{ required: true, message: '请输入树种学名' }
 													]
 												})
 												(
-													<Input placeholder='请输入苗圃名称'/>
+													<Input placeholder='请输入树种学名'/>
 												)
 											}
                                         
                                         </FormItem>
 									</Col>
-									<Col span={12}>
-										<FormItem   {...Edite.layoutT} label="行政区划:">
+									<Col span={24}>
+										<FormItem   {...Edite.layout} label="所属类型:">
 											{
-												getFieldDecorator('ERegionName', {
-                                                    initialValue: `${record.RegionName?record.RegionName:''}`,
+												getFieldDecorator('ETreeTypeGenera', {
+                                                    initialValue: `${record.TreeTypeGenera?record.TreeTypeGenera:''}`,
 													rules: [
-														{ required: true, message: '请输入行政区划' }
+														{ required: true, message: '请输入所属类型' }
 													]
 												})
 												(
-													<Input placeholder='请输入行政区划'/>
+													<Input placeholder='请输入所属类型'/>
 												)
 											}
                                         
                                         </FormItem>
 									</Col>
-									<Col span={12}>
-										<FormItem   {...Edite.layoutT} label="行政区划编码:">
+									<Col span={24}>
+										<FormItem   {...Edite.layout} label="编码:">
 											{
-												getFieldDecorator('ERegionCode', {
-                                                    initialValue: `${record.RegionCode?record.RegionCode:''}`,
+												getFieldDecorator('ETreeTypeNo', {
+                                                    initialValue: `${record.TreeTypeNo?record.TreeTypeNo:''}`,
 													rules: [
-														{ required: true, message: '请输入行政区划编码' }
+														{ required: true, message: '请输入编码' }
 													]
 												})
 												(
-													<Input placeholder='请输入行政区划编码'/>
+													<Input placeholder='请输入编码'/>
 												)
 											}
-                                        
                                         </FormItem>
 									</Col>
-									<Col span={12}>
-										<FormItem   {...Edite.layoutT} label="产地:">
+									<Col span={24}>
+										<FormItem   {...Edite.layout} label="习性:">
 											{
-												getFieldDecorator('ETreePlace', {
-                                                    initialValue: `${record.TreePlace?record.TreePlace:''}`,
+												getFieldDecorator('EGrowthHabite', {
+                                                    initialValue: `${record.GrowthHabit?record.GrowthHabit:''}`,
 													rules: [
-														{ required: true, message: '请输入产地' }
+														{ required: true, message: '请输入习性' }
 													]
 												})
 												(
-													<Input placeholder='请输入产地'/>
+													<InputTextArea  placeholder='请输入习性'
+																	autosize={{minRows:3,maxRows:8}}
+													/>
+												)
+											}
+                                        </FormItem>
+									</Col>
+									<Col span={24}>
+										<FormItem   {...Edite.layout} label="Pics:">
+											{
+												getFieldDecorator('EPics', {
+                                                    initialValue: `${record.Pics?record.Pics:''}`,
+													rules: [
+														{ required: true, message: '请输入Pics' }
+													]
+												})
+												(
+													<Upload {...uploadProps}>
+														<Icon type="plus" className="avatar-uploader-trigger"/>
+													</Upload>
 												)
 											}
                                         </FormItem>
