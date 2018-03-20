@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
+import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
+import { PROJECT_UNITS ,TREETYPENO,ECHARTSCOLOR,SCHEDULRPROJECT} from '../../../_platform/api';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
@@ -25,6 +26,7 @@ export default class Warning extends Component {
                 { value: 0, name: '五标段' },
                 { value: 100, name: '未完成' },
             ],
+            loading:false
 
 
         }
@@ -95,38 +97,32 @@ export default class Warning extends Component {
     render() { //todo 累计完成工程量
         return (
             <div >
-                <Card>
-                截止日期：
-                    <DatePicker  
-                     style={{textAlign:"center"}} 
-                     showTime
-                     defaultValue={moment(this.state.etime1, 'YYYY/MM/DD')} 
-                     format={'YYYY/MM/DD'}
-                     onChange={this.datepick.bind(this)}
-                     onOk={this.datepickok.bind(this)}
-                    >
-                    </DatePicker>
-                    <div id='AccumulativeCompletion' style={{ width: '100%', height: '340px' }}></div>
-                    <Select 
-                     placeholder="请选择部门"
-                     style={{width:'120px'}}
-                     notFoundContent="暂无数据"
-                     defaultValue="便道施工"
-                     onSelect={this.onDepartments.bind(this)}>
-                        <Option key="1" value="便道施工" title="便道施工">便道施工</Option>
-                        <Option key="2" value="给排水沟槽开挖" title="给排水沟槽开挖">给排水沟槽开挖</Option>
-                        <Option key="3" value="给排水管道安装" title="给排水管道安装">给排水管道安装</Option>
-                        <Option key="4" value="给排水回填" title="给排水回填">给排水回填</Option>
-                        <Option key="5" value="绿地平整" title="绿地平整">绿地平整</Option>
-                        <Option key="6" value="种植穴工程" title="种植穴工程">种植穴工程</Option>
-                        <Option key="7" value="常绿乔木" title="常绿乔木">常绿乔木</Option>
-                        <Option key="8" value="落叶乔木" title="落叶乔木">落叶乔木</Option>
-                        <Option key="9" value="亚乔木" title="亚乔木">亚乔木</Option>
-                        <Option key="10" value="灌木" title="灌木">灌木</Option>
-                        <Option key="11" value="草木" title="草木">草木</Option>
-                    </Select>
-                    <span>强度分析</span>
-                </Card>
+                <Spin spinning={this.state.loading}>
+                    <Card>
+                    截止日期：
+                        <DatePicker  
+                        style={{textAlign:"center"}} 
+                        showTime
+                        defaultValue={moment(this.state.etime1, 'YYYY/MM/DD')} 
+                        format={'YYYY/MM/DD'}
+                        onChange={this.datepick.bind(this)}
+                        onOk={this.datepickok.bind(this)}
+                        >
+                        </DatePicker>
+                        <div id='AccumulativeCompletion' style={{ width: '100%', height: '340px' }}></div>
+                        <Select 
+                        placeholder="请选择部门"
+                        style={{width:'120px'}}
+                        notFoundContent="暂无数据"
+                        defaultValue="便道施工"
+                        onSelect={this.onDepartments.bind(this)}>
+                            {SCHEDULRPROJECT.map((rst)=>{
+                                return   <Option key={rst.id} value={rst.name} title={rst.name}>{rst.name}</Option>
+                            })}
+                        </Select>
+                        <span>强度分析</span>
+                    </Card>
+                </Spin>
             </div>
         );
     }

@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import {Select,Row,Col,Radio,Card,DatePicker} from 'antd';
-import { PROJECT_UNITS ,TREETYPENO,ECHARTSCOLOR} from '../../../_platform/api';
+import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
+import { PROJECT_UNITS ,TREETYPENO,ECHARTSCOLOR,SCHEDULRPROJECT} from '../../../_platform/api';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
@@ -14,15 +14,18 @@ export default class Warning extends Component {
     constructor(props){
         super(props);
         this.state={
-            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            stime: moment().subtract(10, 'days').format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             data:"",
-            gpshtnum:[],
             departOptions:"",
-            unitproject:"1标段",
+            currentSection:'',
             project:"便道施工",
             sections:[],
-            treetypeAll:[]
+            treetypeAll:[],
+            gpshtnum:[],
+            times:[],
+            datas:[],
+            loading:false
         }
     }
 
@@ -79,7 +82,7 @@ export default class Warning extends Component {
             stime,
             etime,
             project,
-            unitproject,
+            currentSection,
             treetypeAll
         } = this.state
         const {
@@ -93,8 +96,11 @@ export default class Warning extends Component {
         }catch(e){
             console.log(e)
         }
-        if(stime != prevState.stime || etime != prevState.etime || project != prevState.project || unitproject != prevState.unitproject || treetypeAll != prevState.treetypeAll ){
+        if(stime != prevState.stime || etime != prevState.etime || treetypeAll != prevState.treetypeAll){
             this.getdata()
+        }
+        if(project != prevState.project || currentSection != prevState.currentSection   ){
+            this.filterProjectData()
         }
     }
 
@@ -107,7 +113,10 @@ export default class Warning extends Component {
             if(project.code === leftkeycode){
                 let units = project.units
                 units.map((unit)=>{
-                    sections.push(<Option key={unit.code} value={unit.value}>{unit.value}</Option>)
+                    sections.push(<Option key={unit.code} value={unit.code}>{unit.value}</Option>)
+                })
+                this.setState({
+                    currentSection:units && units[0] && units[0].code
                 })
             }
         })
@@ -123,71 +132,65 @@ export default class Warning extends Component {
         }=this.state
         return (
             <div >
-                <Card>
-                施工时间：
-                 <RangePicker 
-                    style={{verticalAlign:"middle"}} 
-                    defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]} 
-                    showTime={{ format: 'HH:mm:ss' }}
-                    format={'YYYY/MM/DD HH:mm:ss'}
-                    onChange={this.datepick.bind(this)}
-                    onOk={this.datepick.bind(this)}
-                >
-                </RangePicker>
-                    <div id='rightop' style={{ width: '100%', height: '340px' }}></div>
-                    <Select 
-                     placeholder="请选择标段"
-                     notFoundContent="暂无数据"
-                     defaultValue="一标段"
-                     onSelect={this.onDepartments2.bind(this)}
-                     onChange={this.onChange.bind(this)}>
-                        {sections}
-                    </Select>
-                    <Select 
-                     defaultValue="便道施工"
-                     style={{width:'120px'}}
-                     onSelect={this.onDepartments1.bind(this) }
-                     onChange={this.onChange.bind(this)}>
-                        <Option key="1" value="便道施工" title="便道施工">便道施工</Option>
-                        <Option key="2" value="给排水沟槽开挖" title="给排水沟槽开挖">给排水沟槽开挖</Option>
-                        <Option key="3" value="给排水管道安装" title="给排水管道安装">给排水管道安装</Option>
-                        <Option key="4" value="给排水回填" title="给排水回填">给排水回填</Option>
-                        <Option key="5" value="绿地平整" title="绿地平整">绿地平整</Option>
-                        <Option key="6" value="种植穴工程" title="种植穴工程">种植穴工程</Option>
-                        <Option key="7" value="常绿乔木" title="常绿乔木">常绿乔木</Option>
-                        <Option key="8" value="落叶乔木" title="落叶乔木">落叶乔木</Option>
-                        <Option key="9" value="亚乔木" title="亚乔木">亚乔木</Option>
-                        <Option key="10" value="灌木" title="灌木">灌木</Option>
-                        <Option key="11" value="草木" title="草木">草木</Option>
-                    </Select>
-                    
-                    <span>强度分析</span>
-                </Card>
+                <Spin spinning={this.state.loading}>
+                    <Card>
+                    施工时间：
+                    <RangePicker 
+                        style={{verticalAlign:"middle"}} 
+                        defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]} 
+                        showTime={{ format: 'HH:mm:ss' }}
+                        format={'YYYY/MM/DD HH:mm:ss'}
+                        onChange={this.datepick.bind(this)}
+                        onOk={this.datepick.bind(this)}
+                    >
+                    </RangePicker>
+                        <div id='rightop' style={{ width: '100%', height: '340px' }}></div>
+                        <Select 
+                        placeholder="请选择标段"
+                        notFoundContent="暂无数据"
+                        value={this.state.currentSection}
+                        onSelect={this.selectSection.bind(this)}
+                        >
+                            {sections}
+                        </Select>
+                        <Select 
+                        defaultValue="便道施工"
+                        style={{width:'120px'}}
+                        onSelect={this.selectProject.bind(this) }
+                        >
+                            {SCHEDULRPROJECT.map((rst)=>{
+                                return   <Option key={rst.id} value={rst.name} title={rst.name}>{rst.name}</Option>
+                            })}
+                        </Select>
+                        
+                        <span>强度分析</span>
+                    </Card>
+                </Spin>
             </div>
         );
     }
     datepick(value){
-
         this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
         this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
     }
-    onChange(){}
-    onDepartments1(value){
+    //选择项目
+    selectProject(value){
         this.setState({
             project:value,
         })
     }
-    onDepartments2(value){
+    //设置标段
+    selectSection(value){
         this.setState({
-            unitproject:value,
+            currentSection:value,
         })
     }
     getdata(){
         const {
             stime,
             etime,
-            project,
-            unitproject,
+            // project,
+            // unitproject,
             treetypeAll
         } = this.state
         const{
@@ -195,10 +198,11 @@ export default class Warning extends Component {
         }=this.props
         let params = {
             stime:stime,
-            etime:etime,
-            project:project,
-            unitproject:unitproject
+            etime:etime
         }
+        this.setState({
+            loading:true
+        })
         console.log('RightTopaaaaaaaaaaaaaaaaaaaaa',params)
         const {actions: {progressdata,progressalldata}} = this.props;
         let gpshtnum = [];
@@ -211,7 +215,12 @@ export default class Warning extends Component {
             let datas = [];
             if(rst && rst.content){
 
-                let content = rst.content.filter((item)=> item.ProgressType && item.ProgressType==='日实际')
+                let content = []
+                rst.content.map((item)=>{
+                    if(item.ProgressType && item.ProgressType==='日实际'){
+                        content.push(item)
+                    }
+                })
                 //将获取的数据按照 ProgressTime 时间排序
                 content.sort(function(a, b) {
                     if (a.ProgressTime < b.ProgressTime ) {
@@ -232,6 +241,14 @@ export default class Warning extends Component {
                 times = [...new Set(time)]
                 console.log('RightToptimes',times)
 
+                SCHEDULRPROJECT.map((item,index)=>{
+                    datas[index] = new Object();
+                    datas[index].project = item.name;
+                    datas[index].value = new Array()
+                })
+
+                console.log('RightTopdatas',datas)
+
                 if(content && content instanceof Array){
                     PROJECT_UNITS.map((project)=>{
                         //获取正确的项目    
@@ -242,13 +259,15 @@ export default class Warning extends Component {
                             sections.map((section,index)=>{
                                 //定义一个二维数组，分为多个标段
                                 gpshtnum[index] = new Array()
-                                datas[index] = new Array()
+                                datas.map((projectData)=>{
+                                    projectData.value[index] = new Array()
+                                })
                             })
         
                             content.map(item=>{
                                 if(item && item.UnitProject){
                                     sections.map((section,index)=>{
-                                        if(item.UnitProject === section.value){
+                                        if(item.UnitProject === section.code){
                                             gpshtnum[index].push(item)
                                         }
                                     })
@@ -257,22 +276,40 @@ export default class Warning extends Component {
                         }
                     })
                 }
+
+                console.log('RightTopdatas',datas)
+                console.log('RightTopgpshtnum',gpshtnum)
                 
                 times.map((time,index)=>{
-                    datas[index] = 0;
-                    content.map((arr,a)=>{
-                        if(moment(arr.ProgressTime).format('YYYY/MM/DD') === time){
-                            let Items = arr.Items?arr.Items:[]
-                            Items.map((item,x)=>{
-                                //默认的种类
-                                if(x<6){
-                                    if(item.Project === params.project){
-                                        datas[index] = datas[index]+item.Num+0
-                                    }else{
-                                        datas[index] = datas[index]+0
-                                    }
-                                }else{//添加的数目种类
-                                    let treetype = ''
+                    datas.map((projectData)=>{
+                        projectData.value.map((sectionData)=>{
+                            sectionData[index] = 0
+                        })
+                    })
+                   
+                    console.log('sectionData',datas)
+                    gpshtnum.map((data,i)=>{
+                        data.map((arr,a)=>{
+                            if(moment(arr.ProgressTime).format('YYYY/MM/DD') === time){
+                                let Items = arr.Items
+                                Items.map((item,x)=>{
+                                    //默认的种类
+                                    if(x<6){
+                                        SCHEDULRPROJECT.map((project,serial)=>{
+                                            if(item.Project === project.name){
+                                                let reg = isNaN(item.Num);
+                                                console.log('reg',reg)
+                                                if(!reg){
+                                                    if(item.Num > 0){
+                                                        datas[serial].value[i][index] = datas[serial].value[i][index] + item.Num + 0
+                                                    }
+                                                }
+                                                // datas[serial].value[index] = datas[serial].value[index] + item.Num + 0
+                                            }
+                                        })
+                                    
+                                    }else{//添加的数目种类
+                                        let treetype = ''
                                         treetypeAll.map((tree)=>{
                                             if(tree.TreeTypeName === rst.name){
                                                 //获取树种cdoe的首个数字，找到对应的类型
@@ -285,82 +322,146 @@ export default class Warning extends Component {
                                                 })
                                             }
                                         })
-                                    console.log('RightToptreetype',treetype)
-
-                                    if(treetype === params.project){
-                                        datas[index] = datas[index]+item.Num+0
-                                    }else{
-                                        datas[index] = datas[index]+0
+                                        console.log('RightToptreetype',treetype)
+                                        SCHEDULRPROJECT.map((project,serial)=>{
+                                            if(treetype === project.name){
+                                                let reg = isNaN(item.Num);
+                                                console.log('reg',reg)
+                                                if(!reg){
+                                                    if(item.Num > 0){
+                                                        datas[serial].value[i][index] = datas[serial].value[i][index] + item.Num + 0
+                                                    }
+                                                }
+                                            }
+                                        })
                                     }
-                                }
-                            })
-                        }
+                                })
+                            }
+                        })
                     })
                 })
                 console.log('RightTopdatas',datas)
+
+                this.setState({
+                    datas:datas,
+                    gpshtnum:gpshtnum,
+                    times:times
+                },()=>{
+                    this.filterProjectData()
+                })
+            }else{
+                this.setState({
+                    loading:false
+                })
+                this.filterProjectData()
             }
             
-            //当查不出数据时，使横坐标不为空
-            let a = moment().subtract(2, 'days').format('YYYY/MM/DD');
-            let b = moment().subtract(1, 'days').format('YYYY/MM/DD');
-            let c = moment().format('YYYY/MM/DD');
-            let d = moment().add(1, 'days').format('YYYY/MM/DD');
-            let e = moment().add(2, 'days').format('YYYY/MM/DD');
-            let dates = [];
-            dates.push(a)
-            dates.push(b)
-            dates.push(c)
-            dates.push(d)
-            dates.push(e)
-            console.log('RightTopdates',dates)
+            
 
-            const myChart = echarts.init(document.getElementById('rightop'));
+        })
+    }
+    //根据标段和项目筛选数据
+    filterProjectData(){
+        const{
+            times,
+            gpshtnum,
+            datas,
+            project,
+            treetypeAll,
+            currentSection
+        }=this.state
+        const{
+            leftkeycode
+        }=this.props
 
-            let optionLine = {
-            tooltip: {
-                    trigger: 'axis',
+        //当查不出数据时，使横坐标不为空
+        let a = moment().subtract(2, 'days').format('YYYY/MM/DD');
+        let b = moment().subtract(1, 'days').format('YYYY/MM/DD');
+        let c = moment().format('YYYY/MM/DD');
+        let d = moment().add(1, 'days').format('YYYY/MM/DD');
+        let e = moment().add(2, 'days').format('YYYY/MM/DD');
+        let dates = [];
+        dates.push(a)
+        dates.push(b)
+        dates.push(c)
+        dates.push(d)
+        dates.push(e)
+        console.log('RightTopdates',dates)
+
+
+        let currentProjectData = []
+        let currentData = [];
+        datas.map((data)=>{
+            if(data.project === project){
+                currentProjectData = data.value
+            }
+        })
+
+        console.log('currentProjectData',currentProjectData)
+        PROJECT_UNITS.map((item)=>{
+            //获取正确的项目    
+            if(leftkeycode.indexOf(item.code)>-1){
+                //获取项目下的标段
+                let sections = item.units
+                //查找当前标段
+                sections.map((section,index)=>{
+                    if(section.code === currentSection){
+                        currentData = currentProjectData[index]
+                    }
+                })
+            }
+        })
+        console.log('currentData',currentData)
+
+
+        const myChart = echarts.init(document.getElementById('rightop'));
+
+        let optionLine = {
+        tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: times.length>0?times:dates,
                     axisPointer: {
-                        type: 'cross',
-                        crossStyle: {
-                            color: '#999'
+                        type: 'shadow'
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    // name: '长度（m）',
+                    axisLabel: {
+                        formatter: '{value} '
+                    }
+                },
+            ],
+            series: [
+            
+                {
+                    // name:'一标',
+                    type:'line',
+                    data:currentData,
+                    itemStyle:{
+                        normal:{
+                            color:'black'
                         }
                     }
                 },
-                xAxis: [
-                    {
-                        type: 'category',
-                        data: times.length>0?times:dates,
-                        axisPointer: {
-                            type: 'shadow'
-                        }
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value',
-                        // name: '长度（m）',
-                        axisLabel: {
-                            formatter: '{value} '
-                        }
-                    },
-                ],
-                series: [
-                
-                    {
-                        // name:'一标',
-                        type:'line',
-                        data:datas,
-                        itemStyle:{
-                            normal:{
-                                color:'black'
-                            }
-                        }
-                    },
-                
-                ]
-            };
-            myChart.setOption(optionLine);
-
+            
+            ]
+        };
+        myChart.setOption(optionLine);
+        this.setState({
+            loading:false
         })
     }
 }
