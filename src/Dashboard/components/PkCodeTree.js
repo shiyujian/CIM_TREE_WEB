@@ -25,7 +25,6 @@ export default class PkCodeTree extends Component {
 
 	render() {
 		const {treeData = []} = this.props;
-		console.log(treeData);
 		return (
 			<div>
 				{treeData.length?

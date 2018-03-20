@@ -43,7 +43,7 @@ export default class Danger extends Component {
 			isNotDisplay: {
 				display: ''
 			},
-			// leafletCenter: [22.516818, 113.868495],
+			// leafletCenter: [39.004728, 116.244123],
 			leafletCenter: [38.92, 115.98], // 雄安
 			toggle: true,
 			previewUrl: '',
@@ -89,10 +89,10 @@ export default class Danger extends Component {
 			// 	username:'18867508296'
 			// }]
 			fullExtent: window.config.fullExtent || {
-				minlat: 22.468466,
-				maxlat: 22.564885,
-				minlng: 113.827781,
-				maxlng: 113.931283
+				minlat: 38.468466,
+				maxlat: 40.004728,
+				minlng: 100.244123,
+				maxlng: 117.244123
 			}
 		};
 		this.OnlineState = false;
@@ -204,7 +204,7 @@ export default class Danger extends Component {
 				// let measure = levelNode["风险控制措施"];
 				let content = v["ProblemType"];
 				//位置
-				// let coordinates = ["22.5202031353", "113.893730454"];
+				// let coordinates = ["39.004728", "116.244123"];
 				let locationX = v["X"];
 				let locationY = v["Y"];
 				let coordinates = [locationY, locationX];
@@ -501,17 +501,15 @@ export default class Danger extends Component {
 
 	/*在地图上添加marker和polygan*/
 	createMarker(geo, oldMarker) {
-		console.log('geo',geo)
 		var me = this;
-		// debugger
 		if (geo.properties.type != 'area') {
 			if (!oldMarker) {
 				if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {
 					return;
 				}
 				let iconType = L.divIcon({className: this.getIconType(geo.type)});
-				let marker = L.marker(geo.geometry.coordinates, {icon: iconType, title: geo.properties.name});
-				console.log('marker',marker)
+				let marker = L.marker(geo.geometry.coordinates  , {icon: iconType, title: geo.properties.name});
+				// console.log('marker',marker)
 				marker.bindPopup(L.popup({maxWidth: 240}).setContent(this.genPopUpContent(geo)));
 				marker.addTo(this.map);
 				return marker;
@@ -727,22 +725,23 @@ export default class Danger extends Component {
 			creatUserMakers();
 		}
 		this.setState({userCheckedKeys:keys},()=>{
-			console.log(this.state.userCheckedKeys,'选中的key');
+			// console.log(this.state.userCheckedKeys,'选中的key');
 		});
 	}
 
 	/*显示隐藏地图marker*/
 	onCheck(keys, featureName) {
-		console.log('keys',keys,featureName)
+		// console.log('keys',keys,featureName)
 		var content = this.getPanelData(featureName);
 		//获取所有key对应的数据对象
 		this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
 		let checkItems = this.checkMarkers[featureName];
 		//移除未选中的
 		for (var c in checkItems) {
+			// console.log('checkItems[c]',checkItems[c])
 			let k = keys.find(k => k == c);
 			if (!k && checkItems[c]) {
-				checkItems[c].remove();
+				checkItems[c]._icon.remove();
 				delete  checkItems[c];
 			}
 		}
@@ -771,8 +770,9 @@ export default class Danger extends Component {
 								});
 							}
 						}
-
+						// console.log(1111111,featureName)
 						if (featureName == 'geojsonFeature_monitor') {
+							//this.map.panTo(latlng);
 							if(kk){
 								checkItems[kk] = me.createMarker(cc, checkItems[kk]);
 								checkItems[kk]&&checkItems[kk].on('click', function () {
@@ -798,6 +798,8 @@ export default class Danger extends Component {
 						if (kk) {
 							checkItems[kk] = me.createMarker(cc, checkItems[kk]);
 							if (featureName == 'geojsonFeature_hazard') {
+								// console.log(2222222,cc,checkItems[kk])
+								this.map.panTo(cc.geometry.coordinates);
 								checkItems[kk].on('click', function () {
 									//获取隐患处理措施
 									const {getRiskContactSheet} = me.props.actions;
@@ -1008,7 +1010,7 @@ export default class Danger extends Component {
 							<Collapse defaultActiveKey={[this.options[0].value]} accordion>
 								{
 									this.options.map((option) => {
-										console.log('this.options',this.options)
+										// console.log('this.options',this.options)
 										if(option.label === '现场人员'){
 											return (
 												<Panel key={option.value} header={option.label}>
@@ -1178,7 +1180,7 @@ export default class Danger extends Component {
 	/*渲染菜单panel*/
 	renderPanel(option) {
 		let content = this.getPanelData(option.value);
-		console.log('content',content)
+		// console.log('content',content)
 		return (
 			<DashPanel onCheck={this.onCheck.bind(this)}
 			           onSelect={this.onSelect.bind(this)}

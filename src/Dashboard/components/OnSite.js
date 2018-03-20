@@ -282,8 +282,10 @@ export default class Lmap extends Component {
 
     /*在地图上添加marker和polygan*/
     createMarker(geo, oldMarker) {
+        // console.log('geo',geo)
+        // console.log('oldMarker',oldMarker)
+        // console.log('L.geoJSON',L.geoJson)
         var me = this
-        debugger
         if (geo.properties.type != 'area') {
             if (!oldMarker) {
                 if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {
@@ -301,8 +303,9 @@ export default class Lmap extends Component {
             return oldMarker
         } else {
             //创建区域图形
+            // console.log(222222,L)
             if (!oldMarker) {
-                let area = L.geoJSON(geo, {
+                let area = L.geoJson(geo, {
                     style: {
                         fillColor: this.fillAreaColor(geo.key),
                         weight: 1,
@@ -322,9 +325,11 @@ export default class Lmap extends Component {
                 //         iconSize: [48, 20],
                 //     }),
                 // })
-				// area.addLayer(label)
-				area.bindTooltip(geo.properties.name).openTooltip();
-				this.map.fitBounds(area.getBounds());
+                // area.addLayer(label)
+                // console.log(3333333,area)
+				// area.bindTooltip(geo.properties.name).openTooltip();
+                this.map.fitBounds(area.getBounds());
+
 				//this.map.panTo(latlng);
                 return area
             }
@@ -409,12 +414,12 @@ export default class Lmap extends Component {
 
     /*弹出信息框*/
     onSelect(keys, featureName) {
-		
         const { actions: { getTreearea } } = this.props
 		const treeNodeName = featureName != null && featureName.selectedNodes.length > 0 ? featureName.selectedNodes[0].props.title : '';
-
+        
         if (this.checkMarkers.toString() != '') {
             for (var i = 0; i <= this.checkMarkers.length - 1; i++) {
+                // console.log('checkMarkers',this.checkMarkers[i].options)
                 this.checkMarkers[i].remove()
                 delete this.checkMarkers[i]
             }
@@ -426,7 +431,9 @@ export default class Lmap extends Component {
 
         let treearea = []
         getTreearea({}, { no: keys[0] }).then(rst => {
-            let str = rst.content[0].coords
+            // console.log('rst',rst)
+            let str = rst.content[0].coords;
+            // console.log('str',str)
             var target1 = str
                 .slice(str.indexOf('(') + 3, str.indexOf(')'))
                 .split(',')
@@ -441,7 +448,8 @@ export default class Lmap extends Component {
                 properties: { name: treeNodeName, type: 'area' },
                 geometry: { type: 'Polygon', coordinates: treearea }
             }
-            let oldMarker = undefined
+            let oldMarker = undefined;
+            
             this.checkMarkers[0] = this.createMarker(message, this.checkMarkers[0])
         })
         // let selItem = this.checkMarkers[0]
