@@ -160,7 +160,7 @@ class ReceivePage extends Component {
 		return (
 			<Row>
 				<Col span={22} offset={1}>
-					{/*<Row >
+					<Row >
 						<Col span={18}>
 							<Row>
 								<Col span={8}>
@@ -254,7 +254,7 @@ class ReceivePage extends Component {
 								</FormItem>
 							</Row>
 						</Col>
-									</Row>*/}
+									</Row>
 					{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
 					<Table
 						dataSource={this._getNewArrFunc(notifications)}

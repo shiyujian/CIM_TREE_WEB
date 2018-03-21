@@ -210,11 +210,11 @@ export default class CarPackageTable extends Component {
 								重置
 							</Button>
 						</Col>
-						<Col span={2} className='mrg10'>
+						{/*<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.exportexcel.bind(this)}>
 								导出
 							</Button>
-						</Col>
+	</Col>*/}
 					</Row>
 				</div> 
 		return <div>
