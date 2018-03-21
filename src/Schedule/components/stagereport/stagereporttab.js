@@ -70,7 +70,7 @@ class Stagereporttab extends Component {
             
             values.sunitproject?reqData.subject_sectionName__contains = values.sunitproject : '';
             values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
-            values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
+            // values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
             values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
             values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
@@ -102,7 +102,7 @@ class Stagereporttab extends Component {
 					submitperson:item.creator.person_name,
 					submittime:item.real_start_time,
 					status:item.status,
-					superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+					// superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
 					timedate:itemdata.timedate?JSON.parse(itemdata.timedate):'',
 					stagedocument:itemdata.stagedocument?JSON.parse(itemdata.stagedocument):'',
 					TreedataSource:itemtreedatasource,
@@ -331,7 +331,7 @@ class Stagereporttab extends Component {
 											</FormItem>
 										</Col>
 									</Row>
-									<Row>
+									{/* <Row>
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='监理单位'>
                                                 {
@@ -344,7 +344,7 @@ class Stagereporttab extends Component {
                                                 }
                                             </FormItem>
 										</Col>
-									</Row>
+									</Row> */}
 									<Row>
 										<Table
 											columns={this.columns1}
@@ -412,7 +412,7 @@ class Stagereporttab extends Component {
 
         setFieldsValue({
             SdataReview: this.member,
-            Ssuperunit:this.member.org
+            // Ssuperunit:this.member.org
         });
 	}
 	
@@ -475,7 +475,7 @@ class Stagereporttab extends Component {
 					"section": JSON.stringify(values.Ssection),
 					"projectName":JSON.stringify(projectName),
 					"sectionName":JSON.stringify(sectionName),
-					"superunit": JSON.stringify(values.Ssuperunit),
+					// "superunit": JSON.stringify(values.Ssuperunit),
 					"dataReview": JSON.stringify(values.SdataReview),
 					"numbercode": JSON.stringify(values.Snumbercode),
 					"timedate": JSON.stringify(moment(values.Stimedate._d).format('YYYY-MM-DD')),
@@ -676,7 +676,7 @@ class Stagereporttab extends Component {
 			key:Math.random()
 		})
 		this.props.form.setFieldsValue({
-			Ssuperunit: undefined,
+			// Ssuperunit: undefined,
 			Ssection: undefined,
 			SdataReview: undefined,
 			Snumbercode: undefined,

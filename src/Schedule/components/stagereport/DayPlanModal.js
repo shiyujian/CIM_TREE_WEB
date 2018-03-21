@@ -117,7 +117,7 @@ export default class DayPlanModal extends Component {
                                             </FormItem>
                                         </Col>
                                     </Row>
-                                    <Row>
+                                    {/* <Row>
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
@@ -131,7 +131,7 @@ export default class DayPlanModal extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                    </Row>
+                                    </Row> */}
                                     <Row>
                                         <Table
                                             columns={this.columns1}

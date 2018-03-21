@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-21 14:46:16
+ * @Last Modified time: 2018-03-21 20:55:13
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -76,7 +76,7 @@ class All extends Component {
             
             values.sunitproject?reqData.subject_sectionName__contains = values.sunitproject : '';
             values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
-            values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
+            // values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
             values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
             values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
@@ -108,7 +108,7 @@ class All extends Component {
                     submitperson:item.creator.person_name,
                     submittime:item.real_start_time,
                     status:item.status,
-                    totlesuperunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+                    // totlesuperunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
                     totledocument:itemdata.totledocument?JSON.parse(itemdata.totledocument):'',
                     treatmentdata:itemtreatmentdata,
                     dataReview:itemdata.dataReview?JSON.parse(itemdata.dataReview).person_name:''
@@ -325,7 +325,7 @@ class All extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                        <Col span={12}>
+                                        {/* <Col span={12}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
                                                     getFieldDecorator('Tsuperunit', {
@@ -336,7 +336,7 @@ class All extends Component {
                                                         (<Input placeholder='系统自动识别，无需手输' readOnly/>)
                                                 }
                                             </FormItem>
-                                        </Col>
+                                        </Col> */}
                                     </Row>
                                     <Row>
                                         <Dragger
@@ -566,7 +566,7 @@ class All extends Component {
                     "section": JSON.stringify(values.Tsection),
                     "sectionName":JSON.stringify(sectionName),
                     "projectName":JSON.stringify(projectName),
-					"superunit": JSON.stringify(values.Tsuperunit),
+					// "superunit": JSON.stringify(values.Tsuperunit),
 					"dataReview": JSON.stringify(values.TdataReview),
 					"numbercode": JSON.stringify(values.Tnumbercode),
 					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
@@ -687,7 +687,7 @@ class All extends Component {
             key:Math.random()
         })
         this.props.form.setFieldsValue({
-            Tsuperunit: undefined,
+            // Tsuperunit: undefined,
             Tsection: undefined,
             TdataReview: undefined,
             Tnumbercode: undefined
@@ -803,7 +803,7 @@ class All extends Component {
 
         setFieldsValue({
             TdataReview: this.member,
-            Tsuperunit: this.member.org
+            // Tsuperunit: this.member.org
         });
     }
 

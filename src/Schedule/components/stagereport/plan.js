@@ -75,7 +75,7 @@ class Plan extends Component {
             
             values.sunitproject?reqData.subject_sectionName__contains = values.sunitproject : '';
             values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
-            values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
+            // values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
             values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
             values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
@@ -107,7 +107,7 @@ class Plan extends Component {
 					submitperson:item.creator.person_name,
 					submittime:item.real_start_time,
 					status:item.status,
-					superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+					// superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
 					timedate:itemdata.timedate?JSON.parse(itemdata.timedate):'',
 					daydocument:itemdata.daydocument?JSON.parse(itemdata.daydocument):'',
 					TreedataSource:itemtreedatasource,
@@ -356,7 +356,7 @@ class Plan extends Component {
 											</FormItem>
 										</Col>
 									</Row>
-									<Row>
+									{/* <Row>
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='监理单位'>
                                                 {
@@ -369,7 +369,7 @@ class Plan extends Component {
                                                 }
                                             </FormItem>
 										</Col>
-									</Row>
+									</Row> */}
 									<Row>
 										<Table
 											columns={this.columns1}
@@ -436,7 +436,7 @@ class Plan extends Component {
 
 		setFieldsValue({
 			PdataReview: this.member,
-			Psuperunit: this.member.org,
+			// Psuperunit: this.member.org,
 		});
 	}
 
@@ -500,7 +500,7 @@ class Plan extends Component {
 					"section": JSON.stringify(values.Psection),
 					"projectName":JSON.stringify(projectName),
 					"sectionName":JSON.stringify(sectionName),
-					"superunit": JSON.stringify(values.Psuperunit),
+					// "superunit": JSON.stringify(values.Psuperunit),
 					"dataReview": JSON.stringify(values.PdataReview),
 					"numbercode": JSON.stringify(values.Pnumbercode),
 					"timedate": JSON.stringify(moment(values.Ptimedate._d).format('YYYY-MM-DD')),
@@ -702,7 +702,7 @@ class Plan extends Component {
 			key:Math.random()
 		})
 		this.props.form.setFieldsValue({
-			Psuperunit: undefined,
+			// Psuperunit: undefined,
 			Psection: undefined,
 			PdataReview: undefined,
 			Pnumbercode: undefined,
