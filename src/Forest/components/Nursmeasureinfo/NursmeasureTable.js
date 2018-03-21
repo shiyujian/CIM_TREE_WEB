@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Icon, Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message,Cascader} from 'antd';
 import moment from 'moment';
-import { FOREST_API} from '../../../_platform/api';
+import { FOREST_API,PROJECT_UNITS} from '../../../_platform/api';
 import {getUser} from '_platform/auth'
 import '../index.less';
 const TabPane = Tabs.TabPane;
@@ -40,7 +40,18 @@ export default class NursmeasureTable extends Component {
     componentDidMount() {
     	let user = getUser()
 		this.sections = JSON.parse(user.sections)
-    }
+	}
+	getBiao(code){
+		let str = '';
+		PROJECT_UNITS.map(item => {
+			item.units.map(single => {
+				if(single.code === code){
+					str = single.value;
+				}
+			})
+		})
+		return str;
+	}
     componentWillReceiveProps(nextProps){
     	if(nextProps.leftkeycode != this.state.leftkeycode) {
 			this.setState({
@@ -107,6 +118,9 @@ export default class NursmeasureTable extends Component {
 		},{
 			title:"标段",
 			dataIndex: 'BD',
+			render:(text,record) => {
+				return <p>{this.getBiao(text)}</p>
+			}
 		},{
 			title:"树种",
 			dataIndex: 'TreeTypeObj.TreeTypeName',
@@ -243,16 +257,9 @@ export default class NursmeasureTable extends Component {
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>状态：</span>
-							<Cascader 
-								allowClear
-								className='forestcalcw2 mxw150' 
-								defaultValue={['']}
-								// value={[status]}
-								options={statusoption} 
-								expandTrigger='hover' 
-								onChange={this.onstatuschange.bind(this)} 
-								changeOnSelect 
-							/>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' onChange={this.onstatuschange.bind(this)} value={status}>
+								{statusoption}
+							</Select>
 						</Col>
 						<Col xl={10} lg={11} md={12} className='mrg10'>
 							<span>起苗时间：</span>
@@ -365,39 +372,7 @@ export default class NursmeasureTable extends Component {
     }
 
     onstatuschange(value) {    	
-    	let status = '';
-    	if (value.length === 2) {
-    		switch(value[1]){
-    			// 进场退回
-				case "1": 
-					status = 1;
-					break;
-				// 监理退回
-				case "2": 
-					status = 2;
-					break;
-				// 业主退回
-				case "3": 
-					status = 3;
-					break;
-				default:
-					break;
-			}
-    	} else {
-    		switch(value[0]) {
-    			//已种植
-    			case "0":
-    				status = 0;
-    				break;
-    			//未种植
-    			case "-1":
-    				status = -1;
-    				break;
-    			default:
-    				break;
-    		}
-    	}
-		this.setState({status: value[1] || value[0] || ''})
+		this.setState({status: value})
 	}
 
 	onrolenamechange(value) {

@@ -87,30 +87,12 @@ export default class Nursmeasureinfo extends Component {
             <Option key={'2'} value={'0'}>苗景林</Option>,
         ];
 
-        this.setState({typeoption,mmtypeoption})
-
-        //状态
-        let statusoption = [{
-            value: '',
-            label: '全部'
-        },{
-            value: '0',
-            label: '已种植',
-        }, {
-            value: '-1',
-            label: '未种植',
-            children: [{
-                value: '1',
-                label: '进场退回',
-            }, {
-                value: '2',
-                label: '监理退回',
-            }, {
-                value: '3',
-                label: '业主退回',
-            }],
-        }]
-        this.setState({statusoption})
+        let statusoption = [
+            <Option key={'-1'} value={''}>全部</Option>,
+            <Option key={'1'} value={'1'}>未打包</Option>,
+            <Option key={'2'} value={'0'}>已打包</Option>,
+        ];
+        this.setState({typeoption,mmtypeoption,statusoption})
     }
 
     render() {

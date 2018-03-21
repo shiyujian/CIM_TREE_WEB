@@ -148,6 +148,11 @@ class ToggleModal extends Component {
 			message.warning("请添加接收单位！");
 			return
 		}
+		console.log("sentUsers",sentUsers)
+		const sentU=sentUsers[0].split("--")[0]
+		console.log("sentU",sentU)
+		const copyU=copyUsers[0].split("--")[0]
+		
 		// if (copyUsers.length === 0) {
 		// 	message.warning("请添加抄送单位！");
 		// 	return
@@ -169,7 +174,10 @@ class ToggleModal extends Component {
 						"body_rich": this.state.content,
 						"is_draft": false,
 						"sent_email": false,
-						"extend_info": {},
+						"extend_info": {
+							"to_whomCode":sentU,
+							"cc_Code":copyU,
+						},
 						"external_attachments": [
 							{
 								"file_id": fileList[0].id,
@@ -513,12 +521,15 @@ class ToggleModal extends Component {
 
 		const {orgList} = this.props;
 		let ret = data.reduce((pre,cur)=>{
+			console.log("cur",cur)
+			console.log("cur",cur.split("--"))
 			let code = cur.split("--")[0],
 				rightUnit = this.getRightUnit(orgList,code),
 				result = rightUnit? this.getAllUnit(rightUnit) : [code];
 
 			return pre.concat(result);
 		},[])
+		console.log("1111",ret)
 
 		return [...new Set(ret)];
 	}
