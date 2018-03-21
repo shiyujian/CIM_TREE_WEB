@@ -49,8 +49,6 @@ export default class Header extends Component {
 			return null;
 		}
 		const { username = '', name = '', is_superuser = false } = getUser();
-		console.log('username',username)
-		console.log('name',name)
 		const permissions = getPermissions() || [];
 		return (
 			<header className="header">
@@ -84,6 +82,7 @@ export default class Header extends Component {
 										str=str.match(/appmeta(\S*).READ/)[1] || '';
 										str=str.replace(/\./g,"/").toLowerCase();
 										menu.path=str;
+										console.log('path',menu.path)
 									}
 								}
 
