@@ -49,8 +49,9 @@ export default class Header extends Component {
 			return null;
 		}
 		const { username = '', name = '', is_superuser = false } = getUser();
+		console.log('username',username)
+		console.log('name',name)
 		const permissions = getPermissions() || [];
-		console.log('permissions22',permissions)
 		return (
 			<header className="header">
 				<a className="head-logo" href='/'>
@@ -70,18 +71,20 @@ export default class Header extends Component {
 							// let has = true
 							let str;
 							if (has) {
-								//对用户各个模块权限进行遍历，如果拥有某个子模块的权限，则将子模块的权限
-								//进行处理变换成子模块的路径
-								for(var i=0;i<permissions.length;i++){
-									if(permissions[i].indexOf(menu.id)!==-1 && permissions[i] !== `appmeta.${menu.id}.READ` ){
-										str=permissions[i] ;
-										break;
+								if(username!=='admin'){
+									//对用户各个模块权限进行遍历，如果拥有某个子模块的权限，则将子模块的权限
+									//进行处理变换成子模块的路径
+									for(var i=0;i<permissions.length;i++){
+										if(permissions[i].indexOf(menu.id)!==-1 && permissions[i] !== `appmeta.${menu.id}.READ` ){
+											str=permissions[i] ;
+											break;
+										}
 									}
-								}
-								if(str !==undefined){
-									str=str.match(/appmeta(\S*).READ/)[1] || '';
-									str=str.replace(/\./g,"/").toLowerCase();
-									menu.path=str;
+									if(str !==undefined){
+										str=str.match(/appmeta(\S*).READ/)[1] || '';
+										str=str.replace(/\./g,"/").toLowerCase();
+										menu.path=str;
+									}
 								}
 
 								return (
