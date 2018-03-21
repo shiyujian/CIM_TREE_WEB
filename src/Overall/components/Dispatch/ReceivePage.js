@@ -134,7 +134,7 @@ class ReceivePage extends Component {
 					const create_time=moment(item.create_time).utc().utcOffset(+8).format('YYYY-MM-DD')
 					const worktimes1=moment(values.worktimes[0]).format('YYYY-MM-DD')
 					const worktimes2=moment(values.worktimes[1]).format('YYYY-MM-DD')
-					if(moment(create_time).isBetween(worktimes1,worktimes2)||moment(create_time).isSame(worktimes1)){
+					if(moment(create_time).isBetween(worktimes1,worktimes2)||moment(create_time).isSame(worktimes1)||moment(create_time).isSame(worktimes2)){
 						isRoles = true
 					}
 				}
