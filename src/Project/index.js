@@ -26,7 +26,7 @@ export default class Project extends Component {
 				</Aside>
 				<Main>
 					<ContainerRouters menus={Project.menus} containers={this.state} />
-					<Redirect path="/" to={{pathname: '/project/nurserymanagement'}} />
+					{/*<Redirect path="/" to={{pathname: '/project/nurserymanagement'}} />*/}
 				</Main>
 			</Body>
 		);
