@@ -52,12 +52,56 @@ class Addition extends Component {
 				}
 			}
 		}
-
 		const objs = systemRoles.map(roless => {
 			return (<OptGroup label={roless.name}>
 				{
 					roless.value.map(role => {
 						return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+					})
+				}
+			</OptGroup>)
+		})
+		return objs
+	}
+
+	renderTitle() {
+
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		const { platform: { roles = [] } } = this.props;
+		var systemRoles = []
+		if (user.is_superuser) {
+			systemRoles.push({ name: '苗圃职务', children: ["苗圃"], value: roles.filter(role => role.grouptype === 0) });
+			systemRoles.push({ name: '施工职务', children: ["施工领导", "协调调度人", "质量负责人", "安全负责人", "文明负责人", "普通员工", "施工文书", "测量员"], value: roles.filter(role => role.grouptype === 1) });
+			systemRoles.push({ name: '监理职务', children: ["总监", "监理组长", "普通监理", "监理文书"], value: roles.filter(role => role.grouptype === 2) });
+			systemRoles.push({ name: '业主职务', children: ["业主", "业主文书"], value: roles.filter(role => role.grouptype === 3) });
+		}
+		else {
+			for (let i = 0; i < user.groups.length; i++) {
+				const rolea = user.groups[i].grouptype
+				switch (rolea) {
+					case 0:
+						systemRoles.push({ name: '苗圃职务', children: ["苗圃"], value: roles.filter(role => role.grouptype === 0) });
+						break;
+					case 1:
+						systemRoles.push({ name: '苗圃职务', children: ["苗圃"], value: roles.filter(role => role.grouptype === 0) });
+						systemRoles.push({ name: '施工职务', children: ["施工领导", "协调调度人", "质量负责人", "安全负责人", "文明负责人", "普通员工", "施工文书", "测量员"], value: roles.filter(role => role.grouptype === 1) });
+						break;
+					case 2:
+						systemRoles.push({ name: '监理职务', children: ["总监", "监理组长", "普通监理", "监理文书"], value: roles.filter(role => role.grouptype === 2) });
+						break;
+					case 3:
+						systemRoles.push({ name: '业主职务', children: ["业主", "业主文书"], value: roles.filter(role => role.grouptype === 3) });
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		const objs = systemRoles.map(roless => {
+			return (<OptGroup label={roless.name}>
+				{
+					roless.children.map(role => {
+						return (<Option key={role} value={role}>{role}</Option>)
 					})
 				}
 			</OptGroup>)
@@ -198,29 +242,9 @@ class Addition extends Component {
 										(
 										<Select placeholder="请选择职务" onChange={changeAdditionField.bind(this, 'title')}
 											style={{ width: '100%' }}>
-											<OptGroup label="苗圃职务">
-												<Option value="苗圃">苗圃</Option>
-											</OptGroup>
-											<OptGroup label="施工职务">
-												<Option value="施工领导">施工领导</Option>
-												<Option value="协调调度人">协调调度人</Option>
-												<Option value="质量负责人">质量负责人</Option>
-												<Option value="安全负责人">安全负责人</Option>
-												<Option value="文明负责人">文明负责人</Option>
-												<Option value="普通员工">普通员工</Option>
-												<Option value="施工文书">施工文书</Option>
-												<Option value="测量员">测量员</Option>
-											</OptGroup>
-											<OptGroup label="监理职务">
-												<Option value="总监">总监</Option>
-												<Option value="监理组长">监理组长</Option>
-												<Option value="普通监理">普通监理</Option>
-												<Option value="监理文书">监理文书</Option>
-											</OptGroup>
-											<OptGroup label="业主职务">
-												<Option value="业主">业主</Option>
-												<Option value="业主文书">业主文书</Option>
-											</OptGroup>
+											{
+												this.renderTitle()
+											}
 										</Select>
 										)
 								}
@@ -412,7 +436,7 @@ class Addition extends Component {
 								this.setState({
 									newKey: Math.random()
 								})
-								
+
 							} else {
 								message.warn('服务器端报错！');
 							}
