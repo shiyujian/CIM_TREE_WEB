@@ -135,7 +135,7 @@ class AddModal extends Component {
 							</Dragger>
 						</Col>
 					</Row>
-					<Row>
+					<Row style={{ marginTop: 20}}>
 						<Col span={8} offset={4}>
 							<FormItem {...FormItemLayout} label='审核人'>
 								{
@@ -146,7 +146,7 @@ class AddModal extends Component {
 									})
 										(
 										<PerSearch selectMember={this.selectMember.bind(this)} 
-											code={WORKFLOW_CODE.总进度计划报批流程} 
+											code={WORKFLOW_CODE.安全体系报批流程} 
 											visible={addVisible}
 										/>
 										)
@@ -160,6 +160,15 @@ class AddModal extends Component {
 				</Form>
 			</Modal>
 		)
+	}
+
+	cancel() {
+		const { actions: { AddVisible } } = this.props;
+		AddVisible(false);
+	}
+	sendWork(){
+		const { actions: { AddVisible } } = this.props;
+		AddVisible(false);
 	}
 
 	 //选择人员
@@ -283,15 +292,9 @@ class AddModal extends Component {
         })
         return option
     }   
-	
 
-	cancel() {
-		const { actions: { AddVisible } } = this.props;
-		AddVisible(false);
-	}
-	sendWork(){
-		const { actions: { AddVisible } } = this.props;
-		AddVisible(false);
+	_cpoyMsgT(){
+
 	}
 }
 export default Form.create()(AddModal)
