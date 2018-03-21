@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import {Route} from 'react-router-dom';
 import {Main, Aside, Body} from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
+import ContainerRouters from '_platform/components/panels/ContainerRouters';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions as actions2 } from './store/cells';
@@ -120,7 +121,7 @@ import {message} from 'antd'
 				{DanweiJLAsk && <Route path="/quality/yanshou/danweijlask" component={DanweiJLAsk}/>}
 				{Subitem && <Route path="/quality/yanshou/subitem" component={Subitem}/>}
 				{FenbuCheck && <Route path="/quality/yanshou/fenbu/check" component={FenbuCheck}/>}
-				{/* {Score && <Route path="/quality/score" component={Score}/>} */}
+				{/*{Score && <Route path="/quality/score" component={Search}/>}*/}
 				{Search && <Route path="/quality/score/search" component={Search}/>}
 				{Appraising && <Route path="/quality/appraising" component={Appraising}/>}
 				{Faithanalyze && <Route path="/quality/faithanalyze" component={Faithanalyze}/>}
@@ -196,6 +197,7 @@ const menus = [
 		name: '质量评分',
 		id:'QUALITY.SCORE',
 		path: '/quality/score',
+		exact: true,
 		icon: <Icon name="tasks" />,
 		children: [
 			{

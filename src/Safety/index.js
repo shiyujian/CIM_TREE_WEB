@@ -36,7 +36,7 @@ export default class Safety extends Component {
 		id: 'SAFETY.TREND',
 		exact: true,
 		name: '安全动态',
-		path: '/safety',
+		path: '/safety/trend',
 		icon: <Icon name="thermometer-empty" />
 	}, {
 		key: 'SafetySystem',
@@ -97,7 +97,7 @@ export default class Safety extends Component {
 		key: 'EducationRegisters',
 		id: 'SAFETY.EDUCATIONREGISTER',
 		name: '安全教育',
-		path: '/safety/educationRegisters',
+		path: '/safety/educationRegister',
 		icon: <Icon name="tag" />
 	}, {
 		key: 'SafetyTrend',

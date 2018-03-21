@@ -23,7 +23,7 @@ export default class DatumContainer extends Component {
 				<Submenu {...this.props} menus={DatumContainer.menus}/>
 			</Aside>
 			<Main>
-				{Datum && <Route exact path="/datum" component={Datum}/>}
+				{Datum && <Route exact path="/datum/standard" component={Datum}/>}
 				{Engineering && <Route path="/datum/engineering" component={Engineering}/>}
 				{Redios && <Route path="/datum/redios" component={Redios}/>}
 			</Main>
@@ -33,7 +33,7 @@ export default class DatumContainer extends Component {
 	static menus = [{
 		key: 'datum',
 		id: 'DATUM.STANDARD',
-		path: '/datum',
+		path: '/datum/standard',
 		name: '制度标准',
 		icon: <Icon name="file-text-o"/>
 	}, {

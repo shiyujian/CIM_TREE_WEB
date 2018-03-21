@@ -519,10 +519,12 @@ export const MODULES = [
 	}, {
 		id: 'QUALITY',
 		name: '质量管理',
-		children: [{
-			id: 'QUALITY.TONGJI',
-			name: '质量分析',
-		}, {
+		children: [
+		// {
+		// 	id: 'QUALITY.TONGJI',
+		// 	name: '质量分析',
+		// }, 
+		{
 			id: 'QUALITY.SCORE',
 			name: '质量评分',
 			children: [{
@@ -532,32 +534,34 @@ export const MODULES = [
 		}, {
 			id: 'QUALITY.APPRAISING',
 			name: '质量评优',
-		}, {
-			id:'QUALITY.YANSHOU',
-			name: '质量验收',
-			children: [{
-				id: 'QUALITY.CHECK',
-				name: '检验批验收',
-			},{
-				id: 'QUALITY.TIANBAO',
-				name: '进场材料填报',
-			}, {
-				id: 'QUALITY.QUERY',
-				name: '验收查询',
-			}, {
-				id: 'QUALITY.HUAFEN',
-				name: '检验批划分',
-			}, {
-				id: 'QUALITY.SUBITEM',
-				name: '分项验收',
-			}, {
-				id: 'QUALITY.FENBU',
-				name: '分部验收',
-			}, {
-				id: 'QUALITY.DANWEI',
-				name: '单位工程验收',
-			}]
-		}, {
+		},
+		//  {
+		// 	id:'QUALITY.YANSHOU',
+		// 	name: '质量验收',
+		// 	children: [{
+		// 		id: 'QUALITY.CHECK',
+		// 		name: '检验批验收',
+		// 	},{
+		// 		id: 'QUALITY.TIANBAO',
+		// 		name: '进场材料填报',
+		// 	}, {
+		// 		id: 'QUALITY.QUERY',
+		// 		name: '验收查询',
+		// 	}, {
+		// 		id: 'QUALITY.HUAFEN',
+		// 		name: '检验批划分',
+		// 	}, {
+		// 		id: 'QUALITY.SUBITEM',
+		// 		name: '分项验收',
+		// 	}, {
+		// 		id: 'QUALITY.FENBU',
+		// 		name: '分部验收',
+		// 	}, {
+		// 		id: 'QUALITY.DANWEI',
+		// 		name: '单位工程验收',
+		// 	}]
+		// }, 
+		{
 			id: 'QUALITY.DEFECT',
 			name: '质量缺陷',
 		}, {
@@ -638,6 +642,9 @@ export const MODULES = [
 				id: 'FOREST.NURSMEASUREINFO',
 				name: '苗圃测量信息',
 			}, {
+				id: 'FOREST.CARPACKAGE',
+				name: '车辆打包信息',
+			}, {
 				id: 'FOREST.LOCMEASUREINFO',
 				name: '现场测量信息',
 			}, {
@@ -688,10 +695,12 @@ export const MODULES = [
 		}, {
 			id: 'SELFCARE.LEAVE',
 			name: '个人请假',
-		}, {
-			id: 'SELFCARE.ACCOUNT',
-			name: '账号管理',
-		}]
+		}
+		// , {
+		// 	id: 'SELFCARE.ACCOUNT',
+		// 	name: '账号管理',
+		// }
+		]
 	}, {
 		id: 'SYSTEM',
 		name: '系统设置',
