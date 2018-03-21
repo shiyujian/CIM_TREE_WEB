@@ -37,6 +37,8 @@ class Plan extends Component {
 			sectionSchedule:[],
 			projectName:'',
 			filterData:[], //对流程信息根据项目进行过滤
+			currentSection:'',
+			currentSectionName:''
 
 		};
 	}
@@ -194,46 +196,67 @@ class Plan extends Component {
 			
 			return projectCode 
 		}
-	//获取当前登陆用户的标段
-    getSection(){
+	 //获取当前登陆用户的标段
+	 getSection(){
         let user = getUser()
         
         let sections = user.sections
         let sectionSchedule = []
-        let sectionName = ''
+        let currentSectionName = ''
         let projectName = ''
         
         sections = JSON.parse(sections)
         if(sections && sections instanceof Array && sections.length>0){
-            sections.map((section)=>{
-                let code = section.split('-')
-                if(code && code.length === 3){
-                    //获取当前标段的名字
-                    SECTIONNAME.map((item)=>{
-                        if(code[2] === item.code){
-                            sectionName = item.name
-                        }
-                    })
-                    //获取当前标段所在的项目
-                    PROJECT_UNITS.map((item)=>{
-                        if(code[0] === item.code){
-                            projectName = item.value
-                        }
-                    })
-                }
-                sectionSchedule.push({
-                    value:section,
-                    name:sectionName
+            let section = sections[0]
+            console.log('section',section)
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        currentSectionName = item.name
+                    }
                 })
-
-               
-            })
-            
-            
+                //获取当前标段所在的项目
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        projectName = item.value
+                    }
+                })
+            }
+            console.log('section',section)
+            console.log('currentSectionName',currentSectionName)
+            console.log('projectName',projectName)
             this.setState({
-                sectionSchedule,
-                projectName
+                currentSection:section,
+                currentSectionName:currentSectionName,
+                projectName:projectName
             })
+            // sections.map((section)=>{
+            //     let code = section.split('-')
+            //     if(code && code.length === 3){
+            //         //获取当前标段的名字
+            //         SECTIONNAME.map((item)=>{
+            //             if(code[2] === item.code){
+            //                 sectionName = item.name
+            //             }
+            //         })
+            //         //获取当前标段所在的项目
+            //         PROJECT_UNITS.map((item)=>{
+            //             if(code[0] === item.code){
+            //                 projectName = item.value
+            //             }
+            //         })
+            //     }
+            //     sectionSchedule.push({
+            //         value:section,
+            //         name:sectionName
+            //     })
+            // })
+            // this.setState({
+            //     sectionSchedule,
+            //     projectName
+            // })
         }
     }
 	//获取当前登陆用户的标段的下拉选项
@@ -253,7 +276,8 @@ class Plan extends Component {
 		const { 
 			selectedRowKeys, 
 			sectionSchedule=[],
-			filterData
+			filterData,
+			currentSectionName
 		} = this.state;
 		const {
             form: { getFieldDecorator },
@@ -266,7 +290,7 @@ class Plan extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		}
-		let sectionOption = this.getSectionOption()
+		// let sectionOption = this.getSectionOption()
 		return (
 			<div>
 				{
@@ -306,13 +330,15 @@ class Plan extends Component {
 											<FormItem {...FormItemLayout} label='标段'>
 												{
 													getFieldDecorator('Psection', {
-														rules: [
-															{ required: true, message: '请选择标段' }
-														]
-													})
-														(<Select placeholder='请选择标段' allowClear>
-														{sectionOption}
-													</Select>)
+														initialValue: {currentSectionName},
+                                                        rules: [
+                                                            { required: true, message: '请输入标段' }
+                                                        ]
+                                                    })
+                                                        // (<Select placeholder='请选择标段' allowClear>
+                                                        //     {sectionOption}
+                                                        // </Select> )
+                                                        (<Input readOnly placeholder='请输入标段' />)
 												}
 											</FormItem>
 										</Col>
@@ -469,7 +495,9 @@ class Plan extends Component {
 		} = this.props
 		const { 
 			treedataSource,
-			projectName
+			projectName,
+			currentSectionName,
+			currentSection
 		} = this.state
 		let user = getUser();//当前登录用户
 		let me = this;
@@ -495,11 +523,11 @@ class Plan extends Component {
 					"id": parseInt(user.id)
 				};
 
-				let sectionName = me.getSectionName(values.Psection)
+				// let sectionName = me.getSectionName(values.Psection)
 				let subject = [{
-					"section": JSON.stringify(values.Psection),
+					"section": JSON.stringify(currentSection),
 					"projectName":JSON.stringify(projectName),
-					"sectionName":JSON.stringify(sectionName),
+					"sectionName":JSON.stringify(currentSectionName),
 					// "superunit": JSON.stringify(values.Psuperunit),
 					"dataReview": JSON.stringify(values.PdataReview),
 					"numbercode": JSON.stringify(values.Pnumbercode),
@@ -703,7 +731,7 @@ class Plan extends Component {
 		})
 		this.props.form.setFieldsValue({
 			// Psuperunit: undefined,
-			Psection: undefined,
+			Psection: this.state.currentSectionName || undefined,
 			PdataReview: undefined,
 			Pnumbercode: undefined,
 			Ptimedate: undefined

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-21 22:04:17
+ * @Last Modified time: 2018-03-21 23:04:08
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -51,6 +51,8 @@ class All extends Component {
             file:'',
             projectName:'', //当前用户的项目信息
             filterData:[], //对流程信息根据项目进行过滤
+            currentSection:'',
+            currentSectionName:''
         };
     }
     async componentDidMount() {
@@ -176,40 +178,61 @@ class All extends Component {
         
         let sections = user.sections
         let sectionSchedule = []
-        let sectionName = ''
+        let currentSectionName = ''
         let projectName = ''
         
         sections = JSON.parse(sections)
         if(sections && sections instanceof Array && sections.length>0){
-            sections.map((section)=>{
-                let code = section.split('-')
-                if(code && code.length === 3){
-                    //获取当前标段的名字
-                    SECTIONNAME.map((item)=>{
-                        if(code[2] === item.code){
-                            sectionName = item.name
-                        }
-                    })
-                    //获取当前标段所在的项目
-                    PROJECT_UNITS.map((item)=>{
-                        if(code[0] === item.code){
-                            projectName = item.value
-                        }
-                    })
-                }
-                sectionSchedule.push({
-                    value:section,
-                    name:sectionName
+            let section = sections[0]
+            console.log('section',section)
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        currentSectionName = item.name
+                    }
                 })
-
-               
-            })
-            
-            
+                //获取当前标段所在的项目
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        projectName = item.value
+                    }
+                })
+            }
+            console.log('section',section)
+            console.log('currentSectionName',currentSectionName)
+            console.log('projectName',projectName)
             this.setState({
-                sectionSchedule,
-                projectName
+                currentSection:section,
+                currentSectionName:currentSectionName,
+                projectName:projectName
             })
+            // sections.map((section)=>{
+            //     let code = section.split('-')
+            //     if(code && code.length === 3){
+            //         //获取当前标段的名字
+            //         SECTIONNAME.map((item)=>{
+            //             if(code[2] === item.code){
+            //                 sectionName = item.name
+            //             }
+            //         })
+            //         //获取当前标段所在的项目
+            //         PROJECT_UNITS.map((item)=>{
+            //             if(code[0] === item.code){
+            //                 projectName = item.value
+            //             }
+            //         })
+            //     }
+            //     sectionSchedule.push({
+            //         value:section,
+            //         name:sectionName
+            //     })
+            // })
+            // this.setState({
+            //     sectionSchedule,
+            //     projectName
+            // })
         }
     }
     //获取当前登陆用户的标段的下拉选项
@@ -229,7 +252,8 @@ class All extends Component {
             selectedRowKeys,
             sectionSchedule=[],
             filterData,
-            TotleModaldata
+            TotleModaldata,
+            currentSectionName
         } = this.state;
         const {
             form: { getFieldDecorator },
@@ -247,8 +271,9 @@ class All extends Component {
         if(this.state.file){
             fileName = this.state.file.name;
         }
+        console.log('currentSectionNamecurrentSectionNamecurrentSectionName',currentSectionName)
 
-        let sectionOption = this.getSectionOption()
+        // let sectionOption = this.getSectionOption()
         return (
             <div>
                 {
@@ -288,13 +313,15 @@ class All extends Component {
                                             <FormItem {...FormItemLayout} label='标段'>
                                                 {
                                                     getFieldDecorator('Tsection', {
+                                                        initialValue: {currentSectionName},
                                                         rules: [
-                                                            { required: true, message: '请选择标段' }
+                                                            { required: true, message: '请输入标段' }
                                                         ]
                                                     })
-                                                        (<Select placeholder='请选择标段' allowClear>
-                                                            {sectionOption}
-                                                        </Select> )
+                                                        // (<Select placeholder='请选择标段' allowClear>
+                                                        //     {sectionOption}
+                                                        // </Select> )
+                                                        (<Input readOnly placeholder='请输入标段' />)
                                                 }
                                             </FormItem>
                                         </Col>
@@ -517,7 +544,9 @@ class All extends Component {
         const {
             TreatmentData,
             sectionSchedule,
-            projectName
+            projectName,
+            currentSectionName,
+			currentSection
         } = this.state
 
         let user = getUser();//当前登录用户
@@ -561,10 +590,10 @@ class All extends Component {
                     "id": parseInt(user.id)
                 };
                 
-                let sectionName = me.getSectionName(values.Tsection)
+                // let sectionName = me.getSectionName(values.Tsection)
                 let subject = [{
-                    "section": JSON.stringify(values.Tsection),
-                    "sectionName":JSON.stringify(sectionName),
+                    "section": JSON.stringify(currentSectionName),
+                    "sectionName":JSON.stringify(currentSectionName),
                     "projectName":JSON.stringify(projectName),
 					// "superunit": JSON.stringify(values.Tsuperunit),
 					"dataReview": JSON.stringify(values.TdataReview),
@@ -688,7 +717,7 @@ class All extends Component {
         })
         this.props.form.setFieldsValue({
             // Tsuperunit: undefined,
-            Tsection: undefined,
+            Tsection: this.state.currentSectionName || undefined,
             TdataReview: undefined,
             Tnumbercode: undefined
         })
