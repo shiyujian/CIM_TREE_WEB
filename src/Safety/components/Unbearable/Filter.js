@@ -10,9 +10,16 @@ const {RangePicker}=DatePicker;
 export default class Filter extends Component {
 
 	static propTypes = {};
+	state={
+        engineerNumber:'',
+        engineerName:'',
+        engineerApprove:'',
+        engineerTheme:'',
+    }
 
 	render() {
 		const { actions: { toggleAddition }, Doc = [] } = this.props;
+		console.log('DDDDD',Doc)
 		// console.log('filter.this.props',this.props)
 		return (
 			<Form style={{ marginBottom: 24 }}>
@@ -21,7 +28,10 @@ export default class Filter extends Component {
 						<Row gutter={15}  style={{marginTop: 5}}>
 							<Col span={8}>
 								<FormItem   {...Filter.layoutT} label="单位工程:">
-                                     <Select>
+                                     <Select onSelect={(value,option)=>{
+                                                    this.state.engineerName = value;
+                                             }}
+                                     >
                                           <Option value='第一阶段'>第一阶段</Option>
                                           <Option value='第二阶段'>第二阶段</Option>
                                      </Select>
@@ -29,7 +39,13 @@ export default class Filter extends Component {
 							</Col>
 							<Col span={8}>
 								<FormItem {...Filter.layoutT} label="主题:">
-									<Input  placeholder="请输入..."/>
+									<Input  placeholder="请输入..."
+										onChange={(event)=>{
+                                            event=(event)?event:window.event;
+                                            this.state.engineerTheme = event.target.value;
+
+	                                    }}
+                                    />
                                 </FormItem>
 							</Col>
 							<Col span={8}>
@@ -39,7 +55,10 @@ export default class Filter extends Component {
 						<Row gutter={15}  style={{marginTop: 5}}>
 							<Col span={8}>
 								<FormItem {...Filter.layoutT} label="文档类型:">
-									<Select>
+									<Select onSelect={(value,option)=>{
+                                                this.state.engineerApprove = value;
+                                             }}
+									>
                                           <Option value='水环境'>水环境</Option>
                                           <Option value='空气环境'>空气环境</Option>
                                      </Select>
@@ -47,7 +66,12 @@ export default class Filter extends Component {
 							</Col>
 							<Col span={8}>
 								<FormItem {...Filter.layoutT} label="编号:">
-									<Input />
+									<Input  placeholder="请输入..."
+											onChange={(event)=>{
+                                                event=(event)?event:window.event;
+                                                this.state.engineerNumber = event.target.value;
+                                            }}
+									/>
                                 </FormItem>
 							</Col>
 							<Col span={8}>

@@ -162,16 +162,16 @@ class Addition extends Component {
 	}
 
 	uploadProps={
-			name:'file',
-			action:`${FOREST_API}/upload/treetype/`,
-			headers:{
-				//Access-Control-Allow-Headers: "Origin, X-Requested-With, Content-Type, Accept"			
-				// authorization:'authorization-text',
-			},
-			beforeUpload() {
+		name:'file',
+		action:`${FOREST_API}/upload/treetype/`,
+		headers:{
+			//Access-Control-Allow-Headers: "Origin, X-Requested-With, Content-Type, Accept"			
+			// authorization:'authorization-text',
+		},
+		beforeUpload() {
 
-        	},
-		}
+    	},
+	}
 
 	cancel() {
 		const{

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Icon, Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message,Cascader} from 'antd';
 import moment from 'moment';
-import { FOREST_API} from '../../../_platform/api';
+import { FOREST_API,PROJECT_UNITS} from '../../../_platform/api';
 import {getUser} from '_platform/auth'
 import '../index.less';
 const TabPane = Tabs.TabPane;
@@ -40,7 +40,18 @@ export default class NursmeasureTable extends Component {
     componentDidMount() {
     	let user = getUser()
 		this.sections = JSON.parse(user.sections)
-    }
+	}
+	getBiao(code){
+		let str = '';
+		PROJECT_UNITS.map(item => {
+			item.units.map(single => {
+				if(single.code === code){
+					str = single.value;
+				}
+			})
+		})
+		return str;
+	}
     componentWillReceiveProps(nextProps){
     	if(nextProps.leftkeycode != this.state.leftkeycode) {
 			this.setState({
@@ -107,6 +118,9 @@ export default class NursmeasureTable extends Component {
 		},{
 			title:"标段",
 			dataIndex: 'BD',
+			render:(text,record) => {
+				return <p>{this.getBiao(text)}</p>
+			}
 		},{
 			title:"树种",
 			dataIndex: 'TreeTypeObj.TreeTypeName',

@@ -227,7 +227,7 @@ class OverallFormRefill extends Component {
                                                     <div style={{ lineHeight: 2.6 }}>
                                                         <div>审核意见：{note}</div>
                                                         <div>
-                                                            <span>审核人:{`${name}` || `${executor.username}`} [{organization}]</span>
+                                                            <span>审核人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
                                                             <span
                                                                 style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
                                                         </div>
