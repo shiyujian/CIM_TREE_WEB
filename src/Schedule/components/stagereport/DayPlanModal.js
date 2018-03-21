@@ -1,27 +1,53 @@
 import React, { Component, Children } from 'react';
-import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification, } from 'antd';
+import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification,Card, Steps} from 'antd';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
+const Step = Steps.Step;
 export default class DayPlanModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
             treeDatasource: [],
+            history:[]
         }
     }
-    componentDidMount() {
+    async componentDidMount() {
+        
+        const{
+            actions:{
+                getTask
+            },
+            id
+        }=this.props
+        let params = {
+            task_id:id
+        }
+        let task = await getTask(params)
+        let history = []
+        if(task && task.history){
+            history = task.history
+
+        }
+      
         this.setState({
-            treeDatasource: this.props.TreedataSource
+            treeDatasource: this.props.TreedataSource,
+            history
         })
     }
     render() {
         const {
             form: { getFieldDecorator },
         } = this.props;
+        const {
+            history,
+            treeDatasource
+        } = this.state
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 },
         }
-        console.log('this.props',this.props)
+        
         return (
             <div>
                 <Modal
@@ -115,31 +141,62 @@ export default class DayPlanModal extends Component {
                                             className='foresttable'
                                         />
                                     </Row>
-                                    <Row>
-
-                                        <Col span={12} style={{ marginTop: '10px' }}>
-                                            <FormItem {...FormItemLayout} label='审核人'>
-                                                {
-                                                    getFieldDecorator('daydataReview', {
-                                                        initialValue: `${this.props.dataReview || ''}`,
-                                                        rules: [
-                                                            { required: false, message: '请输入审核人员' }
-                                                        ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
-                                            </FormItem>
-                                        </Col>
-                                    </Row>
                                 </Col>
                             </Row>
-
                         </Form>
+                        <Card title={'审批流程'} style={{marginTop:10}}>
+                            <Steps direction="vertical" size="small" current={history.length>0? history.length - 1:0}>
+                                {
+                                    history.map((step, index) => {
+                                        const { state: { participants: [{ executor = {} } = {}] = [] } = {} } = step;
+                                        const { id: userID } = executor || {};
+                                        
+                                        if (step.status === 'processing') { // 根据历史状态显示
+                                            const state = this.getCurrentState();
+                                            return (
+                                                <Step 
+                                                    title={
+                                                        <div style={{ marginBottom: 8 }}>
+                                                            <span>{step.state.name}-(执行中)</span>
+                                                            <span style={{ paddingLeft: 20 }}>当前执行人: </span>
+                                                            <span style={{ color: '#108ee9' }}> {`${executor.person_name}` || `${executor.username}`}</span>
+                                                        </div>}
+                                                    key={index} 
+                                                />
+    
+                                            )
+                                        } else {
+                                            const { records: [record] } = step;
+                                            const { log_on = '', participant: { executor = {} } = {}, note = '' } = record || {};
+                                            const { person_name: name = '', organization = '' } = executor;
+                                            return (
+                                                <Step key={index} title={`${step.state.name}-(${step.status})`}
+                                                    description={
+                                                        <div style={{ lineHeight: 2.6 }}>
+                                                            <div>意见：{note}</div>
+                                                            <div>
+                                                                <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{organization}]</span>
+                                                                <span
+                                                                    style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                            </div>
+                                                        </div>} />);
+                                        }
+                                        
+                                    }).filter(h => !!h)
+                                }
+                            </Steps>
+                        </Card>
                     </div>
                 </Modal>
             </div>
         )
     }
+    getCurrentState() {
+		const { platform: { task = {} } = {}, location = {} } = this.props;
+		// const { state_id = '0' } = queryString.parse(location.search) || {};
+		const { states = [] } = task;
+		return states.find(state => state.status === 'processing');
+	}
     columns1 = [{
 		title: '序号',
 		dataIndex: 'key',

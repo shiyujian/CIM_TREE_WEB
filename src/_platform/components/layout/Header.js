@@ -112,9 +112,9 @@ export default class Header extends Component {
 								<Icon style={{ marginTop: "4px" }} name="tasks" title="个人任务" onClick={this.onClickDot.bind(this)} />
 							</Link>
 						</Badge>
-						<Link to='/modeldown'>
+						{/* <Link to='/modeldown'>
 							<Icon name="download" title="下载模型" style={{marginLeft:10}}/>
-						</Link>
+						</Link> */}
 					</div>
 				</div>
 			</header>);

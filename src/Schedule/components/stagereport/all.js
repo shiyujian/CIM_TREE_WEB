@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-19 11:08:29
+ * @Last Modified time: 2018-03-21 14:46:16
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -93,24 +93,21 @@ class All extends Component {
         let arrange = {};
         if(task && task instanceof Array){
             task.map((item,index)=>{
-
-                let itemdata = item.workflowactivity.subject[0];
+                let itemdata = item.subject[0];
                 let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
                 let itemtreatmentdata = itemdata.TreatmentData ? JSON.parse(itemdata.TreatmentData) : null;
-                
-               
                 let itemarrange = {
                     index:index+1,
-                    id:item.workflowactivity.id,
+                    id:item.id,
                     section: itemdata.section?JSON.parse(itemdata.section):'',
                     sectionName: itemdata.sectionName?JSON.parse(itemdata.sectionName):'',
                     projectName: itemdata.projectName?JSON.parse(itemdata.projectName):'',
                     type: itempostdata.type,
                     numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
                     // remarks:itemtreatmentdata[0].remarks||"--",
-                    submitperson:item.workflowactivity.creator.person_name,
-                    submittime:item.workflowactivity.real_start_time,
-                    status:item.workflowactivity.status,
+                    submitperson:item.creator.person_name,
+                    submittime:item.real_start_time,
+                    status:item.status,
                     totlesuperunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
                     totledocument:itemdata.totledocument?JSON.parse(itemdata.totledocument):'',
                     treatmentdata:itemtreatmentdata,
@@ -135,9 +132,9 @@ class All extends Component {
         }=this.props
         let filterData = []
         let user = getUser()
-        console.log('user',user)
+        
         let sections = user.sections
-        console.log('sections',sections)
+        
         sections = JSON.parse(sections)
         let selectCode = ''
         //关联标段的人只能看自己项目的进度流程
@@ -148,16 +145,16 @@ class All extends Component {
             //不关联标段的人可以看选择项目的进度流程
             selectCode = leftkeycode
         }
-        console.log('selectCode',selectCode)
+        
         totolData.map((task)=>{
-            console.log('task',task)
+            
             let projectName = task.projectName
             let projectCode = this.getProjectCode(projectName)
             if(projectCode === selectCode){
                 filterData.push(task);
             }
         })   
-        console.log('filterData',filterData)
+        
         this.setState({
             filterData
         })
@@ -170,18 +167,18 @@ class All extends Component {
                 projectCode = item.code
             }
         })
-		console.log('projectCode',projectCode)
+		
 		return projectCode 
     }
     //获取当前登陆用户的标段
     getSection(){
         let user = getUser()
-        console.log('user',user)
+        
         let sections = user.sections
         let sectionSchedule = []
         let sectionName = ''
         let projectName = ''
-        console.log('sections',sections)
+        
         sections = JSON.parse(sections)
         if(sections && sections instanceof Array && sections.length>0){
             sections.map((section)=>{
@@ -208,7 +205,7 @@ class All extends Component {
                
             })
             
-            console.log('sectionSchedule',sectionSchedule)
+            
             this.setState({
                 sectionSchedule,
                 projectName
@@ -420,7 +417,7 @@ class All extends Component {
                 })
 			}
 		}
-		console.log('sectionName',sectionName)
+		
 		return sectionName 
     }
 
@@ -432,7 +429,7 @@ class All extends Component {
             }
         } = this.props;
         let type  =  file.name.toString().split('.');
-        console.log('type',type)
+        
         let len = type.length
         if(type[len-1]==='xlsx' || type[len-1]==='xls'){
             const formdata = new FormData();
@@ -444,10 +441,8 @@ class All extends Component {
                     rst.a_file = (rst.a_file) && (rst.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                     rst.download_url = (rst.download_url) && (rst.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                     rst.preview_url = (rst.preview_url) && (rst.preview_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                    console.log('rst.a_file',rst.a_file);
-                    console.log('rst.download_url',rst.download_url);
-                    console.log('rst.preview_url',rst.preview_url);
-                    console.log('文件',rst)
+                    
+                    
                     this.setState({file:rst});
                     return true;
                 }else{
@@ -469,14 +464,14 @@ class All extends Component {
     }
     //解析文件
     uplodachange(info){
-        console.log('解析文件',info)
+        
         if (info && info.file && info.file.status !== 'uploading') {
-			//console.log(info.file, info.fileList);
+			//
         }
         if (info && info.file && info.file.status === 'done') {
             let name = Object.keys(info.file.response)
             let dataList = info.file.response[name[0]]
-            console.log('dataList',dataList)
+            
             let scheduleMaster = [];
             for(var i=1;i<dataList.length;i++){
                 scheduleMaster.push({
@@ -493,7 +488,7 @@ class All extends Component {
                     site: dataList[i][11]?dataList[i][11]:'',
                 })
             }
-            console.log('scheduleMaster',scheduleMaster)
+            
             
             notification.success({
                 message: '文件上传成功',
@@ -526,7 +521,7 @@ class All extends Component {
         } = this.state
 
         let user = getUser();//当前登录用户
-        console.log('user',user)
+        
         let sections = user.sections || []
 
 
@@ -543,7 +538,7 @@ class All extends Component {
         //共有信息
         let postData = {};
         me.props.form.validateFields((err, values) => {
-            console.log('asdasddddddddddddddddddddd',values)
+            
             if (!err) {
                 if (TreatmentData.length === 0) {
                     notification.error({
