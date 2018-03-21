@@ -80,7 +80,8 @@ const setCountInfoAc = createAction('DIS设置统计查询的数据');
 //查询部门出勤信息
 const getCountInfoAcOK = createAction('DIS查询部门出勤信息');
 const getCountInfoAc = createFetchAction(`${base}/main/api/staff-statistic2/?org_code={{code}}&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`, [getCountInfoAcOK]);
-
+// 获取部门信息
+const getOrgName = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`, [], "GET");
 
 export const actions = {
 	setTabActive,
@@ -103,7 +104,7 @@ export const actions = {
 	getUsersListAc,
 	getCopyUsersAcOK,
 	getCopyUsersAc,
-
+	getOrgName,
 	setLoadingAc,
 	setCountTimeAc,
 
