@@ -146,7 +146,8 @@ class AddModal extends Component {
 									})
 										(
 										<PerSearch selectMember={this.selectMember.bind(this)} 
-											code={WORKFLOW_CODE.安全体系报批流程} 
+											// code={WORKFLOW_CODE.安全体系报批流程}
+											code={WORKFLOW_CODE.总进度计划报批流程}  
 											visible={addVisible}
 										/>
 										)

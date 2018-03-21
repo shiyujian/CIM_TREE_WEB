@@ -20,7 +20,7 @@ class Stagereporttab extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			daydata:[],
+			stagedata:[],
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			visible: false,
@@ -111,7 +111,7 @@ class Stagereporttab extends Component {
 				totledata.push(itemarrange);
 			})
 			this.setState({
-				daydata:totledata
+				stagedata:totledata
 			},()=>{
                 this.filterTask()
             })
@@ -120,7 +120,7 @@ class Stagereporttab extends Component {
 	//对流程信息根据选择项目进行过滤
 	filterTask(){
 		const {
-			daydata 
+			stagedata 
 		}=this.state
 		const{
 			leftkeycode
@@ -142,7 +142,7 @@ class Stagereporttab extends Component {
 			selectCode = leftkeycode
 		}      
 		
-		daydata.map((task)=>{
+		stagedata.map((task)=>{
 			
 			let projectName = task.projectName
 			let projectCode = this.getProjectCode(projectName)
