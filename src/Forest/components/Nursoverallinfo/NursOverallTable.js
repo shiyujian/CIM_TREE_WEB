@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message,Icon} from 'antd';
 import moment from 'moment';
-import { FOREST_API} from '../../../_platform/api';
+import { FOREST_API,PROJECT_UNITS} from '../../../_platform/api';
 import '../index.less';
 import {getUser} from '_platform/auth'
 const TabPane = Tabs.TabPane;
@@ -55,7 +55,18 @@ export default class NursOverallTable extends Component {
     componentDidMount() {
 		let user = getUser()
 		this.sections = JSON.parse(user.sections)
-    }
+	}
+	getBiao(code){
+		let str = '';
+		PROJECT_UNITS.map(item => {
+			item.units.map(single => {
+				if(single.code === code){
+					str = single.value;
+				}
+			})
+		})
+		return str;
+	}
     componentWillReceiveProps(nextProps){
     	// if(nextProps.leftkeycode != this.state.leftkeycode) {
 		// 	this.setState({
@@ -124,6 +135,9 @@ export default class NursOverallTable extends Component {
 		},{
 			title:"标段",
 			dataIndex: 'Section',
+			render:(text,record) => {
+				return <p>{this.getBiao(text)}</p>
+			}
 		},{
 			title:"位置",
 			dataIndex: 'place',
