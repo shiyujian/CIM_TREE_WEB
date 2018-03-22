@@ -4,6 +4,7 @@ import {FILE_API,base, SOURCE_API, DATASOURCECODE,UNITS,SERVICE_API,PROJECT_UNIT
 import '../index.less';
 import '../../../Datum/components/Datum/index.less'
 import { getUser } from '../../../_platform/auth';
+import TaskDetail from './TaskDetail';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 
@@ -18,7 +19,8 @@ export default class SafetyTable extends Component {
 		this.state = {
 			taskVisible:false,
 			taskList:[],
-            filterTaskList:[]			
+			filterTaskList:[],
+			TaskDetailData:{}			
 		}
 	}
 	static layout = {
@@ -51,7 +53,8 @@ export default class SafetyTable extends Component {
 		if(safetyTaskList && safetyTaskList instanceof Array){
 			safetyTaskList.map((item,index)=>{
 				let subject = item.subject[0];
-                let itempostdata = subject.postData?JSON.parse(subject.postData):null;
+				let postData = subject.postData?JSON.parse(subject.postData):null;
+				
                 let itemarrange = {
                     index:index+1,
                     id:item.id,
@@ -59,10 +62,11 @@ export default class SafetyTable extends Component {
                     sectionName: subject.sectionName?JSON.parse(subject.sectionName):'',
 					projectName: subject.projectName?JSON.parse(subject.projectName):'',
 					Safename: subject.Safename?JSON.parse(subject.Safename):'',
-                    type: itempostdata.type,
+                    type: postData.type,
                     numbercode:subject.numbercode?JSON.parse(subject.numbercode):'',
                     submitperson:item.creator.person_name,
-                    submittime:item.real_start_time,
+					submittime:item.real_start_time,
+					submitUnit:postData.upload_unit?postData.upload_unit:'',
                     status:item.status,
                     document:subject.document?JSON.parse(subject.document):'',
                     file:subject.file?JSON.parse(subject.file):'',
@@ -132,11 +136,21 @@ export default class SafetyTable extends Component {
 			safetyTaskList
 		}=this.props
 		const {
-			filterTaskList
+			filterTaskList,
+			taskVisible
 		}=this.state
 		return (
 			<div>
-                
+                {
+                    taskVisible &&
+                    <TaskDetail
+                        {...this.props}
+						{...this.state}
+						{...this.state.TaskDetailData}
+                        oncancel={this.taskDetailCancle.bind(this)}
+                        onok={this.taskDetailOk.bind(this)}
+                    />
+                }
                 <Button onClick={this.addClick.bind(this)}>新增</Button>
 				<Table
                     columns={this.columns}
@@ -152,12 +166,18 @@ export default class SafetyTable extends Component {
 	 addClick = () => {
         const { actions: { AddVisible } } = this.props;
 		AddVisible(true);
-        
-
 	}
 	// 操作--查看
     clickInfo(record) {
-        this.setState({ taskVisible: true ,TotleModaldata:record});
+        this.setState({ taskVisible: true ,TaskDetailData:record});
+	}
+	// 取消
+    taskDetailCancle() {
+        this.setState({ taskVisible: false });
+    }
+    // 确定
+    taskDetailOk() {
+        this.setState({ taskVisible: false });
     }
 	columns = [
 		{
