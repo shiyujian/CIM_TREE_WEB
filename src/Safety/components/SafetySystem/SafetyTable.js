@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { Form, Icon, Table, Spin, Tabs, Modal, Row, Col, Select, DatePicker, Button, Input, InputNumber, Progress, message } from 'antd';
-import moment from 'moment';
-import { FOREST_API } from '../../../_platform/api';
+import {FILE_API,base, SOURCE_API, DATASOURCECODE,UNITS,SERVICE_API,PROJECT_UNITS,SECTIONNAME,WORKFLOW_CODE } from '../../../_platform/api';
 import '../index.less';
 import '../../../Datum/components/Datum/index.less'
+import { getUser } from '../../../_platform/auth';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
@@ -14,24 +16,123 @@ export default class SafetyTable extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			workflowTable:[],
-			taskVisible:false
+			taskVisible:false,
+			taskList:[],
+            filterTaskList:[]			
 		}
 	}
 	static layout = {
 		labelCol: { span: 8 },
 		wrapperCol: { span: 16 },
 	};
-	componentDidMount() {
-
+	async componentDidMount() {
+		const{
+			actions:{
+				getTaskSafety
+			}
+		}=this.props
+		getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程})
 	}
+
+	async componentDidUpdate(prevProps,prevState){
+		const{
+			safetyTaskList
+		}=this.props
+		if(safetyTaskList != prevProps.safetyTaskList){
+			this.getTaskList()
+		}
+	}
+
+	getTaskList(){
+		const{
+			safetyTaskList
+		}=this.props
+		let taskList = [];
+		if(safetyTaskList && safetyTaskList instanceof Array){
+			safetyTaskList.map((item,index)=>{
+				let subject = item.subject[0];
+                let itempostdata = subject.postData?JSON.parse(subject.postData):null;
+                let itemarrange = {
+                    index:index+1,
+                    id:item.id,
+                    section: subject.section?JSON.parse(subject.section):'',
+                    sectionName: subject.sectionName?JSON.parse(subject.sectionName):'',
+					projectName: subject.projectName?JSON.parse(subject.projectName):'',
+					Safename: subject.Safename?JSON.parse(subject.Safename):'',
+                    type: itempostdata.type,
+                    numbercode:subject.numbercode?JSON.parse(subject.numbercode):'',
+                    submitperson:item.creator.person_name,
+                    submittime:item.real_start_time,
+                    status:item.status,
+                    document:subject.document?JSON.parse(subject.document):'',
+                    file:subject.file?JSON.parse(subject.file):'',
+                    dataReview:subject.dataReview?JSON.parse(subject.dataReview).person_name:''
+                }
+                taskList.push(itemarrange);
+			})
+			this.setState({
+				taskList:taskList
+			},()=>{
+				this.filterTask()
+			})
+		}
+	}
+
+	//对流程信息根据选择项目进行过滤
+    filterTask(){
+        const {
+            taskList 
+        }=this.state
+        const{
+            leftkeycode
+        }=this.props
+        let filterTaskList = []
+        let user = getUser()
+        
+        let sections = user.sections
+        
+        sections = JSON.parse(sections)
+        let selectCode = ''
+        //关联标段的人只能看自己项目的进度流程
+        if(sections && sections instanceof Array && sections.length>0){
+            let code = sections[0].split('-')
+            selectCode = code[0] || ''
+        }else{
+            //不关联标段的人可以看选择项目的进度流程
+            selectCode = leftkeycode
+        }
+        
+        taskList.map((task)=>{
+            let projectName = task.projectName
+            let projectCode = this.getProjectCode(projectName)
+            if(projectCode === selectCode){
+                filterTaskList.push(task);
+            }
+        })   
+        
+        this.setState({
+            filterTaskList:filterTaskList
+        })
+	}
+	
+	//获取项目code
+    getProjectCode(projectName){
+        let projectCode = ''
+        PROJECT_UNITS.map((item)=>{
+            if(projectName === item.value){
+                projectCode = item.code
+            }
+        })
+		
+		return projectCode 
+    }
 
 	render() {
 		const{
-
+			safetyTaskList
 		}=this.props
 		const {
-			workflowTable
+			filterTaskList
 		}=this.state
 		return (
 			<div>
@@ -40,7 +141,7 @@ export default class SafetyTable extends Component {
 				<Table
                     columns={this.columns}
                     // rowSelection={rowSelection}
-                    dataSource={workflowTable} 
+                    dataSource={filterTaskList} 
                     bordered
                     className='foresttable'
 				/>
@@ -61,32 +162,36 @@ export default class SafetyTable extends Component {
 	columns = [
 		{
 			title: "标段",
-			key:'section',
-			dataIndex: 'section',
+			key:'sectionName',
+			dataIndex: 'sectionName',
 		}, {
 			title: "名称",
-			dkey:'name',
-			dataIndex: 'name',
+			dkey:'Safename',
+			dataIndex: 'Safename',
 		}, {
 			title: "编号",
-			key:'code',
-			dataIndex: 'code',
+			key:'numbercode',
+			dataIndex: 'numbercode',
 		}, {
 			title: "文档类型",
-			key:'documentType',
-			dataIndex: 'documentType',
+			key:'document',
+			dataIndex: 'document',
 		}, {
 			title: "提交单位",
-			key:'createUnit',
-			dataIndex: 'createUnit',
+			key:'submitUnit',
+			dataIndex: 'submitUnit',
 		}, {
 			title: "提交人",
-			key:'createPerson',
-			dataIndex: 'createPerson',
+			key:'submitperson',
+			dataIndex: 'submitperson',
 		}, {
 			title: "提交时间",
-			key:'createTime',
-			dataIndex: 'createTime',
+			key:'submittime',
+			dataIndex: 'submittime',
+			sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
+			render: text => {
+				return moment(text).format('YYYY-MM-DD')
+			}
 		}, {
 			title: '流程状态',
 			dataIndex: 'status',

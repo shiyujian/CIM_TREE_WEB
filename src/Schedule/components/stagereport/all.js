@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-22 11:33:18
+ * @Last Modified time: 2018-03-22 16:31:05
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -597,7 +597,7 @@ class All extends Component {
                 
                 // let sectionName = me.getSectionName(values.Tsection)
                 let subject = [{
-                    "section": JSON.stringify(currentSectionName),
+                    "section": JSON.stringify(currentSection),
                     "sectionName":JSON.stringify(currentSectionName),
                     "projectName":JSON.stringify(projectName),
 					// "superunit": JSON.stringify(values.Tsuperunit),
