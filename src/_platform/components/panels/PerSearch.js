@@ -174,11 +174,13 @@ export default class PerSearch extends Component {
                     org_code : org_code,
                     sections: sections,
                     roles : roles,
+                    is_active : true
                 }
             }else{
                 postdata = {
                     roles : roles,
-                    sections: sections
+                    sections: sections,
+                    is_active : true
                 }
             }
             console.log('postdata',postdata)

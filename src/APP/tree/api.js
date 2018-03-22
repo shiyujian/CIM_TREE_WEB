@@ -26,7 +26,7 @@ export const tree_menus = [{
 	key: 'dashboard',
 	id: 'DASHBOARD',
 	title: '综合展示',
-	path: '/dashboard',
+	path: '/dashboard/onsite',
 	icon: <Icon name="map"/>
 }, {
 	key: 'overall',
@@ -38,13 +38,13 @@ export const tree_menus = [{
 	key: 'datum',
 	id: 'DATUM',
 	title: '资料管理',
-	path: '/datum',
+	path: '/datum/standard',
 	icon: <Icon name="book"/>
 }, {
 	key: 'quality',
 	id: 'QUALITY',
 	title: '质量管理',
-	path: '/quality',
+	path: '/quality/score/search',
 	icon: <Icon name="list-alt"/>
 }, {
 	key: 'schedule',
@@ -56,7 +56,7 @@ export const tree_menus = [{
 	key: 'safety',
 	title: '安环管理',
 	id: 'SAFETY',
-	path: '/safety',
+	path: '/safety/trend',
 	icon: <Icon name="shield"/>,
 }, {
 	key: 'forest',
@@ -80,13 +80,13 @@ export const tree_menus = [{
 	key: 'system',
 	id: 'SYSTEM',
 	title: '系统设置',
-	path: '/system',
+	path: '/system/person',
 	icon: <Icon name="cogs"/>
 }, {
 	key: 'project',
 	id: 'PROJECT',
 	title: '项目管理',
-	path: '/project',
+	path: '/project/nurserymanagement',
 	icon: <Icon name="cogs"/>
 }];
 

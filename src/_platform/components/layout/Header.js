@@ -28,7 +28,6 @@ export default class Header extends Component {
 	componentDidMount() {
 		const { tasks = 0 } = getUser();
 		if (tasks > 0) {
-			console.log('tasks',tasks)
 			this.setState({
 				dotShow: true,
 				tasks:tasks
@@ -44,7 +43,6 @@ export default class Header extends Component {
 
 
 	render() {
-		console.log('header');
 		const { match: { params: { module = '' } = {} } = {} } = this.props;
 		const ignore = Header.ignoreModules.some(m => m === module);
 		if (ignore) {
@@ -69,7 +67,25 @@ export default class Header extends Component {
 						Header.menus.map(menu => {
 							let has = permissions.some(permission => permission === `appmeta.${menu.id}.READ`);
 							// let has = true
+							let str;
 							if (has) {
+								if(username!=='admin'){
+									//对用户各个模块权限进行遍历，如果拥有某个子模块的权限，则将子模块的权限
+									//进行处理变换成子模块的路径
+									for(var i=0;i<permissions.length;i++){
+										if(permissions[i].indexOf(menu.id)!==-1 && permissions[i] !== `appmeta.${menu.id}.READ` ){
+											str=permissions[i] ;
+											break;
+										}
+									}
+									if(str !==undefined){
+										str=str.match(/appmeta(\S*).READ/)[1] || '';
+										str=str.replace(/\./g,"/").toLowerCase();
+										menu.path=str;
+										console.log('path',menu.path)
+									}
+								}
+
 								return (
 									<Menu.Item
 										key={menu.key}
@@ -84,7 +100,6 @@ export default class Header extends Component {
 							// 取出数据使用二进制进行判断对比 如果有这个1就显示否则隐藏
 							// 	if (permissions[i].value & 1 == "1") {
 							// 		if (permissions[i].id == `${menu.id}`) {
-
 							// 			return (
 							// 				<Menu.Item
 							// 					key={menu.key}

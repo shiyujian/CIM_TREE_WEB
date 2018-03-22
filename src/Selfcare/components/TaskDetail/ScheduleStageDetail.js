@@ -62,7 +62,7 @@ class ScheduleStageDetail extends Component {
 				<Row gutter={24}>
 					<Col span={24} >
 						<Row gutter={15} >
-							<Col span={8}>
+							<Col span={12}>
 								<FormItem   {...ScheduleStageDetail.layout} label="标段:">
 								{getFieldDecorator('stagesection', {
 									initialValue: `${record.sectionName ? record.sectionName : '暂无标段'}`,
@@ -70,7 +70,7 @@ class ScheduleStageDetail extends Component {
 								})(<Input readOnly />)}
 								</FormItem>
 							</Col>
-							<Col span={8}>
+							<Col span={12}>
 								<FormItem {...ScheduleStageDetail.layout} label="编号:">
 								{getFieldDecorator('stegenumbercode', {
                                     initialValue: `${record.numbercode ? record.numbercode : '暂无编号'}`,
@@ -80,7 +80,10 @@ class ScheduleStageDetail extends Component {
                                 })(<Input readOnly />)}
 								</FormItem>
 							</Col>
-							<Col span={8}>
+							
+						</Row>
+						<Row gutter={15}>
+							<Col span={12}>
 								<FormItem {...ScheduleStageDetail.layout} label="文档类型:">
 								{getFieldDecorator('stagedocument', {
                                     initialValue: `${record.stagedocument? record.stagedocument : '暂无文档类型'}`,
@@ -90,9 +93,7 @@ class ScheduleStageDetail extends Component {
                                 })(<Input readOnly />)}
 								</FormItem>
 							</Col>
-						</Row>
-						<Row gutter={15}>
-                            <Col span={8}>
+                            <Col span={12}>
 								<FormItem {...ScheduleStageDetail.layout} label="日期:">
 								{getFieldDecorator('stagetimedate', {
                                     initialValue: `${record.timedate? record.timedate : '暂无日期'}`,
@@ -102,7 +103,7 @@ class ScheduleStageDetail extends Component {
                                 })(<Input readOnly />)}
 								</FormItem>
 							</Col>
-							<Col span={8}>
+							{/* <Col span={8}>
 								<FormItem  {...ScheduleStageDetail.layout} label="监理单位:">
 								{getFieldDecorator('stagesuperunit', {
                                     initialValue: `${record.superunit ?record.superunit: '暂无监理单位'}`,
@@ -111,7 +112,7 @@ class ScheduleStageDetail extends Component {
                                     ]
                                 })(<Input readOnly />)}
 								</FormItem>
-							</Col>
+							</Col> */}
 						</Row>
 					</Col>
 				</Row>
@@ -141,7 +142,7 @@ class ScheduleStageDetail extends Component {
             'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
             'stagedocument':subject.stagedocument?JSON.parse(subject.stagedocument):'',
 			'timedate':subject.timedate?JSON.parse(subject.timedate):'',
-			'superunit':subject.superunit?JSON.parse(subject.superunit):''
+			// 'superunit':subject.superunit?JSON.parse(subject.superunit):''
         }
 		return record
 	}

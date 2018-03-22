@@ -311,7 +311,7 @@ export default class Warning extends Component {
                                     }else{//添加的数目种类
                                         let treetype = ''
                                         treetypeAll.map((tree)=>{
-                                            if(tree.TreeTypeName === rst.name){
+                                            if(tree.TreeTypeName === item.Project){
                                                 //获取树种cdoe的首个数字，找到对应的类型
                                                 let code = tree.TreeTypeNo.substr(0, 1)
                                                 console.log('code',code)

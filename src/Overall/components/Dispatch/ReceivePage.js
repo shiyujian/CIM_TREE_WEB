@@ -17,7 +17,9 @@ class ReceivePage extends Component {
 		this.state = {
 			visible: false,
 			showInfo: {},
-			code_id:""
+			code_id:"",
+			searchList:[],
+			isUpdate : false,
 		}
 	}
 
@@ -95,25 +97,56 @@ class ReceivePage extends Component {
 	}
 	//查找
 	query() {
-
 		const {
 			actions: { getReceiveInfoAc },
+			receiveInfo = {},
 			filter = {}
 		} = this.props;
+		const { notifications = [] } = receiveInfo;
+	
 		// const user = getUser();
+		let searchList=[]
 		this.props.form.validateFields(async (err, values) => {
-			// console.log('values',values)
-			console.log(values.title)
-			let conditions = {
-				
-				// executor:user.id,
-				user: values.title || "",
-				// user: values.title || "",
+			notifications.map((item)=>{
+				let isName = false;
+				let isRoles = false;
+				let isTitle = false;
+				if (!values.orgLists) {
+					isName = true
+				}
+				else {
+					if (values.orgLists && item.to_whom.indexOf(values.orgLists) > -1) {
+						isName = true
+					}
+				}
+	
+				if (!values.title) {
+					isTitle = true
+				} else {
+					if (values.title && item.notification_title.indexOf(values.title) > -1) {
+						isTitle = true
+					}
+				}
+		
+				if (!values.worktimes) {
+					isRoles = true
+				} else {
+					const create_time=moment(item.create_time).utc().utcOffset(+8).format('YYYY-MM-DD')
+					const worktimes1=moment(values.worktimes[0]).format('YYYY-MM-DD')
+					const worktimes2=moment(values.worktimes[1]).format('YYYY-MM-DD')
+					if(moment(create_time).isBetween(worktimes1,worktimes2)||moment(create_time).isSame(worktimes1)||moment(create_time).isSame(worktimes2)){
+						isRoles = true
+					}
+				}
+				if (isName && isTitle && isRoles) {
+					searchList.push(item)
+				}
+			})
+			this.setState({
+				searchList: searchList,
+				isUpdate :true,
+			})
 
-			}
-			// console.log(getUser().org)
-			// console.log(this.state.code_id)
-			await getReceiveInfoAc(conditions);
 
 		})
 	}
@@ -149,21 +182,26 @@ class ReceivePage extends Component {
 				visible: false,
 			},
 		} = this.props;
-		console.log("receiveInfo", receiveInfo)
-		const { showInfo = {} } = this.state;
+		const { showInfo = {} ,searchList} = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
 		const { notifications = [] } = receiveInfo;
 		const formItemLayout = {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		};
+		let dataSource
+		if (this.state.isUpdate) {
+			dataSource = searchList
+		} else {
+			dataSource = notifications
+		}
 		return (
 			<Row>
 				<Col span={22} offset={1}>
 					<Row >
 						<Col span={18}>
 							<Row>
-								<Col span={8}>
+								{/* <Col span={8}>
 									<FormItem {...formItemLayout} label="文件类型">
 										{getFieldDecorator('mold', {
 											rules: [{ required: false, message: '请输入文件标题' }],
@@ -174,8 +212,8 @@ class ReceivePage extends Component {
 											<Option value="监理通知">监理通知</Option>
 										</Select>)}
 									</FormItem>
-								</Col>
-								<Col span={8}>
+								</Col> */}
+								{/* <Col span={8}>
 									<FormItem {...formItemLayout} label="名称">
 										{getFieldDecorator('title', {
 											rules: [{ required: false, message: '请输入名称' }],
@@ -185,8 +223,8 @@ class ReceivePage extends Component {
 											/>
 											)}
 									</FormItem>
-								</Col>
-								<Col span={8} >
+								</Col> */}
+								{/* <Col span={8} >
 									<FormItem {...formItemLayout} label="工程名称">
 										{getFieldDecorator('orgList', {
 											rules: [{ required: false, message: '请输入文件标题' }],
@@ -196,7 +234,7 @@ class ReceivePage extends Component {
 											/>
 											)}
 									</FormItem>
-								</Col>
+								</Col> */}
 							</Row>
 							<Row>
 								<Col span={8} >
@@ -211,6 +249,17 @@ class ReceivePage extends Component {
 									</FormItem>
 								</Col>
 								<Col span={8}>
+									<FormItem {...formItemLayout} label="名称">
+										{getFieldDecorator('title', {
+											rules: [{ required: false, message: '请输入名称' }],
+											initialValue: ''
+										})(
+											<Input type="text"
+											/>
+											)}
+									</FormItem>
+								</Col>
+								{/* <Col span={8}>
 									<FormItem {...formItemLayout} label="编号">
 										{getFieldDecorator('numbers', {
 											rules: [{ required: false, message: '请输入编号' }],
@@ -220,7 +269,7 @@ class ReceivePage extends Component {
 											/>
 											)}
 									</FormItem>
-								</Col>
+								</Col> */}
 								<Col span={8}>
 									<FormItem {...formItemLayout} label="收文日期">
 										{
@@ -243,21 +292,21 @@ class ReceivePage extends Component {
 							</Row>
 						</Col>
 						<Col span={4} offset={1}>
-							<Row>
+							<Col span={12}>
 								<FormItem>
 									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
 								</FormItem>
-							</Row>
-							<Row>
+							</Col>
+							<Col span={12}>
 								<FormItem>
 									<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
 								</FormItem>
-							</Row>
+							</Col>
 						</Col>
 									</Row>
 					{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
 					<Table
-						dataSource={this._getNewArrFunc(notifications)}
+						dataSource={this._getNewArrFunc(dataSource)}
 						columns={this.columns}
 						title={() => '收文查询'}
 						className="foresttables"
@@ -324,99 +373,107 @@ class ReceivePage extends Component {
 	}
 	_getNewArrFunc(list = []) {
 		let arr = list;
-		console.log("list",list)
 		list.map((itm, index) => {
 			itm.index = index + 1;
 		});
 		return arr;
 	}
+	// columns = [
+	// 	{
+	// 		title: 'ID',
+	// 		dataIndex: 'index',
+	// 	}, {
+	// 		title: '标题',
+	// 		dataIndex: 'notification_title',
+	// 	}, {
+	// 		title: '来文单位',
+	// 		dataIndex: 'from_whom'
+	// 	},
+	// 	/* {
+	// 		title: '状态',
+	// 		dataIndex: 'is_read',
+	// 		render: is_read => {
+	// 			return (is_read === false) ? "未阅" : "已阅";
+	// 		}
+	// 	}, */
+	// 	{
+	// 		title: '发送时间',
+	// 		dataIndex: 'create_time',
+	// 		render: create_time => {
+	// 			return moment(create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss');
+	// 		}
+	// 	}, {
+	// 		title: '操作',
+	// 		render: record => {
+	// 			return (
+	// 				<span>
+	// 					<Button onClick={this._viewClick.bind(this, record._id)}>查看</Button>
+	// 					<Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
+	// 								cancelText="取消">
+	// 						<Button type="danger">删除</Button>
+	// 					</Popconfirm>
+	// 				</span>
+	// 			)
+	// 		},
+	// 	}
+	// ];
 	columns = [
 		{
-			title: 'ID',
+			title: '序号',
 			dataIndex: 'index',
-		}, {
-			title: '标题',
+			key: 'index'
+		}
+		// ,{
+		// 	title: '文件类型',
+		// 	dataIndex: 'doc_type',
+		// 	key: 'doc_type'
+		// }
+		, {
+			title: '名称',
 			dataIndex: 'notification_title',
-		}, {
+			key:'notification_title'
+		}
+		// , {
+		// 	title: '工程名称',
+		// 	dataIndex: 'project_name',
+		// 	key: 'project_name'
+		// }
+		// ,{
+		// 	title: '编号',
+		// 	dataIndex: 'number',
+		// 	key: 'number'
+		// }
+		,{
 			title: '来文单位',
-			dataIndex: 'from_whom'
-		},
-		/* {
-			title: '状态',
-			dataIndex: 'is_read',
-			render: is_read => {
-				return (is_read === false) ? "未阅" : "已阅";
-			}
-		}, */
-		{
-			title: '发送时间',
-			dataIndex: 'create_time',
-			render: create_time => {
-				return moment(create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss');
+			dataIndex: 'to_whom',
+			key: 'to_whom'
+		},{
+			title: '收文日期',
+			// dataIndex: 'create_time',
+			// key: 'create_time'
+			sorter: (a, b) => moment(a.create_time) - moment(b.create_time),
+			render: notification => {
+				return moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')
 			}
 		}, {
 			title: '操作',
 			render: record => {
 				return (
 					<span>
-						<Button onClick={this._viewClick.bind(this, record._id)}>查看</Button>
-						<Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
-									cancelText="取消">
-							<Button type="danger">删除</Button>
-						</Popconfirm>
+						<a onClick={this._viewClick.bind(this, record._id)}>查看</a>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
+						<a onClick={this._sentDoc.bind(this)}>回文</a>
+						{/*&nbsp;&nbsp;|&nbsp;&nbsp;
+						<a onClick={this._download.bind(this)}>下载</a>
+						 <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
+							cancelText="取消">
+							<a >删除</a>
+						</Popconfirm> */}
+
 					</span>
 				)
 			},
 		}
 	];
-	// columns = [
-	// 	{
-	// 		title: '序号',
-	// 		dataIndex: 'index',
-	// 		key: 'index'
-	// 	},{
-	// 		title: '文件类型',
-	// 		dataIndex: 'doc_type',
-	// 		key: 'doc_type'
-	// 	}, {
-	// 		title: '名称',
-	// 		dataIndex: 'title',
-	// 		key:'title'
-	// 	}, {
-	// 		title: '工程名称',
-	// 		dataIndex: 'project_name',
-	// 		key: 'project_name'
-	// 	},{
-	// 		title: '编号',
-	// 		dataIndex: 'number',
-	// 		key: 'number'
-	// 	},{
-	// 		title: '来文单位',
-	// 		dataIndex: 'come_unit',
-	// 		key: 'come_unit'
-	// 	},{
-	// 		title: '收文日期',
-	// 		dataIndex: 'come_date',
-	// 		key: 'come_date'
-	// 	}, {
-	// 		title: '操作',
-	// 		render: record => {
-	// 			return (
-	// 				<span>
-	// 					<a onClick={this._viewClick.bind(this, record._id)}>查看</a>
-	// 					&nbsp;&nbsp;|&nbsp;&nbsp;
-	// 					<a onClick={this._sentDoc.bind(this)}>回文</a>
-	// 					{/*&nbsp;&nbsp;|&nbsp;&nbsp;
-	// 					<a onClick={this._download.bind(this)}>下载</a>
-	// 					 <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
-	// 						cancelText="取消">
-	// 						<a >删除</a>
-	// 					</Popconfirm> */}
-
-	// 				</span>
-	// 			)
-	// 		},
-	// 	}
-	// ];
 }
 export default Form.create()(ReceivePage)

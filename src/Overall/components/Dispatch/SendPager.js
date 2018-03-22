@@ -61,17 +61,16 @@ export default class SendPage1 extends Component {
 
 		const { showInfo = {} } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
-		// console.log(111111,sendInfo)
-		// console.log(2222,notifications)
+
 		return (
 			<Row>
 				<Col span={22} offset={1}>
 					<Row>
 						<Col offset={22}>
-							<Button type="primary"  onClick={this._sentDoc.bind(this)}>发文</Button>
+							<Button type="primary" onClick={this._sentDoc.bind(this)}>发文</Button>
 						</Col>
 					</Row>
-					<Table 
+					<Table
 						dataSource={this._getNewArrFunc(notifications)}
 						rowSelection={rowSelection}
 						columns={this.columns}
@@ -79,7 +78,7 @@ export default class SendPage1 extends Component {
 						className="foresttables"
 						bordered
 						rowKey="_id"
-						// style={{marginTop:10}}
+					// style={{marginTop:10}}
 					/>
 				</Col>
 				{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
@@ -195,8 +194,30 @@ export default class SendPage1 extends Component {
 			dataIndex: 'extend_to_whom_list',
 			render: extend_to_whom_list => {
 				let orgListName = this._getText(extend_to_whom_list);
+				console.log("orgListName", orgListName)
 				return orgListName;
 			}
+			// render: (text,record,index) => {
+			// 	const { actions: {getOrgName} } = this.props;
+				
+			// 	let orgListName = this._getText(record.extend_to_whom_list);
+			// 	let orgCode=record.extend_info || {}
+			// 	let names=''		
+			// 	if(orgCode.to_whomCode){
+			// 		let orgListCodes=orgCode.to_whomCode.split("_");
+			// 		orgListCodes.pop()
+			// 		let codeu=orgListCodes.join()
+			// 		let ucode=codeu.replace(/,/g,'_')
+			// 		 getOrgName({ code: ucode}).then(rst=>{
+			// 			 names= `${rst.name}-${orgListName}`
+			// 			 console.log("111111",names)
+			// 		})
+					
+			// 		return names;
+			// 	}else{
+			// 		return orgListName;
+			// 	}
+			// }
 		}, {
 			title: '抄送单位',
 			dataIndex: 'extend_cc_list',
@@ -204,6 +225,26 @@ export default class SendPage1 extends Component {
 				let orgListName = this._getText(extend_cc_list);
 				return orgListName;
 			}
+			// render: (text,record,index) => {
+			// 	const { actions: {getOrgName} } = this.props;
+			// 	let orgListName = this._getText(record.extend_cc_list);
+			// 	let orgCode=record.extend_info || {}	
+			// 	let namea=''						
+			// 	if(orgCode.cc_Code){
+			// 		let orgListCodes=orgCode.cc_Code.split("_");
+			// 		orgListCodes.pop()
+			// 		let codeu=orgListCodes.join()
+			// 		let ucode=codeu.replace(/,/g,'_')
+			// 		 getOrgName({ code: ucode}).then(rst=>{
+			// 			namea= `${rst.name}-${orgListName}`
+			// 			console.log("222222",namea)
+						
+			// 		})
+			// 		return namea;
+			// 	}else{
+			// 		return orgListName;
+			// 	}
+			// }
 		}, {
 			title: '发送时间',
 			dataIndex: 'create_time',

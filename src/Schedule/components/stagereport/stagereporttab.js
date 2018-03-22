@@ -20,7 +20,7 @@ class Stagereporttab extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			daydata:[],
+			stagedata:[],
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			visible: false,
@@ -33,6 +33,8 @@ class Stagereporttab extends Component {
 			sectionSchedule:[],
 			projectName:'',
 			filterData:[], //对流程信息根据项目进行过滤
+			currentSection:'',
+			currentSectionName:''
 		};
 	}
 
@@ -70,7 +72,7 @@ class Stagereporttab extends Component {
             
             values.sunitproject?reqData.subject_sectionName__contains = values.sunitproject : '';
             values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
-            values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
+            // values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
             values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
             values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
@@ -82,27 +84,27 @@ class Stagereporttab extends Component {
 
 
         let task = await getTaskSchedule({ code: WORKFLOW_CODE.每日进度填报流程 },tmpData);
-		console.log('task',task)
+		
         let subject = [];
         let totledata = [];
 		let arrange = {};
 		if(task && task instanceof Array){
 			task.map((item,index)=>{
-				let itemdata = item.workflowactivity.subject[0];
+				let itemdata = item.subject[0];
 				let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
 				let itemtreedatasource = itemdata.treedataSource ? JSON.parse(itemdata.treedataSource) : null;
 				let itemarrange = {
 					index:index+1,
-					id:item.workflowactivity.id,
+					id:item.id,
 					section: itemdata.section?JSON.parse(itemdata.section):'',
 					sectionName: itemdata.sectionName?JSON.parse(itemdata.sectionName):'',
 					projectName: itemdata.projectName?JSON.parse(itemdata.projectName):'',
 					type: itempostdata.type,
 					numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
-					submitperson:item.workflowactivity.creator.person_name,
-					submittime:item.workflowactivity.real_start_time,
-					status:item.workflowactivity.status,
-					superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+					submitperson:item.creator.person_name,
+					submittime:item.real_start_time,
+					status:item.status,
+					// superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
 					timedate:itemdata.timedate?JSON.parse(itemdata.timedate):'',
 					stagedocument:itemdata.stagedocument?JSON.parse(itemdata.stagedocument):'',
 					TreedataSource:itemtreedatasource,
@@ -111,102 +113,124 @@ class Stagereporttab extends Component {
 				totledata.push(itemarrange);
 			})
 			this.setState({
-				daydata:totledata
+				stagedata:totledata
 			},()=>{
                 this.filterTask()
             })
 		}
 	}
-	    //对流程信息根据选择项目进行过滤
-		filterTask(){
-			const {
-				daydata 
-			}=this.state
-			const{
-				leftkeycode
-			}=this.props
-			let filterData = []
-			let user = getUser()
-			console.log('user',user)
-			let sections = user.sections
-			console.log('sections',sections)
-			sections = JSON.parse(sections)
+	//对流程信息根据选择项目进行过滤
+	filterTask(){
+		const {
+			stagedata 
+		}=this.state
+		const{
+			leftkeycode
+		}=this.props
+		let filterData = []
+		let user = getUser()
+		
+		let sections = user.sections
+		
+		sections = JSON.parse(sections)
+		
+		let selectCode = ''
+		//关联标段的人只能看自己项目的进度流程
+		if(sections && sections instanceof Array && sections.length>0){
+			let code = sections[0].split('-')
+			selectCode = code[0] || ''
+		}else{
+			//不关联标段的人可以看选择项目的进度流程
+			selectCode = leftkeycode
+		}      
+		
+		stagedata.map((task)=>{
 			
-			let selectCode = ''
-			//关联标段的人只能看自己项目的进度流程
-			if(sections && sections instanceof Array && sections.length>0){
-				let code = sections[0].split('-')
-				selectCode = code[0] || ''
-			}else{
-				//不关联标段的人可以看选择项目的进度流程
-				selectCode = leftkeycode
-			}      
-			console.log('selectCode',selectCode)
-			daydata.map((task)=>{
-				console.log('task',task)
-				let projectName = task.projectName
-				let projectCode = this.getProjectCode(projectName)
-				if(projectCode === selectCode){
-					filterData.push(task);
-				}
-			})
-			console.log('filterData',filterData)
-			this.setState({
-				filterData
-			})
-		}
-		//获取项目code
-		getProjectCode(projectName){
-			let projectCode = ''
-			PROJECT_UNITS.map((item)=>{
-				if(projectName === item.value){
-					projectCode = item.code
-				}
-			})
-			console.log('projectCode',projectCode)
-			return projectCode 
-		}
-	//获取当前登陆用户的标段
-    getSection(){
+			let projectName = task.projectName
+			let projectCode = this.getProjectCode(projectName)
+			
+			
+			if(projectCode === selectCode){
+				filterData.push(task);
+			}
+		})
+		
+		this.setState({
+			filterData
+		})
+	}
+	//获取项目code
+	getProjectCode(projectName){
+		let projectCode = ''
+		PROJECT_UNITS.map((item)=>{
+			if(projectName === item.value){
+				projectCode = item.code
+			}
+		})
+		
+		return projectCode 
+	}
+	 //获取当前登陆用户的标段
+	 getSection(){
         let user = getUser()
-        console.log('user',user)
+        
         let sections = user.sections
         let sectionSchedule = []
-        let sectionName = ''
+        let currentSectionName = ''
         let projectName = ''
-        console.log('sections',sections)
+        
         sections = JSON.parse(sections)
         if(sections && sections instanceof Array && sections.length>0){
-            sections.map((section)=>{
-                let code = section.split('-')
-                if(code && code.length === 3){
-                    //获取当前标段的名字
-                    SECTIONNAME.map((item)=>{
-                        if(code[2] === item.code){
-                            sectionName = item.name
-                        }
-                    })
-                    //获取当前标段所在的项目
-                    PROJECT_UNITS.map((item)=>{
-                        if(code[0] === item.code){
-                            projectName = item.value
-                        }
-                    })
-                }
-                sectionSchedule.push({
-                    value:section,
-                    name:sectionName
+            let section = sections[0]
+            console.log('section',section)
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        currentSectionName = item.name
+                    }
                 })
-
-               
-            })
-            
-			console.log('sectionSchedule',sectionSchedule)
-			console.log('projectName',projectName)
+                //获取当前标段所在的项目
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        projectName = item.value
+                    }
+                })
+            }
+            console.log('section',section)
+            console.log('currentSectionName',currentSectionName)
+            console.log('projectName',projectName)
             this.setState({
-                sectionSchedule,
-                projectName
+                currentSection:section,
+                currentSectionName:currentSectionName,
+                projectName:projectName
             })
+            // sections.map((section)=>{
+            //     let code = section.split('-')
+            //     if(code && code.length === 3){
+            //         //获取当前标段的名字
+            //         SECTIONNAME.map((item)=>{
+            //             if(code[2] === item.code){
+            //                 sectionName = item.name
+            //             }
+            //         })
+            //         //获取当前标段所在的项目
+            //         PROJECT_UNITS.map((item)=>{
+            //             if(code[0] === item.code){
+            //                 projectName = item.value
+            //             }
+            //         })
+            //     }
+            //     sectionSchedule.push({
+            //         value:section,
+            //         name:sectionName
+            //     })
+            // })
+            // this.setState({
+            //     sectionSchedule,
+            //     projectName
+            // })
         }
     }
 	//获取当前登陆用户的标段的下拉选项
@@ -226,7 +250,8 @@ class Stagereporttab extends Component {
 		const { 
 			selectedRowKeys, 
 			sectionSchedule=[],
-			filterData
+			filterData,
+			currentSectionName
 		} = this.state;
 		const {
             form: { getFieldDecorator },
@@ -239,7 +264,7 @@ class Stagereporttab extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		}
-		let sectionOption = this.getSectionOption()
+		// let sectionOption = this.getSectionOption()
 		return (
 			<div>
 				{
@@ -279,13 +304,15 @@ class Stagereporttab extends Component {
 											<FormItem {...FormItemLayout} label='标段'>
 											{
 													getFieldDecorator('Ssection', {
-														rules: [
-															{ required: true, message: '请选择标段' }
-														]
-													})
-														(<Select placeholder='请选择标段' allowClear>
-														{sectionOption}
-													</Select>)
+														initialValue: {currentSectionName},
+                                                        rules: [
+                                                            { required: true, message: '请输入标段' }
+                                                        ]
+                                                    })
+                                                        // (<Select placeholder='请选择标段' allowClear>
+                                                        //     {sectionOption}
+                                                        // </Select> )
+                                                        (<Input readOnly placeholder='请输入标段' />)
 												}
 											</FormItem>
 										</Col>
@@ -329,7 +356,7 @@ class Stagereporttab extends Component {
 											</FormItem>
 										</Col>
 									</Row>
-									<Row>
+									{/* <Row>
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='监理单位'>
                                                 {
@@ -342,7 +369,7 @@ class Stagereporttab extends Component {
                                                 }
                                             </FormItem>
 										</Col>
-									</Row>
+									</Row> */}
 									<Row>
 										<Table
 											columns={this.columns1}
@@ -395,7 +422,7 @@ class Stagereporttab extends Component {
         if (memberInfo) {
             let memberValue = memberInfo.toString().split('#');
             if (memberValue[0] === 'C_PER') {
-                console.log('memberValue', memberValue)
+                
                 this.member = {
                     "username": memberValue[4],
                     "person_code": memberValue[1],
@@ -410,7 +437,7 @@ class Stagereporttab extends Component {
 
         setFieldsValue({
             SdataReview: this.member,
-            Ssuperunit:this.member.org
+            // Ssuperunit:this.member.org
         });
 	}
 	
@@ -428,7 +455,7 @@ class Stagereporttab extends Component {
                 })
 			}
 		}
-		console.log('sectionName',sectionName)
+		
 		return sectionName 
     }
 	// 发起填报
@@ -443,7 +470,9 @@ class Stagereporttab extends Component {
 		} = this.props
 		const{
 			treedataSource,
-			projectName
+			projectName,
+			currentSectionName,
+			currentSection
 		} = this.state
 		let user = getUser();//当前登录用户
 		let me = this;
@@ -451,8 +480,8 @@ class Stagereporttab extends Component {
         let postData = {};
         //专业信息
         let attrs = {};
-        console.log("登录用户",user)
-		console.log("表格信息",treedataSource)
+        
+		
 		me.props.form.validateFields((err,values)=>{
 			console.log("表单信息",values);
 			if(!err){
@@ -460,7 +489,7 @@ class Stagereporttab extends Component {
 				postData.type = '每日实际进度';
                 postData.upload_person = user.name?user.name:user.username;
 				postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
-				console.log("postData",postData)
+				
 				const currentUser = {
                     "username": user.username,
                     "person_code": user.code,
@@ -468,12 +497,12 @@ class Stagereporttab extends Component {
                     "id": parseInt(user.id)
 				};
 
-				let sectionName = me.getSectionName(values.Ssection)
+				// let sectionName = me.getSectionName(values.Ssection)
 				let subject = [{
-					"section": JSON.stringify(values.Ssection),
+					"section": JSON.stringify(currentSection),
 					"projectName":JSON.stringify(projectName),
-					"sectionName":JSON.stringify(sectionName),
-					"superunit": JSON.stringify(values.Ssuperunit),
+					"sectionName":JSON.stringify(currentSectionName),
+					// "superunit": JSON.stringify(values.Ssuperunit),
 					"dataReview": JSON.stringify(values.SdataReview),
 					"numbercode": JSON.stringify(values.Snumbercode),
 					"timedate": JSON.stringify(moment(values.Stimedate._d).format('YYYY-MM-DD')),
@@ -500,7 +529,7 @@ class Stagereporttab extends Component {
 				}
 				//创建流程
 				createFlow({},workflowdata).then((instance)=>{
-                    console.log("instance",instance)
+                    
                     if(!instance.id){
                         notification.error({
                             message:'数据提交失败',
@@ -515,7 +544,7 @@ class Stagereporttab extends Component {
                         if(instance && instance.current){
                             let currentStateId = instance.current[0].id;
                             let nextStates = getNextStates(instance,currentStateId);
-                            console.log('nextStates',nextStates)
+                            
                             let stateid = nextStates[0].to_state[0].id;
 
                             let postInfo={
@@ -572,15 +601,15 @@ class Stagereporttab extends Component {
 			canDelete:true
 		}
 		treedataSource.push(addtree);
-		console.log('treedataSource', treedataSource)
+		
 		this.setState({ treedataSource })
 	}
 	
 	//下拉框选择变化
 	handleSelect(record, project, value) {
         const { treedataSource } = this.state;
-        console.log('record','project','value',record, project, value)
-        console.log('treedataSource',treedataSource)
+        
+        
         value = JSON.parse(value);
         record[project] = value.TreeTypeName;
 	}
@@ -589,8 +618,8 @@ class Stagereporttab extends Component {
 		const{
 			treedataSource
 		}=this.state
-		console.log('index',index)
-		console.log('record',record)
+		
+		
         treedataSource.splice(record.key,1)
 
         for(let i=0;i<treedataSource.length;i++){
@@ -674,8 +703,8 @@ class Stagereporttab extends Component {
 			key:Math.random()
 		})
 		this.props.form.setFieldsValue({
-			Ssuperunit: undefined,
-			Ssection: undefined,
+			// Ssuperunit: undefined,
+			Ssection: this.state.currentSectionName || undefined,
 			SdataReview: undefined,
 			Snumbercode: undefined,
 			Stimedate: undefined

@@ -352,7 +352,7 @@ export default class HiddenDanger extends Component {
                                     ></Input.Search>
                                 </Col>
                                 <Col span={6} >
-                                    <div style={{ width: '80%', marginLeft:'10%'}} >
+                                    <div style={{ width: '90%', marginLeft:'10%'}} >
                                         <span style={{ fontSize: 16,marginRight:5 }}>状态</span>
                                         <Select
                                             defaultValue=''

@@ -26,7 +26,7 @@ export default class System extends Component {
 			</Aside>
 			<Main>
 				<ContainerRouters menus={System.menus} containers={this.state}/>
-				<Redirect path="/" to={{pathname: '/system/person'}} />
+{/*				<Redirect path="/" to={{pathname: '/system/person'}} />*/}
 			</Main>
 			</Body>);
 	}

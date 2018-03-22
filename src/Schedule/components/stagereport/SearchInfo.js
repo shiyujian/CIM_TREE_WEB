@@ -24,7 +24,7 @@ export default class SearchInfo extends Component {
                 <Row>
                     <Col span={20}>
                         <Row>
-                            <Col span={8}>
+                            <Col span={12}>
                                 <FormItem {...SearchInfo.layout} label='单位工程'>
                                     {
                                         getFieldDecorator('sunitproject', {
@@ -38,7 +38,7 @@ export default class SearchInfo extends Component {
                                     }
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
+                            <Col span={12}>
                                 <FormItem {...SearchInfo.layout} label='编号'>
                                     {
                                         getFieldDecorator('snumbercode', {
@@ -50,21 +50,9 @@ export default class SearchInfo extends Component {
                                     }
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
-                                <FormItem {...SearchInfo.layout} label='监理单位'>
-                                    {
-                                        getFieldDecorator('ssuperunit', {
-                                            rules: [
-                                                { required: false, message: '请输入监理单位' }
-                                            ]
-                                        })
-                                            (<Input placeholder='请输入监理单位' />)
-                                    }
-                                </FormItem>
-                            </Col>
                         </Row>
                         <Row>
-                            <Col span={8}>
+                            <Col span={12}>
                                 <FormItem {...SearchInfo.layout} label='日期'>
                                     {
                                         getFieldDecorator('stimedate', {
@@ -76,7 +64,7 @@ export default class SearchInfo extends Component {
                                     }
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
+                            <Col span={12}>
                                 <FormItem {...SearchInfo.layout} label='流程状态'>
                                     {
                                         getFieldDecorator('sstatus', {
