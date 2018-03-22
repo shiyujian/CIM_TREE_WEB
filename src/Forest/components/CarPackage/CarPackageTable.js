@@ -130,6 +130,13 @@ export default class CarPackageTable extends Component {
 		},{
 			title:"苗木规格",
 			dataIndex: 'Standard',
+			render:(text) => {
+				if(text === ''){
+					return <p> / </p>
+				}else{
+					return <p>{text}</p>
+				}
+			}
 		},{
 			title:"创建时间",
 			render: (text,record) => {
