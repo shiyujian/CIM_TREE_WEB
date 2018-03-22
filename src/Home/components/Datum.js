@@ -5,6 +5,7 @@ import moment from 'moment';
 import { base, PDF_FILE_API } from '_platform/api';
 import { Link } from 'react-router-dom';
 import styles from './styles.less';
+import { getUser, clearUser, getPermissions, removePermissions } from '../../_platform/auth';
 
 
 export default class Datum extends Component {
@@ -32,10 +33,17 @@ export default class Datum extends Component {
 		// 	setnewdoc(a)
 		// });
 
-		const { actions: { getNewsList,getTasks} } = this.props;
-		console.log('this.props',this.props)
-		getNewsList();
-		getTasks();
+		// const { actions: { getNewsList,getTasks} } = this.props;
+		// console.log('this.props',this.props)
+		// getNewsList();
+		// getTasks();
+
+		const { actions: { getTaskPerson} } = this.props;
+		const { username = '', name = '',id = '', } = getUser();
+		let user=getUser();
+        getTaskPerson({userid:user.id});
+        let ttt =getTaskPerson({userid:user.id});
+        console.log('ttt',ttt)
 
 	}
 
@@ -81,8 +89,8 @@ export default class Datum extends Component {
 	columns = [
 		{
 			title: '任务标题',
-			dataIndex: 'name',
-			key: 'name',
+			dataIndex: 'workflowactivity.workflow.name',
+			key: 'workflowactivity.workflow.name',
 			width: 400
 		},
 
@@ -99,10 +107,12 @@ export default class Datum extends Component {
 		{
 			title: '操作',
 			width: 100,
-			render: record => {
+			render(record){
+				console.log('rrrr',record)
 				return (
 					<span>
-						<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>
+						{/*<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>*/}
+						<Link to={"/selfcare/task/198?state_id="+record.workflowactivity.current[0].id}><span>查看</span></Link>
 					</span>
 				)
 			}
@@ -120,21 +130,28 @@ export default class Datum extends Component {
 
 
 	render() {
-		const { platform: { tasks = [] } } = this.props;
-		// const { task = [] } = this.props;
-		console.log('task222',tasks)
-
+		// const { tasks=[] } = this.props;
+		const {
+			home: {
+				datum: {
+					usertasks = []
+				} ={}
+			} = {}
+		}=this.props
+		// const { platform: { tasks = [] } } = this.props;
+		console.log('task222',this.props.usertasks)
 		return (
 			<Blade title="待办任务">
 			<Link to='/selfcare'>
 					<span style={{ float: "right", marginTop: "-30px" }} >MORE</span>
 				</Link>
+				<div style={{marginBottom:'14px',marginTop:'-9px'}}><hr/></div>
 				<div className="tableContainer">
 					<Table
-						bordered={false}
-						dataSource={tasks}
+						bordered={true}
+						dataSource={this.props.usertasks}
 						columns={this.columns}
-						rowKey="pk" size="small" pagination={{ pageSize: 8 }} />
+						rowKey="pk"  pagination={{ pageSize: 8 }} />
 				</div>
 
 				<Modal title="预览" width={800} visible={this.state.visible}

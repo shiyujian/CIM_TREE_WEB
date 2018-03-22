@@ -145,7 +145,10 @@ class Filter extends Component {
 
 	componentDidMount(){
 		const {actions:{getTasksList}} = this.props;
+		let ttt=getTasksList();
+		console.log('ttt',ttt)
 		getTasksList().then(rst => {
+			console.log('rst',rst)
 			if(rst.length){
 				const taskNameArr = [];
 				const newTaskNameArr = [];
