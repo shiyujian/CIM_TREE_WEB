@@ -40,49 +40,40 @@ export default class Stage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            treetypeoption: [],
             treetyoption: [],
-            treetypelist: [],
             treeLists: [],
-            sectionoption: [],
             leftkeycode: '',
         };
     }
 
-    componentDidMount() {
-        const {actions: {getTreeList,getTreeNodeList,gettreetype,getProjectList}, treetypes,platform:{tree = {}}} = this.props; 
+    async componentDidMount() {
+        const {actions: {getTreeList,getTreeNodeList,getProjectList,getScheduleTaskList}, treetypes,platform:{tree = {}}} = this.props; 
     
-        if(!tree.projectList){
-            getProjectList()
+        if(!tree.scheduleTaskList){
+            let data = await getScheduleTaskList()
+            if(data && data instanceof Array && data.length>0){
+                data = data[0]
+                let leftkeycode = data.No? data.No :''
+                this.setState({
+                    leftkeycode
+                })
+            }
         }
-        this.setState({
-            leftkeycode:"P009"
-        })
+        // this.setState({
+        //     leftkeycode:"P009"
+        // })
         //类型
-        let treetyoption = [
-            <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={'1'}>常绿乔木</Option>,
-            <Option key={'2'} value={'2'}>落叶乔木</Option>,
-            <Option key={'3'} value={'3'}>亚乔木</Option>,
-            <Option key={'4'} value={'4'}>灌木</Option>,
-            <Option key={'5'} value={'5'}>草本</Option>,
-        ];
-        this.setState({ treetyoption })
     }
 
     render() {
         const { keycode } = this.props;
         const {
-            treetypeoption,
-            treetypelist,
-            treetyoption,
-            sectionoption,
             leftkeycode,
         } = this.state;
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.projectList){
-            treeList = tree.projectList
+        if(tree.scheduleTaskList){
+            treeList = tree.scheduleTaskList
         }
         console.log('tree',tree)
         return (

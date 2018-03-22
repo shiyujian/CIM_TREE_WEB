@@ -9,6 +9,8 @@ export const getLittleClassOK = createAction('获取森林大数据树小班细�
 export const getLittleClass = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`,[getLittleClassOK])
 export const getProjectListOK = createAction('获取进度管理左侧项目工程节点信息')
 export const getProjectList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getProjectListOK]); //    √
+export const getScheduleTaskListOK = createAction('获取进度管理流程填报根据标段筛选左侧项目工程节点信息')
+export const getScheduleTaskList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getScheduleTaskListOK]); //    √
 
 
 export default handleActions({
@@ -73,6 +75,35 @@ export default handleActions({
 		return {
 			...state,
 			projectList: root
+		}
+	},
+	[getScheduleTaskListOK]: (state, {payload}) => {
+		let user = getUser();
+		if(JSON.parse(user.sections).length === 0){
+			let nodeLevel = [];
+			let root = [];
+			if (payload instanceof Array && payload.length > 0) {
+				root = payload.filter(node => {
+					return node.Type === '项目工程' && nodeLevel.indexOf(node.No)===-1 && nodeLevel.push(node.No);
+				})
+			}
+			return {
+				...state,
+				scheduleTaskList: root
+			}
+		}else{
+			let sections = JSON.parse(user.sections);
+			let proj = sections[0].substr(0,4);
+			let root = [];
+			if (payload instanceof Array && payload.length > 0) {
+				root = payload.filter(node => {
+					return node.Type === '项目工程' && node.No === proj;
+				})
+			}
+			return {
+				...state,
+				scheduleTaskList: root
+			}
 		}
 	},
 	[getLittleClassOK]: (state, {payload}) => {

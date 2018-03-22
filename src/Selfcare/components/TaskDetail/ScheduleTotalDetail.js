@@ -105,7 +105,7 @@ class ScheduleTotalDetail extends Component {
 								</FormItem>
 							</Col>
 						</Row>
-						<Row gutter={15}>
+						{/* <Row gutter={15}>
 							<Col span={8}>
 								<FormItem  {...ScheduleTotalDetail.layout} label="监理单位:">
 								{getFieldDecorator('totlesuperunit', {
@@ -116,7 +116,7 @@ class ScheduleTotalDetail extends Component {
                                 })(<Input readOnly />)}
 								</FormItem>
 							</Col>
-						</Row>
+						</Row> */}
 					</Col>
 				</Row>
 				<Row gutter={24}>
@@ -144,7 +144,7 @@ class ScheduleTotalDetail extends Component {
             'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
 			'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
 			'totledocument':subject.totledocument?JSON.parse(subject.totledocument):'',
-			'superunit':subject.superunit?JSON.parse(subject.superunit):''
+			// 'superunit':subject.superunit?JSON.parse(subject.superunit):''
         }
 		return record
 	}

@@ -192,7 +192,7 @@ class ScheduleTotalRefill extends Component {
                                             }
                                         </FormItem>
                                     </Col>
-                                    <Col span={10}>
+                                    {/* <Col span={10}>
                                         <FormItem {...FormItemLayout} label='监理单位'>
                                             {
                                                 getFieldDecorator('superunit', {
@@ -203,7 +203,7 @@ class ScheduleTotalRefill extends Component {
                                                     (<Input placeholder='系统自动识别，无需手输' readOnly/>)
                                             }
                                         </FormItem>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                                 <Row>
                                     <Dragger
@@ -369,7 +369,7 @@ class ScheduleTotalRefill extends Component {
                     "section": JSON.stringify(values.section),
                     "sectionName":JSON.stringify(sectionName),
                     "projectName":JSON.stringify(projectName),
-					"superunit": JSON.stringify(values.superunit),
+					// "superunit": JSON.stringify(values.superunit),
 					"dataReview": JSON.stringify(values.dataReview),
 					"numbercode": JSON.stringify(values.numbercode),
 					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
@@ -479,7 +479,7 @@ class ScheduleTotalRefill extends Component {
 
         setFieldsValue({
             dataReview: this.member,
-            superunit: this.member.org
+            // superunit: this.member.org
         });
     }
 

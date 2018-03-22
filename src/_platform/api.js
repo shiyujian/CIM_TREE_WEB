@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-20 09:43:27
+ * @Last Modified time: 2018-03-21 21:50:24
  */
 /**
 *
@@ -179,6 +179,7 @@ export const WORKFLOW_CODE = {
 	'苗木资料报批流程': 'TEMPLATE_006',
 	'每日进度计划填报流程': 'TEMPLATE_007',
 	'检验批验收审批流程': 'TEMPLATE_008',
+	'安全体系报批流程': 'TEMPLATE_009'
 	// '现场安全隐患排查工作流程': 'TEMPLATE_002',
 	// '分部验收流程': 'TEMPLATE_003',
 	// '周报填写流程': 'TEMPLATE_004',
