@@ -80,13 +80,13 @@ export const tree_menus = [{
 	key: 'system',
 	id: 'SYSTEM',
 	title: '系统设置',
-	path: '/system',
+	path: '/system/person',
 	icon: <Icon name="cogs"/>
 }, {
 	key: 'project',
 	id: 'PROJECT',
 	title: '项目管理',
-	path: '/project',
+	path: '/project/nurserymanagement',
 	icon: <Icon name="cogs"/>
 }];
 
