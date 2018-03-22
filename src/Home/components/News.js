@@ -147,11 +147,13 @@ export default class News extends Component {
 						<TabPane tab="新闻" key="1">
 							<Table dataSource={newsList}
 								columns={this.columns}
+								bordered={true}
 								rowKey="id" />
 						</TabPane>
 						<TabPane tab="通知" key="2">
 							<Table dataSource={tipsList}
 								columns={this.draftColumns}
+								bordered={true}
 								rowKey="id" />
 						</TabPane>
 					</Tabs>
