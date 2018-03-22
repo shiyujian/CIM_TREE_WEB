@@ -64,11 +64,11 @@ export default class Overall extends Component {
 		name: '表单管理',
 		icon: <Icon name="file-text"/>,
 	},
-	{
+/*	{
 		key: 'attend',
 		id: 'OVERALL.CHECKIN',
 		path: '/overall/attend',
 		name: '考勤管理',
 		icon: <Icon name="user-o"/>,
-	}]
+	}*/]
 }

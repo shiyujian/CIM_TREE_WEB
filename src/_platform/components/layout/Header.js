@@ -89,6 +89,7 @@ export default class Header extends Component {
 										str=str.match(/appmeta(\S*).READ/)[1] || '';
 										str=str.replace(/\./g,"/").toLowerCase();
 										menu.path=str;
+										console.log('path',menu.path)
 									}
 								}
 

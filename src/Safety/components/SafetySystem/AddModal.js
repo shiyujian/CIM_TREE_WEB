@@ -8,6 +8,7 @@ import { getUser } from '../../../_platform/auth';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import { getNextStates } from '../../../_platform/components/Progress/util';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -18,10 +19,11 @@ class AddModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            sectionSchedule:[], //当前用户的标段信息
             file:'',
             projectName:'', //当前用户的项目信息
-            filterData:[], //对流程信息根据项目进行过滤
+			currentSection:'',
+			currentSectionName:'',
+			projectName:''
         };
     }
 	async componentDidMount() {
@@ -35,18 +37,12 @@ class AddModal extends Component {
 			addVisible,
         } = this.props;
 		const { 
-            selectedRowKeys,
-            sectionSchedule=[],
-            filterData,
-            TotleModaldata
+			currentSectionName
         } = this.state;
 		const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 },
         }
-		
-
-		let sectionOption = this.getSectionOption()
 
 		return (
 			<Modal title="新增文档"
@@ -64,13 +60,12 @@ class AddModal extends Component {
 									<FormItem {...FormItemLayout} label='标段'>
 										{
 											getFieldDecorator('Safesection', {
+												initialValue: `${currentSectionName?currentSectionName:''}`,
 												rules: [
 													{ required: true, message: '请选择标段' }
 												]
 											})
-												(<Select placeholder='请选择标段' >
-													{sectionOption}
-												</Select> )
+												(<Input readOnly placeholder='请输入标段' />)	
 										}
 									</FormItem>
 								</Col>
@@ -168,8 +163,136 @@ class AddModal extends Component {
 		AddVisible(false);
 	}
 	sendWork(){
-		const { actions: { AddVisible } } = this.props;
-		AddVisible(false);
+		const {
+            actions: {
+                createFlow,
+                getWorkflowById,
+				putFlow,
+				AddVisible,
+				getTaskSafety
+            },
+            location,
+        } = this.props
+        const {
+            projectName,
+            currentSectionName,
+			currentSection,
+			file
+		} = this.state
+
+		let me = this;
+        //共有信息
+		let postData = {};
+		let user = getUser();//当前登录用户
+        let sections = user.sections || []
+        if(!sections || sections.length === 0 ){
+            notification.error({
+                message:'当前用户未关联标段，不能创建流程',
+                duration:3
+            })
+            return
+		}
+		
+		me.props.form.validateFields((err, values) => {
+			if (!err) {
+				postData.upload_unit = user.org ? user.org : '';
+                postData.type = '安全体系';
+                postData.upload_person = user.name ? user.name : user.username;
+                postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
+
+                 
+                const currentUser = {
+                    "username": user.username,
+                    "person_code": user.code,
+                    "person_name": user.name,
+                    "id": parseInt(user.id)
+				};
+				
+				let subject = [{
+                    "section": JSON.stringify(currentSection),
+                    "sectionName":JSON.stringify(currentSectionName),
+					"projectName":JSON.stringify(projectName),
+					"Safename": JSON.stringify(values.Safename),
+					"dataReview": JSON.stringify(values.SafedataReview),
+					"numbercode": JSON.stringify(values.Safenumbercode),
+					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
+					"document": JSON.stringify(values.Safedocument),
+					"postData": JSON.stringify(postData),
+                    "file": JSON.stringify(file),
+                    
+				}];
+				
+				const nextUser = this.member;
+                let WORKFLOW_MAP = {
+                    name: "安全体系报批流程",
+                    desc: "安全管理模块安全体系报批流程",
+                    code: WORKFLOW_CODE.安全体系报批流程
+                };
+                let workflowdata = {
+                    name: WORKFLOW_MAP.name,
+                    description: WORKFLOW_MAP.desc,
+                    subject: subject,
+                    code: WORKFLOW_MAP.code,
+                    creator: currentUser,
+                    plan_start_time: null,
+                    deadline: null,
+                    "status": 2
+				}
+				
+				createFlow({}, workflowdata).then((instance) => {
+                    if (!instance.id) {
+                        notification.error({
+                            message: '数据提交失败',
+                            duration: 2
+                        })
+                        return;
+                    }
+                    const { id, workflow: { states = [] } = {} } = instance;
+                    const [{ id: state_id, actions: [action] }] = states;
+
+                    getWorkflowById({ id: id }).then(instance => {
+                        if (instance && instance.current) {
+                            let currentStateId = instance.current[0].id;
+                            let nextStates = getNextStates(instance, currentStateId);
+                            let stateid = nextStates[0].to_state[0].id;
+
+                            let postInfo = {
+                                next_states: [{
+                                    state: stateid,
+                                    participants: [nextUser],
+                                    deadline: null,
+                                    remark: null
+                                }],
+                                state: instance.workflow.states[0].id,
+                                executor: currentUser,
+                                action: nextStates[0].action_name,
+                                note: "提交",
+                                attachment: null
+                            }
+                            let data = { pk: id };
+                            //提交流程到下一步
+                            putFlow(data, postInfo).then(rst => {
+                                if (rst && rst.creator) {
+                                    notification.success({
+                                        message: '流程提交成功',
+                                        duration: 2
+									});
+									getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程})
+                                    // this.gettaskSchedule();//重新更新流程列表
+                                    AddVisible(false);
+                                } else {
+                                    notification.error({
+                                        message: '流程提交失败',
+                                        duration: 2
+                                    });
+                                    return;
+                                }
+                            });
+                        }
+                    });
+                });
+			}
+		})
 	}
 
 	 //选择人员
@@ -196,7 +319,7 @@ class AddModal extends Component {
         }
 
         setFieldsValue({
-            TdataReview: this.member
+            SafedataReview: this.member
         });
     }
 
@@ -216,6 +339,7 @@ class AddModal extends Component {
 				console.log('fileList',fileList)
 				console.log('event',event)
 				this.setState({file:file});
+
             }else if(status === 'error'){
 				this.setState({file:null});
 				notification.error({
@@ -246,53 +370,67 @@ class AddModal extends Component {
 	}
 	//获取当前登陆用户的标段
 	getSection(){
-        let user = getUser()
-        
-        let sections = user.sections
-        let sectionSchedule = []
-        let sectionName = ''
-        let projectName = ''
-        
-        sections = JSON.parse(sections)
-        if(sections && sections instanceof Array && sections.length>0){
-            sections.map((section)=>{
-                let code = section.split('-')
-                if(code && code.length === 3){
-                    //获取当前标段的名字
-                    SECTIONNAME.map((item)=>{
-                        if(code[2] === item.code){
-                            sectionName = item.name
-                        }
-                    })
-                    //获取当前标段所在的项目
-                    PROJECT_UNITS.map((item)=>{
-                        if(code[0] === item.code){
-                            projectName = item.value
-                        }
-                    })
-                }
-                sectionSchedule.push({
-                    value:section,
-                    name:sectionName
-                })
-            })
-            this.setState({
-                sectionSchedule,
-                projectName
-            })
-        }
-    }
-	//获取当前登陆用户的标段的下拉选项
-    getSectionOption(){
-        const{
-            sectionSchedule
-        } = this.state
-        let option = []
-        sectionSchedule.map((section)=>{
-            option.push(<Option key={section.value} value={section.value}>{section.name}</Option>)
-        })
-        return option
-    }   
+		let user = getUser()
+		
+		let sections = user.sections
+		let sectionSchedule = []
+		let currentSectionName = ''
+		let projectName = ''
+		
+		sections = JSON.parse(sections)
+		if(sections && sections instanceof Array && sections.length>0){
+			let section = sections[0]
+			console.log('section',section)
+			let code = section.split('-')
+			if(code && code.length === 3){
+				//获取当前标段的名字
+				SECTIONNAME.map((item)=>{
+					if(code[2] === item.code){
+						currentSectionName = item.name
+					}
+				})
+				//获取当前标段所在的项目
+				PROJECT_UNITS.map((item)=>{
+					if(code[0] === item.code){
+						projectName = item.value
+					}
+				})
+			}
+			console.log('section',section)
+			console.log('currentSectionName',currentSectionName)
+			console.log('projectName',projectName)
+			this.setState({
+				currentSection:section,
+				currentSectionName:currentSectionName,
+				projectName:projectName
+			})
+			// sections.map((section)=>{
+			//     let code = section.split('-')
+			//     if(code && code.length === 3){
+			//         //获取当前标段的名字
+			//         SECTIONNAME.map((item)=>{
+			//             if(code[2] === item.code){
+			//                 sectionName = item.name
+			//             }
+			//         })
+			//         //获取当前标段所在的项目
+			//         PROJECT_UNITS.map((item)=>{
+			//             if(code[0] === item.code){
+			//                 projectName = item.value
+			//             }
+			//         })
+			//     }
+			//     sectionSchedule.push({
+			//         value:section,
+			//         name:sectionName
+			//     })
+			// })
+			// this.setState({
+			//     sectionSchedule,
+			//     projectName
+			// })
+		}
+	}
 
 	_cpoyMsgT(){
 
