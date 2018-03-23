@@ -53,7 +53,13 @@ class ScheduleDayRefill extends Component {
                     return text
                 }else{
                     return (
-                        <Select style={{ width: '200px' }} placeholder='请选择树种' onSelect={this.handleSelect.bind(this, record, 'project')}>
+						<Select
+						 showSearch
+						 optionFilterProp='children'
+						 filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+						 style={{ width: '200px' }} 
+						 placeholder='请选择树种' 
+						 onChange={this.handleSelect.bind(this, record, 'project')}>
                             {
                                 this.state.treetype
                             }
@@ -97,7 +103,7 @@ class ScheduleDayRefill extends Component {
 		}
 	];
     
-    componentDidMount() {
+    async componentDidMount() {
 		const { 
             actions: { 
                 gettreetype 
@@ -107,51 +113,24 @@ class ScheduleDayRefill extends Component {
             },
             platform: { task = {}, users = {} } = {}, 
         } = this.props;
-		// let treedata = [
-        //     {
-        //         key:0,
-        //         project: '便道施工',
-        //         units: 'm',
-        //         canDelete: false
-        //     }, {
-        //         key:1,
-        //         project: '给排水沟槽开挖',
-        //         units: 'm',
-        //         canDelete: false
-        //     }, {
-        //         key:2,
-        //         project: '给排水管道安装',
-        //         units: 'm',
-        //         canDelete: false
-        //     }, {
-        //         key:3,
-        //         project: '给排水回填',
-        //         units: 'm',
-        //         canDelete: false
-        //     }, {
-        //         key:4,
-        //         project: '绿地平整',
-        //         units: '亩',
-        //         canDelete: false
-        //     }, {
-        //         key:5,
-        //         project: '种植穴工程',
-        //         units: '个',
-        //         canDelete: false
-        //     },
-        // ];
-		// this.setState({
-		// 	treedataSource: treedata
-		// })
-		gettreetype({})
-			.then(rst => {
-				let treetype = rst.map((o, index) => {
-					return (
-						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeName}</Option>
-					)
-				})
-				this.setState({ treetype });
-            })
+
+		let treelist = await gettreetype({})	
+		let arr = []
+		let treetype = TREETYPENO.map((forest)=>{
+			arr = treelist.filter(tree => tree.TreeTypeNo.substr(0,1) === forest.id )
+			return (<OptGroup label={forest.name}>
+				{
+					arr.map(tree => {
+						// let code = tree.TreeTypeNo.substr(0, 1)
+						// if(forest.id === code){
+							return (<Option key={tree.id} value={JSON.stringify(tree)}>{tree.TreeTypeName}</Option>)
+						// }
+					})
+				}
+			</OptGroup>)
+		})
+		console.log('treetype',treetype)
+		this.setState({ treetype });
         this.getSection()
         let record = {}
 		if(task && task.subject && !record.id){

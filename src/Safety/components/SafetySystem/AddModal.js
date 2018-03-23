@@ -130,6 +130,12 @@ class AddModal extends Component {
 							</Dragger>
 						</Col>
 					</Row>
+					<Table
+						columns={this.columns1}
+						pagination={true}
+						dataSource={this.state.TreatmentData}
+						className='foresttable'
+					/>
 					<Row style={{ marginTop: 20}}>
 						<Col span={8} offset={4}>
 							<FormItem {...FormItemLayout} label='审核人'>
@@ -333,15 +339,43 @@ class AddModal extends Component {
 			
             const status = file.status;
             const { newFileLists } = this.state;
-            let newdata = [];
+			let newdata = [];
+			const{
+				TreatmentData = []
+			} = this.state
             if (status === 'done') {
 				console.log('file',file)
 				console.log('fileList',fileList)
 				console.log('event',event)
-				this.setState({file:file});
+
+				let len = TreatmentData.length
+				TreatmentData.push(
+					{
+						index: len + 1,
+                        fileName: file.name,
+                        file_id: file.response.id,
+                        file_partial_url: '/media' + file.response.a_file.split('/media')[1],
+                        send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                        a_file: '/media' + file.response.a_file.split('/media')[1],
+                        download_url: '/media' + file.response.download_url.split('/media')[1],
+                        misc: file.response.misc,
+                        mime_type: file.response.mime_type,
+					}
+				)
+				console.log('TreatmentData',TreatmentData)
+				notification.success({
+                    message:'文件上传成功',
+                    duration:3
+                })
+				this.setState({
+					TreatmentData:TreatmentData,
+					loading:false
+				});
 
             }else if(status === 'error'){
-				this.setState({file:null});
+				this.setState({
+                    loading:false
+                })
 				notification.error({
 					message: '文件上传失败',
 					duration: 2
@@ -349,25 +383,76 @@ class AddModal extends Component {
 				return;
 			}
         },
-    };
+	};
 	
-	changeDoc({ file, fileList, event }) {
-		const {
-            docs = [],
-			actions: { changeDocs }
-        } = this.props;
-		if (file.status === 'done') {
-			changeDocs([...docs, file]);
-		}
-		// this.setState({
-		// 	isUploading: file.status === 'done' ? false : true
-		// })
-		if (event) {
-			let { percent } = event;
-			// if (percent !== undefined)
-			// 	this.setState({ progress: parseFloat(percent.toFixed(1)) });
-		}
+	//删除文件表格中的某行
+	deleteTreatmentFile = (record, index) => {
+		const{
+			TreatmentData
+		}=this.state
+      
+		TreatmentData.splice(index, 1);
+		let array = []
+        TreatmentData.map((item, index) => {
+            let data = {
+				index: index + 1,
+				fileName: item.fileName,
+				file_id: item.file_id,
+				file_partial_url: item.file_partial_url,
+				send_time: item.send_time,
+				a_file: item.a_file,
+				download_url: item.download_url,
+				misc: item.misc,
+				mime_type: item.mime_type,
+            }
+            array.push(data)
+		})
+		console.log('array',array)
+        this.setState({TreatmentData: array })
 	}
+	
+	columns1 = [
+		{
+			title: '序号',
+			dataIndex: 'index',
+			key: 'index',
+			width: '10%',
+		}, {
+			title: '文件名称',
+			dataIndex: 'fileName',
+			key: 'fileName',
+			width: '35%',
+		}, {
+			title: '备注',
+			dataIndex: 'remarks',
+			key: 'remarks',
+			width: '30%',
+			render: (text, record, index) => {
+				return <Input value={record.remarks || ""} onChange={ele => {
+					record.remarks = ele.target.value
+					this.forceUpdate();
+				}} />
+			}
+		}, {
+			title: '操作',
+			dataIndex: 'operation',
+			key: 'operation',
+			width: '10%',
+			render: (text, record, index) => {
+				return <div>
+					<Popconfirm
+						placement="rightTop"
+						title="确定删除吗？"
+						onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
+						okText="确认"
+						cancelText="取消">
+						<a>删除</a>
+					</Popconfirm>
+				</div>
+			}
+		}
+	]
+	
 	//获取当前登陆用户的标段
 	getSection(){
 		let user = getUser()
