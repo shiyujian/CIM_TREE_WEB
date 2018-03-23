@@ -17,38 +17,51 @@ class ReceivePage extends Component {
 		this.state = {
 			visible: false,
 			showInfo: {},
-			code_id:"",
-			searchList:[],
-			isUpdate : false,
+			code_id: "",
+			searchList: [],
+			isUpdate: false,
+			datas: [],
+			_viewClickinfo: {}
 		}
 	}
 
 	//删除
 	_deleteClick(_id) {
 		const { actions: { deleteReceiveDocAc, getReceiveInfoAc } } = this.props;
-		deleteReceiveDocAc({ id: _id, user: encodeURIComponent(getUser().org) })
+		let orgCode = getUser().org_code
+
+		let orgListCodes = orgCode.split("_");
+		orgListCodes.pop()
+		let codeu = orgListCodes.join()
+		let ucode = codeu.replace(/,/g, '_')
+		deleteReceiveDocAc({ id: _id, user: encodeURIComponent(ucode) })
 			.then(() => {
 				message.success("删除收文成功！");
 				getReceiveInfoAc({
-					user: encodeURIComponent(getUser().org)
+					user: encodeURIComponent(ucode)
 				});
 			})
 	}
 
 	//查看信息详情
-	_viewClick(id) {
-		this.setState({code_id:id})
-		console.log(id)
-		console.log(getUser().org)
+	_viewClick(id, record) {
+		this.setState({ code_id: id })
+		let orgCode = getUser().org_code
+
+		let orgListCodes = orgCode.split("_");
+		orgListCodes.pop()
+		let codeu = orgListCodes.join()
+		let ucode = codeu.replace(/,/g, '_')
 
 		//	获取详情
 		const { actions: { getReceiveDetailAc } } = this.props;
 		this.setState({
-			visible: true
+			visible: true,
+			_viewClickinfo: record
 		});
 		getReceiveDetailAc({
 			id: id,
-			user: encodeURIComponent(getUser().org)
+			user: encodeURIComponent(ucode)
 		})
 			.then(rst => {
 				this.setState({
@@ -98,16 +111,16 @@ class ReceivePage extends Component {
 	//查找
 	query() {
 		const {
-			actions: { getReceiveInfoAc },
+			actions: { getReceiveInfoAc, getReceiveInfoAcOK },
 			receiveInfo = {},
 			filter = {}
 		} = this.props;
 		const { notifications = [] } = receiveInfo;
-	
+
 		// const user = getUser();
-		let searchList=[]
+		let searchList = []
 		this.props.form.validateFields(async (err, values) => {
-			notifications.map((item)=>{
+			notifications.map((item) => {
 				let isName = false;
 				let isRoles = false;
 				let isTitle = false;
@@ -119,7 +132,7 @@ class ReceivePage extends Component {
 						isName = true
 					}
 				}
-	
+
 				if (!values.title) {
 					isTitle = true
 				} else {
@@ -127,14 +140,14 @@ class ReceivePage extends Component {
 						isTitle = true
 					}
 				}
-		
+
 				if (!values.worktimes) {
 					isRoles = true
 				} else {
-					const create_time=moment(item.create_time).utc().utcOffset(+8).format('YYYY-MM-DD')
-					const worktimes1=moment(values.worktimes[0]).format('YYYY-MM-DD')
-					const worktimes2=moment(values.worktimes[1]).format('YYYY-MM-DD')
-					if(moment(create_time).isBetween(worktimes1,worktimes2)||moment(create_time).isSame(worktimes1)||moment(create_time).isSame(worktimes2)){
+					const create_time = moment(item.create_time).utc().utcOffset(+8).format('YYYY-MM-DD')
+					const worktimes1 = moment(values.worktimes[0]).format('YYYY-MM-DD')
+					const worktimes2 = moment(values.worktimes[1]).format('YYYY-MM-DD')
+					if (moment(create_time).isBetween(worktimes1, worktimes2) || moment(create_time).isSame(worktimes1) || moment(create_time).isSame(worktimes2)) {
 						isRoles = true
 					}
 				}
@@ -144,7 +157,7 @@ class ReceivePage extends Component {
 			})
 			this.setState({
 				searchList: searchList,
-				isUpdate :true,
+				isUpdate: true,
 			})
 
 
@@ -159,8 +172,8 @@ class ReceivePage extends Component {
 	}
 
 	//回文弹出框
-	_sentDoc() {
-		const { actions: { toggleModalAc } } = this.props;
+	_sentDoc(record) {
+		const { actions: { toggleModalAc, setDocInfo } } = this.props;
 		toggleModalAc({
 			type: 'NEWS',
 			status: 'EDIT',
@@ -168,9 +181,6 @@ class ReceivePage extends Component {
 			editData: null
 		})
 	}
-
-
-
 
 	render() {
 		const {
@@ -182,7 +192,7 @@ class ReceivePage extends Component {
 				visible: false,
 			},
 		} = this.props;
-		const { showInfo = {} ,searchList} = this.state;
+		const { showInfo = {}, searchList } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
 		const { notifications = [] } = receiveInfo;
 		const formItemLayout = {
@@ -303,7 +313,7 @@ class ReceivePage extends Component {
 								</FormItem>
 							</Col>
 						</Col>
-									</Row>
+					</Row>
 					{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
 					<Table
 						dataSource={this._getNewArrFunc(dataSource)}
@@ -332,7 +342,7 @@ class ReceivePage extends Component {
 							</Col>
 							<Row style={{ marginBottom: '20px' }}>
 								<Col span={24}>
-									<h3>来文单位：{notification.from_whom}</h3>
+									<h3>来文单位：{this.state._viewClickinfo.to_whom_name}</h3>
 									<h3>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h3>
 								</Col>
 							</Row>
@@ -417,6 +427,16 @@ class ReceivePage extends Component {
 	// 		},
 	// 	}
 	// ];
+	confirms() {
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		if (user.is_superuser == true) {
+			return <a >删除</a>
+		} else {
+			return []
+		}
+
+
+	}
 	columns = [
 		{
 			title: '序号',
@@ -431,7 +451,7 @@ class ReceivePage extends Component {
 		, {
 			title: '名称',
 			dataIndex: 'notification_title',
-			key:'notification_title'
+			key: 'notification_title'
 		}
 		// , {
 		// 	title: '工程名称',
@@ -443,11 +463,11 @@ class ReceivePage extends Component {
 		// 	dataIndex: 'number',
 		// 	key: 'number'
 		// }
-		,{
+		, {
 			title: '来文单位',
-			dataIndex: 'to_whom',
-			key: 'to_whom'
-		},{
+			dataIndex: 'to_whom_name',
+			key: 'to_whom_name',
+		}, {
 			title: '收文日期',
 			// dataIndex: 'create_time',
 			// key: 'create_time'
@@ -460,15 +480,19 @@ class ReceivePage extends Component {
 			render: record => {
 				return (
 					<span>
-						<a onClick={this._viewClick.bind(this, record._id)}>查看</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this._sentDoc.bind(this)}>回文</a>
-						{/*&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a onClick={this._download.bind(this)}>下载</a>
-						 <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
+						<a style={{ marginRight: '10px' }} onClick={this._viewClick.bind(this, record._id, record)}>查看</a>
+						{/* &nbsp;&nbsp;|&nbsp;&nbsp; */}
+						<a style={{ marginRight: '10px' }} onClick={this._sentDoc.bind(this, record)}>回文</a>
+						{/* &nbsp;&nbsp;|&nbsp;&nbsp; */}
+						{/* <a onClick={this._download.bind(this)}>下载</a> */}
+						<Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定"
 							cancelText="取消">
-							<a >删除</a>
-						</Popconfirm> */}
+							{/* <a >删除</a> */}
+							{
+								this.confirms()
+							}
+						</Popconfirm>
+
 
 					</span>
 				)

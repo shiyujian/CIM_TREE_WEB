@@ -1,7 +1,7 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from './dispatchFetchAction';
 import createFetchActionT from 'fetch-action';
-import { base, USER_API, SERVICE_API, EXCHANGE_API ,CODE_API} from '_platform/api';
+import { base, USER_API, SERVICE_API, EXCHANGE_API, CODE_API } from '_platform/api';
 const ID = "DISPATCH"
 //Tab切换状态
 export const setTabActive = createAction(`${ID}设置当前选中的tab`);
@@ -52,6 +52,9 @@ export const sentMessageAc = createFetchAction(`${CODE_API}/api/v1/sms/`, [], "P
 // export const sentMessageAc = createFetchAction(`http://10.215.160.38:6545/api/v1/sms/`, [], "POST");
 
 
+//存储table回文信息
+export const setDocInfo = createAction('table回文信息');
+
 //Loading加载状态
 export const setLoadingAc = createAction('DISLoading加载状态');
 //设置统计里面的时间
@@ -82,8 +85,46 @@ const getCountInfoAcOK = createAction('DIS查询部门出勤信息');
 const getCountInfoAc = createFetchAction(`${base}/main/api/staff-statistic2/?org_code={{code}}&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`, [getCountInfoAcOK]);
 // 获取部门信息
 const getOrgName = createFetchAction(`${SERVICE_API}/orgs/code/{{code}}/`, [], "GET");
+const loop = (data = [], dataSource = [], datas = []) => {
+	return data.map((item) => {
+		if (item.children && item.children.length) {
+			loop(item.children, dataSource, datas)
+		}
 
+		for (let j = 0; j < dataSource.length; j++) {
+			const element = dataSource[j];
+			if (item.code == element.from_whom) {
+				datas.push({ name: item.name, code: item.code })
+			}else if(element.from_whom=='admin'){
+				datas.push({ name: 'admin', code: 'admin' })
+			}
+
+		}
+	});
+
+};
+
+const loops = (data = [], dataSource = [], datas = [], ccdata = []) => {
+	return data.map((item) => {
+		if (item.children && item.children.length) {
+			loops(item.children, dataSource, datas, ccdata)
+		}
+
+		for (let j = 0; j < dataSource.length; j++) {
+			const element = dataSource[j];
+			if (item.code == element.extend_to_whom_list[0]) {
+				datas.push({ name: item.name, code: item.code, })
+			}
+			if (item.code == element.extend_cc_list[0]) {
+				ccdata.push({ name: item.name, code: item.code, })
+			}
+
+		}
+	});
+
+};
 export const actions = {
+	setDocInfo,
 	setTabActive,
 	getReceiveInfoAcOK,
 	getReceiveInfoAc,
@@ -127,7 +168,12 @@ export const actions = {
 
 	setNewsTabActive
 };
+
 export default handleActions({
+	[setDocInfo]: (state, { payload }) => ({
+		...state,
+		setDocInfos: payload
+	}),
 	[setTabActive]: (state, { payload }) => ({
 		...state,
 		tabValue: payload
@@ -148,14 +194,56 @@ export default handleActions({
 		...state,
 		toggleData: payload
 	}),
-	[getReceiveInfoAcOK]: (state, { payload }) => ({
-		...state,
-		receiveInfo: payload
-	}),
-	[getSentInfoAcOK]: (state, { payload }) => ({
-		...state,
-		sendInfo: payload
-	}),
+	[getReceiveInfoAcOK]: (state, { payload }) => {
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		
+		let datas = []
+		loop(state.orgList, payload.notifications, datas)
+		if (datas && datas.length > 0) {
+			payload.notifications.map((dat, index) => {
+				// if (dat.from_whom == datas[0].code) {
+				// 	dat.to_whom_name = datas[0].name
+				// }
+				for (let i = 0; i < datas.length; i++) {
+					const elementdatas = datas[i];
+					if (dat.from_whom == elementdatas.code) {
+						dat.to_whom_name = elementdatas.name
+					}
+				}
+			})
+		}
+		return {
+			...state,
+			receiveInfo: payload
+		}
+	},
+	[getSentInfoAcOK]: (state, { payload }) => {
+		let datas = []
+		let ccdata = []
+
+		loops(state.orgList, payload.notifications, datas, ccdata)
+		if (datas && datas.length > 0) {
+			payload.notifications.map((dat, index) => {
+				for (let j = 0; j < datas.length; j++) {
+					const elementdatas = datas[j];
+					if (dat.extend_to_whom_list[0] == elementdatas.code) {
+						dat.to_whom_s = elementdatas.name
+					}
+				}
+				for (let z = 0; z < ccdata.length; z++) {
+					const elementccdata = ccdata[z];
+					if (dat.extend_cc_list[0] == elementccdata.code) {
+						dat.cc_whom_s = elementccdata.name
+					}
+				}
+
+			})
+		}
+		return {
+			...state,
+			sendInfo: payload
+		}
+	},
 	[postUploadFilesAc]: (state, { payload }) => ({
 		...state,
 		fileList: payload
