@@ -156,10 +156,6 @@ class ToggleModal extends Component {
 			message.warning("请添加抄送单位！");
 			return
 		}
-
-		const sentU = sentUsers[0].split("--")[0]
-		const copyU = copyUsers[0].split("--")[0]
-
 		let orgCode = getUser().org_code
 		let orgListCodes = orgCode.split("_");
 		orgListCodes.pop()
@@ -171,6 +167,7 @@ class ToggleModal extends Component {
 		validateFields((err, values) => {
 			if (!err) {
 				if (toggleData.status === 'ADD') {
+
 					let sendData = {
 						"from_whom":user.is_superuser == true?'admin': ucode,
 						"from_whom_department": user.is_superuser == true?'admin': ucode,
@@ -180,10 +177,7 @@ class ToggleModal extends Component {
 						"body_rich": this.state.content,
 						"is_draft": false,
 						"sent_email": false,
-						"extend_info": {
-							"to_whomCode": sentU,
-							"cc_Code": copyU,
-						},
+						"extend_info": {},
 						"external_attachments": [
 							{
 								"file_id": fileList[0].id,
@@ -274,10 +268,7 @@ class ToggleModal extends Component {
 						"body_rich": this.state.content,
 						"is_draft": false,
 						"sent_email": false,
-						"extend_info": {
-							"to_whomCode": sentU,
-							"cc_Code": copyU,
-						},
+						"extend_info": {},
 						"external_attachments": [
 							{
 								"file_id": fileList[0].id,
@@ -405,7 +396,7 @@ class ToggleModal extends Component {
 				) : '发文'}
 				wrapClassName='edit-box'
 				visible={toggleData.visible}
-				width="70%"
+				width="80%"
 				maskClosable={false}
 				onOk={this._sendDoc.bind(this)}
 				onCancel={this.closeModal.bind(this)}
@@ -468,20 +459,21 @@ class ToggleModal extends Component {
 													onChange={this._orgChange.bind(this)}
 													// disabledCheckbox={true}
 													dropdownMatchSelectWidth={false}
+													treeCheckable={true}
 												>
 													{
 														ToggleModal.loop(orgList, this.state.sentUsers)
 													}
 												</TreeSelect>
 											</Col>
-											<Col span={4}>
+											{/* <Col span={4}>
 												<Button onClick={this._addSentUser.bind(this)}>添加</Button>
-											</Col>
-											<Col span={4}>
-												<Checkbox onChange={this._cpoyMsg.bind(this)}>短信通知</Checkbox>
+											</Col> */}
+											<Col style={{marginLeft:'10px'}} span={4}>
+												<Checkbox style={{marginTop:'2px'}} onChange={this._cpoyMsg.bind(this)}>短信通知</Checkbox>
 											</Col>
 										</Row>
-										<Row>
+										{/* <Row>
 											<Col span={20} offset={2}>
 												<Table dataSource={this._getUserFunc(this.state.sentUsers)}
 													columns={this.columns}
@@ -489,7 +481,7 @@ class ToggleModal extends Component {
 													bordered
 													rowKey="code" />
 											</Col>
-										</Row>
+										</Row> */}
 									</Col>
 									<Col span={12}>
 										<Row>
@@ -500,20 +492,21 @@ class ToggleModal extends Component {
 												<TreeSelect
 													onChange={this._orgChangeT.bind(this)}
 													dropdownMatchSelectWidth={false}
+													treeCheckable={true}
 												>
 													{
 														ToggleModal.loopT(orgList, this.state.copyUsers)
 													}
 												</TreeSelect>
 											</Col>
-											<Col span={4}>
+											{/* <Col span={4}>
 												<Button onClick={this._addSentUserT.bind(this)}>添加</Button>
-											</Col>
-											<Col span={4}>
-												<Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
+											</Col> */}
+											<Col style={{marginLeft:'10px'}} span={4}>
+												<Checkbox style={{marginTop:'2px'}} onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
 											</Col>
 										</Row>
-										<Row>
+										{/* <Row>
 											<Col span={20} offset={4}>
 												<Table dataSource={this._getUserFunc(this.state.copyUsers)}
 													columns={this.columnsT}
@@ -521,7 +514,7 @@ class ToggleModal extends Component {
 													size="small"
 													rowKey="code" />
 											</Col>
-										</Row>
+										</Row> */}
 									</Col>
 								</Row>
 							</Col>
@@ -575,41 +568,45 @@ class ToggleModal extends Component {
 	_orgChange(value) {
 		// 接受单位选择
 		this.setState({
-			selectSentUser: value
+			selectSentUser: value,
+			sentUsers:value
 		});
 	}
 
 	_orgChangeT(value) {
 		//抄送单位选择
+		
 		this.setState({
-			selectCopyUser: value
+			selectCopyUser: value,
+			copyUsers:value
 		});
 	}
 
-	_addSentUser() {
-		//接受单位添加
-		if (this.state.selectSentUser === '') {
-			message.warning('请选择接受单位！');
-			return
-		}
-		let newUsers = this.state.sentUsers;
-		newUsers.push(this.state.selectSentUser);
-		this.setState({
-			sentUsers: newUsers
-		})
-	}
+	// _addSentUser() {
+	// 	//接受单位添加
+	// 	if (this.state.selectSentUser === '') {
+	// 		message.warning('请选择接受单位！');
+	// 		return
+	// 	}
+	// 	// let newUsers = this.state.sentUsers;
+	// 	// console.log("newUsers",newUsers)
+	// 	// newUsers.push(this.state.selectSentUser);
+	// 	this.setState({
+	// 		sentUsers: this.state.selectSentUser
+	// 	})
+	// }
 
-	_addSentUserT() {
-		if (this.state.selectCopyUser === '') {
-			message.warning('请选择抄送单位！');
-			return
-		}
-		let newUsers = this.state.copyUsers;
-		newUsers.push(this.state.selectCopyUser);
-		this.setState({
-			copyUsers: newUsers
-		})
-	}
+	// _addSentUserT() {
+	// 	if (this.state.selectCopyUser === '') {
+	// 		message.warning('请选择抄送单位！');
+	// 		return
+	// 	}
+	// 	let newUsers = this.state.copyUsers;
+	// 	newUsers.push(this.state.selectCopyUser);
+	// 	this.setState({
+	// 		copyUsers: newUsers
+	// 	})
+	// }
 
 	static _checkSentDisable(value, arr) {
 		let disabled = false;
