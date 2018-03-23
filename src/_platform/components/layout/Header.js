@@ -23,15 +23,12 @@ import * as actions from '_platform/store/global/tabs';
 export default class Header extends Component {
 	static ignoreModules = loadIgnoreModules;
 
-	static menus = loadMenus;
+	// static menus = loadMenus;
 	state = {
 		dotShow: false,
 		tasks:0,
-		headMenus:loadMenus,
 	}
 	componentDidMount() {
-		console.log('loadMenus',loadMenus)
-		console.log('headMenus',this.state.headMenus)
 		const { tasks = 0 } = getUser();
 		if (tasks > 0) {
 			this.setState({
@@ -50,6 +47,81 @@ export default class Header extends Component {
 
 
 	render() {
+		Header.menus=
+		[{
+			key: 'home',
+			id: 'HOME',
+			title: '首页',
+			path: '/',
+			icon: <Icon name="home"/>,
+		}, {
+			key: 'dashboard',
+			id: 'DASHBOARD',
+			title: '综合展示',
+			path: '/dashboard/onsite',
+			icon: <Icon name="map"/>
+		}, {
+			key: 'overall',
+			id: 'OVERALL',
+			title: '综合管理',
+			path: '/overall/news',
+			icon: <Icon name="cubes"/>
+		}, {
+			key: 'datum',
+			id: 'DATUM',
+			title: '资料管理',
+			path: '/datum/standard',
+			icon: <Icon name="book"/>
+		}, {
+			key: 'quality',
+			id: 'QUALITY',
+			title: '质量管理',
+			path: '/quality/score/search',
+			icon: <Icon name="list-alt"/>
+		}, {
+			key: 'schedule',
+			id: 'SCHEDULE',
+			title: '进度管理',
+			path: '/schedule/stagereport',
+			icon: <Icon name="random"/>
+		}, {
+			key: 'safety',
+			title: '安环管理',
+			id: 'SAFETY',
+			path: '/safety/trend',
+			icon: <Icon name="shield"/>,
+		}, {
+			key: 'forest',
+			id: 'FOREST',
+			title: '森林大数据',
+			path: '/forest/nursoverallinfo',
+			icon: <Icon name="tree"/>
+		},/* {
+			key: 'receive',
+			id: 'RECEIVE',
+			title: '收发货管理',
+			path: '/receive',
+			icon: <Icon name="user"/>
+		},*/ {
+			key: 'selfcare',
+			id: 'SELFCARE',
+			title: '个人中心',
+			path: '/selfcare',
+			icon: <Icon name="user"/>
+		}, {
+			key: 'system',
+			id: 'SYSTEM',
+			title: '系统设置',
+			path: '/system',
+			icon: <Icon name="cogs"/>
+		}, {
+			key: 'project',
+			id: 'PROJECT',
+			title: '项目管理',
+			path: '/project',
+			icon: <Icon name="cogs"/>
+		}];
+		console.log('mmmm',Header.menus)
 		const { match: { params: { module = '' } = {} } = {} } = this.props;
 		const ignore = Header.ignoreModules.some(m => m === module);
 		if (ignore) {
@@ -81,7 +153,7 @@ export default class Header extends Component {
 									//进行处理变换成子模块的路径
 									for(var i=0;i<permissions.length;i++){
 										if(permissions[i].indexOf(menu.id)!==-1 && permissions[i] !== `appmeta.${menu.id}.READ` ){
-											str=permissions[i] ;
+											str=permissions[i];
 											break;
 										}
 									}
@@ -89,7 +161,6 @@ export default class Header extends Component {
 										str=str.match(/appmeta(\S*).READ/)[1] || '';
 										str=str.replace(/\./g,"/").toLowerCase();
 										menu.path=str;
-										console.log('path',menu.path)
 									}
 								}
 
@@ -121,6 +192,7 @@ export default class Header extends Component {
 							// break;
 							// }
 						})
+
 					}
 				</Menu>
 				<div className="head-right">
