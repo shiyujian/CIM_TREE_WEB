@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Icon, Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message,Cascader} from 'antd';
 import moment from 'moment';
-import { FOREST_API} from '../../../_platform/api';
+import { FOREST_API,PROJECT_UNITS} from '../../../_platform/api';
 import {getUser} from '_platform/auth'
 import '../index.less';
 const TabPane = Tabs.TabPane;
@@ -36,7 +36,18 @@ export default class CarPackageTable extends Component {
     		checkstatus: '',
     		status: '',
         }
-    }
+	}
+	getBiao(code){
+		let str = '';
+		PROJECT_UNITS.map(item => {
+			item.units.map(single => {
+				if(single.code === code){
+					str = single.value;
+				}
+			})
+		})
+		return str;
+	}
     componentDidMount() {
     	let user = getUser()
 		this.sections = JSON.parse(user.sections)
@@ -101,6 +112,12 @@ export default class CarPackageTable extends Component {
 			title:"车牌号",
 			dataIndex: 'LicensePlate',
 		},{
+			title:"标段",
+			dataIndex: 'Section',
+			render:(text,record) => {
+				return <p>{this.getBiao(text)}</p>
+			}
+		},{
 			title:"苗木类型",
             dataIndex: 'IsShrub',
             render:(text,record) => {
@@ -113,6 +130,13 @@ export default class CarPackageTable extends Component {
 		},{
 			title:"苗木规格",
 			dataIndex: 'Standard',
+			render:(text) => {
+				if(text === ''){
+					return <p> / </p>
+				}else{
+					return <p>{text}</p>
+				}
+			}
 		},{
 			title:"创建时间",
 			render: (text,record) => {

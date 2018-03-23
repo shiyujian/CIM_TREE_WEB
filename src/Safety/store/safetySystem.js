@@ -1,6 +1,7 @@
 import {createAction, handleActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
-import {base, SERVICE_API, FOREST_API,FOREST_SYSTEM} from '_platform/api';
+import {base, SERVICE_API, FOREST_API,FOREST_SYSTEM, FILE_API, WORKFLOW_API} from '_platform/api';
+import {createFetchActionWithHeaders as myFetch} from './fetchAction'
 
 
 export const ID = 'safetySystem';
@@ -16,6 +17,12 @@ export const getForestTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpuni
 export const getNurserysTree = createFetchAction(`${FOREST_API}/tree/treenurserys`, []);
 export const getForestUsersOK = createAction('获取森林数据用户列表');
 export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [getForestUsersOK]);
+export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
+
+export const getTaskSafetyOK = createAction(`${ID}搜索流程`);
+export const getTaskSafety = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[getTaskSafetyOK],'GET');
+//上传文件
+export const postSafeFile = myFetch(`${FILE_API}/api/user/files/`,[],'POST');
 const changeDocs = createAction(`${ID}_CHANGE_DOCS`);
 
 export const actions = {
@@ -29,6 +36,10 @@ export const actions = {
 	getNurserysTree,
 	getForestTreeNodeList,
 	getForestUsers,
+	postSafeFile,
+	getWorkflowById,
+	getTaskSafetyOK,
+	getTaskSafety
 };
 export default handleActions({
 	[changeDocs]: (state, {payload}) => ({
@@ -61,5 +72,9 @@ export default handleActions({
 			users
 		};
 	},
+	[getTaskSafetyOK]: (state, {payload}) => ({
+		...state,
+		safetyTaskList:payload
+}),
 }, {});
 

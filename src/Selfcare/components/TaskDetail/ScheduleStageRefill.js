@@ -29,7 +29,9 @@ class ScheduleStageRefill extends Component {
             treetype: [],//树种
             key:6,
             sectionSchedule:[],
-            projectName:''
+            projectName:'',
+            oldSubject:{},
+            treedataSource:[]
         };
     }
 
@@ -96,43 +98,51 @@ class ScheduleStageRefill extends Component {
 	];
     
     componentDidMount() {
-		const { actions: { gettreetype } } = this.props;
-		let treedata = [
-            {
-                key:0,
-                project: '便道施工',
-                units: 'm',
-                canDelete: false
-            }, {
-                key:1,
-                project: '给排水沟槽开挖',
-                units: 'm',
-                canDelete: false
-            }, {
-                key:2,
-                project: '给排水管道安装',
-                units: 'm',
-                canDelete: false
-            }, {
-                key:3,
-                project: '给排水回填',
-                units: 'm',
-                canDelete: false
-            }, {
-                key:4,
-                project: '绿地平整',
-                units: '亩',
-                canDelete: false
-            }, {
-                key:5,
-                project: '种植穴工程',
-                units: '个',
-                canDelete: false
+		const { 
+            actions: { 
+                gettreetype 
             },
-        ];
-		this.setState({
-			treedataSource: treedata
-		})
+            form: {
+                setFieldsValue
+            },
+            platform: { task = {}, users = {} } = {}, 
+        } = this.props;
+		// let treedata = [
+        //     {
+        //         key:0,
+        //         project: '便道施工',
+        //         units: 'm',
+        //         canDelete: false
+        //     }, {
+        //         key:1,
+        //         project: '给排水沟槽开挖',
+        //         units: 'm',
+        //         canDelete: false
+        //     }, {
+        //         key:2,
+        //         project: '给排水管道安装',
+        //         units: 'm',
+        //         canDelete: false
+        //     }, {
+        //         key:3,
+        //         project: '给排水回填',
+        //         units: 'm',
+        //         canDelete: false
+        //     }, {
+        //         key:4,
+        //         project: '绿地平整',
+        //         units: '亩',
+        //         canDelete: false
+        //     }, {
+        //         key:5,
+        //         project: '种植穴工程',
+        //         units: '个',
+        //         canDelete: false
+        //     },
+        // ];
+		// this.setState({
+		// 	treedataSource: treedata
+		// })
 		gettreetype({})
 			.then(rst => {
 				let treetype = rst.map((o, index) => {
@@ -143,7 +153,46 @@ class ScheduleStageRefill extends Component {
 				this.setState({ treetype });
             })
         this.getSection()
+        let record = {}
+		if(task && task.subject && !record.id){
+			record = this.getTable(task)
+        }
+        console.log('record',record.timedate)
+        
+        setFieldsValue({
+            section:record.sectionName?record.sectionName:'',
+            numbercode:record.numbercode?record.numbercode:'',
+            timedate:record.timedate?moment.utc(record.timedate):'',
+            // timedate:record.timedate?record.timedate:'',
+            dataReview:record.dataReview?(record.dataReview.person_name?record.dataReview.person_name:''):'',
+
+        })
     }
+
+    //获取流程详情
+    getTable(instance){
+        let subject = instance.subject[0]
+        let postData = subject.postData?JSON.parse(subject.postData):''
+        let record = {
+            'id':instance.id,
+			'TreatmentData':subject.treedataSource?JSON.parse(subject.treedataSource):'',
+			'section':subject.section?JSON.parse(subject.section):'',
+			'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
+            'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
+            'stagedocument':subject.stagedocument?JSON.parse(subject.stagedocument):'',
+            'timedate':subject.timedate?JSON.parse(subject.timedate):'',
+            'dataReview':subject.dataReview?JSON.parse(subject.dataReview):'',
+			// 'superunit':subject.superunit?JSON.parse(subject.superunit):''
+        }
+ 
+        let treedataSource = subject.treedataSource?JSON.parse(subject.treedataSource):[];
+        this.setState({
+            oldSubject:subject,
+            treedataSource:treedataSource
+        })
+        
+		return record
+	}
     
     //获取当前登陆用户的标段
     getSection(){
@@ -221,21 +270,22 @@ class ScheduleStageRefill extends Component {
                         <Row>
                             <Col span={24}>
                                 <Row>
-                                    <Col span={8}>
-                                        <FormItem {...FormItemLayout} label='单位工程'>
+                                    <Col span={12}>
+                                        <FormItem {...FormItemLayout} label='标段'>
                                             {
                                                 getFieldDecorator('section', {
                                                     rules: [
-                                                        { required: true, message: '请选择标段' }
+                                                        { required: true, message: '请输入标段' }
                                                     ]
                                                 })
-                                                    (<Select placeholder='请选择标段' allowClear>
-                                                    {sectionOption}
-                                                </Select>)
+                                                    (<Input placeholder='请输入标段' readOnly/>)
+                                                //     (<Select placeholder='请选择标段' allowClear>
+                                                //     {sectionOption}
+                                                // </Select>)
                                             }
                                         </FormItem>
                                     </Col>
-                                    <Col span={8}>
+                                    <Col span={12}>
                                         <FormItem {...FormItemLayout} label='编号'>
                                             {
                                                 getFieldDecorator('numbercode', {
@@ -247,7 +297,10 @@ class ScheduleStageRefill extends Component {
                                             }
                                         </FormItem>
                                     </Col>
-                                    <Col span={8}>
+                                    
+                                </Row>
+                                <Row>
+                                    <Col span={12}>
                                         <FormItem {...FormItemLayout} label='文档类型'>
                                             {
                                                 getFieldDecorator('stagedocument', {
@@ -260,9 +313,7 @@ class ScheduleStageRefill extends Component {
                                             }
                                         </FormItem>
                                     </Col>
-                                </Row>
-                                <Row>
-                                    <Col span={8}>
+                                    <Col span={12}>
                                         <FormItem {...FormItemLayout} label='日期'>
                                             {
                                                 getFieldDecorator('timedate', {
@@ -274,7 +325,7 @@ class ScheduleStageRefill extends Component {
                                             }
                                         </FormItem>
                                     </Col>
-                                    <Col span={8}>
+                                    {/* <Col span={8}>
                                         <FormItem {...FormItemLayout} label='监理单位'>
                                             {
                                                 getFieldDecorator('superunit', {
@@ -285,7 +336,7 @@ class ScheduleStageRefill extends Component {
                                                     (<Input placeholder='系统自动识别，无需手输' readOnly/>)
                                             }
                                         </FormItem>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                                 <Row>
                                     <Table
@@ -325,9 +376,10 @@ class ScheduleStageRefill extends Component {
                                                                                 { required: true, message: '请选择审核人员' }
                                                                             ]
                                                                         })
-                                                                            (
-                                                                            <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
-                                                                            )
+                                                                            (<Input readOnly/>)
+                                                                            // (
+                                                                            // <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
+                                                                            // )
                                                                     }
                                                                 </FormItem>
                                                             </Col>
@@ -355,9 +407,9 @@ class ScheduleStageRefill extends Component {
                                             <Step key={index} title={`${step.state.name}-(${step.status})`}
                                                 description={
                                                     <div style={{ lineHeight: 2.6 }}>
-                                                        <div>审核意见：{note}</div>
+                                                        <div>意见：{note}</div>
                                                         <div>
-                                                            <span>审核人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
+                                                            <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
                                                             <span
                                                                 style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
                                                         </div>
@@ -412,7 +464,8 @@ class ScheduleStageRefill extends Component {
         } = this.props;
         const{
             treedataSource,
-            projectName
+            projectName,
+            oldSubject
         } = this.state
         let user = getUser();//当前登录用户
         let me = this;
@@ -426,13 +479,12 @@ class ScheduleStageRefill extends Component {
                 postData.upload_person = user.name?user.name:user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
-                let sectionName = me.getSectionName(values.section)
+                // let sectionName = me.getSectionName(values.section)
                 let subject = [{
-                    "section": JSON.stringify(values.section),
-                    "projectName":JSON.stringify(projectName),
-                    "superunit": JSON.stringify(values.superunit),
-                    "sectionName":JSON.stringify(sectionName),
-					"dataReview": JSON.stringify(values.dataReview),
+                    "section": oldSubject.section,
+                    "sectionName":oldSubject.sectionName,
+                    "projectName":oldSubject.projectName,
+					"dataReview": oldSubject.dataReview,
 					"numbercode": JSON.stringify(values.numbercode),
 					"timedate": JSON.stringify(moment(values.timedate._d).format('YYYY-MM-DD')),
 					"stagedocument": JSON.stringify(values.stagedocument),
@@ -454,7 +506,7 @@ class ScheduleStageRefill extends Component {
                 };
                 let nextUser = {};
                 
-                nextUser = values.dataReview;
+                nextUser = oldSubject.dataReview?JSON.parse(oldSubject.dataReview):{};
                 // 获取流程的action名称
                 let action_name = '';
                 let nextStates = getNextStates(task, Number(state_id));
@@ -540,7 +592,7 @@ class ScheduleStageRefill extends Component {
 
         setFieldsValue({
             dataReview: this.member,
-            superunit: this.member.org
+            // superunit: this.member.org
         });
     }
 

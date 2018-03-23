@@ -114,7 +114,7 @@ export default class TotleModal extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                        <Col span={12}>
+                                        {/* <Col span={12}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
                                                     getFieldDecorator('totlesuperunit', {
@@ -126,7 +126,7 @@ export default class TotleModal extends Component {
                                                         (<Input readOnly />)
                                                 }
                                             </FormItem>
-                                        </Col>
+                                        </Col> */}
                                     </Row>
                                     <Row>
 

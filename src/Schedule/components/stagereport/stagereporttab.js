@@ -20,7 +20,7 @@ class Stagereporttab extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			daydata:[],
+			stagedata:[],
 			selectedRowKeys: [],
 			dataSourceSelected: [],
 			visible: false,
@@ -33,6 +33,8 @@ class Stagereporttab extends Component {
 			sectionSchedule:[],
 			projectName:'',
 			filterData:[], //对流程信息根据项目进行过滤
+			currentSection:'',
+			currentSectionName:''
 		};
 	}
 
@@ -70,7 +72,7 @@ class Stagereporttab extends Component {
             
             values.sunitproject?reqData.subject_sectionName__contains = values.sunitproject : '';
             values.snumbercode?reqData.subject_numbercode__contains = values.snumbercode : '';
-            values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
+            // values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
             values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
             values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
@@ -102,7 +104,7 @@ class Stagereporttab extends Component {
 					submitperson:item.creator.person_name,
 					submittime:item.real_start_time,
 					status:item.status,
-					superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+					// superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
 					timedate:itemdata.timedate?JSON.parse(itemdata.timedate):'',
 					stagedocument:itemdata.stagedocument?JSON.parse(itemdata.stagedocument):'',
 					TreedataSource:itemtreedatasource,
@@ -111,7 +113,7 @@ class Stagereporttab extends Component {
 				totledata.push(itemarrange);
 			})
 			this.setState({
-				daydata:totledata
+				stagedata:totledata
 			},()=>{
                 this.filterTask()
             })
@@ -120,7 +122,7 @@ class Stagereporttab extends Component {
 	//对流程信息根据选择项目进行过滤
 	filterTask(){
 		const {
-			daydata 
+			stagedata 
 		}=this.state
 		const{
 			leftkeycode
@@ -142,7 +144,7 @@ class Stagereporttab extends Component {
 			selectCode = leftkeycode
 		}      
 		
-		daydata.map((task)=>{
+		stagedata.map((task)=>{
 			
 			let projectName = task.projectName
 			let projectCode = this.getProjectCode(projectName)
@@ -168,47 +170,67 @@ class Stagereporttab extends Component {
 		
 		return projectCode 
 	}
-	//获取当前登陆用户的标段
-    getSection(){
+	 //获取当前登陆用户的标段
+	 getSection(){
         let user = getUser()
         
         let sections = user.sections
         let sectionSchedule = []
-        let sectionName = ''
+        let currentSectionName = ''
         let projectName = ''
         
         sections = JSON.parse(sections)
         if(sections && sections instanceof Array && sections.length>0){
-            sections.map((section)=>{
-                let code = section.split('-')
-                if(code && code.length === 3){
-                    //获取当前标段的名字
-                    SECTIONNAME.map((item)=>{
-                        if(code[2] === item.code){
-                            sectionName = item.name
-                        }
-                    })
-                    //获取当前标段所在的项目
-                    PROJECT_UNITS.map((item)=>{
-                        if(code[0] === item.code){
-                            projectName = item.value
-                        }
-                    })
-                }
-                sectionSchedule.push({
-                    value:section,
-                    name:sectionName
+            let section = sections[0]
+            console.log('section',section)
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        currentSectionName = item.name
+                    }
                 })
-
-               
-            })
-            
-			
-			
+                //获取当前标段所在的项目
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        projectName = item.value
+                    }
+                })
+            }
+            console.log('section',section)
+            console.log('currentSectionName',currentSectionName)
+            console.log('projectName',projectName)
             this.setState({
-                sectionSchedule,
-                projectName
+                currentSection:section,
+                currentSectionName:currentSectionName,
+                projectName:projectName
             })
+            // sections.map((section)=>{
+            //     let code = section.split('-')
+            //     if(code && code.length === 3){
+            //         //获取当前标段的名字
+            //         SECTIONNAME.map((item)=>{
+            //             if(code[2] === item.code){
+            //                 sectionName = item.name
+            //             }
+            //         })
+            //         //获取当前标段所在的项目
+            //         PROJECT_UNITS.map((item)=>{
+            //             if(code[0] === item.code){
+            //                 projectName = item.value
+            //             }
+            //         })
+            //     }
+            //     sectionSchedule.push({
+            //         value:section,
+            //         name:sectionName
+            //     })
+            // })
+            // this.setState({
+            //     sectionSchedule,
+            //     projectName
+            // })
         }
     }
 	//获取当前登陆用户的标段的下拉选项
@@ -228,7 +250,8 @@ class Stagereporttab extends Component {
 		const { 
 			selectedRowKeys, 
 			sectionSchedule=[],
-			filterData
+			filterData,
+			currentSectionName
 		} = this.state;
 		const {
             form: { getFieldDecorator },
@@ -241,7 +264,7 @@ class Stagereporttab extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		}
-		let sectionOption = this.getSectionOption()
+		// let sectionOption = this.getSectionOption()
 		return (
 			<div>
 				{
@@ -281,13 +304,15 @@ class Stagereporttab extends Component {
 											<FormItem {...FormItemLayout} label='标段'>
 											{
 													getFieldDecorator('Ssection', {
-														rules: [
-															{ required: true, message: '请选择标段' }
-														]
-													})
-														(<Select placeholder='请选择标段' allowClear>
-														{sectionOption}
-													</Select>)
+														initialValue: {currentSectionName},
+                                                        rules: [
+                                                            { required: true, message: '请输入标段' }
+                                                        ]
+                                                    })
+                                                        // (<Select placeholder='请选择标段' allowClear>
+                                                        //     {sectionOption}
+                                                        // </Select> )
+                                                        (<Input readOnly placeholder='请输入标段' />)
 												}
 											</FormItem>
 										</Col>
@@ -331,7 +356,7 @@ class Stagereporttab extends Component {
 											</FormItem>
 										</Col>
 									</Row>
-									<Row>
+									{/* <Row>
 										<Col span={12}>
 											<FormItem {...FormItemLayout} label='监理单位'>
                                                 {
@@ -344,7 +369,7 @@ class Stagereporttab extends Component {
                                                 }
                                             </FormItem>
 										</Col>
-									</Row>
+									</Row> */}
 									<Row>
 										<Table
 											columns={this.columns1}
@@ -412,7 +437,7 @@ class Stagereporttab extends Component {
 
         setFieldsValue({
             SdataReview: this.member,
-            Ssuperunit:this.member.org
+            // Ssuperunit:this.member.org
         });
 	}
 	
@@ -445,7 +470,9 @@ class Stagereporttab extends Component {
 		} = this.props
 		const{
 			treedataSource,
-			projectName
+			projectName,
+			currentSectionName,
+			currentSection
 		} = this.state
 		let user = getUser();//当前登录用户
 		let me = this;
@@ -470,12 +497,12 @@ class Stagereporttab extends Component {
                     "id": parseInt(user.id)
 				};
 
-				let sectionName = me.getSectionName(values.Ssection)
+				// let sectionName = me.getSectionName(values.Ssection)
 				let subject = [{
-					"section": JSON.stringify(values.Ssection),
+					"section": JSON.stringify(currentSection),
 					"projectName":JSON.stringify(projectName),
-					"sectionName":JSON.stringify(sectionName),
-					"superunit": JSON.stringify(values.Ssuperunit),
+					"sectionName":JSON.stringify(currentSectionName),
+					// "superunit": JSON.stringify(values.Ssuperunit),
 					"dataReview": JSON.stringify(values.SdataReview),
 					"numbercode": JSON.stringify(values.Snumbercode),
 					"timedate": JSON.stringify(moment(values.Stimedate._d).format('YYYY-MM-DD')),
@@ -676,8 +703,8 @@ class Stagereporttab extends Component {
 			key:Math.random()
 		})
 		this.props.form.setFieldsValue({
-			Ssuperunit: undefined,
-			Ssection: undefined,
+			// Ssuperunit: undefined,
+			Ssection: this.state.currentSectionName || undefined,
 			SdataReview: undefined,
 			Snumbercode: undefined,
 			Stimedate: undefined

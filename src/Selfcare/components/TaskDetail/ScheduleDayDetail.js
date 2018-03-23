@@ -62,7 +62,7 @@ class ScheduleDayDetail extends Component {
 				<Row gutter={24}>
 					<Col span={24} >
 						<Row gutter={15} >
-							<Col span={8}>
+							<Col span={12}>
 								<FormItem   {...ScheduleDayDetail.layout} label="标段:">
 								{getFieldDecorator('daysection', {
 									initialValue: `${record.sectionName? record.sectionName : '暂无标段'}`,
@@ -70,7 +70,7 @@ class ScheduleDayDetail extends Component {
 								})(<Input readOnly />)}
 								</FormItem>
 							</Col>
-							<Col span={8}>
+							<Col span={12}>
 								<FormItem {...ScheduleDayDetail.layout} label="编号:">
 								{getFieldDecorator('stegenumbercode', {
                                     initialValue: `${record.numbercode ? record.numbercode : '暂无编号'}`,
@@ -80,7 +80,10 @@ class ScheduleDayDetail extends Component {
                                 })(<Input readOnly />)}
 								</FormItem>
 							</Col>
-							<Col span={8}>
+							
+						</Row>
+						<Row gutter={15}>
+							<Col span={12}>
 								<FormItem {...ScheduleDayDetail.layout} label="文档类型:">
 								{getFieldDecorator('daydocument', {
                                     initialValue: `${record.daydocument? record.daydocument : '暂无文档类型'}`,
@@ -90,9 +93,7 @@ class ScheduleDayDetail extends Component {
                                 })(<Input readOnly />)}
 								</FormItem>
 							</Col>
-						</Row>
-						<Row gutter={15}>
-                            <Col span={8}>
+                            <Col span={12}>
 								<FormItem {...ScheduleDayDetail.layout} label="日期:">
 								{getFieldDecorator('daytimedate', {
                                     initialValue: `${record.timedate? record.timedate : '暂无日期'}`,
@@ -102,7 +103,7 @@ class ScheduleDayDetail extends Component {
                                 })(<Input readOnly />)}
 								</FormItem>
 							</Col>
-							<Col span={8}>
+							{/* <Col span={8}>
 								<FormItem  {...ScheduleDayDetail.layout} label="监理单位:">
 								{getFieldDecorator('daysuperunit', {
                                     initialValue: `${record.superunit ?record.superunit: '暂无监理单位'}`,
@@ -111,7 +112,7 @@ class ScheduleDayDetail extends Component {
                                     ]
                                 })(<Input readOnly />)}
 								</FormItem>
-							</Col>
+							</Col> */}
 						</Row>
 					</Col>
 				</Row>
@@ -141,7 +142,7 @@ class ScheduleDayDetail extends Component {
             'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
             'daydocument':subject.daydocument?JSON.parse(subject.daydocument):'',
 			'timedate':subject.timedate?JSON.parse(subject.timedate):'',
-			'superunit':subject.superunit?JSON.parse(subject.superunit):''
+			// 'superunit':subject.superunit?JSON.parse(subject.superunit):''
         }
 		return record
 	}

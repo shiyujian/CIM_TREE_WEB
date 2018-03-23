@@ -177,6 +177,7 @@ export default class Warning extends Component {
         const{
             etime,
             stime,
+            treetypeAll
         }=this.state
         const{
             leftkeycode
@@ -248,6 +249,8 @@ export default class Warning extends Component {
                         let Items = arr.Items
                         Items.map((item,x)=>{
                             //默认的种类
+                            // console.log('RightBottomitem',item)
+                            // console.log('RightBottomx',x)
                             if(x<6){
                                 SCHEDULRPROJECT.map((project,serial)=>{
                                     if(item.Project === project.name){
@@ -265,7 +268,7 @@ export default class Warning extends Component {
                             }else{//添加的数目种类
                                 let treetype = ''
                                 treetypeAll.map((tree)=>{
-                                    if(tree.TreeTypeName === rst.name){
+                                    if(tree.TreeTypeName === item.Project){
                                         //获取树种cdoe的首个数字，找到对应的类型
                                         let code = tree.TreeTypeNo.substr(0, 1)
                                         console.log('code',code)
@@ -276,7 +279,7 @@ export default class Warning extends Component {
                                         })
                                     }
                                 })
-                                console.log('RightBottomtreetype',treetype)
+                                // console.log('RightBottomtreetype',treetype)
                                 SCHEDULRPROJECT.map((project,serial)=>{
                                     if(treetype === project.name){
                                         let reg = isNaN(item.Num);

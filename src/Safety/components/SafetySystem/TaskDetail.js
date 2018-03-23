@@ -1,47 +1,58 @@
 import React, { Component, Children } from 'react';
-import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification,Card, Steps} from 'antd';
+import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification, Card, Steps } from 'antd';
+import { STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const Step = Steps.Step;
-export default class DayPlanModal extends Component {
+
+class TaskDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            treeDatasource: [],
+            TreatmentData: [],
             history:[]
         }
     }
     async componentDidMount() {
-        
         const{
             actions:{
                 getTask
             },
-            id
+            TaskDetailData
         }=this.props
         let params = {
-            task_id:id
+            task_id:TaskDetailData.id
         }
         let task = await getTask(params)
         let history = []
         if(task && task.history){
             history = task.history
-
         }
       
         this.setState({
-            treeDatasource: this.props.TreedataSource,
+            TreatmentData: TaskDetailData.treatmentdata,
             history
         })
+        
     }
+    onViewClick(record,index) {
+		const {actions: {openPreview}} = this.props;
+        let filed = {}
+        filed.misc = record.misc;
+        filed.a_file = `${SOURCE_API}` + (record.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (record.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = record.fileName;
+        filed.mime_type = record.mime_type;
+        openPreview(filed);
+	}
     render() {
         const {
             form: { getFieldDecorator },
+            TaskDetailData
         } = this.props;
         const {
-            history,
-            treeDatasource
+            history
         } = this.state
         const FormItemLayout = {
             labelCol: { span: 8 },
@@ -51,7 +62,7 @@ export default class DayPlanModal extends Component {
         return (
             <div>
                 <Modal
-                    title='日进度计划流程详情'
+                    title='安全体系流程详情'
                     width={800}
                     onOk={this.props.onok}
                     onCancel={this.props.oncancel}
@@ -65,10 +76,10 @@ export default class DayPlanModal extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='标段'>
                                                 {
-                                                    getFieldDecorator('daysection', {
-                                                        initialValue: `${this.props.sectionName || '暂无标段'}`,
+                                                    getFieldDecorator('DetailSection', {
+                                                        initialValue: `${TaskDetailData.sectionName || '暂无标段'}`,
                                                         rules: [
-                                                            { required: false, message: '请选择标段' }
+                                                            { required: false, message: '请输入标段' }
                                                         ]
                                                     })
                                                         (<Input readOnly />)
@@ -76,10 +87,25 @@ export default class DayPlanModal extends Component {
                                             </FormItem>
                                         </Col>
                                         <Col span={12}>
+                                            <FormItem {...FormItemLayout} label='名称'>
+                                                {
+                                                    getFieldDecorator('DetailName', {
+                                                        initialValue: `${TaskDetailData.Safename || '暂无名称'}`,
+                                                        rules: [
+                                                            { required: false, message: '请输入名称' }
+                                                        ]
+                                                    })
+                                                        (<Input readOnly />)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={12}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
-                                                    getFieldDecorator('daynumbercode', {
-                                                        initialValue: `${this.props.numbercode || '暂无编号'}`,
+                                                    getFieldDecorator('DetailCode', {
+                                                        initialValue: `${TaskDetailData.numbercode || '暂无编号'}`,
                                                         rules: [
                                                             { required: false, message: '请输入编号' }
                                                         ]
@@ -88,13 +114,11 @@ export default class DayPlanModal extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                    </Row>
-                                    <Row>
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
-                                                    getFieldDecorator('daydocument', {
-                                                        initialValue: `${this.props.daydocument || '暂无文档类型'}`,
+                                                    getFieldDecorator('DetailDocument', {
+                                                        initialValue: `${TaskDetailData.document || '暂无文档类型'}`,
                                                         rules: [
                                                             { required: false, message: '请输入文档类型' }
                                                         ]
@@ -103,40 +127,12 @@ export default class DayPlanModal extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                        <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='日期'>
-                                                {
-                                                    getFieldDecorator('daytimedate', {
-                                                        initialValue: `${this.props.timedate || '暂无日期'}`,
-                                                        rules: [
-                                                            { required: false, message: '请输入日期' }
-                                                        ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
-                                            </FormItem>
-                                        </Col>
                                     </Row>
-                                    {/* <Row>
-                                        <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='监理单位'>
-                                                {
-                                                    getFieldDecorator('daysuperunit', {
-                                                        initialValue: `${this.props.superunit || '暂无监理单位'}`,
-                                                        rules: [
-                                                            { required: false, message: '请输入监理单位' }
-                                                        ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
-                                            </FormItem>
-                                        </Col>
-                                    </Row> */}
                                     <Row>
                                         <Table
                                             columns={this.columns1}
                                             pagination={true}
-                                            dataSource={this.state.treeDatasource}
+                                            dataSource={this.state.TreatmentData}
                                             rowKey='index'
                                             className='foresttable'
                                         />
@@ -198,25 +194,35 @@ export default class DayPlanModal extends Component {
 		return states.find(state => state.status === 'processing');
 	}
     columns1 = [{
-		title: '序号',
-		dataIndex: 'key',
-		key: 'key',
-		width: '10%',
-	}, {
-		title: '项目',
-		dataIndex: 'project',
-		key: 'project',
-	}, {
-		title: '单位',
-		dataIndex: 'units',
-		key: 'units',
-	}, {
-		title: '数量',
-		dataIndex: 'number',
-		key: 'number',
-	},];
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index',
+        width: '10%',
+    }, {
+        title: '文件名称',
+        dataIndex: 'fileName',
+        key: 'fileName',
+        width: '35%',
+    }, {
+        title: '备注',
+        dataIndex: 'remarks',
+        key: 'remarks',
+        width: '30%',
+    }, {
+        title: '操作',
+        dataIndex: 'operation',
+        key: 'operation',
+        width: '10%',
+        render: (text, record, index) => {
+            return <div>
+                <a href='javascript:;' onClick={this.onViewClick.bind(this, record, index)}>预览</a>
+                <span className="ant-divider" />
+                <a href={`${STATIC_DOWNLOAD_API}${record.a_file}`}>下载</a>
+            </div>
+        }
+    }]
 }
 
 
-// export default Form.create()(DayPlanModal)
+export default Form.create()(TaskDetail)
 

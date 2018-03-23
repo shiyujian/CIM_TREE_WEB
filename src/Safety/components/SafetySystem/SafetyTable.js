@@ -1,433 +1,243 @@
 import React, { Component } from 'react';
 import { Form, Icon, Table, Spin, Tabs, Modal, Row, Col, Select, DatePicker, Button, Input, InputNumber, Progress, message } from 'antd';
-import moment from 'moment';
-import { FOREST_API } from '../../../_platform/api';
+import {FILE_API,base, SOURCE_API, DATASOURCECODE,UNITS,SERVICE_API,PROJECT_UNITS,SECTIONNAME,WORKFLOW_CODE } from '../../../_platform/api';
 import '../index.less';
 import '../../../Datum/components/Datum/index.less'
+import { getUser } from '../../../_platform/auth';
+import TaskDetail from './TaskDetail';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
-class SafetyTable extends Component {
+export default class SafetyTable extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			imgvisible: false,
-			tblData: [],
-			pagination: {},
-			loading: false,
-			size: 12,
-			exportsize: 100,
-			leftkeycode: '',
-			zzbm: '',
-			section: '',
-			treety: '',
-			treetype: '',
-			treetypename: '',
-			factory: '',
-			isstandard: '',
-			percent: 0,
+			taskVisible:false,
+			taskList:[],
+			filterTaskList:[],
+			TaskDetailData:{}			
 		}
 	}
 	static layout = {
 		labelCol: { span: 8 },
 		wrapperCol: { span: 16 },
 	};
-	componentDidMount() {
-
+	async componentDidMount() {
+		const{
+			actions:{
+				getTaskSafety
+			}
+		}=this.props
+		getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程})
 	}
-	componentWillReceiveProps(nextProps) {
-		if (nextProps.leftkeycode != this.state.leftkeycode) {
+
+	async componentDidUpdate(prevProps,prevState){
+		const{
+			safetyTaskList
+		}=this.props
+		if(safetyTaskList != prevProps.safetyTaskList){
+			this.getTaskList()
+		}
+	}
+
+	getTaskList(){
+		const{
+			safetyTaskList
+		}=this.props
+		let taskList = [];
+		if(safetyTaskList && safetyTaskList instanceof Array){
+			safetyTaskList.map((item,index)=>{
+				let subject = item.subject[0];
+				let postData = subject.postData?JSON.parse(subject.postData):null;
+				
+                let itemarrange = {
+                    index:index+1,
+                    id:item.id,
+                    section: subject.section?JSON.parse(subject.section):'',
+                    sectionName: subject.sectionName?JSON.parse(subject.sectionName):'',
+					projectName: subject.projectName?JSON.parse(subject.projectName):'',
+					Safename: subject.Safename?JSON.parse(subject.Safename):'',
+                    type: postData.type,
+                    numbercode:subject.numbercode?JSON.parse(subject.numbercode):'',
+                    submitperson:item.creator.person_name,
+					submittime:item.real_start_time,
+					submitUnit:postData.upload_unit?postData.upload_unit:'',
+                    status:item.status,
+                    document:subject.document?JSON.parse(subject.document):'',
+                    file:subject.file?JSON.parse(subject.file):'',
+                    dataReview:subject.dataReview?JSON.parse(subject.dataReview).person_name:''
+                }
+                taskList.push(itemarrange);
+			})
 			this.setState({
-				leftkeycode: nextProps.leftkeycode,
-			}, () => {
-				this.qury(1);
+				taskList:taskList
+			},()=>{
+				this.filterTask()
 			})
 		}
 	}
-	render() {
-		const rowSelection = {
-			// selectedRowKeys,
-			onChange: this.onSelectChange,
-		};
 
-		const { tblData } = this.state;
+	//对流程信息根据选择项目进行过滤
+    filterTask(){
+        const {
+            taskList 
+        }=this.state
+        const{
+            leftkeycode
+        }=this.props
+        let filterTaskList = []
+        let user = getUser()
+        
+        let sections = user.sections
+        
+        sections = JSON.parse(sections)
+        let selectCode = ''
+        //关联标段的人只能看自己项目的进度流程
+        if(sections && sections instanceof Array && sections.length>0){
+            let code = sections[0].split('-')
+            selectCode = code[0] || ''
+        }else{
+            //不关联标段的人可以看选择项目的进度流程
+            selectCode = leftkeycode
+        }
+        
+        taskList.map((task)=>{
+            let projectName = task.projectName
+            let projectCode = this.getProjectCode(projectName)
+            if(projectCode === selectCode){
+                filterTaskList.push(task);
+            }
+        })   
+        
+        this.setState({
+            filterTaskList:filterTaskList
+        })
+	}
+	
+	//获取项目code
+    getProjectCode(projectName){
+        let projectCode = ''
+        PROJECT_UNITS.map((item)=>{
+            if(projectName === item.value){
+                projectCode = item.code
+            }
+        })
+		
+		return projectCode 
+    }
+
+	render() {
+		const{
+			safetyTaskList
+		}=this.props
 		const {
-			platform: { users = [] },
-			form: { getFieldDecorator }
-		} = this.props;
+			filterTaskList,
+			taskVisible
+		}=this.state
 		return (
 			<div>
-				{this.treeTable(tblData)}
+                {
+                    taskVisible &&
+                    <TaskDetail
+                        {...this.props}
+						{...this.state}
+						{...this.state.TaskDetailData}
+                        oncancel={this.taskDetailCancle.bind(this)}
+                        onok={this.taskDetailOk.bind(this)}
+                    />
+                }
+                <Button onClick={this.addClick.bind(this)}>新增</Button>
+				<Table
+                    columns={this.columns}
+                    // rowSelection={rowSelection}
+                    dataSource={filterTaskList} 
+                    bordered
+                    className='foresttable'
+				/>
 			</div>
 		);
 	}
-	treeTable(details) {
-		const {
-			treetypeoption,
-			sectionoption,
-			typeoption,
-			leftkeycode,
-			keycode,
-			standardoption,
-		} = this.props;
-		const {
-			zzbm,
-			factory,
-			section,
-			treety,
-			treetypename,
-			isstandard,
-		} = this.state;
-		//清除
-		const suffix1 = zzbm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
-		const suffix2 = factory ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
-		let columns = [];
-		let header = '';
-		columns = [{
-			title: "主题",
-			dataIndex: 'order',
-		}, {
-			title: "编码",
-			dataIndex: 'attrs.zzbm',
-		}, {
-			title: "工程名称",
-			dataIndex: 'section',
-		}, {
-			title: "文档类型",
-			dataIndex: 'place',
-		}, {
-			title: "提交单位",
-			dataIndex: 'treetype',
-		}, {
-			title: "提交人",
-			dataIndex: 'factory',
-		}, {
-			title: "提交时间",
-			dataIndex: 'nurseryname',
-		}, {
-			title: "流程状态",
-			dataIndex: 'nurseryname',
-		}, {
-			title: "操作",
-			dataIndex: 'nurseryname',
-		}];
-		header = <div >
-			<Row>
-				<Col span={20}>
-					<Row>
-						<Col span={8}>
-							<FormItem {...SafetyTable.layout} label="工程名称：">
-								{/* <span>工程名称：</span> */}
-								<Select allowClear className='forestcalcw2' defaultValue='全部' value={section} onChange={this.onsectionchange.bind(this)}>
-									{sectionoption}
-								</Select>
-							</FormItem>
-						</Col>
-						<Col span={16}>
-							<FormItem {...SafetyTable.layout} label="主题：">
-								{/* <span>主题：</span> */}
-								<Input suffix={suffix2} value={factory} className='forestcalcw3' onChange={this.factorychange.bind(this)} />
-							</FormItem>
-						</Col>
-
-					</Row>
-					<Row>
-						<Col span={8}>
-							<FormItem {...SafetyTable.layout} label="文档类型：">
-								{/* <span>文档类型：</span> */}
-								<Select allowClear className='forestcalcw2' defaultValue='全部' value={treety} onChange={this.ontypechange.bind(this)}>
-									{typeoption}
-								</Select>
-							</FormItem>
-						</Col>
-						<Col span={8}>
-							<FormItem {...SafetyTable.layout} label="流程状态：">
-								{/* <span>流程状态：</span> */}
-								<Select allowClear className='forestcalcw2' defaultValue='全部' value={isstandard} onChange={this.standardchange.bind(this)}>
-									{standardoption}
-								</Select>
-							</FormItem>
-						</Col>
-						<Col span={8}>
-							<FormItem {...SafetyTable.layout} label="编码：">
-								{/* <span>编码：</span> */}
-								<Input suffix={suffix1} value={zzbm} className='forestcalcw2' onChange={this.zzbmchange.bind(this)} />
-							</FormItem>
-						</Col>
-					</Row>
-				</Col>
-				<Col span={3}>
-					<Row span={2} className='mrg10'>
-						<Button type='primary' onClick={this.resetinput.bind(this)}>清空</Button>
-					</Row>
-					<Row span={2} className='mrg10'>
-						<Button type='primary' onClick={this.handleTableChange.bind(this, { current: 1 })}>查询</Button>
-					</Row>
-
-				</Col>
-			</Row>
-		</div>
-		return <div>
-			<Row style={{ marginBottom: 30 }}>
-				{header}
-			</Row>
-			<Row>
-				<Col>
-					<Button style={{ marginRight: "10px" }} onClick={this.add.bind(this)}>新增</Button>
-					<Button style={{ marginRight: "10px" }}>删除</Button>
-				</Col>
-			</Row>
-			<Row>
-				<Table bordered
-					className='foresttables'
-					columns={columns}
-					rowKey='order'
-					loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.state.loading }}
-					locale={{ emptyText: '当天无信息' }}
-					dataSource={details}
-					onChange={this.handleTableChange.bind(this)}
-					pagination={this.state.pagination}
-				/>
-			</Row>
-		</div>
-	}
-
-	add() {
-		const { actions: { AddVisible } } = this.props;
+	 // 新增按钮
+	 addClick = () => {
+        const { actions: { AddVisible } } = this.props;
 		AddVisible(true);
 	}
-
-	emitEmpty1 = () => {
-		this.setState({ zzbm: '' });
+	// 操作--查看
+    clickInfo(record) {
+        this.setState({ taskVisible: true ,TaskDetailData:record});
 	}
-
-	emitEmpty2 = () => {
-		this.setState({ factory: '' });
-	}
-
-	zzbmchange(value) {
-		this.setState({ zzbm: value.target.value })
-	}
-
-	onsectionchange(value) {
-		const { sectionselect } = this.props;
-		const { treety } = this.state;
-		sectionselect(value || '', treety)
-		this.setState({ section: value || '', treetype: '', treetypename: '' })
-	}
-
-	ontypechange(value) {
-		const { typeselect, keycode = '' } = this.props;
-		const { section } = this.state;
-		typeselect(value || '', keycode, section)
-		this.setState({ treety: value || '', treetype: '', treetypename: '' })
-	}
-
-	ontreetypechange(value) {
-		const { treetypelist } = this.props;
-		let treetype = treetypelist.find(rst => rst.name == value)
-		this.setState({ treetype: treetype ? treetype.oid : '', treetypename: value || '' })
-	}
-
-	factorychange(value) {
-		this.setState({ factory: value.target.value })
-	}
-
-	standardchange(value) {
-		this.setState({ isstandard: value || '' })
-	}
-
-	handleTableChange(pagination) {
-		const pager = { ...this.state.pagination };
-		pager.current = pagination.current;
-		this.setState({
-			pagination: pager,
-		});
-		this.qury(pagination.current)
-	}
-
-	onImgClick(src) {
-		src = src.replace(/\/\//g, '/')
-		src = `${FOREST_API}/${src}`
-		this.setState({ src }, () => {
-			this.setState({ imgvisible: true, })
-		})
-	}
-
-	handleCancel() {
-		this.setState({ imgvisible: false })
-	}
-
-	resetinput() {
-		const { resetinput, leftkeycode } = this.props;
-		resetinput(leftkeycode)
-	}
-
-	qury(page) {
-		const {
-    		zzbm = '',
-			section = '',
-			treety = '',
-			treetype = '',
-			factory = '',
-			isstandard = '',
-			stime = '',
-			etime = '',
-			size,
-    	} = this.state;
-		const { actions: { getfactoryAnalyse }, keycode = '' } = this.props;
-		let postdata = {
-			no: keycode,
-			zzbm,
-			section,
-			treety,
-			treetype,
-			factory,
-			isstandard,
-			liftime_min: stime && moment(stime).add(8, 'h').unix(),
-			liftime_max: etime && moment(etime).add(8, 'h').unix(),
-			page,
-			per_page: size
+	// 取消
+    taskDetailCancle() {
+        this.setState({ taskVisible: false });
+    }
+    // 确定
+    taskDetailOk() {
+        this.setState({ taskVisible: false });
+    }
+	columns = [
+		{
+			title: "标段",
+			key:'sectionName',
+			dataIndex: 'sectionName',
+		}, {
+			title: "名称",
+			dkey:'Safename',
+			dataIndex: 'Safename',
+		}, {
+			title: "编号",
+			key:'numbercode',
+			dataIndex: 'numbercode',
+		}, {
+			title: "文档类型",
+			key:'document',
+			dataIndex: 'document',
+		}, {
+			title: "提交单位",
+			key:'submitUnit',
+			dataIndex: 'submitUnit',
+		}, {
+			title: "提交人",
+			key:'submitperson',
+			dataIndex: 'submitperson',
+		}, {
+			title: "提交时间",
+			key:'submittime',
+			dataIndex: 'submittime',
+			sorter: (a, b) => moment(a['submittime']).unix() - moment(b['submittime']).unix(),
+			render: text => {
+				return moment(text).format('YYYY-MM-DD')
+			}
+		}, {
+			title: '流程状态',
+			dataIndex: 'status',
+			key: 'status',
+			width: '10%',
+			render:(record,index)=>{
+                if(record===1){
+                    return '已提交'
+                }else if(record===2){
+                    return '执行中'
+                }else if(record===3){
+                    return '已完成'
+                }else{
+                    return ''
+                }
+            }
+		}, {
+			title: "操作",
+			render: record => {
+				return (
+					<span>
+						<a onClick={this.clickInfo.bind(this, record, 'VIEW')}>查看</a>
+					</span>
+				)
+			}
 		}
-		this.setState({ loading: true, percent: 0 })
-		getfactoryAnalyse({}, postdata)
-			.then(rst => {
-				this.setState({ loading: false, percent: 100 })
-				if (!rst)
-					return
-				let tblData = rst.result;
-				if (tblData instanceof Array) {
-					tblData.forEach((plan, i) => {
-						const { attrs = {} } = plan;
-						tblData[i].order = ((page - 1) * size) + i + 1;
-						let place = `${~~plan.land.replace('P', '')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-						tblData[i].place = place;
-						let liftertime1 = !!plan.liftertime ? moment(plan.liftertime).format('YYYY-MM-DD') : '/';
-						let liftertime2 = !!plan.liftertime ? moment(plan.liftertime).format('HH:mm:ss') : '/';
-						tblData[i].liftertime1 = liftertime1;
-						tblData[i].liftertime2 = liftertime2;
-					})
-					const pagination = { ...this.state.pagination };
-					pagination.total = rst.total;
-					pagination.pageSize = size;
-					this.setState({ tblData, pagination: pagination });
-				}
-			})
-	}
-
-	exportexcel() {
-		const {
-			zzbm = '',
-			section = '',
-			treety = '',
-			treetype = '',
-			factory = '',
-			isstandard = '',
-			stime = '',
-			etime = '',
-			exportsize,
-    	} = this.state;
-		const { actions: { getfactoryAnalyse, getexportTree }, keycode = '' } = this.props;
-		let postdata = {
-			no: keycode,
-			zzbm,
-			section,
-			treety,
-			treetype,
-			factory,
-			isstandard,
-			liftime_min: stime && moment(stime).add(8, 'h').unix(),
-			liftime_max: etime && moment(etime).add(8, 'h').unix(),
-			page: 1,
-			per_page: exportsize
-		}
-		this.setState({ loading: true, percent: 0 })
-		getfactoryAnalyse({}, postdata)
-			.then(result => {
-				let rst = result.result;
-				let total = result.pages;
-				this.setState({ percent: parseFloat((100 / total).toFixed(2)), num: 1 });
-				if (total !== undefined) {
-					let all = [Promise.resolve(rst)];
-					for (let i = 2; i <= total; i++) {
-						postdata.page = i;
-						all.push(getfactoryAnalyse({}, postdata)
-							.then(rst1 => {
-								let { num } = this.state;
-								num++;
-								this.setState({ percent: parseFloat((num * 100 / total).toFixed(2)), num: num });
-								if (!rst1) {
-									message.error(`数据获取失败,丢失100条数据`)
-									return []
-								} else {
-									return rst1.result
-								}
-							}))
-					}
-					Promise.all(all)
-						.then(rst2 => {
-							if (!rst2) {
-								this.setState({ loading: false })
-								return
-							}
-							let allData = rst2.reduce((a, b) => {
-								return a.concat(b)
-							})
-							if (allData instanceof Array) {
-								let data = allData.map((plan, i) => {
-									const { attrs = {} } = plan;
-									let place = `${~~plan.land.replace('P', '')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-									let liftertime = !!plan.liftertime ? moment(plan.liftertime).format('YYYY-MM-DD HH:mm:ss') : '/';
-									let isstandard = plan.isstandard == 1 ? '合标' : '不合标';
-									return [
-										++i,
-										attrs.zzbm || '/',
-										plan.section || '/',
-										place,
-										plan.treetype || '/',
-										plan.factory || '',
-										plan.nurseryname || '/',
-										liftertime,
-										plan.n_gd || '/',
-										plan.n_tqhd || '/',
-										plan.n_tqzj || '/',
-										attrs.gd || '/',
-										attrs.tqhd || '/',
-										attrs.tqzj || '/',
-										isstandard,
-										attrs.supervisor || '/',
-									]
-								})
-								const postdata = {
-									keys: ["序号", "编码", "标段", "位置", "树种", "供苗商", "苗圃名称", "起苗时间", "树高（供苗商）", "土球高度（供苗商）", "土球直径（供苗商）", "树高（监理）", "土球高度（监理）", "土球直径（监理）", "是否合标", "监理人"],
-									values: data
-								}
-								getexportTree({}, postdata)
-									.then(rst3 => {
-										this.setState({ loading: false })
-										let url = `${FOREST_API}/${rst3.file_path}`
-										this.createLink("excel_link", url);
-									})
-							} else {
-								this.setState({ loading: false })
-							}
-						})
-				}
-			})
-	}
-
-	createLink(name, url) {
-		let link = document.createElement("a");
-		// link.download = name;
-		link.href = url;
-		link.setAttribute('download', name);
-		link.setAttribute('target', '_blank');
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	}
+	];
 }
-export default SafetyTable = Form.create()(SafetyTable);
+

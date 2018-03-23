@@ -2,7 +2,7 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm,notification,Card,Steps
+    Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm,notification,Card,Steps,Spin
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
@@ -28,7 +28,10 @@ class ScheduleTotalRefill extends Component {
             TreatmentData: [],
             newFileLists: [],
             sectionSchedule:[],
-            projectName:''
+            projectName:'',
+            oldSubject:{},
+            TreatmentData:[],
+            loading:false
         };
     }
 
@@ -72,8 +75,55 @@ class ScheduleTotalRefill extends Component {
         }
     }]
     componentDidMount(){
+        const { 
+            actions: { 
+                gettreetype 
+            },
+            form: {
+                setFieldsValue
+            },
+            platform: { task = {}, users = {} } = {}, 
+        } = this.props;
         this.getSection()
+
+        let record = {}
+		if(task && task.subject && !record.id){
+			record = this.getTable(task)
+        }
+        console.log('record',record.timedate)
+        
+        setFieldsValue({
+            section:record.sectionName?record.sectionName:'',
+            numbercode:record.numbercode?record.numbercode:'',
+            // timedate:record.timedate?moment.utc(record.timedate):'',
+            dataReview:record.dataReview?(record.dataReview.person_name?record.dataReview.person_name:''):'',
+        })
     }
+
+    //获取流程详情
+    getTable(instance){
+        let subject = instance.subject[0]
+        let postData = subject.postData?JSON.parse(subject.postData):''
+        let record = {
+            'id':instance.id,
+			'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
+            'section':subject.section?JSON.parse(subject.section):'',
+            'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
+			'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
+            'totledocument':subject.totledocument?JSON.parse(subject.totledocument):'',
+            'timedate':subject.timedate?JSON.parse(subject.timedate):'',
+            'dataReview':subject.dataReview?JSON.parse(subject.dataReview):'',
+			// 'superunit':subject.superunit?JSON.parse(subject.superunit):''
+        }
+ 
+        let TreatmentData = subject.TreatmentData?JSON.parse(subject.TreatmentData):[];
+        this.setState({
+            oldSubject:subject,
+            TreatmentData:TreatmentData
+        })
+        
+		return record
+	}
 
     //获取当前登陆用户的标段
     getSection(){
@@ -146,158 +196,162 @@ class ScheduleTotalRefill extends Component {
         let sectionOption = this.getSectionOption()
         return (
             <div>
-                <Form onSubmit={this.handleSubmit.bind(this)}>
-                    <Card title='流程详情'>
-                        <Row>
-                            <Col span={24}>
-                                <Row>
-                                    <Col span={10}>
-                                        <FormItem {...FormItemLayout} label='标段'>
-                                            {
-													getFieldDecorator('section', {
-														rules: [
-															{ required: true, message: '请选择标段' }
-														]
-													})
-														(<Select placeholder='请选择标段' allowClear>
-														{sectionOption}
-													</Select>)
-												}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={10}>
-                                        <FormItem {...FormItemLayout} label='编号'>
-                                            {
-                                                getFieldDecorator('numbercode', {
-                                                    rules: [
-                                                        { required: true, message: '请输入编号' }
-                                                    ]
-                                                })
-                                                    (<Input placeholder='请输入编号' />)
-                                            }
-                                        </FormItem>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col span={10}>
-                                        <FormItem {...FormItemLayout} label='文档类型'>
-                                            {
-                                                getFieldDecorator('totledocument', {
-                                                    initialValue: `总计划进度`,
-                                                    rules: [
-                                                        { required: true, message: '请输入文档类型' }
-                                                    ]
-                                                })
-                                                    (<Input placeholder='请输入文档类型' />)
-                                            }
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={10}>
-                                        <FormItem {...FormItemLayout} label='监理单位'>
-                                            {
-                                                getFieldDecorator('superunit', {
-                                                    rules: [
-                                                        { required: true, message: '请选择审核人员' }
-                                                    ]
-                                                })
-                                                    (<Input placeholder='系统自动识别，无需手输' readOnly/>)
-                                            }
-                                        </FormItem>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Dragger
-                                        {...this.uploadProps}
-                                    >
-                                        <p className="ant-upload-drag-icon">
-                                            <Icon type="inbox" />
-                                        </p>
-                                        <p className="ant-upload-text">点击或者拖拽开始上传</p>
-                                        <p className="ant-upload-hint">
-                                            支持 pdf、doc、docx 文件
-                                        </p>
-                                    </Dragger>
+                <Spin spinning={this.state.loading}>
+                    <Form onSubmit={this.handleSubmit.bind(this)}>
+                        <Card title='流程详情'>
+                            <Row>
+                                <Col span={24}>
+                                    <Row>
+                                        <Col span={10}>
+                                            <FormItem {...FormItemLayout} label='标段'>
+                                                {
+                                                        getFieldDecorator('section', {
+                                                            rules: [
+                                                                { required: true, message: '请选择标段' }
+                                                            ]
+                                                        })
+                                                            (<Input placeholder='请输入标段' readOnly/>)
+                                                        // 	(<Select placeholder='请选择标段' allowClear>
+                                                        // 	{sectionOption}
+                                                        // </Select>)
+                                                    }
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={10}>
+                                            <FormItem {...FormItemLayout} label='编号'>
+                                                {
+                                                    getFieldDecorator('numbercode', {
+                                                        rules: [
+                                                            { required: true, message: '请输入编号' }
+                                                        ]
+                                                    })
+                                                        (<Input placeholder='请输入编号' />)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={10}>
+                                            <FormItem {...FormItemLayout} label='文档类型'>
+                                                {
+                                                    getFieldDecorator('totledocument', {
+                                                        initialValue: `总计划进度`,
+                                                        rules: [
+                                                            { required: true, message: '请输入文档类型' }
+                                                        ]
+                                                    })
+                                                        (<Input placeholder='请输入文档类型' />)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                        {/* <Col span={10}>
+                                            <FormItem {...FormItemLayout} label='监理单位'>
+                                                {
+                                                    getFieldDecorator('superunit', {
+                                                        rules: [
+                                                            { required: true, message: '请选择审核人员' }
+                                                        ]
+                                                    })
+                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
+                                                }
+                                            </FormItem>
+                                        </Col> */}
+                                    </Row>
+                                    <Row>
+                                        <Dragger
+                                            {...this.uploadProps}
+                                        >
+                                            <p className="ant-upload-drag-icon">
+                                                <Icon type="inbox" />
+                                            </p>
+                                            <p className="ant-upload-text">点击或者拖拽开始上传</p>
+                                            <p className="ant-upload-hint">
+                                                支持 pdf、doc、docx 文件
+                                            </p>
+                                        </Dragger>
 
-                                    <Table
-                                        columns={this.columns1}
-                                        pagination={true}
-                                        dataSource={this.state.TreatmentData}
-                                        className='foresttable'
-                                    />
-                                </Row>
-                            </Col>
-                        </Row>
-                    </Card>
-                    <Card title={'审批流程'} style={{marginTop:10}}>
-                        <Steps direction="vertical" size="small" current={history.length - 1}>
-                            {
-                                history.map((step, index) => {
-                                    const { state: { participants: [{ executor = {} } = {}] = [] } = {} } = step;
-                                    const { id: userID } = executor || {};
-                                    if (step.status === 'processing') { // 根据历史状态显示
-                                        const state = this.getCurrentState();
-                                        return (
-                                            <Step 
-                                                title={
-                                                    <div style={{ marginBottom: 8 }}>
-                                                        <span>{step.state.name}-(执行中)</span>
-                                                        <span style={{ paddingLeft: 20 }}>当前执行人: </span>
-                                                        <span style={{ color: '#108ee9' }}> {`${executor.person_name}` || `${executor.username}`}</span>
-                                                    </div>}
-                                                description={userID === +user.id &&
-                                                    <div>
-                                                        <Row>
-                                                            <Col span={8} offset={4}>
-                                                                <FormItem {...FormItemLayout} label='审核人'>
-                                                                    {
-                                                                        getFieldDecorator('dataReview', {
-                                                                            rules: [
-                                                                                { required: true, message: '请选择审核人员' }
-                                                                            ]
-                                                                        })
-                                                                            (
-                                                                            <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
-                                                                            )
-                                                                    }
-                                                                </FormItem>
-                                                            </Col>
-                                                            <Col span={8} offset={4}>
-                                                                <Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
-                                                            </Col>
-                                                        </Row>
-                                                        <FormItem>
+                                        <Table
+                                            columns={this.columns1}
+                                            pagination={true}
+                                            dataSource={this.state.TreatmentData}
+                                            className='foresttable'
+                                        />
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Card>
+                        <Card title={'审批流程'} style={{marginTop:10}}>
+                            <Steps direction="vertical" size="small" current={history.length - 1}>
+                                {
+                                    history.map((step, index) => {
+                                        const { state: { participants: [{ executor = {} } = {}] = [] } = {} } = step;
+                                        const { id: userID } = executor || {};
+                                        if (step.status === 'processing') { // 根据历史状态显示
+                                            const state = this.getCurrentState();
+                                            return (
+                                                <Step 
+                                                    title={
+                                                        <div style={{ marginBottom: 8 }}>
+                                                            <span>{step.state.name}-(执行中)</span>
+                                                            <span style={{ paddingLeft: 20 }}>当前执行人: </span>
+                                                            <span style={{ color: '#108ee9' }}> {`${executor.person_name}` || `${executor.username}`}</span>
+                                                        </div>}
+                                                    description={userID === +user.id &&
+                                                        <div>
                                                             <Row>
-                                                                <Col span={24} style={{ textAlign: 'center' }}>
-                                                                    <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">提交</Button>
+                                                                <Col span={8} offset={4}>
+                                                                    <FormItem {...FormItemLayout} label='审核人'>
+                                                                        {
+                                                                            getFieldDecorator('dataReview', {
+                                                                                rules: [
+                                                                                    { required: true, message: '请选择审核人员' }
+                                                                                ]
+                                                                            })
+                                                                                (<Input readOnly/>)
+                                                                                // (
+                                                                                // <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
+                                                                                // )
+                                                                        }
+                                                                    </FormItem>
+                                                                </Col>
+                                                                <Col span={8} offset={4}>
+                                                                    <Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
                                                                 </Col>
                                                             </Row>
-                                                        </FormItem>
-                                                    </div>} 
-                                                key={index} 
-                                            />
+                                                            <FormItem>
+                                                                <Row>
+                                                                    <Col span={24} style={{ textAlign: 'center' }}>
+                                                                        <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">提交</Button>
+                                                                    </Col>
+                                                                </Row>
+                                                            </FormItem>
+                                                        </div>} 
+                                                    key={index} 
+                                                />
 
-                                        )
-                                    } else {
-                                        const { records: [record] } = step;
-                                        const { log_on = '', participant: { executor = {} } = {}, note = '' } = record || {};
-                                        const { person_name: name = '', organization = '' } = executor;
-                                        return (
-                                            <Step key={index} title={`${step.state.name}-(${step.status})`}
-                                                description={
-                                                    <div style={{ lineHeight: 2.6 }}>
-                                                        <div>审核意见：{note}</div>
-                                                        <div>
-                                                            <span>审核人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
-                                                            <span
-                                                                style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
-                                                        </div>
-                                                    </div>} />);
-                                    }
-                                }).filter(h => !!h)
-                            }
-                        </Steps>
-                    </Card>
-                </Form>
+                                            )
+                                        } else {
+                                            const { records: [record] } = step;
+                                            const { log_on = '', participant: { executor = {} } = {}, note = '' } = record || {};
+                                            const { person_name: name = '', organization = '' } = executor;
+                                            return (
+                                                <Step key={index} title={`${step.state.name}-(${step.status})`}
+                                                    description={
+                                                        <div style={{ lineHeight: 2.6 }}>
+                                                            <div>意见：{note}</div>
+                                                            <div>
+                                                                <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
+                                                                <span
+                                                                    style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                            </div>
+                                                        </div>} />);
+                                        }
+                                    }).filter(h => !!h)
+                                }
+                            </Steps>
+                        </Card>
+                    </Form>
+                </Spin>
             </div>
             
 				
@@ -342,7 +396,8 @@ class ScheduleTotalRefill extends Component {
         } = this.props;
         const{
             TreatmentData,
-            projectName
+            projectName,
+            oldSubject
         } = this.state
         let user = getUser();//当前登录用户
         let me = this;
@@ -364,13 +419,12 @@ class ScheduleTotalRefill extends Component {
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
-                let sectionName = me.getSectionName(values.section)
+                // let sectionName = me.getSectionName(values.section)
                 let subject = [{
-                    "section": JSON.stringify(values.section),
-                    "sectionName":JSON.stringify(sectionName),
-                    "projectName":JSON.stringify(projectName),
-					"superunit": JSON.stringify(values.superunit),
-					"dataReview": JSON.stringify(values.dataReview),
+                    "section": oldSubject.section,
+                    "sectionName":oldSubject.sectionName,
+                    "projectName":oldSubject.projectName,
+					"dataReview": oldSubject.dataReview,
 					"numbercode": JSON.stringify(values.numbercode),
 					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
 					"totledocument": JSON.stringify(values.totledocument),
@@ -393,7 +447,7 @@ class ScheduleTotalRefill extends Component {
                 };
                 let nextUser = {};
                 
-                nextUser = values.dataReview;
+                nextUser = oldSubject.dataReview?JSON.parse(oldSubject.dataReview):{};
                 // 获取流程的action名称
                 let action_name = '';
                 let nextStates = getNextStates(task, Number(state_id));
@@ -479,7 +533,7 @@ class ScheduleTotalRefill extends Component {
 
         setFieldsValue({
             dataReview: this.member,
-            superunit: this.member.org
+            // superunit: this.member.org
         });
     }
 
@@ -508,6 +562,9 @@ class ScheduleTotalRefill extends Component {
         showUploadList: false,
         action: base + "/service/fileserver/api/user/files/",
         onChange: ({ file, fileList, event }) => {
+            this.setState({
+                loading:true
+            })
 
             const status = file.status;
             const { newFileLists } = this.state;
@@ -539,7 +596,11 @@ class ScheduleTotalRefill extends Component {
                     }
                     newdata.push(data)
                 })
-                this.setState({ newFileLists, TreatmentData: newdata })
+                this.setState({ 
+                    newFileLists, 
+                    TreatmentData: newdata,
+                    loading:false 
+                })
             }
         },
     };
