@@ -67,8 +67,8 @@ export default class CarPackage extends Component {
         ]
         let mmtypeoption = [
             <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={'1'}>乔灌</Option>,
-            <Option key={'2'} value={'0'}>地被</Option>,
+            <Option key={'1'} value={'1'}>地被</Option>,
+            <Option key={'2'} value={'0'}>乔灌</Option>,
         ];
         this.setState({statusoption,mmtypeoption})
     }
