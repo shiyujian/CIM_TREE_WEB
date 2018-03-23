@@ -12,7 +12,8 @@ export default class SendPage1 extends Component {
 		super(props);
 		this.state = {
 			visible: false,
-			showInfo: {}
+			showInfo: {},
+			viewClickinfo: {}
 		}
 	}
 
@@ -27,11 +28,18 @@ export default class SendPage1 extends Component {
 
 	_deleteClick(_id) {
 		const { actions: { deleteSentDocAc, getSentInfoAc } } = this.props;
-		deleteSentDocAc({ id: _id, user: encodeURIComponent(getUser().org) })
+		let orgCode = getUser().org_code
+
+		let orgListCodes = orgCode.split("_");
+		orgListCodes.pop()
+		let codeu = orgListCodes.join()
+		let ucode = codeu.replace(/,/g, '_')
+		deleteSentDocAc({ id: _id, user: encodeURIComponent(ucode) })
+
 			.then(() => {
 				message.success("删除发文成功！");
 				getSentInfoAc({
-					user: encodeURIComponent(getUser().org)
+					user: encodeURIComponent(ucode)
 				});
 			})
 
@@ -61,7 +69,6 @@ export default class SendPage1 extends Component {
 
 		const { showInfo = {} } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
-
 		return (
 			<Row>
 				<Col span={22} offset={1}>
@@ -99,8 +106,8 @@ export default class SendPage1 extends Component {
 							</Col>
 							<Row style={{ marginBottom: '20px' }}>
 								<Col span={24}>
-									<h3>接受单位：{this._getText(notification.to_whom)}</h3>
-									<h3>抄送单位：{this._getText(notification.cc)}</h3>
+									<h3>接受单位：{this.state.viewClickinfo.to_whom_s}</h3>
+									<h3>抄送单位：{this.state.viewClickinfo.cc_whom_s}</h3>
 									<h3>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h3>
 								</Col>
 							</Row>
@@ -147,7 +154,6 @@ export default class SendPage1 extends Component {
 		return text;
 	}
 	_getNewArrFunc(list = []) {
-		// console.log(list)
 		let arr = list;
 		list.map((itm, index) => {
 			itm.index = index + 1;
@@ -155,16 +161,22 @@ export default class SendPage1 extends Component {
 		return arr;
 	}
 	//查看信息详情
-	_viewClick(id) {
+	_viewClick(id, record) {
 		//	获取详情
 		const { actions: { getSendDetailAc } } = this.props;
-		console.log(this.props)
 		this.setState({
-			visible: true
+			visible: true,
+			viewClickinfo: record
 		});
+		let orgCode = getUser().org_code
+
+		let orgListCodes = orgCode.split("_");
+		orgListCodes.pop()
+		let codeu = orgListCodes.join()
+		let ucode = codeu.replace(/,/g, '_')
 		getSendDetailAc({
 			id: id,
-			user: encodeURIComponent(getUser().org)
+			user: encodeURIComponent(ucode)
 		})
 			.then(rst => {
 				this.setState({
@@ -177,6 +189,17 @@ export default class SendPage1 extends Component {
 			visible: false,
 			showInfo: {}
 		})
+	}
+	confirms() {
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+		if (user.is_superuser == true) {
+			return <a>删除</a>
+
+		} else {
+			return []
+		}
+
+
 	}
 	columns = [
 		// {
@@ -191,60 +214,10 @@ export default class SendPage1 extends Component {
 			dataIndex: 'notification_title',
 		}, {
 			title: '接收单位',
-			dataIndex: 'extend_to_whom_list',
-			render: extend_to_whom_list => {
-				let orgListName = this._getText(extend_to_whom_list);
-				console.log("orgListName", orgListName)
-				return orgListName;
-			}
-			// render: (text,record,index) => {
-			// 	const { actions: {getOrgName} } = this.props;
-				
-			// 	let orgListName = this._getText(record.extend_to_whom_list);
-			// 	let orgCode=record.extend_info || {}
-			// 	let names=''		
-			// 	if(orgCode.to_whomCode){
-			// 		let orgListCodes=orgCode.to_whomCode.split("_");
-			// 		orgListCodes.pop()
-			// 		let codeu=orgListCodes.join()
-			// 		let ucode=codeu.replace(/,/g,'_')
-			// 		 getOrgName({ code: ucode}).then(rst=>{
-			// 			 names= `${rst.name}-${orgListName}`
-			// 			 console.log("111111",names)
-			// 		})
-					
-			// 		return names;
-			// 	}else{
-			// 		return orgListName;
-			// 	}
-			// }
+			dataIndex: 'to_whom_s',
 		}, {
 			title: '抄送单位',
-			dataIndex: 'extend_cc_list',
-			render: extend_cc_list => {
-				let orgListName = this._getText(extend_cc_list);
-				return orgListName;
-			}
-			// render: (text,record,index) => {
-			// 	const { actions: {getOrgName} } = this.props;
-			// 	let orgListName = this._getText(record.extend_cc_list);
-			// 	let orgCode=record.extend_info || {}	
-			// 	let namea=''						
-			// 	if(orgCode.cc_Code){
-			// 		let orgListCodes=orgCode.cc_Code.split("_");
-			// 		orgListCodes.pop()
-			// 		let codeu=orgListCodes.join()
-			// 		let ucode=codeu.replace(/,/g,'_')
-			// 		 getOrgName({ code: ucode}).then(rst=>{
-			// 			namea= `${rst.name}-${orgListName}`
-			// 			console.log("222222",namea)
-						
-			// 		})
-			// 		return namea;
-			// 	}else{
-			// 		return orgListName;
-			// 	}
-			// }
+			dataIndex: 'cc_whom_s',
 		}, {
 			title: '发送时间',
 			dataIndex: 'create_time',
@@ -256,11 +229,17 @@ export default class SendPage1 extends Component {
 			render: record => {
 				return (
 					<div>
-						<a onClick={this._viewClick.bind(this, record._id)}>查看</a>
-						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定" cancelText="取消">
+						<a style={{ marginRight: '10px' }} onClick={this._viewClick.bind(this, record._id, record)}>查看</a>
+						{/* <Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定" cancelText="取消">
 							<a>删除</a>
+						</Popconfirm> */}
+						<Popconfirm title="确定删除吗?" onConfirm={this._deleteClick.bind(this, record._id)} okText="确定" cancelText="取消">
+							{/* <a>删除</a> */}
+							{
+								this.confirms()
+							}
 						</Popconfirm>
+
 					</div>
 				)
 			},

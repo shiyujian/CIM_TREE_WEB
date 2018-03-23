@@ -205,7 +205,7 @@ class AddModal extends Component {
                     "username": user.username,
                     "person_code": user.code,
                     "person_name": user.name,
-                    "id": parseInt(user.id)
+					"id": parseInt(user.id),
 				};
 				
 				let subject = [{

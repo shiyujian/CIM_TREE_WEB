@@ -26,7 +26,7 @@ class ToggleModal extends Component {
 			isSentMsg: false, //接收人员是否发短信
 			isCopyMsg: false, //接收人员是否发短信
 			progress: 0,
-			org_codes:''
+			org_codes: ''
 		}
 	}
 
@@ -126,8 +126,8 @@ class ToggleModal extends Component {
 	//发送文件
 	_sendDoc() {
 		const {
-			actions: { postSentDocAc, getSentInfoAc, getCopyUsersAc, sentMessageAc },
-			
+			actions: { postSentDocAc, getSentInfoAc, getCopyUsersAc, sentMessageAc, getOrgName },
+
 			toggleData: toggleData = {
 				type: 'NEWS',
 				status: 'ADD',
@@ -137,7 +137,7 @@ class ToggleModal extends Component {
 			form: { validateFields },
 			fileList = []
 		} = this.props;
-		console.log(this.props)
+
 		const {
 			sentUsers = [],
 			copyUsers = [],
@@ -148,36 +148,36 @@ class ToggleModal extends Component {
 			message.warning("请添加接收单位！");
 			return
 		}
-		console.log("sentUsers",sentUsers)
-		const sentU=sentUsers[0].split("--")[0]
-		console.log("sentU",sentU)
-		const copyU=copyUsers[0].split("--")[0]
-		
-		// if (copyUsers.length === 0) {
-		// 	message.warning("请添加抄送单位！");
-		// 	return
-		// }
 		if (fileList.length === 0) {
 			message.warning("请上传文件！");
 			return
 		}
+		if (copyUsers.length === 0) {
+			message.warning("请添加抄送单位！");
+			return
+		}
+		let orgCode = getUser().org_code
+		let orgListCodes = orgCode.split("_");
+		orgListCodes.pop()
+		let codeu = orgListCodes.join()
+		let ucode = codeu.replace(/,/g, '_')
+		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+
+
 		validateFields((err, values) => {
 			if (!err) {
 				if (toggleData.status === 'ADD') {
-					console.log("this._getOrgText(copyUsers)",this._getOrgText(copyUsers))
+
 					let sendData = {
-						"from_whom": getUser().org,
-						"from_whom_department": getUser().org,
-						"to_whom": this.getBottomUnit(sentUsers),
-						"cc": this.getBottomUnit(copyUsers),
+						"from_whom":user.is_superuser == true?'admin': ucode,
+						"from_whom_department": user.is_superuser == true?'admin': ucode,
+						"to_whom": this._getOrgText(sentUsers),
+						"cc": this._getOrgText(copyUsers),
 						"title": values['title3'],
 						"body_rich": this.state.content,
 						"is_draft": false,
 						"sent_email": false,
-						"extend_info": {
-							"to_whomCode":sentU,
-							"cc_Code":copyU,
-						},
+						"extend_info": {},
 						"external_attachments": [
 							{
 								"file_id": fileList[0].id,
@@ -185,27 +185,30 @@ class ToggleModal extends Component {
 								"file_partial_url": fileList[0].a_file,
 								"file_info": fileList[0],
 								"send_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-								
+
 							}
 						]
 					};
-					// sentUsers.map((user) => {
-					// 	let obj = {
-					// 		code: user.split('--')[0],
-					// 		name: user.split('--')[1],
-					// 	}
-					// 	sendData.extend_info[String(user.split('--')[0])] = obj
-					// });
-					// console.log(1, sendData)
-					// return
 					postSentDocAc({}, sendData)
 						.then(rst => {
-							// console.log("rst",rst)
 							if (rst._id) {
 								message.success("发送文件成功！");
-								getSentInfoAc({
-									user: encodeURIComponent(getUser().org)
-								});
+								let orgCode = getUser().org_code
+
+								let orgListCodes = orgCode.split("_");
+								orgListCodes.pop()
+								let codeu = orgListCodes.join()
+								let ucode = codeu.replace(/,/g, '_')
+								if(user.is_superuser == true){
+									getSentInfoAc({
+										user: encodeURIComponent('admin')
+									});
+								}else{
+									getSentInfoAc({
+										user: encodeURIComponent(ucode)
+									});
+								}
+								
 								//所有需要发短信的人员手机号码
 								let promises_one = [];
 								let promises_two = [];
@@ -256,11 +259,9 @@ class ToggleModal extends Component {
 							}
 						})
 				} else if (toggleData.status === 'EDIT') {
-					console.log("getUser()",getUser())
-					console.log("this._getOrgText(sentUsers)",this._getOrgText(sentUsers))					
 					let sendData = {
-						"from_whom": getUser().org,
-						"from_whom_department": getUser().org,
+						"from_whom": ucode,
+						"from_whom_department": ucode,
 						"to_whom": this._getOrgText(sentUsers),
 						"cc": this._getOrgText(copyUsers),
 						"title": values['title3'],
@@ -275,7 +276,7 @@ class ToggleModal extends Component {
 								"file_partial_url": fileList[0].a_file,
 								"file_info": fileList[0],
 								"send_time": moment().format('YYYY-MM-DD HH:mm:ss'),
-								'backTo_id':this._getOrgText(sentUsers)[1]								
+								// 'backTo_id': this._getOrgText(sentUsers)[1]
 							}
 						]
 					};
@@ -290,13 +291,17 @@ class ToggleModal extends Component {
 					// return
 					postSentDocAc({}, sendData)
 						.then(rst => {
-							console.log(sendData)
-							console.log(this.props,"111111")
-							console.log(rst)
 							if (rst._id) {
+
 								message.success("发送文件成功！");
+								let orgCode = getUser().org_code
+
+								let orgListCodes = orgCode.split("_");
+								orgListCodes.pop()
+								let codeu = orgListCodes.join()
+								let ucode = codeu.replace(/,/g, '_')
 								getSentInfoAc({
-									user: encodeURIComponent(getUser().org)
+									user: encodeURIComponent(ucode)
 								});
 								//所有需要发短信的人员手机号码
 								let promises_one = [];
@@ -354,20 +359,16 @@ class ToggleModal extends Component {
 	}
 
 	_getOrgText(arr) {
-		// console.log("arr",arr)
 		let tmpArr = [];
-				
 		arr.map((itm) => {
-			console.log(itm)
 			if (tmpArr.filter(item => item == itm.split('--')[1]).length === 0) {
-				// console.log(itm)
-				tmpArr.push(itm.split('--')[1])
 				tmpArr.push(itm.split('--')[0])
+				// tmpArr.push(itm.split('--')[0])
 			}
-			
+
 			// console.log(itm.split('--')[0])
 			// this.setState({org_codes:itm.split('--')[0]})
-			
+
 		});
 		return tmpArr
 	}
@@ -395,7 +396,7 @@ class ToggleModal extends Component {
 				) : '发文'}
 				wrapClassName='edit-box'
 				visible={toggleData.visible}
-				width="70%"
+				width="80%"
 				maskClosable={false}
 				onOk={this._sendDoc.bind(this)}
 				onCancel={this.closeModal.bind(this)}
@@ -456,26 +457,31 @@ class ToggleModal extends Component {
 											<Col span={10}>
 												<TreeSelect
 													onChange={this._orgChange.bind(this)}
+													// disabledCheckbox={true}
+													dropdownMatchSelectWidth={false}
+													treeCheckable={true}
 												>
 													{
 														ToggleModal.loop(orgList, this.state.sentUsers)
 													}
 												</TreeSelect>
 											</Col>
-											<Col span={4}>
+											{/* <Col span={4}>
 												<Button onClick={this._addSentUser.bind(this)}>添加</Button>
-											</Col>
-											<Col span={4}>
-												<Checkbox onChange={this._cpoyMsg.bind(this)}>短信通知</Checkbox>
+											</Col> */}
+											<Col style={{marginLeft:'10px'}} span={4}>
+												<Checkbox style={{marginTop:'2px'}} onChange={this._cpoyMsg.bind(this)}>短信通知</Checkbox>
 											</Col>
 										</Row>
-										<Row>
+										{/* <Row>
 											<Col span={20} offset={2}>
 												<Table dataSource={this._getUserFunc(this.state.sentUsers)}
 													columns={this.columns}
+													size="small"
+													bordered
 													rowKey="code" />
 											</Col>
-										</Row>
+										</Row> */}
 									</Col>
 									<Col span={12}>
 										<Row>
@@ -485,26 +491,30 @@ class ToggleModal extends Component {
 											<Col span={10}>
 												<TreeSelect
 													onChange={this._orgChangeT.bind(this)}
+													dropdownMatchSelectWidth={false}
+													treeCheckable={true}
 												>
 													{
 														ToggleModal.loopT(orgList, this.state.copyUsers)
 													}
 												</TreeSelect>
 											</Col>
-											<Col span={4}>
+											{/* <Col span={4}>
 												<Button onClick={this._addSentUserT.bind(this)}>添加</Button>
-											</Col>
-											<Col span={4}>
-												<Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
+											</Col> */}
+											<Col style={{marginLeft:'10px'}} span={4}>
+												<Checkbox style={{marginTop:'2px'}} onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
 											</Col>
 										</Row>
-										<Row>
+										{/* <Row>
 											<Col span={20} offset={4}>
 												<Table dataSource={this._getUserFunc(this.state.copyUsers)}
 													columns={this.columnsT}
+													bordered
+													size="small"
 													rowKey="code" />
 											</Col>
-										</Row>
+										</Row> */}
 									</Col>
 								</Row>
 							</Col>
@@ -515,87 +525,88 @@ class ToggleModal extends Component {
 		);
 	}
 
-	getBottomUnit = (data)=>{
+	getBottomUnit = (data) => {
 		//如果选择上级单位工程，返回其最低下所有单位工程
 		//let n = ["ORG_01--业主单位","ORG_P00--9号地块"];	//测试数据
 
-		const {orgList} = this.props;
-		let ret = data.reduce((pre,cur)=>{
-			console.log("cur",cur)
-			console.log("cur",cur.split("--"))
+		const { orgList } = this.props;
+		let ret = data.reduce((pre, cur) => {
 			let code = cur.split("--")[0],
-				rightUnit = this.getRightUnit(orgList,code),
-				result = rightUnit? this.getAllUnit(rightUnit) : [code];
+				rightUnit = this.getRightUnit(orgList, code),
+				result = rightUnit ? this.getAllUnit(rightUnit) : [code];
 
 			return pre.concat(result);
-		},[])
-		console.log("1111",ret)
+		}, [])
 
 		return [...new Set(ret)];
 	}
-	getRightUnit = (orgList,code)=>{
+	getRightUnit = (orgList, code) => {
 		//获得当前code对应的Unit的所有信息
-		for(let i=0;i<orgList.length;i++){
-			if(orgList[i].code == code){
+		for (let i = 0; i < orgList.length; i++) {
+			if (orgList[i].code == code) {
 				return orgList[i];
 			}
 
-			if(orgList[i].children.length != 0){
+			if (orgList[i].children.length != 0) {
 				let x = this.getRightUnit(orgList[i].children, code);
-				if(x) return x;
+				if (x) return x;
 			}
 		}
 	}
-	getAllUnit = (data,parameter="name")=>{
+	getAllUnit = (data, parameter = "name") => {
 		//获得本单位工程最底层所有单位工程的code
 		let child = data.children;
 
 		return child.length == 0
-			? [ data[parameter] ]
-			: child.reduce((pre,cur)=>{
-				return pre.concat( this.getAllUnit(cur) );
-			},[]);	
+			? [data[parameter]]
+			: child.reduce((pre, cur) => {
+				return pre.concat(this.getAllUnit(cur));
+			}, []);
 	}
 
 
 	_orgChange(value) {
-		//接受单位选择
+		// 接受单位选择
 		this.setState({
-			selectSentUser: value
+			selectSentUser: value,
+			sentUsers:value
 		});
 	}
 
 	_orgChangeT(value) {
 		//抄送单位选择
+		
 		this.setState({
-			selectCopyUser: value
+			selectCopyUser: value,
+			copyUsers:value
 		});
 	}
 
-	_addSentUser() {
-		//接受单位添加
-		if (this.state.selectSentUser === '') {
-			message.warning('请选择接受单位！');
-			return
-		}
-		let newUsers = this.state.sentUsers;
-		newUsers.push(this.state.selectSentUser);
-		this.setState({
-			sentUsers: newUsers
-		})
-	}
+	// _addSentUser() {
+	// 	//接受单位添加
+	// 	if (this.state.selectSentUser === '') {
+	// 		message.warning('请选择接受单位！');
+	// 		return
+	// 	}
+	// 	// let newUsers = this.state.sentUsers;
+	// 	// console.log("newUsers",newUsers)
+	// 	// newUsers.push(this.state.selectSentUser);
+	// 	this.setState({
+	// 		sentUsers: this.state.selectSentUser
+	// 	})
+	// }
 
-	_addSentUserT() {
-		if (this.state.selectCopyUser === '') {
-			message.warning('请选择抄送单位！');
-			return
-		}
-		let newUsers = this.state.copyUsers;
-		newUsers.push(this.state.selectCopyUser);
-		this.setState({
-			copyUsers: newUsers
-		})
-	}
+	// _addSentUserT() {
+	// 	if (this.state.selectCopyUser === '') {
+	// 		message.warning('请选择抄送单位！');
+	// 		return
+	// 	}
+	// 	let newUsers = this.state.copyUsers;
+	// 	newUsers.push(this.state.selectCopyUser);
+	// 	this.setState({
+	// 		copyUsers: newUsers
+	// 	})
+	// }
 
 	static _checkSentDisable(value, arr) {
 		let disabled = false;
@@ -616,6 +627,7 @@ class ToggleModal extends Component {
 	columns = [
 		{
 			title: '单位',
+			width: '70%',
 			dataIndex: 'org',
 		}, {
 			title: '操作',
@@ -629,6 +641,7 @@ class ToggleModal extends Component {
 	columnsT = [
 		{
 			title: '单位',
+			width: '70%',
 			dataIndex: 'org',
 		}, {
 			title: '操作',
@@ -686,17 +699,25 @@ class ToggleModal extends Component {
 	static loop(data = [], arr = []) {
 		return data.map((item) => {
 			if (item.children && item.children.length) {
-				return (
-					<TreeNode key={`${item.code}--${item.name}`}
-						value={`${item.code}--${item.name}`}
-						title={`${item.name}`}
-						disabled={ToggleModal._checkSentDisable(`${item.code}--${item.name}`, arr)}
-					>
-						{
-							ToggleModal.loop(item.children)
-						}
-					</TreeNode>
-				);
+				if (item.children[0].children && item.children[0].children.length == 0) {
+					delete item.children
+				} else {
+					return (
+						<TreeNode
+							key={`${item.code}--${item.name}`}
+							value={`${item.code}--${item.name}`}
+							title={`${item.name}`}
+							disabled={ToggleModal._checkSentDisable(`${item.code}--${item.name}`, arr)}
+						>
+							{
+								ToggleModal.loop(item.children)
+
+							}
+
+						</TreeNode>
+					);
+				}
+
 			}
 			return <TreeNode key={`${item.code}--${item.name}`}
 				value={`${item.code}--${item.name}`}
@@ -709,17 +730,24 @@ class ToggleModal extends Component {
 	static loopT(data = [], arr = []) {
 		return data.map((item) => {
 			if (item.children && item.children.length) {
-				return (
-					<TreeNode key={`${item.code}--${item.name}`}
-						value={`${item.code}--${item.name}`}
-						title={`${item.name}`}
-						disabled={ToggleModal._checkSentDisableT(`${item.code}--${item.name}`, arr)}
-					>
-						{
-							ToggleModal.loopT(item.children)
-						}
-					</TreeNode>
-				);
+				if (item.children[0].children && item.children[0].children.length == 0) {
+					delete item.children
+				} else {
+					return (
+						<TreeNode
+							key={`${item.code}--${item.name}`}
+							value={`${item.code}--${item.name}`}
+							title={`${item.name}`}
+							disabled={ToggleModal._checkSentDisableT(`${item.code}--${item.name}`, arr)}
+						>
+							{
+								ToggleModal.loopT(item.children)
+
+							}
+
+						</TreeNode>
+					);
+				}
 			}
 			return <TreeNode key={`${item.code}--${item.name}`}
 				value={`${item.code}--${item.name}`}

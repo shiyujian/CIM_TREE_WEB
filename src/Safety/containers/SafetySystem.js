@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Select} from 'antd';
 import PkCodeTree from '../components/PkCodeTree.js';
-import {SafetyTable, AddModal} from '../components/SafetySystem';
+import {SafetyTable, AddModal,SearchInfo} from '../components/SafetySystem';
 import {actions as platformActions} from '_platform/store/global';
 import {PROJECT_UNITS} from '_platform/api';
 import {actions} from '../store/safetySystem'
@@ -64,12 +64,13 @@ export default class SafetySystem extends Component {
                         />
                     </Sidebar>
                     <Content>
+                        <SearchInfo {...this.props} {...this.state}/>
                         <SafetyTable  
                             {...this.props} 
                             {...this.state}
                         />
                         {
-                            addVisible && <AddModal {...this.props}/>
+                            addVisible && <AddModal {...this.props} {...this.state}/>
                         }
                     </Content>
                 </Main>

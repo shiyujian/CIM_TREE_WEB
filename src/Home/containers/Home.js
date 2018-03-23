@@ -8,17 +8,20 @@ import * as previewActions from '_platform/store/global/preview';
 import Preview from '_platform/components/layout/Preview';
 import {actions as newsActions} from '../store/news';
 import {actions as staffActions} from '../store/staff';
+import {actions as datumActions} from '../store/datum';
+
+// import {actions} from '../store/index';
 import banner from '../components/images/banner.png';
 
 
 
 @connect(
 	state => {
-		const {home: {news = {},staff = {}}, platform} = state || {};
-		return {...news,...staff, platform};
+		const {home: {news = {},staff = {},datum = {}}, platform} = state || {};
+		return {...news,...staff,...datum, platform};
 	},
 	dispatch => ({
-		actions: bindActionCreators({...newsActions,...staffActions ,...platformActions,...previewActions}, dispatch)
+		actions: bindActionCreators({...newsActions,...staffActions ,...datumActions,...platformActions,...previewActions}, dispatch)
 	}),
 )
 
