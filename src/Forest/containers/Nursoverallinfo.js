@@ -43,7 +43,7 @@ export default class Nursoverallinfo extends Component {
     }
 
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList,getForestTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList,getForestTreeNodeList,getLittleBanAll}, users, treetypes,littleBanAll,platform:{tree = {}}} = this.props; 
         this.biaoduan = [];
         PROJECT_UNITS[0].units.map(item => {
             this.biaoduan.push(item);
@@ -61,6 +61,9 @@ export default class Nursoverallinfo extends Component {
         // 避免反复获取森林树种列表，提高效率
         if(!tree.bigTreeList){
             getTreeNodeList()
+        }
+        if(!littleBanAll){
+            getLittleBanAll()
         }
        
         //类型

@@ -15,6 +15,7 @@ export const clearList = createAction(`${ID}清空列表`);
 export const nurseryName = createAction(`${ID}供应商名字`);
 const getForestUsersOK = createAction('获取森林数据用户列表');
 const getTreeListOK = createAction('获取森林树种列表');
+const getLittleBanAllOK = createAction('获取全部小班列表');
 
 /*****************************院内************************/
 export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [getForestUsersOK]);
@@ -60,7 +61,9 @@ export const getHonestyNewTreetype = createFetchAction(`${FOREST_API}/tree/facto
 export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //    √
 export const postPositionData = createFetchAction(`${FOREST_API}/tree/importLocations?user={{id}}`, [],'POST'); //    √
 export const getcarpackage = createFetchAction(`${FOREST_API}/tree/carpacks`, []);
-export const getexportcarpackage = createFetchAction(`${FOREST_API}/tree/exportFactoryAnalyseInfo`, []);
+export const getexportcarpackage = createFetchAction(`${FOREST_API}/tree/exportcarpacks`, []);
+export const getLittleBanAll = createFetchAction(`${FOREST_API}/tree/wpunit4apps`, [getLittleBanAllOK]);
+export const getNurserysByPack = createFetchAction(`${FOREST_API}/tree/nurserysbypack`, []);
 export const actions = {
 	getForestUsers,
 	getTreeOK,
@@ -107,7 +110,9 @@ export const actions = {
 	getForestTreeNodeList,
 	postPositionData,
 	getcarpackage,
-	getexportcarpackage
+	getexportcarpackage,
+	getLittleBanAll,
+	getNurserysByPack
 	// getTreeNodeList
 };
 export default handleActions({
@@ -152,5 +157,9 @@ export default handleActions({
 	[nurseryName]: (state, {payload}) => ({
 		...state,
 		nurseryName: payload
+	}),
+	[getLittleBanAllOK]: (state, {payload}) => ({
+		...state,
+		littleBanAll: payload
 	})
 }, {});

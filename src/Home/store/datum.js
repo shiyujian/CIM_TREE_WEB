@@ -28,7 +28,6 @@ export default handleActions({
 	// 	}
 	// },
 	[getTaskPersonOK](state, {payload}){
-		console.log('payload',payload)
 		return{
 			...state,
 			usertasks: payload
