@@ -18,7 +18,7 @@ const FormItem = Form.Item;
 const Step = Steps.Step;
 
 
-class ScheduleTotalRefill extends Component {
+class SafetySystemRefill extends Component {
 
     static propTypes = {};
     constructor(props) {
@@ -30,7 +30,8 @@ class ScheduleTotalRefill extends Component {
             sectionSchedule:[],
             projectName:'',
             oldSubject:{},
-            loading:false
+            loading:false,
+            file:''
         };
     }
 
@@ -75,9 +76,6 @@ class ScheduleTotalRefill extends Component {
     }]
     componentDidMount(){
         const { 
-            actions: { 
-                gettreetype 
-            },
             form: {
                 setFieldsValue
             },
@@ -92,9 +90,10 @@ class ScheduleTotalRefill extends Component {
         console.log('record',record.timedate)
         
         setFieldsValue({
-            section:record.sectionName?record.sectionName:'',
+            sectionName:record.sectionName?record.sectionName:'',
             numbercode:record.numbercode?record.numbercode:'',
-            // timedate:record.timedate?moment.utc(record.timedate):'',
+            document:record.document?record.document:'',
+            Safename:record.Safename?record.Safename:'',
             dataReview:record.dataReview?(record.dataReview.person_name?record.dataReview.person_name:''):'',
         })
     }
@@ -108,11 +107,11 @@ class ScheduleTotalRefill extends Component {
 			'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
             'section':subject.section?JSON.parse(subject.section):'',
             'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
-			'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
-            'totledocument':subject.totledocument?JSON.parse(subject.totledocument):'',
+            'numbercode':subject.numbercode?JSON.parse(subject.numbercode):'',
+            'Safename':subject.Safename?JSON.parse(subject.Safename):'',
+            'document':subject.document?JSON.parse(subject.document):'',
             'timedate':subject.timedate?JSON.parse(subject.timedate):'',
             'dataReview':subject.dataReview?JSON.parse(subject.dataReview):'',
-			// 'superunit':subject.superunit?JSON.parse(subject.superunit):''
         }
  
         let TreatmentData = subject.TreatmentData?JSON.parse(subject.TreatmentData):[];
@@ -204,7 +203,7 @@ class ScheduleTotalRefill extends Component {
                                         <Col span={10}>
                                             <FormItem {...FormItemLayout} label='标段'>
                                                 {
-                                                        getFieldDecorator('section', {
+                                                        getFieldDecorator('sectionName', {
                                                             rules: [
                                                                 { required: true, message: '请选择标段' }
                                                             ]
@@ -217,6 +216,20 @@ class ScheduleTotalRefill extends Component {
                                             </FormItem>
                                         </Col>
                                         <Col span={10}>
+                                            <FormItem {...FormItemLayout} label='名称'>
+                                                {
+                                                    getFieldDecorator('Safename', {
+                                                        rules: [
+                                                            { required: true, message: '请输入名称' }
+                                                        ]
+                                                    })
+                                                        (<Input placeholder='请输入名称' />)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                    <Col span={10}>
                                             <FormItem {...FormItemLayout} label='编号'>
                                                 {
                                                     getFieldDecorator('numbercode', {
@@ -228,33 +241,22 @@ class ScheduleTotalRefill extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                    </Row>
-                                    <Row>
                                         <Col span={10}>
                                             <FormItem {...FormItemLayout} label='文档类型'>
                                                 {
-                                                    getFieldDecorator('totledocument', {
-                                                        initialValue: `总计划进度`,
+                                                    getFieldDecorator('document', {
                                                         rules: [
                                                             { required: true, message: '请输入文档类型' }
                                                         ]
                                                     })
-                                                        (<Input placeholder='请输入文档类型' />)
+                                                    (<Select placeholder='请选择文档类型' >
+                                                        <Option key={'安全管理体系'} value={'安全管理体系'}>安全管理体系</Option>
+                                                        <Option key={'安全应急预案'} value={'安全应急预案'}>安全应急预案</Option>
+                                                        <Option key={'安全专项方案'} value={'安全专项方案'}>安全专项方案</Option>
+                                                    </Select>)
                                                 }
                                             </FormItem>
                                         </Col>
-                                        {/* <Col span={10}>
-                                            <FormItem {...FormItemLayout} label='监理单位'>
-                                                {
-                                                    getFieldDecorator('superunit', {
-                                                        rules: [
-                                                            { required: true, message: '请选择审核人员' }
-                                                        ]
-                                                    })
-                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
-                                                }
-                                            </FormItem>
-                                        </Col> */}
                                     </Row>
                                     <Row>
                                         <Dragger
@@ -341,7 +343,7 @@ class ScheduleTotalRefill extends Component {
                                                             <div>
                                                                 <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
                                                                 <span
-                                                                    style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                                    style={{ paddingLeft: 20 }}>{`${step.state.name}`}时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
                                                             </div>
                                                         </div>} />);
                                         }
@@ -396,7 +398,8 @@ class ScheduleTotalRefill extends Component {
         const{
             TreatmentData,
             projectName,
-            oldSubject
+            oldSubject,
+            // file 
         } = this.state
         let user = getUser();//当前登录用户
         let me = this;
@@ -414,7 +417,7 @@ class ScheduleTotalRefill extends Component {
                 }
                 
                 postData.upload_unit = user.org ? user.org : '';
-                postData.type = '总进度计划';
+                postData.type = '安全体系';
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
@@ -424,12 +427,14 @@ class ScheduleTotalRefill extends Component {
                     "sectionName":oldSubject.sectionName,
                     "projectName":oldSubject.projectName,
 					"dataReview": oldSubject.dataReview,
-					"numbercode": JSON.stringify(values.numbercode),
+                    "numbercode": JSON.stringify(values.numbercode),
+                    "Safename": JSON.stringify(values.Safename),
 					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
-					"totledocument": JSON.stringify(values.totledocument),
+					"document": JSON.stringify(values.document),
 					"postData": JSON.stringify(postData),
                     "TreatmentData": JSON.stringify(TreatmentData),
-                    
+                    "FillPerson": oldSubject.FillPerson,
+                    // "file": JSON.stringify(file)
                 }];
                 let newSubject = {
                     subject:subject
@@ -627,4 +632,4 @@ class ScheduleTotalRefill extends Component {
     }
 
 }
-export default Form.create()(ScheduleTotalRefill)
+export default Form.create()(SafetySystemRefill)

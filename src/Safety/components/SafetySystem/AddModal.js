@@ -149,8 +149,7 @@ class AddModal extends Component {
 										})
 											(
 											<PerSearch selectMember={this.selectMember.bind(this)} 
-												// code={WORKFLOW_CODE.安全体系报批流程}
-												code={WORKFLOW_CODE.总进度计划报批流程}  
+												code={WORKFLOW_CODE.安全体系报批流程} 
 												visible={addVisible}
 											/>
 											)
@@ -237,8 +236,9 @@ class AddModal extends Component {
 					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
 					"document": JSON.stringify(values.Safedocument),
 					"postData": JSON.stringify(postData),
-					"file": JSON.stringify(file),
+					// "file": JSON.stringify(file),
 					"TreatmentData": JSON.stringify(TreatmentData),
+					"FillPerson":JSON.stringify(currentUser),
                     
 				}];
 				
