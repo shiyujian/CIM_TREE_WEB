@@ -32,12 +32,18 @@ export default class SafetySystem extends Component {
             resetkey: 0,
         }
     }
-    componentDidMount() {
-        const {actions: {getTreeList,getTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
+    async componentDidMount() {
+        const {actions: {getTreeList,getTreeNodeList,getScheduleTaskList}, users, treetypes,platform:{tree = {}}} = this.props; 
 
-        // 避免反复获取森林用户数据，提高效率
-        if (!tree.bigTreeList) {
-            getTreeNodeList()
+        if(!tree.scheduleTaskList){
+            let data = await getScheduleTaskList()
+            if(data && data instanceof Array && data.length>0){
+                data = data[0]
+                let leftkeycode = data.No? data.No :''
+                this.setState({
+                    leftkeycode
+                })
+            }
         }
     }
 
@@ -49,9 +55,10 @@ export default class SafetySystem extends Component {
 
         const {platform:{tree={}}} = this.props;
         let treeList = [];
-        if(tree.bigTreeList){
-            treeList = tree.bigTreeList
+        if(tree.scheduleTaskList){
+            treeList = tree.scheduleTaskList
         }
+        console.log('this.props',this.props)
         return (
             <Body>
                 <Main>
