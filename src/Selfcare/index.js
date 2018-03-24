@@ -25,7 +25,7 @@ export default class Selfcare extends Component {
 				<Submenu {...this.props} menus={Selfcare.menus}/>
 			</Aside>
 			<Main>
-				{Tasks && <Route exact path="/selfcare" component={Tasks}/>}
+				{Tasks && <Route exact path="/selfcare/task" component={Tasks}/>}
 				{Task && <Route exact path="/selfcare/task/:task_id" component={Task}/>}
 				{Query && <Route exact path="/selfcare/query" component={Query}/>}
 				{Leave && <Route exact path="/selfcare/leave" component={Leave}/>}
@@ -38,7 +38,7 @@ export default class Selfcare extends Component {
 		key: 'tasks',
 		id: 'SELFCARE.TASK',
 		name: '个人任务',
-		path: '/selfcare',
+		path: '/selfcare/task',
 		icon: <Icon name="tasks"/>
 	}, {
 		key: 'query',

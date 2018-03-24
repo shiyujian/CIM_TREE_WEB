@@ -106,7 +106,7 @@ export default class Header extends Component {
 			key: 'selfcare',
 			id: 'SELFCARE',
 			title: '个人中心',
-			path: '/selfcare',
+			path: '/selfcare/task',
 			icon: <Icon name="user"/>
 		}, {
 			key: 'system',
