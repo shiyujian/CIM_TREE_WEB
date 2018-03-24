@@ -202,7 +202,7 @@ export default class Header extends Component {
 					</div>
 					<div className="head-fn" >
 						<Badge  count={this.state.tasks}>
-							<Link to='/selfcare'>
+							<Link to='/selfcare/task'>
 								<Icon style={{ marginTop: "4px" }} name="tasks" title="个人任务" onClick={this.onClickDot.bind(this)} />
 							</Link>
 						</Badge>

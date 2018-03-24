@@ -175,7 +175,7 @@ export default class DayPlanModal extends Component {
                                                         <div style={{ lineHeight: 2.6 }}>
                                                             <div>意见：{note}</div>
                                                             <div>
-                                                                <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{organization}]</span>
+                                                                <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
                                                                 <span
                                                                     style={{ paddingLeft: 20 }}>{`${step.state.name}`}时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
                                                             </div>
