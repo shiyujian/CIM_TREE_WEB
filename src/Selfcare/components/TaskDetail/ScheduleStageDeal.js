@@ -40,7 +40,7 @@ export default class ScheduleStageDeal extends Component {
                 </Row>
                 <Row>
                     <div style={{ textAlign: 'center', marginTop: 10 }}>
-                        <Button type='primary' onClick={this.handleSubmit.bind(this, task)} style={{ marginRight: 20 }}>提交</Button>
+                        <Button type='primary' onClick={this.handleSubmit.bind(this, task)} style={{ marginRight: 20 }}>同意</Button>
                         <Button onClick={this.handleReject.bind(this, task)}>退回</Button>
                     </div>
                 </Row>

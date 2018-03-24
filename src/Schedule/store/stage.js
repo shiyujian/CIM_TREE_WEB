@@ -17,7 +17,7 @@ export const getSelectedNodeInfo = createAction(`${ID}_获取选中树节点信�
 export const getTreeOK = createAction(`${ID}_getTreeOK`);
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [getTreeOK]);
 export const getTreeList = createFetchAction(`${FOREST_API}/trees/list/`, []);
-export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypesbyno`, []);
+export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
 export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`);
 const getUserList = createFetchAction(`${USER_API}/users/?page=1&page_sise=5`,[]);
 

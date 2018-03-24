@@ -106,8 +106,9 @@ export default class NursOverallTable extends Component {
 			keycode,
 			statusoption,
 			locationoption,
-			users,
+			users
 		} = this.props;
+		debugger
 		const {
 			sxm, 
 			factory, 
@@ -708,7 +709,25 @@ export default class NursOverallTable extends Component {
 
 	handleCancel(){
     	this.setState({imgvisible:false})
-    }
+	}
+	getThinClassName(no,section){
+		const {littleBanAll} = this.props;
+		let nob = no.substring(0,15);
+		let sectionn = section.substring(8,10);
+		let result = '/'
+		debugger
+		if(littleBanAll){
+			littleBanAll.map(item => {
+				if(item.No.substring(0,15) === nob && item.No.substring(16,18) === sectionn){
+					result = item.ThinClassName;
+					return;
+				}
+			})
+		}else{
+			return <p> / </p>
+		}
+		return result;
+	}
 
     qury(page) {
     	const {
@@ -803,7 +822,7 @@ export default class NursOverallTable extends Component {
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
+	    			let place = this.getThinClassName(plan.No,plan.Section);
 	    			tblData[i].place = place;
 					tblData[i].statusname = this.getStatusName(plan.Status);
 					let islocation = !!plan.LocationTime ? '已定位' : '未定位';

@@ -177,7 +177,7 @@ export default class DayPlanModal extends Component {
                                                             <div>
                                                                 <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{organization}]</span>
                                                                 <span
-                                                                    style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                                    style={{ paddingLeft: 20 }}>{`${step.state.name}`}时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
                                                             </div>
                                                         </div>} />);
                                         }
@@ -201,7 +201,10 @@ export default class DayPlanModal extends Component {
 		title: '序号',
 		dataIndex: 'key',
 		key: 'key',
-		width: '10%',
+        width: '10%',
+        render:(text, record, index) => {
+            return <span>{record.key+1}</span>
+        }
 	}, {
 		title: '项目',
 		dataIndex: 'project',

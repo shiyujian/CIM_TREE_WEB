@@ -31,6 +31,9 @@ class ScheduleDayDetail extends Component {
 		dataIndex: 'key',
 		key: 'key',
 		width: '10%',
+		render:(text, record, index) => {
+			return <span>{record.key+1}</span>
+		}
 	}, {
 		title: '项目',
 		dataIndex: 'project',
