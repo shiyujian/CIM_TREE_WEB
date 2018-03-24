@@ -53,6 +53,12 @@ export default class SendPage1 extends Component {
 			editData: null
 		})
 	}
+	handleCancel() {
+		this.setState({
+			visible: false,
+			container: null,
+		})
+	}
 	render() {
 		const rowSelection = {
 			// selectedRowKeys,
@@ -91,24 +97,26 @@ export default class SendPage1 extends Component {
 				{(toggleData.visible && toggleData.type === 'NEWS') && <ToggleModal {...this.props} />}
 				<Modal
 					title="查看详情"
-					width="90%"
+					width="70%"
 					style={{ padding: "0 20px" }}
 					visible={this.state.visible}
+					onOk={this.handleCancel.bind(this)}
+					onCancel={this.handleCancel.bind(this)}
 					closable={false}
 					maskClosable={false}
-					footer={null}
+					// footer={null}
 				>
 					{
 						notification.title &&
-						<Row>
+						<Row style={{padding:"0 80px",minHeight:"300px"}}>
 							<Col span={24} style={{ textAlign: 'center', marginBottom: '20px' }}>
 								<h1>{notification.title}</h1>
 							</Col>
 							<Row style={{ marginBottom: '20px' }}>
 								<Col span={24}>
-									<h3>接受单位：{this.state.viewClickinfo.to_whom_s}</h3>
-									<h3>抄送单位：{this.state.viewClickinfo.cc_whom_s}</h3>
-									<h3>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h3>
+									<h3 style={{ marginTop: '20px'}}>接受单位：{this.state.viewClickinfo.to_whom_s}</h3>
+									<h3 style={{ marginTop: '20px'}}>抄送单位：{this.state.viewClickinfo.cc_whom_s}</h3>
+									<h3 style={{ marginTop: '20px'}}>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h3>
 								</Col>
 							</Row>
 							<Row style={{ marginBottom: '20px' }}>
@@ -118,6 +126,7 @@ export default class SendPage1 extends Component {
 								<Col span={22}>
 									<div style={{
 										maxHeight: '800px',
+										minHeight: '50px',
 										overflow: 'auto',
 										border: '1px solid #ccc',
 										padding: '10px'
@@ -126,16 +135,26 @@ export default class SendPage1 extends Component {
 								</Col>
 							</Row>
 							<Col span={24}>
-								<h3>附件：</h3>
+							<Col span={4}>
+									<h3 style={{width:'100%'}}>附件：</h3>
+								</Col>
+								<Col span={20}>
 								{
 									notification.fixed_external_attachments.length > 0 &&
 									<a href={STATIC_DOWNLOAD_API + notification.fixed_external_attachments[0].file_partial_url}
 										target="_bank">{notification.fixed_external_attachments[0].file_name}</a>
 								}
+								</Col>
+								{/* <h3>附件：</h3>
+								{
+									notification.fixed_external_attachments.length > 0 &&
+									<a href={STATIC_DOWNLOAD_API + notification.fixed_external_attachments[0].file_partial_url}
+										target="_bank">{notification.fixed_external_attachments[0].file_name}</a>
+								} */}
 							</Col>
-							<Col span={6} offset={18}>
+							{/* <Col span={6} offset={18}>
 								<Button onClick={this._handleCancel.bind(this)}>退出</Button>
-							</Col>
+							</Col> */}
 						</Row>
 					}
 

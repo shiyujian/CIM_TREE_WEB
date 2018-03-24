@@ -73,7 +73,7 @@ class Addition extends Component {
 			systemRoles.push({ name: '苗圃职务', children: ["苗圃"], value: roles.filter(role => role.grouptype === 0) });
 			systemRoles.push({ name: '施工职务', children: ["施工领导", "协调调度人", "质量负责人", "安全负责人", "文明负责人", "普通员工", "施工文书", "测量员"], value: roles.filter(role => role.grouptype === 1) });
 			systemRoles.push({ name: '监理职务', children: ["总监", "监理组长", "普通监理", "监理文书"], value: roles.filter(role => role.grouptype === 2) });
-			systemRoles.push({ name: '业主职务', children: ["业主", "业主文书"], value: roles.filter(role => role.grouptype === 3) });
+			systemRoles.push({ name: '业主职务', children: ["业主", "业主文书","业主领导"], value: roles.filter(role => role.grouptype === 3) });
 		}
 		else {
 			for (let i = 0; i < user.groups.length; i++) {
@@ -90,7 +90,7 @@ class Addition extends Component {
 						systemRoles.push({ name: '监理职务', children: ["总监", "监理组长", "普通监理", "监理文书"], value: roles.filter(role => role.grouptype === 2) });
 						break;
 					case 3:
-						systemRoles.push({ name: '业主职务', children: ["业主", "业主文书"], value: roles.filter(role => role.grouptype === 3) });
+						systemRoles.push({ name: '业主职务', children: ["业主", "业主文书","业主领导"], value: roles.filter(role => role.grouptype === 3) });
 						break;
 					default:
 						break;
