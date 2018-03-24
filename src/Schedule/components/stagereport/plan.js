@@ -422,7 +422,7 @@ class Plan extends Component {
 											dataSource={this.state.treedataSource}
 											className='foresttable'
 										/>
-										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10 }} type="primary" ghost>添加</Button>
+										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10, marginBottom: 20 }} type="primary" ghost>添加</Button>
 									</Row>
 									<Row>
 

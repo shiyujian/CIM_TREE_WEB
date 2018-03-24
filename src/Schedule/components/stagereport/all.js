@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-24 14:54:41
+ * @Last Modified time: 2018-03-24 21:46:35
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -413,7 +413,7 @@ class All extends Component {
                                                 className='foresttable'
                                             />
                                         </Row>
-                                        <Row>
+                                        <Row style={{  marginTop: 20 }}>
 
                                             <Col span={8} offset={4}>
                                                 <FormItem {...FormItemLayout} label='审核人'>
