@@ -3,7 +3,7 @@ import { Row, Col, Input, Form, Spin, Icon, Button, Table, Modal, DatePicker, Pr
 // import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS, PROJECT_UNITS,SECTIONNAME ,SCHEDULETREEDATA} from '../../../_platform/api';
+import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS, PROJECT_UNITS,SECTIONNAME ,SCHEDULETREEDATA, TREETYPENO} from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
 // import PerSearch from './PerSearch';
@@ -13,8 +13,8 @@ import queryString from 'query-string';
 import DayModal from './DayModal';
 moment.locale('zh-cn');
 const FormItem = Form.Item;
-const Option = Select.Option;
 const { MonthPicker, RangePicker } = DatePicker;
+const { Option, OptGroup } = Select;
 class Stagereporttab extends Component {
 
 	constructor(props) {
@@ -38,18 +38,28 @@ class Stagereporttab extends Component {
 		};
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
 		const { actions: { gettreetype } } = this.props;
 		
-		gettreetype({})
-			.then(rst => {
-				let treetype = rst.map((o, index) => {
-					return (
-						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeName}</Option>
-					)
-				})
-				this.setState({ treetype });
-			})
+		let treelist = await gettreetype({})	
+		let arr = []
+		let treetype = TREETYPENO.map((forest)=>{
+			arr = treelist.filter(tree => tree.TreeTypeNo.substr(0,1) === forest.id )
+			return (<OptGroup label={forest.name}>
+				{
+					arr.map(tree => {
+						// let code = tree.TreeTypeNo.substr(0, 1)
+						// if(forest.id === code){
+							return (<Option key={tree.id} value={JSON.stringify(tree)}>{tree.TreeTypeName}</Option>)
+						// }
+					})
+				}
+			</OptGroup>)
+		})
+		console.log('treetype',treetype)
+		this.setState({ treetype });
+
+			
 		this.gettaskSchedule();
 		this.getSection()
 	}
@@ -138,22 +148,31 @@ class Stagereporttab extends Component {
 		//关联标段的人只能看自己项目的进度流程
 		if(sections && sections instanceof Array && sections.length>0){
 			let code = sections[0].split('-')
-			selectCode = code[0] || ''
+			selectCode = code[0] || '';
+
+			stagedata.map((task)=>{
+			
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				
+				if(projectCode === selectCode && task.section === sections[0]){
+					filterData.push(task);
+				}
+			})
 		}else{
 			//不关联标段的人可以看选择项目的进度流程
 			selectCode = leftkeycode
+			stagedata.map((task)=>{
+			
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				
+				if(projectCode === selectCode ){
+					filterData.push(task);
+				}
+			})
+
 		}      
-		
-		stagedata.map((task)=>{
-			
-			let projectName = task.projectName
-			let projectCode = this.getProjectCode(projectName)
-			
-			
-			if(projectCode === selectCode){
-				filterData.push(task);
-			}
-		})
 		
 		this.setState({
 			filterData
@@ -611,7 +630,7 @@ class Stagereporttab extends Component {
         
         
         value = JSON.parse(value);
-        record[project] = value.TreeTypeName;
+		record[project] = value.TreeTypeName;
 	}
 	// 删除树列表
 	delTreeClick(record,index) {
@@ -707,7 +726,7 @@ class Stagereporttab extends Component {
 			Ssection: this.state.currentSectionName || undefined,
 			SdataReview: undefined,
 			Snumbercode: undefined,
-			Stimedate: undefined
+			Stimedate: moment().utc()
 		})
 	}
 	// 关闭弹框
@@ -810,7 +829,13 @@ class Stagereporttab extends Component {
                     return text
                 }else{
                     return (
-                        <Select style={{ width: '200px' }} placeholder='请选择树种' onSelect={this.handleSelect.bind(this, record, 'project')}>
+						<Select
+						 showSearch
+						 optionFilterProp='children'
+						 filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+						 style={{ width: '200px' }} 
+						 placeholder='请选择树种' 
+						 onChange={this.handleSelect.bind(this, record, 'project')}>
                             {
                                 this.state.treetype
                             }

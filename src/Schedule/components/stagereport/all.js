@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-22 16:31:05
+ * @Last Modified time: 2018-03-23 20:48:07
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -126,42 +126,54 @@ class All extends Component {
         }
     }
     //对流程信息根据选择项目进行过滤
-    filterTask(){
-        const {
-            totolData 
-        }=this.state
-        const{
-            leftkeycode
-        }=this.props
-        let filterData = []
-        let user = getUser()
-        
-        let sections = user.sections
-        
-        sections = JSON.parse(sections)
-        let selectCode = ''
-        //关联标段的人只能看自己项目的进度流程
-        if(sections && sections instanceof Array && sections.length>0){
-            let code = sections[0].split('-')
-            selectCode = code[0] || ''
-        }else{
-            //不关联标段的人可以看选择项目的进度流程
-            selectCode = leftkeycode
-        }
-        
-        totolData.map((task)=>{
-            
-            let projectName = task.projectName
-            let projectCode = this.getProjectCode(projectName)
-            if(projectCode === selectCode){
-                filterData.push(task);
-            }
-        })   
-        
-        this.setState({
-            filterData
-        })
-    }
+	filterTask(){
+		const {
+			totolData 
+		}=this.state
+		const{
+			leftkeycode
+		}=this.props
+		let filterData = []
+		let user = getUser()
+		
+		let sections = user.sections
+		
+		sections = JSON.parse(sections)
+		
+		let selectCode = ''
+		//关联标段的人只能看自己项目的进度流程
+		if(sections && sections instanceof Array && sections.length>0){
+			let code = sections[0].split('-')
+			selectCode = code[0] || '';
+
+			totolData.map((task)=>{
+			
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				
+				if(projectCode === selectCode && task.section === sections[0]){
+					filterData.push(task);
+				}
+			})
+		}else{
+			//不关联标段的人可以看选择项目的进度流程
+			selectCode = leftkeycode
+			totolData.map((task)=>{
+			
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				
+				if(projectCode === selectCode ){
+					filterData.push(task);
+				}
+			})
+
+		}      
+		
+		this.setState({
+			filterData
+		})
+	}
     //获取项目code
     getProjectCode(projectName){
         let projectCode = ''
@@ -398,7 +410,6 @@ class All extends Component {
                                                 columns={this.columns1}
                                                 pagination={true}
                                                 dataSource={this.state.TreatmentData}
-                                                rowKey='index'
                                                 className='foresttable'
                                             />
                                         </Row>
@@ -787,6 +798,10 @@ class All extends Component {
                     }
                     newdata.push(data)
                 })
+                notification.success({
+                    message:'文件上传成功',
+                    duration:3
+                })
                 this.setState({ 
                     newFileLists, 
                     TreatmentData: newdata,
@@ -794,6 +809,15 @@ class All extends Component {
                 })
                 postUploadFilesAc(newFileLists)
 
+            }else{
+                notification.error({
+                    message:'文件上传失败',
+                    duration:3
+                })
+                this.setState({
+                    loading:false
+                })
+                return;
             }
         },
     };
