@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {FILE_API,base, SOURCE_API, DATASOURCECODE,UNITS,SERVICE_API,PROJECT_UNITS,SECTIONNAME,WORKFLOW_CODE } from '../../../_platform/api';
 import {
 	Form, Input, Row, Col, Modal, Upload, Button,
-	Icon, message, Table, DatePicker, Progress, Select, Checkbox, Popconfirm,notification
+	Icon, message, Table, DatePicker, Progress, Select, Checkbox, Popconfirm,notification,Spin
 } from 'antd';
 import { getUser } from '../../../_platform/auth';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
@@ -23,7 +23,8 @@ class AddModal extends Component {
             projectName:'', //当前用户的项目信息
 			currentSection:'',
 			currentSectionName:'',
-			projectName:''
+			projectName:'',
+			loading:false
         };
     }
 	async componentDidMount() {
@@ -52,114 +53,116 @@ class AddModal extends Component {
 				onCancel={this.cancel.bind(this)}
                 onOk={this.sendWork.bind(this)}
 				maskClosable={false}>
-				<Form>
-					<Row>
-						<Col span={24}>
-							<Row>
-								<Col span={12}>
-									<FormItem {...FormItemLayout} label='标段'>
-										{
-											getFieldDecorator('Safesection', {
-												initialValue: `${currentSectionName?currentSectionName:''}`,
-												rules: [
-													{ required: true, message: '请选择标段' }
-												]
-											})
-												(<Input readOnly placeholder='请输入标段' />)	
-										}
-									</FormItem>
-								</Col>
-								<Col span={12}>
-									<FormItem {...FormItemLayout} label='名称'>
-										{
-											getFieldDecorator('Safename', {
-												rules: [
-													{ required: true, message: '请输入名称' }
-												]
-											})
-												(<Input placeholder='请输入名称' />)
-										}
-									</FormItem>
-								</Col>
-								
-							</Row>
-							<Row>
-								<Col span={12}>
-									<FormItem {...FormItemLayout} label='编号'>
-										{
-											getFieldDecorator('Safenumbercode', {
-												rules: [
-													{ required: true, message: '请输入编号' }
-												]
-											})
-												(<Input placeholder='请输入编号' />)
-										}
-									</FormItem>
-								</Col>
-								<Col span={12}>
-									<FormItem {...FormItemLayout} label='文档类型'>
-										{
-											getFieldDecorator('Safedocument', {
-												rules: [
-													{ required: true, message: '请选择文档类型' }
-												]
-											})
-												(<Select placeholder='请选择文档类型' >
-													<Option key={'安全管理体系'} value={'安全管理体系'}>安全管理体系</Option>
-													<Option key={'安全应急预案'} value={'安全应急预案'}>安全应急预案</Option>
-													<Option key={'安全专项方案'} value={'安全专项方案'}>安全专项方案</Option>
-												</Select>)
-										}
-									</FormItem>
-								</Col>
-							</Row>
-						</Col>
-					</Row>
-					<Row gutter={24}>
-						<Col span={24} style={{ marginTop: 16, height: '160px' }}>
-							<Dragger 
-								{...this.uploadProps}
-							>
-								<p className="ant-upload-drag-icon">
-									<Icon type="inbox" />
-								</p>
-								<p>点击或者拖拽开始上传</p>
-								<p className="ant-upload-hint">
-									支持 pdf、doc、docx 文件
-						 		</p>
-							</Dragger>
-						</Col>
-					</Row>
-					<Table
-						columns={this.columns1}
-						pagination={true}
-						dataSource={this.state.TreatmentData}
-						className='foresttable'
-					/>
-					<Row style={{ marginTop: 20}}>
-						<Col span={8} offset={4}>
-							<FormItem {...FormItemLayout} label='审核人'>
-								{
-									getFieldDecorator('SafedataReview', {
-										rules: [
-											{ required: true, message: '请选择审核人员' }
-										]
-									})
-										(
-										<PerSearch selectMember={this.selectMember.bind(this)} 
-											// code={WORKFLOW_CODE.安全体系报批流程}
-											code={WORKFLOW_CODE.总进度计划报批流程}  
-											visible={addVisible}
-										/>
-										)
-								}
-							</FormItem>
-						</Col>
-						<Col span={8} offset={4}>
-							<Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
-						</Col>
-					</Row>
-				</Form>
+				<Spin spinning={this.state.loading}>
+					<Form>
+						<Row>
+							<Col span={24}>
+								<Row>
+									<Col span={12}>
+										<FormItem {...FormItemLayout} label='标段'>
+											{
+												getFieldDecorator('Safesection', {
+													initialValue: `${currentSectionName?currentSectionName:''}`,
+													rules: [
+														{ required: true, message: '请选择标段' }
+													]
+												})
+													(<Input readOnly placeholder='请输入标段' />)	
+											}
+										</FormItem>
+									</Col>
+									<Col span={12}>
+										<FormItem {...FormItemLayout} label='名称'>
+											{
+												getFieldDecorator('Safename', {
+													rules: [
+														{ required: true, message: '请输入名称' }
+													]
+												})
+													(<Input placeholder='请输入名称' />)
+											}
+										</FormItem>
+									</Col>
+									
+								</Row>
+								<Row>
+									<Col span={12}>
+										<FormItem {...FormItemLayout} label='编号'>
+											{
+												getFieldDecorator('Safenumbercode', {
+													rules: [
+														{ required: true, message: '请输入编号' }
+													]
+												})
+													(<Input placeholder='请输入编号' />)
+											}
+										</FormItem>
+									</Col>
+									<Col span={12}>
+										<FormItem {...FormItemLayout} label='文档类型'>
+											{
+												getFieldDecorator('Safedocument', {
+													rules: [
+														{ required: true, message: '请选择文档类型' }
+													]
+												})
+													(<Select placeholder='请选择文档类型' >
+														<Option key={'安全管理体系'} value={'安全管理体系'}>安全管理体系</Option>
+														<Option key={'安全应急预案'} value={'安全应急预案'}>安全应急预案</Option>
+														<Option key={'安全专项方案'} value={'安全专项方案'}>安全专项方案</Option>
+													</Select>)
+											}
+										</FormItem>
+									</Col>
+								</Row>
+							</Col>
+						</Row>
+						<Row gutter={24}>
+							<Col span={24} style={{ marginTop: 16, height: '160px' }}>
+								<Dragger 
+									{...this.uploadProps}
+								>
+									<p className="ant-upload-drag-icon">
+										<Icon type="inbox" />
+									</p>
+									<p>点击或者拖拽开始上传</p>
+									<p className="ant-upload-hint">
+										支持 pdf、doc、docx 文件
+									</p>
+								</Dragger>
+							</Col>
+						</Row>
+						<Table
+							columns={this.columns1}
+							pagination={true}
+							dataSource={this.state.TreatmentData}
+							className='foresttable'
+						/>
+						<Row style={{ marginTop: 20}}>
+							<Col span={8} offset={4}>
+								<FormItem {...FormItemLayout} label='审核人'>
+									{
+										getFieldDecorator('SafedataReview', {
+											rules: [
+												{ required: true, message: '请选择审核人员' }
+											]
+										})
+											(
+											<PerSearch selectMember={this.selectMember.bind(this)} 
+												// code={WORKFLOW_CODE.安全体系报批流程}
+												code={WORKFLOW_CODE.总进度计划报批流程}  
+												visible={addVisible}
+											/>
+											)
+									}
+								</FormItem>
+							</Col>
+							<Col span={8} offset={4}>
+								<Checkbox onChange={this._cpoyMsgT.bind(this)}>短信通知</Checkbox>
+							</Col>
+						</Row>
+					</Form>
+				</Spin>
 			</Modal>
 		)
 	}
@@ -183,7 +186,8 @@ class AddModal extends Component {
             projectName,
             currentSectionName,
 			currentSection,
-			file
+			file,
+			TreatmentData
 		} = this.state
 
 		let me = this;
@@ -201,6 +205,15 @@ class AddModal extends Component {
 		
 		me.props.form.validateFields((err, values) => {
 			if (!err) {
+				if (TreatmentData.length === 0) {
+                    notification.error({
+                        message: '请上传文件',
+                        duration: 5
+                    })
+                    return
+                }
+
+
 				postData.upload_unit = user.org ? user.org : '';
                 postData.type = '安全体系';
                 postData.upload_person = user.name ? user.name : user.username;
@@ -224,7 +237,8 @@ class AddModal extends Component {
 					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
 					"document": JSON.stringify(values.Safedocument),
 					"postData": JSON.stringify(postData),
-                    "file": JSON.stringify(file),
+					"file": JSON.stringify(file),
+					"TreatmentData": JSON.stringify(TreatmentData),
                     
 				}];
 				
@@ -336,9 +350,10 @@ class AddModal extends Component {
         showUploadList: false,
         action: base + "/service/fileserver/api/user/files/",
         onChange: ({ file, fileList, event }) => {
-			
+			this.setState({
+                loading:true
+            })
             const status = file.status;
-            const { newFileLists } = this.state;
 			let newdata = [];
 			const{
 				TreatmentData = []
