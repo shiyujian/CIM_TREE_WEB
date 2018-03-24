@@ -6,6 +6,8 @@ import ToggleModal from './ToggleModal'
 import { getUser } from '../../../_platform/auth';
 import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import '../../../Datum/components/Datum/index.less'
+const { TextArea } = Input;
+
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -336,14 +338,14 @@ class ReceivePage extends Component {
 				>
 					{
 						notification.title &&
-						<Row>
+						<Row style={{padding:"0 80px",minHeight:"300px"}}>
 							<Col span={24} style={{ textAlign: 'center', marginBottom: '20px' }}>
 								<h1>{notification.title}</h1>
 							</Col>
 							<Row style={{ marginBottom: '20px' }}>
 								<Col span={24}>
-									<h3>来文单位：{this.state._viewClickinfo.to_whom_name}</h3>
-									<h3>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h3>
+									<h2 style={{ marginTop: '20px'}}>来文单位：{this.state._viewClickinfo.to_whom_name}</h2>
+									<h2 style={{ marginTop: '20px'}}>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h2>
 								</Col>
 							</Row>
 							<Row style={{ marginBottom: '20px' }}>
@@ -353,27 +355,49 @@ class ReceivePage extends Component {
 								<Col span={22}>
 									<div style={{
 										maxHeight: '800px',
+										minHeight: '50px',
 										overflow: 'auto',
 										border: '1px solid #ccc',
-										padding: '10px'
+										padding: '10px',
+										// width:'80%'
 									}}
 										dangerouslySetInnerHTML={{ __html: notification.body_rich }} />
+									{/* <TextArea style={{ minWidth: '100%', minHeight: '50px' }} defaultValue={notification.body_rich}></TextArea> */}
+									{/* <Input
+										type="textarea"
+										placeholder=""
+										autosize
+										value={notification.body_rich}
+
+									></Input> */}
 								</Col>
+
 							</Row>
 							<Col span={24}>
-								<h3>附件：</h3>
+								<Col span={4}>
+									<h3 style={{width:'100%'}}>附件：</h3>
+								</Col>
+								<Col span={20}>
+									{
+										notification.fixed_external_attachments.length > 0 &&
+										<a  href={STATIC_DOWNLOAD_API + notification.fixed_external_attachments[0].file_partial_url}
+											target="_bank">{notification.fixed_external_attachments[0].file_name}</a>
+									}
+								</Col>
+
+								{/* <h3>附件：</h3>
 								{
 									notification.fixed_external_attachments.length > 0 &&
 									<a href={STATIC_DOWNLOAD_API + notification.fixed_external_attachments[0].file_partial_url}
 										target="_bank">{notification.fixed_external_attachments[0].file_name}</a>
-								}
+								} */}
 							</Col>
-							<Col span={6} offset={18}>
-								{/*!is_read &&
-								<Button type="primary" onClick={this._haveView.bind(this, _id)}>已阅</Button>*/}
+							{/* <Col span={6} offset={18}>
+								!is_read &&
+								<Button type="primary" onClick={this._haveView.bind(this, _id)}>已阅</Button>
 								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 								<Button onClick={this._handleCancel.bind(this)}>退出</Button>
-							</Col>
+							</Col> */}
 						</Row>
 					}
 
