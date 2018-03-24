@@ -1,23 +1,59 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
-import {  UNITS } from '../../../_platform/api';
+import {  UNITS, SECTIONNAME } from '../../../_platform/api';
+import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 
 export default class SearchInfo extends Component {
+    constructor(props) {
+		super(props);
+		this.state = {
+            optionArray:[]
+		};
+	}
     static propType = {};
     static layout = {
         labelCol: { span: 6 },
         wrapperCol: { span: 18 },
     };
 
+    async componentDidMount(){
+        let user = getUser()
+        let optionArray = []
+        let sections = user.sections
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            let section = sections[0]
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        let currentSectionName = item.name
+                        optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
+                    }
+                })
+            }
+        }else{
+             UNITS.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
+        }
+        this.setState({
+            optionArray:optionArray
+        })
+    }
+
     render() {
         const {
             form: { getFieldDecorator }
         } = this.props
+        const{
+            optionArray
+        }=this.state
+        
 
         return (
             <Form>
@@ -33,7 +69,7 @@ export default class SearchInfo extends Component {
                                             ]
                                         })
                                             (<Select placeholder='请选择标段'>
-                                                {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
+                                                {optionArray}
                                             </Select>)
                                     }
                                 </FormItem>
