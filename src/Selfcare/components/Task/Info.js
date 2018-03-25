@@ -35,7 +35,7 @@ export default class Info extends Component {
 		setTaskDetailLoading(false);
 	}
 	backClick() {
-		let to = `/selfcare`;
+		let to = `/selfcare/task`;
 		this.props.history.push(to)
 	}
 }

@@ -408,7 +408,7 @@ class QulityCheckRefill extends Component {
                             message: '流程提交成功',
                             duration: 2
                         }) 
-                        let to = `/selfcare`;
+                        let to = `/selfcare/task`;
                         me.props.history.push(to)
                     } else {
                         notification.error({

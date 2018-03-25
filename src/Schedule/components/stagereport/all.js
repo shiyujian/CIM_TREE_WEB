@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-24 21:46:35
+ * @Last Modified time: 2018-03-25 10:29:36
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -774,6 +774,7 @@ class All extends Component {
 			} = this.state
             let newdata = [];
             if (status === 'done') {
+                console.log('file',file)
                 // const { actions: { postUploadFilesAc } } = this.props;
                 let len = TreatmentData.length
 				TreatmentData.push(

@@ -158,7 +158,7 @@ export default class SafetySystemHandle extends Component {
                     message: '流程通过成功',
                     duration: 2
                 })
-                let to = `/selfcare`;
+                let to = `/selfcare/task`;
                 me.props.history.push(to)
             } else {
                 notification.error({
@@ -231,7 +231,7 @@ export default class SafetySystemHandle extends Component {
 					message: '流程退回成功',
 					duration: 2
 				})
-				let to = `/selfcare`;
+                let to = `/selfcare/task`;
 				me.props.history.push(to)
 			} else {
 				notification.error({

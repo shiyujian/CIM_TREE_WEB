@@ -95,7 +95,7 @@ class ScheduleTotalRefill extends Component {
             section:record.sectionName?record.sectionName:'',
             numbercode:record.numbercode?record.numbercode:'',
             // timedate:record.timedate?moment.utc(record.timedate):'',
-            dataReview:record.dataReview?(record.dataReview.person_name?record.dataReview.person_name:''):'',
+            // dataReview:record.dataReview?record.dataReview:'',
         })
     }
 
@@ -306,10 +306,10 @@ class ScheduleTotalRefill extends Component {
                                                                                     { required: true, message: '请选择审核人员' }
                                                                                 ]
                                                                             })
-                                                                                (<Input readOnly/>)
-                                                                                // (
-                                                                                // <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
-                                                                                // )
+                                                                                // (<Input readOnly/>)
+                                                                                (
+                                                                                <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
+                                                                                )
                                                                         }
                                                                     </FormItem>
                                                                 </Col>
@@ -423,7 +423,8 @@ class ScheduleTotalRefill extends Component {
                     "section": oldSubject.section,
                     "sectionName":oldSubject.sectionName,
                     "projectName":oldSubject.projectName,
-					"dataReview": oldSubject.dataReview,
+                    // "dataReview": oldSubject.dataReview,
+                    "dataReview": JSON.stringify(values.dataReview),
 					"numbercode": JSON.stringify(values.numbercode),
 					"timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
 					"totledocument": JSON.stringify(values.totledocument),
@@ -446,7 +447,8 @@ class ScheduleTotalRefill extends Component {
                 };
                 let nextUser = {};
                 
-                nextUser = oldSubject.dataReview?JSON.parse(oldSubject.dataReview):{};
+                // nextUser = oldSubject.dataReview?JSON.parse(oldSubject.dataReview):{};
+                nextUser = values.dataReview;
                 // 获取流程的action名称
                 let action_name = '';
                 let nextStates = getNextStates(task, Number(state_id));
@@ -492,7 +494,7 @@ class ScheduleTotalRefill extends Component {
                             message: '流程提交成功',
                             duration: 2
                         }) 
-                        let to = `/selfcare`;
+                        let to = `/selfcare/task`;
                         me.props.history.push(to)
                     } else {
                         notification.error({

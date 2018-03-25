@@ -34,7 +34,7 @@ class Addition extends Component {
     componentDidUpdate(){
         let array = this.props.array;
         let nodeArray = array.filter(node => {
-            return node.Type === '子项目工程';
+            return node.Type === '项目工程';
         })
         this.areaArray = [];
         nodeArray.map(item => {
@@ -76,24 +76,24 @@ class Addition extends Component {
                 footer={footer}
                 maskClosable={false}>
                 <Form>
-                    <FormItem {...formItemLayout} label="区域">
+                    <FormItem {...formItemLayout} label="项目">
                         {getFieldDecorator('area', {
                             // initialValue: this.props.record.area,
                             rules: [
-                                { required: true, message: '请选择区域' },
+                                { required: true, message: '请选择项目' },
                             ]
-                        })(<Select placeholder='请选择区域'  onChange={this.onSelectChange.bind(this)}>
+                        })(<Select placeholder='请选择项目'  onChange={this.onSelectChange.bind(this)}>
                             {this.areaArray}
                         </Select>)
                         }
                     </FormItem>
-                    <FormItem {...formItemLayout} label="单位工程">
+                    <FormItem {...formItemLayout} label="标段">
                         {getFieldDecorator('unitProject', {
                             // initialValue: this.props.record.unitProject,
                             rules: [
-                                { required: true, message: '请选择单位工程' },
+                                { required: true, message: '请选择标段' },
                             ]
-                        })(<Select placeholder='请选择单位工程'>
+                        })(<Select placeholder='请选择标段'>
                                 {this.unitArray}
                             </Select>)
                         }
@@ -140,7 +140,7 @@ class Addition extends Component {
                             getValueFromEvent: this.coverPicFile,
                         }, {})(
                             <Upload {...this.uploadProps}
-                            // accept={fileTypes}
+                            accept={fileTypes}
                             // defaultFileList={this.state.fileArray || []}
                             >
                                 <Button>
@@ -173,11 +173,21 @@ class Addition extends Component {
         },
         beforeUpload(file) {
             const valid = fileTypes.indexOf(file.type) >= 0;
-            //console.log(file);
+
+            console.log('valid',valid);
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
+                
+                this.props.form.setFieldsValue({
+                    attachment:undefined
+                })
+                
+                
+                return false
+            }else{
+                return valid;
             }
-            return valid;
+           
         },
     };
 
@@ -187,7 +197,9 @@ class Addition extends Component {
             actions: { toggleAddition, postDocument,getdocument }
         } = this.props;
         this.props.form.validateFields((err, values) => {
+            console.log('values',values)
             if(!err){
+                
                 let user = getUser();
                 // debugger
                 let resp = values.attachment[0].response;
