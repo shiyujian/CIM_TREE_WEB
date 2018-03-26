@@ -102,11 +102,11 @@ class ReceivePage extends Component {
 	//清除
 	clear() {
 		this.props.form.setFieldsValue({
-			mold: undefined,
+			// mold: undefined,
 			title: undefined,
-			orgList: undefined,
+			// orgList: undefined,
 			orgLists: undefined,
-			numbers: undefined,
+			// numbers: undefined,
 			worktimes: undefined,
 		});
 	}
@@ -130,7 +130,7 @@ class ReceivePage extends Component {
 					isName = true
 				}
 				else {
-					if (values.orgLists && item.to_whom.indexOf(values.orgLists) > -1) {
+					if (values.orgLists && item.to_whom_name.indexOf(values.orgLists) > -1) {
 						isName = true
 					}
 				}
@@ -184,6 +184,8 @@ class ReceivePage extends Component {
 		})
 	}
 
+
+
 	render() {
 		const {
 			actions: { getReceiveInfoAc },
@@ -201,12 +203,17 @@ class ReceivePage extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		};
+		let orgworm = []
+		notifications.map(ese => {
+			orgworm.push(ese.to_whom_name)
+		})
 		let dataSource
 		if (this.state.isUpdate) {
 			dataSource = searchList
 		} else {
 			dataSource = notifications
 		}
+		const orgworms = Array.from(new Set(orgworm))
 		return (
 			<Row>
 				<Col span={22} offset={1}>
@@ -249,17 +256,6 @@ class ReceivePage extends Component {
 								</Col> */}
 							</Row>
 							<Row>
-								<Col span={8} >
-									<FormItem {...formItemLayout} label="来文单位">
-										{getFieldDecorator('orgLists', {
-											rules: [{ required: false, message: '请输入文件标题' }],
-											initialValue: ''
-										})(
-											<Input type="text"
-											/>
-											)}
-									</FormItem>
-								</Col>
 								<Col span={8}>
 									<FormItem {...formItemLayout} label="名称">
 										{getFieldDecorator('title', {
@@ -271,6 +267,34 @@ class ReceivePage extends Component {
 											)}
 									</FormItem>
 								</Col>
+								<Col span={8} >
+									{/* <FormItem {...formItemLayout} label="来文单位">
+										{getFieldDecorator('orgLists', {
+											rules: [{ required: false, message: '请输入文件标题' }],
+											initialValue: ''
+										})(
+											<Input type="text"
+											/>
+											)}
+									</FormItem> */}
+									<FormItem {...formItemLayout} label="来文单位">
+										{getFieldDecorator('orgLists', {
+											rules: [{ required: false, message: '请输入文件标题' }],
+											initialValue: ''
+										})(
+											<Select style={{ width: '100%' }}>
+												{
+
+													orgworms.map((es) => {
+														return <Option key={es} >{es}</Option>
+													})
+
+												}
+											</Select>
+											)}
+									</FormItem>
+								</Col>
+
 								{/* <Col span={8}>
 									<FormItem {...formItemLayout} label="编号">
 										{getFieldDecorator('numbers', {
@@ -338,14 +362,14 @@ class ReceivePage extends Component {
 				>
 					{
 						notification.title &&
-						<Row style={{padding:"0 80px",minHeight:"300px"}}>
+						<Row style={{ padding: "0 80px", minHeight: "300px" }}>
 							<Col span={24} style={{ textAlign: 'center', marginBottom: '20px' }}>
 								<h1>{notification.title}</h1>
 							</Col>
 							<Row style={{ marginBottom: '20px' }}>
 								<Col span={24}>
-									<h2 style={{ marginTop: '20px'}}>来文单位：{this.state._viewClickinfo.to_whom_name}</h2>
-									<h2 style={{ marginTop: '20px'}}>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h2>
+									<h2 style={{ marginTop: '20px' }}>来文单位：{this.state._viewClickinfo.to_whom_name}</h2>
+									<h2 style={{ marginTop: '20px' }}>发送时间：{moment(notification.create_time).utc().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss')}</h2>
 								</Col>
 							</Row>
 							<Row style={{ marginBottom: '20px' }}>
@@ -375,12 +399,12 @@ class ReceivePage extends Component {
 							</Row>
 							<Col span={24}>
 								<Col span={4}>
-									<h3 style={{width:'100%'}}>附件：</h3>
+									<h3 style={{ width: '100%' }}>附件：</h3>
 								</Col>
 								<Col span={20}>
 									{
 										notification.fixed_external_attachments.length > 0 &&
-										<a  href={STATIC_DOWNLOAD_API + notification.fixed_external_attachments[0].file_partial_url}
+										<a href={STATIC_DOWNLOAD_API + notification.fixed_external_attachments[0].file_partial_url}
 											target="_bank">{notification.fixed_external_attachments[0].file_name}</a>
 									}
 								</Col>
