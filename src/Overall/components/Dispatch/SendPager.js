@@ -75,11 +75,8 @@ class SendPage1 extends Component {
 	//清除
 	clear() {
 		this.props.form.setFieldsValue({
-			mold1: undefined,
 			title1: undefined,
-			orgList1: undefined,
 			orgLists1: undefined,
-			numbers1: undefined,
 			worktimes1: undefined,
 			ccLists1: undefined
 		});

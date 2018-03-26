@@ -102,11 +102,11 @@ class ReceivePage extends Component {
 	//清除
 	clear() {
 		this.props.form.setFieldsValue({
-			mold: undefined,
+			// mold: undefined,
 			title: undefined,
-			orgList: undefined,
+			// orgList: undefined,
 			orgLists: undefined,
-			numbers: undefined,
+			// numbers: undefined,
 			worktimes: undefined,
 		});
 	}
