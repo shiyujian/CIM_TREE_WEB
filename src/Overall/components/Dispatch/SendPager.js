@@ -91,7 +91,6 @@ export default class SendPage1 extends Component {
 
 		const { showInfo = {} } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
-		console.log("this._getNewArrFunc(notifications)", this._getNewArrFunc(notifications))
 		return (
 			<Row>
 				<Col span={22} offset={1}>

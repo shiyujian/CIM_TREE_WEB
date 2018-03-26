@@ -452,7 +452,7 @@ class ToggleModal extends Component {
 									<Col span={12}>
 										<Row>
 											<Col span={4} offset={2}>
-												接受单位：
+												接收单位：
 											</Col>
 											<Col span={10}>
 												<TreeSelect
