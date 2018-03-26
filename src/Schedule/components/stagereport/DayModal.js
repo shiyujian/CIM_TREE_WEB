@@ -173,9 +173,9 @@ export default class DayModal extends Component {
                                                         <div style={{ lineHeight: 2.6 }}>
                                                             <div>意见：{note}</div>
                                                             <div>
-                                                                <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{organization}]</span>
+                                                                <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
                                                                 <span
-                                                                    style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                                    style={{ paddingLeft: 20 }}>{`${step.state.name}`}时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
                                                             </div>
                                                         </div>} />);
                                         }
@@ -199,7 +199,10 @@ export default class DayModal extends Component {
 		title: '序号',
 		dataIndex: 'key',
 		key: 'key',
-		width: '10%',
+        width: '10%',
+        render:(text, record, index) => {
+            return <span>{record.key+1}</span>
+        }
 	}, {
 		title: '项目',
 		dataIndex: 'project',

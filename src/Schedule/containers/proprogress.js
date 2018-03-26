@@ -37,21 +37,28 @@ export default class Proprogress extends Component {
             leftkeycode: '',
 		};
     }
-    componentDidMount () {
-        const {
-            actions: {
-            gettreetype,getTreeList,getProjectList,getNurserysCount
-            },
-            treetypes,
-            platform:{tree = {}}
-        } = this.props;
+    async componentDidMount() {
+        const {actions: {getProjectList}, treetypes,platform:{tree = {}}} = this.props; 
     
         if(!tree.projectList){
-            getProjectList()
+            let data = await getProjectList()
+            if(data && data instanceof Array && data.length>0){
+                data = data[0]
+                let leftkeycode = data.No? data.No :''
+                this.setState({
+                    leftkeycode
+                })
+            }
+        }else{
+            let data = tree.projectList
+            if(data && data instanceof Array && data.length>0){
+                data = data[0]
+                let leftkeycode = data.No? data.No :''
+                this.setState({
+                    leftkeycode
+                })
+            }
         }
-        this.setState({
-            leftkeycode:"P009"
-        })
     }
     
 	//树选择

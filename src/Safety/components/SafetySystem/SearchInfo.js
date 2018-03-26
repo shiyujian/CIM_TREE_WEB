@@ -2,21 +2,56 @@ import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
 import {FILE_API,base, SOURCE_API, DATASOURCECODE,UNITS,SERVICE_API,PROJECT_UNITS,SECTIONNAME,WORKFLOW_CODE } from '../../../_platform/api';
+import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 class SearchInfo extends Component {
+    constructor(props) {
+		super(props);
+		this.state = {
+            optionArray:[]
+		};
+	}
     static propType = {};
     static layout = {
         labelCol: { span: 6 },
         wrapperCol: { span: 18 },
     };
 
+    async componentDidMount(){
+        let user = getUser()
+        let optionArray = []
+        let sections = user.sections
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            let section = sections[0]
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        let currentSectionName = item.name
+                        optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
+                    }
+                })
+            }
+        }else{
+             UNITS.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
+        }
+        this.setState({
+            optionArray:optionArray
+        })
+    }
+
     render() {
         const {
             form: { getFieldDecorator }
         } = this.props
+        const{
+            optionArray
+        }=this.state
 
         return (
             <Form>
@@ -32,7 +67,7 @@ class SearchInfo extends Component {
                                             ]
                                         })
                                             (<Select placeholder='请选择标段' allowClear>
-                                                {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
+                                                  {optionArray}
                                             </Select>)
                                     }
                                 </FormItem>
@@ -87,7 +122,7 @@ class SearchInfo extends Component {
                                                 { type: 'array', required: false, message: '请选择日期' }
                                             ]
                                         })
-                                            (<RangePicker size='default' format='YYYY-MM-DD'  />)
+                                            (<RangePicker size='default' format='YYYY-MM-DD'  style={{ width: '100%', height: '100%' }}/>)
                                     }
                                 </FormItem>
                             </Col>
@@ -100,12 +135,8 @@ class SearchInfo extends Component {
                                             ]
                                         })
                                             (<Select placeholder='请选择流程类型' allowClear>
-                                                <Option key={'编辑中'} value={0}>编辑中</Option>
-                                                <Option key={'已提交'} value={1}>已提交</Option>
                                                 <Option key={'执行中'} value={2}>执行中</Option>
                                                 <Option key={'已完成'} value={3}>已完成</Option>
-                                                <Option key={'已废止'} value={4}>已废止</Option>
-                                                <Option key={'异常'} value={5}>异常</Option>
                                             </Select>)
                                     }
                                 </FormItem>
@@ -138,7 +169,7 @@ class SearchInfo extends Component {
         }=this.props
         let reqData={};
         this.props.form.validateFields((err, values) => {
-			console.log("总进度进度计划流程信息", values);
+			console.log("安全体系报批流程", values);
             console.log("err", err);
             
             values.SSection?reqData.subject_sectionName__contains = values.SSection : '';

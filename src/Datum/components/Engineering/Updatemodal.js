@@ -31,7 +31,7 @@ class Updatemodal extends Component {
     componentDidUpdate(){
         let array = this.props.array;
         let nodeArray = array.filter(node => {
-            return node.Type === '子项目工程';
+            return node.Type === '项目工程';
         })
         this.areaArray = [];
         nodeArray.map(item => {
@@ -77,24 +77,24 @@ class Updatemodal extends Component {
                 footer={footer}
                 maskClosable={false}>
                 <Form>
-                    <FormItem {...formItemLayout} label="区域">
+                    <FormItem {...formItemLayout} label="项目">
                         {getFieldDecorator('area1', {
                             initialValue: oldfile.area,
                             rules: [
-                                { required: true, message: '请选择区域' },
+                                { required: true, message: '请选择项目' },
                             ]
-                        })(<Select placeholder='请选择区域'  onChange={this.onSelectChange.bind(this)}>
+                        })(<Select placeholder='请选择项目'  onChange={this.onSelectChange.bind(this)}>
                             {this.areaArray}
                         </Select>)
                         }
                     </FormItem>
-                    <FormItem {...formItemLayout} label="单位工程">
+                    <FormItem {...formItemLayout} label="标段">
                         {getFieldDecorator('unitProject1', {
                             initialValue: oldfile.unitProject,
                             rules: [
-                                { required: true, message: '请选择单位工程' },
+                                { required: true, message: '请选择标段' },
                             ]
-                        })(<Select placeholder='请选择单位工程'>
+                        })(<Select placeholder='请选择标段'>
                                 {this.unitArray}
                             </Select>)
                         }
@@ -142,7 +142,7 @@ class Updatemodal extends Component {
                             getValueFromEvent: this.coverPicFile,
                         }, {})(
                             <Upload {...this.uploadProps}
-                            // accept={fileTypes}
+                            accept={fileTypes}
                             // defaultFileList={oldfile.basic_params ? oldfile.basic_params.files[0] : []}
                             >
                                 <Button>
@@ -176,6 +176,9 @@ class Updatemodal extends Component {
             const valid = fileTypes.indexOf(file.type) >= 0;
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
+                this.props.form.setFieldsValue({
+                    attachment1:undefined
+                })
             }
             return valid;
         },

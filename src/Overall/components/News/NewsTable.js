@@ -191,7 +191,7 @@ class NewsTable extends Component {
 				org:values.workunits || "",
 				title: values.title1 || "",
 			}
-			if (values && values.worktime ) {
+			if (values && values.worktimes ) {
 				conditions.begin = moment(values.worktimes[0]).format('YYYY-MM-DD');
 				conditions.end = moment(values.worktimes[1]).format('YYYY-MM-DD');
 			}
@@ -316,6 +316,22 @@ class NewsTable extends Component {
 											</FormItem>
 										</Col>
 										<Col span={8} >
+											<FormItem {...formItemLayout} label="发布单位">
+												{
+													getFieldDecorator('workunits', {
+														rules: [
+															{ required: false, message: '发布单位' },
+														]
+													})
+													(<Select allowClear  style={{ width: '100%' }}>
+														{
+															this.array
+														}
+													</Select>)
+												}
+											</FormItem>
+										</Col>
+										<Col span={8} >
 											<FormItem {...formItemLayout} label="修改日期">
 												{
 													getFieldDecorator('worktimes', {
@@ -330,22 +346,6 @@ class NewsTable extends Component {
 															format={'YYYY/MM/DD HH:mm:ss'}
 														>
 														</RangePicker>)
-												}
-											</FormItem>
-										</Col>
-										<Col span={8} >
-											<FormItem {...formItemLayout} label="发布单位">
-												{
-													getFieldDecorator('workunits', {
-														rules: [
-															{ required: false, message: '发布单位' },
-														]
-													})
-													(<Select allowClear  style={{ width: '100%' }}>
-														{
-															this.array
-														}
-													</Select>)
 												}
 											</FormItem>
 										</Col>
@@ -475,7 +475,7 @@ class NewsTable extends Component {
 				}
 			}
 		}, {
-			title: '修改时间',
+			title: '修改日期',
 			dataIndex: 'pub_time',
 			key: 'pub_time',
 			width:'15%',

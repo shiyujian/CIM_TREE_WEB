@@ -23,7 +23,9 @@ import ScheduleStageRefill from '../TaskDetail/ScheduleStageRefill';
 //质量管理模块
 import QulityCheckDetail from '../TaskDetail/QulityCheckDetail';
 import QulityCheckRefill from '../TaskDetail/QulityCheckRefill';
-
+//安环管理模块
+import SafetySystemDetail from '../TaskDetail/SafetySystemDetail';
+import SafetySystemRefill from '../TaskDetail/SafetySystemRefill';
 
 const FormItem = Form.Item;
 export default class Detail extends Component {
@@ -68,6 +70,10 @@ export default class Detail extends Component {
 				return (
 					<OverallFormDetail {...this.props} {...this.state}/>
 				)
+			}else if (code === WORKFLOW_CODE.安全体系报批流程 && (name == '初审' || name == '复审' || name == '结束')){
+				return (
+					<SafetySystemDetail {...this.props} {...this.state}/>
+				)
 			}else if(code === WORKFLOW_CODE.检验批验收审批流程 && (name == '审核' || name == '结束')){
 				return (
 					<QulityCheckDetail {...this.props} {...this.state} />
@@ -103,6 +109,10 @@ export default class Detail extends Component {
 			}else if(code === WORKFLOW_CODE.表单管理流程 && name === '填报'){
 				return (
 					<OverallFormRefill {...this.props} {...this.state} />
+				)
+			}else if(code === WORKFLOW_CODE.安全体系报批流程 && name === '填报'){
+				return (
+					<SafetySystemRefill {...this.props} {...this.state} />
 				)
 			}else {
 				return <div>待定流程</div>

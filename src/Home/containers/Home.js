@@ -41,7 +41,7 @@ export default class Home extends Component {
 					<Col span={12}>
 						{News && <News {...props}/>}
 					</Col>
-					<Col span={12}>
+					<Col style={{marginTop:'3px'}} span={12}>
 						{Datum && <Datum {...props}/>}
 					</Col>
 				</Row>

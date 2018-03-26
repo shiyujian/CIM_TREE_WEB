@@ -46,18 +46,28 @@ export default class Scheduleanalyze extends Component {
         }
     }
 
-
-    componentDidMount () {
-        const {actions: {getTreeList,getTreeNodeList,setkeycode,getProjectList}, treetypes,platform:{tree = {}}} = this.props; 
-        
-        if(!tree.projectList){
-            getProjectList()
-        }
-        const {leftkeycode} = this.state;
+    async componentDidMount() {
+        const {actions: {getProjectList}, treetypes,platform:{tree = {}}} = this.props; 
     
-        this.setState({
-            leftkeycode:"P009"
-        })
+        if(!tree.projectList){
+            let data = await getProjectList()
+            if(data && data instanceof Array && data.length>0){
+                data = data[0]
+                let leftkeycode = data.No? data.No :''
+                this.setState({
+                    leftkeycode
+                })
+            }
+        }else{
+            let data = tree.projectList
+            if(data && data instanceof Array && data.length>0){
+                data = data[0]
+                let leftkeycode = data.No? data.No :''
+                this.setState({
+                    leftkeycode
+                })
+            }
+        }
     }
     //树选择, 重新获取: 标段、树种并置空
     onSelect(value = []) {

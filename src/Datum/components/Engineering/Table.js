@@ -26,11 +26,11 @@ export default class GeneralTable extends Component {
 
 	columns = [
 		{
-			title: '区域',
+			title: '项目',
 			dataIndex: 'extra_params.area',
 			key: 'area',
 		}, {
-			title: '单位工程',
+			title: '标段',
 			dataIndex: 'extra_params.unitProject',
 			key: 'unitProject',
 		},{

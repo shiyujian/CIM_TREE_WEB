@@ -61,6 +61,10 @@ export default class TaskStep extends Component {
 				return (
 					null
 				)
+			}else if (code === WORKFLOW_CODE.安全体系报批流程 && name == '填报'){
+				return (
+					null
+				)
 			}else {
 				return (
 					<div>
@@ -96,7 +100,7 @@ export default class TaskStep extends Component {
 															<div>
 																<span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
 																<span
-																	style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+																	style={{ paddingLeft: 20 }}>{`${step.state.name}`}时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
 															</div>
 														</div>} />);
 										}

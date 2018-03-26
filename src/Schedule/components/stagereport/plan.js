@@ -3,7 +3,7 @@ import { Row, Col, Input, Form, Spin, Icon, Button, Table, Modal, DatePicker, Pr
 // import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS, PROJECT_UNITS,SECTIONNAME,SCHEDULETREEDATA } from '../../../_platform/api';
+import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, UNITS, PROJECT_UNITS,SECTIONNAME,SCHEDULETREEDATA ,TREETYPENO } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
 // import PerSearch from './PerSearch';
@@ -13,7 +13,7 @@ import queryString from 'query-string';
 import DayPlanModal from './DayPlanModal';
 moment.locale('zh-cn');
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option, OptGroup } = Select;
 const { MonthPicker, RangePicker } = DatePicker;
 class Plan extends Component {
 
@@ -42,19 +42,28 @@ class Plan extends Component {
 
 		};
 	}
-
-	componentDidMount() {
-		
+	async componentDidMount() {
 		const { actions: { gettreetype } } = this.props;
-		gettreetype({})
-			.then(rst => {
-				let treetype = rst.map((o, index) => {
-					return (
-						<Option key={index} value={JSON.stringify(o)}>{o.TreeTypeName}</Option>
-					)
-				})
-				this.setState({ treetype });
-			})
+		
+		let treelist = await gettreetype({})	
+		let arr = []
+		let treetype = TREETYPENO.map((forest)=>{
+			arr = treelist.filter(tree => tree.TreeTypeNo.substr(0,1) === forest.id )
+			return (<OptGroup label={forest.name}>
+				{
+					arr.map(tree => {
+						// let code = tree.TreeTypeNo.substr(0, 1)
+						// if(forest.id === code){
+							return (<Option key={tree.id} value={JSON.stringify(tree)}>{tree.TreeTypeName}</Option>)
+						// }
+					})
+				}
+			</OptGroup>)
+		})
+		console.log('treetype',treetype)
+		this.setState({ treetype });
+
+			
 		this.gettaskSchedule();
 		this.getSection()
 	}
@@ -147,57 +156,68 @@ class Plan extends Component {
 		}
         
 	}
-	    //对流程信息根据选择项目进行过滤
-		filterTask(){
-			const {
-				daydata 
-			}=this.state
-			const{
-				leftkeycode
-			}=this.props
-			let filterData = []
-			let user = getUser()
-			
-			let sections = user.sections
-			
-			sections = JSON.parse(sections)
+	//对流程信息根据选择项目进行过滤
+	filterTask(){
+		const {
+			daydata 
+		}=this.state
+		const{
+			leftkeycode
+		}=this.props
+		let filterData = []
+		let user = getUser()
+		
+		let sections = user.sections
+		
+		sections = JSON.parse(sections)
+		
+		let selectCode = ''
+		//关联标段的人只能看自己项目的进度流程
+		if(sections && sections instanceof Array && sections.length>0){
+			let code = sections[0].split('-')
+			selectCode = code[0] || '';
 
-			let selectCode = ''
-			//关联标段的人只能看自己项目的进度流程
-			if(sections && sections instanceof Array && sections.length>0){
-				let code = sections[0].split('-')
-				selectCode = code[0] || ''
-			}else{
-				//不关联标段的人可以看选择项目的进度流程
-				selectCode = leftkeycode
-			}
-			
 			daydata.map((task)=>{
-				
+			
 				let projectName = task.projectName
 				let projectCode = this.getProjectCode(projectName)
-				if(projectCode === selectCode){
+				
+				if(projectCode === selectCode && task.section === sections[0]){
 					filterData.push(task);
 				}
-			})    
-			
-			this.setState({
-				filterData
 			})
-		}
-		//获取项目code
-		getProjectCode(projectName){
-			let projectCode = ''
-			PROJECT_UNITS.map((item)=>{
-				if(projectName === item.value){
-					projectCode = item.code
+		}else{
+			//不关联标段的人可以看选择项目的进度流程
+			selectCode = leftkeycode
+			daydata.map((task)=>{
+			
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				
+				if(projectCode === selectCode ){
+					filterData.push(task);
 				}
 			})
-			
-			return projectCode 
-		}
-	 //获取当前登陆用户的标段
-	 getSection(){
+
+		}      
+		
+		this.setState({
+			filterData
+		})
+	}
+	//获取项目code
+	getProjectCode(projectName){
+		let projectCode = ''
+		PROJECT_UNITS.map((item)=>{
+			if(projectName === item.value){
+				projectCode = item.code
+			}
+		})
+		
+		return projectCode 
+	}
+	//获取当前登陆用户的标段
+	getSection(){
         let user = getUser()
         
         let sections = user.sections
@@ -402,7 +422,7 @@ class Plan extends Component {
 											dataSource={this.state.treedataSource}
 											className='foresttable'
 										/>
-										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10 }} type="primary" ghost>添加</Button>
+										<Button onClick={this.addTreeClick.bind(this)} style={{ marginLeft: 20, marginRight: 10, marginBottom: 20 }} type="primary" ghost>添加</Button>
 									</Row>
 									<Row>
 
@@ -734,7 +754,7 @@ class Plan extends Component {
 			Psection: this.state.currentSectionName || undefined,
 			PdataReview: undefined,
 			Pnumbercode: undefined,
-			Ptimedate: undefined
+			Ptimedate: moment().add(1, 'days').utc()
 		})
 
 	}
@@ -837,7 +857,14 @@ class Plan extends Component {
                     return text
                 }else{
                     return (
-                        <Select style={{ width: '200px' }} placeholder='请选择树种' onSelect={this.handleSelect.bind(this, record, 'project')}>
+						<Select
+						 showSearch
+						 optionFilterProp='children'
+						 filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+						 style={{ width: '200px' }} 
+						 placeholder='请选择树种' 
+						 onChange={this.handleSelect.bind(this, record, 'project')}> 
+						>
                             {
                                 this.state.treetype
                             }

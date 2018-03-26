@@ -40,7 +40,7 @@ export default class ScheduleDayDeal extends Component {
                 </Row>
                 <Row>
                     <div style={{ textAlign: 'center', marginTop: 10 }}>
-                        <Button type='primary' onClick={this.handleSubmit.bind(this, task)} style={{ marginRight: 20 }}>提交</Button>
+                        <Button type='primary' onClick={this.handleSubmit.bind(this, task)} style={{ marginRight: 20 }}>同意</Button>
                         <Button onClick={this.handleReject.bind(this, task)}>退回</Button>
                     </div>
                 </Row>
@@ -144,7 +144,7 @@ export default class ScheduleDayDeal extends Component {
                             message: '流程提交成功',
                             duration: 2
                         })
-                        let to = `/selfcare`;
+						let to = `/selfcare/task`;
                         me.props.history.push(to)
                     } else {
                         notification.error({
@@ -226,7 +226,7 @@ export default class ScheduleDayDeal extends Component {
 					message: '流程退回成功',
 					duration: 2
 				})
-				let to = `/selfcare`;
+				let to = `/selfcare/task`;
 				me.props.history.push(to)
 			} else {
 				notification.error({
