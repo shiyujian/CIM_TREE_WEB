@@ -130,7 +130,7 @@ class ReceivePage extends Component {
 					isName = true
 				}
 				else {
-					if (values.orgLists && item.to_whom.indexOf(values.orgLists) > -1) {
+					if (values.orgLists && item.to_whom_name.indexOf(values.orgLists) > -1) {
 						isName = true
 					}
 				}

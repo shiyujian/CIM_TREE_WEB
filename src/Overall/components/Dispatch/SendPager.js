@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Tabs, Button, Row, Col, message, Modal, Popconfirm } from 'antd';
+import { Table, Tabs, Button, Row, Col, message, Modal, Popconfirm, Input, Form, DatePicker } from 'antd';
 // import SimpleText from './SimpleText';
 import { getUser } from '../../../_platform/auth';
 import moment from 'moment';
@@ -7,13 +7,18 @@ import ToggleModal from './ToggleModal'
 import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import '../../../Datum/components/Datum/index.less'
 
-export default class SendPage1 extends Component {
+const FormItem = Form.Item;
+const { RangePicker } = DatePicker;
+class SendPage1 extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
 			visible: false,
 			showInfo: {},
-			viewClickinfo: {}
+			viewClickinfo: {},
+			searchList: [],
+			isUpdate: false
 		}
 	}
 
@@ -75,6 +80,88 @@ export default class SendPage1 extends Component {
 			container: null,
 		})
 	}
+	//清除
+	clear() {
+		this.props.form.setFieldsValue({
+			mold1: undefined,
+			title1: undefined,
+			orgList1: undefined,
+			orgLists1: undefined,
+			numbers1: undefined,
+			worktimes1: undefined,
+			ccLists1: undefined
+		});
+	}
+	//查找
+	query() {
+		const {
+			actions: { getReceiveInfoAc, getReceiveInfoAcOK },
+			sendInfo = {},
+			filter = {}
+			} = this.props;
+		const { notifications = [] } = sendInfo;
+		console.log("notifications", notifications)
+		// const user = getUser();
+		let searchList = []
+		this.props.form.validateFields(async (err, values) => {
+			console.log("values", values)
+			notifications.map((item) => {
+				let isName = false;
+				let isRoles = false;
+				let isTitle = false;
+				let iscc = false;
+				if (!values.orgLists1) {
+					isName = true
+				}
+				else {
+					if (values.orgLists1 && item.to_whom_s.indexOf(values.orgLists1) > -1) {
+						isName = true
+					}
+				}
+				if (!values.ccLists1) {
+					iscc = true
+				}
+				else {
+					if (item.cc_whom_s) {
+						if (values.ccLists1 && item.cc_whom_s.indexOf(values.ccLists1) > -1) {
+							iscc = true
+						}
+					}
+
+				}
+
+				if (!values.title1) {
+					isTitle = true
+				} else {
+					if (values.title1 && item.notification_title.indexOf(values.title1) > -1) {
+						isTitle = true
+					}
+				}
+
+
+				if (!values.worktimes1) {
+					isRoles = true
+				} else {
+					const create_time = moment(item.create_time).utc().utcOffset(+8).format('YYYY-MM-DD')
+					const worktimea1 = moment(values.worktimes1[0]).format('YYYY-MM-DD')
+					const worktimea2 = moment(values.worktimes1[1]).format('YYYY-MM-DD')
+					if (moment(create_time).isBetween(worktimea1, worktimea2) || moment(create_time).isSame(worktimea1) || moment(create_time).isSame(worktimea2)) {
+						isRoles = true
+					}
+				}
+				if (isName && isTitle && isRoles && iscc) {
+					searchList.push(item)
+				}
+			})
+			console.log("searchList", searchList)
+			this.setState({
+				searchList: searchList,
+				isUpdate: true,
+			})
+
+
+		})
+	}
 	render() {
 		const rowSelection = {
 			// selectedRowKeys,
@@ -82,25 +169,111 @@ export default class SendPage1 extends Component {
 		};
 		const {
 			sendInfo = {},
+			form: { getFieldDecorator },
 			toggleData: toggleData = {
 				type: 'NEWS',
 				visible: false,
 			},
 		} = this.props;
+		const formItemLayout = {
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
+		};
 		const { notifications = [] } = sendInfo;
 
-		const { showInfo = {} } = this.state;
+		const { showInfo = {}, searchList } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
+		let dataSource
+		if (this.state.isUpdate) {
+			dataSource = searchList
+		} else {
+			dataSource = notifications
+		}
 		return (
 			<Row>
 				<Col span={22} offset={1}>
-					<Row>
+					<Row >
+						<Col span={18}>
+							<Row>
+								<Col span={12}>
+									<FormItem {...formItemLayout} label="名称">
+										{getFieldDecorator('title1', {
+											rules: [{ required: false, message: '请输入名称' }],
+											initialValue: ''
+										})(
+											<Input type="text"
+											/>
+											)}
+									</FormItem>
+								</Col>
+								<Col span={12} >
+									<FormItem {...formItemLayout} label="接收单位">
+										{getFieldDecorator('orgLists1', {
+											rules: [{ required: false, message: '请输入接收单位' }],
+											initialValue: ''
+										})(
+											<Input type="text"
+											/>
+											)}
+									</FormItem>
+								</Col>
+							</Row>
+							<Row>
+								<Col span={12} >
+									<FormItem {...formItemLayout} label="抄送单位">
+										{getFieldDecorator('ccLists1', {
+											rules: [{ required: false, message: '请输入抄送单位' }],
+											initialValue: ''
+										})(
+											<Input type="text"
+											/>
+											)}
+									</FormItem>
+								</Col>
+								<Col span={12}>
+									<FormItem {...formItemLayout} label="收文日期">
+										{
+											getFieldDecorator('worktimes1', {
+												rules: [
+													{ required: false, message: '请选择日期' },
+												]
+											})
+												(<RangePicker
+													style={{ verticalAlign: "middle", width: '98%' }}
+													// defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+													showTime={{ format: 'HH:mm:ss' }}
+													format={'YYYY/MM/DD HH:mm:ss'}
+
+												>
+												</RangePicker>)
+										}
+									</FormItem>
+								</Col>
+							</Row>
+						</Col>
+						<Col style={{ paddingLeft: '50px' }} span={4} offset={1}>
+							<Row style={{marginTop:'-50px',marginLeft:'90px'}} span={8}>
+								<Button type="primary" onClick={this._sentDoc.bind(this)}>发文</Button>
+							</Row>
+							<Row  style={{marginTop:'23px'}} span={8}>
+								<FormItem>
+									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
+								</FormItem>
+							</Row>
+							<Row span={8}>
+								<FormItem>
+									<Button icon='reload' onClick={this.clear.bind(this)}>清除</Button>
+								</FormItem>
+							</Row>
+						</Col>
+					</Row>
+					{/* <Row>
 						<Col offset={22}>
 							<Button type="primary" onClick={this._sentDoc.bind(this)}>发文</Button>
 						</Col>
-					</Row>
+					</Row> */}
 					<Table
-						dataSource={this._getNewArrFunc(notifications)}
+						dataSource={this._getNewArrFunc(dataSource)}
 						rowSelection={rowSelection}
 						columns={this.columns}
 						title={() => '发文查询'}
@@ -297,3 +470,4 @@ export default class SendPage1 extends Component {
 		}
 	];
 }
+export default Form.create()(SendPage1)
