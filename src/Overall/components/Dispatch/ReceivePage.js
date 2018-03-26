@@ -184,6 +184,8 @@ class ReceivePage extends Component {
 		})
 	}
 
+
+
 	render() {
 		const {
 			actions: { getReceiveInfoAc },
@@ -201,12 +203,17 @@ class ReceivePage extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		};
+		let orgworm = []
+		notifications.map(ese => {
+			orgworm.push(ese.to_whom_name)
+		})
 		let dataSource
 		if (this.state.isUpdate) {
 			dataSource = searchList
 		} else {
 			dataSource = notifications
 		}
+		const orgworms = Array.from(new Set(orgworm))
 		return (
 			<Row>
 				<Col span={22} offset={1}>
@@ -261,13 +268,29 @@ class ReceivePage extends Component {
 									</FormItem>
 								</Col>
 								<Col span={8} >
-									<FormItem {...formItemLayout} label="来文单位">
+									{/* <FormItem {...formItemLayout} label="来文单位">
 										{getFieldDecorator('orgLists', {
 											rules: [{ required: false, message: '请输入文件标题' }],
 											initialValue: ''
 										})(
 											<Input type="text"
 											/>
+											)}
+									</FormItem> */}
+									<FormItem {...formItemLayout} label="来文单位">
+										{getFieldDecorator('orgLists', {
+											rules: [{ required: false, message: '请输入文件标题' }],
+											initialValue: ''
+										})(
+											<Select style={{ width: '100%' }}>
+												{
+
+													orgworms.map((es) => {
+														return <Option key={es} >{es}</Option>
+													})
+
+												}
+											</Select>
 											)}
 									</FormItem>
 								</Col>

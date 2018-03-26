@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Tabs, Button, Row, Col, message, Modal, Popconfirm, Input, Form, DatePicker } from 'antd';
+import { Table, Tabs, Button, Row, Col, message, Modal, Popconfirm,Select, Input, Form, DatePicker } from 'antd';
 // import SimpleText from './SimpleText';
 import { getUser } from '../../../_platform/auth';
 import moment from 'moment';
@@ -7,6 +7,7 @@ import ToggleModal from './ToggleModal'
 import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import '../../../Datum/components/Datum/index.less'
 
+const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 class SendPage1 extends Component {
@@ -21,15 +22,6 @@ class SendPage1 extends Component {
 			isUpdate: false
 		}
 	}
-
-	componentDidMount() {
-		// const {actions: {getTipsList, getDraftTipsList}} = this.props;
-		// getTipsList();
-		// getDraftTipsList({
-		// 	user_id: user_id
-		// })
-	}
-
 
 	_deleteClick(_id) {
 		const { actions: { deleteSentDocAc, getSentInfoAc } } = this.props;
@@ -100,11 +92,8 @@ class SendPage1 extends Component {
 			filter = {}
 			} = this.props;
 		const { notifications = [] } = sendInfo;
-		console.log("notifications", notifications)
-		// const user = getUser();
 		let searchList = []
 		this.props.form.validateFields(async (err, values) => {
-			console.log("values", values)
 			notifications.map((item) => {
 				let isName = false;
 				let isRoles = false;
@@ -153,7 +142,6 @@ class SendPage1 extends Component {
 					searchList.push(item)
 				}
 			})
-			console.log("searchList", searchList)
 			this.setState({
 				searchList: searchList,
 				isUpdate: true,
@@ -179,7 +167,17 @@ class SendPage1 extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		};
+		let orgto_whom = []
+		let orgcc_whom = []
 		const { notifications = [] } = sendInfo;
+		notifications.map(ese => {
+
+			orgto_whom.push(ese.to_whom_s)
+			if (ese.cc_whom_s) {
+				orgcc_whom.push(ese.cc_whom_s)
+			}
+
+		})
 
 		const { showInfo = {}, searchList } = this.state;
 		const { notification = {}, is_read = false, _id = '' } = showInfo;
@@ -189,6 +187,9 @@ class SendPage1 extends Component {
 		} else {
 			dataSource = notifications
 		}
+		const orgto_whoms = Array.from(new Set(orgto_whom))
+		const orgcc_whoms = Array.from(new Set(orgcc_whom))
+
 		return (
 			<Row>
 				<Col span={22} offset={1}>
@@ -212,8 +213,15 @@ class SendPage1 extends Component {
 											rules: [{ required: false, message: '请输入接收单位' }],
 											initialValue: ''
 										})(
-											<Input type="text"
-											/>
+											<Select style={{ width: '100%' }}>
+												{
+
+													orgto_whoms.map((es) => {
+														return <Option key={es} >{es}</Option>
+													})
+
+												}
+											</Select>
 											)}
 									</FormItem>
 								</Col>
@@ -225,8 +233,15 @@ class SendPage1 extends Component {
 											rules: [{ required: false, message: '请输入抄送单位' }],
 											initialValue: ''
 										})(
-											<Input type="text"
-											/>
+											<Select style={{ width: '100%' }}>
+												{
+
+													orgcc_whoms.map((es) => {
+														return <Option key={es} >{es}</Option>
+													})
+
+												}
+											</Select>
 											)}
 									</FormItem>
 								</Col>
@@ -252,10 +267,10 @@ class SendPage1 extends Component {
 							</Row>
 						</Col>
 						<Col style={{ paddingLeft: '50px' }} span={4} offset={1}>
-							<Row style={{marginTop:'-50px',marginLeft:'90px'}} span={8}>
+							<Row style={{ marginTop: '-50px', marginLeft: '90px' }} span={8}>
 								<Button type="primary" onClick={this._sentDoc.bind(this)}>发文</Button>
 							</Row>
-							<Row  style={{marginTop:'23px'}} span={8}>
+							<Row style={{ marginTop: '23px' }} span={8}>
 								<FormItem>
 									<Button icon='search' onClick={this.query.bind(this)}>查找</Button>
 								</FormItem>
@@ -371,8 +386,6 @@ class SendPage1 extends Component {
 	//查看信息详情
 	_viewClick(id, record) {
 		//	获取详情
-		console.log("record", record)
-		console.log("id", id)
 		const { actions: { getSendDetailAc } } = this.props;
 		this.setState({
 			visible: true,
