@@ -30,6 +30,9 @@ const setoldfile = createAction(`${ID}setoldfile`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
 export const getTreeOK = createAction(`${ID}_目录树`);
 export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
+// export const setDoc = createAction(`${ID}设置查询后的Doc`);
+
+
 export const actions = {
     getWorkflowByIdOK,
     getWorkflowById,
@@ -39,6 +42,7 @@ export const actions = {
     getdocument,
     changeDocs,
     setcurrentcode,
+    // setDoc,
     putdocument,
     selectDocuments,
     deletedoc,
@@ -94,6 +98,13 @@ export default handleActions({
         ...state,
         currentcode: payload
     }),
+    // [setDoc](state, {payload}){
+    //     return{
+    //         ...state,
+    //         dataDoc: payload,       
+    //     }
+    //     console.log('pppp',payload) 
+    // },
     [selectDocuments]: (state, {payload}) => ({
         ...state,
         selected: payload

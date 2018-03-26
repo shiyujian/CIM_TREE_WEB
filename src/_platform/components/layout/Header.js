@@ -112,23 +112,24 @@ export default class Header extends Component {
 			key: 'system',
 			id: 'SYSTEM',
 			title: '系统设置',
-			path: '/system',
+			path: '/system/person',
 			icon: <Icon name="cogs"/>
 		}, {
 			key: 'project',
 			id: 'PROJECT',
 			title: '项目管理',
-			path: '/project',
+			path: '/project/nurserymanagement',
 			icon: <Icon name="cogs"/>
 		}];
-		console.log('mmmm',Header.menus)
 		const { match: { params: { module = '' } = {} } = {} } = this.props;
 		const ignore = Header.ignoreModules.some(m => m === module);
 		if (ignore) {
 			return null;
 		}
 		const { username = '', name = '', is_superuser = false } = getUser();
-		const permissions = getPermissions() || [];
+		let  permissions = getPermissions() || [];
+		// permissions.splice(4,1,"appmeta.PROJECT.NURSERY.NONE.READ");
+		// console.log('permissions333',permissions)
 		return (
 			<header className="header">
 				<a className="head-logo" href='/'>
@@ -152,7 +153,8 @@ export default class Header extends Component {
 									//对用户各个模块权限进行遍历，如果拥有某个子模块的权限，则将子模块的权限
 									//进行处理变换成子模块的路径
 									for(var i=0;i<permissions.length;i++){
-										if(permissions[i].indexOf(menu.id)!==-1 && permissions[i] !== `appmeta.${menu.id}.READ` ){
+										if( permissions[i].indexOf(menu.id)!==-1 && 
+											permissions[i] !== `appmeta.${menu.id}.READ` && permissions[i].indexOf(`.NONE.READ`) ==-1 ){
 											str=permissions[i];
 											break;
 										}
