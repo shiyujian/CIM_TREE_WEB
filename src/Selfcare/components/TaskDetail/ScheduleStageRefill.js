@@ -143,7 +143,7 @@ class ScheduleStageRefill extends Component {
             numbercode:record.numbercode?record.numbercode:'',
             timedate:record.timedate?moment.utc(record.timedate):'',
             // timedate:record.timedate?record.timedate:'',
-            dataReview:record.dataReview?(record.dataReview.person_name?record.dataReview.person_name:''):'',
+            // dataReview:record.dataReview?record.dataReview:'',
 
         })
     }
@@ -355,10 +355,10 @@ class ScheduleStageRefill extends Component {
                                                                                 { required: true, message: '请选择审核人员' }
                                                                             ]
                                                                         })
-                                                                            (<Input readOnly/>)
-                                                                            // (
-                                                                            // <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
-                                                                            // )
+                                                                            // (<Input readOnly/>)
+                                                                            (
+                                                                            <PerSearch selectMember={this.selectMember.bind(this)} task={task}/>
+                                                                            )
                                                                     }
                                                                 </FormItem>
                                                             </Col>
@@ -390,7 +390,7 @@ class ScheduleStageRefill extends Component {
                                                         <div>
                                                             <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
                                                             <span
-                                                                style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                                style={{ paddingLeft: 20 }}>{`${step.state.name}`}时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
                                                         </div>
                                                     </div>} />);
                                     }
@@ -463,7 +463,8 @@ class ScheduleStageRefill extends Component {
                     "section": oldSubject.section,
                     "sectionName":oldSubject.sectionName,
                     "projectName":oldSubject.projectName,
-					"dataReview": oldSubject.dataReview,
+                    // "dataReview": oldSubject.dataReview,
+                    "dataReview": JSON.stringify(values.dataReview),
 					"numbercode": JSON.stringify(values.numbercode),
 					"timedate": JSON.stringify(moment(values.timedate._d).format('YYYY-MM-DD')),
 					"stagedocument": JSON.stringify(values.stagedocument),
@@ -485,7 +486,8 @@ class ScheduleStageRefill extends Component {
                 };
                 let nextUser = {};
                 
-                nextUser = oldSubject.dataReview?JSON.parse(oldSubject.dataReview):{};
+                // nextUser = oldSubject.dataReview?JSON.parse(oldSubject.dataReview):{};
+                nextUser = values.dataReview;
                 // 获取流程的action名称
                 let action_name = '';
                 let nextStates = getNextStates(task, Number(state_id));
@@ -531,7 +533,7 @@ class ScheduleStageRefill extends Component {
                             message: '流程提交成功',
                             duration: 2
                         }) 
-                        let to = `/selfcare`;
+                        let to = `/selfcare/task`;
                         me.props.history.push(to)
                     } else {
                         notification.error({

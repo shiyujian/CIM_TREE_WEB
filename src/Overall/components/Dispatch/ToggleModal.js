@@ -152,10 +152,10 @@ class ToggleModal extends Component {
 			message.warning("请上传文件！");
 			return
 		}
-		if (copyUsers.length === 0) {
-			message.warning("请添加抄送单位！");
-			return
-		}
+		// if (copyUsers.length === 0) {
+		// 	message.warning("请添加抄送单位！");
+		// 	return
+		// }
 		let orgCode = getUser().org_code
 		let orgListCodes = orgCode.split("_");
 		orgListCodes.pop()

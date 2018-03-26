@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-23 20:48:07
+ * @Last Modified time: 2018-03-25 10:29:36
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -413,7 +413,7 @@ class All extends Component {
                                                 className='foresttable'
                                             />
                                         </Row>
-                                        <Row>
+                                        <Row style={{  marginTop: 20 }}>
 
                                             <Col span={8} offset={4}>
                                                 <FormItem {...FormItemLayout} label='审核人'>
@@ -464,88 +464,88 @@ class All extends Component {
 		return sectionName 
     }
 
-    //上传excel文件
-    beforeUpload(file){
-        let {
-            actions:{
-                postScheduleFile
-            }
-        } = this.props;
-        let type  =  file.name.toString().split('.');
+    // //上传excel文件
+    // beforeUpload(file){
+    //     let {
+    //         actions:{
+    //             postScheduleFile
+    //         }
+    //     } = this.props;
+    //     let type  =  file.name.toString().split('.');
         
-        let len = type.length
-        if(type[len-1]==='xlsx' || type[len-1]==='xls'){
-            const formdata = new FormData();
-            formdata.append('a_file',file);
-            formdata.append('name',file.name);
-            let downloadState = true
-            postScheduleFile({},formdata).then(rst=>{
-                if(rst && rst.id){
-                    rst.a_file = (rst.a_file) && (rst.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                    rst.download_url = (rst.download_url) && (rst.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                    rst.preview_url = (rst.preview_url) && (rst.preview_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+    //     let len = type.length
+    //     if(type[len-1]==='xlsx' || type[len-1]==='xls'){
+    //         const formdata = new FormData();
+    //         formdata.append('a_file',file);
+    //         formdata.append('name',file.name);
+    //         let downloadState = true
+    //         postScheduleFile({},formdata).then(rst=>{
+    //             if(rst && rst.id){
+    //                 rst.a_file = (rst.a_file) && (rst.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+    //                 rst.download_url = (rst.download_url) && (rst.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+    //                 rst.preview_url = (rst.preview_url) && (rst.preview_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                     
                     
-                    this.setState({file:rst});
-                    return true;
-                }else{
-                    notification.error({
-                        message: '文件上传失败',
-                        duration: 2
-                    })
-                    downloadState = false
-                    return false;
-                }
-            });
-        }else{
-            notification.error({
-                message: '请上传excel文件',
-                duration: 2
-            })
-            return false;
-        }
-    }
+    //                 this.setState({file:rst});
+    //                 return true;
+    //             }else{
+    //                 notification.error({
+    //                     message: '文件上传失败',
+    //                     duration: 2
+    //                 })
+    //                 downloadState = false
+    //                 return false;
+    //             }
+    //         });
+    //     }else{
+    //         notification.error({
+    //             message: '请上传excel文件',
+    //             duration: 2
+    //         })
+    //         return false;
+    //     }
+    // }
     //解析文件
-    uplodachange(info){
+    // uplodachange(info){
         
-        if (info && info.file && info.file.status !== 'uploading') {
-			//
-        }
-        if (info && info.file && info.file.status === 'done') {
-            let name = Object.keys(info.file.response)
-            let dataList = info.file.response[name[0]]
+    //     if (info && info.file && info.file.status !== 'uploading') {
+	// 		//
+    //     }
+    //     if (info && info.file && info.file.status === 'done') {
+    //         let name = Object.keys(info.file.response)
+    //         let dataList = info.file.response[name[0]]
             
-            let scheduleMaster = [];
-            for(var i=1;i<dataList.length;i++){
-                scheduleMaster.push({
-                    key: i,
-                    code: dataList[i][0]?dataList[i][0]:'',
-                    name: dataList[i][1]?dataList[i][1]:'',
-                    type: dataList[i][2]?dataList[i][2]:'',
-                    company: dataList[i][3]?dataList[i][3]:'',
-                    quantity: dataList[i][4]?dataList[i][4]:'',
-                    output: dataList[i][5]?dataList[i][5]:'',
-                    schedule: dataList[i][8]?dataList[i][8]:'',
-                    path: dataList[i][9]?dataList[i][9]:'',
-                    milestone: dataList[i][10]?dataList[i][10]:'',
-                    site: dataList[i][11]?dataList[i][11]:'',
-                })
-            }
+    //         let scheduleMaster = [];
+    //         for(var i=1;i<dataList.length;i++){
+    //             scheduleMaster.push({
+    //                 key: i,
+    //                 code: dataList[i][0]?dataList[i][0]:'',
+    //                 name: dataList[i][1]?dataList[i][1]:'',
+    //                 type: dataList[i][2]?dataList[i][2]:'',
+    //                 company: dataList[i][3]?dataList[i][3]:'',
+    //                 quantity: dataList[i][4]?dataList[i][4]:'',
+    //                 output: dataList[i][5]?dataList[i][5]:'',
+    //                 schedule: dataList[i][8]?dataList[i][8]:'',
+    //                 path: dataList[i][9]?dataList[i][9]:'',
+    //                 milestone: dataList[i][10]?dataList[i][10]:'',
+    //                 site: dataList[i][11]?dataList[i][11]:'',
+    //             })
+    //         }
             
             
-            notification.success({
-                message: '文件上传成功',
-                duration: 2
-            })
-		}else if (info && info.file && info.file.status === 'error') {
-            this.setState({file:null});
-			notification.error({
-                message: '文件上传失败',
-                duration: 2
-            })
-            return;
-		}
-	};
+    //         notification.success({
+    //             message: '文件上传成功',
+    //             duration: 2
+    //         })
+	// 	}else if (info && info.file && info.file.status === 'error') {
+    //         this.setState({file:null});
+	// 		notification.error({
+    //             message: '文件上传失败',
+    //             duration: 2
+    //         })
+    //         return;
+	// 	}
+	// };
 
     // 确认提交
     sendWork() {
@@ -724,8 +724,8 @@ class All extends Component {
 
     // 新增按钮
     addClick = () => {
-        const { actions: { postUploadFilesAc } } = this.props;
-        postUploadFilesAc([]);
+        // const { actions: { postUploadFilesAc } } = this.props;
+        // postUploadFilesAc([]);
         this.setState({
             visible: true,
             TreatmentData: [],
@@ -741,8 +741,8 @@ class All extends Component {
     }
     // 关闭弹框
     closeModal() {
-        const { actions: { postUploadFilesAc } } = this.props;
-        postUploadFilesAc([]);
+        // const { actions: { postUploadFilesAc } } = this.props;
+        // postUploadFilesAc([]);
 
         this.setState({
             visible: false,
@@ -768,48 +768,40 @@ class All extends Component {
                 loading:true
             })
             const status = file.status;
-            const { newFileLists } = this.state;
+            // const { newFileLists } = this.state;
+            const{
+				TreatmentData = []
+			} = this.state
             let newdata = [];
             if (status === 'done') {
-                const { actions: { postUploadFilesAc } } = this.props;
-                let newFileLists = fileList.map(item => {
-                    return {
-                        file_id: item.response.id,
-                        file_name: item.name,
+                console.log('file',file)
+                // const { actions: { postUploadFilesAc } } = this.props;
+                let len = TreatmentData.length
+				TreatmentData.push(
+					{
+						index: len + 1,
+                        fileName: file.name,
+                        file_id: file.response.id,
+                        file_partial_url: '/media' + file.response.a_file.split('/media')[1],
                         send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-                        file_partial_url: '/media' + item.response.a_file.split('/media')[1],
-                        download_url: '/media' + item.response.download_url.split('/media')[1],
-                        a_file: '/media' + item.response.a_file.split('/media')[1],
-                        misc: item.response.misc,
-                        mime_type: item.response.mime_type,
-                    }
-                })
-                newFileLists.map((item, index) => {
-                    let data = {
-                        index: index + 1,
-                        fileName: item.file_name,
-                        file_id: item.file_id,
-                        file_partial_url: item.file_partial_url,
-                        send_time: item.send_time,
-                        a_file: item.a_file,
-                        download_url: item.download_url,
-                        misc: item.misc,
-                        mime_type: item.mime_type,
-                    }
-                    newdata.push(data)
-                })
+                        a_file: '/media' + file.response.a_file.split('/media')[1],
+                        download_url: '/media' + file.response.download_url.split('/media')[1],
+                        misc: file.response.misc,
+                        mime_type: file.response.mime_type,
+					}
+				)
+				console.log('TreatmentData',TreatmentData)
                 notification.success({
                     message:'文件上传成功',
                     duration:3
                 })
                 this.setState({ 
-                    newFileLists, 
-                    TreatmentData: newdata,
+                    TreatmentData: TreatmentData,
                     loading:false 
                 })
-                postUploadFilesAc(newFileLists)
+                // postUploadFilesAc(newFileLists)
 
-            }else{
+            }else if(status === 'error'){
                 notification.error({
                     message:'文件上传失败',
                     duration:3
@@ -824,22 +816,30 @@ class All extends Component {
     // 修改备注
 
     //删除文件表格中的某行
-    deleteTreatmentFile = (record, index) => {
-        let newFileLists = this.state.newFileLists;
-        let newdata = [];
-        newFileLists.splice(index, 1);
-        newFileLists.map((item, index) => {
+	deleteTreatmentFile = (record, index) => {
+		const{
+			TreatmentData
+		}=this.state
+      
+		TreatmentData.splice(index, 1);
+		let array = []
+        TreatmentData.map((item, index) => {
             let data = {
-                index: index + 1,
-                fileName: item.file_name,
-                fileId: item.file_id,
-                fileUrl: item.file_partial_url,
-                fileTime: item.send_time
+				index: index + 1,
+				fileName: item.fileName,
+				file_id: item.file_id,
+				file_partial_url: item.file_partial_url,
+				send_time: item.send_time,
+				a_file: item.a_file,
+				download_url: item.download_url,
+				misc: item.misc,
+				mime_type: item.mime_type,
             }
-            newdata.push(data)
-        })
-        this.setState({ newFileLists, TreatmentData: newdata })
-    }
+            array.push(data)
+		})
+		console.log('array',array)
+        this.setState({TreatmentData: array })
+	}
 
 
     //选择人员

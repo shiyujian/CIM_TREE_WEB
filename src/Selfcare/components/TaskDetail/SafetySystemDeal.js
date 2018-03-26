@@ -3,16 +3,13 @@ import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,DatePi
 import { base, STATIC_DOWNLOAD_API,SOURCE_API,WORKFLOW_CODE } from '../../../_platform/api';
 import moment from 'moment';
 import Preview from '../../../_platform/components/layout/Preview';
-// import PerSearch from '../Task/PerSearch';
-import PerSearch from '../../../_platform/components/panels/PerSearch';
 import queryString from 'query-string';
 import { getUser } from '_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
 
-let indexSelect='';
-export default class OverallMaterialDeal extends Component {
+export default class SafetySystemDeal extends Component {
 
 	constructor(props){
          super(props);
@@ -36,14 +33,14 @@ export default class OverallMaterialDeal extends Component {
 			<div>
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
-                        <FormItem {...OverallMaterialDeal.layout} label="处理意见">
+                        <FormItem {...SafetySystemDeal.layout} label="处理意见">
                             <Input placeholder="请输入处理意见" onChange={this.changeNote.bind(this)} value={this.state.note} />
                         </FormItem>
                     </Col>
                 </Row>
                 <Row>
                     <div style={{ textAlign: 'center', marginTop: 10 }}>
-                        <Button type='primary' onClick={this.handleSubmit.bind(this, task)} style={{ marginRight: 20 }}>提交</Button>
+                        <Button type='primary' onClick={this.handleSubmit.bind(this, task)} style={{ marginRight: 20 }}>同意</Button>
                         <Button onClick={this.handleReject.bind(this, task)}>拒绝</Button>
                     </div>
                 </Row>
@@ -61,7 +58,8 @@ export default class OverallMaterialDeal extends Component {
 		const {
 			location,
 			actions: {
-				putFlow
+                putFlow,
+                addSchedule
 			},
 		} = this.props
         let {
@@ -93,9 +91,6 @@ export default class OverallMaterialDeal extends Component {
         if (!note) {
 			note = action_name + '。';
 		}
-
-		
-
 		let state = task.current[0].id;
 		let workflowData = {
 			state: state,
@@ -105,10 +100,10 @@ export default class OverallMaterialDeal extends Component {
 			attachment: null
 		}
 		console.log('workflowData', workflowData)
-
 		let data = {
 			pk: task.id
-		}
+        }
+
 
         putFlow(data, workflowData).then(rst => {
             if (rst && rst.creator) {
@@ -126,7 +121,6 @@ export default class OverallMaterialDeal extends Component {
                 return
             }
         })
-        
     }
     
     handleReject(task = {}) {
@@ -134,7 +128,7 @@ export default class OverallMaterialDeal extends Component {
 			location,
 			actions: {
 				putFlow
-			},
+            },
 		} = this.props
         let {
             note
@@ -150,32 +144,45 @@ export default class OverallMaterialDeal extends Component {
 			"username": user.username,
 			"person_code": user.code,
 			"person_name": user.name,
-			"id": parseInt(user.id),
-			"org": user.org,
+            "id": parseInt(user.id),
+            "org": user.org,
 		};
 
 		//获取流程的action名称
-		let action_name = '';
+        let action_name = '';
+        let stateid = 0
 		let nextStates = getNextStates(task, Number(state_id));
 		for (var i = 0; i < nextStates.length; i++) {
 			if (nextStates[i].action_name === '拒绝') {
-				action_name = nextStates[i].action_name
+                action_name = nextStates[i].action_name
+                stateid = nextStates[i].to_state[0].id
 			}
         }
+        console.log('nextStates', nextStates)
         if (!note) {
 			note = action_name + '。';
-		}
-
-		
+        }
+        //获取第一步的填报人，重新填报
+        let oldSubject = task.subject[0]
+        let nextUser = {};
+        nextUser = oldSubject.FillPerson?JSON.parse(oldSubject.FillPerson):{};
 
 		let state = task.current[0].id;
 		let workflowData = {
-			state: state,
-			executor: executor,
-			action: action_name,
-			note: note,
-			attachment: null
-		}
+            next_states: [
+                {
+                    state: stateid,
+                    participants: [nextUser],
+                    dealine: null,
+                    remark: null,
+                }
+            ],
+            state: state,
+            executor: executor,
+            action: action_name,
+            note: note,
+            attachment: null
+        }
 		console.log('workflowData', workflowData)
 
 		let data = {
@@ -199,9 +206,4 @@ export default class OverallMaterialDeal extends Component {
 			}
 		})
 	}
-
-
-
-
-	
 }

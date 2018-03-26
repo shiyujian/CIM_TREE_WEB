@@ -33,13 +33,15 @@ export default class SafetyTable extends Component {
 				getTaskSafety
 			}
 		}=this.props
-		getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程})
+		await getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程})
+		this.getTaskList()
 	}
 
 	async componentDidUpdate(prevProps,prevState){
 		const{
 			safetyTaskList
 		}=this.props
+		console.log('safetyTaskList',safetyTaskList)
 		if(safetyTaskList != prevProps.safetyTaskList){
 			this.getTaskList()
 		}
@@ -70,10 +72,12 @@ export default class SafetyTable extends Component {
                     status:item.status,
                     document:subject.document?JSON.parse(subject.document):'',
                     file:subject.file?JSON.parse(subject.file):'',
-                    dataReview:subject.dataReview?JSON.parse(subject.dataReview).person_name:''
+					dataReview:subject.dataReview?JSON.parse(subject.dataReview).person_name:'',
+					TreatmentData: subject.TreatmentData?JSON.parse(subject.TreatmentData):[]
                 }
                 taskList.push(itemarrange);
 			})
+			console.log('taskList',taskList)
 			this.setState({
 				taskList:taskList
 			},()=>{
@@ -83,40 +87,53 @@ export default class SafetyTable extends Component {
 	}
 
 	//对流程信息根据选择项目进行过滤
-    filterTask(){
-        const {
-            taskList 
-        }=this.state
-        const{
-            leftkeycode
-        }=this.props
-        let filterTaskList = []
-        let user = getUser()
-        
-        let sections = user.sections
-        
-        sections = JSON.parse(sections)
-        let selectCode = ''
-        //关联标段的人只能看自己项目的进度流程
-        if(sections && sections instanceof Array && sections.length>0){
-            let code = sections[0].split('-')
-            selectCode = code[0] || ''
-        }else{
-            //不关联标段的人可以看选择项目的进度流程
-            selectCode = leftkeycode
-        }
-        
-        taskList.map((task)=>{
-            let projectName = task.projectName
-            let projectCode = this.getProjectCode(projectName)
-            if(projectCode === selectCode){
-                filterTaskList.push(task);
-            }
-        })   
-        
-        this.setState({
-            filterTaskList:filterTaskList
-        })
+	filterTask(){
+		const {
+			taskList 
+		}=this.state
+		const{
+			leftkeycode
+		}=this.props
+		let filterTaskList = []
+		let user = getUser()
+		
+		let sections = user.sections
+		
+		sections = JSON.parse(sections)
+		
+		let selectCode = ''
+		//关联标段的人只能看自己项目的进度流程
+		if(sections && sections instanceof Array && sections.length>0){
+			let code = sections[0].split('-')
+			selectCode = code[0] || '';
+
+			taskList.map((task)=>{
+			
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				
+				if(projectCode === selectCode && task.section === sections[0]){
+					filterTaskList.push(task);
+				}
+			})
+		}else{
+			//不关联标段的人可以看选择项目的进度流程
+			selectCode = leftkeycode
+			taskList.map((task)=>{
+			
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				
+				if(projectCode === selectCode ){
+					filterTaskList.push(task);
+				}
+			})
+
+		}      
+		
+		this.setState({
+			filterTaskList:filterTaskList
+		})
 	}
 	
 	//获取项目code
@@ -169,7 +186,8 @@ export default class SafetyTable extends Component {
 	}
 	// 操作--查看
     clickInfo(record) {
-        this.setState({ taskVisible: true ,TaskDetailData:record});
+		this.setState({ taskVisible: true ,TaskDetailData:record});
+		// this.getTaskList()
 	}
 	// 取消
     taskDetailCancle() {

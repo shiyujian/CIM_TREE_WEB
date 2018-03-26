@@ -14,6 +14,8 @@ import ScheduleStageDeal from '../TaskDetail/ScheduleStageDeal';
 import QulityCheckDetail from '../TaskDetail/QulityCheckDetail';
 import QulityCheckDeal from '../TaskDetail/QulityCheckDeal';
 import OverallFormDeal from '../TaskDetail/OverallFormDeal';
+import SafetySystemHandle from '../TaskDetail/SafetySystemHandle'
+import SafetySystemDeal from '../TaskDetail/SafetySystemDeal'
 const FormItem = Form.Item;
 @connect(
 	state => {
@@ -50,19 +52,23 @@ export default class Progress extends Component {
 
 		if (code === WORKFLOW_CODE.机械设备报批流程 && stateName == '初审' ){
 			return (
-				<OverallMaterialHandle {...this.props} {...this.state}/>
+				<SafetySystemHandle {...this.props} {...this.state}/>
 			)
 		}else if (code === WORKFLOW_CODE.工程材料报批流程 && stateName == '初审' ){
 			return (
-				<OverallMaterialHandle {...this.props} {...this.state}/>
+				<SafetySystemHandle {...this.props} {...this.state}/>
 			)
 		}else if (code === WORKFLOW_CODE.苗木资料报批流程 && stateName == '初审' ){
 			return (
-				<OverallMaterialHandle {...this.props} {...this.state}/>
+				<SafetySystemHandle {...this.props} {...this.state}/>
 			)
 		}else if (code === WORKFLOW_CODE.表单管理流程 && stateName == '初审' ){
 			return (
-				<OverallMaterialHandle {...this.props} {...this.state}/>
+				<SafetySystemHandle {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.安全体系报批流程 && stateName == '初审' ){
+			return (
+				<SafetySystemHandle {...this.props} {...this.state}/>
 			)
 		}else if (code === WORKFLOW_CODE.机械设备报批流程 &&  stateName == '复审'){
 			return (
@@ -95,6 +101,10 @@ export default class Progress extends Component {
 		}else if (code === WORKFLOW_CODE.表单管理流程 &&  stateName == '复审'){
 			return (
 				<OverallFormDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.安全体系报批流程 &&  stateName == '复审'){
+			return (
+				<SafetySystemDeal {...this.props} {...this.state}/>
 			)
 		}else {
 			return (

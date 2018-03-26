@@ -10,7 +10,6 @@ class TaskDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            TreatmentData: [],
             history:[]
         }
     }
@@ -31,7 +30,6 @@ class TaskDetail extends Component {
         }
       
         this.setState({
-            TreatmentData: TaskDetailData.treatmentdata,
             history
         })
         
@@ -132,7 +130,7 @@ class TaskDetail extends Component {
                                         <Table
                                             columns={this.columns1}
                                             pagination={true}
-                                            dataSource={this.state.TreatmentData}
+                                            dataSource={TaskDetailData.TreatmentData}
                                             rowKey='index'
                                             className='foresttable'
                                         />
