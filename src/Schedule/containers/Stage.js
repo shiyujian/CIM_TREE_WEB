@@ -59,10 +59,6 @@ export default class Stage extends Component {
                 })
             }
         }
-        // this.setState({
-        //     leftkeycode:"P009"
-        // })
-        //类型
     }
 
     render() {
