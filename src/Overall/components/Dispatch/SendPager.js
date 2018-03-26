@@ -246,11 +246,11 @@ class SendPage1 extends Component {
 									</FormItem>
 								</Col>
 								<Col span={12}>
-									<FormItem {...formItemLayout} label="收文日期">
+									<FormItem {...formItemLayout} label="发送时间">
 										{
 											getFieldDecorator('worktimes1', {
 												rules: [
-													{ required: false, message: '请选择日期' },
+													{ required: false, message: '发送时间' },
 												]
 											})
 												(<RangePicker
@@ -447,7 +447,7 @@ class SendPage1 extends Component {
 			title: 'ID',
 			dataIndex: 'index',
 		}, {
-			title: '标题',
+			title: '名称',
 			dataIndex: 'notification_title',
 		}, {
 			title: '接收单位',
