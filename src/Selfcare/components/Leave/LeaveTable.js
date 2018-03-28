@@ -266,29 +266,29 @@ class LeaveTable extends Component {
 			per_page: size
 		}
 		this.setState({ loading: true, percent: 0 })
-		getfactoryAnalyse({}, postdata)
-			.then(rst => {
-				this.setState({ loading: false, percent: 100 })
-				if (!rst)
-					return
-				let tblData = rst.result;
-				if (tblData instanceof Array) {
-					tblData.forEach((plan, i) => {
-						const { attrs = {} } = plan;
-						tblData[i].order = ((page - 1) * size) + i + 1;
-						let place = `${~~plan.land.replace('P', '')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
-						tblData[i].place = place;
-						let liftertime1 = !!plan.liftertime ? moment(plan.liftertime).format('YYYY-MM-DD') : '/';
-						let liftertime2 = !!plan.liftertime ? moment(plan.liftertime).format('HH:mm:ss') : '/';
-						tblData[i].liftertime1 = liftertime1;
-						tblData[i].liftertime2 = liftertime2;
-					})
-					const pagination = { ...this.state.pagination };
-					pagination.total = rst.total;
-					pagination.pageSize = size;
-					this.setState({ tblData, pagination: pagination });
-				}
-			})
+		// getfactoryAnalyse({}, postdata)
+		// 	.then(rst => {
+		// 		this.setState({ loading: false, percent: 100 })
+		// 		if (!rst)
+		// 			return
+		// 		let tblData = rst.result;
+		// 		if (tblData instanceof Array) {
+		// 			tblData.forEach((plan, i) => {
+		// 				const { attrs = {} } = plan;
+		// 				tblData[i].order = ((page - 1) * size) + i + 1;
+		// 				let place = `${~~plan.land.replace('P', '')}地块${~~plan.region}区块${~~attrs.smallclass}小班${~~attrs.thinclass}细班`;
+		// 				tblData[i].place = place;
+		// 				let liftertime1 = !!plan.liftertime ? moment(plan.liftertime).format('YYYY-MM-DD') : '/';
+		// 				let liftertime2 = !!plan.liftertime ? moment(plan.liftertime).format('HH:mm:ss') : '/';
+		// 				tblData[i].liftertime1 = liftertime1;
+		// 				tblData[i].liftertime2 = liftertime2;
+		// 			})
+		// 			const pagination = { ...this.state.pagination };
+		// 			pagination.total = rst.total;
+		// 			pagination.pageSize = size;
+		// 			this.setState({ tblData, pagination: pagination });
+		// 		}
+		// 	})
 	}
 }
 export default Form.create()(LeaveTable)

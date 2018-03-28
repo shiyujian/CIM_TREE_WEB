@@ -38,11 +38,11 @@ export default class Query extends Component {
 	componentDidMount() {
 		const {actions: {getCheckListAc}} = this.props;
 		let time=moment().format('YYYY-MM');
-		getCheckListAc({
-			month: time
-		});
+		// getCheckListAc({
+		// 	month: time
+		// });
 		if(getUser().org_code){
-			this._getOrgInfo(getUser().org_code)
+			// this._getOrgInfo(getUser().org_code)
 		}
 	}
 
@@ -54,31 +54,31 @@ export default class Query extends Component {
 
 	searchClick() {
 		const {actions: {getCheckListAc}} = this.props;
-		getCheckListAc({
-			month: this.state.month
-		});
+		// getCheckListAc({
+		// 	month: this.state.month
+		// });
 	}
 
 	_getOrgInfo(org_code){
 		const {actions: {getOrgInfoAc}} = this.props;
-		getOrgInfoAc({
-			org_code:org_code,
-		})
-			.then(conf=>{
-				const {extra_params}=conf;
-				const {on_duty,off_duty}=extra_params;
-				if(on_duty && off_duty){
-					this.setState({
-						on_duty:conf[0].on_duty,
-						off_duty:conf[0].off_duty,
-					})
-				}else{
-					this.setState({
-						on_duty:on_off_duty[0],
-						off_duty:on_off_duty[1],
-					})
-				}
-			})
+		// getOrgInfoAc({
+		// 	org_code:org_code,
+		// })
+		// 	.then(conf=>{
+		// 		const {extra_params}=conf;
+		// 		const {on_duty,off_duty}=extra_params;
+		// 		if(on_duty && off_duty){
+		// 			this.setState({
+		// 				on_duty:conf[0].on_duty,
+		// 				off_duty:conf[0].off_duty,
+		// 			})
+		// 		}else{
+		// 			this.setState({
+		// 				on_duty:on_off_duty[0],
+		// 				off_duty:on_off_duty[1],
+		// 			})
+		// 		}
+		// 	})
 	}
 
 	render() {
