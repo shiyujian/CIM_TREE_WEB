@@ -28,7 +28,7 @@ export default class Tasks extends Component {
 		} = this.props;
 		const { type = 'processing' } = filter;
 		const user = getUser();
-		getUsers();
+		// getUsers();
 		// if (platform && platform.tasks && platform.tasks.length != 0) {
 		// 	return
 		// } else {

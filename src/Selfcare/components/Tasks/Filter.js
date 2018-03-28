@@ -92,21 +92,23 @@ class Filter extends Component {
 												{ required: false ,message:'发起人'},
 											]}
 										)
-										(<Select showSearch allowClear
-											placeholder="请选择发起人"
-											optionFilterProp="children"
-											filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-										>
-											{
-												users
-													?
-													users.map(per => {
-														return <Option value={per.id}
-															key={per.account.person_id}>{per.account.person_name}</Option>
-													})
-													: ''
-											}
-										</Select>)
+										(<Input placeholder="请输入发起人姓名"/>
+										// <Select showSearch allowClear
+										// 	placeholder="请选择发起人"
+										// 	optionFilterProp="children"
+										// 	filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+										// >
+										// 	{
+										// 		users
+										// 			?
+										// 			users.map(per => {
+										// 				return <Option value={per.id}
+										// 					key={per.account.person_id}>{per.account.person_name}</Option>
+										// 			})
+										// 			: ''
+										// 	}
+										// </Select>
+										)
 									}
 									
 								</FormItem>
