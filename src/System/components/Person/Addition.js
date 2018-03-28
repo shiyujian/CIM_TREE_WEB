@@ -381,7 +381,7 @@ class Addition extends Component {
 	async save() {
 		const {
 			addition = {}, sidebar: { node } = {},
-			actions: { postUser, clearAdditionField, getUsers, putUser, getSection }, tags = {}
+			actions: { postUser, clearAdditionField, getUsers, putUser, getSection ,getTablePage}, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
@@ -428,8 +428,15 @@ class Addition extends Component {
 						}).then(async rst => {
 							if (rst.code == 1) {
 								const codes = Addition.collect(node);
-								await getUsers({}, { org_code: codes });
+								await getUsers({}, { org_code: codes ,page:this.props.getTablePages.current}).then((es) =>{
+									let pagination = {
+										current: this.props.getTablePages.current,
+										total:es.count,
+									};
+									getTablePage(pagination)
+								});
 								message.info('修改人员成功');
+								document.getElementById("NurseryData").value=''
 								let sectiona = []
 								getSection(sectiona)
 								clearAdditionField();
@@ -488,7 +495,7 @@ class Addition extends Component {
 								getSection(sectiona)
 								clearAdditionField();
 								const codes = Addition.collect(node);
-								getUsers({}, { org_code: codes });
+								getUsers({}, { org_code: codes,page:this.props.getTablePages.current });
 								this.setState({
 									newKey: Math.random()
 								})

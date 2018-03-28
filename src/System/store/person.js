@@ -10,6 +10,8 @@ const getTagsOK = createAction(`${ID}_GET_TAGS_OK`);
 const setUpdate = createAction(`${ID}_LIST_UPDATE`);
 const getSection = createAction(`${ID}_IS_SECTION`);
 const getTreeModal = createAction(`${ID}设置树节点布尔值`);
+const getTablePage = createAction(`${ID}table分页`);
+const getTreeCode = createAction(`${ID}点击tree的节点code`);
 
 const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 
@@ -29,7 +31,9 @@ export const actions = {
 	getTreeModal,
 	setUpdate,
 	getSection,
-	getListStore
+	getListStore,
+	getTablePage,
+	getTreeCode
 };
 
 export default handleActions({
@@ -64,5 +68,13 @@ export default handleActions({
 	[getListStore]: (state, {payload}) => ({
 		...state,
 		listStore: payload
+	}),
+	[getTablePage]: (state, {payload}) => ({
+		...state,
+		getTablePages: payload
+	}),
+	[getTreeCode]: (state, {payload}) => ({
+		...state,
+		getTreeCodes: payload
 	}),
 }, {});

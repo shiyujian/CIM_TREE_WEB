@@ -110,7 +110,7 @@ export default class Tree extends Component {
 		const {node: {props: {eventKey = ''} = {}} = {}} = node || {};
 		const {
 			platform: {org: {children = []} = {}},
-			actions: {changeSidebarField, getUsers,getTreeModal,setUpdate}
+			actions: {changeSidebarField, getUsers,getTreeModal,setUpdate,getTablePage,getTreeCode}
 		} = this.props;
 		const o = Tree.loop(children, eventKey);
 		let ucode
@@ -141,9 +141,15 @@ export default class Tree extends Component {
 			}
 			changeSidebarField('node', o);
 			const codes = Tree.collect(o);
-			getUsers({}, {org_code: codes}).then((e) =>{
+			getTreeCode(codes)
+			getUsers({}, {org_code: codes,page:1}).then((e) =>{
+				let pagination = {
+					current: 1,
+					total:e.count,
+				};
 				getTreeModal(false)
 				setUpdate(true);
+				getTablePage(pagination)
 			});
 		}
 	}

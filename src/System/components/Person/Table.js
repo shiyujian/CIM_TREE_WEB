@@ -19,7 +19,12 @@ export default class Users extends Component {
 			percent: 0,
 			edit: true,
 			roles: [],
-			selectedRowKeys:[]
+			selectedRowKeys:[],
+			btn:'',
+			fristText:'',
+			fristRoles:[],
+			TreeCodes:'',
+			isBtn:true
 		}
 	}
 	static layout = {
@@ -64,43 +69,78 @@ export default class Users extends Component {
 		}
 	}
 
+	// search() {
+	// 	const { actions: { setUpdate } } = this.props;
+	// 	let text = document.getElementById("NurseryData").value;
+	// 	let searchList = []
+	// 	const { platform: { users = [] } } = this.props;
+	// 	users.map((item) => {
+	// 		let isName = false;
+	// 		let isRoles = false;
+	// 		if (!text) {
+	// 			isName = true
+	// 		}
+	// 		else {
+	// 			if (text && item.username.indexOf(text) > -1) {
+	// 				isName = true
+	// 			}
+	// 		}
+
+	// 		if (this.state.roles.length == 0) {
+	// 			isRoles = true
+	// 		} else {
+	// 			if (this.state.roles.sort().join(',') == item.groups.map(i => {
+	// 				return String(i.id)
+	// 			}).sort().join(',')) {
+	// 				isRoles = true
+	// 			}
+	// 		}
+
+	// 		if (isName && isRoles) {
+	// 			searchList.push(item)
+	// 		}
+	// 	})
+	// 	setUpdate(false);
+	// 	this.setState({
+	// 		searchList: searchList,
+	// 	})
+
+	// }
+
 	search() {
-		const { actions: { setUpdate } } = this.props;
 		let text = document.getElementById("NurseryData").value;
-		let searchList = []
-		const { platform: { users = [] } } = this.props;
-		users.map((item) => {
-			let isName = false;
-			let isRoles = false;
-			if (!text) {
-				isName = true
+		const {
+			actions: { getUsers ,getTablePage},
+		} = this.props;
+		if (text || this.state.roles&&this.state.roles.length>0) {
+			// 如果查询输入框里面的内容没有改变就不执行
+			if(text!=this.state.fristText || this.state.fristRoles!=this.state.roles){
+				getUsers({}, {org_code:this.props.getTreeCodes, "username": text,roles:this.state.roles }).then(items => {
+					let pagination = {
+						current: 1,
+						total:items.length+1,
+					};
+					getTablePage(pagination)
+					this.setState({btn:true,fristText:text,fristRoles:this.state.roles,isBtn:false})
+				})
 			}
-			else {
-				if (text && item.username.indexOf(text) > -1) {
-					isName = true
-				}
+		
+		} else {
+			if(this.state.btn){
+				getUsers({}, {org_code: this.props.getTreeCodes,page:1}).then((e) =>{
+			console.log("esssssssssssssss",e)
+			
+					let pagination = {
+						current: 1,
+						total:e.count,
+					};
+					getTablePage(pagination)
+					this.setState({btn:false,fristText:'',fristRoles:[],isBtn:true})
+				});
 			}
-
-			if (this.state.roles.length == 0) {
-				isRoles = true
-			} else {
-				if (this.state.roles.sort().join(',') == item.groups.map(i => {
-					return String(i.id)
-				}).sort().join(',')) {
-					isRoles = true
-				}
-			}
-
-			if (isName && isRoles) {
-				searchList.push(item)
-			}
-		})
-		setUpdate(false);
-		this.setState({
-			searchList: searchList,
-		})
-
+		}
 	}
+
 	confirms() {
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		if (user.is_superuser == true) {
@@ -269,12 +309,12 @@ export default class Users extends Component {
 				}
 			}
 		}];
-		let dataSource = [];
-		if (isUpdate) {
-			dataSource = users
-		} else {
-			dataSource = searchList
-		}
+		// let dataSource = [];
+		// if (isUpdate) {
+		// 	dataSource = users
+		// } else {
+		// 	dataSource = searchList
+		// }
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -421,7 +461,8 @@ export default class Users extends Component {
 						</Row>
 					</div>
 					<Spin tip="加载中" percent={this.state.percent} status="active" strokeWidth={5}  spinning={this.state.loading}>
-					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={columns} dataSource={dataSource}
+					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={columns} dataSource={users}
+					pagination={this.props.getTablePages} 	onChange={this.changePage.bind(this)}					
 						loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.props.getTreeModals }}
 					/>
 					</Spin>
@@ -429,6 +470,38 @@ export default class Users extends Component {
 				: <h3>{'没有权限'}</h3>
 
 		);
+	}
+	componentWillReceiveProps(nextProps) {
+		this.setState({TreeCodes:this.props.getTreeCodes})
+		if(this.state.TreeCodes!=this.props.getTreeCodes){
+			this.setState({roles:[]})	
+		}
+	}
+	async changePage(obj) {
+		const {
+			actions: {getUsers,getTreeModal,setUpdate,getTablePage}
+		} = this.props;	
+		if(this.state.isBtn){
+			getUsers({}, {org_code: this.props.getTreeCodes,page:obj.current}).then((e) =>{
+				let pagination = {
+					current: obj.current,
+					total:e.count,
+				};
+				// getTreeModal(false)
+				// setUpdate(true);
+				getTablePage(pagination)
+			});
+		}else{
+			getUsers({}, {org_code: this.props.getTreeCodes,roles:this.state.roles,page:obj.current}).then((e) =>{
+				let pagination = {
+					current: obj.current,
+					total:e.count,
+				};
+				// getTreeModal(false)
+				// setUpdate(true);
+				getTablePage(pagination)
+			});
+		}
 	}
 	saves() {
 		const { platform: { users = [] }, tags = {} } = this.props;
@@ -584,6 +657,7 @@ export default class Users extends Component {
 			const codes = Users.collect(node);
 			this.selectedCodes.map((userId) => {
 				return deleteUser({ userID: userId }).then(() => {
+					
 					getUsers({}, { org_code: codes }).then(() => {
 						this.setState({loading:false,selectedRowKeys:[]});
 						});
@@ -684,7 +758,7 @@ export default class Users extends Component {
 	del(user) {
 		const {
 			sidebar: { node } = {},
-			actions: { deleteUser, getUsers }
+			actions: { deleteUser, getUsers,getTablePage }
 		} = this.props;
 		const codes = Users.collect(node);
 		// 		const usera = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -694,8 +768,16 @@ export default class Users extends Component {
 
 		// 		}
 		if (user.id) {
+			console.log("this.props.getTablePages.current",this.props.getTablePages.current)
+			
 			deleteUser({ userID: user.id }).then(() => {
-				getUsers({}, { org_code: codes });
+				getUsers({}, { org_code: codes ,page:this.props.getTablePages.current}).then((es) =>{
+					let pagination = {
+						current: this.props.getTablePages.current,
+						total:es.count,
+					};
+					getTablePage(pagination)
+				});;
 			});
 		}
 	}
