@@ -24,7 +24,8 @@ export default class Users extends Component {
 			fristText: '',
 			fristRoles: [],
 			TreeCodes: '',
-			isBtn: true
+			isBtn: true,
+			pagea:''
 		}
 	}
 	static layout = {
@@ -130,15 +131,21 @@ export default class Users extends Component {
 
 		} else {
 			// if(this.state.btn){
-			this.setState({ loading: true });
-
-			getUsers({}, { org_code: this.props.getTreeCodes, page: this.props.getTablePages.current }).then((e) => {
+			// this.setState({ loading: true });
+			let currents
+			console.log("this.state.pagea",this.state.pagea)
+			if(this.state.pagea==0){
+				currents=1
+			}else{
+				currents=this.state.pagea
+			}
+			getUsers({}, { org_code: this.props.getTreeCodes, page: currents }).then((e) => {
 				let pagination = {
-					current: this.props.getTablePages.current,
+					current: this.props.getTablePages.current || '',
 					total: e.count,
 				};
 				getTablePage(pagination)
-				this.setState({ btn: false, fristText: '', fristRoles: [], isBtn: true, loading: false })
+				this.setState({ btn: false, fristText: '', fristRoles: [], isBtn: true})
 				getIsBtn(true)
 
 			});
@@ -817,12 +824,25 @@ export default class Users extends Component {
 					});
 				} else {
 					getUsers({}, {org_code:this.props.getTreeCodes, "username": text,roles:this.state.roles }).then(items => {
-						let pagination = {
-							current: 1,
-							total:items.length+1,
-						};
-						getTablePage(pagination)
-						this.setState({  loading: false })						
+						console.log("items",items)
+
+						if(items&&items.length==0){
+							let pagination = {
+								current: 0,
+								total:0,
+							};
+							getTablePage(pagination)
+							this.setState({  loading: false ,pagea:this.props.getTablePages.current})	
+						}else{
+							let pagination = {
+								current: 1,
+								total:items.length+1,
+							};
+							getTablePage(pagination)
+							this.setState({  loading: false })	
+						}
+						
+						// this.setState({  loading: false })						
 					})
 				}
 			});
