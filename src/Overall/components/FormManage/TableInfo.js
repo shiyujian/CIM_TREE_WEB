@@ -420,7 +420,7 @@ class TableInfo extends Component {
                                                         ]
                                                     })
                                                     (
-                                                        <PerSearch selectMember={this.selectMember.bind(this)} code={this.state.code}/>
+                                                        <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.表单管理流程}/>
                                                     )
                                                 }
                                             </FormItem>
