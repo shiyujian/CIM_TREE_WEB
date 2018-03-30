@@ -318,7 +318,7 @@ class ResourceAddition extends Component {
                                         ]
                                     })
                                         (
-                                        <PerSearch selectMember={this.selectMember.bind(this)} />
+                                        <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.工程材料报批流程}/>
                                         )
                                 }
                             </FormItem>

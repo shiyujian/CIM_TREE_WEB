@@ -276,7 +276,7 @@ class GeneralAddition extends Component {
                                         ]
                                     })
                                         (
-                                        <PerSearch selectMember={this.selectMember.bind(this)} />
+                                        <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.机械设备报批流程}/>
                                         )
                                 }
                             </FormItem>
