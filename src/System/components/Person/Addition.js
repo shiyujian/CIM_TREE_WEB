@@ -378,16 +378,24 @@ class Addition extends Component {
 		}
 	}
 
-	async save() {
+	 save() {
 		const {
 			addition = {}, sidebar: { node } = {},
-			actions: { postUser, clearAdditionField, getUsers, putUser, getSection ,getTablePage}, tags = {}
+			platform: { users = [] },
+			actions: { postUser, clearAdditionField, getUsers, putUser, getSection ,getTablePage,getIsBtn}, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
 		} else {
 			if (addition.id) {
+				for (let i = 0; i < users.length; i++) {
+					// const element = users[i];
+					if(users[i].person_id==addition.person_id){
+						users[i]=addition
+						users[i].account=addition
+					}
+				}
 				this.props.form.validateFields((err, values) => {
 					console.log("err", err)
 					if (!err || !err.FullName && !err.UserName && !err.rolesNmae && !err.sexName && !err.telephone && !err.titles) {
@@ -425,18 +433,12 @@ class Addition extends Component {
 							},
 							extra_params: {},
 							title: addition.title || ''
-						}).then(async rst => {
-							if (rst.code == 1) {
+						}).then(rst => {
+							if (rst.code == 1) {			
 								const codes = Addition.collect(node);
-								await getUsers({}, { org_code: codes ,page:this.props.getTablePages.current}).then((es) =>{
-									let pagination = {
-										current: this.props.getTablePages.current,
-										total:es.count,
-									};
-									getTablePage(pagination)
-								});
 								message.info('修改人员成功');
-								document.getElementById("NurseryData").value=''
+								// 控制是否通过角色条件分页
+								// getIsBtn(true)
 								let sectiona = []
 								getSection(sectiona)
 								clearAdditionField();
@@ -495,7 +497,13 @@ class Addition extends Component {
 								getSection(sectiona)
 								clearAdditionField();
 								const codes = Addition.collect(node);
-								getUsers({}, { org_code: codes,page:this.props.getTablePages.current });
+								getUsers({}, { org_code: codes,page:this.props.getTablePages.current }).then(rest=>{
+									let pagination = {
+										current: this.props.getTablePages.current,
+										total: rest.count,
+									};
+									getTablePage(pagination)
+								});
 								this.setState({
 									newKey: Math.random()
 								})

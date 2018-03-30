@@ -110,7 +110,7 @@ export default class Tree extends Component {
 		const {node: {props: {eventKey = ''} = {}} = {}} = node || {};
 		const {
 			platform: {org: {children = []} = {}},
-			actions: {changeSidebarField, getUsers,getTreeModal,setUpdate,getTablePage,getTreeCode}
+			actions: {changeSidebarField, getUsers,getTreeModal,setUpdate,getTablePage,getTreeCode,getIsBtn}
 		} = this.props;
 		const o = Tree.loop(children, eventKey);
 		let ucode
@@ -150,6 +150,9 @@ export default class Tree extends Component {
 				getTreeModal(false)
 				setUpdate(true);
 				getTablePage(pagination)
+				// 控制是否通过角色条件分页
+				getIsBtn(true)
+			
 			});
 		}
 	}
