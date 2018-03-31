@@ -107,10 +107,11 @@ export default class Dataimport extends Component {
             let single = {
                 // index:item[0] || '',
                 SXM:item[1] || '',
-                X:item[2] || '',
-                Y:item[3] || '',
-                H:item[4] || '',
-                CreateTime:item[5] || ''
+                Section:item[2] || '',
+                X:item[3] || '',
+                Y:item[4] || '',
+                H:item[5] || '',
+                CreateTime:item[6] || ''
             };
             generateData.push(single);
         })
