@@ -73,7 +73,7 @@ class Addition extends Component {
 			systemRoles.push({ name: '苗圃职务', children: ["苗圃"], value: roles.filter(role => role.grouptype === 0) });
 			systemRoles.push({ name: '施工职务', children: ["施工领导", "协调调度人", "质量负责人", "安全负责人", "文明负责人", "普通员工", "施工文书", "测量员"], value: roles.filter(role => role.grouptype === 1) });
 			systemRoles.push({ name: '监理职务', children: ["总监", "监理组长", "普通监理", "监理文书"], value: roles.filter(role => role.grouptype === 2) });
-			systemRoles.push({ name: '业主职务', children: ["业主", "业主文书","业主领导"], value: roles.filter(role => role.grouptype === 3) });
+			systemRoles.push({ name: '业主职务', children: ["业主", "业主文书", "业主领导"], value: roles.filter(role => role.grouptype === 3) });
 		}
 		else {
 			for (let i = 0; i < user.groups.length; i++) {
@@ -90,7 +90,7 @@ class Addition extends Component {
 						systemRoles.push({ name: '监理职务', children: ["总监", "监理组长", "普通监理", "监理文书"], value: roles.filter(role => role.grouptype === 2) });
 						break;
 					case 3:
-						systemRoles.push({ name: '业主职务', children: ["业主", "业主文书","业主领导"], value: roles.filter(role => role.grouptype === 3) });
+						systemRoles.push({ name: '业主职务', children: ["业主", "业主文书", "业主领导"], value: roles.filter(role => role.grouptype === 3) });
 						break;
 					default:
 						break;
@@ -378,16 +378,24 @@ class Addition extends Component {
 		}
 	}
 
-	async save() {
+	save() {
 		const {
 			addition = {}, sidebar: { node } = {},
-			actions: { postUser, clearAdditionField, getUsers, putUser, getSection ,getTablePage}, tags = {}
+			platform: { users = [] },
+			actions: { postUser, clearAdditionField, getUsers, putUser, getSection, getTablePage, getIsBtn }, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
 		} else {
 			if (addition.id) {
+				for (let i = 0; i < users.length; i++) {
+					// const element = users[i];
+					if (users[i].person_id == addition.person_id) {
+						users[i] = addition
+						users[i].account = addition
+					}
+				}
 				this.props.form.validateFields((err, values) => {
 					console.log("err", err)
 					if (!err || !err.FullName && !err.UserName && !err.rolesNmae && !err.sexName && !err.telephone && !err.titles) {
@@ -425,18 +433,12 @@ class Addition extends Component {
 							},
 							extra_params: {},
 							title: addition.title || ''
-						}).then(async rst => {
+						}).then(rst => {
 							if (rst.code == 1) {
 								const codes = Addition.collect(node);
-								await getUsers({}, { org_code: codes ,page:this.props.getTablePages.current}).then((es) =>{
-									let pagination = {
-										current: this.props.getTablePages.current,
-										total:es.count,
-									};
-									getTablePage(pagination)
-								});
 								message.info('修改人员成功');
-								document.getElementById("NurseryData").value=''
+								// 控制是否通过角色条件分页
+								// getIsBtn(true)
 								let sectiona = []
 								getSection(sectiona)
 								clearAdditionField();
@@ -495,7 +497,28 @@ class Addition extends Component {
 								getSection(sectiona)
 								clearAdditionField();
 								const codes = Addition.collect(node);
-								getUsers({}, { org_code: codes,page:this.props.getTablePages.current });
+								let paget = ''
+								const totals = this.props.getTablePages.total
+								if (totals >= 9) {
+									if (totals.toString().length > 1) {
+										const strs1 = totals.toString()
+										const strs2 = strs1.substring(0, strs1.length - 1)
+										paget = (strs2 * 1) + 1
+									} else {
+										paget = 1
+									}
+								} else {
+									paget = 1
+								}
+
+								getUsers({}, { org_code: codes, page: paget }).then(rest => {
+									let pagination = {
+										current: paget,
+										total: rest.count,
+									};
+									getTablePage(pagination)
+
+								});
 								this.setState({
 									newKey: Math.random()
 								})
