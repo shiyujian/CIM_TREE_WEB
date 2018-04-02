@@ -78,7 +78,7 @@ export default class CarPackage extends Component {
         const {
             leftkeycode,
             sectionoption,
-            statusoption,
+            statusoption, 
             resetkey,
             mmtypeoption
         } = this.state;

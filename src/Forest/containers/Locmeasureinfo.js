@@ -62,7 +62,7 @@ export default class Locmeasureinfo extends Component {
         PROJECT_UNITS[1].units.map(item => {
             this.biaoduan.push(item);
         })
-        const { actions: { getTree, gettreetype, getTreeList, getForestUsers, getTreeNodeList }, users, treetypes, platform: { tree = {} } } = this.props;
+        const { actions: { getTree, gettreetype, getTreeList, getForestUsers, getTreeNodeList,getLittleBanAll }, users, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
         // 避免反复获取森林用户数据，提高效率
         if (!users) {
             getForestUsers();
@@ -73,6 +73,9 @@ export default class Locmeasureinfo extends Component {
         }
         if (!tree.bigTreeList) {
             getTreeNodeList()
+        }
+        if(!littleBanAll){
+            getLittleBanAll()
         }
         //类型
         let typeoption = [
@@ -87,11 +90,11 @@ export default class Locmeasureinfo extends Component {
         //状态
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={"-1"}>待审批</Option>,
-            <Option key={'2'} value={"0"}>审批通过</Option>,
-            <Option key={'3'} value={"1"}>审批未通过</Option>,
-            <Option key={'4'} value={"2"}>抽检未通过</Option>,
-            <Option key={'5'} value={"3"}>抽检通过</Option>,
+            <Option key={'1'} value={"-1"}>未抽查</Option>,
+            <Option key={'2'} value={"0"}>监理抽查通过</Option>,
+            <Option key={'3'} value={"1"}>监理抽查退回</Option>,
+            <Option key={'4'} value={"2"}>业主抽查退回</Option>,
+            <Option key={'5'} value={"3"}>业主抽查通过</Option>,
         ]
         this.setState({ statusoption })
         //定位 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input, Progress,Spin } from 'antd';
+import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input, Progress, Spin } from 'antd';
 import { PROJECT_UNITS } from './../../../_platform/api';
 import './index.less';
 
@@ -19,7 +19,13 @@ export default class Users extends Component {
 			percent: 0,
 			edit: true,
 			roles: [],
-			selectedRowKeys:[]
+			selectedRowKeys: [],
+			btn: '',
+			fristText: '',
+			fristRoles: [],
+			TreeCodes: '',
+			isBtn: true,
+			pagea:''
 		}
 	}
 	static layout = {
@@ -64,43 +70,89 @@ export default class Users extends Component {
 		}
 	}
 
+	// search() {
+	// 	const { actions: { setUpdate } } = this.props;
+	// 	let text = document.getElementById("NurseryData").value;
+	// 	let searchList = []
+	// 	const { platform: { users = [] } } = this.props;
+	// 	users.map((item) => {
+	// 		let isName = false;
+	// 		let isRoles = false;
+	// 		if (!text) {
+	// 			isName = true
+	// 		}
+	// 		else {
+	// 			if (text && item.username.indexOf(text) > -1) {
+	// 				isName = true
+	// 			}
+	// 		}
+
+	// 		if (this.state.roles.length == 0) {
+	// 			isRoles = true
+	// 		} else {
+	// 			if (this.state.roles.sort().join(',') == item.groups.map(i => {
+	// 				return String(i.id)
+	// 			}).sort().join(',')) {
+	// 				isRoles = true
+	// 			}
+	// 		}
+
+	// 		if (isName && isRoles) {
+	// 			searchList.push(item)
+	// 		}
+	// 	})
+	// 	setUpdate(false);
+	// 	this.setState({
+	// 		searchList: searchList,
+	// 	})
+
+	// }
+
 	search() {
-		const { actions: { setUpdate } } = this.props;
 		let text = document.getElementById("NurseryData").value;
-		let searchList = []
-		const { platform: { users = [] } } = this.props;
-		users.map((item) => {
-			let isName = false;
-			let isRoles = false;
-			if (!text) {
-				isName = true
-			}
-			else {
-				if (text && item.username.indexOf(text) > -1) {
-					isName = true
-				}
-			}
+		const {
+			actions: { getUsers, getTablePage, getIsBtn },
+		} = this.props;
+		if (text || this.state.roles && this.state.roles.length > 0) {
+			this.setState({ loading: true });
+			// 如果查询输入框里面的内容没有改变就不执行
+			// if(text!=this.state.fristText || this.state.fristRoles!=this.state.roles){
+			getUsers({}, { org_code: this.props.getTreeCodes, "username": text, roles: this.state.roles, page: 1 }).then(items => {
+				let pagination = {
+					current: this.props.getTablePages.current,
+					total: items.count,
+				};
+				getTablePage(pagination)
+				this.setState({ btn: true, fristText: text, fristRoles: this.state.roles, isBtn: false, loading: false })
+				getIsBtn(false)
 
-			if (this.state.roles.length == 0) {
-				isRoles = true
-			} else {
-				if (this.state.roles.sort().join(',') == item.groups.map(i => {
-					return String(i.id)
-				}).sort().join(',')) {
-					isRoles = true
-				}
-			}
+			})
+			// }
 
-			if (isName && isRoles) {
-				searchList.push(item)
+		} else {
+			// if(this.state.btn){
+			// this.setState({ loading: true });
+			let currents
+			console.log("this.state.pagea",this.state.pagea)
+			if(this.state.pagea==0){
+				currents=1
+			}else{
+				currents=this.state.pagea
 			}
-		})
-		setUpdate(false);
-		this.setState({
-			searchList: searchList,
-		})
+			getUsers({}, { org_code: this.props.getTreeCodes, page: currents }).then((e) => {
+				let pagination = {
+					current: this.props.getTablePages.current || '',
+					total: e.count,
+				};
+				getTablePage(pagination)
+				this.setState({ btn: false, fristText: '', fristRoles: [], isBtn: true})
+				getIsBtn(true)
 
+			});
+			// }
+		}
 	}
+
 	confirms() {
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		if (user.is_superuser == true) {
@@ -191,11 +243,26 @@ export default class Users extends Component {
 			dataIndex: 'gender',
 		}, {
 			title: '角色',
-			width:'15%',
+			width: '15%',
 			render: (user) => {
-				const { groups = [] } = user || {};
-				const roles = groups.map(group => group.name);
-				return roles.join('、')
+				if (user.roles) {
+					const {  platform: { roles = [] } } = this.props;
+					let add=[]
+					for (let i = 0; i < user.roles.length; i++) {
+						const element = user.roles[i];
+						for (let j = 0; j < roles.length; j++) {
+							const element = roles[j];
+							if(user.roles[i]==roles[j].id){
+								add.push(roles[j].name)
+							}
+						}
+					}
+					return add.join('、')
+				} else {
+					const { groups = [] } = user || {};
+					const roles = groups.map(group => group.name);
+					return roles.join('、')
+				}
 			}
 		}, {
 			title: '职务',
@@ -247,21 +314,21 @@ export default class Users extends Component {
 			render: (user) => {
 				const userc = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 				if (userc.is_superuser == true) {
-					if (user.is_active==true) {
+					if (user.is_active == true) {
 						return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-							<Popconfirm title="是否真的要删除用户?" key={2}
-								onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-								<a>删除</a>
-							</Popconfirm>,
-							<a style={{ marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>禁用</a>
+						<Popconfirm title="是否真的要删除用户?" key={2}
+							onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+							<a>删除</a>
+						</Popconfirm>,
+						<a style={{ marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>禁用</a>
 						]
-					}else{
+					} else {
 						return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-							<Popconfirm title="是否真的要删除用户?" key={2}
-								onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-								<a>删除</a>
-							</Popconfirm>,
-							 <a style={{color:'red',marginLeft: '.5em'}} onClick={this.disable.bind(this, user)}>启用</a>
+						<Popconfirm title="是否真的要删除用户?" key={2}
+							onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+							<a>删除</a>
+						</Popconfirm>,
+						<a style={{ color: 'red', marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>启用</a>
 						]
 					}
 				} else {
@@ -269,12 +336,12 @@ export default class Users extends Component {
 				}
 			}
 		}];
-		let dataSource = [];
-		if (isUpdate) {
-			dataSource = users
-		} else {
-			dataSource = searchList
-		}
+		// let dataSource = [];
+		// if (isUpdate) {
+		// 	dataSource = users
+		// } else {
+		// 	dataSource = searchList
+		// }
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -298,58 +365,59 @@ export default class Users extends Component {
 		return (
 			is_active ?
 				<div>
-					<div>
-						<Row style={{ marginBottom: "20px" }}>
-							<Col span={10}>
-								<label style={{ minWidth: 60, display: 'inline-block' }}>用户名:</label>
-								<Input id='NurseryData' className='search_input' />
-							</Col>
-							<Col span={7}>
-								<Select placeholder="请选择角色" value={this.state.roles || []} onChange={this.changeRoles.bind(this)}
-									mode="multiple" style={{ width: '100%' }}>
-									<OptGroup label="苗圃角色">
-										{
-											systemRoles.map(role => {
-												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-											})
-										}
-									</OptGroup>
-									<OptGroup label="施工角色">
-										{
-											projectRoles.map(role => {
-												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-											})
-										}
-									</OptGroup>
-									<OptGroup label="监理角色">
-										{
-											professionRoles.map(role => {
-												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-											})
-										}
-									</OptGroup>
-									<OptGroup label="业主角色">
-										{
-											departmentRoles.map(role => {
-												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-											})
-										}
-									</OptGroup>
-								</Select>
-							</Col>
-							<Col span={4} style={{ marginLeft: "20px" }}>
-								<Button type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>
+					<Spin tip="加载中" percent={this.state.percent} status="active" strokeWidth={5} spinning={this.state.loading}>
+						<div>
+							<Row style={{ marginBottom: "20px" }}>
+								<Col span={10}>
+									<label style={{ minWidth: 60, display: 'inline-block' }}>用户名:</label>
+									<Input id='NurseryData' className='search_input' />
+								</Col>
+								<Col span={7}>
+									<Select placeholder="请选择角色" value={this.state.roles || []} onChange={this.changeRoles.bind(this)}
+										mode="multiple" style={{ width: '100%' }}>
+										<OptGroup label="苗圃角色">
+											{
+												systemRoles.map(role => {
+													return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+												})
+											}
+										</OptGroup>
+										<OptGroup label="施工角色">
+											{
+												projectRoles.map(role => {
+													return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+												})
+											}
+										</OptGroup>
+										<OptGroup label="监理角色">
+											{
+												professionRoles.map(role => {
+													return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+												})
+											}
+										</OptGroup>
+										<OptGroup label="业主角色">
+											{
+												departmentRoles.map(role => {
+													return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
+												})
+											}
+										</OptGroup>
+									</Select>
+								</Col>
+								<Col span={4} style={{ marginLeft: "20px" }}>
+									<Button type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>
 
-							</Col>
-						</Row>
+								</Col>
+							</Row>
 
-				
-						<Row style={{ marginBottom: "20px" }}>
-							{
-								this.confirms()
-							}
-						{/*	<Button onClick={this.saves.bind(this)}>确定</Button>*/}
-							{/* <Col span={3}>
+
+							<Row style={{ marginBottom: "20px" }}>
+								{
+									this.confirms()
+								}
+								{/*	<Button onClick={this.saves.bind(this)}>确定</Button>*/}
+								{/* <Col span={3}>
 								<Button onClick={this.append.bind(this)}>添加用户</Button>
 							</Col>
 							<Col span={3}>
@@ -359,7 +427,7 @@ export default class Users extends Component {
 
 								</Popconfirm>
 							</Col> */}
-							{/*<Col span={6}>
+								{/*<Col span={6}>
 							<FormItem {...Users.layout} label="苗圃">
 								<Select placeholder="苗圃" value={this.state.tag} showSearch onChange={this.changeTagss.bind(this)}
 									 style={{ width: '100%' }}>
@@ -418,17 +486,52 @@ export default class Users extends Component {
 								</Select>
 							</FormItem>
 						</Col>*/}
-						</Row>
-					</div>
-					<Spin tip="加载中" percent={this.state.percent} status="active" strokeWidth={5}  spinning={this.state.loading}>
-					<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={columns} dataSource={dataSource}
-						loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.props.getTreeModals }}
-					/>
+							</Row>
+						</div>
+						<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={columns} dataSource={users}
+							pagination={this.props.getTablePages} onChange={this.changePage.bind(this)}
+							loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.props.getTreeModals }}
+						/>
 					</Spin>
 				</div>
 				: <h3>{'没有权限'}</h3>
 
 		);
+	}
+	componentWillReceiveProps(nextProps) {
+		const {
+			actions: { getUsers, getTablePage, getIsBtn }
+		} = nextProps;
+		this.setState({ TreeCodes: this.props.getTreeCodes })
+		if (this.state.TreeCodes != this.props.getTreeCodes) {
+			this.setState({ roles: [] })
+		}
+	}
+	async changePage(obj) {
+		const {
+			actions: { getUsers, getTreeModal, setUpdate, getTablePage }
+		} = this.props;
+		if (this.props.getIsBtns) {
+			getTreeModal(true)
+			getUsers({}, { org_code: this.props.getTreeCodes, page: obj.current }).then((e) => {
+				let pagination = {
+					current: obj.current,
+					total: e.count,
+				};
+				getTablePage(pagination)
+				getTreeModal(false)
+			});
+		} else {
+			getTreeModal(true)
+			getUsers({}, { org_code: this.props.getTreeCodes, roles: this.state.roles, page: obj.current }).then((e) => {
+				let pagination = {
+					current: obj.current,
+					total: e.count,
+				};
+				getTablePage(pagination)
+				getTreeModal(false)
+			});
+		}
 	}
 	saves() {
 		const { platform: { users = [] }, tags = {} } = this.props;
@@ -446,25 +549,59 @@ export default class Users extends Component {
 			for (let j = 0; j < this.selectedCodes.length; j++) {
 				const selectedCode = this.selectedCodes[j];
 				if (element.id == selectedCode) {
-					putUser({  }, {
-/*						username: element.username,
+					putUser({}, {
+						/*						username: element.username,
+												email: element.email,
+												// password: addition.password, // 密码不能变？信息中没有密码
+												account: {
+													person_name: element.person_name,
+													person_type: "C_PER",
+													person_avatar_url: "",
+													// organization: {
+													// 	pk: '229356816973',
+													// 	code: "ORG_02_31_02",
+													// 	obj_type: "C_ORG",
+													// 	rel_type: "member",
+													// 	name: '施工队'
+													// },
+												},
+												tags: [{ id: tags[this.state.tag].ID, name: tags[this.state.tag].NurseryName }],
+												//sections: this.state.sections,
+												// groups: roles.map(role => +role),
+												is_active: true,
+												basic_params: {
+													info: {
+														'电话': element.person_telephone || '',
+														'性别': element.gender || '',
+														'技术职称': element.title || '',
+														'phone': element.person_telephone || '',
+														'sex': element.gender || '',
+														'duty': ''
+													}
+												},
+												extra_params: {},
+												title: element.title || ''*/
+
+						id: element.id,
+						username: element.username,
 						email: element.email,
 						// password: addition.password, // 密码不能变？信息中没有密码
 						account: {
 							person_name: element.person_name,
 							person_type: "C_PER",
 							person_avatar_url: "",
-							// organization: {
-							// 	pk: '229356816973',
-							// 	code: "ORG_02_31_02",
-							// 	obj_type: "C_ORG",
-							// 	rel_type: "member",
-							// 	name: '施工队'
-							// },
+							organization: {
+								pk: node.pk,
+								code: element.org_code,
+								obj_type: "C_ORG",
+								rel_type: "member",
+								name: element.organization
+							},
 						},
-						tags: [{ id: tags[this.state.tag].ID, name: tags[this.state.tag].NurseryName }],
-						//sections: this.state.sections,
-						// groups: roles.map(role => +role),
+						tags: element.tags,
+						sections: element.sections,
+						//groups: [7],
+						groups: [1],
 						is_active: true,
 						basic_params: {
 							info: {
@@ -477,41 +614,7 @@ export default class Users extends Component {
 							}
 						},
 						extra_params: {},
-						title: element.title || ''*/
-
-											id: element.id,
-					username: element.username,
-					email: element.email,
-					// password: addition.password, // 密码不能变？信息中没有密码
-					account: {
-						person_name: element.person_name,
-						person_type: "C_PER",
-						person_avatar_url: "",
-						organization: {
-							pk: node.pk,
-							code: element.org_code,
-							obj_type: "C_ORG",
-							rel_type: "member",
-							name: element.organization
-						},
-					},
-					tags: element.tags,
-					sections: element.sections,
-					//groups: [7],
-					groups: [1],
-					is_active: true,
-					basic_params: {
-						info: {
-							'电话': element.person_telephone || '',
-							'性别': element.gender || '',
-							'技术职称': element.title || '',
-							'phone': element.person_telephone || '',
-							'sex': element.gender || '',
-							'duty': ''
-						}
-					},
-					extra_params: {},
-					title: element.title || ''
+						title: element.title || ''
 
 					}).then(rst => {
 						// if (rst.id) {
@@ -537,7 +640,7 @@ export default class Users extends Component {
 	rowSelection = {
 		onChange: (selectedRowKeys) => {
 			console.log("selectedRowKeys", selectedRowKeys)
-			this.setState({selectedRowKeys:selectedRowKeys})
+			this.setState({ selectedRowKeys: selectedRowKeys })
 			this.selectedCodes = selectedRowKeys;
 		}
 	};
@@ -572,11 +675,11 @@ export default class Users extends Component {
 	}
 
 	remove() {
-		console.log('this.state.selectedRowKeys',this.state.selectedRowKeys)
+		console.log('this.state.selectedRowKeys', this.state.selectedRowKeys)
 		if (this.state.selectedRowKeys.length == 0) {
 			message.warn('请选择需要删除的数据！');
-		} else{
-			this.setState({loading:true});
+		} else {
+			this.setState({ loading: true });
 			const {
 				sidebar: { node } = {},
 				actions: { deleteUser, getUsers }
@@ -584,75 +687,76 @@ export default class Users extends Component {
 			const codes = Users.collect(node);
 			this.selectedCodes.map((userId) => {
 				return deleteUser({ userID: userId }).then(() => {
+
 					getUsers({}, { org_code: codes }).then(() => {
-						this.setState({loading:false,selectedRowKeys:[]});
-						});
+						this.setState({ loading: false, selectedRowKeys: [] });
+					});
 				});
 			});
 		}
 	}
-	disable(user,event){
+	disable(user, event) {
 		const {
 			addition = {}, sidebar: { node } = {},
 			actions: { putUser }
 		} = this.props;
 		let actives
-			if(user.is_active==true){
-				user.is_active=false
-				actives=false
-			}else{
-				user.is_active=true
-				actives=true
-			}
-			let groupe=[]
-			for (let j = 0; j < user.groups.length; j++) {
-				const element = user.groups[j];
-				groupe.push(element.id)
-			}
-			console.log("is_actives0",actives)
-			console.log("groupe",groupe,user)
-					putUser({ }, {
-					id: user.id,
-					username: user.username,
-					email: user.email,
-					// password: addition.password, // 密码不能变？信息中没有密码
-					account: {
-						person_name: user.person_name,
-						person_type: "C_PER",
-						person_avatar_url: "",
-						organization: {
-							pk: node.pk,
-							code: user.org_code,
-							obj_type: "C_ORG",
-							rel_type: "member",
-							name: user.organization
-						},
-					},
-					tags: user.tags,
-					sections: user.sections,
-					//groups: [7],
-					groups: groupe,
-					is_active: actives,
-					basic_params: {
-						info: {
-							'电话': user.person_telephone || '',
-							'性别': user.gender || '',
-							'技术职称': user.title || '',
-							'phone': user.person_telephone || '',
-							'sex': user.gender || '',
-							'duty': ''
-						}
-					},
-					extra_params: {},
-					title: user.title || ''
-					}).then(rst => {
-						this.forceUpdate();
-						console.log("rst",rst)
-						console.log("333333333",JSON.parse(rst.msg))
-					})
-				
-			
-		
+		if (user.is_active == true) {
+			user.is_active = false
+			actives = false
+		} else {
+			user.is_active = true
+			actives = true
+		}
+		let groupe = []
+		for (let j = 0; j < user.groups.length; j++) {
+			const element = user.groups[j];
+			groupe.push(element.id)
+		}
+		console.log("is_actives0", actives)
+		console.log("groupe", groupe, user)
+		putUser({}, {
+			id: user.id,
+			username: user.username,
+			email: user.email,
+			// password: addition.password, // 密码不能变？信息中没有密码
+			account: {
+				person_name: user.person_name,
+				person_type: "C_PER",
+				person_avatar_url: "",
+				organization: {
+					pk: node.pk,
+					code: user.org_code,
+					obj_type: "C_ORG",
+					rel_type: "member",
+					name: user.organization
+				},
+			},
+			tags: user.tags,
+			sections: user.sections,
+			//groups: [7],
+			groups: groupe,
+			is_active: actives,
+			basic_params: {
+				info: {
+					'电话': user.person_telephone || '',
+					'性别': user.gender || '',
+					'技术职称': user.title || '',
+					'phone': user.person_telephone || '',
+					'sex': user.gender || '',
+					'duty': ''
+				}
+			},
+			extra_params: {},
+			title: user.title || ''
+		}).then(rst => {
+			this.forceUpdate();
+			console.log("rst", rst)
+			console.log("333333333", JSON.parse(rst.msg))
+		})
+
+
+
 	}
 
 	edit(user, event) {
@@ -684,7 +788,8 @@ export default class Users extends Component {
 	del(user) {
 		const {
 			sidebar: { node } = {},
-			actions: { deleteUser, getUsers }
+			platform: { users = [] },
+			actions: { deleteUser, getUsers, getTablePage }
 		} = this.props;
 		const codes = Users.collect(node);
 		// 		const usera = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -693,9 +798,53 @@ export default class Users extends Component {
 		// 		if (usera.is_superuser) {
 
 		// 		}
+		let text = document.getElementById("NurseryData").value;
+		let pages
+		if(users&&users.length==1){
+			pages=this.props.getTablePages.current-1
+		}
+		else{
+			pages=this.props.getTablePages.current
+		}
 		if (user.id) {
-			deleteUser({ userID: user.id }).then(() => {
-				getUsers({}, { org_code: codes });
+			console.log("this.props.getTablePages.current", this.props.getTablePages.current)
+			deleteUser({ userID: user.id }).then((as) => {
+				console.log("as",as)
+				if (this.props.getIsBtns) {
+					getUsers({}, { org_code: codes, page: pages }).then((es) => {
+					console.log("es",es)
+							let pagination = {
+								current: this.props.getTablePages.current,
+								total: es.count,
+							};
+							getTablePage(pagination)
+						
+						
+						this.setState({  loading: false })
+					});
+				} else {
+					getUsers({}, {org_code:this.props.getTreeCodes, "username": text,roles:this.state.roles }).then(items => {
+						console.log("items",items)
+
+						if(items&&items.length==0){
+							let pagination = {
+								current: 0,
+								total:0,
+							};
+							getTablePage(pagination)
+							this.setState({  loading: false ,pagea:this.props.getTablePages.current})	
+						}else{
+							let pagination = {
+								current: 1,
+								total:items.length+1,
+							};
+							getTablePage(pagination)
+							this.setState({  loading: false })	
+						}
+						
+						// this.setState({  loading: false })						
+					})
+				}
 			});
 		}
 	}

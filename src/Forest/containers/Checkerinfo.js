@@ -36,7 +36,7 @@ export default class Checkerinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users,treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList,getLittleBanAll}, users,treetypes,littleBanAll,platform:{tree = {}}} = this.props; 
         this.biaoduan = [];
         PROJECT_UNITS[0].units.map(item => {
             this.biaoduan.push(item);
@@ -53,6 +53,9 @@ export default class Checkerinfo extends Component {
         }
         if(!tree.bigTreeList){
             getTreeNodeList()
+        }
+        if(!littleBanAll){
+            getLittleBanAll()
         }
         //类型
         let typeoption = [

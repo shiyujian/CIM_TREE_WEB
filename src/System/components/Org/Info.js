@@ -21,10 +21,8 @@ export default class Info extends Component {
 			actions: { changeAdditionField },
 			listStore
 		} = this.props;
-		console.log('this.props',this.props)
 		const {type, extra_params: extra = {}, obj_type} = node || {};
 		const title = Info.getTitle(type);
-		console.log('type',type)
 		return (
 			<div style={{marginBottom: 20}}>
 				<div style={{borderBottom: '1px solid #e9e9e9', paddingBottom: 5, marginBottom: 20}}>

@@ -863,8 +863,7 @@ class Plan extends Component {
 						 filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
 						 style={{ width: '200px' }} 
 						 placeholder='请选择树种' 
-						 onChange={this.handleSelect.bind(this, record, 'project')}> 
-						>
+						 onChange={this.handleSelect.bind(this, record, 'project')}>
                             {
                                 this.state.treetype
                             }

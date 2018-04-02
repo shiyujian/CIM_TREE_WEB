@@ -322,7 +322,7 @@ class SeedingAddition extends Component {
                                         ]
                                     })
                                         (
-                                        <PerSearch selectMember={this.selectMember.bind(this)} />
+                                        <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.苗木资料报批流程}/>
                                         )
                                 }
                             </FormItem>

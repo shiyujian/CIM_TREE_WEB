@@ -84,18 +84,18 @@ export default class Leave extends Component {
     onSelect(value = []) {
         let keycode = value[0] || '';
         const {actions:{setkeycode,gettreetype,getTreeList,getTree}} =this.props;
-        setkeycode(keycode);
+        // setkeycode(keycode);
         this.setState({leftkeycode:keycode,resetkey:++this.state.resetkey})
         
-        //标段
-        getTreeList({},{field:'section',no:keycode,paginate:false})
-        .then(rst => {
-            this.setSectionOption(rst)
-        })
-        //树种
-        gettreetype({},{no:keycode,paginate:false})
-        .then(rst => {
-            this.setTreeTypeOption(rst)
-        })
+        // //标段
+        // getTreeList({},{field:'section',no:keycode,paginate:false})
+        // .then(rst => {
+        //     this.setSectionOption(rst)
+        // })
+        // //树种
+        // gettreetype({},{no:keycode,paginate:false})
+        // .then(rst => {
+        //     this.setTreeTypeOption(rst)
+        // })
     }
 }

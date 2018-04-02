@@ -104,15 +104,18 @@ export default class Dataimport extends Component {
         data.splice(0, 1);
         let generateData = [];
         data.map(item => {
-            let single = {
-                // index:item[0] || '',
-                SXM:item[1] || '',
-                X:item[2] || '',
-                Y:item[3] || '',
-                H:item[4] || '',
-                CreateTime:item[5] || ''
-            };
-            generateData.push(single);
+            if(item[0] !== ''){
+                let single = {
+                    // index:item[0] || '',
+                    Section:item[1] || '',
+                    SXM:item[2] || '',
+                    X:item[3] || '',
+                    Y:item[4] || '',
+                    H:item[5] || '',
+                    CreateTime:item[6] || ''
+                };
+                generateData.push(single);
+            }
         })
         postPositionData({id:this.user.id},generateData).then(rst => {
             if(rst.code){

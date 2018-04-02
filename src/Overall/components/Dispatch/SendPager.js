@@ -264,7 +264,7 @@ class SendPage1 extends Component {
 							</Row>
 						</Col>
 						<Col style={{ paddingLeft: '50px' }} span={4} offset={1}>
-							<Row style={{ marginTop: '-50px', marginLeft: '90px' }} span={8}>
+							<Row style={{ marginTop: '-50px', marginLeft: '80%' }} span={8}>
 								<Button type="primary" onClick={this._sentDoc.bind(this)}>发文</Button>
 							</Row>
 							<Row style={{ marginTop: '23px' }} span={8}>

@@ -17,7 +17,11 @@ export default (ID, service = '') => {
 	const usersReducer = handleActions({
 		[getUsersOK]: (state, {payload}) => {
 			if(payload){
-				return payload.map((user, index) => ({index, ...user.account, ...user}))
+				if(payload.results){
+					return payload.results.map((user, index) => ({index, ...user.account, ...user}))
+				}else{
+					return payload.map((user, index) => ({index, ...user.account, ...user}))
+				}
 			}
 		},
 		[updateUsers]: (state) => {
