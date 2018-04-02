@@ -52,7 +52,7 @@ export default class Contrastinfo extends Component {
         }
     }
     componentDidMount() {
-        const { actions: { getTree, getTreeList, getTreeNodeList }, treetypes, platform: { tree = {} } } = this.props;
+        const { actions: { getTree, getTreeList, getTreeNodeList,getLittleBanAll }, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
         this.biaoduan = [];
         PROJECT_UNITS[0].units.map(item => {
             this.biaoduan.push(item);
@@ -66,6 +66,9 @@ export default class Contrastinfo extends Component {
         }
         if (!tree.bigTreeList) {
             getTreeNodeList()
+        }
+        if(!littleBanAll){
+            getLittleBanAll()
         }
         //类型
         let typeoption = [

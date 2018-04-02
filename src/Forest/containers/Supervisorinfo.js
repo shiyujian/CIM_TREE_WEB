@@ -42,7 +42,7 @@ export default class Supervisorinfo extends Component {
         PROJECT_UNITS[1].units.map(item => {
             this.biaoduan.push(item);
         })
-        const {actions: {getTree,getForestUsers,getTreeNodeList,getTreeList}, users,treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTree,getForestUsers,getTreeNodeList,getTreeList,getLittleBanAll}, users,treetypes,littleBanAll,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();
@@ -52,6 +52,9 @@ export default class Supervisorinfo extends Component {
         }
         if(!tree.bigTreeList){
             getTreeNodeList()
+        }
+        if(!littleBanAll){
+            getLittleBanAll()
         }
         //类型
         let typeoption = [
