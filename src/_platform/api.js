@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-21 21:50:24
+ * @Last Modified time: 2018-04-02 14:35:34
  */
 /**
 *
@@ -389,7 +389,7 @@ export const SECTIONNAME = [
 	},
 ]
 
-//获取子项目下的标段
+//获取子项目下的标段,和上边不同的是一个是数字1，一个是中文一，对应api的不同
 export const SECTIONNUMBERNAME = [
 	{
 		code:'01',
