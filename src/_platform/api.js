@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-21 21:50:24
+ * @Last Modified time: 2018-04-02 14:35:34
  */
 /**
 *
@@ -389,7 +389,7 @@ export const SECTIONNAME = [
 	},
 ]
 
-//获取子项目下的标段
+//获取子项目下的标段,和上边不同的是一个是数字1，一个是中文一，对应api的不同
 export const SECTIONNUMBERNAME = [
 	{
 		code:'01',
@@ -549,7 +549,7 @@ export const MODULES = [
 			name: '质量评优',
 		},
 		//  {
-		// 	id:'QUALITY.YANSHOU',
+		// 	id:'QUALITY.YANSHOU.NONE',
 		// 	name: '质量验收',
 		// 	children: [{
 		// 		id: 'QUALITY.CHECK',
@@ -618,7 +618,7 @@ export const MODULES = [
 				name: '安全隐患',
 			},
 			{
-				id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT',
+				id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT.NONE',
 				name: '安全文明施工',
 				children: [
 					{
@@ -646,7 +646,7 @@ export const MODULES = [
 		id: 'FOREST',
 		name: '森林大数据',
 		children: [{
-			id: 'FOREST.INFO',
+			id: 'FOREST.INFO.NONE',
 			name: '苗木大数据',
 			children: [{
 				id: 'FOREST.NURSOVERALLINFO',
@@ -674,7 +674,7 @@ export const MODULES = [
 				name: '供应商诚信信息',
 			}]
 		}, {
-			id: 'FOREST.FOREST.IMPORT',
+			id: 'FOREST.FOREST.IMPORT.NONE',
 			name: '数据导入',
 			children: [{
 				id: 'FOREST.DATAIMPORT',
@@ -746,7 +746,7 @@ export const MODULES = [
 		name: '项目管理',
 		children: [
 			// {	
-			// 	id:'PROJECT.LANDAREA',
+			// 	id:'PROJECT.LANDAREA.NONE',
 			// 	name: '地块区域',
 			// 	children: [{
 			// 		id: 'PROJECT.PLOTMAGE',
@@ -765,7 +765,7 @@ export const MODULES = [
 			// 		name: '细班管理',
 			// 	}]
 			// }, {
-			// 	id:'PROJECT.PROMANAGE',
+			// 	id:'PROJECT.PROMANAGE.NONE',
 			// 	name: '工程管理',
 			// 	children: [{
 			// 		id: 'PROJECT.PLOTSET',
@@ -787,7 +787,7 @@ export const MODULES = [
 			// 		name: '分项工程',
 			// 	}]
 			// }, {
-			// 	id:'PROJECT.ORG',
+			// 	id:'PROJECT.ORG.NONE',
 			// 	name: '组织机构',
 			// 	children: [{
 			// 		id: 'PROJECT.ORGTYPE',
@@ -802,7 +802,7 @@ export const MODULES = [
 			// }, 
 
 			{
-				id:'PROJECT.DATAMANAGE',
+				id:'PROJECT.DATAMANAGE.NONE',
 				name: '资料管理',
 				children: [{
 					id: 'PROJECT.STANDARD',
@@ -827,7 +827,7 @@ export const MODULES = [
 				// }
 				]
 			}, {
-				id:'PROJECT.OVERALLMANAGE',
+				id:'PROJECT.OVERALLMANAGE.NONE',
 				name: '综合管理',
 				children: [{
 					id: 'PROJECT.MATERIAL',
@@ -837,7 +837,7 @@ export const MODULES = [
 					name: '表单管理',
 				}]
 			}, {
-				id:'PROJECT.SAFETYMANAGE',
+				id:'PROJECT.SAFETYMANAGE.NONE',
 				name: '安环管理',
 				children: [{
 					id: 'PROJECT.SAFETYSYSTEM',
@@ -862,14 +862,14 @@ export const MODULES = [
 					name: '安全教育',
 				}]
 			}, {
-				id:'PROJECT.MASSMANAGE',
+				id:'PROJECT.MASSMANAGE.NONE',
 				name: '质量管理',
 				children: [{
 					id: 'PROJECT.DEFECTS',
 					name: '质量缺陷',
 				}]
 			}, {
-				id:'PROJECT.NURSERY',
+				id:'PROJECT.NURSERY.NONE',
 				name: '苗木管理',
 				children: [{
 					id: 'PROJECT.NURSERYTYPE',

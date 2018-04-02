@@ -18,9 +18,9 @@ export default class Filter extends Component {
     }
 
 	render() {
-		const { actions: { toggleAddition }, Doc = [] } = this.props;
-		console.log('DDDDD',Doc)
-		// console.log('filter.this.props',this.props)
+
+		const { actions: { toggleAddition,getdocument }, Doc = [] } = this.props;
+		// console.log('DDDDD',Doc)
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
@@ -34,6 +34,8 @@ export default class Filter extends Component {
                                      >
                                           <Option value='第一阶段'>第一阶段</Option>
                                           <Option value='第二阶段'>第二阶段</Option>
+                                          <Option value='第三阶段'>第三阶段</Option>
+                                          <Option value='第四阶段'>第四阶段</Option>
                                      </Select>
                                 </FormItem>
 							</Col>
@@ -49,7 +51,10 @@ export default class Filter extends Component {
                                 </FormItem>
 							</Col>
 							<Col span={8}>
-								<Button type="primary" style={{marginLeft:'100px'}}>查询</Button>
+								<Button type="primary" 
+										style={{marginLeft:'100px'}}
+										onClick={this.onSearch.bind(this)} 
+								>查询</Button>
 							</Col>
 						</Row>
 						<Row gutter={15}  style={{marginTop: 5}}>
@@ -75,7 +80,10 @@ export default class Filter extends Component {
                                 </FormItem>
 							</Col>
 							<Col span={8}>
-								<Button type="primary" ghost style={{marginLeft:'100px'}}>清空</Button>
+								<Button type="primary" ghost 
+										style={{marginLeft:'100px'}}
+										onClick={this.clear.bind(this)}
+								>清空</Button>
 							</Col>
 						</Row>
 					</Col>
@@ -99,13 +107,32 @@ export default class Filter extends Component {
 		);
 	}
 
-	query(value) {
-		const { actions: { getdocument }, currentcode } = this.props;
-		let search = {
-			doc_name: value
-		};
-		getdocument({ code: currentcode.code }, search);
+	onSearch(){
+		//下面这个判断有问题，逻辑是错的
+		const { actions: { getdocument }, Doc = [] } = this.props;
+		console.log('Doc',Doc)
+		let datas=[];
+		for(let i=0;i<Doc.length;i++){
+			if( Doc[i].extra_params.engineer==this.state.engineerName ||
+				Doc[i].extra_params.theme==this.state.engineerTheme ||
+				Doc[i].extra_params.approve==this.state.engineerApprove ||
+				Doc[i].extra_params.number==this.state.engineerNumber){
+				datas.push(Doc[i]);
+			} 
+
+		}
+		console.log('datas',datas)
 	}
+	clear(){
+
+	}
+	// query(value) {
+	// 	const { actions: { getdocument }, currentcode } = this.props;
+	// 	let search = {
+	// 		doc_name: value
+	// 	};
+	// 	getdocument({ code: currentcode.code }, search);
+	// }
 	cancel() {
 
 	}

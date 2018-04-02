@@ -293,7 +293,7 @@ export default class Addition extends Component {
                 extra_params: {
                     engineer:doc.engineer,
                     number:doc.number,
-                    style: doc.approve,
+                    approve: doc.approve,
                     theme:doc.theme,
                     company:doc.company,
                     time:doc.time,
