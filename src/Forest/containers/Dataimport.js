@@ -33,6 +33,7 @@ export default class Dataimport extends Component {
     }
     componentDidMount() {
         if(!this.user.id){
+            debugger
             this.user = getUser();
         }
     }
@@ -45,8 +46,14 @@ export default class Dataimport extends Component {
             },
             showUploadList: false,
             beforeUpload(file) {
+                let sections = JSON.parse(jthis.user.sections)
                 if(file.name.indexOf('xls') !== -1 || file.name.indexOf('xlxs') !== -1){
-                    return true
+                    if(sections.length === 0){
+                        message.info('该用户未关联标段，不能上传文件。')
+                        return false
+                    }else{
+                        return true
+                    }
                 }else{
                     message.warning('只能上传excel文件')
                     return false
@@ -101,18 +108,19 @@ export default class Dataimport extends Component {
     }
     async handleExcelData(data) {
         const { actions: { postPositionData } } = this.props;
+        let sections = JSON.parse(this.user.sections)
         data.splice(0, 1);
         let generateData = [];
         data.map(item => {
             if(item[0] !== ''){
                 let single = {
                     // index:item[0] || '',
-                    Section:item[1] || '',
-                    SXM:item[2] || '',
-                    X:item[3] || '',
-                    Y:item[4] || '',
-                    H:item[5] || '',
-                    CreateTime:item[6] || ''
+                    Section:sections[0],
+                    SXM:item[1] || '',
+                    X:item[2] || '',
+                    Y:item[3] || '',
+                    H:item[4] || '',
+                    CreateTime:item[5] || ''
                 };
                 generateData.push(single);
             }
@@ -127,12 +135,5 @@ export default class Dataimport extends Component {
     }
     onDownloadClick(){
         window.open(download)
-    }
-    beforeUpload(file) {
-        if(file.name.indexOf('xls') !== -1 || file.name.indexOf('xlxs') !== -1){
-            return true
-        }else{
-            message.warning('只能上传excel文件')
-        }
     }
 }
