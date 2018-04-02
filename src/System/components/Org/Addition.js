@@ -10,11 +10,17 @@ class Addition extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			Arrays:[]
+			Arrays:[],
+			sections:[]
 		};
 	}
 	static propTypes = {};
-
+	changeTitle(value) {
+		console.log("value",value)
+		const { actions: { changeAdditionField } } = this.props;
+		this.setState({sections:value})
+		changeAdditionField('sections', value)
+	}
 	render() {
 		const {
 			form: {getFieldDecorator},
@@ -25,10 +31,7 @@ class Addition extends Component {
 		
 		const title = Addition.getTitle(node, parent);
 		let units = this.getUnits()
-		console.log('addition',addition)
-		console.log('units',units)
-		console.log('title',title)
-		console.log('parent',parent)
+
 		return (
 			<Modal title={parent ? `新建${title} | ${parent.name}` : `编辑${title} | ${node.name}`}
 			maskClosable={false}
@@ -46,7 +49,9 @@ class Addition extends Component {
 					
 				</FormItem>
 				<FormItem {...Addition.layout} label={`${title}标段`}>
-					<Select placeholder="标段" value={addition.sections} onChange={changeAdditionField.bind(this, 'sections')}
+					<Select placeholder="标段" value={addition.sections} 
+					onChange={this.changeTitle.bind(this)}
+					// onChange={changeAdditionField.bind(this, 'sections')}
 						mode="multiple" style={{ width: '100%' }}>
 						{
 							units?
@@ -86,9 +91,10 @@ class Addition extends Component {
 
 	save() {
 		const {
-			sidebar: {parent} = {}, addition = {},
+			sidebar: { node = {},parent} = {}, addition = {},
 			actions: {postOrg, putOrg, getOrgTree, changeSidebarField, clearAdditionField, postRole}
 		} = this.props;
+		const {type, extra_params: extra = {}, obj_type} = node || {};
 		console.log(this.props)
 		console.log(addition.introduction)
 		console.log(addition.sections)
@@ -113,6 +119,7 @@ class Addition extends Component {
 				}
 			});
 		} else {
+			
 			putOrg({code: addition.code}, {
 				obj_type: 'C_ORG',
 				status: 'A',
@@ -124,9 +131,7 @@ class Addition extends Component {
 			}).then(rst => {
 				this.forceUpdate();				
 				if (rst.pk) {
-					console.log(rst.pk)
-					console.log(addition)
-					console.log(parent)
+					extra.sections=this.state.sections
 					changeSidebarField('addition', false);
 					parent && changeSidebarField('parent', null);
 					addition.code && clearAdditionField();

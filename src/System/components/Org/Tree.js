@@ -23,9 +23,7 @@ export default class Tree extends Component {
 			listVisible
 		}=this.state
 		const {code} = node || {};
-		console.log("code",code)
-		console.log("children",children)
-		console.log("childList",childList)
+
 		
 		// const list=this.filiter(children);
 		return (
@@ -149,10 +147,8 @@ export default class Tree extends Component {
 			if(rst && rst.children){
 				this.getList(rst.children)
 			}
-			console.log(1111111,rst)
 			const {children: [first] = []} = rst || {};
 			this.setState({list:this.filiter(rst.children)});
-			console.log('first',first)
 			if (first) {
 				changeSidebarField('node', {...first, type: 'project'});
 			}
