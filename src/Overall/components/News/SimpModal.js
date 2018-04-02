@@ -154,7 +154,7 @@ class Modals extends Component {
 		})
 	}
 
-	//发布公告
+	//发布通知
 	postData() {
 		const {
 			actions: { postData, getTipsList, patchData, getDraftTipsList, postUploadFiles },
@@ -169,7 +169,7 @@ class Modals extends Component {
 		} = this.props;
 		validateFields((err, values) => {
 			if (!err) {
-				//判断是发布公告还是更新公告
+				//判断是发布通知还是更新通知
 				if (toggleData.status === 'ADD') {
 					let newData = {
 						"title": values['title'] || '',
@@ -189,8 +189,8 @@ class Modals extends Component {
 						.then(rst => {
 							if (rst.id) {
 								this.modalClick();
-								message.success('发布公告成功');
-								//更新公告列表数据
+								message.success('发布通知成功');
+								//更新通知列表数据
 								getTipsList({
 									user_id: getUser().id
 								});
@@ -213,8 +213,8 @@ class Modals extends Component {
 						.then(rst => {
 							if (rst.id) {
 								this.modalClick();
-								message.success('编辑公告成功');
-								//更新公告列表数据
+								message.success('编辑通知成功');
+								//更新通知列表数据
 								getTipsList({
 									user_id: getUser().id
 								});
@@ -229,7 +229,7 @@ class Modals extends Component {
 		});
 	}
 
-	//暂存公告
+	//暂存通知
 	draftDataFunc() {
 		const {
 			actions: { postData, patchData, getTipsList, getDraftTipsList,postUploadFiles },
@@ -261,7 +261,7 @@ class Modals extends Component {
 							if (rst.id) {
 								this.modalClick();
 								message.success('暂存成功');
-								//更新暂存的公告列表数据
+								//更新暂存的通知列表数据
 								getTipsList({
 									user_id: getUser().id
 								});
@@ -293,7 +293,7 @@ class Modals extends Component {
 							if (rst.id) {
 								this.modalClick();
 								message.success('暂存成功！');
-								//更新暂存的公告列表数据
+								//更新暂存的通知列表数据
 								getDraftTipsList({
 									user_id: getUser().id
 								});
@@ -354,7 +354,7 @@ class Modals extends Component {
 							<Col span={8} offset={1}>
 								<FormItem {...formItemLayout} label="名称">
 									{getFieldDecorator('title', {
-										rules: [{ required: true, message: '请输入公告名称' }],
+										rules: [{ required: true, message: '请输入通知名称' }],
 										initialValue: ''
 									})(
 										<Input type="text" />
