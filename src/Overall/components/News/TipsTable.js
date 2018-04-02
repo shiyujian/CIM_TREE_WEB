@@ -40,7 +40,7 @@ class TipsTable extends Component {
 
 	}
 
-	//公告操作按钮
+	//通知操作按钮
 	clickTips(record, type) {
 		const {
 			actions: { deleteData, getTipsList, getDraftTipsList, toggleModal, patchData },
@@ -49,7 +49,7 @@ class TipsTable extends Component {
 		if (type === 'DELETE') {
 			deleteData({ pk: record.id })
 				.then(() => {
-					message.success('删除公告成功！');
+					message.success('删除通知成功！');
 					if (tipsTabValue === '1') {
 						getTipsList({
 							user_id: user_id
@@ -69,20 +69,21 @@ class TipsTable extends Component {
 			})
 		} else if (type === 'VIEW') {
 			Modal.info({
-				title: <h1>公告标题：{record.title}</h1>,
+				title: <h1>通知标题：{record.title}</h1>,
 				okText: '知道了',
 				width: '800px',
+				iconType:'none',
 				content: (
 					<div>
 						{
 							record.source && record.source.name && <p>{`来源 ：${record.source.name}`}</p>
 						}
-						<h2>公告正文：
+						<h2>通知正文：
 							<div style={{ maxHeight: '600px', overflow: 'auto', border: '1px solid #ccc' }}
 								dangerouslySetInnerHTML={{ __html: record.raw }} />
 						</h2>
 						<h2>
-							公告附件：{
+							通知附件：{
 								record.attachment.fileList.length > 0 ? (
 									record.attachment.fileList.map((file, index) => {
 										return (
@@ -107,8 +108,8 @@ class TipsTable extends Component {
 			patchData({ pk: record.id }, newData)
 				.then(rst => {
 					if (rst.id) {
-						message.success('撤回成功，撤回的公告在暂存的公告中可查看');
-						//更新暂存的公告列表数据
+						message.success('撤回成功，撤回的通知在暂存的通知中可查看');
+						//更新暂存的通知列表数据
 						getTipsList({
 							user_id: user_id
 						});
@@ -125,8 +126,8 @@ class TipsTable extends Component {
 			patchData({ pk: record.id }, newData)
 				.then(rst => {
 					if (rst.id) {
-						message.success('重新发布公告成功！');
-						//更新暂存的公告列表数据
+						message.success('重新发布通知成功！');
+						//更新暂存的通知列表数据
 						getTipsList({
 							user_id: user_id
 						});
@@ -139,7 +140,7 @@ class TipsTable extends Component {
 
 	}
 
-	//发布公告
+	//发布通知
 	publishTipsClick() {
 		const { actions: { toggleModal } } = this.props;
 		toggleModal({
@@ -150,7 +151,7 @@ class TipsTable extends Component {
 		})
 	}
 
-	//公告列表和暂存的公告列表切换
+	//通知列表和暂存的通知列表切换
 	subTabChange(tipsTabValue) {
 		const { actions: { setTipsTabActive } } = this.props;
 		setTipsTabActive(tipsTabValue);
