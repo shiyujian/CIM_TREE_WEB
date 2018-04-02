@@ -103,18 +103,22 @@ export default class Dataimport extends Component {
         const { actions: { postPositionData } } = this.props;
         data.splice(0, 1);
         let generateData = [];
+        debugger
         data.map(item => {
-            let single = {
-                // index:item[0] || '',
-                SXM:item[1] || '',
-                Section:item[2] || '',
-                X:item[3] || '',
-                Y:item[4] || '',
-                H:item[5] || '',
-                CreateTime:item[6] || ''
-            };
-            generateData.push(single);
+            if(item[0] !== ''){
+                let single = {
+                    // index:item[0] || '',
+                    Section:item[1] || '',
+                    SXM:item[2] || '',
+                    X:item[3] || '',
+                    Y:item[4] || '',
+                    H:item[5] || '',
+                    CreateTime:item[6] || ''
+                };
+                generateData.push(single);
+            }
         })
+        debugger
         postPositionData({id:this.user.id},generateData).then(rst => {
             if(rst.code){
                 message.info('定位数据导入成功')
