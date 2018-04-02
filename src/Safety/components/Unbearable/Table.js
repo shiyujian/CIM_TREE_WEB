@@ -198,8 +198,7 @@ export default class GeneralTable extends Component {
 			title: '操作',
 			render: (text,record, index) => {
 				const { Doc = [] } = this.props;
-				// console.log('doc222',Doc)
-				console.log('record22',record)
+
 				let nodes = [];
 				nodes.push(
 				// return (

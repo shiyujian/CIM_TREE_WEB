@@ -103,7 +103,6 @@ export default class Dataimport extends Component {
         const { actions: { postPositionData } } = this.props;
         data.splice(0, 1);
         let generateData = [];
-        debugger
         data.map(item => {
             if(item[0] !== ''){
                 let single = {
@@ -118,7 +117,6 @@ export default class Dataimport extends Component {
                 generateData.push(single);
             }
         })
-        debugger
         postPositionData({id:this.user.id},generateData).then(rst => {
             if(rst.code){
                 message.info('定位数据导入成功')

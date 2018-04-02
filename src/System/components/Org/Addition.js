@@ -11,14 +11,16 @@ class Addition extends Component {
 		super(props);
 		this.state = {
 			Arrays:[],
-			sections:[]
+			sections:[],
+			btn:false
 		};
 	}
 	static propTypes = {};
 	changeTitle(value) {
 		console.log("value",value)
 		const { actions: { changeAdditionField } } = this.props;
-		this.setState({sections:value})
+		this.setState({sections:value,btn:true})
+		
 		changeAdditionField('sections', value)
 	}
 	render() {
@@ -131,7 +133,9 @@ class Addition extends Component {
 			}).then(rst => {
 				this.forceUpdate();				
 				if (rst.pk) {
-					extra.sections=this.state.sections
+					if(this.state.btn){
+						extra.sections=this.state.sections
+					}
 					changeSidebarField('addition', false);
 					parent && changeSidebarField('parent', null);
 					addition.code && clearAdditionField();

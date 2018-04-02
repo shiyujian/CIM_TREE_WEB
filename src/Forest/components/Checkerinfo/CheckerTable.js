@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Icon, Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message} from 'antd';
 import moment from 'moment';
-import { FOREST_API} from '../../../_platform/api';
+import { FOREST_API,PROJECT_UNITS} from '../../../_platform/api';
 import {getUser} from '_platform/auth'
 import '../index.less';
 const TabPane = Tabs.TabPane;
@@ -35,7 +35,18 @@ export default class CheckerTable extends Component {
     		rolename: '',
     		percent:0,        
     	}
-    }
+	}
+	getBiao(code){
+		let str = '';
+		PROJECT_UNITS.map(item => {
+			item.units.map(single => {
+				if(single.code === code){
+					str = single.value;
+				}
+			})
+		})
+		return str;
+	}
     componentDidMount() {
     	let user = getUser()
 		this.sections = JSON.parse(user.sections)
@@ -104,6 +115,9 @@ export default class CheckerTable extends Component {
 		},{
 			title:"标段",
 			dataIndex: 'Section',
+			render:(text,record) => {
+				return <p>{this.getBiao(text)}</p>
+			}
 		},{
 			title:"位置",
 			dataIndex: 'place',
@@ -396,6 +410,24 @@ export default class CheckerTable extends Component {
 			this.setState({imgvisible:true,})
 		})
 	}
+	getThinClassName(no,section){
+		const {littleBanAll} = this.props;
+		let nob = no.substring(0,15);
+		let sectionn = section.substring(8,10);
+		let result = '/'
+		debugger
+		if(littleBanAll){
+			littleBanAll.map(item => {
+				if(item.No.substring(0,15) === nob && item.No.substring(16,18) === sectionn){
+					result = item.ThinClassName;
+					return;
+				}
+			})
+		}else{
+			return <p> / </p>
+		}
+		return result;
+	}
 
 	handleCancel(){
     	this.setState({imgvisible:false})
@@ -453,7 +485,7 @@ export default class CheckerTable extends Component {
 	    		tblData.forEach((plan, i) => {
 	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = `${plan.No.substring(3,4)}号地块${plan.No.substring(6,7)}区${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`;
+	    			let place = this.getThinClassName(plan.No,plan.Section);
 	    			tblData[i].place = place;
 	    			let statusname = '';
 					if(plan.CheckStatus == 0)
