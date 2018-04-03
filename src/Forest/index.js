@@ -83,7 +83,7 @@ export default class ForestContainer extends Component {
 			key: 'supervisorinfo',
 			id: 'FOREST.SUPERVISORINFO',
 			path: '/forest/supervisorinfo',
-			name: '监理验收信息',
+			name: '监理抽查信息',
 		},{
 			key: 'ownerinfo',
 			id: 'FOREST.OWNERINFO',

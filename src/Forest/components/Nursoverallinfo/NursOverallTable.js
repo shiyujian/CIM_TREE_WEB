@@ -822,7 +822,12 @@ export default class NursOverallTable extends Component {
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = this.getThinClassName(plan.No,plan.Section);
+	    			let place = ''
+					if(plan.Section.indexOf('P010') !== -1){
+						place = this.getThinClassName(plan.No,plan.Section);
+					}else{
+						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
+					}
 	    			tblData[i].place = place;
 					tblData[i].statusname = this.getStatusName(plan.Status);
 					let islocation = !!plan.LocationTime ? '已定位' : '未定位';
