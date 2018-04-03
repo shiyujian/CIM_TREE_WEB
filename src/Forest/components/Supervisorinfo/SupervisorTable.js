@@ -210,7 +210,7 @@ export default class SupervisorTable extends Component {
 				title:"状态信息",
 				dataIndex: 'SupervisorInfo',
 			},{
-				title:"状态时间",
+				title:"抽查时间",
 				render: (text,record) => {
 					const {yssj1 = '',yssj2 = '' } = record;
 					return <div><div>{yssj1}</div><div>{yssj2}</div></div>
@@ -263,7 +263,7 @@ export default class SupervisorTable extends Component {
 							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw150' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
 						<Col xl={10} lg={12} md={14} className='mrg10'>
-							<span>验收时间：</span>
+							<span>抽查时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
 							 defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]} 
@@ -484,7 +484,12 @@ export default class SupervisorTable extends Component {
 	    		tblData.forEach((plan, i) => {
 	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-					let place = this.getThinClassName(plan.No,plan.Section);	    			
+					let place = ''
+					if(plan.Section.indexOf('P010') !== -1){
+						place = this.getThinClassName(plan.No,plan.Section);
+					}else{
+						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
+					}	    			
 					tblData[i].place = place;
 	    			let statusname = '';
 					if(plan.SupervisorCheck == -1)
