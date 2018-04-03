@@ -508,6 +508,7 @@ export default class Users extends Component {
 		}
 	}
 	async changePage(obj) {
+		let text = document.getElementById("NurseryData").value;
 		const {
 			actions: { getUsers, getTreeModal, setUpdate, getTablePage }
 		} = this.props;
@@ -523,7 +524,7 @@ export default class Users extends Component {
 			});
 		} else {
 			getTreeModal(true)
-			getUsers({}, { org_code: this.props.getTreeCodes, roles: this.state.roles, page: obj.current }).then((e) => {
+			getUsers({}, { org_code: this.props.getTreeCodes,"keyword": text, roles: this.state.roles, page: obj.current }).then((e) => {
 				let pagination = {
 					current: obj.current,
 					total: e.count,
