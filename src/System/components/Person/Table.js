@@ -119,7 +119,7 @@ export default class Users extends Component {
 			// if(text!=this.state.fristText || this.state.fristRoles!=this.state.roles){
 			getUsers({}, { org_code: this.props.getTreeCodes, "keyword": text, roles: this.state.roles, page: 1 }).then(items => {
 				let pagination = {
-					current: this.props.getTablePages.current,
+					current: 1,
 					total: items.count,
 				};
 				getTablePage(pagination)
