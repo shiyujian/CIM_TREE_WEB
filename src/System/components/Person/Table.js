@@ -117,7 +117,7 @@ export default class Users extends Component {
 			this.setState({ loading: true });
 			// 如果查询输入框里面的内容没有改变就不执行
 			// if(text!=this.state.fristText || this.state.fristRoles!=this.state.roles){
-			getUsers({}, { org_code: this.props.getTreeCodes, "username": text, roles: this.state.roles, page: 1 }).then(items => {
+			getUsers({}, { org_code: this.props.getTreeCodes, "keyword": text, roles: this.state.roles, page: 1 }).then(items => {
 				let pagination = {
 					current: this.props.getTablePages.current,
 					total: items.count,
@@ -823,7 +823,7 @@ export default class Users extends Component {
 						this.setState({  loading: false })
 					});
 				} else {
-					getUsers({}, {org_code:this.props.getTreeCodes, "username": text,roles:this.state.roles }).then(items => {
+					getUsers({}, {org_code:this.props.getTreeCodes, "keyword": text,roles:this.state.roles }).then(items => {
 						console.log("items",items)
 
 						if(items&&items.length==0){
