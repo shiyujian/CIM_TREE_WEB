@@ -10,6 +10,8 @@ import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import moment from 'moment';
 import {Tabs} from 'antd';
+import PkCodeTree  from '../components/PkCodeTree';
+import {SeedingAddition,GeneralAddition,ResourceAddition} from '../components/Material'
 export const Datumcode = window.DeathCode.OVERALL_MATERIAL;
 
 const TabPane=Tabs.TabPane;
@@ -28,9 +30,26 @@ export default class Material extends Component {
         super(props);
         this.state = {
             isTreeSelected: false,
-            loading:false
+            loading:false,
+            leftkeycode: '',
         }
     }
+
+    async componentDidMount() {
+        const {actions: {getScheduleTaskList}, platform:{tree = {}}} = this.props; 
+    
+        if(!tree.scheduleTaskList){
+            let data = await getScheduleTaskList()
+            if(data && data instanceof Array && data.length>0){
+                data = data[0]
+                let leftkeycode = data.No? data.No :''
+                this.setState({
+                    leftkeycode
+                })
+            }
+        }
+    }
+
     //Tab栏的切换
     tabChange(tabValue) {
         const {actions: {setTabActive}} = this.props;
@@ -39,45 +58,42 @@ export default class Material extends Component {
 
     render() {
         const {
-            tree=[],
-            Doc=[],
-            keycode,
-            tabValue = '1',
+            leftkeycode,
+        } = this.state;
+        const {
+            platform:{tree={}},
+            tabValue = '1'
         } = this.props;
-        // const {
-        //     platform: {
-        //         dir:{
-        //             list = []
-        //         } = {}
-        //     } = {},
-        //     Doc=[],
-        //     keycode,
-        //     tabValue = '1',
-        // } = this.props;
-        console.log('material',this.props.Doc)
+        let treeList = [];
+        if(tree.scheduleTaskList){
+            treeList = tree.scheduleTaskList
+        }
+        console.log('tree',tree)
         return (
             <Body>
             <Main>
                 <DynamicTitle title="物资管理" {...this.props}/>
                 <Sidebar>
-                    <DatumTree treeData={tree}
-                                selectedKeys={keycode}
-                                onSelect={this.onSelect.bind(this)}
-                                {...this.state}/>
+                    <div style={{ overflow: 'hidden' }} className="project-tree">
+                        <PkCodeTree treeData={treeList}
+                            selectedKeys={leftkeycode}
+                            onSelect={this.onSelect.bind(this)}
+                            />
+                    </div>
                 </Sidebar>
                 <Content>
                     <Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)} >
                         <TabPane tab="机械设备" key="1">
-                            {/* <GeneralFilter  {...this.props} {...this.state}/> */}
                             <GeneralTable {...this.props} {...this.state}/>
+                            <GeneralAddition {...this.props} {...this.state}/>
                         </TabPane>
                         <TabPane tab="工程材料" key="2">
-                            {/* <ResourceFilter  {...this.props} {...this.state}/> */}
                             <ResourceTable {...this.props} {...this.state}/>
+                            <ResourceAddition {...this.props} {...this.state}/>
                         </TabPane>
                         <TabPane tab="苗木材料" key="3">
-                            {/* <SeedingFilter  {...this.props} {...this.state}/> */}
                             <SeedingTable {...this.props} {...this.state}/>
+                            <SeedingAddition {...this.props} {...this.state}/>
                         </TabPane>
                     </Tabs>
                 </Content>
@@ -87,26 +103,10 @@ export default class Material extends Component {
         );
     }
 
-    componentDidMount() {
-        const {actions: {getTree}} = this.props;
-        this.setState({loading:true});
-        getTree({code:Datumcode}).then(({children}) => {
-            this.setState({loading:false});
-        });
-        if(this.props.Doc){
-            this.setState({isTreeSelected:true})
-        }
-    }
-
-    onSelect(value = [],e) {
-        const [code] = value;
-        const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
-        setkeycode(code);
-        if(code === undefined){
-            return
-        }
-        this.setState({isTreeSelected:e.selected})
-        setcurrentcode({code:code.split("--")[1]});
-        getdocument({code:code.split("--")[1]});
+    //树选择
+    onSelect(value = []) {
+        console.log('MaterialMaterial选择的树节点',value)
+        let keycode = value[0] || '';
+        this.setState({ leftkeycode: keycode })
     }
 }

@@ -213,6 +213,7 @@ class ResourceTable extends Component {
 		return (
 			<div>
 				<ResourceFilter  {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+				<Button onClick={this.addClick.bind(this)}>新增</Button>
 				<Table 
 					// rowSelection={this.rowSelection}
 					dataSource={workflowData}
@@ -311,6 +312,13 @@ class ResourceTable extends Component {
 			}	
 			</div>
 		);
+	}
+
+	addClick(){
+		const {
+            actions: {ResourceAddVisible}
+        } = this.props;
+        ResourceAddVisible(true);
 	}
 
 

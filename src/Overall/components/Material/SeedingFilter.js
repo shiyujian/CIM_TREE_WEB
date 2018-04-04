@@ -120,7 +120,7 @@ export default class SeedingFilter extends Component {
                         </Row>
                     </Col>
 				</Row>
-				<Row gutter={24}>
+				{/* <Row gutter={24}>
 					<Col span={24}>
 						{!this.props.isTreeSelected ?
 							<Button style={{ marginRight: 10 }} disabled>新增</Button> :
@@ -129,15 +129,15 @@ export default class SeedingFilter extends Component {
 						{
 							toggleData.type == 'resource' && <SeedingAddition {...this.props} />
 						}
-						{/* {
+						{
 							(Doc.length === 0) ?
 								<Button style={{ marginRight: 10 }} disabled>删除</Button> :
 								<Popconfirm title="确定要删除文件吗？" onConfirm={this.confirm.bind(this)} onCancel={this.cancel.bind(this)} okText="Yes" cancelText="No">
 									<Button style={{ marginRight: 10 }} type="primary" onClick={this.delete.bind(this)}>删除</Button>
 								</Popconfirm>
-						} */}
+						}
 					</Col>
-				</Row>
+				</Row> */}
 			</Form>
 		);
 	}

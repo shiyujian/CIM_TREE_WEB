@@ -1,41 +1,49 @@
 import React, { Component } from 'react';
-import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon} from 'antd';
-import { base, STATIC_DOWNLOAD_API,SOURCE_API } from '../../../_platform/api';
+import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,Card,Steps} from 'antd';
 import moment from 'moment';
 import './index.less';
 import Preview from '../../../_platform/components/layout/Preview';
-import { WORKFLOW_CODE } from '../../../_platform/api';
+import { SOURCE_API, PROJECT_UNITS,STATIC_DOWNLOAD_API,WORKFLOW_CODE } from '../../../_platform/api';
 import GeneralFilter from './GeneralFilter';
+import { getUser } from '../../../_platform/auth';
 
 const FormItem = Form.Item;
+const Step = Steps.Step;
 
-let indexSelect='';
+
 class GeneralTable extends Component {
 
 	constructor(props){
          super(props);
          this.state={
          	visible: false,
-			data:[],
-			indexSelect:'',
+			filterData:[],
 			record:{},
-			workflowData:[]
+			workflowData:[],
+			history:[]
          }
 	}
 	
 	columns = [
 		{
-			title: '单位工程',
-			dataIndex: 'unit',
-			key: 'unit',
+			title: '项目',
+			dataIndex: 'projectName',
+			key: 'projectName',
+			width: '15%'
+		},
+		{
+			title: '标段',
+			dataIndex: 'sectionName',
+			key: 'sectionName',
+			width: '10%'
 		}, {
 			title: '编号',
 			dataIndex: 'code',
 			key: 'code',
 		}, {
 			title: '文档类型',
-			dataIndex: 'extra_params.style',
-			key: 'extra_params.style',
+			dataIndex: 'document',
+			key: 'document',
 		}, {
 			title: '提交单位',
 			dataIndex: 'submitOrg',
@@ -69,65 +77,66 @@ class GeneralTable extends Component {
 	equipmentColumns=[
         {
             title: '设备名称',
-            dataIndex: 'extra_params.equipName',
-            key: 'extra_params.equipName',
+            dataIndex: 'equipName',
+            key: 'equipName',
 
         }, {
             title: '规格型号',
-            dataIndex: 'extra_params.equipNumber',
-            key: 'extra_params.equipNumber',
+            dataIndex: 'equipNumber',
+            key: 'equipNumber',
         }, {
             title: '数量',
-            dataIndex: 'extra_params.equipCount',
-            key: 'extra_params.equipCount',
+            dataIndex: 'equipCount',
+            key: 'equipCount',
         }, {
             title: '进场日期',
-            dataIndex: 'extra_params.equipTime',
-            key: 'extra_params.equipTime',
+            dataIndex: 'equipTime',
+            key: 'equipTime',
         }, {
             title: '技术状况',
-            dataIndex: 'extra_params.equipMoment',
-            key: 'extra_params.equipMoment',
+            dataIndex: 'equipMoment',
+            key: 'equipMoment',
         },{
             title: '备注',
-            dataIndex: 'extra_params.equipRemark',
-            key: 'extra_params.equipRemark',
+            dataIndex: 'equipRemark',
+            key: 'equipRemark',
         }
 	];
 	
-	columns1 = [
-		{
-			title: '序号',
-			dataIndex: 'index',
-			key: 'index',
-			width: '20%',
-		}, {
-			title: '文件名称',
-			dataIndex: 'fileName',
-			key: 'fileName',
-			width: '45%',
-		}, {
-			title: '操作',
-			dataIndex: 'operation',
-			key: 'operation',
-			width: '20%',
-			render:(text, record, index)=>{
-				const { Doc = [] } = this.props;
-				return (
-					<div>
-						<a onClick={this.previewFile.bind(this,record)}>预览</a>
-						<a  style={{ marginLeft: 10 }} onClick={this.downloadFile.bind(this,record)}>下载</a>
-					</div>
-				)
-			}
-		}
-	]
+	columns1 = [{
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index',
+        width: '10%',
+    }, {
+        title: '文件名称',
+        dataIndex: 'fileName',
+        key: 'fileName',
+        width: '35%',
+    }, {
+        title: '备注',
+        dataIndex: 'remarks',
+        key: 'remarks',
+        width: '30%',
+    }, {
+        title: '操作',
+        dataIndex: 'operation',
+        key: 'operation',
+        width: '10%',
+        render: (text, record, index) => {
+            return <div>
+                <a href='javascript:;' onClick={this.onViewClick.bind(this, record, index)}>预览</a>
+                <span className="ant-divider" />
+                <a href={`${STATIC_DOWNLOAD_API}${record.a_file}`}>下载</a>
+            </div>
+        }
+    }]
 	
 	componentDidMount(){
 		this.gettaskSchedule()
 	}
 
-	// 获取日计划进度流程信息
+	// 获取机械设备流程信息
     gettaskSchedule = async ()=>{
 		const { actions: { getWorkflows } } = this.props;
 		let reqData={};
@@ -135,68 +144,129 @@ class GeneralTable extends Component {
 			console.log("机械设备报批流程", values);
             console.log("err", err);
             
-            values.sunit?reqData.subject_unit__contains = values.sunit : '';
+            values.sunit?reqData.subject_sectionName__contains = values.ssection : '';
             values.scode?reqData.subject_code__contains = values.scode : '';
-            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD HH:MM:SS') : '';
-            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD HH:MM:SS') : '';
+            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
+            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
         })
         
-        console.log('reqData',reqData)
 
         let tmpData = Object.assign({}, reqData);
 
 
         let task = await getWorkflows({ code: WORKFLOW_CODE.机械设备报批流程 },tmpData);
-		console.log('task',task)
         let subject = [];
         let totledata = [];
 		let arrange = {};
 		task.map((item,index)=>{
 
-			let subject = item.workflowactivity.subject[0];
-			let creator = item.workflowactivity.creator;
-			console.log('subject',subject)
+			let subject = item.subject[0];
+			let creator = item.creator;
+			let postData = subject.postData?JSON.parse(subject.postData):null;
 			let data = {
 				// index:index+1,
-				id:item.workflowactivity.id,
+				id:item.id,
 				'workflow':item,
 				'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
 				'dataSource':subject.dataSource?JSON.parse(subject.dataSource):'',
-				'unit':subject.unit?JSON.parse(subject.unit):'',
+				'section': subject.section?JSON.parse(subject.section):'',
+                'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
+                'projectName': subject.projectName?JSON.parse(subject.projectName):'',
 				'code':subject.code?JSON.parse(subject.code):'',
-				'extra_params.style':'',
-				'submitOrg':subject.submitOrg?JSON.parse(subject.submitOrg):'',
+				'document':'机械设备',
+				'submitOrg':postData.upload_unit?postData.upload_unit:'',
 				'submitPerson':creator.person_name?creator.person_name:(creator.username?creator.username:''),
-				'submitTime':moment(item.workflowactivity.creator).format('YYYY-MM-DD'),
-				'flowStyle':item.workflowactivity.status===2?'执行中':'已完成',
+				'submitTime':moment(item.creator).format('YYYY-MM-DD'),
+				'flowStyle':item.status===2?'执行中':'已完成',
 			}
 			totledata.push(data)
 		})
-		console.log('totledata',totledata)
         this.setState({
             workflowData:totledata
+        },()=>{
+			this.filterTask()
+		})
+	}
+	//对流程信息根据选择项目进行过滤
+	filterTask(){
+		const {
+			workflowData 
+		}=this.state
+		const{
+			leftkeycode
+		}=this.props
+		let filterData = []
+		let user = getUser()
+		
+		let sections = user.sections
+		
+		sections = JSON.parse(sections)
+		
+		let selectCode = ''
+		//关联标段的人只能看自己项目的进度流程
+		if(sections && sections instanceof Array && sections.length>0){
+			let code = sections[0].split('-')
+			selectCode = code[0] || '';
+
+			workflowData.map((task)=>{
+			
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				
+				if(projectCode === selectCode && task.section === sections[0]){
+					filterData.push(task);
+				}
+			})
+		}else{
+			//不关联标段的人可以看选择项目的进度流程
+			selectCode = leftkeycode
+			workflowData.map((task)=>{
+			
+				let projectName = task.projectName
+				let projectCode = this.getProjectCode(projectName)
+				
+				if(projectCode === selectCode ){
+					filterData.push(task);
+				}
+			})
+
+		}      
+		
+		this.setState({
+			filterData
+		})
+	}
+	//获取项目code
+    getProjectCode(projectName){
+        let projectCode = ''
+        PROJECT_UNITS.map((item)=>{
+            if(projectName === item.value){
+                projectCode = item.code
+            }
         })
+		
+		return projectCode 
     }
 	render() {
-		let {
-			  visible,
-			  data,
-			  record,
-			  workflowData
+		const {
+			visible,
+			record,
+			workflowData,
+			history,
+			filterData
         } = this.state;
 		const { 
-			Doc = [],
-			docs = [],
 			form: { getFieldDecorator }
 		 } = this.props;
 		
 		return (
 			<div>
 				<GeneralFilter {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+				<Button onClick={this.addClick.bind(this)}>新增</Button>
 				<Table
 					// rowSelection={this.rowSelection}
-					dataSource={workflowData}
+					dataSource={filterData}
 					columns={this.columns}
 					bordered 
 					Rowkey={'code'}
@@ -213,48 +283,96 @@ class GeneralTable extends Component {
 		          onCancel={this.handleCancel}
 		        >
 			        <div>
-	                    <Row gutter={24}>
-	                        <Col span={24} style={{paddingLeft:'3em'}}>
-	                            <Row gutter={15} style={{marginTop:'2em'}} >
-	                                <Col span={12}>
-	                                    <FormItem   {...GeneralTable.layoutT} label="单位工程:">
-										{getFieldDecorator('form1_unit', {
-                                            initialValue: `${record.unit?record.unit:''}`,
-                                            rules: [{ required: true, message: '请输入单位工程' }]
-                                        })(<Input readOnly />)}
-	                                    </FormItem>
-	                                </Col>
-	                                <Col span={12}>
-	                                    <FormItem {...GeneralTable.layoutT} label="编号:">
+						<Row gutter={24}>
+							<Col span={24} style={{paddingLeft:'3em'}}>
+								<Row gutter={15} style={{marginTop:'2em'}} >
+									<Col span={12}>
+										<FormItem   {...GeneralTable.layoutT} label="标段:">
+										{getFieldDecorator('form1_section', {
+											initialValue: `${record.sectionName?record.sectionName:''}`,
+											rules: [{ required: true, message: '请输入标段' }]
+										})(<Input readOnly />)}
+										</FormItem>
+									</Col>
+									<Col span={12}>
+										<FormItem {...GeneralTable.layoutT} label="编号:">
 										{getFieldDecorator('form1_code', {
-                                            initialValue: `${record.code?record.code:''}`,
-                                            rules: [{ required: true, message: '请输入编号' }]
-                                        })(<Input readOnly />)}
-	                                    </FormItem>
-	                                </Col>
-	                            </Row>
-	                        </Col>
-	                    </Row>
-	                    <Row gutter={24}>
-	                        <Col span={24}>
-	                        	<Table 
-								   columns={this.equipmentColumns}
-								   dataSource={record.dataSource?record.dataSource:[]}
-								   bordered 
-								   pagination={true}
-								/>
-	                        </Col>
-	                    </Row>
-	                    <Row gutter={24}>
-	                        <Col span={24} style={{marginTop:'1em'}}>
-								<Table  dataSource={record.TreatmentData?record.TreatmentData:[]}
-										columns={this.columns1} 
-										bordered 
-										pagination={true}
-								/>
-	                            	
-	                        </Col>
-	                    </Row>
+											initialValue: `${record.code?record.code:''}`,
+											rules: [{ required: true, message: '请输入编号' }]
+										})(<Input readOnly />)}
+										</FormItem>
+									</Col>
+								</Row>
+							</Col>
+						</Row>
+
+	                    <Card style={{marginTop:10}}>
+							<Row gutter={24}>
+								<Col span={24}>
+									<Table 
+									columns={this.equipmentColumns}
+									dataSource={record.dataSource?record.dataSource:[]}
+									bordered 
+									pagination={true}
+									/>
+								</Col>
+							</Row>
+						</Card>
+	                    <Card style={{marginTop:10}}>
+							<Row gutter={24}>
+								<Col span={24} style={{marginTop:'1em'}}>
+									<Table  dataSource={record.TreatmentData?record.TreatmentData:[]}
+											columns={this.columns1} 
+											bordered 
+											pagination={true}
+									/>
+										
+								</Col>
+							</Row>
+						</Card>
+	                    
+						<Card title={'审批流程'} style={{marginTop:10}}>
+                            <Steps direction="vertical" size="small" current={history.length>0? history.length - 1:0}>
+                                {
+                                    history.map((step, index) => {
+                                        const { state: { participants: [{ executor = {} } = {}] = [] } = {} } = step;
+                                        const { id: userID } = executor || {};
+                                        
+                                        if (step.status === 'processing') { // 根据历史状态显示
+                                            const state = this.getCurrentState();
+                                            return (
+                                                <Step 
+                                                    title={
+                                                        <div style={{ marginBottom: 8 }}>
+                                                            <span>{step.state.name}-(执行中)</span>
+                                                            <span style={{ paddingLeft: 20 }}>当前执行人: </span>
+                                                            <span style={{ color: '#108ee9' }}> {`${executor.person_name}` || `${executor.username}`}</span>
+                                                        </div>}
+                                                    key={index} 
+                                                />
+    
+                                            )
+                                        } else {
+                                            const { records: [record] } = step;
+                                            const { log_on = '', participant: { executor = {} } = {}, note = '' } = record || {};
+                                            const { person_name: name = '', organization = '' } = executor;
+                                            return (
+                                                <Step key={index} title={`${step.state.name}-(${step.status})`}
+                                                    description={
+                                                        <div style={{ lineHeight: 2.6 }}>
+                                                            <div>意见：{note}</div>
+                                                            <div>
+                                                                <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
+                                                                <span
+                                                                    style={{ paddingLeft: 20 }}>{`${step.state.name}`}时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                            </div>
+                                                        </div>} />);
+                                        }
+                                        
+                                    }).filter(h => !!h)
+                                }
+                            </Steps>
+                        </Card>
 						<Preview />
 					</div>
 		        </Modal>
@@ -262,6 +380,18 @@ class GeneralTable extends Component {
 			</div>
 
 		);
+	}
+	addClick(){
+		const {
+            actions: {GeneralAddVisible}
+        } = this.props;
+        GeneralAddVisible(true);
+	}
+	getCurrentState() {
+		const { platform: { task = {} } = {}, location = {} } = this.props;
+		// const { state_id = '0' } = queryString.parse(location.search) || {};
+		const { states = [] } = task;
+		return states.find(state => state.status === 'processing');
 	}
 
 	// rowSelection = {
@@ -272,11 +402,25 @@ class GeneralTable extends Component {
 	// };
 
 
-	showModal = (key,record) => {
+	async showModal(key,record){
+		const{
+            actions:{
+                getTask
+            },
+        }=this.props
+        let params = {
+            task_id:record.id
+        }
+        let task = await getTask(params)
+        let history = []
+        if(task && task.history){
+            history = task.history
+
+        }
 		this.setState({
 			record:record,
 			visible: true,
-			indexSelect:key
+			history
 		}); 
 	}
 	handleOk = (e) => {
@@ -290,51 +434,16 @@ class GeneralTable extends Component {
 		});
 	} 
 	
-	
-	//下载
-	downloadFile(record){
-        console.log('TreatmentData',record)
-        let link = document.createElement("a");
-        if(record && record.download_url){
-            link.href = STATIC_DOWNLOAD_API + record.download_url;
-            link.setAttribute('download', this);
-            link.setAttribute('target', '_blank');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }else{
-            notification.error({
-                message: '文件下载失败',
-                duration: 2
-            })
-            return;
-        }
-    }
-
-    
-
 	//文件预览
-	previewFile(record, index) {
-		const { actions: { openPreview } } = this.props;
-
-		console.log('record',record)
-		let filed = {};
-		if (record && record.file_id) {
-			
-			filed.misc = "file";
-			filed.a_file = `${SOURCE_API}` + record.a_file;
-			filed.download_url = `${STATIC_DOWNLOAD_API}` + record.download_url;
-			filed.name = record.fileName;
-			filed.id = record.file_id;
-			let type = record.a_file.split('.')[1];
-			if (type == 'xlsx' || type == 'docx' || type == 'xls' || type == 'doc' || type == 'pptx' || type == 'ppt') {
-				filed.mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-			}
-			if (type == 'pdf') {
-				filed.mime_type = "application/pdf";
-			}
-		}
-		openPreview(filed);
+	onViewClick(record,index) {
+		const {actions: {openPreview}} = this.props;
+        let filed = {}
+        filed.misc = record.misc;
+        filed.a_file = `${SOURCE_API}` + (record.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.download_url = `${STATIC_DOWNLOAD_API}` + (record.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        filed.name = record.fileName;
+        filed.mime_type = record.mime_type;
+        openPreview(filed);
 	}
 
 	
@@ -342,10 +451,6 @@ class GeneralTable extends Component {
 	static layoutT = {
       labelCol: {span: 8},
       wrapperCol: {span: 16},
-    };
-    static layout = {
-      labelCol: {span: 4},
-      wrapperCol: {span: 20},
     };
 }
 
