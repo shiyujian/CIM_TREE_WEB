@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { base, STATIC_DOWNLOAD_API, UNITS ,SECTIONNAME} from '../../../_platform/api';
+import {UNITS ,SECTIONNAME} from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';

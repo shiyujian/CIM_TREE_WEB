@@ -10,7 +10,7 @@ import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE, WORKFLOW_CODE,UNITS,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
+import { base,   WORKFLOW_CODE,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
@@ -27,20 +27,24 @@ const EditableCell = ({ editable, value, onChange }) => (
 class GeneralAddition extends Component {
 
     static propTypes = {};
-    state={
-        isUploading: false,
-        dataSource:[],
-        engineerName:'',
-        count:0,
-        TreatmentData:[],
-        newFileLists: [],
-        currentSection:'',
-        currentSectionName:'',
-        projectName:'',
-        loading:false,
-        selectedRowKeys:[]
-
+    constructor(props){
+        super(props)
+        this.state={
+            isUploading: false,
+            dataSource:[],
+            engineerName:'',
+            count:0,
+            TreatmentData:[],
+            newFileLists: [],
+            currentSection:'',
+            currentSectionName:'',
+            projectName:'',
+            loading:false,
+            selectedRowKeys:[]
+    
+        }
     }
+    
     //第一个表格的列属性
     equipment=[
         {
@@ -393,7 +397,119 @@ class GeneralAddition extends Component {
         this.setState({TreatmentData: array })
 	}
 
+    //选择人员
+    selectMember(memberInfo) {
+        const {
+            form: {
+                setFieldsValue
+            }
+        } = this.props
+		this.member = null;
+		if (memberInfo) {
+			let memberValue = memberInfo.toString().split('#');
+			if (memberValue[0] === 'C_PER') {
+				console.log('memberValue', memberValue)
+				this.member = {
+					"username": memberValue[4],
+					"person_code": memberValue[1],
+					"person_name": memberValue[2],
+					"id": parseInt(memberValue[3]),
+					org: memberValue[5],
+				}
+			}
+		} else {
+			this.member = null
+		}
+        setFieldsValue({
+            dataReview: this.member
+        });
+    }
 
+    cancel() {
+        const {
+            actions: {GeneralAddVisible}
+        } = this.props;
+        GeneralAddVisible(false);
+    }
+
+    onSelectChange= (selectedRowKeys) => {
+        console.log('selectedRowKeys',selectedRowKeys)
+        this.setState({
+            selectedRowKeys
+        })
+    }
+    //第一个表格添加行
+    handleAdd(){
+        const {count,dataSource } = this.state;
+        let len = dataSource.length
+        const newData = {
+            key:len,
+            editable:true,
+            count:count
+        };
+        
+        this.setState({
+            dataSource: [...dataSource, newData],
+            count:count+1
+        })
+    }
+    //第一个表格删除
+    onDelete(){
+        const{
+            dataSource,
+            selectedRowKeys
+		}=this.state
+
+        selectedRowKeys.map((rst,index) => {
+            dataSource.splice(rst-index, 1);
+        });
+        let array = []
+        let data = {}
+        dataSource.map((item, index) => {
+            data = item
+            data.key = index
+            array.push(data)
+		})
+
+        this.setState({
+            dataSource:array,
+            selectedRowKeys:[]
+        })
+    }
+    renderColumns(text, record, column) {
+        return (
+          <EditableCell
+            editable={record.editable}
+            value={text}
+            onChange={value => this.handleChange(value, record.key, column)}
+          />
+        );
+    }
+    handleChange(value, key, column) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target[column] = value;
+          this.setState({ dataSource: newData });
+        }
+    }
+    edit(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target.editable = true;
+          this.setState({ dataSource: newData });
+        }
+    }
+    saveTable(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target.editable = false;
+          this.setState({dataSource: newData });
+          this.cacheData = newData.map(item => ({ ...item }));
+        }
+    }
     handleSubmit = (e) =>{
         e.preventDefault();
         const {
@@ -528,128 +644,6 @@ class GeneralAddition extends Component {
                 });
             }
         })
-    }
-
-    //选择人员
-    selectMember(memberInfo) {
-        const {
-            form: {
-                setFieldsValue
-            }
-        } = this.props
-		this.member = null;
-		if (memberInfo) {
-			let memberValue = memberInfo.toString().split('#');
-			if (memberValue[0] === 'C_PER') {
-				console.log('memberValue', memberValue)
-				this.member = {
-					"username": memberValue[4],
-					"person_code": memberValue[1],
-					"person_name": memberValue[2],
-					"id": parseInt(memberValue[3]),
-					org: memberValue[5],
-				}
-			}
-		} else {
-			this.member = null
-		}
-        setFieldsValue({
-            dataReview: this.member
-        });
-    }
-
-    cancel() {
-        const {
-            actions: {GeneralAddVisible}
-        } = this.props;
-        GeneralAddVisible(false);
-    }
-
-
-    
-
-    onSelectChange= (selectedRowKeys) => {
-        console.log('selectedRowKeys',selectedRowKeys)
-        this.setState({
-            selectedRowKeys
-        })
-    }
-
-    handleAdd(){
-        const {count,dataSource } = this.state;
-        let len = dataSource.length
-        const newData = {
-            key:len,
-            editable:true,
-            count:count
-        };
-        
-        this.setState({
-            dataSource: [...dataSource, newData],
-            count:count+1
-        })
-    }
-
-    onDelete(){
-        const{
-            dataSource,
-            selectedRowKeys
-		}=this.state
-
-        selectedRowKeys.map((rst,index) => {
-            dataSource.splice(rst-index, 1);
-        });
-        let array = []
-        let data = {}
-        dataSource.map((item, index) => {
-            data = item
-            data.key = index
-            array.push(data)
-		})
-
-        this.setState({
-            dataSource:array,
-            selectedRowKeys:[]
-        })
-    }
-    renderColumns(text, record, column) {
-        return (
-          <EditableCell
-            editable={record.editable}
-            value={text}
-            onChange={value => this.handleChange(value, record.key, column)}
-          />
-        );
-    }
-    handleChange(value, key, column) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        if (target) {
-          target[column] = value;
-          this.setState({ dataSource: newData });
-        }
-    }
-    edit(key) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        changeDocs(docs);
-        if (target) {
-          target.editable = true;
-          this.setState({ dataSource: newData });
-        }
-    }
-    saveTable(key) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        if (target) {
-          target.editable = false;
-          this.setState({dataSource: newData });
-          this.cacheData = newData.map(item => ({ ...item }));
-        }
     }
 }
 export default Form.create()(GeneralAddition)

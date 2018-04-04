@@ -2,7 +2,7 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm,notification
+    Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm,notification,Spin
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
@@ -10,7 +10,7 @@ import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE, UNITS, WORKFLOW_CODE } from '../../../_platform/api';
+import { base,WORKFLOW_CODE,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
@@ -28,62 +28,49 @@ const EditableCell = ({ editable, value, onChange }) => (
 class ResourceAddition extends Component {
 
     static propTypes = {};
-
-    state={
-        dataSource:[],
-        progress:0,
-        isUploading: false,
-        engineerName:'',
-        resourceName:'',
-        engineerNumber:'',
-        engineerApprove:'',
-        engineerTime:'',
-        engineerBody:'',
-        count:0,
-        TreatmentData:[],
-        newFileLists: [],
+    constructor(props){
+        super(props)
+        this.state={
+            dataSource:[],
+            count:0,
+            TreatmentData:[],
+            currentSection:'',
+            currentSectionName:'',
+            projectName:'',
+            loading:false,
+            selectedRowKeys:[]
+        }
     }
+    
     equipment=[
         {
             title: '名称',
-            dataIndex: 'extra_params.equipName',
-            key: 'extra_params.equipName',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipName'),
-            // render:() => {
-            //     return <Input onChange={(event)=>{
-            //                     event=(event)?event:window.event;
-            //                     const {
-            //                         docs = [],
-            //                         actions: {changeDocs}
-            //                     } = this.props;
-            //                     this.state.equipName = event.target.value;
-            //                     changeDocs(docs);
-            //                 }}
-            //             />;
-            // }
+            dataIndex: 'equipName',
+            key: 'equipName',
+            render: (text, record) => this.renderColumns(text, record, 'equipName'),
         }, {
             title: '规格',
-            dataIndex: 'extra_params.equipFormat',
-            key: 'extra_params.equipFormat',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipFormat'),
-        }, {
-            title: '数量',
-            dataIndex: 'extra_params.equipCount',
-            key: 'extra_params.equipCount',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipCount'),
+            dataIndex: 'equipFormat',
+            key: 'equipFormat',
+            render: (text, record) => this.renderColumns(text, record, 'equipFormat'),
         }, {
             title: '单位',
-            dataIndex: 'extra_params.equipUnit',
-            key: 'extra_params.equipUnit',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipUnit'),
+            dataIndex: 'equipUnit',
+            key: 'equipUnit',
+            render: (text, record) => this.renderColumns(text, record, 'equipUnit'),
+        }, {
+            title: '数量',
+            dataIndex: 'equipCount',
+            key: 'equipCount',
+            render: (text, record) => this.renderColumns(text, record, 'equipCount'),
         }, {
             title: '产地',
-            dataIndex: 'extra_params.equipPlace',
-            key: 'extra_params.equipPlace',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipPlace'),
+            dataIndex: 'equipPlace',
+            key: 'equipPlace',
+            render: (text, record) => this.renderColumns(text, record, 'equipPlace'),
         }, {
           title: '操作',
-          dataIndex: 'extra_params.equipOperation',
+          dataIndex: 'equipOperation',
           render: (text, record) => {
             const { editable } = record;
             return (
@@ -101,40 +88,34 @@ class ResourceAddition extends Component {
           }
         }
     ];
-    // docCols = [
-    //     {
-    //         title:'名称',
-    //         dataIndex:'name'
-    //     }, {
-    //         title:'备注',
-    //         render: (doc) => {
-    //             return <Input onChange={this.remark.bind(this, doc)}/>;
-    //         }
-    //     },{
-    //         title:'操作',
-    //         render: doc => {
-    //             return (
-    //                 <a onClick={this.remove.bind(this, doc)}>删除</a>
-    //             );
-    //         }
-    //     }
-    // ];
+  
     columns1 = [
         {
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index',
-        width: '20%',
+            title: '序号',
+            dataIndex: 'index',
+            key: 'index',
+            width: '10%',
         }, {
             title: '文件名称',
             dataIndex: 'fileName',
             key: 'fileName',
-            width: '45%',
+            width: '35%',
+        }, {
+            title: '备注',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            width: '30%',
+            render: (text, record, index) => {
+                return <Input value={record.remarks || ""} onChange={ele => {
+                    record.remarks = ele.target.value
+                    this.forceUpdate();
+                }} />
+            }
         }, {
             title: '操作',
             dataIndex: 'operation',
             key: 'operation',
-            width: '20%',
+            width: '10%',
             render: (text, record, index) => {
                 return <div>
                     <Popconfirm
@@ -153,6 +134,44 @@ class ResourceAddition extends Component {
         labelCol: {span: 8},
         wrapperCol: {span: 16},
     };
+    async componentDidMount() {
+        this.getSection()
+    }
+
+    //获取当前登陆用户的标段
+    getSection(){
+        let user = getUser()
+        
+        let sections = user.sections
+        let sectionSchedule = []
+        let currentSectionName = ''
+        let projectName = ''
+        
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            let section = sections[0]
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        currentSectionName = item.name
+                    }
+                })
+                //获取当前标段所在的项目
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        projectName = item.value
+                    }
+                })
+            }
+            this.setState({
+                currentSection:section,
+                currentSectionName:currentSectionName,
+                projectName:projectName
+            })
+        }
+    }
     
     render() {
         const{
@@ -160,182 +179,177 @@ class ResourceAddition extends Component {
             docs = [],
             form: { getFieldDecorator },
         } = this.props;
-        let {progress,isUploading,
-            engineerName,resourceName,engineerNumber,engineerApprove,engineerTime,engineerFlow,dataSource,count} = this.state;
-        let cacheData=this.state.dataSource.map(item => ({ ...item }));
+        let {
+            dataSource,
+            count,
+            currentSectionName='',
+            selectedRowKeys=[]
+        } = this.state;
+        const rowSelection  = {
+            selectedRowKeys,
+            onChange: this.onSelectChange
+        };
         
         return (  
-            <Modal title="新增文档"
-                   width={920} visible={resourceAddVisible}
-                   closable={false}
-                   footer={false}
-                   maskClosable={false}>
-                <Form onSubmit={this.handleSubmit.bind(this)}>
-                    <Row gutter={24}>
-                        <Col span={24} style={{paddingLeft:'2em'}}>
-                            <Row gutter={15} >
-                                <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="单位工程:">
-                                    {
-                                        getFieldDecorator('unit', {
-                                            rules: [
-                                                { required: true, message: '请选择单位工程' }
-                                            ]
-                                        })
-                                        (
-                                            <Select placeholder='请选择单位工程' allowClear>
-                                                {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-                                            </Select>
-                                        )
-                                    }
-                                    </FormItem>
-                                </Col>
-                                <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="名称:">
-                                    {
-                                        getFieldDecorator('name', {
-                                            rules: [
-                                                { required: true, message: '请输入材料名称' }
-                                            ]
-                                        })
-                                        (
-                                            <Input  placeholder='请输入材料名称' />
-                                        )
-                                    }
+            <Modal 
+                title="新增文档"
+                width={920} visible={resourceAddVisible}
+                closable={false}
+                footer={false}
+                maskClosable={false}
+            >
+                <Spin spinning={this.state.loading}>
+                    <Form onSubmit={this.handleSubmit.bind(this)}>
+                        <Row gutter={24}>
+                            <Col span={24} style={{paddingLeft:'2em'}}>
+                                <Row gutter={15} >
+                                    <Col span={8}>
+                                        <FormItem   {...ResourceAddition.layoutT} label="标段:">
+                                        {
+                                            getFieldDecorator('section', {
+                                                initialValue: `${currentSectionName}`,
+                                                rules: [
+                                                    { required: true, message: '请输入标段' }
+                                                ]
+                                            })
+                                            (
+                                                (<Input readOnly placeholder='请输入标段' />)
+                                            )
+                                        }
                                         
-                                    </FormItem>
-                                </Col>
-                                <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="编号:">
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={8}>
+                                        <FormItem {...ResourceAddition.layoutT} label="名称:">
+                                        {
+                                            getFieldDecorator('name', {
+                                                rules: [
+                                                    { required: true, message: '请输入材料名称' }
+                                                ]
+                                            })
+                                            (
+                                                <Input  placeholder='请输入材料名称' />
+                                            )
+                                        }
+                                            
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={8}>
+                                        <FormItem {...ResourceAddition.layoutT} label="编号:">
+                                        {
+                                            getFieldDecorator('code', {
+                                                rules: [
+                                                    { required: true, message: '请输入编号' }
+                                                ]
+                                            })
+                                            (
+                                                <Input  placeholder='请输入编号'/>
+                                            )
+                                        }
+                                        </FormItem>
+                                    </Col>
+                                </Row>
+                                <Row gutter={15}>
+                                    <Col span={8}>
+                                        <FormItem {...ResourceAddition.layoutT} label="进场日期:">
+                                        {
+                                            getFieldDecorator('date', {
+                                                rules: [
+                                                    { required: true, message: '请选择进场日期' }
+                                                ]
+                                            })
+                                            (
+                                                <DatePicker placeholder='材料进场日期' format={'YYYY-MM-DD'} style={{width:'100%',height:'100%'}}/>
+                                            )
+                                        }
+                                            
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={8}>
+                                        <FormItem {...ResourceAddition.layoutT} label="施工部位:">
+                                        {
+                                            getFieldDecorator('site', {
+                                                rules: [
+                                                    { required: true, message: '请输入施工部位' }
+                                                ]
+                                            })
+                                            (
+                                                <Input  placeholder='请输入材料具体应用部位'/>
+                                            )
+                                        }
+                                            
+                                        </FormItem>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row gutter={24}>
+                            <Col span={24}>
+                                <Table  rowSelection={rowSelection}
+                                        dataSource={this.state.dataSource}
+                                        columns={this.equipment}
+                                        pagination={false}
+                                        bordered  />
+                            </Col>
+                        </Row>
+                        <Row gutter={24}>
+                            <Col span={24}>
+                                <Button style={{ marginLeft: 20,marginRight: 10 }} type="primary" ghost
+                                        onClick={this.handleAdd. bind(this)}>添加</Button>
+                                <Button  type="primary" onClick={this.onDelete.bind(this)}>删除</Button>
+                            </Col>
+                        </Row>
+                        <Row gutter={24}>
+                            <Col span={24} style={{marginTop: 16, height: 160}}>
+                                <Dragger {...this.uploadProps}>
+                                    <p className="ant-upload-drag-icon">
+                                        <Icon type="inbox"/>
+                                    </p>
+                                    <p className="ant-upload-text">点击或者拖拽开始上传</p>
+                                    <p className="ant-upload-hint">
+                                        支持 pdf、doc、docx 文件
+                                    </p>
+                                </Dragger>
+                            </Col>
+                        </Row>
+                        <Row gutter={24} style={{marginTop: 15}}>
+                            <Col span={24}>
+                                <Table 
+                                    columns={this.columns1}
+                                    dataSource={this.state.TreatmentData}
+                                    pagination={true}
+                                />
+                            </Col>
+                        </Row>
+                        <Row style={{marginTop: 15}}>
+                            <Col span={10} >
+                                <FormItem {...ResourceAddition.layoutT} label='审核人'>
                                     {
-                                        getFieldDecorator('code', {
-                                            rules: [
-                                                { required: true, message: '请输入编号' }
-                                            ]
-                                        })
-                                        (
-                                            <Input  placeholder='请输入编号'/>
-                                        )
-                                    }
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                            <Row gutter={15}>
-                                <Col span={8}>
-                                <FormItem  {...ResourceAddition.layoutT} label="审批单位:">
-                                    {
-                                        getFieldDecorator('reviewUnit', {
+                                        getFieldDecorator('dataReview', {
                                             rules: [
                                                 { required: true, message: '请选择审核人员' }
                                             ]
                                         })
-                                        (
-                                            <Input placeholder='系统自动识别，无需手输' readOnly/>
-                                        )
+                                            (
+                                            <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.工程材料报批流程}/>
+                                            )
                                     }
-                                    </FormItem>
-                                </Col>
-                                <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="进场日期:">
-                                    {
-                                        getFieldDecorator('date', {
-                                            rules: [
-                                                { required: true, message: '请选择进场日期' }
-                                            ]
-                                        })
-                                        (
-                                            <DatePicker placeholder='材料进场日期' format={'YYYY-MM-DD'}/>
-                                        )
-                                    }
-                                        
-                                    </FormItem>
-                                </Col>
-                                <Col span={8}>
-                                    <FormItem {...ResourceAddition.layoutT} label="施工部位:">
-                                    {
-                                        getFieldDecorator('site', {
-                                            rules: [
-                                                { required: true, message: '请输入施工部位' }
-                                            ]
-                                        })
-                                        (
-                                            <Input  placeholder='请输入材料具体应用部位'/>
-                                        )
-                                    }
-                                        
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                        </Col>
-                    </Row>
-                    <Row gutter={24}>
-                        <Col span={24}>
-                            <Table  rowSelection={this.rowSelectionAdd}
-                                    dataSource={this.state.dataSource}
-                                    columns={this.equipment}
-                                    pagination={false}
-                                    bordered  />
-                        </Col>
-                    </Row>
-                    <Row gutter={24}>
-                        <Col span={24}>
-                            <Button style={{ marginLeft: 20,marginRight: 10 }} type="primary" ghost
-                                    onClick={this.handleAdd. bind(this)}>添加</Button>
-                            <Button  type="primary" onClick={this.onDelete.bind(this)}>删除</Button>
-                        </Col>
-                    </Row>
-                    <Row gutter={24}>
-                        <Col span={24} style={{marginTop: 16, height: 160}}>
-                            <Dragger {...this.uploadProps}>
-                                <p className="ant-upload-drag-icon">
-                                    <Icon type="inbox"/>
-                                </p>
-                                <p className="ant-upload-text">点击或者拖拽开始上传</p>
-                                <p className="ant-upload-hint">
-                                    支持 pdf、doc、docx 文件
-
-                                </p>
-                            </Dragger>
-                            {/* <Progress percent={progress} strokeWidth={5} /> */}
-                        </Col>
-                    </Row>
-                    <Row gutter={24} style={{marginTop: 15}}>
-                        <Col span={24}>
-                            <Table 
-                                columns={this.columns1}
-                                dataSource={this.state.TreatmentData}
-                                pagination={true}
-                            />
-                        </Col>
-                    </Row>
-                    <Row style={{marginTop: 15}}>
-                        <Col span={10} >
-                            <FormItem {...ResourceAddition.layoutT} label='审核人'>
-                                {
-                                    getFieldDecorator('dataReview', {
-                                        rules: [
-                                            { required: true, message: '请选择审核人员' }
-                                        ]
-                                    })
-                                        (
-                                        <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.工程材料报批流程}/>
-                                        )
-                                }
-                            </FormItem>
-                        </Col>
-                        <Col span={8} offset={4}>
-                            <Checkbox >短信通知</Checkbox>
-                        </Col>
-                    </Row>
-                    <FormItem>
-                        <Row>
-                            <Col span={24} style={{ textAlign: 'right' }}>
-                                <Button  onClick={this.cancel.bind(this)}>取消</Button>
-                                <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">确认</Button>
+                                </FormItem>
+                            </Col>
+                            <Col span={8} offset={4}>
+                                <Checkbox >短信通知</Checkbox>
                             </Col>
                         </Row>
-                    </FormItem>
-                </Form>
+                        <FormItem>
+                            <Row>
+                                <Col span={24} style={{ textAlign: 'right' }}>
+                                    <Button  onClick={this.cancel.bind(this)}>取消</Button>
+                                    <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">确认</Button>
+                                </Col>
+                            </Row>
+                        </FormItem>
+                    </Form>
+                </Spin>
             </Modal>
         );
     }
@@ -351,7 +365,6 @@ class ResourceAddition extends Component {
                 loading:true
             })
             const status = file.status;
-            // const { newFileLists } = this.state;
             const{
 				TreatmentData = []
 			} = this.state
@@ -382,7 +395,6 @@ class ResourceAddition extends Component {
                     TreatmentData: TreatmentData,
                     loading:false 
                 })
-                // postUploadFilesAc(newFileLists)
 
             }else if(status === 'error'){
                 notification.error({
@@ -402,7 +414,6 @@ class ResourceAddition extends Component {
 		const{
 			TreatmentData
 		}=this.state
-      
 		TreatmentData.splice(index, 1);
 		let array = []
         TreatmentData.map((item, index) => {
@@ -419,9 +430,125 @@ class ResourceAddition extends Component {
             }
             array.push(data)
 		})
-		console.log('array',array)
         this.setState({TreatmentData: array })
 	}
+
+    
+
+    //选择人员
+    selectMember(memberInfo) {
+        const {
+            form: {
+                setFieldsValue
+            }
+        } = this.props
+		this.member = null;
+		if (memberInfo) {
+			let memberValue = memberInfo.toString().split('#');
+			if (memberValue[0] === 'C_PER') {
+				console.log('memberValue', memberValue)
+				this.member = {
+					"username": memberValue[4],
+					"person_code": memberValue[1],
+					"person_name": memberValue[2],
+					"id": parseInt(memberValue[3]),
+					org: memberValue[5],
+				}
+			}
+		} else {
+			this.member = null
+		}
+
+        setFieldsValue({
+            dataReview: this.member
+        });
+    }
+
+    cancel() {
+        const {
+            actions: {ResourceAddVisible}
+        } = this.props;
+        ResourceAddVisible(false);
+    }
+
+    //多选框的选择
+    onSelectChange= (selectedRowKeys) => {
+        console.log('selectedRowKeys',selectedRowKeys)
+        this.setState({
+            selectedRowKeys
+        })
+    }
+    //第一个表格添加行
+    handleAdd(){
+        const {count,dataSource } = this.state;
+        let len = dataSource.length
+        const newData = {
+            key:len,
+            editable:true,
+            count:count
+        };
+        
+        this.setState({
+            dataSource: [...dataSource, newData],
+            count:count+1
+        })
+    }
+    //第一个表格删除
+    onDelete(){
+        const{
+            dataSource,
+            selectedRowKeys
+		}=this.state
+
+        selectedRowKeys.map((rst,index) => {
+            dataSource.splice(rst-index, 1);
+        });
+        let array = []
+        let data = {}
+        dataSource.map((item, index) => {
+            data = item
+            data.key = index
+            array.push(data)
+		})
+
+        this.setState({
+            dataSource:array,
+            selectedRowKeys:[]
+        })
+    }
+    renderColumns(text, record, column) {
+        return (
+          <EditableCell
+            editable={record.editable}
+            value={text}
+            onChange={value => this.handleChange(value, record.key, column)}
+          />
+        );
+    }
+    handleChange(value, key, column) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target[column] = value;
+          this.setState({ dataSource: newData });
+        }
+    }
+    edit(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target.editable = true;
+          this.setState({ dataSource: newData });
+        }
+    }
+    saveTable(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target.editable = false;
+          this.setState({dataSource: newData });
+        }
+    }
 
     handleSubmit = (e) =>{
         e.preventDefault();
@@ -435,18 +562,37 @@ class ResourceAddition extends Component {
                 ResourceAddVisible
             },
             location
-            // actions: {ResourceAddVisible, postDocument, getdocument,changeDocs}
         } = this.props;
         const{
             TreatmentData,
-            dataSource
+            dataSource,
+            projectName,
+            currentSectionName,
+			currentSection
         } = this.state
+
         let user = getUser();//当前登录用户
+        let sections = user.sections || []
+        if(!sections || sections.length === 0 ){
+            notification.error({
+                message:'当前用户未关联标段，不能创建流程',
+                duration:3
+            })
+            return
+        }
+
+
         let me = this;
         let postData = {};
         me.props.form.validateFields((err, values) => {
             console.log('Received values of form: ', values);
             if (!err) {
+
+                postData.upload_unit = user.org ? user.org : '';
+                postData.type = '工程材料';
+                postData.upload_person = user.name ? user.name : user.username;
+                postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
+
 
                 const currentUser = {
                     "username": user.username,
@@ -456,16 +602,18 @@ class ResourceAddition extends Component {
                     "org": user.org,
                 };
                 let subject = [{
+                    "section": JSON.stringify(currentSection),
+                    "sectionName":JSON.stringify(currentSectionName),
+                    "projectName":JSON.stringify(projectName),
                     "dataSource":JSON.stringify(dataSource),
                     "TreatmentData":JSON.stringify(TreatmentData),
-                    "unit":JSON.stringify(values.unit),
                     "name":JSON.stringify(values.name),
                     "code":JSON.stringify(values.code),
-                    "reviewUnit":JSON.stringify(values.reviewUnit),
                     "date":JSON.stringify(moment(values.date).format('YYYY-MM-DD')),
                     "site":JSON.stringify(values.site),
-                    "submitOrg":JSON.stringify(user.org)
+                    "postData":JSON.stringify(postData),
                 }];
+
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {
                     name: "物资管理工程材料报批流程",
@@ -521,9 +669,6 @@ class ResourceAddition extends Component {
                                         duration: 2
                                     });
                                     ResourceAddVisible(false);
-                                    this.setState({
-                                        visible: false
-                                    })
                                 } else {
                                     notification.error({
                                         message: '流程提交失败',
@@ -541,166 +686,6 @@ class ResourceAddition extends Component {
             }
         })
         
-    }
-
-    //选择人员
-    selectMember(memberInfo) {
-        const {
-            form: {
-                setFieldsValue
-            }
-        } = this.props
-		this.member = null;
-		if (memberInfo) {
-			let memberValue = memberInfo.toString().split('#');
-			if (memberValue[0] === 'C_PER') {
-				console.log('memberValue', memberValue)
-				this.member = {
-					"username": memberValue[4],
-					"person_code": memberValue[1],
-					"person_name": memberValue[2],
-					"id": parseInt(memberValue[3]),
-					org: memberValue[5],
-				}
-			}
-		} else {
-			this.member = null
-		}
-
-        setFieldsValue({
-            dataReview: this.member,
-			reviewUnit: this.member.org?this.member.org:null,
-        });
-    }
-
-    cancel() {
-        const {
-            actions: {ResourceAddVisible,changeDocs}
-        } = this.props;
-        ResourceAddVisible(false);
-        changeDocs();
-        this.setState({
-            progress:0
-        })
-    }
-
-    rowSelectionAdd = {
-        onChange: (selectedRowKeys, selectedRows) => {
-            const { actions: { selectDocuments } } = this.props;
-            selectDocuments(selectedRows);
-        },
-    };
-    rowSelection = {
-        onChange: (selectedRowKeys) => {
-            const {actions: {selectDocuments}} = this.props;
-            selectDocuments(selectedRowKeys);
-        },
-    };
-
-    
-
-
-    changeDoc({file, fileList, event}) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        if (file.status === 'done') {
-            changeDocs([...docs, file]);
-        }
-        this.setState({
-            isUploading: file.status === 'done' ? false : true
-        })
-        if(event){
-            let {percent} = event;
-            if(percent!==undefined)
-                this.setState({progress:parseFloat(percent.toFixed(1))});
-        }
-    }
-
-    
-
-    handleAdd(){
-        const {count,dataSource } = this.state;
-        const newData = {
-          key:count,
-          // equipName:this.state.equipName,
-          // equipNumber:this.state.equipNumber,
-        };
-        console.log('newDate',newData)
-        this.setState({
-          dataSource: [...dataSource, newData],
-          count: count + 1,
-        });
-        console.log('dataSource',dataSource)
-    }
-
-    onDelete(){
-        const { selected } = this.props;
-        console.log('selected',selected)
-        const dataSource = [...this.state.dataSource];
-        selected.map(rst => {
-            this.setState({ dataSource: dataSource.filter(item => item.key !== rst.key) });
-        });
-    }
-    renderColumns(text, record, column) {
-        return (
-          <EditableCell
-            editable={record.editable}
-            value={text}
-            onChange={value => this.handleChange(value, record.key, column)}
-          />
-        );
-    }
-    handleChange(value, key, column) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        if (target) {
-          target[column] = value;
-          this.setState({ dataSource: newData });
-        }
-    }
-    edit(key) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        changeDocs(docs);
-        if (target) {
-          target.editable = true;
-          this.setState({ dataSource: newData });
-        }
-    }
-    saveTable(key) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        if (target) {
-          target.editable = false;
-          this.setState({dataSource: newData });
-          this.cacheData = newData.map(item => ({ ...item }));
-        }
-    }
-
-    remark(doc, event) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.remark = event.target.value;
-        changeDocs(docs);
-    }
-
-    remove(doc) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        changeDocs(docs.filter(d => d !== doc));
-        this.setState({
-            progress:0
-        })
     }
     
 

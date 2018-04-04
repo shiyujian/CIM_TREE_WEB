@@ -29,13 +29,11 @@ class GeneralTable extends Component {
 			title: '项目',
 			dataIndex: 'projectName',
 			key: 'projectName',
-			width: '15%'
 		},
 		{
 			title: '标段',
 			dataIndex: 'sectionName',
 			key: 'sectionName',
-			width: '10%'
 		}, {
 			title: '编号',
 			dataIndex: 'code',
@@ -103,34 +101,36 @@ class GeneralTable extends Component {
         }
 	];
 	
-	columns1 = [{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index',
-        width: '10%',
-    }, {
-        title: '文件名称',
-        dataIndex: 'fileName',
-        key: 'fileName',
-        width: '35%',
-    }, {
-        title: '备注',
-        dataIndex: 'remarks',
-        key: 'remarks',
-        width: '30%',
-    }, {
-        title: '操作',
-        dataIndex: 'operation',
-        key: 'operation',
-        width: '10%',
-        render: (text, record, index) => {
-            return <div>
-                <a href='javascript:;' onClick={this.onViewClick.bind(this, record, index)}>预览</a>
-                <span className="ant-divider" />
-                <a href={`${STATIC_DOWNLOAD_API}${record.a_file}`}>下载</a>
-            </div>
-        }
-    }]
+	columns1 = [
+		{
+			title: '序号',
+			dataIndex: 'index',
+			key: 'index',
+			width: '10%',
+		}, {
+			title: '文件名称',
+			dataIndex: 'fileName',
+			key: 'fileName',
+			width: '35%',
+		}, {
+			title: '备注',
+			dataIndex: 'remarks',
+			key: 'remarks',
+			width: '30%',
+		}, {
+			title: '操作',
+			dataIndex: 'operation',
+			key: 'operation',
+			width: '10%',
+			render: (text, record, index) => {
+				return <div>
+					<a href='javascript:;' onClick={this.onViewClick.bind(this, record, index)}>预览</a>
+					<span className="ant-divider" />
+					<a href={`${STATIC_DOWNLOAD_API}${record.a_file}`}>下载</a>
+				</div>
+			}
+		}
+	]
 	
 	componentDidMount(){
 		this.gettaskSchedule()
@@ -146,8 +146,10 @@ class GeneralTable extends Component {
             
             values.sunit?reqData.subject_sectionName__contains = values.ssection : '';
             values.scode?reqData.subject_code__contains = values.scode : '';
-            values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
-            values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
+			if(values.stimedate && values.stimedate instanceof Array && values.stimedate.length>0){
+				values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
+				values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
+			}
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
         })
         
@@ -163,7 +165,7 @@ class GeneralTable extends Component {
 
 			let subject = item.subject[0];
 			let creator = item.creator;
-			let postData = subject.postData?JSON.parse(subject.postData):null;
+			let postData = subject.postData?JSON.parse(subject.postData):{};
 			let data = {
 				// index:index+1,
 				id:item.id,

@@ -5,7 +5,7 @@ import reducer, {actions} from '../store/material';
 //import PkCodeTree from '../../Quality/components/PkCodeTree';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
-import {GeneralFilter, GeneralTable,Updatemodal,DatumTree,ResourceFilter,ResourceTable,SeedingFilter,SeedingTable} from '../components/Material';
+import {GeneralFilter, GeneralTable,Updatemodal,ResourceFilter,ResourceTable,SeedingFilter,SeedingTable} from '../components/Material';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import moment from 'moment';
