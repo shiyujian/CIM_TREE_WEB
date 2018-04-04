@@ -18,9 +18,11 @@ export default class TablePerson extends Component {
 			loading: false,
 			percent: 0,
 			pagination: {},
-			pages:'',
-			resultInfo:{},
-			serialNumber:{},
+			pages: '',
+			resultInfo: {},
+			serialNumber: {},
+			btn: false,
+			value:''
 		}
 	}
 	initopthins(list) {
@@ -66,26 +68,26 @@ export default class TablePerson extends Component {
 		}
 	}
 	renderContent(record) {
-				const { platform: { roles = [] } } = this.props;
-				let groups=[]
-				for (let i = 0; i < roles.length; i++) {
-					for (let j = 0; j < record.groups.length; j++) {
-						if(roles[i].id==record.groups[j]){
-							groups.push(roles[i].name)
-						}
-					}	
+		const { platform: { roles = [] } } = this.props;
+		let groups = []
+		for (let i = 0; i < roles.length; i++) {
+			for (let j = 0; j < record.groups.length; j++) {
+				if (roles[i].id == record.groups[j]) {
+					groups.push(roles[i].name)
 				}
-				return groups
 			}
-	
+		}
+		return groups
+	}
+
 	render() {
-		const { platform: { roles = [],users = []}, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
+		const { platform: { roles = [], users = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
 
 		const columns = [
 			{
 				title: '序号',
 				// dataIndex: 'index',
-				width:'5%',
+				width: '5%',
 				render: (text, record, index) => {
 					const current = this.state.serialNumber.current
 					const pageSize = this.state.serialNumber.pageSize
@@ -95,7 +97,7 @@ export default class TablePerson extends Component {
 						return index + 1
 					}
 				}
-				
+
 			},
 
 			// {
@@ -106,7 +108,7 @@ export default class TablePerson extends Component {
 			{
 				title: '姓名',
 				dataIndex: 'name',
-				width:'5%',
+				width: '5%',
 				key: 'name',
 			}
 			//  , {
@@ -117,23 +119,23 @@ export default class TablePerson extends Component {
 			, {
 				title: '所属部门',
 				dataIndex: 'orgname',
-				width:'12%',
+				width: '12%',
 				key: 'Depart',
 			}, {
 				title: '职务',
 				dataIndex: 'job',
-				width:'12%',
+				width: '12%',
 				key: 'Job',
 			}, {
 				title: '性别',
 				dataIndex: 'sex',
-				width:'4%',
+				width: '4%',
 				key: 'Sex'
-				
+
 			}, {
 				title: '手机号码',
 				dataIndex: 'tel',
-				width:'10%',				
+				width: '10%',
 				key: 'Tel'
 			}
 			// , {
@@ -144,7 +146,7 @@ export default class TablePerson extends Component {
 			, {
 				title: '用户名',
 				dataIndex: 'username',
-				width:'10%',
+				width: '10%',
 				key: 'username'
 			}
 			// , {
@@ -169,7 +171,7 @@ export default class TablePerson extends Component {
 			, {
 				title: '标段',
 				// dataIndex: "sections",
-				width:'10%',
+				width: '10%',
 				// key: 'Sections',
 				render: (text, record, index) => {
 					let sectiones = this.sectiontitle(record)
@@ -188,7 +190,7 @@ export default class TablePerson extends Component {
 			}
 			, {
 				title: '角色',
-				width:'10%',
+				width: '10%',
 				render: (record) => {
 					let groups = this.renderContent(record)
 					return groups.join()
@@ -243,10 +245,10 @@ export default class TablePerson extends Component {
 		// console.log("tempData",tempData)
 		if (is_fresh) {
 			this.setState({ loading: true })
-			const { actions: {is_fresh ,getPersonInfo} } = this.props;
+			const { actions: { is_fresh, getPersonInfo } } = this.props;
 			// 分页获取数据
 			// let rst = await getPersonList({ pagesize: 10, offset: 0 });
-			let rst=await getPersonInfo({page:this.state.pages || 1})
+			let rst = await getPersonInfo({ page: this.state.pages || 1 })
 			let personlist = rst.results
 			// console.log("rst", rst)
 			// let total = rst.result.total;
@@ -258,7 +260,7 @@ export default class TablePerson extends Component {
 			}
 			let pagination = {
 				current: this.state.pages,
-				total:rst.count,
+				total: rst.count,
 			};
 			console.log("pagination", pagination)
 			// console.log("pagination", pagination)
@@ -406,76 +408,87 @@ export default class TablePerson extends Component {
 		})
 	}
 	async changePage(obj) {
-		// console.log("obj", obj)
-		this.setState({ loading: true,pages:obj.current })
-		const { actions: {getPersonInfo } } = this.props;
-		// 分页获取数据
-		let pageSize = 10;
-		// let rst = await getPersonList({ pagesize: pageSize, offset: (obj.current - 1) * pageSize });
-		let rst=await getPersonInfo({page:obj.current})
-		let personlist = rst.results
-		console.log("rst",rst)
-		this.setState({serialNumber:obj})
-		// let total = rst.result.total;
-		// console.log("total",total)
-		let persons = [];
-		for (let i = 0; i < personlist.length; i++) {
-			const element = personlist[i];
-			// let ret = await getPeople({code:element.code});
-			persons.push(element)
+		console.log("obj", obj)
+		const {
+			actions: { getUsers },
+		} = this.props;
+		if (!this.state.btn) {
+			this.setState({ loading: true, pages: obj.current })
+			const { actions: { getPersonInfo } } = this.props;
+			// 分页获取数据
+			let pageSize = 10;
+			// let rst = await getPersonList({ pagesize: pageSize, offset: (obj.current - 1) * pageSize });
+			let rst = await getPersonInfo({ page: obj.current })
+			let personlist = rst.results
+			console.log("rst", rst)
+			this.setState({ serialNumber: obj })
+			let persons = [];
+			for (let i = 0; i < personlist.length; i++) {
+				const element = personlist[i];
+				persons.push(element)
+			}
+			let pagination = {
+				current: obj.current,
+				total: rst.count,
+			};
+			this.setState({
+				pagination: pagination
+			})
+			let data_person =
+				persons.map((item, index) => {
+					let groupsId = []
+					const groups = item.groups || []
+					for (let j = 0; j < groups.length; j++) {
+						const groupss = groups[j].id.toString()
+						groupsId.push(groupss);
+					}
+					return {
+						id: item.id,
+						index: index + 1,
+						name: item.account.person_name || '',
+						orgcode: item.account.org_code || '',
+						orgname: item.account.organization || '',
+						job: item.account.title || '',
+						sex: item.account.gender || '',
+						tel: item.account.person_telephone || '',
+						email: item.email || '',
+						is_user: true,
+						username: item.username || '',
+						sections: item.account.sections || '',
+						tags: item.account.tags || '',
+						groups: groupsId || []
+						// passwords:111111,
+					}
+				})
+
+			this.setState({ dataSource: data_person, tempData: data_person, loading: false });
+		}else{
+			this.setState({ loading: true})
+			
+			getUsers({}, { "keyword": this.state.value, page: obj.current}).then(items => {
+				// if (items.results.length > 0) {
+				// 	if (value == items[0].username) {
+				let pagination = {
+					current: obj.current,
+					total: items.count,
+				};
+				this.setState({ tempData: this.searchDatas(items.results), pagination: pagination, btn: true,loading: false })
+				// 	}
+				// }
+			})
 		}
 
-		let pagination = {
-			current: obj.current,
-			total:rst.count,
-		};
-
-
-		this.setState({
-			pagination: pagination
-		})
-
-		let data_person =
-			persons.map((item, index) => {
-				// console.log(item)
-				let groupsId = []
-				const groups = item.groups || []
-				for (let j = 0; j < groups.length; j++) {
-					const groupss = groups[j].id.toString()
-					groupsId.push(groupss);
-				}
-				return {
-					id: item.id,
-					index: index + 1,
-					// code: item.account.person_code || '',
-					name: item.account.person_name || '',
-					orgcode: item.account.org_code || '',
-					orgname: item.account.organization || '',
-					job: item.account.title || '',
-					sex: item.account.gender || '',
-					tel: item.account.person_telephone || '',
-					email: item.email || '',
-					is_user: true,
-					username: item.username || '',
-					sections: item.account.sections || '',
-					tags: item.account.tags || '',
-					groups: groupsId || []
-					// passwords:111111,
-				}
-			})
-
-		this.setState({ dataSource: data_person, tempData: data_person, loading: false });
 	}
 	async componentDidMount() {
 		this.setState({ loading: true })
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
 		// console.log("addition",addition)
-		const { actions: {getPersonInfo} } = this.props;
+		const { actions: { getPersonInfo } } = this.props;
 		// 分页获取数据
 		// let rst = await getPersonList({ pagesize: 10, offset: 0 });
-		let rst=await getPersonInfo({page:1})
+		let rst = await getPersonInfo({ page: 1 })
 		let personlist = rst.results
-		this.setState({resultInfo:rst})
+		this.setState({ resultInfo: rst })
 		// let total = rst.result.total;
 		let persons = [];
 		for (let i = 0; i < personlist.length; i++) {
@@ -485,7 +498,7 @@ export default class TablePerson extends Component {
 
 		let pagination = {
 			current: 1,
-			total:rst.count,
+			total: rst.count,
 		};
 		this.setState({
 			pagination: pagination
@@ -521,58 +534,58 @@ export default class TablePerson extends Component {
 		this.setState({ dataSource: data_person, tempData: data_person, loading: false });
 	}
 
-	
-	searchDatas(itema){
-		 let data_person =
-		itema.map((item, index) => {
-			let groupsId = []
-			const groups = item.groups || []
-			for (let j = 0; j < groups.length; j++) {
-				const groupss = groups[j].id.toString()
-				groupsId.push(groupss);
-			}
-			return {
-				id: item.id,
-				index: index + 1,
-				// code: item.account.person_code || '',
-				name: item.account.person_name || '',
-				orgcode: item.account.org_code || '',
-				orgname: item.account.organization || '',
-				job: item.account.title || '',
-				sex: item.account.gender || '',
-				tel: item.account.person_telephone || '',
-				email: item.email || '',
-				is_user: true,
-				username: item.username || '',
-				sections: item.account.sections || '',
-				tags: item.account.tags || '',
-				groups: groupsId || []
-			}
-		})
+
+	searchDatas(itema) {
+		let data_person =
+			itema.map((item, index) => {
+				let groupsId = []
+				const groups = item.groups || []
+				for (let j = 0; j < groups.length; j++) {
+					const groupss = groups[j].id.toString()
+					groupsId.push(groupss);
+				}
+				return {
+					id: item.id,
+					index: index + 1,
+					// code: item.account.person_code || '',
+					name: item.account.person_name || '',
+					orgcode: item.account.org_code || '',
+					orgname: item.account.organization || '',
+					job: item.account.title || '',
+					sex: item.account.gender || '',
+					tel: item.account.person_telephone || '',
+					email: item.email || '',
+					is_user: true,
+					username: item.username || '',
+					sections: item.account.sections || '',
+					tags: item.account.tags || '',
+					groups: groupsId || []
+				}
+			})
 		return data_person
 	}
 	searchPerson(value) {
 		const {
 			actions: { getUsers },
 		} = this.props;
+		this.setState({ loading: true})
 		if (value) {
-			getUsers({}, { "username": value }).then(items => {
-				if (items.length > 0) {
-					if (value == items[0].username) {
-						let pagination = {
-							current: 1,
-							total:1,
-						};
-						this.setState({ tempData: this.searchDatas(items),pagination:pagination })
-					}
-				}
+			getUsers({}, { "keyword": value, page: 1 }).then(items => {
+				let pagination = {
+					current: 1,
+					total: items.count,
+				};
+				this.setState({ tempData: this.searchDatas(items.results), pagination: pagination, btn: true ,value:value,loading: false})
 			})
 		} else {
-			let pagination = {
-				current: 1,
-				total:this.state.resultInfo.count,
-			};
-			this.setState({ tempData: this.searchDatas(this.state.resultInfo.results),pagination:pagination})
+			getUsers({}, { page: this.state.pages || 1 }).then(items => {
+				let pagination = {
+					current: this.state.pages || 1,
+					total: items.count,
+				};
+				this.setState({ tempData: this.searchDatas(items.results), pagination: pagination, btn: false ,loading: false})
+			})
+		
 		}
 	}
 

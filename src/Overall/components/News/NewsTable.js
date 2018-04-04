@@ -415,11 +415,14 @@ class NewsTable extends Component {
 			}
 		}, {
 			title: '发布日期',
-			dataIndex: 'pub_time',
 			key: 'pub_time',
 			width:'15%',
-			render: pub_time => {
-				return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
+			render: (text,record) => {
+				if(record.update_time){
+					return moment(record.update_time).utc().format('YYYY-MM-DD HH:mm:ss');
+				}else{
+					return moment(record.pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
+				}
 			}
 			// }, {
 			// 	title: '更新时间',

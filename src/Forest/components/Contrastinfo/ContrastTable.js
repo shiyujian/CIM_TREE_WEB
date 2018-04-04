@@ -429,7 +429,12 @@ export default class ContrastTable extends Component {
 	    		tblData.forEach((plan, i) => {
 	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = this.getThinClassName(plan.No,plan.Section);
+	    			let place = ''
+					if(plan.Section.indexOf('P010') !== -1){
+						place = this.getThinClassName(plan.No,plan.Section);
+					}else{
+						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
+					}
 	    			tblData[i].place = place;
 					let liftertime1 = !!plan.LifterTime ? moment(plan.LifterTime).format('YYYY-MM-DD') : '/';
 					let liftertime2 = !!plan.LifterTime ? moment(plan.LifterTime).format('HH:mm:ss') : '/';

@@ -21,6 +21,8 @@ export default class LocmeasureTable extends Component {
         	leftkeycode: '',
         	stime: moment().format('YYYY-MM-DD 00:00:00'),
 			etime: moment().format('YYYY-MM-DD 23:59:59'),
+			lstime:moment().format('YYYY-MM-DD 00:00:00'),
+			letime:moment().format('YYYY-MM-DD 23:59:59'),
 			sxm: '',
     		section: '',
     		bigType: '',
@@ -35,7 +37,7 @@ export default class LocmeasureTable extends Component {
     		role: 'inputer',
     		rolename: '',
     		percent:0,
-        }
+		}
 	}
 	getBiao(code){
 		let str = '';
@@ -142,6 +144,12 @@ export default class LocmeasureTable extends Component {
 			render: (text,record) => {
 				const {createtime1 = '',createtime2 = '' } = record;
 				return <div><div>{createtime1}</div><div>{createtime2}</div></div>
+			}
+		},{
+			title:"定位时间",
+			render: (text,record) => {
+				const {createtime3 = '',createtime4 = '' } = record;
+				return <div><div>{createtime3}</div><div>{createtime4}</div></div>
 			}
 		},{
 			title:<div><div>高度</div><div>(cm)</div></div>,
@@ -319,6 +327,18 @@ export default class LocmeasureTable extends Component {
 							>
 							</RangePicker>
 						</Col>
+						<Col xl={10} lg={12} md={14} className='mrg10'>
+							<span>定位时间：</span>
+							<RangePicker 
+							 style={{verticalAlign:"middle"}} 
+							 defaultValue={[moment(this.state.lstime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.letime, 'YYYY-MM-DD HH:mm:ss')]} 
+							 showTime={{ format: 'HH:mm:ss' }}
+							 format={'YYYY/MM/DD HH:mm:ss'}
+							 onChange={this.datepick1.bind(this)}
+							 onOk={this.datepick1.bind(this)}
+							>
+							</RangePicker>
+						</Col>
 					</Row>
 					<Row >
 						<Col span={2} className='mrg10'>
@@ -446,6 +466,11 @@ export default class LocmeasureTable extends Component {
 	datepick(value){
 		this.setState({stime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
 		this.setState({etime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
+	}
+	
+	datepick1(value){
+		this.setState({lstime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
+		this.setState({letime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
     }
 
 	handleTableChange(pagination){
@@ -504,7 +529,9 @@ export default class LocmeasureTable extends Component {
     		role = '',
     		rolename = '',
     		stime = '',
-    		etime = '',
+			etime = '',
+			lstime = '',
+			letime = '',
     		status = '',
 			size,
 			thinclass = '',
@@ -527,7 +554,9 @@ export default class LocmeasureTable extends Component {
     		checkstatus,
     		islocation,
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		lstime:lstime&&moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+    		letime:letime&&moment(letime).format('YYYY-MM-DD HH:mm:ss'),
     		status,
     		page,
 			size:size,
@@ -545,7 +574,13 @@ export default class LocmeasureTable extends Component {
     		let tblData = rst.content;
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
-	    			let place = this.getThinClassName(plan.No,plan.Section);
+					tblData[i].order = ((page - 1) * size) + i + 1;
+					let place = ''
+					if(plan.Section.indexOf('P010') !== -1){
+						place = this.getThinClassName(plan.No,plan.Section);
+					}else{
+						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
+					}
 	    			tblData[i].place = place;
 	    			let statusname = '';
 					if(plan.Status == -1)
@@ -560,12 +595,16 @@ export default class LocmeasureTable extends Component {
 						statusname = '业主抽查通过'
 					}
 					tblData[i].statusname = statusname;
-					let islocation = !!plan.LocationTime ? '已定位' : '未定位';
+					let islocation = plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].islocation = islocation;
-					let createtime1 = !!plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
-					let createtime2 = !!plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
+					let createtime1 = plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
+					let createtime2 = plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
+					let createtime3 = plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
+					let createtime4 = plan.LocationTime ? moment(plan.LocationTime).format('HH:mm:ss') : '/';
 					tblData[i].createtime1 = createtime1;
 					tblData[i].createtime2 = createtime2;
+					tblData[i].createtime3 = createtime3;
+					tblData[i].createtime4 = createtime4;
 	    		})
 		    	const pagination = { ...this.state.pagination };
 				pagination.total = rst.pageinfo.total;
@@ -587,7 +626,9 @@ export default class LocmeasureTable extends Component {
     		role = '',
     		rolename = '',
     		stime = '',
+    		lstime = '',
     		etime = '',
+    		letime = '',
 			exportsize,
 			thinclass = '',
 			smallclass = '',
@@ -610,7 +651,9 @@ export default class LocmeasureTable extends Component {
     		// checkstatus,
     		// locationstatus,
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+    		lstime:lstime&&moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+    		letime:letime&&moment(letime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
 			size:exportsize,
 			thinclass,

@@ -462,10 +462,13 @@ class TipsTable extends Component {
 			}
 		},{
 			title: '发布时间',
-			dataIndex: 'pub_time',
 			key: 'pub_time',
-			render: pub_time => {
-				return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
+			render: (text,record) => {
+				if(record.update_time){
+					return moment(record.update_time).utc().format('YYYY-MM-DD HH:mm:ss');
+				}else{
+					return moment(record.pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
+				}
 			}
 		}, {
 			title: '紧急程度',

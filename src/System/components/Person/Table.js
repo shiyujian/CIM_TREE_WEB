@@ -25,7 +25,9 @@ export default class Users extends Component {
 			fristRoles: [],
 			TreeCodes: '',
 			isBtn: true,
-			pagea:''
+			objPage:'',
+			objPages:''
+			
 		}
 	}
 	static layout = {
@@ -117,13 +119,15 @@ export default class Users extends Component {
 			this.setState({ loading: true });
 			// 如果查询输入框里面的内容没有改变就不执行
 			// if(text!=this.state.fristText || this.state.fristRoles!=this.state.roles){
-			getUsers({}, { org_code: this.props.getTreeCodes, "username": text, roles: this.state.roles, page: 1 }).then(items => {
+				
+			getUsers({}, { org_code: this.props.getTreeCodes, "keyword": text, roles: this.state.roles, page:  1 }).then(items => {
+				console.log("items111111",items)
 				let pagination = {
-					current: this.props.getTablePages.current,
+					current:1,
 					total: items.count,
 				};
 				getTablePage(pagination)
-				this.setState({ btn: true, fristText: text, fristRoles: this.state.roles, isBtn: false, loading: false })
+				this.setState({ btn: true, fristText: text, fristRoles: this.state.roles, isBtn: false, loading: false})
 				getIsBtn(false)
 
 			})
@@ -132,16 +136,9 @@ export default class Users extends Component {
 		} else {
 			// if(this.state.btn){
 			// this.setState({ loading: true });
-			let currents
-			console.log("this.state.pagea",this.state.pagea)
-			if(this.state.pagea==0){
-				currents=1
-			}else{
-				currents=this.state.pagea
-			}
-			getUsers({}, { org_code: this.props.getTreeCodes, page: currents }).then((e) => {
+			getUsers({}, { org_code: this.props.getTreeCodes, page:this.state.objPages || 1 }).then((e) => {
 				let pagination = {
-					current: this.props.getTablePages.current || '',
+					current: this.state.objPages || 1,
 					total: e.count,
 				};
 				getTablePage(pagination)
@@ -508,6 +505,7 @@ export default class Users extends Component {
 		}
 	}
 	async changePage(obj) {
+		let text = document.getElementById("NurseryData").value;
 		const {
 			actions: { getUsers, getTreeModal, setUpdate, getTablePage }
 		} = this.props;
@@ -518,16 +516,19 @@ export default class Users extends Component {
 					current: obj.current,
 					total: e.count,
 				};
+				this.setState({objPages:obj.current})				
 				getTablePage(pagination)
 				getTreeModal(false)
 			});
 		} else {
 			getTreeModal(true)
-			getUsers({}, { org_code: this.props.getTreeCodes, roles: this.state.roles, page: obj.current }).then((e) => {
+			getUsers({}, { org_code: this.props.getTreeCodes,"keyword": text, roles: this.state.roles, page: obj.current }).then((e) => {
 				let pagination = {
 					current: obj.current,
 					total: e.count,
 				};
+				
+				this.setState({objPage:obj.current})
 				getTablePage(pagination)
 				getTreeModal(false)
 			});
@@ -823,7 +824,7 @@ export default class Users extends Component {
 						this.setState({  loading: false })
 					});
 				} else {
-					getUsers({}, {org_code:this.props.getTreeCodes, "username": text,roles:this.state.roles }).then(items => {
+					getUsers({}, {org_code:this.props.getTreeCodes, "keyword": text,roles:this.state.roles }).then(items => {
 						console.log("items",items)
 
 						if(items&&items.length==0){
@@ -832,7 +833,14 @@ export default class Users extends Component {
 								total:0,
 							};
 							getTablePage(pagination)
-							this.setState({  loading: false ,pagea:this.props.getTablePages.current})	
+
+							let currents
+							if(this.props.getTablePages.current==0){
+								currents=1
+							}else{
+								currents=this.props.getTablePages.current
+							}
+							this.setState({  loading: false ,objPages:currents})	
 						}else{
 							let pagination = {
 								current: 1,
