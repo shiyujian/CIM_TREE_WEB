@@ -159,7 +159,7 @@ class SeedingAddition extends Component {
     
     render() {
         const{
-            additionVisible = false,
+            seedingAddVisible = false,
             docs = [],
             form: { getFieldDecorator },
         } = this.props;
@@ -169,7 +169,7 @@ class SeedingAddition extends Component {
         
         return (  
             <Modal title="新增文档"
-                   width={920} visible={additionVisible}
+                   width={920} visible={seedingAddVisible}
                    closable={false}
                    footer={false}
                    maskClosable={false}>
@@ -344,56 +344,88 @@ class SeedingAddition extends Component {
         );
     }
 
-    //上传文件
-    uploadProps = {
+      //上传文件
+      uploadProps = {
         name: 'a_file',
         multiple: true,
         showUploadList: false,
         action: base + "/service/fileserver/api/user/files/",
         onChange: ({ file, fileList, event }) => {
-            console.log('file',file)
+            this.setState({
+                loading:true
+            })
             const status = file.status;
-            const {TreatmentData } = this.state;
+            // const { newFileLists } = this.state;
+            const{
+				TreatmentData = []
+			} = this.state
             let newdata = [];
             if (status === 'done') {
+                console.log('file',file)
                 // const { actions: { postUploadFilesAc } } = this.props;
-                console.log('fileList',fileList)
-                let length = TreatmentData.length
-                
-                TreatmentData.push({
-                    index: length,
-                    file_id: file.response.id,
-                    fileName: file.name,
-                    send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-                    file_partial_url: '/media' + file.response.a_file.split('/media')[1],
-                    download_url: '/media' + file.response.download_url.split('/media')[1],
-                    a_file: '/media' + file.response.a_file.split('/media')[1],
-                    misc:file.response.misc,
-                    mime_type:file.response.mime_type,
+                let len = TreatmentData.length
+				TreatmentData.push(
+					{
+						index: len + 1,
+                        fileName: file.name,
+                        file_id: file.response.id,
+                        file_partial_url: '/media' + file.response.a_file.split('/media')[1],
+                        send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                        a_file: '/media' + file.response.a_file.split('/media')[1],
+                        download_url: '/media' + file.response.download_url.split('/media')[1],
+                        misc: file.response.misc,
+                        mime_type: file.response.mime_type,
+					}
+				)
+				console.log('TreatmentData',TreatmentData)
+                notification.success({
+                    message:'文件上传成功',
+                    duration:3
                 })
-            
-                this.setState({ TreatmentData: TreatmentData })
+                this.setState({ 
+                    TreatmentData: TreatmentData,
+                    loading:false 
+                })
+                // postUploadFilesAc(newFileLists)
 
+            }else if(status === 'error'){
+                notification.error({
+                    message:'文件上传失败',
+                    duration:3
+                })
+                this.setState({
+                    loading:false
+                })
+                return;
             }
         },
     };
 
-    //删除文件表格中的某行
-    deleteTreatmentFile = (record, index) => {
-        const {
-            TreatmentData
-        }=this.state
-        TreatmentData.splice(record.index,1)
-
-        for(let i=0;i<TreatmentData.length;i++){
-            if(i>=record.index){
-                TreatmentData[i].index = TreatmentData[i].index - 1;
+     //删除文件表格中的某行
+	deleteTreatmentFile = (record, index) => {
+		const{
+			TreatmentData
+		}=this.state
+      
+		TreatmentData.splice(index, 1);
+		let array = []
+        TreatmentData.map((item, index) => {
+            let data = {
+				index: index + 1,
+				fileName: item.fileName,
+				file_id: item.file_id,
+				file_partial_url: item.file_partial_url,
+				send_time: item.send_time,
+				a_file: item.a_file,
+				download_url: item.download_url,
+				misc: item.misc,
+				mime_type: item.mime_type,
             }
-        }
-        this.setState({
-            TreatmentData:TreatmentData
-        })
-    }
+            array.push(data)
+		})
+		console.log('array',array)
+        this.setState({TreatmentData: array })
+	}
 
     handleSubmit = (e) =>{
         e.preventDefault();
@@ -404,10 +436,10 @@ class SeedingAddition extends Component {
                 createFlow,
                 getWorkflowById,
                 putFlow,
-                toggleAddition
+                SeedingAddVisible
             },
             location
-            // actions: {toggleAddition, postDocument, getdocument,changeDocs}
+            // actions: {SeedingAddVisible, postDocument, getdocument,changeDocs}
         } = this.props;
         const{
             TreatmentData,
@@ -492,7 +524,7 @@ class SeedingAddition extends Component {
                                         message: '流程提交成功',
                                         duration: 2
                                     });
-                                    toggleAddition(false);
+                                    SeedingAddVisible(false);
                                     this.setState({
                                         visible: false
                                     })
@@ -547,9 +579,9 @@ class SeedingAddition extends Component {
 
     cancel() {
         const {
-            actions: {toggleAddition,changeDocs}
+            actions: {SeedingAddVisible,changeDocs}
         } = this.props;
-        toggleAddition(false);
+        SeedingAddVisible(false);
         changeDocs();
         this.setState({
             progress:0
