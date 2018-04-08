@@ -213,6 +213,7 @@ class SeedingTable extends Component {
 		return (
 			<div>
 				<SeedingFilter  {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+				<Button onClick={this.addClick.bind(this)}>新增</Button>
 				<Table 
 					// rowSelection={this.rowSelection}
 					dataSource={workflowData}
@@ -311,6 +312,13 @@ class SeedingTable extends Component {
 			}	
 			</div>
 		);
+	}
+
+	addClick(){
+		const {
+            actions: {SeedingAddVisible}
+        } = this.props;
+        SeedingAddVisible(true);
 	}
 
 	showModal = (key,record) => {

@@ -13,10 +13,12 @@ const documentReducer = documentFactory(ID);
 export const getWorkflowByIdOK = createAction('获取流程详情');
 export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
 export const getWorkflowsOK = createAction('获取机械设备流程的全部流程实例');
-export const getWorkflows = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}`,[getWorkflowsOK],'GET');
+export const getWorkflows = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[getWorkflowsOK],'GET');
 
 
-
+export const GeneralAddVisible = createAction(`${ID}机械设备新增显示和隐藏`);
+export const ResourceAddVisible = createAction(`${ID}工程材料新增显示和隐藏`);
+export const SeedingAddVisible = createAction(`${ID}苗木材料新增显示和隐藏`);
 export const setTabActive = createAction(`${ID}设置当前选中的tab`);
 export const toggleModal = createAction(`${ID}Tab页对应的modal类型`);
 export const getdocumentOK = createAction(`${ID}_搜索目录文档`);
@@ -36,6 +38,10 @@ export const setkeycode =createAction(`${ID}_setkeycode`);
 export const getTreeOK = createAction(`${ID}_目录树`);
 export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
 export const actions = {
+    GeneralAddVisible,
+    ResourceAddVisible,
+    SeedingAddVisible,
+
     getWorkflowByIdOK,
     getWorkflowById,
     getWorkflowsOK,
@@ -64,6 +70,18 @@ export const actions = {
 };
 
 export default handleActions({
+    [GeneralAddVisible]: (state, {payload}) => ( {
+        ...state,
+        generalAddVisible: payload
+    }),
+    [ResourceAddVisible]: (state, {payload}) => ( {
+        ...state,
+        resourceAddVisible: payload
+    }),
+    [SeedingAddVisible]: (state, {payload}) => ( {
+        ...state,
+        seedingAddVisible: payload
+    }),
     [getTreeOK]: (state, {payload: {children}}) => {
         return {
             ...state,

@@ -50,7 +50,13 @@ export default class News extends Component {
 			title: '新闻标题',
 			dataIndex: 'title',
 			key: 'title',
-			width: 400
+			width: 400,
+			render(text,record){
+				if(text.length > 30){
+					text = text.slice(0,30) + '...';
+				}
+				return <p>{text}</p>
+			}
 		},
 
 		{
@@ -82,7 +88,13 @@ export default class News extends Component {
 			title: '通知标题',
 			dataIndex: 'title',
 			key: 'title',
-			width: 400
+			width: 400,
+			render(text,record){
+				if(text.length > 30){
+					text = text.slice(0,30);
+				}
+				return <p>{text}</p>
+			}
 		},
 
 		{
@@ -148,12 +160,14 @@ export default class News extends Component {
 							<Table dataSource={newsList}
 								columns={this.columns}
 								bordered={true}
+								pagination={{showQuickJumper:true,pageSize:5}}
 								rowKey="id" />
 						</TabPane>
 						<TabPane tab="通知" key="2">
 							<Table dataSource={tipsList}
 								columns={this.draftColumns}
 								bordered={true}
+								pagination={{showQuickJumper:true,pageSize:5}}
 								rowKey="id" />
 						</TabPane>
 					</Tabs>

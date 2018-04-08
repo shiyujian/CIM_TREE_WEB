@@ -2,7 +2,7 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm,notification
+    Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm,notification,Spin
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
@@ -10,8 +10,7 @@ import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE, WORKFLOW_CODE,UNITS } from '../../../_platform/api';
-//import {fileTypes} from '../../../_platform/store/global/file';
+import { base,   WORKFLOW_CODE,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
@@ -28,55 +27,59 @@ const EditableCell = ({ editable, value, onChange }) => (
 class GeneralAddition extends Component {
 
     static propTypes = {};
-    state={
-        progress:0,
-        isUploading: false,
-        dataSource:[],
-        engineerNumber:'',
-        engineerName:'',
-        engineerApprove:'',
-        count:0,
-        TreatmentData:[],
-        newFileLists: [],
-        // equipName:'',
-        // equipNumber:'',
-
+    constructor(props){
+        super(props)
+        this.state={
+            isUploading: false,
+            dataSource:[],
+            engineerName:'',
+            count:0,
+            TreatmentData:[],
+            newFileLists: [],
+            currentSection:'',
+            currentSectionName:'',
+            projectName:'',
+            loading:false,
+            selectedRowKeys:[]
+    
+        }
     }
+    
     //第一个表格的列属性
     equipment=[
         {
             title: '设备名称',
-            dataIndex: 'extra_params.equipName',
-            key: 'extra_params.equipName',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipName'),
+            dataIndex: 'equipName',
+            key: 'equipName',
+            render: (text, record) => this.renderColumns(text, record, 'equipName'),
         }, {
             title: '规格型号',
-            dataIndex: 'extra_params.equipNumber',
-            key: 'extra_params.equipNumber',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipNumber'),
+            dataIndex: 'equipNumber',
+            key: 'equipNumber',
+            render: (text, record) => this.renderColumns(text, record, 'equipNumber'),
         }, {
             title: '数量',
-            dataIndex: 'extra_params.equipCount',
-            key: 'extra_params.equipCount',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipCount'),
+            dataIndex: 'equipCount',
+            key: 'equipCount',
+            render: (text, record) => this.renderColumns(text, record, 'equipCount'),
         }, {
             title: '进场日期',
-            dataIndex: 'extra_params.equipTime',
-            key: 'extra_params.equipTime',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipTime'),
+            dataIndex: 'equipTime',
+            key: 'equipTime',
+            render: (text, record) => this.renderColumns(text, record, 'equipTime'),
         }, {
             title: '技术状况',
-            dataIndex: 'extra_params.equipMoment',
-            key: 'extra_params.equipMoment',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipMoment'),
+            dataIndex: 'equipMoment',
+            key: 'equipMoment',
+            render: (text, record) => this.renderColumns(text, record, 'equipMoment'),
         },{
             title: '备注',
-            dataIndex: 'extra_params.equipRemark',
-            key: 'extra_params.equipRemark',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipRemark')
+            dataIndex: 'equipRemark',
+            key: 'equipRemark',
+            render: (text, record) => this.renderColumns(text, record, 'equipRemark')
         }, {
           title: '操作',
-          dataIndex: 'extra_params.equipOperation',
+          dataIndex: 'equipOperation',
           render: (text, record) => {
             const { editable } = record;
             return (
@@ -94,42 +97,33 @@ class GeneralAddition extends Component {
           }
         }
     ];
-    //第二个表格的列属性
-    docCols = [
-        {
-            title:'名称',
-            dataIndex:'name'
-        }, {
-            title:'备注',
-            render: (doc) => {
-                return <Input onChange={this.remark.bind(this, doc)}/>;
-            }
-        }, {
-            title:'操作',
-            render: doc => {
-                return (
-					<a onClick={this.remove.bind(this, doc)}>删除</a>
-                );
-            }
-
-        }
-    ];
     columns1 = [
         {
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index',
-        width: '20%',
+            title: '序号',
+            dataIndex: 'index',
+            key: 'index',
+            width: '10%',
         }, {
             title: '文件名称',
             dataIndex: 'fileName',
             key: 'fileName',
-            width: '45%',
+            width: '35%',
+        }, {
+            title: '备注',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            width: '30%',
+            render: (text, record, index) => {
+                return <Input value={record.remarks || ""} onChange={ele => {
+                    record.remarks = ele.target.value
+                    this.forceUpdate();
+                }} />
+            }
         }, {
             title: '操作',
             dataIndex: 'operation',
             key: 'operation',
-            width: '20%',
+            width: '10%',
             render: (text, record, index) => {
                 return <div>
                     <Popconfirm
@@ -147,43 +141,84 @@ class GeneralAddition extends Component {
     static layoutT = {
         labelCol: {span: 8},
         wrapperCol: {span: 16},
-      };
-    static layout = {
-    labelCol: {span: 4},
-    wrapperCol: {span: 20},
     };
+
+    async componentDidMount() {
+        this.getSection()
+    }
+
+    //获取当前登陆用户的标段
+    getSection(){
+        let user = getUser()
+        
+        let sections = user.sections
+        let sectionSchedule = []
+        let currentSectionName = ''
+        let projectName = ''
+        
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            let section = sections[0]
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        currentSectionName = item.name
+                    }
+                })
+                //获取当前标段所在的项目
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        projectName = item.value
+                    }
+                })
+            }
+            this.setState({
+                currentSection:section,
+                currentSectionName:currentSectionName,
+                projectName:projectName
+            })
+        }
+    }
     render() {
         const{
-            additionVisible = false,
+            generalAddVisible = false,
             form: { getFieldDecorator },
-            docs = []
         } = this.props;
-        let {progress,isUploading,engineerName,engineerNumber,engineerApprove,dataSource,count,
-             equipName,equipNumber
-            } = this.state;
-        let cacheData=this.state.dataSource.map(item => ({ ...item }));
+        const {
+            dataSource,
+            currentSectionName='',
+            selectedRowKeys=[]
+        } = this.state;
+        const rowSelection  = {
+            selectedRowKeys,
+            onChange: this.onSelectChange
+        };
         return (
-			<Modal title="新增文档"
-				   width={920} visible={additionVisible}
-                   closable={false}
-                   footer={false}
-                   maskClosable={false}>
+            <Modal 
+             title="新增文档"
+             width={920} visible={generalAddVisible}
+             closable={false}
+             footer={false}
+             maskClosable={false}
+            >
+            <Spin spinning={this.state.loading}>
 				<Form onSubmit={this.handleSubmit.bind(this)}>
                     <Row gutter={24}>
                         <Col span={24} style={{paddingLeft:'3em'}}>
                             <Row gutter={15} >
                                 <Col span={10}>
-                                    <FormItem   {...GeneralAddition.layoutT} label="单位工程:">
+                                    <FormItem   {...GeneralAddition.layoutT} label="标段:">
                                     {
-                                        getFieldDecorator('unit', {
+                                        getFieldDecorator('section', {
+                                            initialValue: `${currentSectionName}`,
                                             rules: [
-                                                { required: true, message: '请选择单位工程' }
+                                                { required: true, message: '请输入标段' }
                                             ]
                                         })
                                         (
-                                            <Select placeholder='请选择单位工程' allowClear>
-                                                {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-                                            </Select>
+                                            (<Input readOnly placeholder='请输入标段' />)
                                         )
                                     }
                                      
@@ -201,24 +236,6 @@ class GeneralAddition extends Component {
                                             <Input placeholder='请输入编号' />
                                         )
                                     }
-                                        
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                            <Row gutter={15}>
-                                <Col span={20}>
-                                    <FormItem  {...GeneralAddition.layout} label="审批单位:">
-                                    {
-                                        getFieldDecorator('reviewUnit', {
-                                            rules: [
-                                                { required: true, message: '请选择审核人员' }
-                                            ]
-                                        })
-                                        (
-                                            <Input placeholder='系统自动识别，无需手输' readOnly/>
-                                        )
-                                    }
-                                        
                                     </FormItem>
                                 </Col>
                             </Row>
@@ -226,11 +243,12 @@ class GeneralAddition extends Component {
                     </Row>
                     <Row gutter={24}>
                         <Col span={24}>
-                            <Table  rowSelection={this.rowSelectionAdd}
-                                    dataSource={this.state.dataSource}
-                                    columns={this.equipment}
-                                    pagination={false}
-                                    bordered />
+                            <Table  
+                             rowSelection={rowSelection}
+                             dataSource={this.state.dataSource}
+                             columns={this.equipment}
+                             pagination={false}
+                             bordered />
                         </Col>
                     </Row>
                     <Row gutter={24}>
@@ -254,7 +272,6 @@ class GeneralAddition extends Component {
 									支持 pdf、doc、docx 文件
 								</p>
 							</Dragger>
-							{/* <Progress percent={progress} strokeWidth={5} /> */}
 						</Col>
 					</Row>
 					<Row gutter={24} style={{marginTop: 15}}>
@@ -294,7 +311,7 @@ class GeneralAddition extends Component {
                         </Row>
                     </FormItem>
 				</Form>
-
+            </Spin>
 			</Modal>
         );
     }
@@ -306,76 +323,236 @@ class GeneralAddition extends Component {
         showUploadList: false,
         action: base + "/service/fileserver/api/user/files/",
         onChange: ({ file, fileList, event }) => {
-            console.log('file',file)
+            this.setState({
+                loading:true
+            })
             const status = file.status;
-            const {TreatmentData } = this.state;
+            // const { newFileLists } = this.state;
+            const{
+				TreatmentData = []
+			} = this.state
             let newdata = [];
             if (status === 'done') {
+                console.log('file',file)
                 // const { actions: { postUploadFilesAc } } = this.props;
-                console.log('fileList',fileList)
-                let length = TreatmentData.length
-                
-                TreatmentData.push({
-                    index: length,
-                    file_id: file.response.id,
-                    fileName: file.name,
-                    send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-                    file_partial_url: '/media' + file.response.a_file.split('/media')[1],
-                    download_url: '/media' + file.response.download_url.split('/media')[1],
-                    a_file: '/media' + file.response.a_file.split('/media')[1],
-                    misc:file.response.misc,
-                    mime_type:file.response.mime_type,
+                let len = TreatmentData.length
+				TreatmentData.push(
+					{
+						index: len + 1,
+                        fileName: file.name,
+                        file_id: file.response.id,
+                        file_partial_url: '/media' + file.response.a_file.split('/media')[1],
+                        send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                        a_file: '/media' + file.response.a_file.split('/media')[1],
+                        download_url: '/media' + file.response.download_url.split('/media')[1],
+                        misc: file.response.misc,
+                        mime_type: file.response.mime_type,
+					}
+				)
+				console.log('TreatmentData',TreatmentData)
+                notification.success({
+                    message:'文件上传成功',
+                    duration:3
                 })
-            
-                this.setState({ TreatmentData: TreatmentData })
+                this.setState({ 
+                    TreatmentData: TreatmentData,
+                    loading:false 
+                })
+                // postUploadFilesAc(newFileLists)
 
+            }else if(status === 'error'){
+                notification.error({
+                    message:'文件上传失败',
+                    duration:3
+                })
+                this.setState({
+                    loading:false
+                })
+                return;
             }
         },
     };
 
-    //删除文件表格中的某行
-    deleteTreatmentFile = (record, index) => {
-        const {
-            TreatmentData
-        }=this.state
-        TreatmentData.splice(record.index,1)
-
-        for(let i=0;i<TreatmentData.length;i++){
-            if(i>=record.index){
-                TreatmentData[i].index = TreatmentData[i].index - 1;
+     //删除文件表格中的某行
+	deleteTreatmentFile = (record, index) => {
+		const{
+			TreatmentData
+		}=this.state
+		TreatmentData.splice(index, 1);
+		let array = []
+        TreatmentData.map((item, index) => {
+            let data = {
+				index: index + 1,
+				fileName: item.fileName,
+				file_id: item.file_id,
+				file_partial_url: item.file_partial_url,
+				send_time: item.send_time,
+				a_file: item.a_file,
+				download_url: item.download_url,
+				misc: item.misc,
+				mime_type: item.mime_type,
             }
-        }
-        this.setState({
-            TreatmentData:TreatmentData
-        })
+            array.push(data)
+		})
+        this.setState({TreatmentData: array })
+	}
+
+    //选择人员
+    selectMember(memberInfo) {
+        const {
+            form: {
+                setFieldsValue
+            }
+        } = this.props
+		this.member = null;
+		if (memberInfo) {
+			let memberValue = memberInfo.toString().split('#');
+			if (memberValue[0] === 'C_PER') {
+				console.log('memberValue', memberValue)
+				this.member = {
+					"username": memberValue[4],
+					"person_code": memberValue[1],
+					"person_name": memberValue[2],
+					"id": parseInt(memberValue[3]),
+					org: memberValue[5],
+				}
+			}
+		} else {
+			this.member = null
+		}
+        setFieldsValue({
+            dataReview: this.member
+        });
     }
 
+    cancel() {
+        const {
+            actions: {GeneralAddVisible}
+        } = this.props;
+        GeneralAddVisible(false);
+    }
 
+    onSelectChange= (selectedRowKeys) => {
+        console.log('selectedRowKeys',selectedRowKeys)
+        this.setState({
+            selectedRowKeys
+        })
+    }
+    //第一个表格添加行
+    handleAdd(){
+        const {count,dataSource } = this.state;
+        let len = dataSource.length
+        const newData = {
+            key:len,
+            editable:true,
+            count:count
+        };
+        
+        this.setState({
+            dataSource: [...dataSource, newData],
+            count:count+1
+        })
+    }
+    //第一个表格删除
+    onDelete(){
+        const{
+            dataSource,
+            selectedRowKeys
+		}=this.state
+
+        selectedRowKeys.map((rst,index) => {
+            dataSource.splice(rst-index, 1);
+        });
+        let array = []
+        let data = {}
+        dataSource.map((item, index) => {
+            data = item
+            data.key = index
+            array.push(data)
+		})
+
+        this.setState({
+            dataSource:array,
+            selectedRowKeys:[]
+        })
+    }
+    renderColumns(text, record, column) {
+        return (
+          <EditableCell
+            editable={record.editable}
+            value={text}
+            onChange={value => this.handleChange(value, record.key, column)}
+          />
+        );
+    }
+    handleChange(value, key, column) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target[column] = value;
+          this.setState({ dataSource: newData });
+        }
+    }
+    edit(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target.editable = true;
+          this.setState({ dataSource: newData });
+        }
+    }
+    saveTable(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target.editable = false;
+          this.setState({dataSource: newData });
+          this.cacheData = newData.map(item => ({ ...item }));
+        }
+    }
     handleSubmit = (e) =>{
         e.preventDefault();
         const {
             currentcode = {},
-            docs = [],
             actions: {
                 createFlow,
                 getWorkflowById,
                 putFlow,
-                toggleAddition
+                GeneralAddVisible
             },
             location
-            // actions: {toggleAddition, postDocument, getdocument,changeDocs}
         } = this.props;
         const{
             TreatmentData,
-            dataSource
+            dataSource,
+            projectName,
+            currentSectionName,
+			currentSection
         } = this.state
+
         let user = getUser();//当前登录用户
+        let sections = user.sections || []
+        if(!sections || sections.length === 0 ){
+            notification.error({
+                message:'当前用户未关联标段，不能创建流程',
+                duration:3
+            })
+            return
+        }
+
         let me = this;
         let postData = {};
         me.props.form.validateFields((err, values) => {
             console.log('Received values of form: ', values);
             if (!err) {
 
+                postData.upload_unit = user.org ? user.org : '';
+                postData.type = '机械设备';
+                postData.upload_person = user.name ? user.name : user.username;
+                postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
+
+
+                //当前用户信息
                 const currentUser = {
                     "username": user.username,
                     "person_code": user.code,
@@ -383,20 +560,28 @@ class GeneralAddition extends Component {
                     "id": parseInt(user.id),
                     "org": user.org,
                 };
+
+
                 let subject = [{
+                    "section": JSON.stringify(currentSection),
+                    "sectionName":JSON.stringify(currentSectionName),
+                    "projectName":JSON.stringify(projectName),
                     "dataSource":JSON.stringify(dataSource),
                     "TreatmentData":JSON.stringify(TreatmentData),
-                    "unit":JSON.stringify(values.unit),
                     "code":JSON.stringify(values.code),
                     "reviewUnit":JSON.stringify(values.reviewUnit),
-                    "submitOrg":JSON.stringify(user.org)
+                    "timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
+                    "postData": JSON.stringify(postData),
                 }];
+
                 const nextUser = this.member;
+
                 let WORKFLOW_MAP = {
                     name: "物资管理机械设备报批流程",
                     desc: "综合管理模块物资管理机械设备报批流程",
                     code: WORKFLOW_CODE.机械设备报批流程
                 };
+
                 let workflowdata = {
                     name: WORKFLOW_MAP.name,
                     description: WORKFLOW_MAP.desc,
@@ -445,10 +630,7 @@ class GeneralAddition extends Component {
                                         message: '流程提交成功',
                                         duration: 2
                                     });
-                                    toggleAddition(false);
-                                    this.setState({
-                                        visible: false
-                                    })
+                                    GeneralAddVisible(false);
                                 } else {
                                     notification.error({
                                         message: '流程提交失败',
@@ -457,257 +639,11 @@ class GeneralAddition extends Component {
                                     return;
                                 }
                             });
-
-
                         }
                     });
-
                 });
             }
         })
-        
     }
-
-    //选择人员
-    selectMember(memberInfo) {
-        const {
-            form: {
-                setFieldsValue
-            }
-        } = this.props
-		this.member = null;
-		if (memberInfo) {
-			let memberValue = memberInfo.toString().split('#');
-			if (memberValue[0] === 'C_PER') {
-				console.log('memberValue', memberValue)
-				this.member = {
-					"username": memberValue[4],
-					"person_code": memberValue[1],
-					"person_name": memberValue[2],
-					"id": parseInt(memberValue[3]),
-					org: memberValue[5],
-				}
-			}
-		} else {
-			this.member = null
-		}
-
-        setFieldsValue({
-            dataReview: this.member,
-			reviewUnit: this.member.org?this.member.org:null,
-        });
-    }
-
-    cancel() {
-        const {
-            actions: {toggleAddition,changeDocs}
-        } = this.props;
-        toggleAddition(false);
-        changeDocs();
-        this.setState({
-            progress:0
-        })
-    }
-
-
-    rowSelectionAdd = {
-        onChange: (selectedRowKeys, selectedRows) => {
-            const { actions: { selectDocuments } } = this.props;
-            selectDocuments(selectedRows);
-        },
-    };
-    rowSelection = {
-        onChange: (selectedRowKeys) => {
-            const {actions: {selectDocuments}} = this.props;
-            selectDocuments(selectedRowKeys);
-        },
-    };
-    
-    
-
-    // uploadProps = {
-    //     name: 'file',
-    //     action: `${FILE_API}/api/user/files/`,
-    //     showUploadList: false,
-    //     data(file) {
-    //         return {
-    //             name: file.fileName,
-    //             a_file: file,
-    //         };
-    //     },
-    //     beforeUpload(file) {
-    //         const valid = fileTypes.indexOf(file.type) >= 0;
-    //         if (!valid) {
-    //             message.error('只能上传 pdf、doc、docx 文件！');
-    //         }
-    //         return valid;
-    //         this.setState({ progress: 0 });
-    //     },
-    // };
-
-    changeDoc({file, fileList, event}) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        if (file.status === 'done') {
-            changeDocs([...docs, file]);
-        }
-        this.setState({
-            isUploading: file.status === 'done' ? false : true
-        })
-        if(event){
-            let {percent} = event;
-            if(percent!==undefined)
-                this.setState({progress:parseFloat(percent.toFixed(1))});
-        }
-    }
-
-    
-
-    handleAdd(){
-        const {count,dataSource } = this.state;
-        const newData = {
-          key:count,
-        };
-        this.setState({
-          dataSource: [...dataSource, newData],
-          count: count + 1,
-        });
-        console.log('dataSource',dataSource)
-    }
-
-    onDelete(){
-        const { selected } = this.props;
-        // console.log('selected',selected)
-        const dataSource = [...this.state.dataSource];
-        selected.map(rst => {
-            this.setState({ dataSource: dataSource.filter(item => item.key !== rst.key) });
-        });
-    }
-    renderColumns(text, record, column) {
-        return (
-          <EditableCell
-            editable={record.editable}
-            value={text}
-            onChange={value => this.handleChange(value, record.key, column)}
-          />
-        );
-    }
-    handleChange(value, key, column) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        if (target) {
-          target[column] = value;
-          this.setState({ dataSource: newData });
-        }
-    }
-    edit(key) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        changeDocs(docs);
-        if (target) {
-          target.editable = true;
-          this.setState({ dataSource: newData });
-        }
-    }
-    saveTable(key) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        if (target) {
-          target.editable = false;
-          this.setState({dataSource: newData });
-          this.cacheData = newData.map(item => ({ ...item }));
-        }
-    }
-    remark(doc, event) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.remark = event.target.value;
-        changeDocs(docs);
-    }
-
-    remove(doc) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        changeDocs(docs.filter(d => d !== doc));
-        this.setState({
-            progress:0
-        })
-    }
-    save() {
-        const {
-            currentcode = {},
-            docs = [],
-            actions: {toggleAddition, postDocument, getdocument,changeDocs}
-        } = this.props;
-        console.log('docs',docs)
-        const promises = docs.map(doc => {
-            const response = doc.response;
-            let files=DeleteIpPort(doc);
-            doc.engineer=this.state.engineerName;
-            doc.number=this.state.engineerNumber;
-            doc.approve=this.state.engineerApprove;
-            doc.children=this.state.dataSource;
-            // console.log('doc.children',this.state.dataSource);
-            return postDocument({}, {
-                code: `${currentcode.code}_${response.id}`,
-                name: doc.name,
-                obj_type: 'C_DOC',
-                profess_folder: {
-                    code: currentcode.code, obj_type: 'C_DIR',
-                },
-                basic_params: {
-                    files:[files]
-                },
-                extra_params: {
-                    engineer:doc.engineer,
-                    number:doc.number,
-                    approve:doc.approve,
-                    company:doc.company,
-                    time:doc.time,
-                    remark: doc.remark,
-                    type: doc.type,
-                    lasttime: doc.lastModifiedDate,
-                    style: '机械设备',
-                    submitTime: moment.utc().format(),
-                    children:doc.children,
-                    // equipName:doc.equipName,
-                    // equipNumber:doc.equipNumber,
-                    // equipMoment:doc.equipMoment,
-                    // equipCount:doc.equipCount,
-                    // equipTime:doc.equipTime,
-                    // equipRemark:doc.equipRemark
-                },
-            });
-        });
-        message.warning('新增文件中...');
-        Promise.all(promises).then(rst => {
-            message.success('新增文件成功！');
-            changeDocs();
-            toggleAddition(false);
-            getdocument({code: currentcode.code});
-        });
-        this.setState({
-            progress:0
-        })
-    }
-    static layoutT = {
-      labelCol: {span: 8},
-      wrapperCol: {span: 16},
-    };
-    static layout = {
-      labelCol: {span: 4},
-      wrapperCol: {span: 20},
-    };
-
 }
 export default Form.create()(GeneralAddition)

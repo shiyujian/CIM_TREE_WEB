@@ -91,7 +91,13 @@ export default class Datum extends Component {
 			title: '任务标题',
 			dataIndex: 'workflowactivity.workflow.name',
 			key: 'workflowactivity.workflow.name',
-			width: 400
+			width: 400,
+			render(text,record){
+				if(text.length > 30){
+					text = text.slice(0,30);
+				}
+				return <p>{text}</p>
+			}
 		},
 
 		{
@@ -151,6 +157,7 @@ export default class Datum extends Component {
 						bordered={true}
 						dataSource={this.props.usertasks}
 						columns={this.columns}
+						pagination={{showQuickJumper:true,pageSize:5}}
 						rowKey="pk"  pagination={{ pageSize: 8 }} />
 				</div>
 

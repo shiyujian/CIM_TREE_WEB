@@ -82,9 +82,8 @@ export default class PerSearch extends Component {
             task
         } = this.props
         let user = getUser()
-        console.log('user',user)
+    
         let sections = user.sections
-        console.log('sections',sections)
         sections = JSON.parse(sections)
         let org_code = ['003']
         let roles = []
@@ -98,12 +97,10 @@ export default class PerSearch extends Component {
                 code: code
             }
             let templateMess = await getWorkflowTemplate(params)
-            console.log('templateMess',templateMess)
             if(templateMess && templateMess.states){
                 let state = templateMess.states[0]
                 //获取模版下一个节点的部门信息
                 let nextMess = getTemplateOrg(templateMess);
-                console.log('nextMess',nextMess)
                 //如果第一步有多个action或者是多个执行人  需要进行判断  重新改写组件
                 if(nextMess && nextMess instanceof Array){
                     try{
@@ -129,11 +126,9 @@ export default class PerSearch extends Component {
                 }
             }
         }else{
-            console.log('task',task)
             if(task && task.current){
                 let state_id = task.current[0].id
                 let nextStates = getNextStates(task, Number(state_id));
-                console.log('nextStates',nextStates)
                 if(nextStates && nextStates instanceof Array){
                     nextStates.map((rst)=>{
                         if(rst.action_name != '退回'){
@@ -183,8 +178,7 @@ export default class PerSearch extends Component {
                     is_active : true
                 }
             }
-            console.log('postdata',postdata)
-            
+
             let users = await getUsers({},postdata)
             //因多个组件公用此组件，不能放在redux里
             this.setState({
@@ -233,7 +227,6 @@ export default class PerSearch extends Component {
             value: 'C_PER' + '#' + node.code + '#' + node.name + '#' + node.pk + '#' + node.username + '#' + node.org,
             fetching: false
         }));
-        console.log('dataList',dataList)
         return (
             <div >
                 <div >
@@ -256,7 +249,6 @@ export default class PerSearch extends Component {
     }
 
     handleChange = (value) => {
-        console.log('this.props.code',this.props.code)
         let memberValue = value.toString().split('#');
         let text = null;
         if (memberValue[0] === 'C_PER') {
