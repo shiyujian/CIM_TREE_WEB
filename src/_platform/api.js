@@ -237,7 +237,7 @@ export const UNITS = [
 export const PROJECT_UNITS = [
 	{
 		code:'P009',
-		value:'9号地块',
+		value:'九号地块',
 		units:[
 			{
 				code:'P009-01-01',
