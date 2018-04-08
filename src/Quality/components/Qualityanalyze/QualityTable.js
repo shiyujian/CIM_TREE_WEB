@@ -14,14 +14,14 @@ export default class QualityTable extends Component {
         this.state = {
         	section: '',
         	leftkeycode: '',
-        	stime1: moment().format('2017-11-17 00:00:00'),
-			etime1: moment().format('2017-11-24 23:59:59'),
-			stime2: moment().format('2017-11-17 00:00:00'),
-			etime2: moment().format('2017-11-24 23:59:59'),
-			stime3: moment().format('2017-11-17 00:00:00'),
-			etime3: moment().format('2017-11-24 23:59:59'),
-			stime4: moment().format('2017-11-17 00:00:00'),
-			etime4: moment().format('2017-11-24 23:59:59'),
+        	stime1: moment().format('YYYY-MM-DD 00:00:00'),
+			etime1: moment().format('YYYY-MM-DD 23:59:59'),
+			stime2: moment().format('YYYY-MM-DD 00:00:00'),
+			etime2: moment().format('YYYY-MM-DD 23:59:59'),
+			stime3: moment().format('YYYY-MM-DD 00:00:00'),
+			etime3: moment().format('YYYY-MM-DD 23:59:59'),
+			stime4: moment().format('YYYY-MM-DD 00:00:00'),
+			etime4: moment().format('YYYY-MM-DD 23:59:59'),
 			loading1: false,
 			loading2: false,
 			loading3: false,
@@ -210,6 +210,15 @@ export default class QualityTable extends Component {
 		    series: []
 		};
 		myChart4.setOption(options4);
+
+		const { stime1,etime1 } = this.state;
+		let param = {
+			stime:stime1,
+			etime:etime1
+		}
+		for(let i=0;i<4;i++){
+			this.qury(i,param)
+		}
     }
 
 	render() {
@@ -337,16 +346,26 @@ export default class QualityTable extends Component {
             }
             this.qury(index,param);
         }
+	}
+	getBiao(code){
+        let str = '';
+        PROJECT_UNITS.map(item => {
+            item.units.map(single => {
+                if(single.code === code){
+                    str = single.value;
+                }
+            })
+        })
+        return str;
     }
     qury(index,param) {
     	console.log('param',param)
 		const {actions: {getquality,getreturn,getreturnowner,getreturnsupervision},leftkeycode} = this.props;
-		param.no = 'P009';
+		param.no = leftkeycode;
     	if(index === 1 ){
     		this.setState({loading1:true})
 			getquality({},param)
 	        .then(rst => {
-	        	console.log('rst',rst)
 	        	this.setState({loading1:false})
 	        	if(!rst)
 	        		return
@@ -359,14 +378,14 @@ export default class QualityTable extends Component {
 				    	xAxis: [
 					        {
 					        	type: 'category',
-					            data: rst['标段名称']
+					            data: this.getBiao(rst.Label)
 					        }
 					    ],
 				    	series: [
 					        {
 					            name: '监理验收合格率',
 					            type: 'bar',
-					            data: rst['监理验收合格率'],
+					            data: rst.Num,
 					            markPoint: {
 					                data: [
 					                    {type: 'max', name: '最大值'},

@@ -304,7 +304,7 @@ export default class NursOverallTable extends Component {
 		}];
 		header = <div >
 					<Row >
-					<Col  xl={4} lg={5} md={6} className='mrg10'>
+					<Col  xl={3} lg={4} md={5} className='mrg10'>
 							<span>顺序码：</span>
 							<Input suffix={suffix} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
@@ -344,126 +344,6 @@ export default class NursOverallTable extends Component {
 								{statusoption}
 							</Select>
 						</Col>
-						{/*<Col xl={4} lg={6} md={8} className='mrg10'>
-							<span>高度(cm)：</span>
-							<InputNumber
-							  className='forestcalcw4-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.gdminchange.bind(this)}
-						    />
-						    &nbsp;<span>-</span>&nbsp;
-						    <InputNumber
-						      className='forestcalcw4-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.gdmaxchange.bind(this)}
-						    />
-						</Col>
-						<Col xl={4} lg={6} md={8} className='mrg10'>
-							<span>胸径(cm)：</span>
-							<InputNumber
-							  className='forestcalcw4-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.xjminchange.bind(this)}
-						    />
-						    &nbsp;<span>-</span>&nbsp;
-						    <InputNumber
-						      className='forestcalcw4-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.xjmaxchange.bind(this)}
-						    />
-						</Col>
-						<Col xl={4} lg={6} md={8} className='mrg10'>
-							<span>冠幅(cm)：</span>
-							<InputNumber
-							  className='forestcalcw4-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.gfminchange.bind(this)}
-						    />
-						    &nbsp;<span>-</span>&nbsp;
-						    <InputNumber
-						      className='forestcalcw4-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.gfmaxchange.bind(this)}
-						    />
-						</Col>
-						<Col xl={4} lg={6} md={8} className='mrg10'>
-							<span>地径(cm)：</span>
-							<InputNumber
-							  className='forestcalcw4-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.djminchange.bind(this)}
-						    />
-						    &nbsp;<span>-</span>&nbsp;
-						    <InputNumber
-						      className='forestcalcw4-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.djmaxchange.bind(this)}
-						    />
-						</Col>
-						<Col xl={4} lg={7} md={8} className='mrg10'>
-							<span>土球高度(cm)：</span>
-							<InputNumber
-							  className='forestcalcw6-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.tqhdminchange.bind(this)}
-						    />
-						    &nbsp;<span>-</span>&nbsp;
-						    <InputNumber
-						      className='forestcalcw6-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.tqhdmaxchange.bind(this)}
-						    />
-						</Col>
-						<Col xl={4} lg={7} md={8} className='mrg10'>
-							<span>土球直径(cm)：</span>
-							<InputNumber
-							  className='forestcalcw6-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.tqzjminchange.bind(this)}
-						    />
-						    &nbsp;<span>-</span>&nbsp;
-						    <InputNumber
-						      className='forestcalcw6-1 mxw80'
-						      min={0}
-						      max={9999.9}
-						      step={0.1}
-						      precision={1}
-						      onChange={this.tqzjmaxchange.bind(this)}
-						    />
-	</Col>*/}
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>定位：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={islocation} onChange={this.onlocationchange.bind(this)}>
