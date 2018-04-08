@@ -27,7 +27,6 @@ class ScheduleTotalRefill extends Component {
         this.state = {
             isCopyMsg: false, //接收人员是否发短信
             TreatmentData: [],
-            newFileLists: [],
             sectionSchedule:[],
             projectName:'',
             oldSubject:{},

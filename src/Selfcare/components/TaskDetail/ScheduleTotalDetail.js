@@ -7,15 +7,11 @@ import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
 
-let indexSelect='';
 class ScheduleTotalDetail extends Component {
 
 	constructor(props){
          super(props);
          this.state={
-         	visible: false,
-			data:[],
-			indexSelect:'' ,
 			record:{}
          }
     }
