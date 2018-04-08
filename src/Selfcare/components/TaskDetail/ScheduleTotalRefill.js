@@ -13,6 +13,7 @@ import { WORKFLOW_CODE, UNITS } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { base, SOURCE_API, DATASOURCECODE,PROJECT_UNITS,SECTIONNAME } from '../../../_platform/api';
 import queryString from 'query-string';
+const { Option, OptGroup } = Select;
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const Step = Steps.Step;

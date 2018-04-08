@@ -1,11 +1,9 @@
 import React, {PropTypes, Component} from 'react';
-import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
     Icon, message, Table,DatePicker,Progress,Select,Checkbox,Popconfirm,notification,Spin
 } from 'antd';
 import moment from 'moment';
-import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 // import PerSearch from './PerSearch';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
@@ -176,7 +174,6 @@ class ResourceAddition extends Component {
     render() {
         const{
             resourceAddVisible = false,
-            docs = [],
             form: { getFieldDecorator },
         } = this.props;
         let {
@@ -529,39 +526,37 @@ class ResourceAddition extends Component {
         const newData = [...this.state.dataSource];
         const target = newData.filter(item => key === item.key)[0];
         if (target) {
-          target[column] = value;
-          this.setState({ dataSource: newData });
+            target[column] = value;
+            this.setState({ dataSource: newData });
         }
     }
     edit(key) {
         const newData = [...this.state.dataSource];
         const target = newData.filter(item => key === item.key)[0];
         if (target) {
-          target.editable = true;
-          this.setState({ dataSource: newData });
+            target.editable = true;
+            this.setState({ dataSource: newData });
         }
     }
     saveTable(key) {
         const newData = [...this.state.dataSource];
         const target = newData.filter(item => key === item.key)[0];
         if (target) {
-          target.editable = false;
-          this.setState({dataSource: newData });
+            target.editable = false;
+            this.setState({dataSource: newData });
         }
     }
 
     handleSubmit = (e) =>{
         e.preventDefault();
         const {
-            currentcode = {},
-            docs = [],
             actions: {
                 createFlow,
                 getWorkflowById,
                 putFlow,
-                ResourceAddVisible
-            },
-            location
+                ResourceAddVisible,
+                SearchResource
+            }
         } = this.props;
         const{
             TreatmentData,
@@ -668,6 +663,7 @@ class ResourceAddition extends Component {
                                         message: '流程提交成功',
                                         duration: 2
                                     });
+                                    SearchResource(Math.random())
                                     ResourceAddVisible(false);
                                 } else {
                                     notification.error({
