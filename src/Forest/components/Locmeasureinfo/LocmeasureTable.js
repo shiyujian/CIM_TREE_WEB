@@ -21,8 +21,8 @@ export default class LocmeasureTable extends Component {
         	leftkeycode: '',
         	stime: moment().format('YYYY-MM-DD 00:00:00'),
 			etime: moment().format('YYYY-MM-DD 23:59:59'),
-			lstime:moment().format('YYYY-MM-DD 00:00:00'),
-			letime:moment().format('YYYY-MM-DD 23:59:59'),
+			lstime:'',
+			letime:'',
 			sxm: '',
     		section: '',
     		bigType: '',
@@ -265,57 +265,57 @@ export default class LocmeasureTable extends Component {
 		}];
 		header = <div >
 					<Row >
-					<Col  xl={4} lg={5} md={6} className='mrg10'>
+					<Col  xl={3} className='mrg10'>
 							<span>顺序码：</span>
-							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
+							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw50' onChange={this.sxmchange.bind(this)}/>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
+						<Col xl={3} className='mrg10'>
 							<span>标段：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={section} onChange={this.onsectionchange.bind(this)}>
 								{sectionoption}
 							</Select>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
+						<Col xl={3} className='mrg10'>
 							<span>小班：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={smallclass} onChange={this.onsmallclasschange.bind(this)}>
 								{smallclassoption}
 							</Select>
 						</Col>
-						<Col xl={4} lg={6} md={7} className='mrg10'>
+						<Col xl={4} className='mrg10'>
 							<span>细班：</span>
 							<Select allowClear className='forestcalcw2 mxw170' defaultValue='全部' value={thinclass} onChange={this.onthinclasschange.bind(this)}>
 								{thinclassoption}
 							</Select>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
+						<Col xl={3} className='mrg10'>
 							<span>类型：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
 								{typeoption}
 							</Select>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
+						<Col xl={3} className='mrg10'>
 							<span>树种：</span>
 							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
 								{treetypeoption}
 							</Select>
 						</Col>
-						<Col xl={3} lg={5} md={6} className='mrg10'>
+						<Col xl={3} className='mrg10'>
 							<span>状态：</span>
 							<Select allowClear className='forestcalcw2 mxw150' defaultValue='全部' value={status} onChange={this.onstatuschange.bind(this)}>
 								{statusoption}
 							</Select>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
+						<Col xl={3} className='mrg10'>
 							<span>定位：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={islocation} onChange={this.onlocationchange.bind(this)}>
 								{locationoption}
 							</Select>
 						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
+						<Col xl={3} className='mrg10'>
 							<span>测量人：</span>
 							<Input suffix={suffix2} value={rolename}  className='forestcalcw3 mxw100' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
-						<Col xl={10} lg={12} md={14} className='mrg10'>
+						<Col xl={7} className='mrg10'>
 							<span>测量时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
@@ -327,11 +327,10 @@ export default class LocmeasureTable extends Component {
 							>
 							</RangePicker>
 						</Col>
-						<Col xl={10} lg={12} md={14} className='mrg10'>
+						<Col xl={7} className='mrg10'>
 							<span>定位时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
-							 defaultValue={[moment(this.state.lstime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.letime, 'YYYY-MM-DD HH:mm:ss')]} 
 							 showTime={{ format: 'HH:mm:ss' }}
 							 format={'YYYY/MM/DD HH:mm:ss'}
 							 onChange={this.datepick1.bind(this)}

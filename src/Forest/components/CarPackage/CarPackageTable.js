@@ -122,7 +122,7 @@ export default class CarPackageTable extends Component {
 					return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 				}
 			},{
-				title:"起苗时间",
+				title:"创建时间",
 				render: (text,record) => {
 					const {liftertime1 = '',liftertime2 = '' } = record;
 					return <div><div>{liftertime1}</div><div>{liftertime2}</div></div>
@@ -307,24 +307,24 @@ export default class CarPackageTable extends Component {
 		}];
 		header = <div >
 					<Row >
-						<Col xl={4} lg={5} md={6} className='mrg10'>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>车牌号：</span>
 							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
-						<Col xl={4} lg={5} md={6} className='mrg10'>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>标段：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={section} onChange={this.onsectionchange.bind(this)}>
 								{sectionoption}
 							</Select>
 						</Col>
-						<Col xl={10} lg={11} md={12} className='mrg10'>
+						<Col xl={4} lg={5} md={6} className='mrg10'>
                             <span>状态：</span>
                             <Select allowClear className='forestcalcw2 mxw150' defaultValue='全部' value={status} onChange={this.onstatuschange.bind(this)} style={{width:150}}>
 								{statusoption}
 							</Select>
 						</Col>
-						<Col xl={10} lg={11} md={12} className='mrg10'>
-							<span>起苗时间：</span>
+						<Col xl={8} lg={9} md={10} className='mrg10'>
+							<span>创建时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
 							 defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]} 
@@ -335,7 +335,7 @@ export default class CarPackageTable extends Component {
 							>
 							</RangePicker>
 						</Col>
-                        <Col xl={4} lg={5} md={6} className='mrg10'>
+                        <Col xl={3} lg={4} md={5} className='mrg10'>
                             <span>苗木类型：</span>
                             <Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={mmtype} onChange={this.onmmtypechange.bind(this)}>
                                 {mmtypeoption}
@@ -349,7 +349,7 @@ export default class CarPackageTable extends Component {
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>
-							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
+							<span >车辆：{this.state.pagination.total}辆</span>
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.resetinput.bind(this)}>

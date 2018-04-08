@@ -218,7 +218,7 @@ export default class SupervisorTable extends Component {
 		}];
 		header = <div >
 					<Row>
-						<Col  xl={4} lg={5} md={6} className='mrg10'>
+						<Col  xl={3} lg={4} md={5} className='mrg10'>
 							<span>顺序码：</span>
 							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
@@ -234,9 +234,9 @@ export default class SupervisorTable extends Component {
 								{smallclassoption}
 							</Select>
 						</Col>
-						<Col  xl={4} lg={6} md={7} className='mrg10'>
+						<Col  xl={3} lg={4} md={5} className='mrg10'>
 							<span>细班：</span>
-							<Select allowClear className='forestcalcw2 mxw170' defaultValue='全部' value={thinclass} onChange={this.onthinclasschange.bind(this)}>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={thinclass} onChange={this.onthinclasschange.bind(this)}>
 								{thinclassoption}
 							</Select>
 						</Col>
@@ -252,7 +252,7 @@ export default class SupervisorTable extends Component {
 								{treetypeoption}
 							</Select>
 						</Col>
-						<Col  xl={4} lg={5} md={6} className='mrg10'>
+						<Col  xl={3} lg={4} md={5} className='mrg10'>
 							<span>状态：</span>
 							<Select allowClear className='forestcalcw2 mxw150' defaultValue='全部' value={status} onChange={this.onstatuschange.bind(this)}>
 								{statusoption}
@@ -260,7 +260,7 @@ export default class SupervisorTable extends Component {
 						</Col>
 						<Col  xl={4} lg={5} md={6} className='mrg10'>
 							<span>监理人：</span>
-							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw150' onChange={this.onrolenamechange.bind(this)}/>
+							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw100' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
 						<Col xl={10} lg={12} md={14} className='mrg10'>
 							<span>抽查时间：</span>
