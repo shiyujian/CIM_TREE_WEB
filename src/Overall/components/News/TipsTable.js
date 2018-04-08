@@ -69,7 +69,7 @@ class TipsTable extends Component {
 			})
 		} else if (type === 'VIEW') {
 			Modal.info({
-				title: <h1>通知标题：{record.title}</h1>,
+				title: <h1 style={{marginLeft:42}}>{record.title}</h1>,
 				okText: '知道了',
 				width: '800px',
 				iconType:'none',
@@ -78,11 +78,9 @@ class TipsTable extends Component {
 						{
 							record.source && record.source.name && <p>{`来源 ：${record.source.name}`}</p>
 						}
-						<h2>通知正文：
-							<div style={{ maxHeight: '600px', overflow: 'auto', border: '1px solid #ccc' }}
-								dangerouslySetInnerHTML={{ __html: record.raw }} />
-						</h2>
-						<h2>
+						<div style={{ maxHeight: '600px', overflow: 'auto', border: '1px solid #ccc',marginBottom:10,marginTop:10}}
+							dangerouslySetInnerHTML={{ __html: record.raw }} />
+						<h4>
 							通知附件：{
 								record.attachment.fileList.length > 0 ? (
 									record.attachment.fileList.map((file, index) => {
@@ -94,7 +92,7 @@ class TipsTable extends Component {
 									})
 								) : '暂无附件'
 							}
-						</h2>
+						</h4>
 					</div>
 				),
 				onOk() {

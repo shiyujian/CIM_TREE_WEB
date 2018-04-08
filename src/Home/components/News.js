@@ -16,7 +16,8 @@ export default class News extends Component {
 			visible: false,
 			container: null,
 			title: '',
-			source: ''
+			source: '',
+			attachment:[],
 		}
 	}
 
@@ -34,7 +35,8 @@ export default class News extends Component {
 				visible: true,
 				container: record.raw,
 				title: record.title,
-				source: record.source ? record.source.name : '无'
+				source: record.source ? record.source.name : '无',
+				attachment:record.attachment
 			})
 		}
 	}
@@ -181,6 +183,19 @@ export default class News extends Component {
 						}
 						<div style={{ maxHeight: '800px', overflow: 'auto', marginTop: '5px' }}
 							dangerouslySetInnerHTML={{ __html: this.state.container }} />
+							<h4>
+							通知附件：{
+								this.state.attachment && this.state.attachment.fileList && this.state.attachment.fileList.length > 0 ? (
+									this.state.attachment.fileList.map((file, index) => {
+										return (
+											<div key={index}>
+												<a target="_bank" href={file.down_file}>附件{index + 1}、{file.name}</a>
+											</div>
+										)
+									})
+								) : '暂无附件'
+							}
+						</h4>
 					</div>
 
 				</Modal>
