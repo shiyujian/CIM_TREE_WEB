@@ -518,7 +518,8 @@ class GeneralAddition extends Component {
                 createFlow,
                 getWorkflowById,
                 putFlow,
-                GeneralAddVisible
+                GeneralAddVisible,
+                SearchGeneral
             },
             location
         } = this.props;
@@ -630,7 +631,9 @@ class GeneralAddition extends Component {
                                         message: '流程提交成功',
                                         duration: 2
                                     });
+                                    SearchGeneral(Math.random())
                                     GeneralAddVisible(false);
+                                    
                                 } else {
                                     notification.error({
                                         message: '流程提交失败',

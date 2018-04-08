@@ -19,6 +19,11 @@ export const getWorkflows = createFetchAction(`${WORKFLOW_API}/instance/?code={{
 export const GeneralAddVisible = createAction(`${ID}机械设备新增显示和隐藏`);
 export const ResourceAddVisible = createAction(`${ID}工程材料新增显示和隐藏`);
 export const SeedingAddVisible = createAction(`${ID}苗木材料新增显示和隐藏`);
+
+export const SearchGeneral = createAction(`${ID}机械设备是否重新获取流程`);
+export const SearchResource= createAction(`${ID}工程材料是否重新获取流程`);
+export const SearchSeeding = createAction(`${ID}苗木材料是否重新获取流程`);
+
 export const setTabActive = createAction(`${ID}设置当前选中的tab`);
 export const toggleModal = createAction(`${ID}Tab页对应的modal类型`);
 export const getdocumentOK = createAction(`${ID}_搜索目录文档`);
@@ -41,6 +46,10 @@ export const actions = {
     GeneralAddVisible,
     ResourceAddVisible,
     SeedingAddVisible,
+
+    SearchGeneral,
+    SearchResource,
+    SearchSeeding,
 
     getWorkflowByIdOK,
     getWorkflowById,
@@ -70,6 +79,18 @@ export const actions = {
 };
 
 export default handleActions({
+    [SearchGeneral]: (state, {payload}) => ( {
+        ...state,
+        searchGeneral: payload
+    }),
+    [SearchResource]: (state, {payload}) => ( {
+        ...state,
+        searchResource: payload
+    }),
+    [SearchSeeding]: (state, {payload}) => ( {
+        ...state,
+        searchSeeding: payload
+    }),
     [GeneralAddVisible]: (state, {payload}) => ( {
         ...state,
         generalAddVisible: payload

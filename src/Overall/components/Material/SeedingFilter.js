@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { base, STATIC_DOWNLOAD_API,UNITS } from '../../../_platform/api';
+import {UNITS ,SECTIONNAME} from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
+import { getUser } from '../../../_platform/auth';
 import SeedingAddition from './SeedingAddition';
 
 const FormItem = Form.Item;
@@ -12,23 +13,52 @@ const {RangePicker}=DatePicker;
 
 export default class SeedingFilter extends Component {
 
+	constructor(props) {
+		super(props);
+		this.state = {
+            optionArray:[]
+		};
+	}
 	static propTypes = {};
 
 	static layoutT = {
 		labelCol: {span: 8},
 		wrapperCol: {span: 16},
-   	};
+	};
+	   
+	async componentDidMount(){
+		let user = getUser()
+		let optionArray = []
+		let sections = user.sections
+		sections = JSON.parse(sections)
+		if(sections && sections instanceof Array && sections.length>0){
+			let section = sections[0]
+			let code = section.split('-')
+			if(code && code.length === 3){
+				//获取当前标段的名字
+				SECTIONNAME.map((item)=>{
+					if(code[2] === item.code){
+						let currentSectionName = item.name
+						optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
+					}
+				})
+			}
+		}else{
+			UNITS.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
+		}
+		this.setState({
+			optionArray:optionArray
+		})
+	}
 
 	render() {
 		const { 
-			actions: { toggleAddition }, 
-			Doc = [],
-			toggleData: toggleData = {
-				type: 'resource',
-			}, 
 			form: { getFieldDecorator }
 		} = this.props;
-		console.log('this.props',this.props)
+		
+		const{
+            optionArray
+        }=this.state
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
@@ -37,14 +67,14 @@ export default class SeedingFilter extends Component {
 							<Col span={8}>
 								<FormItem   {...SeedingFilter.layoutT} label="单位工程:">
 								{
-                                        getFieldDecorator('sunit', {
+                                        getFieldDecorator('ssection', {
                                             rules: [
-                                                { required: false, message: '请选择单位工程' }
+                                                { required: false, message: '请选择标段' }
                                             ]
                                         })
-                                            (<Select placeholder='请选择单位工程' allowClear>
-                                                {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-                                            </Select>)
+                                        (<Select placeholder='请选择标段'>
+                                            {optionArray}
+                                        </Select>)
                                     }
                                 </FormItem>
 							</Col>
@@ -120,24 +150,6 @@ export default class SeedingFilter extends Component {
                         </Row>
                     </Col>
 				</Row>
-				{/* <Row gutter={24}>
-					<Col span={24}>
-						{!this.props.isTreeSelected ?
-							<Button style={{ marginRight: 10 }} disabled>新增</Button> :
-							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
-						}
-						{
-							toggleData.type == 'resource' && <SeedingAddition {...this.props} />
-						}
-						{
-							(Doc.length === 0) ?
-								<Button style={{ marginRight: 10 }} disabled>删除</Button> :
-								<Popconfirm title="确定要删除文件吗？" onConfirm={this.confirm.bind(this)} onCancel={this.cancel.bind(this)} okText="Yes" cancelText="No">
-									<Button style={{ marginRight: 10 }} type="primary" onClick={this.delete.bind(this)}>删除</Button>
-								</Popconfirm>
-						}
-					</Col>
-				</Row> */}
 			</Form>
 		);
 	}
@@ -148,77 +160,12 @@ export default class SeedingFilter extends Component {
 
     clear() {
         this.props.form.setFieldsValue({
-			sunit: undefined,
+			ssection: undefined,
 			sname: undefined,
             scode: undefined,
             stimedate: undefined,
             sstatus: undefined
         })
     }
-	cancel() {
-
-	}
-
-	delete() {
-		const { selected } = this.props;
-	}
-	confirm() {
-		const {
-			coded = [],
-			selected = [],
-			currentcode = {},
-			actions: { deletedoc, getdocument }
-		} = this.props;
-		if (selected === undefined || selected.length === 0) {
-			message.warning('请先选择要删除的文件！');
-			return;
-		}
-		selected.map(rst => {
-			coded.push(rst.code);
-		});
-		let promises = coded.map(function (code) {
-			return deletedoc({ code: code });
-		});
-		message.warning('删除文件中...');
-		Promise.all(promises).then(() => {
-			message.success('删除文件成功！');
-			getdocument({ code: currentcode.code })
-				.then(() => {
-				});
-		}).catch(() => {
-			message.error('删除失败！');
-			getdocument({ code: currentcode.code })
-				.then(() => {
-				});
-		});
-	}
-	createLink = (name, url) => {    //下载
-		let link = document.createElement("a");
-		link.href = url;
-		link.setAttribute('download', this);
-		link.setAttribute('target', '_blank');
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	}
-
-	download() {
-		const { selected = [], file = [], files = [], down_file = [] } = this.props;
-		if (selected.length == 0) {
-			message.warning('没有选择无法下载');
-		}
-		selected.map(rst => {
-			file.push(rst.basic_params.files);
-		});
-		file.map(value => {
-			value.map(cot => {
-				files.push(cot.download_url)
-			})
-		});
-		files.map(down => {
-			let down_load = STATIC_DOWNLOAD_API + "/media" + down.split('/media')[1];
-			this.createLink(this, down_load);
-		});
-	}
 };
 

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-04-02 14:35:34
+ * @Last Modified time: 2018-04-08 10:00:21
  */
 /**
 *
@@ -231,6 +231,7 @@ export const UNITS = [
 	{value:'四标段'},
 	{value:'五标段'},
 	{value:'六标段'},
+	{value:'市民中心造林'},
 ]
 
 //获取单位工程

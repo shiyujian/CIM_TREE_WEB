@@ -147,6 +147,22 @@ class ResourceTable extends Component {
 		this.gettaskSchedule()
 	}
 
+	async componentDidUpdate(prevProps,prevState){
+		const {
+			searchResource,
+			leftkeycode
+		}=this.props
+
+		if(searchResource != prevProps.searchResource){
+			this.gettaskSchedule()
+		}
+
+		if(leftkeycode != prevProps.leftkeycode){
+			this.filterTask()
+		}
+
+	}
+
 	// 获取日计划进度流程信息
     gettaskSchedule = async ()=>{
 		const { actions: { getWorkflows } } = this.props;
@@ -269,15 +285,14 @@ class ResourceTable extends Component {
 		return projectCode 
     }
 	render() {
-		let {
-			  visible,
-			  record,
-			  workflowData,
-			  filterData,
-			  history
+		const {
+			visible,
+			record,
+			workflowData,
+			filterData,
+			history
         } = this.state;
 		const { 
-			Doc = [],
 			form: { getFieldDecorator }
 		} = this.props;
 		
