@@ -221,7 +221,7 @@ export default class ContrastTable extends Component {
 		}];
 		header = <div >
 					<Row>
-						<Col  xl={4} lg={5} md={6} className='mrg10'>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>顺序码：</span>
 							<Input suffix={suffix1} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
@@ -243,32 +243,20 @@ export default class ContrastTable extends Component {
 								{treetypeoption}
 							</Select>
 						</Col>
-						<Col xl={5} lg={6} md={7} className='mrg10'>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>供应商：</span>
-							<Input suffix={suffix2} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
+							<Input suffix={suffix2} value={factory} className='forestcalcw3 mxw150' onChange={this.factorychange.bind(this)}/>
 						</Col>
-						<Col xl={4} lg={5} md={6} className='mrg10'>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>是否合标：</span>
 							<Select allowClear className='forestcalcw4 mxw100' defaultValue='全部' value={isstandard} onChange={this.standardchange.bind(this)}>
 								{standardoption}
 							</Select>
 						</Col>
-						<Col xl={5} lg={6} md={7} className='mrg10'>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>供应商：</span>
-							<Input suffix={suffix3} value={nursery} className='forestcalcw3 mxw200' onChange={this.nurserychange.bind(this)}/>
+							<Input suffix={suffix3} value={nursery} className='forestcalcw3 mxw100' onChange={this.nurserychange.bind(this)}/>
 						</Col>
-						{/*<Col xl={10} lg={12} md={14} className='mrg10'>
-							<span>起苗时间：</span>
-							<RangePicker 
-							 style={{verticalAlign:"middle"}} 
-							 defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]} 
-							 showTime={{ format: 'HH:mm:ss' }}
-							 format={'YYYY/MM/DD HH:mm:ss'}
-							 onChange={this.datepick.bind(this)}
-							 onOk={this.datepick.bind(this)}
-							>
-							</RangePicker>
-						</Col>*/}
 					</Row>
 					<Row >
 						<Col span={2} className='mrg10'>

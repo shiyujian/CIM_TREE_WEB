@@ -217,7 +217,7 @@ export default class NursmeasureTable extends Component {
 		}];
 		header = <div >
 					<Row >
-					<Col  xl={4} lg={5} md={6} className='mrg10'>
+					<Col  xl={3} lg={5} md={6} className='mrg10'>
 							<span>顺序码：</span>
 							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
@@ -239,21 +239,21 @@ export default class NursmeasureTable extends Component {
 								{treetypeoption}
 							</Select>
 						</Col>
-						<Col xl={5} lg={6} md={7} className='mrg10'>
+						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>苗圃：</span>
-							<Input suffix={suffix5} value={nurseryname} className='forestcalcw2 mxw200' onChange={this.nurschange.bind(this)}/>
+							<Input suffix={suffix5} value={nurseryname} className='forestcalcw2 mxw150' onChange={this.nurschange.bind(this)}/>
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>填报人：</span>
 							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw150' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
-						<Col xl={5} lg={6} md={7} className='mrg10'>
+						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>供应商：</span>
-							<Input suffix={suffix3} value={factory} className='forestcalcw3 mxw200' onChange={this.factorychange.bind(this)}/>
+							<Input suffix={suffix3} value={factory} className='forestcalcw3 mxw150' onChange={this.factorychange.bind(this)}/>
 						</Col>
-						<Col xl={5} lg={6} md={7} className='mrg10'>
+						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>产地：</span>
-							<Input suffix={suffix4} value={treeplace} className='forestcalcw2 mxw200' onChange={this.placechange.bind(this)}/>
+							<Input suffix={suffix4} value={treeplace} className='forestcalcw2 mxw150' onChange={this.placechange.bind(this)}/>
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>状态：</span>
@@ -261,7 +261,7 @@ export default class NursmeasureTable extends Component {
 								{statusoption}
 							</Select>
 						</Col>
-						<Col xl={10} lg={11} md={12} className='mrg10'>
+						<Col xl={8} lg={9} md={10} className='mrg10'>
 							<span>起苗时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
@@ -275,7 +275,7 @@ export default class NursmeasureTable extends Component {
 						</Col>
 						{
 							keycode === '' ? null : keycode.indexOf('P010') === -1 ? null :
-							<Col xl={4} lg={5} md={6} className='mrg10'>
+							<Col xl={3} lg={4} md={5} className='mrg10'>
 								<span>苗木类型：</span>
 								<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={mmtype} onChange={this.onmmtypechange.bind(this)}>
 									{mmtypeoption}
