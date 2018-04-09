@@ -30,12 +30,9 @@ class GeneralAddition extends Component {
     constructor(props){
         super(props)
         this.state={
-            isUploading: false,
             dataSource:[],
-            engineerName:'',
             count:0,
             TreatmentData:[],
-            newFileLists: [],
             currentSection:'',
             currentSectionName:'',
             projectName:'',
@@ -327,7 +324,6 @@ class GeneralAddition extends Component {
                 loading:true
             })
             const status = file.status;
-            // const { newFileLists } = this.state;
             const{
 				TreatmentData = []
 			} = this.state
@@ -358,7 +354,6 @@ class GeneralAddition extends Component {
                     TreatmentData: TreatmentData,
                     loading:false 
                 })
-                // postUploadFilesAc(newFileLists)
 
             }else if(status === 'error'){
                 notification.error({
@@ -489,25 +484,24 @@ class GeneralAddition extends Component {
         const newData = [...this.state.dataSource];
         const target = newData.filter(item => key === item.key)[0];
         if (target) {
-          target[column] = value;
-          this.setState({ dataSource: newData });
+            target[column] = value;
+            this.setState({ dataSource: newData });
         }
     }
     edit(key) {
         const newData = [...this.state.dataSource];
         const target = newData.filter(item => key === item.key)[0];
         if (target) {
-          target.editable = true;
-          this.setState({ dataSource: newData });
+            target.editable = true;
+            this.setState({ dataSource: newData });
         }
     }
     saveTable(key) {
         const newData = [...this.state.dataSource];
         const target = newData.filter(item => key === item.key)[0];
         if (target) {
-          target.editable = false;
-          this.setState({dataSource: newData });
-          this.cacheData = newData.map(item => ({ ...item }));
+            target.editable = false;
+            this.setState({dataSource: newData });
         }
     }
     handleSubmit = (e) =>{
@@ -570,7 +564,6 @@ class GeneralAddition extends Component {
                     "dataSource":JSON.stringify(dataSource),
                     "TreatmentData":JSON.stringify(TreatmentData),
                     "code":JSON.stringify(values.code),
-                    "reviewUnit":JSON.stringify(values.reviewUnit),
                     "timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
                     "postData": JSON.stringify(postData),
                 }];

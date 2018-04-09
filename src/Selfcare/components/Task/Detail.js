@@ -54,15 +54,15 @@ export default class Detail extends Component {
 				return (
 					<ScheduleStageDetail {...this.props} {...this.state}/>
 				)
-			}else if (code === WORKFLOW_CODE.机械设备报批流程 && (name == '初审' || name == '复审' || name == '结束')){
+			}else if (code === WORKFLOW_CODE.机械设备报批流程 && (name == '审核' || name == '结束')){
 				return (
 					<OverallGeneralDetail {...this.props} {...this.state}/>
 				)
-			}else if (code === WORKFLOW_CODE.工程材料报批流程 && (name == '初审' || name == '复审' || name == '结束')){
+			}else if (code === WORKFLOW_CODE.工程材料报批流程 && (name == '审核' || name == '结束')){
 				return (
 					<OverallResourceDetail {...this.props} {...this.state}/>
 				)
-			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && (name == '初审' || name == '复审' || name == '结束')){
+			}else if (code === WORKFLOW_CODE.苗木资料报批流程 && (name == '审核' || name == '结束')){
 				return (
 					<OverallResourceDetail {...this.props} {...this.state}/>
 				)

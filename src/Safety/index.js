@@ -42,7 +42,7 @@ export default class Safety extends Component {
 		key: 'SafetySystem',
 		id: 'SAFETY.SYSTEM',
 		name: '安全体系',
-		path: '/safety/safetySystem',
+		path: '/safety/system',
 		icon: <Icon name="thermometer-empty" />
 	}, {
 		key: 'HiddenDanger',
