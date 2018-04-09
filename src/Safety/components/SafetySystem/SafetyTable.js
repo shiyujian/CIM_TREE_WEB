@@ -39,11 +39,15 @@ export default class SafetyTable extends Component {
 
 	async componentDidUpdate(prevProps,prevState){
 		const{
-			safetyTaskList
+			safetyTaskList,
+			leftkeycode
 		}=this.props
 		console.log('safetyTaskList',safetyTaskList)
 		if(safetyTaskList != prevProps.safetyTaskList){
 			this.getTaskList()
+		}
+		if(leftkeycode != prevProps.leftkeycode){
+			this.filterTask()
 		}
 	}
 
@@ -103,6 +107,7 @@ export default class SafetyTable extends Component {
 		
 		let selectCode = ''
 		//关联标段的人只能看自己项目的进度流程
+		debugger
 		if(sections && sections instanceof Array && sections.length>0){
 			let code = sections[0].split('-')
 			selectCode = code[0] || '';
@@ -214,10 +219,6 @@ export default class SafetyTable extends Component {
 			title: "文档类型",
 			key:'document',
 			dataIndex: 'document',
-		}, {
-			title: "提交单位",
-			key:'submitUnit',
-			dataIndex: 'submitUnit',
 		}, {
 			title: "提交人",
 			key:'submitperson',

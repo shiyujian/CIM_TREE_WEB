@@ -136,6 +136,22 @@ class GeneralTable extends Component {
 		this.gettaskSchedule()
 	}
 
+	async componentDidUpdate(prevProps,prevState){
+		const {
+			searchGeneral,
+			leftkeycode
+		}=this.props
+
+		if(searchGeneral != prevProps.searchGeneral){
+			this.gettaskSchedule()
+		}
+
+		if(leftkeycode != prevProps.leftkeycode){
+			this.filterTask()
+		}
+
+	}
+
 	// 获取机械设备流程信息
     gettaskSchedule = async ()=>{
 		const { actions: { getWorkflows } } = this.props;

@@ -6,7 +6,8 @@ import { base, PDF_FILE_API } from '_platform/api';
 import { Link } from 'react-router-dom';
 import styles from './styles.less';
 import { getUser, clearUser, getPermissions, removePermissions } from '../../_platform/auth';
-
+import 'moment/locale/zh-cn';
+moment.locale('zh-cn');
 
 export default class Datum extends Component {
 
@@ -16,81 +17,39 @@ export default class Datum extends Component {
 		super(props);
 		this.state = {
 			visible: false,
-			container: null
+			container: null,
+			workflowData:[]
 		}
 	}
 
-	componentDidMount() {
-		// const {actions: {getDatumList,setnewdoc}} = this.props;
-		// getDatumList().then(rst =>{
-		// 	console.log('rst',rst)
-		// 	const a =[];
-		// 	rst.result.map(item=>{
-		// 		if(item.extra_params.state && item.extra_params.state !== "作废"){
-		// 			a.push(item)
-		// 		}
-		// 	});
-		// 	setnewdoc(a)
-		// });
-
-		// const { actions: { getNewsList,getTasks} } = this.props;
-		// console.log('this.props',this.props)
-		// getNewsList();
-		// getTasks();
-
+	async componentDidMount() {
 		const { actions: { getTaskPerson} } = this.props;
 		const { username = '', name = '',id = '', } = getUser();
 		let user=getUser();
-        getTaskPerson({userid:user.id});
-        let ttt =getTaskPerson({userid:user.id});
-        console.log('ttt',ttt)
-
-	}
-
-	clickNews(record, type) {
-		if (type === 'VIEW') {
-			this.setState({
-				visible: true,
-				container: record.description
+		let datas = await getTaskPerson({userid:user.id});
+		let workflowData = []
+		if(datas && datas instanceof Array && datas.length>0){
+			datas.map((data)=>{
+				let workflowactivity = data.workflowactivity
+				let state = data.state
+				workflowData.push({
+					'state_id':state.id,
+					'task_id':workflowactivity.id,
+					'name':workflowactivity.name,
+					'pub_time':workflowactivity.real_start_time
+				})
 			})
 		}
+		this.setState({
+			workflowData:workflowData
+		})
 	}
-
-	// columns = [
-	// 	{
-	// 		title: '任务标题',
-	// 		dataIndex: 'name',
-	// 		width: 400
-	// 	},
-	// 	{
-	// 		title: '提交时间',
-	// 		width: 200,
-	// 		render: (record) => {
-	// 			return moment(record.extra_params.submitTime).format('YYYY-MM-DD HH:mm:ss');
-	// 		}
-	// 	},
-	// 	{
-	// 		title: '操作',
-	// 		width: 100,
-	// 		render: record => {
-	// 			return (
-	// 				<span>
-	// 					<Popover content={this.genDownload(record.basic_params.files)}
-	// 						             placement="right">
-	// 						<a>查看</a>
-	// 					</Popover>
-	// 				</span>
-	// 			)
-	// 		}
-	// 	},
-
-	// ];
 
 	columns = [
 		{
 			title: '任务标题',
-			dataIndex: 'workflowactivity.workflow.name',
-			key: 'workflowactivity.workflow.name',
+			dataIndex: 'name',
+			key: 'name',
 			width: 400,
 			render(text,record){
 				if(text.length > 30){
@@ -105,8 +64,8 @@ export default class Datum extends Component {
 			dataIndex: 'pub_time',
 			key: 'pub_time',
 			width: 200,
-			render: pub_time => {
-				return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
+			render: (text,record) => {
+				return moment(record.pub_time).utc().zone(-8).format('YYYY-MM-DD HH:mm:ss'); //转换为东八区时间
 			}
 		},
 
@@ -114,24 +73,15 @@ export default class Datum extends Component {
 			title: '操作',
 			width: 100,
 			render(record){
-				console.log('rrrr',record)
 				return (
 					<span>
-						{/*<a onClick={this.clickNews.bind(this, record, 'VIEW')}>查看</a>*/}
-						<Link to={"/selfcare/task/198?state_id="+record.workflowactivity.current[0].id}><span>查看</span></Link>
+						<Link to={`/selfcare/task/${record.task_id}?state_id=`+record.state_id}><span>查看</span></Link>
 					</span>
 				)
 			}
 		},
 
 	];
-
-	handleCancel() {
-		this.setState({
-			visible: false,
-			container: null
-		})
-	}
 
 
 
@@ -144,59 +94,28 @@ export default class Datum extends Component {
 				} ={}
 			} = {}
 		}=this.props
-		// const { platform: { tasks = [] } } = this.props;
-		console.log('task222',this.props.usertasks)
+		const{
+			workflowData
+		}=this.state
+	
 		return (
 			<Blade title="待办任务">
-			<Link to='/selfcare'>
+			<Link to='/selfcare/task'>
 					<span style={{ float: "right", marginTop: "-30px" }} >MORE</span>
 				</Link>
 				<div style={{marginBottom:'14px',marginTop:'-9px'}}><hr/></div>
 				<div className="tableContainer">
 					<Table
 						bordered={true}
-						dataSource={this.props.usertasks}
+						dataSource={workflowData}
 						columns={this.columns}
 						pagination={{showQuickJumper:true,pageSize:5}}
 						rowKey="pk"  pagination={{ pageSize: 8 }} />
 				</div>
-
-				<Modal title="预览" width={800} visible={this.state.visible}
-					onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
-					<div style={{ maxHeight: '800px', overflow: 'auto' }}
-						dangerouslySetInnerHTML={{ __html: this.state.container }} />
-				</Modal>
 			</Blade>
-
 		);
 	}
 
 
 
-	// genDownload = (text)=>{
-	// 	return(
-	// 		text.map((rst, index) =>{
-	// 			return (
-	// 				<div key={index}>
-	// 					<a onClick={this.previewFile.bind(this,rst)}>{rst.name}</a>
-	// 				</div>)
-	// 		})
-	// 	)
-	// };
-
-	// previewFile(file) {
-	// 	const {actions: {openPreview}} = this.props;
-	// 	if(JSON.stringify(file) === "{}"){
-	// 		return
-	// 	}else {
-	// 		const newfile ={
-	// 			a_file :PDF_FILE_API+file.a_file,
-	// 			download_url:file.download_url,
-	// 			mime_type:file.mime_type,
-	// 			misc:file.file,
-	// 			name:file.name
-	// 		};
-	// 		openPreview(newfile);
-	// 	}
-	// }
 }

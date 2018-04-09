@@ -11,7 +11,7 @@ import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE, UNITS, WORKFLOW_CODE } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE,UNITS,WORKFLOW_CODE,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
 import queryString from 'query-string';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
@@ -30,51 +30,57 @@ const EditableCell = ({ editable, value, onChange }) => (
 class OverallResourceRefill extends Component {
 
     static propTypes = {};
-
-   
-    state={
-        dataSource:[],
-        progress:0,
-        isUploading: false,
-        engineerName:'',
-        resourceName:'',
-        engineerNumber:'',
-        engineerApprove:'',
-        engineerTime:'',
-        engineerBody:'',
-        count:0,
-        TreatmentData:[],
-        newFileLists: [],
+    constructor(props){
+        super(props)
+        this.state={
+            dataSource:[],
+            count:0,
+            TreatmentData:[],
+            dataSource:[],
+            currentSection:'',
+            currentSectionName:'',
+            projectName:'',
+            loading:false,
+            selectedRowKeys:[],
+            oldSubject:{},
+           
+        }
     }
+    //第一个表格的列属性
     equipment=[
         {
-            title: '名称',
-            dataIndex: 'extra_params.equipName',
-            key: 'extra_params.equipName',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipName'),
+            title: '设备名称',
+            dataIndex: 'equipName',
+            key: 'equipName',
+            render: (text, record) => this.renderColumns(text, record, 'equipName'),
         }, {
-            title: '规格',
-            dataIndex: 'extra_params.equipFormat',
-            key: 'extra_params.equipFormat',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipFormat'),
+            title: '规格型号',
+            dataIndex: 'equipNumber',
+            key: 'equipNumber',
+            render: (text, record) => this.renderColumns(text, record, 'equipNumber'),
         }, {
             title: '数量',
-            dataIndex: 'extra_params.equipCount',
-            key: 'extra_params.equipCount',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipCount'),
+            dataIndex: 'equipCount',
+            key: 'equipCount',
+            render: (text, record) => this.renderColumns(text, record, 'equipCount'),
         }, {
-            title: '单位',
-            dataIndex: 'extra_params.equipUnit',
-            key: 'extra_params.equipUnit',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipUnit'),
+            title: '进场日期',
+            dataIndex: 'equipTime',
+            key: 'equipTime',
+            render: (text, record) => this.renderColumns(text, record, 'equipTime'),
         }, {
-            title: '产地',
-            dataIndex: 'extra_params.equipPlace',
-            key: 'extra_params.equipPlace',
-            render: (text, record) => this.renderColumns(text, record, 'extra_params.equipPlace'),
+            title: '技术状况',
+            dataIndex: 'equipMoment',
+            key: 'equipMoment',
+            render: (text, record) => this.renderColumns(text, record, 'equipMoment'),
+        },{
+            title: '备注',
+            dataIndex: 'equipRemark',
+            key: 'equipRemark',
+            render: (text, record) => this.renderColumns(text, record, 'equipRemark')
         }, {
           title: '操作',
-          dataIndex: 'extra_params.equipOperation',
+          dataIndex: 'equipOperation',
           render: (text, record) => {
             const { editable } = record;
             return (
@@ -92,47 +98,150 @@ class OverallResourceRefill extends Component {
           }
         }
     ];
-  
-    columns1 = [{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index',
-        width: '20%',
-    }, {
-        title: '文件名称',
-        dataIndex: 'fileName',
-        key: 'fileName',
-        width: '45%',
-    }, {
-        title: '操作',
-        dataIndex: 'operation',
-        key: 'operation',
-        width: '20%',
-        render: (text, record, index) => {
-            return <div>
-                <Popconfirm
-                    placement="rightTop"
-                    title="确定删除吗？"
-                    onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
-                    okText="确认"
-                    cancelText="取消">
-                    <a>删除</a>
-                </Popconfirm>
-            </div>
+    columns1 = [
+        {
+            title: '序号',
+            dataIndex: 'index',
+            key: 'index',
+            width: '10%',
+        }, {
+            title: '文件名称',
+            dataIndex: 'fileName',
+            key: 'fileName',
+            width: '35%',
+        }, {
+            title: '备注',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            width: '30%',
+            render: (text, record, index) => {
+                return <Input value={record.remarks || ""} onChange={ele => {
+                    record.remarks = ele.target.value
+                    this.forceUpdate();
+                }} />
+            }
+        }, {
+            title: '操作',
+            dataIndex: 'operation',
+            key: 'operation',
+            width: '10%',
+            render: (text, record, index) => {
+                return <div>
+                    <Popconfirm
+                        placement="rightTop"
+                        title="确定删除吗？"
+                        onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
+                        okText="确认"
+                        cancelText="取消">
+                        <a>删除</a>
+                    </Popconfirm>
+                </div>
+            }
         }
-    }]
+    ]
+
     static layoutT = {
         labelCol: {span: 8},
         wrapperCol: {span: 16},
     };
+
+    async componentDidMount() {
+        const { 
+            form: {
+                setFieldsValue
+            },
+            platform: { task = {}, users = {} } = {}, 
+        } = this.props;
+        this.getSection()
+
+        let record = {}
+		if(task && task.subject && !record.id){
+			record = this.getTable(task)
+        }
+        
+        setFieldsValue({
+            section:record.sectionName?record.sectionName:'',
+            name:record.name?record.name:'',
+            code:record.code?record.code:'',
+            date:record.date?moment.utc(record.date):'',
+            site:record.site?record.site:'',
+        })
+    }
+
+    //获取流程详情
+    getTable(instance){
+        let subject = instance.subject[0]
+        let postData = subject.postData?JSON.parse(subject.postData):''
+        let record = {
+            'id':instance.id,
+            'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
+            'dataSource':subject.dataSource?JSON.parse(subject.dataSource):'',
+            'section':subject.section?JSON.parse(subject.section):'',
+            'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
+            'name':subject.name?JSON.parse(subject.name):'',
+            'code':subject.code?JSON.parse(subject.code):'',
+            'date':subject.date?JSON.parse(subject.date):'',
+            'site':subject.site?JSON.parse(subject.site):'',
+        }
+ 
+        let TreatmentData = subject.TreatmentData?JSON.parse(subject.TreatmentData):[];
+        let dataSource = subject.dataSource?JSON.parse(subject.dataSource):[];
+        this.setState({
+            oldSubject:subject,
+            TreatmentData:TreatmentData,
+            dataSource:dataSource
+        })
+        
+		return record
+    }
+    
+    //获取当前登陆用户的标段
+    getSection(){
+        let user = getUser()
+        
+        let sections = user.sections
+        let currentSectionName = ''
+        let projectName = ''
+        
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            let section = sections[0]
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        currentSectionName = item.name
+                    }
+                })
+                //获取当前标段所在的项目
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        projectName = item.value
+                    }
+                })
+            }
+            this.setState({
+                currentSection:section,
+                currentSectionName:currentSectionName,
+                projectName:projectName
+            })
+        }
+    }
     
     render() {
         const { platform: { task = {}, users = {} } = {}, location, actions, form: { getFieldDecorator },docs = [] } = this.props;
 		const { history = [], transitions = [], states = [] } = task;
 		const user = getUser();
-        let {progress,isUploading,
-            engineerName,resourceName,engineerNumber,engineerApprove,engineerTime,engineerFlow,dataSource,count} = this.state;
-        let cacheData=this.state.dataSource.map(item => ({ ...item }));
+        const {
+            dataSource,
+            currentSectionName='',
+            selectedRowKeys=[]
+        } = this.state;
+        const rowSelection  = {
+            selectedRowKeys,
+            onChange: this.onSelectChange
+        };
         
         return (  
             <div>
@@ -142,17 +251,16 @@ class OverallResourceRefill extends Component {
                             <Col span={24} style={{paddingLeft:'2em'}}>
                                 <Row gutter={15} >
                                     <Col span={8}>
-                                        <FormItem {...OverallResourceRefill.layoutT} label="单位工程:">
+                                        <FormItem {...OverallResourceRefill.layoutT} label="标段:">
                                         {
-                                            getFieldDecorator('unit', {
+                                            getFieldDecorator('section', {
+                                                initialValue: `${currentSectionName}`,
                                                 rules: [
-                                                    { required: true, message: '请选择单位工程' }
+                                                    { required: true, message: '请输入标段' }
                                                 ]
                                             })
                                             (
-                                                <Select placeholder='请选择单位工程' allowClear>
-                                                    {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-                                                </Select>
+                                                (<Input readOnly placeholder='请输入标段' />)
                                             )
                                         }
                                         </FormItem>
@@ -189,21 +297,6 @@ class OverallResourceRefill extends Component {
                                 </Row>
                                 <Row gutter={15}>
                                     <Col span={8}>
-                                        <FormItem  {...OverallResourceRefill.layoutT} label="审批单位:">
-                                        {
-                                            getFieldDecorator('reviewUnit', {
-                                                rules: [
-                                                    { required: true, message: '请选择审核人员' }
-                                                ]
-                                            })
-                                            (
-                                                <Input placeholder='系统自动识别，无需手输' readOnly/>
-                                            )
-                                        }
-                                            
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={8}>
                                         <FormItem {...OverallResourceRefill.layoutT} label="进场日期:">
                                         {
                                             getFieldDecorator('date', {
@@ -212,7 +305,7 @@ class OverallResourceRefill extends Component {
                                                 ]
                                             })
                                             (
-                                                <DatePicker placeholder='材料进场日期' format={'YYYY-MM-DD'}/>
+                                                <DatePicker placeholder='材料进场日期' format={'YYYY-MM-DD'} style={{width:'100%',height:'100%'}}/>
                                             )
                                         }
                                             
@@ -238,7 +331,7 @@ class OverallResourceRefill extends Component {
                         </Row>
                         <Row gutter={24}>
                             <Col span={24}>
-                                <Table  rowSelection={this.rowSelectionAdd}
+                                <Table  rowSelection={rowSelection}
                                         dataSource={this.state.dataSource}
                                         columns={this.equipment}
                                         pagination={false}
@@ -365,48 +458,186 @@ class OverallResourceRefill extends Component {
         showUploadList: false,
         action: base + "/service/fileserver/api/user/files/",
         onChange: ({ file, fileList, event }) => {
-            console.log('file',file)
+            this.setState({
+                loading:true
+            })
             const status = file.status;
-            const {TreatmentData } = this.state;
+            // const { newFileLists } = this.state;
+            const{
+				TreatmentData = []
+			} = this.state
             let newdata = [];
             if (status === 'done') {
+                console.log('file',file)
                 // const { actions: { postUploadFilesAc } } = this.props;
-                console.log('fileList',fileList)
-                let length = TreatmentData.length
-                
-                TreatmentData.push({
-                    index: length,
-                    file_id: file.response.id,
-                    fileName: file.name,
-                    send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-                    file_partial_url: '/media' + file.response.a_file.split('/media')[1],
-                    download_url: '/media' + file.response.download_url.split('/media')[1],
-                    a_file: '/media' + file.response.a_file.split('/media')[1],
-                    misc:file.response.misc,
-                    mime_type:file.response.mime_type,
+                let len = TreatmentData.length
+				TreatmentData.push(
+					{
+						index: len + 1,
+                        fileName: file.name,
+                        file_id: file.response.id,
+                        file_partial_url: '/media' + file.response.a_file.split('/media')[1],
+                        send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+                        a_file: '/media' + file.response.a_file.split('/media')[1],
+                        download_url: '/media' + file.response.download_url.split('/media')[1],
+                        misc: file.response.misc,
+                        mime_type: file.response.mime_type,
+					}
+				)
+				console.log('TreatmentData',TreatmentData)
+                notification.success({
+                    message:'文件上传成功',
+                    duration:3
                 })
-            
-                this.setState({ TreatmentData: TreatmentData })
+                this.setState({ 
+                    TreatmentData: TreatmentData,
+                    loading:false 
+                })
+                // postUploadFilesAc(newFileLists)
 
+            }else if(status === 'error'){
+                notification.error({
+                    message:'文件上传失败',
+                    duration:3
+                })
+                this.setState({
+                    loading:false
+                })
+                return;
             }
         },
     };
 
     //删除文件表格中的某行
-    deleteTreatmentFile = (record, index) => {
-        const {
-            TreatmentData
-        }=this.state
-        TreatmentData.splice(record.index,1)
-
-        for(let i=0;i<TreatmentData.length;i++){
-            if(i>=record.index){
-                TreatmentData[i].index = TreatmentData[i].index - 1;
+	deleteTreatmentFile = (record, index) => {
+		const{
+			TreatmentData
+		}=this.state
+		TreatmentData.splice(index, 1);
+		let array = []
+        TreatmentData.map((item, index) => {
+            let data = {
+				index: index + 1,
+				fileName: item.fileName,
+				file_id: item.file_id,
+				file_partial_url: item.file_partial_url,
+				send_time: item.send_time,
+				a_file: item.a_file,
+				download_url: item.download_url,
+				misc: item.misc,
+				mime_type: item.mime_type,
             }
-        }
+            array.push(data)
+		})
+        this.setState({TreatmentData: array })
+	}
+
+    //选择人员
+    selectMember(memberInfo) {
+        const {
+            form: {
+                setFieldsValue
+            }
+        } = this.props
+		this.member = null;
+		if (memberInfo) {
+			let memberValue = memberInfo.toString().split('#');
+			if (memberValue[0] === 'C_PER') {
+				console.log('memberValue', memberValue)
+				this.member = {
+					"username": memberValue[4],
+					"person_code": memberValue[1],
+					"person_name": memberValue[2],
+					"id": parseInt(memberValue[3]),
+					org: memberValue[5],
+				}
+			}
+		} else {
+			this.member = null
+		}
+
+        setFieldsValue({
+            dataReview: this.member,
+        });
+    }
+
+    onSelectChange= (selectedRowKeys) => {
+        console.log('selectedRowKeys',selectedRowKeys)
         this.setState({
-            TreatmentData:TreatmentData
+            selectedRowKeys
         })
+    }
+
+    //第一个表格添加行
+    handleAdd(){
+        const {count,dataSource } = this.state;
+        let len = dataSource.length
+        const newData = {
+            key:len,
+            editable:true,
+            count:count
+        };
+        
+        this.setState({
+            dataSource: [...dataSource, newData],
+            count:count+1
+        })
+    }
+    //第一个表格删除
+    onDelete(){
+        const{
+            dataSource,
+            selectedRowKeys
+        }=this.state
+
+        selectedRowKeys.map((rst,index) => {
+            dataSource.splice(rst-index, 1);
+        });
+        let array = []
+        let data = {}
+        dataSource.map((item, index) => {
+            data = item
+            data.key = index
+            array.push(data)
+        })
+
+        this.setState({
+            dataSource:array,
+            selectedRowKeys:[]
+        })
+    }
+    renderColumns(text, record, column) {
+        return (
+          <EditableCell
+            editable={record.editable}
+            value={text}
+            onChange={value => this.handleChange(value, record.key, column)}
+          />
+        );
+    }
+    handleChange(value, key, column) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+            target[column] = value;
+            this.setState({ dataSource: newData });
+        }
+    }
+    edit(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+            target.editable = true;
+            this.setState({ dataSource: newData });
+        }
+    }
+    saveTable(key) {
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => key === item.key)[0];
+        if (target) {
+          target.editable = false;
+          this.setState({dataSource: newData });
+        }
     }
 
     handleSubmit = (e) =>{
@@ -421,7 +652,8 @@ class OverallResourceRefill extends Component {
         } = this.props;
         const{
             TreatmentData,
-            dataSource
+            dataSource,
+            oldSubject
         } = this.state
         let user = getUser();//当前登录用户
         let me = this;
@@ -475,15 +707,16 @@ class OverallResourceRefill extends Component {
                 }
 
                 let subject = [{
+                    "section": oldSubject.section,
+                    "sectionName":oldSubject.sectionName,
+                    "projectName":oldSubject.projectName,
+                    "postData": oldSubject.postData,
                     "dataSource":JSON.stringify(dataSource),
                     "TreatmentData":JSON.stringify(TreatmentData),
-                    "unit":JSON.stringify(values.unit),
                     "name":JSON.stringify(values.name),
                     "code":JSON.stringify(values.code),
-                    "reviewUnit":JSON.stringify(values.reviewUnit),
                     "date":JSON.stringify(moment(values.date).format('YYYY-MM-DD')),
-                    "site":JSON.stringify(values.site),
-                    "submitOrg":JSON.stringify(user.org)
+                    "site":JSON.stringify(values.site)
                 }];
 
                 let newSubject = {
@@ -517,166 +750,6 @@ class OverallResourceRefill extends Component {
             }
         })
         
-    }
-
-    //选择人员
-    selectMember(memberInfo) {
-        const {
-            form: {
-                setFieldsValue
-            }
-        } = this.props
-		this.member = null;
-		if (memberInfo) {
-			let memberValue = memberInfo.toString().split('#');
-			if (memberValue[0] === 'C_PER') {
-				console.log('memberValue', memberValue)
-				this.member = {
-					"username": memberValue[4],
-					"person_code": memberValue[1],
-					"person_name": memberValue[2],
-					"id": parseInt(memberValue[3]),
-					org: memberValue[5],
-				}
-			}
-		} else {
-			this.member = null
-		}
-
-        setFieldsValue({
-            dataReview: this.member,
-			reviewUnit: this.member.org?this.member.org:null,
-        });
-    }
-
-    cancel() {
-        const {
-            actions: {toggleAddition,changeDocs}
-        } = this.props;
-        toggleAddition(false);
-        changeDocs();
-        this.setState({
-            progress:0
-        })
-    }
-
-    rowSelectionAdd = {
-        onChange: (selectedRowKeys, selectedRows) => {
-            const { actions: { selectDocuments } } = this.props;
-            selectDocuments(selectedRows);
-        },
-    };
-    rowSelection = {
-        onChange: (selectedRowKeys) => {
-            const {actions: {selectDocuments}} = this.props;
-            selectDocuments(selectedRowKeys);
-        },
-    };
-
-    
-
-
-    changeDoc({file, fileList, event}) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        if (file.status === 'done') {
-            changeDocs([...docs, file]);
-        }
-        this.setState({
-            isUploading: file.status === 'done' ? false : true
-        })
-        if(event){
-            let {percent} = event;
-            if(percent!==undefined)
-                this.setState({progress:parseFloat(percent.toFixed(1))});
-        }
-    }
-
-    
-
-    handleAdd(){
-        const {count,dataSource } = this.state;
-        const newData = {
-          key:count,
-          // equipName:this.state.equipName,
-          // equipNumber:this.state.equipNumber,
-        };
-        console.log('newDate',newData)
-        this.setState({
-          dataSource: [...dataSource, newData],
-          count: count + 1,
-        });
-        console.log('dataSource',dataSource)
-    }
-
-    onDelete(){
-        const { selected } = this.props;
-        console.log('selected',selected)
-        const dataSource = [...this.state.dataSource];
-        selected.map(rst => {
-            this.setState({ dataSource: dataSource.filter(item => item.key !== rst.key) });
-        });
-    }
-    renderColumns(text, record, column) {
-        return (
-          <EditableCell
-            editable={record.editable}
-            value={text}
-            onChange={value => this.handleChange(value, record.key, column)}
-          />
-        );
-    }
-    handleChange(value, key, column) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        if (target) {
-          target[column] = value;
-          this.setState({ dataSource: newData });
-        }
-    }
-    edit(key) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        changeDocs(docs);
-        if (target) {
-          target.editable = true;
-          this.setState({ dataSource: newData });
-        }
-    }
-    saveTable(key) {
-        const newData = [...this.state.dataSource];
-        const target = newData.filter(item => key === item.key)[0];
-        if (target) {
-          target.editable = false;
-          this.setState({dataSource: newData });
-          this.cacheData = newData.map(item => ({ ...item }));
-        }
-    }
-
-    remark(doc, event) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.remark = event.target.value;
-        changeDocs(docs);
-    }
-
-    remove(doc) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        changeDocs(docs.filter(d => d !== doc));
-        this.setState({
-            progress:0
-        })
     }
     
 

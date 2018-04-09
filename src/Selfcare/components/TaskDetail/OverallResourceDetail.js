@@ -7,74 +7,71 @@ import Preview from '../../../_platform/components/layout/Preview';
 const FormItem = Form.Item;
 const {RangePicker}=DatePicker;
 
-let indexSelect='';
 class OverallResourceDetail extends Component {
 
 	constructor(props){
          super(props);
          this.state={
-         	visible: false,
-			data:[],
-			indexSelect:'' ,
 			record:{}
          }
     }
 
 	columns1 = [
-		{
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index',
-		width: '20%',
-		render:(text, record, index)=>{
-            return(
-                <span>{record.index+1}</span>
-            )
+        {
+            title: '序号',
+            dataIndex: 'index',
+            key: 'index',
+            width: '10%',
+            render: (text, record, index) => {
+                return index + 1
+            }
+        }, {
+            title: '文件名称',
+            dataIndex: 'fileName',
+            key: 'fileName',
+            width: '35%',
+        }, {
+            title: '备注',
+            dataIndex: 'remarks',
+            key: 'remarks',
+            width: '30%',
+        }, {
+            title: '操作',
+            dataIndex: 'operation',
+            key: 'operation',
+            width: '10%',
+            render: (text, record, index) => {
+                return <div>
+                   <a onClick={this.previewFile.bind(this,record)}>预览</a>
+                   <span className="ant-divider" />
+					<a  style={{ marginLeft: 10 }} onClick={this.downloadFile.bind(this,record)}>下载</a>
+                </div>
+            }
         }
-		}, {
-			title: '文件名称',
-			dataIndex: 'fileName',
-			key: 'fileName',
-			width: '45%',
-		}, {
-			title: '操作',
-			dataIndex: 'operation',
-			key: 'operation',
-			width: '20%',
-			render:(text, record, index)=>{
-				const { Doc = [] } = this.props;
-				return (
-					<div>
-						<a onClick={this.previewFile.bind(this,record)}>预览</a>
-						<a  style={{ marginLeft: 10 }} onClick={this.downloadFile.bind(this,record)}>下载</a>
-					</div>
-				)
-			}
-		}
-	]
+    ]
 
 	equipmentColumns=[
         {
             title: '名称',
-            dataIndex: 'extra_params.equipName',
-            key: 'extra_params.equipName',
+            dataIndex: 'equipName',
+            key: 'equipName',
 
         }, {
             title: '规格',
-            dataIndex: 'extra_params.equipFormat',
-            key: 'extra_params.equipFormat',
+            dataIndex: 'equipFormat',
+            key: 'equipFormat',
         },{
             title: '数量',
-            dataIndex: 'extra_params.equipCount',
-            key: 'extra_params.equipCount',
+            dataIndex: 'equipCount',
+            key: 'equipCount',
         }, {
             title: '单位',
-            dataIndex: 'extra_params.equipUnit',
-            key: 'extra_params.equipUnit',
+            dataIndex: 'equipUnit',
+            key: 'equipUnit',
         },{
             title: '产地',
-            dataIndex: 'extra_params.equipPlace',
-            key: 'extra_params.equipPlace', 
+            dataIndex: 'equipPlace',
+            key: 'equipPlace', 
         }
     ];
 
@@ -101,16 +98,16 @@ class OverallResourceDetail extends Component {
 					<Col span={24} >
 						<Row gutter={15} >
 							<Col span={8}>
-								<FormItem   {...OverallResourceDetail.layout} label="单位工程:">
-								{getFieldDecorator('form_unit', {
-									initialValue: `${record.unit?record.unit:''}`,
-									rules: [{ required: true, message: '请输入单位工程' }]
+								<FormItem   {...OverallResourceDetail.layout} label="标段:">
+								{getFieldDecorator('sectionName', {
+									initialValue: `${record.sectionName?record.sectionName:''}`,
+									rules: [{ required: true, message: '请输入标段' }]
 								})(<Input readOnly />)}
 								</FormItem>
 							</Col>
 							<Col span={8}>
 								<FormItem {...OverallResourceDetail.layout} label="名称:">
-								{getFieldDecorator('form_name', {
+								{getFieldDecorator('name', {
 									initialValue: `${record.name?record.name:''}`,
 									rules: [{ required: true, message: '请输入名称' }]
 								})(<Input readOnly />)}
@@ -118,7 +115,7 @@ class OverallResourceDetail extends Component {
 							</Col>
 							<Col span={8}>
 								<FormItem {...OverallResourceDetail.layout} label="编号:">
-								{getFieldDecorator('form_code', {
+								{getFieldDecorator('code', {
 									initialValue: `${record.code?record.code:''}`,
 									rules: [{ required: true, message: '请输入编号' }]
 								})(<Input readOnly />)}
@@ -127,16 +124,8 @@ class OverallResourceDetail extends Component {
 						</Row>
 						<Row gutter={15}>
 							<Col span={8}>
-								<FormItem  {...OverallResourceDetail.layout} label="审批单位:">
-								{getFieldDecorator('form_reviewUnit', {
-									initialValue: `${record.reviewUnit?record.reviewUnit:''}`,
-									rules: [{ required: true, message: '请输入审批单位' }]
-								})(<Input readOnly />)}
-								</FormItem>
-							</Col>
-							<Col span={8}>
 								<FormItem {...OverallResourceDetail.layout} label="进场日期:">
-								{getFieldDecorator('form_date', {
+								{getFieldDecorator('date', {
 									initialValue: `${record.date?record.date:''}`,
 									rules: [{ required: true, message: '请输入进场日期' }]
 								})(<Input readOnly />)}
@@ -144,7 +133,7 @@ class OverallResourceDetail extends Component {
 							</Col>
 							<Col span={8}>
 								<FormItem {...OverallResourceDetail.layout} label="施工部位:">
-								{getFieldDecorator('form_site', {
+								{getFieldDecorator('site', {
 									initialValue: `${record.site?record.site:''}`,
 									rules: [{ required: true, message: '请输入施工部位' }]
 								})(<Input readOnly />)}
@@ -184,11 +173,10 @@ class OverallResourceDetail extends Component {
             'id':instance.id,
 			'TreatmentData':subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
 			'dataSource':subject.dataSource?JSON.parse(subject.dataSource):'',
-			'unit':subject.unit?JSON.parse(subject.unit):'',
+			'section':subject.section?JSON.parse(subject.section):'',
+            'sectionName': subject.sectionName?JSON.parse(subject.sectionName):'',
 			'name':subject.name?JSON.parse(subject.name):'',
 			'code':subject.code?JSON.parse(subject.code):'',
-			'reviewUnit':subject.reviewUnit?JSON.parse(subject.reviewUnit):'',
-			'submitOrg':subject.submitOrg?JSON.parse(subject.submitOrg):'',
 			'date':subject.date?moment(JSON.parse(subject.date)).format('YYYY-MM-DD'):'',
 			'site':subject.site?JSON.parse(subject.site):'',
         }
