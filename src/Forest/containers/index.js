@@ -11,3 +11,4 @@ export Qualityanalyze from './Qualityanalyze';
 export Enteranalyze from './Enteranalyze';
 export Scheduleanalyze from './Scheduleanalyze';
 export Contrastinfo from './Contrastinfo';
+export DataExport  from './DataExport';
