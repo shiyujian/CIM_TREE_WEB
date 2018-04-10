@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as actions from '../store';
+import '../components/index.less';
 import {PkCodeTree,TreeTable} from '../components';
 import {Table,Row,Col,Select,DatePicker,Button,Modal,Upload,Icon,message,Notification} from 'antd';
 import {actions as platformActions} from '_platform/store/global';
@@ -28,12 +29,12 @@ export default class Dataimport extends Component {
         this.state = {
         	imgvisible:false,
         	imgsrc: '',
-        	title: ''
+            title: '',
+            dataSource:[]
         }
     }
     componentDidMount() {
         if(!this.user.id){
-            debugger
             this.user = getUser();
         }
     }
@@ -81,6 +82,28 @@ export default class Dataimport extends Component {
                 }
             },
         };
+        let columns = [{
+			title:"序号",
+			dataIndex: 'index',
+		},{
+			title:"编号",
+			dataIndex: 'SXM',
+		},{
+			title:"X",
+			dataIndex: 'X'
+		},{
+			title:"Y",
+			dataIndex: 'Y'
+		},{
+			title:"H",
+			dataIndex: 'H'
+		},{
+			title:"定位时间",
+			dataIndex: 'CreateTime',
+			render: (text,record) => {
+				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
+			}
+		}]
 		return (
 				<Body>
 					<Main>
@@ -93,7 +116,7 @@ export default class Dataimport extends Component {
                         <Row style={{fontSize:"20px", marginTop:'20px'}}>
                             <Col span={2}>
                                 <Upload  {...props}>
-                                    <Button type='primary' style={{fontSize: '14px'}}>
+                                    <Button type='primary' style={{fontSize: '14px',marginLeft:21}}>
                                         点击上传
                                     </Button>
                                 </Upload>
@@ -103,18 +126,25 @@ export default class Dataimport extends Component {
                                 <a onClick={this.onDownloadClick.bind(this)}>下载。</a>
                             </Col>                  
                         </Row>
+                        <Content>
+                            <Table bordered
+                            columns={columns}
+                            className='foresttable'
+                            dataSource={this.state.dataSource}
+                            />
+                        </Content>
 					</Main>
+                    <Button type='primary' onClick={this.postData.bind(this)} style={{marginLeft:21}}>确定上传</Button>
 				</Body>);
     }
     async handleExcelData(data) {
-        const { actions: { postPositionData } } = this.props;
         let sections = JSON.parse(this.user.sections)
         data.splice(0, 1);
-        let generateData = [];
+        let dataSource = [];
         data.map(item => {
             if(item[0] !== ''){
                 let single = {
-                    // index:item[0] || '',
+                    index:item[0] || '',
                     Section:sections[0],
                     SXM:item[1] || '',
                     X:item[2] || '',
@@ -122,10 +152,19 @@ export default class Dataimport extends Component {
                     H:item[4] || '',
                     CreateTime:item[5] || ''
                 };
-                generateData.push(single);
+                dataSource.push(single);
             }
         })
-        postPositionData({id:this.user.id},generateData).then(rst => {
+        this.setState({dataSource})
+    }
+    postData(){
+        const { actions: { postPositionData } } = this.props;
+        const {dataSource} = this.state;
+        if(dataSource.length === 0){
+            message.info('上传数据不能为空');
+            return;
+        }
+        postPositionData({id:this.user.id},dataSource).then(rst => {
             if(rst.code){
                 message.info('定位数据导入成功')
             }else{

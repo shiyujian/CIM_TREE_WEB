@@ -30,7 +30,8 @@ export default class ForestContainer extends Component {
 			Scheduleanalyze = null,
 			Dataimport = null,
 			Contrastinfo = null,
-			CarPackage = null
+			CarPackage = null,
+			DataExport = null
 		} = this.state || {};
 		return (
 				<Body >
@@ -50,6 +51,7 @@ export default class ForestContainer extends Component {
 						{Enteranalyze && <Route path="/forest/enteranalyze" component={Enteranalyze}/>}
 						{Scheduleanalyze && <Route path="/forest/scheduleanalyze" component={Scheduleanalyze}/>}
 						{Dataimport && <Route path="/forest/dataimport" component={Dataimport}/>}
+						{DataExport && <Route path="/forest/dataexport" component={DataExport}/>}
 						{Contrastinfo && <Route path="/forest/contrastinfo" component={Contrastinfo}/>}
 					</Main>
 				</Body>);
@@ -137,6 +139,11 @@ export default class ForestContainer extends Component {
 			id: 'FOREST.DATAIMPORT',
 			path: '/forest/dataimport',
 			name: '定位数据导入',
+		},{
+			key: 'dataexport',
+			id: 'FOREST.DATAEXPORT',
+			path: '/forest/dataexport',
+			name: '定位数据导出',
 		}]
 	}];
 	static defaultOpenKeys = ["info",'analyze','import']
