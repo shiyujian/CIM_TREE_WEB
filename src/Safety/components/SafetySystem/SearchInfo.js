@@ -21,29 +21,53 @@ class SearchInfo extends Component {
     };
 
     async componentDidMount(){
-        let user = getUser()
-        let optionArray = []
-        let sections = user.sections
-        sections = JSON.parse(sections)
-        if(sections && sections instanceof Array && sections.length>0){
-            let section = sections[0]
-            let code = section.split('-')
-            if(code && code.length === 3){
-                //获取当前标段的名字
-                SECTIONNAME.map((item)=>{
-                    if(code[2] === item.code){
-                        let currentSectionName = item.name
-                        optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
-                    }
-                })
-            }
-        }else{
-             UNITS.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
-        }
-        this.setState({
-            optionArray:optionArray
-        })
-    }
+        this.getSection()
+     }
+ 
+ 
+     async componentDidUpdate(prevProps, prevState){
+         const {
+             leftkeycode
+         }=this.props
+         //地块修改，则修改标段
+         if(leftkeycode != prevProps.leftkeycode ){
+             this.getSection()
+         }
+     }
+ 
+     async getSection(){
+         const{
+             leftkeycode
+         }=this.props
+         console.log('leftkeycode',leftkeycode)
+         let user = getUser()
+         let optionArray = []
+         let sections = user.sections
+         sections = JSON.parse(sections)
+         if(sections && sections instanceof Array && sections.length>0){
+             let section = sections[0]
+             let code = section.split('-')
+             if(code && code.length === 3){
+                 //获取当前标段的名字
+                 SECTIONNAME.map((item)=>{
+                     if(code[2] === item.code){
+                         let currentSectionName = item.name
+                         optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
+                     }
+                 })
+             }
+         }else{
+             PROJECT_UNITS.map((project)=>{
+                 if(leftkeycode === project.code){
+                     let units = project.units
+                     units.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
+                 }
+             })
+         }
+         this.setState({
+             optionArray:optionArray
+         })
+     }
 
     render() {
         const {
@@ -135,8 +159,8 @@ class SearchInfo extends Component {
                                             ]
                                         })
                                             (<Select placeholder='请选择流程类型' allowClear>
-                                                <Option key={'执行中'} value={2}>执行中</Option>
-                                                <Option key={'已完成'} value={3}>已完成</Option>
+                                                <Option key={'执行中'} value={'2'}>执行中</Option>
+                                                <Option key={'已完成'} value={'3'}>已完成</Option>
                                             </Select>)
                                     }
                                 </FormItem>

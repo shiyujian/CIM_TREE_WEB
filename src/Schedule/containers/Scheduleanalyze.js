@@ -106,14 +106,8 @@ export default class Scheduleanalyze extends Component {
                     </Sidebar>
                     <Content>
                         <ScheduleTable
-                            key={leftkeycode}
                             {...this.props} 
-                            sectionoption={sectionoption}
-                            section={section}
-                            leftkeycode={leftkeycode}
-                            smallclassoption={smallclassoption}
-                            sectionselect={this.sectionselect.bind(this)}
-                            smallclass={smallclass}
+                            {...this.state}
                         />
                         <Row gutter={10} style={{margin: '10px 5px'}}>
                             <Col span={8}>

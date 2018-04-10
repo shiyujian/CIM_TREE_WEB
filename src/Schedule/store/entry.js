@@ -28,7 +28,7 @@ export const nowmessage = createFetchAction(`${FOREST_API}/tree/queryTree?page=1
 
 
 
-export const getTotalSat = createFetchAction(`${FOREST_API}/tree/totalstat?stattype={{statType}}`, []);
+export const getTotalSat = createFetchAction(`${FOREST_API}/tree/totalstat`, []);
 export const gettreetypeAll = createFetchAction(`${FOREST_API}/tree/treestat`, []);
 export const gettreetypeSection = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=Section`, []);
 export const gettreetypeSmallClass = createFetchAction(`${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass`, []);
