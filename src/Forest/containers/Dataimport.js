@@ -23,6 +23,7 @@ var download = window.config.nurseryLocation;
 	}),
 )
 export default class Dataimport extends Component {
+    //
     user = {}
 	constructor(props) {
         super(props)
@@ -99,10 +100,7 @@ export default class Dataimport extends Component {
 			dataIndex: 'H'
 		},{
 			title:"定位时间",
-			dataIndex: 'CreateTime',
-			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
-			}
+			dataIndex: 'CreateTime'
 		}]
 		return (
 				<Body>
@@ -129,7 +127,7 @@ export default class Dataimport extends Component {
                         <Content>
                             <Table bordered
                             columns={columns}
-                            className='foresttable'
+                            pagination={{showQuickJumper:true,pageSize:10}}
                             dataSource={this.state.dataSource}
                             />
                         </Content>
@@ -139,6 +137,7 @@ export default class Dataimport extends Component {
     }
     async handleExcelData(data) {
         let sections = JSON.parse(this.user.sections)
+        let patt = /^\d{4,}-(?:0?\d|1[12])-(?:[012]?\d|3[01]) (?:[01]?\d|2[0-4]):(?:[0-5]?\d|60):(?:[0-5]?\d|60)$/;
         data.splice(0, 1);
         let dataSource = [];
         data.map(item => {
@@ -152,6 +151,10 @@ export default class Dataimport extends Component {
                     H:item[4] || '',
                     CreateTime:item[5] || ''
                 };
+                if(!patt.test(single.CreateTime)){
+                    message.info('第'+single.index+'条信息时间格式错误，请确认后再次提交');
+                    return
+                }
                 dataSource.push(single);
             }
         })
