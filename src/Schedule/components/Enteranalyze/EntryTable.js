@@ -16,7 +16,7 @@ export default class EntryTable extends Component {
             amount: 0,
             //今日进场总数
             today: 0,
-            nurserys: '',
+            nurserys: 0,
             loading3: false,
             loading4: false,
             loading5: false,
@@ -26,60 +26,89 @@ export default class EntryTable extends Component {
         }
     }
 
-    componentDidMount(){
+    async componentDidMount(){
         
         const {actions: {getfactory,nowmessage,gettreetype,getTotalSat}} = this.props;
+        this.setState({
+            loading5:true
+        })
+        this.query()
         //实时种植信息
-        nowmessage().then(rst=>{
-            if(rst && rst.content){
-                console.log(rst.content,"xionsui");
-                this.setState({
-                    nowmessagelist:rst.content,
-                })
-            }
-        })
-        //供应商个数
-        getfactory().then(rst=>{
-            this.setState({loading5:false})
-            if(rst && rst instanceof Array ){
-                let factorynum = rst.length;
-                this.setState({
-                    nurserys:factorynum,
-                }) 
-            }
-            
-        })
-        //入场总数和今日入场数
-        let amount = 0;
-        let today = 0;
-
-        let postdata = {
-            statType:'nursery' 
-        }
-        getTotalSat(postdata).then((rst)=>{
+        let rst = await nowmessage()
+        if(rst && rst.content){
+            console.log(rst.content,"xionsui");
             this.setState({
-                amount:rst
+                nowmessagelist:rst.content,
             })
+        }
+
+        //供应商个数
+        // let factorys = await getfactory()
+        // if(factorys && factorys instanceof Array ){
+        //     let factorynum = factorys.length;
+        //     this.setState({
+        //         nurserys:factorynum,
+        //         loading5:false
+        //     }) 
+        // }
+        
+    }
+
+    async componentDidUpdate(prevProps, prevState){
+        const {
+            leftkeycode
+        }=this.props
+        //地块修改，则修改标段
+        if(leftkeycode != prevProps.leftkeycode ){
+            this.query()
+        }
+    }
+
+
+    async query(){
+        const {
+            actions: {
+                getTotalSat,
+                gettreetype 
+            },
+            leftkeycode
+        } = this.props;
+        this.setState({
+            loading3:true,
+            loading4:true
         })
 
+
+        //获取当前种树信息
+        let postdata = {
+            statType:'nursery',
+            section: leftkeycode
+        }
+        let amount = await getTotalSat({},postdata)
+
+
+        //今日入场数
+        let today = 0;
         let params ={
             stime: moment().format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
+            no: leftkeycode
         }
-        gettreetype({},params).then((rst)=>{
-            if(rst && rst instanceof Array){
-                rst.map(item=>{
-                    if(item && item.Section){
-                        today = today + item.Num
-                    }                    
-                })
-                this.setState({
-                    today
-                })
-            }
+        let rst = await gettreetype({},params)
+        if( rst && rst instanceof Array){
+            rst.map(item=>{
+                if(item && item.Section){
+                    today = today + item.Num
+                }                    
+            })
+        }
                 
+        this.setState({
+            loading3:false,
+            loading4:false,
+            amount,
+            today
         })
-        
     }
 
     render() {
@@ -102,19 +131,19 @@ export default class EntryTable extends Component {
                             </SumTotal>
                         </Spin>
                     </Col>
-                    <Col span={5}>
+                    {/* <Col span={5}>
                         <Spin spinning={this.state.loading5}>
                             <SumTotal search={this.searchSum(2)} title='供苗商总数' title1='Total number of nursery'>
                                 <div>{this.state.nurserys}</div>
                             </SumTotal>
                         </Spin>
-                    </Col>
+                    </Col> */}
                     <Col span={6}>
                      <div className="nowmessage" style={{border:"1px solid #666"}}>
                     <div>实时种植信息</div>
                     <div>
                     {this.state.nowmessagelist.map((item,index)=>
-                            <div key={item.id}>
+                            <div key={item.ID}>
                               <span>{item.CreateTime}{item.Factory}{item.Inputer}录入{item.TreeTypeObj.TreeTypeName}</span>
                             </div>
                         )}
@@ -128,8 +157,8 @@ export default class EntryTable extends Component {
 
     searchSum(index) {
         return(
-            <div>
-                <div style={{cursor:'pointer'}} onClick = {this.handleIsOpen.bind(this,index)}><img style={{height:'36px'}} src={DateImg}/></div>
+            <div key={index}>
+                <div style={{cursor:'pointer'}}  onClick = {this.handleIsOpen.bind(this,index)}><img style={{height:'36px'}} src={DateImg}/></div>
             </div>
         )
     }

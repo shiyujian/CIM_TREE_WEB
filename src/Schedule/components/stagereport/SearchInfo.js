@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
-import {  UNITS, SECTIONNAME } from '../../../_platform/api';
+import {  UNITS, SECTIONNAME, PROJECT_UNITS } from '../../../_platform/api';
 import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -22,6 +22,25 @@ export default class SearchInfo extends Component {
     };
 
     async componentDidMount(){
+       this.getSection()
+    }
+
+
+    async componentDidUpdate(prevProps, prevState){
+        const {
+            leftkeycode
+        }=this.props
+        //地块修改，则修改标段
+        if(leftkeycode != prevProps.leftkeycode ){
+            this.getSection()
+        }
+    }
+
+    async getSection(){
+        const{
+            leftkeycode
+        }=this.props
+        console.log('leftkeycode',leftkeycode)
         let user = getUser()
         let optionArray = []
         let sections = user.sections
@@ -39,12 +58,19 @@ export default class SearchInfo extends Component {
                 })
             }
         }else{
-             UNITS.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
+            PROJECT_UNITS.map((project)=>{
+                if(leftkeycode === project.code){
+                    let units = project.units
+                    units.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
+                }
+            })
         }
         this.setState({
             optionArray:optionArray
         })
     }
+
+
 
     render() {
         const {
@@ -54,7 +80,6 @@ export default class SearchInfo extends Component {
             optionArray
         }=this.state
         
-
         return (
             <Form>
                 <Row>
@@ -109,8 +134,8 @@ export default class SearchInfo extends Component {
                                             ]
                                         })
                                             (<Select placeholder='请选择流程类型' allowClear>
-                                                <Option key={Math.random*6} value={2}>执行中</Option>
-                                                <Option key={Math.random*7} value={3}>已完成</Option>
+                                                <Option key={Math.random*6} value={'2'}>执行中</Option>
+                                                <Option key={Math.random*7} value={'3'}>已完成</Option>
                                             </Select>)
                                     }
                                 </FormItem>

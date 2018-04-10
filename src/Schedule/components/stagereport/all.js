@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-03-25 10:29:36
+ * @Last Modified time: 2018-04-10 10:39:30
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -298,7 +298,7 @@ class All extends Component {
                         onok={this.totleOk.bind(this)}
                     />
                 }
-                <SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+                <SearchInfo {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
                 <Button onClick={this.addClick.bind(this)}>新增</Button>
                 {/* <Button onClick={this.deleteClick.bind(this)}>删除</Button> */}
                 <Table

@@ -87,6 +87,8 @@ export default class Bottom extends Component {
             await this.getSectionoption()
             await this.getSmallClass()
             await this.selectSmallClass()
+            //因为项目更改之后，又可能 smallClassSelect的值并未更改，所以需要执行query()
+            this.query()
         }
         //标段修改，修改小班
         if(section != prevState.section){

@@ -104,9 +104,9 @@ class SearchInfo extends Component {
                                             ]
                                         })
                                             (<Select placeholder='请选择流程类型'>
-                                                <Option value={2}>执行中</Option>
-                                                <Option value={3}>已完成</Option>
-                                                <Option value={4}>已废止</Option>
+                                                <Option value={'2'}>执行中</Option>
+                                                <Option value={'3'}>已完成</Option>
+                                                {/* <Option value={4}>已废止</Option> */}
                                             </Select>)
                                     }
                                 </FormItem>

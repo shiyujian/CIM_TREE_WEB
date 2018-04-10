@@ -110,7 +110,7 @@ export default class Right extends Component {
         treetyoption.push(<Option key={'全部'} value={'全部'}>全部</Option>)
         TREETYPENO.map((tree)=>{
             console.log('tree',tree)
-            treetyoption.push(<Option key={tree.name} value={tree.id}>{tree.name}</Option>)
+            treetyoption.push(<Option key={tree.name} value={tree.id.toString()}>{tree.name}</Option>)
         })
         console.log('treetyoption',treetyoption)
         
@@ -341,7 +341,7 @@ export default class Right extends Component {
         let treetypeoption = [];
         treetypeoption.push(<Option key={-1} value={'全部'}>全部</Option>)
         selectTreeType.map(rst =>{
-            treetypeoption.push(<Option key={rst.ID} title={rst.TreeTypeName} value={rst.ID}>{rst.TreeTypeName}</Option>)
+            treetypeoption.push(<Option key={rst.ID} title={rst.TreeTypeName} value={rst.ID.toString()}>{rst.TreeTypeName}</Option>)
         })
         return treetypeoption
         
