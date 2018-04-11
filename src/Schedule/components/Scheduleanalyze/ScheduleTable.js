@@ -37,15 +37,10 @@ export default class ScheduleTable extends Component {
                 getTotalSat 
             }
         } = this.props;
-
-        this.setState({
-            loading5:true,
-            loading6:true,
-            loading7:true
-        });
-
+        this.query()
+        
+        //实时种植信息
         let message = await nowmessage()
-        console.log('ScheduleTableScheduleTable',message)
         let nowmessagelist = []
         if(message && message.content){
             nowmessagelist = message.content
@@ -54,46 +49,6 @@ export default class ScheduleTable extends Component {
         this.setState({
             nowmessagelist:nowmessagelist
         })
-        
-        let postdata = {
-            statType:'tree' 
-        }
-        //获取当前种树信息
-        let amount = await getTotalSat(postdata)
-
-        let params ={
-            stime: moment().format('YYYY/MM/DD 00:00:00'),
-            etime: moment().format('YYYY/MM/DD 23:59:59'),
-        }
-        let rst = await gettreetypeAll({},params)
-        //今日种植棵数
-        let today = 0;
-        //一共需要种植棵数
-        let total = 0;
-       
-        if(rst && rst instanceof Array){
-            rst.map((item)=>{
-                today = today + item.Num
-            })
-        }
-        //获取所有需要种植的总数
-        let totalTrees = await gettreetypeSection()
-        console.log('ScheduleTabletotalTrees',totalTrees)
-        if(totalTrees && totalTrees instanceof Array){
-            totalTrees.map((tree)=>{
-                total = tree.Complete + tree.UnComplete
-            })
-        }
-    
-        this.setState({
-            amount:amount,
-            today:today,
-            total:total,
-            loading5:false,
-            loading6:false,
-            loading7:false
-        })
-
 
         // sxm:编码 或顺序码  可选
         // no:正式编码 可选
@@ -108,6 +63,77 @@ export default class ScheduleTable extends Component {
         // etime：验收时间 结束时间
         // page：页码，选填
         // size：每页数量，选填
+    }
+
+    async componentDidUpdate(prevProps, prevState){
+        const {
+            leftkeycode
+        }=this.props
+        //地块修改，则修改标段
+        if(leftkeycode != prevProps.leftkeycode ){
+            this.query()
+        }
+    }
+
+    async query(){
+        const {
+            actions: {
+                getTotalSat,
+                gettreetypeAll,
+                gettreetypeSection,
+            },
+            leftkeycode
+        } = this.props;
+        this.setState({
+            loading5:true,
+            loading6:true,
+            loading7:true
+        })
+
+        let postdata = {
+            statType:'tree',
+            section: leftkeycode
+        }
+        //获取当前种树信息
+        let amount = await getTotalSat({},postdata)
+        this.setState({
+            
+        })
+
+        //今日种植棵数
+        let params ={
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
+            no: leftkeycode
+        }
+        let rst = await gettreetypeAll({},params)
+        let today = 0;
+        if(rst && rst instanceof Array){
+            rst.map((item)=>{
+                today = today + item.Num
+            })
+        }
+
+
+        //一共需要种植棵数
+        let total = 0;
+        //获取所有需要种植的总数
+        let totalTrees = await gettreetypeSection({},{no:leftkeycode})
+        if(totalTrees && totalTrees instanceof Array){
+            totalTrees.map((tree)=>{
+                total = tree.Complete + tree.UnComplete + total
+            })
+        }
+        this.setState({
+            amount,
+            today:today,
+            total:total,
+            loading5:false,
+            loading6:false,
+            loading7:false
+        })
+
+
     }
 
 	render() {
@@ -129,10 +155,6 @@ export default class ScheduleTable extends Component {
         }else{
             score = amount + '/' + total
         }
-
-        console.log(asd);
-        
-        console.log(this.state.nowmessagelist,"nowmessagelistnowmessagelistnowmessagelist")
 		return (
 			<div>
                 <Row gutter={10} style={{margin: '5px 5px 20px 5px'}}>
@@ -168,7 +190,7 @@ export default class ScheduleTable extends Component {
                     <div>实时种植信息</div>
                     <div>
                     {this.state.nowmessagelist.map((item,index)=>
-                            <div key={item.id}>
+                            <div key={item.ID}>
                               <span>{item.CreateTime}{item.Factory}{item.Inputer}录入{item.TreeTypeObj.TreeTypeName}</span>
                             </div>
                         )}
@@ -197,53 +219,9 @@ export default class ScheduleTable extends Component {
         return(
             <div>
                 <div style={{cursor:'pointer'}} onClick = {this.handleIsOpen.bind(this,index)}><img style={{height: '36px'}} src={DateImg}/></div>
-                
             </div>
         )
     }
     
-}
-//除
-function division(arr1, arr2) {
-    if(arr1 !== 0 && arr2 !== 0) {
-        let per = 0;
-        per = (Math.round(arr1 / arr2 * 10000) / 100.00 + '%');
-        return per;
-    }
-}
-//拼接
-function joint(arr1, arr2) {
-    let join = '';
-    join = arr1 + '/' + arr2;
-    return join;
-}
-//点击切换
-
-function dd(path){
-    var ele= document.querySelectorAll(path);
-    for(let i=0;i<ele.length;i++){
-        ele[i].index=i;
-        ele[i].onclick=function(){
-            if(this.index===0){
-                this.style.display="none";
-                ele[1].style.display="block";
-            }else{
-                this.style.display="none";
-                ele[0].style.display="block";
-            }
-        }
-    }
-}
-
-function sorting(val1, val2) {
-    let ele1 = val1.Label;
-    let ele2 = val2.Label;
-    if(ele1 < ele2) {
-        return -1;
-    } else if(ele1 > ele2) {
-        return 1;
-    } else {
-        return 0;
-    }
 }
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {UNITS ,SECTIONNAME} from '../../../_platform/api';
+import {UNITS ,SECTIONNAME,PROJECT_UNITS} from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
@@ -26,30 +26,54 @@ export default class ResourceFilter extends Component {
 		wrapperCol: {span: 16},
 	};
 	   
-	async componentDidMount(){
-        let user = getUser()
-        let optionArray = []
-        let sections = user.sections
-        sections = JSON.parse(sections)
-        if(sections && sections instanceof Array && sections.length>0){
-            let section = sections[0]
-            let code = section.split('-')
-            if(code && code.length === 3){
-                //获取当前标段的名字
-                SECTIONNAME.map((item)=>{
-                    if(code[2] === item.code){
-                        let currentSectionName = item.name
-                        optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
-                    }
-                })
-            }
-        }else{
-            UNITS.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
-        }
-        this.setState({
-            optionArray:optionArray
-        })
-    }
+    async componentDidMount(){
+        this.getSection()
+     }
+ 
+ 
+     async componentDidUpdate(prevProps, prevState){
+         const {
+             leftkeycode
+         }=this.props
+         //地块修改，则修改标段
+         if(leftkeycode != prevProps.leftkeycode ){
+             this.getSection()
+         }
+     }
+ 
+     async getSection(){
+         const{
+             leftkeycode
+         }=this.props
+         console.log('leftkeycode',leftkeycode)
+         let user = getUser()
+         let optionArray = []
+         let sections = user.sections
+         sections = JSON.parse(sections)
+         if(sections && sections instanceof Array && sections.length>0){
+             let section = sections[0]
+             let code = section.split('-')
+             if(code && code.length === 3){
+                 //获取当前标段的名字
+                 SECTIONNAME.map((item)=>{
+                     if(code[2] === item.code){
+                         let currentSectionName = item.name
+                         optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
+                     }
+                 })
+             }
+         }else{
+             PROJECT_UNITS.map((project)=>{
+                 if(leftkeycode === project.code){
+                     let units = project.units
+                     units.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
+                 }
+             })
+         }
+         this.setState({
+             optionArray:optionArray
+         })
+     }
 
 	render() {
 		const { 
@@ -127,8 +151,8 @@ export default class ResourceFilter extends Component {
                                             (<Select placeholder='请选择流程类型' allowClear>
                                                 {/* <Option key={Math.random*4} value={0}>编辑中</Option> */}
                                                 {/* <Option key={Math.random*5} value={1}>已提交</Option> */}
-                                                <Option key={Math.random*6} value={2}>执行中</Option>
-                                                <Option key={Math.random*7} value={3}>已完成</Option>
+                                                <Option key={Math.random*6} value={'2'}>执行中</Option>
+                                                <Option key={Math.random*7} value={'3'}>已完成</Option>
                                                 {/* <Option key={Math.random*8} value={4}>已废止</Option> */}
                                                 {/* <Option key={Math.random*9} value={5}>异常</Option> */}
                                             </Select>)

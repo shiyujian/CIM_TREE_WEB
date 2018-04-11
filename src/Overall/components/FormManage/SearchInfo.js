@@ -100,12 +100,12 @@ class SearchInfo extends Component {
                                             ]
                                         })
                                         (<Select placeholder='请选择流程类型' allowClear>
-                                            <Option key={Math.random*4} value={0}>编辑中</Option>
-                                            <Option key={Math.random*5} value={1}>已提交</Option>
-                                            <Option key={Math.random*6} value={2}>执行中</Option>
-                                            <Option key={Math.random*7} value={3}>已完成</Option>
-                                            <Option key={Math.random*8} value={4}>已废止</Option>
-                                            <Option key={Math.random*9} value={5}>异常</Option>
+                                            {/* <Option key={Math.random*4} value={0}>编辑中</Option>
+                                            <Option key={Math.random*5} value={1}>已提交</Option> */}
+                                            <Option key={Math.random*6} value={'2'}>执行中</Option>
+                                            <Option key={Math.random*7} value={'3'}>已完成</Option>
+                                            {/* <Option key={Math.random*8} value={4}>已废止</Option>
+                                            <Option key={Math.random*9} value={5}>异常</Option> */}
                                         </Select>)
                                     }
                                 </FormItem>

@@ -295,7 +295,7 @@ class Stagereporttab extends Component {
                         onok={this.totleOk.bind(this)}
                     />
                 }
-				<SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+				<SearchInfo {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
 				<Button onClick={this.addClick.bind(this)}>新增</Button>
 				{/* <Button onClick={this.deleteClick.bind(this)}>删除</Button> */}
 				<Table
