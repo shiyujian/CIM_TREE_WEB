@@ -92,95 +92,102 @@ class Updatemodal extends Component {
         console.log('oldfile',oldfile)
         
         return (
-            <Modal title="编辑资料"
-                width={920} visible={updatevisible}
-                closable={false}
-                footer={footer}
-                maskClosable={false}>
-                <Spin spinning={isUploading}>
-                    <Form>
-                        <FormItem {...formItemLayout} label="项目">
-                            {getFieldDecorator('area1', {
-                                initialValue:oldfile && oldfile.extra_params && oldfile.extra_params.area,
-                                rules: [
-                                    { required: true, message: '请选择项目' },
-                                ]
-                            })(<Select placeholder='请选择项目'  onChange={this.onSelectChange.bind(this)}>
-                                {this.areaArray}
-                            </Select>)
-                            }
-                        </FormItem>
-                        {
-                            canSection
-                            ? null
-                            : <FormItem {...formItemLayout} label="标段">
-                                {getFieldDecorator('unitProject1', {
-                                    initialValue:oldfile && oldfile.extra_params &&  oldfile.extra_params.unitProject,
-                                    rules: [
-                                        { required: true, message: '请选择标段' },
-                                    ]
-                                })(<Select placeholder='请选择标段'>
-                                        {this.unitArray}
+            <div>
+                {
+                    !updatevisible?
+                    null:
+                    <Modal title="编辑资料"
+                        width={920} visible={updatevisible}
+                        closable={false}
+                        footer={footer}
+                        maskClosable={false}>
+                        <Spin spinning={isUploading}>
+                            <Form>
+                                <FormItem {...formItemLayout} label="项目">
+                                    {getFieldDecorator('area1', {
+                                        initialValue:oldfile && oldfile.extra_params && oldfile.extra_params.area,
+                                        rules: [
+                                            { required: true, message: '请选择项目' },
+                                        ]
+                                    })(<Select placeholder='请选择项目'  onChange={this.onSelectChange.bind(this)}>
+                                        {this.areaArray}
                                     </Select>)
-                                }
-                            </FormItem>
-                        }
-                        <FormItem {...formItemLayout} label="名称">
-                            {getFieldDecorator('name1', {
-                                initialValue: oldfile.name,
-                                rules: [
-                                    { required: true, message: '请输入名称' },
-                                ]
-                            })(
-                                <Input type="text" />
-                                )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="编号">
-                            {getFieldDecorator('number1', {
-                                initialValue: oldfile.extra_params ? oldfile.extra_params.number : '',
-                                rules: [
-                                    { required: true, message: '请输入编号' },
-                                ]
-                            })(
-                                <Input type="text" />
-                                )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="文档类型">
-                            {getFieldDecorator('doc_type1', {
-                                initialValue: this.props.doc_type,
-                                rules: [
-                                    { required: true, message: '未获取到文档类型' },
-                                ]
-                            })(
-                                <Input type="text" readOnly />
-                                )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="上传文件">
-                            {getFieldDecorator('attachment1', {
-                                initialValue: oldfile.basic_params ? oldfile.basic_params.files : [],
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: '请至少上传一个文件！',
                                     }
-                                ],
-                                valuePropName: 'fileList',
-                                getValueFromEvent: this.normFile,
-                            }, {})(
-                                <Upload {...this.uploadProps}
-                                accept={fileTypes}
-                                onChange={this.changeDoc.bind(this)}
-                                // defaultFileList={oldfile.basic_params ? oldfile.basic_params.files[0] : []}
-                                >
-                                    <Button>
-                                        <Icon type="upload" />添加文件
-                                        </Button>
-                                </Upload>
-                                )}
-                        </FormItem>
-                    </Form>
-                </Spin>
-            </Modal>
+                                </FormItem>
+                                {
+                                    canSection
+                                    ? null
+                                    : <FormItem {...formItemLayout} label="标段">
+                                        {getFieldDecorator('unitProject1', {
+                                            initialValue:oldfile && oldfile.extra_params &&  oldfile.extra_params.unitProject,
+                                            rules: [
+                                                { required: true, message: '请选择标段' },
+                                            ]
+                                        })(<Select placeholder='请选择标段'>
+                                                {this.unitArray}
+                                            </Select>)
+                                        }
+                                    </FormItem>
+                                }
+                                <FormItem {...formItemLayout} label="名称">
+                                    {getFieldDecorator('name1', {
+                                        initialValue: oldfile.name,
+                                        rules: [
+                                            { required: true, message: '请输入名称' },
+                                        ]
+                                    })(
+                                        <Input type="text" />
+                                        )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="编号">
+                                    {getFieldDecorator('number1', {
+                                        initialValue: oldfile.extra_params ? oldfile.extra_params.number : '',
+                                        rules: [
+                                            { required: true, message: '请输入编号' },
+                                        ]
+                                    })(
+                                        <Input type="text" />
+                                        )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="文档类型">
+                                    {getFieldDecorator('doc_type1', {
+                                        initialValue: this.props.doc_type,
+                                        rules: [
+                                            { required: true, message: '未获取到文档类型' },
+                                        ]
+                                    })(
+                                        <Input type="text" readOnly />
+                                        )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="上传文件">
+                                    {getFieldDecorator('attachment1', {
+                                        initialValue: oldfile.basic_params ? oldfile.basic_params.files : [],
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请至少上传一个文件！',
+                                            }
+                                        ],
+                                        valuePropName: 'fileList',
+                                        getValueFromEvent: this.normFile,
+                                    }, {})(
+                                        <Upload {...this.uploadProps}
+                                        accept={fileTypes}
+                                        onChange={this.changeDoc.bind(this)}
+                                        // defaultFileList={oldfile.basic_params ? oldfile.basic_params.files[0] : []}
+                                        >
+                                            <Button>
+                                                <Icon type="upload" />添加文件
+                                                </Button>
+                                        </Upload>
+                                        )}
+                                </FormItem>
+                            </Form>
+                        </Spin>
+                    </Modal>
+                }
+            </div>
+            
         )}
 
     cancel() {
