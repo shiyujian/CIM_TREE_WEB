@@ -107,7 +107,6 @@ export default class SafetyTable extends Component {
 		
 		let selectCode = ''
 		//关联标段的人只能看自己项目的进度流程
-		debugger
 		if(sections && sections instanceof Array && sections.length>0){
 			let code = sections[0].split('-')
 			selectCode = code[0] || '';

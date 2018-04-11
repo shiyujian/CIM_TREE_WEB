@@ -15,42 +15,57 @@ class Filter extends Component {
 		wrapperCol: { span: 18 },
 	  };
 	render() {
-		const { actions: { toggleAddition }, Doc = [] } = this.props;
+		const { 
+			actions: { toggleAddition }, 
+			form: { getFieldDecorator },
+			Doc = [] 
+		} = this.props;
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
-					<FormItem>
-						<Col span={14}>
-							<Search placeholder="输入内容"
-								onSearch={this.query.bind(this)} />
-						</Col>
-						<Col span={10}>
-							<FormItem
-								label="拍摄日期"
-								{...Filter.layout}
-							>
-								<Col span={11}>
-									<FormItem>
-										<DatePicker />
-									</FormItem>
-								</Col>
-								<Col span={2}>
-									<span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
-										-
-                        </span>
-								</Col>
-								<Col span={11}>
-									<FormItem>
-										<DatePicker defaultvalue="" />
-									</FormItem>
-								</Col>
-							</FormItem>
-						</Col>
-					</FormItem>
+					<Col span={18}> 
+						<Row>
+							<Col span={12}>
+								<FormItem {...Filter.layout} label='影像名称'>
+									{
+										getFieldDecorator('searchname', {
+											rules: [
+												{ required: false, message: '请输入影像名称' }
+											]
+										})
+											(<Input placeholder='请输入影像名称' />)
+									}
+								</FormItem>
+							</Col>
+							<Col span={12}>
+								<FormItem {...Filter.layout}label="拍摄日期">
+									{
+										getFieldDecorator('searcdate', {
+											rules: [
+												{ type: 'array', required: false, message: '请选择日期' }
+											]
+										})
+											(<RangePicker size='default' format='YYYY-MM-DD' style={{ width: '100%', height: '100%' }} />)
+									}
+								</FormItem>
+							</Col>
+						</Row>
+					</Col>
+					
+					<Col span={5} offset={1}>
+                        <Row gutter={10}>
+                            <Col span={12}>
+                                <Button type='Primary' onClick={this.query.bind(this)} >查询</Button>
+                            </Col>
+							<Col span={12}>
+                                <Button onClick={this.clear.bind(this)}>清除</Button>
+                            </Col>
+                        </Row>
+                    </Col>
 				</Row>
 				<Row gutter={24}>
 					<Col span={24}>
-						{!this.props.isTreeSelected ?
+						{!this.props.parent ?
 							<Button style={{ marginRight: 10 }} disabled>添加文件</Button> :
 							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>添加文件</Button>
 						}
@@ -76,13 +91,29 @@ class Filter extends Component {
 		);
 	}
 
-	query(value) {
-		const { actions: { getdocument }, currentcode } = this.props;
-		let search = {
-			doc_name: value
-		};
-		getdocument({ code: currentcode.code }, search);
+	query() {
+
+		const { 
+			actions: { getdocument }, 
+			form:{validateFields},
+			currentcode 
+		} = this.props;
+		validateFields((err, values) => {
+			let search = {}
+			search = {
+				doc_name: values.searchname
+			};
+			
+			getdocument({ code: currentcode.code }, search);
+		})
+		
 	}
+	clear() {
+        this.props.form.setFieldsValue({
+            searchname: undefined,
+            searchdate: undefined
+        })
+    }
 	cancel() {
 
 	}

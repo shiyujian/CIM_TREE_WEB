@@ -37,7 +37,8 @@ export default class Engineering extends Component {
 		super(props);
 		this.state = {
 			isTreeSelected: false,
-			loading:false
+			loading:false,
+			parent:''
         }
     }
 
@@ -46,7 +47,8 @@ export default class Engineering extends Component {
             tree=[],
             Doc=[],
             keycode,
-        } = this.props;
+		} = this.props;
+		
 		return (
 			<Body>
 			<Main>
@@ -59,11 +61,11 @@ export default class Engineering extends Component {
 				</Sidebar>
 				<Content>
 					<Filter  {...this.props} {...this.state}/>
-					<Table {...this.props}/>
+					<Table {...this.props}  {...this.state}/>
 				</Content>
-				<Addition {...this.props} doc_type = {this.doc_type} array={this.array}/>
+				<Addition {...this.props} {...this.state} doc_type = {this.doc_type} array={this.array}/>
 			</Main>
-			<Updatemodal {...this.props} doc_type = {this.doc_type} array={this.array}/>
+			<Updatemodal {...this.props} {...this.state} doc_type = {this.doc_type} array={this.array}/>
 			<Preview/>
 			</Body>
 		);
@@ -82,14 +84,22 @@ export default class Engineering extends Component {
     }
 
     onSelect(value = [],e) {
+		console.log('console.log(this.props.tree)',value)
+		console.log('console.log(this.props.tree)',e)
         const [code] = value;
 		const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
 		setkeycode(code);
 	    if(code === undefined){
 		    return
 		}
+		let parent = code.split("--")[3]
+		console.log('parent',parent)
 		this.doc_type = e.node.props.title;
-		this.setState({isTreeSelected:e.selected})
+		this.setState({
+			isTreeSelected:e.selected,
+			parent:parent,
+			selectDoc:e.node.props.title
+		})
         setcurrentcode({code:code.split("--")[1]});
         getdocument({code:code.split("--")[1]});
     }

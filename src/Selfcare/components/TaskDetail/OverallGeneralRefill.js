@@ -381,11 +381,11 @@ class OverallGeneralRefill extends Component {
                                                 <Step key={index} title={`${step.state.name}-(${step.status})`}
                                                     description={
                                                         <div style={{ lineHeight: 2.6 }}>
-                                                            <div>审核意见：{note}</div>
+                                                            <div>{`${step.state.name}`}意见：{note}</div>
                                                             <div>
-                                                                <span>审核人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
+                                                                <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
                                                                 <span
-                                                                    style={{ paddingLeft: 20 }}>审核时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                                    style={{ paddingLeft: 20 }}>{`${step.state.name}`}时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
                                                             </div>
                                                         </div>} />);
                                         }

@@ -1,0 +1,268 @@
+*{
+	margin:0;
+	padding:0;
+	list-style: none;
+}
+body{
+	background-color: white;
+}
+.mui-title,.mui-icon{
+	color:white;
+}
+
+.mui-content{
+	background-color: rgba(0, 0, 0, 0.0);
+}
+.mui-bar-nav {
+	z-index: 2022;
+	background: #07c8a2;
+}
+
+.mui-bar {
+	height: 50px;
+}
+
+.mui-title {
+	line-height: 50px;
+}
+
+.mui-bar .mui-icon {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+.pieChartsBox,.statisticsBox,.tabsBox,.examinationBox{
+	width:92%;
+	height:240px;
+	background-color: white;
+	border-radius:6px;
+	margin:10px 4% 10px 4%;
+	position: relative;
+	padding:36px 0 0 0;
+}
+.statisticsBox{
+	
+	padding:36px 0 10px 0;
+}
+.loading{
+	width:100%;
+	height:100%;
+	background-color: rgba(255,255,255, 0.5);
+	position:absolute;
+	left:0;
+	top:0;
+	z-index: 99999;
+	text-align: center;
+
+}
+.pieChartsBox,.examinationBox{
+	height:300px;
+}
+.tabsBox{
+	height:450px;
+	padding:46px 0 10px 0;
+}
+#pieCharts{
+	width:100%;
+	height:196px;
+}
+.listText{
+	overflow: auto;
+	height:194px;
+	width:100%;
+}
+.tabsContent,.tabsStatisticsBox{
+	overflow: auto;
+	height:400px;
+}
+.barBox,.barBox_1{
+	height:350px;
+}
+.tabsContent ul,.tabsStatisticsBox ul{
+	overflow: hidden;
+}
+.tabsContent li,.tabsStatisticsBox li{
+	float: left;
+	width:100px;
+	line-height:42px;
+	font-size: 14px;
+	color:#979797;
+	text-align: center;
+	cursor: pointer;
+}
+
+.listText li{
+	line-height: 42px;
+	border-bottom: 1px solid #dcdddd;
+	color:#979797;
+	font-size: 14px;
+	padding: 0 10px 0 10px;
+	overflow: hidden;
+	width:100%;
+}
+.listText .text,.listText i{
+	float:left;
+}
+.listText i{
+	color:#07c8a2;
+	line-height: 42px;
+	padding: 0 0 0 10px;
+	float: right;
+}
+.listText .length{
+	float: right;
+}
+.headTitle{
+	color:white;
+	font-size: 14px;
+	line-height: 32px;
+	text-align: center;
+	padding:2px 15px 2px 10px;
+	background-color:#07c8a2;
+	border-radius:6px 0 120px 0;
+	position: absolute;
+	left: 0px;
+	top:0;
+	z-index: 102;
+}
+.bottomBtn{
+	position: absolute;
+	bottom:0px;
+	height:40px;
+	background-color: white;
+}
+.bottomBtn li{
+	float: left;
+	color:#737373;
+	width:72px;
+	text-align: center;
+	font-size: 14px;
+}
+.pieChartsBox{
+	overflow:hidden;
+}
+.firstDiv,.lastDiv{
+	position: absolute;
+	bottom:0px;
+	font-size: 14px;
+	color:#737373;
+	height:40px;
+	line-height: 40px;
+	text-align: center;
+	z-index: 99999;
+}
+.allClass{
+	position:absolute;
+	right:0;
+	bottom:45px;
+	width:60px;
+	height:40px;
+	z-index: 999999;
+	background-color: #07c8a2;
+	text-align: center;
+	line-height: 40px;
+	color:white;
+	font-size: 14px;
+	border-top-left-radius:100px;
+	border-bottom-left-radius:100px;
+}
+.firstDiv{
+	left:0px;
+	width:64px;
+	box-shadow: 2px 0px 6px #dfdfdf;
+}
+.lastDiv{
+	right:0px;
+	width:96px;
+	box-shadow: -2px 0px 6px #dfdfdf;
+}
+.listBox{
+	overflow-x: auto;
+	overflow-y:hidden;
+	width:calc(100% - 20px);
+	position: absolute;
+	bottom:0px;
+	left:10px;
+	height:40px;
+	background-color: white;
+}
+
+.bottomText{
+	height:100%;
+}
+
+.bottomText li{
+	float: left;
+	color:#737373;
+	width:58px;
+	text-align: center;
+
+}
+.bottomText li span{
+	font-size:14px ;
+	
+}
+.circular{
+	background-color: white;
+	width:16px;
+	height:16px;
+	border-radius:50%;
+	position: relative;
+	margin: auto;
+}
+.circular_1{
+	background-color: #dcdddd;
+	width:12px;
+	height:12px;
+	border-radius:50%;
+	position:absolute;
+	left: 2px;
+	top:2px;
+}
+
+.table_box_big{
+	overflow-x: scroll;
+	overflow-y: hidden;
+	position: relative;
+	height: 350px;
+}
+.table_box{
+	overflow: hidden;
+	position: absolute;
+}
+.table_tbody_box{
+	height: 300px;
+	overflow: scroll;
+}
+table{
+	border: 1px solid #eeeeee;
+}
+table thead tr th{
+	width: 80px;
+	height: 42px;
+	text-align: center;
+	padding: 2px 10px;
+	background:#07c8a2 ;
+	color:white;
+	font-size: 12px;
+}
+table tbody tr td{
+	width: 80px;
+	height: 42px;
+	border-right: 1px solid #eeeeee;
+	text-align: center;
+	border-bottom: 1px solid #eeeeee;
+	padding: 2px 10px;
+	font-size: 12px;
+	color:#979797;
+}
+
+
+
+
+
+.barExamination{
+	height:204px;
+}
+.hiddenVal{
+	display:none;
+}

@@ -185,6 +185,8 @@ module.exports = {
 			{from: '../static/jquery.jqprint-0.3.js'},
 			{from: '../static/webVideoCtrl.js'},
 			{from: `../static/DeathCode_${process.env.proj}.js`,to:'DeathCode.js'},
+			{from: `../static/treemapdemo`,to:'treemapdemo/'},
+			
 
 			{from: `../src/APP/${process.env.proj}/config_${process.env.branch}.js`, to:'config.js'}
 		]),

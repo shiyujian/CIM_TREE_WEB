@@ -289,7 +289,7 @@ export default class Staff extends Component {
         if(tree.bigTreeList){
 			treeList = tree.bigTreeList;
 			treeList.map(item => {
-				options.push(<Option value={item.No}>{item.Name}</Option>)
+				options.push(<Option value={item.No} key={item.No}>{item.Name}</Option>)
 			})
 		}
 		return (
@@ -299,7 +299,7 @@ export default class Staff extends Component {
 						options
 					}
 				</Select>
-				<div id = 'quality2' style = {{width:'100%',height:'360px'}}>
+				<div id = 'quality2' style = {{width:'100%',height:'340px'}}>
 				</div>
 			</Blade>
 

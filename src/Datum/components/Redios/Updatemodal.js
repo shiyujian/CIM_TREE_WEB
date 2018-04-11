@@ -2,12 +2,12 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input,Button, Row, Col, Modal, Upload,DatePicker,Progress,
-    Icon, message, Table
+    Icon, message, Table,Spin
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 const Dragger = Upload.Dragger;
-let fileTypes = 'application/mp4,application/3gpp,application/wmv,video/mp4,video/ogg,video/webm';
+let fileTypes = 'image/jpeg,image/tiff,image/png,image/bmp,image/jpg';
 
 export default class Addition extends Component {
 
@@ -37,31 +37,34 @@ export default class Addition extends Component {
                    closable={false}
                    footer={footer}
                    maskClosable={false}>
-                <Form>
-                    <Row gutter={24}>
-                        <Col span={24} style={{marginTop: 16, height: 160}}>
-                            <Dragger {...this.uploadProps}
-                                     accept={fileTypes}
-                                     onChange={this.changeDoc.bind(this)}>
-                                <p className="ant-upload-drag-icon">
-                                    <Icon type="inbox"/>
-                                </p>
-                                <p className="ant-upload-text">点击或者拖拽开始上传</p>
-                                <p className="ant-upload-hint">
-                                支持mp4、ogg、webm视频</p>
-                            </Dragger>
-                            <Progress percent={progress} strokeWidth={5}/>
-                        </Col>
-                    </Row>
-                    <Row gutter={24} style={{marginTop: 35}} >
-                        <Col span={24}>
-                            <Table rowSelection={this.rowSelection}
-                                   columns={this.docCols}
-                                   dataSource={docs}
-                                   bordered rowKey="uid"/>
-                        </Col>
-                    </Row>
-                </Form>
+                <Spin spinning={isUploading}>
+                    <Form>
+                        <Row gutter={24}>
+                            <Col span={24} style={{marginTop: 16, height: 160}}>
+                                <Dragger {...this.uploadProps}
+                                        accept={fileTypes}
+                                        onChange={this.changeDoc.bind(this)}>
+                                    <p className="ant-upload-drag-icon">
+                                        <Icon type="inbox"/>
+                                    </p>
+                                    <p className="ant-upload-text">点击或者拖拽开始上传</p>
+                                    <p className="ant-upload-hint">
+                                    支持bmp,jpg,png,tif文件</p>
+                                </Dragger>
+                                {/* <Progress percent={progress} strokeWidth={5}/> */}
+                            </Col>
+                        </Row>
+                        <Row gutter={24} style={{marginTop: 35}} >
+                            <Col span={24}>
+                                <Table 
+                                // rowSelection={this.rowSelection}    
+                                    columns={this.docCols}
+                                    dataSource={docs}
+                                    bordered rowKey="uid"/>
+                            </Col>
+                        </Row>
+                    </Form>
+                </Spin>
             </Modal>
         );
     }
@@ -94,7 +97,11 @@ export default class Addition extends Component {
                 a_file: file
             };
         },
-        beforeUpload(file) {
+        beforeUpload:(file) => {
+            this.setState({ 
+                progress: 0,
+                isUploading:true 
+            });
             const valid = fileTypes.indexOf(file.type) >= 0;
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
@@ -107,18 +114,13 @@ export default class Addition extends Component {
     changeDoc({file, fileList, event}) {
         const {
             docs = [],
-            actions: {changeDocs}
+            actions: { changeDocs }
         } = this.props;
         if (file.status === 'done') {
             changeDocs([...docs, file]);
-        }
-        this.setState({
-            isUploading: file.status === 'done' ? false : true
-        })
-        if(event){
-            let {percent} = event;
-            if(percent!==undefined)
-                this.setState({progress:parseFloat(percent.toFixed(1))});
+            this.setState({
+                isUploading:false
+            })
         }
     }
 
@@ -209,6 +211,20 @@ export default class Addition extends Component {
             docs = [],
             actions: {updatevisible, postDocument, getdocument,changeDocs,PatchDocument}
         } = this.props;
+
+        let canSave = true
+        //判断各列有没有输入
+        docs.map((doc)=>{
+            if( !doc.number || !doc.company || !doc.time  ){
+                canSave = false
+            }
+        })
+
+        if(!canSave){
+            message.error('请输入表格中除备注外的每项');
+            return 
+        }
+
         const promises = docs.map(doc => {
             const response = doc.response;
             let files=DeleteIpPort(doc);
@@ -234,10 +250,10 @@ export default class Addition extends Component {
                 },
             });
         });
-        message.warning('新增文件中...');
+        message.warning('更新文件中...');
         Promise.all(promises).then(rst => {
             const {oldfile = {},currentcode = {},actions:{putdocument}}=this.props;
-            message.success('新增文件成功！');
+            message.success('更新文件成功！');
             putdocument({code:oldfile.code},{
                     extra_params: {
                         state: '作废'

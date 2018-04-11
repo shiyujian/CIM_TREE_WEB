@@ -37,8 +37,9 @@ export default class Redios extends Component {
 		super(props);
 		this.state = {
 			isTreeSelected: false,
-			loading: false
-		}
+			loading:false,
+			parent:''
+        }
 	}
 
 	render() {
@@ -50,7 +51,7 @@ export default class Redios extends Component {
 		return (
 			<Body>
 				<Main>
-				<DynamicTitle title="工程影像" {...this.props}/>
+				<DynamicTitle title="影像资料" {...this.props}/>
 				<Sidebar>
 					<DatumTree treeData={tree}
 								selectedKeys={keycode}
@@ -59,11 +60,11 @@ export default class Redios extends Component {
 				</Sidebar>
 				<Content>
 					<Filter  {...this.props} {...this.state}/>
-					<Table {...this.props}/>
+					<Table {...this.props} {...this.state}/>
 				</Content>
-				<Addition {...this.props}/>
+				<Addition {...this.props}  {...this.state}/>
 			</Main>
-			<Updatemodal {...this.props}/>
+			<Updatemodal {...this.props} {...this.state}/>
 			<Preview/>
 			</Body>
 		)
@@ -85,7 +86,14 @@ export default class Redios extends Component {
 		if (code === undefined) {
 			return
 		}
-		this.setState({ isTreeSelected: e.selected })
+		let parent = code.split("--")[3]
+		console.log('parent',parent)
+		this.doc_type = e.node.props.title;
+		this.setState({
+			isTreeSelected:e.selected,
+			parent:parent,
+			selectDoc:e.node.props.title
+		})
 		setcurrentcode({ code: code.split("--")[1] });
 		getdocument({ code: code.split("--")[1] });
 	}

@@ -2,7 +2,7 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input,Button, Row, Col, Modal, Upload,DatePicker,Progress,
-    Icon, message, Table,Select
+    Icon, message, Table,Select,Spin
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
@@ -15,6 +15,13 @@ const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument
 class Updatemodal extends Component {
 
     static propTypes = {};
+    constructor(props){
+        super(props)
+        this.state = {
+            progress: 0,
+            isUploading: false
+        }
+    }
     coverPicFile = (e) => {
 		if (Array.isArray(e)) {
 			return e;
@@ -35,7 +42,7 @@ class Updatemodal extends Component {
         })
         this.areaArray = [];
         nodeArray.map(item => {
-            this.areaArray.push(<Option value={item.No+'--'+item.Name}>{item.Name}</Option>)
+            this.areaArray.push(<Option value={item.No+'--'+item.Name} key={item.No}>{item.Name}</Option>)
         })
     }
     onSelectChange(value){
@@ -49,110 +56,138 @@ class Updatemodal extends Component {
             return node.Type === '单位工程' && node.No.indexOf(temp) !== -1;
         })
         nodeArray.map(item => {
-            this.unitArray.push(<Option value={item.No+'--'+item.Name}>{item.Name}</Option>)
+            this.unitArray.push(<Option value={item.No+'--'+item.Name} key={item.No}>{item.Name}</Option>)
         })
     }
 
     render() {
-        const {oldfile = {}}=this.props;
         const {
             form: { getFieldDecorator },
-            additionVisible = false,
+            updatevisible = false,
+            oldfile = {},
+            selectDoc,
+			parent 
         } = this.props;
+        const{
+            isUploading
+        }=this.state
+        //判断选中的是哪个节点下的文件夹
+		let canSection = false
+		if(selectDoc === '综合管理性文件' || parent === '综合管理性文件'){
+			canSection = true
+        }
+       
+
         const formItemLayout = {
 			labelCol: { span: 6 },
 			wrapperCol: { span: 14 },
 		};
-        const{
-            updatevisible = false
-        } = this.props;
-        // debugger
+        
+        
         let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
                     <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
-        let footer = arr;
+        let footer = isUploading ? null : arr;
+
+
+        console.log('oldfile',oldfile)
+        
         return (
-            <Modal title="编辑资料"
-                width={920} visible={updatevisible}
-                closable={false}
-                footer={footer}
-                maskClosable={false}>
-                <Form>
-                    <FormItem {...formItemLayout} label="项目">
-                        {getFieldDecorator('area1', {
-                            initialValue: oldfile.area,
-                            rules: [
-                                { required: true, message: '请选择项目' },
-                            ]
-                        })(<Select placeholder='请选择项目'  onChange={this.onSelectChange.bind(this)}>
-                            {this.areaArray}
-                        </Select>)
-                        }
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="标段">
-                        {getFieldDecorator('unitProject1', {
-                            initialValue: oldfile.unitProject,
-                            rules: [
-                                { required: true, message: '请选择标段' },
-                            ]
-                        })(<Select placeholder='请选择标段'>
-                                {this.unitArray}
-                            </Select>)
-                        }
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="名称">
-                        {getFieldDecorator('name1', {
-                            initialValue: oldfile.name,
-                            rules: [
-                                { required: true, message: '请输入名称' },
-                            ]
-                        })(
-                            <Input type="text" />
-                            )}
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="编号">
-                        {getFieldDecorator('number1', {
-                            initialValue: oldfile.extra_params ? oldfile.extra_params.number : '',
-                            rules: [
-                                { required: true, message: '请输入编号' },
-                            ]
-                        })(
-                            <Input type="text" />
-                            )}
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="文档类型">
-                        {getFieldDecorator('doc_type1', {
-                            initialValue: this.props.doc_type,
-                            rules: [
-                                { required: true, message: '未获取到文档类型' },
-                            ]
-                        })(
-                            <Input type="text" readOnly />
-                            )}
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="上传文件">
-                        {getFieldDecorator('attachment1', {
-                            initialValue: oldfile.basic_params ? oldfile.basic_params.files : [],
-                            rules: [
+            <div>
+                {
+                    !updatevisible?
+                    null:
+                    <Modal title="编辑资料"
+                        width={920} visible={updatevisible}
+                        closable={false}
+                        footer={footer}
+                        maskClosable={false}>
+                        <Spin spinning={isUploading}>
+                            <Form>
+                                <FormItem {...formItemLayout} label="项目">
+                                    {getFieldDecorator('area1', {
+                                        initialValue:oldfile && oldfile.extra_params && oldfile.extra_params.area,
+                                        rules: [
+                                            { required: true, message: '请选择项目' },
+                                        ]
+                                    })(<Select placeholder='请选择项目'  onChange={this.onSelectChange.bind(this)}>
+                                        {this.areaArray}
+                                    </Select>)
+                                    }
+                                </FormItem>
                                 {
-                                    required: true,
-                                    message: '请至少上传一个文件！',
+                                    canSection
+                                    ? null
+                                    : <FormItem {...formItemLayout} label="标段">
+                                        {getFieldDecorator('unitProject1', {
+                                            initialValue:oldfile && oldfile.extra_params &&  oldfile.extra_params.unitProject,
+                                            rules: [
+                                                { required: true, message: '请选择标段' },
+                                            ]
+                                        })(<Select placeholder='请选择标段'>
+                                                {this.unitArray}
+                                            </Select>)
+                                        }
+                                    </FormItem>
                                 }
-                            ],
-                            valuePropName: 'fileList',
-                            getValueFromEvent: this.coverPicFile,
-                        }, {})(
-                            <Upload {...this.uploadProps}
-                            accept={fileTypes}
-                            // defaultFileList={oldfile.basic_params ? oldfile.basic_params.files[0] : []}
-                            >
-                                <Button>
-                                    <Icon type="upload" />添加文件
-                                    </Button>
-                            </Upload>
-                            )}
-                    </FormItem>
-                </Form>
-            </Modal>
+                                <FormItem {...formItemLayout} label="名称">
+                                    {getFieldDecorator('name1', {
+                                        initialValue: oldfile.name,
+                                        rules: [
+                                            { required: true, message: '请输入名称' },
+                                        ]
+                                    })(
+                                        <Input type="text" />
+                                        )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="编号">
+                                    {getFieldDecorator('number1', {
+                                        initialValue: oldfile.extra_params ? oldfile.extra_params.number : '',
+                                        rules: [
+                                            { required: true, message: '请输入编号' },
+                                        ]
+                                    })(
+                                        <Input type="text" />
+                                        )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="文档类型">
+                                    {getFieldDecorator('doc_type1', {
+                                        initialValue: this.props.doc_type,
+                                        rules: [
+                                            { required: true, message: '未获取到文档类型' },
+                                        ]
+                                    })(
+                                        <Input type="text" readOnly />
+                                        )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="上传文件">
+                                    {getFieldDecorator('attachment1', {
+                                        initialValue: oldfile.basic_params ? oldfile.basic_params.files : [],
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请至少上传一个文件！',
+                                            }
+                                        ],
+                                        valuePropName: 'fileList',
+                                        getValueFromEvent: this.normFile,
+                                    }, {})(
+                                        <Upload {...this.uploadProps}
+                                        accept={fileTypes}
+                                        onChange={this.changeDoc.bind(this)}
+                                        // defaultFileList={oldfile.basic_params ? oldfile.basic_params.files[0] : []}
+                                        >
+                                            <Button>
+                                                <Icon type="upload" />添加文件
+                                                </Button>
+                                        </Upload>
+                                        )}
+                                </FormItem>
+                            </Form>
+                        </Spin>
+                    </Modal>
+                }
+            </div>
+            
         )}
 
     cancel() {
@@ -160,6 +195,14 @@ class Updatemodal extends Component {
             actions: {updatevisible}
         } = this.props;
         updatevisible(false);
+    }
+
+    normFile = (e) => {
+        console.log('Upload event:', e);
+        if (Array.isArray(e)) {
+          return e;
+        }
+        return e && e.fileList;
     }
 
     uploadProps = {
@@ -172,7 +215,11 @@ class Updatemodal extends Component {
                 a_file: file
             };
         },
-        beforeUpload(file) {
+        beforeUpload:(file) => {
+            this.setState({ 
+                progress: 0,
+                isUploading:true 
+            })
             const valid = fileTypes.indexOf(file.type) >= 0;
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
@@ -184,12 +231,36 @@ class Updatemodal extends Component {
         },
     };
 
+    changeDoc({file, fileList, event}) {
+        const{
+            form:{setFieldsValue}
+        }=this.props
+        if (file && file.status && file.status === 'done') {
+            this.setState({
+                isUploading:false
+            })
+        }else if(file && file.status && file.status === 'removed'){
+            console.log('filefilefilefilefilefile')
+            setFieldsValue({
+                attachment1:undefined
+            })
+        }
+    }
+
     save() {
         const {
             currentcode = {},
-            actions: { updatevisible, putdocument,getdocument }
+            actions: { updatevisible, putdocument,getdocument },
+            selectDoc,
+			parent 
         } = this.props;
+        //判断选中的是哪个节点下的文件夹
+		let canSection = false
+		if(selectDoc === '综合管理性文件' || parent === '综合管理性文件'){
+			canSection = true
+        }
         this.props.form.validateFields((err, values) => {
+            console.log('values',values)
             if(!err){
                 let user = getUser();
                 // debugger
@@ -209,8 +280,9 @@ class Updatemodal extends Component {
                     extra_params: {
                         number: values.number1,
                         area: values.area1.split('--')[1],
-                        unitProject: values.unitProject1.split('--')[1],
-                        people: user.username,
+                        unitProject: canSection ? '' : (values.unitProject.split('--')?values.unitProject.split('--')[1]:values.unitProject),
+                        people: user.name,
+                        username: user.username,
                         unit:user.org,
                         doc_type: values.doc_type1,
                         time: moment.utc().format('YYYY-MM-DD')

@@ -2,13 +2,13 @@ import React, { PropTypes, Component } from 'react';
 import { FILE_API } from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table, DatePicker, Progress, Select,
+    Icon, message, Table, DatePicker, Progress, Select,Spin
 } from 'antd';
 import moment from 'moment';
 import { DeleteIpPort } from '../../../_platform/components/singleton/DeleteIpPort';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
-let fileTypes = 'application/mp4,application/3gpp,application/wmv,video/mp4,video/ogg,video/webm';
+let fileTypes = 'image/jpeg,image/tiff,image/png,image/bmp,image/jpg';
 
 
 
@@ -35,37 +35,47 @@ export default class Addition extends Component {
         <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
         let footer = isUploading ? null : arr;
         return (
-            <Modal title="添加文件"
-                width={920} visible={additionVisible}
-                closable={false}
-                footer={footer}
-                maskClosable={false}>
-                <Form>
-                    <Row gutter={24}>
-                        <Col span={24} style={{ marginTop: 16, height: 160 }}>
-                            <Dragger {...this.uploadProps}
-                                accept={fileTypes}
-                                onChange={this.changeDoc.bind(this)}>
-                                <p className="ant-upload-drag-icon">
-                                    <Icon type="inbox" />
-                                </p>
-                                <p className="ant-upload-text">点击或者拖拽开始上传</p>
-                                <p className="ant-upload-hint">
-                                    支持mp4、ogg、webm视频</p>
-                            </Dragger>
-                            <Progress percent={progress} strokeWidth={5} />
-                        </Col>
-                    </Row>
-                    <Row gutter={24} style={{ marginTop: 35 }}>
-                        <Col span={24}>
-                            <Table rowSelection={this.rowSelection}
-                                columns={this.docCols}
-                                dataSource={docs}
-                                bordered rowKey="uid" />
-                        </Col>
-                    </Row>
-                </Form>
-            </Modal>
+            <div>
+                {
+                !additionVisible
+                ? null
+                :
+                    <Modal title="添加文件"
+                    width={920} visible={additionVisible}
+                    closable={false}
+                    footer={footer}
+                    maskClosable={false}>
+                    <Spin spinning={isUploading}>
+                    <Form>
+                        <Row gutter={24}>
+                            <Col span={24} style={{ marginTop: 16, height: 160 }}>
+                                <Dragger {...this.uploadProps}
+                                    accept={fileTypes}
+                                    onChange={this.changeDoc.bind(this)}>
+                                    <p className="ant-upload-drag-icon">
+                                        <Icon type="inbox" />
+                                    </p>
+                                    <p className="ant-upload-text">点击或者拖拽开始上传</p>
+                                    <p className="ant-upload-hint">
+                                        支持bmp,jpg,png,tif文件</p>
+                                </Dragger>
+                                {/* <Progress percent={progress} strokeWidth={5} /> */}
+                            </Col>
+                        </Row>
+                        <Row gutter={24} style={{ marginTop: 35 }}>
+                            <Col span={24}>
+                                <Table 
+                                    // rowSelection={this.rowSelection}
+                                    columns={this.docCols}
+                                    dataSource={docs}
+                                    bordered rowKey="uid" />
+                            </Col>
+                        </Row>
+                    </Form>
+                    </Spin>
+                </Modal>}
+            </div>
+            
         );
     }
 
@@ -82,9 +92,9 @@ export default class Addition extends Component {
         } = this.props;
         toggleAddition(false);
         changeDocs();
-        this.setState({
-            progress: 0
-        })
+        // this.setState({
+        //     progress: 0
+        // })
     }
 
     uploadProps = {
@@ -97,14 +107,19 @@ export default class Addition extends Component {
                 a_file: file,
             };
         },
-        beforeUpload(file) {
+        beforeUpload:(file) => {
+            this.setState({ 
+                progress: 0,
+                isUploading:true 
+            });
+            
             const valid = fileTypes.indexOf(file.type) >= 0;
             //console.log(file);
             if (!valid) {
-                message.error('只能上传 pdf、doc、docx 文件！');
+                message.error('只能上传 bmp,jpg,png,tif 文件！');
             }
             return valid;
-            this.setState({ progress: 0 });
+            // this.setState({ progress: 0 });
         },
     };
 
@@ -115,23 +130,19 @@ export default class Addition extends Component {
         } = this.props;
         if (file.status === 'done') {
             changeDocs([...docs, file]);
-        }
-        this.setState({
-            isUploading: file.status === 'done' ? false : true
-        })
-        if (event) {
-            let { percent } = event;
-            if (percent !== undefined)
-                this.setState({ progress: parseFloat(percent.toFixed(1)) });
+            this.setState({
+                isUploading:false
+            })
         }
     }
 
+
     docCols = [
         {
-            title: '规范名称',
+            title: '影像名称',
             dataIndex: 'name'
         }, {
-            title: '规范编号',
+            title: '影像编号',
             render: (doc) => {
                 return <Input onChange={this.number.bind(this, doc)} />;
             }
@@ -141,7 +152,7 @@ export default class Addition extends Component {
                 return <Input onChange={this.company.bind(this, doc)} />;
             }
         }, {
-            title: '实施日期',
+            title: '拍摄日期',
             render: (doc) => {
                 return <DatePicker onChange={this.time.bind(this, doc)} />;
             }
@@ -213,6 +224,20 @@ export default class Addition extends Component {
             docs = [],
             actions: { toggleAddition, postDocument, getdocument, changeDocs }
         } = this.props;
+
+        let canSave = true
+        //判断各列有没有输入
+        docs.map((doc)=>{
+            if( !doc.number || !doc.company || !doc.time  ){
+                canSave = false
+            }
+        })
+
+        if(!canSave){
+            message.error('请输入表格中除备注外的每项');
+            return 
+        }
+
         const promises = docs.map(doc => {
             const response = doc.response;
             let files = DeleteIpPort(doc);
