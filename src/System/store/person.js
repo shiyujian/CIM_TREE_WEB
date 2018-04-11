@@ -13,6 +13,8 @@ const getTreeModal = createAction(`${ID}设置树节点布尔值`);
 const getTablePage = createAction(`${ID}table分页`);
 const getTreeCode = createAction(`${ID}点击tree的节点code`);
 const getIsBtn = createAction(`${ID}控制是否根据角色进行分页`);
+const getIsActive = createAction(`${ID}控制是否根据角色是否禁用启用`);
+
 
 const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 
@@ -36,6 +38,7 @@ export const actions = {
 	getTablePage,
 	getTreeCode,
 	getIsBtn,
+	getIsActive
 };
 
 export default handleActions({
@@ -82,5 +85,9 @@ export default handleActions({
 	[getIsBtn]: (state, {payload}) => ({
 		...state,
 		getIsBtns: payload
+	}),
+	[getIsActive]: (state, {payload}) => ({
+		...state,
+		getIsActives: payload
 	}),
 }, {});

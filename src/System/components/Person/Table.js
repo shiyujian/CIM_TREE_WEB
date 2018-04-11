@@ -25,9 +25,9 @@ export default class Users extends Component {
 			fristRoles: [],
 			TreeCodes: '',
 			isBtn: true,
-			objPage:'',
-			objPages:''
-			
+			objPage: '',
+			objPages: ''
+
 		}
 	}
 	static layout = {
@@ -119,15 +119,15 @@ export default class Users extends Component {
 			this.setState({ loading: true });
 			// 如果查询输入框里面的内容没有改变就不执行
 			// if(text!=this.state.fristText || this.state.fristRoles!=this.state.roles){
-				
-			getUsers({}, { org_code: this.props.getTreeCodes, "keyword": text, roles: this.state.roles, page:  1 }).then(items => {
-				console.log("items111111",items)
+
+			getUsers({}, { org_code: this.props.getTreeCodes, "keyword": text, roles: this.state.roles, page: 1 }).then(items => {
+				console.log("items111111", items)
 				let pagination = {
-					current:1,
+					current: 1,
 					total: items.count,
 				};
 				getTablePage(pagination)
-				this.setState({ btn: true, fristText: text, fristRoles: this.state.roles, isBtn: false, loading: false})
+				this.setState({ btn: true, fristText: text, fristRoles: this.state.roles, isBtn: false, loading: false })
 				getIsBtn(false)
 
 			})
@@ -136,13 +136,13 @@ export default class Users extends Component {
 		} else {
 			// if(this.state.btn){
 			// this.setState({ loading: true });
-			getUsers({}, { org_code: this.props.getTreeCodes, page:this.state.objPages || 1 }).then((e) => {
+			getUsers({}, { org_code: this.props.getTreeCodes, page: this.state.objPages || 1 }).then((e) => {
 				let pagination = {
 					current: this.state.objPages || 1,
 					total: e.count,
 				};
 				getTablePage(pagination)
-				this.setState({ btn: false, fristText: '', fristRoles: [], isBtn: true})
+				this.setState({ btn: false, fristText: '', fristRoles: [], isBtn: true })
 				getIsBtn(true)
 
 			});
@@ -243,13 +243,13 @@ export default class Users extends Component {
 			width: '15%',
 			render: (user) => {
 				if (user.roles) {
-					const {  platform: { roles = [] } } = this.props;
-					let add=[]
+					const { platform: { roles = [] } } = this.props;
+					let add = []
 					for (let i = 0; i < user.roles.length; i++) {
 						const element = user.roles[i];
 						for (let j = 0; j < roles.length; j++) {
 							const element = roles[j];
-							if(user.roles[i]==roles[j].id){
+							if (user.roles[i] == roles[j].id) {
 								add.push(roles[j].name)
 							}
 						}
@@ -311,23 +311,39 @@ export default class Users extends Component {
 			render: (user) => {
 				const userc = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 				if (userc.is_superuser == true) {
+					let add = ''
+					let acc = ''				
 					if (user.is_active == true) {
-						return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-						<Popconfirm title="是否真的要删除用户?" key={2}
-							onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-							<a>删除</a>
-						</Popconfirm>,
-						<a style={{ marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>禁用</a>
-						]
+						add = '禁用'
+						acc = ''
+						// return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+						// <Popconfirm title="是否真的要删除用户?" key={2}
+						// 	onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+						// 	<a>删除</a>
+						// </Popconfirm>,
+						// <a style={{ marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>禁用</a>,
+						// <a style={{ marginLeft: '.5em' }} >加入黑名单</a>
+						// ]
 					} else {
-						return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-						<Popconfirm title="是否真的要删除用户?" key={2}
-							onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-							<a>删除</a>
-						</Popconfirm>,
-						<a style={{ color: 'red', marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>启用</a>
-						]
+						add = '启用'
+						acc = 'red'
+						// return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+						// <Popconfirm title="是否真的要删除用户?" key={2}
+						// 	onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+						// 	<a>删除</a>
+						// </Popconfirm>,
+						// <a style={{ color: 'red', marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>启用</a>,
+						// <a style={{ marginLeft: '.5em' }} >取消黑名单</a>						
+						// ]
 					}
+					return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
+					<Popconfirm title="是否真的要删除用户?" key={2}
+						onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
+						<a>删除</a>
+					</Popconfirm>,
+					<a style={{ marginLeft: '.5em', color: acc }} onClick={this.disable.bind(this, user)}>{add}</a>,
+					<a style={{ marginLeft: '.5em' }} >加入黑名单</a>
+					]
 				} else {
 					return <a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>
 				}
@@ -516,19 +532,19 @@ export default class Users extends Component {
 					current: obj.current,
 					total: e.count,
 				};
-				this.setState({objPages:obj.current})				
+				this.setState({ objPages: obj.current })
 				getTablePage(pagination)
 				getTreeModal(false)
 			});
 		} else {
 			getTreeModal(true)
-			getUsers({}, { org_code: this.props.getTreeCodes,"keyword": text, roles: this.state.roles, page: obj.current }).then((e) => {
+			getUsers({}, { org_code: this.props.getTreeCodes, "keyword": text, roles: this.state.roles, page: obj.current }).then((e) => {
 				let pagination = {
 					current: obj.current,
 					total: e.count,
 				};
-				
-				this.setState({objPage:obj.current})
+
+				this.setState({ objPage: obj.current })
 				getTablePage(pagination)
 				getTreeModal(false)
 			});
@@ -761,13 +777,17 @@ export default class Users extends Component {
 	}
 
 	edit(user, event) {
+		console.log("user",user)
+		
 		event.preventDefault();
 		const account = user.account;
 		const groups = user.groups || [];
 		const {
 			sidebar: { node } = {},
-			actions: { resetAdditionField }
+			actions: { resetAdditionField,getIsActive }
 		} = this.props;
+		getIsActive(user.is_active)
+		
 		// if (node.children && node.children.length > 0) {
 		// 	message.warn('请选择最下级组织结构目录');
 
@@ -801,55 +821,55 @@ export default class Users extends Component {
 		// 		}
 		let text = document.getElementById("NurseryData").value;
 		let pages
-		if(users&&users.length==1){
-			pages=this.props.getTablePages.current-1
+		if (users && users.length == 1) {
+			pages = this.props.getTablePages.current - 1
 		}
-		else{
-			pages=this.props.getTablePages.current
+		else {
+			pages = this.props.getTablePages.current
 		}
 		if (user.id) {
 			console.log("this.props.getTablePages.current", this.props.getTablePages.current)
 			deleteUser({ userID: user.id }).then((as) => {
-				console.log("as",as)
+				console.log("as", as)
 				if (this.props.getIsBtns) {
 					getUsers({}, { org_code: codes, page: pages }).then((es) => {
-					console.log("es",es)
-							let pagination = {
-								current: this.props.getTablePages.current,
-								total: es.count,
-							};
-							getTablePage(pagination)
-						
-						
-						this.setState({  loading: false })
+						console.log("es", es)
+						let pagination = {
+							current: this.props.getTablePages.current,
+							total: es.count,
+						};
+						getTablePage(pagination)
+
+
+						this.setState({ loading: false })
 					});
 				} else {
-					getUsers({}, {org_code:this.props.getTreeCodes, "keyword": text,roles:this.state.roles }).then(items => {
-						console.log("items",items)
+					getUsers({}, { org_code: this.props.getTreeCodes, "keyword": text, roles: this.state.roles }).then(items => {
+						console.log("items", items)
 
-						if(items&&items.length==0){
+						if (items && items.length == 0) {
 							let pagination = {
 								current: 0,
-								total:0,
+								total: 0,
 							};
 							getTablePage(pagination)
 
 							let currents
-							if(this.props.getTablePages.current==0){
-								currents=1
-							}else{
-								currents=this.props.getTablePages.current
+							if (this.props.getTablePages.current == 0) {
+								currents = 1
+							} else {
+								currents = this.props.getTablePages.current
 							}
-							this.setState({  loading: false ,objPages:currents})	
-						}else{
+							this.setState({ loading: false, objPages: currents })
+						} else {
 							let pagination = {
 								current: 1,
-								total:items.length+1,
+								total: items.length + 1,
 							};
 							getTablePage(pagination)
-							this.setState({  loading: false })	
+							this.setState({ loading: false })
 						}
-						
+
 						// this.setState({  loading: false })						
 					})
 				}

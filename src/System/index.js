@@ -104,6 +104,13 @@ export default class System extends Component {
 			path: '/system/personsdata',
 			icon: <Icon name="street-view"/>
 		},
+		{
+			key: 'Blacklist',
+			id: 'SYSTEM.BLACKLIST',
+			name: '黑名单',
+			path: '/system/blacklist',
+			icon: <Icon name="street-view"/>
+		},
 		// ,{
 		// 	key: 'Document',
 		// 	id: 'SYSTEM.DOCUMENT',

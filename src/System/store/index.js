@@ -1,29 +1,30 @@
-import {handleActions, combineActions} from 'redux-actions';
-import {actionsMap} from '_platform/store/util';
-import projectReducer, {actions as projectActions} from './project';
-import roleReducer, {actions as roleActions} from './role';
-import permissionReducer, {actions as permissionActions} from './permission';
+import { handleActions, combineActions } from 'redux-actions';
+import { actionsMap } from '_platform/store/util';
+import projectReducer, { actions as projectActions } from './project';
+import roleReducer, { actions as roleActions } from './role';
+import permissionReducer, { actions as permissionActions } from './permission';
 
 import frameworkReducer, * as frameworkActions from './framework';
-import videoReducer, {actions as videoActions} from './video';
-import codeReducer, {actions as codeActions} from './code';
-import dictReducer, {actions as dictActions} from './dict';
-import createReducer, {actions as createActions} from './create';
-import conventionReducer, {actions as conventionActions} from './convention';
-import dangerReducer, {actions as dangerActions} from './danger';
-import hazardReducer, {actions as hazardActions} from './hazard';
-import defectsReducer, {actions as defectsActions} from './defects';
-import accidentReducer, {actions as accidentActions} from './accident';
-import majorReducer, {actions as majorActions} from './major';
-import documentReducer, {actions as documentActions} from './document';
-import tagReducer, {actions as tagActions} from './tag';
-import quantitiesReducer, {actions as quantitiesActions} from './quantities';
-import personReducer, {actions as personActions} from './person';
-import orgReducer, {actions as orgActions} from './org';
-import orgdataReducer, {actions as orgdataActions} from './orgdata';
-import qualityDataReducer, {actions as qualityDataActions} from './quality';
-import persondataReducer, {actions as persondataActions} from './persondata';
-import persondata1Reducer, {actions as persondata1Actions} from './persondata1';
+import videoReducer, { actions as videoActions } from './video';
+import codeReducer, { actions as codeActions } from './code';
+import dictReducer, { actions as dictActions } from './dict';
+import createReducer, { actions as createActions } from './create';
+import conventionReducer, { actions as conventionActions } from './convention';
+import dangerReducer, { actions as dangerActions } from './danger';
+import hazardReducer, { actions as hazardActions } from './hazard';
+import defectsReducer, { actions as defectsActions } from './defects';
+import accidentReducer, { actions as accidentActions } from './accident';
+import majorReducer, { actions as majorActions } from './major';
+import documentReducer, { actions as documentActions } from './document';
+import tagReducer, { actions as tagActions } from './tag';
+import quantitiesReducer, { actions as quantitiesActions } from './quantities';
+import personReducer, { actions as personActions } from './person';
+import orgReducer, { actions as orgActions } from './org';
+import orgdataReducer, { actions as orgdataActions } from './orgdata';
+import qualityDataReducer, { actions as qualityDataActions } from './quality';
+import persondataReducer, { actions as persondataActions } from './persondata';
+import persondata1Reducer, { actions as persondata1Actions } from './persondata1';
+import blacklistReducer, { actions as blacklistActions } from './blacklist';
 
 
 export default handleActions({
@@ -127,5 +128,10 @@ export default handleActions({
 	[combineActions(...actionsMap(persondata1Actions))]: (state = {}, action) => ({
 		...state,
 		persondata1: persondata1Reducer(state.persondata1, action),
+	}),
+	//黑名单
+	[combineActions(...actionsMap(blacklistActions))]: (state = {}, action) => ({
+		...state,
+		blacklist: persondata1Reducer(state.blacklist, action),
 	}),
 }, {});
