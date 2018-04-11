@@ -1,51 +1,69 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-	Form, Input,Button, Row, Col, Modal, Upload, Icon, message, Table,notification
+	Form, Input, Button, Row, Col, Modal, Upload, Icon, message, Table, notification
 } from 'antd';
 const FormItem = Form.Item;
 
 class Addition extends Component {
 	static propTypes = {};
-    constructor(props){
-        super(props);
-        this.state={
-			addVisible:false,
+	constructor(props) {
+		super(props);
+		this.state = {
+			addVisible: false,
+			seeVisible: false,
 			newKey: Math.random()
-        }
+		}
 	}
-	
+
 	static layoutT = {
-        labelCol: {span: 8},
-        wrapperCol: {span: 16},
-    };
-    static layout = {
-		labelCol: {span: 4},
-		wrapperCol: {span: 20},
-    };
+		labelCol: { span: 8 },
+		wrapperCol: { span: 16 },
+	};
+	static layout = {
+		labelCol: { span: 4 },
+		wrapperCol: { span: 20 },
+	};
+	export(){
+
+	}
+
 
 	render() {
-		const{
+		const {
 			addVisible = false,
+			seeVisible = false,
 		} = this.state;
 
-		const { 
-			form: { 
-				getFieldDecorator 
-			} 
+		const {
+			form: {
+				getFieldDecorator
+			}
 		} = this.props;
 
 		return (
 			<div>
-				<div style={{float:'right',marginBottom:12}}>
-					<Button type='primary' onClick={this.add.bind(this)}>新增苗圃</Button>
+				<div style={{ float: 'right', marginBottom: 12 }}>
+					<Button type='primary' onClick={this.see.bind(this)} >查看黑名单</Button>
+					<Button type='primary' style={{ marginLeft: '5px' }} onClick={this.add.bind(this)}>新增苗圃</Button>
 				</div>
-				
 				<Modal title="新增苗圃"
-				       width={920} visible={addVisible}
-					   onOk={this.save.bind(this)}
+					width={920} visible={seeVisible}
+					onOk={this.save1.bind(this)}
 					//    key={this.state.newKey}
-				       onCancel={this.cancel.bind(this)}>
+					onCancel={this.cancel1.bind(this)}>
+					<Button type='primary' style={{ marginBottom: '5px' }} onClick={this.export.bind(this)}>导出表格</Button>
+					<Table 
+						// dataSource={arrList}
+						columns={this.columns}
+						// expandedRowRender={record=> <p>{111111111}</p>}							
+						bordered />
+				</Modal>
+				<Modal title="新增苗圃"
+					width={920} visible={addVisible}
+					onOk={this.save.bind(this)}
+					//    key={this.state.newKey}
+					onCancel={this.cancel.bind(this)}>
 					<Form>
 						<Row>
 							<Col span={24}>
@@ -58,12 +76,12 @@ class Addition extends Component {
 														{ required: true, message: '请输入供应商' }
 													]
 												})
-												(
-													<Input placeholder='请输入供应商'/>
-												)
+													(
+													<Input placeholder='请输入供应商' />
+													)
 											}
-                                        
-                                        </FormItem>
+
+										</FormItem>
 									</Col>
 									<Col span={12}>
 										<FormItem   {...Addition.layoutT} label="苗圃名称:">
@@ -73,12 +91,12 @@ class Addition extends Component {
 														{ required: true, message: '请输入苗圃名称' }
 													]
 												})
-												(
-													<Input placeholder='请输入苗圃名称'/>
-												)
+													(
+													<Input placeholder='请输入苗圃名称' />
+													)
 											}
-                                        
-                                        </FormItem>
+
+										</FormItem>
 									</Col>
 									<Col span={12}>
 										<FormItem   {...Addition.layoutT} label="行政区划:">
@@ -88,12 +106,12 @@ class Addition extends Component {
 														{ required: true, message: '请输入行政区划' }
 													]
 												})
-												(
-													<Input placeholder='请输入行政区划'/>
-												)
+													(
+													<Input placeholder='请输入行政区划' />
+													)
 											}
-                                        
-                                        </FormItem>
+
+										</FormItem>
 									</Col>
 									<Col span={12}>
 										<FormItem   {...Addition.layoutT} label="行政区划编码:">
@@ -103,12 +121,12 @@ class Addition extends Component {
 														{ required: true, message: '请输入行政区划编码' }
 													]
 												})
-												(
-													<Input placeholder='请输入行政区划编码'/>
-												)
+													(
+													<Input placeholder='请输入行政区划编码' />
+													)
 											}
-                                        
-                                        </FormItem>
+
+										</FormItem>
 									</Col>
 									<Col span={12}>
 										<FormItem   {...Addition.layoutT} label="产地:">
@@ -118,11 +136,11 @@ class Addition extends Component {
 														{ required: true, message: '请输入产地' }
 													]
 												})
-												(
-													<Input placeholder='请输入产地'/>
-												)
+													(
+													<Input placeholder='请输入产地' />
+													)
 											}
-                                        </FormItem>
+										</FormItem>
 									</Col>
 								</Row>
 							</Col>
@@ -133,16 +151,26 @@ class Addition extends Component {
 		);
 	}
 
-	add(){
+	add() {
 		this.setState({
 			// newKey: Math.random(),
-			addVisible:true
+			addVisible: true
 		})
 	}
-
+	see() {
+		this.setState({
+			// newKey: Math.random(),
+			seeVisible: true
+		})
+	}
+	cancel1() {
+		this.setState({
+			seeVisible: false
+		})
+	}
 	cancel() {
-		const{
-			form:{setFieldsValue}
+		const {
+			form: { setFieldsValue }
 		} = this.props
 		setFieldsValue({
 			'SFactory': undefined,
@@ -153,42 +181,46 @@ class Addition extends Component {
 		});
 
 		this.setState({
-			addVisible:false
+			addVisible: false
 		})
 	}
-
+	save1() {
+		this.setState({
+			seeVisible: false
+		})
+	}
 	save() {
-		const{
-			actions:{
+		const {
+			actions: {
 				postNursery,
-				getNurseryList			
+			getNurseryList
 			},
-			form:{setFieldsValue}
-		}= this.props
-        let me = this;
-        me.props.form.validateFields((err, values) => {
+			form: { setFieldsValue }
+		} = this.props
+		let me = this;
+		me.props.form.validateFields((err, values) => {
 			console.log('Received values of form: ', values);
-            if (!err) {
+			if (!err) {
 				let postdata = {
-					Factory:values.SFactory,
-					NurseryName:values.SNurseryName,
-					RegionCode:values.SRegionCode,
-					RegionName:values.SRegionName,
-					TreePlace:values.STreePlace
+					Factory: values.SFactory,
+					NurseryName: values.SNurseryName,
+					RegionCode: values.SRegionCode,
+					RegionName: values.SRegionName,
+					TreePlace: values.STreePlace
 				}
-				postNursery({},postdata).then((rst)=>{
-					console.log('rst',rst)
-					if(rst && rst.code){
-						if(rst.msg && rst.msg === '苗圃已存在'){
+				postNursery({}, postdata).then((rst) => {
+					console.log('rst', rst)
+					if (rst && rst.code) {
+						if (rst.msg && rst.msg === '苗圃已存在') {
 							notification.error({
-								message:'名称已存在',
-								duration:3
+								message: '名称已存在',
+								duration: 3
 							})
-						}else{
+						} else {
 							notification.success({
 								message: '新增苗圃成功',
 								duration: 2
-							}) 
+							})
 							getNurseryList()
 							setFieldsValue({
 								'SFactory': undefined,
@@ -198,23 +230,81 @@ class Addition extends Component {
 								'STreePlace': undefined,
 							});
 							me.setState({
-								addVisible:false
+								addVisible: false
 							})
 						}
-						
-					}else{
+
+					} else {
 						notification.error({
-                            message: '新增苗圃失败',
-                            duration: 2
-                        }) 
+							message: '新增苗圃失败',
+							duration: 2
+						})
 					}
-					
+
 				})
-				
+
 			}
 		})
-		
+
 	}
+	columns = [
+		// {
+		// 	title: '序号',
+		// 	key: 'key',
+		// 	dataIndex: 'key',
+		// },
+		{
+			title: '苗圃ID',
+			key: 'ID',
+			width: '6%',
+			dataIndex: 'ID',
+		}, {
+			title: '供应商',
+			key: 'Factory',
+			width: '20%',
+			dataIndex: 'Factory',
+		}, {
+			title: '苗圃名称',
+			key: 'NurseryName',
+			width: '16%',
+			dataIndex: 'NurseryName',
+		}, {
+			title: '行政区划编码',
+			key: 'RegionCode',
+			width: '10%',
+			dataIndex: 'RegionCode',
+		}, {
+			title: '行政区划',
+			key: 'RegionName',
+			width: '16%',
+			dataIndex: 'RegionName',
+		}, {
+			title: '产地',
+			key: 'TreePlace',
+			width: '16%',
+			dataIndex: 'TreePlace',
+		}, {
+			title: '操作',
+			key: 'operate',
+			dataIndex: 'operate',
+			render: (text, record, index) => {
+				if (record.ID) {
+					return (
+						<div>
+							<a onClick={this.edite.bind(this, record)}>修改</a>
+							<span className="ant-divider" />
+							<Popconfirm title="是否真的要删除该苗圃?"
+								onConfirm={this.delet.bind(this, record)} okText="是" cancelText="否">
+								<a>删除</a>
+							</Popconfirm>
+							<span className="ant-divider" />
+							<a >加入黑名单</a>
+						</div>
+					)
+				}
+			}
+		}
+	];
 }
 
 export default Form.create()(Addition)

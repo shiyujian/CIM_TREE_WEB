@@ -398,6 +398,7 @@ class Addition extends Component {
 				}
 				this.props.form.validateFields((err, values) => {
 					console.log("err", err)
+					console.log("this.props.getIsActives", this.props.getIsActives)
 					if (!err || !err.FullName && !err.UserName && !err.rolesNmae && !err.sexName && !err.telephone && !err.titles) {
 						putUser({}, {
 							id: addition.id,
@@ -420,7 +421,7 @@ class Addition extends Component {
 							sections: addition.sections,
 							//groups: [7],
 							groups: roles.map(role => +role),
-							is_active: true,
+							is_active: this.props.getIsActives,
 							basic_params: {
 								info: {
 									'电话': addition.person_telephone || '',
