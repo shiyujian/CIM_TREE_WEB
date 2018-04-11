@@ -1,31 +1,111 @@
 import React, { Component } from 'react';
 import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import {
-	Form, Input, Button, Row, Col, message, Popconfirm
+	Form, Input, Button, Row, Col, message, Popconfirm,DatePicker
 } from 'antd';
 const FormItem = Form.Item;
 const Search = Input.Search;
+const { RangePicker } = DatePicker;
 
-export default class Filter extends Component {
+class Filter extends Component {
 
 	static propTypes = {};
 
+	static layout = {
+		labelCol: { span: 6 },
+		wrapperCol: { span: 18 },
+	};
 	render() {
-		const { actions: { toggleAddition }, Doc = [] } = this.props;
+		const { 
+			actions: { toggleAddition }, 
+			form: { getFieldDecorator },
+			Doc = [] 
+		} = this.props;
 		// console.log('sssss',this.props.isTreeSelected)
 		return (
 			<Form style={{ marginBottom: 24 }}>
 				<Row gutter={24}>
-					<FormItem>
-						<Col span={14}>
-							<Search placeholder="输入内容"
-								onSearch={this.query.bind(this)} />
-						</Col>
-					</FormItem>
+					<Col span={20}> 
+						<Row>
+							<Col span={8}>
+								<FormItem {...Filter.layout} label='项目'>
+									{
+										getFieldDecorator('searchProject', {
+											rules: [
+												{ required: false, message: '请选择项目' }
+											]
+										})
+											(<Input placeholder='请选择项目' />)
+									}
+								</FormItem>
+							</Col>
+							<Col span={8}>
+								<FormItem {...Filter.layout}label="标段">
+									{
+										getFieldDecorator('searcSection', {
+											rules: [
+												{ required: false, message: '请选择标段' }
+											]
+										})
+											(<Input placeholder='请选择标段' />)
+									}
+								</FormItem>
+							</Col>
+							<Col span={8}>
+								<FormItem {...Filter.layout} label='名称'>
+									{
+										getFieldDecorator('searchName', {
+											rules: [
+												{ required: false, message: '请输入名称' }
+											]
+										})
+											(<Input placeholder='请输入名称' />)
+									}
+								</FormItem>
+							</Col>
+						</Row>
+						<Row>
+							<Col span={8}>
+								<FormItem {...Filter.layout} label='编号'>
+									{
+										getFieldDecorator('searchCode', {
+											rules: [
+												{ required: false, message: '请输入编号' }
+											]
+										})
+											(<Input placeholder='请输入编号' />)
+									}
+								</FormItem>
+							</Col>
+							<Col span={8}>
+								<FormItem {...Filter.layout} label='日期'>
+									{
+										getFieldDecorator('searchDate', {
+											rules: [
+												{type: 'array',  required: false, message: '请选择日期' }
+											]
+										})
+											(<RangePicker size='default' format='YYYY-MM-DD' style={{ width: '100%', height: '100%' }} />)
+									}
+								</FormItem>
+							</Col>
+						</Row>
+					</Col>
+					
+					<Col span={3} offset={1}>
+                        <Row gutter={10}>
+                            <FormItem >
+                                <Button type='Primary' onClick={this.query.bind(this)} >查询</Button>
+                            </FormItem>
+							<FormItem >
+                                <Button onClick={this.clear.bind(this)}>清除</Button>
+                            </FormItem>
+                        </Row>
+                    </Col>
 				</Row>
 				<Row gutter={24}>
 					<Col span={24}>
-						{!this.props.isTreeSelected ?
+						{!this.props.parent ?
 							<Button style={{ marginRight: 10 }} disabled>新增</Button> :
 							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
 						}
@@ -51,13 +131,31 @@ export default class Filter extends Component {
 		);
 	}
 
-	query(value) {
-		const { actions: { getdocument }, currentcode } = this.props;
-		let search = {
-			doc_name: value
-		};
-		getdocument({ code: currentcode.code }, search);
+	query() {
+		const { 
+			actions: { getdocument }, 
+			form:{validateFields},
+			currentcode 
+		} = this.props;
+		validateFields((err, values) => {
+			let search = {}
+			search = {
+				doc_name: values.searchName
+			};
+			
+			getdocument({ code: currentcode.code }, search);
+		})
+		
 	}
+	clear() {
+        this.props.form.setFieldsValue({
+			searchProject: undefined,
+            searcSection: undefined,
+            searchName: undefined,
+			searchDate: undefined,
+			searchCode: undefined,
+        })
+    }
 	cancel() {
 
 	}
@@ -124,3 +222,4 @@ export default class Filter extends Component {
 		});
 	}
 };
+export default Filter = Form.create()(Filter);

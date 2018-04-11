@@ -2,15 +2,16 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input, Row, Col, Modal, Upload, Button,
-    Icon, message, Table,DatePicker,Progress,Select,
+    Icon, message, Table,DatePicker,Progress,Select,Spin
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
+const FormItem = Form.Item;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
 
-export default class Addition extends Component {
+class Addition extends Component {
 
     static propTypes = {};
 
@@ -22,11 +23,17 @@ export default class Addition extends Component {
         progress:0,
         isUploading: false
     }
+    formItemLayout = {
+        // labelCol: { span: 6 },
+        wrapperCol: { span: 24 },
+    };
     render() {
         const{
+            form: { getFieldDecorator },
             additionVisible = false,
             docs = []
         } = this.props;
+        
         console.log('add.props',this.props);
         let {progress,isUploading} = this.state;
         let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
@@ -38,33 +45,37 @@ export default class Addition extends Component {
                    closable={false}
                    footer={footer}
                    maskClosable={false}>
-				<Form>
-					<Row gutter={24}>
-						<Col span={24} style={{marginTop: 16, height: 160}}>
-							<Dragger {...this.uploadProps}
-									 accept={fileTypes}
-									 onChange={this.changeDoc.bind(this)}>
-								<p className="ant-upload-drag-icon">
-									<Icon type="inbox"/>
-								</p>
-								<p className="ant-upload-text">点击或者拖拽开始上传</p>
-								<p className="ant-upload-hint">
-									支持 pdf、doc、docx 文件
+                <Spin spinning={isUploading}>
+                    <Form>
+                        <Row gutter={24}>
+                            <Col span={24} style={{marginTop: 16, height: 160}}>
+                                <Dragger {...this.uploadProps}
+                                        accept={fileTypes}
+                                        onChange={this.changeDoc.bind(this)}>
+                                    <p className="ant-upload-drag-icon">
+                                        <Icon type="inbox"/>
+                                    </p>
+                                    <p className="ant-upload-text">点击或者拖拽开始上传</p>
+                                    <p className="ant-upload-hint">
+                                        支持 pdf、doc、docx 文件
 
-								</p>
-							</Dragger>
-							<Progress percent={progress} strokeWidth={5}/>
-						</Col>
-					</Row>
-					<Row gutter={24} style={{marginTop: 35}}>
-						<Col span={24}>
-							<Table rowSelection={this.rowSelection}
-								   columns={this.docCols}
-								   dataSource={docs}
-								   bordered rowKey="uid"/>
-						</Col>
-					</Row>
-				</Form>
+                                    </p>
+                                </Dragger>
+                                {/* <Progress percent={progress} strokeWidth={5}/> */}
+                            </Col>
+                        </Row>
+                        <Row gutter={24} style={{marginTop: 35}}>
+                            <Col span={24}>
+                                <Table 
+                                    // rowSelection={this.rowSelection}
+                                    columns={this.docCols}
+                                    dataSource={docs}
+                                    bordered rowKey="uid"/>
+                            </Col>
+                        </Row>
+                    </Form>
+                </Spin>
+				
 			</Modal>
         );
     }
@@ -97,14 +108,19 @@ export default class Addition extends Component {
                 a_file: file,
             };
         },
-        beforeUpload(file) {
+        beforeUpload:(file) => {
+            this.setState({ 
+                progress: 0,
+                isUploading:true 
+            });
             const valid = fileTypes.indexOf(file.type) >= 0;
             //console.log(file);
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
             }
+            
             return valid;
-            this.setState({ progress: 0 });
+            
         },
     };
 
@@ -115,21 +131,22 @@ export default class Addition extends Component {
         } = this.props;
         if (file.status === 'done') {
             changeDocs([...docs, file]);
+            this.setState({
+                isUploading:false
+            })
         }
-        this.setState({
-            isUploading: file.status === 'done' ? false : true
-        })
-        if(event){
-            let {percent} = event;
-            if(percent!==undefined)
-                this.setState({progress:parseFloat(percent.toFixed(1))});
-        }
+        // if(event){
+        //     let {percent} = event;
+        //     if(percent!==undefined)
+        //         this.setState({progress:parseFloat(percent.toFixed(1))});
+        // }
     }
 
     docCols = [
         {
             title:'规范名称',
-            dataIndex:'name'
+            dataIndex:'name',
+            key:'name'
         },{
             title:'规范编号',
             render: (doc) => {
@@ -213,6 +230,22 @@ export default class Addition extends Component {
             docs = [],
             actions: {toggleAddition, postDocument, getdocument,changeDocs}
         } = this.props;
+
+        let canSave = true
+        //判断各列有没有输入
+        docs.map((doc)=>{
+            if( !doc.number || !doc.company || !doc.time  ){
+                canSave = false
+            }
+        })
+
+        if(!canSave){
+            message.error('请输入表格中除备注外的每项');
+            return 
+        }
+
+
+
         const promises = docs.map(doc => {
             const response = doc.response;
             let files=DeleteIpPort(doc);
@@ -251,3 +284,4 @@ export default class Addition extends Component {
     }
 
 }
+export default Form.create()(Addition);

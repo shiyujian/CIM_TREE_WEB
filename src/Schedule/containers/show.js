@@ -110,7 +110,8 @@ export default class Proprogress extends Component {
                     </div>
                 </Sidebar>
                 <Content>
-                    <video src=" " controls="controls" width="600" height="600"></video>
+                    <iframe src='/treemapdemo/navigation.html' style={{height:'810',width:'100%'}}></iframe>
+                    {/* <video src=" " controls="controls" width="600" height="600"></video>
                     <Row>
                     <Col span={3}>
                     <Checkbox>常绿乔木</Checkbox>
@@ -142,7 +143,7 @@ export default class Proprogress extends Component {
                      <Col span={21}>
                     <Progress percent={progress} strokeWidth={5}/>
                     </Col>
-                    </Row>
+                    </Row> */}
                 </Content>
 			</div>);
 	}

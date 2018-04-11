@@ -52,9 +52,14 @@ export default class Filter extends Component {
 
 	query(value) {
 		const { actions: { getdocument }, currentcode } = this.props;
-		let search = {
-			doc_name: value
-		};
+		let search = {}
+		if(value){
+			search = {
+				doc_name: value
+			};
+		}
+		
+		console.log('search',search)
 		getdocument({ code: currentcode.code }, search);
 	}
 	cancel() {

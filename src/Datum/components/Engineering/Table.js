@@ -6,12 +6,20 @@ import './index.less';
 export default class GeneralTable extends Component {
 
 	render() {
-		const { Doc = [] } = this.props;
-		console.log('ttt',this.props)
+		const { 
+			Doc = [],
+			selectDoc,
+			parent 
+		} = this.props;
+		let canSection = false
+		if(selectDoc === '综合管理性文件' || parent === '综合管理性文件'){
+			canSection = true
+		}
+
 		return (
 			<Table rowSelection={this.rowSelection}
 				dataSource={Doc}
-				columns={this.columns}
+				columns={canSection?this.columns1:this.columns}
 				className='foresttables'
 				bordered rowKey="code" />
 		);
@@ -28,35 +36,45 @@ export default class GeneralTable extends Component {
 		{
 			title: '项目',
 			dataIndex: 'extra_params.area',
-			key: 'area',
+			key: 'extra_params.area',
 		}, {
 			title: '标段',
 			dataIndex: 'extra_params.unitProject',
-			key: 'unitProject',
+			key: 'extra_params.unitProject',
 		},{
 			title: '名称',
 			dataIndex: 'name',
-			key: 'name',
+			key: 'extra_params.name',
 		},{
 			title: '编号',
 			dataIndex: 'extra_params.number',
-			key: 'number',
+			key: 'extra_params.number',
 		},{
 			title: '文档类型',
 			dataIndex: 'extra_params.doc_type',
-			key: 'doc_type',
-		},{
-			title: '提交单位',
-			dataIndex: 'extra_params.unit',
-			key: 'unit',
-		},{
+			key: 'extra_params.doc_type',
+		}
+		// ,{
+		// 	title: '提交单位',
+		// 	dataIndex: 'extra_params.unit',
+		// 	key: 'unit',
+		// }
+		,{
 			title: '提交人',
 			dataIndex: 'extra_params.people',
-			key: 'people',
+			key: 'extra_params.people',
+			render: (text, record, index)=>{
+				if(record && record.extra_params && record.extra_params.username){
+					return <span>{`${record.extra_params.people}(${record.extra_params.username})`}</span>
+				}else{
+					return <span>{text}</span>
+				}
+				
+			}
 		},{
 			title: '提交时间',
 			dataIndex: 'extra_params.time',
-			key: 'time',
+			key: 'extra_params.time',
 		},{
 			title: '操作',
 			render: (record, index) => {
@@ -72,6 +90,62 @@ export default class GeneralTable extends Component {
 			}
 		}
 	];
+
+	columns1 = [
+		{
+			title: '项目',
+			dataIndex: 'extra_params.area',
+			key: 'extra_params.area',
+		}, {
+			title: '名称',
+			dataIndex: 'name',
+			key: 'extra_params.name',
+		},{
+			title: '编号',
+			dataIndex: 'extra_params.number',
+			key: 'extra_params.number',
+		},{
+			title: '文档类型',
+			dataIndex: 'extra_params.doc_type',
+			key: 'extra_params.doc_type',
+		}
+		// ,{
+		// 	title: '提交单位',
+		// 	dataIndex: 'extra_params.unit',
+		// 	key: 'unit',
+		// }
+		,{
+			title: '提交人',
+			dataIndex: 'extra_params.people',
+			key: 'extra_params.people',
+			render: (text, record, index)=>{
+				if(record && record.extra_params && record.extra_params.username){
+					return <span>{`${record.extra_params.people}(${record.extra_params.username})`}</span>
+				}else{
+					return <span>{text}</span>
+				}
+				
+			}
+		},{
+			title: '提交时间',
+			dataIndex: 'extra_params.time',
+			key: 'extra_params.time',
+		},{
+			title: '操作',
+			render: (record, index) => {
+				let nodes = [];
+				nodes.push(
+					<div>
+						<a onClick={this.previewFile.bind(this, record)}>预览</a>
+						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
+						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, record)}>下载</a>
+					</div>
+				);
+				return nodes;
+			}
+		}
+	];
+
 	createLink = (name, url) => {    //下载
 		let link = document.createElement("a");
 		link.href = url;
