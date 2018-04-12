@@ -56,12 +56,11 @@ export default class DataExport extends Component {
     }
     componentDidMount() {
         this.biaoduan = [];
-        PROJECT_UNITS[0].units.map(item => {
-            this.biaoduan.push(item);
-        })
-        PROJECT_UNITS[1].units.map(item => {
-            this.biaoduan.push(item);
-        })
+        for(let i=0;i<PROJECT_UNITS.length;i++){
+            PROJECT_UNITS[i].units.map(item => {
+                this.biaoduan.push(item);
+            })
+        }
         const { actions: { getTree, gettreetype, getTreeList, getForestUsers, getTreeNodeList,getLittleBanAll }, users, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
         // 避免反复获取森林用户数据，提高效率
         if (!users) {

@@ -38,12 +38,11 @@ export default class CarPackage extends Component {
     componentDidMount() {
         const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users,platform:{tree = {}}} = this.props; 
         this.biaoduan = [];
-        PROJECT_UNITS[0].units.map(item => {
-            this.biaoduan.push(item);
-        })
-        PROJECT_UNITS[1].units.map(item => {
-            this.biaoduan.push(item);
-        })
+        for(let i=0;i<PROJECT_UNITS.length;i++){
+            PROJECT_UNITS[i].units.map(item => {
+                this.biaoduan.push(item);
+            })
+        }
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();
