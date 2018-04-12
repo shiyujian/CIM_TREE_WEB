@@ -8,81 +8,56 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {QH, XA, Air,Tree} from './APP';
+//antdesign3.0国际化概念
+import { LocaleProvider } from 'antd';
+import zh_TW from 'antd/lib/locale-provider/zh_TW';
+// import {QH, XA, Air,Tree} from './APP';//此处不需要引入，会导致热更新失败
 import 'babel-polyfill';
 require('es6-promise').polyfill();
-
-if(__env__ == 'qh'){
-	ReactDOM.render(<QH/>, document.getElementById('root'));
-	// document.domain = "simulate.com";
-	if (module.hot) {
-		module.hot.accept('./APP/qh/app', () => {
-			const NextApp = require('./APP/qh/app').default;
-			ReactDOM.render(
-				<NextApp/>,
-				document.getElementById('root')
-			);
-		});
-	}
-}
-
-if(__env__ == 'xa'){
-
-	console.log(window.config.nextMaxScreen);
-	$(document).keydown(function (e) {
-		
-		switch (e.keyCode) {
-			// 右
-			case 39:
-				window.location.href = window.config.nextMaxScreen;
-				break;
-			// 左
-			case 37:
-				
-				break;
-			default:
-				break;
-		}
-	});
-
-	ReactDOM.render(<XA/>, document.getElementById('root'));
-
-	if (module.hot) {
-		module.hot.accept('./APP/xa/app', () => {
-			const NextApp = require('./APP/xa/app').default;
-			ReactDOM.render(
-				<NextApp/>,
-				document.getElementById('root')
-			);
-		});
-	}
-}
+import $ from 'jquery';
+import './hack.css';
 
 
-if(__env__ == 'air'){
-	ReactDOM.render(<Air/>, document.getElementById('root'));
-
-	if (module.hot) {
-		module.hot.accept('./APP/air/app', () => {
-			const NextApp = require('./APP/air/app').default;
-			ReactDOM.render(
-				<NextApp/>,
-				document.getElementById('root')
-			);
-		});
-	}
-}
-
+// $('.js-scroll').mCustomScrollbar({
+// 	mouseWheel: {
+// 		preventDefault: true
+// 	},
+// 	scrollInertia: 10,
+// 	autoHideScrollbar: true,
+// 	advanced: {
+// 		autoExpandHorizontalScroll: true,
+// 		updateOnImageLoad: false,
+// 		updateOnContentResize: true
+// 	},
+// 	theme: "dark-3",
+// 	live: 'on'
+// });
+const MOUNT_NODE = document.getElementById('root');
 if(__env__ == 'tree'){
-	ReactDOM.render(<Tree/>, document.getElementById('root'));
 
-	if (module.hot) {
-		module.hot.accept('./APP/tree/app', () => {
-			const NextApp = require('./APP/tree/app').default;
-			ReactDOM.render(
-				<NextApp/>,
-				document.getElementById('root')
-			);
-		});
+	// ReactDOM.render(<Tree/>, document.getElementById('root'));
+
+	// if (module.hot) {
+	// 	module.hot.accept('./APP/tree/app', () => {
+	// 		const NextApp = require('./APP/tree/app').default;
+	// 		ReactDOM.render(
+	// 			<NextApp/>,
+	// 			document.getElementById('root')
+	// 		);
+	// 	});
+	// }
+
+	let render = () => {
+		const TREE = require('./App/tree/app').default;
+		ReactDOM.render(<LocaleProvider locale={zh_TW}><TREE /></LocaleProvider>, MOUNT_NODE);
 	}
+	if (module.hot) {
+		module.hot.accept('./App/tree/app', () =>
+			setImmediate(() => {
+				ReactDOM.unmountComponentAtNode(MOUNT_NODE);
+				render();
+			})
+		);
+	}
+	render();
 }
