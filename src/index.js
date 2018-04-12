@@ -10,7 +10,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 //antdesign3.0国际化概念
 import { LocaleProvider } from 'antd';
-import zh_TW from 'antd/lib/locale-provider/zh_TW';
+// import zh_CN from 'antd/lib/locale-provider/zh_CN';
 // import {QH, XA, Air,Tree} from './APP';//此处不需要引入，会导致热更新失败
 import 'babel-polyfill';
 require('es6-promise').polyfill();
@@ -49,7 +49,7 @@ if(__env__ == 'tree'){
 
 	let render = () => {
 		const TREE = require('./App/tree/app').default;
-		ReactDOM.render(<LocaleProvider locale={zh_TW}><TREE /></LocaleProvider>, MOUNT_NODE);
+		ReactDOM.render(<LocaleProvider ><TREE /></LocaleProvider>, MOUNT_NODE);
 	}
 	if (module.hot) {
 		module.hot.accept('./App/tree/app', () =>
