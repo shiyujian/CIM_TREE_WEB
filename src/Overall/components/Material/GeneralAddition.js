@@ -63,7 +63,9 @@ class GeneralAddition extends Component {
             title: '进场日期',
             dataIndex: 'equipTime',
             key: 'equipTime',
-            render: (text, record) => this.renderColumns(text, record, 'equipTime'),
+            render: (text, record) => {
+                return <DatePicker onChange={this.equipTimeChange.bind(this,record,'equipTime')} format={'YYYY-MM-DD'}/>
+            },
         }, {
             title: '技术状况',
             dataIndex: 'equipMoment',
@@ -82,12 +84,15 @@ class GeneralAddition extends Component {
             return (
               <div>
                     <span>
-                      <a style={{marginRight:'10'}}onClick={() => this.saveTable(record.key)}>
-                        <Icon type='save' style={{fontSize:20}}/>
-                      </a>
-                      <a onClick={() => this.edit(record.key)}>
-                        <Icon type='edit' style={{fontSize:20}}/>
-                      </a>
+                        {
+                            editable ?
+                            <a style={{marginRight:'10'}}onClick={() => this.saveTable(record.key)}>
+                                <Icon type='save' style={{fontSize:20}}/>
+                            </a>:
+                            <a onClick={() => this.edit(record.key)}>
+                                <Icon type='edit' style={{fontSize:20}}/>
+                            </a>
+                        }
                     </span>
               </div>
             );
@@ -471,6 +476,14 @@ class GeneralAddition extends Component {
             selectedRowKeys:[]
         })
     }
+    equipTimeChange( record, column,value){
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => record.key === item.key)[0];
+        if (target) {
+            target[column] = moment(value._d).format('YYYY-MM-DD')
+            this.setState({ dataSource: newData });
+        }
+    }
     renderColumns(text, record, column) {
         return (
           <EditableCell
@@ -517,6 +530,7 @@ class GeneralAddition extends Component {
             },
             location
         } = this.props;
+        
         const{
             TreatmentData,
             dataSource,
@@ -524,7 +538,8 @@ class GeneralAddition extends Component {
             currentSectionName,
 			currentSection
         } = this.state
-
+        console.log('TreatmentData',TreatmentData)
+        console.log('dataSource',dataSource)
         let user = getUser();//当前登录用户
         let sections = user.sections || []
         if(!sections || sections.length === 0 ){

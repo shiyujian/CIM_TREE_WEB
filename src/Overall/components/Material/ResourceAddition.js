@@ -72,16 +72,19 @@ class ResourceAddition extends Component {
           render: (text, record) => {
             const { editable } = record;
             return (
-              <div>
+                <div>
                     <span>
-                      <a style={{marginRight:'10'}}onClick={() => this.saveTable(record.key)}>
-                        <Icon type='save' style={{fontSize:20}}/>
-                      </a>
-                      <a onClick={() => this.edit(record.key)}>
-                        <Icon type='edit' style={{fontSize:20}}/>
-                      </a>
+                        {
+                            editable ?
+                            <a style={{marginRight:'10'}}onClick={() => this.saveTable(record.key)}>
+                                <Icon type='save' style={{fontSize:20}}/>
+                            </a>:
+                            <a onClick={() => this.edit(record.key)}>
+                                <Icon type='edit' style={{fontSize:20}}/>
+                            </a>
+                        }
                     </span>
-              </div>
+                </div>
             );
           }
         }

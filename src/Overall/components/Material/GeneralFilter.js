@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {UNITS ,SECTIONNAME,PROJECT_UNITS} from '../../../_platform/api';
+import {SECTIONNAME,PROJECT_UNITS} from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
@@ -80,7 +80,7 @@ export default class GeneralFilter extends Component {
             optionArray
         }=this.state
 		return (
-			<Form style={{ marginBottom: 24 }}>
+			<Form style={{ marginBottom: 0 }}>
 				<Row >
 					<Col span={20}>
 						<Row >

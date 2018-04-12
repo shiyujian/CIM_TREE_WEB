@@ -11,7 +11,7 @@ import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE,UNITS,WORKFLOW_CODE,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE,WORKFLOW_CODE,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
 import queryString from 'query-string';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
@@ -49,51 +49,49 @@ class OverallResourceRefill extends Component {
     //第一个表格的列属性
     equipment=[
         {
-            title: '设备名称',
+            title: '名称',
             dataIndex: 'equipName',
             key: 'equipName',
             render: (text, record) => this.renderColumns(text, record, 'equipName'),
         }, {
-            title: '规格型号',
-            dataIndex: 'equipNumber',
-            key: 'equipNumber',
-            render: (text, record) => this.renderColumns(text, record, 'equipNumber'),
+            title: '规格',
+            dataIndex: 'equipFormat',
+            key: 'equipFormat',
+            render: (text, record) => this.renderColumns(text, record, 'equipFormat'),
+        }, {
+            title: '单位',
+            dataIndex: 'equipUnit',
+            key: 'equipUnit',
+            render: (text, record) => this.renderColumns(text, record, 'equipUnit'),
         }, {
             title: '数量',
             dataIndex: 'equipCount',
             key: 'equipCount',
             render: (text, record) => this.renderColumns(text, record, 'equipCount'),
         }, {
-            title: '进场日期',
-            dataIndex: 'equipTime',
-            key: 'equipTime',
-            render: (text, record) => this.renderColumns(text, record, 'equipTime'),
-        }, {
-            title: '技术状况',
-            dataIndex: 'equipMoment',
-            key: 'equipMoment',
-            render: (text, record) => this.renderColumns(text, record, 'equipMoment'),
-        },{
-            title: '备注',
-            dataIndex: 'equipRemark',
-            key: 'equipRemark',
-            render: (text, record) => this.renderColumns(text, record, 'equipRemark')
+            title: '产地',
+            dataIndex: 'equipPlace',
+            key: 'equipPlace',
+            render: (text, record) => this.renderColumns(text, record, 'equipPlace'),
         }, {
           title: '操作',
           dataIndex: 'equipOperation',
           render: (text, record) => {
             const { editable } = record;
             return (
-              <div>
+                <div>
                     <span>
-                      <a style={{marginRight:'10'}}onClick={() => this.saveTable(record.key)}>
-                        <Icon type='save' style={{fontSize:20}}/>
-                      </a>
-                      <a onClick={() => this.edit(record.key)}>
-                        <Icon type='edit' style={{fontSize:20}}/>
-                      </a>
+                        {
+                            editable ?
+                            <a style={{marginRight:'10'}}onClick={() => this.saveTable(record.key)}>
+                                <Icon type='save' style={{fontSize:20}}/>
+                            </a>:
+                            <a onClick={() => this.edit(record.key)}>
+                                <Icon type='edit' style={{fontSize:20}}/>
+                            </a>
+                        }
                     </span>
-              </div>
+                </div>
             );
           }
         }

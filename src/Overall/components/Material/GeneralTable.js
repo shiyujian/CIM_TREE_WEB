@@ -42,11 +42,13 @@ class GeneralTable extends Component {
 			title: '文档类型',
 			dataIndex: 'document',
 			key: 'document',
-		}, {
-			title: '提交单位',
-			dataIndex: 'submitOrg',
-			key: 'submitOrg',
-		}, {
+		}, 
+		// {
+		// 	title: '提交单位',
+		// 	dataIndex: 'submitOrg',
+		// 	key: 'submitOrg',
+		// }, 
+		{
 			title: '提交人',
 			dataIndex: 'submitPerson',
 			key: 'submitPerson'
@@ -194,7 +196,7 @@ class GeneralTable extends Component {
 				'code':subject.code?JSON.parse(subject.code):'',
 				'document':'机械设备',
 				'submitOrg':postData.upload_unit?postData.upload_unit:'',
-				'submitPerson':creator.person_name?creator.person_name:(creator.username?creator.username:''),
+				'submitPerson':creator.person_name?creator.person_name+'('+creator.username+')':creator.username,
 				'submitTime':moment(item.creator).format('YYYY-MM-DD'),
 				'flowStyle':item.status===2?'执行中':'已完成',
 			}

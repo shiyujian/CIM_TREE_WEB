@@ -209,7 +209,7 @@ class Updatemodal extends Component {
         name: 'file',
         action: `${FILE_API}/api/user/files/`,
         showUploadList: true,
-        data(file) {
+        data:(file)=> {
             return {
                 name: file.fileName,
                 a_file: file
@@ -269,6 +269,7 @@ class Updatemodal extends Component {
                     name: values.name1,
                     basic_params: {
                         files: [{
+                            "uid": resp.uid,
                             "misc": resp.misc,
                             "download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
                             "a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
@@ -280,7 +281,7 @@ class Updatemodal extends Component {
                     extra_params: {
                         number: values.number1,
                         area: values.area1.split('--')[1],
-                        unitProject: canSection ? '' : (values.unitProject.split('--')?values.unitProject.split('--')[1]:values.unitProject),
+                        unitProject: canSection ? '' : values.unitProject1.split('--')[1],
                         people: user.name,
                         username: user.username,
                         unit:user.org,

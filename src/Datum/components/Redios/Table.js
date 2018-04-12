@@ -85,8 +85,7 @@ export default class GeneralTable extends Component {
 		}, {
 			title: '操作',
 			render: (record, index) => {
-				let nodes = [];
-				nodes.push(
+				return(
 					<div>
 						<a onClick={this.previewFile.bind(this, record)}>预览
 
@@ -95,7 +94,6 @@ export default class GeneralTable extends Component {
 						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, record)}>下载</a>
 					</div>
 				);
-				return nodes;
 			}
 		}
 	];

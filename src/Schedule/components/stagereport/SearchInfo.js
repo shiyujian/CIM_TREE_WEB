@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
-import {  UNITS, SECTIONNAME, PROJECT_UNITS } from '../../../_platform/api';
+import {   SECTIONNAME, PROJECT_UNITS } from '../../../_platform/api';
 import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;

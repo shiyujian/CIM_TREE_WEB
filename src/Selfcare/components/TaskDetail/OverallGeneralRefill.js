@@ -10,7 +10,7 @@ import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE,UNITS,WORKFLOW_CODE,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE,WORKFLOW_CODE,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
 import queryString from 'query-string';
 //import {fileTypes} from '../../../_platform/store/global/file';
 const Dragger = Upload.Dragger;
@@ -66,7 +66,9 @@ class OverallGeneralRefill extends Component {
             title: '进场日期',
             dataIndex: 'equipTime',
             key: 'equipTime',
-            render: (text, record) => this.renderColumns(text, record, 'equipTime'),
+            render: (text, record) => {
+                return <DatePicker onChange={this.equipTimeChange.bind(this,record,'equipTime')} format={'YYYY-MM-DD'}/>
+            },
         }, {
             title: '技术状况',
             dataIndex: 'equipMoment',
@@ -83,16 +85,19 @@ class OverallGeneralRefill extends Component {
           render: (text, record) => {
             const { editable } = record;
             return (
-              <div>
+                <div>
                     <span>
-                      <a style={{marginRight:'10'}}onClick={() => this.saveTable(record.key)}>
-                        <Icon type='save' style={{fontSize:20}}/>
-                      </a>
-                      <a onClick={() => this.edit(record.key)}>
-                        <Icon type='edit' style={{fontSize:20}}/>
-                      </a>
+                        {
+                            editable ?
+                            <a style={{marginRight:'10'}}onClick={() => this.saveTable(record.key)}>
+                                <Icon type='save' style={{fontSize:20}}/>
+                            </a>:
+                            <a onClick={() => this.edit(record.key)}>
+                                <Icon type='edit' style={{fontSize:20}}/>
+                            </a>
+                        }
                     </span>
-              </div>
+                </div>
             );
           }
         }
@@ -562,6 +567,14 @@ class OverallGeneralRefill extends Component {
             dataSource:array,
             selectedRowKeys:[]
         })
+    }
+    equipTimeChange( record, column,value){
+        const newData = [...this.state.dataSource];
+        const target = newData.filter(item => record.key === item.key)[0];
+        if (target) {
+            target[column] = moment(value._d).format('YYYY-MM-DD')
+            this.setState({ dataSource: newData });
+        }
     }
     renderColumns(text, record, column) {
         return (

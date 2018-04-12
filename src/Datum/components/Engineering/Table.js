@@ -78,15 +78,13 @@ export default class GeneralTable extends Component {
 		},{
 			title: '操作',
 			render: (record, index) => {
-				let nodes = [];
-				nodes.push(
+				return(
 					<div>
 						<a onClick={this.previewFile.bind(this, record)}>预览</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
 						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, record)}>下载</a>
 					</div>
 				);
-				return nodes;
 			}
 		}
 	];
@@ -133,15 +131,13 @@ export default class GeneralTable extends Component {
 		},{
 			title: '操作',
 			render: (record, index) => {
-				let nodes = [];
-				nodes.push(
+				return(
 					<div>
 						<a onClick={this.previewFile.bind(this, record)}>预览</a>
 						<a style={{ marginLeft: 10 }} onClick={this.update.bind(this, record)}>更新</a>
 						<a style={{ marginLeft: 10 }} type="primary" onClick={this.download.bind(this, record)}>下载</a>
 					</div>
 				);
-				return nodes;
 			}
 		}
 	];

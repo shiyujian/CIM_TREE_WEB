@@ -26,11 +26,11 @@ class ResourceTable extends Component {
 
 
 	columns = [
-		{
-			title: '项目',
-			dataIndex: 'projectName',
-			key: 'projectName',
-		},
+		// {
+		// 	title: '项目',
+		// 	dataIndex: 'projectName',
+		// 	key: 'projectName',
+		// },
 		{
 			title: '标段',
 			dataIndex: 'sectionName',
@@ -211,7 +211,7 @@ class ResourceTable extends Component {
 				'date':subject.date?moment(JSON.parse(subject.date)).format('YYYY-MM-DD'):'',
 				'site':subject.site?JSON.parse(subject.site):'',
 				'submitOrg':postData.upload_unit?postData.upload_unit:'',
-				'submitPerson':creator.person_name?creator.person_name:(creator.username?creator.username:''),
+				'submitPerson':creator.person_name?creator.person_name+'('+creator.username+')':creator.username,
 				'submitTime':moment(item.creator).format('YYYY-MM-DD'),
 				'resourceStyle':item.status===2?'执行中':'已完成',
 			}

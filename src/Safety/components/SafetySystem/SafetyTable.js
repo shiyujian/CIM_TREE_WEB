@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Form, Icon, Table, Spin, Tabs, Modal, Row, Col, Select, DatePicker, Button, Input, InputNumber, Progress, message } from 'antd';
-import {FILE_API,base, SOURCE_API, DATASOURCECODE,UNITS,SERVICE_API,PROJECT_UNITS,SECTIONNAME,WORKFLOW_CODE } from '../../../_platform/api';
+import {FILE_API,base, SOURCE_API, DATASOURCECODE,SERVICE_API,PROJECT_UNITS,SECTIONNAME,WORKFLOW_CODE } from '../../../_platform/api';
 import '../index.less';
 import '../../../Datum/components/Datum/index.less'
 import { getUser } from '../../../_platform/auth';
