@@ -64,7 +64,11 @@ export const getcarpackage = createFetchAction(`${FOREST_API}/tree/carpacks`, []
 export const getexportcarpackage = createFetchAction(`${FOREST_API}/tree/exportcarpacks`, []);
 export const getLittleBanAll = createFetchAction(`${FOREST_API}/tree/wpunit4apps`, [getLittleBanAllOK]);
 export const getNurserysByPack = createFetchAction(`${FOREST_API}/tree/nurserysbypack`, []);
+export const getTreeLocations = createFetchAction(`${FOREST_API}/tree/treelocations`, []);  //获取同步后的苗木定位列表
+export const getExportTreeLocations = createFetchAction(`${FOREST_API}/exporttreelocations`,[])  //导出同步后的苗木定位列表
 export const actions = {
+	getTreeLocations,
+	getExportTreeLocations,
 	getForestUsers,
 	getTreeOK,
 	getTree,

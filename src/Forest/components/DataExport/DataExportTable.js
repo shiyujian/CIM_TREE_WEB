@@ -197,38 +197,6 @@ export default class LocmeasureTable extends Component {
 								{treetypeoption}
 							</Select>
 						</Col>
-						{/* <Col xl={3} className='mrg10'>
-							<span>状态：</span>
-							<Select allowClear className='forestcalcw2 mxw150' defaultValue='全部' value={status} onChange={this.onstatuschange.bind(this)}>
-								{statusoption}
-							</Select>
-						</Col> */}
-						{/* <Col xl={3} className='mrg10'>
-							<span>定位：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={islocation} onChange={this.onlocationchange.bind(this)}>
-								{locationoption}
-							</Select>
-						</Col> */}
-						<Col xl={3} className='mrg10'>
-							<span>测量人：</span>
-							<Input suffix={suffix2} value={rolename}  className='forestcalcw3 mxw100' onChange={this.onrolenamechange.bind(this)}/>
-						</Col>
-						<Col xl={7} className='mrg10'>
-							<span>测量时间：</span>
-							<RangePicker 
-							 style={{verticalAlign:"middle"}} 
-							 defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]} 
-							 showTime={{ format: 'HH:mm:ss' }}
-							 format={'YYYY/MM/DD HH:mm:ss'}
-							 onChange={this.datepick.bind(this)}
-							 onOk={this.datepick.bind(this)}
-							>
-							</RangePicker>
-						</Col>
-						<Col xl={3} className='mrg10'>
-							<span>定位人：</span>
-							<Input suffix={suffix2} value={rolename}  className='forestcalcw3 mxw100' onChange={this.onrolenamechange.bind(this)}/>
-						</Col>
 						<Col xl={7} className='mrg10'>
 							<span>定位时间：</span>
 							<RangePicker 
@@ -239,13 +207,6 @@ export default class LocmeasureTable extends Component {
 							 onOk={this.datepick1.bind(this)}
 							>
 							</RangePicker>
-						</Col>
-						<Col xl={3} className='mrg10'>
-							<span>状态：</span>
-							<Select allowClear className='forestcalcw2 mxw150' defaultValue='全部' value={status} onChange={this.onstatuschange.bind(this)}>
-								<Option value={1}>经纬度</Option>
-								<Option value={2}>2000坐标系</Option>
-							</Select>
 						</Col>
 					</Row>
 					<Row >
@@ -451,30 +412,31 @@ export default class LocmeasureTable extends Component {
 				return;
 			}
 		}
-    	const {actions: {getqueryTree},keycode = ''} = this.props;
+    	const {actions: {getTreeLocations}} = this.props;
     	let postdata = {
-    		no:keycode,
-    		sxm,
+    		// no:keycode,
     		section,
-    		bigType,
+    		// bigType,
     		treetype,
-    		supervisorcheck,
-    		checkstatus,
-    		islocation,
+    		// supervisorcheck,
+    		// checkstatus,
+    		// islocation,
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-    		lstime:lstime&&moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-    		letime:letime&&moment(letime).format('YYYY-MM-DD HH:mm:ss'),
-    		status,
     		page,
 			size:size,
-			thinclass,
-			smallclass
-    	}
-    	if(!!role)
-    		postdata[role] = rolename;
+			// thinclass,
+			// smallclass
+		}
+		if(smallclass === ''){
+			postdata.no = ''
+		}else if(thinclass === ''){
+			postdata.no = smallclass
+		}else{
+			postdata.no = thinclass
+		}
     	this.setState({loading:true,percent:0})
-    	getqueryTree({},postdata)
+    	getTreeLocations({},postdata)
     	.then(rst => {
     		this.setState({loading:false,percent:100})
     		if(!rst)
@@ -491,28 +453,10 @@ export default class LocmeasureTable extends Component {
 					}
 	    			tblData[i].place = place;
 	    			let statusname = '';
-					if(plan.Status == -1)
-						statusname = "未抽查"
-					else if(plan.Status == 0) 
-						statusname = "监理抽查通过"
-					else if(plan.Status === 1){
-						statusname = "监理抽查退回"
-					}else if(plan.Status === 2){
-						statusname = "业主抽查退回"
-					}else if(plan.Status === 3){
-						statusname = '业主抽查通过'
-					}
-					tblData[i].statusname = statusname;
-					let islocation = plan.LocationTime ? '已定位' : '未定位';
-					tblData[i].islocation = islocation;
-					let createtime1 = plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
-					let createtime2 = plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
-					let createtime3 = plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
-					let createtime4 = plan.LocationTime ? moment(plan.LocationTime).format('HH:mm:ss') : '/';
+					let createtime1 = plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
+					let createtime2 = plan.LocationTime ? moment(plan.LocationTime).format('HH:mm:ss') : '/';
 					tblData[i].createtime1 = createtime1;
 					tblData[i].createtime2 = createtime2;
-					tblData[i].createtime3 = createtime3;
-					tblData[i].createtime4 = createtime4;
 	    		})
 		    	const pagination = { ...this.state.pagination };
 				pagination.total = rst.pageinfo.total;
@@ -548,29 +492,34 @@ export default class LocmeasureTable extends Component {
 				return;
 			}
 		}
-    	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
+    	const {actions: {getExportTreeLocations},keycode = ''} = this.props;
     	let postdata = {
-    		no:keycode,
-    		sxm,
+    		// no:keycode,
+    		// sxm,
     		section,
 			treetype,
-			status,
+			// status,
     		// supervisorcheck,
     		// checkstatus,
     		// locationstatus,
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-    		lstime:lstime&&moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
+    		// lstime:lstime&&moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-    		letime:letime&&moment(letime).format('YYYY-MM-DD HH:mm:ss'),
+    		// letime:letime&&moment(letime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
 			size:exportsize,
-			thinclass,
-			smallclass
-    	}
-    	if(!!role)
-    		postdata[role] = rolename;
+			// thinclass,
+			// smallclass
+		}
+		if(smallclass === ''){
+			postdata.no = ''
+		}else if(thinclass === ''){
+			postdata.no = smallclass
+		}else{
+			postdata.no = thinclass
+		}
     	this.setState({loading:true,percent:0})
-    	getexportTree({},postdata)
+    	getExportTreeLocations({},postdata)
 		.then(rst3 => {
 			if(rst3 === ''){
 				message.info('没有符合条件的信息');
