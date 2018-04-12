@@ -42,7 +42,7 @@ class NewsTable extends Component {
 		})
 		this.array = [];
 		DEPARTMENT.map(item =>{
-			this.array.push(<Option value={item.code}>{item.name}</Option>)
+			this.array.push(<Option value={item.code} key={item.code}>{item.name}</Option>)
 		})
 	}
 	componentDidUpdate(){
