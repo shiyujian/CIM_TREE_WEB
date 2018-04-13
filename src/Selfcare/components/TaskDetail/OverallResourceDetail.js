@@ -77,8 +77,8 @@ class OverallResourceDetail extends Component {
 
 	
 	static layout = {
-        labelCol: {span: 4},
-        wrapperCol: {span: 20},
+        labelCol: {span: 6},
+        wrapperCol: {span: 18},
     };
 
 	

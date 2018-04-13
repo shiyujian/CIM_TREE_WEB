@@ -3,11 +3,14 @@ import {Main, Content, Sidebar, DynamicTitle} from '_platform/components/layout'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions, ID} from '../store/cell';
+import {PROJECT_UNITS} from '_platform/api';
 import {actions as platformActions} from '_platform/store/global';
 import PkCodeTree from '../components/PkCodeTree';
-import {Filter, Table} from '../components/Score';
+import {Table,Chart} from '../components/Score';
+import {getUser} from '_platform/auth'
+import {Select,Row,Col} from 'antd';
 
-
+const Option = Select.Option
 @connect(
 	state => {
 		const {quality: {cell = {}}, platform} = state || {};
@@ -21,50 +24,80 @@ import {Filter, Table} from '../components/Score';
 
 export default class Search extends Component {
 	static propTypes = {};
-
+	biaoduan = [];
+	constructor(props){
+		super(props)
+		this.state = {
+			treeList:[],
+			sectionList:[]
+		}
+	}
 	render() {
 
-		const {tree = [], currentNode = {}} = this.props;
+		const {platform:{tree={}}} = this.props;
+		let treeList = [];
+		if(tree.bigTreeList){
+			treeList = tree.bigTreeList
+		}
+		const { code } = this.state;
 
 		return (
 			<Main>
-				<DynamicTitle title="质量管理检查记录" {...this.props}/>
+				<DynamicTitle title="质量评分" {...this.props}/>
 				<Sidebar>
-					<PkCodeTree treeData={tree}
-					            selectedKeys={currentNode.code}
+					<PkCodeTree treeData={treeList}
+					            selectedKeys={code}
 					            onSelect={this.onSelect.bind(this)}/>
 				</Sidebar>
 				<Content>
-					<Filter  {...this.props}/>
-					<Table {...this.props}/>
+					<Row>
+						<Col span={12}>
+							<Chart {...this.props} {...this.state}/>
+						</Col>
+						<Col span={12}>
+							<Table {...this.props} {...this.state}/>	
+						</Col>
+					</Row>
 				</Content>
 			</Main>
 		);
 	}
 
 	componentDidMount() {
-		const {actions: {getTree, setCurrentNode}} = this.props;
-		getTree({}, {depth: '4'}).then(({children}) => {
-			//setCurrentNode(children.code)
-		});
+		this.biaoduan = [];
+		for(let i=0;i<PROJECT_UNITS.length;i++){
+			PROJECT_UNITS[i].units.map(item => {
+				this.biaoduan.push(item);
+			})
+		}
+		const {actions: {getTreeNodeList},platform:{tree = {}}} = this.props;
+		if(!tree.bigTreeList){
+			getTreeNodeList()
+		}
+	}
+	generateSectionList(sections){
+		let sectionList = [];
+		sections.map(item => {
+			sectionList.push(<Option key={item.code} value={item.code}>{item.value}</Option>)
+		})
+		return sectionList
 	}
 
 	onSelect(value = []) {
-		const [code] = value;
-		const {actions: {changeFilterField,getSections, setSection, setSubsection, setItem}} = this.props;
-		if (code.indexOf('--子单位') !== -1) {
-            getSections({code: code.split("--")[1]}).then(({children_wp}) => {
-				setSection(children_wp);
-			});
-		} else {
-			setSection([]);
-            setSubsection([]);
-			setItem([]);
+		let code = value[0] || ''
+		let user = getUser()
+		let sections = JSON.parse(user.sections)
+		let rst = [];
+		if(sections.length === 0){
+			rst = this.biaoduan.filter(item => {
+				return item.code.indexOf(code) !== -1
+			})
+		}else {
+			rst = this.biaoduan.filter(item => {
+				return item.code.indexOf(code) !== -1 && sections.indexOf(item.code) !== -1
+			})
 		}
-        changeFilterField('section', undefined);
-        changeFilterField('subSection', undefined);
-        setSubsection([]);
-        changeFilterField('item', undefined);
-        setItem([]);
+		let sectionList = this.generateSectionList(rst)
+		this.setState({code,sectionList})
 	}
 }
