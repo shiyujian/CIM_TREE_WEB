@@ -424,7 +424,7 @@ class Addition extends Component {
 							is_active: this.props.getIsActives,
 							id_num:'',
 							is_black:0,
-							id_image:[],
+							id_image:[{"name":"主照片","filepath":""},{"name":"副照片","filepath":""}],
 							basic_params: {
 								info: {
 									'电话': addition.person_telephone || '',
@@ -484,7 +484,7 @@ class Addition extends Component {
 							is_active: true,
 							id_num:'',
 							is_black:0,
-							id_image:[],
+							id_image:[{"name":"主照片","filepath":""},{"name":"副照片","filepath":""}],
 							basic_params: {
 								info: {
 									'电话': addition.person_telephone || '',
