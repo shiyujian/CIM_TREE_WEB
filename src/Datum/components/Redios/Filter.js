@@ -3,6 +3,7 @@ import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,DatePicker,Table,Modal
 } from 'antd';
+import moment from 'moment';
 const FormItem = Form.Item;
 const Search = Input.Search;
 const { RangePicker } = DatePicker;
@@ -28,7 +29,7 @@ class Filter extends Component {
 							<Col span={12}>
 								<FormItem {...Filter.layout} label='影像名称'>
 									{
-										getFieldDecorator('searchname', {
+										getFieldDecorator('searchName', {
 											rules: [
 												{ required: false, message: '请输入影像名称' }
 											]
@@ -40,7 +41,7 @@ class Filter extends Component {
 							<Col span={12}>
 								<FormItem {...Filter.layout}label="拍摄日期">
 									{
-										getFieldDecorator('searcdate', {
+										getFieldDecorator('searchDate', {
 											rules: [
 												{ type: 'array', required: false, message: '请选择日期' }
 											]
@@ -92,26 +93,47 @@ class Filter extends Component {
 	}
 
 	query() {
-
 		const { 
-			actions: { getdocument }, 
+			actions: { 
+				searchRedioMessage,
+				searchRedioVisible 
+			}, 
 			form:{validateFields},
 			currentcode 
 		} = this.props;
 		validateFields((err, values) => {
 			let search = {}
-			search = {
-				doc_name: values.searchname
-			};
-			
-			getdocument({ code: currentcode.code }, search);
+
+			console.log("获取工程文档搜索信息", values);
+            console.log("err", err);
+            
+			values.searchName?search.searchName = values.searchName : '';
+			//moment的比较日期的方法不能判断同一天的   所以前后各加一天
+			values.searchDate?search.searchDate_begin = moment(values.searchDate[0]._d).subtract(1, 'days').format('YYYY-MM-DD') : '';
+            values.searchDate?search.searchDate_end = moment(values.searchDate[1]._d).add(1, 'days').format('YYYY-MM-DD') : '';
+		
+			console.log('search',search)
+
+			let postData = Object.assign({}, search);
+			searchRedioMessage(postData)
+			searchRedioVisible(true)
 		})
+
+
+		// validateFields((err, values) => {
+		// 	let search = {}
+		// 	search = {
+		// 		doc_name: values.searchname
+		// 	};
+			
+		// 	getdocument({ code: currentcode.code }, search);
+		// })
 		
 	}
 	clear() {
         this.props.form.setFieldsValue({
-            searchname: undefined,
-            searchdate: undefined
+            searchName: undefined,
+            searchDate: undefined
         })
     }
 	cancel() {
