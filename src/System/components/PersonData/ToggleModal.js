@@ -567,6 +567,9 @@ export default class ToggleModal extends Component {
                         sections: item.sections,
                         groups: item.groups,
                         is_active: true,
+                        id_num:'',
+                        is_black:0,
+                        id_image:[],
                         basic_params: {
                             info: {
                                 '电话': "11" + item.tel,

@@ -8,16 +8,67 @@ export default class GeneralTable extends Component {
 		super(props);
 		this.state = {
 			previewModalVisible: false,
-			video: ''
+			video: '',
+			filterData:[]
 		}
 	}
 
+	componentDidUpdate(prevProps,prevState){
+		const{
+			searchrediovisible,
+			searchredio,
+			Doc = [],
+		}=this.props
+		if(searchrediovisible && (searchredio!=prevProps.searchredio || Doc!=prevProps.Doc) && Doc.length>0){
+			this.filter()
+		}
+	}
+
+	filter(){
+		const{
+			searchrediovisible,
+			searchredio,
+			Doc,
+			actions: { 
+				searchRedioVisible 
+			},  
+	   	}=this.props
+
+	   	
+
+		let arr = Doc.filter(doc => 
+			(searchredio.searchName? doc.name.indexOf(searchredio.searchName) != -1: true) &&
+			(searchredio.searchDate_begin? moment(doc.extra_params.time).isAfter(searchredio.searchDate_begin) : true) &&
+			(searchredio.searchDate_end? moment(doc.extra_params.time).isBefore(searchredio.searchDate_end): true)
+		)
+
+		this.setState({
+			filterData : arr
+		})
+
+		console.log('arrarrarr',arr)
+
+		// searchEnginVisible(false)
+	}
+
 	render() {
-		const { Doc = [] } = this.props;
+		const { 
+			Doc = [],
+			searchrediovisible  
+		} = this.props;
+		const{
+			filterData = []
+		}=this.state
+
+		//数据是要搜索后的  还是   所有数据
+		let dataSource = Doc
+		if(searchrediovisible){
+			dataSource = filterData
+		}
 		return (
 			<div>
 				<Table rowSelection={this.rowSelection}
-					dataSource={Doc}
+					dataSource={dataSource}
 					columns={this.columns}
 					className='foresttables'
 					bordered rowKey="code" />

@@ -620,6 +620,9 @@ export default class Users extends Component {
 						//groups: [7],
 						groups: [1],
 						is_active: true,
+						id_num:'',
+						is_black:0,
+						id_image:[],
 						basic_params: {
 							info: {
 								'电话': element.person_telephone || '',
@@ -754,6 +757,9 @@ export default class Users extends Component {
 			//groups: [7],
 			groups: groupe,
 			is_active: actives,
+			id_num:'',
+			is_black:0,
+			id_image:[],
 			basic_params: {
 				info: {
 					'电话': user.person_telephone || '',
