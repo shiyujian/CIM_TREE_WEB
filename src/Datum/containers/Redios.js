@@ -70,8 +70,15 @@ export default class Redios extends Component {
 		)
 	}
 	componentDidMount() {
-		const { actions: { getTree } } = this.props;
+		const { 
+			actions: 
+			{ 
+				getTree,
+				searchRedioVisible 
+			} 
+		} = this.props;
 		this.setState({ loading: true });
+		searchRedioVisible(false)
 		getTree({ code: Datumcode }).then(({ children }) => {
 			this.setState({ loading: false });
 		});
@@ -81,11 +88,21 @@ export default class Redios extends Component {
 	}
 	onSelect(value = [], e) {
 		const [code] = value;
-		const { actions: { getdocument, setcurrentcode, setkeycode } } = this.props;
+		const { 
+			actions: { 
+				getdocument, 
+				setcurrentcode, 
+				setkeycode,
+				searchRedioVisible
+			} 
+		} = this.props;
+
+		searchRedioVisible(false)
 		setkeycode(code);
 		if (code === undefined) {
 			return
 		}
+		
 		let parent = code.split("--")[3]
 		console.log('parent',parent)
 		this.doc_type = e.node.props.title;
