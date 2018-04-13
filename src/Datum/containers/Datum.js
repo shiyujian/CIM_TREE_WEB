@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import reducer, {actions} from '../store/index';
-//import PkCodeTree from '../../Quality/components/PkCodeTree';
 import {actions as platformActions} from '_platform/store/global';
 import {Main, Aside, Body, Sidebar, Content, DynamicTitle} from '_platform/components/layout';
 import {Filter, Table,Addition,Updatemodal,DatumTree} from '../components/Datum'

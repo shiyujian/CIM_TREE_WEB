@@ -47,7 +47,7 @@ class TableInfo extends Component {
 			if(item.children.length > 0){
 				this.getSomeNode(item.children);
 			}else{
-				this.array.push(<Option value={item.code}>{item.name}</Option>)
+				this.array.push(<Option value={item.code} key={item.code}>{item.name}</Option>)
 			}
 		})
     }

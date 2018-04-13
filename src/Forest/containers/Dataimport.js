@@ -73,9 +73,6 @@ export default class Dataimport extends Component {
                         return
                     }
                     jthis.handleExcelData(importData);
-                    Notification.success({
-                        message: `${info.file.name}解析成功`
-                    });
                 } else if (info.file.status === 'error') {
                     Notification.error({
                         message: `${info.file.name}解析失败，请检查输入`
@@ -137,6 +134,7 @@ export default class Dataimport extends Component {
     }
     async handleExcelData(data) {
         let sections = JSON.parse(this.user.sections)
+        let flat = false;
         let patt = /^\d{4,}-(?:0?\d|1[12])-(?:[012]?\d|3[01]) (?:[01]?\d|2[0-4]):(?:[0-5]?\d|60):(?:[0-5]?\d|60)$/;
         data.splice(0, 1);
         let dataSource = [];
@@ -153,12 +151,18 @@ export default class Dataimport extends Component {
                 };
                 if(!patt.test(single.CreateTime)){
                     message.info('第'+single.index+'条信息时间格式错误，请确认后再次提交');
+                    flag = true
                     return
                 }
                 dataSource.push(single);
             }
         })
-        this.setState({dataSource})
+        if(!flag){   //没有错误再更新数据
+            Notification.success({
+                message: `${info.file.name}解析成功`
+            });
+            this.setState({dataSource})
+        }
     }
     postData(){
         const { actions: { postPositionData } } = this.props;
