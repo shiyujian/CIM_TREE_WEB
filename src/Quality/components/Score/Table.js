@@ -33,7 +33,8 @@ export default class CellTable extends Component {
                     }
                 </Select>
                 <Table bordered
-                columns = {this.columns}/>
+                columns = {this.columns}
+                style={{marginTop:15}}/>
             </div>
         );
     }

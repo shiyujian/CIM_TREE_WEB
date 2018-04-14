@@ -81,20 +81,24 @@ export default class Defect extends Component {
                     return <div>{index + 1}</div>;
                 }
             }, {
-                title: '隐患内容',
+                title: '单位工程',
                 dataIndex: 'problemType',
                 width: '10%'
             }, {
-                title: '工程部位',
+                title: '小班',
                 dataIndex: 'unitName',
                 width: '10%'
             }, {
-                title: '等级',
+                title: '细班',
                 dataIndex: 'level',
                 width: '10%'
             }, {
-                title: '整改期限',
+                title: '等级',
                 dataIndex: 'createTime',
+                width: '10%'
+            }, {
+                title: '整改期限',
+                dataIndex: 'status',
                 width: '10%'
             }, {
                 title: '状态',

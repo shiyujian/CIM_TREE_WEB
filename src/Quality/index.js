@@ -122,7 +122,7 @@ import {message} from 'antd'
 				{Subitem && <Route path="/quality/yanshou/subitem" component={Subitem}/>}
 				{FenbuCheck && <Route path="/quality/yanshou/fenbu/check" component={FenbuCheck}/>}
 				{/*{Score && <Route path="/quality/score" component={Search}/>}*/}
-				{Search && <Route path="/quality/score" component={Search}/>}
+				{Search && <Route path="/quality/search" component={Search}/>}
 				{Appraising && <Route path="/quality/appraising" component={Appraising}/>}
 				{Faithanalyze && <Route path="/quality/faithanalyze" component={Faithanalyze}/>}
 				{Qualityanalyze && <Route path="/quality/qualityanalyze" component={Qualityanalyze}/>}
@@ -193,11 +193,11 @@ const menus = [
 	// 	icon: <Icon name="tasks" />
 	// },
 	{
-		key: 'score',
+		key: 'search',
 		name: '质量评分',
-		id:'QUALITY.SCORE',
+		id:'QUALITY.SEARCH',
 		exact: true,
-		path: '/quality/score',
+		path: '/quality/search',
 		icon: <Icon name="tasks" />,
 	},{
 		key: 'appraising',

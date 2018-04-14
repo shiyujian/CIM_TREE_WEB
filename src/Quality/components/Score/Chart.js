@@ -83,12 +83,6 @@ export default class Chart extends Component {
         };
         myChart.setOption(this.option)
     }
-
-    componentWillReceiveProps(props){
-        if(props.sectionList){
-            this.setState({sectionList:props.sectionList})
-        }
-    }
     render() {
         const {part = [], formdocument = []} = this.props;
         return (
@@ -102,11 +96,6 @@ export default class Chart extends Component {
 
                 </RangePicker>
                 <div id='qualtyScore' style = {{width:'80%',height:'340px',marginTop:20}}></div>
-                <Select style={{width:150,marginTop:20,marginLeft:100}}>
-                    {
-                        this.state.sectionList
-                    }
-                </Select>
             </div>
         );
     }
