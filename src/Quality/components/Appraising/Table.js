@@ -5,60 +5,60 @@ import {
 import moment from 'moment';
 import {Link} from 'react-router-dom';
 
-const FormItem = Form.Item;
 const Option = Select.Option;
-const Panel = Collapse.Panel;
 
 export default class CellTable extends Component {
 
-    static propTypes = {};
+    constructor(props) {
+        super(props)
+        this.state = {
+            sectionList:[]
+        }
+    }
+
+    componentWillReceiveProps(props){
+        if(props.sectionList){
+            this.setState({sectionList:props.sectionList})
+        }
+    }
 
     render() {
         const {part = [], formdocument = []} = this.props;
 
         return (
             <div>
-                <Collapse onChange={this.callback.bind(this)} accordion>
+                <Select style={{width:150}}>
                     {
-                        part.map((parts) => {
-                            const extra = (
-                                <Row>
-                                    <Col span={8}>{parts.name}</Col>
-                                    <Col span={8}>{this.selectnames(parts)}</Col>
-                                    <Col span={8}>{this.selectstatus(parts)}</Col>
-                                </Row>
-                            );
-                            return <Panel header={extra} key={parts.name}>
-                                <Table dataSource={formdocument} columns={this.columns}/>
-                            </Panel>
-                        })
+                        this.state.sectionList
                     }
-                </Collapse>
+                </Select>
+                <Table bordered
+                columns = {this.columns}/>
             </div>
         );
     }
 
     columns = [{
-        title: '检验批内容',
+        title: '排名',
         dataIndex: 'subject[0].workContent',
     }, {
-        title: '当前状态',
+        title: '标段',
         sorter: (a, b) => a.status - b.status,
         render:record => {
             return this.getStatusName(record.status)
         }
     }, {
-        title: '提交时间',
+        title: '总分',
         sorter: (a, b) => moment(a.real_start_time).unix() - moment(b.real_start_time).unix(),
         render: (record) => {
             return moment(record.real_start_time).utc().zone(-8).format('YYYY-MM-DD');
         },
     }, {
-        title: '审核时间',
+        title: '环比',
         dataIndex: 'deadline',
         sorter: (a, b) => moment(a.deadline).unix() - moment(b.deadline).unix(),
     }, {
-        title: '操作',
+        title: '详情',
         render:(record) => {
             const {router} = this.props;
             const {id, name} = record;

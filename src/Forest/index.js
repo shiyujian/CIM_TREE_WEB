@@ -133,7 +133,7 @@ export default class ForestContainer extends Component {
 	{
 		key: 'import',
 		id: 'FOREST.IMPORT',
-		name: '数据导入',
+		name: '定位数据信息',
 		children: [{
 			key: 'dataimport',
 			id: 'FOREST.DATAIMPORT',

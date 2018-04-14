@@ -134,7 +134,7 @@ export default class Dataimport extends Component {
     }
     async handleExcelData(data) {
         let sections = JSON.parse(this.user.sections)
-        let flat = false;
+        let flag = false;
         let patt = /^\d{4,}-(?:0?\d|1[12])-(?:[012]?\d|3[01]) (?:[01]?\d|2[0-4]):(?:[0-5]?\d|60):(?:[0-5]?\d|60)$/;
         data.splice(0, 1);
         let dataSource = [];
@@ -159,7 +159,7 @@ export default class Dataimport extends Component {
         })
         if(!flag){   //没有错误再更新数据
             Notification.success({
-                message: `${info.file.name}解析成功`
+                message: '解析成功'
             });
             this.setState({dataSource})
         }
