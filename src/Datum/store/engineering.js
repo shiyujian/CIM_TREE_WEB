@@ -31,6 +31,9 @@ export const setkeycode =createAction(`${ID}_setkeycode`);
 export const getTreeOK = createAction(`${ID}_目录树`);
 export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
 const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
+
+export const searchEnginMessage = createAction(`${ID}获取工程文档搜索信息`);
+export const searchEnginVisible = createAction(`${ID}是否搜索工程文档`);
 export const actions = {
     getdocumentOK,
     getdocument,
@@ -47,6 +50,8 @@ export const actions = {
 	setkeycode,
     getTreeOK,
     getTree,
+    searchEnginMessage,
+    searchEnginVisible,
     ...documentReducer,
     ...additionReducer,
     ...visibleReducer,
@@ -111,5 +116,13 @@ export default handleActions({
     [setkeycode]: (state, {payload}) => ({
 	    ...state,
 	    keycode: payload
+    }),
+    [searchEnginMessage]: (state, {payload}) => ({
+	    ...state,
+	    searchengin: payload
+    }),
+    [searchEnginVisible]: (state, {payload}) => ({
+	    ...state,
+	    searchenginvisible: payload
     }),
 }, {});

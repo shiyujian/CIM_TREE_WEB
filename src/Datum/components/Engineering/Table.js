@@ -5,20 +5,85 @@ import moment from 'moment';
 import './index.less';
 export default class GeneralTable extends Component {
 
+	constructor(props) {
+		super(props);
+		this.state = {
+			filterData:[]
+		}
+    }
+
+	componentDidUpdate(prevProps,prevState){
+		const{
+			searchenginvisible,
+			searchengin,
+			Doc = [],
+		}=this.props
+		if(searchenginvisible && (searchengin!=prevProps.searchengin || Doc!=prevProps.Doc) && Doc.length>0){
+			this.filter()
+		}
+	}
+	
+	filter(){
+		const{
+			searchenginvisible,
+			searchengin,
+			Doc,
+			selectDoc,
+			parent,
+			actions: { 
+				searchEnginVisible 
+			},  
+	   	}=this.props
+
+	   	let canSection = false
+		if(selectDoc === '综合管理性文件' || parent === '综合管理性文件'){
+			canSection = true
+		}
+
+		let arr = Doc.filter(doc => 
+			(searchengin.searchProject? doc.extra_params.area.indexOf(searchengin.searchProject) != -1 : true) &&
+			(canSection ? true : (searchengin.searcSection? doc.extra_params.unitProject.indexOf(searchengin.searcSection) != -1 : true)) &&
+			(searchengin.searchName? doc.name.indexOf(searchengin.searchName) != -1: true) &&
+			(searchengin.searchCode? doc.extra_params.number.indexOf(searchengin.searchCode) != -1 : true) && 
+			(searchengin.searchDate_begin? moment(doc.extra_params.time).isAfter(searchengin.searchDate_begin) : true) &&
+			(searchengin.searchDate_end? moment(doc.extra_params.time).isBefore(searchengin.searchDate_end): true)
+		)
+
+		this.setState({
+			filterData : arr
+		})
+
+		console.log('arrarrarr',arr)
+
+		// searchEnginVisible(false)
+	}
 	render() {
 		const { 
 			Doc = [],
 			selectDoc,
-			parent 
+			parent,
+			searchenginvisible 
 		} = this.props;
+		const{
+			filterData = []
+		}=this.state
+
+
+		//是否要显示标段
 		let canSection = false
 		if(selectDoc === '综合管理性文件' || parent === '综合管理性文件'){
 			canSection = true
 		}
 
+		//数据是要搜索后的  还是   所有数据
+		let dataSource = Doc
+		if(searchenginvisible){
+			dataSource = filterData
+		}
+
 		return (
 			<Table rowSelection={this.rowSelection}
-				dataSource={Doc}
+				dataSource={dataSource}
 				columns={canSection?this.columns1:this.columns}
 				className='foresttables'
 				bordered rowKey="code" />

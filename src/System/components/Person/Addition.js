@@ -422,6 +422,9 @@ class Addition extends Component {
 							//groups: [7],
 							groups: roles.map(role => +role),
 							is_active: this.props.getIsActives,
+							id_num:'',
+							is_black:0,
+							id_image:[{"name":"主照片","filepath":""},{"name":"副照片","filepath":""}],
 							basic_params: {
 								info: {
 									'电话': addition.person_telephone || '',
@@ -479,6 +482,9 @@ class Addition extends Component {
 							sections: addition.id ? addition.sections : this.props.isSection,
 							groups: roles.map(role => +role),
 							is_active: true,
+							id_num:'',
+							is_black:0,
+							id_image:[{"name":"主照片","filepath":""},{"name":"副照片","filepath":""}],
 							basic_params: {
 								info: {
 									'电话': addition.person_telephone || '',

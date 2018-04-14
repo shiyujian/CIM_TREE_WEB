@@ -26,6 +26,9 @@ export const setkeycode =createAction(`${ID}_setkeycode`);
 
 export const getTreeOK = createAction(`${ID}_目录树`);
 export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
+
+export const searchRedioMessage = createAction(`${ID}获取影像资料搜索信息`);
+export const searchRedioVisible = createAction(`${ID}是否搜索影像资料`);
 export const actions = {
     getdocumentOK,
     getdocument,
@@ -41,6 +44,8 @@ export const actions = {
 	setkeycode,
     getTreeOK,
     getTree,
+    searchRedioMessage,
+    searchRedioVisible,
     ...documentReducer,
     ...additionReducer,
     ...visibleReducer,
@@ -101,5 +106,13 @@ export default handleActions({
     [setkeycode]: (state, {payload}) => ({
 	    ...state,
 	    keycode: payload
+    }),
+    [searchRedioMessage]: (state, {payload}) => ({
+	    ...state,
+	    searchredio: payload
+    }),
+    [searchRedioVisible]: (state, {payload}) => ({
+	    ...state,
+	    searchrediovisible: payload
     }),
 }, {});

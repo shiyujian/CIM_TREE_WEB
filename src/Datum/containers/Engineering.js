@@ -59,7 +59,7 @@ export default class Engineering extends Component {
 								{...this.state}/>
 				</Sidebar>
 				<Content>
-					<Filter  {...this.props} {...this.state}/>
+					<Filter  {...this.props} {...this.state} array={this.array}/>
 					<Table {...this.props}  {...this.state}/>
 				</Content>
 				<Addition {...this.props} {...this.state} doc_type = {this.doc_type} array={this.array}/>
@@ -71,8 +71,15 @@ export default class Engineering extends Component {
 	}
 
     async componentDidMount() {
-		const {actions: {getTree,getTreeNodeList}} = this.props;
+		const {
+			actions: {
+				getTree,
+				getTreeNodeList,
+				searchEnginVisible
+			}
+		} = this.props;
 		this.setState({loading:true});
+		searchEnginVisible(false)
         getTree({code:Datumcode}).then(({children}) => {
 			this.setState({loading:false});
 		});
@@ -85,6 +92,12 @@ export default class Engineering extends Component {
     onSelect(value = [],e) {
 		console.log('console.log(this.props.tree)',value)
 		console.log('console.log(this.props.tree)',e)
+		const{
+			actions:{
+				searchEnginVisible
+			}
+		}=this.props
+		searchEnginVisible(false)
         const [code] = value;
 		const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
 		setkeycode(code);
