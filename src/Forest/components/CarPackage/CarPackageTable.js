@@ -348,13 +348,13 @@ export default class CarPackageTable extends Component {
 								查询
 							</Button>
 						</Col>
-						<Col span={18} className='quryrstcnt mrg10'>
-							<span >车辆：{this.state.pagination.total}辆</span>
-						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.resetinput.bind(this)}>
 								重置
 							</Button>
+						</Col>
+						<Col span={18} className='quryrstcnt mrg10'>
+							<span >车辆：{this.state.pagination.total}辆</span>
 						</Col>
 						{/*<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.exportexcel.bind(this)}>

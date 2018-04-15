@@ -380,13 +380,13 @@ export default class NursOverallTable extends Component {
 								查询
 							</Button>
 						</Col>
-						<Col span={18} className='quryrstcnt mrg10'>
-							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
-						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.resetinput.bind(this)}>
 								重置
 							</Button>
+						</Col>
+						<Col span={18} className='quryrstcnt mrg10'>
+							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
