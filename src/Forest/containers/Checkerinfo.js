@@ -98,7 +98,7 @@ export default class Checkerinfo extends Component {
                 <Body>
                     <Main>
                         <DynamicTitle title="业主抽查信息" {...this.props}/>
-                        <Sidebar>
+                        <Sidebar width={190}>
                             <PkCodeTree treeData={treeList}
                                 selectedKeys={leftkeycode}
                                 onSelect={this.onSelect.bind(this)}

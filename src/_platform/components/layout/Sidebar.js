@@ -22,10 +22,11 @@ export default class Sidebar extends Component {
 	static propTypes = {};
 
 	render() {
+		const width = this.props.width;
 		return (
 			<div style={{
 				float: 'left',
-				width: 220,
+				width: width ? width : 220,
 				position: 'relative',
 				minHeight: this.state.minHeight
 			}}>

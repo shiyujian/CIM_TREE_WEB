@@ -97,7 +97,7 @@ export default class Supervisorinfo extends Component {
 				<Body>
 					<Main>
 						<DynamicTitle title="监理验收信息" {...this.props}/>
-						<Sidebar>
+						<Sidebar width={190}>
 							<PkCodeTree treeData={treeList}
 								selectedKeys={leftkeycode}
 								onSelect={this.onSelect.bind(this)}

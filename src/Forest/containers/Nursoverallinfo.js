@@ -127,7 +127,7 @@ export default class Nursoverallinfo extends Component {
 				<Body>
 					<Main>
 						<DynamicTitle title="苗木综合信息" {...this.props}/>
-						<Sidebar>
+						<Sidebar width={190}>
 							<PkCodeTree treeData={treeList}
 								selectedKeys={leftkeycode}
 								onSelect={this.onSelect.bind(this)}
