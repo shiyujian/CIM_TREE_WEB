@@ -48,7 +48,7 @@ export default class GeneralTable extends Component {
 
 		console.log('arrarrarr',arr)
 
-		// searchEnginVisible(false)
+		// searchRedioVisible(false)
 	}
 
 	render() {
