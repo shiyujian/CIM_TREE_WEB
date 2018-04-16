@@ -388,7 +388,8 @@ class Addition extends Component {
                     people: user.name,
                     username: user.username,
                     state: '正常文档',
-                    submitTime: moment.utc().format()
+                    submitTime: moment.utc().format(),
+                    time: moment.utc().format('YYYY-MM-DD')
                 },
             });
         });
