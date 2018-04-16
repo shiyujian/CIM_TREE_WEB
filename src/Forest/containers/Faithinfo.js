@@ -85,7 +85,7 @@ export default class Faithinfo extends Component {
                 <Body>
                     <Main>
                         <DynamicTitle title="供应商诚信信息" {...this.props}/>
-                        <Sidebar>
+                        <Sidebar width={190}>
                             <PkCodeTree treeData={treeList}
                                 selectedKeys={leftkeycode}
                                 onSelect={this.onSelect.bind(this)}

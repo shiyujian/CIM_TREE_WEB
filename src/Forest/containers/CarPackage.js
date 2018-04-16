@@ -90,7 +90,7 @@ export default class CarPackage extends Component {
                 <Body>
                     <Main>
                         <DynamicTitle title="车辆打包信息" {...this.props}/>
-                        <Sidebar>
+                        <Sidebar width={190}>
                             <PkCodeTree treeData={treeList}
                                 selectedKeys={leftkeycode}
                                 onSelect={this.onSelect.bind(this)}

@@ -129,7 +129,11 @@ export default class NursmeasureTable extends Component {
 			dataIndex: 'Age',
 			render:(text,record) => {
 				if(record.BD.indexOf('P010') !== -1){
-					return <p>{text}</p>
+					if(text === 0){
+						return <p> / </p>
+					}else{
+						return <p>{text}</p>
+					}
 				}else{
 					return <p> / </p>
 				}
