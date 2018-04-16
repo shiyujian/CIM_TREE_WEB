@@ -128,7 +128,7 @@ export default class FaithinfoTable extends Component {
 								查询
 							</Button>
 						</Col>
-						<Col span={2} push={18} className='mrg10'>
+						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.resetinput.bind(this)}>
 								重置
 							</Button>

@@ -105,8 +105,6 @@ export default class LocmeasureTable extends Component {
 			status,
 			islocation,
 		} = this.state;
-		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
-		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		let columns = [];
 		let header = '';
 		columns = [{
@@ -163,10 +161,6 @@ export default class LocmeasureTable extends Component {
 		}];
 		header = <div >
 					<Row >
-					<Col  xl={3} className='mrg10'>
-							<span>顺序码：</span>
-							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw50' onChange={this.sxmchange.bind(this)}/>
-						</Col>
 						<Col xl={3} className='mrg10'>
 							<span>标段：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={section} onChange={this.onsectionchange.bind(this)}>
@@ -203,8 +197,8 @@ export default class LocmeasureTable extends Component {
 							 style={{verticalAlign:"middle"}} 
 							 showTime={{ format: 'HH:mm:ss' }}
 							 format={'YYYY/MM/DD HH:mm:ss'}
-							 onChange={this.datepick1.bind(this)}
-							 onOk={this.datepick1.bind(this)}
+							 onChange={this.datepick.bind(this)}
+							 onOk={this.datepick.bind(this)}
 							>
 							</RangePicker>
 						</Col>
@@ -215,13 +209,13 @@ export default class LocmeasureTable extends Component {
 								查询
 							</Button>
 						</Col>
-						<Col span={18} className='quryrstcnt mrg10'>
-							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
-						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.resetinput.bind(this)}>
 								重置
 							</Button>
+						</Col>
+						<Col span={18} className='quryrstcnt mrg10'>
+							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
@@ -248,14 +242,6 @@ export default class LocmeasureTable extends Component {
 					</Row>
 				</div>
     }
-
-	emitEmpty1 = () => {
-	    this.setState({sxm: ''});
-  	}
-
-  	emitEmpty2 = () => {
-	    this.setState({rolename: ''});
-  	}
 
 	sxmchange(value) {
 		this.setState({sxm:value.target.value})
@@ -324,23 +310,10 @@ export default class LocmeasureTable extends Component {
 
     }
 
-    onlocationchange(value) {
-		this.setState({islocation:value || ''})
-    }
-
-	onrolenamechange(value) {
-		this.setState({rolename:value.target.value})
-	}
-
 	datepick(value){
 		this.setState({stime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
 		this.setState({etime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
 	}
-	
-	datepick1(value){
-		this.setState({lstime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
-		this.setState({letime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
-    }
 
 	handleTableChange(pagination){
         const pager = { ...this.state.pagination};
@@ -452,7 +425,6 @@ export default class LocmeasureTable extends Component {
 						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
 					}
 	    			tblData[i].place = place;
-	    			let statusname = '';
 					let createtime1 = plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
 					let createtime2 = plan.LocationTime ? moment(plan.LocationTime).format('HH:mm:ss') : '/';
 					tblData[i].createtime1 = createtime1;

@@ -420,7 +420,8 @@ export default class Lmap extends Component {
         if (this.checkMarkers.toString() != '') {
             for (var i = 0; i <= this.checkMarkers.length - 1; i++) {
                 // console.log('checkMarkers',this.checkMarkers[i])
-                this.checkMarkers[i]._leaflet_id.remove()
+                this.map.removeLayer(this.checkMarkers[i])
+                // this.checkMarkers[i]._leaflet_id.remove()
                 delete this.checkMarkers[i]
             }
 		}
