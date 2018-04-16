@@ -67,8 +67,8 @@ class Filter extends Component {
 				<Row gutter={24}>
 					<Col span={24}>
 						{!this.props.parent ?
-							<Button style={{ marginRight: 10 }} disabled>添加文件</Button> :
-							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>添加文件</Button>
+							<Button style={{ marginRight: 10 }} disabled>新增</Button> :
+							<Button style={{ marginRight: 10 }} type="primary" onClick={toggleAddition.bind(this, true)}>新增</Button>
 						}
 						{/* </Col> */}
 						{/* <Col span ={2}> */}
@@ -81,9 +81,9 @@ class Filter extends Component {
 						{/* <Col span ={2}> */}
 						{
 							(Doc.length === 0) ?
-								<Button style={{ marginRight: 10 }} disabled>删除文件</Button> :
+								<Button style={{ marginRight: 10 }} disabled type="danger">删除</Button> :
 								<Popconfirm title="确定要删除文件吗？" onConfirm={this.confirm.bind(this)} onCancel={this.cancel.bind(this)} okText="Yes" cancelText="No">
-									<Button style={{ marginRight: 10 }} type="primary" onClick={this.delete.bind(this)}>删除文件</Button>
+									<Button style={{ marginRight: 10 }} type="danger" onClick={this.delete.bind(this)}>删除</Button>
 								</Popconfirm>
 						}
 					</Col>

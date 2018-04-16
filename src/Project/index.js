@@ -186,28 +186,30 @@ export default class Project extends Component {
 			// 	icon: <Icon name="money" />
 			// }
 			]
-		}, {
-			key: 'OverallManage',
-			name: '综合管理',
-			id: 'PROJECT.OVERALLMANAGE',			
-			icon: <Icon name="won" />,
-			children: [{
-				key: 'Material',
-				id: 'PROJECT.MATERIAL',
-				name: '物资管理',
-				path: '/project/material',
-				exact: true,
-				icon: <Icon name="retweet" />,
-			},
-			{
-				key: 'FormManage',
-				id: 'PROJECT.FORM',
-				name: '表单管理',
-				path: '/project/formmanage',
-				exact: true,
-				icon: <Icon name="retweet" />,
-			}] 
-		}, {
+		}, 
+		// {
+		// 	key: 'OverallManage',
+		// 	name: '综合管理',
+		// 	id: 'PROJECT.OVERALLMANAGE',			
+		// 	icon: <Icon name="won" />,
+		// 	children: [{
+		// 		key: 'Material',
+		// 		id: 'PROJECT.MATERIAL',
+		// 		name: '物资管理',
+		// 		path: '/project/material',
+		// 		exact: true,
+		// 		icon: <Icon name="retweet" />,
+		// 	},
+		// 	{
+		// 		key: 'FormManage',
+		// 		id: 'PROJECT.FORM',
+		// 		name: '表单管理',
+		// 		path: '/project/formmanage',
+		// 		exact: true,
+		// 		icon: <Icon name="retweet" />,
+		// 	}] 
+		// }, 
+		{
 			key: 'safetyManage',
 			name: '安环管理',
 			id: 'PROJECT.SAFETYMANAGE',			
