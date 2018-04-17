@@ -18,8 +18,95 @@ class Filter extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			newTaskNameArr : []
+			newTaskNameArr : [],
+			userSelect:[]
 		}
+	}
+
+	componentDidMount(){
+		const {actions:{getTasksList}} = this.props;
+		let ttt=getTasksList();
+		console.log('ttt',ttt)
+		getTasksList().then(rst => {
+			console.log('rst',rst)
+			if(rst.length){
+				const taskNameArr = [];
+				const newTaskNameArr = [];
+				rst.forEach(task => {
+					const {id,name} = task;
+					taskNameArr.push({id,name})
+				})
+				this.unique(taskNameArr,newTaskNameArr);
+				this.setState({newTaskNameArr})
+			}
+		})
+		this.getUserSelect()
+	}
+
+	componentDidUpdate(prevProps,prevState){
+		const{
+			platform:{tasks = []}
+		}=this.props
+		
+		if(tasks && tasks.length>0 && tasks != prevProps.platform.tasks){
+			console.log('tasks',tasks )
+			console.log('prevProps.platform.tasks',prevProps.platform.tasks )
+			console.log('prevProps.platform.tasks === tasks',prevProps.platform.tasks === tasks )
+			this.getUserSelect()
+		}
+	}
+
+	getUserSelect(){
+		const{
+			platform:{tasks = []}
+		}=this.props
+		if(tasks && tasks instanceof Array && tasks.length>0){
+			let arr = []
+			let creators = []
+			tasks.map((task)=>{
+				creators.push(task.creator)				
+			})
+			creators = this.getUnique('id',creators)
+			creators.map((creator)=>{
+				arr.push(<Option value={String(creator.id)} key ={creator.id}>{creator.person_name?creator.person_name:creator.username}</Option>)
+			})
+			
+			this.setState({
+				userSelect:arr
+			})
+		}else{
+			this.setState({
+				userSelect:[]
+			})
+		}
+
+	}
+
+	//key指属性名,arr为数组，数组去重方法
+	getUnique(key,arr) {
+		var unique = [arr[0]];
+		for (var i = 1; i < arr.length; i++) {
+			if (key === undefined) {
+				if (unique.indexOf(arr[i]) == -1){
+					unique.push(arr[i])
+				};
+			} else {
+				inner: {
+					var has = false;
+					for (var j = 0; j < unique.length; j++) {
+						if (arr[i][key] == unique[j][key]) {
+							has = true;
+							break inner;
+						}
+					}
+				}
+				if (!has) {
+					unique.push(arr[i]);
+				}
+			}
+		}
+		console.log('unique',unique)
+		return unique;
 	}
 
 	render() {
@@ -27,7 +114,10 @@ class Filter extends Component {
 			platform: { users = [] }, 
 			form: { getFieldDecorator }
 		} = this.props;
-		const {newTaskNameArr = []} = this.state;
+		const {
+			newTaskNameArr = [],
+			userSelect =[]
+		} = this.state;
 		return (
 			<Form>
 				<Row>
@@ -92,22 +182,17 @@ class Filter extends Component {
 												{ required: false ,message:'发起人'},
 											]}
 										)
-										(<Input placeholder="请输入发起人姓名"/>
-										// <Select showSearch allowClear
-										// 	placeholder="请选择发起人"
-										// 	optionFilterProp="children"
-										// 	filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-										// >
-										// 	{
-										// 		users
-										// 			?
-										// 			users.map(per => {
-										// 				return <Option value={per.id}
-										// 					key={per.account.person_id}>{per.account.person_name}</Option>
-										// 			})
-										// 			: ''
-										// 	}
-										// </Select>
+										(
+										// <Input placeholder="请输入发起人姓名"/>
+											<Select showSearch allowClear
+												placeholder="请选择发起人"
+												optionFilterProp="children"
+												filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+											>
+												{
+													userSelect
+												}
+											</Select>
 										)
 									}
 									
@@ -143,25 +228,6 @@ class Filter extends Component {
 				</Row>
 			</Form>
 		);
-	}
-
-	componentDidMount(){
-		const {actions:{getTasksList}} = this.props;
-		let ttt=getTasksList();
-		console.log('ttt',ttt)
-		getTasksList().then(rst => {
-			console.log('rst',rst)
-			if(rst.length){
-				const taskNameArr = [];
-				const newTaskNameArr = [];
-				rst.forEach(task => {
-					const {id,name} = task;
-					taskNameArr.push({id,name})
-				})
-				this.unique(taskNameArr,newTaskNameArr);
-				this.setState({newTaskNameArr})
-			}
-		})
 	}
 
 	unique(arr,newArr) {

@@ -212,7 +212,7 @@ class ResourceTable extends Component {
 				'site':subject.site?JSON.parse(subject.site):'',
 				'submitOrg':postData.upload_unit?postData.upload_unit:'',
 				'submitPerson':creator.person_name?creator.person_name+'('+creator.username+')':creator.username,
-				'submitTime':moment(item.creator).format('YYYY-MM-DD'),
+				'submitTime':moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),
 				'resourceStyle':item.status===2?'执行中':'已完成',
 			}
 			totledata.push(data)

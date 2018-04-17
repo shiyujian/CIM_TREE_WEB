@@ -71,7 +71,7 @@ export default class SafetyTable extends Component {
                     type: postData.type,
                     numbercode:subject.numbercode?JSON.parse(subject.numbercode):'',
                     submitperson:item.creator.person_name,
-					submittime:item.real_start_time,
+					submittime:moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),
 					submitUnit:postData.upload_unit?postData.upload_unit:'',
                     status:item.status,
                     document:subject.document?JSON.parse(subject.document):'',

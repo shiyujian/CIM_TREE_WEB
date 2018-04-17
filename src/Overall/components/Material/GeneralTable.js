@@ -25,11 +25,11 @@ class GeneralTable extends Component {
 	}
 	
 	columns = [
-		{
-			title: '项目',
-			dataIndex: 'projectName',
-			key: 'projectName',
-		},
+		// {
+		// 	title: '项目',
+		// 	dataIndex: 'projectName',
+		// 	key: 'projectName',
+		// },
 		{
 			title: '标段',
 			dataIndex: 'sectionName',
@@ -184,6 +184,8 @@ class GeneralTable extends Component {
 			let subject = item.subject[0];
 			let creator = item.creator;
 			let postData = subject.postData?JSON.parse(subject.postData):{};
+			console.log('item.creator',item.creator)
+			console.log('submitTime',moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),)
 			let data = {
 				// index:index+1,
 				id:item.id,
@@ -197,7 +199,7 @@ class GeneralTable extends Component {
 				'document':'机械设备',
 				'submitOrg':postData.upload_unit?postData.upload_unit:'',
 				'submitPerson':creator.person_name?creator.person_name+'('+creator.username+')':creator.username,
-				'submitTime':moment(item.creator).format('YYYY-MM-DD'),
+				'submitTime':moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),
 				'flowStyle':item.status===2?'执行中':'已完成',
 			}
 			totledata.push(data)

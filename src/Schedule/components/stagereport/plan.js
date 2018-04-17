@@ -116,7 +116,7 @@ class Plan extends Component {
 					type: itempostdata.type,
 					numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
 					submitperson:item.creator.person_name,
-					submittime:item.real_start_time,
+					submittime:moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),
 					status:item.status,
 					// superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
 					timedate:itemdata.timedate?JSON.parse(itemdata.timedate):'',
