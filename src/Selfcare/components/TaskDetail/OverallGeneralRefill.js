@@ -67,7 +67,17 @@ class OverallGeneralRefill extends Component {
             dataIndex: 'equipTime',
             key: 'equipTime',
             render: (text, record) => {
-                return <DatePicker onChange={this.equipTimeChange.bind(this,record,'equipTime')} format={'YYYY-MM-DD'}/>
+
+                return  <div>
+                    { 
+                        record.editable 
+                        ?
+                        < DatePicker onChange={this.equipTimeChange.bind(this,record,'equipTime')} defaultValue={moment(record.equipTime,'YYYY-MM-DD')} format={'YYYY-MM-DD'}/>
+                        :
+                        record.equipTime
+                    }
+                </div>
+                
             },
         }, {
             title: '技术状况',
