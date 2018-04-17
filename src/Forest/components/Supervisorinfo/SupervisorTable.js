@@ -121,6 +121,9 @@ export default class SupervisorTable extends Component {
 				title:"树种",
 				dataIndex: 'TreeTypeObj.TreeTypeName',
 			},{
+				title:"状态",
+				dataIndex: 'statusname',
+			},{
 				title:"监理人",
 				dataIndex: 'Supervisor',
 				render: (text,record) => {
@@ -129,82 +132,7 @@ export default class SupervisorTable extends Component {
 					}
 					return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
 				}
-			},{
-				title:"状态",
-				dataIndex: 'statusname',
-			},{
-				title:"高度(cm)",
-				dataIndex: 'GD',
-				render:(text)=>{
-					if(text === 0){
-						return <p> / </p>
-					}else{
-						return <p>{text}</p>
-					}
-				}
-			},{
-				title:"地径",
-				dataIndex: 'DJ',
-				render:(text)=>{
-					if(text === 0){
-						return <p> / </p>
-					}else{
-						return <p>{text}</p>
-					}
-				}
 			},
-			// {
-			// 	title:"是否截干",
-			// 	dataIndex: 'JG',
-			// 	render:(text) =>{
-			// 		if(text === 0){
-			// 			return <p>否</p>
-			// 		}else{
-			// 			return <p>是</p>
-			// 		}
-			// 	}
-			// },{
-			// 	title:"干皮损伤",
-			// 	dataIndex: 'GP',
-			// 	render:(text) =>{
-			// 		if(text === 0){
-			// 			return <p>否</p>
-			// 		}else{
-			// 			return <p>是</p>
-			// 		}
-			// 	}
-			// },{
-			// 	title:"冠型完整",
-			// 	dataIndex: 'GXWZ',
-			// 	render:(text) =>{
-			// 		if(text === 0){
-			// 			return <p>否</p>
-			// 		}else{
-			// 			return <p>是</p>
-			// 		}
-			// 	}
-			// },{
-			// 	title:"健壮",
-			// 	dataIndex: 'SZJZ',
-			// 	render:(text) =>{
-			// 		if(text === 0){
-			// 			return <p>否</p>
-			// 		}else{
-			// 			return <p>是</p>
-			// 		}
-			// 	}
-			// },{
-			// 	title:"病虫害",
-			// 	dataIndex: 'BCH',
-			// 	render:(text) =>{
-			// 		if(text === 0){
-			// 			return <p>否</p>
-			// 		}else{
-			// 			return <p>是</p>
-			// 		}
-			// 	}
-
-			// },
 			{
 				title:"定位",
 				dataIndex: 'locationstatus',
@@ -281,13 +209,13 @@ export default class SupervisorTable extends Component {
 					</Row>
 					<Row >
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
-								查询
+							<Button type='primary' onClick={this.resetinput.bind(this)}>
+								重置
 							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.resetinput.bind(this)}>
-								重置
+							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
+								查询
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>
@@ -496,12 +424,16 @@ export default class SupervisorTable extends Component {
 					}	    			
 					tblData[i].place = place;
 	    			let statusname = '';
-					if(plan.SupervisorCheck == -1)
+					if(plan.Status == -1)
 						statusname = "未抽查"
-					else if(plan.SupervisorCheck == 0) 
-						statusname = "抽查未通过"
-					else {
-						statusname = "抽查通过"
+					else if(plan.Status == 0) 
+						statusname = "监理抽查通过"
+					else if(plan.Status === 1){
+						statusname = "监理抽查退回"
+					}else if(plan.Status === 2){
+						statusname = "业主抽查退回"
+					}else if(plan.Status === 3){
+						statusname = '业主抽查通过'
 					}
 					tblData[i].statusname = statusname;
 					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';

@@ -68,8 +68,8 @@ export default class Supervisorinfo extends Component {
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
             <Option key={'1'} value={"-1"}>未抽查</Option>,
-            <Option key={'2'} value={"0"}>抽查未通过</Option>,
-            <Option key={'3'} value={"1"}>抽查通过</Option>,
+            <Option key={'2'} value={"0"}>监理抽查通过</Option>,
+            <Option key={'3'} value={"1"}>监理抽查退回</Option>,
         ]
         this.setState({statusoption,typeoption})
     }

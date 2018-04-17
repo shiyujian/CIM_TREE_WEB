@@ -260,13 +260,13 @@ export default class ContrastTable extends Component {
 					</Row>
 					<Row >
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
-								查询
+							<Button type='primary' onClick={this.resetinput.bind(this)}>
+								重置
 							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.resetinput.bind(this)}>
-								重置
+							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
+								查询
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>

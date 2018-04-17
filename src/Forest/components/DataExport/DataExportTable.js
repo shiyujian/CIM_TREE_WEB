@@ -112,7 +112,7 @@ export default class LocmeasureTable extends Component {
 			dataIndex: 'order',
 		},{
 			title:"顺序码",
-			dataIndex: 'ZZBM',
+			dataIndex: 'SXM',
 		},{
 			title:"标段",
 			dataIndex: 'Section',
@@ -126,28 +126,10 @@ export default class LocmeasureTable extends Component {
 			title:"树种",
 			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
-			title:"测量人",
-			dataIndex: 'Inputer',
-			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
-			}
-		},{
 			title:"测量时间",
 			render: (text,record) => {
 				const {createtime1 = '',createtime2 = '' } = record;
 				return <div><div>{createtime1}</div><div>{createtime2}</div></div>
-			}
-		},{
-			title:"定位人",
-			dataIndex: 'Inputer',
-			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
-			}
-		},{
-			title:"定位时间",
-			render: (text,record) => {
-				const {createtime3 = '',createtime4 = '' } = record;
-				return <div><div>{createtime3}</div><div>{createtime4}</div></div>
 			}
 		},{
 			title:'X',
@@ -156,8 +138,8 @@ export default class LocmeasureTable extends Component {
 			title:'Y',
 			dataIndex:'Y'
 		},{
-			title:'Z',
-			dataIndex:'Z'
+			title:'H',
+			dataIndex:'H'
 		}];
 		header = <div >
 					<Row >
@@ -205,20 +187,20 @@ export default class LocmeasureTable extends Component {
 					</Row>
 					<Row >
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
-								查询
+							<Button type='primary' onClick={this.resetinput.bind(this)}>
+								重置
 							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.resetinput.bind(this)}>
-								重置
+							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
+								查询
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>
 							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
+							<Button type='primary' onClick={this.exportexcel.bind(this)}>
 								导出
 							</Button>
 						</Col>
@@ -234,7 +216,7 @@ export default class LocmeasureTable extends Component {
 							columns={columns}
 							rowKey='order'
 							loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
-							locale={{emptyText:'当天无现场测量信息'}}
+							locale={{emptyText:'无定位数据导出信息'}}
 							dataSource={details}
 							onChange={this.handleTableChange.bind(this)}
 							pagination={this.state.pagination}
@@ -379,13 +361,11 @@ export default class LocmeasureTable extends Component {
 			thinclass = '',
 			smallclass = ''
 		} = this.state;
-		if(this.sections.length !== 0){  //不是admin，要做查询判断了
-			if(section === ''){
-				message.info('请选择标段信息');
-				return;
-			}
+		if(section === ''){
+			message.info('请选择标段信息');
+			return;
 		}
-    	const {actions: {getTreeLocations}} = this.props;
+		const {actions: {getTreeLocations}} = this.props;
     	let postdata = {
     		// no:keycode,
     		section,
@@ -404,9 +384,9 @@ export default class LocmeasureTable extends Component {
 		if(smallclass === ''){
 			postdata.no = ''
 		}else if(thinclass === ''){
-			postdata.no = smallclass
+			postdata.no = section.substring(0,8)+smallclass
 		}else{
-			postdata.no = thinclass
+			postdata.no = section.substring(0,8)+smallclass+'-'+thinclass
 		}
     	this.setState({loading:true,percent:0})
     	getTreeLocations({},postdata)
@@ -418,15 +398,19 @@ export default class LocmeasureTable extends Component {
     		if(tblData instanceof Array) {
 	    		tblData.forEach((plan, i) => {
 					tblData[i].order = ((page - 1) * size) + i + 1;
+					tblData[i].SXM = plan.SXM;
 					let place = ''
-					if(plan.Section.indexOf('P010') !== -1){
+					if(plan.No.indexOf('P010') !== -1){
 						place = this.getThinClassName(plan.No,plan.Section);
 					}else{
-						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
+						place = `${plan.No.substring(8,11)}号小班${plan.No.substring(12,15)}号细班`
 					}
-	    			tblData[i].place = place;
-					let createtime1 = plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
-					let createtime2 = plan.LocationTime ? moment(plan.LocationTime).format('HH:mm:ss') : '/';
+					tblData[i].place = place;
+					tblData[i].H = plan.H;
+					tblData[i].X = plan.Coords.split(' ')[0].split('(')[1];
+					tblData[i].Y = plan.Coords.split(' ')[1].split(')')[0];
+					let createtime1 = plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
+					let createtime2 = plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
 					tblData[i].createtime1 = createtime1;
 					tblData[i].createtime2 = createtime2;
 	    		})
@@ -458,11 +442,9 @@ export default class LocmeasureTable extends Component {
 			smallclass = '',
 			status = ''
 		} = this.state;
-		if(this.sections.length !== 0){  //不是admin，要做查询判断了
-			if( section === ''){
-				message.info('请选择标段信息');
-				return;
-			}
+		if( section === ''){
+			message.info('请选择标段信息');
+			return;
 		}
     	const {actions: {getExportTreeLocations},keycode = ''} = this.props;
     	let postdata = {
@@ -486,9 +468,9 @@ export default class LocmeasureTable extends Component {
 		if(smallclass === ''){
 			postdata.no = ''
 		}else if(thinclass === ''){
-			postdata.no = smallclass
+			postdata.no = section.substring(0,8)+smallclass
 		}else{
-			postdata.no = thinclass
+			postdata.no = section.substring(0,8)+smallclass+'-'+thinclass
 		}
     	this.setState({loading:true,percent:0})
     	getExportTreeLocations({},postdata)

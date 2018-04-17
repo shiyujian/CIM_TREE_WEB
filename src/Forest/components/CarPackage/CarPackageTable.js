@@ -128,9 +128,6 @@ export default class CarPackageTable extends Component {
 					return <div><div>{liftertime1}</div><div>{liftertime2}</div></div>
 				}
 			},{
-				title:"状态",
-				dataIndex: 'statusname',
-			},{
 				title:<div><div>高度</div><div>(cm)</div></div>,
 				render: (text,record) => {
 					if(record.GD != 0)
@@ -140,19 +137,19 @@ export default class CarPackageTable extends Component {
 					}
 				}
 			},{
-				title:<div><div>胸径</div><div>(cm)</div></div>,
+				title:<div><div>冠幅</div><div>(cm)</div></div>,
 				render: (text,record) => {
-					if(record.XJ != 0)
-						return <span>{record.XJ}</span>
+					if(record.GF != 0)
+					return <span>{record.GF}</span>
 					else {
 						return <span>/</span>
 					}
 				}
 			},{
-				title:<div><div>冠幅</div><div>(cm)</div></div>,
+				title:<div><div>胸径</div><div>(cm)</div></div>,
 				render: (text,record) => {
-					if(record.GF != 0)
-					return <span>{record.GF}</span>
+					if(record.XJ != 0)
+						return <span>{record.XJ}</span>
 					else {
 						return <span>/</span>
 					}
@@ -317,12 +314,12 @@ export default class CarPackageTable extends Component {
 								{sectionoption}
 							</Select>
 						</Col>
-						<Col xl={4} lg={5} md={6} className='mrg10'>
-                            <span>状态：</span>
-                            <Select allowClear className='forestcalcw2 mxw150' defaultValue='全部' value={status} onChange={this.onstatuschange.bind(this)} style={{width:150}}>
-								{statusoption}
-							</Select>
-						</Col>
+						<Col xl={3} lg={4} md={5} className='mrg10'>
+                            <span>苗木类型：</span>
+                            <Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={mmtype} onChange={this.onmmtypechange.bind(this)}>
+                                {mmtypeoption}
+                            </Select>
+                        </Col>
 						<Col xl={8} lg={9} md={10} className='mrg10'>
 							<span>创建时间：</span>
 							<RangePicker 
@@ -335,22 +332,22 @@ export default class CarPackageTable extends Component {
 							>
 							</RangePicker>
 						</Col>
-                        <Col xl={3} lg={4} md={5} className='mrg10'>
-                            <span>苗木类型：</span>
-                            <Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={mmtype} onChange={this.onmmtypechange.bind(this)}>
-                                {mmtypeoption}
-                            </Select>
-                        </Col>
+                        <Col xl={4} lg={5} md={6} className='mrg10'>
+                            <span>状态：</span>
+                            <Select allowClear className='forestcalcw2 mxw150' defaultValue='全部' value={status} onChange={this.onstatuschange.bind(this)} style={{width:150}}>
+								{statusoption}
+							</Select>
+						</Col>
 					</Row>
 					<Row>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
-								查询
+							<Button type='primary' onClick={this.resetinput.bind(this)}>
+								重置
 							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.resetinput.bind(this)}>
-								重置
+							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
+								查询
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>
