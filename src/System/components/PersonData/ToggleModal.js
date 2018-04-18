@@ -122,6 +122,21 @@ export default class ToggleModal extends Component {
                     }
                 }
             }, {
+                title: '身份证号码',
+                dataIndex: 'record.id_num',
+                key: 'id_num',
+                render: (text, record, index) => {
+                    // console.log("record", record)
+                    if (record.editing === true) {
+                        return <Input style={{ width: '60px' }} value={record.id_num || ""} onChange={ele => {
+                            record.id_num = ele.target.value
+                            this.forceUpdate();
+                        }} />
+                    } else {
+                        return <span>{record.id_num}</span>
+                    }
+                }
+            }, {
                 title: '密码',
                 dataIndex: 'record.passwords',
                 key: 'Passwords',
@@ -567,7 +582,8 @@ export default class ToggleModal extends Component {
                         sections: item.sections,
                         groups: item.groups,
                         is_active: true,
-                        id_num:'',
+                        black_remark:'',
+                        id_num:item.id_num,
                         is_black:0,
                         id_image:[],
                         basic_params: {
@@ -786,6 +802,7 @@ export default class ToggleModal extends Component {
                     partname.push(org_names[i].orgNames) 
                 }
             }
+            console.log("item",item)
             const group = item[11].toString()
             const tag = item[10].toString()
             const section = item[9].toString()
@@ -803,6 +820,7 @@ export default class ToggleModal extends Component {
                 job: item[3] || '',
                 sex: item[4] || '',
                 tel: item[5] || '',
+                id_num: item[12] || '',
                 tel_red: tel_red,
                 email: item[6] || '',
                 email_red: email_red,

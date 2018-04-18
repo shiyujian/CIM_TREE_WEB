@@ -15,6 +15,16 @@ const getTreeCode = createAction(`${ID}点击tree的节点code`);
 const getIsBtn = createAction(`${ID}控制是否根据角色进行分页`);
 const getIsActive = createAction(`${ID}控制是否根据角色是否禁用启用`);
 
+//设置上传的文件列表
+export const postUploadFilesImg = createAction('xhy设置上传的文件列表');
+//设置上传的身份证照片
+export const postUploadFilesNum = createAction('设置上传的身份证照片');
+//控制只能上传一张用户照片
+export const getImgBtn= createAction('控制只能上传一张用户照片');
+//控制只能上传一张身份证照片
+export const getImgNumBtn= createAction('控制只能上传一张身份证照片');
+//编辑时如果有照片就显示照片
+export const getImgArr= createAction('编辑时如果有照片就显示照片');
 
 const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 
@@ -38,7 +48,12 @@ export const actions = {
 	getTablePage,
 	getTreeCode,
 	getIsBtn,
-	getIsActive
+	getIsActive,
+	postUploadFilesImg,
+	getImgBtn,
+	getImgArr,
+	postUploadFilesNum,
+	getImgNumBtn
 };
 
 export default handleActions({
@@ -89,5 +104,25 @@ export default handleActions({
 	[getIsActive]: (state, {payload}) => ({
 		...state,
 		getIsActives: payload
+	}),
+	[postUploadFilesImg]: (state, {payload}) => ( {
+		...state,
+		fileList: payload
+	}),
+	[getImgBtn]: (state, {payload}) => ( {
+		...state,
+		getImgBtns: payload
+	}),
+	[getImgArr]: (state, {payload}) => ( {
+		...state,
+		getImgArrs: payload
+	}),
+	[postUploadFilesNum]: (state, {payload}) => ( {
+		...state,
+		postUploadFilesNums: payload
+	}),
+	[getImgNumBtn]: (state, {payload}) => ( {
+		...state,
+		getImgNumBtns: payload
 	}),
 }, {});

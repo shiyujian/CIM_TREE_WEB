@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
-import { Modal, Row, Col, Form, Input, Select, message } from 'antd';
+import { Modal, Row, Col, Form, Input, Select, message, Upload, Icon, Button, Switch } from 'antd';
 import PropTypes from 'prop-types';
 
 import { getProjectUnits } from '../../../_platform/auth'
+import { base, STATIC_DOWNLOAD_API, SOURCE_API } from '../../../_platform/api';
+let fileTypes = 'application/jpeg,application/gif,application/png,image/jpeg,image/gif,image/png,image/jpg';
+
+window.config = window.config || {};
 const FormItem = Form.Item;
+const { TextArea } = Input;
 const { Option, OptGroup } = Select;
 
 // export default class Addition extends Component {
@@ -15,7 +20,7 @@ class Addition extends Component {
 			searchList: [],
 			search: false,
 			searchValue: '',
-			newKey: Math.random()
+			newKey: Math.random(),
 		}
 	}
 
@@ -108,11 +113,62 @@ class Addition extends Component {
 		})
 		return objs
 	}
+	uploadChange(file) {
+
+		const status = file.file.status;
+		const { actions: { postUploadFilesImg, getImgBtn }, fileList = [] } = this.props;
+		if (status === 'done') {
+			let newFileList = file.file.response.download_url.split('/media')[1]
+			// postUploadVideo(newFileList)
+			getImgBtn(true)
+			postUploadFilesImg(newFileList)
+		}
+		if (status === "removed") {
+			getImgBtn(false)
+			postUploadFilesImg()
+		}
+		if (event) {
+			let { percent } = event;
+			if (percent !== undefined) {
+
+			}
+			// this.setState({ progress: parseFloat(percent.toFixed(1)) });
+		}
+	}
+	uploadChanges(file) {
+		console.log("file", file)
+		const status = file.file.status;
+		const { actions: { postUploadFilesNum, getImgNumBtn }, postUploadFilesNums = [] } = this.props;
+		if (status === 'done') {
+			let newFileList = postUploadFilesNums;
+			let newFile = {
+				name: file.file.name,
+				filepath: STATIC_DOWNLOAD_API + "/media" + file.file.response.download_url.split('/media')[1]
+			};
+			newFileList = newFileList.concat(newFile);
+			getImgNumBtn(true)
+			postUploadFilesNum(newFileList)
+		}
+		if (status === "removed") {
+			getImgNumBtn(false)
+			postUploadFilesNum()
+		}
+		if (event) {
+			let { percent } = event;
+			if (percent !== undefined) {
+
+			}
+			// this.setState({ progress: parseFloat(percent.toFixed(1)) });
+		}
+	}
+	onChange(checked) {
+		console.log(`switch to ${checked}`);
+	}
 
 	render() {
 		const { form: {
 			getFieldDecorator
-		}, platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = [] } = this.props;
+		}, platform: { roles = [] }, addition = {}, actions: { changeAdditionField, getImgArr }, tags = [] } = this.props;
 		const tagsOptions = this.initopthins(tags);
 		const {
 			search
@@ -121,8 +177,43 @@ class Addition extends Component {
 		let nurseryData = [];
 		let defaultNurse = this.query(addition)
 		let units = this.getUnits()
+		console.log("addition", addition)
+		let avatar_url = ''
+		let avatar_urlName
+		let fileList = []
+		if (addition.person_avatar_url && addition.person_avatar_url != 'http://47.104.160.65:6511') {
+			avatar_urlName = addition.person_avatar_url.split("/").pop()
+			avatar_url = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + addition.person_avatar_url
+			fileList = [{
+				uid: -1,
+				name: avatar_urlName,
+				status: 'done',
+				url: avatar_url,
+				thumbUrl: avatar_url,
+			}];
+		}
+		let fileList1 = []
+		let id_image_url = ''
+		let id_image_urlName
+		if (addition.id_image && addition.id_image.length != 0) {
+			id_image_urlName = addition.id_image[0].name
+			id_image_url = addition.id_image[0].filepath ? addition.id_image[0].filepath : addition.id_image[0].thumbUrl
+			fileList1 = [{
+				uid: 1,
+				name: id_image_urlName,
+				status: 'done',
+				url: id_image_url,
+				thumbUrl: id_image_url,
+			}]
+		}
+		console.log("333333", fileList1)
+		let marginTops=''
+		if (!user.is_superuser) {
+			marginTops= '55px'
+		}
+		console.log("marginTops",marginTops)
 		return (
-			<Modal title={addition.id ? "编辑人员信息" : "新增人员"} visible={addition.visible} className="large-modal" width={800}
+			<Modal title={addition.id ? "编辑人员信息" : "新增人员"} visible={addition.visible} className="large-modal" width="80%"
 				maskClosable={false}
 				key={this.state.newKey}
 				onOk={this.save.bind(this)} onCancel={this.cancel.bind(this)}>
@@ -176,6 +267,21 @@ class Addition extends Component {
 										)
 								}
 							</FormItem>
+							<FormItem   {...Addition.layout} label="身份证号码:">
+								{
+									getFieldDecorator('idcard', {
+										initialValue: `${addition.id_num ? addition.id_num : ''}`,
+										rules: [
+											{ required: true, message: '请输入身份证号码' }
+										]
+									})
+										(
+										<Input placeholder="请输入身份证号码"
+											onChange={changeAdditionField.bind(this, 'id_num')}
+										/>
+										)
+								}
+							</FormItem>
 							{user.is_superuser ?
 								<FormItem {...Addition.layout} label="部门编码">
 									<Input placeholder="部门编码" value={addition.org_code} onChange={changeAdditionField.bind(this, 'org_code')} />
@@ -213,6 +319,25 @@ class Addition extends Component {
 									}
 								</Select>
 							</FormItem>
+							<div style={{ marginLeft: '25%' }}>
+								{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
+								<Upload name="file"
+									multiple={true}
+									accept={fileTypes}
+									// showUploadList: false,
+									action={base + "/service/fileserver/api/user/files/"}
+									listType="picture"
+									data={(file) => ({ name: file.fileName, a_file: file })}
+									onChange={this.uploadChange.bind(this)}
+									defaultFileList={fileList}
+									disabled={this.props.getImgBtns}
+								>
+									<Button>
+										<Icon type="upload" />
+										<span>上传用户照片</span>
+									</Button>
+								</Upload>
+							</div>
 						</Col>
 						<Col span={12}>
 							<FormItem {...Addition.layout} label="邮箱">
@@ -249,11 +374,7 @@ class Addition extends Component {
 										)
 								}
 							</FormItem>
-							{user.is_superuser ?
-								<FormItem {...Addition.layout} label="部门名称">
-									<Input placeholder="部门名称" value={addition.organization} onChange={changeAdditionField.bind(this, 'organization')} />
-								</FormItem> : ''
-							}
+
 							<FormItem   {...Addition.layout} label="角色:">
 								{
 									getFieldDecorator('rolesNmae', {
@@ -273,6 +394,11 @@ class Addition extends Component {
 										)
 								}
 							</FormItem>
+							{user.is_superuser ?
+								<FormItem {...Addition.layout} label="部门名称">
+									<Input placeholder="部门名称" value={addition.organization} onChange={changeAdditionField.bind(this, 'organization')} />
+								</FormItem> : ''
+							}
 							<FormItem {...Addition.layout} label="苗圃">
 								{/* <Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
 								mode="multiple" style={{ width: '100%' }} > */}
@@ -287,6 +413,47 @@ class Addition extends Component {
 									{tagsOptions}
 								</Select>
 							</FormItem>
+							<Row >
+								<Col span={8}>
+									{user.is_superuser ?
+										<FormItem {...Addition.layoutT} label="黑名单">
+											{/* <Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} /> */}
+
+											<Switch defaultChecked onChange={this.onChange.bind(this)} />
+										</FormItem> : ''}
+								</Col>
+								<Col span={16}>
+									{user.is_superuser ?
+										<FormItem {...Addition.layoutR} label="原因">
+											{/* <Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} /> */}
+
+											<Input value={addition.black_remark}
+												onChange={changeAdditionField.bind(this, 'black_remark')}
+											/>
+										</FormItem> : ''}
+								</Col>
+
+							</Row>
+
+							<div style={{ marginLeft: '25%',marginTop:marginTops }}>
+								{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
+								<Upload name="file"
+									multiple={true}
+									accept={fileTypes}
+									// showUploadList: false,
+									action={base + "/service/fileserver/api/user/files/"}
+									listType="picture"
+									data={(file) => ({ name: file.fileName, a_file: file })}
+									onChange={this.uploadChanges.bind(this)}
+									defaultFileList={fileList1}
+									disabled={this.props.getImgNumBtns}
+								>
+									<Button>
+										<Icon type="upload" />
+										<span>上传身份证照片</span>
+									</Button>
+								</Upload>
+							</div>
 						</Col>
 					</Row>
 				</Form>
@@ -379,12 +546,25 @@ class Addition extends Component {
 	}
 
 	save() {
+		// const { actions: { postUploadFilesImg,getImgBtn }, fileList = [] } = this.props;
+
 		const {
 			addition = {}, sidebar: { node } = {},
 			platform: { users = [] },
-			actions: { postUser, clearAdditionField, getUsers, putUser, getSection, getTablePage, getIsBtn }, tags = {}
+			actions: { postUser, clearAdditionField, getUsers, postUploadFilesImg, getImgBtn,
+				putUser, getSection, getTablePage, getIsBtn, postUploadFilesNum, getImgNumBtn }, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
+		if (this.props.postUploadFilesNums) {
+			addition.id_image = this.props.postUploadFilesNums
+		} else {
+			addition.id_image = addition.id_image
+		}
+		if (this.props.fileList) {
+			addition.person_avatar_url = this.props.fileList
+		} else {
+			addition.person_avatar_url = addition.person_avatar_url
+		}
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
 		} else {
@@ -399,7 +579,7 @@ class Addition extends Component {
 				this.props.form.validateFields((err, values) => {
 					console.log("err", err)
 					console.log("this.props.getIsActives", this.props.getIsActives)
-					if (!err || !err.FullName && !err.UserName && !err.rolesNmae && !err.sexName && !err.telephone && !err.titles) {
+					if (!err || !err.FullName && !err.UserName && !err.rolesNmae && !err.sexName && !err.telephone && !err.titles &&!err.idcard) {
 						putUser({}, {
 							id: addition.id,
 							username: addition.username,
@@ -408,7 +588,7 @@ class Addition extends Component {
 							account: {
 								person_name: addition.person_name,
 								person_type: "C_PER",
-								person_avatar_url: "",
+								person_avatar_url: this.props.fileList || '',
 								organization: {
 									pk: node.pk,
 									code: addition.org_code,
@@ -421,10 +601,12 @@ class Addition extends Component {
 							sections: addition.sections,
 							//groups: [7],
 							groups: roles.map(role => +role),
+							black_remark: addition.black_remark,
 							is_active: this.props.getIsActives,
-							id_num:'',
-							is_black:0,
-							id_image:[{"name":"主照片","filepath":""},{"name":"副照片","filepath":""}],
+							id_num: addition.id_num,
+							is_black: 0,
+							// id_image: [],
+							id_image: this.props.postUploadFilesNums ? this.props.postUploadFilesNums : addition.id_image,
 							basic_params: {
 								info: {
 									'电话': addition.person_telephone || '',
@@ -441,13 +623,15 @@ class Addition extends Component {
 							if (rst.code == 1) {
 								const codes = Addition.collect(node);
 								message.info('修改人员成功');
+								postUploadFilesImg()
+								postUploadFilesNum()
 								// 控制是否通过角色条件分页
 								// getIsBtn(true)
 								let sectiona = []
 								getSection(sectiona)
 								clearAdditionField();
 								this.setState({
-									newKey: Math.random()
+									newKey: Math.random(),
 								})
 
 							} else {
@@ -459,6 +643,7 @@ class Addition extends Component {
 
 			} else {
 				this.props.form.validateFields((err, values) => {
+					console.log("this.props", this.props.fileList)
 					if (!err) {
 						postUser({}, {
 							is_person: true,
@@ -469,7 +654,7 @@ class Addition extends Component {
 								person_code: addition.code,
 								person_name: addition.person_name,
 								person_type: "C_PER",
-								person_avatar_url: "",
+								person_avatar_url: this.props.fileList || '',
 								organization: {
 									pk: node.pk,
 									code: node.code,
@@ -482,9 +667,10 @@ class Addition extends Component {
 							sections: addition.id ? addition.sections : this.props.isSection,
 							groups: roles.map(role => +role),
 							is_active: true,
-							id_num:'',
-							is_black:0,
-							id_image:[{"name":"主照片","filepath":""},{"name":"副照片","filepath":""}],
+							black_remark: addition.black_remark,
+							id_num: addition.id_num,
+							is_black: 0,
+							id_image: this.props.postUploadFilesNums,
 							basic_params: {
 								info: {
 									'电话': addition.person_telephone || '',
@@ -503,6 +689,10 @@ class Addition extends Component {
 								let sectiona = []
 								getSection(sectiona)
 								clearAdditionField();
+								postUploadFilesImg()
+								postUploadFilesNum()
+								getImgBtn(false)
+								getImgNumBtn(false)
 								const codes = Addition.collect(node);
 								let paget = ''
 								const totals = this.props.getTablePages.total
@@ -545,9 +735,11 @@ class Addition extends Component {
 	}
 
 	cancel() {
-		const { actions: { clearAdditionField } } = this.props;
+		const { actions: { clearAdditionField, getImgBtn, getImgNumBtn } } = this.props;
+		getImgBtn(false)
+		getImgNumBtn(false)
 		this.setState({
-			newKey: Math.random()
+			newKey: Math.random(),
 		})
 		clearAdditionField();
 	}
@@ -566,6 +758,14 @@ class Addition extends Component {
 	static layout = {
 		labelCol: { span: 6 },
 		wrapperCol: { span: 18 },
+	};
+	static layoutT = {
+		labelCol: { span: 18 },
+		wrapperCol: { span: 6 },
+	};
+	static layoutR = {
+		labelCol: { span: 4 },
+		wrapperCol: { span: 20 },
 	};
 }
 export default Form.create()(Addition)
