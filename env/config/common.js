@@ -173,10 +173,7 @@ module.exports = {
 			{from: '../static/sources.list'},
 			{from: '../static/supervisord.conf'},
 			
-			{from: '../static/1108', to: '1108/'},
 			{from: '../static/leaflet', to: 'leaflet/'},
-			{from: '../static/leaflet_plugins', to: 'leaflet_plugins/'},
-			{from: `../static/xaxq_${process.env.proj}`, to: 'xaxq/'},
 			{from: '../static/fonts', to: 'fonts/'},
 			{from: '../static/gooflow', to: 'gooflow/'},
 			{from: '../static/oajs', to: 'oajs/'},
