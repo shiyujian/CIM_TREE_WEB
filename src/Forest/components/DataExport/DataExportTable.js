@@ -396,6 +396,10 @@ export default class LocmeasureTable extends Component {
 			// thinclass,
 			// smallclass
 		}
+		if(postdata.stime === moment().format('YYYY-MM-DD 00:00:00') && postdata.etime === moment().format('YYYY-MM-DD 23:59:59')){
+			postdata.stime = ''
+			postdata.etime = ''
+		}
 		if(smallclass === ''){
 			postdata.no = ''
 		}else if(thinclass === ''){
@@ -479,6 +483,10 @@ export default class LocmeasureTable extends Component {
 			crs:positiontype
 			// thinclass,
 			// smallclass
+		}
+		if(postdata.stime === moment().format('YYYY-MM-DD 00:00:00') && postdata.etime === moment().format('YYYY-MM-DD 23:59:59')){
+			postdata.stime = ''
+			postdata.etime = ''
 		}
 		if(smallclass === ''){
 			postdata.no = ''
