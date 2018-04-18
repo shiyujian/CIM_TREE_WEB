@@ -311,8 +311,10 @@ export default class Users extends Component {
 			render: (user) => {
 				const userc = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 				if (userc.is_superuser == true) {
-					let add = ''
-					let acc = ''				
+					let add = ''  //是否禁用启用
+					let acc = ''	//是否禁用启用颜色			
+					let aee = ''	//是否是黑名单		
+					let att = ''	//是否是黑名单颜色		
 					if (user.is_active == true) {
 						add = '禁用'
 						acc = ''
@@ -336,13 +338,20 @@ export default class Users extends Component {
 						// <a style={{ marginLeft: '.5em' }} >取消黑名单</a>						
 						// ]
 					}
+					if(user.is_black== 1){
+						att = 'red'
+						 aee = '取消黑名单'										
+					}else if(user.is_black== 0){
+						 aee = '加入黑名单'	
+						 att=''									
+					}
 					return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
 					<Popconfirm title="是否真的要删除用户?" key={2}
 						onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
 						<a>删除</a>
 					</Popconfirm>,
 					<a style={{ marginLeft: '.5em', color: acc }} onClick={this.disable.bind(this, user)}>{add}</a>,
-					<a style={{ marginLeft: '.5em' }} >加入黑名单</a>
+					<a style={{ marginLeft: '.5em', color: att  }} onClick={this.black.bind(this, user)} >{aee}</a>
 					]
 				} else {
 					return <a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>
@@ -715,6 +724,70 @@ export default class Users extends Component {
 			});
 		}
 	}
+	black(user, event){
+		const {
+			addition = {}, sidebar: { node } = {},
+			actions: { putUser }
+		} = this.props;
+		let blacks
+		if (user.is_black == 0) {
+			user.is_black = 1
+			blacks = 1
+		} else {
+			user.is_black = 0
+			blacks = 0
+		}
+		
+		let groupe = []
+		for (let j = 0; j < user.groups.length; j++) {
+			const element = user.groups[j];
+			groupe.push(element.id)
+		}
+		console.log("groupe", groupe, user)
+		putUser({}, {
+			id: user.id,
+			username: user.username,
+			email: user.email,
+			// password: addition.password, // 密码不能变？信息中没有密码
+			account: {
+				person_name: user.person_name,
+				person_type: "C_PER",
+				person_avatar_url: "",
+				organization: {
+					pk: node.pk,
+					code: user.org_code,
+					obj_type: "C_ORG",
+					rel_type: "member",
+					name: user.organization
+				},
+			},
+			tags: user.tags,
+			sections: user.sections,
+			//groups: [7],
+			groups: groupe,
+			is_active: user.is_active,
+			black_remark:user.black_remark,
+			id_num:user.id_num,
+			is_black:blacks,
+			id_image:[],
+			basic_params: {
+				info: {
+					'电话': user.person_telephone || '',
+					'性别': user.gender || '',
+					'技术职称': user.title || '',
+					'phone': user.person_telephone || '',
+					'sex': user.gender || '',
+					'duty': ''
+				}
+			},
+			extra_params: {},
+			title: user.title || ''
+		}).then(rst => {
+			this.forceUpdate();
+			console.log("rst", rst)
+			console.log("333333333", JSON.parse(rst.msg))
+		})
+	}
 	disable(user, event) {
 		const {
 			addition = {}, sidebar: { node } = {},
@@ -757,7 +830,8 @@ export default class Users extends Component {
 			//groups: [7],
 			groups: groupe,
 			is_active: actives,
-			id_num:'',
+			black_remark:user.black_remark,			
+			id_num:user.id_num,
 			is_black:0,
 			id_image:[],
 			basic_params: {

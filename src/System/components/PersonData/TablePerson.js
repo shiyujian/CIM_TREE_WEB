@@ -150,6 +150,12 @@ export default class TablePerson extends Component {
 				key: 'username'
 			}
 			// , {
+			// 	title: '身份证号码',
+			// 	dataIndex: 'id_num',
+			// 	// width: '10%',
+			// 	key: 'id_num'
+			// }
+			// , {
 			// 	title: '密码',
 			// 	dataIndex: 'passwords',
 			// 	key: 'Passwords'
@@ -290,7 +296,8 @@ export default class TablePerson extends Component {
 						username: item.username || '',
 						sections: item.account.sections || '',
 						tags: item.account.tags || '',
-						groups: groupsId || []
+						groups: groupsId || [],
+						id_num: item.account.id_num || '',
 						// passwords:111111
 					}
 				})
@@ -456,7 +463,8 @@ export default class TablePerson extends Component {
 						username: item.username || '',
 						sections: item.account.sections || '',
 						tags: item.account.tags || '',
-						groups: groupsId || []
+						groups: groupsId || [],
+						id_num: item.account.id_num || '',						
 						// passwords:111111,
 					}
 				})
@@ -528,7 +536,8 @@ export default class TablePerson extends Component {
 					username: item.username || '',
 					sections: item.account.sections || '',
 					tags: item.account.tags || '',
-					groups: groupsId || []
+					groups: groupsId || [],
+					id_num: item.account.id_num || '',					
 				}
 			})
 		this.setState({ dataSource: data_person, tempData: data_person, loading: false });
@@ -559,7 +568,8 @@ export default class TablePerson extends Component {
 					username: item.username || '',
 					sections: item.account.sections || '',
 					tags: item.account.tags || '',
-					groups: groupsId || []
+					groups: groupsId || [],
+					id_num: item.account.id_num || '',					
 				}
 			})
 		return data_person
