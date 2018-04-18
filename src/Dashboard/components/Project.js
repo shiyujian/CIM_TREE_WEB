@@ -136,7 +136,8 @@ export default class Lmap extends Component {
 		}
 		//绑定
 		maps.map(function (t) {
-		  t.on({moveend:maplink,zoomend:maplink})
+		  //t.on({moveend:maplink,zoomend:maplink})
+		  t.on({drag:maplink,zoom:maplink})
 		})
 	}
 
