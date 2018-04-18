@@ -680,6 +680,9 @@ export const MODULES = [
 			children: [{
 				id: 'FOREST.DATAIMPORT',
 				name: '定位数据导入',
+			},{
+				id: 'FOREST.DATAEXPORT',
+				name: '定位数据导出',
 			}]
 		}]
 	}
@@ -740,6 +743,9 @@ export const MODULES = [
 			}, {
 				id: 'SYSTEM.PERSONSDATA',
 				name: '人员信息填报'
+			}, {
+				id: 'SYSTEM.BLACKLIST',
+				name: '黑名单'
 			}
 		]
 	}, {
