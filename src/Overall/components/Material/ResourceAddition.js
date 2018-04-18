@@ -191,166 +191,175 @@ class ResourceAddition extends Component {
         };
         
         return (  
-            <Modal 
-                title="新增文档"
-                width={920} visible={resourceAddVisible}
-                closable={false}
-                footer={false}
-                maskClosable={false}
-            >
-                <Spin spinning={this.state.loading}>
-                    <Form onSubmit={this.handleSubmit.bind(this)}>
-                        <Row gutter={24}>
-                            <Col span={24} style={{paddingLeft:'2em'}}>
-                                <Row gutter={15} >
-                                    <Col span={8}>
-                                        <FormItem   {...ResourceAddition.layoutT} label="标段:">
-                                        {
-                                            getFieldDecorator('section', {
-                                                initialValue: `${currentSectionName}`,
-                                                rules: [
-                                                    { required: true, message: '请输入标段' }
-                                                ]
-                                            })
-                                            (
-                                                (<Input readOnly placeholder='请输入标段' />)
-                                            )
-                                        }
-                                        
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={8}>
-                                        <FormItem {...ResourceAddition.layoutT} label="名称:">
-                                        {
-                                            getFieldDecorator('name', {
-                                                rules: [
-                                                    { required: true, message: '请输入材料名称' }
-                                                ]
-                                            })
-                                            (
-                                                <Input  placeholder='请输入材料名称' />
-                                            )
-                                        }
-                                            
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={8}>
-                                        <FormItem {...ResourceAddition.layoutT} label="编号:">
-                                        {
-                                            getFieldDecorator('code', {
-                                                rules: [
-                                                    { required: true, message: '请输入编号' }
-                                                ]
-                                            })
-                                            (
-                                                <Input  placeholder='请输入编号'/>
-                                            )
-                                        }
-                                        </FormItem>
+            <div>
+                {
+                    resourceAddVisible
+                    ?
+                    <Modal 
+                        title="新增文档"
+                        width={920} visible={resourceAddVisible}
+                        closable={false}
+                        footer={false}
+                        maskClosable={false}
+                        >
+                        <Spin spinning={this.state.loading}>
+                            <Form onSubmit={this.handleSubmit.bind(this)}>
+                                <Row gutter={24}>
+                                    <Col span={24} style={{paddingLeft:'2em'}}>
+                                        <Row gutter={15} >
+                                            <Col span={8}>
+                                                <FormItem   {...ResourceAddition.layoutT} label="标段:">
+                                                {
+                                                    getFieldDecorator('section', {
+                                                        initialValue: `${currentSectionName}`,
+                                                        rules: [
+                                                            { required: true, message: '请输入标段' }
+                                                        ]
+                                                    })
+                                                    (
+                                                        (<Input readOnly placeholder='请输入标段' />)
+                                                    )
+                                                }
+                                                
+                                                </FormItem>
+                                            </Col>
+                                            <Col span={8}>
+                                                <FormItem {...ResourceAddition.layoutT} label="名称:">
+                                                {
+                                                    getFieldDecorator('name', {
+                                                        rules: [
+                                                            { required: true, message: '请输入材料名称' }
+                                                        ]
+                                                    })
+                                                    (
+                                                        <Input  placeholder='请输入材料名称' />
+                                                    )
+                                                }
+                                                    
+                                                </FormItem>
+                                            </Col>
+                                            <Col span={8}>
+                                                <FormItem {...ResourceAddition.layoutT} label="编号:">
+                                                {
+                                                    getFieldDecorator('code', {
+                                                        rules: [
+                                                            { required: true, message: '请输入编号' }
+                                                        ]
+                                                    })
+                                                    (
+                                                        <Input  placeholder='请输入编号'/>
+                                                    )
+                                                }
+                                                </FormItem>
+                                            </Col>
+                                        </Row>
+                                        <Row gutter={15}>
+                                            <Col span={8}>
+                                                <FormItem {...ResourceAddition.layoutT} label="进场日期:">
+                                                {
+                                                    getFieldDecorator('date', {
+                                                        rules: [
+                                                            { required: true, message: '请选择进场日期' }
+                                                        ]
+                                                    })
+                                                    (
+                                                        <DatePicker placeholder='材料进场日期' format={'YYYY-MM-DD'} style={{width:'100%',height:'100%'}}/>
+                                                    )
+                                                }
+                                                    
+                                                </FormItem>
+                                            </Col>
+                                            <Col span={8}>
+                                                <FormItem {...ResourceAddition.layoutT} label="施工部位:">
+                                                {
+                                                    getFieldDecorator('site', {
+                                                        rules: [
+                                                            { required: true, message: '请输入施工部位' }
+                                                        ]
+                                                    })
+                                                    (
+                                                        <Input  placeholder='请输入材料具体应用部位'/>
+                                                    )
+                                                }
+                                                    
+                                                </FormItem>
+                                            </Col>
+                                        </Row>
                                     </Col>
                                 </Row>
-                                <Row gutter={15}>
-                                    <Col span={8}>
-                                        <FormItem {...ResourceAddition.layoutT} label="进场日期:">
-                                        {
-                                            getFieldDecorator('date', {
-                                                rules: [
-                                                    { required: true, message: '请选择进场日期' }
-                                                ]
-                                            })
-                                            (
-                                                <DatePicker placeholder='材料进场日期' format={'YYYY-MM-DD'} style={{width:'100%',height:'100%'}}/>
-                                            )
-                                        }
-                                            
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={8}>
-                                        <FormItem {...ResourceAddition.layoutT} label="施工部位:">
-                                        {
-                                            getFieldDecorator('site', {
-                                                rules: [
-                                                    { required: true, message: '请输入施工部位' }
-                                                ]
-                                            })
-                                            (
-                                                <Input  placeholder='请输入材料具体应用部位'/>
-                                            )
-                                        }
-                                            
-                                        </FormItem>
+                                <Row gutter={24}>
+                                    <Col span={24}>
+                                        <Table  rowSelection={rowSelection}
+                                                dataSource={this.state.dataSource}
+                                                columns={this.equipment}
+                                                pagination={false}
+                                                bordered  />
                                     </Col>
                                 </Row>
-                            </Col>
-                        </Row>
-                        <Row gutter={24}>
-                            <Col span={24}>
-                                <Table  rowSelection={rowSelection}
-                                        dataSource={this.state.dataSource}
-                                        columns={this.equipment}
-                                        pagination={false}
-                                        bordered  />
-                            </Col>
-                        </Row>
-                        <Row gutter={24}>
-                            <Col span={24}>
-                                <Button style={{ marginLeft: 20,marginRight: 10 }} type="primary" ghost
-                                        onClick={this.handleAdd. bind(this)}>添加</Button>
-                                <Button  type="primary" onClick={this.onDelete.bind(this)}>删除</Button>
-                            </Col>
-                        </Row>
-                        <Row gutter={24}>
-                            <Col span={24} style={{marginTop: 16, height: 160}}>
-                                <Dragger {...this.uploadProps}>
-                                    <p className="ant-upload-drag-icon">
-                                        <Icon type="inbox"/>
-                                    </p>
-                                    <p className="ant-upload-text">点击或者拖拽开始上传</p>
-                                    <p className="ant-upload-hint">
-                                        支持 pdf、doc、docx 文件
-                                    </p>
-                                </Dragger>
-                            </Col>
-                        </Row>
-                        <Row gutter={24} style={{marginTop: 15}}>
-                            <Col span={24}>
-                                <Table 
-                                    columns={this.columns1}
-                                    dataSource={this.state.TreatmentData}
-                                    pagination={true}
-                                />
-                            </Col>
-                        </Row>
-                        <Row style={{marginTop: 15}}>
-                            <Col span={10} >
-                                <FormItem {...ResourceAddition.layoutT} label='审核人'>
-                                    {
-                                        getFieldDecorator('dataReview', {
-                                            rules: [
-                                                { required: true, message: '请选择审核人员' }
-                                            ]
-                                        })
-                                            (
-                                            <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.工程材料报批流程}/>
-                                            )
-                                    }
+                                <Row gutter={24}>
+                                    <Col span={24}>
+                                        <Button style={{ marginLeft: 20,marginRight: 10 }} type="primary" ghost
+                                                onClick={this.handleAdd. bind(this)}>添加</Button>
+                                        <Button  type="primary" onClick={this.onDelete.bind(this)}>删除</Button>
+                                    </Col>
+                                </Row>
+                                <Row gutter={24}>
+                                    <Col span={24} style={{marginTop: 16, height: 160}}>
+                                        <Dragger {...this.uploadProps}>
+                                            <p className="ant-upload-drag-icon">
+                                                <Icon type="inbox"/>
+                                            </p>
+                                            <p className="ant-upload-text">点击或者拖拽开始上传</p>
+                                            <p className="ant-upload-hint">
+                                                支持 pdf、doc、docx 文件
+                                            </p>
+                                        </Dragger>
+                                    </Col>
+                                </Row>
+                                <Row gutter={24} style={{marginTop: 15}}>
+                                    <Col span={24}>
+                                        <Table 
+                                            columns={this.columns1}
+                                            dataSource={this.state.TreatmentData}
+                                            pagination={true}
+                                        />
+                                    </Col>
+                                </Row>
+                                <Row style={{marginTop: 15}}>
+                                    <Col span={10} >
+                                        <FormItem {...ResourceAddition.layoutT} label='审核人'>
+                                            {
+                                                getFieldDecorator('dataReview', {
+                                                    rules: [
+                                                        { required: true, message: '请选择审核人员' }
+                                                    ]
+                                                })
+                                                    (
+                                                    <PerSearch selectMember={this.selectMember.bind(this)} code={WORKFLOW_CODE.工程材料报批流程}/>
+                                                    )
+                                            }
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={8} offset={4}>
+                                        <Checkbox >短信通知</Checkbox>
+                                    </Col>
+                                </Row>
+                                <FormItem>
+                                    <Row>
+                                        <Col span={24} style={{ textAlign: 'right' }}>
+                                            <Button  onClick={this.cancel.bind(this)}>取消</Button>
+                                            <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">确认</Button>
+                                        </Col>
+                                    </Row>
                                 </FormItem>
-                            </Col>
-                            <Col span={8} offset={4}>
-                                <Checkbox >短信通知</Checkbox>
-                            </Col>
-                        </Row>
-                        <FormItem>
-                            <Row>
-                                <Col span={24} style={{ textAlign: 'right' }}>
-                                    <Button  onClick={this.cancel.bind(this)}>取消</Button>
-                                    <Button style={{ marginLeft: 8 }} type="primary" htmlType="submit">确认</Button>
-                                </Col>
-                            </Row>
-                        </FormItem>
-                    </Form>
-                </Spin>
-            </Modal>
+                            </Form>
+                        </Spin>
+                    </Modal>
+                    :
+                    ''
+                }
+            </div>
+            
         );
     }
 

@@ -129,7 +129,11 @@ export default class NursmeasureTable extends Component {
 			dataIndex: 'Age',
 			render:(text,record) => {
 				if(record.BD.indexOf('P010') !== -1){
-					return <p>{text}</p>
+					if(text === 0){
+						return <p> / </p>
+					}else{
+						return <p>{text}</p>
+					}
 				}else{
 					return <p> / </p>
 				}
@@ -147,7 +151,7 @@ export default class NursmeasureTable extends Component {
 			title:"填报人",
 			dataIndex: 'Inputer',
 			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
+				return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
 			}
 		},{
 			title:"起苗时间",
@@ -240,20 +244,20 @@ export default class NursmeasureTable extends Component {
 							</Select>
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
-							<span>苗圃：</span>
-							<Input suffix={suffix5} value={nurseryname} className='forestcalcw2 mxw150' onChange={this.nurschange.bind(this)}/>
-						</Col>
-						<Col xl={4} lg={5} md={6} className='mrg10'>
-							<span>填报人：</span>
-							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw150' onChange={this.onrolenamechange.bind(this)}/>
+							<span>产地：</span>
+							<Input suffix={suffix4} value={treeplace} className='forestcalcw2 mxw150' onChange={this.placechange.bind(this)}/>
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>供应商：</span>
 							<Input suffix={suffix3} value={factory} className='forestcalcw3 mxw150' onChange={this.factorychange.bind(this)}/>
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
-							<span>产地：</span>
-							<Input suffix={suffix4} value={treeplace} className='forestcalcw2 mxw150' onChange={this.placechange.bind(this)}/>
+							<span>苗圃：</span>
+							<Input suffix={suffix5} value={nurseryname} className='forestcalcw2 mxw150' onChange={this.nurschange.bind(this)}/>
+						</Col>
+						<Col xl={4} lg={5} md={6} className='mrg10'>
+							<span>填报人：</span>
+							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw150' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>状态：</span>
@@ -285,17 +289,17 @@ export default class NursmeasureTable extends Component {
 					</Row>
 					<Row>
 						<Col span={2} className='mrg10'>
+							<Button type='primary' onClick={this.resetinput.bind(this)}>
+								重置
+							</Button>
+						</Col>
+						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
 								查询
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>
 							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
-						</Col>
-						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.resetinput.bind(this)}>
-								重置
-							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>

@@ -207,62 +207,64 @@ export default class LocmeasureTable extends Component {
 					return <span>/</span>
 				}
 			}
-		},{
-			title:<div><div>是否</div><div>截干</div></div>,
-			render: (text,record) => {
-				return <div>
-							{
-								record.JG == 1
-								? <span>是</span>
-								: <span>否</span>
-							}
-						</div>
-			}
-		},{
-			title:<div><div>干皮有无</div><div>损伤</div></div>,
-			render: (text,record) => {
-				return <div>
-							{
-								record.GP == 1
-								? <span>有</span>
-								: <span>无</span>
-							}
-						</div>
-			}
-		},{
-			title:<div><div>冠型完整，</div><div>不偏冠</div></div>,
-			render: (text,record) => {
-				return <div>
-							{
-								record.GXWZ == 1
-								? <span>是</span>
-								: <span>否</span>
-							}
-						</div>
-			}
-		},{
-			title:<div><div>生长</div><div>健壮</div></div>,
-			render: (text,record) => {
-				return <div>
-							{
-								record.SZJZ == 1
-								? <span>是</span>
-								: <span>否</span>
-							}
-						</div>
-			}
-		},{
-			title:<div><div>有无病</div><div>虫害</div></div>,
-			render: (text,record) => {
-				return <div>
-							{
-								record.BCH == 1
-								? <span>有</span>
-								: <span>无</span>
-							}
-						</div>
-			}
-		}];
+		}
+		// ,{
+		// 	title:<div><div>是否</div><div>截干</div></div>,
+		// 	render: (text,record) => {
+		// 		return <div>
+		// 					{
+		// 						record.JG == 1
+		// 						? <span>是</span>
+		// 						: <span>否</span>
+		// 					}
+		// 				</div>
+		// 	}
+		// },{
+		// 	title:<div><div>干皮有无</div><div>损伤</div></div>,
+		// 	render: (text,record) => {
+		// 		return <div>
+		// 					{
+		// 						record.GP == 1
+		// 						? <span>有</span>
+		// 						: <span>无</span>
+		// 					}
+		// 				</div>
+		// 	}
+		// },{
+		// 	title:<div><div>冠型完整，</div><div>不偏冠</div></div>,
+		// 	render: (text,record) => {
+		// 		return <div>
+		// 					{
+		// 						record.GXWZ == 1
+		// 						? <span>是</span>
+		// 						: <span>否</span>
+		// 					}
+		// 				</div>
+		// 	}
+		// },{
+		// 	title:<div><div>生长</div><div>健壮</div></div>,
+		// 	render: (text,record) => {
+		// 		return <div>
+		// 					{
+		// 						record.SZJZ == 1
+		// 						? <span>是</span>
+		// 						: <span>否</span>
+		// 					}
+		// 				</div>
+		// 	}
+		// },{
+		// 	title:<div><div>有无病</div><div>虫害</div></div>,
+		// 	render: (text,record) => {
+		// 		return <div>
+		// 					{
+		// 						record.BCH == 1
+		// 						? <span>有</span>
+		// 						: <span>无</span>
+		// 					}
+		// 				</div>
+		// 	}
+		// }
+	];
 		header = <div >
 					<Row >
 					<Col  xl={3} className='mrg10'>
@@ -341,17 +343,17 @@ export default class LocmeasureTable extends Component {
 					</Row>
 					<Row >
 						<Col span={2} className='mrg10'>
+							<Button type='primary' onClick={this.resetinput.bind(this)}>
+								重置
+							</Button>
+						</Col>
+						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
 								查询
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>
 							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
-						</Col>
-						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.resetinput.bind(this)}>
-								重置
-							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>

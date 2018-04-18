@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-04-12 09:29:04
+ * @Last Modified time: 2018-04-16 16:48:45
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -109,7 +109,7 @@ class All extends Component {
                     numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
                     // remarks:itemtreatmentdata[0].remarks||"--",
                     submitperson:item.creator.person_name,
-                    submittime:item.real_start_time,
+                    submittime:moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),
                     status:item.status,
                     // totlesuperunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
                     totledocument:itemdata.totledocument?JSON.parse(itemdata.totledocument):'',

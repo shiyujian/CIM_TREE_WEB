@@ -116,7 +116,7 @@ export default class Nursmeasureinfo extends Component {
                 <Body>
                     <Main>
                         <DynamicTitle title="苗圃测量信息" {...this.props}/>
-                        <Sidebar>
+                        <Sidebar width={190}>
                             <PkCodeTree treeData={treeList}
                                 selectedKeys={leftkeycode}
                                 onSelect={this.onSelect.bind(this)}

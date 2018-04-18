@@ -129,7 +129,7 @@ export default class DataExport extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title="定位信息导出" {...this.props} />
-                    <Sidebar>
+                    <Sidebar width={190}>
                         <PkCodeTree treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}

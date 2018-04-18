@@ -83,6 +83,10 @@ export default class Chart extends Component {
         };
         myChart.setOption(this.option)
     }
+
+    componentWillReceiveProps(props){
+        
+    }
     render() {
         const {part = [], formdocument = []} = this.props;
         return (

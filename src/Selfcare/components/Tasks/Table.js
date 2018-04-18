@@ -31,6 +31,7 @@ export default class TaskTable extends Component {
 				<Table columns={this.columns} dataSource={tasks}
 					rowSelection={rowSelection}
 					bordered
+					rowKey='rowKey'
 					className="foresttables"
 					onChange={this.onChange.bind(this)}
 					pagination={pagination} />
