@@ -9,7 +9,6 @@ import { actions as platformActions } from '_platform/store/global';
 import { message, Select, Table, Input, Button, Radio ,Spin,Modal,Row,Col,Card,Checkbox,Upload} from 'antd';
 import { Main, Content, Sidebar, DynamicTitle } from '_platform/components/layout';
 import DocTree from '../components/DocTree';
-import Approval from '_platform/components/singleton/Approval';
 import { Filter, Blueprint } from '../components/Item';
 import QualityTree from '../components/QualityTree'
 import './fenbu.less';

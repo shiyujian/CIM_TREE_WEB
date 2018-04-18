@@ -21,7 +21,7 @@ export default class App extends Component {
 		const {default: Forest} = await import('../../Forest');
 		const {default: Overall} = await import('../../Overall');
 		const {default: Datum} = await import('../../Datum');
-		const {default: Design} = await import('../../Design');
+		// const {default: Design} = await import('../../Design');
 		const {default: Quality} = await import('../../Quality');
 		const {default: Schedule} = await import('../../Schedule');
 		const {default: System} = await import('../../System');
@@ -43,7 +43,7 @@ export default class App extends Component {
 			Forest,
 			Overall,
 			Datum,
-			Design,
+			// Design,
 			Quality,
 			Schedule,
 			Selfcare,
@@ -68,7 +68,7 @@ export default class App extends Component {
 			Forest,
 			Overall,
 			Datum,
-			Design,
+			// Design,
 			Quality,
 			Schedule,
 			Selfcare,
@@ -96,7 +96,7 @@ export default class App extends Component {
 						{Forest && <Route path="/forest" component={Forest}/>}
 						{Overall && <Route path="/overall" component={Overall}/>}
 						{Datum && <Route path="/datum/:category?" component={Datum}/>}
-						{Design && <Route path="/design" component={Design}/>}
+						{/* {Design && <Route path="/design" component={Design}/>} */}
 						{Quality && <Route path="/quality" component={Quality}/>}
 						{Schedule && <Route path="/schedule" component={Schedule}/>}
 						{Selfcare && <Route path="/selfcare" component={Selfcare}/>}

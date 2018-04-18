@@ -9,7 +9,6 @@ import { actions as platformActions } from '_platform/store/global';
 import { message, Select, Table, Input, Button, Radio ,Spin,Modal} from 'antd';
 import { Main, Content, Sidebar, DynamicTitle } from '_platform/components/layout';
 
-import Approval from '_platform/components/singleton/Approval';
 
 
 import './fenbu.less';

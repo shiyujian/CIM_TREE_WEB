@@ -5,7 +5,7 @@ import {bindActionCreators} from 'redux';
 import moment from 'moment';
 import { actions as actions2 } from '../store/cells';
 import {actions as actions3} from '../store/monitoring';
-import {WORKFLOW_MAPS, SubItem_WordTemplate, previewWord_API,STATIC_UPLOAD_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api'
+import { SubItem_WordTemplate, previewWord_API,STATIC_UPLOAD_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api'
 const FormItem = Form.Item;
 const Option = Select.Option;
 

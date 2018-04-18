@@ -5,7 +5,7 @@ import { SERVICE_API, base } from '_platform/api';
 
 export const ID = 'formmanage';
 export const getworkTreeOK = createAction(`${ID}_文档目录树`);
-export const getworkTree  = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getworkTreeOK]);
+export const getworkTree  = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=3`, [getworkTreeOK]);
 export const setcurrentcode = createAction(`${ID}_Current_Code`);
 
 const addDir = createFetchAction(`${SERVICE_API}/directories/`, 'POST');
