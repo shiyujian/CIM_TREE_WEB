@@ -172,19 +172,19 @@ export default class NursmeasureTable extends Component {
 				}
 			}
 		},{
-			title:<div><div>胸径</div><div>(cm)</div></div>,
+			title:<div><div>冠幅</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				if(record.XJ != 0)
-					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
+				if(record.GF != 0)
+					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
 				else {
 					return <span>/</span>
 				}
 			}
 		},{
-			title:<div><div>冠幅</div><div>(cm)</div></div>,
+			title:<div><div>胸径</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				if(record.GF != 0)
-					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
+				if(record.XJ != 0)
+					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
 				else {
 					return <span>/</span>
 				}

@@ -130,7 +130,7 @@ export default class SupervisorTable extends Component {
 					if(text === 0){
 						return <p> / </p>
 					}
-					return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
+					return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
 				}
 			},
 			{
