@@ -97,7 +97,7 @@ window.config = {
 
 	/***********************临时资yu源服务**************************/
 	'initLeaflet': {
-		
+		crs:L.CRS.EPSG4326, //new setting
 		center: [38.9818, 116.03411],
 		zoomControl: false,
 		zoom: 14
