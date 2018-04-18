@@ -131,7 +131,10 @@ export default class CheckerTable extends Component {
 			title:"抽查人",
 			dataIndex: 'Checker',
 			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
+				if(text === 0){
+					return <p> / </p>
+				}
+				return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
 			}
 		},
 		{

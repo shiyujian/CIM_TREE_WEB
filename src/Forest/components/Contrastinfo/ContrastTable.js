@@ -215,8 +215,10 @@ export default class ContrastTable extends Component {
 		},{
 			title:"监理人",
 			render: (text,record) => {
-				return <span>{record.SupervisorUser ? record.SupervisorUser.Full_Name : '/'}</span>
-				
+				if(text === 0){
+					return <p> / </p>
+				}
+				return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
 			}
 		}];
 		header = <div >
