@@ -667,8 +667,6 @@ export default class LocmeasureTable extends Component {
 		.then(rst3 => {
 			if(rst3 === ''){
 				message.info('没有符合条件的信息');
-			}else if(rst3 === '定位导出不能超过20000条记录'){
-				message.info('定位导出不能超过20000条记录')
 			}else{
 				window.open(`${FOREST_API}/${rst3}`);
 				// this.createLink(this,`${FOREST_API}/${rst3}`)
