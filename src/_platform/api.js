@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-04-18 20:16:08
+ * @Last Modified time: 2018-04-19 11:07:13
  */
 /**
 *
@@ -179,13 +179,25 @@ export const WORKFLOW_CODE = {
 	'苗木资料报批流程': 'TEMPLATE_006',
 	'每日进度计划填报流程': 'TEMPLATE_007',
 	'检验批验收审批流程': 'TEMPLATE_008',
-	'安全体系报批流程': 'TEMPLATE_009'
+	'安全体系报批流程': 'TEMPLATE_009',
+	'普通审查流程': 'TEMPLATE_010',
+	'审查核定流程': 'TEMPLATE_011',
+	'总监审查流程': 'TEMPLATE_012'
 };
 
 export const FORM_WORKFLOW = [
 	{
-		value:'表单管理流程'
-	}
+		value: '普通审查流程',
+		code:'TEMPLATE_010'
+	},
+	{
+		value: '审查核定流程',
+		code:'TEMPLATE_011'
+	},
+	{
+		value: '总监审查流程',
+		code:'TEMPLATE_012'
+	},
 ]
 
 

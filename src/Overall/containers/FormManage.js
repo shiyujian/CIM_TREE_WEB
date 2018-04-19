@@ -8,7 +8,7 @@ import { actions as platformActions } from '_platform/store/global';
 import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import { WorkTree, SearchInfo, TableInfo } from '../components/FormManage';
+import { WorkTree, SearchInfo, TableInfo,FormAddition } from '../components/FormManage';
 import moment from 'moment';
 import { Tabs } from 'antd';
 export const Datumcode = window.DeathCode.OVERALL_FORM;
@@ -30,11 +30,13 @@ export default class FormManage extends Component {
         super(props);
         this.state = {
             isTreeSelected: false,
-            loading:false
+            loading:false,
+            selectedDir:'',
+            depth:''
         }
     }
     async componentDidMount() {
-        const {actions: {getTree,getPublicUnitList}} = this.props;
+        const {actions: {getTree}} = this.props;
         this.setState({loading:true});
         getTree({code:Datumcode}).then(({children}) => {
             this.setState({loading:false});
@@ -45,15 +47,31 @@ export default class FormManage extends Component {
 		
     }
 
-    onSelect(value = [],e) {
+    onSelect(value = [],data) {
         const [code] = value;
         const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
         console.log('value',value)
+        console.log('data',data)
         setkeycode(code); 
+        this.setState({
+            isTreeSelected:data.selected
+        })
         if(code === undefined){
             return
         }
-        this.setState({isTreeSelected:e.selected})
+
+        if(value && value.length){
+			let arr = value[0].split('--')
+			let depth = arr[2]
+			this.setState({
+				depth:depth
+			})
+		}
+        let selectedDir = data.node.props.data
+        this.setState({
+            selectedDir
+        })
+
         setcurrentcode({code:code.split("--")[1]});
         getdocument({code:code.split("--")[1]});
     }
@@ -73,7 +91,8 @@ export default class FormManage extends Component {
                                 {...this.state}  />
                 </Sidebar>
                 <Content>
-                    <TableInfo {...this.props} array = {this.array}/>
+                    <TableInfo {...this.props} array = {this.array} {...this.state}/>
+                    <FormAddition {...this.props} array = {this.array} {...this.state}/>
                 </Content>
             </div>
         )

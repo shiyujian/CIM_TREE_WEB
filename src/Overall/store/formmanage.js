@@ -4,6 +4,8 @@ import createFetchAction from 'fetch-action';
 import { SERVICE_API, WORKFLOW_API,base} from '_platform/api';
 
 const ID = 'OVERALL_FORMMANAGE';
+export const FormAddVisible = createAction(`${ID}表单管理新增显示和隐藏`);
+export const SearchForm = createAction(`${ID}表单管理是否重新获取流程`);
 //上传的文件列表
 export const postUploadFilesAc = createAction(`${ID}上传的文件列表`);
 
@@ -17,12 +19,14 @@ export const getSelectedNodeInfo = createAction(`${ID}_获取选中树节点信�
 const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
 export const getTreeOK = createAction(`${ID}_目录树`);
-export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
+export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=3`, [getTreeOK]);
 
 export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}`);
 
 const getPublicUnitList = createFetchAction(`${base}/service/construction/api/org-tree/?depth=4`, [],'GET');
 export const actions = {
+    FormAddVisible,
+    SearchForm,
     getdocumentOK,
     getdocument,
     postUploadFilesAc,
@@ -38,6 +42,14 @@ export const actions = {
 }
 
 export default handleActions({
+    [FormAddVisible]: (state, {payload}) => ( {
+        ...state,
+        formAddVisible: payload
+    }),
+    [SearchForm]: (state, {payload}) => ( {
+        ...state,
+        searchForm: payload
+    }),
     [getTreeOK]: (state, {payload: {children}}) => {
         return {
             ...state,

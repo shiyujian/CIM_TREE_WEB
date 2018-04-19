@@ -136,7 +136,7 @@ export default class FormManage extends Component {
 				<DynamicTitle title="表单管理" {...this.props} />
 				<Sidebar>
 					<div style={{borderBottom: 'solid 1px #999', paddingBottom: 8,}}>
-						<Button style={this.state.data === "undefined" ? this.state.hidden : this.state.show} onClick={() => {refreshPanelTo('ADD');}}>新增目录</Button>
+						<Button style={this.state.depth === "3" ? this.state.hidden : this.state.show} onClick={() => {refreshPanelTo('ADD');}}>新增目录</Button>
 						<Button onClick={() => {refreshPanelTo('DEL');}}>删除目录</Button>
 					</div>
 					<FormTree 	treeData={worktree}

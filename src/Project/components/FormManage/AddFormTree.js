@@ -180,7 +180,7 @@ class AddFormTree extends Component {
 							<Select placeholder="请选择关联流程">
 								{
 									FORM_WORKFLOW.map((workflow)=>{
-										return <Option key={workflow.value} value={workflow.value}>{workflow.value}</Option>
+										return <Option key={workflow.value} value={workflow.code +'--' + workflow.value}>{workflow.value}</Option>
 									})
 								}
 								

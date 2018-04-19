@@ -6,19 +6,19 @@ export default class WorkTree extends Component {
 
 	static propTypes = {};
 
-	static loop(data = []) {
+	static loop(data = [],loopnum = 1) {
 		return data.map((item) => {
 			if (item.children && item.children.length) {
 				return (
-					<TreeNode key={`${item.pk}--${item.code}--children`}
+					<TreeNode key={`${item.pk}--${item.code}--${loopnum}`} data={item}
 					          title={item.name}>
 						{
-							WorkTree.loop(item.children)
+							WorkTree.loop(item.children,loopnum+1)
 						}
 					</TreeNode>
 				);
 			}
-			return <TreeNode key={`${item.pk}--${item.code}--${item.obj_type_hum}`}
+			return <TreeNode key={`${item.pk}--${item.code}--${loopnum}`} data={item}
 			                 title={item.name}/>;
 		});
 	};
