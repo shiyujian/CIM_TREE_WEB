@@ -36,6 +36,7 @@ export default class DataExport extends Component {
             leftkeycode: '',
             resetkey: 0,
             bigType: '',
+            positionoption:[]
         }
     }
     getbigTypeName(type) {
@@ -95,7 +96,11 @@ export default class DataExport extends Component {
             <Option key={'4'} value={"2"}>业主抽查退回</Option>,
             <Option key={'5'} value={"3"}>业主抽查通过</Option>,
         ]
-        this.setState({ statusoption })
+        let positionoption = [
+            <Option key={'4326'} value={4326}>地理坐标系</Option>,
+            <Option key={'3857'} value={3857}>平面坐标系</Option>
+        ]
+        this.setState({ statusoption,positionoption })
         //定位 
         let locationoption = [
             <Option key={'-1'} value={''}>全部</Option>,
@@ -119,6 +124,7 @@ export default class DataExport extends Component {
             statusoption,
             locationoption,
             resetkey,
+            positionoption
         } = this.state;
         const { platform: { tree = {} } } = this.props;
         let treeList = [];
@@ -145,6 +151,7 @@ export default class DataExport extends Component {
                             smallclassselect={this.smallclassselect.bind(this)}
                             thinclassoption={thinclassoption}
                             thinclassselect={this.thinclassselect.bind(this)}
+                            positionoption={positionoption}
                             bigType={bigType}
                             typeoption={typeoption}
                             typeselect={this.typeselect.bind(this)}

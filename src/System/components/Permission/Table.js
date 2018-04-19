@@ -48,7 +48,7 @@ export default class PermissionTable extends Component {
 		}).then(rst => {
 			let flag = true;
 			rst.groups.map(item => {
-				if (item.name === "超级管理员") {
+				if (item.name === "超级管理员"){
 					flag = true;
 				}else{
 					flag = false;

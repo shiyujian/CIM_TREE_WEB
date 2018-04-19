@@ -1,6 +1,0 @@
-export MainContent from './MainContent'
-export SubitemTable from './SubitemTable'
-export SheetPage from './SheetPage'
-export SubitemTable2 from './SubitemTable2'
-export SheetPage2 from './SheetPage2'
-export Sidebar from './Sidebar'

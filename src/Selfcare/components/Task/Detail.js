@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Input, Row, Col, Card, Select, DatePicker, Popconfirm, notification, Button, Form, message } from 'antd';
-import { WORKFLOW_MAPS, WORKFLOW_CODE,SOURCE_API,STATIC_DOWNLOAD_API } from '_platform/api';
+import {  WORKFLOW_CODE,SOURCE_API,STATIC_DOWNLOAD_API } from '_platform/api';
 import styles from './index.css';
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';

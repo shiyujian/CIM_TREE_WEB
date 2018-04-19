@@ -29,14 +29,16 @@ export default class LocmeasureTable extends Component {
     		treetype: '',
     		smallclass: '',
         	thinclass: '',
-        	treetypename: '',
+			treetypename: '',
+			positiontypename:'',
         	status: '',
     		SupervisorCheck: '',
     		CheckStatus: '',
     		islocation: '',
     		role: 'inputer',
     		rolename: '',
-    		percent:0,
+			percent:0,
+			positiontype:4326,   //默认地理坐标系
 		}
 	}
 	getBiao(code){
@@ -91,6 +93,7 @@ export default class LocmeasureTable extends Component {
 			leftkeycode,
 			keycode,
 			statusoption,
+			positionoption,
 			locationoption,
 			users
 		} = this.props;
@@ -102,6 +105,7 @@ export default class LocmeasureTable extends Component {
 			thinclass,
 			bigType,
 			treetypename,
+			positiontypename,
 			status,
 			islocation,
 		} = this.state;
@@ -126,7 +130,7 @@ export default class LocmeasureTable extends Component {
 			title:"树种",
 			dataIndex: 'TreeTypeObj.TreeTypeName',
 		},{
-			title:"测量时间",
+			title:"定位时间",
 			render: (text,record) => {
 				const {createtime1 = '',createtime2 = '' } = record;
 				return <div><div>{createtime1}</div><div>{createtime2}</div></div>
@@ -171,6 +175,12 @@ export default class LocmeasureTable extends Component {
 							<span>树种：</span>
 							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
 								{treetypeoption}
+							</Select>
+						</Col>
+						<Col xl={3} className='mrg10'>
+							<span>坐标系：</span>
+							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue={'地理坐标系'} onChange={this.onpositionchange.bind(this)}>
+								{positionoption}
 							</Select>
 						</Col>
 						<Col xl={7} className='mrg10'>
@@ -257,7 +267,10 @@ export default class LocmeasureTable extends Component {
 
 	ontreetypechange(value) {
 		this.setState({treetype:value,treetypename:value})
-    }
+	}
+	onpositionchange(value){
+		this.setState({positiontype:value,positiontypename:value})
+	}
 
 	onstatuschange(value) {
 		let SupervisorCheck = '';
@@ -359,7 +372,8 @@ export default class LocmeasureTable extends Component {
     		status = '',
 			size,
 			thinclass = '',
-			smallclass = ''
+			smallclass = '',
+			positiontype
 		} = this.state;
 		if(section === ''){
 			message.info('请选择标段信息');
@@ -378,8 +392,13 @@ export default class LocmeasureTable extends Component {
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
 			size:size,
+			crs:positiontype
 			// thinclass,
 			// smallclass
+		}
+		if(postdata.stime === moment().format('YYYY-MM-DD 00:00:00') && postdata.etime === moment().format('YYYY-MM-DD 23:59:59')){
+			postdata.stime = ''
+			postdata.etime = ''
 		}
 		if(smallclass === ''){
 			postdata.no = ''
@@ -407,8 +426,8 @@ export default class LocmeasureTable extends Component {
 					}
 					tblData[i].place = place;
 					tblData[i].H = plan.H;
-					tblData[i].X = plan.Coords.split(' ')[0].split('(')[1];
-					tblData[i].Y = plan.Coords.split(' ')[1].split(')')[0];
+					tblData[i].X = plan.X;
+					tblData[i].Y = plan.Y;
 					let createtime1 = plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
 					let createtime2 = plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
 					tblData[i].createtime1 = createtime1;
@@ -440,7 +459,8 @@ export default class LocmeasureTable extends Component {
 			exportsize,
 			thinclass = '',
 			smallclass = '',
-			status = ''
+			status = '',
+			positiontype
 		} = this.state;
 		if( section === ''){
 			message.info('请选择标段信息');
@@ -460,10 +480,13 @@ export default class LocmeasureTable extends Component {
     		// lstime:lstime&&moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		// letime:letime&&moment(letime).format('YYYY-MM-DD HH:mm:ss'),
-    		page:1,
-			size:exportsize,
+			crs:positiontype
 			// thinclass,
 			// smallclass
+		}
+		if(postdata.stime === moment().format('YYYY-MM-DD 00:00:00') && postdata.etime === moment().format('YYYY-MM-DD 23:59:59')){
+			postdata.stime = ''
+			postdata.etime = ''
 		}
 		if(smallclass === ''){
 			postdata.no = ''
@@ -477,6 +500,8 @@ export default class LocmeasureTable extends Component {
 		.then(rst3 => {
 			if(rst3 === ''){
 				message.info('没有符合条件的信息');
+			}else if(rst3 === '定位导出不能超过20000条记录'){
+				message.info('定位导出不能超过20000条记录')
 			}else{
 				this.createLink(this,`${FOREST_API}/${rst3}`)
 			}

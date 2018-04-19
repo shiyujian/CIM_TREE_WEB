@@ -137,7 +137,7 @@ export default class LocmeasureTable extends Component {
 			title:"测量人",
 			dataIndex: 'Inputer',
 			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
+				return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
 			}
 		},{
 			title:"测量时间",
@@ -161,19 +161,19 @@ export default class LocmeasureTable extends Component {
 				}
 			}
 		},{
-			title:<div><div>胸径</div><div>(cm)</div></div>,
+			title:<div><div>冠幅</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				if(record.XJ != 0)
-					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
+				if(record.GF != 0)
+					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
 				else {
 					return <span>/</span>
 				}
 			}
 		},{
-			title:<div><div>冠幅</div><div>(cm)</div></div>,
+			title:<div><div>胸径</div><div>(cm)</div></div>,
 			render: (text,record) => {
-				if(record.GF != 0)
-					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
+				if(record.XJ != 0)
+					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
 				else {
 					return <span>/</span>
 				}
@@ -668,7 +668,8 @@ export default class LocmeasureTable extends Component {
 			if(rst3 === ''){
 				message.info('没有符合条件的信息');
 			}else{
-				this.createLink(this,`${FOREST_API}/${rst3}`)
+				window.open(`${FOREST_API}/${rst3}`);
+				// this.createLink(this,`${FOREST_API}/${rst3}`)
 			}
 			this.setState({loading:false})
 		})

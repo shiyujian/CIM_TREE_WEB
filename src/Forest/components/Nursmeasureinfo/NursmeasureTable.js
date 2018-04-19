@@ -100,7 +100,7 @@ export default class NursmeasureTable extends Component {
 			bigType,
 			treetypename,
 			status,
-			mmtype
+			mmtype = ''
 		} = this.state;
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
@@ -124,101 +124,129 @@ export default class NursmeasureTable extends Component {
 		},{
 			title:"树种",
 			dataIndex: 'TreeTypeObj.TreeTypeName',
-		},{
-			title:"苗龄",
-			dataIndex: 'Age',
-			render:(text,record) => {
-				if(record.BD.indexOf('P010') !== -1){
-					if(text === 0){
-						return <p> / </p>
+		}]
+		if(keycode.indexOf('P010') !== -1 && mmtype !== '1'){
+			columns.push({
+				title:"苗龄",
+				dataIndex: 'Age',
+				render:(text,record) => {
+					if(record.BD.indexOf('P010') !== -1){
+						if(text === 0){
+							return <p> / </p>
+						}else{
+							return <p>{text}</p>
+						}
 					}else{
-						return <p>{text}</p>
+						return <p> / </p>
 					}
-				}else{
-					return <p> / </p>
 				}
-			}
-		},{
+			})
+		}else if(keycode === '' && mmtype === ''){
+			columns.push({
+				title:"苗龄",
+				dataIndex: 'Age',
+				render:(text,record) => {
+					if(record.BD.indexOf('P010') !== -1){
+						if(text === 0){
+							return <p> / </p>
+						}else{
+							return <p>{text}</p>
+						}
+					}else{
+						return <p> / </p>
+					}
+				}
+			})
+		}
+		columns.push({
 			title:"产地",
 			dataIndex: 'TreePlace',
-		},{
+		})
+		columns.push({
 			title:"供应商",
 			dataIndex: 'Factory',
-		},{
+		})
+		columns.push({
 			title:"苗圃名称",
 			dataIndex: 'NurseryName',
-		},{
+		})
+		columns.push({
 			title:"填报人",
 			dataIndex: 'Inputer',
 			render: (text,record) => {
 				return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
 			}
-		},{
+		})
+		columns.push({
 			title:"起苗时间",
 			render: (text,record) => {
 				const {liftertime1 = '',liftertime2 = '' } = record;
 				return <div><div>{liftertime1}</div><div>{liftertime2}</div></div>
 			}
-		},{
+		})
+		columns.push({
 			title:"状态",
 			dataIndex: 'statusname',
-		},{
-			title:<div><div>高度</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.GD != 0)
-					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
-				else {
-					return <span>/</span>
+		})
+		if(mmtype !== '0'){
+			columns.push({
+				title:<div><div>高度</div><div>(cm)</div></div>,
+				render: (text,record) => {
+					if(record.GD != 0)
+						return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
+					else {
+						return <span>/</span>
+					}
 				}
-			}
-		},{
-			title:<div><div>胸径</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.XJ != 0)
-					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
-				else {
-					return <span>/</span>
+			},{
+				title:<div><div>冠幅</div><div>(cm)</div></div>,
+				render: (text,record) => {
+					if(record.GF != 0)
+						return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
+					else {
+						return <span>/</span>
+					}
 				}
-			}
-		},{
-			title:<div><div>冠幅</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.GF != 0)
-					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
-				else {
-					return <span>/</span>
+			},{
+				title:<div><div>胸径</div><div>(cm)</div></div>,
+				render: (text,record) => {
+					if(record.XJ != 0)
+						return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
+					else {
+						return <span>/</span>
+					}
 				}
-			}
-		},{
-			title:<div><div>地径</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.DJ != 0)
-					return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
-				else {
-					return <span>/</span>
+			},{
+				title:<div><div>地径</div><div>(cm)</div></div>,
+				render: (text,record) => {
+					if(record.DJ != 0)
+						return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
+					else {
+						return <span>/</span>
+					}
 				}
-			}
-		},{
-			title:<div><div>土球厚度</div><div>(cm)</div></div>,
-			dataIndex: 'tqhd',
-			render: (text,record) => {
-				if(record.TQHD != 0)
-					return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
-				else {
-					return <span>/</span>
+			},{
+				title:<div><div>土球厚度</div><div>(cm)</div></div>,
+				dataIndex: 'tqhd',
+				render: (text,record) => {
+					if(record.TQHD != 0)
+						return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
+					else {
+						return <span>/</span>
+					}
 				}
-			}
-		},{
-			title:<div><div>土球直径</div><div>(cm)</div></div>,
-			dataIndex: 'tqzj',
-			render: (text,record) => {
-				if(record.TQZJ != 0)
-					return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
-				else {
-					return <span>/</span>
+			},{
+				title:<div><div>土球直径</div><div>(cm)</div></div>,
+				dataIndex: 'tqzj',
+				render: (text,record) => {
+					if(record.TQZJ != 0)
+						return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
+					else {
+						return <span>/</span>
+					}
 				}
-			}
-		}];
+			})
+		}
 		header = <div >
 					<Row >
 					<Col  xl={3} lg={5} md={6} className='mrg10'>
@@ -366,6 +394,10 @@ export default class NursmeasureTable extends Component {
 	}
 	onmmtypechange(value){
 		this.setState({mmtype:value})
+		const pagination = { ...this.state.pagination };
+		pagination.total = 0;
+		pagination.pageSize = 10;
+		this.setState({ tblData:[],pagination });
 	}
 
 	ontreetypechange(value) {

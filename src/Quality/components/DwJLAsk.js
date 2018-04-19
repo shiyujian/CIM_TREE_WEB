@@ -10,7 +10,6 @@ import { message, Select, Table, Input, Button, Radio ,Spin,Modal,Row,Col,Card,C
 import { Main, Content, Sidebar, DynamicTitle } from '_platform/components/layout';
 import DocTree from '../components/DocTree';
 import {getUser} from '_platform/auth'
-import Approval from '_platform/components/singleton/Approval';
 import { Filter, Blueprint } from '../components/Item';
 import QualityTree from '../components/QualityTree'
 import '../containers/fenbu.less';

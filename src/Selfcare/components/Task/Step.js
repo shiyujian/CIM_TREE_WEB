@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Steps, Button, Cascader, message, Input, Col, Row, Card, notification } from 'antd';
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
-import { WORKFLOW_MAPS } from '_platform/api';
 import { Link } from 'react-router-dom';
 import Progress from './Progress';
 import queryString from 'query-string';

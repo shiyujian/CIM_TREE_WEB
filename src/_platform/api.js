@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-04-08 10:00:21
+ * @Last Modified time: 2018-04-19 11:07:13
  */
 /**
 *
@@ -179,49 +179,27 @@ export const WORKFLOW_CODE = {
 	'苗木资料报批流程': 'TEMPLATE_006',
 	'每日进度计划填报流程': 'TEMPLATE_007',
 	'检验批验收审批流程': 'TEMPLATE_008',
-	'安全体系报批流程': 'TEMPLATE_009'
-	// '现场安全隐患排查工作流程': 'TEMPLATE_002',
-	// '分部验收流程': 'TEMPLATE_003',
-	// '周报填写流程': 'TEMPLATE_004',
-	// '进度填报流程': 'TEMPLATE_005',
-	// '进度节点填报流程': 'TEMPLATE_006',
-	// '检验批验收流程': 'TEMPLATE_007',
-	// '分项验收流程': 'TEMPLATE_008',
-	// '施工包划分填报流程': 'TEMPLATE_012',
-	// '总进度计划报批': 'TEMPLATE_028',
-	// '申请推迟总进度计划填报流程': 'TEMPLATE_029',
-	// '进度管控审批流程': 'TEMPLATE_031',
-	// '安全隐患上报流程': 'TEMPLATE_011',
-	// '设计计划填报流程': 'TEMPLATE_013',
-	// '设计计划变更流程': 'TEMPLATE_014',
-	// '设计成果上报流程': 'TEMPLATE_015',
-	// '设计成果一般变更流程': 'TEMPLATE_016',
-	// '设计成果重大变更流程': 'TEMPLATE_019',
-	// '数据报送流程': 'TEMPLATE_033'
+	'安全体系报批流程': 'TEMPLATE_009',
+	'普通审查流程': 'TEMPLATE_010',
+	'审查核定流程': 'TEMPLATE_011',
+	'总监审查流程': 'TEMPLATE_012'
 };
 
-export const WORKFLOW_MAPS = {
-	DESIGN_BLUEPRINT: {
-		name: '图纸填报',
-		desc: '图纸填报',
-		code: 'TEMPLATE_001',
+export const FORM_WORKFLOW = [
+	{
+		value: '普通审查流程',
+		code:'TEMPLATE_010'
 	},
-	DESIGN_NOTICE: {
-		name: '修改通知报审',
-		desc: '修改通知报审',
-		code: 'TEMPLATE_001',
+	{
+		value: '审查核定流程',
+		code:'TEMPLATE_011'
 	},
-	QUALITY_ITEM: {
-		name: '分项验收流程',
-		desc: '分项验收流程',
-		code: 'TEMPLATE_024'
+	{
+		value: '总监审查流程',
+		code:'TEMPLATE_012'
 	},
-	OVERALL_PACKAGE: {
-		name: '施工包划分填报流程',
-		desc: '施工包划分填报流程',
-		code: 'TEMPLATE_012'
-	}
-};
+]
+
 
 //获取单位工程
 export const UNITS = [
@@ -256,7 +234,7 @@ export const PROJECT_UNITS = [
 				code:'P009-01-05',
 				value:'五标段'
 			},{
-				code:'P009-99-01',
+				code:'P009-99-99',
 				value:'市民中心造林'
 			},
 		]
@@ -680,6 +658,9 @@ export const MODULES = [
 			children: [{
 				id: 'FOREST.DATAIMPORT',
 				name: '定位数据导入',
+			},{
+				id: 'FOREST.DATAEXPORT',
+				name: '定位数据导出',
 			}]
 		}]
 	}
@@ -740,6 +721,9 @@ export const MODULES = [
 			}, {
 				id: 'SYSTEM.PERSONSDATA',
 				name: '人员信息填报'
+			}, {
+				id: 'SYSTEM.BLACKLIST',
+				name: '黑名单'
 			}
 		]
 	}, {

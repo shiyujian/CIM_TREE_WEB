@@ -61,6 +61,7 @@ export default class EngineeringImage extends Component {
 		})
 		this.setState({hadSelectDir: true});
 		const [code] = value;
+		console.log('code',code)
         const {actions:{setcurrentcode,savecode,setcurrentpk,refreshPanelTo}} = this.props;
 		if(code === undefined){
 			setcurrentcode(code);

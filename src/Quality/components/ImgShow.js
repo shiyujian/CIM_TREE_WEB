@@ -3,7 +3,7 @@ import {Input, Form, Spin, message, Upload, Button, Icon, DatePicker, Select,Mod
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import moment from 'moment';
-import {WORKFLOW_MAPS, SubItem_WordTemplate, previewWord_API,STATIC_UPLOAD_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api'
+import { SubItem_WordTemplate, previewWord_API,STATIC_UPLOAD_API,STATIC_DOWNLOAD_API,SOURCE_API} from '_platform/api'
 const FormItem = Form.Item;
 const Option = Select.Option;
 
