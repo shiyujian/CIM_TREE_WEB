@@ -7,7 +7,6 @@ import {actions as platformActions} from '_platform/store/global';
 import {message,Row,Col,Card} from 'antd';
 import {Main, Content, Sidebar, DynamicTitle} from '_platform/components/layout';
 import DocTree from '../components/DocTree';
-import Approval from '_platform/components/singleton/Approval';
 import {Filter, Table, Blueprint} from '../components/Item';
 import QualityTree from '../components/QualityTree';
 import LeftTop from '../components/Item/LeftTop'

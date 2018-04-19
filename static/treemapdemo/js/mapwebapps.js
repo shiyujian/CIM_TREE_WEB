@@ -22,13 +22,32 @@ function initMap() {
 	map.on('drag', function(){
 		
 	});
-	MAPLABELLAYER = new L.tileLayer(_TiandituSLLabelPath, { subdomains: [1, 2, 3], minZoom: 11, maxZoom: 21, storagetype: 0 });
-    TREELAYER = new L.tileLayer("http://47.104.107.55:200/thinclass", { opacity:1.0,subdomains: [1, 2, 3], minZoom: 11, maxZoom: 21, storagetype: 0,tiletype:"arcgis" });
+	MAPLABELLAYER = new L.tileLayer(_TiandituSLLabelPath, { 
+		subdomains: [1, 2, 3], 
+		minZoom: 11, 
+		maxZoom: 21, 
+		storagetype: 0 
+	});
+    TREELAYER = new L.tileLayer("http://47.104.107.55:200/thinclass", { 
+		opacity:1.0,
+		subdomains: [1, 2, 3], 
+		minZoom: 11, 
+		maxZoom: 21, 
+		storagetype: 0,
+		tiletype:"arcgis" 
+	});
     TREELAYER.addTo(map);
     MAPLABELLAYER.addTo(map);
 
  
-	var _treeLayer = L.tileLayer("http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}", { opacity:1.0,subdomains: [1, 2, 3], minZoom: 11, maxZoom: 21, storagetype: 0,tiletype:"wtms" });
+	var _treeLayer = L.tileLayer("http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}", { 
+		opacity:1.0,
+		subdomains: [1, 2, 3], 
+		minZoom: 11, 
+		maxZoom: 21, 
+		storagetype: 0,
+		tiletype:"wtms" 
+	});
 	_treeLayer.setOpacity(0.7);
 	_treeLayer.addTo(map);
 

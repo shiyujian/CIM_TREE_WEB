@@ -105,8 +105,8 @@ import {message} from 'antd'
 				{HuaFen && <Route path="/quality/yanshou/huafen" component={HuaFen}/>}
 				{jyptb && <Route path="/quality/yanshou/tianbao" component={jyptb}/>}
 				{Cell && <Route path="/quality/cell" component={Cell}/>}
-				{Inspection && <Route path="/quality/inspection" component={Inspection}/>}
-				{Evaluate && <Route path="/quality/evaluate" component={Evaluate}/>}
+				{/* {Inspection && <Route path="/quality/inspection" component={Inspection}/>} */}
+				{/* {Evaluate && <Route path="/quality/evaluate" component={Evaluate}/>} */}
                 {Defect && <Route path="/quality/defect" component={Defect}/>}
                 {Fenbu && <Route exact path="/quality/yanshou/fenbu" component={Fenbu}/>}
 				{dwys && <Route path="/quality/yanshou/danwei" component={dwys}/>}
@@ -119,7 +119,7 @@ import {message} from 'antd'
 				{DanWeiAsk && <Route path="/quality/yanshou/danweiask" component={DanWeiAsk}/>}
 				{DanweiJLShow && <Route path="/quality/yanshou/danweijlshow" component={DanweiJLShow}/>}
 				{DanweiJLAsk && <Route path="/quality/yanshou/danweijlask" component={DanweiJLAsk}/>}
-				{Subitem && <Route path="/quality/yanshou/subitem" component={Subitem}/>}
+				{/* {Subitem && <Route path="/quality/yanshou/subitem" component={Subitem}/>} */}
 				{FenbuCheck && <Route path="/quality/yanshou/fenbu/check" component={FenbuCheck}/>}
 				{/*{Score && <Route path="/quality/score" component={Search}/>}*/}
 				{Search && <Route path="/quality/search" component={Search}/>}

@@ -422,14 +422,14 @@ export default class Danger extends Component {
 		this.tileLayer = L.tileLayer(this.tileUrls[1], {
             subdomains: [1, 2, 3],
 			minZoom: 1, 
-			maxZoom: 20, 
+			maxZoom: 17, 
 			storagetype: 0
         }).addTo(this.map)
 
         L.tileLayer(this.WMSTileLayerUrl, {
             subdomains: [1, 2, 3], 
 			minZoom: 1, 
-			maxZoom: 20, 
+			maxZoom: 17, 
 			storagetype: 0 
         }).addTo(this.map)
 
