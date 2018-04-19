@@ -132,6 +132,6 @@ export default handleActions({
 	//黑名单
 	[combineActions(...actionsMap(blacklistActions))]: (state = {}, action) => ({
 		...state,
-		blacklist: persondata1Reducer(state.blacklist, action),
+		blacklist: blacklistReducer(state.blacklist, action),
 	}),
 }, {});

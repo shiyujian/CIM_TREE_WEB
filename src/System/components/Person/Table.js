@@ -769,7 +769,7 @@ export default class Users extends Component {
 			black_remark:user.black_remark,
 			id_num:user.id_num,
 			is_black:blacks,
-			id_image:[],
+			id_image:user.id_image,
 			basic_params: {
 				info: {
 					'电话': user.person_telephone || '',
@@ -784,9 +784,12 @@ export default class Users extends Component {
 			title: user.title || ''
 		}).then(rst => {
 			this.forceUpdate();
-			console.log("rst", rst)
-			console.log("333333333", JSON.parse(rst.msg))
+			// console.log("rst", rst)
+			// console.log("333333333", JSON.parse(rst.msg))
 		})
+	}
+	componentWillReceiveProps(nextProps) {
+		// console.log("nextProps",nextProps)
 	}
 	disable(user, event) {
 		const {
@@ -832,8 +835,8 @@ export default class Users extends Component {
 			is_active: actives,
 			black_remark:user.black_remark,			
 			id_num:user.id_num,
-			is_black:0,
-			id_image:[],
+			is_black:user.is_black,
+			id_image:user.id_image,
 			basic_params: {
 				info: {
 					'电话': user.person_telephone || '',
@@ -864,7 +867,7 @@ export default class Users extends Component {
 		const groups = user.groups || [];
 		const {
 			sidebar: { node } = {},
-			actions: { resetAdditionField,getIsActive }
+			actions: { resetAdditionField,getIsActive ,getSwitch}
 		} = this.props;
 		getIsActive(user.is_active)
 		
@@ -876,13 +879,16 @@ export default class Users extends Component {
 		// 	// console.log("resetAdditionField", resetAdditionField)
 
 		// }
+		getSwitch(user.is_black)
+		console.log("11111111111111",user.is_black)
 		resetAdditionField({
 			visible: true,
 			roles: groups.map(group => String(group.id)),
 			...user,
-			...account,
+			// ...account,
 
 		});
+
 
 	}
 

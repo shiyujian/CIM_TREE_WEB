@@ -17,6 +17,13 @@ const getIsActive = createAction(`${ID}控制是否根据角色是否禁用启�
 
 //设置上传的文件列表
 export const postUploadFilesImg = createAction('xhy设置上传的文件列表');
+
+//设置上传的用户签名
+export const postUploadAutograph = createAction('设置上传的用户签名');
+
+//控制只能上传一张用户照片签名
+export const getAutographBtn= createAction('控制只能上传一张用户照片');
+
 //设置上传的身份证照片
 export const postUploadFilesNum = createAction('设置上传的身份证照片');
 //控制只能上传一张用户照片
@@ -25,6 +32,10 @@ export const getImgBtn= createAction('控制只能上传一张用户照片');
 export const getImgNumBtn= createAction('控制只能上传一张身份证照片');
 //编辑时如果有照片就显示照片
 export const getImgArr= createAction('编辑时如果有照片就显示照片');
+//黑名单控制开关
+export const getSwitch= createAction('黑名单控制开关');
+
+
 
 const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 
@@ -53,7 +64,10 @@ export const actions = {
 	getImgBtn,
 	getImgArr,
 	postUploadFilesNum,
-	getImgNumBtn
+	getImgNumBtn,
+	getSwitch,
+	postUploadAutograph,
+	getAutographBtn
 };
 
 export default handleActions({
@@ -124,5 +138,17 @@ export default handleActions({
 	[getImgNumBtn]: (state, {payload}) => ( {
 		...state,
 		getImgNumBtns: payload
+	}),
+	[getSwitch]: (state, {payload}) => ( {
+		...state,
+		getSwitchBtn: payload
+	}),
+	[postUploadAutograph]: (state, {payload}) => ( {
+		...state,
+		postUploadAutographs: payload
+	}),
+	[getAutographBtn]: (state, {payload}) => ( {
+		...state,
+		getAutographBtns: payload
 	}),
 }, {});

@@ -203,8 +203,8 @@ export default class Blacklist extends Component {
 	}
 	componentDidMount() {
 		const {actions:{getTags,getRoles}} =this.props;
-		// getTags({});
-		// getRoles();
+		getTags({});
+		getRoles();
 	}
 	render() {
 		const {visible, Exvisible, Modvisible} = this.props;
@@ -215,11 +215,11 @@ export default class Blacklist extends Component {
 					<TablePerson {...this.props} />
 					{/* {
 						visible && <ToggleModal {...this.props} setData = {this.setData.bind(this)}/>
-					} */}
-					{/* {
+					} 
+					{
 						Exvisible && <PersonExpurgate {...this.props} setDataDel = {this.setDataDel.bind(this)}/>
-					} */}
-					{/* {
+					}
+					{
 						Modvisible && <PersonModify {...this.props} setDataUpdate = {this.setDataUpdate.bind(this)}/>
 					} */}
 				</Content>

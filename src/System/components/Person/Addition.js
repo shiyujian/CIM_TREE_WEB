@@ -135,6 +135,28 @@ class Addition extends Component {
 			// this.setState({ progress: parseFloat(percent.toFixed(1)) });
 		}
 	}
+	uploadChangew(file) {
+		
+				const status = file.file.status;
+				const { actions: { postUploadAutograph, getAutographBtn }, postUploadAutographs = [] } = this.props;
+				if (status === 'done') {
+					let newFileList = file.file.response.download_url.split('/media')[1]
+					// postUploadVideo(newFileList)
+					getAutographBtn(true)
+					postUploadAutograph(newFileList)
+				}
+				if (status === "removed") {
+					getAutographBtn(false)
+					postUploadAutograph()
+				}
+				if (event) {
+					let { percent } = event;
+					if (percent !== undefined) {
+		
+					}
+					// this.setState({ progress: parseFloat(percent.toFixed(1)) });
+				}
+			}
 	uploadChanges(file) {
 		console.log("file", file)
 		const status = file.file.status;
@@ -162,7 +184,10 @@ class Addition extends Component {
 		}
 	}
 	onChange(checked) {
-		console.log(`switch to ${checked}`);
+		console.log("checked",checked);
+	}
+	componentWillReceiveProps(nextProps) {
+
 	}
 
 	render() {
@@ -177,7 +202,6 @@ class Addition extends Component {
 		let nurseryData = [];
 		let defaultNurse = this.query(addition)
 		let units = this.getUnits()
-		console.log("addition", addition)
 		let avatar_url = ''
 		let avatar_urlName
 		let fileList = []
@@ -206,258 +230,294 @@ class Addition extends Component {
 				thumbUrl: id_image_url,
 			}]
 		}
-		console.log("333333", fileList1)
+		console.log("addition",addition)
+		
+		// if(this.props.getSwitchBtn==0 || this.props.getSwitchBtn==1){
+		// 	addition.is_black=this.props.getSwitchBtn
+		// }else{
+		// 	addition.is_black=addition.is_black
+		// }
+		// console.log("addition", addition)
+		
 		let marginTops=''
 		if (!user.is_superuser) {
 			marginTops= '55px'
 		}
-		console.log("marginTops",marginTops)
 		return (
-			<Modal title={addition.id ? "编辑人员信息" : "新增人员"} visible={addition.visible} className="large-modal" width="80%"
-				maskClosable={false}
-				key={this.state.newKey}
-				onOk={this.save.bind(this)} onCancel={this.cancel.bind(this)}>
-				<Form>
-					<Row gutter={24}>
-						<Col span={12}>
-							<FormItem   {...Addition.layout} label="用户名:">
-								{
-									getFieldDecorator('UserName', {
-										initialValue: `${addition.username ? addition.username : ''}`,
-										rules: [
-											{ required: true, message: '请输入用户名' }
-										]
-									})
-										(
-										<Input readOnly={!!addition.id} placeholder="请输入用户名"
-											onChange={changeAdditionField.bind(this, 'username')}
-										/>
-										)
-								}
-
-							</FormItem>
-							<FormItem   {...Addition.layout} label="姓名:">
-								{
-									getFieldDecorator('FullName', {
-										initialValue: `${addition.person_name ? addition.person_name : ''}`,
-										rules: [
-											{ required: true, message: '请输入姓名' }
-										]
-									})
-										(
-										<Input placeholder="请输入姓名"
-											onChange={changeAdditionField.bind(this, 'person_name')}
-										/>
-										)
-								}
-							</FormItem>
-							<FormItem   {...Addition.layout} label="性别:">
-								{
-									getFieldDecorator('sexName', {
-										initialValue: `${addition.gender ? addition.gender : ''}`,
-										rules: [
-											{ required: true, message: '请选择性别' }
-										]
-									})
-										(
-										<Select placeholder="请选择性别" onChange={changeAdditionField.bind(this, 'gender')} style={{ width: '100%' }}>
-											<Option value="女">女</Option>
-											<Option value="男">男</Option>
-										</Select>
-										)
-								}
-							</FormItem>
-							<FormItem   {...Addition.layout} label="身份证号码:">
-								{
-									getFieldDecorator('idcard', {
-										initialValue: `${addition.id_num ? addition.id_num : ''}`,
-										rules: [
-											{ required: true, message: '请输入身份证号码' }
-										]
-									})
-										(
-										<Input placeholder="请输入身份证号码"
-											onChange={changeAdditionField.bind(this, 'id_num')}
-										/>
-										)
-								}
-							</FormItem>
-							{user.is_superuser ?
-								<FormItem {...Addition.layout} label="部门编码">
-									<Input placeholder="部门编码" value={addition.org_code} onChange={changeAdditionField.bind(this, 'org_code')} />
-								</FormItem> : ''
-							}
-							{
-								addition.id ? <FormItem {...Addition.layout} label="密码">
-									<Input disabled={!!addition.id} placeholder="请输入密码" value={addition.password}
-										onChange={changeAdditionField.bind(this, 'password')} />
-								</FormItem> : <FormItem   {...Addition.layout} label="密码:">
-										{
-											getFieldDecorator('PassWord', {
-												initialValue: `${addition.password ? addition.password : ''}`,
-												rules: [
-													{ required: true, message: '请输入密码' }
-												]
-											})
-												(
-												<Input disabled={!!addition.id} placeholder="请输入密码"
-													onChange={changeAdditionField.bind(this, 'password')} />
-												)
-										}
-									</FormItem>
-							}
-
-							<FormItem {...Addition.layout} label="标段">
-								<Select placeholder="标段" value={addition.id ? addition.sections : this.props.isSection} onChange={this.changeRolea.bind(this)}
-									mode="multiple" style={{ width: '100%' }}>
+			<div>
+				{
+					addition.visible&&<Modal title={addition.id ? "编辑人员信息" : "新增人员"} visible={true} className="large-modal" width="80%"
+					maskClosable={false}
+					key={this.state.newKey}
+					onOk={this.save.bind(this)} onCancel={this.cancel.bind(this)}>
+					<Form>
+						<Row gutter={24}>
+							<Col span={12}>
+								<FormItem   {...Addition.layout} label="用户名:">
 									{
-										units ?
-											units.map((item) => {
-												return <Option key={item.code} value={item.code} >{item.value}</Option>
-											}) :
-											''
-									}
-								</Select>
-							</FormItem>
-							<div style={{ marginLeft: '25%' }}>
-								{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
-								<Upload name="file"
-									multiple={true}
-									accept={fileTypes}
-									// showUploadList: false,
-									action={base + "/service/fileserver/api/user/files/"}
-									listType="picture"
-									data={(file) => ({ name: file.fileName, a_file: file })}
-									onChange={this.uploadChange.bind(this)}
-									defaultFileList={fileList}
-									disabled={this.props.getImgBtns}
-								>
-									<Button>
-										<Icon type="upload" />
-										<span>上传用户照片</span>
-									</Button>
-								</Upload>
-							</div>
-						</Col>
-						<Col span={12}>
-							<FormItem {...Addition.layout} label="邮箱">
-								<Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} />
-							</FormItem>
-							<FormItem   {...Addition.layout} label="手机号码:">
-								{
-									getFieldDecorator('telephone', {
-										initialValue: `${addition.person_telephone ? addition.person_telephone : ''}`,
-										rules: [
-											{ required: true, message: '请输入手机号码' }
-										]
-									})
-										(
-										<Input placeholder="请输入手机号码" onChange={changeAdditionField.bind(this, 'person_telephone')} />
-										)
-								}
-							</FormItem>
-							<FormItem   {...Addition.layout} label="职务:">
-								{
-									getFieldDecorator('titles', {
-										initialValue: `${addition.title ? addition.title : ''}`,
-										rules: [
-											{ required: true, message: '请选择职务' }
-										]
-									})
-										(
-										<Select placeholder="请选择职务" onChange={changeAdditionField.bind(this, 'title')}
-											style={{ width: '100%' }}>
-											{
-												this.renderTitle()
-											}
-										</Select>
-										)
-								}
-							</FormItem>
-
-							<FormItem   {...Addition.layout} label="角色:">
-								{
-									getFieldDecorator('rolesNmae', {
-										initialValue: addition.roles,
-										rules: [
-											{ required: true, message: '请选择角色' }
-										]
-									})
-										(
-										<Select placeholder="请选择角色"
-											onChange={this.changeRoles.bind(this)}
-											mode="multiple" style={{ width: '100%' }}>
-											{
-												this.renderContent()
-											}
-										</Select>
-										)
-								}
-							</FormItem>
-							{user.is_superuser ?
-								<FormItem {...Addition.layout} label="部门名称">
-									<Input placeholder="部门名称" value={addition.organization} onChange={changeAdditionField.bind(this, 'organization')} />
-								</FormItem> : ''
-							}
-							<FormItem {...Addition.layout} label="苗圃">
-								{/* <Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
-								mode="multiple" style={{ width: '100%' }} > */}
-								{/* {tagsOptions} */}
-
-								<Select placeholder="苗圃" showSearch
-									value={defaultNurse}
-									optionFilterProp='children'
-									filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-									onChange={this.changeNursery.bind(this)}
-									style={{ width: '100%' }} >
-									{tagsOptions}
-								</Select>
-							</FormItem>
-							<Row >
-								<Col span={8}>
-									{user.is_superuser ?
-										<FormItem {...Addition.layoutT} label="黑名单">
-											{/* <Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} /> */}
-
-											<Switch defaultChecked onChange={this.onChange.bind(this)} />
-										</FormItem> : ''}
-								</Col>
-								<Col span={16}>
-									{user.is_superuser ?
-										<FormItem {...Addition.layoutR} label="原因">
-											{/* <Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} /> */}
-
-											<Input value={addition.black_remark}
-												onChange={changeAdditionField.bind(this, 'black_remark')}
+										getFieldDecorator('UserName', {
+											initialValue: `${addition.username ? addition.username : ''}`,
+											rules: [
+												{ required: true, message: '请输入用户名' }
+											]
+										})
+											(
+											<Input readOnly={!!addition.id} placeholder="请输入用户名"
+												onChange={changeAdditionField.bind(this, 'username')}
 											/>
-										</FormItem> : ''}
-								</Col>
+											)
+									}
+	
+								</FormItem>
+								<FormItem   {...Addition.layout} label="姓名:">
+									{
+										getFieldDecorator('FullName', {
+											initialValue: `${addition.person_name ? addition.person_name : ''}`,
+											rules: [
+												{ required: true, message: '请输入姓名' }
+											]
+										})
+											(
+											<Input placeholder="请输入姓名"
+												onChange={changeAdditionField.bind(this, 'person_name')}
+											/>
+											)
+									}
+								</FormItem>
+								<FormItem   {...Addition.layout} label="性别:">
+									{
+										getFieldDecorator('sexName', {
+											initialValue: `${addition.gender ? addition.gender : ''}`,
+											rules: [
+												{ required: true, message: '请选择性别' }
+											]
+										})
+											(
+											<Select placeholder="请选择性别" onChange={changeAdditionField.bind(this, 'gender')} style={{ width: '100%' }}>
+												<Option value="女">女</Option>
+												<Option value="男">男</Option>
+											</Select>
+											)
+									}
+								</FormItem>
+								<FormItem   {...Addition.layout} label="身份证号码:">
+									{
+										getFieldDecorator('idcard', {
+											initialValue: `${addition.id_num ? addition.id_num : ''}`,
+											rules: [
+												{ required: true, message: '请输入身份证号码' }
+											]
+										})
+											(
+											<Input placeholder="请输入身份证号码"
+												onChange={changeAdditionField.bind(this, 'id_num')}
+											/>
+											)
+									}
+								</FormItem>
+								{user.is_superuser ?
+									<FormItem {...Addition.layout} label="部门编码">
+										<Input placeholder="部门编码" value={addition.org_code} onChange={changeAdditionField.bind(this, 'org_code')} />
+									</FormItem> : ''
+								}
+								{
+									addition.id ? <FormItem {...Addition.layout} label="密码">
+										<Input disabled={!!addition.id} placeholder="请输入密码" value={addition.password}
+											onChange={changeAdditionField.bind(this, 'password')} />
+									</FormItem> : <FormItem   {...Addition.layout} label="密码:">
+											{
+												getFieldDecorator('PassWord', {
+													initialValue: `${addition.password ? addition.password : ''}`,
+													rules: [
+														{ required: true, message: '请输入密码' }
+													]
+												})
+													(
+													<Input disabled={!!addition.id} placeholder="请输入密码"
+														onChange={changeAdditionField.bind(this, 'password')} />
+													)
+											}
+										</FormItem>
+								}
+	
+								<FormItem {...Addition.layout} label="标段">
+									<Select placeholder="标段" value={addition.id ? addition.sections : this.props.isSection} onChange={this.changeRolea.bind(this)}
+										mode="multiple" style={{ width: '100%' }}>
+										{
+											units ?
+												units.map((item) => {
+													return <Option key={item.code} value={item.code} >{item.value}</Option>
+												}) :
+												''
+										}
+									</Select>
+								</FormItem>
+								<div style={{ marginLeft: '25%' }}>
+									{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
+									<Upload name="file"
+										multiple={true}
+										accept={fileTypes}
+										// showUploadList: false,
+										action={base + "/service/fileserver/api/user/files/"}
+										listType="picture"
+										data={(file) => ({ name: file.fileName, a_file: file })}
+										onChange={this.uploadChange.bind(this)}
+										defaultFileList={fileList}
+										disabled={this.props.getImgBtns}
+									>
+										<Button>
+											<Icon type="upload" />
+											<span>上传用户照片</span>
+										</Button>
+									</Upload>
+								</div>
 
-							</Row>
+								{/* <div style={{ marginLeft: '25%',marginTop: '30px' }}> */}
+									{/* {!addition.id || fileList.length == 0 || !this.state.btns ?
+									<Upload name="file"
+										multiple={true}
+										accept={fileTypes}
+										// showUploadList: false,
+										action={base + "/service/fileserver/api/user/files/"}
+										listType="picture"
+										data={(file) => ({ name: file.fileName, a_file: file })}
+										onChange={this.uploadChangew.bind(this)}
+										// defaultFileList={fileList}
+										disabled={this.props.getAutographBtns}
+									>
+										<Button>
+											<Icon type="upload" />
+											<span>上传用户签名</span>
+										</Button>
+									</Upload> */}
+								{/* </div> */}
 
-							<div style={{ marginLeft: '25%',marginTop:marginTops }}>
-								{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
-								<Upload name="file"
-									multiple={true}
-									accept={fileTypes}
-									// showUploadList: false,
-									action={base + "/service/fileserver/api/user/files/"}
-									listType="picture"
-									data={(file) => ({ name: file.fileName, a_file: file })}
-									onChange={this.uploadChanges.bind(this)}
-									defaultFileList={fileList1}
-									disabled={this.props.getImgNumBtns}
-								>
-									<Button>
-										<Icon type="upload" />
-										<span>上传身份证照片</span>
-									</Button>
-								</Upload>
-							</div>
-						</Col>
-					</Row>
-				</Form>
-			</Modal>
+							</Col>
+							<Col span={12}>
+								<FormItem {...Addition.layout} label="邮箱">
+									<Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} />
+								</FormItem>
+								<FormItem   {...Addition.layout} label="手机号码:">
+									{
+										getFieldDecorator('telephone', {
+											initialValue: `${addition.person_telephone ? addition.person_telephone : ''}`,
+											rules: [
+												{ required: true, message: '请输入手机号码' }
+											]
+										})
+											(
+											<Input placeholder="请输入手机号码" onChange={changeAdditionField.bind(this, 'person_telephone')} />
+											)
+									}
+								</FormItem>
+								<FormItem   {...Addition.layout} label="职务:">
+									{
+										getFieldDecorator('titles', {
+											initialValue: `${addition.title ? addition.title : ''}`,
+											rules: [
+												{ required: true, message: '请选择职务' }
+											]
+										})
+											(
+											<Select placeholder="请选择职务" onChange={changeAdditionField.bind(this, 'title')}
+												style={{ width: '100%' }}>
+												{
+													this.renderTitle()
+												}
+											</Select>
+											)
+									}
+								</FormItem>
+	
+								<FormItem   {...Addition.layout} label="角色:">
+									{
+										getFieldDecorator('rolesNmae', {
+											initialValue: addition.roles,
+											rules: [
+												{ required: true, message: '请选择角色' }
+											]
+										})
+											(
+											<Select placeholder="请选择角色"
+												onChange={this.changeRoles.bind(this)}
+												mode="multiple" style={{ width: '100%' }}>
+												{
+													this.renderContent()
+												}
+											</Select>
+											)
+									}
+								</FormItem>
+								{user.is_superuser ?
+									<FormItem {...Addition.layout} label="部门名称">
+										<Input placeholder="部门名称" value={addition.organization} onChange={changeAdditionField.bind(this, 'organization')} />
+									</FormItem> : ''
+								}
+								<FormItem {...Addition.layout} label="苗圃">
+									{/* <Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
+									mode="multiple" style={{ width: '100%' }} > */}
+									{/* {tagsOptions} */}
+	
+									<Select placeholder="苗圃" showSearch
+										value={defaultNurse}
+										optionFilterProp='children'
+										filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+										onChange={this.changeNursery.bind(this)}
+										style={{ width: '100%' }} >
+										{tagsOptions}
+									</Select>
+								</FormItem>
+								<Row >
+									<Col span={8}>
+										{user.is_superuser ?
+											<FormItem {...Addition.layoutT} label="黑名单">
+												{/* <Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} /> */}
+	
+												<Switch checked={addition.id ? (addition.is_black==0?false:true) : false}
+													onChange={changeAdditionField.bind(this, 'is_black')}
+												/>
+												
+											</FormItem> : ''}
+									</Col>
+									<Col span={16}>
+										{user.is_superuser ?
+											<FormItem {...Addition.layoutR} label="原因">
+												{/* <Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} /> */}
+	
+												<Input value={addition.black_remark}
+													onChange={changeAdditionField.bind(this, 'black_remark')}
+												/>
+											</FormItem> : ''}
+									</Col>
+	
+								</Row>
+	
+								<div style={{ marginLeft: '25%',marginTop:marginTops }}>
+									{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
+									<Upload name="file"
+										multiple={true}
+										accept={fileTypes}
+										// showUploadList: false,
+										action={base + "/service/fileserver/api/user/files/"}
+										listType="picture"
+										data={(file) => ({ name: file.fileName, a_file: file })}
+										onChange={this.uploadChanges.bind(this)}
+										defaultFileList={fileList1}
+										disabled={this.props.getImgNumBtns}
+									>
+										<Button>
+											<Icon type="upload" />
+											<span>上传身份证照片</span>
+										</Button>
+									</Upload>
+								</div>
+							</Col>
+						</Row>
+					</Form>
+				</Modal>
+				}
+			</div>
+			
 		);
 	}
 
@@ -552,7 +612,7 @@ class Addition extends Component {
 			addition = {}, sidebar: { node } = {},
 			platform: { users = [] },
 			actions: { postUser, clearAdditionField, getUsers, postUploadFilesImg, getImgBtn,
-				putUser, getSection, getTablePage, getIsBtn, postUploadFilesNum, getImgNumBtn }, tags = {}
+				putUser, getSection, getTablePage, getIsBtn, postUploadFilesNum, getImgNumBtn ,getSwitch}, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
 		if (this.props.postUploadFilesNums) {
@@ -565,6 +625,14 @@ class Addition extends Component {
 		} else {
 			addition.person_avatar_url = addition.person_avatar_url
 		}
+		let blacksa
+			if(addition.is_black==true){
+				blacksa=1
+			}
+			if(addition.is_black==false){
+				blacksa=0
+			}
+		
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
 		} else {
@@ -578,7 +646,6 @@ class Addition extends Component {
 				}
 				this.props.form.validateFields((err, values) => {
 					console.log("err", err)
-					console.log("this.props.getIsActives", this.props.getIsActives)
 					if (!err || !err.FullName && !err.UserName && !err.rolesNmae && !err.sexName && !err.telephone && !err.titles &&!err.idcard) {
 						putUser({}, {
 							id: addition.id,
@@ -589,6 +656,7 @@ class Addition extends Component {
 								person_name: addition.person_name,
 								person_type: "C_PER",
 								person_avatar_url: this.props.fileList || '',
+								person_signature_url: this.props.postUploadAutographs || '',
 								organization: {
 									pk: node.pk,
 									code: addition.org_code,
@@ -604,7 +672,7 @@ class Addition extends Component {
 							black_remark: addition.black_remark,
 							is_active: this.props.getIsActives,
 							id_num: addition.id_num,
-							is_black: 0,
+							is_black: blacksa,
 							// id_image: [],
 							id_image: this.props.postUploadFilesNums ? this.props.postUploadFilesNums : addition.id_image,
 							basic_params: {
@@ -623,6 +691,7 @@ class Addition extends Component {
 							if (rst.code == 1) {
 								const codes = Addition.collect(node);
 								message.info('修改人员成功');
+								getSwitch()
 								postUploadFilesImg()
 								postUploadFilesNum()
 								// 控制是否通过角色条件分页
@@ -643,7 +712,7 @@ class Addition extends Component {
 
 			} else {
 				this.props.form.validateFields((err, values) => {
-					console.log("this.props", this.props.fileList)
+
 					if (!err) {
 						postUser({}, {
 							is_person: true,
@@ -735,9 +804,10 @@ class Addition extends Component {
 	}
 
 	cancel() {
-		const { actions: { clearAdditionField, getImgBtn, getImgNumBtn } } = this.props;
+		const { actions: { clearAdditionField, getImgBtn, getImgNumBtn ,getSwitch} } = this.props;
 		getImgBtn(false)
 		getImgNumBtn(false)
+		getSwitch()
 		this.setState({
 			newKey: Math.random(),
 		})
