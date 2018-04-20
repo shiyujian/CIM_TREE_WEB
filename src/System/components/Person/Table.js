@@ -737,6 +737,14 @@ export default class Users extends Component {
 			user.is_black = 0
 			blacks = 0
 		}
+		let actives
+		if (user.is_active == true) {
+			user.is_active = false
+			actives = false
+		} else {
+			user.is_active = true
+			actives = true
+		}
 		
 		let groupe = []
 		for (let j = 0; j < user.groups.length; j++) {
@@ -765,7 +773,7 @@ export default class Users extends Component {
 			sections: user.sections,
 			//groups: [7],
 			groups: groupe,
-			is_active: user.is_active,
+			is_active: actives,
 			black_remark:user.black_remark,
 			id_num:user.id_num,
 			is_black:blacks,
