@@ -730,21 +730,26 @@ export default class Users extends Component {
 			actions: { putUser }
 		} = this.props;
 		let blacks
+		let actives
 		if (user.is_black == 0) {
 			user.is_black = 1
 			blacks = 1
-		} else {
-			user.is_black = 0
-			blacks = 0
-		}
-		let actives
-		if (user.is_active == true) {
 			user.is_active = false
 			actives = false
 		} else {
+			user.is_black = 0
+			blacks = 0
 			user.is_active = true
 			actives = true
 		}
+		// let actives
+		// if (user.is_active == true) {
+		// 	user.is_active = false
+		// 	actives = false
+		// } else {
+		// 	user.is_active = true
+		// 	actives = true
+		// }
 		
 		let groupe = []
 		for (let j = 0; j < user.groups.length; j++) {
