@@ -205,7 +205,7 @@ class Addition extends Component {
 			// newFileList = newFileList.concat(newFile);
 			// console.log("")
 			this.setState({ btns: true })
-			
+
 			getImgNegative(true)
 			postUploadNegative(newFile)
 		}
@@ -256,10 +256,14 @@ class Addition extends Component {
 		let id_image_url = ''
 		let id_image_urlName
 		if (addition.id_image && addition.id_image[0]) {
-			
+
 			if (addition.id_image[0].name && addition.id_image[0].filepath) {
 				id_image_urlName = addition.id_image[0].name
-				id_image_url = addition.id_image[0].filepath ? addition.id_image[0].filepath : addition.id_image[0].thumbUrl
+				console.log('addition.id_image[0].filepath', addition.id_image[0].filepath)
+				// filepath: STATIC_DOWNLOAD_API + "/media" + file.file.response.download_url.split('/media')[1]
+				const id_img = addition.id_image[0].filepath.split('/media')[1]
+				const id_imgs = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + id_img
+				id_image_url = id_imgs ? id_imgs : addition.id_image[0].thumbUrl
 				fileList1 = [{
 					uid: 1,
 					name: id_image_urlName,
@@ -276,8 +280,14 @@ class Addition extends Component {
 		let id_image_urlName1
 		if (addition.id_image && addition.id_image[1]) {
 			if (addition.id_image[1].name && addition.id_image[1].filepath) {
+
+				const id_img = addition.id_image[1].filepath.split('/media')[1]
+				const id_imgs = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + id_img
+				
+
 				id_image_urlName1 = addition.id_image[1].name
-				id_image_url1 = addition.id_image[1].filepath ? addition.id_image[1].filepath : addition.id_image[1].thumbUrl
+				// id_image_url1 = addition.id_image[1].filepath ? addition.id_image[1].filepath : addition.id_image[1].thumbUrl
+				id_image_url1 = id_imgs ? id_imgs : addition.id_image[1].thumbUrl
 				fileList2 = [{
 					uid: 2,
 					name: id_image_urlName1,
@@ -294,8 +304,8 @@ class Addition extends Component {
 		if (!user.is_superuser) {
 			marginTops = '55px'
 		}
-		console.log("this.props,getImgBtns",this.props.getImgBtns)
-		console.log("fileList",fileList)
+		console.log("this.props,getImgBtns", this.props.getImgBtns)
+		console.log("fileList", fileList)
 		return (
 			<div>
 				{
@@ -416,7 +426,7 @@ class Addition extends Component {
 											data={(file) => ({ name: file.fileName, a_file: file })}
 											onChange={this.uploadChange.bind(this)}
 											defaultFileList={fileList}
-											disabled={fileList&&fileList.length?(this.props.getImgBtns==true?this.props.getImgBtns:this.props.getImgBtns==false?false:true):this.props.getImgBtns}
+											disabled={fileList && fileList.length ? (this.props.getImgBtns == true ? this.props.getImgBtns : this.props.getImgBtns == false ? false : true) : this.props.getImgBtns}
 										>
 											<Button>
 												<Icon type="upload" />
@@ -426,8 +436,8 @@ class Addition extends Component {
 									</div>
 
 									{/* <div style={{ marginLeft: '25%', marginTop: '30px' }}> */}
-										{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
-										{/* <Upload name="file"
+									{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
+									{/* <Upload name="file"
 											multiple={true}
 											accept={fileTypes}
 											// showUploadList: false,
@@ -557,8 +567,8 @@ class Addition extends Component {
 											onChange={this.uploadChanges.bind(this)}
 											defaultFileList={fileList1}
 											// disabled={this.props.getImgNumBtns}
-											disabled={fileList1&&fileList1.length?(this.props.getImgNumBtns==true?this.props.getImgNumBtns:this.props.getImgNumBtns==false?false:true):this.props.getImgNumBtns}
-											
+											disabled={fileList1 && fileList1.length ? (this.props.getImgNumBtns == true ? this.props.getImgNumBtns : this.props.getImgNumBtns == false ? false : true) : this.props.getImgNumBtns}
+
 										>
 											<Button>
 												<Icon type="upload" />
@@ -578,8 +588,8 @@ class Addition extends Component {
 											onChange={this.uploadChangea.bind(this)}
 											defaultFileList={fileList2}
 											// disabled={this.props.getImgNegatives}
-											disabled={fileList2&&fileList2.length?(this.props.getImgNegatives==true?this.props.getImgNegatives:this.props.getImgNegatives==false?false:true):this.props.getImgNegatives}
-											
+											disabled={fileList2 && fileList2.length ? (this.props.getImgNegatives == true ? this.props.getImgNegatives : this.props.getImgNegatives == false ? false : true) : this.props.getImgNegatives}
+
 										>
 											<Button>
 												<Icon type="upload" />
@@ -687,39 +697,39 @@ class Addition extends Component {
 		const {
 			addition = {}, sidebar: { node } = {},
 			platform: { users = [] },
-			actions: { postUser, clearAdditionField, getUsers, postUploadFilesImg, getImgBtn,postUploadNegative,getImgNegative,getAutographBtn,
+			actions: { postUser, clearAdditionField, getUsers, postUploadFilesImg, getImgBtn, postUploadNegative, getImgNegative, getAutographBtn,
 				putUser, getSection, getTablePage, getIsBtn, postUploadFilesNum, getImgNumBtn, getSwitch }, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
-		console.log("addition",addition)
-		if(!addition.id_image){
-			
-			
-			if(!this.props.postUploadFilesNums){
+		console.log("addition", addition)
+		if (!addition.id_image) {
+
+
+			if (!this.props.postUploadFilesNums) {
 				message.warn('请上传身份证正面照片');
 				return
 			}
-			if(!this.props.postUploadNegatives){
+			if (!this.props.postUploadNegatives) {
 				message.warn('请上传身份证反面照片');
 				return
 			}
-			
-		}else{
-			if(!this.props.postUploadFilesNums&&!addition.id_image[0]){
-			
-					message.warn('请上传身份证正面照片');
-					return
-				
-			}
-			if(!this.props.postUploadNegatives&&!addition.id_image[1]){
 
-					message.warn('请上传身份证反面照片');
-					return
-				
+		} else {
+			if (!this.props.postUploadFilesNums && !addition.id_image[0]) {
+
+				message.warn('请上传身份证正面照片');
+				return
+
 			}
-			
+			if (!this.props.postUploadNegatives && !addition.id_image[1]) {
+
+				message.warn('请上传身份证反面照片');
+				return
+
+			}
+
 		}
-		
+
 
 		if (this.props.fileList) {
 			addition.person_avatar_url = this.props.fileList
@@ -738,7 +748,7 @@ class Addition extends Component {
 			addition.is_active = true
 			actives = true
 		}
-		
+
 		console.log("addition.id_image[1]", addition)
 		let UploadFilesNums
 		let UploadNegatives
@@ -747,7 +757,7 @@ class Addition extends Component {
 			UploadFilesNums = null
 
 			imgBtnZ = false
-		} else if ( this.state.btnf == true&&this.props.postUploadFilesNums) {
+		} else if (this.state.btnf == true && this.props.postUploadFilesNums) {
 			UploadFilesNums = this.props.postUploadFilesNums
 			// addition.id_image=[]
 			imgBtnZ = false
@@ -759,7 +769,7 @@ class Addition extends Component {
 		if (this.state.btns == false && !this.props.postUploadNegatives) {
 			UploadNegatives = null
 			imgBtnF = false
-		} else if ( this.state.btns == true&&this.props.postUploadNegatives) {
+		} else if (this.state.btns == true && this.props.postUploadNegatives) {
 			UploadNegatives = this.props.postUploadNegatives
 			imgBtnF = false
 		} else {
@@ -773,10 +783,10 @@ class Addition extends Component {
 			this.setState({ btns: true })
 		}
 
-	
-		console.log("111111",UploadFilesNums)
-		console.log("2222222",UploadNegatives)
-		addition.id_image=[UploadFilesNums, UploadNegatives]
+
+		console.log("111111", UploadFilesNums)
+		console.log("2222222", UploadNegatives)
+		addition.id_image = [UploadFilesNums, UploadNegatives]
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
 		} else {
@@ -884,7 +894,7 @@ class Addition extends Component {
 							black_remark: addition.black_remark,
 							id_num: addition.id_num,
 							is_black: 0,
-							id_image:[UploadFilesNums, UploadNegatives],
+							id_image: [UploadFilesNums, UploadNegatives],
 							basic_params: {
 								info: {
 									'电话': addition.person_telephone || '',
@@ -952,7 +962,7 @@ class Addition extends Component {
 	}
 
 	cancel() {
-		const { actions: { clearAdditionField, getImgBtn, getImgNumBtn, getSwitch,getImgNegative ,getAutographBtn} } = this.props;
+		const { actions: { clearAdditionField, getImgBtn, getImgNumBtn, getSwitch, getImgNegative, getAutographBtn } } = this.props;
 		getImgBtn()
 		getImgNumBtn(false)
 		getImgNegative(false)
