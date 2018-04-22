@@ -106,6 +106,7 @@ export default class Lmap extends Component {
         this.OnlineState = false
         this.checkMarkers = []
         this.tileLayer = null
+        this.tileLayer2 = null;
         this.map = null
         this.track = null
         this.orgs = null
@@ -149,63 +150,63 @@ export default class Lmap extends Component {
     tileUrls = {
         1: window.config.IMG_W,
         2: window.config.VEC_W,
-	}
-	
-	//获取地块树数据
-	loadAreaData(){
-		const { actions: { getTree } } = this.props
-		try {
-			getTree({}, { parent: 'root' }).then(rst => {
-				if (rst instanceof Array && rst.length > 0) {
-					rst.forEach((item, index) => {
-						rst[index].children = []
-					})
-					getTree({}, { parent: rst[0].No }).then(rst1 => {
-						if (rst1 instanceof Array && rst1.length > 0) {
-							rst1.forEach((item, index) => {
-								rst1[index].children = []
-							})
-							getNewTreeData(rst, rst[0].No, rst1)
-							getTree({}, { parent: rst1[0].No }).then(rst2 => {
-								if (rst2 instanceof Array && rst2.length > 0) {
-									getNewTreeData(rst1, rst1[0].No, rst2)
-									this.setState({ treeLists: rst }, () => {
-										// this.onSelect([rst2[0].No])
-									})
-									// getNewTreeData(rst1,rst1[0].No,rst2)
-									getTree({}, { parent: rst2[0].No }).then(rst3 => {
-										if (rst3 instanceof Array && rst3.length > 0) {
-											getNewTreeData(rst2, rst2[0].No, rst3)
-											this.setState({ treeLists: rst }, () => {
-												// this.onSelect([rst3[0].No])
-											})
-											for (let i = 0; i <= rst3.length - 1; i++) {
-												getTree({}, { parent: rst3[i].No }).then(rst4 => {
-													getNewTreeData(rst3, rst3[i].No, rst4)
-													this.setState({ treeLists: rst })
-													// this.setState({treeLists:rst},() => {
-													//     this.onSelect([rst4[0].No])
-													// })
-												})
-											}
-										} else {
-											this.setState({ treeLists: rst })
-										}
-									})
-								} else {
-									this.setState({ treeLists: rst })
-								}
-							})
-						} else {
-							this.setState({ treeLists: rst })
-						}
-					})
-				}
-			})
-		} catch (e) {
-			console.log(e)
-		}
-	}
+    }
+
+    //获取地块树数据
+    loadAreaData() {
+        const { actions: { getTree } } = this.props
+        try {
+            getTree({}, { parent: 'root' }).then(rst => {
+                if (rst instanceof Array && rst.length > 0) {
+                    rst.forEach((item, index) => {
+                        rst[index].children = []
+                    })
+                    getTree({}, { parent: rst[0].No }).then(rst1 => {
+                        if (rst1 instanceof Array && rst1.length > 0) {
+                            rst1.forEach((item, index) => {
+                                rst1[index].children = []
+                            })
+                            getNewTreeData(rst, rst[0].No, rst1)
+                            getTree({}, { parent: rst1[0].No }).then(rst2 => {
+                                if (rst2 instanceof Array && rst2.length > 0) {
+                                    getNewTreeData(rst1, rst1[0].No, rst2)
+                                    this.setState({ treeLists: rst }, () => {
+                                        // this.onSelect([rst2[0].No])
+                                    })
+                                    // getNewTreeData(rst1,rst1[0].No,rst2)
+                                    getTree({}, { parent: rst2[0].No }).then(rst3 => {
+                                        if (rst3 instanceof Array && rst3.length > 0) {
+                                            getNewTreeData(rst2, rst2[0].No, rst3)
+                                            this.setState({ treeLists: rst }, () => {
+                                                // this.onSelect([rst3[0].No])
+                                            })
+                                            for (let i = 0; i <= rst3.length - 1; i++) {
+                                                getTree({}, { parent: rst3[i].No }).then(rst4 => {
+                                                    getNewTreeData(rst3, rst3[i].No, rst4)
+                                                    this.setState({ treeLists: rst })
+                                                    // this.setState({treeLists:rst},() => {
+                                                    //     this.onSelect([rst4[0].No])
+                                                    // })
+                                                })
+                                            }
+                                        } else {
+                                            this.setState({ treeLists: rst })
+                                        }
+                                    })
+                                } else {
+                                    this.setState({ treeLists: rst })
+                                }
+                            })
+                        } else {
+                            this.setState({ treeLists: rst })
+                        }
+                    })
+                }
+            })
+        } catch (e) {
+            console.log(e)
+        }
+    }
 
     /*初始化地图*/
     initMap() {
@@ -215,22 +216,65 @@ export default class Lmap extends Component {
 
         this.tileLayer = L.tileLayer(this.tileUrls[1], {
             subdomains: [1, 2, 3],
-			minZoom: 1, 
-			maxZoom: 17, 
-			storagetype: 0
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
         }).addTo(this.map)
 
         L.tileLayer(this.WMSTileLayerUrl, {
-            subdomains: [1, 2, 3], 
-			minZoom: 1, 
-			maxZoom: 17, 
-			storagetype: 0 
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
         }).addTo(this.map)
+        // this.tileLayer2 = L.tileLayer(this.tileUrls[1], {
+        //     opacity: 1.0,
+        //     subdomains: [1, 2, 3],
+        //     minZoom: 12,
+        //     maxZoom: 20,
+        //     storagetype: 0,
+        //     tiletype: "arcgis",
+        // }).addTo(this.map);
+        this.tileLayer2 = L.tileLayer('http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&amp;style=&amp;tilematrixset=EPSG%3A4326&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image%2Fpng&amp;TileMatrix=EPSG%3A4326%3A{z}&amp;TileCol={x}&amp;TileRow={y}', {
+            opacity: 1.0,
+            subdomains: [1, 2, 3],
+            minZoom: 11, 
+            maxZoom: 21,
+            storagetype: 0,
+             tiletype: 'wtms'
+        }).addTo(this.map);
+        // this.map.on( 'click' , function(e) {
+        //     //getThinClass(e.latlng.lng,e.latlng.lat);
+    
+        //    { 
+        //     //    this.getTreeInfo(e.latlng.lng, e.latlng.lat)
+        //     }
+        // });
+
 
         //航拍影像
         // if (CUS_TILEMAP)
         //     L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map)
+
+    }
+     getTreeInfo(x, y) {
+        var resolutions = [0.703125, 0.3515625, 0.17578125, 0.087890625, 0.0439453125, 0.02197265625, 0.010986328125, 0.0054931640625, 0.00274658203125, 0.001373291015625, 6.866455078125E-4, 3.4332275390625E-4, 1.71661376953125E-4, 8.58306884765625E-5, 4.291534423828125E-5, 2.1457672119140625E-5, 1.0728836059570312E-5, 5.364418029785156E-6, 2.682209014892578E-6, 1.341104507446289E-6, 6.705522537231445E-7, 3.3527612686157227E-7];
         
+        var zoom = map.getZoom();
+        var resolution = resolutions[zoom];
+        var col = (x + 180) / (resolution);
+        var colp = col % 256;
+        col = Math.floor(col / 256);
+        var row = (90 - y) / (resolution);
+        var rowp = row % 256;
+        row = Math.floor(row / 256);
+    
+    
+        var url = '<IMG src="file://C:/Users/ecidi/AppData/Roaming/feiq/RichOle/1096464985.bmp">http://47.104.107.55:8080/geoserver/gwc/service/wmts?VERSION=1.0.0&amp;LAYER=xatree:treelocation&amp;STYLE=&amp;TILEMATRIX=EPSG:4326:' + zoom + '&amp;TILEMATRIXSET=EPSG:4326&amp;SERVICE=WMTS&amp;FORMAT=image/png&amp;SERVICE=WMTS&amp;REQUEST=GetFeatureInfo&amp;INFOFORMAT=application/json&amp;TileCol=' + col + '&amp;TileRow=' + row + '&amp;I=' + colp + '&amp;J=' + rowp;
+    
+        jQuery.get(url, null, function (data) {
+            debugger
+        });
     }
 
     genPopUpContent(geo) {
@@ -327,10 +371,10 @@ export default class Lmap extends Component {
                 // })
                 // area.addLayer(label)
                 // console.log(3333333,area)
-				// area.bindTooltip(geo.properties.name).openTooltip();
+                // area.bindTooltip(geo.properties.name).openTooltip();
                 this.map.fitBounds(area.getBounds());
 
-				//this.map.panTo(latlng);
+                //this.map.panTo(latlng);
                 return area
             }
             return oldMarker
@@ -339,13 +383,13 @@ export default class Lmap extends Component {
 
     options = [{ label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' }]
 
-	options2 = [
+    options2 = [
         { label: '现场人员', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access', },
         { label: '安全监测', value: 'geojsonFeature_safety', IconUrl: require('./ImageIcon/camera.png'), IconName: 'shield', },
         { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning', },
         { label: '视频监控', value: 'geojsonFeature_monitor', IconUrl: require('./ImageIcon/video.png'), IconName: 'video-camera', },
-	];
-	
+    ];
+
     //切换为2D
     toggleTileLayer(index) {
         this.tileLayer.setUrl(this.tileUrls[index])
@@ -415,8 +459,8 @@ export default class Lmap extends Component {
     /*弹出信息框*/
     onSelect(keys, featureName) {
         const { actions: { getTreearea } } = this.props
-		const treeNodeName = featureName != null && featureName.selectedNodes.length > 0 ? featureName.selectedNodes[0].props.title : '';
-        
+        const treeNodeName = featureName != null && featureName.selectedNodes.length > 0 ? featureName.selectedNodes[0].props.title : '';
+
         if (this.checkMarkers.toString() != '') {
             for (var i = 0; i <= this.checkMarkers.length - 1; i++) {
                 // console.log('checkMarkers',this.checkMarkers[i])
@@ -424,11 +468,11 @@ export default class Lmap extends Component {
                 // this.checkMarkers[i]._leaflet_id.remove()
                 delete this.checkMarkers[i]
             }
-		}
-		
-		this.setState({
-			leftkeycode: keys[0]
-		});
+        }
+
+        this.setState({
+            leftkeycode: keys[0]
+        });
 
         let treearea = []
         getTreearea({}, { no: keys[0] }).then(rst => {
@@ -440,8 +484,8 @@ export default class Lmap extends Component {
                 .split(',')
                 .map(item => {
                     return item.split(' ').map(_item => _item - 0)
-				})
-			treearea.push(target1)
+                })
+            treearea.push(target1)
 
             let message = {
                 key: 3,
@@ -450,7 +494,7 @@ export default class Lmap extends Component {
                 geometry: { type: 'Polygon', coordinates: treearea }
             }
             let oldMarker = undefined;
-            
+
             this.checkMarkers[0] = this.createMarker(message, this.checkMarkers[0])
         })
         // let selItem = this.checkMarkers[0]
@@ -503,14 +547,14 @@ export default class Lmap extends Component {
                     <div
                         className={`menuPanel ${this.state.isNotThree ? '' : 'hide'} ${
                             this.state.menuIsExtend ? 'animExtend' : 'animFold'
-                        }`}
+                            }`}
                         style={
                             this.state.menuIsExtend
                                 ? { transform: 'translateX(0)', width: this.state.menuWidth }
                                 : {
-                                      transform: `translateX(-${this.state.menuWidth}px)`,
-                                      width: this.state.menuWidth,
-                                  }
+                                    transform: `translateX(-${this.state.menuWidth}px)`,
+                                    width: this.state.menuWidth,
+                                }
                         }
                     >
                         <aside className="aside" draggable="false">
@@ -538,14 +582,14 @@ export default class Lmap extends Component {
                                 收起
                             </div>
                         ) : (
-                            <div
-                                className="foldBtn"
-                                style={{ left: this.state.menuWidth }}
-                                onClick={this.extendAndFold.bind(this)}
-                            >
-                                展开
+                                <div
+                                    className="foldBtn"
+                                    style={{ left: this.state.menuWidth }}
+                                    onClick={this.extendAndFold.bind(this)}
+                                >
+                                    展开
                             </div>
-                        )}
+                            )}
                     </div>
                     {this.state.isVisibleMapBtn ? (
                         <div className="treeControl">
@@ -566,8 +610,8 @@ export default class Lmap extends Component {
                             </div>
                         </div>
                     ) : (
-                        ''
-                    )}
+                            ''
+                        )}
                     <div style={this.state.isNotThree == true ? {} : { display: 'none' }}>
                         <div
                             className="iconList"
@@ -599,8 +643,8 @@ export default class Lmap extends Component {
                             close={this.exitTrack.bind(this)}
                         />
                     ) : (
-                        ''
-                    )}
+                            ''
+                        )}
                     <div>
                         <div
                             style={
