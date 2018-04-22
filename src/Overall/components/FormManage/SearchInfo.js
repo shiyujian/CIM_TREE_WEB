@@ -1,24 +1,91 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
-import {  UNITS } from '../../../_platform/api';
-
+import {SECTIONNAME,PROJECT_UNITS,UNITS} from '../../../_platform/api';
+import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 class SearchInfo extends Component {
+
+    constructor(props) {
+		super(props);
+		this.state = {
+            optionArray:[]
+		};
+	}
     static propType = {};
     static layout = {
         labelCol: { span: 6 },
         wrapperCol: { span: 18 },
     };
 
+    async componentDidMount(){
+        this.getSection()
+    }
+
+
+    async componentDidUpdate(prevProps, prevState){
+        const {
+            selectedDir
+        }=this.props
+        
+        if(selectedDir != prevProps.selectedDir ){
+            this.getSection()
+        }
+    }
+
+    async getSection(){
+        const{
+            leftkeycode
+        }=this.props
+        console.log('leftkeycode',leftkeycode)
+        let user = getUser()
+        let optionArray = []
+        let sections = user.sections
+        sections = JSON.parse(sections)
+        if(sections && sections instanceof Array && sections.length>0){
+            let section = sections[0]
+            let code = section.split('-')
+            if(code && code.length === 3){
+                //获取当前标段的名字
+                SECTIONNAME.map((item)=>{
+                    if(code[2] === item.code){
+                        let currentSectionName = item.name
+                        optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
+                    }
+                })
+            }
+        }else{
+            UNITS.map((unit)=>{
+                optionArray.push(<Option key={unit.value} value={unit.value}>{unit.value}</Option>)
+                
+            })
+        }
+        this.setState({
+            optionArray:optionArray
+        })
+    }
+
+    async componentDidUpdate(prevProps,prevState){
+		const {
+			selectedDir
+		}=this.props
+
+		if(selectedDir != prevProps.selectedDir){
+			this.clear()
+        }
+	}
+
     render() {
         const {
             form: { getFieldDecorator }
         } = this.props
 
+        const{
+            optionArray
+        }=this.state
         return (
             <Form>
                 <Row>
@@ -27,13 +94,13 @@ class SearchInfo extends Component {
                             <Col span={8}>
                                 <FormItem {...SearchInfo.layout} label='单位工程'>
                                     {
-                                        getFieldDecorator('sunit', {
+                                        getFieldDecorator('ssection', {
                                             rules: [
-                                                { required: false, message: '请选择单位工程' }
+                                                { required: false, message: '请选择标段' }
                                             ]
                                         })
-                                        (<Select placeholder='请选择单位工程' allowClear>
-                                            {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
+                                        (<Select placeholder='请选择标段'>
+                                            {optionArray}
                                         </Select>)
                                     }
                                 </FormItem>
@@ -53,7 +120,7 @@ class SearchInfo extends Component {
                             <Col span={8}>
                                 <FormItem {...SearchInfo.layout} label='编号'>
                                     {
-                                        getFieldDecorator('snumbercode', {
+                                        getFieldDecorator('scode', {
                                             rules: [
                                                 { required: false, message: '请输入编号' }
                                             ]
@@ -65,29 +132,14 @@ class SearchInfo extends Component {
                         </Row>
                         <Row>
                             <Col span={8}>
-                                <FormItem {...SearchInfo.layout} label='文档类型'>
-                                    {
-                                        getFieldDecorator('sdocument', {
-                                            rules: [
-                                                { required: false, message: '请选择文档类型' }
-                                            ]
-                                        })
-                                        (<Select placeholder='请选择文档类型' allowClear>
-                                            <Option key={5} value={'施工组织设计'}>施工组织设计</Option>
-                                            <Option key={6} value={'施工方案'}>施工方案</Option>
-                                        </Select>)
-                                    }
-                                </FormItem>
-                            </Col>
-                            <Col span={8}>
-                                <FormItem {...SearchInfo.layout} label='日期'>
+                                <FormItem {...SearchInfo.layout} label='发起日期'>
                                     {
                                         getFieldDecorator('stimedate', {
                                             rules: [
                                                 { type: 'array', required: false, message: '请选择日期' }
                                             ]
                                         })
-                                            (<RangePicker size='default' format='YYYY-MM-DD'  />)
+                                        (<RangePicker size='default' format='YYYY-MM-DD'  style={{ width: '100%', height: '100%' }} />)
                                     }
                                 </FormItem>
                             </Col>
@@ -136,10 +188,9 @@ class SearchInfo extends Component {
 
     clear(){
         this.props.form.setFieldsValue({
-            sunit:undefined,
+            ssection:undefined,
             sname:undefined,
-            snumbercode:undefined,
-            sdocument:undefined,
+            scode:undefined,
             stimedate:undefined,
             sstatus:undefined
         })

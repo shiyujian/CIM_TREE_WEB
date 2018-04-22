@@ -129,7 +129,7 @@ export default class Header extends Component {
 		const { username = '', name = '', is_superuser = false } = getUser();
 		let  permissions = getPermissions() || [];
 		// permissions.splice(4,1,"appmeta.PROJECT.NURSERY.NONE.READ");
-		console.log('permissions333',permissions)
+		// console.log('permissions333',permissions)
 		return (
 			<header className="header">
 				<a className="head-logo" href='/'>

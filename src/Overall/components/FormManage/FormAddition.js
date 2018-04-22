@@ -6,7 +6,6 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
-// import PerSearch from './PerSearch';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -22,7 +21,6 @@ class FormAddition extends Component {
     constructor(props){
         super(props)
         this.state={
-            dataSource:[],
             TreatmentData:[],
             currentSection:'',
             currentSectionName:'',
@@ -78,7 +76,21 @@ class FormAddition extends Component {
     };
 
     async componentDidMount() {
+        console.log('componentDidMountcomponentDidMount')
+        this.setState({
+            TreatmentData:[]
+        })
         this.getSection()
+    }
+    async componentDidUpdate(prevProps,prevState){
+        const{
+            formAddVisible = false,
+        }= this.props
+        if(formAddVisible && formAddVisible != prevProps.formAddVisible){
+            this.setState({
+                TreatmentData:[]
+            })
+        }
     }
 
     //获取当前登陆用户的标段
@@ -122,12 +134,18 @@ class FormAddition extends Component {
             form: { getFieldDecorator },
         } = this.props;
         const {
-            dataSource,
+            TreatmentData,
             currentSectionName=''
         } = this.state;
 
         let flow = selectedDir.extra_params ? selectedDir.extra_params.workflow : ''
-        let arr = flow.split('--')
+        let arr = ''
+        try{
+            arr = flow.split('--')[0]
+        }catch(e){
+            console.log(e)
+        }
+         
         console.log('arr',arr)
         return (
             <div>
@@ -141,7 +159,7 @@ class FormAddition extends Component {
                      maskClosable={false}
                      footer={false}
                      >
-                        <Spin spinning={this.state.loading}>>
+                        <Spin spinning={this.state.loading}>
                             <Form onSubmit={this.handleSubmit.bind(this)}>
                                 <Row>
                                     <Col span={12}>
@@ -176,7 +194,7 @@ class FormAddition extends Component {
                                     <Col span={12}>
                                         <FormItem {...FormAddition.layoutT} label='编号'>
                                             {
-                                                getFieldDecorator('numbercode', {
+                                                getFieldDecorator('code', {
                                                     rules: [
                                                         { required: true, message: '请输入编号' }
                                                     ]
@@ -214,7 +232,7 @@ class FormAddition extends Component {
 
                                     <Table 
                                         columns={this.columns1}
-                                        dataSource={this.state.TreatmentData}
+                                        dataSource={TreatmentData}
                                         pagination={true}
                                     />
                                 </Row>
@@ -228,7 +246,7 @@ class FormAddition extends Component {
                                                     ]
                                                 })
                                                     (
-                                                    <PerSearch selectMember={this.selectMember.bind(this)} code={arr[0]}/>
+                                                    <PerSearch selectMember={this.selectMember.bind(this)} code={arr}/>
                                                     )
                                             }
                                         </FormItem>
@@ -373,7 +391,6 @@ class FormAddition extends Component {
     handleSubmit = (e) =>{
         e.preventDefault();
         const {
-            currentcode = {},
             selectedDir,
             actions: {
                 createFlow,
@@ -386,13 +403,11 @@ class FormAddition extends Component {
         
         const{
             TreatmentData,
-            dataSource,
             projectName,
             currentSectionName,
 			currentSection
         } = this.state
         console.log('TreatmentData',TreatmentData)
-        console.log('dataSource',dataSource)
         let user = getUser();//当前登录用户
         let sections = user.sections || []
         if(!sections || sections.length === 0 ){
@@ -409,8 +424,16 @@ class FormAddition extends Component {
             console.log('Received values of form: ', values);
             if (!err) {
 
+                if (TreatmentData.length === 0) {
+                    notification.error({
+                        message: '请上传文件',
+                        duration: 3
+                    })
+                    return
+                }
+
                 postData.upload_unit = user.org ? user.org : '';
-                postData.type = '机械设备';
+                postData.type = values.document;
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
@@ -429,9 +452,11 @@ class FormAddition extends Component {
                     "section": JSON.stringify(currentSection),
                     "sectionName":JSON.stringify(currentSectionName),
                     "projectName":JSON.stringify(projectName),
-                    "dataSource":JSON.stringify(dataSource),
-                    "TreatmentData":JSON.stringify(TreatmentData),
+
+                    "name":JSON.stringify(values.name),
                     "code":JSON.stringify(values.code),
+                    "document":JSON.stringify(values.document),
+                    "TreatmentData":JSON.stringify(TreatmentData),
                     "timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
                     "postData": JSON.stringify(postData),
                 }];
@@ -441,6 +466,7 @@ class FormAddition extends Component {
                 //在项目管理时关联的流程
                 let flow = selectedDir.extra_params.workflow
                 let arr = flow.split('--')
+                console.log('arr',arr)
 
                 let WORKFLOW_MAP = {
                     name: arr[1],
