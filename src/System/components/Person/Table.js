@@ -765,7 +765,9 @@ export default class Users extends Component {
 			account: {
 				person_name: user.person_name,
 				person_type: "C_PER",
-				person_avatar_url: "",
+				person_avatar_url:user.person_avatar_url || '',
+				person_signature_url: user.person_signature_url || '',
+				
 				organization: {
 					pk: node.pk,
 					code: user.org_code,
@@ -832,7 +834,8 @@ export default class Users extends Component {
 			account: {
 				person_name: user.person_name,
 				person_type: "C_PER",
-				person_avatar_url: "",
+				person_avatar_url:user.person_avatar_url || '',
+				person_signature_url: user.person_signature_url || '',
 				organization: {
 					pk: node.pk,
 					code: user.org_code,

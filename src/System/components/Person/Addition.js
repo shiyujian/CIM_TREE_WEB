@@ -240,6 +240,7 @@ class Addition extends Component {
 		let units = this.getUnits()
 		let avatar_url = ''
 		let avatar_urlName
+		// 上传用户头像
 		let fileList = []
 		if (addition.person_avatar_url && addition.person_avatar_url != 'http://47.104.160.65:6511') {
 			avatar_urlName = addition.person_avatar_url.split("/").pop()
@@ -252,6 +253,22 @@ class Addition extends Component {
 				thumbUrl: avatar_url,
 			}];
 		}
+		// 上传用户签名
+
+		console.log("addition11111111111",addition)
+		let autographList = []
+		if (addition.relative_signature_url && addition.relative_signature_url != 'http://47.104.160.65:6511') {
+			const avatar_urlName3 = addition.relative_signature_url.split("/").pop()
+			const avatar_url3 = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + addition.relative_signature_url
+			autographList = [{
+				uid: -1,
+				name: avatar_urlName3,
+				status: 'done',
+				url: avatar_url3,
+				thumbUrl: avatar_url3,
+			}];
+		}
+		// 上传身份证正面
 		let fileList1 = []
 		let id_image_url = ''
 		let id_image_urlName
@@ -274,7 +291,7 @@ class Addition extends Component {
 			}
 		}
 
-
+		// 上传身份证发面
 		let fileList2 = []
 		let id_image_url1 = ''
 		let id_image_urlName1
@@ -430,14 +447,14 @@ class Addition extends Component {
 										>
 											<Button>
 												<Icon type="upload" />
-												<span>上传用户照片</span>
+												<span>上传用户头像</span>
 											</Button>
 										</Upload>
 									</div>
 
-									{/* <div style={{ marginLeft: '25%', marginTop: '30px' }}> */}
+									<div style={{ marginLeft: '25%', marginTop: '30px' }}>
 									{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
-									{/* <Upload name="file"
+									<Upload name="file"
 											multiple={true}
 											accept={fileTypes}
 											// showUploadList: false,
@@ -445,15 +462,17 @@ class Addition extends Component {
 											listType="picture"
 											data={(file) => ({ name: file.fileName, a_file: file })}
 											onChange={this.uploadChangew.bind(this)}
-											// defaultFileList={fileList}
-											disabled={this.props.getAutographBtns}
+											defaultFileList={autographList}
+											// disabled={this.props.getAutographBtns}
+											disabled={autographList && autographList.length ? (this.props.getAutographBtns == true ? this.props.getAutographBtns : this.props.getAutographBtns == false ? false : true) : this.props.getAutographBtns}
+											
 										>
 											<Button>
 												<Icon type="upload" />
 												<span>上传用户签名</span>
 											</Button>
-										</Upload> */}
-									{/* </div> */}
+										</Upload>
+									</div>
 
 								</Col>
 								<Col span={12}>
@@ -698,7 +717,7 @@ class Addition extends Component {
 			addition = {}, sidebar: { node } = {},
 			platform: { users = [] },
 			actions: { postUser, clearAdditionField, getUsers, postUploadFilesImg, getImgBtn, postUploadNegative, getImgNegative, getAutographBtn,
-				putUser, getSection, getTablePage, getIsBtn, postUploadFilesNum, getImgNumBtn, getSwitch }, tags = {}
+				putUser, getSection, getTablePage, getIsBtn, postUploadFilesNum, getImgNumBtn, getSwitch,postUploadAutograph }, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
 		console.log("addition", addition)
@@ -736,6 +755,12 @@ class Addition extends Component {
 		} else {
 			addition.person_avatar_url = addition.person_avatar_url
 		}
+		
+		if (this.props.postUploadAutographs) {
+			addition.relative_signature_url = this.props.postUploadAutographs
+		} else {
+			addition.relative_signature_url = addition.relative_signature_url
+		}
 		let blacksa
 		let actives
 		if (addition.is_black == true) {
@@ -745,8 +770,8 @@ class Addition extends Component {
 		}
 		if (addition.is_black == false) {
 			blacksa = 0
-			addition.is_active = true
-			actives = true
+			addition.is_active = this.props.getIsActives
+			actives = this.props.getIsActives
 		}
 
 		console.log("addition.id_image[1]", addition)
@@ -849,6 +874,7 @@ class Addition extends Component {
 								postUploadFilesImg()
 								postUploadFilesNum()
 								postUploadNegative()
+								postUploadAutograph()
 								// 控制是否通过角色条件分页
 								// getIsBtn(true)
 								let sectiona = []
@@ -879,6 +905,7 @@ class Addition extends Component {
 								person_name: addition.person_name,
 								person_type: "C_PER",
 								person_avatar_url: this.props.fileList || '',
+								person_signature_url: this.props.postUploadAutographs || '',
 								organization: {
 									pk: node.pk,
 									code: node.code,
@@ -916,10 +943,11 @@ class Addition extends Component {
 								postUploadFilesImg()
 								postUploadFilesNum()
 								postUploadNegative()
-								getAutographBtn(false)
-								getImgBtn(false)
-								getImgNumBtn(false)
-								getImgNegative(false)
+								postUploadAutograph()
+								getAutographBtn()
+								getImgBtn()
+								getImgNumBtn()
+								getImgNegative()
 								const codes = Addition.collect(node);
 								let paget = ''
 								const totals = this.props.getTablePages.total
@@ -964,9 +992,9 @@ class Addition extends Component {
 	cancel() {
 		const { actions: { clearAdditionField, getImgBtn, getImgNumBtn, getSwitch, getImgNegative, getAutographBtn } } = this.props;
 		getImgBtn()
-		getImgNumBtn(false)
-		getImgNegative(false)
-		getAutographBtn(false)
+		getImgNumBtn()
+		getImgNegative()
+		getAutographBtn()
 		getSwitch()
 		this.setState({
 			newKey: Math.random(),
