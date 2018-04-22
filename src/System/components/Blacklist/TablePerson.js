@@ -780,7 +780,7 @@ export default class TablePerson extends Component {
 			//groups: [7],
 			groups: groupd,
 			black_remark: record.black_remark,
-			is_active: record.is_active,
+			is_active: true,
 			id_num: record.id_num,
 			is_black: 0,
 			// id_image: [],
