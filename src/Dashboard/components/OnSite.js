@@ -221,13 +221,13 @@ export default class Lmap extends Component {
             storagetype: 0
         }).addTo(this.map)
 
-        this.tileLayer2 = L.tileLayer("http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}", { 
-            opacity:1.0,
-            subdomains: [1, 2, 3], 
-            minZoom: 11, 
-            maxZoom: 21, 
+        this.tileLayer2 = L.tileLayer("http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}", {
+            opacity: 1.0,
+            subdomains: [1, 2, 3],
+            minZoom: 11,
+            maxZoom: 21,
             storagetype: 0,
-            tiletype:"wtms" 
+            tiletype: "wtms"
         }).addTo(this.map);
         // this.tileLayer2 = L.tileLayer('http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&amp;style=&amp;tilematrixset=EPSG%3A4326&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image%2Fpng&amp;TileMatrix=EPSG%3A4326%3A{z}&amp;TileCol={x}&amp;TileRow={y}', {
         //     opacity: 1.0,
@@ -239,14 +239,13 @@ export default class Lmap extends Component {
         // }).addTo(this.map);
 
         // L.tileLayer("http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}", { opacity:1.0,subdomains: [1, 2, 3], minZoom: 11, maxZoom: 21, storagetype: 0,tiletype:"wtms" });
-    
-        // this.map.on( 'click' , function(e) {
-        //     //getThinClass(e.latlng.lng,e.latlng.lat);
-    
-        //    { 
-        //     //    this.getTreeInfo(e.latlng.lng, e.latlng.lat)
-        //     }
-        // });
+        const that=this
+        this.map.on('click', function (e) {
+            //getThinClass(e.latlng.lng,e.latlng.lat);
+            console.log("ssssssssssssssss")
+            that.getTreeInfo(e.latlng.lng, e.latlng.lat,that)
+
+        });
 
 
         //航拍影像
@@ -254,8 +253,11 @@ export default class Lmap extends Component {
         //     L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map)
 
     }
-     getTreeInfo(x,y){
-        var zoom = map.getZoom();
+    getTreeInfo(x, y,that) {
+        var resolutions = [0.703125, 0.3515625, 0.17578125, 0.087890625, 0.0439453125, 0.02197265625, 0.010986328125, 0.0054931640625, 0.00274658203125, 0.001373291015625, 6.866455078125E-4, 3.4332275390625E-4, 1.71661376953125E-4, 8.58306884765625E-5, 4.291534423828125E-5, 2.1457672119140625E-5, 1.0728836059570312E-5, 5.364418029785156E-6, 2.682209014892578E-6, 1.341104507446289E-6, 6.705522537231445E-7, 3.3527612686157227E-7];
+        
+        console.log(x,y,that)
+        var zoom = that.map.getZoom();
         var resolution = resolutions[zoom];
         var col = (x + 180) / (resolution);
         var colp = col % 256;
@@ -263,14 +265,16 @@ export default class Lmap extends Component {
         var row = (90 - y) / (resolution);
         var rowp = row % 256;
         row = Math.floor(row / 256);
-        
-        
-        var url = "http://47.104.107.55:8080/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:" + zoom + "&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=" + col + "&TileRow=" + row + "&I=" + colp + "&J=" + rowp;
 
-        jQuery.get(url, null,function(data){
+
+        var url = "http://47.104.107.55:8080/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:" + zoom + "&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=" + col + "&TileRow=" + row + "&I=" + colp + "&J=" + rowp;
+        console.log("jQuery",jQuery)
+        console.log("$",$)
+        jQuery.getJSON(url, null, function (data) {
+            console.log("222222222222")
             debugger
         });
-}
+    }
 
     genPopUpContent(geo) {
         const { properties = {} } = geo
@@ -370,8 +374,11 @@ export default class Lmap extends Component {
                 this.map.fitBounds(area.getBounds());
 
                 //this.map.panTo(latlng);
+            console.log("area",area)
+            
                 return area
             }
+            console.log("oldMarker",oldMarker)
             return oldMarker
         }
     }
