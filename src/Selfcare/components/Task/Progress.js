@@ -6,9 +6,14 @@ import { getUser } from '_platform/auth';
 import { Link } from 'react-router-dom';
 import {connect} from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
-//综合管理
+//物资管理
 import OverallMaterialDeal from '../TaskDetail/OverallMaterialDeal';
-import OverallFormDeal from '../TaskDetail/OverallFormDeal';
+
+//表单管理
+import OverallDirectorFormDeal from '../TaskDetail/OverallDirectorFormDeal';
+import OverallNormalFormDeal from '../TaskDetail/OverallNormalFormDeal';
+import OverallReviewFormHandle from '../TaskDetail/OverallReviewFormHandle';
+import OverallReviewFormDeal from '../TaskDetail/OverallReviewFormDeal';
 //进度管理
 import ScheduleTotalDeal from '../TaskDetail/ScheduleTotalDeal';
 import ScheduleDayDeal from '../TaskDetail/ScheduleDayDeal';
@@ -65,9 +70,17 @@ export default class Progress extends Component {
 			return (
 				<OverallMaterialDeal {...this.props} {...this.state}/>
 			)
-		}else if (code === WORKFLOW_CODE.表单管理流程 && stateName == '初审' ){
+		}else if (code === WORKFLOW_CODE.普通审查流程 && stateName == '审核' ){
 			return (
-				<SafetySystemHandle {...this.props} {...this.state}/>
+				<OverallNormalFormDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.总监审查流程 && stateName == '审核' ){
+			return (
+				<OverallDirectorFormDeal {...this.props} {...this.state}/>
+			)
+		}else if (code === WORKFLOW_CODE.审查核定流程 && stateName == '初审' ){
+			return (
+				<OverallReviewFormHandle {...this.props} {...this.state}/>
 			)
 		}else if (code === WORKFLOW_CODE.安全体系报批流程 && stateName == '初审' ){
 			return (
@@ -89,9 +102,9 @@ export default class Progress extends Component {
 			return (
 				<QulityCheckDeal {...this.props} {...this.state} />
 			)
-		}else if (code === WORKFLOW_CODE.表单管理流程 &&  stateName == '复审'){
+		}else if (code === WORKFLOW_CODE.审查核定流程 &&  stateName == '复审'){
 			return (
-				<OverallFormDeal {...this.props} {...this.state}/>
+				<OverallReviewFormDeal {...this.props} {...this.state}/>
 			)
 		}else if (code === WORKFLOW_CODE.安全体系报批流程 &&  stateName == '复审'){
 			return (

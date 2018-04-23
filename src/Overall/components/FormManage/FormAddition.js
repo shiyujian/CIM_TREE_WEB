@@ -459,6 +459,7 @@ class FormAddition extends Component {
                     "TreatmentData":JSON.stringify(TreatmentData),
                     "timedate": JSON.stringify(moment().format('YYYY-MM-DD')),
                     "postData": JSON.stringify(postData),
+                    "FillPerson":JSON.stringify(currentUser),
                 }];
 
                 const nextUser = this.member;
