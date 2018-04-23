@@ -153,59 +153,117 @@ export default class Lmap extends Component {
     }
 
     //获取地块树数据
-    loadAreaData() {
-        const { actions: { getTree } } = this.props
+    async loadAreaData() {
+        const { 
+            actions: { 
+                getTree,
+                getTreeNodeList,
+                getLittleBan
+            } 
+        } = this.props
+        console.log('this.props',this.props)
         try {
-            getTree({}, { parent: 'root' }).then(rst => {
-                if (rst instanceof Array && rst.length > 0) {
-                    rst.forEach((item, index) => {
-                        rst[index].children = []
-                    })
-                    getTree({}, { parent: rst[0].No }).then(rst1 => {
-                        if (rst1 instanceof Array && rst1.length > 0) {
-                            rst1.forEach((item, index) => {
-                                rst1[index].children = []
-                            })
-                            getNewTreeData(rst, rst[0].No, rst1)
-                            getTree({}, { parent: rst1[0].No }).then(rst2 => {
-                                if (rst2 instanceof Array && rst2.length > 0) {
-                                    getNewTreeData(rst1, rst1[0].No, rst2)
-                                    this.setState({ treeLists: rst }, () => {
-                                        // this.onSelect([rst2[0].No])
-                                    })
-                                    // getNewTreeData(rst1,rst1[0].No,rst2)
-                                    getTree({}, { parent: rst2[0].No }).then(rst3 => {
-                                        if (rst3 instanceof Array && rst3.length > 0) {
-                                            getNewTreeData(rst2, rst2[0].No, rst3)
-                                            this.setState({ treeLists: rst }, () => {
-                                                // this.onSelect([rst3[0].No])
-                                            })
-                                            for (let i = 0; i <= rst3.length - 1; i++) {
-                                                getTree({}, { parent: rst3[i].No }).then(rst4 => {
-                                                    getNewTreeData(rst3, rst3[i].No, rst4)
-                                                    this.setState({ treeLists: rst })
-                                                    // this.setState({treeLists:rst},() => {
-                                                    //     this.onSelect([rst4[0].No])
-                                                    // })
-                                                })
-                                            }
-                                        } else {
-                                            this.setState({ treeLists: rst })
-                                        }
-                                    })
-                                } else {
-                                    this.setState({ treeLists: rst })
-                                }
-                            })
-                        } else {
-                            this.setState({ treeLists: rst })
-                        }
+
+            let rst = await getTreeNodeList()
+            if (rst instanceof Array && rst.length > 0) {
+                rst.forEach((item, index) => {
+                    rst[index].children = []
+                })
+            }
+            //项目级
+            let projectList = [];
+            //子项目级
+            let unitProjectList = [];
+            if (rst instanceof Array && rst.length > 0) {
+
+                rst.map((node)=>{
+                    if(node.Type === '项目工程'){
+                        projectList.push({
+                            Name:node.Name,
+                            No:node.No
+                        })
+                    }else if(node.Type === '子项目工程') {
+                        unitProjectList.push({
+                            Name:node.Name,
+                            No:node.No,
+                            Parent:node.Parent
+                        })
+                    }
+                })
+
+                for (let i = 0; i<projectList.length; i++){
+                    projectList[i].children = unitProjectList.filter(node => {
+                        return node.Parent === projectList[i].No;
                     })
                 }
+                console.log('projectList',projectList)
+
+            }
+
+            unitProjectList.map( async (section)=>{
+                let list = await getLittleBan({no:section.No})
+                console.log('list',list)
+                let smallClassList = this.getSmallClass(list)
+                smallClassList.map((smallClass)=>{
+                    let thinClassList = this.getThinClass(smallClass,list)
+                    smallClass.children = thinClassList
+                })
+                section.children = smallClassList
+                this.setState({ treeLists: projectList })
             })
+
+            debugger
+            console.log('unitProjectList',unitProjectList)
+
+            
+
+
+
+            
+            // this.setState({ treeLists: projectList })
+                
         } catch (e) {
             console.log(e)
         }
+    }
+
+    getSmallClass(smallClassList){
+        //将小班的code获取到，进行去重
+        let uniqueSmallClass = [];
+        //进行数组去重的数组
+        let array = [];
+        let smallClassSelect = ''
+        smallClassList.map((list)=>{
+            if(list.SmallClass && array.indexOf(list.SmallClass) === -1){
+                let noArr = list.No.split('-')
+                let No = noArr[0] + '-' + noArr[1] +'-' + noArr[2]
+                uniqueSmallClass.push({
+                    Name:list.SmallClassName?list.SmallClassName+'小班':list.SmallClass+'小班',
+                    No:No,
+                });
+                array.push(list.SmallClass)
+            }
+        })
+        
+        console.log('uniqueSmallClass',uniqueSmallClass)
+        return uniqueSmallClass
+    }
+
+    getThinClass(smallClass,list){
+        let thinClassList = []
+        list.map((rst)=>{
+            debugger
+            if(rst.ThinClass && rst.No.indexOf(smallClass.No) != -1 ){
+                let noArr = rst.No.split('-')
+                let No = noArr[0] + '-' + noArr[1] +'-' + noArr[2] + '-' + noArr[3]
+                thinClassList.push({
+                    Name:rst.ThinClassName?rst.ThinClassName+'细班':rst.ThinClass+'细班',
+                    No:No,
+                })
+            }
+        })
+        console.log('thinClassList',thinClassList)
+        return thinClassList
     }
 
     /*初始化地图*/
@@ -460,6 +518,8 @@ export default class Lmap extends Component {
 
     /*弹出信息框*/
     onSelect(keys, featureName) {
+        console.log('keys',keys)
+        console.log('featureName',featureName)
         const { actions: { getTreearea } } = this.props
         const treeNodeName = featureName != null && featureName.selectedNodes.length > 0 ? featureName.selectedNodes[0].props.title : '';
 
@@ -538,6 +598,7 @@ export default class Lmap extends Component {
     render() {
         let height = document.querySelector('html').clientHeight - 80 - 36 - 52
         let treeLists = this.state.treeLists
+        console.log('this.state',this.state)
         return (
             <div className="map-container">
                 <div
