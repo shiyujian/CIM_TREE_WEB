@@ -212,7 +212,7 @@ export default class Lmap extends Component {
                 this.setState({ treeLists: projectList })
             })
 
-            debugger
+            
             console.log('unitProjectList',unitProjectList)
 
             
@@ -251,15 +251,16 @@ export default class Lmap extends Component {
 
     getThinClass(smallClass,list){
         let thinClassList = []
+        let array = [];
         list.map((rst)=>{
-            debugger
-            if(rst.ThinClass && rst.No.indexOf(smallClass.No) != -1 ){
+            if(rst.ThinClass && rst.No.indexOf(smallClass.No) != -1 &&  array.indexOf(rst.ThinClass) === -1){
                 let noArr = rst.No.split('-')
                 let No = noArr[0] + '-' + noArr[1] +'-' + noArr[2] + '-' + noArr[3]
                 thinClassList.push({
                     Name:rst.ThinClassName?rst.ThinClassName+'细班':rst.ThinClass+'细班',
                     No:No,
                 })
+                array.push(list.ThinClass)
             }
         })
         console.log('thinClassList',thinClassList)
