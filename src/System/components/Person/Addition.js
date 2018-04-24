@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { getProjectUnits } from '../../../_platform/auth'
 import { base, STATIC_DOWNLOAD_API, SOURCE_API } from '../../../_platform/api';
 import Tree from 'antd/lib/tree';
+import { tracks } from '../../../Dashboard/components/geojsonFeature';
 let fileTypes = 'application/jpeg,application/gif,application/png,image/jpeg,image/gif,image/png,image/jpg';
 
 window.config = window.config || {};
@@ -24,6 +25,7 @@ class Addition extends Component {
 			newKey: Math.random(),
 			btns: true,
 			btnf: true,
+			checkedBtn:null
 		}
 	}
 
@@ -222,9 +224,6 @@ class Addition extends Component {
 			// this.setState({ progress: parseFloat(percent.toFixed(1)) });
 		}
 	}
-	onChange(checked) {
-		console.log("checked", checked);
-	}
 
 	render() {
 		const { form: {
@@ -255,7 +254,6 @@ class Addition extends Component {
 		}
 		// 上传用户签名
 
-		console.log("addition11111111111",addition)
 		let autographList = []
 		if (addition.relative_signature_url && addition.relative_signature_url != 'http://47.104.160.65:6511') {
 			const avatar_urlName3 = addition.relative_signature_url.split("/").pop()
@@ -276,7 +274,6 @@ class Addition extends Component {
 
 			if (addition.id_image[0].name && addition.id_image[0].filepath) {
 				id_image_urlName = addition.id_image[0].name
-				console.log('addition.id_image[0].filepath', addition.id_image[0].filepath)
 				// filepath: STATIC_DOWNLOAD_API + "/media" + file.file.response.download_url.split('/media')[1]
 				const id_img = addition.id_image[0].filepath.split('/media')[1]
 				const id_imgs = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + id_img
@@ -321,8 +318,6 @@ class Addition extends Component {
 		if (!user.is_superuser) {
 			marginTops = '55px'
 		}
-		console.log("this.props,getImgBtns", this.props.getImgBtns)
-		console.log("fileList", fileList)
 		return (
 			<div>
 				{
@@ -556,7 +551,8 @@ class Addition extends Component {
 													{/* <Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} /> */}
 
 													<Switch checked={addition.id ? (addition.is_black == 0 ? false : true) : false}
-														onChange={changeAdditionField.bind(this, 'is_black')}
+														onChange={this.changeblack.bind(this)}
+														// onChange={changeAdditionField.bind(this, 'is_black')}
 													/>
 
 												</FormItem> : ''}
@@ -667,6 +663,12 @@ class Addition extends Component {
 		getSection(value)
 		changeAdditionField('sections', value)
 	}
+	changeblack(checked){
+		const { actions: { changeAdditionField, getSection } } = this.props;
+		console.log("checked111111111111",checked)
+		this.setState({checkedBtn:checked})
+		changeAdditionField('is_black', checked)
+	}
 	//将选择的苗圃传入redux
 	changeNursery(value) {
 		const { actions: { changeAdditionField }, tags = [] } = this.props;
@@ -763,18 +765,30 @@ class Addition extends Component {
 		}
 		let blacksa
 		let actives
-		if (addition.is_black == true) {
-			addition.is_active = false
-			actives = false
-			blacksa = 1
+		if(this.state.checkedBtn==true){
+			if (addition.is_black == true) {
+				addition.is_active = false
+				actives = false
+				blacksa = 1
+			}
+		}else if(this.state.checkedBtn==false){
+			if (addition.is_black == false) {
+				addition.is_active = true
+				actives = true
+				blacksa = 0	
+			}
+		}else{
+			if(addition.is_black == true){
+				blacksa = 1
+				actives = this.props.getIsActives
+			}
+			if (addition.is_black == false) {
+				blacksa = 0	
+				actives = this.props.getIsActives
+			}
+			
 		}
-		if (addition.is_black == false) {
-			blacksa = 0
-			addition.is_active = this.props.getIsActives
-			actives = this.props.getIsActives
-		}
-
-		console.log("addition.id_image[1]", addition)
+		console.log('111111111111',actives,blacksa)
 		let UploadFilesNums
 		let UploadNegatives
 		let imgBtnZ = true
@@ -809,8 +823,6 @@ class Addition extends Component {
 		}
 
 
-		console.log("111111", UploadFilesNums)
-		console.log("2222222", UploadNegatives)
 		addition.id_image = [UploadFilesNums, UploadNegatives]
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
@@ -882,6 +894,7 @@ class Addition extends Component {
 								clearAdditionField();
 								this.setState({
 									newKey: Math.random(),
+									checkedBtn:null,
 								})
 
 							} else {
@@ -972,7 +985,8 @@ class Addition extends Component {
 
 								});
 								this.setState({
-									newKey: Math.random()
+									newKey: Math.random(),
+									checkedBtn:null
 								})
 							} else {
 								if (rst.code == 2) {
@@ -998,6 +1012,7 @@ class Addition extends Component {
 		getSwitch()
 		this.setState({
 			newKey: Math.random(),
+			checkedBtn:null
 		})
 		clearAdditionField();
 	}

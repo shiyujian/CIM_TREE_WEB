@@ -47,8 +47,8 @@ class Addition extends Component {
 					<Button type='primary' onClick={this.see.bind(this)} >查看黑名单</Button>
 					<Button type='primary' style={{ marginLeft: '5px' }} onClick={this.add.bind(this)}>新增苗圃</Button>
 				</div>
-				<Modal title="新增苗圃"
-					width={920} visible={seeVisible}
+				<Modal title="查看黑名单"
+					width='80%' visible={seeVisible}
 					onOk={this.save1.bind(this)}
 					//    key={this.state.newKey}
 					onCancel={this.cancel1.bind(this)}>
