@@ -49,7 +49,7 @@ export default class FormManage extends Component {
 
     onSelect(value = [],data) {
         const [code] = value;
-        const {actions:{getdocument,setcurrentcode,setkeycode}} =this.props;
+        const {actions:{setkeycode}} =this.props;
         console.log('value',value)
         console.log('data',data)
         setkeycode(code); 
@@ -72,8 +72,7 @@ export default class FormManage extends Component {
             selectedDir
         })
 
-        setcurrentcode({code:code.split("--")[1]});
-        getdocument({code:code.split("--")[1]});
+        // getdocument({code:code.split("--")[1]});
     }
     render() {
         const {

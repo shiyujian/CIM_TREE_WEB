@@ -8,11 +8,17 @@ import { getNextStates } from '../../../_platform/components/Progress/util';
 //综合管理模块 物资管理
 import OverallGeneralDetail from '../TaskDetail/OverallGeneralDetail';
 import OverallResourceDetail from '../TaskDetail/OverallResourceDetail';
+
 import OverallGeneralRefill from '../TaskDetail/OverallGeneralRefill';
 import OverallResourceRefill from '../TaskDetail/OverallResourceRefill';
 //综合管理模块 表单管理
-import OverallFormDetail from '../TaskDetail/OverallFormDetail';
-import OverallFormRefill from '../TaskDetail/OverallFormRefill';
+import OverallNormalFormDetail from '../TaskDetail/OverallNormalFormDetail';
+import OverallReviewFormDetail from '../TaskDetail/OverallReviewFormDetail';
+import OverallDirectorFormDetail from '../TaskDetail/OverallDirectorFormDetail';
+
+import OverallNormalFormRefill from '../TaskDetail/OverallNormalFormRefill';
+import OverallReviewFormRefill from '../TaskDetail/OverallReviewFormRefill';
+import OverallDirectorFormRefill from '../TaskDetail/OverallDirectorFormRefill';
 //进度管理模块
 import ScheduleTotalDetail from '../TaskDetail/ScheduleTotalDetail';
 import ScheduleTotalRefill from '../TaskDetail/ScheduleTotalRefill';
@@ -66,9 +72,17 @@ export default class Detail extends Component {
 				return (
 					<OverallResourceDetail {...this.props} {...this.state}/>
 				)
-			}else if (code === WORKFLOW_CODE.表单管理流程 && (name == '初审' || name == '复审' || name == '结束')){
+			}else if (code === WORKFLOW_CODE.普通审查流程 && (name == '审核' || name == '结束')){
 				return (
-					<OverallFormDetail {...this.props} {...this.state}/>
+					<OverallNormalFormDetail {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.审查核定流程 && (name == '初审' || name == '复审' || name == '结束')){
+				return (
+					<OverallReviewFormDetail {...this.props} {...this.state}/>
+				)
+			}else if (code === WORKFLOW_CODE.总监审查流程 && (name == '审核'|| name == '结束')){
+				return (
+					<OverallDirectorFormDetail {...this.props} {...this.state}/>
 				)
 			}else if (code === WORKFLOW_CODE.安全体系报批流程 && (name == '初审' || name == '复审' || name == '结束')){
 				return (
@@ -106,9 +120,17 @@ export default class Detail extends Component {
 				return (
 					<QulityCheckRefill {...this.props} {...this.state} />
 				)
-			}else if(code === WORKFLOW_CODE.表单管理流程 && name === '填报'){
+			}else if(code === WORKFLOW_CODE.普通审查流程 && name === '填报'){
 				return (
-					<OverallFormRefill {...this.props} {...this.state} />
+					<OverallNormalFormRefill {...this.props} {...this.state} />
+				)
+			}else if(code === WORKFLOW_CODE.审查核定流程 && name === '填报'){
+				return (
+					<OverallReviewFormRefill {...this.props} {...this.state} />
+				)
+			}else if(code === WORKFLOW_CODE.总监审查流程 && name === '填报'){
+				return (
+					<OverallDirectorFormRefill {...this.props} {...this.state} />
 				)
 			}else if(code === WORKFLOW_CODE.安全体系报批流程 && name === '填报'){
 				return (

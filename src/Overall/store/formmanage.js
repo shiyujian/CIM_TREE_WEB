@@ -16,12 +16,12 @@ export const getWorkflowByIdOK = createAction('获取流程详情');
 export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
 //获取选中树节点信息
 export const getSelectedNodeInfo = createAction(`${ID}_获取选中树节点信息`);
-const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
 export const getTreeOK = createAction(`${ID}_目录树`);
 export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=3`, [getTreeOK]);
 
-export const getTaskSchedule = createFetchAction(`${WORKFLOW_API}/participant-task/?code={{code}}`);
+export const getWorkflowsOK = createAction('获取表单管理流程的全部流程实例');
+export const getWorkflows = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[getWorkflowsOK],'GET');
 
 const getPublicUnitList = createFetchAction(`${base}/service/construction/api/org-tree/?depth=4`, [],'GET');
 export const actions = {
@@ -33,9 +33,9 @@ export const actions = {
     getWorkflowByIdOK,
     getWorkflowById,
     getSelectedNodeInfo,
-    setcurrentcode,
     setkeycode,
-    getTaskSchedule,
+    getWorkflowsOK,
+    getWorkflows,
     getPublicUnitList,
     getTreeOK,
     getTree
@@ -70,12 +70,12 @@ export default handleActions({
         ...state,
         Doc: payload.result
     }),
-    [setcurrentcode]: (state, {payload}) => ({
-        ...state,
-        currentcode: payload
-    }),
     [setkeycode]: (state, {payload}) => ({
 	    ...state,
 	    keycode: payload
+    }),
+    [getWorkflowsOK]: (state, {payload}) => ({
+	    ...state,
+	    formWorkflow: payload
     }),
 },{});

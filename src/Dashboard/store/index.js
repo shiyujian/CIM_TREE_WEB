@@ -21,8 +21,13 @@ export const getUserOrgInfo = createFetchAction(`${SERVICE_API}/persons/code/{{C
 export const getOrgs = createFetchAction(`${SERVICE_API}/org-tree/`,[]);
 export const getOrgsByCode = createFetchAction(`${SERVICE_API}/org-tree/code/{{CODE}}/`,[]);
 export const getRiskProcess = createFetchAction(`${WORKFLOW_API}/instance/`,[]);//获取隐患处理工单
+
+
+export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
+export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //    
 export const getRiskProcessDetail = createFetchAction(`${WORKFLOW_API}/instance/{{ID}}`,[]);//获取隐患工单详情
 export const getRiskContactSheet = createFetchAction(`${base}/main/api/potential-risk/{{ID}}/contact-sheet/`,[]);
+
 export const getCameraTree = createFetchAction(`${SERVICE_API}/project-tree/?depth=3`, []);
 
 // 获取设计图纸信息流程
@@ -84,6 +89,8 @@ export const actions = {
 	getChildrenOrgTree,
 	fetchDefectDataByLoc,
 	getVideo360List,
+	getTreeNodeList,
+	getLittleBan,
 	
 	getMapRouter,
 	getMapList

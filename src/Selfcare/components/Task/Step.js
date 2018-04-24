@@ -56,7 +56,15 @@ export default class TaskStep extends Component {
 				return (
 					null
 				)
-			}else if (code === WORKFLOW_CODE.表单管理流程 && name == '填报'){
+			}else if (code === WORKFLOW_CODE.普通审查流程 && name == '填报'){
+				return (
+					null
+				)
+			}else if (code === WORKFLOW_CODE.审查核定流程 && name == '填报'){
+				return (
+					null
+				)
+			}else if (code === WORKFLOW_CODE.总监审查流程 && name == '填报'){
 				return (
 					null
 				)
