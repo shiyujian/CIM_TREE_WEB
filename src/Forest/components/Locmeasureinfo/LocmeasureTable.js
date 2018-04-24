@@ -583,18 +583,29 @@ export default class LocmeasureTable extends Component {
 						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
 					}
 	    			tblData[i].place = place;
-	    			let statusname = '';
-					if(plan.Status == -1)
+					let statusname = '';
+					
+					// if(plan.Status == -1)
+					// 	statusname = "未抽查"
+					// else if(plan.Status == 0) 
+					// 	statusname = "监理抽查通过"
+					// else if(plan.Status === 1){
+					// 	statusname = "监理抽查退回"
+					// }else if(plan.Status === 2){
+					// 	statusname = "业主抽查退回"
+					// }else if(plan.Status === 3){
+					// 	statusname = '业主抽查通过'
+					// }
+					
+
+					if(plan.SupervisorCheck == -1)
 						statusname = "未抽查"
-					else if(plan.Status == 0) 
-						statusname = "监理抽查通过"
-					else if(plan.Status === 1){
-						statusname = "监理抽查退回"
-					}else if(plan.Status === 2){
-						statusname = "业主抽查退回"
-					}else if(plan.Status === 3){
-						statusname = '业主抽查通过'
+					else if(plan.SupervisorCheck == 0) 
+						statusname = "抽查未通过"
+					else if(plan.SupervisorCheck === 1){
+						statusname = "抽查通过"
 					}
+
 					tblData[i].statusname = statusname;
 					let islocation = plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].islocation = islocation;
