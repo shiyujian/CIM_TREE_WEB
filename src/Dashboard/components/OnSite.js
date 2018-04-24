@@ -329,16 +329,15 @@ class Lmap extends Component {
         var rowp = row % 256;
         row = Math.floor(row / 256);
         var url = window.config.DASHBOARD_ONSITE+"/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:" + zoom + "&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=" + col + "&TileRow=" + row + "&I=" + colp + "&J=" + rowp;
-
         jQuery.getJSON(url, null, function (data) {
-            if(data.features){
+            if(data.features&&data.features.length){
                 let dimensionalsArr = [
                     {
                         coordinatesX: data.features[0].geometry.coordinates[0],
                         coordinatesY: data.features[0].geometry.coordinates[1],
                         CreateTime: data.features[0].properties.CreateTime,
                         H: data.features[0].properties.H,
-                        IsCheck: dimdataensionals.features[0].properties.IsCheck,
+                        IsCheck: data.features[0].properties.IsCheck,
                         No: data.features[0].properties.No,
                         SNNo: data.features[0].properties.SNNo,
                         SXM: data.features[0].properties.SXM,
@@ -346,11 +345,11 @@ class Lmap extends Component {
                         TreeType: data.features[0].properties.TreeType,
                     }
                 ]
-                this.setState({ seeVisible: true, dimensional: dimensionalsArr })
-                if(this.state.markers){
-                    this.state.markers.remove();
+                that.setState({ seeVisible: true, dimensional: dimensionalsArr })
+                if(that.state.markers){
+                    that.state.markers.remove();
                 }
-                this.createMarkers(data.features[0].geometry.coordinates)
+                that.createMarkers(data.features[0].geometry.coordinates)
             }
         }); 
     }
@@ -407,9 +406,9 @@ class Lmap extends Component {
         if (!geo[0] || !geo[1]) {
             return
         }
-        let iconType = L.divIcon({ className: this.getIconType('danger') })
+        let iconType = L.divIcon({ className: this.getIconType('tree') })
         console.log("iconType", iconType)
-        let marker = L.marker(geo, {
+        let marker = L.marker([geo[1],geo[0]], {
             icon: iconType,
         })
         marker.addTo(this.map)
@@ -512,9 +511,12 @@ class Lmap extends Component {
                 break
             case 'monitor':
                 return 'videoIcon'
+            case 'tree':
+                return 'treeIcon'
                 break
             default:
                 break
+                
         }
     }
 
