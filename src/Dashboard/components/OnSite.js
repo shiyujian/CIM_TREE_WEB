@@ -259,14 +259,28 @@ class Lmap extends Component {
         let thinClassList = []
         let array = [];
         list.map((rst)=>{
-            if(rst.ThinClass && rst.No.indexOf(smallClass.No) != -1 &&  array.indexOf(rst.ThinClass) === -1){
+            // if(rst.ThinClass && rst.No.indexOf(smallClass.No) != -1 &&  array.indexOf(rst.ThinClass) === -1){
+            //     let noArr = rst.No.split('-')
+            //     let No = noArr[0] + '-' + noArr[1] +'-' + noArr[2] + '-' + noArr[3]
+            //     thinClassList.push({
+            //         Name:rst.ThinClassName?rst.ThinClassName+'细班':rst.ThinClass+'细班',
+            //         No:No,
+            //     })
+            //     array.push(list.ThinClass)
+            // }
+
+            //暂时去掉重复的节点
+            if(rst.ThinClass && rst.No.indexOf(smallClass.No) != -1){
                 let noArr = rst.No.split('-')
                 let No = noArr[0] + '-' + noArr[1] +'-' + noArr[2] + '-' + noArr[3]
-                thinClassList.push({
-                    Name:rst.ThinClassName?rst.ThinClassName+'细班':rst.ThinClass+'细班',
-                    No:No,
-                })
-                array.push(list.ThinClass)
+                if(array.indexOf(No) === -1){
+                    thinClassList.push({
+                        Name:rst.ThinClassName?rst.ThinClassName+'细班':rst.ThinClass+'细班',
+                        No:No,
+                    })
+                    array.push(No)
+                }
+                
             }
         })
         console.log('thinClassList',thinClassList)
