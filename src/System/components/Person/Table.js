@@ -72,44 +72,6 @@ export default class Users extends Component {
 		}
 	}
 
-	// search() {
-	// 	const { actions: { setUpdate } } = this.props;
-	// 	let text = document.getElementById("NurseryData").value;
-	// 	let searchList = []
-	// 	const { platform: { users = [] } } = this.props;
-	// 	users.map((item) => {
-	// 		let isName = false;
-	// 		let isRoles = false;
-	// 		if (!text) {
-	// 			isName = true
-	// 		}
-	// 		else {
-	// 			if (text && item.username.indexOf(text) > -1) {
-	// 				isName = true
-	// 			}
-	// 		}
-
-	// 		if (this.state.roles.length == 0) {
-	// 			isRoles = true
-	// 		} else {
-	// 			if (this.state.roles.sort().join(',') == item.groups.map(i => {
-	// 				return String(i.id)
-	// 			}).sort().join(',')) {
-	// 				isRoles = true
-	// 			}
-	// 		}
-
-	// 		if (isName && isRoles) {
-	// 			searchList.push(item)
-	// 		}
-	// 	})
-	// 	setUpdate(false);
-	// 	this.setState({
-	// 		searchList: searchList,
-	// 	})
-
-	// }
-
 	search() {
 		let text = document.getElementById("NurseryData").value;
 		const {
@@ -117,9 +79,6 @@ export default class Users extends Component {
 		} = this.props;
 		if (text || this.state.roles && this.state.roles.length > 0) {
 			this.setState({ loading: true });
-			// 如果查询输入框里面的内容没有改变就不执行
-			// if(text!=this.state.fristText || this.state.fristRoles!=this.state.roles){
-
 			getUsers({}, { org_code: this.props.getTreeCodes, "keyword": text, roles: this.state.roles, page: 1 }).then(items => {
 				console.log("items111111", items)
 				let pagination = {
@@ -129,13 +88,8 @@ export default class Users extends Component {
 				getTablePage(pagination)
 				this.setState({ btn: true, fristText: text, fristRoles: this.state.roles, isBtn: false, loading: false })
 				getIsBtn(false)
-
 			})
-			// }
-
 		} else {
-			// if(this.state.btn){
-			// this.setState({ loading: true });
 			getUsers({}, { org_code: this.props.getTreeCodes, page: this.state.objPages || 1 }).then((e) => {
 				let pagination = {
 					current: this.state.objPages || 1,
@@ -144,9 +98,7 @@ export default class Users extends Component {
 				getTablePage(pagination)
 				this.setState({ btn: false, fristText: '', fristRoles: [], isBtn: true })
 				getIsBtn(true)
-
 			});
-			// }
 		}
 	}
 
@@ -227,10 +179,6 @@ export default class Users extends Component {
 			title: '姓名',
 			dataIndex: 'person_name',
 		}
-			// , {
-			// 	title: '编码',
-			// 	dataIndex: 'person_code',
-			// }
 			,
 		{
 			title: '用户名',
@@ -318,52 +266,30 @@ export default class Users extends Component {
 					if (user.is_active == true) {
 						add = '禁用'
 						acc = ''
-						// return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-						// <Popconfirm title="是否真的要删除用户?" key={2}
-						// 	onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-						// 	<a>删除</a>
-						// </Popconfirm>,
-						// <a style={{ marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>禁用</a>,
-						// <a style={{ marginLeft: '.5em' }} >加入黑名单</a>
-						// ]
 					} else {
 						add = '启用'
 						acc = 'red'
-						// return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
-						// <Popconfirm title="是否真的要删除用户?" key={2}
-						// 	onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
-						// 	<a>删除</a>
-						// </Popconfirm>,
-						// <a style={{ color: 'red', marginLeft: '.5em' }} onClick={this.disable.bind(this, user)}>启用</a>,
-						// <a style={{ marginLeft: '.5em' }} >取消黑名单</a>						
-						// ]
 					}
-					if(user.is_black== 1){
-						att = 'red'
-						 aee = '取消黑名单'										
-					}else if(user.is_black== 0){
-						 aee = '加入黑名单'	
-						 att=''									
-					}
+					// if(user.is_black== 1){
+					// 	att = 'red'
+					// 	 aee = '取消黑名单'										
+					// }else if(user.is_black== 0){
+					// 	 aee = '加入黑名单'	
+					// 	 att=''									
+					// }
 					return [<a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>,
 					<Popconfirm title="是否真的要删除用户?" key={2}
 						onConfirm={this.del.bind(this, user)} okText="是" cancelText="否">
 						<a>删除</a>
 					</Popconfirm>,
 					<a style={{ marginLeft: '.5em', color: acc }} onClick={this.disable.bind(this, user)}>{add}</a>,
-					<a style={{ marginLeft: '.5em', color: att  }} onClick={this.black.bind(this, user)} >{aee}</a>
+						// <a style={{ marginLeft: '.5em', color: att  }} onClick={this.black.bind(this, user)} >{aee}</a>
 					]
 				} else {
 					return <a onClick={this.edit.bind(this, user)} key={1} style={{ marginRight: '.5em' }}>编辑</a>
 				}
 			}
 		}];
-		// let dataSource = [];
-		// if (isUpdate) {
-		// 	dataSource = users
-		// } else {
-		// 	dataSource = searchList
-		// }
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 
 		let is_active = false
@@ -629,9 +555,9 @@ export default class Users extends Component {
 						//groups: [7],
 						groups: [1],
 						is_active: true,
-						id_num:'',
-						is_black:0,
-						id_image:[],
+						id_num: '',
+						is_black: 0,
+						id_image: [],
 						basic_params: {
 							info: {
 								'电话': element.person_telephone || '',
@@ -724,7 +650,7 @@ export default class Users extends Component {
 			});
 		}
 	}
-	black(user, event){
+	black(user, event) {
 		const {
 			addition = {}, sidebar: { node } = {},
 			actions: { putUser }
@@ -750,7 +676,7 @@ export default class Users extends Component {
 		// 	user.is_active = true
 		// 	actives = true
 		// }
-		
+
 		let groupe = []
 		for (let j = 0; j < user.groups.length; j++) {
 			const element = user.groups[j];
@@ -765,9 +691,9 @@ export default class Users extends Component {
 			account: {
 				person_name: user.person_name,
 				person_type: "C_PER",
-				person_avatar_url:user.person_avatar_url || '',
+				person_avatar_url: user.person_avatar_url || '',
 				person_signature_url: user.person_signature_url || '',
-				
+
 				organization: {
 					pk: node.pk,
 					code: user.org_code,
@@ -781,10 +707,10 @@ export default class Users extends Component {
 			//groups: [7],
 			groups: groupe,
 			is_active: actives,
-			black_remark:user.black_remark,
-			id_num:user.id_num,
-			is_black:blacks,
-			id_image:user.id_image,
+			black_remark: user.black_remark,
+			id_num: user.id_num,
+			is_black: blacks,
+			id_image: user.id_image,
 			basic_params: {
 				info: {
 					'电话': user.person_telephone || '',
@@ -824,8 +750,14 @@ export default class Users extends Component {
 			const element = user.groups[j];
 			groupe.push(element.id)
 		}
-		console.log("is_actives0", actives)
-		console.log("groupe", groupe, user)
+		let userblack
+		if (user.is_black == true) {
+			userblack = 1
+		} else if (user.is_black == false) {
+			userblack = 0
+		} else {
+			userblack = user.is_black
+		}
 		putUser({}, {
 			id: user.id,
 			username: user.username,
@@ -834,7 +766,7 @@ export default class Users extends Component {
 			account: {
 				person_name: user.person_name,
 				person_type: "C_PER",
-				person_avatar_url:user.person_avatar_url || '',
+				person_avatar_url: user.person_avatar_url || '',
 				person_signature_url: user.person_signature_url || '',
 				organization: {
 					pk: node.pk,
@@ -849,10 +781,10 @@ export default class Users extends Component {
 			//groups: [7],
 			groups: groupe,
 			is_active: actives,
-			black_remark:user.black_remark,			
-			id_num:user.id_num,
-			is_black:user.is_black,
-			id_image:user.id_image,
+			black_remark: user.black_remark,
+			id_num: user.id_num,
+			is_black: userblack,
+			id_image: user.id_image,
 			basic_params: {
 				info: {
 					'电话': user.person_telephone || '',
@@ -876,17 +808,17 @@ export default class Users extends Component {
 	}
 
 	edit(user, event) {
-		console.log("user",user)
-		
+		console.log("user", user)
+
 		event.preventDefault();
 		const account = user.account;
 		const groups = user.groups || [];
 		const {
 			sidebar: { node } = {},
-			actions: { resetAdditionField,getIsActive ,getSwitch}
+			actions: { resetAdditionField, getIsActive, getSwitch }
 		} = this.props;
 		getIsActive(user.is_active)
-		
+
 		// if (node.children && node.children.length > 0) {
 		// 	message.warn('请选择最下级组织结构目录');
 
@@ -896,7 +828,7 @@ export default class Users extends Component {
 
 		// }
 		getSwitch(user.is_black)
-		console.log("11111111111111",user.is_black)
+		console.log("11111111111111", user.is_black)
 		resetAdditionField({
 			visible: true,
 			roles: groups.map(group => String(group.id)),

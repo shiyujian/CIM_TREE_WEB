@@ -39,7 +39,8 @@ window.config = {
 	//静态文件存储服务访问用户和密码
 	'STATIC_FILE_USER':'bimxan',
 	'STATIC_FILE_PASSWORD':'ecidibim',
-
+	// 二维展示获取树木详情端口
+	'DASHBOARD_ONSITE':'http://47.104.107.55:8080',
 	//现场收发文接口的端口
 	'DOC_EXCHANGE_URL': 'http://47.104.160.65:6545',
 	//现场收发文接口验证用的用户名和密码

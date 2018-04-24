@@ -50,7 +50,11 @@ const getVideo360List = createFetchAction(`${SERVICE_API}/metalist/video360list/
 const getMapRouter = createFetchAction(`${FOREST_API}/tree/patrolroutes`, []);
 //获取轨迹列表
 const getMapList = createFetchAction(`${FOREST_API}/tree/patrolpositions?routeid={{routeID}}`, []);
+//存储二维展示点击后弹框数据
+export const getDimensional = createAction(`ssfirst_getDimensional`);
+
 export const actions = {
+	getDimensional,
 	getTreeOK,
 	getTree,
 	getTreearea,
@@ -85,6 +89,12 @@ export const actions = {
 	getMapList
 };
 export default handleActions({
+	[getDimensional]: (state, {payload}) => {
+		return {
+			...state,
+			dimensionalData: [payload]
+		}
+	},
 	[getTreeOK]: (state, {payload}) => {
 		return {
 			...state,

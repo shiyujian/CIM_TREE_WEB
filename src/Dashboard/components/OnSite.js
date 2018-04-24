@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { actions } from '../store'
-import { Button, Modal, Spin, message, Collapse, Checkbox } from 'antd'
+import { Button, Modal, Spin, message, Collapse, Checkbox, Form, Input } from 'antd'
 import { Icon } from 'react-fa';
-import { panorama_360 } from './geojsonFeature'
+import { panorama_360, tracks } from './geojsonFeature'
 import {
     PDF_FILE_API,
     previewWord_API,
@@ -24,6 +24,7 @@ import { wrapperMapUser } from './util'
 import DGN from '_platform/components/panels/DGN'
 import DGNProjectInfo from './DGNProjectInfo'
 import PkCodeTree from './PkCodeTree'
+const FormItem = Form.Item;
 
 const Panel = Collapse.Panel
 const $ = window.$
@@ -38,7 +39,8 @@ let model_name = window.config.dgn_model_name
         actions: bindActionCreators(actions, dispatch),
     }),
 )
-export default class Lmap extends Component {
+class Lmap extends Component {
+    // export default class Lmap extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -50,6 +52,10 @@ export default class Lmap extends Component {
             isNotDisplay: {
                 display: '',
             },
+            seeVisible: false,
+            dimensional: {},
+            nums: 0,
+            markers: null,
             // leafletCenter: [22.516818, 113.868495],
             leafletCenter: [38.92, 115.98], // 雄安
             toggle: true,
@@ -221,7 +227,7 @@ export default class Lmap extends Component {
             storagetype: 0
         }).addTo(this.map)
 
-        this.tileLayer2 = L.tileLayer("http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}", {
+        this.tileLayer2 = L.tileLayer(window.config.DASHBOARD_ONSITE+"/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}", {
             opacity: 1.0,
             subdomains: [1, 2, 3],
             minZoom: 11,
@@ -239,24 +245,22 @@ export default class Lmap extends Component {
         // }).addTo(this.map);
 
         // L.tileLayer("http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}", { opacity:1.0,subdomains: [1, 2, 3], minZoom: 11, maxZoom: 21, storagetype: 0,tiletype:"wtms" });
-        const that=this
+        const that = this
         this.map.on('click', function (e) {
             //getThinClass(e.latlng.lng,e.latlng.lat);
-            console.log("ssssssssssssssss")
-            that.getTreeInfo(e.latlng.lng, e.latlng.lat,that)
+            that.getTreeInfo(e.latlng.lng, e.latlng.lat, that)
 
         });
-
-
         //航拍影像
         // if (CUS_TILEMAP)
         //     L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map)
 
     }
-    getTreeInfo(x, y,that) {
+    getTreeInfo(x, y, that) {
+        const { actions: { getDimensional } } = this.props
         var resolutions = [0.703125, 0.3515625, 0.17578125, 0.087890625, 0.0439453125, 0.02197265625, 0.010986328125, 0.0054931640625, 0.00274658203125, 0.001373291015625, 6.866455078125E-4, 3.4332275390625E-4, 1.71661376953125E-4, 8.58306884765625E-5, 4.291534423828125E-5, 2.1457672119140625E-5, 1.0728836059570312E-5, 5.364418029785156E-6, 2.682209014892578E-6, 1.341104507446289E-6, 6.705522537231445E-7, 3.3527612686157227E-7];
-        
-        console.log(x,y,that)
+
+        console.log(x, y, that)
         var zoom = that.map.getZoom();
         var resolution = resolutions[zoom];
         var col = (x + 180) / (resolution);
@@ -265,15 +269,31 @@ export default class Lmap extends Component {
         var row = (90 - y) / (resolution);
         var rowp = row % 256;
         row = Math.floor(row / 256);
+        var url = window.config.DASHBOARD_ONSITE+"/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:" + zoom + "&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=" + col + "&TileRow=" + row + "&I=" + colp + "&J=" + rowp;
 
-
-        var url = "http://47.104.107.55:8080/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:" + zoom + "&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=" + col + "&TileRow=" + row + "&I=" + colp + "&J=" + rowp;
-        console.log("jQuery",jQuery)
-        console.log("$",$)
         jQuery.getJSON(url, null, function (data) {
-            console.log("222222222222")
-            debugger
-        });
+            if(data.features){
+                let dimensionalsArr = [
+                    {
+                        coordinatesX: data.features[0].geometry.coordinates[0],
+                        coordinatesY: data.features[0].geometry.coordinates[1],
+                        CreateTime: data.features[0].properties.CreateTime,
+                        H: data.features[0].properties.H,
+                        IsCheck: dimdataensionals.features[0].properties.IsCheck,
+                        No: data.features[0].properties.No,
+                        SNNo: data.features[0].properties.SNNo,
+                        SXM: data.features[0].properties.SXM,
+                        Section: data.features[0].properties.Section,
+                        TreeType: data.features[0].properties.TreeType,
+                    }
+                ]
+                this.setState({ seeVisible: true, dimensional: dimensionalsArr })
+                if(this.state.markers){
+                    this.state.markers.remove();
+                }
+                this.createMarkers(data.features[0].geometry.coordinates)
+            }
+        }); 
     }
 
     genPopUpContent(geo) {
@@ -322,11 +342,26 @@ export default class Lmap extends Component {
             }
         }
     }
+    /*在地图上添加marker和polygan*/
+    createMarkers(geo) {
+        var me = this
+        if (!geo[0] || !geo[1]) {
+            return
+        }
+        let iconType = L.divIcon({ className: this.getIconType('danger') })
+        console.log("iconType", iconType)
+        let marker = L.marker(geo, {
+            icon: iconType,
+        })
+        marker.addTo(this.map)
+        this.setState({markers:marker})
+        return marker
 
+    }
     /*在地图上添加marker和polygan*/
     createMarker(geo, oldMarker) {
-        // console.log('geo',geo)
-        // console.log('oldMarker',oldMarker)
+        // console.log('geo', geo)
+        // console.log('oldMarker', oldMarker)
         // console.log('L.geoJSON',L.geoJson)
         var me = this
         if (geo.properties.type != 'area') {
@@ -374,11 +409,11 @@ export default class Lmap extends Component {
                 this.map.fitBounds(area.getBounds());
 
                 //this.map.panTo(latlng);
-            console.log("area",area)
-            
+                console.log("area", area)
+
                 return area
             }
-            console.log("oldMarker",oldMarker)
+            console.log("oldMarker", oldMarker)
             return oldMarker
         }
     }
@@ -455,6 +490,11 @@ export default class Lmap extends Component {
     toggleIcon() {
         this.setState({
             toggle: !this.state.toggle,
+        })
+    }
+    toggleIcon1() {
+        this.setState({
+            seeVisible: !this.state.seeVisible,
         })
     }
 
@@ -614,7 +654,7 @@ export default class Lmap extends Component {
                     ) : (
                             ''
                         )}
-                    <div style={this.state.isNotThree == true ? {} : { display: 'none' }}>
+                    {/* <div style={this.state.isNotThree == true ? {} : { display: 'none' }}>
                         <div
                             className="iconList"
                             style={this.state.toggle ? { width: '100px' } : { width: '0' }}
@@ -634,6 +674,67 @@ export default class Lmap extends Component {
                                     )
                                 }
                             })}
+                        </div>
+                    </div> */}
+                    <div style={this.state.isNotThree == true ? {} : { display: 'none' }}>
+                        <div
+                            className="iconList"
+                            style={this.state.seeVisible ? { width: '200px' } : { width: '0' }}
+                        >
+                            {
+                                this.state.seeVisible ? <span
+                                    className="imageControll"
+                                    onClick={this.toggleIcon1.bind(this)}
+                                    style={{ width: '26px', height: '30px', background: 'white', textAlgin: 'center', lineHeight: '30px', display: 'block' }}
+                                >收回</span> : <span
+                                    className="imageControll"
+                                    onClick={this.toggleIcon1.bind(this)}
+                                    style={{ width: '26px', height: '30px', background: 'white', textAlgin: 'center', lineHeight: '30px', display: 'block' }}
+                                >展开</span>
+                            }
+                            {[
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'经度'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].coordinatesX : ''}</p>
+                                </div>,
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'纬度'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].coordinatesY : ''}</p>
+                                </div>,
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].CreateTime : ''}</p>
+                                </div>,
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].H : ''}</p>
+                                </div>,
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].IsCheck : ''}</p>
+                                </div>,
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].No : ''}</p>
+                                </div>,
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].SNNo : ''}</p>
+                                </div>,
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].SXM : ''}</p>
+                                </div>,
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].Section : ''}</p>
+                                </div>,
+                                <div className="imgIcon">
+                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].TreeType : ''}</p>
+                                </div>
+                            ]
+                            }
                         </div>
                     </div>
                     {this.state.isShowTrack ? (
@@ -692,8 +793,12 @@ export default class Lmap extends Component {
         let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5']
         return colors[index % 5]
     }
+    static layout = {
+        labelCol: { span: 6 },
+        wrapperCol: { span: 16 },
+    };
 }
-
+export default Form.create()(Lmap)
 // getNewTreeData(rst3,rst3[i].No,rst4);
 function getNewTreeData(treeData, curKey, child) {
     const loop = data => {
