@@ -124,6 +124,15 @@ export default class SeedlingsChange extends Component {
 			},{
 				title:"苗龄",
 				dataIndex: 'Age',
+				render: (text,record) => {
+					if(record.Age !=0){
+						return <span>{text}</span>
+					}else{
+						return <span>0</span>
+					}
+					
+				}
+				
 			},{
 				title:"产地",
 				dataIndex: 'TreePlace',
