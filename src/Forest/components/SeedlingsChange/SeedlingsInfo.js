@@ -218,8 +218,8 @@ export default class SeedlingsChange extends Component {
 				render: (text,record) => {
 					return <div>
 								<a onClick={this.remark.bind(this,record)}>备注</a>
-								<span className="ant-divider" />
-								<a onClick={this.change.bind(this,record)}>修改</a>
+								{/* <span className="ant-divider" />
+								<a onClick={this.change.bind(this,record)}>修改</a> */}
 							</div>
 				}
 			}
