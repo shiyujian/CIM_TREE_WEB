@@ -66,6 +66,11 @@ export const getLittleBanAll = createFetchAction(`${FOREST_API}/tree/wpunit4apps
 export const getNurserysByPack = createFetchAction(`${FOREST_API}/tree/nurserysbypack`, []);
 export const getTreeLocations = createFetchAction(`${FOREST_API}/tree/treelocations`, []);  //获取同步后的苗木定位列表
 export const getExportTreeLocations = createFetchAction(`${FOREST_API}/tree/exporttreelocations`,[])  //导出同步后的苗木定位列表
+
+export const getSeedlingInfo = createFetchAction(`${FOREST_API}/tree/remarktree?remark={{remark}}&sxm={{sxm}}`,[])  //修改备注信息
+
+
+
 export const actions = {
 	getTreeLocations,
 	getExportTreeLocations,
@@ -116,7 +121,8 @@ export const actions = {
 	getcarpackage,
 	getexportcarpackage,
 	getLittleBanAll,
-	getNurserysByPack
+	getNurserysByPack,
+	getSeedlingInfo
 	// getTreeNodeList
 };
 export default handleActions({

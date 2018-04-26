@@ -57,6 +57,18 @@ const getMapRouter = createFetchAction(`${FOREST_API}/tree/patrolroutes`, []);
 const getMapList = createFetchAction(`${FOREST_API}/tree/patrolpositions?routeid={{routeID}}`, []);
 //存储二维展示点击后弹框数据
 export const getDimensional = createAction(`ssfirst_getDimensional`);
+//获取二维展示点击树节点的数据
+export const getqueryTree = createFetchAction(`${FOREST_API}/tree/queryTree`, []);
+//获取树种
+export const gettreetype = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
+//获取头部统计
+export const getSamplingstat = createFetchAction(`${FOREST_API}/tree/samplingstat`, []);
+//获取种植流程
+export const getTreeflows = createFetchAction(`${FOREST_API}/tree/treeflows`, []);
+//获取苗圃信息
+export const getNurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
+//获取打包车辆信息
+export const getCarpackbysxm = createFetchAction(`${FOREST_API}/tree/carpackbysxm/{{sxm}}`, []);
 
 export const actions = {
 	getDimensional,
@@ -93,7 +105,13 @@ export const actions = {
 	getLittleBan,
 	
 	getMapRouter,
-	getMapList
+	getMapList,
+	getqueryTree,
+	gettreetype,
+	getSamplingstat,
+	getTreeflows,
+	getNurserys,
+	getCarpackbysxm 
 };
 export default handleActions({
 	[getDimensional]: (state, {payload}) => {

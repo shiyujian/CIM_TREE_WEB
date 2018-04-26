@@ -1,8 +1,21 @@
+/**
+ *
+ * Copyright (c) 2016-present, ecidi.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @Author: ecidi.mingey
+ * @Date: 2018-04-26 10:45:34
+ * @Last Modified by: ecidi.mingey
+ * @Last Modified time: 2018-04-26 15:17:49
+ */
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { actions } from '../store'
-import { Button, Modal, Spin, message, Collapse, Checkbox, Form, Input } from 'antd'
+import { Button, Modal, Spin, message, Collapse, Checkbox, Form, Input, Tabs  } from 'antd'
 import { Icon } from 'react-fa';
 import { panorama_360, tracks } from './geojsonFeature'
 import {
@@ -25,6 +38,7 @@ import DGN from '_platform/components/panels/DGN'
 import DGNProjectInfo from './DGNProjectInfo'
 import PkCodeTree from './PkCodeTree'
 const FormItem = Form.Item;
+const TabPane = Tabs.TabPane;
 
 const Panel = Collapse.Panel
 const $ = window.$
@@ -107,6 +121,7 @@ class Lmap extends Component {
                 minlng: 113.827781,
                 maxlng: 113.931283,
             },
+            treeType:[]
         }
         this.aa = {}
         this.OnlineState = false
@@ -329,8 +344,15 @@ class Lmap extends Component {
         //     L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map)
 
     }
-    getTreeInfo(x, y, that) {
-        const { actions: { getDimensional } } = this.props
+    async getTreeInfo(x, y, that) {
+        const { actions: { 
+            getDimensional,
+            getqueryTree,
+            getSamplingstat,
+            getTreeflows,
+            getNurserys,
+            getCarpackbysxm 
+        } } = this.props
         var resolutions = [0.703125, 0.3515625, 0.17578125, 0.087890625, 0.0439453125, 0.02197265625, 0.010986328125, 0.0054931640625, 0.00274658203125, 0.001373291015625, 6.866455078125E-4, 3.4332275390625E-4, 1.71661376953125E-4, 8.58306884765625E-5, 4.291534423828125E-5, 2.1457672119140625E-5, 1.0728836059570312E-5, 5.364418029785156E-6, 2.682209014892578E-6, 1.341104507446289E-6, 6.705522537231445E-7, 3.3527612686157227E-7];
 
         console.log(x, y, that)
@@ -343,8 +365,52 @@ class Lmap extends Component {
         var rowp = row % 256;
         row = Math.floor(row / 256);
         var url = window.config.DASHBOARD_ONSITE+"/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:" + zoom + "&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=" + col + "&TileRow=" + row + "&I=" + colp + "&J=" + rowp;
-        jQuery.getJSON(url, null, function (data) {
+        jQuery.getJSON(url, null,async  function (data) {
             if(data.features&&data.features.length){
+
+                let postdata = {
+                    sxm:data.features[0].properties.SXM
+                }
+
+                let queryTreeData = await getqueryTree({},postdata)
+                let samplingstatData = await getSamplingstat({},postdata)
+                let treeflowData = await getTreeflows({},postdata)
+                let nurserysData = await getNurserys({},postdata)
+                let carData = await getCarpackbysxm(postdata)
+
+                console.log('queryTreeData',queryTreeData)
+                console.log('samplingstatData',samplingstatData)
+                console.log('treeflowData',treeflowData)
+                console.log('nurserysData',nurserysData)
+                console.log('carData',carData)
+                // getqueryTree({},postdata).then((rst)=>{
+                //     console.log('getqueryTreegetqueryTree',rst)
+                //     if(rst && rst.content && rst.content instanceof Array && rst.content.length>0){
+                //         let data = rst.content[0]
+                       
+                //         let seedlingMess = {
+                //             sxm:data.ZZBM?data.ZZBM:'',
+                //             car:data.ZZBM?data.ZZBM:'',
+                //             treeType:data.TreeTypeObj?data.TreeTypeObj.TreeTypeName:'',
+                //             place:data.ZZBM?data.ZZBM:'',
+                //             supplier:data.ZZBM?data.ZZBM:'',
+                //             nursery :data.ZZBM?data.ZZBM:'',
+                //             seedlingTime:data.ZZBM?data.ZZBM:'',
+                //             seedlingPlace:data.ZZBM?data.ZZBM:'',
+                //             height:data.ZZBM?data.ZZBM:'',
+                //             crown:data.ZZBM?data.ZZBM:'',
+                //             diameter:data.ZZBM?data.ZZBM:'',
+                //             thickness:data.ZZBM?data.ZZBM:'',
+
+                //         }
+                //         let treeMess = {
+
+                //         }
+                //         let approvalMess = {
+                            
+                //         }
+                //     }
+                // })
                 let dimensionalsArr = [
                     {
                         coordinatesX: data.features[0].geometry.coordinates[0],
@@ -757,9 +823,67 @@ class Lmap extends Component {
                     <div style={this.state.isNotThree == true ? {} : { display: 'none' }}>
                         <div
                             className="iconList"
-                            style={this.state.seeVisible ? { width: '200px' } : { width: '0' }}
+                            style={this.state.seeVisible ? { width: '290px' } : { width: '0' }}
                         >
-                            {
+                            <Modal
+                             visible={this.state.seeVisible}
+                             onOk={this.toggleIcon1.bind(this)}
+                             onCancel={this.toggleIcon1.bind(this)}
+                                >
+                                <Tabs defaultActiveKey="1" onChange={this.tabChange.bind(this)} size='small'>
+                                    <TabPane tab="苗木信息" key="1">
+                                        [
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'经度'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].coordinatesX : ''}</p>
+                                            </div>,
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'纬度'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].coordinatesY : ''}</p>
+                                            </div>,
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].CreateTime : ''}</p>
+                                            </div>,
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].H : ''}</p>
+                                            </div>,
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].IsCheck : ''}</p>
+                                            </div>,
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].No : ''}</p>
+                                            </div>,
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].SNNo : ''}</p>
+                                            </div>,
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].SXM : ''}</p>
+                                            </div>,
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].Section : ''}</p>
+                                            </div>,
+                                            <div className="imgIcon">
+                                                <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                                <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].TreeType : ''}</p>
+                                            </div>
+                                        ]
+                                    </TabPane>
+                                    <TabPane tab="树木信息" key="2">
+                                        Content of Tab Pane 2
+                                    </TabPane>
+                                    <TabPane tab="审批流程" key="3">
+                                        Content of Tab Pane 3
+                                    </TabPane>
+                                </Tabs>
+                            </Modal>
+                            {/* {
                                 this.state.seeVisible ? <span
                                     className="imageControll"
                                     onClick={this.toggleIcon1.bind(this)}
@@ -770,48 +894,61 @@ class Lmap extends Component {
                                     style={{ width: '26px', height: '30px', background: 'white', textAlgin: 'center', lineHeight: '30px', display: 'block' }}
                                 >展开</span>
                             }
-                            {[
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'经度'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].coordinatesX : ''}</p>
-                                </div>,
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'纬度'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].coordinatesY : ''}</p>
-                                </div>,
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].CreateTime : ''}</p>
-                                </div>,
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].H : ''}</p>
-                                </div>,
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].IsCheck : ''}</p>
-                                </div>,
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].No : ''}</p>
-                                </div>,
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].SNNo : ''}</p>
-                                </div>,
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].SXM : ''}</p>
-                                </div>,
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].Section : ''}</p>
-                                </div>,
-                                <div className="imgIcon">
-                                    <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
-                                    <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].TreeType : ''}</p>
-                                </div>
-                            ]
+                            {
+                            <Tabs defaultActiveKey="1" onChange={this.tabChange.bind(this)} size='small'>
+                                <TabPane tab="苗木信息" key="1">
+                                    [
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'经度'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].coordinatesX : ''}</p>
+                                        </div>,
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'纬度'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].coordinatesY : ''}</p>
+                                        </div>,
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].CreateTime : ''}</p>
+                                        </div>,
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].H : ''}</p>
+                                        </div>,
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].IsCheck : ''}</p>
+                                        </div>,
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].No : ''}</p>
+                                        </div>,
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].SNNo : ''}</p>
+                                        </div>,
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].SXM : ''}</p>
+                                        </div>,
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].Section : ''}</p>
+                                        </div>,
+                                        <div className="imgIcon">
+                                            <span style={{ display: 'block', marginTop: '2px' }}>{'时间'}</span>
+                                            <p>{this.state.dimensional && this.state.dimensional.length > 0 ? this.state.dimensional[0].TreeType : ''}</p>
+                                        </div>
+                                    ]
+                                </TabPane>
+                                <TabPane tab="树木信息" key="2">
+                                    Content of Tab Pane 2
+                                </TabPane>
+                                <TabPane tab="审批流程" key="3">
+                                    Content of Tab Pane 3
+                                </TabPane>
+                            </Tabs> */}
+                                
+                                
                             }
                         </div>
                     </div>
@@ -850,6 +987,10 @@ class Lmap extends Component {
                 </div>
             </div>
         )
+    }
+    //  切换标签页    
+    tabChange(key){
+        console.log(key);
     }
 
     /*渲染菜单panel*/
