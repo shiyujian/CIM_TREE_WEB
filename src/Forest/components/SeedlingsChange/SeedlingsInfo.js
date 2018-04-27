@@ -78,7 +78,7 @@ export default class SeedlingsChange extends Component {
 					<div>
 						<div style={{textAlign:'left'}}>备注：</div>
 						<div>
-							<TextArea  rows={4} defaultValue={remarkRecord.Remark?remarkRecord.Remark:''} id='remarkID'/>
+							<TextArea  rows={4} defaultValue={remarkRecord.Remark} id='remarkID'/>
 						</div>
 					</div>
 				</Modal>
@@ -102,6 +102,9 @@ export default class SeedlingsChange extends Component {
 			sxm, 
 			remark
 		} = this.state;
+		const {
+			users
+		} = this.props;
 	
 		let columns = [];
 		let header = '';
@@ -119,49 +122,37 @@ export default class SeedlingsChange extends Component {
 					return <p>{this.getBiao(text)}</p>
 				}
 			},{
+				title:"位置",
+				dataIndex: 'place',
+			},{
 				title:"树种",
 				dataIndex: 'TreeTypeObj.TreeTypeName',
 			},{
-				title:"苗龄",
-				dataIndex: 'Age',
-				render: (text,record) => {
-					if(record.Age !=0){
-						return <span>{text}</span>
-					}else{
-						return <span>0</span>
-					}
-					
-				}
-				
-			},{
-				title:"产地",
-				dataIndex: 'TreePlace',
-			},{
-				title:"供应商",
-				dataIndex: 'Factory',
-			},{
-				title:"苗圃名称",
-				dataIndex: 'NurseryName',
-			},{
-				title:"填报人",
-				dataIndex: 'Inputer',
-				render: (text,record) => {
-					const {InputerObj} = record
-					return <div>{InputerObj.Full_Name?InputerObj.Full_Name:InputerObj.User_Name}</div>
-				}
-			},{
-				title:"起苗时间",
-				dataIndex: 'time',
-				render: (text,record) => {
-					const {liftertime1 = '',liftertime2 = '' } = record;
-					return <div><div>{liftertime1}</div><div>{liftertime2}</div></div>
-				}
-			},{
 				title:"状态",
 				dataIndex: 'statusname',
-			},,{
-				title:"高度(cm)",
-				dataIndex: 'height',
+			},{
+				title:"定位",
+				dataIndex: 'islocation',
+			},{
+				title:"测量人",
+				dataIndex: 'Inputer',
+				render: (text,record) => {
+					return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
+				}
+			},{
+				title:"测量时间",
+				render: (text,record) => {
+					const {createtime1 = '',createtime2 = '' } = record;
+					return <div><div>{createtime1}</div><div>{createtime2}</div></div>
+				}
+			},{
+				title:"定位时间",
+				render: (text,record) => {
+					const {createtime3 = '',createtime4 = '' } = record;
+					return <div><div>{createtime3}</div><div>{createtime4}</div></div>
+				}
+			},{
+				title:<div><div>高度</div><div>(cm)</div></div>,
 				render: (text,record) => {
 					if(record.GD != 0)
 						return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
@@ -169,10 +160,8 @@ export default class SeedlingsChange extends Component {
 						return <span>/</span>
 					}
 				}
-			},
-			{
-				title:"冠幅(cm)",
-				dataIndex: 'guanfu',
+			},{
+				title:<div><div>冠幅</div><div>(cm)</div></div>,
 				render: (text,record) => {
 					if(record.GF != 0)
 						return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
@@ -181,8 +170,7 @@ export default class SeedlingsChange extends Component {
 					}
 				}
 			},{
-				title:"胸径(cm)",
-				dataIndex: 'xiongjing',
+				title:<div><div>胸径</div><div>(cm)</div></div>,
 				render: (text,record) => {
 					if(record.XJ != 0)
 						return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
@@ -191,8 +179,7 @@ export default class SeedlingsChange extends Component {
 					}
 				}
 			},{
-				title:"地径(cm)",
-				dataIndex: 'dijing',
+				title:<div><div>地径</div><div>(cm)</div></div>,
 				render: (text,record) => {
 					if(record.DJ != 0)
 						return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
@@ -200,10 +187,9 @@ export default class SeedlingsChange extends Component {
 						return <span>/</span>
 					}
 				}
-				
 			},{
-				title:"土球厚度(cm)",
-				dataIndex: 'houdu',
+				title:<div><div>土球厚度</div><div>(cm)</div></div>,
+				dataIndex: 'tqhd',
 				render: (text,record) => {
 					if(record.TQHD != 0)
 						return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
@@ -212,17 +198,16 @@ export default class SeedlingsChange extends Component {
 					}
 				}
 			},{
-				title:"土球直径(cm)",
-				dataIndex: 'zhijing',
+				title:<div><div>土球直径</div><div>(cm)</div></div>,
+				dataIndex: 'tqzj',
 				render: (text,record) => {
 					if(record.TQZJ != 0)
-						return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
+						return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQZJ}</a>
 					else {
 						return <span>/</span>
 					}
 				}
-			},
-			{
+			},{
 				title:"操作",
 				render: (text,record) => {
 					return <div>
@@ -237,11 +222,11 @@ export default class SeedlingsChange extends Component {
 					<Row>
 						<Col  xl={3} lg={4} md={5} className='mrg10'>
 							<span>顺序码：</span>
-							<Input   value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
+							<Input   className='forestcalcw2 mxw100' id='sxmID'/>
 						</Col>
 						<Col xl={3} lg={4} md={5} className='mrg10'>
 							<span>备注关键字：</span>
-							<Input  value={remark} className='forestcalcw2 mxw100' onChange={this.remarkchange.bind(this)}/>
+							<Input   className='forestcalcw2 mxw100'  id='remarkValueID'/>
 						</Col>
 						<Col xl={10} lg={12} md={14} className='mrg10'>
 							<span>时间选择：</span>
@@ -292,9 +277,10 @@ export default class SeedlingsChange extends Component {
 	}
 
 	remark(record){
+		console.log('record',record)
 		this.setState({
-			remarkvisible:true,
-			remarkRecord:record
+			remarkRecord:record,
+			remarkvisible:true
 		})
 	}
 
@@ -385,14 +371,32 @@ export default class SeedlingsChange extends Component {
     resetinput(){
     	const {resetinput,leftkeycode} = this.props;
 		resetinput(leftkeycode)
-    }
+	}
+	
+	getThinClassName(no,section){
+		const {littleBanAll} = this.props;
+		let nob = no.substring(0,15);
+		let sectionn = section.substring(8,10);
+		let result = '/'
+		debugger
+		if(littleBanAll){
+			littleBanAll.map(item => {
+				if(item.No.substring(0,15) === nob && item.No.substring(16,18) === sectionn){
+					result = item.ThinClassName;
+					return;
+				}
+			})
+		}else{
+			return <p> / </p>
+		}
+		return result;
+	}
     async qury(page) {
     	const {
-    		sxm = '',
+    		
     		stime = '',
     		etime = '',
 			size,
-			remark = ''
 		} = this.state;
 		const {
 			actions: {
@@ -402,8 +406,11 @@ export default class SeedlingsChange extends Component {
 			keycode = ''
 		} = this.props;
 
+		let sxm = document.querySelector('#sxmID').value 
+		let remark = document.querySelector('#remarkValueID').value 
 		let user = getUser()
 		let section = ''
+		console.log('this.sections',this.sections)
 		if(user.username !='admin' && this.sections.length > 0){  //不是admin，要做查询判断了
 			section = this.sections[0]
 		}else if(user.username !='admin' && this.sections.length === 0){
@@ -432,11 +439,18 @@ export default class SeedlingsChange extends Component {
     		if(tblData instanceof Array) {
 				let sxmArr = []
 
-	    		tblData.forEach((plan, i) => {
+	    		tblData.map((plan, i) => {
 					sxmArr.push(plan.ZZBM)
 					
 	    			// const {attrs = {}} = plan;
-	    			tblData[i].order = ((page - 1) * size) + i + 1;
+					tblData[i].order = ((page - 1) * size) + i + 1;
+					let place = ''
+					if(plan.Section.indexOf('P010') !== -1){
+						place = this.getThinClassName(plan.No,plan.Section);
+					}else{
+						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
+					}
+	    			tblData[i].place = place;
 	    			
 	    			let statusname = '';
 					if(plan.SupervisorCheck == -1)
@@ -447,46 +461,18 @@ export default class SeedlingsChange extends Component {
 						statusname = "抽查通过"
 					}
 					tblData[i].statusname = statusname;
-					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
-					tblData[i].locationstatus = locationstatus;
-					let checktime1 = !!plan.CheckTime ? moment(plan.CheckTime).format('YYYY-MM-DD') : '/';
-					let checktime2 = !!plan.CheckTime ? moment(plan.CheckTime).format('HH:mm:ss') : '/';
-					tblData[i].checktime1 = checktime1;
-					tblData[i].checktime2 = checktime2;
+					let islocation = plan.LocationTime ? '已定位' : '未定位';
+					tblData[i].islocation = islocation;
+					let createtime1 = plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
+					let createtime2 = plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
+					let createtime3 = plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
+					let createtime4 = plan.LocationTime ? moment(plan.LocationTime).format('HH:mm:ss') : '/';
+					tblData[i].createtime1 = createtime1;
+					tblData[i].createtime2 = createtime2;
+					tblData[i].createtime3 = createtime3;
+					tblData[i].createtime4 = createtime4;
 				})
-				let postdata = [] 
-				sxmArr.map((sxm)=>{
-					postdata.push(getnurserys({},{sxm:sxm}))
-				})
-				let datas = await Promise.all(postdata)
-				// debugger
-				if(datas && datas.length>0){
-					datas.map((data,index)=>{
-						if(data.content && data.content.length>0){
-							let treeinfo = data.content[0]
-							tblData[index].Age = treeinfo.Age?treeinfo.Age:''
-							tblData[index].TreePlace = treeinfo.TreePlace?treeinfo.TreePlace:''
-							tblData[index].Factory = treeinfo.Factory?treeinfo.Factory:''
-							tblData[index].NurseryName = treeinfo.NurseryName?treeinfo.NurseryName:''
-							tblData[index].Inputer = treeinfo.Inputer?treeinfo.Inputer:''
-							tblData[index].InputerObj = treeinfo.InputerObj?treeinfo.InputerObj:''
-							tblData[index].liftertime1 = treeinfo.CreateTime?moment(treeinfo.CreateTime).format('YYYY-MM-DD'):'/'
-							tblData[index].liftertime2 = treeinfo.CreateTime?moment(treeinfo.CreateTime).format('HH:mm:ss') : '/';
-							tblData[index].GD = treeinfo.GD?treeinfo.GD:''
-							tblData[index].GDFJ = treeinfo.GDFJ?treeinfo.GDFJ:''
-							tblData[index].GF = treeinfo.GF?treeinfo.GF:''
-							tblData[index].GFFJ = treeinfo.GFFJ?treeinfo.GFFJ:''
-							tblData[index].XJFJ = treeinfo.XJFJ?treeinfo.XJFJ:''
-							tblData[index].DJ = treeinfo.DJ?treeinfo.DJ:''
-							tblData[index].DJFJ = treeinfo.DJFJ?treeinfo.DJFJ:''
-							tblData[index].TQHD = treeinfo.TQHD?treeinfo.TQHD:''
-							tblData[index].TQHDFJ = treeinfo.TQHDFJ?treeinfo.TQHDFJ:''
-							tblData[index].TQZJ = treeinfo.TQZJ?treeinfo.TQZJ:''
-							tblData[index].TQZJFJ = treeinfo.TQZJFJ?treeinfo.TQZJFJ:''
-						}
-						
-					})
-				}
+				
 		    	const pagination = { ...this.state.pagination };
 				pagination.total = rst.pageinfo.total;
 				pagination.pageSize = size;
