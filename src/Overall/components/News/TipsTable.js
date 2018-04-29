@@ -163,7 +163,7 @@ class TipsTable extends Component {
 		const user = getUser();
 		this.props.form.validateFields(async (err, values) => {
 			let conditions = {
-				executor: user.id,
+				user_id: user.id,
 				title: values.theme || "",
 				org: values.workunit || "",
 				degree:values.degree || ""

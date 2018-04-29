@@ -29,7 +29,8 @@ export default class SeedlingsChange extends Component {
 			changevisible:false,
 			changeRecord:'',
 			remarkvisible:false,
-			remarkRecord:''
+			remarkRecord:'',
+			remarkInfo:''
     	}
 	}
 	getBiao(code){
@@ -52,7 +53,8 @@ export default class SeedlingsChange extends Component {
 		const {
 			tblData,
 			remarkRecord,
-			changeRecord
+			changeRecord,
+			remarkInfo
 		} = this.state;
 		return (
 			<div>
@@ -78,7 +80,7 @@ export default class SeedlingsChange extends Component {
 					<div>
 						<div style={{textAlign:'left'}}>备注：</div>
 						<div>
-							<TextArea  rows={4} defaultValue={remarkRecord.Remark} id='remarkID'/>
+							<TextArea  rows={4} value={remarkInfo} id='remarkID' onChange={this.remarkInfochange.bind(this)}/>
 						</div>
 					</div>
 				</Modal>
@@ -276,11 +278,16 @@ export default class SeedlingsChange extends Component {
 				</div>
 	}
 
+	remarkInfochange(value){
+		this.setState({remarkInfo:value.target.value})
+	}
+
 	remark(record){
 		console.log('record',record)
 		this.setState({
 			remarkRecord:record,
-			remarkvisible:true
+			remarkvisible:true,
+			remarkInfo:record.Remark?record.Remark:''
 		})
 	}
 
@@ -291,16 +298,15 @@ export default class SeedlingsChange extends Component {
 			}
 		}=this.props
 		const{
-			remarkRecord
+			remarkRecord,
+			remarkInfo
 		}=this.state
-		let remark = document.querySelector('#remarkID').value;
 	
-
 		let postdata = {
-			remark:remark,
+			remark:remarkInfo,
 			sxm:remarkRecord.ZZBM
 		}
-		let rst = getSeedlingInfo(postdata)
+		let rst = await getSeedlingInfo(postdata)
 		this.setState({
 			remarkvisible:false
 		},()=>{

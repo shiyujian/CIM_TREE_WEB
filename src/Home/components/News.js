@@ -154,9 +154,9 @@ export default class News extends Component {
 
 			<Row>
 				<Col style={{position:'relative'}} span={22} offset={1}>
-					<Link  to='/overall/news'>
+					{/* <Link  to='/overall/news'>
 						<span style={{position:'absolute', top: "10px",right:'0',zIndex:'200' }} >MORE</span>
-					</Link>
+					</Link> */}
 					<Tabs className="tabless" onChange={this.subTabChange.bind(this)} >
 						<TabPane  tab="新闻" key="1">
 							<Table dataSource={newsList}
