@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input, Progress, Spin } from 'antd';
 import { PROJECT_UNITS } from './../../../_platform/api';
-import './index.less';
+import  styles from './index.less';
 
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
@@ -156,6 +156,18 @@ export default class Users extends Component {
 			}
 		}
 		return sectione
+	}
+	setColor(record,i){
+
+		const {
+			platform: { users = [] },
+		} = this.props;
+		// console.log("users",users)
+		if(record.is_black==1 || record.is_black==true){
+			return 'background'
+		}else{
+			return ''
+		}
 	}
 	render() {
 		const { isUpdate = false, platform: { roles = [] }, filter = {}, addition = {}, actions: { changeFilterField, changeAdditionField }, tags = {}, sidebar: { node: { extra_params: { sections } = {}, code } = {}, parent } = {} } = this.props;
@@ -437,6 +449,7 @@ export default class Users extends Component {
 							</Row>
 						</div>
 						<Table rowKey="id" size="middle" bordered rowSelection={this.rowSelection} columns={columns} dataSource={users}
+							rowClassName={this.setColor.bind(this)}
 							pagination={this.props.getTablePages} onChange={this.changePage.bind(this)}
 							loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.props.getTreeModals }}
 						/>
@@ -597,7 +610,10 @@ export default class Users extends Component {
 			console.log("selectedRowKeys", selectedRowKeys)
 			this.setState({ selectedRowKeys: selectedRowKeys })
 			this.selectedCodes = selectedRowKeys;
-		}
+		},
+		getCheckboxProps: record => ({
+			disabled: record.name === 'Disabled User', // Column configuration not to be checked
+		}),
 	};
 	changeTags(record, value) {
 		record.tags = value;
@@ -781,9 +797,9 @@ export default class Users extends Component {
 			//groups: [7],
 			groups: groupe,
 			is_active: actives,
-			black_remark: user.black_remark,
+			// black_remark: user.black_remark,
 			id_num: user.id_num,
-			is_black: userblack,
+			// is_black: userblack,
 			id_image: user.id_image,
 			basic_params: {
 				info: {

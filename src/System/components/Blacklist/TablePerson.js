@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Popconfirm, Notification, Input, Icon, Spin, Progress, Switch, Pagination, Select } from 'antd';
+import { Row, Col, Table, Button, Popconfirm, Notification, Input, Icon, Spin, Progress, Switch, Pagination, Select, Form } from 'antd';
 import style from './TableOrg.css'
 import DelPer from './PersonExpurgate';
 import { DataReportTemplate_PersonInformation, NODE_FILE_EXCHANGE_API, STATIC_DOWNLOAD_API } from '_platform/api';
@@ -7,16 +7,19 @@ import { flattenDeep } from 'lodash';
 import { PROJECT_UNITS } from './../../../_platform/api';
 const Search = Input.Search;
 const { Option, OptGroup } = Select;
+const FormItem = Form.Item;
+class TablePerson extends Component {
 
-export default class TablePerson extends Component {
+	// export default class TablePerson extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			dataSource: [],
 			selectData: [],
 			tempData: [],
+			tempDatas: [],
 			fristTempData: [],
-			
+
 			loading: false,
 			percent: 0,
 			pagination: {},
@@ -25,7 +28,8 @@ export default class TablePerson extends Component {
 			resultInfo: {},
 			serialNumber: {},
 			btn: false,
-			value: ''
+			value: '',
+			isUpdate:false
 		}
 	}
 	initopthins(list) {
@@ -41,10 +45,13 @@ export default class TablePerson extends Component {
 			const item = PROJECT_UNITS[i];
 			for (let j = 0; j < item.units.length; j++) {
 				const element = item.units[j];
-				for (let z = 0; z < record.sections.length; z++) {
-					const items = record.sections[z];
-					if (items == element.code) {
-						sectione.push(element.value)
+				// console.log("record",record)
+				if (record.sections) {
+					for (let z = 0; z < record.sections.length; z++) {
+						const items = record.sections[z];
+						if (items == element.code) {
+							sectione.push(element.value)
+						}
 					}
 				}
 			}
@@ -52,17 +59,12 @@ export default class TablePerson extends Component {
 		return sectione
 	}
 	query(value) {
-		// console.log("value",value)
-		
 		if (value && value.tags) {
 			const {
 				tags = []
 			} = this.props
 			let array = value.tags || []
 			let defaultNurse = []
-		// console.log("tags",tags)
-		console.log("this.props",this.props)
-		
 			array.map((item) => {
 				tags.map((rst) => {
 					if (rst && rst.ID) {
@@ -77,50 +79,145 @@ export default class TablePerson extends Component {
 	}
 	renderContent(record) {
 		const { platform: { roles = [] } } = this.props;
-		// console.log("roles",roles)
 		let groups = []
 		for (let i = 0; i < roles.length; i++) {
-			for (let j = 0; j < record.groups.length; j++) {
-				if (roles[i].id == record.groups[j].id) {
-					groups.push(roles[i].name)
+			if (record.groups) {
+				for (let j = 0; j < record.groups.length; j++) {
+					if (roles[i].id == record.groups[j].id) {
+						groups.push(roles[i].name)
+					}
 				}
 			}
 		}
-		// console.log("groups",groups)
-		
 		return groups
 	}
+	querys() {
+		let searchList = []
+		this.props.form.validateFields(async (err, values) => {
+			this.state.tempData.map((item) => {
+				let isName = false;
+				let isTitle = false;
+				let iscc = false;
+				if (!values.names) {
+					isName = true
+				}
+				else {
+					if (item.account) {
+						if (values.names && item.account.person_name.indexOf(values.names) > -1) {
+							isName = true
+						}
+					}
 
+				}
+				if (!values.is_num) {
+					iscc = true
+				}
+				else {
+					if (item.id_num) {
+						if (values.is_num && item.id_num.indexOf(values.is_num) > -1) {
+							iscc = true
+						}
+					}
+
+				}
+				if (!values.usernamet) {
+					isTitle = true
+				} else {
+					if (values.usernamet && item.username.indexOf(values.usernamet) > -1) {
+						isTitle = true
+					}
+				}
+				if (isName && isTitle && iscc) {
+					searchList.push(item)
+				}
+			})
+			this.setState({
+				tempDatas: searchList,
+				isUpdate: true,
+			})
+		})
+	}
+	clears() {
+		this.props.form.setFieldsValue({
+			usernamet: undefined,
+			is_num: undefined,
+			names: undefined,
+		});
+	}
 	render() {
 		const { platform: { roles = [], users = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
-		console.log("tags", tags)
+		const {
+			form: { getFieldDecorator },
+		} = this.props;
+		let usersArr = []
+		let numArr = []
+		// console.log("users",users)
+		let dataSourceb
+		if (this.state.isUpdate) {
+			dataSourceb = this.state.tempDatas
+		} else {
+			dataSourceb = this.state.tempData
+		}
+		dataSourceb.map((rst, index) => {
+			numArr.push(rst.id_num)
+			rst.index = index.toString() + 'd'
+			rst.key = index.toString() + 'd'
+			return { ...rst }
+		})
+		const numArr1 = Array.from(new Set(numArr))
+		numArr1.map((rst, index) => {
+			usersArr.push({
+				children: [],
+				id_num: rst,
+				key: (index + 1).toString()
+			})
+		})
+		usersArr.map((ess, i) => {
+			this.state.tempData.map((item, j) => {
+				if (ess.id_num == item.id_num) {
+					ess.children.push(item)
+				}
+			})
+		})
+	
 		const columns = [
 			{
 				title: '序号',
 				// dataIndex: 'index',
 				width: '5%',
 				render: (text, record, index) => {
-					const current = this.state.serialNumber.current
-					const pageSize = this.state.serialNumber.pageSize
-					if (current != undefined && pageSize != undefined) {
-						return (index + 1) + (current - 1) * pageSize;
-					} else {
-						return index + 1
+					if (record.id) {
+						const current = this.state.serialNumber.current
+						const pageSize = this.state.serialNumber.pageSize
+						if (current != undefined && pageSize != undefined) {
+							return (index + 1) + (current - 1) * pageSize;
+						} else {
+							return index + 1
+						}
 					}
 				}
 
 			},
-
-			// {
-			// 	title: '人员编码',
-			// 	dataIndex: 'code',
-			// 	key: 'Code',
-			// },
 			{
 				title: '姓名',
 				dataIndex: 'account.person_name',
 				width: '5%',
 				key: 'account.person_name',
+			}, {
+				title: '身份证号',
+				dataIndex: 'id_num',
+				width: '8%',
+				key: 'id_num',
+			}, {
+				title: '原因',
+				width: '9%',
+				dataIndex: "black_remark",
+				key: 'black_remark',
+				// render: (record) => {
+				// 	// console.log("record",record)
+				// 	let groups = this.renderContent(record)
+				// 	return groups.join()
+				// }
 			}
 			, {
 				title: '用户名',
@@ -134,11 +231,6 @@ export default class TablePerson extends Component {
 				width: '4%',
 				key: 'basic_params.info.sex'
 
-			}, {
-				title: '身份证号',
-				dataIndex: 'id_num',
-				width: '8%',
-				key: 'id_num'
 			}
 			, {
 				title: '手机号码',
@@ -146,47 +238,6 @@ export default class TablePerson extends Component {
 				width: '10%',
 				key: 'basic_params.info.phone'
 			}
-			//  , {
-			// 	title: '所在组织机构单位',
-			// 	dataIndex: 'type',
-			// 	key: 'Org',
-			// }
-			, {
-				title: '所属部门',
-				dataIndex: 'account.organization.name',
-				width: '8%',
-				key: 'account.organization.name',
-			}, {
-				title: '职务',
-				dataIndex: 'title',
-				width: '8%',
-				key: 'title',
-			}
-			// , {
-			// 	title: '邮箱',
-			// 	dataIndex: 'email',
-			// 	key: 'email'
-			// }
-
-			// , {
-			// 	title: '密码',
-			// 	dataIndex: 'passwords',
-			// 	key: 'Passwords'
-			// }
-			// , {
-			// 	title: '二维码',
-			// 	render: (record) => {
-			// 		if (record.signature) {
-			// 			if (record.signature.indexOf("documents") !== -1) {
-			// 				return <img style={{ width: 60 }} src={record.signature} />
-			// 			} else {
-			// 				return <span>暂无</span>
-			// 			}
-			// 		} else {
-			// 			return (<span>暂无</span>)
-			// 		}
-			// 	}
-			// }
 			, {
 				title: '标段',
 				// dataIndex: "sections",
@@ -203,8 +254,10 @@ export default class TablePerson extends Component {
 				// key: 'tags',
 				width: '10%',
 				render: (text, record, index) => {
-					let defaultNurse = this.query(record)
-					return defaultNurse.join()
+					if (record.title) {
+						let defaultNurse = this.query(record)
+						return defaultNurse.join()
+					}
 				}
 			}
 			, {
@@ -217,224 +270,122 @@ export default class TablePerson extends Component {
 				}
 			}
 			, {
-				title: '原因',
-				width: '10%',
-				dataIndex: "black_remark",
-				key: 'black_remark',
-				// render: (record) => {
-				// 	// console.log("record",record)
-				// 	let groups = this.renderContent(record)
-				// 	return groups.join()
-				// }
+				title: '所属部门',
+				dataIndex: 'account.organization.name',
+				width: '8%',
+				key: 'account.organization.name',
+			}, {
+				title: '职务',
+				dataIndex: 'title',
+				width: '8%',
+				key: 'title',
 			}
+			// , {
+			// 	title: '邮箱',
+			// 	dataIndex: 'email',
+			// 	key: 'email'
+			// }
 			, {
 				title: "移除黑名单",
 				// dataIndex: "edit",
 				key: "Edit",
 				render: (record) => {
-					return (
-						<div>
-							{/* <a onClick={this.edits.bind(this, record)}><Icon type="edit"></Icon></a> */}
-							{/* <span style={{ "margin": "0 10px 0 10px" }}>|</span> */}
-							{/* <a >
-								移除
-							</a> */}
-							<span>
-								<Popconfirm title="是否真的要移除黑名单?" onConfirm={this.confirm.bind(this, record)} okText="Yes" cancelText="No">
-									<a type="primary" >移除</a>
-								</Popconfirm>
-							</span>
-						</div>
-					)
+					if (record.id) {
+						return (
+							<div>
+								<a onClick={this.edits.bind(this, record)}>查看</a>
+								<span style={{ "margin": "0 10px 0 10px" }}>|</span>
+								{/* <a >
+									移除
+								</a> */}
+								<span>
+									<Popconfirm title="是否真的要移除黑名单?" onConfirm={this.confirm.bind(this, record)} okText="Yes" cancelText="No">
+										<a type="primary" >移除</a>
+									</Popconfirm>
+								</span>
+							</div>
+						)
+					}
 				}
 			}
 		]
+		const formItemLayout = {
+			labelCol: { span: 8 },
+			wrapperCol: { span: 16 },
+		};
+
 		return (
 			<div>
-				<div>
-					<Search enterButton className={style.button} onSearch={this.searchPerson.bind(this)} style={{ width: "240px" }} placeholder="请输入用户名" />
-				</div>
+				{/* <div>
+					<Search enterButton className={style.button} onSearch={this.searchPerson.bind(this)} style={{ width: "240px" }} placeholder="请输入姓名或用户名" />
+				</div> */}
+				<Row >
+					<Col span={18}>
+						<Row>
+							<Col span={8} >
+								<FormItem {...formItemLayout} label="姓名">
+									{
+										getFieldDecorator('names', {
+											rules: [
+												{ required: false, message: '请输入姓名' },
+											]
+										})
+											(<Input placeholder="请输入姓名" />)
+									}
+								</FormItem>
+							</Col>
+							<Col span={8} >
+								<FormItem {...formItemLayout} label="身份证号">
+									{
+										getFieldDecorator('is_num', {
+										})
+											(<Input placeholder="请输入身份证号" />)
+									}
+								</FormItem>
+							</Col>
+							<Col span={8} >
+								<FormItem {...formItemLayout} label="用户名">
+									{
+										getFieldDecorator('usernamet', {
+											rules: [
+												{ required: false, message: '请输入用户名' },
+											]
+										})
+											(<Input placeholder="请输入用户名" />)
+									}
+								</FormItem>
+							</Col>
+						</Row>
+						<Row>
+						</Row>
+					</Col>
+					<Col span={2} offset={1}>
+						<Button icon='search' onClick={this.querys.bind(this)}>查找</Button>
+					</Col>
+					<Col span={2} >
+						<Button icon='reload' onClick={this.clears.bind(this)}>清空</Button>
+					</Col>
+				</Row>
 				<Table
 					columns={columns}
-					bordered={true}
+					bordered
 					// rowSelection={this.rowSelection}
-					dataSource={this.state.tempData}
-					rowKey="index"
-					onChange={this.changePage.bind(this)}
-					pagination={this.state.pagination}
+					// console.log("usersArr",usersArr)
+					dataSource={usersArr}
+					// dataSource={this.state.tempData}
+					// rowKey="index"
+					// onChange={this.changePage.bind(this)}
+					// pagination={this.state.pagination}
 					loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status="active" strokeWidth={5} />, spinning: this.state.loading }}
 				>
 				</Table>
-
 			</div>
 		)
-	}
-	// async componentWillReceiveProps(props) {
-	// 	const { tempData, is_fresh = false } = props
-	// 	// console.log("tempData",tempData)
-	// 	if (is_fresh) {
-	// 		this.setState({ loading: true })
-	// 		const { actions: { is_fresh, getPersonInfo } } = this.props;
-	// 		// 分页获取数据
-	// 		// let rst = await getPersonList({ pagesize: 10, offset: 0 });
-	// 		let rst = await getPersonInfo({ page: this.state.pages || 1 })
-	// 		let personlist = rst.results
-	// 		// console.log("rst", rst)
-	// 		// let total = rst.result.total;
-	// 		let persons = [];
-	// 		for (let i = 0; i < personlist.length; i++) {
-	// 			const element = personlist[i];
-	// 			// let ret = await getPeople({code:element.code});
-	// 			persons.push(element)
-	// 		}
-	// 		let pagination = {
-	// 			current: this.state.pages,
-	// 			total: rst.count,
-	// 		};
-	// 		console.log("pagination", pagination)
-	// 		// console.log("pagination", pagination)
-	// 		this.setState({
-	// 			pagination: pagination
-	// 		})
-	// 		let data_person =
-	// 			persons.map((item, index) => {
-	// 				let groupsId = []
-	// 				const groups = item.groups || []
-	// 				for (let j = 0; j < groups.length; j++) {
-	// 					const groupss = groups[j].id.toString()
-	// 					groupsId.push(groupss);
-	// 				}
-	// 				return {
-	// 					id: item.id,
-	// 					index: index + 1,
-	// 					// code: item.account.person_code || '',
-	// 					name: item.account.person_name || '',
-	// 					orgcode: item.account.org_code || '',
-	// 					orgname: item.account.organization || '',
-	// 					job: item.account.title || '',
-	// 					sex: item.account.gender || '',
-	// 					tel: item.account.person_telephone || '',
-	// 					email: item.email || '',
-	// 					is_user: true,
-	// 					username: item.username || '',
-	// 					sections: item.account.sections || '',
-	// 					tags: item.account.tags || '',
-	// 					groups: groupsId || []
-	// 					// passwords:111111
-	// 				}
-	// 			})
-	// 		this.setState({ dataSource: data_person, tempData: data_person, loading: false });
-	// 		is_fresh(false);
-	// 	}
-	// }
-	// //发送
-	// send() {
-	// 	const { actions: { ModalVisible } } = this.props;
-	// 	ModalVisible(true);
-	// }
-	//批量删除
-	expurgate() {
-		const { actions: { ExprugateVisible, setDeletePer } } = this.props;
-		if (this.state.selectData.length) {
-			setDeletePer(this.state.selectData);
-			ExprugateVisible(true);
-		} else {
-			Notification.warning({
-				message: "请先选择数据！"
-			});
-		}
-	}
-	//批量变更
-	modify() {
-		const { actions: { ModifyVisible, setModifyPer } } = this.props;
-		if (this.state.selectData.length) {
-			let dataList = [];
-			this.state.selectData.map(item => {
-				let newList = { ...item }
-				newList.account = { ...newList.account }
-				dataList.push(newList)
-			})
-			setModifyPer(dataList)
-			ModifyVisible(true);
-		} else {
-			Notification.warning({
-				message: "请先选择数据！"
-			});
-		}
 	}
 	edits(record) {
 		const { actions: { ModifyVisible, getAllUsers, setModifyPer } } = this.props;
 		ModifyVisible(true);
 		setModifyPer(record);
-	}
-	// // 导出excel表格
-	// getExcel() {
-	// 	if (this.state.excelData !== undefined) {
-	// 		let exhead = ['人员编码', '姓名', '所在组织机构单位', '所属部门', '职务', '性别', '手机号码', '邮箱'];
-	// 		let rows = [exhead];
-	// 		let getcoordinate = (param) => {
-	// 			if (typeof param !== 'string') {
-	// 				return '';
-	// 			}
-	// 			if ((!param || param.length <= 0)) {
-	// 				return ''
-	// 			} else {
-	// 				return param;
-	// 			}
-	// 		}
-	// 		let excontent = this.state.excelData.map(data => {
-	// 			return [
-	// 				data.orgcode || '',
-	// 				data.name || '',
-	// 				data.orgname || '',
-	// 				// data.account.org_code || '',
-	// 				// data.account.user_name || '',
-	// 				data.job || '',
-	// 				data.sex || '',
-	// 				data.tel || '',
-	// 				data.email || '',
-	// 				data.username || '',
-	// 				data.sections || '',
-	// 				data.tags || '',
-	// 				data.edit || '',
-	// 				data.groups || '',
-	// 			];
-	// 		});
-	// 		rows = rows.concat(excontent);
-	// 		const { actions: { jsonToExcel } } = this.props;
-	// 		jsonToExcel({}, { rows: rows })
-	// 			.then(rst => {
-	// 				this.createLink('人员信息导出表', NODE_FILE_EXCHANGE_API + '/api/download/' + rst.filename);
-	// 			})
-	// 	} else {
-	// 		Notification.warning({
-	// 			message: "请先选择数据！"
-	// 		});
-	// 		return;
-	// 	}
-	// }
-
-	//下载
-	createLink = (name, url) => {    //下载
-		let link = document.createElement("a");
-		link.href = url;
-		link.setAttribute('download', this);
-		link.setAttribute('target', '_blank');
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	}
-	mapCodes(arr) {
-		return arr.map(item => {
-			if (item.children && item.children.length) {
-				return [
-					item.code,
-					this.mapCodes(item.children)
-				]
-			} else {
-				return item.code;
-			}
-		})
 	}
 	async changePage(obj) {
 		console.log("obj", obj)
@@ -442,8 +393,8 @@ export default class TablePerson extends Component {
 			actions: { getUsers },
 		} = this.props;
 		this.setState({
-			fristTempData:this.state.tempData,
-			fristPagination:this.state.pagination
+			fristTempData: this.state.tempData,
+			fristPagination: this.state.pagination
 		})
 		if (!this.state.btn) {
 			this.setState({ loading: true, pages: obj.current })
@@ -451,8 +402,8 @@ export default class TablePerson extends Component {
 			// 分页获取数据
 			let pageSize = 10;
 			// let rst = await getPersonList({ pagesize: pageSize, offset: (obj.current - 1) * pageSize });
-			let rst = await getPersonInfo({is_black: 1, page: obj.current })
-			console.log("rst",rst)
+			let rst = await getPersonInfo({ is_black: 1, page: obj.current })
+			console.log("rst", rst)
 			let personlist = rst.results
 			console.log("rst", rst)
 			this.setState({ serialNumber: obj })
@@ -485,6 +436,7 @@ export default class TablePerson extends Component {
 							person_name: item.account.person_name,
 							person_type: "C_PER",
 							person_avatar_url: item.account.person_avatar_url,
+							person_signature_url: item.account.person_signature_url,
 							organization: {
 								// pk: node.pk,
 								code: item.account.org_code,
@@ -537,14 +489,14 @@ export default class TablePerson extends Component {
 	async componentDidMount() {
 		this.setState({ loading: true })
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
-		console.log("tags",tags)
-		console.log("this.props",this.props)
+		console.log("tags", tags)
+		console.log("this.props", this.props)
 		const { actions: { getPersonInfo } } = this.props;
 		// 分页获取数据
 		// let rst = await getPersonList({ pagesize: 10, offset: 0 });
-		let rst = await getPersonInfo({}, { is_black: 1 ,page:1})
+		let rst = await getPersonInfo({}, { is_black: 1 })
 		console.log("rst", rst)
-		let personlist = rst.results
+		let personlist = rst
 		this.setState({ resultInfo: rst })
 		// let total = rst.result.total;
 		let persons = [];
@@ -579,6 +531,7 @@ export default class TablePerson extends Component {
 						person_name: item.account.person_name,
 						person_type: "C_PER",
 						person_avatar_url: item.account.person_avatar_url,
+						person_signature_url: item.account.person_signature_url,
 						organization: {
 							// pk: node.pk,
 							code: item.account.org_code,
@@ -607,20 +560,6 @@ export default class TablePerson extends Component {
 					},
 					extra_params: {},
 					title: item.account.title || ''
-
-					// code: item.account.person_code || '',
-					// name: item.account.person_name || '',
-					// orgcode: item.account.org_code || '',
-					// orgname: item.account.organization || '',
-					// job: item.account.title || '',
-					// sex: item.account.gender || '',
-					// tel: item.account.person_telephone || '',
-
-					// is_user: true,
-
-					// sections: item.account.sections || '',
-					// tags: item.account.tags || '',
-					// groups: groupsId || []
 				}
 			})
 		this.setState({ dataSource: data_person, tempData: data_person, loading: false });
@@ -645,6 +584,7 @@ export default class TablePerson extends Component {
 						person_name: item.account.person_name,
 						person_type: "C_PER",
 						person_avatar_url: item.account.person_avatar_url,
+						person_signature_url: item.account.person_signature_url,
 						organization: {
 							// pk: node.pk,
 							code: item.account.org_code,
@@ -683,7 +623,7 @@ export default class TablePerson extends Component {
 		} = this.props;
 		this.setState({ loading: true })
 		if (value) {
-			getUsers({}, {is_black: 1 , "keyword": value, page: 1 }).then(items => {
+			getUsers({}, { is_black: 1, "keyword": value, page: 1 }).then(items => {
 				let pagination = {
 					current: 1,
 					total: items.count,
@@ -691,7 +631,7 @@ export default class TablePerson extends Component {
 				this.setState({ tempData: this.searchDatas(items.results), pagination: pagination, btn: true, value: value, loading: false })
 			})
 		} else {
-			getUsers({}, {is_black: 1 , page: this.state.pages || 1 }).then(items => {
+			getUsers({}, { is_black: 1, page: this.state.pages || 1 }).then(items => {
 				let pagination = {
 					current: this.state.pages || 1,
 					total: items.count,
@@ -749,14 +689,21 @@ export default class TablePerson extends Component {
 			sidebar: { node } = {},
 			actions: { deleteUser, getOrgName }
 		} = this.props;
-		const { actions: { reverseFind, is_fresh, deletePerson, putUser } } = this.props;
+		const { actions: { reverseFind, is_fresh, deletePerson, putUser, putUserBlackList } } = this.props;
 		console.log("record", record)
 		let rst = await getOrgName({ code: record.account.organization.code })
 		console.log("rst", rst)
-	
+
 		let groupd = []
 		record.groups.map(ess => {
 			groupd.push(ess.id)
+		})
+		putUserBlackList({ userID: record.id }, {
+			is_black: 0,
+			change_all: false,
+			black_remark: '',
+		}).then(rst => {
+			console.log("rst", rst)
 		})
 		putUser({}, {
 			id: record.id,
@@ -767,6 +714,7 @@ export default class TablePerson extends Component {
 				person_name: record.account.person_name,
 				person_type: "C_PER",
 				person_avatar_url: record.account.person_avatar_url,
+				person_signature_url: record.account.person_signature_url,
 				organization: {
 					pk: rst.pk,
 					code: record.account.organization.code,
@@ -779,10 +727,10 @@ export default class TablePerson extends Component {
 			sections: record.sections,
 			//groups: [7],
 			groups: groupd,
-			black_remark: record.black_remark,
+			// black_remark: record.black_remark,
 			is_active: true,
 			id_num: record.id_num,
-			is_black: 0,
+			// is_black: 0,
 			// id_image: [],
 			id_image: record.id_image,
 			basic_params: {
@@ -801,27 +749,39 @@ export default class TablePerson extends Component {
 			if (rst.code == 1) {
 				console.log("rst", rst)
 				// console.log("333333333", JSON.parse(rst.msg))
-			
-				if(this.state.pagination.current>1&&this.state.tempData.length==1){
-				const strs1=this.state.fristPagination.total.toString()
-				const strs2=strs1.slice(0 , strs1.length-1)
 
-					this.state.fristPagination.total=strs2*10
-					this.setState({ tempData: this.state.fristTempData,
-						pagination:this.state.fristPagination
-					})
-				}else{
-					let tempDatas = []
-					this.state.tempData.map(item => {
-						const msg=JSON.parse(rst.msg).id
-						if (item.id != msg) {
-							tempDatas.push(item)
-						}
-					})
-					this.setState({
-						tempData:tempDatas
-					})
-				}
+				// if (this.state.pagination.current > 1 && this.state.tempData.length == 1) {
+				// 	const strs1 = this.state.fristPagination.total.toString()
+				// 	const strs2 = strs1.slice(0, strs1.length - 1)
+
+				// 	this.state.fristPagination.total = strs2 * 10
+				// 	this.setState({
+				// 		tempData: this.state.fristTempData,
+				// 		pagination: this.state.fristPagination
+				// 	})
+				// } else {
+				// 	let tempDatas = []
+				// 	this.state.tempData.map(item => {
+				// 		const msg = JSON.parse(rst.msg).id
+				// 		if (item.id != msg) {
+				// 			tempDatas.push(item)
+				// 		}
+				// 	})
+				// 	this.setState({
+				// 		tempData: tempDatas
+				// 	})
+				// }
+				let tempDatas = []
+				this.state.tempData.map(item => {
+					const msg = JSON.parse(rst.msg).id
+					if (item.id != msg) {
+						tempDatas.push(item)
+					}
+				})
+				this.setState({
+					tempData: tempDatas
+				})
+				this.querys()
 			}
 		})
 
@@ -864,6 +824,5 @@ export default class TablePerson extends Component {
 	// 	pageSizeOptions: ['5', '10', '20', '30', '40', '50'],
 	// 	showQuickJumper: true,
 	// }
-
-
 }
+export default Form.create()(TablePerson)

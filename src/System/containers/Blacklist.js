@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {TablePerson} from '../components/Blacklist'
+import {TablePerson,PersonModify} from '../components/Blacklist'
 import {actions as platformActions} from '_platform/store/global';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -218,10 +218,10 @@ export default class Blacklist extends Component {
 					} 
 					{
 						Exvisible && <PersonExpurgate {...this.props} setDataDel = {this.setDataDel.bind(this)}/>
-					}
+					} */}
 					{
 						Modvisible && <PersonModify {...this.props} setDataUpdate = {this.setDataUpdate.bind(this)}/>
-					} */}
+					}
 				</Content>
 			</div>
 			)
