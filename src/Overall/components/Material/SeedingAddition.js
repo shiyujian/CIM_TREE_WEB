@@ -137,6 +137,18 @@ class SeedingAddition extends Component {
         this.getSection()
     }
 
+    async componentDidUpdate(prevProps,prevState){
+        const{
+            seedingAddVisible = false,
+        }= this.props
+        if(seedingAddVisible && seedingAddVisible != prevProps.seedingAddVisible){
+            this.setState({
+                TreatmentData:[],
+                dataSource:[],
+            })
+        }
+    }
+
     //获取当前登陆用户的标段
     getSection(){
         let user = getUser()
@@ -475,6 +487,7 @@ class SeedingAddition extends Component {
             actions: {SeedingAddVisible}
         } = this.props;
         SeedingAddVisible(false);
+
     }
     //多选框的选择
     onSelectChange= (selectedRowKeys) => {

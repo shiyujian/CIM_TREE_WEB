@@ -171,7 +171,7 @@ class ResourceTable extends Component {
 			console.log("工程材料报批流程", values);
             console.log("err", err);
             
-			values.sunit?reqData.subject_sectionName__contains = values.ssection : '';
+			values.ssection?reqData.subject_sectionName__contains = values.ssection : '';
 			values.sname?reqData.subject_name__contains = values.sname : '';
 			values.scode?reqData.subject_code__contains = values.scode : '';
 			if(values.stimedate && values.stimedate instanceof Array && values.stimedate.length>0){
@@ -255,17 +255,23 @@ class ResourceTable extends Component {
 				}
 			})
 		}else{
-			//不关联标段的人可以看选择项目的进度流程
-			selectCode = leftkeycode
-			workflowData.map((task)=>{
-			
-				let projectName = task.projectName
-				let projectCode = this.getProjectCode(projectName)
+
+			if(leftkeycode){
+				//不关联标段的人可以看选择项目的进度流程
+				selectCode = leftkeycode
+				workflowData.map((task)=>{
 				
-				if(projectCode === selectCode ){
-					filterData.push(task);
-				}
-			})
+					let projectName = task.projectName
+					let projectCode = this.getProjectCode(projectName)
+					
+					if(projectCode === selectCode ){
+						filterData.push(task);
+					}
+				})
+			}else{
+				filterData = workflowData
+			}
+			
 
 		}      
 		

@@ -194,6 +194,7 @@ class SearchInfo extends Component {
             stimedate:undefined,
             sstatus:undefined
         })
+        this.props.gettaskSchedule()
     }
 }
 

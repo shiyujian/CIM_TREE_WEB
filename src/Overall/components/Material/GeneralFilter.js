@@ -173,6 +173,7 @@ export default class GeneralFilter extends Component {
             stimedate: undefined,
             sstatus: undefined
         })
+        this.props.gettaskSchedule()
     }
 	cancel() {
 

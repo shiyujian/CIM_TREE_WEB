@@ -162,14 +162,15 @@ class GeneralTable extends Component {
 			console.log("机械设备报批流程", values);
             console.log("err", err);
             
-            values.sunit?reqData.subject_sectionName__contains = values.ssection : '';
+            values.ssection?reqData.subject_sectionName__contains = values.ssection : '';
             values.scode?reqData.subject_code__contains = values.scode : '';
 			if(values.stimedate && values.stimedate instanceof Array && values.stimedate.length>0){
 				values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
 				values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
 			}
             values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
-        })
+		})
+		console.log('reqData',reqData)
         
 
         let tmpData = Object.assign({}, reqData);
@@ -184,8 +185,6 @@ class GeneralTable extends Component {
 			let subject = item.subject[0];
 			let creator = item.creator;
 			let postData = subject.postData?JSON.parse(subject.postData):{};
-			console.log('item.creator',item.creator)
-			console.log('submitTime',moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),)
 			let data = {
 				// index:index+1,
 				id:item.id,
@@ -241,19 +240,26 @@ class GeneralTable extends Component {
 				}
 			})
 		}else{
-			//不关联标段的人可以看选择项目的进度流程
-			selectCode = leftkeycode
-			workflowData.map((task)=>{
+
+			if(leftkeycode){
+				//不关联标段的人可以看选择项目的进度流程
+				selectCode = leftkeycode
+				workflowData.map((task)=>{
+
+					let projectName = task.projectName
+					let projectCode = this.getProjectCode(projectName)
+					
+					if(projectCode === selectCode ){
+						filterData.push(task);
+					}
+				})
+			}else{
+				filterData = workflowData
+			}
 			
-				let projectName = task.projectName
-				let projectCode = this.getProjectCode(projectName)
-				
-				if(projectCode === selectCode ){
-					filterData.push(task);
-				}
-			})
 
 		}      
+		console.log('filterData',filterData)
 		
 		this.setState({
 			filterData

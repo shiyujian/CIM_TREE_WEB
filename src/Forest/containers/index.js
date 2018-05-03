@@ -12,3 +12,4 @@ export Enteranalyze from './Enteranalyze';
 export Scheduleanalyze from './Scheduleanalyze';
 export Contrastinfo from './Contrastinfo';
 export DataExport  from './DataExport';
+export SeedlingsChange  from './SeedlingsChange';

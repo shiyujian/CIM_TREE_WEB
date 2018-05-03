@@ -31,7 +31,8 @@ export default class ForestContainer extends Component {
 			Dataimport = null,
 			Contrastinfo = null,
 			CarPackage = null,
-			DataExport = null
+			DataExport = null,
+			SeedlingsChange = null
 		} = this.state || {};
 		return (
 				<Body >
@@ -53,6 +54,7 @@ export default class ForestContainer extends Component {
 						{Dataimport && <Route path="/forest/dataimport" component={Dataimport}/>}
 						{DataExport && <Route path="/forest/dataexport" component={DataExport}/>}
 						{Contrastinfo && <Route path="/forest/contrastinfo" component={Contrastinfo}/>}
+						{SeedlingsChange && <Route path="/forest/seedlingschange" component={SeedlingsChange}/>}
 					</Main>
 				</Body>);
 	}
@@ -101,6 +103,11 @@ export default class ForestContainer extends Component {
 			id: 'FOREST.FAITHINFO',
 			path: '/forest/faithinfo',
 			name: '供应商诚信信息',
+		},{
+			key: 'seedlingschange',
+			id: 'FOREST.SEEDLINGSCHANGE',
+			path: '/forest/seedlingschange',
+			name: '苗木信息修改',
 		}]
 	},
 	// {

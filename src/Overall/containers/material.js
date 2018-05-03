@@ -42,6 +42,7 @@ export default class Material extends Component {
             let data = await getScheduleTaskList()
             if(data && data instanceof Array && data.length>0){
                 data = data[0]
+                
                 let leftkeycode = data.No? data.No :''
                 this.setState({
                     leftkeycode
@@ -51,6 +52,7 @@ export default class Material extends Component {
             let data = tree.projectList
             if(data && data instanceof Array && data.length>0){
                 data = data[0]
+                
                 let leftkeycode = data.No? data.No :''
                 this.setState({
                     leftkeycode

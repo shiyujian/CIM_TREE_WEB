@@ -189,7 +189,8 @@ export default class SeedingFilter extends Component {
             scode: undefined,
             stimedate: undefined,
             sstatus: undefined
-        })
+		})
+		this.props.gettaskSchedule()
     }
 };
 

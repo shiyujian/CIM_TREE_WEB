@@ -190,6 +190,7 @@ export default class ResourceFilter extends Component {
             stimedate: undefined,
             sstatus: undefined
         })
+        this.props.gettaskSchedule()
     }
 };
 
