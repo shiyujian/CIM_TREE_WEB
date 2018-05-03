@@ -698,6 +698,7 @@ class TablePerson extends Component {
 		record.groups.map(ess => {
 			groupd.push(ess.id)
 		})
+		this.setState({ loading: true })
 		putUserBlackList({ userID: record.id }, {
 			is_black: 0,
 			change_all: false,
@@ -779,7 +780,8 @@ class TablePerson extends Component {
 					}
 				})
 				this.setState({
-					tempData: tempDatas
+					tempData: tempDatas,
+					loading: false 
 				})
 				this.querys()
 			}
