@@ -31,7 +31,7 @@ class Updatemodal extends Component {
             },
             updatevisible
         }=this.props
-        if(oldfile != prevProps.oldfile || updatevisible){
+        if(oldfile != prevProps.oldfile || updatevisible != prevProps.updatevisible){
             setFieldsValue(
                 {
                     name1:oldfile.name?oldfile.name:'',
@@ -259,7 +259,7 @@ class Updatemodal extends Component {
                         time:moment(values.time1).format('YYYY-MM-DD'),
                         remark: values.remark1,
                         type: resp.type,
-                        lasttime: moment(values.lastModifiedDate).format('YYYY-MM-DD'),
+                        lasttime: moment(resp.lastModifiedDate).format('YYYY-MM-DD'),
                         state: '正常文档',
                         submitTime: moment.utc().format()
                     },
