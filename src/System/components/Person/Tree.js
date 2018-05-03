@@ -110,7 +110,7 @@ export default class Tree extends Component {
 		const {node: {props: {eventKey = ''} = {}} = {}} = node || {};
 		const {
 			platform: {org: {children = []} = {}},
-			actions: {changeSidebarField, getUsers,getTreeModal,setUpdate,getTablePage,getTreeCode,getIsBtn}
+			actions: {changeSidebarField, getUsers,getTreeModal,setUpdate,getTablePage,getTreeCode,getIsBtn,getUsersBlackListOK}
 		} = this.props;
 		const o = Tree.loop(children, eventKey);
 		let ucode

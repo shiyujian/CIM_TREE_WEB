@@ -25,12 +25,13 @@ class Addition extends Component {
 			newKey: Math.random(),
 			btns: true,
 			btnf: true,
-			checkedBtn:null
+			checkedBtn: null,
+			OriginalBlack:null,
+			change_alValue:null,
+			black_remarkValue:null,
 		}
 	}
-
 	renderContent() {
-
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		const { platform: { roles = [] } } = this.props;
 		var systemRoles = []
@@ -73,9 +74,7 @@ class Addition extends Component {
 		})
 		return objs
 	}
-
 	renderTitle() {
-
 		const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
 		const { platform: { roles = [] } } = this.props;
 		var systemRoles = []
@@ -120,12 +119,10 @@ class Addition extends Component {
 	}
 	// 上传用户头像
 	uploadChange(file) {
-
 		const status = file.file.status;
 		const { actions: { postUploadFilesImg, getImgBtn }, fileList = [] } = this.props;
 		if (status === 'done') {
 			let newFileList = file.file.response.download_url.split('/media')[1]
-			// postUploadVideo(newFileList)
 			getImgBtn(true)
 			postUploadFilesImg(newFileList)
 		}
@@ -136,14 +133,11 @@ class Addition extends Component {
 		if (event) {
 			let { percent } = event;
 			if (percent !== undefined) {
-
 			}
-			// this.setState({ progress: parseFloat(percent.toFixed(1)) });
 		}
 	}
 	// 上传用户签名
 	uploadChangew(file) {
-
 		const status = file.file.status;
 		const { actions: { postUploadAutograph, getAutographBtn }, postUploadAutographs = [] } = this.props;
 		if (status === 'done') {
@@ -159,14 +153,12 @@ class Addition extends Component {
 		if (event) {
 			let { percent } = event;
 			if (percent !== undefined) {
-
 			}
 			// this.setState({ progress: parseFloat(percent.toFixed(1)) });
 		}
 	}
 	// 上传身份证正面照片
 	uploadChanges(file) {
-		console.log("file", file)
 		const status = file.file.status;
 		const { actions: { postUploadFilesNum, getImgNumBtn }, postUploadFilesNums = [] } = this.props;
 		if (status === 'done') {
@@ -175,7 +167,6 @@ class Addition extends Component {
 				name: file.file.name,
 				filepath: STATIC_DOWNLOAD_API + "/media" + file.file.response.download_url.split('/media')[1]
 			};
-			// newFileList = newFileList.concat(newFile);
 			getImgNumBtn(true)
 			this.setState({ btnf: true })
 			postUploadFilesNum(newFile)
@@ -188,14 +179,11 @@ class Addition extends Component {
 		if (event) {
 			let { percent } = event;
 			if (percent !== undefined) {
-
 			}
-			// this.setState({ progress: parseFloat(percent.toFixed(1)) });
 		}
 	}
 	// 上传身份证反面照片
 	uploadChangea(file) {
-		console.log("file", file)
 		const status = file.file.status;
 		const { actions: { postUploadNegative, getImgNegative }, postUploadNegatives = [] } = this.props;
 		if (status === 'done') {
@@ -204,8 +192,6 @@ class Addition extends Component {
 				name: file.file.name,
 				filepath: STATIC_DOWNLOAD_API + "/media" + file.file.response.download_url.split('/media')[1]
 			};
-			// newFileList = newFileList.concat(newFile);
-			// console.log("")
 			this.setState({ btns: true })
 
 			getImgNegative(true)
@@ -219,9 +205,7 @@ class Addition extends Component {
 		if (event) {
 			let { percent } = event;
 			if (percent !== undefined) {
-
 			}
-			// this.setState({ progress: parseFloat(percent.toFixed(1)) });
 		}
 	}
 
@@ -271,7 +255,6 @@ class Addition extends Component {
 		let id_image_url = ''
 		let id_image_urlName
 		if (addition.id_image && addition.id_image[0]) {
-
 			if (addition.id_image[0].name && addition.id_image[0].filepath) {
 				id_image_urlName = addition.id_image[0].name
 				// filepath: STATIC_DOWNLOAD_API + "/media" + file.file.response.download_url.split('/media')[1]
@@ -294,13 +277,9 @@ class Addition extends Component {
 		let id_image_urlName1
 		if (addition.id_image && addition.id_image[1]) {
 			if (addition.id_image[1].name && addition.id_image[1].filepath) {
-
 				const id_img = addition.id_image[1].filepath.split('/media')[1]
 				const id_imgs = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + id_img
-				
-
 				id_image_urlName1 = addition.id_image[1].name
-				// id_image_url1 = addition.id_image[1].filepath ? addition.id_image[1].filepath : addition.id_image[1].thumbUrl
 				id_image_url1 = id_imgs ? id_imgs : addition.id_image[1].thumbUrl
 				fileList2 = [{
 					uid: 2,
@@ -311,9 +290,6 @@ class Addition extends Component {
 				}]
 			}
 		}
-
-
-
 		let marginTops = ''
 		if (!user.is_superuser) {
 			marginTops = '55px'
@@ -428,7 +404,6 @@ class Addition extends Component {
 										</Select>
 									</FormItem>
 									<div style={{ marginLeft: '25%' }}>
-										{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
 										<Upload name="file"
 											multiple={true}
 											accept={fileTypes}
@@ -448,8 +423,7 @@ class Addition extends Component {
 									</div>
 
 									<div style={{ marginLeft: '25%', marginTop: '30px' }}>
-									{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
-									<Upload name="file"
+										<Upload name="file"
 											multiple={true}
 											accept={fileTypes}
 											// showUploadList: false,
@@ -458,9 +432,7 @@ class Addition extends Component {
 											data={(file) => ({ name: file.fileName, a_file: file })}
 											onChange={this.uploadChangew.bind(this)}
 											defaultFileList={autographList}
-											// disabled={this.props.getAutographBtns}
 											disabled={autographList && autographList.length ? (this.props.getAutographBtns == true ? this.props.getAutographBtns : this.props.getAutographBtns == false ? false : true) : this.props.getAutographBtns}
-											
 										>
 											<Button>
 												<Icon type="upload" />
@@ -505,7 +477,6 @@ class Addition extends Component {
 												)
 										}
 									</FormItem>
-
 									<FormItem   {...Addition.layout} label="角色:">
 										{
 											getFieldDecorator('rolesNmae', {
@@ -534,7 +505,6 @@ class Addition extends Component {
 										{/* <Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
 									mode="multiple" style={{ width: '100%' }} > */}
 										{/* {tagsOptions} */}
-
 										<Select placeholder="苗圃" showSearch
 											value={defaultNurse}
 											optionFilterProp='children'
@@ -548,30 +518,33 @@ class Addition extends Component {
 										<Col span={8}>
 											{user.is_superuser ?
 												<FormItem {...Addition.layoutT} label="黑名单">
-													{/* <Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} /> */}
-
 													<Switch checked={addition.id ? (addition.is_black == 0 ? false : true) : false}
 														onChange={this.changeblack.bind(this)}
-														// onChange={changeAdditionField.bind(this, 'is_black')}
+													// onChange={changeAdditionField.bind(this, 'is_black')}
 													/>
-
 												</FormItem> : ''}
 										</Col>
-										<Col span={16}>
+										<Col span={6}>
+											{user.is_superuser ?
+												<FormItem {...Addition.layoutY} label="关联用户">
+													<Switch checked={addition.id ? addition.change_all : false}
+														onChange={this.changeChange_all.bind(this)}
+														// onChange={changeAdditionField.bind(this, 'change_all')}
+													/>
+												</FormItem> : ''}
+										</Col>
+										<Col span={10}>
 											{user.is_superuser ?
 												<FormItem {...Addition.layoutR} label="原因">
-													{/* <Input placeholder="请输入邮箱" value={addition.email} onChange={changeAdditionField.bind(this, 'email')} /> */}
-
 													<Input value={addition.black_remark}
-														onChange={changeAdditionField.bind(this, 'black_remark')}
+														onChange={this.changeBlack_remark.bind(this)}														
+														// onChange={changeAdditionField.bind(this, 'black_remark')}
 													/>
 												</FormItem> : ''}
 										</Col>
-
 									</Row>
 
 									<div style={{ marginLeft: '25%', marginTop: marginTops }}>
-										{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
 										<Upload name="file"
 											multiple={true}
 											accept={fileTypes}
@@ -581,9 +554,7 @@ class Addition extends Component {
 											data={(file) => ({ name: file.fileName, a_file: file })}
 											onChange={this.uploadChanges.bind(this)}
 											defaultFileList={fileList1}
-											// disabled={this.props.getImgNumBtns}
 											disabled={fileList1 && fileList1.length ? (this.props.getImgNumBtns == true ? this.props.getImgNumBtns : this.props.getImgNumBtns == false ? false : true) : this.props.getImgNumBtns}
-
 										>
 											<Button>
 												<Icon type="upload" />
@@ -592,7 +563,6 @@ class Addition extends Component {
 										</Upload>
 									</div>
 									<div style={{ marginLeft: '25%', marginTop: '30px' }}>
-										{/* {!addition.id || fileList.length == 0 || !this.state.btns ? */}
 										<Upload name="file"
 											multiple={true}
 											accept={fileTypes}
@@ -602,9 +572,7 @@ class Addition extends Component {
 											data={(file) => ({ name: file.fileName, a_file: file })}
 											onChange={this.uploadChangea.bind(this)}
 											defaultFileList={fileList2}
-											// disabled={this.props.getImgNegatives}
 											disabled={fileList2 && fileList2.length ? (this.props.getImgNegatives == true ? this.props.getImgNegatives : this.props.getImgNegatives == false ? false : true) : this.props.getImgNegatives}
-
 										>
 											<Button>
 												<Icon type="upload" />
@@ -618,7 +586,6 @@ class Addition extends Component {
 					</Modal>
 				}
 			</div>
-
 		);
 	}
 
@@ -635,7 +602,6 @@ class Addition extends Component {
 					projectName = listStore[index] ? listStore[index][0].name : ''
 				}
 			})
-
 		})
 		return getProjectUnits(projectName)
 	}
@@ -663,11 +629,23 @@ class Addition extends Component {
 		getSection(value)
 		changeAdditionField('sections', value)
 	}
-	changeblack(checked){
-		const { actions: { changeAdditionField, getSection } } = this.props;
-		console.log("checked111111111111",checked)
-		this.setState({checkedBtn:checked})
+	changeblack(checked) {
+		const {addition = {}, actions: { changeAdditionField } } = this.props;
+		this.setState({ checkedBtn: checked,OriginalBlack:addition.is_black })
 		changeAdditionField('is_black', checked)
+	}
+	changeChange_all(value){
+		const { addition = {},actions: { changeAdditionField,} } = this.props;
+		this.setState({ change_alValue: value })		
+		changeAdditionField('change_all', value)
+	}
+	changeBlack_remark(value){
+		const { addition = {},actions: { changeAdditionField,} } = this.props;
+		if(value!=addition.black_remark){
+			this.setState({ black_remarkValue: value })	
+			changeAdditionField('black_remark', value)				
+		}
+		
 	}
 	//将选择的苗圃传入redux
 	changeNursery(value) {
@@ -713,19 +691,14 @@ class Addition extends Component {
 	}
 
 	save() {
-		// const { actions: { postUploadFilesImg,getImgBtn }, fileList = [] } = this.props;
-
 		const {
 			addition = {}, sidebar: { node } = {},
 			platform: { users = [] },
 			actions: { postUser, clearAdditionField, getUsers, postUploadFilesImg, getImgBtn, postUploadNegative, getImgNegative, getAutographBtn,
-				putUser, getSection, getTablePage, getIsBtn, postUploadFilesNum, getImgNumBtn, getSwitch,postUploadAutograph }, tags = {}
+				putUser, getSection, getTablePage, getIsBtn, postUploadFilesNum, getImgNumBtn, getSwitch, postUploadAutograph, putUserBlackList }, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
-		console.log("addition", addition)
 		if (!addition.id_image) {
-
-
 			if (!this.props.postUploadFilesNums) {
 				message.warn('请上传身份证正面照片');
 				return
@@ -734,67 +707,75 @@ class Addition extends Component {
 				message.warn('请上传身份证反面照片');
 				return
 			}
-
 		} else {
 			if (!this.props.postUploadFilesNums && !addition.id_image[0]) {
-
 				message.warn('请上传身份证正面照片');
 				return
-
 			}
 			if (!this.props.postUploadNegatives && !addition.id_image[1]) {
-
 				message.warn('请上传身份证反面照片');
 				return
-
 			}
-
 		}
-
-
 		if (this.props.fileList) {
 			addition.person_avatar_url = this.props.fileList
 		} else {
 			addition.person_avatar_url = addition.person_avatar_url
 		}
-		
 		if (this.props.postUploadAutographs) {
 			addition.relative_signature_url = this.props.postUploadAutographs
 		} else {
 			addition.relative_signature_url = addition.relative_signature_url
 		}
-		let blacksa
+		let blacksa=null
 		let actives
-		if(this.state.checkedBtn==true){
+		if (this.state.checkedBtn == true) {
 			if (addition.is_black == true) {
 				addition.is_active = false
 				actives = false
 				blacksa = 1
 			}
-		}else if(this.state.checkedBtn==false){
+		} else if (this.state.checkedBtn == false) {
 			if (addition.is_black == false) {
 				addition.is_active = true
 				actives = true
-				blacksa = 0	
+				blacksa = 0
 			}
-		}else{
-			if(addition.is_black == true){
+		} else {
+			if (addition.is_black == true) {
 				blacksa = 1
 				actives = this.props.getIsActives
 			}
 			if (addition.is_black == false) {
-				blacksa = 0	
+				blacksa = 0
 				actives = this.props.getIsActives
 			}
-			
 		}
-		console.log('111111111111',actives,blacksa)
+		if(blacksa==1){
+			if(this.state.change_alValue==true || addition.change_all==true){
+				users.map(ese=>{
+					 if(ese.id_num==addition.id_num ){
+						ese.is_active = false
+						ese.is_black= 1
+					 }
+				})
+			}
+		}
+		if(blacksa==0){
+			if(this.state.change_alValue==true || addition.change_all==true){
+				users.map(ese=>{
+					 if(ese.id_num==addition.id_num){
+						ese.is_black= 0
+						ese.is_active = true
+					 }
+				})
+			}
+		}
 		let UploadFilesNums
 		let UploadNegatives
 		let imgBtnZ = true
 		if (this.state.btnf == false && !this.props.postUploadFilesNums) {
 			UploadFilesNums = null
-
 			imgBtnZ = false
 		} else if (this.state.btnf == true && this.props.postUploadFilesNums) {
 			UploadFilesNums = this.props.postUploadFilesNums
@@ -821,8 +802,6 @@ class Addition extends Component {
 		if (!imgBtnF) {
 			this.setState({ btns: true })
 		}
-
-
 		addition.id_image = [UploadFilesNums, UploadNegatives]
 		if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
 			message.warn('请输入英文字符、数字');
@@ -836,8 +815,16 @@ class Addition extends Component {
 					}
 				}
 				this.props.form.validateFields((err, values) => {
-					console.log("err", err)
 					if (!err || !err.FullName && !err.UserName && !err.rolesNmae && !err.sexName && !err.telephone && !err.titles && !err.idcard) {
+						if ((this.state.checkedBtn!=null && blacksa != this.state.OriginalBlack)||this.state.change_alValue!=null||this.state.black_remarkValue!=null) {
+							putUserBlackList({ userID: addition.id }, {
+								is_black: blacksa,
+								change_all: addition.change_all,
+								black_remark: addition.black_remark,
+							}).then(rst => {
+								console.log("rst", rst)
+							})
+						}
 						putUser({}, {
 							id: addition.id,
 							username: addition.username,
@@ -858,13 +845,12 @@ class Addition extends Component {
 							},
 							tags: addition.tags,
 							sections: addition.sections,
-							//groups: [7],
 							groups: roles.map(role => +role),
-							black_remark: addition.black_remark,
+							// black_remark: addition.black_remark,
+							// change_all:addition.change_all,
 							is_active: actives,
 							id_num: addition.id_num,
-							is_black: blacksa,
-							// id_image: [],
+							// is_black: blacksa,
 							id_image: [UploadFilesNums, UploadNegatives],
 							basic_params: {
 								info: {
@@ -894,19 +880,18 @@ class Addition extends Component {
 								clearAdditionField();
 								this.setState({
 									newKey: Math.random(),
-									checkedBtn:null,
+									checkedBtn: null,
+									change_alValue:false,
+									black_remarkValue:null
 								})
-
 							} else {
 								message.warn('服务器端报错！');
 							}
 						})
 					}
 				});
-
 			} else {
 				this.props.form.validateFields((err, values) => {
-
 					if (!err) {
 						postUser({}, {
 							is_person: true,
@@ -931,9 +916,9 @@ class Addition extends Component {
 							sections: addition.id ? addition.sections : this.props.isSection,
 							groups: roles.map(role => +role),
 							is_active: true,
-							black_remark: addition.black_remark,
+							// black_remark: addition.black_remark,
 							id_num: addition.id_num,
-							is_black: 0,
+							// is_black: 0,
 							id_image: [UploadFilesNums, UploadNegatives],
 							basic_params: {
 								info: {
@@ -949,7 +934,13 @@ class Addition extends Component {
 							title: addition.title || ''
 						}).then(rst => {
 							if (rst.code == 1) {
-								message.info('新增人员成功');
+								const msgs=JSON.parse(rst.msg)
+								if(msgs.status==400&&msgs.error=='This id_num is blacklist'){
+									message.warning('身份证号已经加入黑名单');
+									return
+								}else{
+									message.info('新增人员成功');
+								}
 								let sectiona = []
 								getSection(sectiona)
 								clearAdditionField();
@@ -975,7 +966,6 @@ class Addition extends Component {
 								} else {
 									paget = 1
 								}
-
 								getUsers({}, { org_code: codes, page: paget }).then(rest => {
 									let pagination = {
 										current: paget,
@@ -986,7 +976,7 @@ class Addition extends Component {
 								});
 								this.setState({
 									newKey: Math.random(),
-									checkedBtn:null
+									checkedBtn: null
 								})
 							} else {
 								if (rst.code == 2) {
@@ -998,7 +988,6 @@ class Addition extends Component {
 						})
 					}
 				});
-
 			}
 		}
 	}
@@ -1012,7 +1001,7 @@ class Addition extends Component {
 		getSwitch()
 		this.setState({
 			newKey: Math.random(),
-			checkedBtn:null
+			checkedBtn: null
 		})
 		clearAdditionField();
 	}
@@ -1036,9 +1025,13 @@ class Addition extends Component {
 		labelCol: { span: 18 },
 		wrapperCol: { span: 6 },
 	};
+	static layoutY = {
+		labelCol: { span: 14 },
+		wrapperCol: { span: 6 },
+	};
 	static layoutR = {
-		labelCol: { span: 4 },
-		wrapperCol: { span: 20 },
+		labelCol: { span: 6 },
+		wrapperCol: { span: 18 },
 	};
 }
 export default Form.create()(Addition)
