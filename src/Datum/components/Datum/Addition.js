@@ -231,6 +231,10 @@ class Addition extends Component {
             actions: {toggleAddition, postDocument, getdocument,changeDocs}
         } = this.props;
 
+        if (docs.length === 0) {
+            message.error('请上传文件');
+            return
+        }
         let canSave = true
         //判断各列有没有输入
         docs.map((doc)=>{

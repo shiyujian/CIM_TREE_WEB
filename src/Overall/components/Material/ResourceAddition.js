@@ -139,6 +139,18 @@ class ResourceAddition extends Component {
         this.getSection()
     }
 
+    async componentDidUpdate(prevProps,prevState){
+        const{
+            resourceAddVisible = false,
+        }= this.props
+        if(resourceAddVisible && resourceAddVisible != prevProps.resourceAddVisible){
+            this.setState({
+                TreatmentData:[],
+                dataSource:[],
+            })
+        }
+    }
+
     //获取当前登陆用户的标段
     getSection(){
         let user = getUser()

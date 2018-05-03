@@ -159,6 +159,18 @@ class GeneralAddition extends Component {
         this.getSection()
     }
 
+    async componentDidUpdate(prevProps,prevState){
+        const{
+            generalAddVisible = false,
+        }= this.props
+        if(generalAddVisible && generalAddVisible != prevProps.generalAddVisible){
+            this.setState({
+                TreatmentData:[],
+                dataSource:[],
+            })
+        }
+    }
+
     //获取当前登陆用户的标段
     getSection(){
         let user = getUser()

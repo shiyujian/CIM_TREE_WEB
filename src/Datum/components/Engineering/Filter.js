@@ -221,13 +221,20 @@ class Filter extends Component {
 		
 	}
 	clear() {
+		const { 
+			actions: { 
+				searchEnginMessage,
+				searchEnginVisible 
+			}
+		} = this.props;
         this.props.form.setFieldsValue({
 			searchProject: undefined,
             searcSection: undefined,
             searchName: undefined,
 			searchDate: undefined,
 			searchCode: undefined,
-        })
+		})
+		searchEnginMessage({})
     }
 	cancel() {
 

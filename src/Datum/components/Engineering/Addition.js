@@ -339,7 +339,11 @@ class Addition extends Component {
 			parent 
         } = this.props;
 
-        
+        if (docs.length === 0) {
+            message.error('请上传文件');
+            return
+        }
+
         //判断各列有没有输入
         let canSave = true
         //判断选中的是哪个节点下的文件夹
@@ -367,6 +371,8 @@ class Addition extends Component {
         const promises = docs.map(doc => {
             const response = doc.response;
             let files = DeleteIpPort(doc);
+            files.uid = response.id
+            console.log('files',files)
             return postDocument({}, {
                 code: `${currentcode.code}_${response.id}`,
                 name: doc.name,
@@ -417,15 +423,15 @@ class Addition extends Component {
         //                 code: currentcode.code, obj_type: 'C_DIR',
         //             },
         //             basic_params: {
-        //                 files: [{
-        //                     "uid": resp.id,
-        //                     "misc": resp.misc,
-        //                     "download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-        //                     "a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-        //                     "create_time": resp.create_time,
-        //                     "mime_type": resp.mime_type,
-        //                     "name":resp.name
-        //                 }]
+                        // files: [{
+                        //     "uid": resp.id,
+                        //     "misc": resp.misc,
+                        //     "download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        //     "a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        //     "create_time": resp.create_time,
+                        //     "mime_type": resp.mime_type,
+                        //     "name":resp.name
+                        // }]
         //             },
         //             extra_params: {
         //                 number: values.number,
