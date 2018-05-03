@@ -50,7 +50,7 @@ export default class Datum extends Component {
 				</Content>
 				<Addition {...this.props}/>
 			</Main>
-			<Updatemodal {...this.props}/>
+			<Updatemodal {...this.props} doc_type = {this.doc_type}/>
 			<Preview/>
 			</Body>
 		);
@@ -74,6 +74,7 @@ export default class Datum extends Component {
 	    if(code === undefined){
 		    return
 		}
+		this.doc_type = e.node.props.title;
 		this.setState({isTreeSelected:e.selected})
         setcurrentcode({code:code.split("--")[1]});
         getdocument({code:code.split("--")[1]});

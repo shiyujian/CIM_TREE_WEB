@@ -2,14 +2,15 @@ import React, {PropTypes, Component} from 'react';
 import {FILE_API} from '../../../_platform/api';
 import {
     Form, Input,Button, Row, Col, Modal, Upload,DatePicker,Progress,
-    Icon, message, Table
+    Icon, message, Table,Spin
 } from 'antd';
 import moment from 'moment';
 import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort';
 const Dragger = Upload.Dragger;
+const FormItem = Form.Item;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
 
-export default class Addition extends Component {
+class Updatemodal extends Component {
 
     static propTypes = {};
 
@@ -22,57 +23,150 @@ export default class Addition extends Component {
         isUploading: false
     }
 
+    componentDidUpdate(prevProps,prevState){
+        const{
+            oldfile,
+            form: {
+                setFieldsValue
+            },
+            updatevisible
+        }=this.props
+        if(oldfile != prevProps.oldfile || updatevisible){
+            setFieldsValue(
+                {
+                    name1:oldfile.name?oldfile.name:'',
+                    number1:oldfile.extra_params.number?oldfile.extra_params.number:'',
+                    company1:oldfile.extra_params.company?oldfile.extra_params.company:'',
+                    time1:oldfile.extra_params.time?moment.utc(oldfile.extra_params.time):'',
+                    remark1:oldfile.extra_params.remark?oldfile.extra_params.remark:'',
+                    attachment1:oldfile.basic_params.files?oldfile.basic_params.files:[],
+                }
+            )
+        }
+    }
+
     render() {
         const{
+            form: { getFieldDecorator },
             updatevisible = false,
-            docs = []
+            docs = [],
+            oldfile = {}
         } = this.props;
+
+        const formItemLayout = {
+			labelCol: { span: 6 },
+			wrapperCol: { span: 14 },
+		};
+
         let {progress,isUploading} = this.state;
         let arr = [<Button key="back" size="large" onClick={this.cancel.bind(this)}>取消</Button>,
                     <Button key="submit" type="primary" size="large" onClick={this.save.bind(this)}>确定</Button>];
         let footer = isUploading ? null : arr;
         return (
-            <Modal title="新增资料"
-                   width={920} visible={updatevisible}
-                   closable={false}
-                   footer={footer}
-                   maskClosable={false}>
-                <Form>
-                    <Row gutter={24}>
-                        <Col span={24} style={{marginTop: 16, height: 160}}>
-                            <Dragger {...this.uploadProps}
-                                     accept={fileTypes}
-                                     onChange={this.changeDoc.bind(this)}>
-                                <p className="ant-upload-drag-icon">
-                                    <Icon type="inbox"/>
-                                </p>
-                                <p className="ant-upload-text">点击或者拖拽开始上传</p>
-                                <p className="ant-upload-hint">
-                                    支持 pdf、doc、docx 文件
-                                </p>
-                            </Dragger>
-                            <Progress percent={progress} strokeWidth={5}/>
-                        </Col>
-                    </Row>
-                    <Row gutter={24} style={{marginTop: 35}} >
-                        <Col span={24}>
-                            <Table rowSelection={this.rowSelection}
-                                   columns={this.docCols}
-                                   dataSource={docs}
-                                   bordered rowKey="uid"/>
-                        </Col>
-                    </Row>
-                </Form>
-            </Modal>
+            <div>
+                {
+                    !updatevisible?
+                    null:
+                    <Modal title="编辑资料"
+                        width={920} visible={updatevisible}
+                        closable={false}
+                        footer={footer}
+                        maskClosable={false}>
+                        <Spin spinning={isUploading}>
+                            <Form>
+                                <FormItem {...formItemLayout} label="规范名称">
+                                    {getFieldDecorator('name1', {
+                                        // initialValue:oldfile && oldfile.name ,
+                                        rules: [
+                                            { required: true, message: '请输入规范名称' },
+                                        ]
+                                    })(<Input type="text" readOnly/>)
+                                    }
+                                </FormItem>
+                                
+                                <FormItem {...formItemLayout} label="规范编号">
+                                    {getFieldDecorator('number1', {
+                                        // initialValue:oldfile && oldfile.extra_params &&  oldfile.extra_params.number,
+                                        rules: [
+                                            { required: true, message: '请输入规范编号' },
+                                        ]
+                                    })(<Input type="text" />)
+                                    }
+                                </FormItem>
+                                
+                                <FormItem {...formItemLayout} label="发布单位">
+                                    {getFieldDecorator('company1', {
+                                        // initialValue: oldfile && oldfile.extra_params &&  oldfile.extra_params.company,
+                                        rules: [
+                                            { required: true, message: '请输入发布单位' },
+                                        ]
+                                    })(
+                                        <Input type="text" />
+                                        )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="实施日期">
+                                    {getFieldDecorator('time1', {
+                                        rules: [
+                                            { required: true, message: '请选择实施日期' },
+                                        ]
+                                    })(
+                                        <DatePicker  format={'YYYY-MM-DD'} style={{ width: '100%', height: '100%' }}/>
+                                        )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="备注">
+                                    {getFieldDecorator('remark1', {
+                                        // initialValue: oldfile && oldfile.extra_params &&  oldfile.extra_params.remark,
+                                        rules: [
+                                            { required: false, message: '请输入备注' },
+                                        ]
+                                    })(
+                                        <Input type="text"  />
+                                        )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="上传文件">
+                                    {getFieldDecorator('attachment1', {
+                                        // initialValue: oldfile.basic_params ? oldfile.basic_params.files : [],
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请至少上传一个文件！',
+                                            }
+                                        ],
+                                        valuePropName: 'fileList',
+                                        getValueFromEvent: this.normFile,
+                                    }, {})(
+                                        <Upload {...this.uploadProps}
+                                        accept={fileTypes}
+                                        onChange={this.changeDoc.bind(this)}
+                                        // defaultFileList={oldfile.basic_params ? oldfile.basic_params.files[0] : []}
+                                        >
+                                            <Button>
+                                                <Icon type="upload" />添加文件
+                                                </Button>
+                                        </Upload>
+                                        )}
+                                </FormItem>
+                            </Form>
+                        </Spin>
+                    </Modal>
+                }
+            </div>
         );
     }
 
-    rowSelection = {
-        onChange: (selectedRowKeys) => {
-            const {actions: {selectDocuments}} = this.props;
-            selectDocuments(selectedRowKeys);
+    normFile = (e) => {
+        console.log('Upload event:', e);
+        if (Array.isArray(e)) {
+          return e;
         }
-    };
+        let len = e.fileList.length
+        if(len>0){
+            return e && [e.fileList[len-1]];
+        }else{
+            return e && e.fileList;
+        }
+        
+    }
 
     cancel() {
         const {
@@ -88,169 +182,102 @@ export default class Addition extends Component {
     uploadProps = {
         name: 'file',
         action: `${FILE_API}/api/user/files/`,
-        showUploadList: false,
-        data(file) {
+        showUploadList: true,
+        data:(file)=> {
             return {
                 name: file.fileName,
                 a_file: file
             };
         },
-        beforeUpload(file) {
+        beforeUpload:(file) => {
+            this.setState({ 
+                progress: 0,
+                isUploading:true 
+            })
             const valid = fileTypes.indexOf(file.type) >= 0;
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
+                this.props.form.setFieldsValue({
+                    attachment1:undefined
+                })
             }
             return valid;
-            this.setState({ progress: 0 });
         },
     };
 
     changeDoc({file, fileList, event}) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        if (file.status === 'done') {
-            changeDocs([...docs, file]);
+        const{
+            form:{setFieldsValue}
+        }=this.props
+        if (file && file.status && file.status === 'done') {
+            setFieldsValue(
+                {
+                    name1:file.name?file.name:'',
+                }
+            )
+            this.setState({
+                isUploading:false
+            })
+        }else if(file && file.status && file.status === 'removed'){
+            setFieldsValue({
+                attachment1:undefined
+            })
         }
-        this.setState({
-            isUploading: file.status === 'done' ? false : true
-        })
-        if(event){
-            let {percent} = event;
-            if(percent!==undefined)
-                this.setState({progress:parseFloat(percent.toFixed(1))});
-        }
     }
 
-    docCols = [
-        {
-            title:'规范名称',
-            dataIndex:'name'
-        },{
-            title:'规范编号',
-            render: (doc) => {
-                return <Input onChange={this.number.bind(this, doc)}/>;
-            }
-        },{
-            title:'发布单位',
-            render: (doc) => {
-                return <Input onChange={this.company.bind(this, doc)}/>;
-            }
-        },{
-            title:'实施日期',
-		    render: (doc) => {
-			    return <DatePicker  onChange={this.time.bind(this, doc)}/>;
-		    }
-        },{
-            title:'备注',
-            render: (doc) => {
-                return <Input onChange={this.remark.bind(this, doc)}/>;
-            }
-        },{
-            title:'操作',
-            render: doc => {
-                return (
-                    <a onClick={this.remove.bind(this, doc)}>删除</a>
-                );
-            }
-        }
-    ];
 
-    remark(doc, event) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.remark = event.target.value;
-        changeDocs(docs);
-    }
-
-	time(doc, event,date) {
-		const {
-			docs = [],
-			actions: {changeDocs}
-		} = this.props;
-		doc.time = date;
-		changeDocs(docs);
-	}
-
-    company(doc, event) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.company = event.target.value;
-        changeDocs(docs);
-    }
-
-    number(doc, event) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        doc.number = event.target.value;
-        changeDocs(docs);
-    }
-
-    remove(doc) {
-        const {
-            docs = [],
-            actions: {changeDocs}
-        } = this.props;
-        changeDocs(docs.filter(d => d !== doc));
-        this.setState({
-            progress:0
-        })
-    }
 
     save() {
         const {
             currentcode = {},
             docs = [],
-            actions: {updatevisible, postDocument, getdocument,changeDocs,PatchDocument}
+            actions: {updatevisible, postDocument, getdocument,changeDocs,PatchDocument,putdocument}
         } = this.props;
-        const promises = docs.map(doc => {
-            const response = doc.response;
-            let files=DeleteIpPort(doc);
-            return postDocument({}, {
-                code: `${currentcode.code}_${response.id}`,
-                name: doc.name,
-                obj_type: 'C_DOC',
-                profess_folder: {
-                    code: currentcode.code, obj_type: 'C_DIR',
-                },
-                basic_params: {
-                    files:[files]
-                },
-                extra_params: {
-                    number:doc.number,
-                    company:doc.company,
-                    time:doc.time,
-                    remark: doc.remark,
-                    type: doc.type,
-                    lasttime: doc.lastModifiedDate,
-                    state: '正常文档',
-	                submitTime: moment.utc().format()
-                },
-            });
-        });
-        message.warning('新增文件中...');
-        Promise.all(promises).then(rst => {
-            const {oldfile = {},currentcode = {},actions:{putdocument}}=this.props;
-            message.success('新增文件成功！');
-            putdocument({code:oldfile.code},{
-                    extra_params: {
-                        state: '作废'
+
+
+        this.props.form.validateFields((err, values) => {
+            console.log('values',values)
+            if(!err){
+                // debugger
+                let resp = values.attachment1[0].response ? values.attachment1[0].response : values.attachment1[0];
+                let postData = {
+                    name: values.name1,
+                    basic_params: {
+                        files: [{
+                            "uid": resp.uid,
+                            "misc": resp.misc,
+                            "download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                            "a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                            "create_time": resp.create_time,
+                            "mime_type": resp.mime_type,
+                            "name":resp.name
+                        }]
                     },
-            });
-            changeDocs([]);
-            updatevisible(false);
-	        setTimeout(()=>{getdocument({code: currentcode.code})},1000);
-        });
-        this.setState({
-            progress:0
+                    extra_params: {
+                        number:values.number1,
+                        company:values.company1,
+                        time:moment(values.time1).format('YYYY-MM-DD'),
+                        remark: values.remark1,
+                        type: resp.type,
+                        lasttime: moment(values.lastModifiedDate).format('YYYY-MM-DD'),
+                        state: '正常文档',
+                        submitTime: moment.utc().format()
+                    },
+                }
+                putdocument({code:this.props.oldfile.code},postData).then(rst => {
+                    if(rst && rst.pk){
+                        message.success('修改文件成功！');
+                    }else{
+                        message.error('修改文件失败！');
+                    }
+                    
+                    changeDocs([]);
+                    updatevisible(false);
+                    getdocument({ code: currentcode.code });
+                })
+            }
         })
     }
 
 }
+export default Form.create()(Updatemodal);

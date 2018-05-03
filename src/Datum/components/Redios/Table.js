@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Spin, message, Modal } from 'antd';
-import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { base, STATIC_DOWNLOAD_API,SOURCE_API } from '../../../_platform/api';
 import moment from 'moment';
 import '../Datum/index.less';
 export default class GeneralTable extends Component {
@@ -9,7 +9,8 @@ export default class GeneralTable extends Component {
 		this.state = {
 			previewModalVisible: false,
 			video: '',
-			filterData:[]
+			filterData:[],
+			src:''
 		}
 	}
 
@@ -79,15 +80,16 @@ export default class GeneralTable extends Component {
 					onCancel={this.cancelT.bind(this)}
 					cancelText={"关闭"}
 					maskClosable={false}>
-					<video
+					{/* <video
 						controls
 						preload="auto"
 						width="100%"
 						height="500px"
 						src={this.state.video}
 					>
-						{/* <source src={this.props.video} /> */}
-					</video>
+						<source src={this.props.video} />
+					</video> */}
+					<img style={{width:"490px"}} src={this.state.src} alt="图片"/>
 				</Modal>
 
 			</div>
@@ -166,36 +168,49 @@ export default class GeneralTable extends Component {
 		});
 	}
 
-	previewFile(file) {
+	// previewFile(file) {
+	// 	console.log(file.basic_params.files)
+	// 	const videos = file.basic_params.files[0] || []
+	// 	console.log(videos.a_file.split(".")[4])
+	// 	// const index=videos.a_file.indexOf(".")
+	// 	// console.log(index)
+	// 	let a_file = videos.a_file.split(".")[4]
+	// 	console.log(a_file)
+
+	// 	if (a_file == "mp4") {
+	// 		console.log(1)
+	// 		this.setState({ previewModalVisible: true, video: videos.a_file })
+
+	// 	} else {
+	// 		const { actions: { openPreview } } = this.props;
+	// 		console.log(2)
+
+	// 		if (JSON.stringify(file.basic_params) == "{}") {
+	// 			console.log(3)
+	// 			return
+	// 		} else {
+	// 			console.log(4)
+
+	// 			const filed = file.basic_params.files[0];
+	// 			openPreview(filed);
+	// 		}
+	// 	}
+	// }
+
+	previewFile(file){
 		console.log(file.basic_params.files)
-		const videos = file.basic_params.files[0] || []
-		console.log(videos.a_file.split(".")[4])
-		// const index=videos.a_file.indexOf(".")
-		// console.log(index)
-		let a_file = videos.a_file.split(".")[4]
-		console.log(a_file)
-
-		if (a_file == "mp4") {
-			console.log(1)
-			this.setState({ previewModalVisible: true, video: videos.a_file })
-
-		} else {
-			const { actions: { openPreview } } = this.props;
-			console.log(2)
-
-			if (JSON.stringify(file.basic_params) == "{}") {
-				console.log(3)
-				return
-			} else {
-				console.log(4)
-
-				const filed = file.basic_params.files[0];
-				openPreview(filed);
-			}
-		}
-
+		const videos = file.basic_params.files[0] || {}
+		let src = SOURCE_API + videos.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')
+		console.log('src',src)
+		
+		this.setState({
+			src,
+			previewModalVisible: true
+		})
 
 	}
+
+
 
 	update(file) {
 		const { actions: { updatevisible, setoldfile } } = this.props;

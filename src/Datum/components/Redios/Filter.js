@@ -131,10 +131,17 @@ class Filter extends Component {
 		
 	}
 	clear() {
+		const { 
+			actions: { 
+				searchRedioMessage,
+				searchRedioVisible 
+			}
+		} = this.props;
         this.props.form.setFieldsValue({
             searchName: undefined,
             searchDate: undefined
-        })
+		})
+		searchRedioMessage({})
     }
 	cancel() {
 

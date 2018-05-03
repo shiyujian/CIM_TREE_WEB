@@ -852,7 +852,7 @@ class Stagereporttab extends Component {
 			dataIndex: 'number',
 			key: 'number',
 			render: (text, record, index) => {
-				return <Input value={record.number || ""} onChange={ele => {
+				return <Input  value={record.number} onChange={ele => {
 					record.number = ele.target.value
 					this.forceUpdate();
 				}} />

@@ -202,7 +202,13 @@ class Updatemodal extends Component {
         if (Array.isArray(e)) {
           return e;
         }
-        return e && e.fileList;
+        let len = e.fileList.length
+        if(len>0){
+            return e && [e.fileList[len-1]];
+        }else{
+            return e && e.fileList;
+        }
+        
     }
 
     uploadProps = {
@@ -236,6 +242,11 @@ class Updatemodal extends Component {
             form:{setFieldsValue}
         }=this.props
         if (file && file.status && file.status === 'done') {
+            setFieldsValue(
+                {
+                    name1:file.name?file.name:'',
+                }
+            )
             this.setState({
                 isUploading:false
             })
@@ -290,7 +301,11 @@ class Updatemodal extends Component {
                     },
                 }
                 putdocument({code:this.props.oldfile.code},postData).then(rst => {
-                    message.success('修改文件成功！');
+                    if(rst && rst.pk){
+                        message.success('修改文件成功！');
+                    }else{
+                        message.error('修改文件失败！');
+                    }
                     updatevisible(false);
                     getdocument({ code: currentcode.code });
                 })

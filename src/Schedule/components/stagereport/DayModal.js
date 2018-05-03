@@ -50,9 +50,10 @@ export default class DayModal extends Component {
                 <Modal
                     title='日进度计划流程详情'
                     width={800}
-                    onOk={this.props.onok}
-                    onCancel={this.props.oncancel}
+                    // onOk={this.props.onok}
+                    // onCancel={this.props.oncancel}
                     visible={true}
+                    footer={null}
                 >
                     <div>
                         <Form>
@@ -184,6 +185,9 @@ export default class DayModal extends Component {
                                 }
                             </Steps>
                         </Card>
+                        <Row style={{marginTop:10}}>
+                            <Button  onClick={this.props.onok } style={{float:'right'}}type="primary">关闭</Button>
+                        </Row>
                     </div>
                 </Modal>
             </div>

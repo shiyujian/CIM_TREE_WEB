@@ -246,6 +246,7 @@ export default class Addition extends Component {
         const promises = docs.map(doc => {
             const response = doc.response;
             let files = DeleteIpPort(doc);
+            files.uid = response.id
             return postDocument({}, {
                 code: `${currentcode.code}_${response.id}`,
                 name: doc.name,

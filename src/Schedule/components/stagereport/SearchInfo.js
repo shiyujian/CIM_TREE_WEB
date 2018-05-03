@@ -172,6 +172,7 @@ export default class SearchInfo extends Component {
             sstatus: undefined,
             ssuperunit: undefined
         })
+        this.props.gettaskSchedule()
     }
 }
 
