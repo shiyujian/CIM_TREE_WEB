@@ -45,7 +45,6 @@ class TablePerson extends Component {
 			const item = PROJECT_UNITS[i];
 			for (let j = 0; j < item.units.length; j++) {
 				const element = item.units[j];
-				// console.log("record",record)
 				if (record.sections) {
 					for (let z = 0; z < record.sections.length; z++) {
 						const items = record.sections[z];
@@ -151,7 +150,6 @@ class TablePerson extends Component {
 		} = this.props;
 		let usersArr = []
 		let numArr = []
-		// console.log("users",users)
 		let dataSourceb
 		if (this.state.isUpdate) {
 			dataSourceb = this.state.tempDatas
@@ -213,11 +211,6 @@ class TablePerson extends Component {
 				width: '9%',
 				dataIndex: "black_remark",
 				key: 'black_remark',
-				// render: (record) => {
-				// 	// console.log("record",record)
-				// 	let groups = this.renderContent(record)
-				// 	return groups.join()
-				// }
 			}
 			, {
 				title: '用户名',
@@ -264,7 +257,6 @@ class TablePerson extends Component {
 				title: '角色',
 				width: '8%',
 				render: (record) => {
-					// console.log("record",record)
 					let groups = this.renderContent(record)
 					return groups.join()
 				}
@@ -370,7 +362,6 @@ class TablePerson extends Component {
 					columns={columns}
 					bordered
 					// rowSelection={this.rowSelection}
-					// console.log("usersArr",usersArr)
 					dataSource={usersArr}
 					// dataSource={this.state.tempData}
 					// rowKey="index"
@@ -388,7 +379,6 @@ class TablePerson extends Component {
 		setModifyPer(record);
 	}
 	async changePage(obj) {
-		console.log("obj", obj)
 		const {
 			actions: { getUsers },
 		} = this.props;
@@ -403,9 +393,7 @@ class TablePerson extends Component {
 			let pageSize = 10;
 			// let rst = await getPersonList({ pagesize: pageSize, offset: (obj.current - 1) * pageSize });
 			let rst = await getPersonInfo({ is_black: 1, page: obj.current })
-			console.log("rst", rst)
 			let personlist = rst.results
-			console.log("rst", rst)
 			this.setState({ serialNumber: obj })
 			let persons = [];
 			for (let i = 0; i < personlist.length; i++) {
@@ -489,13 +477,10 @@ class TablePerson extends Component {
 	async componentDidMount() {
 		this.setState({ loading: true })
 		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
-		console.log("tags", tags)
-		console.log("this.props", this.props)
 		const { actions: { getPersonInfo } } = this.props;
 		// 分页获取数据
 		// let rst = await getPersonList({ pagesize: 10, offset: 0 });
 		let rst = await getPersonInfo({}, { is_black: 1 })
-		console.log("rst", rst)
 		let personlist = rst
 		this.setState({ resultInfo: rst })
 		// let total = rst.result.total;
@@ -641,7 +626,6 @@ class TablePerson extends Component {
 
 		}
 	}
-
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
 		},
@@ -658,42 +642,14 @@ class TablePerson extends Component {
 			})
 		},
 	};
-
-	//删除
-	delete(index) {
-		let { dataSource } = this.state;
-		dataSource.splice(index, 1);
-		let dataSources = [];
-		dataSource.map((item, key) => {
-			console.log(item)
-			dataSources.push({
-				key: key + 1,
-				person_code: item.code,
-				person_name: item.name,
-				organization: item.org,
-				org_code: item.depart,
-				job: item.jop,
-				sex: item.sex,
-				person_telephone: item.tel,
-				email: item.email,
-			})
-		})
-		this.setState({ dataSource: dataSources });
-	}
-
-	paginationOnChange(e) {
-		// console.log('vip-分页', e);
-	}
 	async confirm(record) {
 		const {
 			sidebar: { node } = {},
-			actions: { deleteUser, getOrgName }
+			actions: { getOrgName, putUser, putUserBlackList }
 		} = this.props;
-		const { actions: { reverseFind, is_fresh, deletePerson, putUser, putUserBlackList } } = this.props;
 		console.log("record", record)
 		let rst = await getOrgName({ code: record.account.organization.code })
 		console.log("rst", rst)
-
 		let groupd = []
 		record.groups.map(ess => {
 			groupd.push(ess.id)
@@ -704,127 +660,26 @@ class TablePerson extends Component {
 			change_all: false,
 			black_remark: '',
 		}).then(rst => {
-			console.log("rst", rst)
-		})
-		putUser({}, {
-			id: record.id,
-			username: record.username,
-			email: record.email,
-			// password: addition.password, // 密码不能变？信息中没有密码
-			account: {
-				person_name: record.account.person_name,
-				person_type: "C_PER",
-				person_avatar_url: record.account.person_avatar_url,
-				person_signature_url: record.account.person_signature_url,
-				organization: {
-					pk: rst.pk,
-					code: record.account.organization.code,
-					obj_type: "C_ORG",
-					rel_type: "member",
-					name: record.account.organization.name
-				},
-			},
-			tags: record.tags,
-			sections: record.sections,
-			//groups: [7],
-			groups: groupd,
-			// black_remark: record.black_remark,
-			is_active: true,
-			id_num: record.id_num,
-			// is_black: 0,
-			// id_image: [],
-			id_image: record.id_image,
-			basic_params: {
-				info: {
-					'电话': record.basic_params.info.phone || '',
-					'性别': record.basic_params.info.sex || '',
-					'技术职称': record.basic_params.info.title || '',
-					'phone': record.basic_params.info.phone || '',
-					'sex': record.basic_params.info.sex || '',
-					'duty': ''
+			console.log("rst111111111111", rst)
+			let tempDatas = []
+			this.state.tempData.map(item => {
+				if(rst.account.is_black==1){
+					message.warn('移除失败');
+					tempDatas=this.state.tempData
 				}
-			},
-			extra_params: {},
-			title: record.basic_params.info.title || ''
-		}).then(rst => {
-			if (rst.code == 1) {
-				console.log("rst", rst)
-				// console.log("333333333", JSON.parse(rst.msg))
-
-				// if (this.state.pagination.current > 1 && this.state.tempData.length == 1) {
-				// 	const strs1 = this.state.fristPagination.total.toString()
-				// 	const strs2 = strs1.slice(0, strs1.length - 1)
-
-				// 	this.state.fristPagination.total = strs2 * 10
-				// 	this.setState({
-				// 		tempData: this.state.fristTempData,
-				// 		pagination: this.state.fristPagination
-				// 	})
-				// } else {
-				// 	let tempDatas = []
-				// 	this.state.tempData.map(item => {
-				// 		const msg = JSON.parse(rst.msg).id
-				// 		if (item.id != msg) {
-				// 			tempDatas.push(item)
-				// 		}
-				// 	})
-				// 	this.setState({
-				// 		tempData: tempDatas
-				// 	})
-				// }
-				let tempDatas = []
-				this.state.tempData.map(item => {
-					const msg = JSON.parse(rst.msg).id
-					if (item.id != msg) {
+				if(rst.account.is_black==0){
+					// message.warn('请求失败');
+					if (item.id != rst.id) {
 						tempDatas.push(item)
 					}
-				})
-				this.setState({
-					tempData: tempDatas,
-					loading: false 
-				})
-				this.querys()
-			}
+				}
+			})
+			this.setState({
+				tempData: tempDatas,
+				loading: false 
+			})
+			this.querys()
 		})
-
-		if (record.is_user) {
-			// 当前是用户
-			// let rst = await reverseFind({ pk: record.personPk })
-			// deleteUser({ userID: record.id }).then(async (re) => {
-
-			// 	if (re.code == '1') {
-			// 		Notification.success({
-			// 			message: "删除成功"
-			// 		})
-			// 		let tempDatas=[]
-			// 		this.state.tempData.map(item=>{
-			// 			if(item.id!=record.id){
-			// 				tempDatas.push(item)
-			// 			}
-			// 		})
-			// 		this.setState({tempData:tempDatas})				
-			// 		is_fresh(true);
-			// 	}
-
-			// })
-		} else {
-			// 当前是人员
-			// deletePerson({ code: record.code }).then(rst => {
-			// 	if (rst === "") {
-			// 		Notification.success({
-			// 			message: "删除成功"
-			// 		})
-			// 		is_fresh(true);
-			// 	}
-			// })
-		}
 	}
-
-	// paginationInfo = {
-	// 	onChange: this.paginationOnChange,
-	// 	showSizeChanger: true,
-	// 	pageSizeOptions: ['5', '10', '20', '30', '40', '50'],
-	// 	showQuickJumper: true,
-	// }
 }
 export default Form.create()(TablePerson)
