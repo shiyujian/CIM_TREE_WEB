@@ -177,7 +177,8 @@ class AddModal extends Component {
                 getWorkflowById,
 				putFlow,
 				AddVisible,
-				getTaskSafety
+				getTaskSafety,
+				SearchSafety
             },
             location,
         } = this.props
@@ -297,8 +298,9 @@ class AddModal extends Component {
                                         message: '流程提交成功',
                                         duration: 2
 									});
-									getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程})
-                                    // this.gettaskSchedule();//重新更新流程列表
+									// getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程})
+									// this.gettaskSchedule();//重新更新流程列表
+									SearchSafety(Math.random())
                                     AddVisible(false);
                                 } else {
                                     notification.error({

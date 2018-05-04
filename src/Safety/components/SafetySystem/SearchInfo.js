@@ -186,26 +186,29 @@ class SearchInfo extends Component {
     }
 
     query() {
-        const{
-			actions:{
-				getTaskSafety
-			}
-        }=this.props
-        let reqData={};
-        this.props.form.validateFields((err, values) => {
-			console.log("安全体系报批流程", values);
-            console.log("err", err);
+
+        this.props.gettaskSchedule()
+
+        // const{
+		// 	actions:{
+		// 		getTaskSafety
+		// 	}
+        // }=this.props
+        // let reqData={};
+        // this.props.form.validateFields((err, values) => {
+		// 	console.log("安全体系报批流程", values);
+        //     console.log("err", err);
             
-            values.SSection?reqData.subject_sectionName__contains = values.SSection : '';
-            values.SSafeName?reqData.subject_Safename__contains = values.SSafeName : '';
-            values.SNumbercode?reqData.subject_numbercode__contains = values.SNumbercode : '';
-            values.SDocument?reqData.subject_document__contains = values.SDocument : '';
-            values.SSimedate?reqData.real_start_time_begin = moment(values.SSimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
-            values.SSimedate?reqData.real_start_time_end = moment(values.SSimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
-            values.SStatus?reqData.status = values.SStatus : (values.SStatus === 0? reqData.SStatus = 0 : '');
-        })
-        let tmpData = Object.assign({}, reqData);
-		getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程},tmpData)
+        //     values.SSection?reqData.subject_sectionName__contains = values.SSection : '';
+        //     values.SSafeName?reqData.subject_Safename__contains = values.SSafeName : '';
+        //     values.SNumbercode?reqData.subject_numbercode__contains = values.SNumbercode : '';
+        //     values.SDocument?reqData.subject_document__contains = values.SDocument : '';
+        //     values.SSimedate?reqData.real_start_time_begin = moment(values.SSimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
+        //     values.SSimedate?reqData.real_start_time_end = moment(values.SSimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
+        //     values.SStatus?reqData.status = values.SStatus : (values.SStatus === 0? reqData.SStatus = 0 : '');
+        // })
+        // let tmpData = Object.assign({}, reqData);
+		// getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程},tmpData)
     }
 
     clear() {
@@ -217,6 +220,7 @@ class SearchInfo extends Component {
             SSimedate: undefined,
             SStatus: undefined
         })
+        this.props.gettaskSchedule()
     }
 }
 

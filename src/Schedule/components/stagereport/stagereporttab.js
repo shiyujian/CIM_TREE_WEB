@@ -274,11 +274,17 @@ class Stagereporttab extends Component {
 		} = this.state;
 		const {
             form: { getFieldDecorator },
-        } = this.props;
-		const rowSelection = {
-			selectedRowKeys,
-			onChange: this.onSelectChange,
+		} = this.props;
+		
+
+		let user = getUser()
+        let username = user.username
+
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onSelectChange,
 		};
+		
 		const FormItemLayout = {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
@@ -297,10 +303,23 @@ class Stagereporttab extends Component {
                 }
 				<SearchInfo {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
 				<Button onClick={this.addClick.bind(this)}>新增</Button>
-				{/* <Button onClick={this.deleteClick.bind(this)}>删除</Button> */}
+				{
+                    username === 'admin'?
+                    <Popconfirm
+                      placement="leftTop"
+                      title="确定删除吗？"
+                      onConfirm={this.deleteClick.bind(this)}
+                      okText="确认"
+                      cancelText="取消"
+                    >
+                        <Button >删除</Button>
+                    </Popconfirm>
+                    :
+                    ''
+                }
 				<Table
 					columns={this.columns}
-					// rowSelection={rowSelection} 
+					rowSelection={username === 'admin'?rowSelection:null} 
 					dataSource={filterData}
 					className='foresttable'
 					bordered
@@ -313,7 +332,7 @@ class Stagereporttab extends Component {
 					onCancel={this.closeModal.bind(this)}
 					onOk={this.sendWork.bind(this)}
 					// key={this.state.key}
-				>
+				 >
 					<div>
 						<Form>
 							<Row>
@@ -653,8 +672,72 @@ class Stagereporttab extends Component {
 	}
 
 	onSelectChange = (selectedRowKeys, selectedRows) => {
-		this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+        console.log('selectedRowKeys',selectedRowKeys)
+        console.log('selectedRows',selectedRows)
+        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
 	}
+	// 删除
+    deleteClick = async () => {
+        const{
+            actions:{
+                deleteFlow
+            }
+        }=this.props
+        const { 
+            dataSourceSelected 
+        } = this.state
+        if (dataSourceSelected.length === 0) {
+            notification.warning({
+                message: '请先选择数据！',
+                duration: 3
+            });
+            return
+        } else {
+
+            let user = getUser()
+            let username = user.username
+
+            if(username != 'admin'){
+                notification.warning({
+                    message: '非管理员不得删除！',
+                    duration: 3
+                });
+                return
+            }
+
+            let flowArr = dataSourceSelected.map((data)=>{
+                if(data && data.id){
+                    return data.id
+                }
+            })
+             
+            let promises = flowArr.map((flow)=>{
+                let data = flow
+                let postdata = {
+                    pk:data
+                }
+                return deleteFlow(postdata)
+            })
+
+            Promise.all(promises).then(rst => {
+                console.log('rst',rst)
+                notification.success({
+                    message: '删除流程成功',
+                    duration: 3
+                });
+                this.setState({
+                    selectedRowKeys:[],
+                    dataSourceSelected:[]
+                })
+                this.gettaskSchedule()
+            });
+            
+            
+            
+        }
+    }
+
+
 	// 操作--查看
     clickInfo(record) {
         this.setState({ dayvisible: true, TotleModaldata:record });
@@ -667,19 +750,7 @@ class Stagereporttab extends Component {
     totleOk() {
         this.setState({ dayvisible: false });
     }
-	// 删除
-	deleteClick = () => {
-		const { selectedRowKeys } = this.state
-		if (selectedRowKeys.length === 0) {
-			notification.warning({
-				message: '请先选择数据！',
-				duration: 2
-			});
-			return
-		} else {
-			alert('还未做删除功能')
-		}
-	}
+
 
 	// 新增按钮
 	addClick = () => {

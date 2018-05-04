@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Icon, Table, Spin, Tabs, Modal, Row, Col, Select, DatePicker, Button, Input, InputNumber, Progress, message } from 'antd';
+import { Form, Icon, Table, Spin, Tabs, Modal, Row, Col, Select, DatePicker, Button, Input, InputNumber, Progress, message,Popconfirm,notification } from 'antd';
 import {FILE_API,base, SOURCE_API, DATASOURCECODE,SERVICE_API,PROJECT_UNITS,SECTIONNAME,WORKFLOW_CODE } from '../../../_platform/api';
 import '../index.less';
 import '../../../Datum/components/Datum/index.less'
@@ -7,20 +7,23 @@ import { getUser } from '../../../_platform/auth';
 import TaskDetail from './TaskDetail';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import SearchInfo from './SearchInfo';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
-
-export default class SafetyTable extends Component {
+class SafetyTable extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			taskVisible:false,
 			taskList:[],
 			filterTaskList:[],
-			TaskDetailData:{}			
+			TaskDetailData:{},
+			//多选
+			selectedRowKeys: [],
+            dataSourceSelected: [],			
 		}
 	}
 	static layout = {
@@ -28,37 +31,52 @@ export default class SafetyTable extends Component {
 		wrapperCol: { span: 16 },
 	};
 	async componentDidMount() {
-		const{
-			actions:{
-				getTaskSafety
-			}
-		}=this.props
-		await getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程})
-		this.getTaskList()
+		this.gettaskSchedule()
 	}
 
 	async componentDidUpdate(prevProps,prevState){
 		const{
-			safetyTaskList,
-			leftkeycode
+			leftkeycode,
+			searchSafety
 		}=this.props
-		console.log('safetyTaskList',safetyTaskList)
-		if(safetyTaskList != prevProps.safetyTaskList){
-			this.getTaskList()
+		if(searchSafety != prevProps.searchSafety){
+			this.gettaskSchedule()
 		}
 		if(leftkeycode != prevProps.leftkeycode){
 			this.filterTask()
 		}
 	}
 
-	getTaskList(){
-		const{
-			safetyTaskList
-		}=this.props
+	gettaskSchedule = async ()=>{
+		const { actions: { getWorkflows } } = this.props;
+		let reqData={};
+		this.props.form.validateFields((err, values) => {
+			console.log("安全体系报批流程", values);
+			console.log("err", err);
+			
+			values.SSection?reqData.subject_sectionName__contains = values.SSection : '';
+            values.SSafeName?reqData.subject_Safename__contains = values.SSafeName : '';
+            values.SNumbercode?reqData.subject_numbercode__contains = values.SNumbercode : '';
+			values.SDocument?reqData.subject_document__contains = values.SDocument : '';
+			if(values.SSimedate && values.SSimedate instanceof Array && values.SSimedate.length>0){
+            	values.SSimedate?reqData.real_start_time_begin = moment(values.SSimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
+            	values.SSimedate?reqData.real_start_time_end = moment(values.SSimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
+			}
+			values.SStatus?reqData.status = values.SStatus : (values.SStatus === 0? reqData.SStatus = 0 : '');
+		})
+		console.log('reqData',reqData)
+        
+
+        let tmpData = Object.assign({}, reqData);
+
+
+		let task = await getWorkflows({ code: WORKFLOW_CODE.安全体系报批流程 },tmpData);
+
 		let taskList = [];
-		if(safetyTaskList && safetyTaskList instanceof Array){
-			safetyTaskList.map((item,index)=>{
+		if(task && task instanceof Array){
+			task.map((item,index)=>{
 				let subject = item.subject[0];
+				let creator = item.creator;
 				let postData = subject.postData?JSON.parse(subject.postData):null;
 				
                 let itemarrange = {
@@ -70,7 +88,7 @@ export default class SafetyTable extends Component {
 					Safename: subject.Safename?JSON.parse(subject.Safename):'',
                     type: postData.type,
                     numbercode:subject.numbercode?JSON.parse(subject.numbercode):'',
-                    submitperson:item.creator.person_name,
+                    submitperson:creator.person_name?creator.person_name+'('+creator.username+')':creator.username,
 					submittime:moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),
 					submitUnit:postData.upload_unit?postData.upload_unit:'',
                     status:item.status,
@@ -153,15 +171,24 @@ export default class SafetyTable extends Component {
     }
 
 	render() {
-		const{
-			safetyTaskList
-		}=this.props
 		const {
 			filterTaskList,
-			taskVisible
+			taskVisible,
+			selectedRowKeys
 		}=this.state
+
+		let user = getUser()
+        let username = user.username
+
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onSelectChange,
+		};
+		
+
 		return (
 			<div>
+				<SearchInfo {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
                 {
                     taskVisible &&
                     <TaskDetail
@@ -173,9 +200,23 @@ export default class SafetyTable extends Component {
                     />
                 }
                 <Button onClick={this.addClick.bind(this)}>新增</Button>
+				{
+                    username === 'admin'?
+                    <Popconfirm
+                      placement="leftTop"
+                      title="确定删除吗？"
+                      onConfirm={this.deleteClick.bind(this)}
+                      okText="确认"
+                      cancelText="取消"
+                    >
+                        <Button >删除</Button>
+                    </Popconfirm>
+                    :
+                    ''
+                }
 				<Table
                     columns={this.columns}
-                    // rowSelection={rowSelection}
+                    rowSelection={username === 'admin'?rowSelection:null} 
                     dataSource={filterTaskList} 
                     bordered
                     className='foresttable'
@@ -183,6 +224,71 @@ export default class SafetyTable extends Component {
 			</div>
 		);
 	}
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys',selectedRowKeys)
+        console.log('selectedRows',selectedRows)
+        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+	}
+	
+	// 删除
+    deleteClick = async () => {
+        const{
+            actions:{
+                deleteFlow
+            }
+        }=this.props
+        const { 
+            dataSourceSelected 
+        } = this.state
+        if (dataSourceSelected.length === 0) {
+            notification.warning({
+                message: '请先选择数据！',
+                duration: 3
+            });
+            return
+        } else {
+
+            let user = getUser()
+            let username = user.username
+
+            if(username != 'admin'){
+                notification.warning({
+                    message: '非管理员不得删除！',
+                    duration: 3
+                });
+                return
+            }
+
+            let flowArr = dataSourceSelected.map((data)=>{
+                if(data && data.id){
+                    return data.id
+                }
+            })
+             
+            let promises = flowArr.map((flow)=>{
+                let data = flow
+                let postdata = {
+                    pk:data
+                }
+                return deleteFlow(postdata)
+            })
+
+            Promise.all(promises).then(rst => {
+                console.log('rst',rst)
+                notification.success({
+                    message: '删除流程成功',
+                    duration: 3
+                });
+                this.setState({
+                    selectedRowKeys:[],
+                    dataSourceSelected:[]
+                })
+                this.gettaskSchedule()
+            });
+        }
+    }
+
+
 	 // 新增按钮
 	 addClick = () => {
         const { actions: { AddVisible } } = this.props;
@@ -191,7 +297,6 @@ export default class SafetyTable extends Component {
 	// 操作--查看
     clickInfo(record) {
 		this.setState({ taskVisible: true ,TaskDetailData:record});
-		// this.getTaskList()
 	}
 	// 取消
     taskDetailCancle() {
@@ -258,4 +363,6 @@ export default class SafetyTable extends Component {
 		}
 	];
 }
+
+export default Form.create()(SafetyTable)
 

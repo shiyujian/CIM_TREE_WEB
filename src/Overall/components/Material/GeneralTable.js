@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,Card,Steps} from 'antd';
+import { Table, Spin, message,Modal,Button,Form,Row,Col,Select,Input,Icon,Card,Steps,Popconfirm,notification  } from 'antd';
 import moment from 'moment';
 import './index.less';
 import Preview from '../../../_platform/components/layout/Preview';
@@ -20,7 +20,10 @@ class GeneralTable extends Component {
 			filterData:[],
 			record:{},
 			workflowData:[],
-			history:[]
+			history:[],
+			//多选
+			selectedRowKeys: [],
+            dataSourceSelected: [],
          }
 	}
 	
@@ -177,9 +180,8 @@ class GeneralTable extends Component {
 
 
         let task = await getWorkflows({ code: WORKFLOW_CODE.机械设备报批流程 },tmpData);
-        let subject = [];
+      
         let totledata = [];
-		let arrange = {};
 		task.map((item,index)=>{
 
 			let subject = item.subject[0];
@@ -282,18 +284,41 @@ class GeneralTable extends Component {
 			record,
 			workflowData,
 			history,
-			filterData
+			filterData,
+			selectedRowKeys
         } = this.state;
 		const { 
 			form: { getFieldDecorator }
 		 } = this.props;
+
+		let user = getUser()
+        let username = user.username
+
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onSelectChange,
+        };
 		
 		return (
 			<div>
 				<GeneralFilter {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
 				<Button onClick={this.addClick.bind(this)}>新增</Button>
+				{
+                    username === 'admin'?
+                    <Popconfirm
+                      placement="leftTop"
+                      title="确定删除吗？"
+                      onConfirm={this.deleteClick.bind(this)}
+                      okText="确认"
+                      cancelText="取消"
+                    >
+                        <Button >删除</Button>
+                    </Popconfirm>
+                    :
+                    ''
+                }
 				<Table
-					// rowSelection={this.rowSelection}
+					rowSelection={username === 'admin'?rowSelection:null} 
 					dataSource={filterData}
 					columns={this.columns}
 					bordered 
@@ -307,9 +332,10 @@ class GeneralTable extends Component {
 		          // footer={null}
 		          visible={this.state.visible}
 		          maskClosable={false}
-		          onOk={this.handleOk}
-		          onCancel={this.handleCancel}
-		        >
+		        	//   onOk={this.handleOk}
+					//   onCancel={this.handleCancel}
+				 footer={null}
+		         >
 			        <div>
 						<Row gutter={24}>
 							<Col span={24} style={{paddingLeft:'3em'}}>
@@ -401,6 +427,9 @@ class GeneralTable extends Component {
                                 }
                             </Steps>
                         </Card>
+						<Row style={{marginTop:10}}>
+                            <Button  onClick={this.handleOk } style={{float:'right'}}type="primary">关闭</Button>
+                        </Row>
 						<Preview />
 					</div>
 		        </Modal>
@@ -409,6 +438,73 @@ class GeneralTable extends Component {
 
 		);
 	}
+	onSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys',selectedRowKeys)
+        console.log('selectedRows',selectedRows)
+        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+	}
+	
+	// 删除
+    deleteClick = async () => {
+        const{
+            actions:{
+                deleteFlow
+            }
+        }=this.props
+        const { 
+            dataSourceSelected 
+        } = this.state
+        if (dataSourceSelected.length === 0) {
+            notification.warning({
+                message: '请先选择数据！',
+                duration: 3
+            });
+            return
+        } else {
+
+            let user = getUser()
+            let username = user.username
+
+            if(username != 'admin'){
+                notification.warning({
+                    message: '非管理员不得删除！',
+                    duration: 3
+                });
+                return
+            }
+
+            let flowArr = dataSourceSelected.map((data)=>{
+                if(data && data.id){
+                    return data.id
+                }
+            })
+             
+            let promises = flowArr.map((flow)=>{
+                let data = flow
+                let postdata = {
+                    pk:data
+                }
+                return deleteFlow(postdata)
+            })
+
+            Promise.all(promises).then(rst => {
+                console.log('rst',rst)
+                notification.success({
+                    message: '删除流程成功',
+                    duration: 3
+                });
+                this.setState({
+                    selectedRowKeys:[],
+                    dataSourceSelected:[]
+                })
+                this.gettaskSchedule()
+            });
+            
+            
+            
+        }
+    }
+
 	addClick(){
 		const {
             actions: {GeneralAddVisible}

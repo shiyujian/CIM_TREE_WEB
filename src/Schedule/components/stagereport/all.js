@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-04-16 16:48:45
+ * @Last Modified time: 2018-05-04 17:24:30
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -272,10 +272,15 @@ class All extends Component {
             form: { getFieldDecorator },
             fileList = [],
         } = this.props;
+
+        let user = getUser()
+        let username = user.username
+
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange,
         };
+        
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 },
@@ -300,23 +305,36 @@ class All extends Component {
                 }
                 <SearchInfo {...this.props} {...this.state} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
                 <Button onClick={this.addClick.bind(this)}>新增</Button>
-                {/* <Button onClick={this.deleteClick.bind(this)}>删除</Button> */}
+                {
+                    username === 'admin'?
+                    <Popconfirm
+                      placement="leftTop"
+                      title="确定删除吗？"
+                      onConfirm={this.deleteClick.bind(this)}
+                      okText="确认"
+                      cancelText="取消"
+                    >
+                        <Button >删除</Button>
+                    </Popconfirm>
+                    :
+                    ''
+                }
                 <Table
                     columns={this.columns}
-                    // rowSelection={rowSelection}
+                    rowSelection={username === 'admin'?rowSelection:null} 
                     dataSource={filterData} 
                     bordered
                     rowKey='index'
                     className='foresttable'/>
                 <Modal
-                title="新增文档"
-                width={800}
-                visible={this.state.visible}
-                maskClosable={false}
-                onCancel={this.closeModal.bind(this)}
-                onOk={this.sendWork.bind(this)}
-                // key={this.state.key}
-                >
+                 title="新增文档"
+                 width={800}
+                 visible={this.state.visible}
+                 maskClosable={false}
+                 onCancel={this.closeModal.bind(this)}
+                 onOk={this.sendWork.bind(this)}
+                 // key={this.state.key}
+                 >
                     <div>
                         <Spin spinning={this.state.loading}>
                             <Form>
@@ -463,89 +481,6 @@ class All extends Component {
 		
 		return sectionName 
     }
-
-    // //上传excel文件
-    // beforeUpload(file){
-    //     let {
-    //         actions:{
-    //             postScheduleFile
-    //         }
-    //     } = this.props;
-    //     let type  =  file.name.toString().split('.');
-        
-    //     let len = type.length
-    //     if(type[len-1]==='xlsx' || type[len-1]==='xls'){
-    //         const formdata = new FormData();
-    //         formdata.append('a_file',file);
-    //         formdata.append('name',file.name);
-    //         let downloadState = true
-    //         postScheduleFile({},formdata).then(rst=>{
-    //             if(rst && rst.id){
-    //                 rst.a_file = (rst.a_file) && (rst.a_file).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-    //                 rst.download_url = (rst.download_url) && (rst.download_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-    //                 rst.preview_url = (rst.preview_url) && (rst.preview_url).replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                    
-                    
-    //                 this.setState({file:rst});
-    //                 return true;
-    //             }else{
-    //                 notification.error({
-    //                     message: '文件上传失败',
-    //                     duration: 2
-    //                 })
-    //                 downloadState = false
-    //                 return false;
-    //             }
-    //         });
-    //     }else{
-    //         notification.error({
-    //             message: '请上传excel文件',
-    //             duration: 2
-    //         })
-    //         return false;
-    //     }
-    // }
-    //解析文件
-    // uplodachange(info){
-        
-    //     if (info && info.file && info.file.status !== 'uploading') {
-	// 		//
-    //     }
-    //     if (info && info.file && info.file.status === 'done') {
-    //         let name = Object.keys(info.file.response)
-    //         let dataList = info.file.response[name[0]]
-            
-    //         let scheduleMaster = [];
-    //         for(var i=1;i<dataList.length;i++){
-    //             scheduleMaster.push({
-    //                 key: i,
-    //                 code: dataList[i][0]?dataList[i][0]:'',
-    //                 name: dataList[i][1]?dataList[i][1]:'',
-    //                 type: dataList[i][2]?dataList[i][2]:'',
-    //                 company: dataList[i][3]?dataList[i][3]:'',
-    //                 quantity: dataList[i][4]?dataList[i][4]:'',
-    //                 output: dataList[i][5]?dataList[i][5]:'',
-    //                 schedule: dataList[i][8]?dataList[i][8]:'',
-    //                 path: dataList[i][9]?dataList[i][9]:'',
-    //                 milestone: dataList[i][10]?dataList[i][10]:'',
-    //                 site: dataList[i][11]?dataList[i][11]:'',
-    //             })
-    //         }
-            
-            
-    //         notification.success({
-    //             message: '文件上传成功',
-    //             duration: 2
-    //         })
-	// 	}else if (info && info.file && info.file.status === 'error') {
-    //         this.setState({file:null});
-	// 		notification.error({
-    //             message: '文件上传失败',
-    //             duration: 2
-    //         })
-    //         return;
-	// 	}
-	// };
 
     // 确认提交
     sendWork() {
@@ -694,8 +629,71 @@ class All extends Component {
     }
 
     onSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys',selectedRowKeys)
+        console.log('selectedRows',selectedRows)
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     }
+    // 删除
+    deleteClick = async () => {
+        const{
+            actions:{
+                deleteFlow
+            }
+        }=this.props
+        const { 
+            dataSourceSelected 
+        } = this.state
+        if (dataSourceSelected.length === 0) {
+            notification.warning({
+                message: '请先选择数据！',
+                duration: 3
+            });
+            return
+        } else {
+
+            let user = getUser()
+            let username = user.username
+
+            if(username != 'admin'){
+                notification.warning({
+                    message: '非管理员不得删除！',
+                    duration: 3
+                });
+                return
+            }
+
+            let flowArr = dataSourceSelected.map((data)=>{
+                if(data && data.id){
+                    return data.id
+                }
+            })
+             
+            let promises = flowArr.map((flow)=>{
+                let data = flow
+                let postdata = {
+                    pk:data
+                }
+                return deleteFlow(postdata)
+            })
+
+            Promise.all(promises).then(rst => {
+                console.log('rst',rst)
+                notification.success({
+                    message: '删除流程成功',
+                    duration: 3
+                });
+                this.setState({
+                    selectedRowKeys:[],
+                    dataSourceSelected:[]
+                })
+                this.gettaskSchedule()
+            });
+            
+            
+            
+        }
+    }
+    
     // 操作--查看
     clickInfo(record) {
         this.setState({ totlevisible: true ,TotleModaldata:record});
@@ -707,19 +705,6 @@ class All extends Component {
     // 确定
     totleOk() {
         this.setState({ totlevisible: false });
-    }
-    // 删除
-    deleteClick = () => {
-        const { selectedRowKeys } = this.state
-        if (selectedRowKeys.length === 0) {
-            notification.warning({
-                message: '请先选择数据！',
-                duration: 2
-            });
-            return
-        } else {
-            alert('还未做删除功能')
-        }
     }
 
     // 新增按钮

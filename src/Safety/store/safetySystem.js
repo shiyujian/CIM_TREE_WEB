@@ -19,11 +19,13 @@ export const getForestUsersOK = createAction('获取森林数据用户列表');
 export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [getForestUsersOK]);
 export const getWorkflowById = createFetchAction(`${WORKFLOW_API}/instance/{{id}}/`,[],'GET');
 
-export const getTaskSafetyOK = createAction(`${ID}搜索流程`);
-export const getTaskSafety = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[getTaskSafetyOK],'GET');
+export const getWorkflowsOK = createAction(`${ID}搜索流程`);
+export const getWorkflows = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`,[getWorkflowsOK],'GET');
 //上传文件
 export const postSafeFile = myFetch(`${FILE_API}/api/user/files/`,[],'POST');
 const changeDocs = createAction(`${ID}_CHANGE_DOCS`);
+
+export const SearchSafety = createAction(`${ID}安全体系是否重新获取流程`);
 
 export const actions = {
 	AddVisible,
@@ -38,8 +40,9 @@ export const actions = {
 	getForestUsers,
 	postSafeFile,
 	getWorkflowById,
-	getTaskSafetyOK,
-	getTaskSafety
+	getWorkflowsOK,
+	getWorkflows,
+	SearchSafety
 };
 export default handleActions({
 	[changeDocs]: (state, {payload}) => ({
@@ -72,9 +75,13 @@ export default handleActions({
 			users
 		};
 	},
-	[getTaskSafetyOK]: (state, {payload}) => ({
+	[getWorkflowsOK]: (state, {payload}) => ({
 		...state,
 		safetyTaskList:payload
-}),
+	}),
+	[SearchSafety]: (state, {payload}) => ( {
+        ...state,
+        searchSafety: payload
+    }),
 }, {});
 

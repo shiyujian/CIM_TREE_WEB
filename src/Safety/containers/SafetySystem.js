@@ -44,6 +44,15 @@ export default class SafetySystem extends Component {
                     leftkeycode
                 })
             }
+        }else{
+            let data = tree.projectList
+            if(data && data instanceof Array && data.length>0){
+                data = data[0]
+                let leftkeycode = data.No? data.No :''
+                this.setState({
+                    leftkeycode
+                })
+            }
         }
     }
 
@@ -71,7 +80,7 @@ export default class SafetySystem extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        <SearchInfo {...this.props} {...this.state}/>
+                        {/* <SearchInfo {...this.props} {...this.state}/> */}
                         <SafetyTable  
                             {...this.props} 
                             {...this.state}
