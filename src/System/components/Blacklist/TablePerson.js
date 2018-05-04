@@ -626,7 +626,6 @@ class TablePerson extends Component {
 
 		}
 	}
-
 	rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
 		},
@@ -643,31 +642,6 @@ class TablePerson extends Component {
 			})
 		},
 	};
-
-	//删除
-	delete(index) {
-		let { dataSource } = this.state;
-		dataSource.splice(index, 1);
-		let dataSources = [];
-		dataSource.map((item, key) => {
-			dataSources.push({
-				key: key + 1,
-				person_code: item.code,
-				person_name: item.name,
-				organization: item.org,
-				org_code: item.depart,
-				job: item.jop,
-				sex: item.sex,
-				person_telephone: item.tel,
-				email: item.email,
-			})
-		})
-		this.setState({ dataSource: dataSources });
-	}
-
-	paginationOnChange(e) {
-		// console.log('vip-分页', e);
-	}
 	async confirm(record) {
 		const {
 			sidebar: { node } = {},
@@ -706,91 +680,6 @@ class TablePerson extends Component {
 			})
 			this.querys()
 		})
-		// putUser({}, {
-		// 	id: record.id,
-		// 	username: record.username,
-		// 	email: record.email,
-		// 	// password: addition.password, // 密码不能变？信息中没有密码
-		// 	account: {
-		// 		person_name: record.account.person_name,
-		// 		person_type: "C_PER",
-		// 		person_avatar_url: record.account.person_avatar_url,
-		// 		person_signature_url: record.account.person_signature_url,
-		// 		organization: {
-		// 			pk: rst.pk,
-		// 			code: record.account.organization.code,
-		// 			obj_type: "C_ORG",
-		// 			rel_type: "member",
-		// 			name: record.account.organization.name
-		// 		},
-		// 	},
-		// 	tags: record.tags,
-		// 	sections: record.sections,
-		// 	//groups: [7],
-		// 	groups: groupd,
-		// 	// black_remark: record.black_remark,
-		// 	is_active: true,
-		// 	id_num: record.id_num,
-		// 	// is_black: 0,
-		// 	// id_image: [],
-		// 	id_image: record.id_image,
-		// 	basic_params: {
-		// 		info: {
-		// 			'电话': record.basic_params.info.phone || '',
-		// 			'性别': record.basic_params.info.sex || '',
-		// 			'技术职称': record.basic_params.info.title || '',
-		// 			'phone': record.basic_params.info.phone || '',
-		// 			'sex': record.basic_params.info.sex || '',
-		// 			'duty': ''
-		// 		}
-		// 	},
-		// 	extra_params: {},
-		// 	title: record.basic_params.info.title || ''
-		// }).then(rst => {
-		// 	if (rst.code == 1) {
-		// 		console.log("rst", rst)
-		// 		// if (this.state.pagination.current > 1 && this.state.tempData.length == 1) {
-		// 		// 	const strs1 = this.state.fristPagination.total.toString()
-		// 		// 	const strs2 = strs1.slice(0, strs1.length - 1)
-
-		// 		// 	this.state.fristPagination.total = strs2 * 10
-		// 		// 	this.setState({
-		// 		// 		tempData: this.state.fristTempData,
-		// 		// 		pagination: this.state.fristPagination
-		// 		// 	})
-		// 		// } else {
-		// 		// 	let tempDatas = []
-		// 		// 	this.state.tempData.map(item => {
-		// 		// 		const msg = JSON.parse(rst.msg).id
-		// 		// 		if (item.id != msg) {
-		// 		// 			tempDatas.push(item)
-		// 		// 		}
-		// 		// 	})
-		// 		// 	this.setState({
-		// 		// 		tempData: tempDatas
-		// 		// 	})
-		// 		// }
-		// 		let tempDatas = []
-		// 		this.state.tempData.map(item => {
-		// 			const msg = JSON.parse(rst.msg).id
-		// 			if (item.id != msg) {
-		// 				tempDatas.push(item)
-		// 			}
-		// 		})
-		// 		this.setState({
-		// 			tempData: tempDatas,
-		// 			loading: false 
-		// 		})
-		// 		this.querys()
-		// 	}
-		// })
 	}
-
-	// paginationInfo = {
-	// 	onChange: this.paginationOnChange,
-	// 	showSizeChanger: true,
-	// 	pageSizeOptions: ['5', '10', '20', '30', '40', '50'],
-	// 	showQuickJumper: true,
-	// }
 }
 export default Form.create()(TablePerson)
