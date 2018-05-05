@@ -335,7 +335,7 @@ export default class LocmeasureTable extends Component {
 		let nob = no.substring(0,15);
 		let sectionn = section.substring(8,10);
 		let result = '/'
-		debugger
+		
 		if(littleBanAll){
 			littleBanAll.map(item => {
 				if(item.No.substring(0,15) === nob && item.No.substring(16,18) === sectionn){

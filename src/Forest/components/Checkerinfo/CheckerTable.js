@@ -266,7 +266,6 @@ export default class CheckerTable extends Component {
 	onsectionchange(value) {
 		const {sectionselect} = this.props;
 		sectionselect(value || '')
-		debugger
 		this.setState({section:value || '', smallclass:'', thinclass:''})
 	}
 
@@ -290,7 +289,6 @@ export default class CheckerTable extends Component {
 	}
 
 	ontreetypechange(value) {
-		// debugger
 		// const {treetypelist} = this.props;
 		// let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
 		// this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
@@ -350,7 +348,7 @@ export default class CheckerTable extends Component {
 		let nob = no.substring(0,15);
 		let sectionn = section.substring(8,10);
 		let result = '/'
-		debugger
+		
 		if(littleBanAll){
 			littleBanAll.map(item => {
 				if(item.No.substring(0,15) === nob && item.No.substring(16,18) === sectionn){
@@ -488,11 +486,11 @@ export default class CheckerTable extends Component {
     	}
     	if(!!role)
 			postdata[role] = rolename;
-			debugger
+			
     	this.setState({loading:true,percent:0})
     	getexportTree4Checker({},postdata)
 		.then(rst3 => {
-			debugger
+			
 			console.log('rst3',rst3)
 			this.setState({loading:false})
 			if(rst3 === ''){

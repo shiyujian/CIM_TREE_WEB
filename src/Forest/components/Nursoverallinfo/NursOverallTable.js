@@ -108,7 +108,7 @@ export default class NursOverallTable extends Component {
 			locationoption,
 			users
 		} = this.props;
-		debugger
+		
 		const {
 			sxm, 
 			factory, 
@@ -457,7 +457,6 @@ export default class NursOverallTable extends Component {
 	}
 
 	ontreetypechange(value) {
-		// debugger
 		// const {treetypelist} = this.props;
 		// let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
 		// this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
@@ -595,7 +594,7 @@ export default class NursOverallTable extends Component {
 		let nob = no.substring(0,15);
 		let sectionn = section.substring(8,10);
 		let result = '/'
-		debugger
+		
 		if(littleBanAll){
 			littleBanAll.map(item => {
 				if(item.No.substring(0,15) === nob && item.No.substring(16,18) === sectionn){

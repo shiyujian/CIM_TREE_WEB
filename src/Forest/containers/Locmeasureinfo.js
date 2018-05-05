@@ -278,28 +278,34 @@ export default class Locmeasureinfo extends Component {
     }
 
     // 设置细班选项
-    setThinClassOption(rst) {
-        if (rst instanceof Array) {
+    setThinClassOption(rst){
+        if(rst instanceof Array){
             let thinclassList = [];
             let thinclassOptions = [];
-            let thinclassoption = rst.map(item => {
-                if (item.name) {
+
+            //去除重复的细班,虽然细班是最小的节点，但是只要还有其他元素组成不同，所以数组里面会有相同的细班code，需要去重
+            let array = []
+            let data = []
+            rst.map(item=>{
+                if(item.code && array.indexOf(item.code) === -1){
                     let thins = {
-                        code: item.code,
-                        name: item.name
+                        code:item.code,
+                        name:item.name
                     };
                     thinclassList.push(thins);
+                    array.push(item.code)
+                }else{
+                    data.push(item)
                 }
             })
-            let thinclassData = [...new Set(thinclassList)];
-            thinclassData.sort();
-            let i = 0;
-            thinclassData.map(thin => {
-                thinclassOptions.push(<Option key={i} value={thin.code}>{thin.name}</Option>)
-                i++
+            //重复数据
+            console.log('data',data)
+          
+            thinclassList.map(thin => {
+                thinclassOptions.push(<Option key={thin.code} value={thin.code}>{thin.name}</Option>)
             })
             thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({ thinclassoption: thinclassOptions })
+            this.setState({thinclassoption: thinclassOptions})
         }
     }
 

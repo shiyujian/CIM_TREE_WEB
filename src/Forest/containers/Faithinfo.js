@@ -80,7 +80,7 @@ export default class Faithinfo extends Component {
         if(tree.bigTreeList){
             treeList = tree.bigTreeList
         }
-        debugger
+        
         return (
                 <Body>
                     <Main>

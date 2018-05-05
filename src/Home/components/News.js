@@ -5,6 +5,7 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 
 import styles from './styles.less';
+import { getUser } from '../../_platform/auth';
 
 const TabPane = Tabs.TabPane;
 
@@ -25,6 +26,8 @@ export default class News extends Component {
 
 	componentDidMount() {
 		const { actions: { getNewsList, getTipsList } } = this.props;
+		const user = getUser()
+		let user_id = user.id
 		getNewsList({}, { tag: '新闻', is_draft: false });
 		getTipsList({}, { tag: '公告', is_draft: false });
 	}
