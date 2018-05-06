@@ -89,7 +89,7 @@ export default class Locmeasureinfo extends Component {
         //状态
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={"-1"}>未抽查</Option>,
+            <Option key={'1'} value={"-1"}>未确认</Option>,
             <Option key={'2'} value={"0"}>监理抽查通过</Option>,
             <Option key={'3'} value={"1"}>监理抽查退回</Option>,
             <Option key={'4'} value={"2"}>业主抽查退回</Option>,

@@ -130,6 +130,34 @@ export default class LocmeasureTable extends Component {
 		},{
 			title:"状态",
 			dataIndex: 'statusname',
+			render:(text,record) =>{
+				let superName = ''
+				let ownerName = ''
+				if(record.SupervisorCheck == -1){
+					return <span>未抽查</span>
+				}else {
+					if(record.SupervisorCheck == 0) 
+						superName = "监理抽查退回"
+					else if(record.SupervisorCheck === 1){
+						superName = "监理抽查通过"
+					}
+
+					if(record.CheckStatus == 0) 
+						ownerName = "业主抽查退回"
+					else if(record.CheckStatus == 1){
+						ownerName = "业主抽查通过"
+					}else if(record.CheckStatus == 2){
+						ownerName = "业主抽查退回后修改"
+					}
+					if(superName && ownerName){
+						return <div><div>{superName}</div><div>{ownerName}</div></div>
+					}else if(superName){
+						return <span>{superName}</span>
+					}else{
+						return <span>{ownerName}</span>
+					}
+				}
+			}
 		},{
 			title:"定位",
 			dataIndex: 'islocation',
@@ -424,35 +452,7 @@ export default class LocmeasureTable extends Component {
     }
 
 	onstatuschange(value) {
-		let SupervisorCheck = '';
-		let CheckStatus  = '';
-		switch(value){
-			case "1": 
-				SupervisorCheck = -1;
-				break;
-			case "2": 
-				SupervisorCheck = 1;
-				CheckStatus = -1;
-				break;
-			case "3": 
-				SupervisorCheck = 0;
-				break;
-			case "4": 
-				SupervisorCheck = 1;
-				CheckStatus = 0;
-				break;
-			case "5": 
-				SupervisorCheck = 1;
-				CheckStatus = 1;
-				break;
-			// case "6": 
-			// 	SupervisorCheck = 1;
-			// 	CheckStatus = 2;
-			// 	break;
-			default:
-				break;
-		}
-		this.setState({SupervisorCheck,CheckStatus,status:value || ''})
+		this.setState({status:value || ''})
 
     }
 
@@ -524,8 +524,6 @@ export default class LocmeasureTable extends Component {
     		section = '',
     		bigType = '',
     		treetype = '',
-    		supervisorcheck = '',
-    		checkstatus = '',
     		islocation = '',
     		role = '',
     		rolename = '',
@@ -551,8 +549,6 @@ export default class LocmeasureTable extends Component {
     		section,
     		bigType,
     		treetype,
-    		supervisorcheck,
-    		checkstatus,
     		islocation,
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
     		lstime:lstime&&moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
@@ -585,27 +581,9 @@ export default class LocmeasureTable extends Component {
 	    			tblData[i].place = place;
 					let statusname = '';
 					
-					// if(plan.Status == -1)
-					// 	statusname = "未抽查"
-					// else if(plan.Status == 0) 
-					// 	statusname = "监理抽查通过"
-					// else if(plan.Status === 1){
-					// 	statusname = "监理抽查退回"
-					// }else if(plan.Status === 2){
-					// 	statusname = "业主抽查退回"
-					// }else if(plan.Status === 3){
-					// 	statusname = '业主抽查通过'
-					// }
 					
-
-					if(plan.SupervisorCheck == -1)
-						statusname = "未抽查"
-					else if(plan.SupervisorCheck == 0) 
-						statusname = "抽查未通过"
-					else if(plan.SupervisorCheck === 1){
-						statusname = "抽查通过"
-					}
-
+					tblData[i].SupervisorCheck = plan.SupervisorCheck;
+					tblData[i].CheckStatus = plan.CheckStatus;
 					tblData[i].statusname = statusname;
 					let islocation = plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].islocation = islocation;
@@ -632,8 +610,6 @@ export default class LocmeasureTable extends Component {
     		section = '',
     		bigType = '',
     		treetype = '',
-    		supervisorcheck = '',
-    		checkstatus = '',
     		locationstatus = '',
     		role = '',
     		rolename = '',
@@ -659,8 +635,6 @@ export default class LocmeasureTable extends Component {
     		section,
 			treetype,
 			status,
-    		// supervisorcheck,
-    		// checkstatus,
     		// locationstatus,
     		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
     		lstime:lstime&&moment(lstime).format('YYYY-MM-DD HH:mm:ss'),

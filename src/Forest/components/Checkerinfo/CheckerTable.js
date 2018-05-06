@@ -146,7 +146,7 @@ export default class CheckerTable extends Component {
 		// 	dataIndex: 'SupervisorInfo',
 		// },
 		{
-			title:"抽查时间",
+			title:"验收时间",
 			render: (text,record) => {
 				const {checktime1 = '',checktime2 = '' } = record;
 				return <div><div>{checktime1}</div><div>{checktime2}</div></div>
@@ -199,7 +199,7 @@ export default class CheckerTable extends Component {
 							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw100' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
 						<Col xl={10} lg={12} md={14} className='mrg10'>
-							<span>抽查时间：</span>
+							<span>验收时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
 							 defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]} 
@@ -420,23 +420,21 @@ export default class CheckerTable extends Component {
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			let place = this.getThinClassName(plan.No,plan.Section);
 	    			tblData[i].place = place;
-	    			let statusname = '';
-					if(plan.Status == -1)
-						statusname = "未抽查"
-					else if(plan.Status == 0) 
-						statusname = "监理抽查通过"
-					else if(plan.Status === 1){
-						statusname = "监理抽查退回"
-					}else if(plan.Status === 2){
+					let statusname = '';
+					
+					if(plan.CheckStatus == 0) 
 						statusname = "业主抽查退回"
-					}else if(plan.Status === 3){
-						statusname = '业主抽查通过'
+					else if(plan.CheckStatus == 1){
+						statusname = "业主抽查通过"
+					}else if(plan.CheckStatus == 2){
+						statusname = "业主抽查退回后修改"
 					}
 					tblData[i].statusname = statusname;
 					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
-					let checktime1 = !!plan.CheckTime ? moment(plan.CheckTime).format('YYYY-MM-DD') : '/';
-					let checktime2 = !!plan.CheckTime ? moment(plan.CheckTime).format('HH:mm:ss') : '/';
+					//改为验收时间
+					let checktime1 = !!plan.YSSJ ? moment(plan.YSSJ).format('YYYY-MM-DD') : '/';
+					let checktime2 = !!plan.YSSJ ? moment(plan.YSSJ).format('HH:mm:ss') : '/';
 					tblData[i].checktime1 = checktime1;
 					tblData[i].checktime2 = checktime2;
 	    		})

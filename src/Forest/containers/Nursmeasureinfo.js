@@ -88,8 +88,8 @@ export default class Nursmeasureinfo extends Component {
 
         let statusoption = [
             <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={'1'}>未打包</Option>,
-            <Option key={'2'} value={'0'}>已打包</Option>,
+            <Option key={'1'} value={'0'}>未打包</Option>,
+            <Option key={'2'} value={'1'}>已打包</Option>,
         ];
         this.setState({typeoption,mmtypeoption,statusoption})
     }

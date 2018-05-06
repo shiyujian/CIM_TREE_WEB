@@ -34,7 +34,7 @@ export default class NursmeasureTable extends Component {
     		percent: 0,
     		supervisorcheck: '',
     		checkstatus: '',
-    		status: '',
+    		ispack: '',
         }
     }
     componentDidMount() {
@@ -99,7 +99,7 @@ export default class NursmeasureTable extends Component {
 			section,
 			bigType,
 			treetypename,
-			status,
+			ispack,
 			mmtype = ''
 		} = this.state;
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
@@ -289,7 +289,7 @@ export default class NursmeasureTable extends Component {
 						</Col>
 						<Col xl={4} lg={5} md={6} className='mrg10'>
 							<span>状态：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' onChange={this.onstatuschange.bind(this)} value={status}>
+							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' onChange={this.onstatuschange.bind(this)} value={ispack}>
 								{statusoption}
 							</Select>
 						</Col>
@@ -408,7 +408,7 @@ export default class NursmeasureTable extends Component {
     }
 
     onstatuschange(value) {    	
-		this.setState({status: value})
+		this.setState({ispack: value})
 	}
 
 	onrolenamechange(value) {
@@ -473,7 +473,7 @@ export default class NursmeasureTable extends Component {
     		size,
     		supervisorcheck = '',
     		checkstatus = '',
-			status = '',
+			ispack = '',
 			mmtype = ''
     	} = this.state;
     	const {actions: {getnurserys},keycode = ''} = this.props;
@@ -492,7 +492,7 @@ export default class NursmeasureTable extends Component {
     		size,
     		supervisorcheck,
     		checkstatus,
-    		status,
+    		ispack,
 		}
 		if(this.sections.length !== 0){  //不是admin，要做查询判断了
 			if(section === ''){
@@ -541,7 +541,7 @@ export default class NursmeasureTable extends Component {
     		stime = '',
     		etime = '',
     		exportsize,
-			status = '',
+			ispack = '',
 			mmtype
 		} = this.state;
 		if(this.sections.length !== 0){  //不是admin，要做查询判断了
@@ -564,7 +564,7 @@ export default class NursmeasureTable extends Component {
     		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
     		page: 1,
     		size: exportsize,
-    		status,
+    		ispack,
 		}
 		if(keycode!== ''&& keycode.indexOf('P010') !== -1){   //有苗木类型选项
 			postdata.foresttype = mmtype

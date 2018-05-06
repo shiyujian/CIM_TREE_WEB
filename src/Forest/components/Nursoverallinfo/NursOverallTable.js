@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message,Icon} from 'antd';
+import {Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message,Icon,Card} from 'antd';
 import moment from 'moment';
 import { FOREST_API,PROJECT_UNITS} from '../../../_platform/api';
 import '../index.less';
@@ -16,40 +16,14 @@ export default class NursOverallTable extends Component {
         	tblData: [],
         	pagination: {},
         	loading: false,
-        	size:10,
-        	exportsize:100,
-        	leftkeycode: '',
-        	smallclass: '',
-        	thinclass: '',
-        	treetypename: '',
         	status: '',
-        	keycode: '-1',
-        	stime: moment().format('YYYY-MM-DD 00:00:00'),
-			etime: moment().format('YYYY-MM-DD 23:59:59'),
 			sxm: '',
-    		section: '',
-    		bigType: '',
-    		treetype: '',
-    		gd_min: '',
-    		gd_max: '',
-    		xj_min: '',
-    		xj_max: '',
-    		gf_min: '',
-    		gf_max: '',
-    		dj_min: '',
-    		dj_max: '',
-    		tqhd_min: '',
-    		tqhd_max: '',
-    		tqzj_min: '',
-    		tqzj_max: '',
-    		SupervisorCheck: '',
-    		CheckStatus: '',
-    		islocation: '',
-    		factory: '',
-    		role: 'inputer',
-    		rolename: '',
     		percent: 0,
-    		keyword: '',
+			keyword: '',
+			seedlingMess:[],
+            treeMess:[],
+			flowMess:[],
+			src:''
         }
     }
     componentDidMount() {
@@ -67,326 +41,179 @@ export default class NursOverallTable extends Component {
 		})
 		return str;
 	}
-    componentWillReceiveProps(nextProps){
-    	// if(nextProps.leftkeycode != this.state.leftkeycode) {
-		// 	this.setState({
-		// 		leftkeycode: nextProps.leftkeycode,
-    	// 	},() => {
-    	// 		this.qury(1);
-    	// 	})
-    	// } 
-    }
+    
 	render() {
-		const {tblData} = this.state;
-		return (
-			<div>
-				{this.treeTable(tblData)}
-				<Modal
-					width={522}
-					title='详细信息'
-					style={{textAlign:'center',overflow:'auto'}}
-					visible={this.state.imgvisible}
-					onOk={this.handleCancel.bind(this)}
-					onCancel={this.handleCancel.bind(this)}
-				>
-					<img style ={{width:'490px'}} src={this.state.src} alt="图片"/>
-				</Modal>
-			</div>
-		);
-	}
-	treeTable(details) {
 		const {
-			treetypeoption,
-			sectionoption,
-			smallclassoption,
-			thinclassoption,
-			typeoption,
-			roleoption,
-			leftkeycode,
-			keycode,
-			statusoption,
-			locationoption,
-			users
-		} = this.props;
-		
-		const {
-			sxm, 
-			factory, 
-			rolename,
-			section,
-			smallclass,
-			thinclass,
-			treetypename,
-			bigType,
-			status,
-			islocation,
-			role,
+			seedlingMess,
+            treeMess,
+			flowMess,
+			sxm
 		} = this.state;
 		const suffix = sxm ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
-		const suffix1 = factory ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
-		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
-		let columns = [];
 		let header = '';
-		columns = [{
-			title:"序号",
-			dataIndex: 'order',
-		},{
-			title:"顺序码",
-			dataIndex: 'ZZBM',
-		},{
-			title:"标段",
-			dataIndex: 'Section',
-			render:(text,record) => {
-				return <p>{this.getBiao(text)}</p>
-			}
-		},{
-			title:"位置",
-			dataIndex: 'place',
-		},{
-			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeName',
-		},{
-			title:"状态",
-			dataIndex: 'statusname',
-		},{
-			title:"定位",
-			dataIndex: 'islocation',
-		},
-		// {
-		// 	title:"定位时间",
-		// 	render: (text,record) => {
-		// 		const {locationtime1 = '',locationtime2 = '' } = record;
-		// 		return <div><div>{locationtime1}</div><div>{locationtime2}</div></div>
-		// 	}
-		// },
-		{
-			title:"供应商",
-			dataIndex: 'Factory',
-		},{
-			title:"测量人",
-			dataIndex: 'Inputer',
-			render: (text,record) => {
-				if(text === 0){
-					return <span> / </span>
+		let seedlingColumns = [
+			{
+				title:"顺序码",
+				dataIndex: 'sxm',
+			},{
+				title:"打包车牌",
+				dataIndex: 'car',
+			},{
+				title:"树种",
+				dataIndex: 'TreeTypeName',
+			},{
+				title:"产地",
+				dataIndex: 'TreePlace',
+			},{
+				title:"供应商",
+				dataIndex: 'Factory',
+			},{
+				title:"苗圃名称",
+				dataIndex: 'NurseryName',
+			},
+			{
+				title:"起苗时间",
+				dataIndex: 'LifterTime',
+			},{
+				title:"起苗地点",
+				dataIndex: 'location',
+			},{
+				title: "高度(cm)",
+				render: (text,record) => {
+					if(record.height)
+						return <a disabled={!record.heightImg} onClick={this.imgShow.bind(this,record.heightImg)}>{record.height}</a>
+					else {
+						return <span>/</span>
+					}
 				}
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
-			}
-		},{
-			title: "监理人",
-			dataIndex: 'Supervisor',
-			render: (text,record) => {
-				if(text === 0){
-					return <span> / </span>
+			},{
+				title: "冠幅(cm)",
+				render: (text,record) => {
+					if(record.crown)
+						return <a disabled={!record.crownImg} onClick={this.imgShow.bind(this,record.crownImg)}>{record.crown}</a>
+					else {
+						return <span>/</span>
+					}
 				}
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
-			}
-		},{
-			title: "抽查人",
-			dataIndex: 'Checker',
-			render: (text,record) => {
-				if(text === 0){
-					return <span> / </span>
+			},{
+				title: "土球直径(cm)",
+				render: (text,record) => {
+					if(record.diameter)
+						return <a disabled={!record.diameterImg} onClick={this.imgShow.bind(this,record.diameterImg)}>{record.diameter}</a>
+					else {
+						return <span>/</span>
+					}
 				}
-				return <span>{users&&users[text] ? users[text].Full_Name : ''}</span>
-			}
-		},{
-			title:<div><div>高度</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.GD != 0)
-					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
-				else {
-					return <span>/</span>
+			},{
+				title: "土球直径(cm)",
+				render: (text,record) => {
+					if(record.thickness)
+						return <a disabled={!record.thicknessImg} onClick={this.imgShow.bind(this,record.thicknessImg)}>{record.thickness}</a>
+					else {
+						return <span>/</span>
+					}
 				}
 			}
-		},{
-			title:<div><div>胸径</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.XJ != 0)
-					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
-				else {
-					return <span>/</span>
+		];
+		let treeColumns = [
+			{
+				title:"顺序码",
+				dataIndex: 'sxm',
+			},{
+				title:"地块",
+				dataIndex: 'landName',
+			},{
+				title:"标段",
+				dataIndex: 'sectionName',
+			},{
+				title:"小班",
+				dataIndex: 'SmallClass',
+			},{
+				title:"细班",
+				dataIndex: 'ThinClass',
+			},{
+				title:"树种",
+				dataIndex: 'TreeTypeName',
+			},
+			{
+				title:"位置",
+				dataIndex: 'Location',
+			},{
+				title: "胸径(cm)",
+				render: (text,record) => {
+					if(record.XJ)
+						return <a disabled={!record.XJImg} onClick={this.imgShow.bind(this,record.XJImg)}>{record.XJ}</a>
+					else {
+						return <span>/</span>
+					}
 				}
 			}
-		},{
-			title:<div><div>冠幅</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.GF != 0)
-					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>地径</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.DJ != 0)
-					return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>土球高度</div><div>(cm)</div></div>,
-			dataIndex: 'tqhd',
-			render: (text,record) => {
-				if(record.TQHD != 0)
-					return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>土球直径</div><div>(cm)</div></div>,
-			dataIndex: 'tqzj',
-			render: (text,record) => {
-				if(record.TQZJ != 0)
-					return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>是否</div><div>截干</div></div>,
-			render: (text,record) => {
-				// console.log('record',record)
-				return <div>
-							{
-								record.JG == 1
-								? <span>是</span>
-								: <span>否</span>
+		];
+
+		let flowColumns = [
+			{
+				title:"流程",
+				render: (text,record) => {
+					if(record.Node){
+						if(record.Node === '种树'){
+							return <span>施工提交</span> 
+						}else if(record.Node === '监理'){
+							if(record.Status === 1){
+								return <span>监理通过</span> 
+							}else{
+								return <span>监理拒绝</span> 
 							}
-						</div>
-			}
-		},{
-			title:<div><div>干皮有无</div><div>损伤</div></div>,
-			render: (text,record) => {
-				return <div>
-							{
-								record.GP == 1
-								? <span>有</span>
-								: <span>无</span>
+							
+						}else if(record.Node === '业主'){
+							if(record.Status === 2){
+								return <span>业主抽查通过</span> 
+							}else{
+								return <span>业主抽查拒绝</span> 
 							}
-						</div>
+						}else if(record.Node === '补种'){
+							return <span>施工补录扫码</span> 
+						}else if (record.Node === '苗圃提交'){
+							return <span>苗圃提交</span> 
+						}
+					}
+				}
+			},{
+				title:"人员",
+				render: (text,record) => {
+					if(record.FromUserObj)
+						return <span>{record.FromUserObj.Full_Name}</span>
+					else {
+						return <span>/</span>
+					}
+				}
+			},{
+				title:"意见",
+				dataIndex: 'Info',
+			},{
+				title:"时间",
+				dataIndex: 'CreateTime',
+			},{
+				title:"备注",
+				dataIndex: 'Remark',
 			}
-		},{
-			title:<div><div>冠型完整，</div><div>不偏冠</div></div>,
-			render: (text,record) => {
-				return <div>
-							{
-								record.GXWZ == 1
-								? <span>是</span>
-								: <span>否</span>
-							}
-						</div>
-			}
-		},{
-			title:<div><div>生长</div><div>健壮</div></div>,
-			render: (text,record) => {
-				return <div>
-							{
-								record.SZJZ == 1
-								? <span>是</span>
-								: <span>否</span>
-							}
-						</div>
-			}
-		},{
-			title:<div><div>有无病</div><div>虫害</div></div>,
-			render: (text,record) => {
-				return <div>
-							{
-								record.BCH == 1
-								? <span>有</span>
-								: <span>无</span>
-							}
-						</div>
-			}
-		}];
-		header = <div >
+		];
+		return (
+			<div>
+				<Row>
 					<Row >
-					<Col  xl={3} lg={4} md={5} className='mrg10'>
+						<Col  xl={3} lg={4} md={5} className='mrg10'>
 							<span>顺序码：</span>
 							<Input suffix={suffix} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
-						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>标段：</span>
-							<Select allowClear className='forestcalcw2 mxw100' value={section} onChange={this.onsectionchange.bind(this)}>
-								{sectionoption}
-							</Select>
-						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>小班：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={smallclass} onChange={this.onsmallclasschange.bind(this)}>
-								{smallclassoption}
-							</Select>
-						</Col>
-						<Col xl={4} lg={6} md={7} className='mrg10'>
-							<span>细班：</span>
-							<Select allowClear className='forestcalcw2 mxw170' defaultValue='全部' value={thinclass} onChange={this.onthinclasschange.bind(this)}>
-								{thinclassoption}
-							</Select>
-						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>类型：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={bigType} onChange={this.ontypechange.bind(this)}>
-								{typeoption}
-							</Select>
-						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>树种：</span>
-							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
-								{treetypeoption}
-							</Select>
-						</Col>
-						<Col xl={3} lg={5} md={6} className='mrg10'>
-							<span>状态：</span>
-							<Select allowClear className='forestcalcw2 mxw150' defaultValue='全部' value={status} onChange={this.onstatuschange.bind(this)}>
-								{statusoption}
-							</Select>
-						</Col>
-						<Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>定位：</span>
-							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={islocation} onChange={this.onlocationchange.bind(this)}>
-								{locationoption}
-							</Select>
-						</Col>
-						<Col xl={6} lg={7} md={8} className='mrg10'>
-							<span>供应商：</span>
-							<Input suffix={suffix1} value={factory} className='forestcalcw3 mxw250' onChange={this.factorychange.bind(this)}/>
-						</Col>
-						<Col xl={5} lg={6} md={7} className='mrg10'>
-							<span>角色：</span>
-							<Select allowClear className='forestcalcw2-1 mxw50' defaultValue='全部' value={role} onChange={this.onrolechange.bind(this)}>
-								{roleoption}
-							</Select>
-							<Input suffix={suffix2} value={rolename} className='forestcalcw2-1 mxw150' onChange={this.onrolenamechange.bind(this)}/>
-						</Col>
-						<Col xl={10} lg={12} md={14} className='mrg10'>
-							<span>测量时间：</span>
-							<RangePicker 
-							 style={{verticalAlign:"middle"}} 
-							 defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]} 
-							 showTime={{ format: 'HH:mm:ss' }}
-							 format={'YYYY/MM/DD HH:mm:ss'}
-							 onChange={this.datepick.bind(this)}
-							 onOk={this.datepick.bind(this)}
-							>
-							</RangePicker>
 						</Col>
 					</Row>
 					<Row >
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
+							<Button type='primary' onClick={this.qury.bind(this)}>
 								查询
 							</Button>
 						</Col>
-						<Col span={18} className='quryrstcnt mrg10'>
-							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
-						</Col>
-						<Col span={2} className='mrg10'>
-							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
-								导出
-							</Button>
+						<Col span={20} className='quryrstcnt mrg10'>
+							
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.resetinput.bind(this)}>
@@ -394,434 +221,208 @@ export default class NursOverallTable extends Component {
 							</Button>
 						</Col>
 					</Row>
-				</div> 
-		return <div>
-					<Row>
-						{header}
+				</Row>
+				<Card title='苗木信息' style={{marginTop:10}}>
+					<Table bordered
+						columns={seedlingColumns}  
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
+						locale={{emptyText:'暂无信息'}}
+						dataSource={seedlingMess} 
+					/>
+				</Card>
+				<Card title='树木信息' style={{marginTop:10}}>
+					<Table bordered
+						columns={treeColumns}  
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
+						locale={{emptyText:'暂无信息'}}
+						dataSource={treeMess} 
+					/>
+				</Card>
+				<Card title='流程信息' style={{marginTop:10}}>
+					<Table bordered
+						columns={flowColumns} 
+						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
+						locale={{emptyText:'暂无信息'}}
+						dataSource={flowMess} 
+					/>
+				</Card>
+				<Modal
+					width={522}
+					title='详细信息'
+					style={{textAlign:'center',overflow:'auto'}}
+					visible={this.state.imgvisible}
+					// onOk={this.handleCancel.bind(this)}
+					// onCancel={this.handleCancel.bind(this)}
+					footer={null}
+				>
+					<img style ={{width:'490px'}} src={this.state.src} alt="图片"/>
+					<Row style={{marginTop:10}}>
+						<Button  onClick={this.handleCancel.bind(this) } style={{float:'right'}}type="primary">关闭</Button>
 					</Row>
-					<Row>
-						<Table bordered
-						 className='foresttable'
-						 columns={columns}  
-						 rowKey='order'
-						 loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
-						 locale={{emptyText:'当天无现场测量信息'}}
-						 dataSource={details} 
-						 onChange={this.handleTableChange.bind(this)}
-						 pagination={this.state.pagination}
-						/>
-					</Row>
-				</div>
+				</Modal>
+			</div>
+		);
 	}
 
 	emitEmpty = () => {
 	    this.setState({sxm: ''});
   	}
 
-  	emitEmpty1 = () => {
-	    this.setState({factory: ''});
-  	}
-
-  	emitEmpty2 = () => {
-	    this.setState({rolename: ''});
-  	}
-
 	sxmchange(value) {
 		this.setState({sxm:value.target.value})
 	}
 
-	onsectionchange(value) {
-		const {sectionselect} = this.props;
-		sectionselect(value || '')
-		this.setState({section:value || '', smallclass:'', thinclass:'', bigType:'', treetype: '', treetypename:''})
-	}
-
-	onsmallclasschange(value) {
-		const {smallclassselect} = this.props;
-		const {section,leftkeycode} = this.state;
-		smallclassselect(value || leftkeycode,section);
-		this.setState({smallclass:value || '',thinclass:'', bigType:'', treetype: '', treetypename:''})
-	}
-
-	onthinclasschange(value) {
-		const {thinclassselect} = this.props;
-		const {section,smallclass} = this.state;
-		thinclassselect(value || smallclass,section);
-		this.setState({thinclass:value || '', bigType:'', treetype: '', treetypename:''})
-	}
-
-	ontypechange(value) {
-		const {typeselect} = this.props;
-		typeselect(value || '')
-		this.setState({bigType: value || '' , treetype: '', treetypename:''})
-	}
-
-	ontreetypechange(value) {
-		// const {treetypelist} = this.props;
-		// let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
-		// this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
-		this.setState({treetype:value,treetypename:value})
-    }
-
-	gdminchange(value) {
-		this.setState({gd_min:value})
-	}
-
-	gdmaxchange(value) {
-		this.setState({gd_max:value})
-	}
-
-	xjminchange(value) {
-		this.setState({xj_min:value})
-	}
-
-	xjmaxchange(value) {
-		this.setState({xj_max:value})
-	}
-
-	gfminchange(value) {
-		this.setState({gf_min:value})
-	}
-
-	gfmaxchange(value) {
-		this.setState({gf_max:value})
-	}
-
-	djminchange(value) {
-		this.setState({dj_min:value})
-	}
-
-	djmaxchange(value) {
-		this.setState({dj_max:value})
-	}
-
-	tqhdminchange(value) {
-		this.setState({tqhd_min:value})
-	}
-
-	tqhdmaxchange(value) {
-		this.setState({tqhd_max:value})
-	}
-
-	tqzjminchange(value) {
-		this.setState({tqzj_min:value})
-	}
-
-	tqzjmaxchange(value) {
-		this.setState({tqzj_max:value})
-	}
-	onstatuschange(value) {
-		// console.log('value',value)
-		let SupervisorCheck = '';
-		let CheckStatus  = '';
-		switch(value){
-			case "1": 
-				SupervisorCheck = -1;
-				break;
-			case "2": 
-				SupervisorCheck = 1;
-				CheckStatus = -1;
-				break;
-			case "3": 
-				SupervisorCheck = 0;
-				break;
-			case "4": 
-				SupervisorCheck = 1;
-				CheckStatus = 0;
-				break;
-			case "5": 
-				SupervisorCheck = 1;
-				CheckStatus = 1;
-				break;
-			// case "6": 
-			// 	SupervisorCheck = 1;
-			// 	CheckStatus = 2;
-			// 	break;
-			default:
-				break;
-		}
-		this.setState({SupervisorCheck,CheckStatus,status:value || ''})
-    }
-
-    onlocationchange(value) {
-		this.setState({islocation:value || ''})
-    }
-
-	factorychange(value) {
-		this.setState({factory: value.target.value})
-	}
-
-	onrolechange(value) {
-		this.setState({role:value || 'inputer'})
-	}
-
-	onrolenamechange(value) {
-		this.setState({rolename:value.target.value})
-	}
-
-	datepick(value){
-		this.setState({stime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
-		this.setState({etime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
-    }
-
     resetinput(){
-    	const {resetinput,leftkeycode} = this.props;
-		resetinput(leftkeycode)
+    	const {resetinput} = this.props;
+		resetinput()
     }
 
-	handleTableChange(pagination){
-        const pager = { ...this.state.pagination};
-        pager.current = pagination.current;
-    	this.setState({
-        	pagination: pager,
-        });
-        this.qury(pagination.current)
-    }
-
-	onImgClick(src) {
+    onImgClick(data) {
+       
+        let src = ''
+        try{
+            let srcs = data.split(',')
+            if(srcs && srcs instanceof Array && srcs.length>0){
+                let len = srcs.length
+                src = srcs[len-1]
+            }else{
+                src = data
+            }
+        }catch(e){
+            console.log('处理图片',e)
+        }
 		src = src.replace(/\/\//g,'/')
 		src =  `${FOREST_API}/${src}`
-		this.setState({src},() => {
-			this.setState({imgvisible:true,})
-		})
+		return src
+        
 	}
 
 	handleCancel(){
     	this.setState({imgvisible:false})
 	}
-	getThinClassName(no,section){
-		const {littleBanAll} = this.props;
-		let nob = no.substring(0,15);
-		let sectionn = section.substring(8,10);
-		let result = '/'
-		
-		if(littleBanAll){
-			littleBanAll.map(item => {
-				if(item.No.substring(0,15) === nob && item.No.substring(16,18) === sectionn){
-					result = item.ThinClassName;
-					return;
-				}
-			})
-		}else{
-			return <p> / </p>
-		}
-		return result;
-	}
 
-    qury(page) {
-    	const {
-    		sxm = '',
-    		section = '',
-    		bigType = '',
-    		treetype = '',
-    		gd_min = '',
-    		gd_max = '',
-    		xj_min = '',
-    		xj_max = '',
-    		gf_min = '',
-    		gf_max = '',
-    		dj_min = '',
-    		dj_max = '',
-    		tqhd_min = '',
-    		tqhd_max = '',
-    		tqzj_min = '',
-    		tqzj_max = '',
-    		SupervisorCheck = '',
-    		CheckStatus = '',
-    		islocation = '',
-    		factory = '',
-    		role = '',
-    		rolename = '',
-    		stime = '',
-    		etime = '',
-    		status = '',
-			size,
-			smallclass = '',
-			thinclass
-    	} = this.state;
-    	let gd = '', xj = '', gf = '', dj = '', tqhd = '', tqzj = ''; 
-    	if(gd_min !== '' && gd_max !== '') {
-    		gd = `${gd_min}-${gd_max}`
-    	}
-    	if(xj_min !== '' && xj_max !== '') {
-    		xj = `${xj_min}-${xj_max}`
-    	}
-    	if(gf_min !== '' && gf_max !== '') {
-    		gf = `${gf_min}-${gf_max}`
-    	}
-    	if(dj_min !== '' && dj_max !== '') {
-    		dj = `${dj_min}-${dj_max}`
-    	}
-    	if(tqhd_min !== '' && tqhd_max !== '') {
-    		tqhd = `${tqhd_min}-${tqhd_max}`
-    	}
-    	if(tqzj_min !== '' && tqzj_max !== '') {
-    		tqzj = `${tqzj_min}-${tqzj_max}`
-    	}
-		const {actions: {getNurserysTree},keycode = ''} = this.props;
-		if(this.sections.length !== 0){  //不是admin，要做查询判断了
-			if( section === ''){
-				message.info('请选择标段信息');
-				return;
-			}
-		}
-    	let postdata = {
-    		no:keycode,
-    		sxm,
-    		section,
-    		bigType,
-    		treetype,
-    		gd,
-    		xj,
-    		gf,
-    		dj,
-    		tqhd,
-			tqzj,
-			smallclass,
-			thinclass,
-    		SupervisorCheck,
-    		CheckStatus,
-    		status,
-    		islocation,
-    		factory,
-    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-    		page,
-    		size
-    	}
-    	if(!!role)
-    		postdata[role] = rolename;
-		this.setState({loading:true,percent:0})
-    	getNurserysTree({},postdata)
-    	.then(rst => {
-    		this.setState({loading:false,percent:100})
-    		if(!rst)
-    			return
-    		let tblData = rst.content;
-    		if(tblData instanceof Array) {
-	    		tblData.forEach((plan, i) => {
-	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = ''
-					if(plan.Section.indexOf('P010') !== -1){
-						place = this.getThinClassName(plan.No,plan.Section);
-					}else{
-						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
-					}
-	    			tblData[i].place = place;
-					tblData[i].statusname = this.getStatusName(plan.Status);
-					let islocation = !!plan.LocationTime ? '已定位' : '未定位';
-					tblData[i].islocation = islocation;
-					let locationtime1 = !!plan.LocationTime ? moment(plan.LocationTime).format('YYYY-MM-DD') : '/';
-					let locationtime2 = !!plan.LocationTime ? moment(plan.LocationTime).format('HH:mm:ss') : '/';
-					tblData[i].locationtime1 = locationtime1;
-					tblData[i].locationtime2 = locationtime2;
-	    		})
-		    	const pagination = { ...this.state.pagination };
-				pagination.total = rst.pageinfo.total;
-				pagination.pageSize = size;
-				this.setState({ tblData,pagination:pagination });	
-	    	}
-    	})
-	}
-	getStatusName(status){
-		switch(status){
-			case -1 :
-			 return '未确认'
-			case 0:
-			 return '监理抽查通过'
-			case 1:
-			 return '监理抽查退回'
-			case 2:
-			 return '业主抽查通过'
-			case 3:
-			 return '业主抽查通过'
-		}
-	}
-
-	exportexcel() {
-		const {
-    		sxm = '',
-    		section = '',
-    		bigType = '',
-    		treetype = '',
-    		gd_min = '',
-    		gd_max = '',
-    		xj_min = '',
-    		xj_max = '',
-    		gf_min = '',
-    		gf_max = '',
-    		dj_min = '',
-    		dj_max = '',
-    		tqhd_min = '',
-    		tqhd_max = '',
-    		tqzj_min = '',
-    		tqzj_max = '',
-    		supervisorcheck = '',
-    		checkstatus = '',
-    		locationstatus = '',
-    		factory = '',
-    		role = '',
-    		rolename = '',
-    		stime = '',
-    		etime = '',
-    		exportsize,
-    	} = this.state;
-    	const {actions: {getNurserysTree,getexportTreeNurserys},keycode = ''} = this.props;
-    	let postdata = {
-    		no:keycode,
-    		sxm,
-    		section,
-    		bigType,
-    		treetype,
-    		gd_min,
-    		gd_max,
-    		xj_min,
-    		xj_max,
-    		gf_min,
-    		gf_max,
-    		dj_min,
-    		dj_max,
-    		tqhd_min,
-    		tqhd_max,
-    		tqzj_min,
-    		tqzj_max,
-    		supervisorcheck,
-    		checkstatus,
-    		locationstatus,
-			factory,
-    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-    		etime:stime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-    		page: 1,
-    		size: exportsize
-		}
-		if(this.sections.length !== 0){  //不是admin，要做查询判断了
-			if(section === ''){
-				message.info('请选择标段信息');
-				return;
-			}
-		}
-    	if(!!role)
-    		postdata[role] = rolename;
-    	this.setState({loading:true,percent:0})
-    	getexportTreeNurserys({},postdata)
-		.then(rst3 => {
-			if(rst3 === ''){
-				message.info('没有符合条件的信息');
-			}else{
-				this.createLink(this,`${FOREST_API}/${rst3}`)
-			}
-			this.setState({loading:false})
+	imgShow(src){
+		this.setState({
+			imgvisible:true,
+			src:src
 		})
 	}
 
-	createLink(name,url) {
-        let link = document.createElement("a");
-        // link.download = name;
-        link.href = url;
-        link.setAttribute('download', name);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+    async qury() {
+    	const {
+    		sxm = '',
+    	} = this.state;
+    	
+		const {
+			actions: {
+				getNurserysTree,
+				getqueryTree,
+				getTreeflows,
+				getnurserys,
+				getCarpackbysxm
+			}
+		} = this.props;
+		let me = this
+    	let postdata = {
+    		sxm,
+    	}
+    
+		this.setState({
+			loading:true,
+			percent:0
+		})
+
+		let queryTreeDatas = await getqueryTree({},postdata)
+		let treeflowDatas = await getTreeflows({},postdata)
+		let nurserysDatas = await getnurserys({},postdata)
+		let carData = await getCarpackbysxm(postdata)
+
+		let queryTreeData = {}
+		let treeflowData = {}
+		let nurserysData = {}
+
+		if(queryTreeDatas && queryTreeDatas.content && queryTreeDatas.content instanceof Array && queryTreeDatas.content.length>0){
+			queryTreeData =  queryTreeDatas.content[0]
+		}
+		if(treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array && treeflowDatas.content.length>0){
+			treeflowData =  treeflowDatas.content
+		}
+		if(nurserysDatas && nurserysDatas.content && nurserysDatas.content instanceof Array && nurserysDatas.content.length>0){
+			nurserysData =  nurserysDatas.content[0]
+		}
+
+		let seedlingMess = [{
+			sxm:queryTreeData.ZZBM?queryTreeData.ZZBM:'',
+			car:carData.LicensePlate?carData.LicensePlate:'',
+			TreeTypeName:nurserysData.TreeTypeObj?nurserysData.TreeTypeObj.TreeTypeName:'',
+			TreePlace:nurserysData.TreePlace?nurserysData.TreePlace:'',
+			Factory:nurserysData.Factory?nurserysData.Factory:'',
+			NurseryName:nurserysData.NurseryName?nurserysData.NurseryName:'',
+			LifterTime:nurserysData.LifterTime?nurserysData.LifterTime:'',
+			location:nurserysData.location?nurserysData.location:'',
+			height:nurserysData.GD?nurserysData.GD:'',
+			heightImg:nurserysData.GDFJ?me.onImgClick(nurserysData.GDFJ):'',
+			crown:nurserysData.GF?nurserysData.GF:'',
+			crownImg:nurserysData.GFFJ?me.onImgClick(nurserysData.GFFJ):'',
+			diameter:nurserysData.TQZJ?nurserysData.TQZJ:'',
+			diameterImg:nurserysData.TQZJFJ?me.onImgClick(nurserysData.TQZJFJ):'',
+			thickness:nurserysData.TQHD?nurserysData.TQHD:'',
+			thicknessImg:nurserysData.TQHDFJ?me.onImgClick(nurserysData.TQHDFJ):'',
+			InputerObj:nurserysData.InputerObj?nurserysData.InputerObj:''
+		}]
+
+		 //项目code
+		 let land = queryTreeData.Land?queryTreeData.Land:''
+		 //项目名称
+		 let landName = ''
+		 //项目下的标段
+		 let sections = []
+		 //查到的标段code
+		 let Section = queryTreeData.Section?queryTreeData.Section:''
+		 //标段名称
+		 let sectionName = ''
+		 
+		 PROJECT_UNITS.map((unit)=>{
+			 if(land === unit.code){
+				 sections = unit.units
+				 landName = unit.value
+			 }
+		 })
+		 console.log('sections',sections)
+		 
+		 sections.map((section)=>{
+			 if(section.code === Section){
+				 sectionName = section.value
+			 }
+		 })
+
+		 let treeMess = [{
+			sxm:queryTreeData.ZZBM?queryTreeData.ZZBM:'',
+			landName:landName,
+			sectionName:sectionName,
+			SmallClass:queryTreeData.SmallClass?queryTreeData.SmallClass+'号小班':'',
+			ThinClass:queryTreeData.ThinClass?queryTreeData.ThinClass + '号细班':'',
+			TreeTypeName:nurserysData.TreeTypeObj?nurserysData.TreeTypeObj.TreeTypeName:'',
+			Location:queryTreeData.LocationTime ? '已定位' : '未定位',
+			XJ:queryTreeData.XJ?queryTreeData.XJ:'',
+			XJImg:queryTreeData.XJFJ?me.onImgClick(queryTreeData.XJFJ):'',
+		}]
+		let flowMess = treeflowData || []
+		flowMess.push({
+			Node:'苗圃提交',
+			FromUserObj:nurserysData.InputerObj?nurserysData.InputerObj:'',
+			Info:nurserysData.Factory?nurserysData.Factory:''
+		})
+
+		console.log('seedlingMess',seedlingMess)
+		console.log('treeMess',treeMess)
+		console.log('flowMess',flowMess)
+		this.setState({ 
+			seedlingMess,
+			treeMess,
+			flowMess,
+			loading:false,
+			percent:100
+		})
+	}
 }
