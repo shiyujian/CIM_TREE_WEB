@@ -424,7 +424,7 @@ export default class SupervisorTable extends Component {
 					tblData[i].place = place;
 					let statusname = '';
 					
-					if(plan.SupervisorCheck == -1)
+					if(plan.SupervisorCheck == -1 && plan.CheckStatus == -1)
 						statusname = "未抽查"
 					else if(plan.SupervisorCheck == 0) 
 						statusname = "监理抽查退回"
