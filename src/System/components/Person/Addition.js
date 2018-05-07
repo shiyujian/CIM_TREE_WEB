@@ -26,9 +26,9 @@ class Addition extends Component {
 			btns: true,
 			btnf: true,
 			checkedBtn: null,
-			OriginalBlack:null,
-			change_alValue:null,
-			black_remarkValue:null,
+			OriginalBlack: null,
+			change_alValue: null,
+			black_remarkValue: null,
 		}
 	}
 	renderContent() {
@@ -524,7 +524,7 @@ class Addition extends Component {
 													/>
 												</FormItem> : ''}
 										</Col>
-										<Col span={6}>
+										{/* <Col span={6}>
 											{user.is_superuser ?
 												<FormItem {...Addition.layoutY} label="关联用户">
 													<Switch checked={addition.id ? addition.change_all : false}
@@ -532,13 +532,13 @@ class Addition extends Component {
 														// onChange={changeAdditionField.bind(this, 'change_all')}
 													/>
 												</FormItem> : ''}
-										</Col>
-										<Col span={10}>
+										</Col> */}
+										<Col span={16}>
 											{user.is_superuser ?
 												<FormItem {...Addition.layoutR} label="原因">
 													<Input value={addition.black_remark}
-														onChange={this.changeBlack_remark.bind(this)}														
-														// onChange={changeAdditionField.bind(this, 'black_remark')}
+														onChange={this.changeBlack_remark.bind(this)}
+													// onChange={changeAdditionField.bind(this, 'black_remark')}
 													/>
 												</FormItem> : ''}
 										</Col>
@@ -630,22 +630,22 @@ class Addition extends Component {
 		changeAdditionField('sections', value)
 	}
 	changeblack(checked) {
-		const {addition = {}, actions: { changeAdditionField } } = this.props;
-		this.setState({ checkedBtn: checked,OriginalBlack:addition.is_black })
+		const { addition = {}, actions: { changeAdditionField } } = this.props;
+		this.setState({ checkedBtn: checked, OriginalBlack: addition.is_black })
 		changeAdditionField('is_black', checked)
 	}
-	changeChange_all(value){
-		const { addition = {},actions: { changeAdditionField,} } = this.props;
-		this.setState({ change_alValue: value })		
+	changeChange_all(value) {
+		const { addition = {}, actions: { changeAdditionField, } } = this.props;
+		this.setState({ change_alValue: value })
 		changeAdditionField('change_all', value)
 	}
-	changeBlack_remark(value){
-		const { addition = {},actions: { changeAdditionField,} } = this.props;
-		if(value!=addition.black_remark){
-			this.setState({ black_remarkValue: value })	
-			changeAdditionField('black_remark', value)				
+	changeBlack_remark(value) {
+		const { addition = {}, actions: { changeAdditionField, } } = this.props;
+		if (value != addition.black_remark) {
+			this.setState({ black_remarkValue: value })
+			changeAdditionField('black_remark', value)
 		}
-		
+
 	}
 	//将选择的苗圃传入redux
 	changeNursery(value) {
@@ -727,7 +727,7 @@ class Addition extends Component {
 		} else {
 			addition.relative_signature_url = addition.relative_signature_url
 		}
-		let blacksa=null
+		let blacksa = null
 		let actives
 		if (this.state.checkedBtn == true) {
 			if (addition.is_black == true) {
@@ -751,25 +751,21 @@ class Addition extends Component {
 				actives = this.props.getIsActives
 			}
 		}
-		if(blacksa==1){
-			if(this.state.change_alValue==true || addition.change_all==true){
-				users.map(ese=>{
-					 if(ese.id_num==addition.id_num ){
-						ese.is_active = false
-						ese.is_black= 1
-					 }
-				})
-			}
+		if (blacksa == 1) {
+			users.map(ese => {
+				if (ese.id_num == addition.id_num) {
+					ese.is_active = false
+					ese.is_black = 1
+				}
+			})
 		}
-		if(blacksa==0){
-			if(this.state.change_alValue==true || addition.change_all==true){
-				users.map(ese=>{
-					 if(ese.id_num==addition.id_num){
-						ese.is_black= 0
-						ese.is_active = true
-					 }
-				})
-			}
+		if (blacksa == 0) {
+			users.map(ese => {
+				if (ese.id_num == addition.id_num) {
+					ese.is_black = 0
+					ese.is_active = true
+				}
+			})
 		}
 		let UploadFilesNums
 		let UploadNegatives
@@ -816,10 +812,10 @@ class Addition extends Component {
 				}
 				this.props.form.validateFields((err, values) => {
 					if (!err || !err.FullName && !err.UserName && !err.rolesNmae && !err.sexName && !err.telephone && !err.titles && !err.idcard) {
-						if ((this.state.checkedBtn!=null && blacksa != this.state.OriginalBlack)||this.state.change_alValue!=null||this.state.black_remarkValue!=null) {
+						if ((this.state.checkedBtn != null && blacksa != this.state.OriginalBlack) || this.state.black_remarkValue != null) {
 							putUserBlackList({ userID: addition.id }, {
 								is_black: blacksa,
-								change_all: addition.change_all,
+								change_all: true,
 								black_remark: addition.black_remark,
 							}).then(rst => {
 								console.log("rst", rst)
@@ -881,8 +877,7 @@ class Addition extends Component {
 								this.setState({
 									newKey: Math.random(),
 									checkedBtn: null,
-									change_alValue:false,
-									black_remarkValue:null
+									black_remarkValue: null
 								})
 							} else {
 								message.warn('服务器端报错！');
@@ -934,11 +929,11 @@ class Addition extends Component {
 							title: addition.title || ''
 						}).then(rst => {
 							if (rst.code == 1) {
-								const msgs=JSON.parse(rst.msg)
-								if(msgs.status==400&&msgs.error=='This id_num is blacklist'){
+								const msgs = JSON.parse(rst.msg)
+								if (msgs.status == 400 && msgs.error == 'This id_num is blacklist') {
 									message.warning('身份证号已经加入黑名单');
 									return
-								}else{
+								} else {
 									message.info('新增人员成功');
 								}
 								let sectiona = []
@@ -1030,8 +1025,8 @@ class Addition extends Component {
 		wrapperCol: { span: 6 },
 	};
 	static layoutR = {
-		labelCol: { span: 6 },
-		wrapperCol: { span: 18 },
+		labelCol: { span: 4 },
+		wrapperCol: { span: 20 },
 	};
 }
 export default Form.create()(Addition)
