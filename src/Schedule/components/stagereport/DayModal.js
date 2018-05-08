@@ -51,7 +51,7 @@ export default class DayModal extends Component {
                     title='日进度计划流程详情'
                     width={800}
                     // onOk={this.props.onok}
-                    // onCancel={this.props.oncancel}
+                    onCancel={this.props.oncancel}
                     visible={true}
                     footer={null}
                 >

@@ -109,193 +109,194 @@ export default class LocmeasureTable extends Component {
 		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
 		let columns = [];
 		let header = '';
-		columns = [{
-			title:"序号",
-			dataIndex: 'order',
-		},{
-			title:"顺序码",
-			dataIndex: 'ZZBM',
-		},{
-			title:"标段",
-			dataIndex: 'Section',
-			render:(text,record) => {
-				return <p>{this.getBiao(text)}</p>
-			}
-		},{
-			title:"位置",
-			dataIndex: 'place',
-		},{
-			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeName',
-		},{
-			title:"状态",
-			dataIndex: 'statusname',
-			render:(text,record) =>{
-				let superName = ''
-				let ownerName = ''
-				if(record.SupervisorCheck == -1 && record.CheckStatus == -1){
-					return <span>未抽查</span>
-				}else {
-					if(record.SupervisorCheck == 0) 
-						superName = "监理抽查退回"
-					else if(record.SupervisorCheck === 1){
-						superName = "监理抽查通过"
-					}
+		columns = [
+			{
+				title:"序号",
+				dataIndex: 'order',
+			},{
+				title:"顺序码",
+				dataIndex: 'ZZBM',
+			},{
+				title:"标段",
+				dataIndex: 'Section',
+				render:(text,record) => {
+					return <p>{this.getBiao(text)}</p>
+				}
+			},{
+				title:"位置",
+				dataIndex: 'place',
+			},{
+				title:"树种",
+				dataIndex: 'TreeTypeObj.TreeTypeName',
+			},{
+				title:"状态",
+				dataIndex: 'statusname',
+				render:(text,record) =>{
+					let superName = ''
+					let ownerName = ''
+					if(record.SupervisorCheck == -1 && record.CheckStatus == -1){
+						return <span>未抽查</span>
+					}else {
+						if(record.SupervisorCheck == 0) 
+							superName = "监理抽查退回"
+						else if(record.SupervisorCheck === 1){
+							superName = "监理抽查通过"
+						}
 
-					if(record.CheckStatus == 0) 
-						ownerName = "业主抽查退回"
-					else if(record.CheckStatus == 1){
-						ownerName = "业主抽查通过"
-					}else if(record.CheckStatus == 2){
-						ownerName = "业主抽查退回后修改"
+						if(record.CheckStatus == 0) 
+							ownerName = "业主抽查退回"
+						else if(record.CheckStatus == 1){
+							ownerName = "业主抽查通过"
+						}else if(record.CheckStatus == 2){
+							ownerName = "业主抽查退回后修改"
+						}
+						if(superName && ownerName){
+							return <div><div>{superName}</div><div>{ownerName}</div></div>
+						}else if(superName){
+							return <span>{superName}</span>
+						}else{
+							return <span>{ownerName}</span>
+						}
 					}
-					if(superName && ownerName){
-						return <div><div>{superName}</div><div>{ownerName}</div></div>
-					}else if(superName){
-						return <span>{superName}</span>
-					}else{
-						return <span>{ownerName}</span>
+				}
+			},{
+				title:"定位",
+				dataIndex: 'islocation',
+			},{
+				title:"测量人",
+				dataIndex: 'Inputer',
+				render: (text,record) => {
+					return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
+				}
+			},{
+				title:"测量时间",
+				render: (text,record) => {
+					const {createtime1 = '',createtime2 = '' } = record;
+					return <div><div>{createtime1}</div><div>{createtime2}</div></div>
+				}
+			},{
+				title:"定位时间",
+				render: (text,record) => {
+					const {createtime3 = '',createtime4 = '' } = record;
+					return <div><div>{createtime3}</div><div>{createtime4}</div></div>
+				}
+			},{
+				title:<div><div>高度</div><div>(cm)</div></div>,
+				render: (text,record) => {
+					if(record.GD != 0)
+						return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
+					else {
+						return <span>/</span>
+					}
+				}
+			},{
+				title:<div><div>冠幅</div><div>(cm)</div></div>,
+				render: (text,record) => {
+					if(record.GF != 0)
+						return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
+					else {
+						return <span>/</span>
+					}
+				}
+			},{
+				title:<div><div>胸径</div><div>(cm)</div></div>,
+				render: (text,record) => {
+					if(record.XJ != 0)
+						return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
+					else {
+						return <span>/</span>
+					}
+				}
+			},{
+				title:<div><div>地径</div><div>(cm)</div></div>,
+				render: (text,record) => {
+					if(record.DJ != 0)
+						return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
+					else {
+						return <span>/</span>
+					}
+				}
+			},{
+				title:<div><div>土球厚度</div><div>(cm)</div></div>,
+				dataIndex: 'tqhd',
+				render: (text,record) => {
+					if(record.TQHD != 0)
+						return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
+					else {
+						return <span>/</span>
+					}
+				}
+			},{
+				title:<div><div>土球直径</div><div>(cm)</div></div>,
+				dataIndex: 'tqzj',
+				render: (text,record) => {
+					if(record.TQZJ != 0)
+						return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQZJ}</a>
+					else {
+						return <span>/</span>
 					}
 				}
 			}
-		},{
-			title:"定位",
-			dataIndex: 'islocation',
-		},{
-			title:"测量人",
-			dataIndex: 'Inputer',
-			render: (text,record) => {
-				return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
-			}
-		},{
-			title:"测量时间",
-			render: (text,record) => {
-				const {createtime1 = '',createtime2 = '' } = record;
-				return <div><div>{createtime1}</div><div>{createtime2}</div></div>
-			}
-		},{
-			title:"定位时间",
-			render: (text,record) => {
-				const {createtime3 = '',createtime4 = '' } = record;
-				return <div><div>{createtime3}</div><div>{createtime4}</div></div>
-			}
-		},{
-			title:<div><div>高度</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.GD != 0)
-					return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>冠幅</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.GF != 0)
-					return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>胸径</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.XJ != 0)
-					return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>地径</div><div>(cm)</div></div>,
-			render: (text,record) => {
-				if(record.DJ != 0)
-					return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>土球厚度</div><div>(cm)</div></div>,
-			dataIndex: 'tqhd',
-			render: (text,record) => {
-				if(record.TQHD != 0)
-					return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		},{
-			title:<div><div>土球直径</div><div>(cm)</div></div>,
-			dataIndex: 'tqzj',
-			render: (text,record) => {
-				if(record.TQZJ != 0)
-					return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQZJ}</a>
-				else {
-					return <span>/</span>
-				}
-			}
-		}
-		// ,{
-		// 	title:<div><div>是否</div><div>截干</div></div>,
-		// 	render: (text,record) => {
-		// 		return <div>
-		// 					{
-		// 						record.JG == 1
-		// 						? <span>是</span>
-		// 						: <span>否</span>
-		// 					}
-		// 				</div>
-		// 	}
-		// },{
-		// 	title:<div><div>干皮有无</div><div>损伤</div></div>,
-		// 	render: (text,record) => {
-		// 		return <div>
-		// 					{
-		// 						record.GP == 1
-		// 						? <span>有</span>
-		// 						: <span>无</span>
-		// 					}
-		// 				</div>
-		// 	}
-		// },{
-		// 	title:<div><div>冠型完整，</div><div>不偏冠</div></div>,
-		// 	render: (text,record) => {
-		// 		return <div>
-		// 					{
-		// 						record.GXWZ == 1
-		// 						? <span>是</span>
-		// 						: <span>否</span>
-		// 					}
-		// 				</div>
-		// 	}
-		// },{
-		// 	title:<div><div>生长</div><div>健壮</div></div>,
-		// 	render: (text,record) => {
-		// 		return <div>
-		// 					{
-		// 						record.SZJZ == 1
-		// 						? <span>是</span>
-		// 						: <span>否</span>
-		// 					}
-		// 				</div>
-		// 	}
-		// },{
-		// 	title:<div><div>有无病</div><div>虫害</div></div>,
-		// 	render: (text,record) => {
-		// 		return <div>
-		// 					{
-		// 						record.BCH == 1
-		// 						? <span>有</span>
-		// 						: <span>无</span>
-		// 					}
-		// 				</div>
-		// 	}
-		// }
-	];
+			// ,{
+			// 	title:<div><div>是否</div><div>截干</div></div>,
+			// 	render: (text,record) => {
+			// 		return <div>
+			// 					{
+			// 						record.JG == 1
+			// 						? <span>是</span>
+			// 						: <span>否</span>
+			// 					}
+			// 				</div>
+			// 	}
+			// },{
+			// 	title:<div><div>干皮有无</div><div>损伤</div></div>,
+			// 	render: (text,record) => {
+			// 		return <div>
+			// 					{
+			// 						record.GP == 1
+			// 						? <span>有</span>
+			// 						: <span>无</span>
+			// 					}
+			// 				</div>
+			// 	}
+			// },{
+			// 	title:<div><div>冠型完整，</div><div>不偏冠</div></div>,
+			// 	render: (text,record) => {
+			// 		return <div>
+			// 					{
+			// 						record.GXWZ == 1
+			// 						? <span>是</span>
+			// 						: <span>否</span>
+			// 					}
+			// 				</div>
+			// 	}
+			// },{
+			// 	title:<div><div>生长</div><div>健壮</div></div>,
+			// 	render: (text,record) => {
+			// 		return <div>
+			// 					{
+			// 						record.SZJZ == 1
+			// 						? <span>是</span>
+			// 						: <span>否</span>
+			// 					}
+			// 				</div>
+			// 	}
+			// },{
+			// 	title:<div><div>有无病</div><div>虫害</div></div>,
+			// 	render: (text,record) => {
+			// 		return <div>
+			// 					{
+			// 						record.BCH == 1
+			// 						? <span>有</span>
+			// 						: <span>无</span>
+			// 					}
+			// 				</div>
+			// 	}
+			// }
+		];
 		header = <div >
 					<Row >
-					<Col  xl={3} className='mrg10'>
+						<Col  xl={3} className='mrg10'>
 							<span>顺序码：</span>
 							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw50' onChange={this.sxmchange.bind(this)}/>
 						</Col>

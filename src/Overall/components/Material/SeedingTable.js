@@ -342,7 +342,7 @@ class SeedingTable extends Component {
 		          visible={this.state.visible}
 		          maskClosable={false}
 		        //   onOk={this.handleOk}
-				//   onCancel={this.handleCancel}
+				  onCancel={this.handleCancel}
 				 footer={null}
 		         >
 			        <div>

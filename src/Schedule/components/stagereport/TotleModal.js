@@ -65,7 +65,7 @@ export default class TotleModal extends Component {
                     title='总进度计划流程详情'
                     width={800}
                     // onOk={null}
-                    // onCancel={this.props.oncancel}
+                    onCancel={this.props.oncancel}
                     visible={true}
                     footer={null}
                 >

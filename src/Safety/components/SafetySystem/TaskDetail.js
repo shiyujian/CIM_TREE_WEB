@@ -63,7 +63,7 @@ class TaskDetail extends Component {
                     title='安全体系流程详情'
                     width={800}
                     // onOk={this.props.onok}
-                    // onCancel={this.props.oncancel}
+                    onCancel={this.props.oncancel}
                     footer={null}
                     visible={true}
                 >

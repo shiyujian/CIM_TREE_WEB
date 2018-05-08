@@ -60,7 +60,7 @@ export default class NursOverallTable extends Component {
 				title:"人员",
 				render: (text,record) => {
 					if(record.FromUserObj)
-						return <span>{record.FromUserObj.Full_Name}</span>
+						return <span>{`${record.FromUserObj.Full_Name} (${record.FromUserObj.User_Name})`}</span>
 					else {
 						return <span>/</span>
 					}
@@ -157,7 +157,14 @@ export default class NursOverallTable extends Component {
 				dataIndex: 'ThinClass',
 			},{
 				title:"位置",
-				dataIndex: 'Location',
+				// dataIndex: 'Location',
+				render: (text,record) =>{
+					if(record.Location){
+						return <span>{`${record.LocationX},${record.LocationY}`}</span>
+					}else{
+						return <span>未定位</span>
+					}
+				}
 			}
 		]
 		
@@ -246,7 +253,7 @@ export default class NursOverallTable extends Component {
 					style={{textAlign:'center',overflow:'auto'}}
 					visible={this.state.imgvisible}
 					// onOk={this.handleCancel.bind(this)}
-					// onCancel={this.handleCancel.bind(this)}
+					onCancel={this.handleCancel.bind(this)}
 					footer={null}
 				>
 					{
@@ -407,20 +414,6 @@ export default class NursOverallTable extends Component {
 				}
 			)
 		}
-		if(seedling.DJ){
-			this.seedlingColumns.push(
-				{
-					title: "地径(cm)",
-					render: (text,record) => {
-						if(record.DJ)
-							return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
-						else {
-							return <span>/</span>
-						}
-					}
-				}
-			)
-		}
 		if(seedling.XJ){
 			this.seedlingColumns.push(
 				{
@@ -428,6 +421,20 @@ export default class NursOverallTable extends Component {
 					render: (text,record) => {
 						if(record.XJ)
 							return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(seedling.DJ){
+			this.seedlingColumns.push(
+				{
+					title: "地径(cm)",
+					render: (text,record) => {
+						if(record.DJ)
+							return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
 						else {
 							return <span>/</span>
 						}
@@ -489,25 +496,18 @@ export default class NursOverallTable extends Component {
 				dataIndex: 'ThinClass',
 			},{
 				title:"位置",
-				dataIndex: 'Location',
+				// dataIndex: 'Location',
+				render: (text,record) =>{
+					if(record.Location){
+						return <span>{`${record.LocationX},${record.LocationY}`}</span>
+					}else{
+						return <span>未定位</span>
+					}
+				}
 			}
 		];
 
 		let tree = treeMess[0]
-		if(tree.DJ){
-			this.treeColumns.push(
-				{
-					title: "地径(cm)",
-					render: (text,record) => {
-						if(record.DJ)
-							return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
-						else {
-							return <span>/</span>
-						}
-					}
-				}
-			)
-		}
 		if(tree.GD){
 			this.treeColumns.push(
 				{
@@ -529,6 +529,34 @@ export default class NursOverallTable extends Component {
 					render: (text,record) => {
 						if(record.GF)
 							return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(tree.XJ){
+			this.treeColumns.push(
+				{
+					title: "胸径(cm)",
+					render: (text,record) => {
+						if(record.XJ)
+							return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(tree.DJ){
+			this.treeColumns.push(
+				{
+					title: "地径(cm)",
+					render: (text,record) => {
+						if(record.DJ)
+							return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
 						else {
 							return <span>/</span>
 						}
@@ -592,20 +620,7 @@ export default class NursOverallTable extends Component {
 				}
 			)
 		}
-		if(tree.XJ){
-			this.treeColumns.push(
-				{
-					title: "胸径(cm)",
-					render: (text,record) => {
-						if(record.XJ)
-							return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
-						else {
-							return <span>/</span>
-						}
-					}
-				}
-			)
-		}
+		
 
 		this.setState({
 			update:Math.random()
@@ -621,7 +636,7 @@ export default class NursOverallTable extends Component {
 		const {
 			actions: {
 				getNurserysTree,
-				getqueryTree,
+				getTreeMess,
 				getTreeflows,
 				getnurserys,
 				getCarpackbysxm
@@ -637,18 +652,18 @@ export default class NursOverallTable extends Component {
 			percent:0
 		})
 
-		let queryTreeDatas = await getqueryTree({},postdata)
+		let queryTreeData = await getTreeMess(postdata)
 		let treeflowDatas = await getTreeflows({},postdata)
 		let nurserysDatas = await getnurserys({},postdata)
 		let carData = await getCarpackbysxm(postdata)
 
-		let queryTreeData = {}
+		// let queryTreeData = {}
 		let treeflowData = {}
 		let nurserysData = {}
 
-		if(queryTreeDatas && queryTreeDatas.content && queryTreeDatas.content instanceof Array && queryTreeDatas.content.length>0){
-			queryTreeData =  queryTreeDatas.content[0]
-		}
+		// if(queryTreeDatas && queryTreeDatas.content && queryTreeDatas.content instanceof Array && queryTreeDatas.content.length>0){
+		// 	queryTreeData =  queryTreeDatas.content[0]
+		// }
 		if(treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array && treeflowDatas.content.length>0){
 			treeflowData =  treeflowDatas.content
 		}
@@ -666,7 +681,7 @@ export default class NursOverallTable extends Component {
 			TreePlace:nurserysData.TreePlace?nurserysData.TreePlace:'',
 			Factory:nurserysData.Factory?nurserysData.Factory:'',
 			NurseryName:nurserysData.NurseryName?nurserysData.NurseryName:'',
-			LifterTime:nurserysData.LifterTime?nurserysData.LifterTime:'',
+			LifterTime:nurserysData.LifterTime?moment(nurserysData.LifterTime).format('YYYY-MM-DD HH:mm:ss'):'',
 			location:nurserysData.location?nurserysData.location:'',
 			InputerObj:nurserysData.InputerObj?nurserysData.InputerObj:'',
 			GD:nurserysData.GD?nurserysData.GD:'',
@@ -717,6 +732,8 @@ export default class NursOverallTable extends Component {
 			ThinClass:queryTreeData.ThinClass?queryTreeData.ThinClass + '号细班':'',
 			TreeTypeName:nurserysData.TreeTypeObj?nurserysData.TreeTypeObj.TreeTypeName:'',
 			Location:queryTreeData.LocationTime ? '已定位' : '未定位',
+			LocationX:queryTreeData.Location ? queryTreeData.Location.X : '',
+			LocationY:queryTreeData.Location ? queryTreeData.Location.Y : '',
 			DJ:queryTreeData.DJ?queryTreeData.DJ:'',
 			DJFJ:queryTreeData.DJFJ?queryTreeData.DJFJ:'',
 			GD:queryTreeData.GD?queryTreeData.GD:'',
@@ -735,13 +752,19 @@ export default class NursOverallTable extends Component {
 			XJFJ:queryTreeData.XJFJ?queryTreeData.XJFJ:'',
 		}]
 
+		console.log('treeflowData',treeflowData)
+		let flowMess = []
+		
 		if(treeflowData instanceof Array){
 			treeflowData = treeflowData
+			let len = treeflowData.length - 1
+			for(let i=len;i>=0;i--){
+				flowMess.push(treeflowData[i])
+			}
 		}else{
-			treeflowData = []
+			
 		}
 	
-		let flowMess = treeflowData 
 
 		try{
 			flowMess.unshift({

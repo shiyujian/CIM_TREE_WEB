@@ -62,7 +62,7 @@ class DetailModal extends Component {
                     title='表单管理流程详情'
                     width={800}
                     // onOk={this.props.onok}
-                    // onCancel={this.props.oncancel}
+                    onCancel={this.props.oncancel}
                     visible={true}
                     footer={null}
                 >

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-04-27 20:57:51
+ * @Last Modified time: 2018-05-08 15:03:20
  */
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -376,9 +376,11 @@ class Lmap extends Component {
         var rowp = row % 256;
         row = Math.floor(row / 256);
         var url = window.config.DASHBOARD_ONSITE+"/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:" + zoom + "&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=" + col + "&TileRow=" + row + "&I=" + colp + "&J=" + rowp;
+        debugger
         jQuery.getJSON(url, null,async  function (data) {
+            console.log('data',data)
             if(data.features&&data.features.length){
-
+                debugger
                 let postdata = {
                     sxm:data.features[0].properties.SXM
                 }
