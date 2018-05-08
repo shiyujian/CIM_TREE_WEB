@@ -23,134 +23,13 @@ export default class NursOverallTable extends Component {
 			seedlingMess:[],
             treeMess:[],
 			flowMess:[],
-			src:''
-        }
-    }
-    componentDidMount() {
-		let user = getUser()
-		this.sections = JSON.parse(user.sections)
-	}
-	getBiao(code){
-		let str = '';
-		PROJECT_UNITS.map(item => {
-			item.units.map(single => {
-				if(single.code === code){
-					str = single.value;
-				}
-			})
-		})
-		return str;
-	}
-    
-	render() {
-		const {
-			seedlingMess,
-            treeMess,
-			flowMess,
-			sxm
-		} = this.state;
-		const suffix = sxm ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
-		let header = '';
-		let seedlingColumns = [
-			{
-				title:"顺序码",
-				dataIndex: 'sxm',
-			},{
-				title:"打包车牌",
-				dataIndex: 'car',
-			},{
-				title:"树种",
-				dataIndex: 'TreeTypeName',
-			},{
-				title:"产地",
-				dataIndex: 'TreePlace',
-			},{
-				title:"供应商",
-				dataIndex: 'Factory',
-			},{
-				title:"苗圃名称",
-				dataIndex: 'NurseryName',
-			},
-			{
-				title:"起苗时间",
-				dataIndex: 'LifterTime',
-			},{
-				title:"起苗地点",
-				dataIndex: 'location',
-			},{
-				title: "高度(cm)",
-				render: (text,record) => {
-					if(record.height)
-						return <a disabled={!record.heightImg} onClick={this.imgShow.bind(this,record.heightImg)}>{record.height}</a>
-					else {
-						return <span>/</span>
-					}
-				}
-			},{
-				title: "冠幅(cm)",
-				render: (text,record) => {
-					if(record.crown)
-						return <a disabled={!record.crownImg} onClick={this.imgShow.bind(this,record.crownImg)}>{record.crown}</a>
-					else {
-						return <span>/</span>
-					}
-				}
-			},{
-				title: "土球直径(cm)",
-				render: (text,record) => {
-					if(record.diameter)
-						return <a disabled={!record.diameterImg} onClick={this.imgShow.bind(this,record.diameterImg)}>{record.diameter}</a>
-					else {
-						return <span>/</span>
-					}
-				}
-			},{
-				title: "土球直径(cm)",
-				render: (text,record) => {
-					if(record.thickness)
-						return <a disabled={!record.thicknessImg} onClick={this.imgShow.bind(this,record.thicknessImg)}>{record.thickness}</a>
-					else {
-						return <span>/</span>
-					}
-				}
-			}
-		];
-		let treeColumns = [
-			{
-				title:"顺序码",
-				dataIndex: 'sxm',
-			},{
-				title:"地块",
-				dataIndex: 'landName',
-			},{
-				title:"标段",
-				dataIndex: 'sectionName',
-			},{
-				title:"小班",
-				dataIndex: 'SmallClass',
-			},{
-				title:"细班",
-				dataIndex: 'ThinClass',
-			},{
-				title:"树种",
-				dataIndex: 'TreeTypeName',
-			},
-			{
-				title:"位置",
-				dataIndex: 'Location',
-			},{
-				title: "胸径(cm)",
-				render: (text,record) => {
-					if(record.XJ)
-						return <a disabled={!record.XJImg} onClick={this.imgShow.bind(this,record.XJImg)}>{record.XJ}</a>
-					else {
-						return <span>/</span>
-					}
-				}
-			}
-		];
-
-		let flowColumns = [
+			srcs:'',
+			update:0,
+			imgArr:[],
+			remark:'',
+			remarkPics:''
+		}
+		this.flowColumns = [                                                        
 			{
 				title:"流程",
 				render: (text,record) => {
@@ -192,11 +71,125 @@ export default class NursOverallTable extends Component {
 			},{
 				title:"时间",
 				dataIndex: 'CreateTime',
+				render: (text,record) => {
+					if(record.CreateTime)
+						return <span>{moment(record.CreateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+					else {
+						return <span>/</span>
+					}
+				}
 			},{
 				title:"备注",
 				dataIndex: 'Remark',
+				render: (text,record) => {
+					if(record.Node){
+						if(record.Node === '种树'){
+							return <a disabled={!this.state.remarkPics} onClick={this.remarkImgClick.bind(this)}>{this.state.remark}</a> 
+						}
+					}
+				}
 			}
-		];
+		]
+		this.seedlingColumns = [
+			{
+				title:"顺序码",
+				dataIndex: 'sxm',
+			},{
+				title:"树种",
+				dataIndex: 'TreeTypeName',
+			},{
+				title:"打包车牌",
+				dataIndex: 'car',
+			},{
+				title:"产地",
+				dataIndex: 'TreePlace',
+			},{
+				title:"供应商",
+				dataIndex: 'Factory',
+			},{
+				title:"苗圃名称",
+				dataIndex: 'NurseryName',
+			},
+			{
+				title:"起苗时间",
+				dataIndex: 'LifterTime',
+			},{
+				title:"起苗地点",
+				dataIndex: 'location',
+			},{
+				title: "土球直径(cm)",
+				render: (text,record) => {
+					if(record.TQZJ)
+						return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
+					else {
+						return <span>/</span>
+					}
+				}
+			},{
+				title: "土球厚度(cm)",
+				render: (text,record) => {
+					if(record.TQHD)
+						return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.TQHD}</a>
+					else {
+						return <span>/</span>
+					}
+				}
+			}
+		]
+		this.treeColumns = [
+			{
+				title:"顺序码",
+				dataIndex: 'sxm',
+			},{
+				title:"树种",
+				dataIndex: 'TreeTypeName',
+			},{
+				title:"项目",
+				dataIndex: 'landName',
+			},{
+				title:"标段",
+				dataIndex: 'sectionName',
+			},{
+				title:"小班",
+				dataIndex: 'SmallClass',
+			},{
+				title:"细班",
+				dataIndex: 'ThinClass',
+			},{
+				title:"位置",
+				dataIndex: 'Location',
+			}
+		]
+		
+
+    }
+    componentDidMount() {
+		let user = getUser()
+		this.sections = JSON.parse(user.sections)
+		
+	}
+	getBiao(code){
+		let str = '';
+		PROJECT_UNITS.map(item => {
+			item.units.map(single => {
+				if(single.code === code){
+					str = single.value;
+				}
+			})
+		})
+		return str;
+	}
+    
+	render() {
+		const {
+			seedlingMess,
+            treeMess,
+			flowMess,
+			sxm,
+			srcs
+		} = this.state;
+		const suffix = sxm ? <Icon type="close-circle" onClick={this.emitEmpty} /> : null;
+		let header = '';
 		return (
 			<div>
 				<Row>
@@ -205,15 +198,10 @@ export default class NursOverallTable extends Component {
 							<span>顺序码：</span>
 							<Input suffix={suffix} value={sxm} className='forestcalcw2 mxw100' onChange={this.sxmchange.bind(this)}/>
 						</Col>
-					</Row>
-					<Row >
 						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.qury.bind(this)}>
 								查询
 							</Button>
-						</Col>
-						<Col span={20} className='quryrstcnt mrg10'>
-							
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.resetinput.bind(this)}>
@@ -221,29 +209,35 @@ export default class NursOverallTable extends Component {
 							</Button>
 						</Col>
 					</Row>
+					<Row >
+						
+					</Row>
 				</Row>
-				<Card title='苗木信息' style={{marginTop:10}}>
+				<Card title='苗圃测量信息' style={{marginTop:10}}>
 					<Table bordered
-						columns={seedlingColumns}  
+						columns={this.seedlingColumns}  
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 						locale={{emptyText:'暂无信息'}}
 						dataSource={seedlingMess} 
+						pagination={false}
 					/>
 				</Card>
-				<Card title='树木信息' style={{marginTop:10}}>
+				<Card title='现场测量信息' style={{marginTop:10}}>
 					<Table bordered
-						columns={treeColumns}  
+						columns={this.treeColumns}  
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 						locale={{emptyText:'暂无信息'}}
 						dataSource={treeMess} 
+						pagination={false}
 					/>
 				</Card>
 				<Card title='流程信息' style={{marginTop:10}}>
 					<Table bordered
-						columns={flowColumns} 
+						columns={this.flowColumns} 
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 						locale={{emptyText:'暂无信息'}}
 						dataSource={flowMess} 
+						pagination={false}
 					/>
 				</Card>
 				<Modal
@@ -255,7 +249,11 @@ export default class NursOverallTable extends Component {
 					// onCancel={this.handleCancel.bind(this)}
 					footer={null}
 				>
-					<img style ={{width:'490px'}} src={this.state.src} alt="图片"/>
+					{
+						this.state.imgArr
+						
+					
+					}
 					<Row style={{marginTop:10}}>
 						<Button  onClick={this.handleCancel.bind(this) } style={{float:'right'}}type="primary">关闭</Button>
 					</Row>
@@ -279,33 +277,340 @@ export default class NursOverallTable extends Component {
 
     onImgClick(data) {
        
-        let src = ''
+		let srcs = [] 
         try{
-            let srcs = data.split(',')
-            if(srcs && srcs instanceof Array && srcs.length>0){
-                let len = srcs.length
-                src = srcs[len-1]
-            }else{
-                src = data
-            }
+
+			let arr = data.split(',')
+			console.log('arr',arr)
+			arr.map((rst)=>{
+				let src = rst.replace(/\/\//g,'/')
+				src =  `${FOREST_API}/${src}`
+				srcs.push(src)
+
+			})
         }catch(e){
             console.log('处理图片',e)
-        }
-		src = src.replace(/\/\//g,'/')
-		src =  `${FOREST_API}/${src}`
-		return src
+		}
+
+
+		let imgArr = []
+		srcs.map((src)=>{
+			imgArr.push (<img style ={{width:'490px'}} src={src} alt="图片"/>)
+		})
+
+		this.setState({
+			imgvisible:true,
+			imgArr:imgArr
+		})
         
+	}
+
+	remarkImgClick(){
+		const{
+			remarkPics
+		}=this.state
+
+		let srcs = [] 
+        try{
+
+			let arr = remarkPics.split(',')
+			console.log('arr',arr)
+			arr.map((rst)=>{
+				let src = rst.replace(/\/\//g,'/')
+				src =  `${FOREST_API}/${src}`
+				srcs.push(src)
+
+			})
+        }catch(e){
+            console.log('处理图片',e)
+		}
+
+
+		let imgArr = []
+		srcs.map((src)=>{
+			imgArr.push (<img style ={{width:'490px'}} src={src} alt="图片"/>)
+		})
+
+		this.setState({
+			imgvisible:true,
+			imgArr:imgArr
+		})
+
 	}
 
 	handleCancel(){
     	this.setState({imgvisible:false})
 	}
 
-	imgShow(src){
+
+	changeColumn(){
+		const {
+			seedlingMess,
+            treeMess,
+			flowMess,
+		}=this.state
+		this.seedlingColumns = [
+			{
+				title:"顺序码",
+				dataIndex: 'sxm',
+			},{
+				title:"树种",
+				dataIndex: 'TreeTypeName',
+			},{
+				title:"打包车牌",
+				dataIndex: 'car',
+			},{
+				title:"产地",
+				dataIndex: 'TreePlace',
+			},{
+				title:"供应商",
+				dataIndex: 'Factory',
+			},{
+				title:"苗圃名称",
+				dataIndex: 'NurseryName',
+			},
+			{
+				title:"起苗时间",
+				dataIndex: 'LifterTime',
+			},{
+				title:"起苗地点",
+				dataIndex: 'location',
+			}
+		];
+
+		let seedling = seedlingMess[0]
+		if(seedling.GD){
+			this.seedlingColumns.push(
+				{
+					title: "高度(cm)",
+					render: (text,record) => {
+						if(record.GD)
+							return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(seedling.GF){
+			this.seedlingColumns.push(
+				{
+					title: "冠幅(cm)",
+					render: (text,record) => {
+						if(record.GF)
+							return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(seedling.DJ){
+			this.seedlingColumns.push(
+				{
+					title: "地径(cm)",
+					render: (text,record) => {
+						if(record.DJ)
+							return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(seedling.XJ){
+			this.seedlingColumns.push(
+				{
+					title: "胸径(cm)",
+					render: (text,record) => {
+						if(record.XJ)
+							return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(seedling.TQZJ){
+			this.seedlingColumns.push(
+				{
+					title: "土球直径(cm)",
+					render: (text,record) => {
+						if(record.TQZJ)
+							return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(seedling.TQHD){
+			this.seedlingColumns.push(
+				{
+					title: "土球厚度(cm)",
+					render: (text,record) => {
+						if(record.TQHD)
+							return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		
+		
+
+
+
+		this.treeColumns = [
+			{
+				title:"顺序码",
+				dataIndex: 'sxm',
+			},{
+				title:"树种",
+				dataIndex: 'TreeTypeName',
+			},{
+				title:"项目",
+				dataIndex: 'landName',
+			},{
+				title:"标段",
+				dataIndex: 'sectionName',
+			},{
+				title:"小班",
+				dataIndex: 'SmallClass',
+			},{
+				title:"细班",
+				dataIndex: 'ThinClass',
+			},{
+				title:"位置",
+				dataIndex: 'Location',
+			}
+		];
+
+		let tree = treeMess[0]
+		if(tree.DJ){
+			this.treeColumns.push(
+				{
+					title: "地径(cm)",
+					render: (text,record) => {
+						if(record.DJ)
+							return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(tree.GD){
+			this.treeColumns.push(
+				{
+					title: "高度(cm)",
+					render: (text,record) => {
+						if(record.GD)
+							return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(tree.GF){
+			this.treeColumns.push(
+				{
+					title: "冠幅(cm)",
+					render: (text,record) => {
+						if(record.GF)
+							return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(tree.MD){
+			this.treeColumns.push(
+				{
+					title: "密度(棵/m^3)",
+					render: (text,record) => {
+						if(record.MD)
+							return <a disabled={!record.MDFJ} onClick={this.onImgClick.bind(this,record.MDFJ)}>{record.MD}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(tree.MJ){
+			this.treeColumns.push(
+				{
+					title: "面积(m^2)",
+					render: (text,record) => {
+						if(record.MJ)
+							return <a disabled={!record.MJFJ} onClick={this.onImgClick.bind(this,record.MJFJ)}>{record.MJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(tree.TQHD){
+			this.treeColumns.push(
+				{
+					title: "土球厚度(cm)",
+					render: (text,record) => {
+						if(record.TQHD)
+							return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(tree.TQZJ){
+			this.treeColumns.push(
+				{
+					title: "土球直径(cm)",
+					render: (text,record) => {
+						if(record.TQZJ)
+							return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		if(tree.XJ){
+			this.treeColumns.push(
+				{
+					title: "胸径(cm)",
+					render: (text,record) => {
+						if(record.XJ)
+							return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+
 		this.setState({
-			imgvisible:true,
-			src:src
+			update:Math.random()
 		})
+
 	}
 
     async qury() {
@@ -351,6 +656,9 @@ export default class NursOverallTable extends Component {
 			nurserysData =  nurserysDatas.content[0]
 		}
 
+		let remarkPics = queryTreeData.RemarkPics?queryTreeData.RemarkPics:''
+		let remark = queryTreeData.Remark?queryTreeData.Remark:''
+
 		let seedlingMess = [{
 			sxm:queryTreeData.ZZBM?queryTreeData.ZZBM:'',
 			car:carData.LicensePlate?carData.LicensePlate:'',
@@ -360,15 +668,20 @@ export default class NursOverallTable extends Component {
 			NurseryName:nurserysData.NurseryName?nurserysData.NurseryName:'',
 			LifterTime:nurserysData.LifterTime?nurserysData.LifterTime:'',
 			location:nurserysData.location?nurserysData.location:'',
-			height:nurserysData.GD?nurserysData.GD:'',
-			heightImg:nurserysData.GDFJ?me.onImgClick(nurserysData.GDFJ):'',
-			crown:nurserysData.GF?nurserysData.GF:'',
-			crownImg:nurserysData.GFFJ?me.onImgClick(nurserysData.GFFJ):'',
-			diameter:nurserysData.TQZJ?nurserysData.TQZJ:'',
-			diameterImg:nurserysData.TQZJFJ?me.onImgClick(nurserysData.TQZJFJ):'',
-			thickness:nurserysData.TQHD?nurserysData.TQHD:'',
-			thicknessImg:nurserysData.TQHDFJ?me.onImgClick(nurserysData.TQHDFJ):'',
-			InputerObj:nurserysData.InputerObj?nurserysData.InputerObj:''
+			InputerObj:nurserysData.InputerObj?nurserysData.InputerObj:'',
+			GD:nurserysData.GD?nurserysData.GD:'',
+			GDFJ:nurserysData.GDFJ?nurserysData.GDFJ:'',
+			GF:nurserysData.GF?nurserysData.GF:'',
+			GFFJ:nurserysData.GFFJ?nurserysData.GFFJ:'',
+			TQZJ:nurserysData.TQZJ?nurserysData.TQZJ:'',
+			TQZJFJ:nurserysData.TQZJFJ?nurserysData.TQZJFJ:'',
+			TQHD:nurserysData.TQHD?nurserysData.TQHD:'',
+			TQHDFJ:nurserysData.TQHDFJ?nurserysData.TQHDFJ:'',
+			DJ:nurserysData.DJ?nurserysData.DJ:'',
+			DJFJ:nurserysData.DJFJ?nurserysData.DJFJ:'',
+			XJ:nurserysData.XJ?nurserysData.XJ:'',
+			XJFJ:nurserysData.XJFJ?nurserysData.XJFJ:'',
+
 		}]
 
 		 //项目code
@@ -404,15 +717,43 @@ export default class NursOverallTable extends Component {
 			ThinClass:queryTreeData.ThinClass?queryTreeData.ThinClass + '号细班':'',
 			TreeTypeName:nurserysData.TreeTypeObj?nurserysData.TreeTypeObj.TreeTypeName:'',
 			Location:queryTreeData.LocationTime ? '已定位' : '未定位',
+			DJ:queryTreeData.DJ?queryTreeData.DJ:'',
+			DJFJ:queryTreeData.DJFJ?queryTreeData.DJFJ:'',
+			GD:queryTreeData.GD?queryTreeData.GD:'',
+			GDFJ:queryTreeData.GDFJ?queryTreeData.GDFJ:'',
+			GF:queryTreeData.GF?queryTreeData.GF:'',
+			GFFJ:queryTreeData.GFFJ?queryTreeData.GFFJ:'',
+			MD:queryTreeData.MD?queryTreeData.MD:'',
+			MDFJ:queryTreeData.MDFJ?queryTreeData.MDFJ:'',
+			MJ:queryTreeData.MJ?queryTreeData.MJ:'',
+			MJFJ:queryTreeData.MJFJ?queryTreeData.MJFJ:'',
+			TQHD:queryTreeData.TQHD?queryTreeData.TQHD:'',
+			TQHDFJ:queryTreeData.TQHDFJ?queryTreeData.TQHDFJ:'',
+			TQZJ:queryTreeData.TQZJ?queryTreeData.TQZJ:'',
+			TQZJFJ:queryTreeData.TQZJFJ?queryTreeData.TQZJFJ:'',
 			XJ:queryTreeData.XJ?queryTreeData.XJ:'',
-			XJImg:queryTreeData.XJFJ?me.onImgClick(queryTreeData.XJFJ):'',
+			XJFJ:queryTreeData.XJFJ?queryTreeData.XJFJ:'',
 		}]
-		let flowMess = treeflowData || []
-		flowMess.push({
-			Node:'苗圃提交',
-			FromUserObj:nurserysData.InputerObj?nurserysData.InputerObj:'',
-			Info:nurserysData.Factory?nurserysData.Factory:''
-		})
+
+		if(treeflowData instanceof Array){
+			treeflowData = treeflowData
+		}else{
+			treeflowData = []
+		}
+	
+		let flowMess = treeflowData 
+
+		try{
+			flowMess.unshift({
+				Node:'苗圃提交',
+				FromUserObj:nurserysData.InputerObj?nurserysData.InputerObj:'',
+				Info:'',
+				CreateTime:nurserysData.LifterTime?nurserysData.LifterTime:'',
+			})
+		}catch(e){
+
+		}
+		
 
 		console.log('seedlingMess',seedlingMess)
 		console.log('treeMess',treeMess)
@@ -422,7 +763,11 @@ export default class NursOverallTable extends Component {
 			treeMess,
 			flowMess,
 			loading:false,
-			percent:100
+			percent:100,
+			remarkPics,
+			remark
+		},()=>{
+			this.changeColumn()
 		})
 	}
 }

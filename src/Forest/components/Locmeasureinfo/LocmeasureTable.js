@@ -133,7 +133,7 @@ export default class LocmeasureTable extends Component {
 			render:(text,record) =>{
 				let superName = ''
 				let ownerName = ''
-				if(record.SupervisorCheck == -1){
+				if(record.SupervisorCheck == -1 && record.CheckStatus == -1){
 					return <span>未抽查</span>
 				}else {
 					if(record.SupervisorCheck == 0) 

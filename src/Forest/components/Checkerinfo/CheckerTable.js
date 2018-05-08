@@ -421,8 +421,9 @@ export default class CheckerTable extends Component {
 	    			let place = this.getThinClassName(plan.No,plan.Section);
 	    			tblData[i].place = place;
 					let statusname = '';
-					
-					if(plan.CheckStatus == 0) 
+					if(plan.SupervisorCheck == -1 && plan.CheckStatus == -1){
+						statusname = "未抽查"
+					}else if(plan.CheckStatus == 0) 
 						statusname = "业主抽查退回"
 					else if(plan.CheckStatus == 1){
 						statusname = "业主抽查通过"
