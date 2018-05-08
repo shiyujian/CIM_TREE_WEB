@@ -88,7 +88,6 @@ class PersonModify extends Component {
 				fileList3 = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + addition.id_image[1].filepath.split('/media')[1]
 			}
 		}
-
         return (
             <Modal
                 onCancel={this.cancel.bind(this)}
@@ -113,11 +112,11 @@ class PersonModify extends Component {
                             <FormItem   {...PersonModify.layout} label="身份证号码:">
                                 <Input placeholder="请输入身份证号码" value={addition.id_num} />
                             </FormItem>
-                            {/* {user.is_superuser ?
-                                <FormItem {...Addition.layout} label="部门编码">
-                                    <Input placeholder="部门编码" value={addition.org_code}  />
+                            {user.is_superuser ?
+                                <FormItem {...PersonModify.layout} label="部门编码">
+                                    <Input placeholder="部门编码" value={addition.account.organization.code}  />
                                 </FormItem> : ''
-                            } */}
+                            }
                             {
                                 addition.id ? <FormItem {...PersonModify.layout} label="密码">
                                     <Input disabled={!!addition.id} placeholder="请输入密码" value={addition.password} />
@@ -169,11 +168,11 @@ class PersonModify extends Component {
                                     mode="multiple" style={{ width: '100%' }}>
                                 </Input>
                             </FormItem>
-                            {/* {user.is_superuser ?
-                                <FormItem {...Addition.layout} label="部门名称">
-                                    <Input placeholder="部门名称" value={addition.organization} onChange={changeAdditionField.bind(this, 'organization')} />
+                            {user.is_superuser ?
+                                <FormItem {...PersonModify.layout} label="部门名称">
+                                    <Input placeholder="部门名称" value={addition.account.organization.name} />
                                 </FormItem> : ''
-                            } */}
+                            }
                             <FormItem {...PersonModify.layout} label="苗圃">
                                 <Input placeholder="苗圃"
                                     value={defaultNurse}
@@ -186,12 +185,12 @@ class PersonModify extends Component {
                                         <Switch checked={addition.id ? (addition.is_black == 0 ? false : true) : false} />
                                     </FormItem>
                                 </Col>
-                                <Col span={5}>
+                                {/* <Col span={5}>
                                     <FormItem {...PersonModify.layoutT} label="关联用户">
                                         <Switch checked={addition.id ? addition.change_all : false} />
                                     </FormItem>
-                                </Col>
-                                <Col span={11}>
+                                </Col> */}
+                                <Col span={16}>
                                     <FormItem {...PersonModify.layoutR} label="原因">
                                         <Input value={addition.black_remark} />
                                     </FormItem>
@@ -236,8 +235,8 @@ class PersonModify extends Component {
         wrapperCol: { span: 6 },
     };
     static layoutR = {
-        labelCol: { span: 6 },
-        wrapperCol: { span: 18 },
+        labelCol: { span: 4 },
+        wrapperCol: { span: 20 },
     };
 }
 

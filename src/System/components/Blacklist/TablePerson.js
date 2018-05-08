@@ -29,7 +29,8 @@ class TablePerson extends Component {
 			serialNumber: {},
 			btn: false,
 			value: '',
-			isUpdate:false
+			isUpdate: false,
+			projectTree: {}
 		}
 	}
 	initopthins(list) {
@@ -157,16 +158,32 @@ class TablePerson extends Component {
 			dataSourceb = this.state.tempData
 		}
 		dataSourceb.map((rst, index) => {
-			numArr.push(rst.id_num)
+			numArr.push({
+				id_num: rst.id_num,
+				person_name: rst.account.person_name,
+				black_remark: rst.black_remark
+			})
 			rst.index = index.toString() + 'd'
 			rst.key = index.toString() + 'd'
 			return { ...rst }
 		})
-		const numArr1 = Array.from(new Set(numArr))
-		numArr1.map((rst, index) => {
+		for (let i = 0; i < numArr.length - 1; i++) {
+			for (let j = 0; j < numArr.length; j++) {
+				if (i != j) {
+					if (numArr[i].id_num == numArr[j].id_num) {
+						numArr.splice(j, 1)
+					}
+				}
+
+			}
+
+		}
+		numArr.map((rst, index) => {
 			usersArr.push({
 				children: [],
-				id_num: rst,
+				id_num: rst.id_num,
+				person_name: rst.person_name,
+				black_remark: rst.black_remark,
 				key: (index + 1).toString()
 			})
 		})
@@ -177,7 +194,7 @@ class TablePerson extends Component {
 				}
 			})
 		})
-	
+
 		const columns = [
 			{
 				title: '序号',
@@ -198,17 +215,24 @@ class TablePerson extends Component {
 			},
 			{
 				title: '姓名',
-				dataIndex: 'account.person_name',
+				// dataIndex: 'account.person_name',
 				width: '5%',
-				key: 'account.person_name',
+				// key: 'account.person_name',
+				render: (text, record, index) => {
+					if (record.id) {
+						return record.account.person_name
+					} else {
+						return record.person_name
+					}
+				}
 			}, {
 				title: '身份证号',
 				dataIndex: 'id_num',
-				width: '8%',
+				width: '10%',
 				key: 'id_num',
 			}, {
 				title: '原因',
-				width: '9%',
+				width: '10%',
 				dataIndex: "black_remark",
 				key: 'black_remark',
 			}
@@ -221,7 +245,7 @@ class TablePerson extends Component {
 			, {
 				title: '性别',
 				dataIndex: 'basic_params.info.sex',
-				width: '4%',
+				width: '5%',
 				key: 'basic_params.info.sex'
 
 			}
@@ -231,28 +255,67 @@ class TablePerson extends Component {
 				width: '10%',
 				key: 'basic_params.info.phone'
 			}
+			// , {
+			// 	title: '所属部门',
+			// 	dataIndex: 'account.organization.name',
+			// 	width: '8%',
+			// 	key: 'account.organization.name',
+			// }
+			, {
+				title: '项目',
+				// dataIndex: 'account.organization.name',
+				width: '8%',
+				// key: 'account.organization.name',
+				render: (text, record, index) => {
+					if (record.id) {
+						const projectCode = record.account.organization.code.split('_',2)
+						const projectCodeStr=projectCode.join('_')
+						let names = ''
+						this.state.projectTree.children.map((ese) => {
+							const eseCode=ese.code.substring(0, 6)
+							if (eseCode == projectCodeStr) {
+								names = ese.name
+							}
+							if (projectCodeStr == 'ORG_02' || projectCodeStr == 'ORG_03' || projectCodeStr == 'ORG_P009') {
+								names = '九号地块'
+							}
+							if (projectCodeStr == 'ORG_P010' ) {
+								names = '十万亩苗景兼用林'
+							}
+							if (projectCodeStr == 'ORG_P999' ) {
+								names = '市民中心景观'
+							}
+							
+						})
+						return names
+					}
+
+				}
+			}
+
+
 			, {
 				title: '标段',
 				// dataIndex: "sections",
-				width: '6%',
+				width: '8%',
 				key: 'Sections',
 				render: (text, record, index) => {
 					let sectiones = this.sectiontitle(record)
 					return sectiones.join()
 				}
 			}
-			, {
-				title: '苗圃',
-				// dataIndex: "tags",
-				// key: 'tags',
-				width: '10%',
-				render: (text, record, index) => {
-					if (record.title) {
-						let defaultNurse = this.query(record)
-						return defaultNurse.join()
-					}
-				}
-			}
+			// , {
+			// 	title: '苗圃',
+			// 	// dataIndex: "tags",
+			// 	// key: 'tags',
+			// 	width: '10%',
+			// 	render: (text, record, index) => {
+			// 		if (record.title) {
+			// 			let defaultNurse = this.query(record)
+			// 			return defaultNurse.join()
+			// 		}
+			// 	}
+			// }
 			, {
 				title: '角色',
 				width: '8%',
@@ -262,11 +325,6 @@ class TablePerson extends Component {
 				}
 			}
 			, {
-				title: '所属部门',
-				dataIndex: 'account.organization.name',
-				width: '8%',
-				key: 'account.organization.name',
-			}, {
 				title: '职务',
 				dataIndex: 'title',
 				width: '8%',
@@ -283,20 +341,23 @@ class TablePerson extends Component {
 				key: "Edit",
 				render: (record) => {
 					if (record.id) {
-						return (
-							<div>
-								<a onClick={this.edits.bind(this, record)}>查看</a>
-								<span style={{ "margin": "0 10px 0 10px" }}>|</span>
-								{/* <a >
+						return <a onClick={this.edits.bind(this, record)}>查看</a>
+						{/* <span style={{ "margin": "0 10px 0 10px" }}>|</span> */ }
+						{/* <a >
 									移除
 								</a> */}
-								<span>
-									<Popconfirm title="是否真的要移除黑名单?" onConfirm={this.confirm.bind(this, record)} okText="Yes" cancelText="No">
-										<a type="primary" >移除</a>
-									</Popconfirm>
-								</span>
-							</div>
-						)
+
+
+
+					} else {
+						return <span>
+							<Popconfirm title="是否真的要移除黑名单?" onConfirm={this.confirm.bind(this, record)} okText="Yes" cancelText="No">
+								<a type="primary" >移除</a>
+							</Popconfirm>
+						</span>
+
+
+
 					}
 				}
 			}
@@ -305,7 +366,6 @@ class TablePerson extends Component {
 			labelCol: { span: 8 },
 			wrapperCol: { span: 16 },
 		};
-
 		return (
 			<div>
 				{/* <div>
@@ -474,80 +534,89 @@ class TablePerson extends Component {
 		}
 
 	}
+
 	async componentDidMount() {
 		this.setState({ loading: true })
-		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField }, tags = {} } = this.props;
+		const { platform: { roles = [] }, addition = {}, actions: { changeAdditionField, getOrgTree }, tags = {} } = this.props;
 		const { actions: { getPersonInfo } } = this.props;
-		// 分页获取数据
-		// let rst = await getPersonList({ pagesize: 10, offset: 0 });
 		let rst = await getPersonInfo({}, { is_black: 1 })
-		let personlist = rst
-		this.setState({ resultInfo: rst })
-		// let total = rst.result.total;
-		let persons = [];
-		for (let i = 0; i < personlist.length; i++) {
-			const element = personlist[i];
-			persons.push(element)
-		}
-
-		let pagination = {
-			current: 1,
-			total: rst.count,
-		};
-		this.setState({
-			pagination: pagination
-		})
-		let type = [];
-		let element = ''
-		let data_person =
-			persons.map((item, index) => {
-				let groupsId = []
-				const groups = item.groups || []
-				for (let j = 0; j < groups.length; j++) {
-					const groupss = groups[j].id.toString()
-					groupsId.push(groupss);
-				}
-				return {
-					index: index + 1,
-					id: item.id,
-					username: item.username || '',
-					email: item.email || '',
-					account: {
-						person_name: item.account.person_name,
-						person_type: "C_PER",
-						person_avatar_url: item.account.person_avatar_url,
-						person_signature_url: item.account.person_signature_url,
-						organization: {
-							// pk: node.pk,
-							code: item.account.org_code,
-							obj_type: "C_ORG",
-							rel_type: "member",
-							name: item.account.organization
-						},
-					},
-					tags: item.account.tags,
-					sections: item.account.sections,
-					groups: item.groups,
-					black_remark: item.account.black_remark,
-					is_active: item.is_active,
-					id_num: item.account.id_num,
-					is_black: item.account.is_black,
-					id_image: item.account.id_image,
-					basic_params: {
-						info: {
-							'电话': item.account.person_telephone || '',
-							'性别': item.account.gender || '',
-							'title': item.account.title || '',
-							'phone': item.account.person_telephone || '',
-							'sex': item.account.gender || '',
-							'duty': ''
-						}
-					},
-					extra_params: {},
-					title: item.account.title || ''
-				}
+		getOrgTree({}, { depth: 3 }).then(rstc => {
+			this.setState({
+				projectTree: rstc
 			})
-		this.setState({ dataSource: data_person, tempData: data_person, loading: false });
+			
+			// 分页获取数据
+			// let rst = await getPersonList({ pagesize: 10, offset: 0 });
+			let personlist = rst
+			this.setState({ resultInfo: rst })
+			// let total = rst.result.total;
+			let persons = [];
+			for (let i = 0; i < personlist.length; i++) {
+				const element = personlist[i];
+				persons.push(element)
+			}
+
+			let pagination = {
+				current: 1,
+				total: rst.count,
+			};
+			this.setState({
+				pagination: pagination
+			})
+			// let rst = await getOrgName({ code: record.account.organization.code })
+
+			let type = [];
+			let element = ''
+			let data_person =
+				persons.map((item, index) => {
+					let groupsId = []
+					const groups = item.groups || []
+					for (let j = 0; j < groups.length; j++) {
+						const groupss = groups[j].id.toString()
+						groupsId.push(groupss);
+					}
+					return {
+						index: index + 1,
+						id: item.id,
+						username: item.username || '',
+						email: item.email || '',
+						account: {
+							person_name: item.account.person_name,
+							person_type: "C_PER",
+							person_avatar_url: item.account.person_avatar_url,
+							person_signature_url: item.account.person_signature_url,
+							organization: {
+								// pk: node.pk,
+								code: item.account.org_code,
+								obj_type: "C_ORG",
+								rel_type: "member",
+								name: item.account.organization
+							},
+						},
+						tags: item.account.tags,
+						sections: item.account.sections,
+						groups: item.groups,
+						black_remark: item.account.black_remark,
+						is_active: item.is_active,
+						id_num: item.account.id_num,
+						is_black: item.account.is_black,
+						id_image: item.account.id_image,
+						basic_params: {
+							info: {
+								'电话': item.account.person_telephone || '',
+								'性别': item.account.gender || '',
+								'title': item.account.title || '',
+								'phone': item.account.person_telephone || '',
+								'sex': item.account.gender || '',
+								'duty': ''
+							}
+						},
+						extra_params: {},
+						title: item.account.title || ''
+					}
+				})
+			this.setState({ dataSource: data_person, tempData: data_person, loading: false });
+		});
 	}
 
 
@@ -648,35 +717,39 @@ class TablePerson extends Component {
 			actions: { getOrgName, putUser, putUserBlackList }
 		} = this.props;
 		console.log("record", record)
-		let rst = await getOrgName({ code: record.account.organization.code })
-		console.log("rst", rst)
-		let groupd = []
-		record.groups.map(ess => {
-			groupd.push(ess.id)
-		})
+		// let rst = await getOrgName({ code: record.account.organization.code })
+		// console.log("rst", rst)
+		// let groupd = []
+		// record.groups.map(ess => {
+		// 	groupd.push(ess.id)
+		// })
 		this.setState({ loading: true })
-		putUserBlackList({ userID: record.id }, {
+		putUserBlackList({ userID: record.children[0].id }, {
 			is_black: 0,
-			change_all: false,
+			change_all: true,
 			black_remark: '',
 		}).then(rst => {
 			console.log("rst111111111111", rst)
 			let tempDatas = []
 			this.state.tempData.map(item => {
-				if(rst.account.is_black==1){
+				if (rst.account.is_black == 1) {
 					message.warn('移除失败');
-					tempDatas=this.state.tempData
+					tempDatas = this.state.tempData
 				}
-				if(rst.account.is_black==0){
-					// message.warn('请求失败');
-					if (item.id != rst.id) {
+				console.log("item", item)
+				if (rst.account.is_black == 0) {
+					if (item.id_num != rst.account.id_num) {
 						tempDatas.push(item)
 					}
+					// message.warn('请求失败');
+					// if (item.id != rst.id) {
+
+					// }
 				}
 			})
 			this.setState({
 				tempData: tempDatas,
-				loading: false 
+				loading: false
 			})
 			this.querys()
 		})
