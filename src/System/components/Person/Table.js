@@ -754,12 +754,17 @@ export default class Users extends Component {
 			actions: { putUser }
 		} = this.props;
 		let actives
-		if (user.is_active == true) {
-			user.is_active = false
-			actives = false
-		} else {
-			user.is_active = true
-			actives = true
+		if(user.is_black!=1){
+			if (user.is_active == true) {
+				user.is_active = false
+				actives = false
+			} else {
+				user.is_active = true
+				actives = true
+			}
+		}else{
+			message.warn('用户已加入黑名单,不可启用');
+			return
 		}
 		let groupe = []
 		for (let j = 0; j < user.groups.length; j++) {

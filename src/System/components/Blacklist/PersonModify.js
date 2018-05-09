@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { Modal, Input, Form, Button, Notification, Table, Radio, Row, Col, Select, Switch, Upload, Icon } from 'antd';
 import { CODE_PROJECT } from '_platform/api';
 // import { getProjectUnits } from '../../../_platform/auth'
-import '../index.less';
+import './PersonModify.less';
 import { getUser, getProjectUnits } from '_platform/auth';
 import { getNextStates } from '_platform/components/Progress/util';
-import { WORKFLOW_CODE ,PROJECT_UNITS} from '_platform/api'
+import { WORKFLOW_CODE, PROJECT_UNITS } from '_platform/api'
 import { flattenDeep } from 'lodash';
 
 const RadioGroup = Radio.Group;
@@ -32,7 +32,7 @@ class PersonModify extends Component {
     render() {
         const { modifyPer } = this.props;
         console.log("modifyPer", modifyPer)
-        
+
         const addition = modifyPer
         const { form: {
 			getFieldDecorator
@@ -42,16 +42,16 @@ class PersonModify extends Component {
         addition.groups.map(ese => {
             roles.push(ese.name)
         })
-        let sectio=[]
-        PROJECT_UNITS.map(ies=>{
-            ies.units.map(ies1=>{
-                addition.sections.map(ie=>{
+        let sectio = []
+        PROJECT_UNITS.map(ies => {
+            ies.units.map(ies1 => {
+                addition.sections.map(ie => {
                     if (ies1.code == ie) {
                         sectio.push(ies1.value)
                     }
                 })
             })
-           
+
         })
 
         let defaultNurse = []
@@ -63,31 +63,72 @@ class PersonModify extends Component {
 
             })
         })
-        // 头像
-        let fileList = ''
+        // 上传用户头像
+        let fileList = []
+        console.log("addition",addition)
         if (addition.account.person_avatar_url && addition.account.person_avatar_url != 'http://47.104.160.65:6511') {
-            fileList = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + addition.account.person_avatar_url
+            const avatar_urlName = addition.account.person_avatar_url.split("/").pop()
+            const avatar_url = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + addition.account.person_avatar_url
+            fileList = [{
+                uid: -1,
+                name: avatar_urlName,
+                status: 'done',
+                url: avatar_url,
+                thumbUrl: avatar_url,
+            }];
         }
-        // 签名
-        let fileList1 = ''
+        // 上传用户签名
+        let fileList1 = []
         if (addition.account.person_signature_url && addition.account.person_signature_url != 'http://47.104.160.65:6511') {
-            fileList1 = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + addition.account.person_signature_url
-
+            const avatar_urlName3 = addition.account.person_signature_url.split("/").pop()
+            const avatar_url3 = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + addition.account.person_signature_url
+            fileList1 = [{
+                uid: -1,
+                name: avatar_urlName3,
+                status: 'done',
+                url: avatar_url3,
+                thumbUrl: avatar_url3,
+            }];
         }
-        // 身份证正面
-        let fileList2 = ''
+        // 上传身份证正面
+        let fileList2 = []
+        let id_image_url = ''
+        let id_image_urlName
         if (addition.id_image && addition.id_image[0]) {
             if (addition.id_image[0].name && addition.id_image[0].filepath) {
-                fileList2 = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + addition.id_image[0].filepath.split('/media')[1]
+                id_image_urlName = addition.id_image[0].name
+                // filepath: STATIC_DOWNLOAD_API + "/media" + file.file.response.download_url.split('/media')[1]
+                const id_img = addition.id_image[0].filepath.split('/media')[1]
+                const id_imgs = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + id_img
+                id_image_url = id_imgs ? id_imgs : addition.id_image[0].thumbUrl
+                fileList2 = [{
+                    uid: 1,
+                    name: id_image_urlName,
+                    status: 'done',
+                    url: id_image_url,
+                    thumbUrl: id_image_url,
+                }]
             }
         }
-        // 身份证反面
-        let fileList3 = ''
+        // 上传身份证发面
+        let fileList3 = []
+        let id_image_url1 = ''
+        let id_image_urlName1
         if (addition.id_image && addition.id_image[1]) {
-			if (addition.id_image[1].name && addition.id_image[1].filepath) {
-				fileList3 = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + addition.id_image[1].filepath.split('/media')[1]
-			}
-		}
+            if (addition.id_image[1].name && addition.id_image[1].filepath) {
+                const id_img = addition.id_image[1].filepath.split('/media')[1]
+                const id_imgs = window.config.STATIC_FILE_IP + ':' + window.config.STATIC_PREVIEW_PORT + '/media' + id_img
+                id_image_urlName1 = addition.id_image[1].name
+                id_image_url1 = id_imgs ? id_imgs : addition.id_image[1].thumbUrl
+                fileList3 = [{
+                    uid: 2,
+                    name: id_image_urlName1,
+                    status: 'done',
+                    url: id_image_url1,
+                    thumbUrl: id_image_url1,
+                }]
+            }
+        }
         return (
             <Modal
                 onCancel={this.cancel.bind(this)}
@@ -114,7 +155,7 @@ class PersonModify extends Component {
                             </FormItem>
                             {user.is_superuser ?
                                 <FormItem {...PersonModify.layout} label="部门编码">
-                                    <Input placeholder="部门编码" value={addition.account.organization.code}  />
+                                    <Input placeholder="部门编码" value={addition.account.organization.code} />
                                 </FormItem> : ''
                             }
                             {
@@ -138,15 +179,28 @@ class PersonModify extends Component {
                                 </Input>
                             </FormItem>
                             <FormItem {...PersonModify.layout} label="用户头像">
-                               
+
                                 {
-                                    fileList? <img style={{ width: '70px', height: '30px' }} src={fileList} />:'无'
+                                    fileList&&fileList.length ? <Upload
+                                        name="file"
+
+                                        listType="picture-card"
+                                        onRemove={false}
+                                        defaultFileList={fileList}
+                                    >
+                                    </Upload> : '无'
                                 }
                             </FormItem>
                             <FormItem {...PersonModify.layout} label="用户签名">
-                               
+
                                 {
-                                    fileList1? <img style={{ width: '70px', height: '30px' }} src={fileList1} />:'无'
+                                    fileList1&&fileList1.length ? <Upload
+                                        name="file"
+                                        listType="picture-card"
+                                        onRemove={false}
+                                        defaultFileList={fileList1}
+                                    >
+                                    </Upload> : '无'
                                 }
                             </FormItem>
                         </Col>
@@ -199,16 +253,29 @@ class PersonModify extends Component {
                             </Row>
                             <FormItem {...PersonModify.layout} label="身份证正面照片">
                                 {
-                                    fileList2? <img style={{ width: '70px', height: '30px' }}  src={fileList2}/>:'无'
+                                    fileList2&&fileList2.length ? <Upload
+                                        name="file"
+
+                                        listType="picture-card"
+                                        onRemove={false}
+                                        defaultFileList={fileList2}
+                                    >
+                                    </Upload> : '无'
                                 }
                             </FormItem>
                             <FormItem {...PersonModify.layout} label="身份证反面照片">
-                               
                                 {
-                                    fileList3? <img style={{ width: '70px', height: '30px' }} src={fileList3} />:'无'
+                                    fileList3&&fileList3.length ? <Upload
+                                        name="file"
+
+                                        listType="picture-card"
+                                        onRemove={false}
+                                        defaultFileList={fileList3}
+                                    >
+                                    </Upload> : '无'
                                 }
                             </FormItem>
-                            
+
                         </Col>
                     </Row>
                 </Form>
