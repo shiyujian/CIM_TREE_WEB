@@ -111,42 +111,50 @@ export default class LocmeasureTable extends Component {
 		} = this.state;
 		let columns = [];
 		let header = '';
-		columns = [{
-			title:"序号",
-			dataIndex: 'order',
-		},{
-			title:"顺序码",
-			dataIndex: 'SXM',
-		},{
-			title:"标段",
-			dataIndex: 'Section',
-			render:(text,record) => {
-				return <p>{this.getBiao(text)}</p>
+		columns = [
+			{
+				title:"序号",
+				dataIndex: 'order',
+			},{
+				title:"顺序码",
+				dataIndex: 'SXM',
+			},{
+				title:"标段",
+				dataIndex: 'Section',
+				render:(text,record) => {
+					return <p>{this.getBiao(text)}</p>
+				}
+			},{
+				title:"位置",
+				dataIndex: 'place',
+			},{
+				title:"树种",
+				dataIndex: 'TreeTypeObj.TreeTypeName',
+			},{
+				title:"定位时间",
+				render: (text,record) => {
+					const {createtime1 = '',createtime2 = '' } = record;
+					return <div><div>{createtime1}</div><div>{createtime2}</div></div>
+				}
+			},{
+				title:'X',
+				dataIndex:'X'
+			},{
+				title:'Y',
+				dataIndex:'Y'
+			},{
+				title:'H',
+				dataIndex:'H'
 			}
-		},{
-			title:"位置",
-			dataIndex: 'place',
-		},{
-			title:"树种",
-			dataIndex: 'TreeTypeObj.TreeTypeName',
-		},{
-			title:"定位时间",
-			render: (text,record) => {
-				const {createtime1 = '',createtime2 = '' } = record;
-				return <div><div>{createtime1}</div><div>{createtime2}</div></div>
-			}
-		},{
-			title:'X',
-			dataIndex:'X'
-		},{
-			title:'Y',
-			dataIndex:'Y'
-		},{
-			title:'H',
-			dataIndex:'H'
-		}];
+		];
+
+		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		header = <div >
 					<Row >
+						<Col  xl={3} className='mrg10'>
+							<span>顺序码：</span>
+							<Input suffix={suffix1} value={sxm}  className='forestcalcw2 mxw50' onChange={this.sxmchange.bind(this)}/>
+						</Col>
 						<Col xl={3} className='mrg10'>
 							<span>标段：</span>
 							<Select allowClear className='forestcalcw2 mxw100' defaultValue='全部' value={section} onChange={this.onsectionchange.bind(this)}>
@@ -233,7 +241,11 @@ export default class LocmeasureTable extends Component {
 							/>
 					</Row>
 				</div>
-    }
+	}
+	
+	emitEmpty1 = () => {
+	    this.setState({sxm: ''});
+  	}
 
 	sxmchange(value) {
 		this.setState({sxm:value.target.value})
@@ -375,12 +387,13 @@ export default class LocmeasureTable extends Component {
 			smallclass = '',
 			positiontype
 		} = this.state;
-		if(section === ''){
-			message.info('请选择标段信息');
+		if(section === '' && sxm === ''){
+			message.info('请选择标段信息或输入顺序码');
 			return;
 		}
 		const {actions: {getTreeLocations}} = this.props;
     	let postdata = {
+			sxm,
     		// no:keycode,
     		section,
     		// bigType,

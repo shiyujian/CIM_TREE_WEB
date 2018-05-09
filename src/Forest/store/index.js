@@ -73,6 +73,8 @@ export const getSeedlingInfo = createFetchAction(`${FOREST_API}/tree/remarktree?
 export const getTreeflows = createFetchAction(`${FOREST_API}/tree/treeflows`, []);
 //获取打包车辆信息
 export const getCarpackbysxm = createFetchAction(`${FOREST_API}/tree/carpackbysxm/{{sxm}}`, []);
+//获取树木现场种植的信息
+export const getTreeMess = createFetchAction(`${FOREST_API}/tree/tree/{{sxm}}`, []);
 
 
 export const actions = {
@@ -128,7 +130,8 @@ export const actions = {
 	getNurserysByPack,
 	getSeedlingInfo,
 	getTreeflows,
-	getCarpackbysxm
+	getCarpackbysxm,
+	getTreeMess
 	// getTreeNodeList
 };
 export default handleActions({
