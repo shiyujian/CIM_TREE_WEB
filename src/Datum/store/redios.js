@@ -29,6 +29,8 @@ export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?
 
 export const searchRedioMessage = createAction(`${ID}获取影像资料搜索信息`);
 export const searchRedioVisible = createAction(`${ID}是否搜索影像资料`);
+
+
 export const actions = {
     getdocumentOK,
     getdocument,
@@ -114,5 +116,5 @@ export default handleActions({
     [searchRedioVisible]: (state, {payload}) => ({
 	    ...state,
 	    searchrediovisible: payload
-    }),
+    })
 }, {});

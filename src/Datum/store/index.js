@@ -27,6 +27,9 @@ const setoldfile = createAction(`${ID}setoldfile`);
 export const setkeycode =createAction(`${ID}_setkeycode`);
 export const getTreeOK = createAction(`${ID}_目录树`);
 export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
+
+export const searchVideoMessage = createAction(`${ID}获取视频资料搜索信息`);
+export const searchVideoVisible = createAction(`${ID}是否搜索视频资料`);
 export const actions = {
     getdocumentOK,
     getdocument,
@@ -42,6 +45,8 @@ export const actions = {
 	setkeycode,
     getTreeOK,
     getTree,
+    searchVideoMessage,
+    searchVideoVisible,
     ...documentReducer,
     ...additionReducer,
     ...visibleReducer,
@@ -112,5 +117,13 @@ export default handleActions({
     [setkeycode]: (state, {payload}) => ({
 	    ...state,
 	    keycode: payload
+    }),
+    [searchVideoMessage]: (state, {payload}) => ({
+	    ...state,
+	    searchvideo: payload
+    }),
+    [searchVideoVisible]: (state, {payload}) => ({
+	    ...state,
+	    searchvideovisible: payload
     }),
 }, {});
