@@ -21,6 +21,7 @@ window.DeathCode = {
 	DATUM_DATUM:"QH01" ,//资料管理制度规范编码
 	DATUM_GCYX:"TREE_GCYX" ,//工程影像目录名称
 	DATUM_GCWD:"TREE_GCWD" ,//工程影像目录名称
+	DATUM_VIDEO:"TREE_VIDEO",
 	SAFETY_AQJY:"TREE_AQJY" ,//安全教育目录名称
 	SAFETY_HJBH:"TREE_HJBH" ,//环境保护目录名称
 	SAFETY_AQYH:"TREE_AQYH" ,//安全隐患目录名称

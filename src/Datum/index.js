@@ -16,7 +16,7 @@ export default class DatumContainer extends Component {
 	}
 
 	render() {
-		const {Datum, Engineering,Redios} = this.state || {};
+		const {Datum, Engineering,Redios,Video} = this.state || {};
 		return (
 			<Body>
 			<Aside>
@@ -26,6 +26,7 @@ export default class DatumContainer extends Component {
 				{Datum && <Route exact path="/datum/standard" component={Datum}/>}
 				{Engineering && <Route path="/datum/engineering" component={Engineering}/>}
 				{Redios && <Route path="/datum/redios" component={Redios}/>}
+				{Video && <Route path="/datum/video" component={Video}/>}
 			</Main>
 			</Body>);
 	}
@@ -42,12 +43,17 @@ export default class DatumContainer extends Component {
 		path: '/datum/engineering',
 		name: '工程文档',
 		icon: <Icon name="file-word-o"/>
-	},
-	{
+	}, {
 		key: 'redios',
 		id: 'DATUM.REDIOS',
 		path: '/datum/redios',
 		name: '影像资料',
+		icon: <Icon name="file-word-o"/>
+	}, {
+		key: 'video',
+		id: 'DATUM.VIDEO',
+		path: '/datum/video',
+		name: '视频资料',
 		icon: <Icon name="file-word-o"/>
 	}
 ];
