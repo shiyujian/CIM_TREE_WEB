@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Table, Row, Col, Form, Select, Button, Popconfirm, message, Input, Progress, Spin } from 'antd';
 import { PROJECT_UNITS } from './../../../_platform/api';
-import  styles from './index.less';
+import styles from './index.less';
 
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
@@ -157,15 +157,15 @@ export default class Users extends Component {
 		}
 		return sectione
 	}
-	setColor(record,i){
+	setColor(record, i) {
 
 		const {
 			platform: { users = [] },
 		} = this.props;
 		// console.log("users",users)
-		if(record.is_black==1 || record.is_black==true){
+		if (record.is_black == 1 || record.is_black == true) {
 			return 'background'
-		}else{
+		} else {
 			return ''
 		}
 	}
@@ -754,7 +754,7 @@ export default class Users extends Component {
 			actions: { putUser }
 		} = this.props;
 		let actives
-		if(user.is_black!=1){
+		if (user.is_black != 1) {
 			if (user.is_active == true) {
 				user.is_active = false
 				actives = false
@@ -762,7 +762,7 @@ export default class Users extends Component {
 				user.is_active = true
 				actives = true
 			}
-		}else{
+		} else {
 			message.warn('用户已加入黑名单,不可启用');
 			return
 		}
@@ -830,6 +830,10 @@ export default class Users extends Component {
 
 	edit(user, event) {
 		console.log("user", user)
+		if (user.is_black == 1 || user.is_black == true) {
+			message.warn('用户已加入黑名单,不可编辑');
+			return
+		}
 
 		event.preventDefault();
 		const account = user.account;
