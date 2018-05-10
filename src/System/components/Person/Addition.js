@@ -1004,7 +1004,9 @@ class Addition extends Component {
 		getSwitch()
 		this.setState({
 			newKey: Math.random(),
-			checkedBtn: null
+			checkedBtn: null,
+			btns:true,
+			btnf:true
 		})
 		clearAdditionField();
 	}
