@@ -33,7 +33,8 @@ export default class CheckerTable extends Component {
     		locationstatus: '',
     		role: 'checker',
     		rolename: '',
-    		percent:0,        
+			percent:0,    
+			totalNum:''    
     	}
 	}
 	getBiao(code){
@@ -218,7 +219,7 @@ export default class CheckerTable extends Component {
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>
-							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
+							<span >此次查询共有苗木：{this.state.totalNum}棵</span>
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
@@ -384,11 +385,15 @@ export default class CheckerTable extends Component {
 			bigType = '',
     		treetype = '',
 		} = this.state;
-		if(this.sections.length !== 0){  //不是admin，要做查询判断了
-			if(section === ''){
-				message.info('请选择标段信息');
-				return;
-			}
+		// if(this.sections.length !== 0){  //不是admin，要做查询判断了
+		// 	if(section === ''){
+		// 		message.info('请选择标段信息');
+		// 		return;
+		// 	}
+		// }
+		if(thinclass === '' && sxm === ''){
+			message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+			return;
 		}
     	const {actions: {getqueryTree},keycode = ''} = this.props;
     	let postdata = {
@@ -439,10 +444,11 @@ export default class CheckerTable extends Component {
 					tblData[i].checktime1 = checktime1;
 					tblData[i].checktime2 = checktime2;
 	    		})
-		    	const pagination = { ...this.state.pagination };
+				const pagination = { ...this.state.pagination };a
+				let totalNum = rst.total
 				pagination.total = rst.pageinfo.total;
 				pagination.pageSize = size;
-				this.setState({ tblData,pagination:pagination });	
+				this.setState({ tblData,pagination:pagination,totalNum:totalNum });	
 	    	}
     	})
     }

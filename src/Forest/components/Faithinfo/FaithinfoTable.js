@@ -221,7 +221,11 @@ export default class FaithinfoTable extends Component {
     		bigType = '',
     		treetype = '',
     		factory = '',
-    	} = this.state;
+		} = this.state;
+		if((section === '' || bigType == '')&& factory === ''){
+			message.info('请选择项目,标段及类型信息或输入供应商');
+			return;
+		}
     	const {actions: {getHonestyNew},keycode = ''} = this.props;
     	let postdata = {
     		section,

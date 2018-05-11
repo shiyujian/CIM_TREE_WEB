@@ -387,8 +387,8 @@ export default class LocmeasureTable extends Component {
 			smallclass = '',
 			positiontype
 		} = this.state;
-		if(section === '' && sxm === ''){
-			message.info('请选择标段信息或输入顺序码');
+		if(thinclass === '' && sxm === ''){
+			message.info('请选择项目，标段，小班及细班信息或输入顺序码');
 			return;
 		}
 		const {actions: {getTreeLocations}} = this.props;

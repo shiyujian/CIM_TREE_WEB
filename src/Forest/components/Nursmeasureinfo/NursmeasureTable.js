@@ -475,7 +475,11 @@ export default class NursmeasureTable extends Component {
     		checkstatus = '',
 			ispack = '',
 			mmtype = ''
-    	} = this.state;
+		} = this.state;
+		if(section === '' && sxm === ''){
+			message.info('请选择项目及标段信息或输入顺序码');
+			return;
+		}
     	const {actions: {getnurserys},keycode = ''} = this.props;
     	let postdata = {
     		// no:keycode,

@@ -476,7 +476,11 @@ export default class CarPackageTable extends Component {
     		size,
 			status = '',
 			mmtype = ''
-    	} = this.state;
+		} = this.state;
+		if(section === '' && sxm === ''){
+			message.info('请选择项目及标段信息或输入车牌号');
+			return;
+		}
     	const {actions: {getcarpackage},keycode = ''} = this.props;
     	let postdata = {
     		licenseplate:sxm,

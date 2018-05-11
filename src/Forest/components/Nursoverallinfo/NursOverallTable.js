@@ -117,19 +117,19 @@ export default class NursOverallTable extends Component {
 				title:"起苗地点",
 				dataIndex: 'location',
 			},{
-				title: "土球直径(cm)",
+				title: "土球厚度(cm)",
 				render: (text,record) => {
-					if(record.TQZJ)
-						return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
+					if(record.TQHD)
+						return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.TQHD}</a>
 					else {
 						return <span>/</span>
 					}
 				}
 			},{
-				title: "土球厚度(cm)",
+				title: "土球直径(cm)",
 				render: (text,record) => {
-					if(record.TQHD)
-						return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.TQHD}</a>
+					if(record.TQZJ)
+						return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
 					else {
 						return <span>/</span>
 					}
@@ -442,20 +442,6 @@ export default class NursOverallTable extends Component {
 				}
 			)
 		}
-		if(seedling.TQZJ){
-			this.seedlingColumns.push(
-				{
-					title: "土球直径(cm)",
-					render: (text,record) => {
-						if(record.TQZJ)
-							return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
-						else {
-							return <span>/</span>
-						}
-					}
-				}
-			)
-		}
 		if(seedling.TQHD){
 			this.seedlingColumns.push(
 				{
@@ -470,6 +456,21 @@ export default class NursOverallTable extends Component {
 				}
 			)
 		}
+		if(seedling.TQZJ){
+			this.seedlingColumns.push(
+				{
+					title: "土球直径(cm)",
+					render: (text,record) => {
+						if(record.TQZJ)
+							return <a disabled={!record.TQZJFJ} onClick={this.onImgClick.bind(this,record.TQZJFJ)}>{record.TQZJ}</a>
+						else {
+							return <span>/</span>
+						}
+					}
+				}
+			)
+		}
+		
 		
 		
 

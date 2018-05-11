@@ -36,80 +36,10 @@ export default class LocmeasureTable extends Component {
     		islocation: '',
     		role: 'inputer',
     		rolename: '',
-    		percent:0,
+			percent:0,
+			totalNum:''
 		}
-	}
-	getBiao(code){
-		let str = '';
-		PROJECT_UNITS.map(item => {
-			item.units.map(single => {
-				if(single.code === code){
-					str = single.value;
-				}
-			})
-		})
-		return str;
-	}
-    componentDidMount() {
-    	let user = getUser()
-		this.sections = JSON.parse(user.sections)
-    }
-    componentWillReceiveProps(nextProps){
-    	if(nextProps.leftkeycode != this.state.leftkeycode) {
-			this.setState({
-				leftkeycode: nextProps.leftkeycode,
-    		},()=> {
-    			this.qury(1);
-    		})
-    	} 
-    }
-	render() {
-		const {tblData} = this.state;
-		return (
-			<div>
-				{this.treeTable(tblData)}
-				<Modal
-					width={522}
-					title='详细信息'
-					style={{textAlign:'center'}}
-					visible={this.state.imgvisible}
-					onOk={this.handleCancel.bind(this)}
-					onCancel={this.handleCancel.bind(this)}
-				>
-					<img style={{width:"490px"}} src={this.state.src} alt="图片"/>
-				</Modal>
-			</div>
-		);
-	}
-	treeTable(details) {
-		const {
-			treetypeoption,
-			sectionoption,
-			smallclassoption,
-			thinclassoption,
-			typeoption,
-			leftkeycode,
-			keycode,
-			statusoption,
-			locationoption,
-			users
-		} = this.props;
-		const {
-			sxm, 
-			rolename,
-			section,
-			smallclass,
-			thinclass,
-			bigType,
-			treetypename,
-			status,
-			islocation,
-		} = this.state;
-		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
-		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
-		let columns = [];
-		let header = '';
-		columns = [
+		this.columns = [
 			{
 				title:"序号",
 				dataIndex: 'order',
@@ -294,6 +224,78 @@ export default class LocmeasureTable extends Component {
 			// 	}
 			// }
 		];
+	}
+	getBiao(code){
+		let str = '';
+		PROJECT_UNITS.map(item => {
+			item.units.map(single => {
+				if(single.code === code){
+					str = single.value;
+				}
+			})
+		})
+		return str;
+	}
+    componentDidMount() {
+    	let user = getUser()
+		this.sections = JSON.parse(user.sections)
+    }
+    componentWillReceiveProps(nextProps){
+    	if(nextProps.leftkeycode != this.state.leftkeycode) {
+			this.setState({
+				leftkeycode: nextProps.leftkeycode,
+    		},()=> {
+    			this.qury(1);
+    		})
+    	} 
+    }
+	render() {
+		const {tblData} = this.state;
+		return (
+			<div>
+				{this.treeTable(tblData)}
+				<Modal
+					width={522}
+					title='详细信息'
+					style={{textAlign:'center'}}
+					visible={this.state.imgvisible}
+					onOk={this.handleCancel.bind(this)}
+					onCancel={this.handleCancel.bind(this)}
+				>
+					<img style={{width:"490px"}} src={this.state.src} alt="图片"/>
+				</Modal>
+			</div>
+		);
+	}
+	treeTable(details) {
+		const {
+			treetypeoption,
+			sectionoption,
+			smallclassoption,
+			thinclassoption,
+			typeoption,
+			leftkeycode,
+			keycode,
+			statusoption,
+			locationoption,
+			users
+		} = this.props;
+		const {
+			sxm, 
+			rolename,
+			section,
+			smallclass,
+			thinclass,
+			bigType,
+			treetypename,
+			status,
+			islocation,
+		} = this.state;
+		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
+		const suffix2 = rolename ? <Icon type="close-circle" onClick={this.emitEmpty2} /> : null;
+		let columns = [];
+		let header = '';
+		
 		header = <div >
 					<Row >
 						<Col  xl={3} className='mrg10'>
@@ -377,7 +379,7 @@ export default class LocmeasureTable extends Component {
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>
-							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
+							<span >此次查询共有苗木：{this.state.totalNum}棵</span>
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
@@ -398,7 +400,7 @@ export default class LocmeasureTable extends Component {
 					<Row>
 						<Table bordered
 						 className='foresttable'
-						 columns={columns}
+						 columns={this.columns}
 						 rowKey='order'
 						 loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 						 locale={{emptyText:'当天无现场测量信息'}}
@@ -520,6 +522,9 @@ export default class LocmeasureTable extends Component {
     }
 
     qury(page) {
+		const{
+			users
+		}=this.props
     	const {
     		sxm = '',
     		section = '',
@@ -537,12 +542,18 @@ export default class LocmeasureTable extends Component {
 			thinclass = '',
 			smallclass = ''
 		} = this.state;
-		if(this.sections.length !== 0){  //不是admin，要做查询判断了
-			if(section === ''){
-				message.info('请选择标段信息');
-				return;
-			}
+		// if(this.sections.length !== 0){  //不是admin，要做查询判断了
+		// 	if(section === ''){
+		// 		message.info('请选择标段信息');
+		// 		return;
+		// 	}
+		// }
+		
+		if(thinclass === '' && sxm === ''){
+			message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+			return;
 		}
+
     	const {actions: {getqueryTree},keycode = ''} = this.props;
     	let postdata = {
     		no:keycode,
@@ -596,11 +607,217 @@ export default class LocmeasureTable extends Component {
 					tblData[i].createtime2 = createtime2;
 					tblData[i].createtime3 = createtime3;
 					tblData[i].createtime4 = createtime4;
-	    		})
+				})
+				let totalNum = rst.total
 		    	const pagination = { ...this.state.pagination };
 				pagination.total = rst.pageinfo.total;
 				pagination.pageSize = size;
-				this.setState({ tblData,pagination:pagination });	
+
+				if(bigType == '5'){
+					this.columns = [
+						{
+							title:"序号",
+							dataIndex: 'order',
+						},{
+							title:"顺序码",
+							dataIndex: 'ZZBM',
+						},{
+							title:"标段",
+							dataIndex: 'Section',
+							render:(text,record) => {
+								return <p>{this.getBiao(text)}</p>
+							}
+						},{
+							title:"位置",
+							dataIndex: 'place',
+						},{
+							title:"树种",
+							dataIndex: 'TreeTypeObj.TreeTypeName',
+						},{
+							title:"状态",
+							dataIndex: 'statusname',
+							render:(text,record) =>{
+								let superName = ''
+								let ownerName = ''
+								if(record.SupervisorCheck == -1 && record.CheckStatus == -1){
+									return <span>未抽查</span>
+								}else {
+									if(record.SupervisorCheck == 0) 
+										superName = "监理抽查退回"
+									else if(record.SupervisorCheck === 1){
+										superName = "监理抽查通过"
+									}
+			
+									if(record.CheckStatus == 0) 
+										ownerName = "业主抽查退回"
+									else if(record.CheckStatus == 1){
+										ownerName = "业主抽查通过"
+									}else if(record.CheckStatus == 2){
+										ownerName = "业主抽查退回后修改"
+									}
+									if(superName && ownerName){
+										return <div><div>{superName}</div><div>{ownerName}</div></div>
+									}else if(superName){
+										return <span>{superName}</span>
+									}else{
+										return <span>{ownerName}</span>
+									}
+								}
+							}
+						},{
+							title:"测量人",
+							dataIndex: 'Inputer',
+							render: (text,record) => {
+								return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
+							}
+						},{
+							title:"测量时间",
+							render: (text,record) => {
+								const {createtime1 = '',createtime2 = '' } = record;
+								return <div><div>{createtime1}</div><div>{createtime2}</div></div>
+							}
+						},{
+							title:"实际载植量",
+							dataIndex: 'Num',
+						}
+					];
+				}else{
+					this.columns = [
+						{
+							title:"序号",
+							dataIndex: 'order',
+						},{
+							title:"顺序码",
+							dataIndex: 'ZZBM',
+						},{
+							title:"标段",
+							dataIndex: 'Section',
+							render:(text,record) => {
+								return <p>{this.getBiao(text)}</p>
+							}
+						},{
+							title:"位置",
+							dataIndex: 'place',
+						},{
+							title:"树种",
+							dataIndex: 'TreeTypeObj.TreeTypeName',
+						},{
+							title:"状态",
+							dataIndex: 'statusname',
+							render:(text,record) =>{
+								let superName = ''
+								let ownerName = ''
+								if(record.SupervisorCheck == -1 && record.CheckStatus == -1){
+									return <span>未抽查</span>
+								}else {
+									if(record.SupervisorCheck == 0) 
+										superName = "监理抽查退回"
+									else if(record.SupervisorCheck === 1){
+										superName = "监理抽查通过"
+									}
+			
+									if(record.CheckStatus == 0) 
+										ownerName = "业主抽查退回"
+									else if(record.CheckStatus == 1){
+										ownerName = "业主抽查通过"
+									}else if(record.CheckStatus == 2){
+										ownerName = "业主抽查退回后修改"
+									}
+									if(superName && ownerName){
+										return <div><div>{superName}</div><div>{ownerName}</div></div>
+									}else if(superName){
+										return <span>{superName}</span>
+									}else{
+										return <span>{ownerName}</span>
+									}
+								}
+							}
+						},{
+							title:"定位",
+							dataIndex: 'islocation',
+						},{
+							title:"测量人",
+							dataIndex: 'Inputer',
+							render: (text,record) => {
+								return <span>{users&&users[text] ? users[text].Full_Name+"("+users[text].User_Name+")": ''}</span>
+							}
+						},{
+							title:"测量时间",
+							render: (text,record) => {
+								const {createtime1 = '',createtime2 = '' } = record;
+								return <div><div>{createtime1}</div><div>{createtime2}</div></div>
+							}
+						},{
+							title:"定位时间",
+							render: (text,record) => {
+								const {createtime3 = '',createtime4 = '' } = record;
+								return <div><div>{createtime3}</div><div>{createtime4}</div></div>
+							}
+						},{
+							title:<div><div>高度</div><div>(cm)</div></div>,
+							render: (text,record) => {
+								if(record.GD != 0)
+									return <a disabled={!record.GDFJ} onClick={this.onImgClick.bind(this,record.GDFJ)}>{record.GD}</a>
+								else {
+									return <span>/</span>
+								}
+							}
+						},{
+							title:<div><div>冠幅</div><div>(cm)</div></div>,
+							render: (text,record) => {
+								if(record.GF != 0)
+									return <a disabled={!record.GFFJ} onClick={this.onImgClick.bind(this,record.GFFJ)}>{record.GF}</a>
+								else {
+									return <span>/</span>
+								}
+							}
+						},{
+							title:<div><div>胸径</div><div>(cm)</div></div>,
+							render: (text,record) => {
+								if(record.XJ != 0)
+									return <a disabled={!record.XJFJ} onClick={this.onImgClick.bind(this,record.XJFJ)}>{record.XJ}</a>
+								else {
+									return <span>/</span>
+								}
+							}
+						},{
+							title:<div><div>地径</div><div>(cm)</div></div>,
+							render: (text,record) => {
+								if(record.DJ != 0)
+									return <a disabled={!record.DJFJ} onClick={this.onImgClick.bind(this,record.DJFJ)}>{record.DJ}</a>
+								else {
+									return <span>/</span>
+								}
+							}
+						},{
+							title:<div><div>土球厚度</div><div>(cm)</div></div>,
+							dataIndex: 'tqhd',
+							render: (text,record) => {
+								if(record.TQHD != 0)
+									return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQHD}</a>
+								else {
+									return <span>/</span>
+								}
+							}
+						},{
+							title:<div><div>土球直径</div><div>(cm)</div></div>,
+							dataIndex: 'tqzj',
+							render: (text,record) => {
+								if(record.TQZJ != 0)
+									return <a disabled={!record.TQHDFJ} onClick={this.onImgClick.bind(this,record.TQHDFJ)}>{record.TQZJ}</a>
+								else {
+									return <span>/</span>
+								}
+							}
+						}
+					];
+				}
+
+
+
+
+
+				this.setState({ tblData,pagination:pagination,totalNum:totalNum });	
 	    	}
     	})
     }

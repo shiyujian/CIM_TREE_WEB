@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-05-08 15:03:20
+ * @Last Modified time: 2018-05-10 09:29:46
  */
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -730,9 +730,12 @@ class Lmap extends Component {
 
         let treearea = []
         getTreearea({}, { no: keys[0] }).then(rst => {
-            // console.log('rst',rst)
+            console.log('rst',rst)
+            if(!(rst && rst.content && rst.content  instanceof Array && rst.content.length > 0))
+                return
+            
             let str = rst.content[0].coords;
-            // console.log('str',str)
+            console.log('str',str)
             var target1 = str
                 .slice(str.indexOf('(') + 3, str.indexOf(')'))
                 .split(',')

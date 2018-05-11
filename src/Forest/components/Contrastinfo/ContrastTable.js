@@ -387,11 +387,15 @@ export default class ContrastTable extends Component {
     		etime = '',
     		size,
 		} = this.state;
-		if(this.sections.length !== 0){  //不是admin，要做查询判断了
-			if(section === ''){
-				message.info('请选择标段信息');
-				return;
-			}
+		// if(this.sections.length !== 0){  //不是admin，要做查询判断了
+		// 	if(section === ''){
+		// 		message.info('请选择标段信息');
+		// 		return;
+		// 	}
+		// }
+		if(section === '' && sxm === ''){
+			message.info('请选择项目及标段信息或输入顺序码');
+			return;
 		}
     	const {actions: {getfactoryAnalyse},keycode = ''} = this.props;
     	let postdata = {
