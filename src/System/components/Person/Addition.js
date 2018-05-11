@@ -698,7 +698,7 @@ class Addition extends Component {
 				putUser, getSection, getTablePage, getIsBtn, postUploadFilesNum, getImgNumBtn, getSwitch, postUploadAutograph, putUserBlackList }, tags = {}
 		} = this.props;
 		const roles = addition.roles || [];
-		if (!addition.id_image) {
+		if (!addition.id_image||!addition.id_image.length) {
 			if (!this.props.postUploadFilesNums) {
 				message.warn('请上传身份证正面照片');
 				return
@@ -708,11 +708,19 @@ class Addition extends Component {
 				return
 			}
 		} else {
-			if (!this.props.postUploadFilesNums && !addition.id_image[0]) {
+			if (!this.props.postUploadFilesNums && !addition.id_image[0].filepath) {
 				message.warn('请上传身份证正面照片');
 				return
 			}
-			if (!this.props.postUploadNegatives && !addition.id_image[1]) {
+			if (this.state.btnf == false) {
+				message.warn('请上传身份证正面照片');
+				return
+			}
+			if (!this.props.postUploadNegatives && !addition.id_image[1].filepath) {
+				message.warn('请上传身份证反面照片');
+				return
+			}
+			if (this.state.btns == false) {
 				message.warn('请上传身份证反面照片');
 				return
 			}
@@ -996,7 +1004,9 @@ class Addition extends Component {
 		getSwitch()
 		this.setState({
 			newKey: Math.random(),
-			checkedBtn: null
+			checkedBtn: null,
+			btns:true,
+			btnf:true
 		})
 		clearAdditionField();
 	}
