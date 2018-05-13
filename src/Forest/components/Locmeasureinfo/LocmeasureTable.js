@@ -37,7 +37,8 @@ export default class LocmeasureTable extends Component {
     		role: 'inputer',
     		rolename: '',
 			percent:0,
-			totalNum:''
+			totalNum:'',
+			imgArr:[],
 		}
 		this.columns = [
 			{
@@ -264,8 +265,15 @@ export default class LocmeasureTable extends Component {
 					visible={this.state.imgvisible}
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
+					footer={null}
 				>
-					<img style={{width:"490px"}} src={this.state.src} alt="图片"/>
+					{
+						this.state.imgArr
+					}
+					{/* <img style={{width:"490px"}} src={this.state.src} alt="图片"/> */}
+					<Row style={{marginTop:10}}>
+						<Button  onClick={this.handleCancel.bind(this) } style={{float:'right'}}type="primary">关闭</Button>
+					</Row>
 				</Modal>
 			</div>
 		);
@@ -385,7 +393,7 @@ export default class LocmeasureTable extends Component {
 							<span >此次查询共有苗木：{this.state.totalNum}棵</span>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary' style={{display:'none'}} onClick={this.exportexcel.bind(this)}>
+							<Button type='primary'  onClick={this.exportexcel.bind(this)}>
 								导出
 							</Button>
 						</Col>
@@ -489,13 +497,41 @@ export default class LocmeasureTable extends Component {
         this.qury(pagination.current)
     }
 
-	onImgClick(src) {
-		src = src.replace(/\/\//g,'/')
-		src =  `${FOREST_API}/${src}`
-		this.setState({src},() => {
-			this.setState({imgvisible:true,})
+	onImgClick(data) {
+		// src = src.replace(/\/\//g,'/')
+		// src =  `${FOREST_API}/${src}`
+		// this.setState({src},() => {
+		// 	this.setState({imgvisible:true,})
+		// })
+
+		let srcs = [] 
+        try{
+
+			let arr = data.split(',')
+			console.log('arr',arr)
+			arr.map((rst)=>{
+				let src = rst.replace(/\/\//g,'/')
+				src =  `${FOREST_API}/${src}`
+				srcs.push(src)
+
+			})
+        }catch(e){
+            console.log('处理图片',e)
+		}
+
+
+		let imgArr = []
+		srcs.map((src)=>{
+			imgArr.push (<img style ={{width:'490px'}} src={src} alt="图片"/>)
+		})
+
+		this.setState({
+			imgvisible:true,
+			imgArr:imgArr
 		})
 	}
+
+	
 
 	handleCancel(){
     	this.setState({imgvisible:false})
@@ -861,11 +897,15 @@ export default class LocmeasureTable extends Component {
 			smallclass = '',
 			status = ''
 		} = this.state;
-		if(this.sections.length !== 0){  //不是admin，要做查询判断了
-			if( section === ''){
-				message.info('请选择标段信息');
-				return;
-			}
+		// if(this.sections.length !== 0){  //不是admin，要做查询判断了
+		// 	if( section === ''){
+		// 		message.info('请选择标段信息');
+		// 		return;
+		// 	}
+		// }
+		if(thinclass === '' && sxm === ''){
+			message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+			return;
 		}
     	const {actions: {getqueryTree,getexportTree},keycode = ''} = this.props;
     	let postdata = {

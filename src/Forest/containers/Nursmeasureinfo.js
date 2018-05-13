@@ -61,6 +61,9 @@ export default class Nursmeasureinfo extends Component {
         }
         const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
+       
+        
+        setkeycode('')
         if(!users){
             getForestUsers();
         }

@@ -61,7 +61,7 @@ export default class Locmeasureinfo extends Component {
                 this.biaoduan.push(item);
             })
         }
-        const { actions: { getTree, gettreetype, getTreeList, getForestUsers, getTreeNodeList,getLittleBanAll }, users, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
+        const { actions: { getTree, gettreetype, getTreeList, getForestUsers, getTreeNodeList,getLittleBanAll,setkeycode }, users, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
         // 避免反复获取森林用户数据，提高效率
         if (!users) {
             getForestUsers();
@@ -76,6 +76,8 @@ export default class Locmeasureinfo extends Component {
         if(!littleBanAll){
             getLittleBanAll()
         }
+
+        setkeycode('');
         //类型
         let typeoption = [
             <Option key={'-1'} value={''}>全部</Option>,

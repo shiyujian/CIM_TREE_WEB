@@ -52,13 +52,14 @@ export default class Contrastinfo extends Component {
         }
     }
     componentDidMount() {
-        const { actions: { getTree, getTreeList, getTreeNodeList,getLittleBanAll }, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
+        const { actions: { getTree, getTreeList, getTreeNodeList,getLittleBanAll,setkeycode }, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
         this.biaoduan = [];
         for(let i=0;i<PROJECT_UNITS.length;i++){
             PROJECT_UNITS[i].units.map(item => {
                 this.biaoduan.push(item);
             })
         }
+        setkeycode('')
         // 避免反复获取森林树种列表，提高效率
         if (!treetypes) {
             getTreeList().then(x => this.setTreeTypeOption(x));

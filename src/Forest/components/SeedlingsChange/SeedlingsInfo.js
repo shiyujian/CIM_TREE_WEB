@@ -30,7 +30,8 @@ export default class SeedlingsChange extends Component {
 			changeRecord:'',
 			remarkvisible:false,
 			remarkRecord:'',
-			remarkInfo:''
+			remarkInfo:'',
+			imgArr:[]
     	}
 	}
 	getBiao(code){
@@ -66,8 +67,15 @@ export default class SeedlingsChange extends Component {
 					visible={this.state.imgvisible}
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
+					footer={null}
 				>
-					<img style={{width:"490px"}} src={this.state.src} alt="图片"/>
+					{
+						this.state.imgArr
+					}
+					{/* <img style={{width:"490px"}} src={this.state.src} alt="图片"/> */}
+					<Row style={{marginTop:10}}>
+						<Button  onClick={this.handleCancel.bind(this) } style={{float:'right'}}type="primary">关闭</Button>
+					</Row>
 				</Modal>
 				<Modal
 					width={522}
@@ -347,11 +355,37 @@ export default class SeedlingsChange extends Component {
 		this.setState({remark:value.target.value})
 	}
 
-	onImgClick(src) {
-		src = src.replace(/\/\//g,'/')
-		src =  `${FOREST_API}/${src}`
-		this.setState({src},() => {
-			this.setState({imgvisible:true,})
+	onImgClick(data) {
+		// src = src.replace(/\/\//g,'/')
+		// src =  `${FOREST_API}/${src}`
+		// this.setState({src},() => {
+		// 	this.setState({imgvisible:true,})
+		// })
+
+		let srcs = [] 
+        try{
+
+			let arr = data.split(',')
+			console.log('arr',arr)
+			arr.map((rst)=>{
+				let src = rst.replace(/\/\//g,'/')
+				src =  `${FOREST_API}/${src}`
+				srcs.push(src)
+
+			})
+        }catch(e){
+            console.log('处理图片',e)
+		}
+
+
+		let imgArr = []
+		srcs.map((src)=>{
+			imgArr.push (<img style ={{width:'490px'}} src={src} alt="图片"/>)
+		})
+
+		this.setState({
+			imgvisible:true,
+			imgArr:imgArr
 		})
 	}
 

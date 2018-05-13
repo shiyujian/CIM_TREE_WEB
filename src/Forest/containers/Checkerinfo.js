@@ -36,13 +36,15 @@ export default class Checkerinfo extends Component {
         }
     }
     componentDidMount() {
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList,getLittleBanAll}, users,treetypes,littleBanAll,platform:{tree = {}}} = this.props; 
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList,getLittleBanAll,setkeycode}, users,treetypes,littleBanAll,platform:{tree = {}}} = this.props; 
         this.biaoduan = [];
         for(let i=0;i<PROJECT_UNITS.length;i++){
             PROJECT_UNITS[i].units.map(item => {
                 this.biaoduan.push(item);
             })
         }
+
+        setkeycode('')
         // 避免反复获取森林用户数据，提高效率
         if(!users){
             getForestUsers();

@@ -34,7 +34,8 @@ export default class CheckerTable extends Component {
     		role: 'checker',
     		rolename: '',
 			percent:0,    
-			totalNum:''    
+			totalNum:'',
+			imgArr:[]    
     	}
 	}
 	getBiao(code){
@@ -74,7 +75,13 @@ export default class CheckerTable extends Component {
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
 				>
-					<img style={{width:"490px"}} src={this.state.src} alt="图片"/>
+					{
+						this.state.imgArr
+					}
+					{/* <img style={{width:"490px"}} src={this.state.src} alt="图片"/> */}
+					<Row style={{marginTop:10}}>
+						<Button  onClick={this.handleCancel.bind(this) } style={{float:'right'}}type="primary">关闭</Button>
+					</Row>
 				</Modal>
 			</div>
 		);
@@ -340,11 +347,37 @@ export default class CheckerTable extends Component {
         this.qury(pagination.current)
     }
 
-	onImgClick(src) {
-		src = src.replaceAll('//','/')
-		src =  `${FOREST_API}/${src}`
-		this.setState({src},() => {
-			this.setState({imgvisible:true,})
+	onImgClick(data) {
+		// src = src.replace(/\/\//g,'/')
+		// src =  `${FOREST_API}/${src}`
+		// this.setState({src},() => {
+		// 	this.setState({imgvisible:true,})
+		// })
+
+		let srcs = [] 
+        try{
+
+			let arr = data.split(',')
+			console.log('arr',arr)
+			arr.map((rst)=>{
+				let src = rst.replace(/\/\//g,'/')
+				src =  `${FOREST_API}/${src}`
+				srcs.push(src)
+
+			})
+        }catch(e){
+            console.log('处理图片',e)
+		}
+
+
+		let imgArr = []
+		srcs.map((src)=>{
+			imgArr.push (<img style ={{width:'490px'}} src={src} alt="图片"/>)
+		})
+
+		this.setState({
+			imgvisible:true,
+			imgArr:imgArr
 		})
 	}
 	getThinClassName(no,section){

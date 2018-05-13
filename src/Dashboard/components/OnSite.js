@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-05-10 09:29:46
+ * @Last Modified time: 2018-05-13 10:26:13
  */
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -263,6 +263,8 @@ class Lmap extends Component {
         let uniqueSmallClass = [];
         //进行数组去重的数组
         let array = [];
+
+        let test = []
         let smallClassSelect = ''
         smallClassList.map((list)=>{
             if(list.SmallClass && array.indexOf(list.SmallClass) === -1){
@@ -274,8 +276,12 @@ class Lmap extends Component {
                 });
                 array.push(list.SmallClass)
             }
+            else{
+                test.push(list)
+            }
         })
         
+        console.log('testtesttesttesttesttest',test)
         console.log('uniqueSmallClass',uniqueSmallClass)
         return uniqueSmallClass
     }

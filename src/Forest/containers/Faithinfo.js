@@ -38,13 +38,15 @@ export default class Faithinfo extends Component {
 		console.log('oh why you got destroy11111')
 	}
     componentDidMount() {
-        const {actions: {getTree,getTreeList,getTreeNodeList}, treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTree,getTreeList,getTreeNodeList,setkeycode}, treetypes,platform:{tree = {}}} = this.props; 
         this.biaoduan = [];
         for(let i=0;i<PROJECT_UNITS.length;i++){
             PROJECT_UNITS[i].units.map(item => {
                 this.biaoduan.push(item);
             })
         }
+
+        setkeycode('')
         // 避免反复获取森林树种列表，提高效率
         if(!treetypes){
             getTreeList().then(x => this.setTreeTypeOption(x));

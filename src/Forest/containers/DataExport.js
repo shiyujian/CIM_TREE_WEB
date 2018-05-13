@@ -62,7 +62,9 @@ export default class DataExport extends Component {
                 this.biaoduan.push(item);
             })
         }
-        const { actions: { getTree, gettreetype, getTreeList, getForestUsers, getTreeNodeList,getLittleBanAll }, users, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
+        const { actions: { getTree, gettreetype, getTreeList, getForestUsers, getTreeNodeList,getLittleBanAll,setkeycode }, users, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
+       
+        setkeycode('')
         // 避免反复获取森林用户数据，提高效率
         if (!users) {
             getForestUsers();
