@@ -118,6 +118,9 @@ export default class SeedlingsChange extends Component {
 				title:"顺序码",
 				dataIndex: 'ZZBM',
 			},{
+				title:"项目",
+				dataIndex: 'Project',
+			},{
 				title:"标段",
 				dataIndex: 'Section',
 				render:(text,record) => {
@@ -477,6 +480,7 @@ export default class SeedlingsChange extends Component {
 					tblData[i].createtime2 = createtime2;
 					tblData[i].createtime3 = createtime3;
 					tblData[i].createtime4 = createtime4;
+					tblData[i].Project = this.getProject(tblData[i].Section)
 				})
 				
 		    	const pagination = { ...this.state.pagination };
@@ -485,5 +489,16 @@ export default class SeedlingsChange extends Component {
 				this.setState({ tblData,pagination:pagination });	
 	    	}
     	})
-    }
+	}
+	
+	getProject(section){
+		let projectName = ''
+		//获取当前标段所在的项目
+		PROJECT_UNITS.map((item)=>{
+			if(section.indexOf(item.code) != -1){
+				projectName = item.value
+			}
+		})
+		return projectName
+	}
 }

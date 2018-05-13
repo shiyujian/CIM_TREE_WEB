@@ -47,6 +47,9 @@ export default class LocmeasureTable extends Component {
 				title:"顺序码",
 				dataIndex: 'ZZBM',
 			},{
+				title:"项目",
+				dataIndex: 'Project',
+			},{
 				title:"标段",
 				dataIndex: 'Section',
 				render:(text,record) => {
@@ -242,10 +245,10 @@ export default class LocmeasureTable extends Component {
     }
     componentWillReceiveProps(nextProps){
     	if(nextProps.leftkeycode != this.state.leftkeycode) {
+			console.log('nextProps.leftkeycode',nextProps.leftkeycode)
+			console.log('this.state.leftkeycode',this.state.leftkeycode)
 			this.setState({
 				leftkeycode: nextProps.leftkeycode,
-    		},()=> {
-    			this.qury(1);
     		})
     	} 
     }
@@ -607,6 +610,7 @@ export default class LocmeasureTable extends Component {
 					tblData[i].createtime2 = createtime2;
 					tblData[i].createtime3 = createtime3;
 					tblData[i].createtime4 = createtime4;
+					tblData[i].Project = this.getProject(tblData[i].Section)
 				})
 				let totalNum = rst.total
 		    	const pagination = { ...this.state.pagination };
@@ -621,6 +625,9 @@ export default class LocmeasureTable extends Component {
 						},{
 							title:"顺序码",
 							dataIndex: 'ZZBM',
+						},{
+							title:"项目",
+							dataIndex: 'Project',
 						},{
 							title:"标段",
 							dataIndex: 'Section',
@@ -689,6 +696,9 @@ export default class LocmeasureTable extends Component {
 						},{
 							title:"顺序码",
 							dataIndex: 'ZZBM',
+						},{
+							title:"项目",
+							dataIndex: 'Project',
 						},{
 							title:"标段",
 							dataIndex: 'Section',
@@ -820,7 +830,18 @@ export default class LocmeasureTable extends Component {
 				this.setState({ tblData,pagination:pagination,totalNum:totalNum });	
 	    	}
     	})
-    }
+	}
+	
+	getProject(section){
+		let projectName = ''
+		//获取当前标段所在的项目
+		PROJECT_UNITS.map((item)=>{
+			if(section.indexOf(item.code) != -1){
+				projectName = item.value
+			}
+		})
+		return projectName
+	}
 
 	exportexcel() {
 		const {

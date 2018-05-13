@@ -116,6 +116,9 @@ export default class NursmeasureTable extends Component {
 			title:"顺序码",
 			dataIndex: 'ZZBM',
 		},{
+			title:"项目",
+			dataIndex: 'Project',
+		},{
 			title:"标段",
 			dataIndex: 'BD',
 			render:(text,record) => {
@@ -522,6 +525,7 @@ export default class NursmeasureTable extends Component {
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			tblData[i].liftertime1 = !!plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
 					tblData[i].liftertime2 = !!plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
+					tblData[i].Project = this.getProject(tblData[i].BD)
 	    		})
 		    	const pagination = { ...this.state.pagination };
 				pagination.total = rst.pageinfo.total;
@@ -529,7 +533,18 @@ export default class NursmeasureTable extends Component {
 				this.setState({ tblData,pagination });	
 	    	}
     	})
-    }
+	}
+	
+	getProject(section){
+		let projectName = ''
+		//获取当前标段所在的项目
+		PROJECT_UNITS.map((item)=>{
+			if(section.indexOf(item.code) != -1){
+				projectName = item.value
+			}
+		})
+		return projectName
+	}
 
 	exportexcel() {
 		const {

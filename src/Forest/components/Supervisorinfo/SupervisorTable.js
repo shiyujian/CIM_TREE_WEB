@@ -110,6 +110,9 @@ export default class SupervisorTable extends Component {
 				title:"顺序码",
 				dataIndex: 'ZZBM',
 			},{
+				title:"项目",
+				dataIndex: 'Project',
+			},{
 				title:"标段",
 				dataIndex: 'Section',
 				render:(text,record) => {
@@ -444,6 +447,7 @@ export default class SupervisorTable extends Component {
 					let yssj2 = !!plan.YSSJ ? moment(plan.YSSJ).format('HH:mm:ss') : '/';
 					tblData[i].yssj1 = yssj1;
 					tblData[i].yssj2 = yssj2;
+					tblData[i].Project = this.getProject(tblData[i].Section)
 				})
 				let totalNum = rst.total
 		    	const pagination = { ...this.state.pagination };
@@ -452,7 +456,18 @@ export default class SupervisorTable extends Component {
 				this.setState({ tblData,pagination:pagination,totalNum:totalNum });	
 	    	}
     	})
-    }
+	}
+	
+	getProject(section){
+		let projectName = ''
+		//获取当前标段所在的项目
+		PROJECT_UNITS.map((item)=>{
+			if(section.indexOf(item.code) != -1){
+				projectName = item.value
+			}
+		})
+		return projectName
+	}
 
 	exportexcel() {
 		const {

@@ -77,6 +77,7 @@ export default class CarPackageTable extends Component {
 					visible={this.state.imgvisible}
 					onOk={this.handleCancel.bind(this)}
 					onCancel={this.handleCancel.bind(this)}
+					footer={null}
 				>
 					<div>{this.treeTable1(tblData1)}</div>
 				</Modal>
@@ -87,7 +88,8 @@ export default class CarPackageTable extends Component {
 		const {
 			users
 		} = this.props;
-		let columns = [{
+		let columns = [
+			{
 				title:"序号",
 				dataIndex: 'order',
 			},{
@@ -183,7 +185,8 @@ export default class CarPackageTable extends Component {
 						return <span>/</span>
 					}
 				}
-		}];
+			}
+		];
 		return <div>
 			<Table bordered
 				className='foresttable'
@@ -195,6 +198,9 @@ export default class CarPackageTable extends Component {
 				onChange={this.handleTableChange1.bind(this)}
 				pagination={this.state.pagination1}
 			/>
+			<Row style={{marginTop:10}}>
+				<Button  onClick={this.handleCancel.bind(this) } style={{float:'right'}}type="primary">关闭</Button>
+			</Row>
 		</div>
 
 	}
@@ -224,84 +230,89 @@ export default class CarPackageTable extends Component {
 		const suffix1 = sxm ? <Icon type="close-circle" onClick={this.emitEmpty1} /> : null;
 		let columns = [];
 		let header = '';
-		columns = [{
-			title:"序号",
-			dataIndex: 'order',
-		},{
-			title:"车牌号",
-			dataIndex: 'LicensePlate',
-		},{
-			title:"标段",
-			dataIndex: 'Section',
-			render:(text,record) => {
-				return <p>{this.getBiao(text)}</p>
-			}
-		},{
-			title:"苗木类型",
-            dataIndex: 'IsShrub',
-            render:(text,record) => {
-                if(text === 0){
-                    return <p>乔灌</p>
-                }else{
-                    return <p>地被</p>
-                }
-            }
-		},{
-			title:"苗木规格",
-			dataIndex: 'Standard',
-			render:(text) => {
-				if(text === ''){
-					return <p> / </p>
-				}else{
-					return <p>{text}</p>
+		columns = [
+			{
+				title:"序号",
+				dataIndex: 'order',
+			},{
+				title:"车牌号",
+				dataIndex: 'LicensePlate',
+			},{
+				title:"项目",
+				dataIndex: 'Project',
+			},{
+				title:"标段",
+				dataIndex: 'Section',
+				render:(text,record) => {
+					return <p>{this.getBiao(text)}</p>
+				}
+			},{
+				title:"苗木类型",
+				dataIndex: 'IsShrub',
+				render:(text,record) => {
+					if(text === 0){
+						return <p>乔灌</p>
+					}else{
+						return <p>地被</p>
+					}
+				}
+			},{
+				title:"苗木规格",
+				dataIndex: 'Standard',
+				render:(text) => {
+					if(text === ''){
+						return <p> / </p>
+					}else{
+						return <p>{text}</p>
+					}
+				}
+			},{
+				title:"创建时间",
+				render: (text,record) => {
+					const {liftertime1 = '',liftertime2 = '' } = record;
+					return <div><div>{liftertime1}</div><div>{liftertime2}</div></div>
+				}
+			},{
+				title:"总数",
+				dataIndex: 'NurseryNum',
+			},{
+				title:"进场抽检退苗量",
+				dataIndex: 'UnQualifiedNum',
+			},{
+				title:"状态",
+				dataIndex: 'Status',
+				render:(text,record) => {
+					if(text === -1){
+						return <p>打包</p>
+					}else if(text === 0){
+						return <p>施工提交</p>
+					}else if(text === 1){
+						return <p>监理合格</p>
+					}else if(text === 2){
+						return <p>监理退苗</p>
+					}else if(text === 3){
+						return <p>监理合格施工同意</p>
+					}else if(text === 4){
+						return <p>监理合格施工不同意</p>
+					}else if(text === 5){
+						return <p>监理退苗施工同意</p>
+					}else if(text === 6){
+						return <p>监理退苗施工不同意</p>
+					}else if(text === 7){
+						return <p>业主合格</p>
+					}else if(text === 8){
+						return <p>业主退苗</p>
+					}else {
+						return <p> / </p>
+					}
+				}
+			},{
+				title:'操作',
+				render: (text,record) => {
+					return <a href='javascript:;' onClick={this.onViewClick.bind(this,record)}>详情</a>
 				}
 			}
-		},{
-			title:"创建时间",
-			render: (text,record) => {
-				const {liftertime1 = '',liftertime2 = '' } = record;
-				return <div><div>{liftertime1}</div><div>{liftertime2}</div></div>
-			}
-		},{
-			title:"总数",
-			dataIndex: 'NurseryNum',
-		},{
-			title:"进场抽检退苗量",
-			dataIndex: 'UnQualifiedNum',
-		},{
-			title:"状态",
-            dataIndex: 'Status',
-            render:(text,record) => {
-                if(text === -1){
-                    return <p>打包</p>
-                }else if(text === 0){
-                    return <p>施工提交</p>
-                }else if(text === 1){
-                    return <p>监理合格</p>
-                }else if(text === 2){
-                    return <p>监理退苗</p>
-                }else if(text === 3){
-                    return <p>监理合格施工同意</p>
-                }else if(text === 4){
-                    return <p>监理合格施工不同意</p>
-                }else if(text === 5){
-                    return <p>监理退苗施工同意</p>
-                }else if(text === 6){
-                    return <p>监理退苗施工不同意</p>
-                }else if(text === 7){
-                    return <p>业主合格</p>
-                }else if(text === 8){
-                    return <p>业主退苗</p>
-                }else {
-                    return <p> / </p>
-                }
-            }
-		},{
-			title:'操作',
-			render: (text,record) => {
-				return <a href='javascript:;' onClick={this.onViewClick.bind(this,record)}>详情</a>
-			}
-		}];
+		];
 		header = <div >
 					<Row >
 						<Col xl={3} lg={4} md={5} className='mrg10'>
@@ -357,7 +368,7 @@ export default class CarPackageTable extends Component {
 							<Button type='primary' onClick={this.exportexcel.bind(this)}>
 								导出
 							</Button>
-	</Col>*/}
+						</Col>*/}
 					</Row>
 				</div> 
 		return <div>
@@ -379,10 +390,15 @@ export default class CarPackageTable extends Component {
 					
 				</div>
     }
-    onViewClick = (record) => {
+    onViewClick =async  (record) => {
+		const{
+			pagination1
+		}=this.state
 		this.currentCarID = record.ID;
-		this.query(1)
-        this.setState({imgvisible:true})
+		await this.query(1)
+		
+		pagination1.current = 1
+        this.setState({imgvisible:true,pagination1:pagination1})
 	}
 
 	query(page){
@@ -512,6 +528,7 @@ export default class CarPackageTable extends Component {
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
 	    			tblData[i].liftertime1 = !!plan.CreateTime ? moment(plan.CreateTime).format('YYYY-MM-DD') : '/';
 					tblData[i].liftertime2 = !!plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
+					tblData[i].Project = this.getProject(tblData[i].Section)
 	    		})
 		    	const pagination = { ...this.state.pagination };
 				pagination.total = rst.pageinfo.total;
@@ -519,7 +536,18 @@ export default class CarPackageTable extends Component {
 				this.setState({ tblData,pagination });	
 	    	}
     	})
-    }
+	}
+	
+	getProject(section){
+		let projectName = ''
+		//获取当前标段所在的项目
+		PROJECT_UNITS.map((item)=>{
+			if(section.indexOf(item.code) != -1){
+				projectName = item.value
+			}
+		})
+		return projectName
+	}
 
 	exportexcel() {
 		const {

@@ -60,9 +60,11 @@ export default class LocmeasureTable extends Component {
     	if(nextProps.leftkeycode != this.state.leftkeycode) {
 			this.setState({
 				leftkeycode: nextProps.leftkeycode,
-    		},()=> {
-    			this.qury(1);
-    		})
+			}
+			// ,()=> {
+    		// 	this.qury(1);
+			// }
+			)
     	} 
     }
 	render() {
@@ -118,6 +120,9 @@ export default class LocmeasureTable extends Component {
 			},{
 				title:"顺序码",
 				dataIndex: 'SXM',
+			},{
+				title:"项目",
+				dataIndex: 'Project',
 			},{
 				title:"标段",
 				dataIndex: 'Section',
@@ -205,17 +210,17 @@ export default class LocmeasureTable extends Component {
 					</Row>
 					<Row >
 						<Col span={2} className='mrg10'>
-							<Button type='primary' onClick={this.resetinput.bind(this)}>
-								重置
-							</Button>
-						</Col>
-						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.handleTableChange.bind(this,{current:1})}>
 								查询
 							</Button>
 						</Col>
 						<Col span={18} className='quryrstcnt mrg10'>
 							<span >此次查询共有苗木：{this.state.pagination.total}棵</span>
+						</Col>
+						<Col span={2} className='mrg10'>
+							<Button type='primary' onClick={this.resetinput.bind(this)}>
+								重置
+							</Button>
 						</Col>
 						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.exportexcel.bind(this)}>
@@ -387,10 +392,14 @@ export default class LocmeasureTable extends Component {
 			smallclass = '',
 			positiontype
 		} = this.state;
+		const{
+			keycode
+		}=this.props
 		if(thinclass === '' && sxm === ''){
 			message.info('请选择项目，标段，小班及细班信息或输入顺序码');
 			return;
 		}
+		console.log('keycode',keycode)
 		const {actions: {getTreeLocations}} = this.props;
     	let postdata = {
 			sxm,
@@ -445,6 +454,7 @@ export default class LocmeasureTable extends Component {
 					let createtime2 = plan.CreateTime ? moment(plan.CreateTime).format('HH:mm:ss') : '/';
 					tblData[i].createtime1 = createtime1;
 					tblData[i].createtime2 = createtime2;
+					tblData[i].Project = this.getProject(tblData[i].Section)
 	    		})
 		    	const pagination = { ...this.state.pagination };
 				pagination.total = rst.pageinfo.total;
@@ -452,7 +462,18 @@ export default class LocmeasureTable extends Component {
 				this.setState({ tblData,pagination:pagination });	
 	    	}
     	})
-    }
+	}
+	
+	getProject(section){
+		let projectName = ''
+		//获取当前标段所在的项目
+		PROJECT_UNITS.map((item)=>{
+			if(section.indexOf(item.code) != -1){
+				projectName = item.value
+			}
+		})
+		return projectName
+	}
 
 	exportexcel() {
 		const {

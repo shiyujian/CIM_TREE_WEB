@@ -222,6 +222,7 @@ export default class NursOverallTable extends Component {
 				</Row>
 				<Card title='苗圃测量信息' style={{marginTop:10}}>
 					<Table bordered
+						className='foresttable'
 						columns={this.seedlingColumns}  
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 						locale={{emptyText:'暂无信息'}}
@@ -231,6 +232,7 @@ export default class NursOverallTable extends Component {
 				</Card>
 				<Card title='现场测量信息' style={{marginTop:10}}>
 					<Table bordered
+						className='foresttable'
 						columns={this.treeColumns}  
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 						locale={{emptyText:'暂无信息'}}
@@ -240,6 +242,7 @@ export default class NursOverallTable extends Component {
 				</Card>
 				<Card title='流程信息' style={{marginTop:10}}>
 					<Table bordered
+						className='foresttable'
 						columns={this.flowColumns} 
 						loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading}}
 						locale={{emptyText:'暂无信息'}}
