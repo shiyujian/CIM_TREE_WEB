@@ -20,8 +20,8 @@ export default class SupervisorTable extends Component {
 			exportsize:100,
 			treetypename: '',
         	leftkeycode: '',
-        	stime: moment().format('YYYY-MM-DD 00:00:00'),
-			etime: moment().format('YYYY-MM-DD 23:59:59'),
+        	sstime: moment().format('YYYY-MM-DD 00:00:00'),
+			setime: moment().format('YYYY-MM-DD 23:59:59'),
 			sxm: '',
     		section: '',
     		smallclass: '',
@@ -154,7 +154,7 @@ export default class SupervisorTable extends Component {
 			// 	dataIndex: 'SupervisorInfo',
 			// },
 			{
-				title:"验收时间",
+				title:"抽查时间",
 				render: (text,record) => {
 					const {yssj1 = '',yssj2 = '' } = record;
 					return <div><div>{yssj1}</div><div>{yssj2}</div></div>
@@ -207,10 +207,10 @@ export default class SupervisorTable extends Component {
 							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw100' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
 						<Col xl={10} lg={12} md={14} className='mrg10'>
-							<span>验收时间：</span>
+							<span>抽查时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
-							 defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]} 
+							 defaultValue={[moment(this.state.sstime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.setime, 'YYYY-MM-DD HH:mm:ss')]} 
 							 showTime={{ format: 'HH:mm:ss' }}
 							 format={'YYYY/MM/DD HH:mm:ss'}
 							 onChange={this.datepick.bind(this)}
@@ -345,8 +345,8 @@ export default class SupervisorTable extends Component {
 	}
 
 	datepick(value){
-		this.setState({stime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
-		this.setState({etime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
+		this.setState({sstime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
+		this.setState({setime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
     }
 
 	handleTableChange(pagination){
@@ -410,8 +410,8 @@ export default class SupervisorTable extends Component {
     		thinclass = '',
     		role = '',
     		rolename = '',
-    		stime = '',
-    		etime = '',
+    		sstime = '',
+    		setime = '',
     		status = '',
 			size,
 			bigType = '',
@@ -436,8 +436,8 @@ export default class SupervisorTable extends Component {
     		thinclass,
     		status,
     		SupervisorCheck,
-    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+    		sstime:sstime&&moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
+    		setime:setime&&moment(setime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
 			size,
 			bigType,
@@ -477,8 +477,8 @@ export default class SupervisorTable extends Component {
 					tblData[i].statusname = statusname;
 					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
-					let yssj1 = !!plan.YSSJ ? moment(plan.YSSJ).format('YYYY-MM-DD') : '/';
-					let yssj2 = !!plan.YSSJ ? moment(plan.YSSJ).format('HH:mm:ss') : '/';
+					let yssj1 = !!plan.SupervisorTime ? moment(plan.SupervisorTime).format('YYYY-MM-DD') : '/';
+					let yssj2 = !!plan.SupervisorTime ? moment(plan.SupervisorTime).format('HH:mm:ss') : '/';
 					tblData[i].yssj1 = yssj1;
 					tblData[i].yssj2 = yssj2;
 					tblData[i].Project = this.getProject(tblData[i].Section)
@@ -510,8 +510,8 @@ export default class SupervisorTable extends Component {
     		// SupervisorCheck = '',
     		role = '',
     		rolename = '',
-    		stime = '',
-    		etime = '',
+    		sstime = '',
+    		setime = '',
 			exportsize,
 			bigType = '',
     		treetype = '',
@@ -528,8 +528,8 @@ export default class SupervisorTable extends Component {
     		sxm,
     		section,
     		// SupervisorCheck,
-    		stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-    		etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+    		sstime:sstime&&moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
+    		setime:setime&&moment(setime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
 			size:exportsize,
 			bigType,

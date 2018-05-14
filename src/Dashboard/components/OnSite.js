@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-05-13 10:26:13
+ * @Last Modified time: 2018-05-14 15:25:57
  */
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -267,17 +267,21 @@ class Lmap extends Component {
         let test = []
         let smallClassSelect = ''
         smallClassList.map((list)=>{
-            if(list.SmallClass && array.indexOf(list.SmallClass) === -1){
+            let codeName = list.SmallClass + '#' + list.SmallClassName
+            if(list.SmallClass && array.indexOf(codeName) === -1){
                 let noArr = list.No.split('-')
                 let No = noArr[0] + '-' + noArr[1] +'-' + noArr[2]
                 uniqueSmallClass.push({
                     Name:list.SmallClassName?list.SmallClassName+'小班':list.SmallClass+'小班',
-                    No:No,
+                    No:codeName,
                 });
-                array.push(list.SmallClass)
+                array.push(codeName)
             }
             else{
-                test.push(list)
+                test.push({
+                    SmallClassName:list.SmallClassName,
+                    SmallClass:list.SmallClass
+                })
             }
         })
         
@@ -288,7 +292,8 @@ class Lmap extends Component {
 
     getThinClass(smallClass,list){
         let thinClassList = []
-        let array = [];
+        let codeArray = [];
+        let nameArray = [];
         list.map((rst)=>{
             // if(rst.ThinClass && rst.No.indexOf(smallClass.No) != -1 &&  array.indexOf(rst.ThinClass) === -1){
             //     let noArr = rst.No.split('-')
@@ -300,16 +305,27 @@ class Lmap extends Component {
             //     array.push(list.ThinClass)
             // }
 
+            let codeName = smallClass.No.split('#')
+            let code = codeName[0]
+            let name = codeName[1]
+            // console.log('code',code)
+            // console.log('name',name)
+            if(name == 'null'){
+                name = null
+            }
+            // console.log('boolean',rst.ThinClass && rst.SmallClass == code  && rst.SmallClassName == name)
             //暂时去掉重复的节点
-            if(rst.ThinClass && rst.No.indexOf(smallClass.No) != -1){
+            // debugger
+            if(rst.ThinClass && rst.SmallClass == code  && rst.SmallClassName == name){
                 let noArr = rst.No.split('-')
                 let No = noArr[0] + '-' + noArr[1] +'-' + noArr[2] + '-' + noArr[3]
-                if(array.indexOf(No) === -1){
+                if(codeArray.indexOf(No) === -1){
                     thinClassList.push({
                         Name:rst.ThinClassName?rst.ThinClassName+'细班':rst.ThinClass+'细班',
                         No:No,
                     })
-                    array.push(No)
+                    codeArray.push(No)
+                    nameArray.push(rst.ThinClassName)
                 }
                 
             }

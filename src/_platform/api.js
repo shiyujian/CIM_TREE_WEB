@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-04-19 11:07:13
+ * @Last Modified time: 2018-05-14 16:40:32
  */
 /**
 *
@@ -240,7 +240,7 @@ export const PROJECT_UNITS = [
 		]
 	},{
 		code:'P010',
-		value:'十万亩苗景兼用林',
+		value:'苗景兼用林',
 		units:[
 			{
 				code:'P010-01-01',
