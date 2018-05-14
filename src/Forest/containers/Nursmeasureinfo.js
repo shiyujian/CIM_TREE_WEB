@@ -59,7 +59,7 @@ export default class Nursmeasureinfo extends Component {
                 this.biaoduan.push(item);
             })
         }
-        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList}, users, treetypes,platform:{tree = {}}} = this.props; 
+        const {actions: {getTree,gettreetype,getTreeList,getForestUsers,getTreeNodeList,setkeycode}, users, treetypes,platform:{tree = {}}} = this.props; 
         // 避免反复获取森林用户数据，提高效率
        
         
@@ -74,6 +74,7 @@ export default class Nursmeasureinfo extends Component {
         if(!tree.bigTreeList){
             getTreeNodeList()
         }
+        debugger
         //类型
         let typeoption = [
             <Option key={'-1'} value={''}>全部</Option>,
