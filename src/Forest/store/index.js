@@ -1,6 +1,6 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import createFetchAction from './fetchAction';
-import {createFetchActionWithHeaders} from './fetchAction'
+import {createFetchActionWithHeaders as myFetch} from './fetchAction'
 // 
 import faithInfoReducer, {actions as faithActions} from './faithInfo';
 import { FOREST_API, FOREST_SYSTEM } from '_platform/api';
@@ -67,7 +67,7 @@ export const getNurserysByPack = createFetchAction(`${FOREST_API}/tree/nurserysb
 export const getTreeLocations = createFetchAction(`${FOREST_API}/tree/treelocations`, []);  //获取同步后的苗木定位列表
 export const getExportTreeLocations = createFetchAction(`${FOREST_API}/tree/exporttreelocations`,[])  //导出同步后的苗木定位列表
 
-export const getSeedlingInfo = createFetchAction(`${FOREST_API}/tree/remarktree?remark={{remark}}&sxm={{sxm}}`,[])  //修改备注信息
+export const getSeedlingInfo = createFetchAction(`${FOREST_API}/tree/remarktree?remark={{remark}}&pics={{pics}}&sxm={{sxm}}`,[])  //修改备注信息
 
 //获取种植流程
 export const getTreeflows = createFetchAction(`${FOREST_API}/tree/treeflows`, []);
@@ -75,6 +75,8 @@ export const getTreeflows = createFetchAction(`${FOREST_API}/tree/treeflows`, []
 export const getCarpackbysxm = createFetchAction(`${FOREST_API}/tree/carpackbysxm/{{sxm}}`, []);
 //获取树木现场种植的信息
 export const getTreeMess = createFetchAction(`${FOREST_API}/tree/tree/{{sxm}}`, []);
+
+export const postForsetPic =  myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=leader`, [],'POST');
 
 
 export const actions = {
@@ -131,7 +133,8 @@ export const actions = {
 	getSeedlingInfo,
 	getTreeflows,
 	getCarpackbysxm,
-	getTreeMess
+	getTreeMess,
+	postForsetPic
 	// getTreeNodeList
 };
 export default handleActions({

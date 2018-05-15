@@ -138,6 +138,34 @@ export default class CheckerTable extends Component {
 		},{
 			title:"状态",
 			dataIndex: 'statusname',
+			render:(text,record) =>{
+				let superName = ''
+				let ownerName = ''
+				if(record.SupervisorCheck == -1 && record.CheckStatus == -1){
+					return <span>未抽查</span>
+				}else {
+					if(record.SupervisorCheck == 0) 
+						superName = "监理抽查退回"
+					else if(record.SupervisorCheck === 1){
+						superName = "监理抽查通过"
+					}
+
+					if(record.CheckStatus == 0) 
+						ownerName = "业主抽查退回"
+					else if(record.CheckStatus == 1){
+						ownerName = "业主抽查通过"
+					}else if(record.CheckStatus == 2){
+						ownerName = "业主抽查退回后修改"
+					}
+					if(superName && ownerName){
+						return <div><div>{superName}</div><div>{ownerName}</div></div>
+					}else if(superName){
+						return <span>{superName}</span>
+					}else{
+						return <span>{ownerName}</span>
+					}
+				}
+			}
 		},{
 			title:"抽查人",
 			dataIndex: 'Checker',
@@ -459,19 +487,29 @@ export default class CheckerTable extends Component {
 	    		tblData.forEach((plan, i) => {
 	    			// const {attrs = {}} = plan;
 	    			tblData[i].order = ((page - 1) * size) + i + 1;
-	    			let place = this.getThinClassName(plan.No,plan.Section);
+	    			let place = ''
+					if(plan.Section.indexOf('P010') !== -1){
+						place = this.getThinClassName(plan.No,plan.Section);
+					}else{
+						place = `${plan.SmallClass}号小班${plan.ThinClass}号细班`
+					}
 	    			tblData[i].place = place;
 					let statusname = '';
-					if(plan.SupervisorCheck == -1 && plan.CheckStatus == -1){
-						statusname = "未抽查"
-					}else if(plan.CheckStatus == 0) 
-						statusname = "业主抽查退回"
-					else if(plan.CheckStatus == 1){
-						statusname = "业主抽查通过"
-					}else if(plan.CheckStatus == 2){
-						statusname = "业主抽查退回后修改"
-					}
+					// if(plan.SupervisorCheck == -1 && plan.CheckStatus == -1){
+					// 	statusname = "未抽查"
+					// }else if(plan.CheckStatus == 0) 
+					// 	statusname = "业主抽查退回"
+					// else if(plan.CheckStatus == 1){
+					// 	statusname = "业主抽查通过"
+					// }else if(plan.CheckStatus == 2){
+					// 	statusname = "业主抽查退回后修改"
+					// }
+					// tblData[i].statusname = statusname;
+
+					tblData[i].SupervisorCheck = plan.SupervisorCheck;
+					tblData[i].CheckStatus = plan.CheckStatus;
 					tblData[i].statusname = statusname;
+
 					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
 					//改为验收时间

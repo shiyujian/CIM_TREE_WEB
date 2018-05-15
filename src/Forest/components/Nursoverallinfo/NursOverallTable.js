@@ -643,7 +643,8 @@ export default class NursOverallTable extends Component {
 				getTreeMess,
 				getTreeflows,
 				getnurserys,
-				getCarpackbysxm
+				getCarpackbysxm,
+				getLittleBan
 			}
 		} = this.props;
 		let me = this
@@ -660,6 +661,27 @@ export default class NursOverallTable extends Component {
 		let treeflowDatas = await getTreeflows({},postdata)
 		let nurserysDatas = await getnurserys({},postdata)
 		let carData = await getCarpackbysxm(postdata)
+
+
+		let SmallClassName=queryTreeData.SmallClass?queryTreeData.SmallClass+'号小班':''
+		let ThinClassName=queryTreeData.ThinClass?queryTreeData.ThinClass + '号细班':''
+		if(queryTreeData && queryTreeData.Section && queryTreeData.SmallClass && queryTreeData.ThinClass){
+			let data = {
+				no:queryTreeData.Section
+			}
+			let noList = await  getLittleBan(data)
+			let sections = queryTreeData.Section.split('-')
+			let No = sections[0] + '-' + sections[1] + '-' + queryTreeData.SmallClass + '-' + queryTreeData.ThinClass + '-' + sections[2]
+			console.log('No',No)
+			noList.map((rst)=>{
+				if(rst.No.indexOf(No) != -1){
+					SmallClassName = rst.SmallClassName?rst.SmallClassName+'号小班':SmallClassName
+					ThinClassName = rst.ThinClassName?rst.ThinClassName+'号小班':ThinClassName
+				}
+			})
+		}
+		
+
 
 		// let queryTreeData = {}
 		let treeflowData = {}
@@ -732,10 +754,10 @@ export default class NursOverallTable extends Component {
 			sxm:queryTreeData.ZZBM?queryTreeData.ZZBM:'',
 			landName:landName,
 			sectionName:sectionName,
-			SmallClass:queryTreeData.SmallClass?queryTreeData.SmallClass+'号小班':'',
-			ThinClass:queryTreeData.ThinClass?queryTreeData.ThinClass + '号细班':'',
+			SmallClass:SmallClassName,
+			ThinClass:ThinClassName,
 			TreeTypeName:nurserysData.TreeTypeObj?nurserysData.TreeTypeObj.TreeTypeName:'',
-			Location:queryTreeData.LocationTime ? '已定位' : '未定位',
+			Location:queryTreeData.LocationTime ? queryTreeData.LocationTime : '',
 			LocationX:queryTreeData.Location ? queryTreeData.Location.X : '',
 			LocationY:queryTreeData.Location ? queryTreeData.Location.Y : '',
 			DJ:queryTreeData.DJ?queryTreeData.DJ:'',

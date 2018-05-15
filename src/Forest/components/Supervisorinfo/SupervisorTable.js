@@ -135,6 +135,34 @@ export default class SupervisorTable extends Component {
 			},{
 				title:"状态",
 				dataIndex: 'statusname',
+				render:(text,record) =>{
+					let superName = ''
+					let ownerName = ''
+					if(record.SupervisorCheck == -1 && record.CheckStatus == -1){
+						return <span>未抽查</span>
+					}else {
+						if(record.SupervisorCheck == 0) 
+							superName = "监理抽查退回"
+						else if(record.SupervisorCheck === 1){
+							superName = "监理抽查通过"
+						}
+
+						if(record.CheckStatus == 0) 
+							ownerName = "业主抽查退回"
+						else if(record.CheckStatus == 1){
+							ownerName = "业主抽查通过"
+						}else if(record.CheckStatus == 2){
+							ownerName = "业主抽查退回后修改"
+						}
+						if(superName && ownerName){
+							return <div><div>{superName}</div><div>{ownerName}</div></div>
+						}else if(superName){
+							return <span>{superName}</span>
+						}else{
+							return <span>{ownerName}</span>
+						}
+					}
+				}
 			},{
 				title:"监理人",
 				dataIndex: 'Supervisor',
@@ -466,13 +494,17 @@ export default class SupervisorTable extends Component {
 					tblData[i].place = place;
 					let statusname = '';
 					
-					if(plan.SupervisorCheck == -1 && plan.CheckStatus == -1)
-						statusname = "未抽查"
-					else if(plan.SupervisorCheck == 0) 
-						statusname = "监理抽查退回"
-					else if(plan.SupervisorCheck === 1){
-						statusname = "监理抽查通过"
-					}
+					// if(plan.SupervisorCheck == -1 && plan.CheckStatus == -1)
+					// 	statusname = "未抽查"
+					// else if(plan.SupervisorCheck == 0) 
+					// 	statusname = "监理抽查退回"
+					// else if(plan.SupervisorCheck === 1){
+					// 	statusname = "监理抽查通过"
+					// }
+
+					tblData[i].SupervisorCheck = plan.SupervisorCheck;
+					tblData[i].CheckStatus = plan.CheckStatus;
+					tblData[i].statusname = statusname;
 
 					tblData[i].statusname = statusname;
 					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';

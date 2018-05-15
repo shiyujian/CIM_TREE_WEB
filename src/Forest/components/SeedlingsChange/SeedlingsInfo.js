@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Icon, Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message} from 'antd';
+import {Icon, Table, Spin,Tabs,Modal,Row,Col,Select,DatePicker,Button,Input,InputNumber,Progress,message,Upload,Popconfirm } from 'antd';
 import moment from 'moment';
 import { FOREST_API,PROJECT_UNITS} from '../../../_platform/api';
 import {getUser} from '_platform/auth'
@@ -8,6 +8,7 @@ const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const {RangePicker} = DatePicker;
 const { TextArea } = Input;
+const Dragger = Upload.Dragger;
 
 export default class SeedlingsChange extends Component {
 	constructor(props) {
@@ -31,7 +32,8 @@ export default class SeedlingsChange extends Component {
 			remarkvisible:false,
 			remarkRecord:'',
 			remarkInfo:'',
-			imgArr:[]
+			imgArr:[],
+			TreatmentData:[]
     	}
 	}
 	getBiao(code){
@@ -48,7 +50,129 @@ export default class SeedlingsChange extends Component {
     componentDidMount() {
     	let user = getUser()
 		this.sections = JSON.parse(user.sections)
-    }
+	}
+	
+	columns1 = [{
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index',
+        // width: '10%',
+    }, {
+        title: '文件名称',
+        dataIndex: 'fileName',
+        key: 'fileName',
+        // width: '35%',
+    }, {
+        title: '操作',
+        dataIndex: 'operation',
+        key: 'operation',
+        // width: '10%',
+        render: (text, record, index) => {
+			console.log('record',record)
+            return <div>
+				<a onClick={this.onImgClick.bind(this,record.a_file)}>查看</a>
+				<span className="ant-divider" />
+                <Popconfirm
+                    placement="rightTop"
+                    title="确定删除吗？"
+                    onConfirm={this.deleteTreatmentFile.bind(this, record, index)}
+                    okText="确认"
+                    cancelText="取消">
+                    <a>删除</a>
+                </Popconfirm>
+
+            </div>
+        }
+	}]
+	
+	//删除文件表格中的某行
+	deleteTreatmentFile = (record, index) => {
+		const{
+			TreatmentData
+		}=this.state
+      
+		TreatmentData.splice(index, 1);
+		let array = []
+        TreatmentData.map((item, index) => {
+            let data = {
+				index: index + 1,
+				fileName: item.fileName,
+				a_file: item.a_file,
+            }
+            array.push(data)
+		})
+		console.log('array',array)
+        this.setState({TreatmentData: array })
+	}
+
+
+	//上传文件
+	uploadProps = {
+		name: 'a_file',
+		multiple: true,
+		showUploadList: false,
+		action: `${FOREST_API}/UploadHandler.ashx?filetype=leader`,
+		beforeUpload: (file) =>{
+			const {
+				actions:{
+					postForsetPic
+				}
+			} = this.props;
+			const{
+				TreatmentData = []
+			} = this.state
+			let type  =  file.name.toString().split('.');
+			console.log('type',type)
+			let len = type.length
+			if(type[len-1]==='jpg' || type[len-1]==='jpeg' || type[len-1]==='png' || type[len-1]==='JPG' || type[len-1]==='JPEG' || type[len-1]==='PNG'){
+				const formdata = new FormData();
+				formdata.append('a_file',file);
+				formdata.append('name',file.name);
+				let downloadState = true
+				postForsetPic({},formdata).then(rst=>{
+					console.log('rstrstrst',rst)
+					let len = TreatmentData.length
+					TreatmentData.push(
+						{
+							index: len + 1,
+							fileName: file.name,
+							a_file: rst
+						}
+					)
+					console.log('TreatmentData',TreatmentData)
+					// notification.success({
+					// 	message:'文件上传成功',
+					// 	duration:3
+					// })
+					this.setState({ 
+						TreatmentData: TreatmentData,
+						loading:false 
+					})
+					return false
+				});
+			}else{
+				message.error('请上传jpg,jpeg,png 文件')
+				return false;
+			}
+			
+		},
+		onChange: ({ file, fileList, event }) => {
+			this.setState({
+				loading:true
+			})
+			const status = file.status;
+			// const { newFileLists } = this.state;
+			
+			let newdata = [];
+			if (status === 'done') {
+				debugger
+				console.log('file',file)
+
+			}else if(status === 'error'){
+				return;
+			}
+		},
+	};
     
 	render() {
 		const {
@@ -80,16 +204,36 @@ export default class SeedlingsChange extends Component {
 				<Modal
 					width={522}
 					title='修改备注信息'
-					style={{textAlign:'center'}}
+					// style={{textAlign:'center'}}
 					visible={this.state.remarkvisible}
 					onOk={this.remarkOK.bind(this)}
 					onCancel={this.remarkCancel.bind(this)}
 				>
 					<div>
 						<div style={{textAlign:'left'}}>备注：</div>
-						<div>
+						<div style={{marginBottom:10}}>
 							<TextArea  rows={4} value={remarkInfo} id='remarkID' onChange={this.remarkInfochange.bind(this)}/>
 						</div>
+						<Dragger
+						 	
+							{...this.uploadProps}
+						 >
+							<p className="ant-upload-drag-icon">
+								<Icon type="inbox" />
+							</p>
+							<p className="ant-upload-text">点击或者拖拽开始上传</p>
+							<p className="ant-upload-hint">
+								支持 jpg,jpeg,png 文件
+							</p>
+						</Dragger>
+						<Table
+							style={{marginTop:10}}
+							columns={this.columns1}
+							pagination={true}
+							dataSource={this.state.TreatmentData}
+							className='foresttable'
+						/>
+						
 					</div>
 				</Modal>
 				<Modal
@@ -224,7 +368,7 @@ export default class SeedlingsChange extends Component {
 				title:"操作",
 				render: (text,record) => {
 					return <div>
-								<a onClick={this.remark.bind(this,record)}>备注</a>
+								<a onClick={this.remarkDefault.bind(this,record)}>备注</a>
 								{/* <span className="ant-divider" />
 								<a onClick={this.change.bind(this,record)}>修改</a> */}
 							</div>
@@ -293,12 +437,38 @@ export default class SeedlingsChange extends Component {
 		this.setState({remarkInfo:value.target.value})
 	}
 
-	remark(record){
+	remarkDefault(record){
 		console.log('record',record)
+		let picArr = []
+		let TreatmentData = []
+		//显示原始图片数据，但是name无法获取
+		// if(record && record.RemarkPics){
+		// 	try{
+		// 		picArr = record.RemarkPics.split(',')
+		// 		picArr.map((pic,index)=>{
+		// 			let data = pic.split('//')
+		// 			let len = data.length
+		// 			let fileName = data[len-1]
+		// 			TreatmentData.push({
+		// 				index:index,
+		// 				fileName:fileName,
+		// 				a_file:pic
+		// 			})
+		// 		})
+
+		// 		console.log('TreatmentData',TreatmentData)
+				
+				
+		// 	}catch(e){
+	
+		// 	}
+		// }
+		
 		this.setState({
 			remarkRecord:record,
 			remarkvisible:true,
-			remarkInfo:record.Remark?record.Remark:''
+			remarkInfo:record.Remark?record.Remark:'',
+			TreatmentData:TreatmentData
 		})
 	}
 
@@ -310,20 +480,49 @@ export default class SeedlingsChange extends Component {
 		}=this.props
 		const{
 			remarkRecord,
-			remarkInfo
+			remarkInfo,
+			TreatmentData
 		}=this.state
+
+		let remarkPics = ''
+		try{
+			TreatmentData.map((data)=>{
+				if(data.a_file){
+					if(remarkPics){
+						remarkPics = remarkPics + ',' + data.a_file
+					}else{
+						remarkPics = data.a_file
+					}
+					
+				}
+			})
+		}catch(e){
+
+		}
+
+		console.log('remarkPics',remarkPics)
+		
 	
 		let postdata = {
 			remark:remarkInfo,
+			pics:remarkPics,
 			sxm:remarkRecord.ZZBM
 		}
+		console.log('postdata',postdata)
 		let rst = await getSeedlingInfo(postdata)
-		this.setState({
-			remarkvisible:false
-		},()=>{
-			document.querySelector('#remarkID').value = ''
-			this.handleTableChange({current:1})
-		})
+		if(rst && rst.code && rst.code == 1){
+			message.success('修改备注和图片成功')
+			this.setState({
+				remarkvisible:false,
+				TreatmentData:[]
+			},()=>{
+				document.querySelector('#remarkID').value = ''
+				this.handleTableChange({current:1})
+			})
+		}else{
+			message.success('修改备注和图片失败')
+		}
+		
 	}
 
 	remarkCancel(){
@@ -356,6 +555,7 @@ export default class SeedlingsChange extends Component {
 	}
 
 	onImgClick(data) {
+		debugger
 		// src = src.replace(/\/\//g,'/')
 		// src =  `${FOREST_API}/${src}`
 		// this.setState({src},() => {
