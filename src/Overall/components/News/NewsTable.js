@@ -144,6 +144,7 @@ class NewsTable extends Component {
 			worktime: undefined,
 			workunit: undefined,
 		});
+		this.query()
 	}
 
 	clear1() {
@@ -153,6 +154,7 @@ class NewsTable extends Component {
 			workunits: undefined,
 
 		});
+		this.query1()
 	}
 	query() {
 		const {

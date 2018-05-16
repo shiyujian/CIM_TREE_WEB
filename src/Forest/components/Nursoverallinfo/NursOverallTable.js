@@ -676,7 +676,7 @@ export default class NursOverallTable extends Component {
 			noList.map((rst)=>{
 				if(rst.No.indexOf(No) != -1){
 					SmallClassName = rst.SmallClassName?rst.SmallClassName+'号小班':SmallClassName
-					ThinClassName = rst.ThinClassName?rst.ThinClassName+'号小班':ThinClassName
+					ThinClassName = rst.ThinClassName?rst.ThinClassName+'号细班':ThinClassName
 				}
 			})
 		}

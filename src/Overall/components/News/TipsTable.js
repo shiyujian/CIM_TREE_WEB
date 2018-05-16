@@ -206,6 +206,7 @@ class TipsTable extends Component {
 			workunit: undefined,
 			degree: undefined
 		});
+		this.query()
 	}
 
 	clear1() {
@@ -216,6 +217,7 @@ class TipsTable extends Component {
 			workunits: undefined,
 			degrees: undefined
 		});
+		this.query1()
 	}
 
 	render() {
