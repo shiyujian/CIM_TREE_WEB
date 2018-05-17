@@ -209,10 +209,22 @@ export default class Locmeasureinfo extends Component {
         this.setState({ bigType: value });
         let selectTreeType = [];
         treetypes.map(item => {
-            let code = item.TreeTypeNo.substr(0, 1);
-            if (code === value) {
-                selectTreeType.push(item);
+           
+            if(item.TreeTypeNo == null){
+                // console.log('itemitemitemitemitem',item)
             }
+            if(item.TreeTypeNo){
+                try{
+                    let code = item.TreeTypeNo.substr(0, 1);
+                    if (code === value) {
+                        selectTreeType.push(item);
+                    }
+                }catch(e){
+
+                }
+                
+            }
+            
         })
         this.setTreeTypeOption(selectTreeType);
     }
