@@ -109,6 +109,7 @@ class ReceivePage extends Component {
 			// numbers: undefined,
 			worktimes: undefined,
 		});
+		this.query()
 	}
 	//查找
 	query() {
@@ -121,6 +122,7 @@ class ReceivePage extends Component {
 
 		// const user = getUser();
 		let searchList = []
+		debugger
 		this.props.form.validateFields(async (err, values) => {
 			notifications.map((item) => {
 				let isName = false;

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-05-14 16:40:32
+ * @Last Modified time: 2018-05-17 15:45:45
  */
 /**
 *
@@ -271,74 +271,20 @@ export const PROJECT_UNITS = [
 				value:'市民中心景观'
 			}
 		]
+	},{
+		code:'P998',
+		value:'截洪渠景观一期工程',
+		units:[
+			{
+				code:'P998-01-01',
+				value:'一标段'
+			}
+		]
 	}
 ]
 
 //echarts图表的颜色
 export const ECHARTSCOLOR = ['black','orange','yellow','blue','green','purple']
-
-
-//获取子项目下的标段
-export const SUBPROJECT_UNITS = [
-	{
-		code:'P009-01',
-		value:'9号地块',
-		units:[
-			{
-				code:'P009-01-01',
-				value:'一标段'
-			},{
-				code:'P009-01-02',
-				value:'二标段'
-			},{
-				code:'P009-01-03',
-				value:'三标段'
-			},{
-				code:'P009-01-04',
-				value:'四标段'
-			},{
-				code:'P009-01-05',
-				value:'五标段'
-			},
-		]
-	},{
-		code:'P010-01',
-		value:'一号区块',
-		units:[
-			{
-				code:'P010-01-01',
-				value:'一标段'
-			},{
-				code:'P010-01-02',
-				value:'二标段'
-			},{
-				code:'P010-01-03',
-				value:'三标段'
-			},{
-				code:'P010-01-04',
-				value:'四标段'
-			}
-		]
-	},{
-		code:'P010-02',
-		value:'二号区块',
-		units:[
-			{
-				code:'P010-02-05',
-				value:'五标段'
-			}
-		]
-	},{
-		code:'P010-03',
-		value:'三号区块',
-		units:[
-			{
-				code:'P010-03-06',
-				value:'六标段'
-			}
-		]
-	}
-]
 
 //获取子项目下的标段
 export const SECTIONNAME = [
@@ -365,6 +311,10 @@ export const SECTIONNAME = [
 	{
 		code:'06',
 		name:'六标段'
+	},
+	{
+		code:'99',
+		name:'市民中心造林'
 	},
 ]
 
@@ -393,6 +343,10 @@ export const SECTIONNUMBERNAME = [
 	{
 		code:'06',
 		name:'6标段'
+	},
+	{
+		code:'99',
+		name:'市民中心造林'
 	},
 ]
 

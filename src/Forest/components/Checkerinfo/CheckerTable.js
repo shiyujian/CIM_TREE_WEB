@@ -510,7 +510,7 @@ export default class CheckerTable extends Component {
 					tblData[i].CheckStatus = plan.CheckStatus;
 					tblData[i].statusname = statusname;
 
-					let locationstatus = !!plan.LocationTime ? '已定位' : '未定位';
+					let locationstatus = plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
 					//改为验收时间
 					let checktime1 = !!plan.SupervisorTime ? moment(plan.SupervisorTime).format('YYYY-MM-DD') : '/';

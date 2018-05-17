@@ -507,7 +507,7 @@ export default class SupervisorTable extends Component {
 					tblData[i].statusname = statusname;
 
 					tblData[i].statusname = statusname;
-					let locationstatus = !!plan.locationtime ? '已定位' : '未定位';
+					let locationstatus = plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
 					let yssj1 = !!plan.SupervisorTime ? moment(plan.SupervisorTime).format('YYYY-MM-DD') : '/';
 					let yssj2 = !!plan.SupervisorTime ? moment(plan.SupervisorTime).format('HH:mm:ss') : '/';

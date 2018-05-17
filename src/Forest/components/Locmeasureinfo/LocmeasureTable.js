@@ -393,15 +393,16 @@ export default class LocmeasureTable extends Component {
 							<span >此次查询共有苗木：{this.state.totalNum}棵</span>
 						</Col>
 						<Col span={2} className='mrg10'>
-							<Button type='primary'  onClick={this.exportexcel.bind(this)}>
-								导出
-							</Button>
-						</Col>
-						<Col span={2} className='mrg10'>
 							<Button type='primary' onClick={this.resetinput.bind(this)}>
 								重置
 							</Button>
 						</Col>
+						<Col span={2} className='mrg10'>
+							<Button type='primary'  onClick={this.exportexcel.bind(this)}>
+								导出
+							</Button>
+						</Col>
+						
 					</Row>
 				</div> 
 		return <div>

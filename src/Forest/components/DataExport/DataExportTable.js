@@ -200,8 +200,9 @@ export default class LocmeasureTable extends Component {
 							<span>定位时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
-							 showTime={{ format: 'HH:mm:ss' }}
+							 showTime={{ format: 'HH:mm:ss',defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('11:59:59', 'HH:mm:ss')]}}
 							 format={'YYYY/MM/DD HH:mm:ss'}
+							 
 							 onChange={this.datepick.bind(this)}
 							 onOk={this.datepick.bind(this)}
 							>
