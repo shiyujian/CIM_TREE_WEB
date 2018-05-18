@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {FILE_API,base, SOURCE_API, DATASOURCECODE,SERVICE_API,PROJECT_UNITS,SECTIONNAME,WORKFLOW_CODE } from '../../../_platform/api';
+import {FILE_API,base, SOURCE_API, DATASOURCECODE,SERVICE_API,PROJECT_UNITS,WORKFLOW_CODE } from '../../../_platform/api';
 import {
 	Form, Input, Row, Col, Modal, Upload, Button,
 	Icon, message, Table, DatePicker, Progress, Select, Checkbox, Popconfirm,notification,Spin
@@ -485,52 +485,28 @@ class AddModal extends Component {
 			console.log('section',section)
 			let code = section.split('-')
 			if(code && code.length === 3){
-				//获取当前标段的名字
-				SECTIONNAME.map((item)=>{
-					if(code[2] === item.code){
-						currentSectionName = item.name
-					}
-				})
 				//获取当前标段所在的项目
-				PROJECT_UNITS.map((item)=>{
-					if(code[0] === item.code){
-						projectName = item.value
-					}
-				})
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        projectName = item.value
+                        let units = item.units
+                        units.map((unit)=>{
+                            //获取当前标段的名字
+                            if(unit.code == section){
+                                currentSectionName = unit.value
+                                console.log('currentSectionName',currentSectionName)
+                                console.log('projectName',projectName)
+                            }
+                        })
+
+                    }
+                })
 			}
-			console.log('section',section)
-			console.log('currentSectionName',currentSectionName)
-			console.log('projectName',projectName)
 			this.setState({
 				currentSection:section,
 				currentSectionName:currentSectionName,
 				projectName:projectName
 			})
-			// sections.map((section)=>{
-			//     let code = section.split('-')
-			//     if(code && code.length === 3){
-			//         //获取当前标段的名字
-			//         SECTIONNAME.map((item)=>{
-			//             if(code[2] === item.code){
-			//                 sectionName = item.name
-			//             }
-			//         })
-			//         //获取当前标段所在的项目
-			//         PROJECT_UNITS.map((item)=>{
-			//             if(code[0] === item.code){
-			//                 projectName = item.value
-			//             }
-			//         })
-			//     }
-			//     sectionSchedule.push({
-			//         value:section,
-			//         name:sectionName
-			//     })
-			// })
-			// this.setState({
-			//     sectionSchedule,
-			//     projectName
-			// })
 		}
 	}
 

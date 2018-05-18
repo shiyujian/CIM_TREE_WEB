@@ -9,7 +9,7 @@ import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base,   WORKFLOW_CODE,SECTIONNAME,PROJECT_UNITS } from '../../../_platform/api';
+import { base,   WORKFLOW_CODE,PROJECT_UNITS } from '../../../_platform/api';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const fileTypes = 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
@@ -107,16 +107,18 @@ class FormAddition extends Component {
             let section = sections[0]
             let code = section.split('-')
             if(code && code.length === 3){
-                //获取当前标段的名字
-                SECTIONNAME.map((item)=>{
-                    if(code[2] === item.code){
-                        currentSectionName = item.name
-                    }
-                })
                 //获取当前标段所在的项目
                 PROJECT_UNITS.map((item)=>{
                     if(code[0] === item.code){
                         projectName = item.value
+                        let units = item.units
+                        units.map((unit)=>{
+                            //获取当前标段的名字
+                            if(unit.code == section){
+                                currentSectionName = unit.value
+                            }
+                        })
+
                     }
                 })
             }
@@ -422,6 +424,9 @@ class FormAddition extends Component {
         let postData = {};
         me.props.form.validateFields((err, values) => {
             console.log('Received values of form: ', values);
+            // console.log('currentSection: ', currentSection);
+            // console.log('currentSectionName: ', currentSectionName);
+            // console.log('projectName: ', projectName);
             if (!err) {
 
                 if (TreatmentData.length === 0) {

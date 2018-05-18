@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {SECTIONNAME,PROJECT_UNITS} from '../../../_platform/api';
+import {PROJECT_UNITS} from '../../../_platform/api';
 import {
 	Form, Input, Button, Row, Col, message, Popconfirm,Tabs,DatePicker,Select
 } from 'antd';
@@ -54,13 +54,21 @@ export default class ResourceFilter extends Component {
              let section = sections[0]
              let code = section.split('-')
              if(code && code.length === 3){
-                 //获取当前标段的名字
-                 SECTIONNAME.map((item)=>{
-                     if(code[2] === item.code){
-                         let currentSectionName = item.name
-                         optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
-                     }
-                 })
+                 //获取当前标段所在的项目
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        let units = item.units
+                        units.map((unit)=>{
+                            //获取当前标段的名字
+                            if(unit.code == section){
+                                let currentSectionName = unit.value
+                                console.log('unitunitunit',unit)
+                                optionArray.push(<Option key={unit.code} value={currentSectionName}>{currentSectionName}</Option>)
+                            }
+                        })
+
+                    }
+                })
              }
          }else{
              PROJECT_UNITS.map((project)=>{

@@ -3,7 +3,7 @@ import { Row, Col, Input, Form, Spin, Icon, Button, Table, Modal, DatePicker, Pr
 // import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, PROJECT_UNITS,SECTIONNAME,SCHEDULETREEDATA ,TREETYPENO } from '../../../_platform/api';
+import { WORKFLOW_CODE, base, SOURCE_API, DATASOURCECODE, PROJECT_UNITS,SCHEDULETREEDATA ,TREETYPENO } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
 // import PerSearch from './PerSearch';
@@ -231,16 +231,20 @@ class Plan extends Component {
             console.log('section',section)
             let code = section.split('-')
             if(code && code.length === 3){
-                //获取当前标段的名字
-                SECTIONNAME.map((item)=>{
-                    if(code[2] === item.code){
-                        currentSectionName = item.name
-                    }
-                })
                 //获取当前标段所在的项目
                 PROJECT_UNITS.map((item)=>{
                     if(code[0] === item.code){
                         projectName = item.value
+                        let units = item.units
+                        units.map((unit)=>{
+                            //获取当前标段的名字
+                            if(unit.code == section){
+                                currentSectionName = unit.value
+                                console.log('currentSectionName',currentSectionName)
+                                console.log('projectName',projectName)
+                            }
+                        })
+
                     }
                 })
             }
@@ -252,31 +256,6 @@ class Plan extends Component {
                 currentSectionName:currentSectionName,
                 projectName:projectName
             })
-            // sections.map((section)=>{
-            //     let code = section.split('-')
-            //     if(code && code.length === 3){
-            //         //获取当前标段的名字
-            //         SECTIONNAME.map((item)=>{
-            //             if(code[2] === item.code){
-            //                 sectionName = item.name
-            //             }
-            //         })
-            //         //获取当前标段所在的项目
-            //         PROJECT_UNITS.map((item)=>{
-            //             if(code[0] === item.code){
-            //                 projectName = item.value
-            //             }
-            //         })
-            //     }
-            //     sectionSchedule.push({
-            //         value:section,
-            //         name:sectionName
-            //     })
-            // })
-            // this.setState({
-            //     sectionSchedule,
-            //     projectName
-            // })
         }
     }
 	//获取当前登陆用户的标段的下拉选项
@@ -504,23 +483,6 @@ class Plan extends Component {
 		});
 	}
 
-	//获取当前标段的名字
-    getSectionName(section){
-		let sectionName = ''
-		if(section){
-			let code = section.split('-')
-			if(code && code.length === 3){
-                //获取当前标段的名字
-                SECTIONNAME.map((item)=>{
-                    if(code[2] === item.code){
-                        sectionName = item.name
-                    }
-                })
-			}
-		}
-		
-		return sectionName 
-    }
 	// 发起填报
 	sendWork() {
 		const {
@@ -561,7 +523,6 @@ class Plan extends Component {
 					"id": parseInt(user.id)
 				};
 
-				// let sectionName = me.getSectionName(values.Psection)
 				let subject = [{
 					"section": JSON.stringify(currentSection),
 					"projectName":JSON.stringify(projectName),

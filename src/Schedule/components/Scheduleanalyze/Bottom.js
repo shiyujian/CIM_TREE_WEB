@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
-import { PROJECT_UNITS,SECTIONNUMBERNAME } from '../../../_platform/api';
+import { PROJECT_UNITS } from '../../../_platform/api';
 import {Cards, SumTotal, DateImg} from '../../components';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
@@ -166,6 +166,7 @@ export default class Bottom extends Component {
         let code = '';
         //根据标段筛选不同的小班
         let selectSmallClassList = [];
+        let test = []
         if(section){
             try{
                 code = section.split('-')[2]
@@ -174,13 +175,24 @@ export default class Bottom extends Component {
             }
             
         }
-        SECTIONNUMBERNAME.map((section)=>{
-            if(code === section.code){
-                selectSmallClassList = SmallClassList.filter(list => list.UnitProject === section.name)
+        console.log('codecode',code)
+        
+
+        SmallClassList.map((SmallClass)=>{
+            try{
+                if(SmallClass && SmallClass.No){
+                    let sectionArr = SmallClass.No.split('-')
+                    let sectionCode = sectionArr[0] + '-' + sectionArr [1] + '-' + SmallClass.UnitProjectNo
+                    if(sectionCode == section){
+                        selectSmallClassList.push(SmallClass)
+                    }
+                }
+                
+            }catch(e){
+
             }
+            
         })
-        console.log('SmallClassList',SmallClassList)
-        console.log('selectSmallClassListselectSmallClassList',selectSmallClassList)
 
         
         //将小班的code获取到，进行去重

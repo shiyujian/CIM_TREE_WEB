@@ -11,7 +11,7 @@ import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, SOURCE_API, DATASOURCECODE ,PROJECT_UNITS,SECTIONNAME,SCHEDULETREEDATA,TREETYPENO} from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE ,PROJECT_UNITS,SCHEDULETREEDATA,TREETYPENO} from '../../../_platform/api';
 import queryString from 'query-string';
 const { Option, OptGroup } = Select;
 const Dragger = Upload.Dragger;
@@ -188,16 +188,20 @@ class ScheduleStageRefill extends Component {
             sections.map((section)=>{
                 let code = section.split('-')
                 if(code && code.length === 3){
-                    //获取当前标段的名字
-                    SECTIONNAME.map((item)=>{
-                        if(code[2] === item.code){
-                            sectionName = item.name
-                        }
-                    })
                     //获取当前标段所在的项目
                     PROJECT_UNITS.map((item)=>{
                         if(code[0] === item.code){
                             projectName = item.value
+                            let units = item.units
+                            units.map((unit)=>{
+                                //获取当前标段的名字
+                                if(unit.code == section){
+                                    sectionName = unit.value
+                                    console.log('sectionName',sectionName)
+                                    console.log('projectName',projectName)
+                                }
+                            })
+
                         }
                     })
                 }
@@ -412,24 +416,6 @@ class ScheduleStageRefill extends Component {
 		const { states = [] } = task;
 		return states.find(state => state.status === 'processing' && state.id === +state_id);
     }
-    
-    //获取当前标段的名字
-    getSectionName(section){
-		let sectionName = ''
-		if(section){
-			let code = section.split('-')
-			if(code && code.length === 3){
-                //获取当前标段的名字
-                SECTIONNAME.map((item)=>{
-                    if(code[2] === item.code){
-                        sectionName = item.name
-                    }
-                })
-			}
-		}
-		console.log('sectionName',sectionName)
-		return sectionName 
-    }
 
 
     handleSubmit = (e) =>{
@@ -459,7 +445,6 @@ class ScheduleStageRefill extends Component {
                 postData.upload_person = user.name?user.name:user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
-                // let sectionName = me.getSectionName(values.section)
                 let subject = [{
                     "section": oldSubject.section,
                     "sectionName":oldSubject.sectionName,

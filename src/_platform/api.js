@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-05-17 15:45:45
+ * @Last Modified time: 2018-05-18 16:36:22
  */
 /**
 *
@@ -200,18 +200,6 @@ export const FORM_WORKFLOW = [
 	},
 ]
 
-
-//获取单位工程
-export const UNITS = [
-	{value:'一标段'},
-	{value:'二标段'},
-	{value:'三标段'},
-	{value:'四标段'},
-	{value:'五标段'},
-	{value:'六标段'},
-	{value:'市民中心造林'},
-]
-
 //获取单位工程
 export const PROJECT_UNITS = [
 	{
@@ -285,70 +273,6 @@ export const PROJECT_UNITS = [
 
 //echarts图表的颜色
 export const ECHARTSCOLOR = ['black','orange','yellow','blue','green','purple']
-
-//获取子项目下的标段
-export const SECTIONNAME = [
-	{
-		code:'01',
-		name:'一标段'
-	},
-	{
-		code:'02',
-		name:'二标段'
-	},
-	{
-		code:'03',
-		name:'三标段'
-	},
-	{
-		code:'04',
-		name:'四标段'
-	},
-	{
-		code:'05',
-		name:'五标段'
-	},
-	{
-		code:'06',
-		name:'六标段'
-	},
-	{
-		code:'99',
-		name:'市民中心造林'
-	},
-]
-
-//获取子项目下的标段,和上边不同的是一个是数字1，一个是中文一，对应api的不同
-export const SECTIONNUMBERNAME = [
-	{
-		code:'01',
-		name:'1标段'
-	},
-	{
-		code:'02',
-		name:'2标段'
-	},
-	{
-		code:'03',
-		name:'3标段'
-	},
-	{
-		code:'04',
-		name:'4标段'
-	},
-	{
-		code:'05',
-		name:'5标段'
-	},
-	{
-		code:'06',
-		name:'6标段'
-	},
-	{
-		code:'99',
-		name:'市民中心造林'
-	},
-]
 
 export const TREETYPENO = [
 	{

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-05-04 17:24:30
+ * @Last Modified time: 2018-05-18 15:21:21
  */
 import React, { Component } from 'react';
 import { Table, Spin, Button, notification, Modal, Form, Row, Col, Input, Select, Checkbox, Upload, Progress, Icon, Popconfirm } from 'antd';
@@ -17,7 +17,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
-import { base, SOURCE_API, DATASOURCECODE,SERVICE_API,PROJECT_UNITS,SECTIONNAME } from '../../../_platform/api';
+import { base, SOURCE_API, DATASOURCECODE,SERVICE_API,PROJECT_UNITS } from '../../../_platform/api';
 // import PerSearch from './PerSearch';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { WORKFLOW_CODE } from '../../../_platform/api';
@@ -200,52 +200,28 @@ class All extends Component {
             console.log('section',section)
             let code = section.split('-')
             if(code && code.length === 3){
-                //获取当前标段的名字
-                SECTIONNAME.map((item)=>{
-                    if(code[2] === item.code){
-                        currentSectionName = item.name
-                    }
-                })
                 //获取当前标段所在的项目
                 PROJECT_UNITS.map((item)=>{
                     if(code[0] === item.code){
                         projectName = item.value
+                        let units = item.units
+                        units.map((unit)=>{
+                            //获取当前标段的名字
+                            if(unit.code == section){
+                                currentSectionName = unit.value
+                                console.log('currentSectionName',currentSectionName)
+                                console.log('projectName',projectName)
+                            }
+                        })
+
                     }
                 })
             }
-            console.log('section',section)
-            console.log('currentSectionName',currentSectionName)
-            console.log('projectName',projectName)
             this.setState({
                 currentSection:section,
                 currentSectionName:currentSectionName,
                 projectName:projectName
             })
-            // sections.map((section)=>{
-            //     let code = section.split('-')
-            //     if(code && code.length === 3){
-            //         //获取当前标段的名字
-            //         SECTIONNAME.map((item)=>{
-            //             if(code[2] === item.code){
-            //                 sectionName = item.name
-            //             }
-            //         })
-            //         //获取当前标段所在的项目
-            //         PROJECT_UNITS.map((item)=>{
-            //             if(code[0] === item.code){
-            //                 projectName = item.value
-            //             }
-            //         })
-            //     }
-            //     sectionSchedule.push({
-            //         value:section,
-            //         name:sectionName
-            //     })
-            // })
-            // this.setState({
-            //     sectionSchedule,
-            //     projectName
-            // })
         }
     }
     //获取当前登陆用户的标段的下拉选项
@@ -464,23 +440,6 @@ class All extends Component {
         )
     }
 
-    //获取当前标段的名字
-    getSectionName(section){
-		let sectionName = ''
-		if(section){
-			let code = section.split('-')
-			if(code && code.length === 3){
-                //获取当前标段的名字
-                SECTIONNAME.map((item)=>{
-                    if(code[2] === item.code){
-                        sectionName = item.name
-                    }
-                })
-			}
-		}
-		
-		return sectionName 
-    }
 
     // 确认提交
     sendWork() {
@@ -541,7 +500,7 @@ class All extends Component {
                     "id": parseInt(user.id)
                 };
                 
-                // let sectionName = me.getSectionName(values.Tsection)
+               
                 let subject = [{
                     "section": JSON.stringify(currentSection),
                     "sectionName":JSON.stringify(currentSectionName),

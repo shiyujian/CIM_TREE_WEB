@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
-import {SECTIONNAME,PROJECT_UNITS,UNITS} from '../../../_platform/api';
+import {PROJECT_UNITS} from '../../../_platform/api';
 import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -45,22 +45,39 @@ class SearchInfo extends Component {
         let optionArray = []
         let sections = user.sections
         sections = JSON.parse(sections)
+        let nameArr = []
         if(sections && sections instanceof Array && sections.length>0){
             let section = sections[0]
             let code = section.split('-')
             if(code && code.length === 3){
-                //获取当前标段的名字
-                SECTIONNAME.map((item)=>{
-                    if(code[2] === item.code){
-                        let currentSectionName = item.name
-                        optionArray.push(<Option key={currentSectionName} value={currentSectionName}>{currentSectionName}</Option>)
+
+                //获取当前标段所在的项目
+                PROJECT_UNITS.map((item)=>{
+                    if(code[0] === item.code){
+                        let units = item.units
+                        units.map((unit)=>{
+                            //获取当前标段的名字
+                            if(unit.code == section){
+                                let currentSectionName = unit.value
+                                optionArray.push(<Option key={unit.code} value={currentSectionName}>{currentSectionName}</Option>)
+                            }
+                        })
+
                     }
                 })
             }
         }else{
-            UNITS.map((unit)=>{
-                optionArray.push(<Option key={unit.value} value={unit.value}>{unit.value}</Option>)
-                
+            PROJECT_UNITS.map((project)=>{
+                if(project && project.units && project.units.length>0){
+                    let units = project.units
+                    units.map((unit)=>{
+                        if(nameArr.indexOf(unit.value) == -1){
+                            optionArray.push(<Option key={unit.code} value={unit.value}>{unit.value}</Option>)
+                            nameArr.push(unit.value)
+                        }
+                        
+                    })
+                }
             })
         }
         this.setState({

@@ -9,7 +9,7 @@ import {DeleteIpPort} from '../../../_platform/components/singleton/DeleteIpPort
 // import PerSearch from '../../../Schedule/components/stagereport/PerSearch';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
-import { WORKFLOW_CODE, UNITS } from '../../../_platform/api';
+import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { base, SOURCE_API, DATASOURCECODE } from '../../../_platform/api';
 import queryString from 'query-string';
@@ -143,9 +143,7 @@ class QulityCheckRefill extends Component {
                                                         { required: true, message: '请选择单位工程' }
                                                     ]
                                                 })
-                                                    (<Select placeholder='请选择单位工程' allowClear>
-                                                        {UNITS.map(d => <Option key={d.value} value={d.value}>{d.value}</Option>)}
-                                                    </Select>)
+                                                    (<Input placeholder='请输入标段' readOnly/>)
                                             }
                                         </FormItem>
                                     </Col>
