@@ -647,6 +647,10 @@ export default class NursOverallTable extends Component {
 				getLittleBan
 			}
 		} = this.props;
+		if(!sxm){
+			message.warning('请输入顺序码')
+			return
+		}
 		let me = this
     	let postdata = {
     		sxm,

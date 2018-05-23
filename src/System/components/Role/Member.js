@@ -269,7 +269,7 @@ export default class Member extends Component {
 		title: '手机号码',
 		dataIndex: 'account.person_telephone',
 	}, {
-		title: '管理权限',
+		title: '关联',
 		render: (user) => {
 			const { member = {} } = this.props;
 			const members = member.members || [];
@@ -299,7 +299,7 @@ export default class Member extends Component {
 		title: '手机号码',
 		dataIndex: 'account.person_telephone',
 	}, {
-		title: '取消关联',
+		title: '关联',
 		render: (user) => {
 			const { member = {} } = this.props;
 			const members = member.members || [];

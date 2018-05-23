@@ -182,7 +182,7 @@ export default class SupervisorTable extends Component {
 			// 	dataIndex: 'SupervisorInfo',
 			// },
 			{
-				title:"抽查时间",
+				title:"监理抽查时间",
 				render: (text,record) => {
 					const {yssj1 = '',yssj2 = '' } = record;
 					return <div><div>{yssj1}</div><div>{yssj2}</div></div>
@@ -235,7 +235,7 @@ export default class SupervisorTable extends Component {
 							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw100' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
 						<Col xl={10} lg={12} md={14} className='mrg10'>
-							<span>抽查时间：</span>
+							<span>监理抽查时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
 							 defaultValue={[moment(this.state.sstime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.setime, 'YYYY-MM-DD HH:mm:ss')]} 

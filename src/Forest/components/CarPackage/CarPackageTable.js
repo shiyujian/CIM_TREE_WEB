@@ -39,7 +39,7 @@ export default class CarPackageTable extends Component {
     		percent1: 0,
     		supervisorcheck: '',
     		checkstatus: '',
-    		status: '',
+			status: ''
         }
 	}
 	getBiao(code){
@@ -394,6 +394,10 @@ export default class CarPackageTable extends Component {
 		const{
 			pagination1
 		}=this.state
+		if(record && record.Status &&  (record.Status == '5'  ||  record.Status == '8')){
+			message.info('本车苗木均已退回')
+			return
+		}
 		this.currentCarID = record.ID;
 		await this.query(1)
 		
@@ -508,14 +512,20 @@ export default class CarPackageTable extends Component {
     		size,
     		status,
 		}
-		if(this.sections.length !== 0){  //不是admin，要做查询判断了
-			if(section === ''){
-				message.info('请选择标段信息');
-				return;
-			}
-		}
+		// if(this.sections.length !== 0){  //不是admin，要做查询判断了
+		// 	if(section === ''){
+		// 		message.info('请选择标段信息');
+		// 		return;
+		// 	}
+		// }
+
     	
-    	this.setState({loading:true,percent:0})
+    	this.setState({
+			loading:true,
+			percent:0,
+			
+		})
+
     	getcarpackage({},postdata)
     	.then(rst => {
     		this.setState({loading:false,percent:100})

@@ -167,7 +167,7 @@ export default class Faithanalyze extends Component {
             sectionData.map(sec => {
                 sectionOptions.push(<Option key={sec} value={sec}>{sec}</Option>)
             })
-            sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            // sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({sectionoption: sectionOptions})
         }
     }

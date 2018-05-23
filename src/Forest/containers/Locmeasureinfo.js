@@ -255,9 +255,9 @@ export default class Locmeasureinfo extends Component {
             sectionData.map(sec => {
                 sectionOptions.push(<Option key={sec.code} value={sec.code}>{sec.value}</Option>)
             })
-            if(section.length === 0){   //admin用户赋给全部的查阅权限
-                sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
-            }
+            // if(section.length === 0){   //admin用户赋给全部的查阅权限
+            //     sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            // }
             this.setState({sectionoption: sectionOptions})
         }
     }

@@ -20,8 +20,8 @@ export default class CheckerTable extends Component {
         	size:10,
         	exportsize: 100,
         	leftkeycode: '',
-        	sstime: moment().format('YYYY-MM-DD 00:00:00'),
-			setime: moment().format('YYYY-MM-DD 23:59:59'),
+        	ostime: moment().format('YYYY-MM-DD 00:00:00'),
+			oetime: moment().format('YYYY-MM-DD 23:59:59'),
 			sxm: '',
     		section: '',
     		smallclass: '',
@@ -185,7 +185,7 @@ export default class CheckerTable extends Component {
 		// 	dataIndex: 'SupervisorInfo',
 		// },
 		{
-			title:"抽查时间",
+			title:"业主抽查时间",
 			render: (text,record) => {
 				const {checktime1 = '',checktime2 = '' } = record;
 				return <div><div>{checktime1}</div><div>{checktime2}</div></div>
@@ -238,10 +238,10 @@ export default class CheckerTable extends Component {
 							<Input suffix={suffix2} value={rolename} className='forestcalcw3 mxw100' onChange={this.onrolenamechange.bind(this)}/>
 						</Col>
 						<Col xl={10} lg={12} md={14} className='mrg10'>
-							<span>抽查时间：</span>
+							<span>业主抽查时间：</span>
 							<RangePicker 
 							 style={{verticalAlign:"middle"}} 
-							 defaultValue={[moment(this.state.sstime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.setime, 'YYYY-MM-DD HH:mm:ss')]} 
+							 defaultValue={[moment(this.state.ostime, 'YYYY-MM-DD HH:mm:ss'),moment(this.state.oetime, 'YYYY-MM-DD HH:mm:ss')]} 
 							 showTime={{ format: 'HH:mm:ss' }}
 							 format={'YYYY/MM/DD HH:mm:ss'}
 							 onChange={this.datepick.bind(this)}
@@ -362,8 +362,8 @@ export default class CheckerTable extends Component {
 	}
 
 	datepick(value){
-		this.setState({sstime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
-		this.setState({setime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
+		this.setState({ostime:value[0]?moment(value[0]).format('YYYY-MM-DD HH:mm:ss'):''})
+		this.setState({oetime:value[1]?moment(value[1]).format('YYYY-MM-DD HH:mm:ss'):''})
     }
 
 	handleTableChange(pagination){
@@ -441,8 +441,8 @@ export default class CheckerTable extends Component {
     		status = '',
     		role = '',
     		rolename = '',
-    		sstime = '',
-    		setime = '',
+    		ostime = '',
+    		oetime = '',
 			size,
 			smallclass,
 			thinclass,
@@ -465,8 +465,8 @@ export default class CheckerTable extends Component {
     		sxm,
     		section,
     		status,
-    		sstime:sstime&&moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
-    		setime:setime&&moment(setime).format('YYYY-MM-DD HH:mm:ss'),
+    		ostime:ostime&&moment(ostime).format('YYYY-MM-DD HH:mm:ss'),
+    		oetime:oetime&&moment(oetime).format('YYYY-MM-DD HH:mm:ss'),
     		page,
 			size,
 			smallclass,
@@ -513,8 +513,8 @@ export default class CheckerTable extends Component {
 					let locationstatus = plan.LocationTime ? '已定位' : '未定位';
 					tblData[i].locationstatus = locationstatus;
 					//改为验收时间
-					let checktime1 = !!plan.SupervisorTime ? moment(plan.SupervisorTime).format('YYYY-MM-DD') : '/';
-					let checktime2 = !!plan.SupervisorTime ? moment(plan.SupervisorTime).format('HH:mm:ss') : '/';
+					let checktime1 = !!plan.CheckTime ? moment(plan.CheckTime).format('YYYY-MM-DD') : '/';
+					let checktime2 = !!plan.CheckTime ? moment(plan.CheckTime).format('HH:mm:ss') : '/';
 					tblData[i].checktime1 = checktime1;
 					tblData[i].checktime2 = checktime2;
 					tblData[i].Project = this.getProject(tblData[i].Section)
@@ -546,8 +546,8 @@ export default class CheckerTable extends Component {
     		// CheckStatus = '',
     		role = '',
     		rolename = '',
-    		sstime = '',
-    		setime = '',
+    		ostime = '',
+    		oetime = '',
 			exportsize,
 			smallclass,
 			thinclass,
@@ -566,8 +566,8 @@ export default class CheckerTable extends Component {
     		sxm,
     		section,
     		// CheckStatus,
-    		sstime:sstime&&moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
-    		setime:setime&&moment(setime).format('YYYY-MM-DD HH:mm:ss'),
+    		ostime:ostime&&moment(ostime).format('YYYY-MM-DD HH:mm:ss'),
+    		oetime:oetime&&moment(oetime).format('YYYY-MM-DD HH:mm:ss'),
     		page:1,
 			size:exportsize,
 			smallclass,

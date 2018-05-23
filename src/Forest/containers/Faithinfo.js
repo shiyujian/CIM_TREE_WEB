@@ -144,7 +144,7 @@ export default class Faithinfo extends Component {
             sectionData.map(sec => {
                 sectionOptions.push(<Option key={sec.code} value={sec.code}>{sec.value}</Option>)
             })
-            sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            // sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({sectionoption: sectionOptions})
         }
     }

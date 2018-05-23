@@ -221,9 +221,9 @@ export default class Checkerinfo extends Component {
             sectionData.map(sec => {
                 sectionOptions.push(<Option key={sec.code} value={sec.code}>{sec.value}</Option>)
             })
-            if(section.length === 0){   //admin用户赋给全部的查阅权限
-                sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
-            }
+            // if(section.length === 0){   //admin用户赋给全部的查阅权限
+            //     sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            // }
             this.setState({sectionoption: sectionOptions})
         }
     }
@@ -252,7 +252,7 @@ export default class Checkerinfo extends Component {
             smalls.map(small => {
                 smallclassOptions.push(<Option key={small.code} value={small.code}>{small.name}</Option>)
             })
-            smallclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            // smallclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({smallclassoption: smallclassOptions})
         }
     }
@@ -284,7 +284,7 @@ export default class Checkerinfo extends Component {
             thinclassList.map(thin => {
                 thinclassOptions.push(<Option key={thin.code} value={thin.code}>{thin.name}</Option>)
             })
-            thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
+            // thinclassOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             this.setState({thinclassoption: thinclassOptions})
         }
     }
