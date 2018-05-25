@@ -51,7 +51,7 @@ export default class Roles extends Component {
 						</Card>
 					</TabPane>
 					<TabPane tab="业主角色" key="4">
-						<Card title="业主角色" extra={<Button type="primary" onClick={this.append.bind(this, 3)}>添加业主角色</Button>}>
+						<Card title="业主角色" extra={<Button type="primary" ghost onClick={this.append.bind(this, 3)}>添加业主角色</Button>}>
 							<Table size="middle" bordered
 								style={{ marginBottom: "10px", overflow: "hidden" }}
 								columns={this.columns} dataSource={departmentRoles} rowKey="id" />

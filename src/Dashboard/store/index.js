@@ -24,7 +24,7 @@ export const getRiskProcess = createFetchAction(`${WORKFLOW_API}/instance/`,[]);
 
 
 export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
-export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //    
+export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); // 
 export const getRiskProcessDetail = createFetchAction(`${WORKFLOW_API}/instance/{{ID}}`,[]);//获取隐患工单详情
 export const getRiskContactSheet = createFetchAction(`${base}/main/api/potential-risk/{{ID}}/contact-sheet/`,[]);
 
@@ -69,6 +69,8 @@ export const getTreeflows = createFetchAction(`${FOREST_API}/tree/treeflows`, []
 export const getNurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
 //获取打包车辆信息
 export const getCarpackbysxm = createFetchAction(`${FOREST_API}/tree/carpackbysxm/{{sxm}}`, []);
+//获取树木现场种植的信息
+export const getTreeMess = createFetchAction(`${FOREST_API}/tree/tree/{{sxm}}`, []);
 
 export const actions = {
 	getDimensional,
@@ -111,7 +113,8 @@ export const actions = {
 	getSamplingstat,
 	getTreeflows,
 	getNurserys,
-	getCarpackbysxm 
+	getCarpackbysxm ,
+	getTreeMess
 };
 export default handleActions({
 	[getDimensional]: (state, {payload}) => {

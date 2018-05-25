@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-05-18 16:36:22
+ * @Last Modified time: 2018-05-25 16:55:26
  */
 /**
 *
@@ -519,7 +519,7 @@ export const MODULES = [
 				name: '现场测量信息',
 			}, {
 				id: 'FOREST.SUPERVISORINFO',
-				name: '监理验收信息',
+				name: '监理抽查信息',
 			}, {
 				id: 'FOREST.OWNERINFO',
 				name: '业主抽查信息',
@@ -532,7 +532,7 @@ export const MODULES = [
 			}]
 		}, {
 			id: 'FOREST.FOREST.IMPORT.NONE',
-			name: '数据导入',
+			name: '定位数据信息',
 			children: [{
 				id: 'FOREST.DATAIMPORT',
 				name: '定位数据导入',

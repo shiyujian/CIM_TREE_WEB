@@ -3,6 +3,7 @@ import {Table, Checkbox, Button, Switch} from 'antd';
 import { MODULES, MODULES2} from '_platform/api';
 import Card from '_platform/components/panels/Card';
 import {getUser} from '_platform/auth';
+import './index.css'
 export default class PermissionTable extends Component {
 	constructor(props) {
 		super(props);
@@ -33,7 +34,7 @@ export default class PermissionTable extends Component {
 						{editing || <Button type="primary" ghost onClick={changeTableField.bind(this, 'editing', true)}>编辑</Button>}
 						{editing && <Button type="primary" onClick={this.save.bind(this)}>保存</Button>}
 					</div>}>
-					<Table showLine columns={this.columns} dataSource={userPermi} bordered pagination={false} rowKey="id"/>
+					<Table showLine columns={this.columns} dataSource={userPermi} bordered pagination={false} rowKey="id" className='tableLevel2'/>
 				</Card>
 			</div>);
 	}

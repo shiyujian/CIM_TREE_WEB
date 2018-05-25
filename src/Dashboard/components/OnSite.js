@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-05-14 15:25:57
+ * @Last Modified time: 2018-05-24 15:20:07
  */
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -383,7 +383,9 @@ class Lmap extends Component {
             getSamplingstat,
             getTreeflows,
             getNurserys,
-            getCarpackbysxm 
+            getCarpackbysxm,
+            getTreeMess,
+            getLittleBan 
         } } = this.props
         let me = this
         var resolutions = [0.703125, 0.3515625, 0.17578125, 0.087890625, 0.0439453125, 0.02197265625, 0.010986328125, 0.0054931640625, 0.00274658203125, 0.001373291015625, 6.866455078125E-4, 3.4332275390625E-4, 1.71661376953125E-4, 8.58306884765625E-5, 4.291534423828125E-5, 2.1457672119140625E-5, 1.0728836059570312E-5, 5.364418029785156E-6, 2.682209014892578E-6, 1.341104507446289E-6, 6.705522537231445E-7, 3.3527612686157227E-7];
@@ -398,33 +400,51 @@ class Lmap extends Component {
         var rowp = row % 256;
         row = Math.floor(row / 256);
         var url = window.config.DASHBOARD_ONSITE+"/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:" + zoom + "&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=" + col + "&TileRow=" + row + "&I=" + colp + "&J=" + rowp;
-        debugger
+        // debugger
         jQuery.getJSON(url, null,async  function (data) {
             console.log('data',data)
             if(data.features&&data.features.length){
-                debugger
+                // debugger
                 let postdata = {
                     sxm:data.features[0].properties.SXM
                 }
 
-                let queryTreeDatas = await getqueryTree({},postdata)
+                let queryTreeData = await getTreeMess(postdata)
                 let samplingstatData = await getSamplingstat({},postdata)
                 let treeflowDatas = await getTreeflows({},postdata)
                 let nurserysDatas = await getNurserys({},postdata)
                 let carData = await getCarpackbysxm(postdata)
 
-                console.log('queryTreeDatas',queryTreeDatas)
+                let SmallClassName=queryTreeData.SmallClass?queryTreeData.SmallClass+'号小班':''
+                let ThinClassName=queryTreeData.ThinClass?queryTreeData.ThinClass + '号细班':''
+                if(queryTreeData && queryTreeData.Section && queryTreeData.SmallClass && queryTreeData.ThinClass){
+                    let data = {
+                        no:queryTreeData.Section
+                    }
+                    let noList = await  getLittleBan(data)
+                    let sections = queryTreeData.Section.split('-')
+                    let No = sections[0] + '-' + sections[1] + '-' + queryTreeData.SmallClass + '-' + queryTreeData.ThinClass + '-' + sections[2]
+                    console.log('No',No)
+                    noList.map((rst)=>{
+                        if(rst.No.indexOf(No) != -1){
+                            SmallClassName = rst.SmallClassName?rst.SmallClassName+'号小班':SmallClassName
+                            ThinClassName = rst.ThinClassName?rst.ThinClassName+'号细班':ThinClassName
+                        }
+                    })
+                }
+
+                console.log('queryTreeData',queryTreeData)
                 console.log('samplingstatData',samplingstatData)
                 console.log('treeflowData',treeflowDatas)
                 console.log('nurserysData',nurserysDatas)
                 console.log('carData',carData)
-                let queryTreeData = {}
+                // let queryTreeData = {}
                 let treeflowData = {}
                 let nurserysData = {}
 
-                if(queryTreeDatas && queryTreeDatas.content && queryTreeDatas.content instanceof Array && queryTreeDatas.content.length>0){
-                    queryTreeData =  queryTreeDatas.content[0]
-                }
+                // if(queryTreeDatas && queryTreeDatas.content && queryTreeDatas.content instanceof Array && queryTreeDatas.content.length>0){
+                //     queryTreeData =  queryTreeDatas.content[0]
+                // }
                 if(treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array && treeflowDatas.content.length>0){
                     treeflowData =  treeflowDatas.content
                 }
@@ -440,17 +460,21 @@ class Lmap extends Component {
                     TreePlace:nurserysData.TreePlace?nurserysData.TreePlace:'',
                     Factory:nurserysData.Factory?nurserysData.Factory:'',
                     NurseryName:nurserysData.NurseryName?nurserysData.NurseryName:'',
-                    LifterTime:nurserysData.LifterTime?nurserysData.LifterTime:'',
+                    LifterTime:nurserysData.LifterTime?moment(nurserysData.LifterTime).format('YYYY-MM-DD HH:mm:ss'):'',
                     location:nurserysData.location?nurserysData.location:'',
-                    height:nurserysData.GD?nurserysData.GD:'',
-                    heightImg:nurserysData.GDFJ?me.onImgClick(nurserysData.GDFJ):'',
-                    crown:nurserysData.GF?nurserysData.GF:'',
-                    crownImg:nurserysData.GFFJ?me.onImgClick(nurserysData.GFFJ):'',
-                    diameter:nurserysData.TQZJ?nurserysData.TQZJ:'',
-                    diameterImg:nurserysData.TQZJFJ?me.onImgClick(nurserysData.TQZJFJ):'',
-                    thickness:nurserysData.TQHD?nurserysData.TQHD:'',
-                    thicknessImg:nurserysData.TQHDFJ?me.onImgClick(nurserysData.TQHDFJ):'',
-                    InputerObj:nurserysData.InputerObj?nurserysData.InputerObj:''
+                    InputerObj:nurserysData.InputerObj?nurserysData.InputerObj:'',
+                    GD:nurserysData.GD?nurserysData.GD:'',
+                    GDFJ:nurserysData.GDFJ?me.onImgClick(nurserysData.GDFJ):'',
+                    GF:nurserysData.GF?nurserysData.GF:'',
+                    GFFJ:nurserysData.GFFJ?me.onImgClick(nurserysData.GFFJ):'',
+                    TQZJ:nurserysData.TQZJ?nurserysData.TQZJ:'',
+                    TQZJFJ:nurserysData.TQZJFJ?me.onImgClick(nurserysData.TQZJFJ):'',
+                    TQHD:nurserysData.TQHD?nurserysData.TQHD:'',
+                    TQHDFJ:nurserysData.TQHDFJ?me.onImgClick(nurserysData.TQHDFJ):'',
+                    DJ:nurserysData.DJ?nurserysData.DJ:'',
+                    DJFJ:nurserysData.DJFJ?me.onImgClick(nurserysData.DJFJ):'',
+                    XJ:nurserysData.XJ?nurserysData.XJ:'',
+                    XJFJ:nurserysData.XJFJ?me.onImgClick(nurserysData.XJFJ):'',
                 }
 
 
@@ -482,12 +506,28 @@ class Lmap extends Component {
                     sxm:queryTreeData.ZZBM?queryTreeData.ZZBM:'',
                     landName:landName,
                     sectionName:sectionName,
-                    SmallClass:queryTreeData.SmallClass?queryTreeData.SmallClass+'号小班':'',
-                    ThinClass:queryTreeData.ThinClass?queryTreeData.ThinClass + '号细班':'',
+                    SmallClass:SmallClassName,
+                    ThinClass:ThinClassName,
                     TreeTypeName:nurserysData.TreeTypeObj?nurserysData.TreeTypeObj.TreeTypeName:'',
-                    Location:queryTreeData.LocationTime ? '已定位' : '未定位',
+                    Location:queryTreeData.LocationTime ? queryTreeData.LocationTime : '',
+                    LocationX:queryTreeData.Location ? queryTreeData.Location.X : '',
+                    LocationY:queryTreeData.Location ? queryTreeData.Location.Y : '',
+                    DJ:queryTreeData.DJ?queryTreeData.DJ:'',
+                    DJFJ:queryTreeData.DJFJ?me.onImgClick(queryTreeData.DJFJ):'',
+                    GD:queryTreeData.GD?queryTreeData.GD:'',
+                    GDFJ:queryTreeData.GDFJ?me.onImgClick(queryTreeData.GDFJ):'',
+                    GF:queryTreeData.GF?queryTreeData.GF:'',
+                    GFFJ:queryTreeData.GFFJ?me.onImgClick(queryTreeData.GFFJ):'',
+                    MD:queryTreeData.MD?queryTreeData.MD:'',
+                    MDFJ:queryTreeData.MDFJ?me.onImgClick(queryTreeData.MDFJ):'',
+                    MJ:queryTreeData.MJ?queryTreeData.MJ:'',
+                    MJFJ:queryTreeData.MJFJ?me.onImgClick(queryTreeData.MJFJ):'',
+                    TQHD:queryTreeData.TQHD?queryTreeData.TQHD:'',
+                    TQHDFJ:queryTreeData.TQHDFJ?me.onImgClick(queryTreeData.TQHDFJ):'',
+                    TQZJ:queryTreeData.TQZJ?queryTreeData.TQZJ:'',
+                    TQZJFJ:queryTreeData.TQZJFJ?me.onImgClick(queryTreeData.TQZJFJ):'',
                     XJ:queryTreeData.XJ?queryTreeData.XJ:'',
-                    XJImg:queryTreeData.XJFJ?me.onImgClick(queryTreeData.XJFJ):'',
+                    XJFJ:queryTreeData.XJFJ?me.onImgClick(queryTreeData.XJFJ):'',
                 }
                 let flowMess = treeflowData
               
@@ -507,21 +547,21 @@ class Lmap extends Component {
 
     onImgClick(data) {
        
-        let src = ''
+        let srcs = [] 
         try{
-            let srcs = data.split(',')
-            if(srcs && srcs instanceof Array && srcs.length>0){
-                let len = srcs.length
-                src = srcs[len-1]
-            }else{
-                src = data
-            }
+
+			let arr = data.split(',')
+			console.log('arr',arr)
+			arr.map((rst)=>{
+				let src = rst.replace(/\/\//g,'/')
+				src =  `${FOREST_API}/${src}`
+				srcs.push(src)
+
+			})
         }catch(e){
             console.log('处理图片',e)
         }
-		src = src.replace(/\/\//g,'/')
-		src =  `${FOREST_API}/${src}`
-		return src
+        return srcs
         
 	}
 
@@ -819,11 +859,11 @@ class Lmap extends Component {
             flowMess
         }=this.state
 
-        let heightImgStyle = seedlingMess.height?'block':'none'
-        let crownImgStyle = seedlingMess.crown?'block':'none'
-        let diameterImgStyle = seedlingMess.diameter?'block':'none'
-        let thicknessStyle = seedlingMess.thickness?'block':'none'
-        let XJIStyle = treeMess.XJ?'block':'none'
+        // let heightImgStyle = seedlingMess.height?'block':'none'
+        // let crownImgStyle = seedlingMess.crown?'block':'none'
+        // let diameterImgStyle = seedlingMess.diameter?'block':'none'
+        // let thicknessStyle = seedlingMess.thickness?'block':'none'
+        // let XJIStyle = treeMess.XJ?'block':'none'
 
         let height = document.querySelector('html').clientHeight - 80 - 36 - 52
         let treeLists = this.state.treeLists
@@ -946,22 +986,102 @@ class Lmap extends Component {
                                         <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='苗圃名称'  value={seedlingMess.NurseryName?seedlingMess.NurseryName:''} />
                                         <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='起苗时间'  value={seedlingMess.LifterTime?seedlingMess.LifterTime:''} />
                                         <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='起苗地点'  value={seedlingMess.location?seedlingMess.location:''} />
-                                        <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='高度(cm)'  value={seedlingMess.height?seedlingMess.height:''} />
-                                        <div>
-                                            <img style={{width:"150px",height:"150px",display: heightImgStyle,marginTop: '10px'}} src={seedlingMess.heightImg?seedlingMess.heightImg:''} alt="图片"/>
-                                        </div>
-                                        <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='冠幅(cm)'  value={seedlingMess.crown?seedlingMess.crown:''} />
-                                        <div>
-                                            <img style={{width:"150px",height:"150px",display: crownImgStyle,marginTop: '10px'}} src={seedlingMess.crownImg?seedlingMess.crownImg:''} alt="图片"/>
-                                        </div>
-                                        <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='土球直径(cm)'  value={seedlingMess.diameter?seedlingMess.diameter:''} />
-                                        <div>
-                                            <img style={{width:"150px",height:"150px",display: diameterImgStyle,marginTop: '10px'}} src={seedlingMess.diameterImg?seedlingMess.diameterImg:''} alt="图片"/>
-                                        </div>
-                                        <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='土球厚度(cm)'  value={seedlingMess.thickness?seedlingMess.thickness:''} />
-                                        <div>
-                                            <img style={{width:"150px",height:"150px",display: thicknessStyle,marginTop: '10px'}} src={seedlingMess.thicknessImg?seedlingMess.thicknessImg:''} alt="图片"/>
-                                        </div>
+                                        {
+                                            seedlingMess.GD?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='高度(cm)'  value={seedlingMess.GD} />
+                                                {
+                                                    seedlingMess.GDFJ?
+                                                    seedlingMess.GDFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            seedlingMess.GF?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='冠幅(cm)'  value={seedlingMess.GF} />
+                                                {
+                                                    seedlingMess.GFFJ?
+                                                    seedlingMess.GFFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            seedlingMess.XJ?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='胸径(cm)'  value={seedlingMess.XJ} />
+                                                {
+                                                    seedlingMess.XJFJ?
+                                                    seedlingMess.XJFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            seedlingMess.DJ?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='地径(cm)'  value={seedlingMess.DJ} />
+                                                {
+                                                    seedlingMess.DJFJ?
+                                                    seedlingMess.DJFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            seedlingMess.TQHD?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='土球厚度(cm)'  value={seedlingMess.TQHD} />
+                                                {
+                                                    seedlingMess.TQHDFJ?
+                                                    seedlingMess.TQHDFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            seedlingMess.TQZJ?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='土球直径(cm)'  value={seedlingMess.TQZJ} />
+                                                {
+                                                    seedlingMess.TQZJFJ?
+                                                    seedlingMess.TQZJFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
                                     
                                     </TabPane>
                                     <TabPane tab="树木信息" key="2">
@@ -972,10 +1092,150 @@ class Lmap extends Component {
                                         <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='细班'  value={treeMess.ThinClass?treeMess.ThinClass:''} />
                                         <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='树种'  value={treeMess.TreeTypeName?treeMess.TreeTypeName:''} />
                                         <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='位置'  value={treeMess.Location?treeMess.Location:''} />
-                                        <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='胸径(cm)'  value={treeMess.XJ?treeMess.XJ:''} />
-                                        <div>
-                                            <img style={{width:"150px",height:"150px",display: XJIStyle,marginTop: '10px'}} src={treeMess.XJImg?treeMess.XJImg:''} alt="图片"/>
-                                        </div>
+                                        {
+                                            treeMess.GD?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='高度(cm)'  value={treeMess.GD} />
+                                                {
+                                                    treeMess.GDFJ?
+                                                    treeMess.GDFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            treeMess.GF?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='冠幅(cm)'  value={treeMess.GF} />
+                                                {
+                                                    treeMess.GFFJ?
+                                                    treeMess.GFFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            treeMess.XJ?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='胸径(cm)'  value={treeMess.XJ} />
+                                                {
+                                                    treeMess.XJFJ?
+                                                    treeMess.XJFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            treeMess.DJ?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='地径(cm)'  value={treeMess.DJ} />
+                                                {
+                                                    treeMess.DJFJ?
+                                                    treeMess.DJFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            treeMess.MD?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='密度(棵/m^3)'  value={treeMess.MD} />
+                                                {
+                                                    treeMess.MDFJ?
+                                                    treeMess.MDFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            treeMess.MJ?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='面积(m^2)'  value={treeMess.MJ} />
+                                                {
+                                                    treeMess.MJFJ?
+                                                    treeMess.MJFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            treeMess.TQHD?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='土球厚度(cm)'  value={treeMess.TQHD} />
+                                                {
+                                                    treeMess.TQHDFJ?
+                                                    treeMess.TQHDFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            treeMess.TQZJ?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='地径(cm)'  value={treeMess.TQZJ} />
+                                                {
+                                                    treeMess.TQZJFJ?
+                                                    treeMess.TQZJFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
+                                        {
+                                            treeMess.DJ?
+                                            <div>
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='地径(cm)'  value={treeMess.DJ} />
+                                                {
+                                                    treeMess.DJFJ?
+                                                    treeMess.DJFJ.map((src)=>{
+                                                        return <div>
+                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
+                                                        </div>
+                                                    })
+                                                    :''
+                                                }
+                                            </div>
+                                            :''
+                                        }
                                     </TabPane>
                                     <TabPane tab="审批流程" key="3">
                                         <div>

@@ -98,6 +98,9 @@ export default class NursOverallTable extends Component {
 				title:"树种",
 				dataIndex: 'TreeTypeName',
 			},{
+				title:"苗龄",
+				dataIndex: 'Age',
+			},{
 				title:"打包车牌",
 				dataIndex: 'car',
 			},{
@@ -366,6 +369,9 @@ export default class NursOverallTable extends Component {
 			},{
 				title:"树种",
 				dataIndex: 'TreeTypeName',
+			},{
+				title:"苗龄",
+				dataIndex: 'Age',
 			},{
 				title:"打包车牌",
 				dataIndex: 'car',
@@ -711,6 +717,7 @@ export default class NursOverallTable extends Component {
 			TreePlace:nurserysData.TreePlace?nurserysData.TreePlace:'',
 			Factory:nurserysData.Factory?nurserysData.Factory:'',
 			NurseryName:nurserysData.NurseryName?nurserysData.NurseryName:'',
+			Age:nurserysData.Age?nurserysData.Age:'',
 			LifterTime:nurserysData.LifterTime?moment(nurserysData.LifterTime).format('YYYY-MM-DD HH:mm:ss'):'',
 			location:nurserysData.location?nurserysData.location:'',
 			InputerObj:nurserysData.InputerObj?nurserysData.InputerObj:'',

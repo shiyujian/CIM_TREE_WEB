@@ -66,6 +66,9 @@ export default class Member extends Component {
 		} else {
 			dataSource = users1
 		}
+		console.log('this.state.searchUser',this.state.searchUser)
+		console.log('users2',users2)
+
 		this.state.orgSet && users2.forEach(ele => {
 			if (this.state.orgSet[ele.person_id]) {
 				ele.organization = this.state.orgSet[ele.person_id];
@@ -274,6 +277,7 @@ export default class Member extends Component {
 			const { member = {} } = this.props;
 			const members = member.members || [];
 			const checked = members.some(member => member === user.id);
+			
 			return <Checkbox checked={checked} onChange={this.check.bind(this, user)} />
 		},
 	}];

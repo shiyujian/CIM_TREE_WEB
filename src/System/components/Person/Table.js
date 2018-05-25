@@ -74,6 +74,8 @@ export default class Users extends Component {
 
 	search() {
 		let text = document.getElementById("NurseryData").value;
+		console.log('text',text)
+		console.log('this.state.roles',this.state.roles)
 		const {
 			actions: { getUsers, getTablePage, getIsBtn },
 		} = this.props;
@@ -100,6 +102,27 @@ export default class Users extends Component {
 				getIsBtn(true)
 			});
 		}
+	}
+
+	clear(){
+		document.getElementById("NurseryData").value = '';
+		this.setState({
+			roles:[]
+		})
+		const {
+			actions: { getUsers, getTablePage, getIsBtn },
+		} = this.props;
+		
+		getUsers({}, { org_code: this.props.getTreeCodes, page: this.state.objPages || 1 }).then((e) => {
+			let pagination = {
+				current: this.state.objPages || 1,
+				total: e.count,
+			};
+			getTablePage(pagination)
+			this.setState({ btn: false, fristText: '', fristRoles: [], isBtn: true })
+			getIsBtn(true)
+		});
+		
 	}
 
 	confirms() {
@@ -328,7 +351,7 @@ export default class Users extends Component {
 					<Spin tip="加载中" percent={this.state.percent} status="active" strokeWidth={5} spinning={this.state.loading}>
 						<div>
 							<Row style={{ marginBottom: "20px" }}>
-								<Col span={10}>
+								<Col span={9}>
 									<label style={{ minWidth: 60, display: 'inline-block' }}>用户名:</label>
 									<Input id='NurseryData' className='search_input' />
 								</Col>
@@ -365,9 +388,13 @@ export default class Users extends Component {
 										</OptGroup>
 									</Select>
 								</Col>
-								<Col span={4} style={{ marginLeft: "20px" }}>
-									<Button type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>查询</Button>
-
+								<Col span={4}>
+									<Button type='primary' onClick={this.search.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginLeft: 20 }}>查询</Button>
+										
+								</Col>
+								<Col span={4}>
+									<Button type='primary' onClick={this.clear.bind(this)} style={{ minWidth: 30, display: 'inline-block', marginRight: 20 }}>清空</Button>
+										
 								</Col>
 							</Row>
 
