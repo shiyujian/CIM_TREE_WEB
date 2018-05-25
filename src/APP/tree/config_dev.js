@@ -75,6 +75,8 @@ window.config = {
 	'IMG_3':'http://47.104.159.127:200/3',
 	'IMG_4':'http://47.104.159.127:200/4',
 	'IMG_5':'http://47.104.159.127:200/5',
+	'IMG_6':'http://47.104.159.127:200/6',
+	'IMG_7':'http://47.104.159.127:200/7',
 
 	//视频监控插件下载配置
 	'Video_PLUGIN_URL':'http://47.104.160.65:6512/media/documents/meta/WebComponentsKithas_rem_cfg.exe',

@@ -151,6 +151,8 @@ export default class Lmap extends Component {
 		3: window.config.IMG_3,
 		4: window.config.IMG_4,
 		5: window.config.IMG_5,
+		6: window.config.IMG_6,
+		7: window.config.IMG_7,
 		
 
 	};
@@ -299,6 +301,8 @@ export default class Lmap extends Component {
 									<RadioButton value={3}>2017年12月01日</RadioButton>
 									<RadioButton value={4}>2017年12月10日</RadioButton>
 									<RadioButton value={5}>2017年12月13日</RadioButton>
+									<RadioButton value={6}>2018年3月23日</RadioButton>
+									<RadioButton value={7}>2018年5月4日</RadioButton>
 								</RadioGroup>
 							</div>
 						</div>
@@ -311,6 +315,8 @@ export default class Lmap extends Component {
 									<RadioButton value={3}>2017年12月01日</RadioButton>
 									<RadioButton value={4}>2017年12月10日</RadioButton>
 									<RadioButton value={5}>2017年12月13日</RadioButton>
+									<RadioButton value={6}>2018年3月23日</RadioButton>
+									<RadioButton value={7}>2018年5月4日</RadioButton>
 								</RadioGroup>
 							</div>
 						</div>
