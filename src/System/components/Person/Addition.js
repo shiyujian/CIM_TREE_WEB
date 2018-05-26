@@ -209,6 +209,36 @@ class Addition extends Component {
 		}
 	}
 
+	componentDidUpdate(prevProps,prevState){
+		const{
+			sidebar,
+			addition,
+			actions:{
+				changeAdditionField
+			}
+		}=this.props
+		console.log('prevProps.addition',prevProps.addition)
+		if(addition && addition.visible && (prevProps.addition == undefined)){
+			let node = sidebar && sidebar.node
+			if(!node){
+				return
+			}
+			let code = node.code
+			let name = node.name
+			changeAdditionField('org_code',code)
+			changeAdditionField('organization',name)
+		}else if(addition && addition.visible && (prevProps.addition != undefined) && addition.visible != prevProps.addition.visible){
+			let node = sidebar && sidebar.node
+			if(!node){
+				return
+			}
+			let code = node.code
+			let name = node.name
+			changeAdditionField('org_code',code)
+			changeAdditionField('organization',name)
+		}
+	}
+
 	render() {
 		const { form: {
 			getFieldDecorator
@@ -294,6 +324,8 @@ class Addition extends Component {
 		if (!user.is_superuser) {
 			marginTops = '55px'
 		}
+		console.log('additionadditionadditionaddition',addition)
+		console.log('this.props',this.props)
 		return (
 			<div>
 				{
@@ -368,7 +400,7 @@ class Addition extends Component {
 									</FormItem>
 									{user.is_superuser ?
 										<FormItem {...Addition.layout} label="部门编码">
-											<Input placeholder="部门编码" value={addition.org_code} onChange={changeAdditionField.bind(this, 'org_code')} />
+											<Input placeholder="部门编码" value={addition.org_code} onChange={changeAdditionField.bind(this, 'org_code')} readOnly />
 										</FormItem> : ''
 									}
 									{
@@ -415,7 +447,7 @@ class Addition extends Component {
 											defaultFileList={fileList}
 											disabled={fileList && fileList.length ? (this.props.getImgBtns == true ? this.props.getImgBtns : this.props.getImgBtns == false ? false : true) : this.props.getImgBtns}
 										>
-											<Button>
+											<Button >
 												<Icon type="upload" />
 												<span>上传用户头像</span>
 											</Button>
@@ -487,6 +519,8 @@ class Addition extends Component {
 											})
 												(
 												<Select placeholder="请选择角色"
+													optionFilterProp='children'
+													filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
 													onChange={this.changeRoles.bind(this)}
 													mode="multiple" style={{ width: '100%' }}>
 													{
@@ -498,7 +532,7 @@ class Addition extends Component {
 									</FormItem>
 									{user.is_superuser ?
 										<FormItem {...Addition.layout} label="部门名称">
-											<Input placeholder="部门名称" value={addition.organization} onChange={changeAdditionField.bind(this, 'organization')} />
+											<Input placeholder="部门名称" value={addition.organization} onChange={changeAdditionField.bind(this, 'organization')} readOnly/>
 										</FormItem> : ''
 									}
 									<FormItem {...Addition.layout} label="苗圃">
@@ -549,6 +583,7 @@ class Addition extends Component {
 											multiple={true}
 											accept={fileTypes}
 											// showUploadList: false,
+											className='form-item-required'
 											action={base + "/service/fileserver/api/user/files/"}
 											listType="picture"
 											data={(file) => ({ name: file.fileName, a_file: file })}
@@ -566,6 +601,7 @@ class Addition extends Component {
 										<Upload name="file"
 											multiple={true}
 											accept={fileTypes}
+											className='form-item-required'
 											// showUploadList: false,
 											action={base + "/service/fileserver/api/user/files/"}
 											listType="picture"
