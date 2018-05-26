@@ -217,7 +217,6 @@ class Addition extends Component {
 				changeAdditionField
 			}
 		}=this.props
-		console.log('prevProps.addition',prevProps.addition)
 		if(addition && addition.visible && (prevProps.addition == undefined)){
 			let node = sidebar && sidebar.node
 			if(!node){
@@ -324,8 +323,7 @@ class Addition extends Component {
 		if (!user.is_superuser) {
 			marginTops = '55px'
 		}
-		console.log('additionadditionadditionaddition',addition)
-		console.log('this.props',this.props)
+	
 		return (
 			<div>
 				{
