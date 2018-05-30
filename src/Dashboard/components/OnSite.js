@@ -9,13 +9,13 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-05-24 15:20:07
+ * @Last Modified time: 2018-05-30 17:25:27
  */
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { actions } from '../store'
-import { Button, Modal, Spin, message, Collapse, Checkbox, Form, Input, Tabs, Row, Col  } from 'antd'
+import { Button, Modal, Spin, message, Collapse, Checkbox, Form, Input, Tabs, Row, Col, DatePicker  } from 'antd'
 import { Icon } from 'react-fa';
 import { panorama_360, tracks } from './geojsonFeature'
 import {
@@ -41,6 +41,7 @@ import DGNProjectInfo from './DGNProjectInfo'
 import PkCodeTree from './PkCodeTree'
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
+const { RangePicker } = DatePicker;
 
 const Panel = Collapse.Panel
 const $ = window.$
@@ -127,7 +128,9 @@ class Lmap extends Component {
             unitProjectList:[],
             seedlingMess:'',
             treeMess:'',
-            flowMess:''
+            flowMess:'',
+            mapList: [],//轨迹列表
+            mapRould: [],//坐标
         }
         this.aa = {}
         this.OnlineState = false
@@ -167,8 +170,16 @@ class Lmap extends Component {
     }
 
     async componentDidMount() {
+        
         this.loadAreaData();
         this.initMap()
+        //巡检路线
+        this.getMapRouter();
+        //安全隐患
+        this.getArea();
+		this.getRisk();
+		// this.getVedio();
+		// this.getSafeMonitor();
     }
 
     WMSTileLayerUrl = window.config.WMSTileLayerUrl
@@ -334,6 +345,360 @@ class Lmap extends Component {
         return thinClassList
     }
 
+    //巡检路线代码
+
+    /*查询巡检路线*/
+    getMapRouter() {
+        let me = this;
+        const { getMapRouter } = this.props.actions;
+        getMapRouter().then((orgs) => {
+            let orgArr = orgs.map(or => {
+                if(or.PatrolerUser!=undefined){
+                    return {
+                        key: or.ID,
+                        properties: {
+                            name: or.PatrolerUser.Full_Name
+                        }
+                    }
+                }
+            });
+            me.setState({ users: orgArr });
+        })
+    }
+
+
+    //巡检路线多选树节点
+    onCheckPlan(keys, featureName) {
+        let me = this;
+        this.setState({ userCheckedKeys: keys }, () => {
+            const { getMapList } = this.props.actions;
+            console.log("this.state.userCheckedKeys",this.state.userCheckedKeys)
+            for (let i = 0; i < this.state.userCheckedKeys.length; i++) {
+                const element = this.state.userCheckedKeys[i];
+                getMapList({ routeID: element }).then((orgs) => {
+                    console.log("orgs222222222",orgs)
+                    
+                        let set = {}
+                        orgs.forEach(item => {
+        
+                            set[item.RouteID] = []
+                        })
+                        orgs.forEach(item => {
+                            if (set[item.RouteID]) {
+                                set[item.RouteID].push({
+                                    'GPSTime': item.GPSTime, 'ID': item.ID,
+                                    'Patroler': item.Patroler, 'X': item.X, 'Y': item.Y
+                                })
+                            }
+                        })
+                        let arr = []
+                        for (var i in set) {
+                            arr.push(i)
+                        }
+                        // console.log('arr', arr)
+        
+                        let arr1 = []
+                        for (var i in set) {
+                            arr1.push(set[i])
+        
+                        }
+                        console.log("arr1", arr1)
+                        console.log("arr", arr)
+                        me.setState({ mapRould: arr1 })
+                        me.setState({ mapList: arr });
+                        let latlngs = []
+                        if(arr1 && arr1 instanceof Array && arr1.length>0){
+                            arr1[0].map((rst)=>{
+                                if(rst && rst.X && rst.Y){
+                                    latlngs.push([rst.X,rst.Y])
+    
+                                }
+                            })
+                            console.log('latlngs',latlngs)
+                        }
+                        let polyline = L.polyline(latlngs, { color: 'red' }).addTo(this.map)
+                        this.map.fitBounds(polyline.getBounds())
+                        
+
+                    })
+            }
+        
+        });
+
+    }
+    //巡检路线选择树节点
+    onSelectPlan(keys, featureName) {
+        console.log("keys",keys)
+        console.log("featureName",featureName)
+        let me = this;
+        console.log("me",me)
+        this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
+        let checkItems = this.checkMarkers[featureName];
+        console.log("this.checkMarkers",this.checkMarkers)
+        
+        let key = keys.length > 0 && keys[0];
+        if (key) {
+            let selItem = checkItems[key];
+            console.log("selItem",selItem)
+            if (selItem) {
+                if (featureName != 'geojsonFeature_area')
+                    this.map.setView(selItem.getLatLng());
+                else {
+                    this.map.fitBounds(selItem.getBounds(), { padding: [200, 200] });
+                }
+                selItem.openPopup();
+            }
+        }
+    }
+
+
+    //巡检路线代码
+
+
+
+    /**
+     * 安全隐患代码
+     */
+    
+    /*获取区域数据*/
+	getArea() {
+		let me = this;
+		const {getArea} = this.props.actions;
+		//获取区域数据
+		getArea({})
+			.then((rst = {}) => {
+				let areaData = rst.children || [];
+				var resAreas = me.loop(areaData, []);
+				resAreas.forEach((v, index) => {
+					v.key = index;
+				});
+				let areas = [{
+					key: 'ALL',
+					'properties': {
+						name: "区域地块",
+					},
+					children: resAreas
+				}];
+				me.setState({areaJson: areas});
+			});
+    }
+    
+
+    /*获取安全隐患点*/
+	getRisk() {
+		const {getRisk} = this.props.actions;
+		let me = this;
+		getRisk().then(data => {
+			console.log('data',data)
+			//安全隐患数据处理
+			let datas = data.content;
+			let riskObj = {}
+			datas.forEach((v, index) => {
+				// let levelNode = v["risk_level"];
+				let level = v["EventType"];
+				let name = v["ProblemType"];
+				let response_org = v['ReorganizerObj'];
+				// let measure = levelNode["风险控制措施"];
+				let content = v["ProblemType"];
+				//位置
+				// let coordinates = ["39.004728", "116.244123"];
+				let locationX = v["X"];
+				let locationY = v["Y"];
+				let coordinates = [locationY, locationX];
+				riskObj[level] = riskObj[level] || {
+					key: level,
+					'properties': {
+						name: level
+					},
+					children: []
+				};
+				riskObj[level].children.push({
+					'type': 'danger',
+					key: v.ID,
+					'properties': {
+						'content': content,
+						'level': level,
+						'measure': '',
+						'name': name,
+						'response_org':response_org?response_org.Full_Name:'',
+						// beforeImgs: v['rectify_before'] ? v['rectify_before'].images : [],
+						// afterImgs: v['rectify_after'] ? v['rectify_after'].images : []
+					},
+					'geometry': {
+						'type': 'Point',
+						'coordinates': coordinates
+					}
+				});
+			});
+			let risks = [];
+			for (let i in riskObj) {
+				risks.push(riskObj[i]);
+			}
+			me.setState({hazards: risks});
+		});
+    }
+
+    	//解构得到的区域数据
+	loop(data = [], resAreas = []) {
+		let me = this;
+		data.map((item) => {
+			if (item.children && item.children.length) {
+				me.loop(item.children, resAreas)
+			} else if (item.extra_params.coordinates) {
+				let areaData = item.extra_params.coordinates;
+				let coordinates = [];
+				areaData.map((LatLng) => {
+					let LngLat = [LatLng.Lng, LatLng.Lat];
+					coordinates.push(LngLat)
+				});
+				resAreas.push({
+					key: 0,
+					"type": "Feature",
+					"properties": {
+						"name": item.name,
+						"type": "area"
+					},
+					"geometry": {
+						"type": "Polygon",
+						"coordinates": [coordinates]
+					},
+					"file_info": item.extra_params.file_info
+				})
+			}
+		});
+		return resAreas;
+	};
+    
+
+    /*获取隐患处理过程*/
+	getRiskProcess(id) {
+		let me = this;
+		const {getRiskProcess, getRiskProcessDetail} = this.props.actions;
+		getRiskProcess({}, {code: 'TEMPLATE_011', 'subject_id': id}).then(data => {
+			if (data.length) {
+				let process = data[0];
+				let processId = process.id;
+				getRiskProcessDetail({ID: processId}).then(dd => {
+					//处理history 显示处理过程
+					let excuLogs = [];
+					dd.history.forEach(h => {
+						if (h.records && h.records.length) {
+							let record = h.records[0];
+							let personName = record.participant.executor['person_name'];
+							let note = record.note;
+							let time = new moment(record['log_on']);
+							let excuText = `${personName} ${note}  ${time.format('YYYY-MM-DD HH:mm:ss')}`;
+							excuLogs.push(excuText);
+						} else {
+							let participant = h.state.participants;
+							let excuLog = '';
+							participant.forEach(p => {
+								excuLog += p.executor['person_name']||'' + ' ';
+							});
+							excuLog += '正在处理';
+							excuLogs.push(excuLog);
+						}
+					});
+					let oldRisk = me.state.risk;
+					oldRisk.processHistory = excuLogs;
+					me.setState({risk: {...oldRisk}});
+				})
+			}
+		});
+	}
+
+
+
+    /*显示隐藏地图marker*/
+    onCheckDanger(keys, featureName) {
+		// console.log('keys',keys,featureName)
+		var content = this.getPanelData(featureName);
+		//获取所有key对应的数据对象
+		this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
+		let checkItems = this.checkMarkers[featureName];
+		//移除未选中的
+		for (var c in checkItems) {
+			// console.log('checkItems[c]',checkItems[c])
+			let k = keys.find(k => k == c);
+			if (!k && checkItems[c]) {
+				checkItems[c]._icon.remove();
+				delete  checkItems[c];
+			}
+		}
+		// debugger
+		let me = this;
+		
+        content.forEach(c => {
+            if (!c.children) {
+                let kkkk = keys.find(k => k == c.key);
+                if (kkkk) {
+                    checkItems[kkkk] = me.createMarker(c, checkItems[kkkk]);
+                }
+            } else {
+                c.children.forEach(cc => {
+                    let kk = keys.find(k => k == cc.key);
+                    if (kk) {
+                        checkItems[kk] = me.createMarker(cc, checkItems[kk]);
+                        if (featureName == 'geojsonFeature_hazard') {
+                            // console.log(2222222,cc,checkItems[kk])
+                            this.map.panTo(cc.geometry.coordinates);
+                            checkItems[kk].on('click', function () {
+                                //获取隐患处理措施
+                                const {getRiskContactSheet} = me.props.actions;
+                                getRiskContactSheet({ID: kk}).then(contact => {
+                                    if (contact.length) {
+                                        let ct = contact[0];
+                                        let measure = ct['rectify_measure'];
+                                        let risk;
+                                        me.state.hazards.forEach(v => {
+                                            if (!risk)
+                                                risk = v.children.find(v1 => v1.key == kk);
+                                        });
+                                        if (risk) {
+                                            risk.properties.measure = measure;
+                                            checkItems[kk].setPopupContent(me.genPopUpContent(risk));
+                                            if (me.state.risk.detail) {//更新详情页隐患措施
+                                                me.state.risk.detail.properties.measure = measure;
+                                                me.setState({risk: me.state.risk});
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                    }
+                })
+            }
+        });
+    
+		this.checkMarkers[featureName] = checkItems;
+    }
+    
+
+    /*弹出信息框*/
+	onSelectDanger(keys, featureName) {
+		this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
+		let checkItems = this.checkMarkers[featureName];
+		let key = keys.length > 0 && keys[0];
+		if (key) {
+			let selItem = checkItems[key];
+			if (selItem) {
+				if (featureName != 'geojsonFeature_area')
+					this.map.setView(selItem.getLatLng());
+				else {
+					this.map.fitBounds(selItem.getBounds(), {padding: [200, 200]});
+				}
+				selItem.openPopup();
+			}
+		}
+    }
+
+
+    /**
+     * 安全隐患代码
+     */
+    
+
     /*初始化地图*/
     initMap() {
         this.map = L.map('mapid', window.config.initLeaflet)
@@ -355,16 +720,47 @@ class Lmap extends Component {
             storagetype: 0,
             tiletype: "wtms"
         }).addTo(this.map);
-        // this.tileLayer2 = L.tileLayer('http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&amp;style=&amp;tilematrixset=EPSG%3A4326&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image%2Fpng&amp;TileMatrix=EPSG%3A4326%3A{z}&amp;TileCol={x}&amp;TileRow={y}', {
-        //     opacity: 1.0,
-        //     subdomains: [1, 2, 3],
-        //     minZoom: 11, 
-        //     maxZoom: 21,
-        //     storagetype: 0,
-        //      tiletype: 'wtms'
-        // }).addTo(this.map);
 
-        // L.tileLayer("http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}", { opacity:1.0,subdomains: [1, 2, 3], minZoom: 11, maxZoom: 21, storagetype: 0,tiletype:"wtms" });
+
+        /**
+         * 增加巡检路线后代码
+         */
+        //巡检路线的代码   地图上边的地点的名称
+        L.tileLayer(this.WMSTileLayerUrl, {
+            subdomains: [1, 2, 3], 
+			minZoom: 1, 
+			maxZoom: 17, 
+			storagetype: 0 
+        }).addTo(this.map)
+
+
+        /**
+         * 增加安全隐患后代码
+         */
+        //隐患详情点击事件
+        document.querySelector('.leaflet-popup-pane').addEventListener('click', function (e) {
+			let target = e.target;
+			//绑定隐患详情点击事件
+			if (target.getAttribute('class') == 'btnViewRisk') {
+				let idRisk = target.getAttribute('data-id');
+				let risk = null;
+				me.state.hazards.forEach(v => {
+					if (!risk)
+						risk = v.children.find(v1 => v1.key == parseInt(idRisk));
+				});
+				if (risk) {
+					let oldRisk = me.state.risk;
+					oldRisk.showRiskDetail = true;
+					oldRisk.processHistory = [];
+					oldRisk.detail = risk;
+					me.setState({risk: oldRisk});
+					me.getRiskProcess(idRisk);
+				}
+			}
+		})
+
+       
+
         const that = this
         this.map.on('click', function (e) {
             //getThinClass(e.latlng.lng,e.latlng.lat);
@@ -649,6 +1045,12 @@ class Lmap extends Component {
             }
             return oldMarker
         } else {
+
+            /**
+             * 增加安全隐患前代码
+             */
+
+            
             //创建区域图形
             // console.log(222222,L)
             if (!oldMarker) {
@@ -684,10 +1086,47 @@ class Lmap extends Component {
             }
             console.log("oldMarker", oldMarker)
             return oldMarker
+
+            /**
+             * 增加安全隐患后代码
+             */
+            // if (!oldMarker) {
+			// 	var area = L.geoJSON(geo, {
+			// 		style: {
+			// 			fillColor: this.fillAreaColor(geo.key),
+			// 			weight: 1,
+			// 			opacity: 1,
+			// 			color: '#201ffd',
+			// 			fillOpacity: 0.3
+			// 		},
+			// 		title: geo.properties.name,
+			// 	}).addTo(this.map);
+			// 	//地块标注
+			// 	let latlng = area.getBounds().getCenter();
+			// 	let label = L.marker([latlng.lat, latlng.lng], {
+			// 		icon: L.divIcon({
+			// 			className: 'label-text',
+			// 			html: geo.properties.name,
+			// 			iconSize: [48, 20]
+			// 		})
+			// 	});
+			// 	area.addLayer(label);
+			// 	//点击预览
+			// 	area.on({
+			// 		click: function (event) {
+			// 			me.previewFile(geo.file_info, geo.properties);
+			// 		}
+			// 	});
+			// 	return area;
+			// }
         }
     }
 
-    options = [{ label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' }]
+    options = [
+        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' },
+        // { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access', },
+        // { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning',}
+    ]
 
     options2 = [
         { label: '现场人员', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access', },
@@ -742,7 +1181,7 @@ class Lmap extends Component {
                 content = this.state.safetys
                 break
             case 'geojsonFeature_hazard':
-                content = this.state.hazard
+                content = this.state.hazards
                 break
             case 'geojsonFeature_monitor':
                 content = this.state.vedios
@@ -1091,7 +1530,7 @@ class Lmap extends Component {
                                         <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='小班'  value={treeMess.SmallClass?treeMess.SmallClass:''} />
                                         <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='细班'  value={treeMess.ThinClass?treeMess.ThinClass:''} />
                                         <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='树种'  value={treeMess.TreeTypeName?treeMess.TreeTypeName:''} />
-                                        <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='位置'  value={treeMess.Location?treeMess.Location:''} />
+                                        <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='位置'  value={treeMess.Location?`${treeMess.LocationX},${treeMess.LocationY}`:''} />
                                         {
                                             treeMess.GD?
                                             <div>
@@ -1207,26 +1646,10 @@ class Lmap extends Component {
                                         {
                                             treeMess.TQZJ?
                                             <div>
-                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='地径(cm)'  value={treeMess.TQZJ} />
+                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='土球直径(cm)'  value={treeMess.TQZJ} />
                                                 {
                                                     treeMess.TQZJFJ?
                                                     treeMess.TQZJFJ.map((src)=>{
-                                                        return <div>
-                                                            <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
-                                                        </div>
-                                                    })
-                                                    :''
-                                                }
-                                            </div>
-                                            :''
-                                        }
-                                        {
-                                            treeMess.DJ?
-                                            <div>
-                                                <Input readOnly style={{  marginTop: '10px' }}  size="large" addonBefore='地径(cm)'  value={treeMess.DJ} />
-                                                {
-                                                    treeMess.DJFJ?
-                                                    treeMess.DJFJ.map((src)=>{
                                                         return <div>
                                                             <img style={{width:"150px",height:"150px",display: 'block',marginTop: '10px'}} src={src} alt="图片"/>
                                                         </div>
@@ -1345,16 +1768,63 @@ class Lmap extends Component {
     /*渲染菜单panel*/
     renderPanel(option) {
         let content = this.getPanelData(option.value)
+        console.log('this.state.hazards',this.state.hazards)
+        if(option && option.value){
+            
+            switch (option.value) {
+                case 'geojsonFeature_people':
+                    return (
+                        <div>
+                            <DashPanel style={{height:'200px'}} 
+                                onCheck={this.onCheckPlan.bind(this)}
+                                onSelect={this.onSelectPlan.bind(this)}
+                                content={content}
+                                userCheckKeys={this.state.userCheckedKeys}
+                                featureName={option.value} />
+                            <RangePicker
+                                style={{ verticalAlign: "middle", width: '100%' }}
+                                showTime={{ format: 'HH:mm:ss' }}
+                                format={'YYYY/MM/DD HH:mm:ss'}>
+                            </RangePicker>
+                        </div>
+                    )
+                    break
+                // case 'geojsonFeature_safety':
+                //     content = this.state.safetys
+                //     break
+                case 'geojsonFeature_hazard':
+                    return (
+                        <DashPanel onCheck={this.onCheckDanger.bind(this)}
+                                onSelect={this.onSelectDanger.bind(this)}
+                                content={content}
+                                userCheckKeys={this.state.userCheckedKeys}
+                                // loadData={this.loadUsersByOrg.bind(this)}
+                                featureName={option.value}/>
+            
+                    )
+                    break
+                // case 'geojsonFeature_monitor':
+                //     content = this.state.vedios
+                //     break
+                case 'geojsonFeature_area':
+                    return (
+                        <PkCodeTree
+                            treeData={content}
+                            selectedKeys={this.state.leftkeycode}
+                            onSelect={this.onSelect.bind(this)}
+                            // onExpand={this.onExpand.bind(this)}
+                            showIcon={false}
+                        />
+                    )
+                    break
+                // {label: '360全景', value: 'geojsonFeature_360'},
+                case 'geojsonFeature_360':
+                    content = this.state.panorama
+                    break
+            }
+        }
 
-        return (
-            <PkCodeTree
-                treeData={content}
-                selectedKeys={this.state.leftkeycode}
-                onSelect={this.onSelect.bind(this)}
-                // onExpand={this.onExpand.bind(this)}
-                showIcon={false}
-            />
-        )
+        
     }
 
     fillAreaColor(index) {

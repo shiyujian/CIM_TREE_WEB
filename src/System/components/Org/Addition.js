@@ -43,7 +43,7 @@ class Addition extends Component {
 				</FormItem>
 				<FormItem {...Addition.layout} label={`${title}编码`}>
 				   {getFieldDecorator('code', {
-				   	  rules: [{required: true, message: '必须为英文字母、数字以及 -_~`*!.[]{}()的组合'	,pattern:/^[\w\d\_\-]+$/}],
+				   	  rules: [{required: true, message: '必须为英文字母、数字以及 -_的组合'	,pattern:/^[\w\d\_\-]+$/}],
                      initialValue: ''
                     })(
                     <Input readOnly={!parent} placeholder="请输入编码" value={addition.code}

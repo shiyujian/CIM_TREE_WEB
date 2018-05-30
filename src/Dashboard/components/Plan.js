@@ -390,6 +390,7 @@ export default class Plan extends Component {
     }
 
     render() {
+        console.log('this.options',this.options)
         let height = document.querySelector('html').clientHeight - 80 - 36 - 52;
 // console.log("this.state.mapList",this.state.mapList)
         return (
@@ -523,6 +524,7 @@ export default class Plan extends Component {
     /*渲染菜单panel*/
     renderPanel(option) {
         let content = this.getPanelData(option.value);
+        console.log('content',content)
         return (
             <DashPanel style={{height:'200px'}} 
                 onCheck={this.onCheck.bind(this)}

@@ -1180,7 +1180,7 @@ export default class Danger extends Component {
 	/*渲染菜单panel*/
 	renderPanel(option) {
 		let content = this.getPanelData(option.value);
-		// console.log('content',content)
+		console.log('this.state.userCheckedKeys',this.state.userCheckedKeys)
 		return (
 			<DashPanel onCheck={this.onCheck.bind(this)}
 			           onSelect={this.onSelect.bind(this)}
