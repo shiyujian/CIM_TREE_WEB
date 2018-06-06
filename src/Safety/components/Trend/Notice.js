@@ -24,7 +24,7 @@ export default class Notice extends Component {
 		if (type === 'VIEW') {
 			this.setState({
 				visible: true,
-				container: record.raw
+				container: record
 			})
 		}
 	}
@@ -69,6 +69,10 @@ export default class Notice extends Component {
 		const {
 			TipsList = [],
 		} = this.props;
+		const{
+			container
+		}=this.state
+		console.log('container',container)
 
 		return (
 			<Blade title="项目安全公告">
@@ -83,8 +87,22 @@ export default class Notice extends Component {
 				/>
 				<Modal title="新闻预览" width={800} visible={this.state.visible}
 					onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
-					<div style={{ maxHeight: '800px', overflow: 'auto' }}
-						dangerouslySetInnerHTML={{ __html: this.state.container }} />
+					<div style={{ maxHeight: '800px', overflow: 'auto', marginTop: '5px' }}
+						dangerouslySetInnerHTML={{ __html: container?(container.raw?container.raw:''):'' }} />
+					<h4>
+						公告附件：{
+							container?
+							(container.attachment.fileList.length > 0 ? (
+								container.attachment.fileList.map((file, index) => {
+									return (
+										<div key={index}>
+											<a target="_bank" href={file.down_file}>附件{index + 1}、{file.name}</a>
+										</div>
+									)
+								})
+							) : '暂无附件'):'暂无附件'
+						}
+					</h4>
 				</Modal>
 			</Blade>
 		);

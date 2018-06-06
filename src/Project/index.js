@@ -259,7 +259,8 @@ export default class Project extends Component {
 				path: '/project/educationRegister',
 				icon: <Icon name="tag" />
 			}]
-	  	}, {
+		}
+		, {
 			key: 'massManage',
 			name: '质量管理',
 			id: 'PROJECT.MASSMANAGE',			

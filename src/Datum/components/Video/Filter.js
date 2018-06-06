@@ -56,7 +56,7 @@ class Filter extends Component {
 								</FormItem>
 							</Col>
 							<Col span={8}>
-								<FormItem {...Filter.layout}label="拍摄日期">
+								<FormItem {...Filter.layout}label="提交日期">
 									{
 										getFieldDecorator('searchDate', {
 											rules: [

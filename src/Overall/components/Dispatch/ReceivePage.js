@@ -288,7 +288,7 @@ class ReceivePage extends Component {
 												{
 
 													orgworms.map((es) => {
-														return <Option key={es} >{es}</Option>
+														return <Option key={es} value={es}>{es}</Option>
 													})
 
 												}

@@ -301,7 +301,7 @@ class StateTable extends Component {
 								</Col>
 							</Row>
 							<Table
-								rowSelection={rowSelection}
+								// rowSelection={rowSelection}
 								className="foresttables"
 								bordered
 								dataSource={newsList}
@@ -371,7 +371,7 @@ class StateTable extends Component {
 								</Col>
 							</Row>
 							<Table
-								rowSelection={rowSelection}
+								// rowSelection={rowSelection}
 								className="foresttables"
 								bordered
 								dataSource={draftNewsLis}
@@ -467,7 +467,11 @@ class StateTable extends Component {
 			dataIndex: 'update_time',
 			key: 'update_time',
 			render: update_time => {
-				return moment(update_time).utc().format('YYYY-MM-DD HH:mm:ss');
+				if(update_time){
+					return moment(update_time).utc().format('YYYY-MM-DD HH:mm:ss');
+				}else{
+					return <span>未撤回</span>
+				}
 			}
 		}, {
 			title: '操作',

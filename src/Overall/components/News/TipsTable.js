@@ -78,7 +78,9 @@ class TipsTable extends Component {
 						{
 							record.source && record.source.name && <p>{`来源 ：${record.source.name}`}</p>
 						}
-						<div style={{ maxHeight: '600px', overflow: 'auto', border: '1px solid #ccc',marginBottom:10,marginTop:10}}
+						<div 
+							// style={{ maxHeight: '600px', overflow: 'auto', border: '1px solid #ccc',marginBottom:10,marginTop:10}}
+							style={{ maxHeight: '800px', overflow: 'auto', marginTop: '5px' }}
 							dangerouslySetInnerHTML={{ __html: record.raw }} />
 						<h4>
 							通知附件：{

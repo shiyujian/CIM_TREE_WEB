@@ -221,18 +221,21 @@ class Updatemodal extends Component {
             console.log('values',values)
             if(!err){
                 // debugger
+                console.log('values.attachment1',values.attachment1)
                 let resp = values.attachment1[0].response ? values.attachment1[0].response : values.attachment1[0];
+                let name = values.attachment1[0]?(values.attachment1[0].name?values.attachment1[0].name:''):''
+                console.log('resp',resp)
                 let postData = {
                     name: values.name1,
                     basic_params: {
                         files: [{
-                            "uid": resp.uid,
+                            "uid": resp.id?resp.id:resp.uid,
                             "misc": resp.misc,
                             "download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
                             "a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
                             "create_time": resp.create_time,
                             "mime_type": resp.mime_type,
-                            "name":resp.name
+                            "name": name
                         }]
                     },
                     extra_params: {

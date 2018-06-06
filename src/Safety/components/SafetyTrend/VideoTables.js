@@ -323,7 +323,7 @@ class VideoTables extends Component {
 								columns={this.columns}
 								rowKey="id"
 								className="foresttables"
-								rowSelection={rowSelection}
+								// rowSelection={rowSelection}
 								bordered
 							/>
 						</TabPane>
@@ -393,7 +393,7 @@ class VideoTables extends Component {
 								columns={this.draftColumns}
 								rowKey="id"
 								className="foresttables"
-								rowSelection={rowSelection}
+								// rowSelection={rowSelection}
 								bordered
 							/>
 						</TabPane>
@@ -495,7 +495,11 @@ class VideoTables extends Component {
 			dataIndex: 'update_time',
 			key: 'update_time',
 			render: update_time => {
-				return moment(update_time).utc().format('YYYY-MM-DD HH:mm:ss');
+				if(update_time){
+					return moment(update_time).utc().format('YYYY-MM-DD HH:mm:ss');
+				}else{
+					return <span>未撤回</span>
+				}
 			}
 		}, {
 			title: '操作',

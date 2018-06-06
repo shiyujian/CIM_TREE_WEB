@@ -80,6 +80,7 @@ class SendPage1 extends Component {
 			worktimes1: undefined,
 			ccLists1: undefined
 		});
+		this.query()
 	}
 	//查找
 	query() {

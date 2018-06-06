@@ -295,7 +295,7 @@ class NoticeTable extends Component {
 								</Col>
 							</Row>
 							<Table
-								rowSelection={rowSelection}
+								// rowSelection={rowSelection}
 								bordered
 								className="foresttables"
 								dataSource={tipsList}
@@ -354,7 +354,7 @@ class NoticeTable extends Component {
 								</Col>
 							</Row>
 							<Table dataSource={draftTipsList}
-								rowSelection={rowSelection}
+								// rowSelection={rowSelection}
 								className="foresttables"
 								bordered
 								columns={this.draftColumns}
@@ -430,8 +430,13 @@ class NoticeTable extends Component {
 			title: '撤回时间',
 			dataIndex: 'update_time',
 			key: 'update_time',
-			render: update_time => {
-				return moment(update_time).utc().format('YYYY-MM-DD HH:mm:ss');
+			render: (update_time) => {
+				if(update_time){
+					return moment(update_time).utc().format('YYYY-MM-DD HH:mm:ss');
+				}else{
+					return <span>未撤回</span>
+				}
+				
 			}
 		}, {
 			title: '操作',
