@@ -76,7 +76,7 @@ export default class Header extends Component {
 			key: 'quality',
 			id: 'QUALITY',
 			title: '质量管理',
-			path: '/quality/score/search',
+			path: '/quality/search',
 			icon: <Icon name="list-alt"/>
 		}, {
 			key: 'schedule',

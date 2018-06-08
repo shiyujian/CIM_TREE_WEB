@@ -98,8 +98,11 @@ export default class Video extends Component {
 		const videoa = []
 		const newsListT = this.props.videoList || []
 		for (var k = 0; k < newsListT.length; k++) {
+			// debugger
 			const newsListTT = newsListT[k].attachment.fileList[0] || {}
-			if (k < 3) {
+			
+			if (k < 3 && newsListTT && newsListTT.down_file) {
+				console.log('newsListTT',newsListTT)
 				videoa.push(
 					<div className="video box ">
 						<video
