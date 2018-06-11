@@ -6,7 +6,8 @@
     "env": {
         "es6": true,
         "browser": true,
-        "node": true
+        "node": true,
+        "jquery":true
     },
     "parser": "babel-eslint",
     "rules": {
@@ -14,10 +15,11 @@
         "semi": [2, "always"],
         "indent": [1, 4, {"SwitchCase": 1}],
         "no-tabs": 0,
+        "no-debugger": "off",
+        "one-var": 0,
         "react/jsx-indent": [1, 4, {"SwitchCase": 1}],
         "react/jsx-indent-props": [1, 4, {"SwitchCase": 1}],
         "react/prop-types": 0,
-        "react/jsx-no-bind": [2, {"allowBind": true}],
-        "no-debugger": 0
+        "react/jsx-no-bind": [2, {"allowBind": true}]
     }
 }
