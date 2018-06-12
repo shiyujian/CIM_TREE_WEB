@@ -105,6 +105,7 @@ export default class Filter extends Component {
             currentcode = {},
             actions: { deletedoc, getdocument }
         } = this.props;
+        debugger;
         if (selected === undefined || selected.length === 0) {
             message.warning('请先选择要删除的文件！');
             return;

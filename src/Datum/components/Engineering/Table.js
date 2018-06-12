@@ -105,7 +105,7 @@ export default class GeneralTable extends Component {
     }
 
     rowSelection = {
-        onChange: (selectedRows) => {
+        onChange: (selectedRowKeys, selectedRows) => {
             const {
                 actions: { selectDocuments }
             } = this.props;
