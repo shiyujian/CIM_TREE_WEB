@@ -9,7 +9,6 @@ export default class Filter extends Component {
 
     render () {
         const {
-            actions: { toggleAddition },
             Doc = []
         } = this.props;
         return (
@@ -34,7 +33,7 @@ export default class Filter extends Component {
                             <Button
                                 style={{ marginRight: 10 }}
                                 type='primary'
-                                onClick={toggleAddition.bind(this, true)}
+                                onClick={this.addVisible.bind(this)}
                             >
                                 新增
                             </Button>
@@ -79,6 +78,23 @@ export default class Filter extends Component {
         );
     }
 
+    addVisible () {
+        const {
+            actions: {
+                toggleAddition
+            },
+            currentSection,
+            currentSectionName,
+            projectName
+        } = this.props;
+
+        if (currentSection === '' && currentSectionName === '' && projectName === '') {
+            message.error('该用户未关联标段，不能添加文档');
+            return;
+        }
+        toggleAddition(true);
+    }
+
     query (value) {
         const {
             actions: { getdocument },
@@ -91,7 +107,6 @@ export default class Filter extends Component {
             };
         }
 
-        console.log('search', search);
         getdocument({ code: currentcode.code }, search);
     }
     cancel () {}

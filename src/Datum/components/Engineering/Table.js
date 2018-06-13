@@ -45,7 +45,7 @@ export default class GeneralTable extends Component {
                 (canSection
                     ? true
                     : searchengin.searcSection
-                        ? doc.extra_params.unitProject.indexOf(
+                        ? doc.extra_params.currentSection.indexOf(
                             searchengin.searcSection
                         ) !== -1
                         : true) &&
@@ -72,8 +72,6 @@ export default class GeneralTable extends Component {
             filterData: arr
         });
 
-        console.log('arrarrarr', arr);
-
         // searchEnginVisible(false)
     }
     render () {
@@ -91,17 +89,41 @@ export default class GeneralTable extends Component {
         if (searchenginvisible) {
             dataSource = filterData;
         }
+        // 根据登陆账号是否关联标段来筛选数据，只能查看自己项目的
+        let data = this.filterData(dataSource);
 
         return (
             <Table
                 rowSelection={this.rowSelection}
-                dataSource={dataSource}
+                dataSource={data}
                 columns={canSection ? this.columns1 : this.columns}
                 className='foresttables'
                 bordered
                 rowKey='code'
             />
         );
+    }
+
+    filterData (dataSource) {
+        const {
+            currentSection,
+            currentSectionName,
+            projectName
+        } = this.props;
+
+        let filterData = [];
+        if (currentSection === '' && currentSectionName === '' && projectName === '') {
+            return dataSource;
+        } else {
+            dataSource.map((doc) => {
+                if (doc && doc.extra_params && doc.extra_params.projectName) {
+                    if (doc.extra_params.projectName === projectName) {
+                        filterData.push(doc);
+                    }
+                }
+            });
+            return filterData;
+        }
     }
 
     rowSelection = {
@@ -116,13 +138,13 @@ export default class GeneralTable extends Component {
     columns = [
         {
             title: '项目',
-            dataIndex: 'extra_params.area',
-            key: 'extra_params.area'
+            dataIndex: 'extra_params.projectName',
+            key: 'extra_params.projectName'
         },
         {
             title: '标段',
-            dataIndex: 'extra_params.unitProject',
-            key: 'extra_params.unitProject'
+            dataIndex: 'extra_params.currentSectionName',
+            key: 'extra_params.currentSectionName'
         },
         {
             title: '名称',
@@ -199,8 +221,8 @@ export default class GeneralTable extends Component {
     columns1 = [
         {
             title: '项目',
-            dataIndex: 'extra_params.area',
-            key: 'extra_params.area'
+            dataIndex: 'extra_params.projectName',
+            key: 'extra_params.projectName'
         },
         {
             title: '名称',

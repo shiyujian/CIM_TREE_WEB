@@ -52,8 +52,6 @@ export default class GeneralTable extends Component {
             filterData: arr
         });
 
-        console.log('arrarrarr', arr);
-
         // searchRedioVisible(false)
     }
 
@@ -66,11 +64,13 @@ export default class GeneralTable extends Component {
         if (searchrediovisible) {
             dataSource = filterData;
         }
+        // 根据登陆账号是否关联标段来筛选数据，只能查看自己项目的
+        let data = this.filterData(dataSource);
         return (
             <div>
                 <Table
                     rowSelection={this.rowSelection}
-                    dataSource={dataSource}
+                    dataSource={data}
                     columns={this.columns}
                     className='foresttables'
                     bordered
@@ -105,6 +105,28 @@ export default class GeneralTable extends Component {
         );
     }
 
+    filterData (dataSource) {
+        const {
+            currentSection,
+            currentSectionName,
+            projectName
+        } = this.props;
+
+        let filterData = [];
+        if (currentSection === '' && currentSectionName === '' && projectName === '') {
+            return dataSource;
+        } else {
+            dataSource.map((doc) => {
+                if (doc && doc.extra_params && doc.extra_params.projectName) {
+                    if (doc.extra_params.projectName === projectName) {
+                        filterData.push(doc);
+                    }
+                }
+            });
+            return filterData;
+        }
+    }
+
     rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             const {
@@ -118,6 +140,12 @@ export default class GeneralTable extends Component {
     }
 
     columns = [
+        {
+            title: '项目',
+            dataIndex: 'extra_params.projectName',
+            key: 'extra_params.projectName'
+            // sorter: (a, b) => a.name.length - b.name.length
+        },
         {
             title: '名称',
             dataIndex: 'name',
@@ -203,41 +231,10 @@ export default class GeneralTable extends Component {
         });
     }
 
-    // previewFile(file) {
-    // 	console.log(file.basic_params.files)
-    // 	const videos = file.basic_params.files[0] || []
-    // 	console.log(videos.a_file.split(".")[4])
-    // 	// const index=videos.a_file.indexOf(".")
-    // 	// console.log(index)
-    // 	let a_file = videos.a_file.split(".")[4]
-    // 	console.log(a_file)
-
-    // 	if (a_file == "mp4") {
-    // 		console.log(1)
-    // 		this.setState({ previewModalVisible: true, video: videos.a_file })
-
-    // 	} else {
-    // 		const { actions: { openPreview } } = this.props;
-    // 		console.log(2)
-
-    // 		if (JSON.stringify(file.basic_params) == "{}") {
-    // 			console.log(3)
-    // 			return
-    // 		} else {
-    // 			console.log(4)
-
-    // 			const filed = file.basic_params.files[0];
-    // 			openPreview(filed);
-    // 		}
-    // 	}
-    // }
-
     previewFile (file) {
-        console.log(file.basic_params.files);
         const videos = file.basic_params.files[0] || {};
         let src =
             SOURCE_API + videos.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        console.log('src', src);
 
         this.setState({
             src,

@@ -23,26 +23,30 @@ const fileTypes =
 
 class Addition extends Component {
     static propTypes = {};
+    constructor (props) {
+        super(props);
+        this.state = {
+            progress: 0,
+            isUploading: false,
+            loading: false
+        };
+    }
 
     static layout = {
         labelCol: { span: 8 },
         wrapperCol: { span: 16 }
     };
-    state = {
-        progress: 0,
-        isUploading: false
-    };
     formItemLayout = {
         // labelCol: { span: 6 },
         wrapperCol: { span: 24 }
     };
+
     render () {
         const {
             additionVisible = false,
             docs = []
         } = this.props;
 
-        console.log('add.props', this.props);
         let { isUploading } = this.state;
         let arr = [
             <Button key='back' size='large' onClick={this.cancel.bind(this)}>
@@ -145,7 +149,6 @@ class Addition extends Component {
                 isUploading: true
             });
             const valid = fileTypes.indexOf(file.type) >= 0;
-            // console.log(file);
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
             }
@@ -261,6 +264,9 @@ class Addition extends Component {
         const {
             currentcode = {},
             docs = [],
+            currentSection,
+            currentSectionName,
+            projectName,
             actions: { toggleAddition, postDocument, getdocument, changeDocs }
         } = this.props;
 
@@ -306,7 +312,10 @@ class Addition extends Component {
                         type: doc.type,
                         lasttime: doc.lastModifiedDate,
                         state: '正常文档',
-                        submitTime: moment.utc().format()
+                        submitTime: moment.utc().format(),
+                        currentSection: currentSection,
+                        currentSectionName: currentSectionName,
+                        projectName: projectName
                     }
                 }
             );

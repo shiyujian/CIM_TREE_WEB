@@ -25,7 +25,6 @@ class Filter extends Component {
     };
     render () {
         const {
-            actions: { toggleAddition },
             form: { getFieldDecorator },
             Doc = []
         } = this.props;
@@ -121,7 +120,7 @@ class Filter extends Component {
                         <Button
                             style={{ marginRight: 10 }}
                             type='primary'
-                            onClick={toggleAddition.bind(this, true)}
+                            onClick={this.addVisible.bind(this)}
                         >
                             新增
                         </Button>
@@ -156,6 +155,23 @@ class Filter extends Component {
         );
     }
 
+    addVisible () {
+        const {
+            actions: {
+                toggleAddition
+            },
+            currentSection,
+            currentSectionName,
+            projectName
+        } = this.props;
+
+        if (currentSection === '' && currentSectionName === '' && projectName === '') {
+            message.error('该用户未关联标段，不能添加文档');
+            return;
+        }
+        toggleAddition(true);
+    }
+
     query () {
         const {
             actions: { searchVideoMessage, searchVideoVisible },
@@ -163,8 +179,6 @@ class Filter extends Component {
         } = this.props;
         validateFields((err, values) => {
             let search = {};
-
-            console.log('获取工程文档搜索信息', values);
             console.log('err', err);
 
             if (values.searchName) {
@@ -181,8 +195,6 @@ class Filter extends Component {
                     .add(1, 'days')
                     .format('YYYY-MM-DD');
             }
-
-            console.log('search', search);
 
             let postData = Object.assign({}, search);
             searchVideoMessage(postData);

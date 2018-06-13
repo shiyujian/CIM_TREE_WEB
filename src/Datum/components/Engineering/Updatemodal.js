@@ -28,66 +28,14 @@ class Updatemodal extends Component {
             isUploading: false
         };
     }
-    coverPicFile = e => {
-        if (Array.isArray(e)) {
-            return e;
-        }
-        if (e.file.status === 'done' && !e.file.response.a_file) {
-            return [];
-        }
-        let array = [];
-        let length = e.fileList.length - 1;
-        array.push(e.fileList[length]);
-        this.name = e.file.name;
-        return e && array;
-    };
-    componentDidUpdate () {
-        let array = this.props.array;
-        let nodeArray = array.filter(node => {
-            return node.Type === '项目工程';
-        });
-        this.areaArray = [];
-        nodeArray.map(item => {
-            this.areaArray.push(
-                <Option value={item.No + '--' + item.Name} key={item.No}>
-                    {item.Name}
-                </Option>
-            );
-        });
-    }
-    onSelectChange (value) {
-        this.props.form.setFieldsValue({
-            unitProject: undefined
-        });
-        let temp = value.split('--')[0];
-        this.unitArray = [];
-        let array = this.props.array;
-        let nodeArray = array.filter(node => {
-            return node.Type === '单位工程' && node.No.indexOf(temp) !== -1;
-        });
-        nodeArray.map(item => {
-            this.unitArray.push(
-                <Option value={item.No + '--' + item.Name} key={item.No}>
-                    {item.Name}
-                </Option>
-            );
-        });
-    }
 
     render () {
         const {
             form: { getFieldDecorator },
             updatevisible = false,
-            oldfile = {},
-            selectDoc,
-            parent
+            oldfile = {}
         } = this.props;
         const { isUploading } = this.state;
-        // 判断选中的是哪个节点下的文件夹
-        let canSection = false;
-        if (selectDoc === '综合管理性文件' || parent === '综合管理性文件') {
-            canSection = true;
-        }
 
         const formItemLayout = {
             labelCol: { span: 6 },
@@ -109,8 +57,6 @@ class Updatemodal extends Component {
         ];
         let footer = isUploading ? null : arr;
 
-        console.log('oldfile', oldfile);
-
         return (
             <div>
                 {!updatevisible ? null : (
@@ -124,50 +70,6 @@ class Updatemodal extends Component {
                     >
                         <Spin spinning={isUploading}>
                             <Form>
-                                <FormItem {...formItemLayout} label='项目'>
-                                    {getFieldDecorator('area1', {
-                                        initialValue:
-                                            oldfile &&
-                                            oldfile.extra_params &&
-                                            oldfile.extra_params.area,
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请选择项目'
-                                            }
-                                        ]
-                                    })(
-                                        <Select
-                                            placeholder='请选择项目'
-                                            onChange={this.onSelectChange.bind(
-                                                this
-                                            )}
-                                        >
-                                            {this.areaArray}
-                                        </Select>
-                                    )}
-                                </FormItem>
-                                {canSection ? null : (
-                                    <FormItem {...formItemLayout} label='标段'>
-                                        {getFieldDecorator('unitProject1', {
-                                            initialValue:
-                                                oldfile &&
-                                                oldfile.extra_params &&
-                                                oldfile.extra_params
-                                                    .unitProject,
-                                            rules: [
-                                                {
-                                                    required: true,
-                                                    message: '请选择标段'
-                                                }
-                                            ]
-                                        })(
-                                            <Select placeholder='请选择标段'>
-                                                {this.unitArray}
-                                            </Select>
-                                        )}
-                                    </FormItem>
-                                )}
                                 <FormItem {...formItemLayout} label='名称'>
                                     {getFieldDecorator('name1', {
                                         initialValue: oldfile.name,
@@ -250,7 +152,6 @@ class Updatemodal extends Component {
     }
 
     normFile = e => {
-        console.log('Upload event:', e);
         if (Array.isArray(e)) {
             return e;
         }
@@ -300,7 +201,6 @@ class Updatemodal extends Component {
                 isUploading: false
             });
         } else if (file && file.status && file.status === 'removed') {
-            console.log('filefilefilefilefilefile');
             setFieldsValue({
                 attachment1: undefined
             });
@@ -311,16 +211,11 @@ class Updatemodal extends Component {
         const {
             currentcode = {},
             actions: { updatevisible, putdocument, getdocument },
-            selectDoc,
-            parent
+            currentSection,
+            currentSectionName,
+            projectName
         } = this.props;
-        // 判断选中的是哪个节点下的文件夹
-        let canSection = false;
-        if (selectDoc === '综合管理性文件' || parent === '综合管理性文件') {
-            canSection = true;
-        }
         this.props.form.validateFields((err, values) => {
-            console.log('values', values);
             if (!err) {
                 let user = getUser();
                 // debugger
@@ -332,7 +227,6 @@ class Updatemodal extends Component {
                         ? values.attachment1[0].name
                         : ''
                     : '';
-                console.log('resp', resp);
                 let postData = {
                     name: values.name1,
                     basic_params: {
@@ -356,15 +250,14 @@ class Updatemodal extends Component {
                     },
                     extra_params: {
                         number: values.number1,
-                        area: values.area1.split('--')[1],
-                        unitProject: canSection
-                            ? ''
-                            : values.unitProject1.split('--')[1],
                         people: user.name,
                         username: user.username,
                         unit: user.org,
                         doc_type: values.doc_type1,
-                        time: moment.utc().format('YYYY-MM-DD')
+                        time: moment.utc().format('YYYY-MM-DD'),
+                        currentSection: currentSection,
+                        currentSectionName: currentSectionName,
+                        projectName: projectName
                     }
                 };
                 putdocument({ code: this.props.oldfile.code }, postData).then(

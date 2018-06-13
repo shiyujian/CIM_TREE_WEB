@@ -4,18 +4,41 @@ import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import './index.less';
 export default class GeneralTable extends Component {
     render () {
-        const { Doc = [] } = this.props;
-        console.log('ttt', this.props);
+        // 根据登陆账号是否关联标段来筛选数据，只能查看自己项目的
+        let data = this.filterData();
         return (
             <Table
                 rowSelection={this.rowSelection}
-                dataSource={Doc}
+                dataSource={data}
                 columns={this.columns}
                 className='foresttables'
                 bordered
                 rowKey='code'
             />
         );
+    }
+
+    filterData () {
+        const {
+            Doc = [],
+            currentSection,
+            currentSectionName,
+            projectName
+        } = this.props;
+
+        let filterData = [];
+        if (currentSection === '' && currentSectionName === '' && projectName === '') {
+            return Doc;
+        } else {
+            Doc.map((doc) => {
+                if (doc && doc.extra_params && doc.extra_params.projectName) {
+                    if (doc.extra_params.projectName === projectName) {
+                        filterData.push(doc);
+                    }
+                }
+            });
+            return filterData;
+        }
     }
 
     rowSelection = {
@@ -28,6 +51,12 @@ export default class GeneralTable extends Component {
     };
 
     columns = [
+        {
+            title: '项目',
+            dataIndex: 'extra_params.projectName',
+            key: 'extra_params.projectName'
+            // sorter: (a, b) => a.name.length - b.name.length
+        },
         {
             title: '名称',
             dataIndex: 'name',

@@ -140,7 +140,6 @@ export default class Addition extends Component {
             });
 
             const valid = fileTypes.indexOf(file.type) >= 0;
-            // console.log(file);
             if (!valid) {
                 message.error('只能上传 bmp,jpg,png,tif 文件！');
             }
@@ -250,6 +249,9 @@ export default class Addition extends Component {
         const {
             currentcode = {},
             docs = [],
+            currentSection,
+            currentSectionName,
+            projectName,
             actions: { toggleAddition, postDocument, getdocument, changeDocs }
         } = this.props;
 
@@ -296,7 +298,10 @@ export default class Addition extends Component {
                         type: doc.type,
                         lasttime: doc.lastModifiedDate,
                         state: '正常文档',
-                        submitTime: moment.utc().format()
+                        submitTime: moment.utc().format(),
+                        currentSection: currentSection,
+                        currentSectionName: currentSectionName,
+                        projectName: projectName
                     }
                 }
             );

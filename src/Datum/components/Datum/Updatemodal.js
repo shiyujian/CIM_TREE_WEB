@@ -270,6 +270,9 @@ class Updatemodal extends Component {
     save () {
         const {
             currentcode = {},
+            currentSection,
+            currentSectionName,
+            projectName,
             actions: {
                 updatevisible,
                 getdocument,
@@ -279,7 +282,6 @@ class Updatemodal extends Component {
         } = this.props;
 
         this.props.form.validateFields((err, values) => {
-            console.log('values', values);
             if (!err) {
                 // debugger
                 let resp = values.attachment1[0].response
@@ -322,7 +324,10 @@ class Updatemodal extends Component {
                             'YYYY-MM-DD'
                         ),
                         state: '正常文档',
-                        submitTime: moment.utc().format()
+                        submitTime: moment.utc().format(),
+                        currentSection: currentSection,
+                        currentSectionName: currentSectionName,
+                        projectName: projectName
                     }
                 };
                 putdocument({ code: this.props.oldfile.code }, postData).then(

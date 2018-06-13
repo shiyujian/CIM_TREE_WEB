@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { STATIC_DOWNLOAD_API, PROJECT_UNITS } from '../../../_platform/api';
 import {
     Form,
     Input,
@@ -12,6 +12,7 @@ import {
     Select
 } from 'antd';
 import moment from 'moment';
+import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
@@ -28,52 +29,81 @@ class Filter extends Component {
         this.state = {
             isTreeSelected: false,
             loading: false,
-            parent: ''
+            parent: '',
+            sectionArray: [],
+            projectArray: []
         };
-        this.areaArray = [];
-        this.unitArray = [];
     }
 
-    componentDidUpdate () {
-        let array = this.props.array;
-        let nodeArray = array.filter(node => {
-            return node.Type === '项目工程';
-        });
-        this.areaArray = [];
-        nodeArray.map(item => {
-            this.areaArray.push(
-                <Option value={item.No + '--' + item.Name} key={item.No}>
-                    {item.Name}
-                </Option>
-            );
+    componentDidMount () {
+        this.getSection();
+    }
+
+    async getSection () {
+        let user = getUser();
+        let projectArray = [];
+        let sectionArray = [];
+        let sections = user.sections;
+        sections = JSON.parse(sections);
+        if (sections && sections instanceof Array && sections.length > 0) {
+            let section = sections[0];
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                PROJECT_UNITS.map((item) => {
+                    if (code[0] === item.code) {
+                        projectArray.push(<Option key={item.value} value={item.value}>{item.value}</Option>);
+                        let units = item.units;
+                        units.map((unit) => {
+                            sectionArray.push(<Option key={unit.code} value={unit.code}>{unit.value}</Option>);
+                        });
+                    }
+                });
+            }
+        } else {
+            PROJECT_UNITS.map((project) => {
+                projectArray.push(<Option key={project.value} value={project.value}>{project.value}</Option>);
+            });
+        }
+        this.setState({
+            projectArray: projectArray,
+            sectionArray: sectionArray
         });
     }
+    // 项目选择函数
     onSelectChange (value) {
-        let temp = value.split('--')[0];
-        this.props.form.setFieldsValue({
-            searcSection: undefined
+        const {
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        setFieldsValue({
+            searcSection: ''
         });
-        this.unitArray = [];
-        let array = this.props.array;
-        let nodeArray = array.filter(node => {
-            return node.Type === '单位工程' && node.No.indexOf(temp) !== -1;
+        let sectionArray = [];
+        PROJECT_UNITS.map((project) => {
+            if (project.value === value) {
+                let units = project.units;
+                units.map((unit) => {
+                    sectionArray.push(<Option key={unit.code} value={unit.code}>{unit.value}</Option>);
+                });
+            }
         });
-        nodeArray.map(item => {
-            this.unitArray.push(
-                <Option value={item.Name} key={item.No}>
-                    {item.Name}
-                </Option>
-            );
+        this.setState({
+            sectionArray: sectionArray
         });
     }
     render () {
         const {
-            actions: { toggleAddition },
             form: { getFieldDecorator },
             Doc = [],
             selectDoc,
             parent
         } = this.props;
+        const {
+            projectArray,
+            sectionArray
+        } = this.state;
 
         // 判断选中的是哪个节点下的文件夹
         let canSection = false;
@@ -102,7 +132,7 @@ class Filter extends Component {
                                                 this
                                             )}
                                         >
-                                            {this.areaArray}
+                                            {projectArray}
                                         </Select>
                                     )}
                                 </FormItem>
@@ -121,7 +151,7 @@ class Filter extends Component {
                                             ]
                                         })(
                                             <Select placeholder='请选择标段'>
-                                                {this.unitArray}
+                                                {sectionArray}
                                             </Select>
                                         )}
                                     </FormItem>
@@ -206,7 +236,7 @@ class Filter extends Component {
                             <Button
                                 style={{ marginRight: 10 }}
                                 type='primary'
-                                onClick={toggleAddition.bind(this, true)}
+                                onClick={this.addVisible.bind(this)}
                             >
                                 新增
                             </Button>
@@ -251,6 +281,23 @@ class Filter extends Component {
         );
     }
 
+    addVisible () {
+        const {
+            actions: {
+                toggleAddition
+            },
+            currentSection,
+            currentSectionName,
+            projectName
+        } = this.props;
+
+        if (currentSection === '' && currentSectionName === '' && projectName === '') {
+            message.error('该用户未关联标段，不能添加文档');
+            return;
+        }
+        toggleAddition(true);
+    }
+
     query () {
         const {
             actions: { searchEnginMessage, searchEnginVisible },
@@ -258,7 +305,6 @@ class Filter extends Component {
         } = this.props;
         validateFields((err, values) => {
             let search = {};
-            console.log('获取工程文档搜索信息', values);
             console.log('err', err);
             if (values.searchProject) {
                 search.searchProject = values.searchProject.split('--')[1];
@@ -284,7 +330,6 @@ class Filter extends Component {
             // 	doc_name: values.searchName
             // };
             // getdocument({ code: currentcode.code }, search);
-            console.log('search', search);
 
             let postData = Object.assign({}, search);
             searchEnginMessage(postData);

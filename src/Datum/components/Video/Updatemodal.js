@@ -180,7 +180,6 @@ class Updatemodal extends Component {
     }
 
     normFile = e => {
-        console.log('Upload event:', e);
         if (Array.isArray(e)) {
             return e;
         }
@@ -249,6 +248,9 @@ class Updatemodal extends Component {
 
     save () {
         const {
+            currentSection,
+            currentSectionName,
+            projectName,
             actions: {
                 updatevisible,
                 getdocument,
@@ -258,10 +260,7 @@ class Updatemodal extends Component {
         } = this.props;
 
         this.props.form.validateFields((err, values) => {
-            console.log('values', values);
             if (!err) {
-                // debugger
-                console.log('values.attachment1', values.attachment1);
                 let resp = values.attachment1[0].response
                     ? values.attachment1[0].response
                     : values.attachment1[0];
@@ -270,7 +269,6 @@ class Updatemodal extends Component {
                         ? values.attachment1[0].name
                         : ''
                     : '';
-                console.log('resp', resp);
                 let postData = {
                     name: values.name1,
                     basic_params: {
@@ -300,7 +298,10 @@ class Updatemodal extends Component {
                             'YYYY-MM-DD'
                         ),
                         state: '正常文档',
-                        submitTime: moment.utc().format()
+                        submitTime: moment.utc().format(),
+                        currentSection: currentSection,
+                        currentSectionName: currentSectionName,
+                        projectName: projectName
                     }
                 };
                 putdocument({ code: this.props.oldfile.code }, postData).then(

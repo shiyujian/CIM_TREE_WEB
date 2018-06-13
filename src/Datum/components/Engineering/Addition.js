@@ -11,7 +11,6 @@ import {
     Icon,
     message,
     Table,
-    Select,
     Spin
 } from 'antd';
 import moment from 'moment';
@@ -19,7 +18,6 @@ import { getUser } from '_platform/auth';
 import { DeleteIpPort } from '../../../_platform/components/singleton/DeleteIpPort';
 const fileTypes =
     'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
-const Option = Select.Option;
 const Dragger = Upload.Dragger;
 moment.locale('zh-cn');
 class Addition extends Component {
@@ -29,21 +27,6 @@ class Addition extends Component {
         unitArray: [],
         unitProject: ''
     };
-
-    componentDidUpdate () {
-        let array = this.props.array;
-        let nodeArray = array.filter(node => {
-            return node.Type === '项目工程';
-        });
-        this.areaArray = [];
-        nodeArray.map(item => {
-            this.areaArray.push(
-                <Option value={item.No + '--' + item.Name} key={item.No}>
-                    {item.Name}
-                </Option>
-            );
-        });
-    }
 
     render () {
         const {
@@ -151,7 +134,6 @@ class Addition extends Component {
             });
 
             const valid = fileTypes.indexOf(file.type) >= 0;
-            // console.log(file);
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
             }
@@ -179,36 +161,6 @@ class Addition extends Component {
             title: '文档名称',
             dataIndex: 'name',
             width: '25%'
-        },
-        {
-            title: '项目',
-            width: '20%',
-            render: doc => {
-                return (
-                    <Select
-                        placeholder='请选择项目'
-                        onChange={this.areaChange.bind(this, doc)}
-                    >
-                        {this.areaArray}
-                    </Select>
-                );
-            }
-        },
-        {
-            title: '标段',
-            width: '20%',
-            render: doc => {
-                const { unitArray } = this.state;
-                return (
-                    <Select
-                        placeholder='请选择标段'
-                        value={this.state.unitProject}
-                        onChange={this.unitProjectChange.bind(this, doc)}
-                    >
-                        {unitArray}
-                    </Select>
-                );
-            }
         },
         {
             title: '编号',
@@ -248,20 +200,6 @@ class Addition extends Component {
             width: '30%'
         },
         {
-            title: '项目',
-            width: '25%',
-            render: doc => {
-                return (
-                    <Select
-                        placeholder='请选择项目'
-                        onChange={this.areaChange.bind(this, doc)}
-                    >
-                        {this.areaArray}
-                    </Select>
-                );
-            }
-        },
-        {
             title: '编号',
             width: '15%',
             render: doc => {
@@ -291,47 +229,6 @@ class Addition extends Component {
             }
         }
     ];
-
-    areaChange (doc, value) {
-        const {
-            docs = [],
-            actions: { changeDocs }
-        } = this.props;
-
-        doc.area = value;
-        doc.unitProject = '';
-        changeDocs(docs);
-
-        let temp = value.split('--')[0];
-        let unitArray = [];
-        let array = this.props.array;
-        let nodeArray = array.filter(node => {
-            return node.Type === '单位工程' && node.No.indexOf(temp) !== -1;
-        });
-        nodeArray.map(item => {
-            unitArray.push(
-                <Option value={item.No + '--' + item.Name} key={item.No}>
-                    {item.Name}
-                </Option>
-            );
-        });
-        this.setState({
-            unitArray,
-            unitProject: ''
-        });
-    }
-    unitProjectChange (doc, value) {
-        const {
-            docs = [],
-            actions: { changeDocs }
-        } = this.props;
-
-        doc.unitProject = value;
-        changeDocs(docs);
-        this.setState({
-            unitProject: value
-        });
-    }
 
     remark (doc, event) {
         const {
@@ -378,6 +275,9 @@ class Addition extends Component {
             currentcode = {},
             actions: { toggleAddition, postDocument, getdocument, changeDocs },
             docs = [],
+            currentSection,
+            currentSectionName,
+            projectName,
             selectDoc,
             parent
         } = this.props;
@@ -390,21 +290,17 @@ class Addition extends Component {
         // 判断各列有没有输入
         let canSave = true;
         // 判断选中的是哪个节点下的文件夹
-        let canSection = false;
         if (selectDoc === '综合管理性文件' || parent === '综合管理性文件') {
-            canSection = true;
             docs.map(doc => {
-                if (!doc.area || !doc.number || !doc.doc_type) {
+                if (!doc.number || !doc.doc_type) {
                     canSave = false;
                 }
             });
         } else {
             docs.map(doc => {
                 if (
-                    !doc.area ||
                     !doc.number ||
-                    !doc.doc_type ||
-                    !doc.unitProject
+                    !doc.doc_type
                 ) {
                     canSave = false;
                 }
@@ -420,7 +316,6 @@ class Addition extends Component {
             const response = doc.response;
             let files = DeleteIpPort(doc);
             files.uid = response.id;
-            console.log('files', files);
             return postDocument(
                 {},
                 {
@@ -435,20 +330,19 @@ class Addition extends Component {
                         files: [files]
                     },
                     extra_params: {
-                        area: doc.area.split('--')[1],
                         number: doc.number,
                         doc_type: doc.doc_type,
                         remark: doc.remark,
-                        unitProject: canSection
-                            ? ''
-                            : doc.unitProject.split('--')[1],
                         type: doc.type,
                         lasttime: doc.lastModifiedDate,
                         people: user.name,
                         username: user.username,
                         state: '正常文档',
                         submitTime: moment.utc().format(),
-                        time: moment.utc().format('YYYY-MM-DD')
+                        time: moment.utc().format('YYYY-MM-DD'),
+                        currentSection: currentSection,
+                        currentSectionName: currentSectionName,
+                        projectName: projectName
                     }
                 }
             );
@@ -461,50 +355,6 @@ class Addition extends Component {
             toggleAddition(false);
             getdocument({ code: currentcode.code });
         });
-
-        // this.props.form.validateFields((err, values) => {
-        //     console.log('values',values)
-        //     if(!err){
-
-        //         let user = getUser();
-        //         // debugger
-        //         let resp = values.attachment[0].response;
-        //         let postData = {
-        //             code: `${currentcode.code}_${resp.id}`,
-        //             name: values.name,
-        //             obj_type: 'C_DOC',
-        //             profess_folder: {
-        //                 code: currentcode.code, obj_type: 'C_DIR',
-        //             },
-        //             basic_params: {
-        // files: [{
-        //     "uid": resp.id,
-        //     "misc": resp.misc,
-        //     "download_url": resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-        //     "a_file": resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-        //     "create_time": resp.create_time,
-        //     "mime_type": resp.mime_type,
-        //     "name":resp.name
-        // }]
-        //             },
-        //             extra_params: {
-        //                 number: values.number,
-        //                 area: values.area.split('--')[1],
-        //                 unitProject: canSection ? '' : values.unitProject.split('--')[1],
-        //                 people: user.name,
-        //                 username: user.username,
-        //                 unit:user.org,
-        //                 doc_type: values.doc_type,
-        //                 time: moment.utc().format('YYYY-MM-DD')
-        //             },
-        //         }
-        //         postDocument({},postData).then(rst => {
-        //             message.success('新增文件成功！');
-        //             toggleAddition(false);
-        //             getdocument({ code: currentcode.code });
-        //         })
-        //     }
-        // })
     }
 }
 export default Form.create()(Addition);

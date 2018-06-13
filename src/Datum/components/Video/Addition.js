@@ -42,8 +42,6 @@ class Addition extends Component {
             additionVisible = false,
             docs = []
         } = this.props;
-
-        console.log('add.props', this.props);
         let { isUploading } = this.state;
         let arr = [
             <Button key='back' size='large' onClick={this.cancel.bind(this)}>
@@ -146,7 +144,6 @@ class Addition extends Component {
                 isUploading: true
             });
             const valid = fileTypes.indexOf(file.type) >= 0;
-            // console.log(file);
             if (!valid) {
                 message.error('只能上传 pdf、doc、docx 文件！');
             }
@@ -239,6 +236,9 @@ class Addition extends Component {
     save () {
         const {
             docs = [],
+            currentSection,
+            currentSectionName,
+            projectName,
             actions: { toggleAddition, postDocument, getdocument, changeDocs }
         } = this.props;
 
@@ -249,7 +249,6 @@ class Addition extends Component {
         let canSave = true;
         // 判断各列有没有输入
         docs.map(doc => {
-            console.log('doc', doc);
             if (!doc.fileType) {
                 canSave = false;
             }
@@ -283,7 +282,10 @@ class Addition extends Component {
                         lasttime: doc.lastModifiedDate,
                         state: '正常文档',
                         submitTime: moment.utc().format(),
-                        time: moment.utc().format('YYYY-MM-DD')
+                        time: moment.utc().format('YYYY-MM-DD'),
+                        currentSection: currentSection,
+                        currentSectionName: currentSectionName,
+                        projectName: projectName
                     }
                 }
             );
