@@ -173,7 +173,7 @@ export default class Users extends Component {
     confirms () {
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         if (user.is_superuser === true) {
-            return [
+            return (<div>
                 <Col span={3}>
                     <Button onClick={this.append.bind(this)}>添加用户</Button>
                 </Col>,
@@ -187,7 +187,7 @@ export default class Users extends Component {
                         <Button>批量删除</Button>
                     </Popconfirm>
                 </Col>
-            ];
+            </div>);
         } else {
             return (
                 <Col span={3}>
@@ -388,6 +388,7 @@ export default class Users extends Component {
                                 <a>删除</a>
                             </Popconfirm>,
                             <a
+                                key={3}
                                 style={{ marginLeft: '.5em', color: acc }}
                                 onClick={this.disable.bind(this, user)}
                             >
@@ -399,7 +400,7 @@ export default class Users extends Component {
                         return (
                             <a
                                 onClick={this.edit.bind(this, user)}
-                                key={1}
+                                key={4}
                                 style={{ marginRight: '.5em' }}
                             >
                                 编辑

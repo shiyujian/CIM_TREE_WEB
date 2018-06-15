@@ -102,7 +102,7 @@ class Addition extends Component {
         }
         const objs = systemRoles.map(roless => {
             return (
-                <OptGroup label={roless.name}>
+                <OptGroup label={roless.name} key={roless.name}>
                     {roless.value.map(role => {
                         return (
                             <Option key={role.id} value={String(role.id)}>
@@ -209,7 +209,7 @@ class Addition extends Component {
         }
         const objs = systemRoles.map(roless => {
             return (
-                <OptGroup label={roless.name}>
+                <OptGroup label={roless.name} key={roless.name} >
                     {roless.children.map(role => {
                         return (
                             <Option key={role} value={role}>
@@ -588,8 +588,8 @@ class Addition extends Component {
                                                 )}
                                                 style={{ width: '100%' }}
                                             >
-                                                <Option value='女'>女</Option>
-                                                <Option value='男'>男</Option>
+                                                <Option key='女' value='女'>女</Option>
+                                                <Option key='男' value='男'>男</Option>
                                             </Select>
                                         )}
                                     </FormItem>
@@ -1125,8 +1125,8 @@ class Addition extends Component {
         for (let i = 0; i < list.length; i++) {
             ops.push(
                 <Option
-                    key={list[i].ID}
-                    value={list[i].ID}
+                    key={JSON.stringify(list[i].ID)}
+                    value={JSON.stringify(list[i].ID)}
                     title={list[i].NurseryName + '-' + list[i].Factory}
                 >
                     {list[i].NurseryName + '-' + list[i].Factory}
