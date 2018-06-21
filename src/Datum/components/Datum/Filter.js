@@ -17,7 +17,7 @@ export default class Filter extends Component {
                     <FormItem>
                         <Col span={14}>
                             <Search
-                                placeholder='输入内容'
+                                placeholder='请输入名称进行搜索'
                                 onSearch={this.query.bind(this)}
                             />
                         </Col>

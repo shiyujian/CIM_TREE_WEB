@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-06-08 15:27:13
+ * @Last Modified time: 2018-06-19 11:31:11
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -252,7 +252,11 @@ class Lmap extends Component {
 
         let test = [];
         smallClassList.map(list => {
-            let codeName = list.SmallClass + '#' + list.SmallClassName;
+            // if (!list.SmallClassName) {
+            //     console.log('list', list);
+            // }
+            // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
+            let codeName = list.LandNo + '#' + list.RegionNo + '#' + list.SmallClass + '#' + list.SmallClassName;
             if (list.SmallClass && array.indexOf(codeName) === -1) {
                 uniqueSmallClass.push({
                     Name: list.SmallClassName
@@ -287,8 +291,8 @@ class Lmap extends Component {
             // }
 
             let codeName = smallClass.No.split('#');
-            let code = codeName[0];
-            let name = codeName[1];
+            let code = codeName[2];
+            let name = codeName[3];
             if (name === 'null') {
                 name = null;
             }
