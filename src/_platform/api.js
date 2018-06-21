@@ -7,9 +7,22 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @Author: ecidi.mingey
+ * @Date: 2018-06-21 09:03:44
+ * @Last Modified by: ecidi.mingey
+ * @Last Modified time: 2018-06-21 09:04:34
+ */
+/**
+ *
+ * Copyright (c) 2016-present, ecidi.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @Author: ecidi.mingey
  * @Date: 2018-03-12 20:06:03
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-06-19 11:34:21
+ * @Last Modified time: 2018-06-21 09:03:39
  */
 /**
  *
@@ -561,6 +574,10 @@ export const MODULES = [
             {
                 id: 'DATUM.REDIOS',
                 name: '工程影像'
+            },
+            {
+                id: 'DATUM.VIDEO',
+                name: '视频资料'
             }
         ]
     },
