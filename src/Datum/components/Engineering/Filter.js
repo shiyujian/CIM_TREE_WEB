@@ -50,19 +50,31 @@ class Filter extends Component {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
-                PROJECT_UNITS.map((item) => {
+                PROJECT_UNITS.map(item => {
                     if (code[0] === item.code) {
-                        projectArray.push(<Option key={item.value} value={item.value}>{item.value}</Option>);
+                        projectArray.push(
+                            <Option key={item.value} value={item.value}>
+                                {item.value}
+                            </Option>
+                        );
                         let units = item.units;
-                        units.map((unit) => {
-                            sectionArray.push(<Option key={unit.code} value={unit.code}>{unit.value}</Option>);
+                        units.map(unit => {
+                            sectionArray.push(
+                                <Option key={unit.code} value={unit.code}>
+                                    {unit.value}
+                                </Option>
+                            );
                         });
                     }
                 });
             }
         } else {
-            PROJECT_UNITS.map((project) => {
-                projectArray.push(<Option key={project.value} value={project.value}>{project.value}</Option>);
+            PROJECT_UNITS.map(project => {
+                projectArray.push(
+                    <Option key={project.value} value={project.value}>
+                        {project.value}
+                    </Option>
+                );
             });
         }
         this.setState({
@@ -73,19 +85,21 @@ class Filter extends Component {
     // 项目选择函数
     onSelectChange (value) {
         const {
-            form: {
-                setFieldsValue
-            }
+            form: { setFieldsValue }
         } = this.props;
         setFieldsValue({
             searcSection: ''
         });
         let sectionArray = [];
-        PROJECT_UNITS.map((project) => {
+        PROJECT_UNITS.map(project => {
             if (project.value === value) {
                 let units = project.units;
-                units.map((unit) => {
-                    sectionArray.push(<Option key={unit.code} value={unit.code}>{unit.value}</Option>);
+                units.map(unit => {
+                    sectionArray.push(
+                        <Option key={unit.code} value={unit.code}>
+                            {unit.value}
+                        </Option>
+                    );
                 });
             }
         });
@@ -100,10 +114,7 @@ class Filter extends Component {
             selectDoc,
             parent
         } = this.props;
-        const {
-            projectArray,
-            sectionArray
-        } = this.state;
+        const { projectArray, sectionArray } = this.state;
 
         // 判断选中的是哪个节点下的文件夹
         let canSection = false;
@@ -283,15 +294,17 @@ class Filter extends Component {
 
     addVisible () {
         const {
-            actions: {
-                toggleAddition
-            },
+            actions: { toggleAddition },
             currentSection,
             currentSectionName,
             projectName
         } = this.props;
 
-        if (currentSection === '' && currentSectionName === '' && projectName === '') {
+        if (
+            currentSection === '' &&
+            currentSectionName === '' &&
+            projectName === ''
+        ) {
             message.error('该用户未关联标段，不能添加文档');
             return;
         }
@@ -304,10 +317,11 @@ class Filter extends Component {
             form: { validateFields }
         } = this.props;
         validateFields((err, values) => {
+            console.log('values', values);
             let search = {};
             console.log('err', err);
             if (values.searchProject) {
-                search.searchProject = values.searchProject.split('--')[1];
+                search.searchProject = values.searchProject;
             }
             if (values.searcSection) {
                 search.searcSection = values.searcSection;
@@ -332,6 +346,7 @@ class Filter extends Component {
             // getdocument({ code: currentcode.code }, search);
 
             let postData = Object.assign({}, search);
+            console.log('postData', postData);
             searchEnginMessage(postData);
             searchEnginVisible(true);
         });
@@ -351,8 +366,7 @@ class Filter extends Component {
     }
     cancel () {}
 
-    delete () {
-    }
+    delete () {}
     confirm () {
         const {
             coded = [],
@@ -393,11 +407,7 @@ class Filter extends Component {
     };
 
     download () {
-        const {
-            selected = [],
-            file = [],
-            files = []
-        } = this.props;
+        const { selected = [], file = [], files = [] } = this.props;
         if (selected.length === 0) {
             message.warning('没有选择无法下载');
         }

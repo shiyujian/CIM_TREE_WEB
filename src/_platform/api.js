@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-06-21 09:04:34
+ * @Last Modified time: 2018-06-21 15:25:04
  */
 /**
  *
@@ -752,6 +752,10 @@ export const MODULES = [
                     {
                         id: 'FOREST.FAITHINFO',
                         name: '供应商诚信信息'
+                    },
+                    {
+                        id: 'FOREST.SEEDLINGSCHANGE',
+                        name: '苗木信息修改'
                     }
                 ]
             },

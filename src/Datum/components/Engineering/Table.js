@@ -38,7 +38,7 @@ export default class GeneralTable extends Component {
         let arr = Doc.filter(
             doc =>
                 (searchengin.searchProject
-                    ? doc.extra_params.area.indexOf(
+                    ? doc.extra_params.projectName.indexOf(
                         searchengin.searchProject
                     ) !== -1
                     : true) &&
