@@ -605,7 +605,7 @@ class Addition extends Component {
                                             }`,
                                             rules: [
                                                 {
-                                                    required: true,
+                                                    required: false,
                                                     message: '请输入身份证号码'
                                                 }
                                             ]
