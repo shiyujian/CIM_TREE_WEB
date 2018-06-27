@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-06-19 11:31:11
+ * @Last Modified time: 2018-06-27 15:18:49
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -383,7 +383,7 @@ class Lmap extends Component {
                             }
                         });
                     }
-                    let polyline = L.polyline(latlngs, { color: 'red' }).addTo(
+                    let polyline = L.polyline(latlngs, { color: 'blue' }).addTo(
                         this.map
                     );
                     this.map.fitBounds(polyline.getBounds());
@@ -461,9 +461,9 @@ class Lmap extends Component {
                 let locationY = v['Y'];
                 let coordinates = [locationY, locationX];
                 riskObj[level] = riskObj[level] || {
-                    key: level,
+                    key: 'Level' + ' ' + level,
                     properties: {
-                        name: level
+                        name: 'Level' + ' ' + level
                     },
                     children: []
                 };
@@ -489,6 +489,7 @@ class Lmap extends Component {
             for (let i in riskObj) {
                 risks.push(riskObj[i]);
             }
+            console.log('risks', risks);
             me.setState({ hazards: risks });
         });
     }
@@ -581,7 +582,6 @@ class Lmap extends Component {
                 delete checkItems[c];
             }
         }
-        // debugger
         let me = this;
 
         content.forEach(c => {
@@ -736,9 +736,6 @@ class Lmap extends Component {
             // getThinClass(e.latlng.lng,e.latlng.lat);
             that.getTreeInfo(e.latlng.lng, e.latlng.lat, that);
         });
-        // 航拍影像
-        // if (CUS_TILEMAP)
-        //     L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map)
     }
     async getTreeInfo (x, y, that) {
         const {
@@ -778,10 +775,14 @@ class Lmap extends Component {
         var zoom = that.map.getZoom();
         var resolution = resolutions[zoom];
         var col = (x + 180) / resolution;
-        var colp = col % 256;
+        // 林总说明I和J必须是整数
+        var colp = Math.floor(col % 256);
+        // var colp = col % 256;
         col = Math.floor(col / 256);
         var row = (90 - y) / resolution;
-        var rowp = row % 256;
+        // 林总说明I和J必须是整数
+        var rowp = Math.floor(row % 256);
+        // var rowp = row % 256;
         row = Math.floor(row / 256);
         var url =
             window.config.DASHBOARD_ONSITE +
@@ -1185,9 +1186,9 @@ class Lmap extends Component {
     }
 
     options = [
-        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' }
-        // { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access', },
-        // { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning',}
+        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' },
+        { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access' },
+        { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning' }
     ];
 
     options2 = [
@@ -2425,6 +2426,7 @@ class Lmap extends Component {
 
     /* 渲染菜单panel */
     renderPanel (option) {
+        // console.log('this.state.userCheckedKeys', this.state.userCheckedKeys);
         let content = this.getPanelData(option.value);
         if (option && option.value) {
             switch (option.value) {
