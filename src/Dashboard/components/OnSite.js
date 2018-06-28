@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-06-27 15:18:49
+ * @Last Modified time: 2018-06-28 10:52:45
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -365,6 +365,7 @@ class Lmap extends Component {
                             });
                         }
                     });
+                    console.log('set', set);
                     let arr = [];
                     for (var i in set) {
                         arr.push(i);
@@ -379,7 +380,7 @@ class Lmap extends Component {
                     if (arr1 && arr1 instanceof Array && arr1.length > 0) {
                         arr1[0].map(rst => {
                             if (rst && rst.X && rst.Y) {
-                                latlngs.push([rst.X, rst.Y]);
+                                latlngs.push([rst.Y, rst.X]);
                             }
                         });
                     }
@@ -1186,9 +1187,9 @@ class Lmap extends Component {
     }
 
     options = [
-        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' },
-        { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access' },
-        { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning' }
+        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' }
+        // { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access' },
+        // { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning' }
     ];
 
     options2 = [
