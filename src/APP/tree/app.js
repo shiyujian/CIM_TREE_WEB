@@ -31,8 +31,8 @@ export default class App extends Component {
 		const {default: Video} = await import('../../Video');
 		const {default: Cost} = await import('../../Cost');
 		const {default: Safety} = await import('../../Safety');
-		const {default: DataReport} = await import('../../Datareport');
-		const {default: Summary} = await import('../../Summary');
+		// const {default: DataReport} = await import('../../Datareport');
+		// const {default: Summary} = await import('../../Summary');
 		const {default: Receive} = await import('../../Receive');
 		const {default: Project} = await import('../../Project');
 
@@ -53,8 +53,8 @@ export default class App extends Component {
 			Video,
 			Cost,
 			Safety,
-			DataReport,
-			Summary,
+			// DataReport,
+			// Summary,
 			Receive,
 			Project,
 		});
@@ -78,8 +78,8 @@ export default class App extends Component {
 			Video,
 			Cost,
 			Safety,
-			DataReport,
-			Summary,
+			// DataReport,
+			// Summary,
 			Receive,
 			Project,
 		} = this.state || {};
@@ -106,8 +106,8 @@ export default class App extends Component {
 						{Cost && <Route path="/cost" component={Cost}/>}
 						{Video && <Route path="/video" component={Video}/>}
 						{Safety && <Route path="/safety" component={Safety}/>}
-						{DataReport && <Route path="/data" component={DataReport}/>}
-						{Summary && <Route path="/summary" component={Summary}/>}
+						{/* {DataReport && <Route path="/data" component={DataReport}/>} */}
+						{/* {Summary && <Route path="/summary" component={Summary}/>} */}
 						{Receive && <Route path="/receive" component={Receive}/>}
 						{Project && <Route path="/project" component={Project}/>}
 					

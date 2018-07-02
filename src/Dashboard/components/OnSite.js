@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-06-28 10:52:45
+ * @Last Modified time: 2018-07-02 20:34:06
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -1187,9 +1187,9 @@ class Lmap extends Component {
     }
 
     options = [
-        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' }
-        // { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access' },
-        // { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning' }
+        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' },
+        { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access' },
+        { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning' }
     ];
 
     options2 = [
