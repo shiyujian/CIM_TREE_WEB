@@ -29,7 +29,7 @@ export default class App extends Component {
 		const {default: Selfcare} = await import('../../Selfcare'); 
 		const {default: ModelDown} = await import('../../Down');
 		const {default: Video} = await import('../../Video');
-		const {default: Cost} = await import('../../Cost');
+		// const {default: Cost} = await import('../../Cost');
 		const {default: Safety} = await import('../../Safety');
 		// const {default: DataReport} = await import('../../Datareport');
 		// const {default: Summary} = await import('../../Summary');
@@ -51,7 +51,7 @@ export default class App extends Component {
 			// Setup,
 			ModelDown,
 			Video,
-			Cost,
+			// Cost,
 			Safety,
 			// DataReport,
 			// Summary,
@@ -76,7 +76,7 @@ export default class App extends Component {
 			// Setup,
 			ModelDown,
 			Video,
-			Cost,
+			// Cost,
 			Safety,
 			// DataReport,
 			// Summary,
@@ -103,7 +103,7 @@ export default class App extends Component {
 						{System && <Route path="/system" component={System}/>}
 						{/*Setup && <Route path="/setup" component={Setup}/>*/}
 						{ModelDown && <Route path="/ModelDown" component={ModelDown}/>}
-						{Cost && <Route path="/cost" component={Cost}/>}
+						{/* {Cost && <Route path="/cost" component={Cost}/>} */}
 						{Video && <Route path="/video" component={Video}/>}
 						{Safety && <Route path="/safety" component={Safety}/>}
 						{/* {DataReport && <Route path="/data" component={DataReport}/>} */}
