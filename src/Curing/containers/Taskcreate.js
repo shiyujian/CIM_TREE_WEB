@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store';
-import { Lmap } from '../components';
 import { actions as platformActions } from '_platform/store/global';
-
+import { TaskcreateTable } from '../components/Taskcreate';
 @connect(
     state => {
         const { platform } = state;
@@ -17,12 +16,8 @@ import { actions as platformActions } from '_platform/store/global';
         )
     })
 )
-export default class Home extends Component {
+export default class Taskcreate extends Component {
     render () {
-        return (
-            <div>
-                <Lmap />
-            </div>
-        );
+        return <TaskcreateTable {...this.props} />;
     }
 }

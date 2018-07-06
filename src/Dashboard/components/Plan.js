@@ -5,35 +5,20 @@ import { actions } from '../store';
 import {
     Button,
     Modal,
-    Spin,
     message,
     Collapse,
-    Checkbox,
     DatePicker
 } from 'antd';
-import { Icon } from 'react-fa';
-import { panorama_360 } from './geojsonFeature';
 import {
     PDF_FILE_API,
-    previewWord_API,
-    CUS_TILEMAP,
-    Video360_API2,
-    DashboardVideo360API
+    previewWord_API
 } from '_platform/api';
 // import './Plan.less';
 
 import './OnSite.less';
-import CityMarker from './CityMarker';
-import CameraVideo from '../../Video/components/CameraVideo';
 import DashPanel from './DashPanel';
 import TrackPlayBack from './TrackPlayBack';
-import moment from 'moment';
-import RiskDetail from './riskDetail';
 import UserSelect from '_platform/components/panels/UserSelect';
-import { wrapperMapUser } from './util';
-import DGN from '_platform/components/panels/DGN';
-import DGNProjectInfo from './DGNProjectInfo';
-import { CONSTRACTT } from '../../_platform/api';
 
 const Panel = Collapse.Panel;
 const $ = window.$;

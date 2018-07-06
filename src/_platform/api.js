@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-06-21 15:25:04
+ * @Last Modified time: 2018-07-06 10:26:27
  */
 /**
  *
@@ -775,6 +775,24 @@ export const MODULES = [
             }
         ]
     },
+    {
+        id: 'CURING',
+        name: '养护管理',
+        children: [
+            {
+                id: 'CURING.TASKCREATE',
+                name: '任务下发'
+            },
+            {
+                id: 'CURING.TASKREPORT',
+                name: '任务上报'
+            },
+            {
+                id: 'CURING.TASKSTATIS',
+                name: '任务统计'
+            }
+        ]
+    },
     // , {
     // 	id: 'RECEIVE',
     // 	name: '收发货管理',
@@ -1265,6 +1283,24 @@ export const MODULES2 = [
                         name: '定位数据导入'
                     }
                 ]
+            }
+        ]
+    },
+    {
+        id: 'CURING',
+        name: '养护管理',
+        children: [
+            {
+                id: 'CURING.TASKCREATE',
+                name: '任务下发'
+            },
+            {
+                id: 'CURING.TASKREPORT',
+                name: '任务上报'
+            },
+            {
+                id: 'CURING.TASKSTATIS',
+                name: '任务统计'
             }
         ]
     },

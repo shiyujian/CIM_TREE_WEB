@@ -2,16 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../store';
-import { Button, Modal, Spin, message, Collapse, Checkbox } from 'antd';
-import { Icon } from 'react-fa';
-// import {Icon} from 'react-fa';
-// import {users, safetys, hazards, vedios} from './geojsonFeature';
-import { panorama_360 } from './geojsonFeature';
+import { Button, Modal, message, Collapse, Checkbox } from 'antd';
 import {
     PDF_FILE_API,
     previewWord_API,
-    CUS_TILEMAP,
-    Video360_API2,
     DashboardVideo360API
 } from '_platform/api';
 import './OnSite.less';
@@ -21,9 +15,7 @@ import DashPanel from './DashPanel';
 import TrackPlayBack from './TrackPlayBack';
 import moment from 'moment';
 import RiskDetail from './riskDetail';
-import UserSelect from '_platform/components/panels/UserSelect';
 import { wrapperMapUser } from './util';
-import DGN from '_platform/components/panels/DGN';
 import DGNProjectInfo from './DGNProjectInfo';
 
 const Panel = Collapse.Panel;
@@ -40,7 +32,7 @@ let model_name = window.config.dgn_model_name;
     })
 )
 export default class Danger extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             TileLayerUrl: this.tileUrls[1],
@@ -57,24 +49,24 @@ export default class Danger extends Component {
             previewVisible: false,
             previewTitle: '文件预览',
             loading: false,
-            areaJson: [], //区域地块
-            users: [], //人员树
-            safetys: [], //安全监测
-            hazards: [], //安全隐患
-            vedios: [], //视频监控
-            panorama: [], //全景图
+            areaJson: [], // 区域地块
+            users: [], // 人员树
+            safetys: [], // 安全监测
+            hazards: [], // 安全隐患
+            vedios: [], // 视频监控
+            panorama: [], // 全景图
             panoramalink: '',
             panoramaModalVisble: false,
-            userCheckedKeys: [], //用户被选中键值
+            userCheckedKeys: [], // 用户被选中键值
             trackState: false,
             isShowTrack: false,
             trackId: null,
             trackUser: null,
-            menuIsExtend: true /*菜单是否展开*/,
-            menuWidth: 200 /*菜单宽度*/,
+            menuIsExtend: true /* 菜单是否展开 */,
+            menuWidth: 200 /* 菜单宽度 */,
             showCamera: false,
             checkedVedio: {},
-            iframe_key: false, //iframe首次进入不加载，点击三维后保留iframe
+            iframe_key: false, // iframe首次进入不加载，点击三维后保留iframe
             iframe_dgn: false,
             risk: {
                 showRiskDetail: false,
@@ -89,7 +81,7 @@ export default class Danger extends Component {
             userOnlineState: false,
             userOnline: [],
             nowShowModel: `${model_name}`,
-            //测试选择人员功能是否好用
+            // 测试选择人员功能是否好用
             // userOnline:[{
             // 	id:528,
             // 	username:'18867508296'
@@ -108,7 +100,7 @@ export default class Danger extends Component {
         this.track = null;
         this.orgs = null;
         this.timeInteval = null;
-        /*菜单宽度调整*/
+        /* 菜单宽度调整 */
         this.menu = {
             startPos: 0,
             isStart: false,
@@ -117,14 +109,14 @@ export default class Danger extends Component {
             minWidth: 200,
             maxWidth: 500
         };
-        /*现场人员*/
+        /* 现场人员 */
         this.user = {
             orgs: {},
             userList: {}
         };
     }
 
-    componentDidMount() {
+    componentDidMount () {
         this.initMap();
         this.getArea();
         this.getRisk();
@@ -132,9 +124,9 @@ export default class Danger extends Component {
         this.getSafeMonitor();
     }
 
-    componentWillUnmount() {
+    componentWillUnmount () {
         clearInterval(this.timeInteval);
-        /*三维切换卡顿*/
+        /* 三维切换卡顿 */
 
         if (this.state.iframe_key) {
             $('#showCityMarkerId')[0].contentWindow.terminateRender &&
@@ -142,8 +134,8 @@ export default class Danger extends Component {
         }
     }
 
-    /*解析组织树*/
-    loopOrg(org = {}, root, leafs = []) {
+    /* 解析组织树 */
+    loopOrg (org = {}, root, leafs = []) {
         let me = this;
         var node = {
             key: org.code,
@@ -171,11 +163,11 @@ export default class Danger extends Component {
         };
     }
 
-    /*获取区域数据*/
-    getArea() {
+    /* 获取区域数据 */
+    getArea () {
         let me = this;
         const { getArea } = this.props.actions;
-        //获取区域数据
+        // 获取区域数据
         getArea({}).then((rst = {}) => {
             let areaData = rst.children || [];
             var resAreas = me.loop(areaData, []);
@@ -195,12 +187,12 @@ export default class Danger extends Component {
         });
     }
 
-    /*获取安全隐患点*/
-    getRisk() {
+    /* 获取安全隐患点 */
+    getRisk () {
         const { getRisk } = this.props.actions;
         let me = this;
         getRisk().then(data => {
-            //安全隐患数据处理
+            // 安全隐患数据处理
             let datas = data.content;
             let riskObj = {};
             datas.forEach((v, index) => {
@@ -210,7 +202,7 @@ export default class Danger extends Component {
                 let response_org = v['ReorganizerObj'];
                 // let measure = levelNode["风险控制措施"];
                 let content = v['ProblemType'];
-                //位置
+                // 位置
                 // let coordinates = ["39.004728", "116.244123"];
                 let locationX = v['X'];
                 let locationY = v['Y'];
@@ -248,8 +240,8 @@ export default class Danger extends Component {
         });
     }
 
-    /*获取视频点*/
-    getVedio() {
+    /* 获取视频点 */
+    getVedio () {
         let me = this;
         const { getVedio } = this.props.actions;
         const { getCameraTree } = this.props.actions;
@@ -258,71 +250,71 @@ export default class Danger extends Component {
                 const engineerings = project.children;
                 return engineerings
                     ? {
-                          key: project.pk,
-                          properties: {
-                              name: project.name
-                          },
-                          geometry: { coordinates: [] },
-                          children: engineerings.map(engineering => {
-                              const cameras = engineering.extra_params.cameras;
-                              return cameras
-                                  ? {
-                                        key: engineering.pk,
-                                        properties: {
-                                            name: engineering.name
-                                        },
-                                        geometry: { coordinates: [] },
-                                        children: cameras
-                                            ? cameras.map(camera => {
-                                                  let coord = [
-                                                      camera.lat,
-                                                      camera.lng
-                                                  ];
-                                                  return {
-                                                      type: 'monitor',
-                                                      key: camera.pk,
-                                                      properties: {
-                                                          name: camera.name,
-                                                          // vType,
-                                                          pk: camera.pk,
-                                                          ip: camera.ip,
-                                                          port: camera.port,
-                                                          password:
+                        key: project.pk,
+                        properties: {
+                            name: project.name
+                        },
+                        geometry: { coordinates: [] },
+                        children: engineerings.map(engineering => {
+                            const cameras = engineering.extra_params.cameras;
+                            return cameras
+                                ? {
+                                    key: engineering.pk,
+                                    properties: {
+                                        name: engineering.name
+                                    },
+                                    geometry: { coordinates: [] },
+                                    children: cameras
+                                        ? cameras.map(camera => {
+                                            let coord = [
+                                                camera.lat,
+                                                camera.lng
+                                            ];
+                                            return {
+                                                type: 'monitor',
+                                                key: camera.pk,
+                                                properties: {
+                                                    name: camera.name,
+                                                    // vType,
+                                                    pk: camera.pk,
+                                                    ip: camera.ip,
+                                                    port: camera.port,
+                                                    password:
                                                               camera.password,
-                                                          username:
+                                                    username:
                                                               camera.username,
-                                                          description:
+                                                    description:
                                                               camera.desc
-                                                      },
-                                                      geometry: {
-                                                          type: 'Point',
-                                                          coordinates: coord
-                                                      }
-                                                  };
-                                              })
-                                            : []
-                                    }
-                                  : {
-                                        key: engineering.pk,
-                                        properties: {
-                                            name: engineering.name
-                                        },
-                                        geometry: { coordinates: [] }
-                                    };
-                          })
-                      }
+                                                },
+                                                geometry: {
+                                                    type: 'Point',
+                                                    coordinates: coord
+                                                }
+                                            };
+                                        })
+                                        : []
+                                }
+                                : {
+                                    key: engineering.pk,
+                                    properties: {
+                                        name: engineering.name
+                                    },
+                                    geometry: { coordinates: [] }
+                                };
+                        })
+                    }
                     : {
-                          title: project.name,
-                          key: project.pk
-                      };
+                        title: project.name,
+                        key: project.pk
+                    };
             });
-            //过滤没有摄像头的单位工程
+            // 过滤没有摄像头的单位工程
             for (let i = treeData.length - 1; i >= 0; i--) {
                 let en = treeData[i];
                 for (let j = en.children.length - 1; j >= 0; j--) {
                     let unit = en.children[j];
                     if (!unit.children || !unit.children.length) {
-                        //移除该项目
+                        // 移除该项目
                         en.children.splice(j, 1);
                     }
                 }
@@ -343,40 +335,40 @@ export default class Danger extends Component {
                 const engineerings = project.children;
                 return engineerings
                     ? {
-                          title: project.name,
-                          key: project.pk,
-                          children: engineerings.map(engineering => {
-                              const cameras = engineering.extra_params.cameras;
-                              return cameras
-                                  ? {
-                                        title: engineering.name,
-                                        key: engineering.pk,
-                                        children: cameras
-                                            ? cameras.map(camera => {
-                                                  return {
-                                                      title: camera.name,
-                                                      key: camera.pk,
-                                                      extra: camera
-                                                  };
-                                              })
-                                            : []
-                                    }
-                                  : {
-                                        title: engineering.name,
-                                        key: engineering.pk
-                                    };
-                          })
-                      }
+                        title: project.name,
+                        key: project.pk,
+                        children: engineerings.map(engineering => {
+                            const cameras = engineering.extra_params.cameras;
+                            return cameras
+                                ? {
+                                    title: engineering.name,
+                                    key: engineering.pk,
+                                    children: cameras
+                                        ? cameras.map(camera => {
+                                            return {
+                                                title: camera.name,
+                                                key: camera.pk,
+                                                extra: camera
+                                            };
+                                        })
+                                        : []
+                                }
+                                : {
+                                    title: engineering.name,
+                                    key: engineering.pk
+                                };
+                        })
+                    }
                     : {
-                          title: project.name,
-                          key: project.pk
-                      };
+                        title: project.name,
+                        key: project.pk
+                    };
             });
             this.setState({ treeData: treeData });
         });
     };
 
-    getSafeMonitor() {
+    getSafeMonitor () {
         let me = this;
         const { getSafeMonitor } = this.props.actions;
         getSafeMonitor().then(data => {
@@ -402,8 +394,8 @@ export default class Danger extends Component {
         });
     }
 
-    //解构得到的区域数据
-    loop(data = [], resAreas = []) {
+    // 解构得到的区域数据
+    loop (data = [], resAreas = []) {
         let me = this;
         data.map(item => {
             if (item.children && item.children.length) {
@@ -440,8 +432,8 @@ export default class Danger extends Component {
         2: window.config.VEC_W
     };
 
-    /*初始化地图*/
-    initMap() {
+    /* 初始化地图 */
+    initMap () {
         this.map = L.map('mapid', window.config.initLeaflet);
 
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
@@ -462,17 +454,18 @@ export default class Danger extends Component {
 
         document
             .querySelector('.leaflet-popup-pane')
-            .addEventListener('click', function(e) {
+            .addEventListener('click', function (e) {
                 let target = e.target;
-                //绑定隐患详情点击事件
+                // 绑定隐患详情点击事件
                 if (target.getAttribute('class') == 'btnViewRisk') {
                     let idRisk = target.getAttribute('data-id');
                     let risk = null;
                     me.state.hazards.forEach(v => {
-                        if (!risk)
+                        if (!risk) {
                             risk = v.children.find(
                                 v1 => v1.key == parseInt(idRisk)
                             );
+                        }
                     });
                     if (risk) {
                         let oldRisk = me.state.risk;
@@ -486,7 +479,7 @@ export default class Danger extends Component {
             });
     }
 
-    genPopUpContent(geo) {
+    genPopUpContent (geo) {
         const { properties = {} } = geo;
         switch (geo.type) {
             case 'danger': {
@@ -497,7 +490,7 @@ export default class Danger extends Component {
 						<h2><span>整改措施：</span>${properties.measure ? properties.measure : ''}</h2>
 						<h2><span>责任单位：</span>${properties.response_org}</h2>
 					</div>`;
-                //<a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
+                // <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
             }
             case 'monitor': {
                 return `<div>
@@ -522,8 +515,8 @@ export default class Danger extends Component {
         }
     }
 
-    /*在地图上添加marker和polygan*/
-    createMarker(geo, oldMarker) {
+    /* 在地图上添加marker和polygan */
+    createMarker (geo, oldMarker) {
         var me = this;
         if (geo.properties.type != 'area') {
             if (!oldMarker) {
@@ -550,7 +543,7 @@ export default class Danger extends Component {
             }
             return oldMarker;
         } else {
-            //创建区域图形
+            // 创建区域图形
             if (!oldMarker) {
                 var area = L.geoJSON(geo, {
                     style: {
@@ -562,7 +555,7 @@ export default class Danger extends Component {
                     },
                     title: geo.properties.name
                 }).addTo(this.map);
-                //地块标注
+                // 地块标注
                 let latlng = area.getBounds().getCenter();
                 let label = L.marker([latlng.lat, latlng.lng], {
                     icon: L.divIcon({
@@ -572,9 +565,9 @@ export default class Danger extends Component {
                     })
                 });
                 area.addLayer(label);
-                //点击预览
+                // 点击预览
                 area.on({
-                    click: function(event) {
+                    click: function (event) {
                         me.previewFile(geo.file_info, geo.properties);
                     }
                 });
@@ -625,8 +618,8 @@ export default class Danger extends Component {
         }
         // {label: '区域地块', value: 'geojsonFeature_area', IconName: 'square'}
     ];
-    //切换伟景行
-    switchToDgn() {
+    // 切换伟景行
+    switchToDgn () {
         this.setState({
             isNotThree: true,
             isNotDisplay: { display: '' },
@@ -647,8 +640,8 @@ export default class Danger extends Component {
         }
     }
 
-    //切换为3D
-    setTrueForThree() {
+    // 切换为3D
+    setTrueForThree () {
         this.setState({
             isNotThree: false,
             isNotDisplay: { display: 'none' },
@@ -669,7 +662,7 @@ export default class Danger extends Component {
         }
     }
 
-    show2DMap() {
+    show2DMap () {
         this.setState({
             isNotThree: true,
             isNotDisplay: { display: '' },
@@ -685,8 +678,8 @@ export default class Danger extends Component {
         }
     }
 
-    //切换为2D
-    toggleTileLayer(index) {
+    // 切换为2D
+    toggleTileLayer (index) {
         this.tileLayer.setUrl(this.tileUrls[index]);
         this.setState({
             TileLayerUrl: this.tileUrls[index],
@@ -695,8 +688,8 @@ export default class Danger extends Component {
         this.show2DMap();
     }
 
-    //获取对应的ICON
-    getIconType(type) {
+    // 获取对应的ICON
+    getIconType (type) {
         switch (type) {
             case 'people':
                 return 'peopleIcon';
@@ -719,7 +712,7 @@ export default class Danger extends Component {
     }
 
     /* 获取对应图层数据 */
-    getPanelData(featureName) {
+    getPanelData (featureName) {
         var content = {};
         switch (featureName) {
             case 'geojsonFeature_people':
@@ -745,25 +738,25 @@ export default class Danger extends Component {
         return content;
     }
 
-    //图例的显示与否
-    toggleIcon() {
+    // 图例的显示与否
+    toggleIcon () {
         this.setState({
             toggle: !this.state.toggle
         });
     }
 
-    //人员被选中写入地图
-    onPeopleCheck(keys, checkItems) {
+    // 人员被选中写入地图
+    onPeopleCheck (keys, checkItems) {
         let me = this;
-        let creatUserMakers = function() {
+        let creatUserMakers = function () {
             keys.forEach(k => {
                 let user = me.user.userList[k];
                 if (user) {
                     checkItems[k] = me.createMarker(user, checkItems[k]);
-                    //获取人员职务
+                    // 获取人员职务
                     if (checkItems[k]) {
                         const { getUserOrgInfo } = me.props.actions;
-                        checkItems[k].on('click', function() {
+                        checkItems[k].on('click', function () {
                             !user.properties.job &&
                                 getUserOrgInfo({
                                     CODE: user.properties.personCode
@@ -778,31 +771,31 @@ export default class Danger extends Component {
                 }
             });
         };
-        //检查是否是组织根节点,如果未加载用户数据,先加载
+        // 检查是否是组织根节点,如果未加载用户数据,先加载
         let rootKey = keys.find(v => {
             return me.user.orgs[v] !== undefined;
         });
         if (rootKey) {
             me.getUsersByOrg(rootKey).then(uKeys => {
                 if (uKeys)
-                    //返回的结果有值,说明请求了数据;为空,说明数据已加载过,不重复请求
-                    keys = uKeys;
+                // 返回的结果有值,说明请求了数据;为空,说明数据已加载过,不重复请求
+                { keys = uKeys; }
                 creatUserMakers();
             });
         } else {
-            //未选中组织根节点
+            // 未选中组织根节点
             creatUserMakers();
         }
         this.setState({ userCheckedKeys: keys }, () => {});
     }
 
-    /*显示隐藏地图marker*/
-    onCheck(keys, featureName) {
+    /* 显示隐藏地图marker */
+    onCheck (keys, featureName) {
         var content = this.getPanelData(featureName);
-        //获取所有key对应的数据对象
+        // 获取所有key对应的数据对象
         this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
         let checkItems = this.checkMarkers[featureName];
-        //移除未选中的
+        // 移除未选中的
         for (var c in checkItems) {
             let k = keys.find(k => k == c);
             if (!k && checkItems[c]) {
@@ -831,7 +824,7 @@ export default class Danger extends Component {
                                     checkItems[kk]
                                 );
                                 checkItems[kk] &&
-                                    checkItems[kk].on('click', function() {
+                                    checkItems[kk].on('click', function () {
                                         me.setState({
                                             panoramaModalVisble: true,
                                             panoramalink:
@@ -843,14 +836,14 @@ export default class Danger extends Component {
                             }
                         }
                         if (featureName == 'geojsonFeature_monitor') {
-                            //this.map.panTo(latlng);
+                            // this.map.panTo(latlng);
                             if (kk) {
                                 checkItems[kk] = me.createMarker(
                                     cc,
                                     checkItems[kk]
                                 );
                                 checkItems[kk] &&
-                                    checkItems[kk].on('click', function() {
+                                    checkItems[kk].on('click', function () {
                                         me.setState({ checkedVedio: cc });
                                         me.showCamera();
                                     });
@@ -866,7 +859,7 @@ export default class Danger extends Component {
                                         checkItems[kkk] &&
                                             checkItems[kkk].on(
                                                 'click',
-                                                function() {
+                                                function () {
                                                     // me.setState({checkedVedio: cc});
                                                     me.setState({
                                                         checkedVedio: ccc
@@ -886,8 +879,8 @@ export default class Danger extends Component {
                             );
                             if (featureName == 'geojsonFeature_hazard') {
                                 this.map.panTo(cc.geometry.coordinates);
-                                checkItems[kk].on('click', function() {
-                                    //获取隐患处理措施
+                                checkItems[kk].on('click', function () {
+                                    // 获取隐患处理措施
                                     const {
                                         getRiskContactSheet
                                     } = me.props.actions;
@@ -899,10 +892,11 @@ export default class Danger extends Component {
                                                     ct['rectify_measure'];
                                                 let risk;
                                                 me.state.hazards.forEach(v => {
-                                                    if (!risk)
+                                                    if (!risk) {
                                                         risk = v.children.find(
                                                             v1 => v1.key == kk
                                                         );
+                                                    }
                                                 });
                                                 if (risk) {
                                                     risk.properties.measure = measure;
@@ -912,7 +906,7 @@ export default class Danger extends Component {
                                                         me.genPopUpContent(risk)
                                                     );
                                                     if (me.state.risk.detail) {
-                                                        //更新详情页隐患措施
+                                                        // 更新详情页隐患措施
                                                         me.state.risk.detail.properties.measure = measure;
                                                         me.setState({
                                                             risk: me.state.risk
@@ -932,17 +926,15 @@ export default class Danger extends Component {
         this.checkMarkers[featureName] = checkItems;
     }
 
-    /*弹出信息框*/
-    onSelect(keys, featureName) {
+    /* 弹出信息框 */
+    onSelect (keys, featureName) {
         this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
         let checkItems = this.checkMarkers[featureName];
         let key = keys.length > 0 && keys[0];
         if (key) {
             let selItem = checkItems[key];
             if (selItem) {
-                if (featureName != 'geojsonFeature_area')
-                    this.map.setView(selItem.getLatLng());
-                else {
+                if (featureName != 'geojsonFeature_area') { this.map.setView(selItem.getLatLng()); } else {
                     this.map.fitBounds(selItem.getBounds(), {
                         padding: [200, 200]
                     });
@@ -952,28 +944,28 @@ export default class Danger extends Component {
         }
     }
 
-    /*退出轨迹查看*/
-    exitTrack() {
+    /* 退出轨迹查看 */
+    exitTrack () {
         this.setState({ isShowTrack: false });
     }
 
-    /*菜单展开收起*/
-    extendAndFold() {
+    /* 菜单展开收起 */
+    extendAndFold () {
         this.setState({ menuIsExtend: !this.state.menuIsExtend });
     }
 
-    /*显示视频*/
-    showCamera() {
+    /* 显示视频 */
+    showCamera () {
         this.setState({ showCamera: true });
     }
 
-    /*关闭视频*/
-    closeCamera() {
+    /* 关闭视频 */
+    closeCamera () {
         this.setState({ showCamera: false });
     }
 
-    /*手动调整菜单宽度*/
-    onStartResizeMenu(e) {
+    /* 手动调整菜单宽度 */
+    onStartResizeMenu (e) {
         e.preventDefault();
         this.menu.startPos = e.clientX;
         this.menu.isStart = true;
@@ -981,12 +973,12 @@ export default class Danger extends Component {
         this.menu.count = 0;
     }
 
-    onResizingMenu(e) {
+    onResizingMenu (e) {
         if (this.menu.isStart) {
             e.preventDefault();
             this.menu.count++;
             let ys = this.menu.count % 5;
-            if (ys == 0 || ys == 1 || ys == 3 || ys == 4) return; //降低事件执行频率
+            if (ys == 0 || ys == 1 || ys == 3 || ys == 4) return; // 降低事件执行频率
             let dx = e.clientX - this.menu.startPos;
             let menuWidth = this.menu.tempMenuWidth + dx;
             if (menuWidth > this.menu.maxWidth) menuWidth = this.menu.maxWidth;
@@ -995,19 +987,19 @@ export default class Danger extends Component {
         }
     }
 
-    onEndResize(e) {
+    onEndResize (e) {
         this.menu.isStart = false;
     }
 
-    /*隐患详情*/
-    closeRiskDetail() {
+    /* 隐患详情 */
+    closeRiskDetail () {
         let oldRisk = this.state.risk;
         oldRisk.showRiskDetail = false;
         this.setState({ risk: oldRisk });
     }
 
-    /*获取隐患处理过程*/
-    getRiskProcess(id) {
+    /* 获取隐患处理过程 */
+    getRiskProcess (id) {
         let me = this;
         const { getRiskProcess, getRiskProcessDetail } = this.props.actions;
         getRiskProcess({}, { code: 'TEMPLATE_011', subject_id: id }).then(
@@ -1016,7 +1008,7 @@ export default class Danger extends Component {
                     let process = data[0];
                     let processId = process.id;
                     getRiskProcessDetail({ ID: processId }).then(dd => {
-                        //处理history 显示处理过程
+                        // 处理history 显示处理过程
                         let excuLogs = [];
                         dd.history.forEach(h => {
                             if (h.records && h.records.length) {
@@ -1068,7 +1060,7 @@ export default class Danger extends Component {
         });
     };
 
-    //现场人员搜索
+    // 现场人员搜索
     queryUser = usr => {
         let { userCheckedKeys } = this.state;
         let me = this;
@@ -1076,7 +1068,7 @@ export default class Danger extends Component {
         if (usr) {
             let mapUser = wrapperMapUser(usr);
             if (!this.user.userList[usr.id]) {
-                //不在目录树中,添加到目录
+                // 不在目录树中,添加到目录
                 this.user.userList[usr.id] = mapUser;
                 this.overallUsersTree(this.state.users, mapUser);
                 this.setState({ users: this.state.users }, () => {
@@ -1084,7 +1076,7 @@ export default class Danger extends Component {
                         userCheckedKeys.push(mapUser.key);
                         this.onCheck(userCheckedKeys, geoFeature);
                     }
-                    //居中 并弹出属性框
+                    // 居中 并弹出属性框
                     me.onSelect([mapUser.key], geoFeature);
                 });
             } else {
@@ -1092,19 +1084,19 @@ export default class Danger extends Component {
                     userCheckedKeys.push(usr.id);
                     this.onCheck(userCheckedKeys, geoFeature);
                 }
-                //居中 并弹出属性框
+                // 居中 并弹出属性框
                 me.onSelect([mapUser.key], geoFeature);
             }
         }
     };
 
-    render() {
+    render () {
         let height = document.querySelector('html').clientHeight - 80 - 36 - 52;
         return (
-            <div className="map-container">
+            <div className='map-container'>
                 <div
-                    ref="appendBody"
-                    className="l-map r-main"
+                    ref='appendBody'
+                    className='l-map r-main'
                     onMouseUp={this.onEndResize.bind(this)}
                     onMouseMove={this.onResizingMenu.bind(this)}
                 >
@@ -1117,21 +1109,21 @@ export default class Danger extends Component {
                         style={
                             this.state.menuIsExtend
                                 ? {
-                                      transform: 'translateX(0)',
-                                      width: this.state.menuWidth
-                                  }
+                                    transform: 'translateX(0)',
+                                    width: this.state.menuWidth
+                                }
                                 : {
-                                      transform: `translateX(-${
-                                          this.state.menuWidth
-                                      }px)`,
-                                      width: this.state.menuWidth
-                                  }
+                                    transform: `translateX(-${
+                                        this.state.menuWidth
+                                    }px)`,
+                                    width: this.state.menuWidth
+                                }
                         }
                     >
-                        <aside className="aside" draggable="false">
-                            {/*<div>
+                        <aside className='aside' draggable='false'>
+                            {/* <div>
 								<UserSelect placeholder="查询人员" onChange={this.queryUser}></UserSelect>
-							</div>*/}
+							</div> */}
                             <Collapse
                                 defaultActiveKey={[this.options[0].value]}
                                 accordion
@@ -1154,7 +1146,7 @@ export default class Danger extends Component {
                                                 {this.renderPanel(option)}
                                             </Panel>
                                         );
-                                    } /*if(option.label === '360全景'){
+                                    } /* if(option.label === '360全景'){
 											return (
 												<Panel key={option.value} header={option.label}>
 													<div
@@ -1165,7 +1157,7 @@ export default class Danger extends Component {
 													>全景图</div>
 												</Panel>
 											)
-										}else*/ else {
+										}else */ else {
                                         return (
                                             <Panel
                                                 key={option.value}
@@ -1180,12 +1172,12 @@ export default class Danger extends Component {
                             <div style={{ height: '20px' }} />
                         </aside>
                         <div
-                            className="resizeSenseArea"
+                            className='resizeSenseArea'
                             onMouseDown={this.onStartResizeMenu.bind(this)}
                         />
                         {this.state.menuIsExtend ? (
                             <div
-                                className="foldBtn"
+                                className='foldBtn'
                                 style={{ left: this.state.menuWidth }}
                                 onClick={this.extendAndFold.bind(this)}
                             >
@@ -1193,23 +1185,23 @@ export default class Danger extends Component {
                             </div>
                         ) : (
                             <div
-                                className="foldBtn"
+                                className='foldBtn'
                                 style={{ left: this.state.menuWidth }}
                                 onClick={this.extendAndFold.bind(this)}
                             >
                                 展开
                             </div>
                         )}
-                        {/*<div style={{
+                        {/* <div style={{
 							position: 'absolute', bottom: 0, left: 0,
 							width: '100%', lineHeight: '20px',
 							textAlign: 'center', zIndex: 1000, background: '#fff'
 						}}
-						>当前在线人数:{this.state.userOnlineNumber}</div>*/}
+						>当前在线人数:{this.state.userOnlineNumber}</div> */}
                     </div>
                     {this.state.isVisibleMapBtn ? (
-                        <div className="treeControl">
-                            {/*<iframe allowTransparency={true} className={styles.btnCtro}/>*/}
+                        <div className='treeControl'>
+                            {/* <iframe allowTransparency={true} className={styles.btnCtro}/> */}
                             <div>
                                 <Button
                                     type={
@@ -1231,7 +1223,7 @@ export default class Danger extends Component {
                                 >
                                     地图
                                 </Button>
-                                {/*<Button type="danger" onClick={this.setTrueForThree.bind(this)}>三维</Button>*/}
+                                {/* <Button type="danger" onClick={this.setTrueForThree.bind(this)}>三维</Button> */}
                             </div>
                         </div>
                     ) : (
@@ -1245,7 +1237,7 @@ export default class Danger extends Component {
                         }
                     >
                         <div
-                            className="iconList"
+                            className='iconList'
                             style={
                                 this.state.toggle
                                     ? { width: '100px' }
@@ -1254,13 +1246,13 @@ export default class Danger extends Component {
                         >
                             <img
                                 src={require('./ImageIcon/tuli.png')}
-                                className="imageControll"
+                                className='imageControll'
                                 onClick={this.toggleIcon.bind(this)}
                             />
                             {this.options1.map((option, index) => {
                                 if (option.label !== '区域地块') {
                                     return (
-                                        <div key={index} className="imgIcon">
+                                        <div key={index} className='imgIcon'>
                                             <img src={option.IconUrl} />
                                             <p>{option.label}</p>
                                         </div>
@@ -1290,7 +1282,7 @@ export default class Danger extends Component {
                             }
                         >
                             <div
-                                id="mapid"
+                                id='mapid'
                                 style={{
                                     position: 'absolute',
                                     top: 0,
@@ -1328,32 +1320,32 @@ export default class Danger extends Component {
                         title={this.state.previewTitle}
                         visible={this.state.previewVisible}
                         footer={false}
-                        className="preview"
+                        className='preview'
                         onOk={this.previewModal.bind(this)}
                         onCancel={this.previewModal.bind(this)}
-                        width="90%"
-                        height="100%"
+                        width='90%'
+                        height='100%'
                     >
                         {this.state.previewType === 'office' ? (
                             <iframe
                                 src={`${previewWord_API}${
                                     this.state.previewUrl
                                 }`}
-                                width="100%"
-                                height="100%"
-                                frameBorder="0"
+                                width='100%'
+                                height='100%'
+                                frameBorder='0'
                                 style={{ minHeight: '480px' }}
                             />
                         ) : (
                             <iframe
-                                className="file-pop-frame"
+                                className='file-pop-frame'
                                 src={`/pdfjs/web/viewer.html?file=${
                                     this.state.previewUrl
                                 }`}
-                                width="100%"
-                                height="100%"
-                                scrolling="no"
-                                frameBorder="0"
+                                width='100%'
+                                height='100%'
+                                scrolling='no'
+                                frameBorder='0'
                                 style={{ minHeight: '480px' }}
                             />
                         )}
@@ -1365,11 +1357,11 @@ export default class Danger extends Component {
                                 : '视频监控'
                         }
                         visible={this.state.showCamera}
-                        width="90%"
-                        height="90%"
+                        width='90%'
+                        height='90%'
                         onOk={this.closeCamera.bind(this)}
                         onCancel={this.closeCamera.bind(this)}
-                        className="vedioModal"
+                        className='vedioModal'
                     >
                         {this.state.showCamera ? (
                             <CameraVideo {...this.state.checkedVedio} />
@@ -1378,12 +1370,12 @@ export default class Danger extends Component {
                         )}
                     </Modal>
                     <Modal
-                        title="隐患详情"
+                        title='隐患详情'
                         width={800}
                         visible={this.state.risk.showRiskDetail}
                         onOk={this.closeRiskDetail.bind(this)}
                         onCancel={this.closeRiskDetail.bind(this)}
-                        className="riskDetail"
+                        className='riskDetail'
                     >
                         {this.state.risk.detail ? (
                             <RiskDetail
@@ -1395,7 +1387,7 @@ export default class Danger extends Component {
                         )}
                     </Modal>
                     <Modal
-                        title="全景图"
+                        title='全景图'
                         width={1200}
                         visible={this.state.panoramaModalVisble}
                         footer={null}
@@ -1405,8 +1397,8 @@ export default class Danger extends Component {
                     >
                         <div style={{ width: '100%', height: '800px' }}>
                             <iframe
-                                title="全景图"
-                                id="overall-view2"
+                                title='全景图'
+                                id='overall-view2'
                                 src={this.state.panoramalink}
                                 /* style={{position:'absolute', width:'100%', height: '100%'}} */
                                 style={{ width: '100%', height: '100%' }}
@@ -1418,8 +1410,8 @@ export default class Danger extends Component {
         );
     }
 
-    /*渲染菜单panel*/
-    renderPanel(option) {
+    /* 渲染菜单panel */
+    renderPanel (option) {
         let content = this.getPanelData(option.value);
         return (
             <DashPanel
@@ -1433,12 +1425,12 @@ export default class Danger extends Component {
         );
     }
 
-    fillAreaColor(index) {
+    fillAreaColor (index) {
         let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
         return colors[index % 5];
     }
 
-    previewFile(file, properties) {
+    previewFile (file, properties) {
         if (!file.a_file || /void\.pdf$/.test(file.a_file)) {
             message.warning('该区域暂时没有介绍文件！');
             return;
@@ -1462,7 +1454,7 @@ export default class Danger extends Component {
         }, 1000);
     }
 
-    previewModal() {
+    previewModal () {
         this.setState({
             previewVisible: false
         });

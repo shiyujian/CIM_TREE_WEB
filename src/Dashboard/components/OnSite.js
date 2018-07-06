@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-02 20:34:06
+ * @Last Modified time: 2018-07-04 20:38:21
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -25,10 +25,7 @@ import {
     Row,
     DatePicker
 } from 'antd';
-import {
-    PROJECT_UNITS,
-    FOREST_API
-} from '_platform/api';
+import { PROJECT_UNITS, FOREST_API } from '_platform/api';
 import './OnSite.less';
 import DashPanel from './DashPanel';
 import TrackPlayBack from './TrackPlayBack';
@@ -79,9 +76,6 @@ class Lmap extends Component {
             safetys: [], // 安全监测
             hazards: [], // 安全隐患
             vedios: [], // 视频监控
-            panorama: [], // 全景图
-            panoramalink: '',
-            panoramaModalVisble: false,
             userCheckedKeys: [], // 用户被选中键值
             trackState: false,
             isShowTrack: false,
@@ -174,7 +168,6 @@ class Lmap extends Component {
         this.getArea();
         this.getRisk();
         // this.getVedio();
-        // this.getSafeMonitor();
     }
 
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -256,7 +249,14 @@ class Lmap extends Component {
             //     console.log('list', list);
             // }
             // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
-            let codeName = list.LandNo + '#' + list.RegionNo + '#' + list.SmallClass + '#' + list.SmallClassName;
+            let codeName =
+                list.LandNo +
+                '#' +
+                list.RegionNo +
+                '#' +
+                list.SmallClass +
+                '#' +
+                list.SmallClassName;
             if (list.SmallClass && array.indexOf(codeName) === -1) {
                 uniqueSmallClass.push({
                     Name: list.SmallClassName
@@ -401,7 +401,9 @@ class Lmap extends Component {
         if (key) {
             let selItem = checkItems[key];
             if (selItem) {
-                if (featureName !== 'geojsonFeature_area') { this.map.setView(selItem.getLatLng()); } else {
+                if (featureName !== 'geojsonFeature_area') {
+                    this.map.setView(selItem.getLatLng());
+                } else {
                     this.map.fitBounds(selItem.getBounds(), {
                         padding: [200, 200]
                     });
@@ -454,10 +456,7 @@ class Lmap extends Component {
                 let level = v['EventType'];
                 let name = v['ProblemType'];
                 let ResponseOrg = v['ReorganizerObj'];
-                // let measure = levelNode["风险控制措施"];
-                let content = v['ProblemType'];
                 // 位置
-                // let coordinates = ["39.004728", "116.244123"];
                 let locationX = v['X'];
                 let locationY = v['Y'];
                 let coordinates = [locationY, locationX];
@@ -472,13 +471,16 @@ class Lmap extends Component {
                     type: 'danger',
                     key: v.ID,
                     properties: {
-                        content: content,
                         level: level,
                         measure: '',
                         name: name,
-                        response_org: ResponseOrg ? ResponseOrg.Full_Name : ''
-                        // beforeImgs: v['rectify_before'] ? v['rectify_before'].images : [],
-                        // afterImgs: v['rectify_after'] ? v['rectify_after'].images : []
+                        response_org: ResponseOrg ? ResponseOrg.Full_Name : '',
+                        Status: v.Status,
+                        RouteID: v.RouteID,
+                        CreateTime: v.CreateTime,
+                        ID: v.ID,
+                        InputerObj: v.InputerObj,
+                        Supervisor: v.Supervisor
                     },
                     geometry: {
                         type: 'Point',
@@ -650,7 +652,9 @@ class Lmap extends Component {
         if (key) {
             let selItem = checkItems[key];
             if (selItem) {
-                if (featureName !== 'geojsonFeature_area') { this.map.setView(selItem.getLatLng()); } else {
+                if (featureName !== 'geojsonFeature_area') {
+                    this.map.setView(selItem.getLatLng());
+                } else {
                     this.map.fitBounds(selItem.getBounds(), {
                         padding: [200, 200]
                     });
@@ -1031,6 +1035,10 @@ class Lmap extends Component {
 
     genPopUpContent (geo) {
         const { properties = {} } = geo;
+        console.log('properties', properties);
+        console.log('geo', geo);
+        let me = this;
+        console.log('this', this);
         switch (geo.type) {
             case 'people': {
                 return `<div class="popupBox">
@@ -1045,29 +1053,18 @@ class Lmap extends Component {
             }
             case 'danger': {
                 return `<div>
-						<h2><span>隐患内容：</span>${properties.content}</h2>
+						<h2><span>隐患内容：</span>${properties.name}</h2>
 						<h2><span>风险级别：</span>${properties.level}</h2>
-						<h2><span>整改状态：</span>未整改</h2>
+						<h2><span>整改状态：</span>${properties.Status ? (properties.Status === -1 ? '已提交' : (properties.Status === 0 ? '整改中' : (properties.Status === 1 ? '整改完成' : '整改完成'))) : ''}</h2>
 						<h2><span>整改措施：</span>${properties.measure ? properties.measure : ''}</h2>
 						<h2><span>责任单位：</span>${properties.response_org}</h2>
 						<a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-					</div>`;
-            }
-            case 'monitor': {
-                return `<div>
-						<h2><span>摄像头型号：</span>${properties.description}</h2>
-						<h2><span>部位：</span>${properties.name}</h2>
 					</div>`;
             }
             case 'safety': {
                 return `<div>
 						<h2>仪器名称：${properties.name}</h2>
 						<h2>所属部位：${properties.loc}</h2>
-					</div>`;
-            }
-            case 'panorama': {
-                return `<div>
-						<h2>360全景位置：${properties.name}</h2>
 					</div>`;
             }
             default: {
@@ -1188,8 +1185,18 @@ class Lmap extends Component {
 
     options = [
         { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' },
-        { label: '巡检路线', value: 'geojsonFeature_people', IconUrl: require('./ImageIcon/people.png'), IconName: 'universal-access' },
-        { label: '安全隐患', value: 'geojsonFeature_hazard', IconUrl: require('./ImageIcon/danger.png'), IconName: 'warning' }
+        {
+            label: '巡检路线',
+            value: 'geojsonFeature_people',
+            IconUrl: require('./ImageIcon/people.png'),
+            IconName: 'universal-access'
+        },
+        {
+            label: '安全隐患',
+            value: 'geojsonFeature_hazard',
+            IconUrl: require('./ImageIcon/danger.png'),
+            IconName: 'warning'
+        }
     ];
 
     options2 = [
@@ -1210,12 +1217,6 @@ class Lmap extends Component {
             value: 'geojsonFeature_hazard',
             IconUrl: require('./ImageIcon/danger.png'),
             IconName: 'warning'
-        },
-        {
-            label: '视频监控',
-            value: 'geojsonFeature_monitor',
-            IconUrl: require('./ImageIcon/video.png'),
-            IconName: 'video-camera'
         }
     ];
 
@@ -1237,10 +1238,6 @@ class Lmap extends Component {
                 return 'cameraIcon';
             case 'danger':
                 return 'dangerIcon';
-            case 'panorama':
-                return 'allViewIcon';
-            case 'monitor':
-                return 'videoIcon';
             case 'tree':
                 return 'treeIcon';
             default:
@@ -1261,15 +1258,8 @@ class Lmap extends Component {
             case 'geojsonFeature_hazard':
                 content = this.state.hazards;
                 break;
-            case 'geojsonFeature_monitor':
-                content = this.state.vedios;
-                break;
             case 'geojsonFeature_area':
                 content = this.state.treeLists;
-                break;
-            // {label: '360全景', value: 'geojsonFeature_360'},
-            case 'geojsonFeature_360':
-                content = this.state.panorama;
                 break;
         }
         return content;
@@ -1318,7 +1308,9 @@ class Lmap extends Component {
                     rst.content instanceof Array &&
                     rst.content.length > 0
                 )
-            ) { return; }
+            ) {
+                return;
+            }
 
             let str = rst.content[0].coords;
             var target1 = str
@@ -1504,11 +1496,7 @@ class Lmap extends Component {
                         </div>
                     </div> */}
                     <div
-                        style={
-                            this.state.isNotThree
-                                ? {}
-                                : { display: 'none' }
-                        }
+                        style={this.state.isNotThree ? {} : { display: 'none' }}
                     >
                         <div
                             className='iconList'
@@ -2466,9 +2454,6 @@ class Lmap extends Component {
                             featureName={option.value}
                         />
                     );
-                // case 'geojsonFeature_monitor':
-                //     content = this.state.vedios
-                //     break
                 case 'geojsonFeature_area':
                     return (
                         <PkCodeTree
@@ -2479,10 +2464,6 @@ class Lmap extends Component {
                             showIcon={false}
                         />
                     );
-                // {label: '360全景', value: 'geojsonFeature_360'},
-                case 'geojsonFeature_360':
-                    content = this.state.panorama;
-                    break;
             }
         }
     }
