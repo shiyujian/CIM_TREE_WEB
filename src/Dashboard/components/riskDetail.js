@@ -1,86 +1,235 @@
-
-import React ,{Component} from 'react';
-import {Row,Col,Timeline,Carousel,Spin} from 'antd';
-import {PDF_FILE_API} from '_platform/api';
+import React, { Component } from 'react';
+import { Row, Input, Steps } from 'antd';
+import { FOREST_API, PROJECT_UNITS } from '_platform/api';
 import styles from './style.css';
-const  reg = /^http:/g;
+import moment from 'moment';
+const Step = Steps.Step;
 
 export default class RiskDetail extends Component {
-
-    constructor(props){
+    constructor (props) {
         super(props);
+        this.state = {
+        };
     }
 
-    componentDidMount(){
+    // 树节点信息查看图片时格式转换
+    _onImgClick (data) {
+        let srcs = [];
+        try {
+            if (data) {
+                let arr = data.split(',');
+                arr.map(rst => {
+                    let src = rst.replace(/\/\//g, '/');
+                    src = `${FOREST_API}/${src}`;
+                    srcs.push(src);
+                });
+            }
+        } catch (e) {
+            // console.log('处理图片', e);
+        }
+        return srcs;
     }
 
-    render(){
-        const {risk} = this.props;
-        return (<Row gutter={28}>
-            <Col span={12}>
-                <h3>整改前</h3>
-                <div className={`mb`}>
-                    {
-                        risk.detail.properties.beforeImgs&&risk.detail.properties.beforeImgs.length ?
-                            (<Carousel >
-                                {
-                                    risk.detail.properties.beforeImgs.map((img, index)=> {
-                                        if(reg.test(img)){
-                                            return <img src={`${img}`} key={index}/>
-                                        }else {
-                                            return <img src={`${PDF_FILE_API}${img}`} key={index}/>
-                                        }
-                                    })
-                                }
-                            </Carousel>) :
-                            (<div className="noImg"></div>)
-                    }
-                </div>
-                <h3>整改后</h3>
-                <div className={`mb`}>
-                    {
-                        risk.detail.properties.afterImgs&&risk.detail.properties.afterImgs.length ?
-                            (<Carousel >
-                                {
-                                    risk.detail.properties.afterImgs.map((img, index)=> {
-                                        if(reg.test(img)){
-                                            return <img src={`${img}`} key={index}/>
-                                        } else {
-                                            return <img src={`${PDF_FILE_API}${img}`} key={index}/>
-                                        }
-                                    })
-                                }
-                            </Carousel>) :
-                            (<div className="noImg"></div>)
-                    }
-                </div>
-            </Col>
-            <Col span={12}>
-                <div className={styles.mb}>
-                    <h3>危险源信息</h3>
-                    <p><span>危险源内容：</span>{risk.detail.properties.content}</p>
-                    <p><span>风险级别：</span>{risk.detail.properties.level}</p>
-                    <p><span>整改状态：</span>未整改</p>
-                    <p><span>整改措施：</span>{risk.detail.properties.measure}</p>
-                </div>
+    _handleFlow (flow) {
+        let arr = [];
+        if (flow && flow.length > 0) {
+            for (let i = flow.length - 1; i >= 0; i--) {
+                let fullName = '';
+                let userName = '';
+                if (flow[i].CreateUserObj) {
+                    fullName = flow[i].CreateUserObj.Full_Name ? flow[i].CreateUserObj.Full_Name : '';
+                    userName = flow[i].CreateUserObj.User_Name ? flow[i].CreateUserObj.User_Name : '';
+                }
+                flow[i].Full_Name = fullName;
+                flow[i].User_Name = userName;
+                arr.push(flow[i]);
+            }
+        }
+        return arr;
+    }
+    _handleRiskStatus (Status) {
+        let status = '';
+        if (Status === -1) {
+            status = '已提交';
+        } else if (Status === 0) {
+            status = '未审核通过';
+        } else if (Status === 1) {
+            status = '（审核通过）整改中';
+        } else if (Status === 2) {
+            status = '整改完成';
+        } else if (Status === 3) {
+            status = '确认完成';
+        }
+        return status;
+    }
 
-                <div className={`${styles.divLine} ${styles.mb}`}></div>
-                <div className={styles.mb}>
-                    <h3>处理过程</h3>
-                    <Timeline>
-                        {
-                            risk.processHistory.length?
-                            risk.processHistory.map((node,index)=>{
-                                return (<Timeline.Item key={index}>{node}</Timeline.Item>)
-                            }):
-                            <div style={{textAlign: 'center'}}>
-                                <Spin />
-                           </div>
+    _handleSection (section) {
+        let data = '';
+        if (section) {
+            try {
+                let arr = section.split('-');
+                if (arr && arr.length === 3) {
+                    PROJECT_UNITS.map((project) => {
+                        if (project.code === arr[0]) {
+                            let units = project.units;
+                            data = project.value;
+                            units.map((unit) => {
+                                if (unit.code === section) {
+                                    data = data + unit.value;
+                                }
+                            });
                         }
-                    </Timeline>
-                </div>
-            </Col>
+                    });
+                }
+            } catch (e) {
 
-        </Row>)
+            }
+        }
+        return data;
+    }
+
+    /**
+     *  CreateTime  上报时间   EventType  事件类型   InputerObj：上报对象  Pics：隐患照片  Problem：问题描述   ProblemType：问题类型
+        Reorganizer：整改人  ReorganizeTime：整改时间  ReorganizeInfo：整改信息   ReorganizePics：整改照片
+        ReorganizeRequireTime：整改要求期限
+        隐患关联线路  Section 标段 ：Status  状态  Supervisor：监理
+        EventType :  0:质量缺陷 1：安全隐患 2：文明施工，3：其他
+        Status  -1:提交  0:未审核通过 1：（审核通过）整改中 2：整改完成  3：确认完成
+     */
+
+    render () {
+        const { risk } = this.props;
+        // 隐患照片
+        let beforeImgs = this._onImgClick(risk.Pics);
+        let afterImgs = this._onImgClick(risk.ReorganizePics);
+        let flow = this._handleFlow(risk.Flows);
+        let status = this._handleRiskStatus(risk.Status);
+        let location = this._handleSection(risk.Section);
+        return (
+            <Row gutter={28}>
+                <Input
+                    readOnly
+                    style={{
+                        marginTop: '10px'
+                    }}
+                    size='large'
+                    addonBefore='隐患内容'
+                    value={risk.ProblemType}
+                />
+                <Input
+                    readOnly
+                    style={{
+                        marginTop: '10px'
+                    }}
+                    size='large'
+                    addonBefore='隐患描述'
+                    value={risk.Problem}
+                />
+                <Input
+                    readOnly
+                    style={{
+                        marginTop: '10px'
+                    }}
+                    size='large'
+                    addonBefore='隐患区域'
+                    value={location}
+                />
+                <Input
+                    readOnly
+                    style={{
+                        marginTop: '10px'
+                    }}
+                    size='large'
+                    addonBefore='隐患位置'
+                    value={`${risk.X} , ${
+                        risk.Y
+                    }`}
+                />
+                <Input
+                    readOnly
+                    style={{
+                        marginTop: '10px'
+                    }}
+                    size='large'
+                    addonBefore='整改状态'
+                    value={status}
+                />
+                <div className={`mb`}>
+                    {(beforeImgs && beforeImgs.length > 0)
+                        ? beforeImgs.map(src => {
+                            return (
+                                <div>
+                                    <h3 style={{
+                                        marginTop: '15px'
+                                    }}>整改前照片：</h3>
+                                    <img
+                                        style={{
+                                            width: '300px',
+                                            height: '300px',
+                                            display: 'block',
+                                            marginTop: '10px',
+                                            marginLeft: 70
+                                        }}
+                                        src={src}
+                                        alt='整改前照片'
+                                    />
+                                </div>
+                            );
+                        })
+                        : ''}
+                </div>
+                <div className={`mb`}>
+                    {(afterImgs && afterImgs.length > 0)
+                        ? afterImgs.map(src => {
+                            return (
+                                <div>
+                                    <h3 style={{
+                                        marginTop: '15px'
+                                    }}>整改后照片：</h3>
+                                    <img
+                                        style={{
+                                            width: '300px',
+                                            height: '300px',
+                                            display: 'block',
+                                            marginTop: '10px',
+                                            marginLeft: 70
+                                        }}
+                                        src={src}
+                                        alt='整改后照片'
+                                    />
+                                </div>
+                            );
+                        })
+                        : ''}
+                </div>
+                <div className={`${styles.divLine} ${styles.mb}`} />
+                <div className={styles.mb}>
+                    <h3 style={{
+                        marginTop: '15px'
+                    }} >处理过程：</h3>
+                    <Steps direction='vertical' size='small' current={history.length - 1} style={{marginLeft: 70}}>
+                        {
+                            flow.map((step, index) => {
+                                return (
+                                    <Step
+                                        key={index}
+                                        title={`${step.Node}`}
+                                        description={
+                                            <div style={{ lineHeight: 2.6 }}>
+                                                <div>意见：{step.Info}</div>
+                                                <div>
+                                                    <span>执行人:{`${step.Full_Name}` || `${step.User_Name}`} [{step.User_Name}]</span>
+                                                    <span
+                                                        style={{ paddingLeft: 20 }}>执行时间：{moment(step.CreateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    />);
+                            })
+                        }
+                    </Steps>
+                </div>
+            </Row>
+        );
     }
 }

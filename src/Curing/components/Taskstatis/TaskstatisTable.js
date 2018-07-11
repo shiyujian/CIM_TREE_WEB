@@ -1,14 +1,11 @@
 import React, {Component} from 'react';
 import {
     Collapse,
-    Button,
-    DatePicker
+    Button
 } from 'antd';
-import DashPanel from '../DashPanel';
 import PkCodeTree from '../PkCodeTree';
 import '../Curing.less';
 const Panel = Collapse.Panel;
-const { RangePicker } = DatePicker;
 window.config = window.config || {};
 
 export default class TaskstatisTable extends Component {
@@ -362,41 +359,6 @@ export default class TaskstatisTable extends Component {
         let content = this._getPanelData(option.value);
         if (option && option.value) {
             switch (option.value) {
-                case 'geojsonFeature_people':
-                    return (
-                        <div>
-                            <DashPanel
-                                style={{ height: '200px' }}
-                                onCheck={this.onCheckPlan.bind(this)}
-                                onSelect={this.onSelectPlan.bind(this)}
-                                content={content}
-                                userCheckKeys={this.state.userCheckedKeys}
-                                featureName={option.value}
-                            />
-                            <RangePicker
-                                style={{
-                                    verticalAlign: 'middle',
-                                    width: '100%'
-                                }}
-                                showTime={{ format: 'HH:mm:ss' }}
-                                format={'YYYY/MM/DD HH:mm:ss'}
-                            />
-                        </div>
-                    );
-                    // case 'geojsonFeature_safety':
-                    //     content = this.state.safetys
-                    //     break
-                case 'geojsonFeature_hazard':
-                    return (
-                        <DashPanel
-                            onCheck={this.onCheckDanger.bind(this)}
-                            onSelect={this.onSelectDanger.bind(this)}
-                            content={content}
-                            userCheckKeys={this.state.userCheckedKeys}
-                            // loadData={this.loadUsersByOrg.bind(this)}
-                            featureName={option.value}
-                        />
-                    );
                 case 'geojsonFeature_area':
                     return (
                         <PkCodeTree

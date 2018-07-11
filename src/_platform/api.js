@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-06 10:26:27
+ * @Last Modified time: 2018-07-06 10:52:43
  */
 /**
  *
@@ -519,14 +519,14 @@ export const MODULES = [
                 id: 'DASHBOARD.ONSITE',
                 name: '二维展示'
             },
-            {
-                id: 'DASHBOARD.PLAN',
-                name: '巡检路线'
-            },
-            {
-                id: 'DASHBOARD.DANGER',
-                name: '安全隐患'
-            },
+            // {
+            //     id: 'DASHBOARD.PLAN',
+            //     name: '巡检路线'
+            // },
+            // {
+            //     id: 'DASHBOARD.DANGER',
+            //     name: '安全隐患'
+            // },
             {
                 id: 'DASHBOARD.PROJECT',
                 name: '工程影像'
@@ -662,11 +662,11 @@ export const MODULES = [
             {
                 id: 'SCHEDULE.SCHEDULEANALYZE',
                 name: '种植进度分析'
-            },
-            {
-                id: 'SCHEDULE.SHOW',
-                name: '种植进度展示'
             }
+            // {
+            //     id: 'SCHEDULE.SHOW',
+            //     name: '种植进度展示'
+            // }
         ]
     },
     {

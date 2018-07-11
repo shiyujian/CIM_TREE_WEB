@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-04 20:38:21
+ * @Last Modified time: 2018-07-11 15:15:26
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -28,7 +28,7 @@ import {
 import { PROJECT_UNITS, FOREST_API } from '_platform/api';
 import './OnSite.less';
 import DashPanel from './DashPanel';
-import TrackPlayBack from './TrackPlayBack';
+import RiskDetail from './RiskDetail';
 import moment from 'moment';
 import PkCodeTree from './PkCodeTree';
 const TabPane = Tabs.TabPane;
@@ -37,7 +37,6 @@ const { RangePicker } = DatePicker;
 const Panel = Collapse.Panel;
 
 window.config = window.config || {};
-let ModelName = window.config.dgn_model_name;
 @connect(
     state => {
         const { map = {} } = state.dashboard || {};
@@ -47,8 +46,8 @@ let ModelName = window.config.dgn_model_name;
         actions: bindActionCreators(actions, dispatch)
     })
 )
-class Lmap extends Component {
-    // export default class Lmap extends Component {
+class OnSite extends Component {
+    // export default class OnSite extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -57,78 +56,42 @@ class Lmap extends Component {
             tree: '',
             mapLayerBtnType: true,
             isNotThree: true,
-            isNotDisplay: {
-                display: ''
-            },
             seeVisible: false,
-            nums: 0,
             markers: null,
             // leafletCenter: [22.516818, 113.868495],
             leafletCenter: [38.92, 115.98], // 雄安
             toggle: true,
-            previewUrl: '',
-            previewType: '',
-            previewVisible: false,
-            previewTitle: '文件预览',
-            loading: false,
             areaJson: [], // 区域地块
             users: [], // 人员树
             safetys: [], // 安全监测
             hazards: [], // 安全隐患
-            vedios: [], // 视频监控
             userCheckedKeys: [], // 用户被选中键值
-            trackState: false,
             isShowTrack: false,
             trackId: null,
             trackUser: null,
             menuIsExtend: true /* 菜单是否展开 */,
             menuWidth: 200 /* 菜单宽度 */,
-            showCamera: false,
-            checkedVedio: {},
-            iframe_key: false, // iframe首次进入不加载，点击三维后保留iframe
-            iframe_dgn: false,
-            risk: {
-                showRiskDetail: false,
-                detail: null,
-                beforImgs: [],
-                afterImgs: [],
-                processHistory: []
-            },
-            userOnlineNumber: 0,
+            risk: {},
             selectedMenu: '1',
             isVisibleMapBtn: true,
-            userOnlineState: false,
-            userOnline: [],
-            nowShowModel: `${ModelName}`,
-            // 测试选择人员功能是否好用
-            // userOnline:[{
-            // 	id:528,
-            // 	username:'18867508296'
-            // }]
-            fullExtent: window.config.fullExtent || {
-                minlat: 22.468466,
-                maxlat: 22.564885,
-                minlng: 113.827781,
-                maxlng: 113.931283
-            },
             treeType: [],
             projectList: [],
             unitProjectList: [],
             seedlingMess: '',
             treeMess: '',
             flowMess: '',
-            mapList: [], // 轨迹列表
-            mapRould: [] // 坐标
+            mapList: {}, // 轨迹列表
+            isShowRisk: false,
+            treeTypes: [],
+            treeLayerList: {}
         };
-        this.aa = {};
-        this.OnlineState = false;
         this.checkMarkers = [];
         this.tileLayer = null;
         this.tileLayer2 = null;
+        this.tileLayer3 = null;
         this.map = null;
         this.track = null;
         this.orgs = null;
-        this.timeInteval = null;
         /* 菜单宽度调整 */
         this.menu = {
             startPos: 0,
@@ -145,20 +108,6 @@ class Lmap extends Component {
         };
     }
 
-    async gettreedata (rst) {
-        const {
-            actions: { getTree }
-        } = this.props;
-        for (var i = 0; i < rst.length; ++i) {
-            let children = await getTree({}, { parent: rst[i].No });
-            if (children.length) {
-                children = await this.gettreedata(children);
-            }
-            rst[i].children = children;
-        }
-        return rst;
-    }
-
     async componentDidMount () {
         this.loadAreaData();
         this.initMap();
@@ -167,7 +116,8 @@ class Lmap extends Component {
         // 安全隐患
         this.getArea();
         this.getRisk();
-        // this.getVedio();
+        // 树种筛选
+        this.getTreeType();
     }
 
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -178,6 +128,301 @@ class Lmap extends Component {
         2: window.config.VEC_W
     };
 
+    options = [
+        {
+            label: '区域地块',
+            value: 'geojsonFeature_area',
+            IconName: 'square'
+        },
+        // {
+        //     label: '巡检路线',
+        //     value: 'geojsonFeature_people',
+        //     IconUrl: require('./ImageIcon/people.png'),
+        //     IconName: 'universal-access'
+        // },
+        // {
+        //     label: '安全隐患',
+        //     value: 'geojsonFeature_hazard',
+        //     IconUrl: require('./ImageIcon/danger.png'),
+        //     IconName: 'warning'
+        // },
+        {
+            label: '树种筛选',
+            value: 'geojsonFeature_treetype',
+            IconName: 'square'
+        }
+    ];
+
+    /* 渲染菜单panel */
+    renderPanel (option) {
+        let content = this.getPanelData(option.value);
+        if (option && option.value) {
+            switch (option.value) {
+                case 'geojsonFeature_people':
+                    return (
+                        <div>
+                            <DashPanel
+                                style={{ height: '200px' }}
+                                onCheck={this.handleTrackCheck.bind(this)}
+                                onSelect={this.handleTrackSelect.bind(this)}
+                                content={content}
+                                userCheckKeys={this.state.userCheckedKeys}
+                                featureName={option.value}
+                            />
+                            <RangePicker
+                                style={{
+                                    verticalAlign: 'middle',
+                                    width: '100%'
+                                }}
+                                showTime={{ format: 'HH:mm:ss' }}
+                                format={'YYYY/MM/DD HH:mm:ss'}
+                            />
+                        </div>
+                    );
+                case 'geojsonFeature_hazard':
+                    return (
+                        <DashPanel
+                            onCheck={this.handleRiskCheck.bind(this)}
+                            onSelect={this.handleRiskSelect.bind(this)}
+                            content={content}
+                            userCheckKeys={this.state.userCheckedKeys}
+                            featureName={option.value}
+                        />
+                    );
+                case 'geojsonFeature_area':
+                    return (
+                        <PkCodeTree
+                            treeData={content}
+                            selectedKeys={this.state.leftkeycode}
+                            onSelect={this.handleAreaSelect.bind(this)}
+                            showIcon={false}
+                        />
+                    );
+                case 'geojsonFeature_treetype':
+                    return (
+                        <DashPanel
+                            onCheck={this.handleTreeTypeCheck.bind(this)}
+                            onSelect={this.handleTreeTypeSelect.bind(this)}
+                            content={content}
+                            // userCheckKeys={this.state.userCheckedKeys}
+                            featureName={option.value}
+                        />
+                    );
+            }
+        }
+    }
+    /* 获取对应图层数据 */
+    getPanelData (featureName) {
+        var content = {};
+        switch (featureName) {
+            case 'geojsonFeature_people':
+                content = this.state.users;
+                break;
+            case 'geojsonFeature_hazard':
+                content = this.state.hazards;
+                break;
+            case 'geojsonFeature_area':
+                content = this.state.treeLists;
+                break;
+            case 'geojsonFeature_treetype':
+                content = this.state.treeTypes;
+                break;
+        }
+        return content;
+    }
+    genPopUpContent (geo) {
+        const { properties = {} } = geo;
+        switch (geo.type) {
+            case 'people': {
+                return `<div class="popupBox">
+						<h2><span>姓名：</span>${properties.name}</h2>
+						<h2><span>所属单位：</span>${properties.organization}</h2>
+						<h2><span>联系方式：</span>${properties.person_telephone}</h2>
+						<h2><span>标段：</span>${properties.sectionName}</h2>
+					</div>`;
+            }
+            case 'danger': {
+                return `<div>
+						<h2><span>隐患内容：</span>${properties.name}</h2>
+                        <h2><span>隐患类型：</span>${properties.riskType}</h2>
+                        <h2><span>隐患描述：</span>${properties.Problem}</h2>
+						<h2><span>整改状态：</span>${properties.status}</h2>
+                        <h2 class="btnRow">
+                            <a href="javascript:;" class="btnViewRisk" data-id=${
+    geo.key
+}>查看详情</a>
+                        </h2>
+					</div>`;
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+    /* 在地图上添加marker和polygan */
+    createMarker (geo, oldMarker) {
+        if (geo.properties.type !== 'area') {
+            if (!oldMarker) {
+                if (
+                    !geo.geometry.coordinates[0] ||
+                    !geo.geometry.coordinates[1]
+                ) {
+                    return;
+                }
+                let iconType = L.divIcon({
+                    className: this.getIconType(geo.type)
+                });
+                let marker = L.marker(geo.geometry.coordinates, {
+                    icon: iconType,
+                    title: geo.properties.name
+                });
+                marker.bindPopup(
+                    L.popup({ maxWidth: 240 }).setContent(
+                        this.genPopUpContent(geo)
+                    )
+                );
+                marker.addTo(this.map);
+                return marker;
+            }
+
+            return oldMarker;
+        } else {
+            /**
+             * 增加安全隐患前代码
+             */
+            // 创建区域图形
+            if (!oldMarker) {
+                let area = L.geoJson(geo, {
+                    style: {
+                        fillColor: this.fillAreaColor(geo.key),
+                        weight: 1,
+                        opacity: 1,
+                        color: '#201ffd',
+                        fillOpacity: 0.3
+                    },
+                    title: geo.properties.name
+                }).addTo(this.map);
+                // 地块标注
+                // let latlng = area.getBounds().getCenter()
+                // let label = L.marker([latlng.lat, latlng.lng], {
+                //     icon: L.divIcon({
+                //         // className: this.getIconType('people'),
+                //         // className: 'label-text',
+                //         html: geo.properties.name,
+                //         iconSize: [48, 20],
+                //     }),
+                // })
+                // area.addLayer(label)
+                // area.bindTooltip(geo.properties.name).openTooltip();
+                this.map.fitBounds(area.getBounds());
+
+                return area;
+            }
+            return oldMarker;
+        }
+    }
+    // 获取对应的ICON
+    getIconType (type) {
+        switch (type) {
+            case 'people':
+                return 'peopleIcon';
+            case 'safety':
+                return 'cameraIcon';
+            case 'danger':
+                return 'dangerIcon';
+            case 'tree':
+                return 'treeIcon';
+            default:
+                break;
+        }
+    }
+    /* 初始化地图 */
+    initMap () {
+        let me = this;
+        this.map = L.map('mapid', window.config.initLeaflet);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+
+        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
+        }).addTo(this.map);
+
+        this.tileLayer2 = L.tileLayer(
+            // window.config.DASHBOARD_TREETYPE +
+            // '/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(64,65)&service=WMS&request=GetMap&layers=xatree%3Atreelocation&styles=&format=image%2Fpng&transparent=true&version=1.1.1&width=256&height=256&srs=EPSG%3A4326&bbox={min.y, min.x, max.y, max.x}',
+            window.config.DASHBOARD_ONSITE +
+            '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+            {
+                opacity: 1.0,
+                subdomains: [1, 2, 3],
+                minZoom: 11,
+                maxZoom: 21,
+                storagetype: 0,
+                tiletype: 'wtms'
+            }
+        ).addTo(this.map);
+
+        /**
+         * 增加巡检路线后代码
+         */
+        // 巡检路线的代码   地图上边的地点的名称
+        L.tileLayer(this.WMSTileLayerUrl, {
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
+        }).addTo(this.map);
+
+        /**
+         * 增加安全隐患后代码
+         */
+        // 隐患详情点击事件
+        document
+            .querySelector('.leaflet-popup-pane')
+            .addEventListener('click', async function (e) {
+                let target = e.target;
+                // 绑定隐患详情点击事件
+                if (target.getAttribute('class') === 'btnViewRisk') {
+                    let idRisk = target.getAttribute('data-id');
+                    let risk = null;
+                    me.state.hazards.forEach(v => {
+                        if (!risk) {
+                            risk = v.children.find(v1 => v1.key === idRisk);
+                        }
+                    });
+                    if (risk) {
+                        // 获取隐患处理措施
+                        const { getRiskContactSheet } = me.props.actions;
+                        let contact = await getRiskContactSheet({ ID: idRisk });
+                        if (contact && contact.ID) {
+                            me.setState({
+                                risk: contact,
+                                isShowRisk: true
+                            });
+                        }
+                    }
+                }
+                // 绑定轨迹查看点击事件
+                if (target.getAttribute('class') === 'btnViewTrack') {
+                    let id = target.getAttribute('data-id');
+                    // 开始显示轨迹
+                    me.setState({
+                        isShowTrack: true,
+                        trackId: id,
+                        trackUser: name
+                    });
+                }
+            });
+
+        const that = this;
+        this.map.on('click', function (e) {
+            // getThinClass(e.latlng.lng,e.latlng.lat);
+            that.getTreeInfo(e.latlng.lng, e.latlng.lat, that);
+        });
+    }
     // 获取地块树数据
     async loadAreaData () {
         const {
@@ -213,14 +458,12 @@ class Lmap extends Component {
                     projectList,
                     unitProjectList
                 });
-
                 for (let i = 0; i < projectList.length; i++) {
                     projectList[i].children = unitProjectList.filter(node => {
                         return node.Parent === projectList[i].No;
                     });
                 }
             }
-
             unitProjectList.map(async section => {
                 let list = await getLittleBan({ no: section.No });
                 let smallClassList = this.getSmallClass(list);
@@ -231,12 +474,11 @@ class Lmap extends Component {
                 section.children = smallClassList;
                 this.setState({ treeLists: projectList });
             });
-            // this.setState({ treeLists: projectList })
         } catch (e) {
-            console.log(e);
+            console.log('获取地块树数据', e);
         }
     }
-
+    // 小班排列
     getSmallClass (smallClassList) {
         // 将小班的code获取到，进行去重
         let uniqueSmallClass = [];
@@ -245,9 +487,6 @@ class Lmap extends Component {
 
         let test = [];
         smallClassList.map(list => {
-            // if (!list.SmallClassName) {
-            //     console.log('list', list);
-            // }
             // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
             let codeName =
                 list.LandNo +
@@ -274,22 +513,12 @@ class Lmap extends Component {
         });
         return uniqueSmallClass;
     }
-
+    // 细班排列
     getThinClass (smallClass, list) {
         let thinClassList = [];
         let codeArray = [];
         let nameArray = [];
         list.map(rst => {
-            // if(rst.ThinClass && rst.No.indexOf(smallClass.No) != -1 &&  array.indexOf(rst.ThinClass) === -1){
-            //     let noArr = rst.No.split('-')
-            //     let No = noArr[0] + '-' + noArr[1] +'-' + noArr[2] + '-' + noArr[3]
-            //     thinClassList.push({
-            //         Name:rst.ThinClassName?rst.ThinClassName+'细班':rst.ThinClass+'细班',
-            //         No:No,
-            //     })
-            //     array.push(list.ThinClass)
-            // }
-
             let codeName = smallClass.No.split('#');
             let code = codeName[2];
             let name = codeName[3];
@@ -297,7 +526,6 @@ class Lmap extends Component {
                 name = null;
             }
             // 暂时去掉重复的节点
-            // debugger
             if (
                 rst.ThinClass &&
                 rst.SmallClass === code &&
@@ -320,105 +548,77 @@ class Lmap extends Component {
         });
         return thinClassList;
     }
-
-    // 巡检路线代码
-
+    // 获取树种数据
+    async getTreeType () {
+        const { getTreeTypeAction } = this.props.actions;
+        try {
+            let treeData = await getTreeTypeAction();
+            let arrData = [];
+            let treeTypes = [
+                {
+                    key: Math.random.toString(),
+                    properties: {
+                        name: '全部树种'
+                    },
+                    children: []
+                }
+            ];
+            treeData.map(tree => {
+                if (tree && tree.ID) {
+                    arrData.push({
+                        key: tree.ID,
+                        properties: {
+                            name: tree.TreeTypeName,
+                            TreeTypeNo: tree.PTreeTypeNo,
+                            TreeTypeGenera: tree.TreeTypeGenera,
+                            TreeParam: tree.TreeParam,
+                            SamplingParam: tree.SamplingParam,
+                            Pics: tree.Pics,
+                            NurseryParam: tree.NurseryParam,
+                            MorphologicalCharacter: tree.MorphologicalCharacter,
+                            IsLocation: tree.IsLocation,
+                            HaveQRCode: tree.HaveQRCode,
+                            GrowthHabit: tree.GrowthHabit
+                        }
+                    });
+                }
+            });
+            treeTypes[0].children = arrData;
+            this.setState({
+                treeTypes
+            });
+        } catch (e) {
+            console.log('树种', e);
+        }
+    }
     /* 查询巡检路线 */
     getMapRouter () {
         let me = this;
         const { getMapRouter } = this.props.actions;
         getMapRouter().then(orgs => {
-            let orgArr = orgs.map(or => {
-                if (or.PatrolerUser !== undefined && or.PatrolerUser !== null) {
-                    return {
+            let orgArr = [];
+            orgs.map(or => {
+                if (
+                    or &&
+                    or.ID &&
+                    or.PatrolerUser !== undefined &&
+                    or.PatrolerUser !== null
+                ) {
+                    orgArr.push({
                         key: or.ID,
                         properties: {
-                            name: or.PatrolerUser.Full_Name
+                            name: or.PatrolerUser.Full_Name,
+                            ID: or.PatrolerUser.ID,
+                            User_Name: or.PatrolerUser.User_Name,
+                            PK: or.PatrolerUser.PK,
+                            Phone: or.PatrolerUser.Phone
                         }
-                    };
+                    });
                 }
             });
             me.setState({ users: orgArr });
         });
     }
-
-    // 巡检路线多选树节点
-    onCheckPlan (keys, featureName) {
-        let me = this;
-        this.setState({ userCheckedKeys: keys }, () => {
-            const { getMapList } = this.props.actions;
-            for (let i = 0; i < this.state.userCheckedKeys.length; i++) {
-                const element = this.state.userCheckedKeys[i];
-                getMapList({ routeID: element }).then(orgs => {
-                    let set = {};
-                    orgs.forEach(item => {
-                        set[item.RouteID] = [];
-                    });
-                    orgs.forEach(item => {
-                        if (set[item.RouteID]) {
-                            set[item.RouteID].push({
-                                GPSTime: item.GPSTime,
-                                ID: item.ID,
-                                Patroler: item.Patroler,
-                                X: item.X,
-                                Y: item.Y
-                            });
-                        }
-                    });
-                    console.log('set', set);
-                    let arr = [];
-                    for (var i in set) {
-                        arr.push(i);
-                    }
-                    let arr1 = [];
-                    for (var t in set) {
-                        arr1.push(set[t]);
-                    }
-                    me.setState({ mapRould: arr1 });
-                    me.setState({ mapList: arr });
-                    let latlngs = [];
-                    if (arr1 && arr1 instanceof Array && arr1.length > 0) {
-                        arr1[0].map(rst => {
-                            if (rst && rst.X && rst.Y) {
-                                latlngs.push([rst.Y, rst.X]);
-                            }
-                        });
-                    }
-                    let polyline = L.polyline(latlngs, { color: 'blue' }).addTo(
-                        this.map
-                    );
-                    this.map.fitBounds(polyline.getBounds());
-                });
-            }
-        });
-    }
-    // 巡检路线选择树节点
-    onSelectPlan (keys, featureName) {
-        this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
-        let checkItems = this.checkMarkers[featureName];
-
-        let key = keys.length > 0 && keys[0];
-        if (key) {
-            let selItem = checkItems[key];
-            if (selItem) {
-                if (featureName !== 'geojsonFeature_area') {
-                    this.map.setView(selItem.getLatLng());
-                } else {
-                    this.map.fitBounds(selItem.getBounds(), {
-                        padding: [200, 200]
-                    });
-                }
-                selItem.openPopup();
-            }
-        }
-    }
-
-    // 巡检路线代码
-
-    /**
-     * 安全隐患代码
-     */
-
     /* 获取区域数据 */
     getArea () {
         let me = this;
@@ -442,7 +642,6 @@ class Lmap extends Component {
             me.setState({ areaJson: areas });
         });
     }
-
     /* 获取安全隐患点 */
     getRisk () {
         const { getRisk } = this.props.actions;
@@ -452,7 +651,10 @@ class Lmap extends Component {
             let datas = data.content;
             let riskObj = {};
             datas.forEach((v, index) => {
-                // let levelNode = v["risk_level"];
+                // 去除坐标为0的点  和  名称为空的点（名称为空的点   type类型也不一样）
+                if (v['X'] === 0 || v['Y'] === 0 || v['ProblemType'] === '') {
+                    return;
+                }
                 let level = v['EventType'];
                 let name = v['ProblemType'];
                 let ResponseOrg = v['ReorganizerObj'];
@@ -460,22 +662,44 @@ class Lmap extends Component {
                 let locationX = v['X'];
                 let locationY = v['Y'];
                 let coordinates = [locationY, locationX];
+                // 隐患类型
+                let riskType = '';
+                if (v.EventType === 0) {
+                    riskType = '质量缺陷';
+                } else if (v.EventType === 1) {
+                    riskType = '安全隐患';
+                } else if (v.EventType === 2) {
+                    riskType = '其他';
+                }
                 riskObj[level] = riskObj[level] || {
-                    key: 'Level' + ' ' + level,
+                    key: riskType,
                     properties: {
-                        name: 'Level' + ' ' + level
+                        name: riskType
                     },
                     children: []
                 };
+                let status = '';
+                if (v.Status === -1) {
+                    status = '已提交';
+                } else if (v.Status === 0) {
+                    status = '未审核通过';
+                } else if (v.Status === 1) {
+                    status = '（审核通过）整改中';
+                } else if (v.Status === 2) {
+                    status = '整改完成';
+                } else if (v.Status === 3) {
+                    status = '确认完成';
+                }
                 riskObj[level].children.push({
                     type: 'danger',
                     key: v.ID,
                     properties: {
-                        level: level,
+                        riskType: riskType,
                         measure: '',
                         name: name,
+                        Problem: v.Problem,
                         response_org: ResponseOrg ? ResponseOrg.Full_Name : '',
-                        Status: v.Status,
+                        status: status,
                         RouteID: v.RouteID,
                         CreateTime: v.CreateTime,
                         ID: v.ID,
@@ -492,11 +716,9 @@ class Lmap extends Component {
             for (let i in riskObj) {
                 risks.push(riskObj[i]);
             }
-            console.log('risks', risks);
             me.setState({ hazards: risks });
         });
     }
-
     // 解构得到的区域数据
     loop (data = [], resAreas = []) {
         let me = this;
@@ -527,52 +749,145 @@ class Lmap extends Component {
         });
         return resAreas;
     }
-
-    /* 获取隐患处理过程 */
-    getRiskProcess (id) {
+    // 巡检路线多选树节点
+    async handleTrackCheck (keys, featureName, info) {
+        const { getMapList, getUserDetail } = this.props.actions;
+        const { mapList } = this.state;
         let me = this;
-        const { getRiskProcess, getRiskProcessDetail } = this.props.actions;
-        getRiskProcess({}, { code: 'TEMPLATE_011', subject_id: id }).then(
-            data => {
-                if (data.length) {
-                    let process = data[0];
-                    let processId = process.id;
-                    getRiskProcessDetail({ ID: processId }).then(dd => {
-                        // 处理history 显示处理过程
-                        let excuLogs = [];
-                        dd.history.forEach(h => {
-                            if (h.records && h.records.length) {
-                                let record = h.records[0];
-                                let personName =
-                                    record.participant.executor['person_name'];
-                                let note = record.note;
-                                let time = new moment(record['log_on']);
-                                let excuText = `${personName} ${note}  ${time.format(
-                                    'YYYY-MM-DD HH:mm:ss'
-                                )}`;
-                                excuLogs.push(excuText);
-                            } else {
-                                let participant = h.state.participants;
-                                let excuLog = '';
-                                participant.forEach(p => {
-                                    excuLog +=
-                                        p.executor['person_name'] || '' + ' ';
-                                });
-                                excuLog += '正在处理';
-                                excuLogs.push(excuLog);
-                            }
+        var content = this.getPanelData(featureName);
+        // 获取所有key对应的数据对象
+        this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
+        let checkItems = this.checkMarkers[featureName];
+        // 当前选中的节点
+        let selectKey = info.node.props.eventKey;
+        // 当前的选中状态
+        let checked = info.checked;
+        if (checked) {
+            try {
+                let routes = await getMapList({ routeID: selectKey });
+                // getMapList({ routeID: selectKey }).then(async routes => {
+                let set = {};
+                routes.forEach(item => {
+                    set[item.RouteID] = [];
+                });
+                routes.forEach(item => {
+                    if (set[item.RouteID]) {
+                        set[item.RouteID].push({
+                            GPSTime: item.GPSTime,
+                            ID: item.ID,
+                            Patroler: item.Patroler,
+                            X: item.X,
+                            Y: item.Y
                         });
-                        let oldRisk = me.state.risk;
-                        oldRisk.processHistory = excuLogs;
-                        me.setState({ risk: { ...oldRisk } });
+                    }
+                });
+                let arr1 = [];
+                for (var t in set) {
+                    arr1.push(set[t]);
+                }
+                let latlngs = [];
+                if (arr1 && arr1 instanceof Array && arr1.length > 0) {
+                    arr1[0].map(rst => {
+                        if (rst && rst.X && rst.Y) {
+                            latlngs.push([rst.Y, rst.X]);
+                        }
                     });
                 }
-            }
-        );
-    }
+                // 选中节点的数据
+                let selectData = '';
+                content.map(data => {
+                    if (data.key === selectKey) {
+                        selectData = data;
+                    }
+                });
+                if (
+                    selectData &&
+                    selectData.properties &&
+                    selectData.properties.PK
+                ) {
+                    let user = await getUserDetail({
+                        pk: selectData.properties.PK
+                    });
+                    let sectionName = '';
+                    if (
+                        user &&
+                        user.account &&
+                        user.account.sections &&
+                        user.account.sections.length > 0
+                    ) {
+                        try {
+                            let section = user.account.sections[0];
+                            let arr = section.split('-');
+                            if (arr && arr.length === 3) {
+                                PROJECT_UNITS.map(project => {
+                                    if (project.code === arr[0]) {
+                                        let units = project.units;
+                                        sectionName = project.value;
+                                        units.map(unit => {
+                                            if (unit.code === section) {
+                                                sectionName =
+                                                    sectionName + unit.value;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        } catch (e) {
+                            console.log('获取标段', e);
+                        }
+                    }
+                    let iconData = {
+                        geometry: {
+                            coordinates: [latlngs[0][0], latlngs[0][1]],
+                            type: 'Point'
+                        },
+                        key: selectKey,
+                        properties: {
+                            name: user.account.person_name
+                                ? user.account.person_name
+                                : user.username,
+                            organization: user.account.organization
+                                ? user.account.organization
+                                : '',
+                            person_telephone: user.account.person_telephone
+                                ? user.account.person_telephone
+                                : '',
+                            sectionName: sectionName
+                        },
+                        type: 'people'
+                    };
+                    checkItems[selectKey] = me.createMarker(
+                        iconData,
+                        checkItems[selectKey]
+                    );
+                }
 
-    /* 显示隐藏地图marker */
-    onCheckDanger (keys, featureName) {
+                let polyline = L.polyline(latlngs, { color: 'blue' }).addTo(
+                    this.map
+                );
+                mapList[selectKey] = polyline;
+                this.map.fitBounds(polyline.getBounds());
+                this.setState({
+                    mapList
+                });
+            } catch (e) {
+                console.log('e', e);
+            }
+        } else {
+            // 如果取消选中 则将数据删除
+            // 移除未选中的
+            checkItems[selectKey]._icon.remove();
+            delete checkItems[selectKey];
+            this.map.removeLayer(mapList[selectKey]);
+            // mapList[selectKey]._bounds.remove();
+            delete mapList[selectKey];
+        }
+    }
+    // 巡检路线点击树节点
+    handleTrackSelect (keys, featureName) {
+    }
+    /* 安全隐患多选树节点 */
+    handleRiskCheck (keys, featureName, info) {
         var content = this.getPanelData(featureName);
         // 获取所有key对应的数据对象
         this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
@@ -586,7 +901,6 @@ class Lmap extends Component {
             }
         }
         let me = this;
-
         content.forEach(c => {
             if (!c.children) {
                 let kkkk = keys.find(k => k === c.key);
@@ -600,626 +914,134 @@ class Lmap extends Component {
                         checkItems[kk] = me.createMarker(cc, checkItems[kk]);
                         if (featureName === 'geojsonFeature_hazard') {
                             this.map.panTo(cc.geometry.coordinates);
-                            checkItems[kk].on('click', function () {
-                                // 获取隐患处理措施
-                                const {
-                                    getRiskContactSheet
-                                } = me.props.actions;
-                                getRiskContactSheet({ ID: kk }).then(
-                                    contact => {
-                                        if (contact.length) {
-                                            let ct = contact[0];
-                                            let measure = ct['rectify_measure'];
-                                            let risk;
-                                            me.state.hazards.forEach(v => {
-                                                if (!risk) {
-                                                    risk = v.children.find(
-                                                        v1 => v1.key === kk
-                                                    );
-                                                }
-                                            });
-                                            if (risk) {
-                                                risk.properties.measure = measure;
-                                                checkItems[kk].setPopupContent(
-                                                    me.genPopUpContent(risk)
-                                                );
-                                                if (me.state.risk.detail) {
-                                                    // 更新详情页隐患措施
-                                                    me.state.risk.detail.properties.measure = measure;
-                                                    me.setState({
-                                                        risk: me.state.risk
-                                                    });
-                                                }
-                                            }
-                                        }
-                                    }
-                                );
-                            });
                         }
                     }
                 });
             }
         });
-
         this.checkMarkers[featureName] = checkItems;
     }
-
-    /* 弹出信息框 */
-    onSelectDanger (keys, featureName) {
-        this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
-        let checkItems = this.checkMarkers[featureName];
-        let key = keys.length > 0 && keys[0];
-        if (key) {
-            let selItem = checkItems[key];
-            if (selItem) {
-                if (featureName !== 'geojsonFeature_area') {
-                    this.map.setView(selItem.getLatLng());
-                } else {
-                    this.map.fitBounds(selItem.getBounds(), {
-                        padding: [200, 200]
-                    });
-                }
-                selItem.openPopup();
-            }
-        }
+    /* 安全隐患点击树节点 */
+    handleRiskSelect (keys, featureName) {
     }
-
-    /**
-     * 安全隐患代码
-     */
-
-    /* 初始化地图 */
-    initMap () {
-        let me = this;
-        this.map = L.map('mapid', window.config.initLeaflet);
-
-        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
-
-        this.tileLayer = L.tileLayer(this.tileUrls[1], {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 17,
-            storagetype: 0
-        }).addTo(this.map);
-
-        this.tileLayer2 = L.tileLayer(
-            window.config.DASHBOARD_ONSITE +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-            {
-                opacity: 1.0,
-                subdomains: [1, 2, 3],
-                minZoom: 11,
-                maxZoom: 21,
-                storagetype: 0,
-                tiletype: 'wtms'
-            }
-        ).addTo(this.map);
-
-        /**
-         * 增加巡检路线后代码
-         */
-        // 巡检路线的代码   地图上边的地点的名称
-        L.tileLayer(this.WMSTileLayerUrl, {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 17,
-            storagetype: 0
-        }).addTo(this.map);
-
-        /**
-         * 增加安全隐患后代码
-         */
-        // 隐患详情点击事件
-        document
-            .querySelector('.leaflet-popup-pane')
-            .addEventListener('click', function (e) {
-                let target = e.target;
-                // 绑定隐患详情点击事件
-                if (target.getAttribute('class') === 'btnViewRisk') {
-                    let idRisk = target.getAttribute('data-id');
-                    let risk = null;
-                    me.state.hazards.forEach(v => {
-                        if (!risk) {
-                            risk = v.children.find(
-                                v1 => v1.key === parseInt(idRisk)
-                            );
-                        }
-                    });
-                    if (risk) {
-                        let oldRisk = me.state.risk;
-                        oldRisk.showRiskDetail = true;
-                        oldRisk.processHistory = [];
-                        oldRisk.detail = risk;
-                        me.setState({ risk: oldRisk });
-                        me.getRiskProcess(idRisk);
-                    }
-                }
-            });
-
-        const that = this;
-        this.map.on('click', function (e) {
-            // getThinClass(e.latlng.lng,e.latlng.lat);
-            that.getTreeInfo(e.latlng.lng, e.latlng.lat, that);
-        });
-    }
-    async getTreeInfo (x, y, that) {
+    /* 树种筛选多选树节点 */
+    handleTreeTypeCheck (keys, featureName, info) {
         const {
-            actions: {
-                getTreeflows,
-                getNurserys,
-                getCarpackbysxm,
-                getTreeMess,
-                getLittleBan
-            }
-        } = this.props;
+            treeLayerList
+        } = this.state;
         let me = this;
-        var resolutions = [
-            0.703125,
-            0.3515625,
-            0.17578125,
-            0.087890625,
-            0.0439453125,
-            0.02197265625,
-            0.010986328125,
-            0.0054931640625,
-            0.00274658203125,
-            0.001373291015625,
-            6.866455078125e-4,
-            3.4332275390625e-4,
-            1.71661376953125e-4,
-            8.58306884765625e-5,
-            4.291534423828125e-5,
-            2.1457672119140625e-5,
-            1.0728836059570312e-5,
-            5.364418029785156e-6,
-            2.682209014892578e-6,
-            1.341104507446289e-6,
-            6.705522537231445e-7,
-            3.3527612686157227e-7
-        ];
-        var zoom = that.map.getZoom();
-        var resolution = resolutions[zoom];
-        var col = (x + 180) / resolution;
-        // 林总说明I和J必须是整数
-        var colp = Math.floor(col % 256);
-        // var colp = col % 256;
-        col = Math.floor(col / 256);
-        var row = (90 - y) / resolution;
-        // 林总说明I和J必须是整数
-        var rowp = Math.floor(row % 256);
-        // var rowp = row % 256;
-        row = Math.floor(row / 256);
-        var url =
-            window.config.DASHBOARD_ONSITE +
-            '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:' +
-            zoom +
-            '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +
-            col +
-            '&TileRow=' +
-            row +
-            '&I=' +
-            colp +
-            '&J=' +
-            rowp;
-        // debugger
-        jQuery.getJSON(url, null, async function (data) {
-            if (data.features && data.features.length) {
-                // debugger
-                let postdata = {
-                    sxm: data.features[0].properties.SXM
-                };
+        var content = this.getPanelData(featureName);
+        // 当前选中的节点
+        let selectKey = info.node.props.eventKey;
+        // 当前的选中状态
+        let checked = info.checked;
+        let allTreeKey = '';
+        if (content && content.length > 0) {
+            allTreeKey = content[0].key;
+        }
+        let queryData = '';
+        for (let i = 0; i < keys.length; i++) {
+            queryData = queryData + keys[i];
+            if (i < keys.length - 1) {
+                queryData = queryData + ',';
+            }
+        }
+        console.log('keys', keys);
+        console.log('info', info);
+        console.log('selectKey', selectKey);
 
-                let queryTreeData = await getTreeMess(postdata);
-                let treeflowDatas = await getTreeflows({}, postdata);
-                let nurserysDatas = await getNurserys({}, postdata);
-                let carData = await getCarpackbysxm(postdata);
+        // 如果是选中节点，首先看是否是选中全部，如果是，就加载所有树种的图层
 
-                let SmallClassName = queryTreeData.SmallClass
-                    ? queryTreeData.SmallClass + '号小班'
-                    : '';
-                let ThinClassName = queryTreeData.ThinClass
-                    ? queryTreeData.ThinClass + '号细班'
-                    : '';
-                if (
-                    queryTreeData &&
-                    queryTreeData.Section &&
-                    queryTreeData.SmallClass &&
-                    queryTreeData.ThinClass
-                ) {
-                    let data = {
-                        no: queryTreeData.Section
-                    };
-                    let noList = await getLittleBan(data);
-                    let sections = queryTreeData.Section.split('-');
-                    let No =
-                        sections[0] +
-                        '-' +
-                        sections[1] +
-                        '-' +
-                        queryTreeData.SmallClass +
-                        '-' +
-                        queryTreeData.ThinClass +
-                        '-' +
-                        sections[2];
-                    noList.map(rst => {
-                        if (rst.No.indexOf(No) !== -1) {
-                            SmallClassName = rst.SmallClassName
-                                ? rst.SmallClassName + '号小班'
-                                : SmallClassName;
-                            ThinClassName = rst.ThinClassName
-                                ? rst.ThinClassName + '号细班'
-                                : ThinClassName;
+        if (allTreeKey === selectKey && checked) {
+            if (this.tileLayer2) {
+                this.tileLayer2.addTo(this.map);
+            } else {
+                this.tileLayer2 = L.tileLayer(
+                    window.config.DASHBOARD_ONSITE +
+                            '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    {
+                        opacity: 1.0,
+                        subdomains: [1, 2, 3],
+                        minZoom: 11,
+                        maxZoom: 21,
+                        storagetype: 0,
+                        tiletype: 'wtms'
+                    }
+                ).addTo(this.map);
+            }
+        } else if (keys && keys.length === 0) {
+            // 如果是取消选中，首先看是否是取消全部，如果是，直接把所有图层去除
+            try {
+                if (this.tileLayer2) {
+                    this.map.removeLayer(this.tileLayer2);
+                }
+                if (this.tileLayer3) {
+                    this.map.removeLayer(this.tileLayer3);
+                    this.tileLayer3 = null;
+                }
+                // 去除掉选中某个节点所产生的图层
+                for (let i in treeLayerList) {
+                    console.log('treeLayerList[i]', treeLayerList[i]);
+                    this.map.removeLayer(treeLayerList[i]);
+                }
+            } catch (e) {
+                console.log('去除全部树种', e);
+            }
+        } else {
+            if (checked) {
+                // 不是选中全部，一定是选中某个节点，将这个节点添加就可以
+                // 首先看之前选中过没有，选中过的话，直接添加该图层就好
+                if (treeLayerList[selectKey]) {
+                    treeLayerList[selectKey].addTo(this.map);
+                } else {
+                    // 没选中的话，需要重新请求，然后添加到state里面
+                    var url = window.config.DASHBOARD_TREETYPE +
+                    `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${selectKey})`;
+                    let checkedTreeLayer = L.tileLayer.wms(url,
+                        {
+                            layers: 'xatree:treelocation',
+                            crs: L.CRS.EPSG4326,
+                            format: 'image/png',
+                            maxZoom: 22,
+                            transparent: true
                         }
+                    ).addTo(this.map);
+                    treeLayerList[selectKey] = checkedTreeLayer;
+                    me.setState({
+                        treeLayerList
                     });
                 }
-                // let queryTreeData = {}
-                let treeflowData = {};
-                let nurserysData = {};
-
-                // if(queryTreeDatas && queryTreeDatas.content && queryTreeDatas.content instanceof Array && queryTreeDatas.content.length>0){
-                //     queryTreeData =  queryTreeDatas.content[0]
-                // }
-                if (
-                    treeflowDatas &&
-                    treeflowDatas.content &&
-                    treeflowDatas.content instanceof Array &&
-                    treeflowDatas.content.length > 0
-                ) {
-                    treeflowData = treeflowDatas.content;
-                }
-                if (
-                    nurserysDatas &&
-                    nurserysDatas.content &&
-                    nurserysDatas.content instanceof Array &&
-                    nurserysDatas.content.length > 0
-                ) {
-                    nurserysData = nurserysDatas.content[0];
-                }
-
-                let seedlingMess = {
-                    sxm: queryTreeData.ZZBM ? queryTreeData.ZZBM : '',
-                    car: carData.LicensePlate ? carData.LicensePlate : '',
-                    TreeTypeName: nurserysData.TreeTypeObj
-                        ? nurserysData.TreeTypeObj.TreeTypeName
-                        : '',
-                    TreePlace: nurserysData.TreePlace
-                        ? nurserysData.TreePlace
-                        : '',
-                    Factory: nurserysData.Factory ? nurserysData.Factory : '',
-                    NurseryName: nurserysData.NurseryName
-                        ? nurserysData.NurseryName
-                        : '',
-                    LifterTime: nurserysData.LifterTime
-                        ? moment(nurserysData.LifterTime).format(
-                            'YYYY-MM-DD HH:mm:ss'
-                        )
-                        : '',
-                    location: nurserysData.location
-                        ? nurserysData.location
-                        : '',
-                    InputerObj: nurserysData.InputerObj
-                        ? nurserysData.InputerObj
-                        : '',
-                    GD: nurserysData.GD ? nurserysData.GD : '',
-                    GDFJ: nurserysData.GDFJ
-                        ? me.onImgClick(nurserysData.GDFJ)
-                        : '',
-                    GF: nurserysData.GF ? nurserysData.GF : '',
-                    GFFJ: nurserysData.GFFJ
-                        ? me.onImgClick(nurserysData.GFFJ)
-                        : '',
-                    TQZJ: nurserysData.TQZJ ? nurserysData.TQZJ : '',
-                    TQZJFJ: nurserysData.TQZJFJ
-                        ? me.onImgClick(nurserysData.TQZJFJ)
-                        : '',
-                    TQHD: nurserysData.TQHD ? nurserysData.TQHD : '',
-                    TQHDFJ: nurserysData.TQHDFJ
-                        ? me.onImgClick(nurserysData.TQHDFJ)
-                        : '',
-                    DJ: nurserysData.DJ ? nurserysData.DJ : '',
-                    DJFJ: nurserysData.DJFJ
-                        ? me.onImgClick(nurserysData.DJFJ)
-                        : '',
-                    XJ: nurserysData.XJ ? nurserysData.XJ : '',
-                    XJFJ: nurserysData.XJFJ
-                        ? me.onImgClick(nurserysData.XJFJ)
-                        : ''
-                };
-
-                // 项目code
-                let land = queryTreeData.Land ? queryTreeData.Land : '';
-                // 项目名称
-                let landName = '';
-                // 项目下的标段
-                let sections = [];
-                // 查到的标段code
-                let Section = queryTreeData.Section
-                    ? queryTreeData.Section
-                    : '';
-                // 标段名称
-                let sectionName = '';
-
-                PROJECT_UNITS.map(unit => {
-                    if (land === unit.code) {
-                        sections = unit.units;
-                        landName = unit.value;
+            } else {
+                // 不是取消选中全部，首先看之前的列表中有没有点击过这个节点，点击过，取消，未点击过，就重新获取数据
+                if (treeLayerList[selectKey]) {
+                    this.map.removeLayer(treeLayerList[selectKey]);
+                    // delete treeLayerList[selectKey];
+                } else {
+                    if (this.tileLayer2) {
+                        this.map.removeLayer(this.tileLayer2);
                     }
-                });
-                sections.map(section => {
-                    if (section.code === Section) {
-                        sectionName = section.value;
+                    if (this.tileLayer3) {
+                        this.map.removeLayer(this.tileLayer3);
+                        this.tileLayer3 = null;
                     }
-                });
-
-                let treeMess = {
-                    sxm: queryTreeData.ZZBM ? queryTreeData.ZZBM : '',
-                    landName: landName,
-                    sectionName: sectionName,
-                    SmallClass: SmallClassName,
-                    ThinClass: ThinClassName,
-                    TreeTypeName: nurserysData.TreeTypeObj
-                        ? nurserysData.TreeTypeObj.TreeTypeName
-                        : '',
-                    Location: queryTreeData.LocationTime
-                        ? queryTreeData.LocationTime
-                        : '',
-                    LocationX: queryTreeData.Location
-                        ? queryTreeData.Location.X
-                        : '',
-                    LocationY: queryTreeData.Location
-                        ? queryTreeData.Location.Y
-                        : '',
-                    DJ: queryTreeData.DJ ? queryTreeData.DJ : '',
-                    DJFJ: queryTreeData.DJFJ
-                        ? me.onImgClick(queryTreeData.DJFJ)
-                        : '',
-                    GD: queryTreeData.GD ? queryTreeData.GD : '',
-                    GDFJ: queryTreeData.GDFJ
-                        ? me.onImgClick(queryTreeData.GDFJ)
-                        : '',
-                    GF: queryTreeData.GF ? queryTreeData.GF : '',
-                    GFFJ: queryTreeData.GFFJ
-                        ? me.onImgClick(queryTreeData.GFFJ)
-                        : '',
-                    MD: queryTreeData.MD ? queryTreeData.MD : '',
-                    MDFJ: queryTreeData.MDFJ
-                        ? me.onImgClick(queryTreeData.MDFJ)
-                        : '',
-                    MJ: queryTreeData.MJ ? queryTreeData.MJ : '',
-                    MJFJ: queryTreeData.MJFJ
-                        ? me.onImgClick(queryTreeData.MJFJ)
-                        : '',
-                    TQHD: queryTreeData.TQHD ? queryTreeData.TQHD : '',
-                    TQHDFJ: queryTreeData.TQHDFJ
-                        ? me.onImgClick(queryTreeData.TQHDFJ)
-                        : '',
-                    TQZJ: queryTreeData.TQZJ ? queryTreeData.TQZJ : '',
-                    TQZJFJ: queryTreeData.TQZJFJ
-                        ? me.onImgClick(queryTreeData.TQZJFJ)
-                        : '',
-                    XJ: queryTreeData.XJ ? queryTreeData.XJ : '',
-                    XJFJ: queryTreeData.XJFJ
-                        ? me.onImgClick(queryTreeData.XJFJ)
-                        : ''
-                };
-                let flowMess = treeflowData;
-
-                that.setState({
-                    seeVisible: true,
-                    seedlingMess,
-                    treeMess,
-                    flowMess
-                });
-                if (that.state.markers) {
-                    that.state.markers.remove();
+                    var url = window.config.DASHBOARD_TREETYPE +
+                        `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${queryData})`;
+                    // this.tileLayer3指的是一下获取多个树种的图层，单个树种的图层直接存在treeLayerList对象中
+                    this.tileLayer3 = L.tileLayer.wms(url,
+                        {
+                            layers: 'xatree:treelocation',
+                            crs: L.CRS.EPSG4326,
+                            format: 'image/png',
+                            maxZoom: 22,
+                            transparent: true
+                        }
+                    ).addTo(this.map);
                 }
-                that.createMarkers(data.features[0].geometry.coordinates);
-            }
-        });
-    }
-
-    onImgClick (data) {
-        let srcs = [];
-        try {
-            let arr = data.split(',');
-            arr.map(rst => {
-                let src = rst.replace(/\/\//g, '/');
-                src = `${FOREST_API}/${src}`;
-                srcs.push(src);
-            });
-        } catch (e) {
-            console.log('处理图片', e);
-        }
-        return srcs;
-    }
-
-    genPopUpContent (geo) {
-        const { properties = {} } = geo;
-        console.log('properties', properties);
-        console.log('geo', geo);
-        let me = this;
-        console.log('this', this);
-        switch (geo.type) {
-            case 'people': {
-                return `<div class="popupBox">
-						<h2><span>姓名：</span>${properties.name}</h2>
-						<h2><span>所属单位：</span>${properties.org}</h2>
-						<h2><span>联系方式：</span>${properties.phone}</h2>
-						<h2><span>职务：</span>${properties.job}</h2>
-						<h2 class="btnRow">
-						<a href="javascript:;" class="btnViewTrack" data-id=${geo.key}>轨迹查看</a>
-						</h2>
-					</div>`;
-            }
-            case 'danger': {
-                return `<div>
-						<h2><span>隐患内容：</span>${properties.name}</h2>
-						<h2><span>风险级别：</span>${properties.level}</h2>
-						<h2><span>整改状态：</span>${properties.Status ? (properties.Status === -1 ? '已提交' : (properties.Status === 0 ? '整改中' : (properties.Status === 1 ? '整改完成' : '整改完成'))) : ''}</h2>
-						<h2><span>整改措施：</span>${properties.measure ? properties.measure : ''}</h2>
-						<h2><span>责任单位：</span>${properties.response_org}</h2>
-						<a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-					</div>`;
-            }
-            case 'safety': {
-                return `<div>
-						<h2>仪器名称：${properties.name}</h2>
-						<h2>所属部位：${properties.loc}</h2>
-					</div>`;
-            }
-            default: {
-                return null;
             }
         }
     }
-    /* 在地图上添加marker和polygan */
-    createMarkers (geo) {
-        if (!geo[0] || !geo[1]) {
-            return;
-        }
-        let iconType = L.divIcon({ className: this.getIconType('tree') });
-        let marker = L.marker([geo[1], geo[0]], {
-            icon: iconType
-        });
-        marker.addTo(this.map);
-        this.setState({ markers: marker });
-        return marker;
-    }
-    /* 在地图上添加marker和polygan */
-    createMarker (geo, oldMarker) {
-        if (geo.properties.type !== 'area') {
-            if (!oldMarker) {
-                if (
-                    !geo.geometry.coordinates[0] ||
-                    !geo.geometry.coordinates[1]
-                ) {
-                    return;
-                }
-                let iconType = L.divIcon({
-                    className: this.getIconType(geo.type)
-                });
-                let marker = L.marker(geo.geometry.coordinates, {
-                    icon: iconType,
-                    title: geo.properties.name
-                });
-                marker.bindPopup(
-                    L.popup({ maxWidth: 240 }).setContent(
-                        this.genPopUpContent(geo)
-                    )
-                );
-                marker.addTo(this.map);
-                return marker;
-            }
-            return oldMarker;
-        } else {
-            /**
-             * 增加安全隐患前代码
-             */
-
-            // 创建区域图形
-            if (!oldMarker) {
-                let area = L.geoJson(geo, {
-                    style: {
-                        fillColor: this.fillAreaColor(geo.key),
-                        weight: 1,
-                        opacity: 1,
-                        color: '#201ffd',
-                        fillOpacity: 0.3
-                    },
-                    title: geo.properties.name
-                }).addTo(this.map);
-                // 地块标注
-                // let latlng = area.getBounds().getCenter()
-                // let label = L.marker([latlng.lat, latlng.lng], {
-                //     icon: L.divIcon({
-                //         // className: this.getIconType('people'),
-                //         // className: 'label-text',
-                //         html: geo.properties.name,
-                //         iconSize: [48, 20],
-                //     }),
-                // })
-                // area.addLayer(label)
-                // area.bindTooltip(geo.properties.name).openTooltip();
-                this.map.fitBounds(area.getBounds());
-
-                // this.map.panTo(latlng);
-
-                return area;
-            }
-            return oldMarker;
-
-            /**
-             * 增加安全隐患后代码
-             */
-            // if (!oldMarker) {
-            // 	var area = L.geoJSON(geo, {
-            // 		style: {
-            // 			fillColor: this.fillAreaColor(geo.key),
-            // 			weight: 1,
-            // 			opacity: 1,
-            // 			color: '#201ffd',
-            // 			fillOpacity: 0.3
-            // 		},
-            // 		title: geo.properties.name,
-            // 	}).addTo(this.map);
-            // 	//地块标注
-            // 	let latlng = area.getBounds().getCenter();
-            // 	let label = L.marker([latlng.lat, latlng.lng], {
-            // 		icon: L.divIcon({
-            // 			className: 'label-text',
-            // 			html: geo.properties.name,
-            // 			iconSize: [48, 20]
-            // 		})
-            // 	});
-            // 	area.addLayer(label);
-            // 	//点击预览
-            // 	area.on({
-            // 		click: function (event) {
-            // 			me.previewFile(geo.file_info, geo.properties);
-            // 		}
-            // 	});
-            // 	return area;
-            // }
-        }
-    }
-
-    options = [
-        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' },
-        {
-            label: '巡检路线',
-            value: 'geojsonFeature_people',
-            IconUrl: require('./ImageIcon/people.png'),
-            IconName: 'universal-access'
-        },
-        {
-            label: '安全隐患',
-            value: 'geojsonFeature_hazard',
-            IconUrl: require('./ImageIcon/danger.png'),
-            IconName: 'warning'
-        }
-    ];
-
-    options2 = [
-        {
-            label: '现场人员',
-            value: 'geojsonFeature_people',
-            IconUrl: require('./ImageIcon/people.png'),
-            IconName: 'universal-access'
-        },
-        {
-            label: '安全监测',
-            value: 'geojsonFeature_safety',
-            IconUrl: require('./ImageIcon/camera.png'),
-            IconName: 'shield'
-        },
-        {
-            label: '安全隐患',
-            value: 'geojsonFeature_hazard',
-            IconUrl: require('./ImageIcon/danger.png'),
-            IconName: 'warning'
-        }
-    ];
-
+    /* 树种筛选点击树节点 */
+    handleTreeTypeSelect (keys, featureName) {}
     // 切换为2D
     toggleTileLayer (index) {
         this.tileLayer.setUrl(this.tileUrls[index]);
@@ -1228,49 +1050,7 @@ class Lmap extends Component {
             mapLayerBtnType: !this.state.mapLayerBtnType
         });
     }
-
-    // 获取对应的ICON
-    getIconType (type) {
-        switch (type) {
-            case 'people':
-                return 'peopleIcon';
-            case 'safety':
-                return 'cameraIcon';
-            case 'danger':
-                return 'dangerIcon';
-            case 'tree':
-                return 'treeIcon';
-            default:
-                break;
-        }
-    }
-
-    /* 获取对应图层数据 */
-    getPanelData (featureName) {
-        var content = {};
-        switch (featureName) {
-            case 'geojsonFeature_people':
-                content = this.state.users;
-                break;
-            case 'geojsonFeature_safety':
-                content = this.state.safetys;
-                break;
-            case 'geojsonFeature_hazard':
-                content = this.state.hazards;
-                break;
-            case 'geojsonFeature_area':
-                content = this.state.treeLists;
-                break;
-        }
-        return content;
-    }
-
     // 图例的显示与否
-    toggleIcon () {
-        this.setState({
-            toggle: !this.state.toggle
-        });
-    }
     toggleIcon1 () {
         this.setState({
             seeVisible: !this.state.seeVisible
@@ -1278,7 +1058,7 @@ class Lmap extends Component {
     }
 
     /* 弹出信息框 */
-    onSelect (keys, featureName) {
+    handleAreaSelect (keys, featureName) {
         const {
             actions: { getTreearea }
         } = this.props;
@@ -1286,19 +1066,15 @@ class Lmap extends Component {
             featureName != null && featureName.selectedNodes.length > 0
                 ? featureName.selectedNodes[0].props.title
                 : '';
-
         if (this.checkMarkers.toString() !== '') {
             for (var i = 0; i <= this.checkMarkers.length - 1; i++) {
                 this.map.removeLayer(this.checkMarkers[i]);
-                // this.checkMarkers[i]._leaflet_id.remove()
                 delete this.checkMarkers[i];
             }
         }
-
         this.setState({
             leftkeycode: keys[0]
         });
-
         let treearea = [];
         getTreearea({}, { no: keys[0] }).then(rst => {
             if (
@@ -1311,7 +1087,6 @@ class Lmap extends Component {
             ) {
                 return;
             }
-
             let str = rst.content[0].coords;
             var target1 = str
                 .slice(str.indexOf('(') + 3, str.indexOf(')'))
@@ -1327,55 +1102,15 @@ class Lmap extends Component {
                 properties: { name: treeNodeName, type: 'area' },
                 geometry: { type: 'Polygon', coordinates: treearea }
             };
-
             this.checkMarkers[0] = this.createMarker(
                 message,
                 this.checkMarkers[0]
             );
         });
-        // let selItem = this.checkMarkers[0]
-        // if (selItem) {
-        //     selItem.openPopup()
-        // }
-    }
-
-    /* 菜单展开收起 */
-    extendAndFold () {
-        this.setState({ menuIsExtend: !this.state.menuIsExtend });
-    }
-
-    /* 手动调整菜单宽度 */
-    onStartResizeMenu (e) {
-        e.preventDefault();
-        this.menu.startPos = e.clientX;
-        this.menu.isStart = true;
-        this.menu.tempMenuWidth = this.state.menuWidth;
-        this.menu.count = 0;
-    }
-    onEndResize (e) {
-        this.menu.isStart = false;
-    }
-    onResizingMenu (e) {
-        if (this.menu.isStart) {
-            e.preventDefault();
-            this.menu.count++;
-            let ys = this.menu.count % 5;
-            if (ys === 0 || ys === 1 || ys === 3 || ys === 4) return; // 降低事件执行频率
-            let dx = e.clientX - this.menu.startPos;
-            let menuWidth = this.menu.tempMenuWidth + dx;
-            if (menuWidth > this.menu.maxWidth) menuWidth = this.menu.maxWidth;
-            if (menuWidth < this.menu.minWidth) menuWidth = this.menu.minWidth;
-            this.setState({ menuWidth: menuWidth });
-        }
     }
 
     render () {
         const { seedlingMess, treeMess, flowMess } = this.state;
-        // let heightImgStyle = seedlingMess.height?'block':'none'
-        // let crownImgStyle = seedlingMess.crown?'block':'none'
-        // let diameterImgStyle = seedlingMess.diameter?'block':'none'
-        // let thicknessStyle = seedlingMess.thickness?'block':'none'
-        // let XJIStyle = treeMess.XJ?'block':'none'
         return (
             <div className='map-container'>
                 <div
@@ -1473,28 +1208,6 @@ class Lmap extends Component {
                     ) : (
                         ''
                     )}
-                    {/* <div style={this.state.isNotThree == true ? {} : { display: 'none' }}>
-                        <div
-                            className="iconList"
-                            style={this.state.toggle ? { width: '100px' } : { width: '0' }}
-                        >
-                            <img
-                                src={require('./ImageIcon/tuli.png')}
-                                className="imageControll"
-                                onClick={this.toggleIcon.bind(this)}
-                            />
-                            {this.options2.map((option, index) => {
-                                if (option.label !== '区域地块') {
-                                    return (
-                                        <div key={index} className="imgIcon">
-                                            <img src={option.IconUrl} />
-                                            <p>{option.label}</p>
-                                        </div>
-                                    )
-                                }
-                            })}
-                        </div>
-                    </div> */}
                     <div
                         style={this.state.isNotThree ? {} : { display: 'none' }}
                     >
@@ -2371,17 +2084,37 @@ class Lmap extends Component {
                             </Modal>
                         </div>
                     </div>
-                    {this.state.isShowTrack ? (
-                        <TrackPlayBack
-                            {...this.props}
-                            map={this.map}
-                            trackId={this.state.trackId}
-                            trackUser={this.state.trackUser}
-                            close={this.exitTrack.bind(this)}
-                        />
-                    ) : (
-                        ''
-                    )}
+                    <Modal
+                        title='隐患详情'
+                        width={800}
+                        visible={this.state.isShowRisk}
+                        onOk={this._handleOkVisible.bind(this)}
+                        onCancel={this._handleCancelVisible.bind(this)}
+                        footer={null}
+                    >
+                        <div>
+                            {
+                                <RiskDetail
+                                    {...this.props}
+                                    map={this.map}
+                                    risk={this.state.risk}
+                                    isShowRisk={this.state.isShowRisk}
+                                    close={this.exitRiskDetail.bind(this)}
+                                />
+                            }
+                            <Row style={{ marginTop: 10 }}>
+                                <Button
+                                    onClick={this._handleCancelVisible.bind(
+                                        this
+                                    )}
+                                    style={{ float: 'right' }}
+                                    type='primary'
+                                >
+                                    关闭
+                                </Button>
+                            </Row>
+                        </div>
+                    </Modal>
                     <div>
                         <div
                             style={
@@ -2408,73 +2141,348 @@ class Lmap extends Component {
             </div>
         );
     }
+
+    /* 菜单展开收起 */
+    extendAndFold () {
+        this.setState({ menuIsExtend: !this.state.menuIsExtend });
+    }
+    /* 手动调整菜单宽度 */
+    onStartResizeMenu (e) {
+        e.preventDefault();
+        this.menu.startPos = e.clientX;
+        this.menu.isStart = true;
+        this.menu.tempMenuWidth = this.state.menuWidth;
+        this.menu.count = 0;
+    }
+    onEndResize (e) {
+        this.menu.isStart = false;
+    }
+    onResizingMenu (e) {
+        if (this.menu.isStart) {
+            e.preventDefault();
+            this.menu.count++;
+            let ys = this.menu.count % 5;
+            if (ys === 0 || ys === 1 || ys === 3 || ys === 4) return; // 降低事件执行频率
+            let dx = e.clientX - this.menu.startPos;
+            let menuWidth = this.menu.tempMenuWidth + dx;
+            if (menuWidth > this.menu.maxWidth) menuWidth = this.menu.maxWidth;
+            if (menuWidth < this.menu.minWidth) menuWidth = this.menu.minWidth;
+            this.setState({ menuWidth: menuWidth });
+        }
+    }
     //  切换标签页
     tabChange (key) {
-        console.log(key);
     }
-
-    /* 渲染菜单panel */
-    renderPanel (option) {
-        // console.log('this.state.userCheckedKeys', this.state.userCheckedKeys);
-        let content = this.getPanelData(option.value);
-        if (option && option.value) {
-            switch (option.value) {
-                case 'geojsonFeature_people':
-                    return (
-                        <div>
-                            <DashPanel
-                                style={{ height: '200px' }}
-                                onCheck={this.onCheckPlan.bind(this)}
-                                onSelect={this.onSelectPlan.bind(this)}
-                                content={content}
-                                userCheckKeys={this.state.userCheckedKeys}
-                                featureName={option.value}
-                            />
-                            <RangePicker
-                                style={{
-                                    verticalAlign: 'middle',
-                                    width: '100%'
-                                }}
-                                showTime={{ format: 'HH:mm:ss' }}
-                                format={'YYYY/MM/DD HH:mm:ss'}
-                            />
-                        </div>
-                    );
-                // case 'geojsonFeature_safety':
-                //     content = this.state.safetys
-                //     break
-                case 'geojsonFeature_hazard':
-                    return (
-                        <DashPanel
-                            onCheck={this.onCheckDanger.bind(this)}
-                            onSelect={this.onSelectDanger.bind(this)}
-                            content={content}
-                            userCheckKeys={this.state.userCheckedKeys}
-                            // loadData={this.loadUsersByOrg.bind(this)}
-                            featureName={option.value}
-                        />
-                    );
-                case 'geojsonFeature_area':
-                    return (
-                        <PkCodeTree
-                            treeData={content}
-                            selectedKeys={this.state.leftkeycode}
-                            onSelect={this.onSelect.bind(this)}
-                            // onExpand={this.onExpand.bind(this)}
-                            showIcon={false}
-                        />
-                    );
-            }
-        }
+    /* 退出轨迹查看 */
+    exitTrack () {
+        this.setState({ isShowTrack: false });
+    }
+    // 退出隐患详情查看
+    exitRiskDetail () {
+        this.setState({ isShowRisk: false });
+    }
+    _handleOkVisible () {
+        this.setState({
+            isShowRisk: false
+        });
+    }
+    _handleCancelVisible () {
+        this.setState({
+            isShowRisk: false
+        });
     }
 
     fillAreaColor (index) {
         let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
         return colors[index % 5];
     }
-    static layout = {
-        labelCol: { span: 6 },
-        wrapperCol: { span: 16 }
-    };
+    // 点击树节点获取树节点信息
+    async getTreeInfo (x, y, that) {
+        const {
+            actions: {
+                getTreeflows,
+                getNurserys,
+                getCarpackbysxm,
+                getTreeMess,
+                getLittleBan
+            }
+        } = this.props;
+        let me = this;
+        var resolutions = [
+            0.703125,
+            0.3515625,
+            0.17578125,
+            0.087890625,
+            0.0439453125,
+            0.02197265625,
+            0.010986328125,
+            0.0054931640625,
+            0.00274658203125,
+            0.001373291015625,
+            6.866455078125e-4,
+            3.4332275390625e-4,
+            1.71661376953125e-4,
+            8.58306884765625e-5,
+            4.291534423828125e-5,
+            2.1457672119140625e-5,
+            1.0728836059570312e-5,
+            5.364418029785156e-6,
+            2.682209014892578e-6,
+            1.341104507446289e-6,
+            6.705522537231445e-7,
+            3.3527612686157227e-7
+        ];
+        var zoom = that.map.getZoom();
+        var resolution = resolutions[zoom];
+        var col = (x + 180) / resolution;
+        // 林总说明I和J必须是整数
+        var colp = Math.floor(col % 256);
+        // var colp = col % 256;
+        col = Math.floor(col / 256);
+        var row = (90 - y) / resolution;
+        // 林总说明I和J必须是整数
+        var rowp = Math.floor(row % 256);
+        // var rowp = row % 256;
+        row = Math.floor(row / 256);
+        var url =
+            window.config.DASHBOARD_ONSITE +
+            '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:' +
+            zoom +
+            '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +
+            col +
+            '&TileRow=' +
+            row +
+            '&I=' +
+            colp +
+            '&J=' +
+            rowp;
+        jQuery.getJSON(url, null, async function (data) {
+            if (data.features && data.features.length) {
+                let postdata = {
+                    sxm: data.features[0].properties.SXM
+                };
+
+                let queryTreeData = await getTreeMess(postdata);
+                let treeflowDatas = await getTreeflows({}, postdata);
+                let nurserysDatas = await getNurserys({}, postdata);
+                let carData = await getCarpackbysxm(postdata);
+
+                let SmallClassName = queryTreeData.SmallClass
+                    ? queryTreeData.SmallClass + '号小班'
+                    : '';
+                let ThinClassName = queryTreeData.ThinClass
+                    ? queryTreeData.ThinClass + '号细班'
+                    : '';
+                if (
+                    queryTreeData &&
+                    queryTreeData.Section &&
+                    queryTreeData.SmallClass &&
+                    queryTreeData.ThinClass
+                ) {
+                    let data = {
+                        no: queryTreeData.Section
+                    };
+                    let noList = await getLittleBan(data);
+                    let sections = queryTreeData.Section.split('-');
+                    let No =
+                        sections[0] +
+                        '-' +
+                        sections[1] +
+                        '-' +
+                        queryTreeData.SmallClass +
+                        '-' +
+                        queryTreeData.ThinClass +
+                        '-' +
+                        sections[2];
+                    noList.map(rst => {
+                        if (rst.No.indexOf(No) !== -1) {
+                            SmallClassName = rst.SmallClassName
+                                ? rst.SmallClassName + '号小班'
+                                : SmallClassName;
+                            ThinClassName = rst.ThinClassName
+                                ? rst.ThinClassName + '号细班'
+                                : ThinClassName;
+                        }
+                    });
+                }
+                // let queryTreeData = {}
+                let treeflowData = {};
+                let nurserysData = {};
+
+                // if(queryTreeDatas && queryTreeDatas.content && queryTreeDatas.content instanceof Array && queryTreeDatas.content.length>0){
+                //     queryTreeData =  queryTreeDatas.content[0]
+                // }
+                if (
+                    treeflowDatas &&
+                    treeflowDatas.content &&
+                    treeflowDatas.content instanceof Array &&
+                    treeflowDatas.content.length > 0
+                ) {
+                    treeflowData = treeflowDatas.content;
+                }
+                if (
+                    nurserysDatas &&
+                    nurserysDatas.content &&
+                    nurserysDatas.content instanceof Array &&
+                    nurserysDatas.content.length > 0
+                ) {
+                    nurserysData = nurserysDatas.content[0];
+                }
+
+                let seedlingMess = {
+                    sxm: queryTreeData.ZZBM ? queryTreeData.ZZBM : '',
+                    car: carData.LicensePlate ? carData.LicensePlate : '',
+                    TreeTypeName: nurserysData.TreeTypeObj
+                        ? nurserysData.TreeTypeObj.TreeTypeName
+                        : '',
+                    TreePlace: nurserysData.TreePlace
+                        ? nurserysData.TreePlace
+                        : '',
+                    Factory: nurserysData.Factory ? nurserysData.Factory : '',
+                    NurseryName: nurserysData.NurseryName
+                        ? nurserysData.NurseryName
+                        : '',
+                    LifterTime: nurserysData.LifterTime
+                        ? moment(nurserysData.LifterTime).format(
+                            'YYYY-MM-DD HH:mm:ss'
+                        )
+                        : '',
+                    location: nurserysData.location
+                        ? nurserysData.location
+                        : '',
+                    InputerObj: nurserysData.InputerObj
+                        ? nurserysData.InputerObj
+                        : '',
+                    GD: nurserysData.GD ? nurserysData.GD : '',
+                    GDFJ: nurserysData.GDFJ
+                        ? me.onImgClick(nurserysData.GDFJ)
+                        : '',
+                    GF: nurserysData.GF ? nurserysData.GF : '',
+                    GFFJ: nurserysData.GFFJ
+                        ? me.onImgClick(nurserysData.GFFJ)
+                        : '',
+                    TQZJ: nurserysData.TQZJ ? nurserysData.TQZJ : '',
+                    TQZJFJ: nurserysData.TQZJFJ
+                        ? me.onImgClick(nurserysData.TQZJFJ)
+                        : '',
+                    TQHD: nurserysData.TQHD ? nurserysData.TQHD : '',
+                    TQHDFJ: nurserysData.TQHDFJ
+                        ? me.onImgClick(nurserysData.TQHDFJ)
+                        : '',
+                    DJ: nurserysData.DJ ? nurserysData.DJ : '',
+                    DJFJ: nurserysData.DJFJ
+                        ? me.onImgClick(nurserysData.DJFJ)
+                        : '',
+                    XJ: nurserysData.XJ ? nurserysData.XJ : '',
+                    XJFJ: nurserysData.XJFJ
+                        ? me.onImgClick(nurserysData.XJFJ)
+                        : ''
+                };
+
+                // 项目code
+                let land = queryTreeData.Land ? queryTreeData.Land : '';
+                // 项目名称
+                let landName = '';
+                // 项目下的标段
+                let sections = [];
+                // 查到的标段code
+                let Section = queryTreeData.Section
+                    ? queryTreeData.Section
+                    : '';
+                // 标段名称
+                let sectionName = '';
+
+                PROJECT_UNITS.map(unit => {
+                    if (land === unit.code) {
+                        sections = unit.units;
+                        landName = unit.value;
+                    }
+                });
+                sections.map(section => {
+                    if (section.code === Section) {
+                        sectionName = section.value;
+                    }
+                });
+
+                let treeMess = {
+                    sxm: queryTreeData.ZZBM ? queryTreeData.ZZBM : '',
+                    landName: landName,
+                    sectionName: sectionName,
+                    SmallClass: SmallClassName,
+                    ThinClass: ThinClassName,
+                    TreeTypeName: nurserysData.TreeTypeObj
+                        ? nurserysData.TreeTypeObj.TreeTypeName
+                        : '',
+                    Location: queryTreeData.LocationTime
+                        ? queryTreeData.LocationTime
+                        : '',
+                    LocationX: queryTreeData.Location
+                        ? queryTreeData.Location.X
+                        : '',
+                    LocationY: queryTreeData.Location
+                        ? queryTreeData.Location.Y
+                        : '',
+                    DJ: queryTreeData.DJ ? queryTreeData.DJ : '',
+                    DJFJ: queryTreeData.DJFJ
+                        ? me.onImgClick(queryTreeData.DJFJ)
+                        : '',
+                    GD: queryTreeData.GD ? queryTreeData.GD : '',
+                    GDFJ: queryTreeData.GDFJ
+                        ? me.onImgClick(queryTreeData.GDFJ)
+                        : '',
+                    GF: queryTreeData.GF ? queryTreeData.GF : '',
+                    GFFJ: queryTreeData.GFFJ
+                        ? me.onImgClick(queryTreeData.GFFJ)
+                        : '',
+                    MD: queryTreeData.MD ? queryTreeData.MD : '',
+                    MDFJ: queryTreeData.MDFJ
+                        ? me.onImgClick(queryTreeData.MDFJ)
+                        : '',
+                    MJ: queryTreeData.MJ ? queryTreeData.MJ : '',
+                    MJFJ: queryTreeData.MJFJ
+                        ? me.onImgClick(queryTreeData.MJFJ)
+                        : '',
+                    TQHD: queryTreeData.TQHD ? queryTreeData.TQHD : '',
+                    TQHDFJ: queryTreeData.TQHDFJ
+                        ? me.onImgClick(queryTreeData.TQHDFJ)
+                        : '',
+                    TQZJ: queryTreeData.TQZJ ? queryTreeData.TQZJ : '',
+                    TQZJFJ: queryTreeData.TQZJFJ
+                        ? me.onImgClick(queryTreeData.TQZJFJ)
+                        : '',
+                    XJ: queryTreeData.XJ ? queryTreeData.XJ : '',
+                    XJFJ: queryTreeData.XJFJ
+                        ? me.onImgClick(queryTreeData.XJFJ)
+                        : ''
+                };
+                let flowMess = treeflowData;
+
+                that.setState({
+                    seeVisible: true,
+                    seedlingMess,
+                    treeMess,
+                    flowMess
+                });
+                if (that.state.markers) {
+                    that.state.markers.remove();
+                }
+            }
+        });
+    }
+    // 树节点信息查看图片时格式转换
+    onImgClick (data) {
+        let srcs = [];
+        try {
+            let arr = data.split(',');
+            arr.map(rst => {
+                let src = rst.replace(/\/\//g, '/');
+                src = `${FOREST_API}/${src}`;
+                srcs.push(src);
+            });
+        } catch (e) {
+            console.log('处理图片', e);
+        }
+        return srcs;
+    }
 }
-export default Form.create()(Lmap);
+export default Form.create()(OnSite);

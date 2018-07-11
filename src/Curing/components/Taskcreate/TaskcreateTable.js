@@ -1,14 +1,11 @@
 import React, {Component} from 'react';
 import {
     Collapse,
-    Button,
-    DatePicker
+    Button
 } from 'antd';
-import DashPanel from '../DashPanel';
 import PkCodeTree from '../PkCodeTree';
 import '../Curing.less';
 const Panel = Collapse.Panel;
-const { RangePicker } = DatePicker;
 window.config = window.config || {};
 
 export default class TaskcreateTable extends Component {
@@ -55,164 +52,6 @@ export default class TaskcreateTable extends Component {
     async componentDidMount () {
         this._loadAreaData();
         this._initMap();
-    }
-
-    // 获取地块树数据
-    async _loadAreaData () {
-        const {
-            actions: { getTreeNodeList, getLittleBan }
-        } = this.props;
-        try {
-            let rst = await getTreeNodeList();
-            if (rst instanceof Array && rst.length > 0) {
-                rst.forEach((item, index) => {
-                    rst[index].children = [];
-                });
-            }
-            // 项目级
-            let projectList = [];
-            // 子项目级
-            let unitProjectList = [];
-            if (rst instanceof Array && rst.length > 0) {
-                rst.map(node => {
-                    if (node.Type === '项目工程') {
-                        projectList.push({
-                            Name: node.Name,
-                            No: node.No
-                        });
-                    } else if (node.Type === '子项目工程') {
-                        unitProjectList.push({
-                            Name: node.Name,
-                            No: node.No,
-                            Parent: node.Parent
-                        });
-                    }
-                });
-                this.setState({
-                    projectList,
-                    unitProjectList
-                });
-
-                for (let i = 0; i < projectList.length; i++) {
-                    projectList[i].children = unitProjectList.filter(node => {
-                        return node.Parent === projectList[i].No;
-                    });
-                }
-            }
-
-            unitProjectList.map(async section => {
-                let list = await getLittleBan({ no: section.No });
-                let smallClassList = this._getSmallClass(list);
-                smallClassList.map(smallClass => {
-                    let thinClassList = this._getThinClass(smallClass, list);
-                    smallClass.children = thinClassList;
-                });
-                section.children = smallClassList;
-                this.setState({ treeLists: projectList });
-            });
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    _getSmallClass (smallClassList) {
-        // 将小班的code获取到，进行去重
-        let uniqueSmallClass = [];
-        // 进行数组去重的数组
-        let array = [];
-
-        let test = [];
-        smallClassList.map(list => {
-            // if (!list.SmallClassName) {
-            //     console.log('list', list);
-            // }
-            // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
-            let codeName =
-                list.LandNo +
-                '#' +
-                list.RegionNo +
-                '#' +
-                list.SmallClass +
-                '#' +
-                list.SmallClassName;
-            if (list.SmallClass && array.indexOf(codeName) === -1) {
-                uniqueSmallClass.push({
-                    Name: list.SmallClassName
-                        ? list.SmallClassName + '小班'
-                        : list.SmallClass + '小班',
-                    No: codeName
-                });
-                array.push(codeName);
-            } else {
-                test.push({
-                    SmallClassName: list.SmallClassName,
-                    SmallClass: list.SmallClass
-                });
-            }
-        });
-        return uniqueSmallClass;
-    }
-
-    _getThinClass (smallClass, list) {
-        let thinClassList = [];
-        let codeArray = [];
-        let nameArray = [];
-        list.map(rst => {
-            let codeName = smallClass.No.split('#');
-            let code = codeName[2];
-            let name = codeName[3];
-            if (name === 'null') {
-                name = null;
-            }
-            // 暂时去掉重复的节点
-            if (
-                rst.ThinClass &&
-                rst.SmallClass === code &&
-                rst.SmallClassName === name
-            ) {
-                let noArr = rst.No.split('-');
-                let No =
-                    noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
-                if (codeArray.indexOf(No) === -1) {
-                    thinClassList.push({
-                        Name: rst.ThinClassName
-                            ? rst.ThinClassName + '细班'
-                            : rst.ThinClass + '细班',
-                        No: No
-                    });
-                    codeArray.push(No);
-                    nameArray.push(rst.ThinClassName);
-                }
-            }
-        });
-        return thinClassList;
-    }
-
-    /* 初始化地图 */
-    _initMap () {
-        this.map = L.map('mapid', window.config.initLeaflet);
-
-        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
-
-        this.tileLayer = L.tileLayer(this.tileUrls[1], {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 17,
-            storagetype: 0
-        }).addTo(this.map);
-
-        this.tileLayer2 = L.tileLayer(
-            window.config.DASHBOARD_ONSITE +
-                    '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-            {
-                opacity: 1.0,
-                subdomains: [1, 2, 3],
-                minZoom: 11,
-                maxZoom: 21,
-                storagetype: 0,
-                tiletype: 'wtms'
-            }
-        ).addTo(this.map);
     }
 
     render () {
@@ -339,6 +178,164 @@ export default class TaskcreateTable extends Component {
             </div>);
     }
 
+    // 获取地块树数据
+    async _loadAreaData () {
+        const {
+            actions: { getTreeNodeList, getLittleBan }
+        } = this.props;
+        try {
+            let rst = await getTreeNodeList();
+            if (rst instanceof Array && rst.length > 0) {
+                rst.forEach((item, index) => {
+                    rst[index].children = [];
+                });
+            }
+            // 项目级
+            let projectList = [];
+            // 子项目级
+            let unitProjectList = [];
+            if (rst instanceof Array && rst.length > 0) {
+                rst.map(node => {
+                    if (node.Type === '项目工程') {
+                        projectList.push({
+                            Name: node.Name,
+                            No: node.No
+                        });
+                    } else if (node.Type === '子项目工程') {
+                        unitProjectList.push({
+                            Name: node.Name,
+                            No: node.No,
+                            Parent: node.Parent
+                        });
+                    }
+                });
+                this.setState({
+                    projectList,
+                    unitProjectList
+                });
+
+                for (let i = 0; i < projectList.length; i++) {
+                    projectList[i].children = unitProjectList.filter(node => {
+                        return node.Parent === projectList[i].No;
+                    });
+                }
+            }
+
+            unitProjectList.map(async section => {
+                let list = await getLittleBan({ no: section.No });
+                let smallClassList = this._getSmallClass(list);
+                smallClassList.map(smallClass => {
+                    let thinClassList = this._getThinClass(smallClass, list);
+                    smallClass.children = thinClassList;
+                });
+                section.children = smallClassList;
+                this.setState({ treeLists: projectList });
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    _getSmallClass (smallClassList) {
+        // 将小班的code获取到，进行去重
+        let uniqueSmallClass = [];
+        // 进行数组去重的数组
+        let array = [];
+
+        let test = [];
+        smallClassList.map(list => {
+            // if (!list.SmallClassName) {
+            //     console.log('list', list);
+            // }
+            // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
+            let codeName =
+                    list.LandNo +
+                    '#' +
+                    list.RegionNo +
+                    '#' +
+                    list.SmallClass +
+                    '#' +
+                    list.SmallClassName;
+            if (list.SmallClass && array.indexOf(codeName) === -1) {
+                uniqueSmallClass.push({
+                    Name: list.SmallClassName
+                        ? list.SmallClassName + '小班'
+                        : list.SmallClass + '小班',
+                    No: codeName
+                });
+                array.push(codeName);
+            } else {
+                test.push({
+                    SmallClassName: list.SmallClassName,
+                    SmallClass: list.SmallClass
+                });
+            }
+        });
+        return uniqueSmallClass;
+    }
+
+    _getThinClass (smallClass, list) {
+        let thinClassList = [];
+        let codeArray = [];
+        let nameArray = [];
+        list.map(rst => {
+            let codeName = smallClass.No.split('#');
+            let code = codeName[2];
+            let name = codeName[3];
+            if (name === 'null') {
+                name = null;
+            }
+            // 暂时去掉重复的节点
+            if (
+                rst.ThinClass &&
+                    rst.SmallClass === code &&
+                    rst.SmallClassName === name
+            ) {
+                let noArr = rst.No.split('-');
+                let No =
+                        noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
+                if (codeArray.indexOf(No) === -1) {
+                    thinClassList.push({
+                        Name: rst.ThinClassName
+                            ? rst.ThinClassName + '细班'
+                            : rst.ThinClass + '细班',
+                        No: No
+                    });
+                    codeArray.push(No);
+                    nameArray.push(rst.ThinClassName);
+                }
+            }
+        });
+        return thinClassList;
+    }
+
+    /* 初始化地图 */
+    _initMap () {
+        this.map = L.map('mapid', window.config.initLeaflet);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+
+        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
+        }).addTo(this.map);
+
+        this.tileLayer2 = L.tileLayer(
+            window.config.DASHBOARD_ONSITE +
+                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+            {
+                opacity: 1.0,
+                subdomains: [1, 2, 3],
+                minZoom: 11,
+                maxZoom: 21,
+                storagetype: 0,
+                tiletype: 'wtms'
+            }
+        ).addTo(this.map);
+    }
+
     _handleEndResize (e) {
         this.menu.isStart = false;
     }
@@ -362,41 +359,6 @@ export default class TaskcreateTable extends Component {
         let content = this._getPanelData(option.value);
         if (option && option.value) {
             switch (option.value) {
-                case 'geojsonFeature_people':
-                    return (
-                        <div>
-                            <DashPanel
-                                style={{ height: '200px' }}
-                                onCheck={this.onCheckPlan.bind(this)}
-                                onSelect={this.onSelectPlan.bind(this)}
-                                content={content}
-                                userCheckKeys={this.state.userCheckedKeys}
-                                featureName={option.value}
-                            />
-                            <RangePicker
-                                style={{
-                                    verticalAlign: 'middle',
-                                    width: '100%'
-                                }}
-                                showTime={{ format: 'HH:mm:ss' }}
-                                format={'YYYY/MM/DD HH:mm:ss'}
-                            />
-                        </div>
-                    );
-                    // case 'geojsonFeature_safety':
-                    //     content = this.state.safetys
-                    //     break
-                case 'geojsonFeature_hazard':
-                    return (
-                        <DashPanel
-                            onCheck={this.onCheckDanger.bind(this)}
-                            onSelect={this.onSelectDanger.bind(this)}
-                            content={content}
-                            userCheckKeys={this.state.userCheckedKeys}
-                            // loadData={this.loadUsersByOrg.bind(this)}
-                            featureName={option.value}
-                        />
-                    );
                 case 'geojsonFeature_area':
                     return (
                         <PkCodeTree

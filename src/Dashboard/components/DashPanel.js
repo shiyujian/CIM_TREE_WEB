@@ -10,9 +10,8 @@ export default class DashPanel extends Component {
         this.originOnSelect = this.props.onSelect;
     }
 
-    onCheck (keys) {
-        // console.log("111111",keys,this.featureName)
-        this.originOnCheck(keys, this.featureName);
+    onCheck (keys, info) {
+        this.originOnCheck(keys, this.featureName, info);
     }
 
     onSelect (keys) {
@@ -41,6 +40,9 @@ export default class DashPanel extends Component {
                 break;
             case 'geojsonFeature_360':
                 icClass = 'tr-allview';
+                break;
+            case 'geojsonFeature_treetype':
+                icClass = 'tr-treetype';
                 break;
         }
         return icClass;
@@ -82,8 +84,6 @@ export default class DashPanel extends Component {
 
     render () {
         let { content = [], loadData } = this.props;
-        // console.log("loadData",loadData)
-        // console.log("content",content)
         let contents = [];
         for (let j = 0; j < content.length; j++) {
             const element = content[j];
@@ -91,7 +91,14 @@ export default class DashPanel extends Component {
                 contents.push(element);
             }
         }
-        // console.log("contents",contents)
+        let defaultCheckedKeys = '';
+        let checkStatus = false;
+        if (this.featureName === 'geojsonFeature_treetype') {
+            if (contents && contents.length > 0) {
+                defaultCheckedKeys = [contents[0].key];
+                checkStatus = true;
+            }
+        }
         return (
             <div className={this.genIconClass()}>
                 {this.featureName === 'geojsonFeature_people' ? (
@@ -105,6 +112,20 @@ export default class DashPanel extends Component {
                         defaultExpandAll
                         //   checkedKeys={userCheckKeys}
                         loadData={loadData}
+                    >
+                        {contents.map(p => {
+                            return this.loop(p);
+                        })}
+                    </Tree>
+                ) : checkStatus ? (
+                    <Tree
+                        checkable
+                        showIcon
+                        onCheck={this.onCheck.bind(this)}
+                        showLine
+                        onSelect={this.onSelect.bind(this)}
+                        defaultExpandAll
+                        defaultCheckedKeys={defaultCheckedKeys}
                     >
                         {contents.map(p => {
                             return this.loop(p);

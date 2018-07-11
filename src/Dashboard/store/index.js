@@ -69,7 +69,7 @@ export const getRiskProcessDetail = createFetchAction(
     []
 ); // 获取隐患工单详情
 export const getRiskContactSheet = createFetchAction(
-    `${base}/main/api/potential-risk/{{ID}}/contact-sheet/`,
+    `${FOREST_API}/tree/patrolevent/{{ID}}`,
     []
 );
 
@@ -165,6 +165,10 @@ export const getTreeMess = createFetchAction(
     []
 );
 
+export const getUserDetail = createFetchAction(`${USER_API}/users/{{pk}}`, []);
+
+export const getTreeTypeAction = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
+
 export const actions = {
     getDimensional,
     getTreeOK,
@@ -207,7 +211,9 @@ export const actions = {
     getTreeflows,
     getNurserys,
     getCarpackbysxm,
-    getTreeMess
+    getTreeMess,
+    getUserDetail,
+    getTreeTypeAction
 };
 export default handleActions(
     {

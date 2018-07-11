@@ -162,8 +162,6 @@ export default class Header extends Component {
                             permission =>
                                 permission === `appmeta.${menu.id}.READ`
                         );
-                        console.log('permissions', permissions);
-                        console.log('menu', menu.title, has);
                         // let has = true
                         let str;
                         if (has) {

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-07-04 14:32:29
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-06 09:39:29
+ * @Last Modified time: 2018-07-10 20:04:48
  */
 /**
  *
@@ -84,15 +84,6 @@ export default class Dashboard extends Component {
                             <Route
                                 path='/dashboard/onsite'
                                 component={OnSite}
-                            />
-                        )}
-                        {Plan && (
-                            <Route path='/dashboard/plan' component={Plan} />
-                        )}
-                        {Danger && (
-                            <Route
-                                path='/dashboard/danger'
-                                component={Danger}
                             />
                         )}
                         {Project && (
