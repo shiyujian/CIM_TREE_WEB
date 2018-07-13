@@ -38,7 +38,7 @@ export default class DashPanel extends Component {
                 <TreeNode
                     title={p.Name}
                     key={p.No}
-                    // disableCheckbox={disableCheckbox}
+                    disableCheckbox={disableCheckbox}
                 >
                     {p.children &&
                         p.children.map(m => {

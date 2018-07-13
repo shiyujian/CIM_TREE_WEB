@@ -10,7 +10,7 @@
       // right: 0;
       top: 0;
       height: 100%;
-      width: 200px;
+      width: 260px;
       transition: all .3s;
       z-index: 980;
   
@@ -24,6 +24,19 @@
         color: #333;
         z-index: 999;
         overflow: auto;
+
+        .ant-tree-title{
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          width: 180px;
+        }
+        .ant-tree li .ant-tree-node-content-wrapper{
+            word-break: break-all;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            width: 270px;
+        }
       }
     }
     .drawer {
@@ -468,6 +481,12 @@
       margin-left: 20px;
       
     }
+  }
+
+  .bady :global(.ant-tree-title) {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   
   

@@ -26,11 +26,8 @@ export default class PkCodeTree extends Component {
                     <Tree
                         showLine
                         selectedKeys={[this.props.selectedKeys]}
-                        //   defaultExpandAll={true}
-                        //   autoExpandParent ={true}
                         onSelect={this.props.onSelect}
-                        showIcon={this.props.showIcon}
-                        defaultExpandedKeys={['P009', 'P010', 'P999']}
+                        // defaultExpandedKeys={['P009', 'P010', 'P999']}
                     >
                         {PkCodeTree.loop(treeData)}
                     </Tree>

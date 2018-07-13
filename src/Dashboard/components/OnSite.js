@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-12 11:45:53
+ * @Last Modified time: 2018-07-13 15:52:00
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -70,7 +70,7 @@ class OnSite extends Component {
             trackId: null,
             trackUser: null,
             menuIsExtend: true /* 菜单是否展开 */,
-            menuWidth: 200 /* 菜单宽度 */,
+            menuWidth: 260 /* 菜单宽度 */,
             risk: {},
             selectedMenu: '1',
             isVisibleMapBtn: true,
@@ -98,7 +98,7 @@ class OnSite extends Component {
             isStart: false,
             tempMenuWidth: 0,
             count: 0,
-            minWidth: 200,
+            minWidth: 260,
             maxWidth: 500
         };
         /* 现场人员 */
@@ -134,18 +134,18 @@ class OnSite extends Component {
             value: 'geojsonFeature_area',
             IconName: 'square'
         },
-        // {
-        //     label: '巡检路线',
-        //     value: 'geojsonFeature_people',
-        //     IconUrl: require('./ImageIcon/people.png'),
-        //     IconName: 'universal-access'
-        // },
-        // {
-        //     label: '安全隐患',
-        //     value: 'geojsonFeature_hazard',
-        //     IconUrl: require('./ImageIcon/danger.png'),
-        //     IconName: 'warning'
-        // },
+        {
+            label: '巡检路线',
+            value: 'geojsonFeature_people',
+            IconUrl: require('./ImageIcon/people.png'),
+            IconName: 'universal-access'
+        },
+        {
+            label: '安全隐患',
+            value: 'geojsonFeature_hazard',
+            IconUrl: require('./ImageIcon/danger.png'),
+            IconName: 'warning'
+        },
         {
             label: '树种筛选',
             value: 'geojsonFeature_treetype',
@@ -195,7 +195,6 @@ class OnSite extends Component {
                             treeData={content}
                             selectedKeys={this.state.leftkeycode}
                             onSelect={this.handleAreaSelect.bind(this)}
-                            showIcon={false}
                         />
                     );
                 case 'geojsonFeature_treetype':
@@ -282,7 +281,6 @@ class OnSite extends Component {
                 marker.addTo(this.map);
                 return marker;
             }
-
             return oldMarker;
         } else {
             // 创建区域图形
@@ -298,17 +296,6 @@ class OnSite extends Component {
                     title: geo.properties.name
                 }).addTo(this.map);
                 // 地块标注
-                // let latlng = area.getBounds().getCenter()
-                // let label = L.marker([latlng.lat, latlng.lng], {
-                //     icon: L.divIcon({
-                //         // className: this.getIconType('people'),
-                //         // className: 'label-text',
-                //         html: geo.properties.name,
-                //         iconSize: [48, 20],
-                //     }),
-                // })
-                // area.addLayer(label)
-                // area.bindTooltip(geo.properties.name).openTooltip();
                 this.map.fitBounds(area.getBounds());
 
                 return area;
@@ -1150,7 +1137,7 @@ class OnSite extends Component {
                                     );
                                 })}
                             </Collapse>
-                            <div style={{ height: '20px' }} />
+                            {/* <div style={{ height: '20px' }} /> */}
                         </aside>
                         <div
                             className='resizeSenseArea'

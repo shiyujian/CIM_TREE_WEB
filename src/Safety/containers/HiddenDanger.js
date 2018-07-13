@@ -3,17 +3,41 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import reducer, { actions } from '../store/hiddenDanger';
 import { actions as platformActions } from '_platform/store/global';
-import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import {
-    Table, Button, Row, Col, Icon, Modal, Input, message,
-    notification, DatePicker, Select, Form, Upload, Steps
+    Main,
+    Aside,
+    Body,
+    Sidebar,
+    Content,
+    DynamicTitle
+} from '_platform/components/layout';
+import {
+    Table,
+    Button,
+    Row,
+    Col,
+    Icon,
+    Modal,
+    Input,
+    message,
+    notification,
+    DatePicker,
+    Select,
+    Form,
+    Upload,
+    Steps
 } from 'antd';
 import HiddenModle from './HiddenModle';
 // import WorkPackageTree from '../components/WorkPackageTree';
 import DatumTree from '../components/DatumTree';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from '_platform/api';
+import {
+    SOURCE_API,
+    STATIC_DOWNLOAD_API,
+    WORKFLOW_CODE,
+    DefaultZoomLevel
+} from '_platform/api';
 import './Register.css';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -25,19 +49,21 @@ const Option = Select.Option;
 @connect(
     state => {
         const { safety: { hiddenDanger = {} } = {}, platform } = state;
-        return { ...hiddenDanger, platform }
+        return { ...hiddenDanger, platform };
     },
     dispatch => ({
-        actions: bindActionCreators({ ...actions, ...platformActions, ...previewActions }, dispatch)
+        actions: bindActionCreators(
+            { ...actions, ...platformActions, ...previewActions },
+            dispatch
+        )
     })
 )
-
 export default class HiddenDanger extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             isTreeSelected: false,
-            loading:false,
+            loading: false,
             dataSet: [],
             currentUnitCode: '',
             currentSteps: 0,
@@ -46,9 +72,9 @@ export default class HiddenDanger extends Component {
             modalVisible: false,
             dataSous: {},
             leafletCenter: [22.516818, 113.868495]
-        }
+        };
     }
-    componentDidMount() {
+    componentDidMount () {
         const {
             // platform: {
             //     dir:{
@@ -57,39 +83,38 @@ export default class HiddenDanger extends Component {
             // } = {},
             // Doc=[],
             keycode,
-            actions: {getTree}
+            actions: { getTree }
         } = this.props;
-        this.setState({loading:true});
-        getTree({code:Datumcode}).then(({children}) => {
-            this.setState({loading:false});
+        this.setState({ loading: true });
+        getTree({ code: Datumcode }).then(({ children }) => {
+            this.setState({ loading: false });
         });
         // let cccc=getDir({code:Datumcode});
         // console.log('cccc',cccc)
-        if(this.props.Doc){
-            this.setState({isTreeSelected:true})
+        if (this.props.Doc) {
+            this.setState({ isTreeSelected: true });
         }
-        
     }
 
-    onSearch = (value) => {
+    onSearch = value => {
         const {
-            actions: {
-                getRisk,
-            }
-        } = this.props; 
-        getRisk( ).then(rst => {
-            console.log('rst',rst)
+            actions: { getRisk }
+        } = this.props;
+        getRisk().then(rst => {
+            console.log('rst', rst);
             const { dataSet } = this.state;
             let datas = [];
             // debugger
             for (let i = 0; i < rst.content.length; i++) {
                 let data = {};
-                if(rst.content[i].ProblemType.indexOf(value) >= 0){
-                    data.problemType=rst.content[i].ProblemType;
-                    data.level='V';
-                    data.createTime=rst.content[i].CreateTime;
+                if (rst.content[i].ProblemType.indexOf(value) >= 0) {
+                    data.problemType = rst.content[i].ProblemType;
+                    data.level = 'V';
+                    data.createTime = rst.content[i].CreateTime;
                     data.status = this.getRiskState(rst.content[i].Status);
-                    data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                    data.resPeople = rst.content[i].ReorganizerObj
+                        ? rst.content[i].ReorganizerObj.Full_Name
+                        : '';
 
                     // data.riskContent = rst[i].risk_content;
                     // data.projectName = rst[i].project_location.project_name;
@@ -105,7 +130,7 @@ export default class HiddenDanger extends Component {
             }
             this.setState({ dataSet: datas });
         });
-    }
+    };
 
     // onViewClick(record, index) {
     //     const { actions: { openPreview } } = this.props;
@@ -136,26 +161,26 @@ export default class HiddenDanger extends Component {
     //     openPreview(filed);
     // }
 
-    getRiskState(status){
+    getRiskState (status) {
         switch (status) {
             case -1:
-                return "确认中"; 
+                return '确认中';
             case 0:
-                return "整改中";
+                return '整改中';
             case 1:
-                return "审核中";
+                return '审核中';
             case 2:
-                return "完成";
-            case "确认中":
+                return '完成';
+            case '确认中':
                 return -1;
-            case "整改中":
+            case '整改中':
                 return 0;
-            case "审核中":
+            case '审核中':
                 return 1;
-            case "完成":
+            case '完成':
                 return 2;
             default:
-                return "确认中";
+                return '确认中';
         }
     }
 
@@ -170,20 +195,18 @@ export default class HiddenDanger extends Component {
     //     setcurrentcode({code:code.split("--")[1]});
     //     getdocument({code:code.split("--")[1]});
     // }
-    onSelect(selectedKeys, e) {
-        console.log('selectedKeys',selectedKeys,e)
+    onSelect (selectedKeys, e) {
+        console.log('selectedKeys', selectedKeys, e);
         if (!e.selected) {
-            return
+            return;
         }
         this.setState({ currentUnitCode: selectedKeys });
         const {
-            actions: {
-                getRisk,
-            }
+            actions: { getRisk }
         } = this.props;
 
         const { currentSelectValue } = this.state;
-         getRisk( ).then(rst => {
+        getRisk().then(rst => {
             const { dataSet } = this.state;
             let datas = [];
             // debugger
@@ -193,19 +216,20 @@ export default class HiddenDanger extends Component {
                     duration: 2
                 });
                 this.setState({ dataSet: datas });
-                return;
-            }else{
+            } else {
                 for (let i = 0; i < rst.content.length; i++) {
                     let data = {};
-                    data.problemType=rst.content[i].ProblemType;
-                    data.level='V';
-                    data.createTime=rst.content[i].CreateTime;
+                    data.problemType = rst.content[i].ProblemType;
+                    data.level = 'V';
+                    data.createTime = rst.content[i].CreateTime;
                     data.status = this.getRiskState(rst.content[i].Status);
-                    data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                    data.resPeople = rst.content[i].ReorganizerObj
+                        ? rst.content[i].ReorganizerObj.Full_Name
+                        : '';
                     data.id = rst.content[i].id;
                     datas.push(data);
-                }   
-                this.setState({ dataSet: datas }); 
+                }
+                this.setState({ dataSet: datas });
             }
         });
     }
@@ -230,14 +254,12 @@ export default class HiddenDanger extends Component {
     //     }
     // }
 
-    onSelectChange = (value) => {
+    onSelectChange = value => {
         this.setState({ currentSelectValue: value });
         const {
-            actions: {
-                getRisk
-            }
+            actions: { getRisk }
         } = this.props;
-         getRisk({status:value}).then(rst => {
+        getRisk({ status: value }).then(rst => {
             const { dataSet } = this.state;
             let datas = [];
             // debugger
@@ -247,38 +269,35 @@ export default class HiddenDanger extends Component {
                     duration: 2
                 });
                 this.setState({ dataSet: datas });
-                return;
-            }else{
+            } else {
                 for (let i = 0; i < rst.content.length; i++) {
                     let data = {};
-                    data.problemType=rst.content[i].ProblemType;
-                    data.level='V';
-                    data.createTime=rst.content[i].CreateTime;
+                    data.problemType = rst.content[i].ProblemType;
+                    data.level = 'V';
+                    data.createTime = rst.content[i].CreateTime;
                     data.status = this.getRiskState(rst.content[i].Status);
-                    data.resPeople= rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                    data.resPeople = rst.content[i].ReorganizerObj
+                        ? rst.content[i].ReorganizerObj.Full_Name
+                        : '';
                     data.id = rst.content[i].id;
                     datas.push(data);
                 }
                 this.setState({ dataSet: datas });
             }
         });
-    }
+    };
 
     onDetailClick = (record, index) => {
-        const {dataSous} = this.state;
+        const { dataSous } = this.state;
         this.setState({ dataSous: record, modalVisible: true });
+    };
+
+    cancel () {
+        this.setState({ modalVisible: false });
     }
 
-    cancel() {
-        this.setState({modalVisible: false})
-    }
-
-    render() {
-        const {
-            tree=[],
-            Doc=[],
-            keycode,
-        } = this.props;
+    render () {
+        const { tree = [], Doc = [], keycode } = this.props;
         const columns = [
             {
                 title: '编号',
@@ -287,77 +306,111 @@ export default class HiddenDanger extends Component {
                 render: (text, record, index) => {
                     return <div>{index + 1}</div>;
                 }
-            }, {
+            },
+            {
                 title: '隐患内容',
                 dataIndex: 'problemType',
                 width: '10%'
-            }, {
+            },
+            {
                 title: '工程部位',
                 dataIndex: 'unitName',
                 width: '10%'
-            }, {
+            },
+            {
                 title: '等级',
                 dataIndex: 'level',
                 width: '10%'
-            }, {
+            },
+            {
                 title: '整改期限',
                 dataIndex: 'createTime',
                 width: '10%'
-            }, {
+            },
+            {
                 title: '状态',
                 dataIndex: 'status',
                 width: '10%'
-            }, {
-                title: '负责人',  
+            },
+            {
+                title: '负责人',
                 dataIndex: 'resPeople',
                 width: '10%'
-            }, {
+            },
+            {
                 title: '操作',
                 dataIndex: 'opt',
                 width: '15%',
                 render: (text, record, index) => {
-                    return <div>
-                        {/*<a href='avascript:;' onClick={this.onViewClick.bind(this,record,index)}>预览</a>
-                              <span className="ant-divider" />
-                              <a href="javascript:;" onClick={this.onDownClick.bind(this,record,index)}>下载</a>
-                              <span className="ant-divider" />*/}
-                        <a href="javascript:;" onClick={this.onDetailClick.bind(this, record, index)}>详情</a>
-                    </div>
+                    return (
+                        <div>
+                            <a
+                                href='javascript:;'
+                                onClick={this.onDetailClick.bind(
+                                    this,
+                                    record,
+                                    index
+                                )}
+                            >
+                                详情
+                            </a>
+                        </div>
+                    );
                 }
             }
         ];
 
         return (
             <div>
-                <DynamicTitle title="安全隐患" {...this.props} />
-                {/*<Sidebar>
+                <DynamicTitle title='安全隐患' {...this.props} />
+                {/* <Sidebar>
                     <WorkPackageTree {...this.props}
                         onSelect={this.onSelect.bind(this)} />
-                </Sidebar>*/}
+                </Sidebar> */}
                 <Sidebar>
-                    <DatumTree treeData={tree}
-                                selectedKeys={keycode}
-                                onSelect={this.onSelect.bind(this)}
-                                {...this.state}/>
+                    <DatumTree
+                        treeData={tree}
+                        selectedKeys={keycode}
+                        onSelect={this.onSelect.bind(this)}
+                        {...this.state}
+                    />
                 </Sidebar>
                 <Content>
                     <Row>
                         <Col>
                             <Row>
-                                <Col span={6} >
+                                <Col span={6}>
                                     <Input.Search
-                                        placeholder="请输入搜索关键词"
-                                        style={{ width: '80%', display: 'block' }}
-                                        onSearch={(value) => this.onSearch(value)}
-                                    ></Input.Search>
+                                        placeholder='请输入搜索关键词'
+                                        style={{
+                                            width: '80%',
+                                            display: 'block'
+                                        }}
+                                        onSearch={value => this.onSearch(value)}
+                                    />
                                 </Col>
-                                <Col span={6} >
-                                    <div style={{ width: '90%', marginLeft:'10%'}} >
-                                        <span style={{ fontSize: 16,marginRight:5 }}>状态</span>
+                                <Col span={6}>
+                                    <div
+                                        style={{
+                                            width: '90%',
+                                            marginLeft: '10%'
+                                        }}
+                                    >
+                                        <span
+                                            style={{
+                                                fontSize: 16,
+                                                marginRight: 5
+                                            }}
+                                        >
+                                            状态
+                                        </span>
                                         <Select
                                             defaultValue=''
-                                            style={{ width:80}}
-                                            onChange={(value) => this.onSelectChange(value)}>
+                                            style={{ width: 80 }}
+                                            onChange={value =>
+                                                this.onSelectChange(value)
+                                            }
+                                        >
                                             <Option value={-1}>确认中</Option>
                                             <Option value={0}>整改中</Option>
                                             <Option value={1}>审核中</Option>
@@ -368,27 +421,25 @@ export default class HiddenDanger extends Component {
                                 </Col>
                             </Row>
                             <Table
-                                className = 'foresttable'
+                                className='foresttable'
                                 columns={columns}
-                                dataSource = {this.state.dataSet}
+                                dataSource={this.state.dataSet}
                                 bordered
-                                style={{ marginTop: 20 }} 
+                                style={{ marginTop: 20 }}
                             />
                         </Col>
                     </Row>
-                    {this.state.modalVisible && 
-                     <HiddenModle 
-                        {...this.props} 
-                        onok = {this.onDetailClick.bind(this)} 
-                        oncancel = {this.cancel.bind(this)}
-                        data = {this.state.dataSet}
-                        dataSous = {this.state.dataSous}
-                    />}
+                    {this.state.modalVisible && (
+                        <HiddenModle
+                            {...this.props}
+                            onok={this.onDetailClick.bind(this)}
+                            oncancel={this.cancel.bind(this)}
+                            data={this.state.dataSet}
+                            dataSous={this.state.dataSous}
+                        />
+                    )}
                 </Content>
             </div>
-
         );
     }
 }
-
-

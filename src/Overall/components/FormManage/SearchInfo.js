@@ -8,108 +8,103 @@ const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 class SearchInfo extends Component {
-
-    constructor(props) {
-		super(props);
-		this.state = {
-            optionArray:[]
-		};
-	}
+    constructor (props) {
+        super(props);
+        this.state = {
+            optionArray: []
+        };
+    }
     static propType = {};
     static layout = {
         labelCol: { span: 6 },
-        wrapperCol: { span: 18 },
+        wrapperCol: { span: 18 }
     };
 
-    async componentDidMount(){
-        this.getSection()
+    async componentDidMount () {
+        this.getSection();
     }
 
-
-    async componentDidUpdate(prevProps, prevState){
+    async componentDidUpdate (prevProps, prevState) {
         const {
             selectedDir
-        }=this.props
-        
-        if(selectedDir != prevProps.selectedDir ){
-            this.getSection()
+        } = this.props;
+
+        if (selectedDir != prevProps.selectedDir) {
+            this.getSection();
         }
     }
 
-    async getSection(){
-        const{
+    async getSection () {
+        const {
             leftkeycode
-        }=this.props
-        console.log('leftkeycode',leftkeycode)
-        let user = getUser()
-        let optionArray = []
-        let sections = user.sections
-        sections = JSON.parse(sections)
-        let nameArr = []
-        if(sections && sections instanceof Array && sections.length>0){
-            let section = sections[0]
-            let code = section.split('-')
-            if(code && code.length === 3){
-
-                //获取当前标段所在的项目
-                PROJECT_UNITS.map((item)=>{
-                    if(code[0] === item.code){
-                        let units = item.units
-                        units.map((unit)=>{
-                            //获取当前标段的名字
-                            if(unit.code == section){
-                                let currentSectionName = unit.value
-                                optionArray.push(<Option key={unit.code} value={currentSectionName}>{currentSectionName}</Option>)
+        } = this.props;
+        console.log('leftkeycode', leftkeycode);
+        let user = getUser();
+        let optionArray = [];
+        let sections = user.sections;
+        sections = JSON.parse(sections);
+        let nameArr = [];
+        if (sections && sections instanceof Array && sections.length > 0) {
+            let section = sections[0];
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                PROJECT_UNITS.map((item) => {
+                    if (code[0] === item.code) {
+                        let units = item.units;
+                        units.map((unit) => {
+                            // 获取当前标段的名字
+                            if (unit.code == section) {
+                                let currentSectionName = unit.value;
+                                optionArray.push(<Option key={unit.code} value={currentSectionName}>{currentSectionName}</Option>);
                             }
-                        })
-
+                        });
                     }
-                })
+                });
             }
-        }else{
-            PROJECT_UNITS.map((project)=>{
-                if(project && project.units && project.units.length>0){
-                    let units = project.units
-                    units.map((unit)=>{
-                        if(nameArr.indexOf(unit.value) == -1){
-                            optionArray.push(<Option key={unit.code} value={unit.value}>{unit.value}</Option>)
-                            nameArr.push(unit.value)
+        } else {
+            PROJECT_UNITS.map((project) => {
+                if (project && project.units && project.units.length > 0) {
+                    let units = project.units;
+                    units.map((unit) => {
+                        if (nameArr.indexOf(unit.value) == -1) {
+                            optionArray.push(<Option key={unit.code} value={unit.value}>{unit.value}</Option>);
+                            nameArr.push(unit.value);
                         }
-                        
-                    })
+                    });
                 }
-            })
+            });
         }
         this.setState({
-            optionArray:optionArray
-        })
+            optionArray: optionArray
+        });
     }
 
-    async componentDidUpdate(prevProps,prevState){
-		const {
-			selectedDir
-		}=this.props
+    // async componentDidUpdate (prevProps, prevState) {
+    //     const {
+    //         selectedDir
+    //     } = this.props;
 
-		if(selectedDir != prevProps.selectedDir){
-			this.clear()
-        }
-	}
+    //     if (selectedDir != prevProps.selectedDir) {
+    //         this.clear();
+    //     }
+    // }
 
-    render() {
+    render () {
         const {
             form: { getFieldDecorator }
-        } = this.props
+        } = this.props;
 
-        const{
+        const {
             optionArray
-        }=this.state
+        } = this.state;
         return (
             <Form>
                 <Row>
                     <Col span={20}>
                         <Row>
                             <Col span={8}>
-                                <FormItem {...SearchInfo.layout} label='单位工程'>
+                                <FormItem {...SearchInfo.layout} label='标段'>
                                     {
                                         getFieldDecorator('ssection', {
                                             rules: [
@@ -142,7 +137,7 @@ class SearchInfo extends Component {
                                                 { required: false, message: '请输入编号' }
                                             ]
                                         })
-                                            (<Input placeholder='请输入编号' />)
+                                        (<Input placeholder='请输入编号' />)
                                     }
                                 </FormItem>
                             </Col>
@@ -156,7 +151,7 @@ class SearchInfo extends Component {
                                                 { type: 'array', required: false, message: '请选择日期' }
                                             ]
                                         })
-                                        (<RangePicker size='default' format='YYYY-MM-DD'  style={{ width: '100%', height: '100%' }} />)
+                                        (<RangePicker size='default' format='YYYY-MM-DD' style={{ width: '100%', height: '100%' }} />)
                                     }
                                 </FormItem>
                             </Col>
@@ -171,8 +166,8 @@ class SearchInfo extends Component {
                                         (<Select placeholder='请选择流程类型' allowClear>
                                             {/* <Option key={Math.random*4} value={0}>编辑中</Option>
                                             <Option key={Math.random*5} value={1}>已提交</Option> */}
-                                            <Option key={Math.random*6} value={'2'}>执行中</Option>
-                                            <Option key={Math.random*7} value={'3'}>已完成</Option>
+                                            <Option key={Math.random * 6} value={'2'}>执行中</Option>
+                                            <Option key={Math.random * 7} value={'3'}>已完成</Option>
                                             {/* <Option key={Math.random*8} value={4}>已废止</Option>
                                             <Option key={Math.random*9} value={5}>异常</Option> */}
                                         </Select>)
@@ -184,34 +179,34 @@ class SearchInfo extends Component {
                     <Col span={3} offset={1}>
                         <Row>
                             <FormItem>
-                                <Button type='Primary' onClick = {this.query.bind(this)}>查询</Button>
+                                <Button type='Primary' onClick={this.query.bind(this)}>查询</Button>
                             </FormItem>
                         </Row>
                         <Row>
                             <FormItem>
-                                <Button onClick = {this.clear.bind(this)}>清除</Button>
+                                <Button onClick={this.clear.bind(this)}>清除</Button>
                             </FormItem>
                         </Row>
                     </Col>
                 </Row>
 
             </Form>
-        )
+        );
     }
 
-    query() {
-        this.props.gettaskSchedule()
+    query () {
+        this.props.gettaskSchedule();
     }
 
-    clear(){
+    clear () {
         this.props.form.setFieldsValue({
-            ssection:undefined,
-            sname:undefined,
-            scode:undefined,
-            stimedate:undefined,
-            sstatus:undefined
-        })
-        this.props.gettaskSchedule()
+            ssection: undefined,
+            sname: undefined,
+            scode: undefined,
+            stimedate: undefined,
+            sstatus: undefined
+        });
+        this.props.gettaskSchedule();
     }
 }
 
