@@ -24,7 +24,8 @@ export default class PkCodeTree extends Component {
             <div>
                 {treeData.length ? (
                     <Tree
-                        showLine
+                        showIcon
+                        checkable
                         selectedKeys={[this.props.selectedKeys]}
                         //   defaultExpandAll={true}
                         //   autoExpandParent ={true}

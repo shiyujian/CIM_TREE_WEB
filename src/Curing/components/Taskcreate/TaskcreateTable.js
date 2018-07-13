@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import {
-    Collapse,
     Button
 } from 'antd';
 import PkCodeTree from '../PkCodeTree';
+import DashPanel from '../DashPanel';
 import '../Curing.less';
-const Panel = Collapse.Panel;
 window.config = window.config || {};
 
 export default class TaskcreateTable extends Component {
@@ -21,8 +20,11 @@ export default class TaskcreateTable extends Component {
             treeType: [],
             projectList: [],
             unitProjectList: [],
-            leftkeycode: ''
+            coordinates: [],
+            polygon: '',
+            areaLayerList: {}
         };
+        this.checkMarkers = [];
         this.tileLayer = null;
         this.tileLayer2 = null;
         this.map = null;
@@ -52,130 +54,6 @@ export default class TaskcreateTable extends Component {
     async componentDidMount () {
         this._loadAreaData();
         this._initMap();
-    }
-
-    render () {
-        return (
-            <div className='map-container'>
-                <div
-                    ref='appendBody'
-                    className='l-map r-main'
-                    onMouseUp={this._handleEndResize.bind(this)}
-                    onMouseMove={this._handleResizingMenu.bind(this)}
-                >
-                    <div
-                        className={`menuPanel ${
-                            this.state.isNotThree ? '' : 'hide'
-                        } ${
-                            this.state.menuIsExtend ? 'animExtend' : 'animFold'
-                        }`}
-                        style={
-                            this.state.menuIsExtend
-                                ? {
-                                    transform: 'translateX(0)',
-                                    width: this.state.menuWidth
-                                }
-                                : {
-                                    transform: `translateX(-${
-                                        this.state.menuWidth
-                                    }px)`,
-                                    width: this.state.menuWidth
-                                }
-                        }
-                    >
-                        <aside className='aside' draggable='false'>
-                            <Collapse
-                                defaultActiveKey={[this.options[0].value]}
-                                accordion
-                            >
-                                {this.options.map(option => {
-                                    return (
-                                        <Panel
-                                            key={option.value}
-                                            header={option.label}
-                                        >
-                                            {this._renderPanel(option)}
-                                        </Panel>
-                                    );
-                                })}
-                            </Collapse>
-                            <div style={{ height: '20px' }} />
-                        </aside>
-                        <div
-                            className='resizeSenseArea'
-                            onMouseDown={this._onStartResizeMenu.bind(this)}
-                        />
-                        {this.state.menuIsExtend ? (
-                            <div
-                                className='foldBtn'
-                                style={{ left: this.state.menuWidth }}
-                                onClick={this._extendAndFold.bind(this)}
-                            >
-                                收起
-                            </div>
-                        ) : (
-                            <div
-                                className='foldBtn'
-                                style={{ left: this.state.menuWidth }}
-                                onClick={this._extendAndFold.bind(this)}
-                            >
-                                展开
-                            </div>
-                        )}
-                    </div>
-                    {this.state.isVisibleMapBtn ? (
-                        <div className='treeControl'>
-                            {/* <iframe allowTransparency={true} className={styles.btnCtro}/> */}
-                            <div>
-                                <Button
-                                    type={
-                                        this.state.mapLayerBtnType
-                                            ? 'primary'
-                                            : 'info'
-                                    }
-                                    onClick={this._toggleTileLayer.bind(this, 1)}
-                                >
-                                    卫星图
-                                </Button>
-                                <Button
-                                    type={
-                                        this.state.mapLayerBtnType
-                                            ? 'info'
-                                            : 'primary'
-                                    }
-                                    onClick={this._toggleTileLayer.bind(this, 2)}
-                                >
-                                    地图
-                                </Button>
-                            </div>
-                        </div>
-                    ) : (
-                        ''
-                    )}
-                    <div>
-                        <div
-                            style={
-                                this.state.selectedMenu === '1' &&
-                                this.state.isNotThree
-                                    ? {}
-                                    : { display: 'none' }
-                            }
-                        >
-                            <div
-                                id='mapid'
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    borderLeft: '1px solid #ccc'
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>);
     }
 
     // 获取地块树数据
@@ -292,16 +170,33 @@ export default class TaskcreateTable extends Component {
                     rst.SmallClassName === name
             ) {
                 let noArr = rst.No.split('-');
-                let No =
-                        noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
-                if (codeArray.indexOf(No) === -1) {
+                // 为了让各个细班的code都不一样   把各个细班的code全部加入
+                // let No = noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
+                if (noArr.length !== 8) {
+                    console.log('rst', rst);
+                    return;
+                }
+                let No = noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3] + '@@' + noArr[4] + '-' + noArr[5] + '' + noArr[6] + '-' + noArr[7];
+                // if (noArr.length > 4) {
+                //     let len = noArr.length;
+                //     for (let i = 4; i < len; i++) {
+                //         if (i === 4) {
+                //             No = No + '@@' + noArr[i];
+                //         } else {
+                //             No = No + '-' + noArr[i];
+                //         }
+                //     }
+                // }
+                let screenNo = noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
+
+                if (codeArray.indexOf(screenNo) === -1) {
                     thinClassList.push({
                         Name: rst.ThinClassName
                             ? rst.ThinClassName + '细班'
                             : rst.ThinClass + '细班',
                         No: No
                     });
-                    codeArray.push(No);
+                    codeArray.push(screenNo);
                     nameArray.push(rst.ThinClassName);
                 }
             }
@@ -311,6 +206,10 @@ export default class TaskcreateTable extends Component {
 
     /* 初始化地图 */
     _initMap () {
+        let me = this;
+        const {
+            coordinates = []
+        } = this.state;
         this.map = L.map('mapid', window.config.initLeaflet);
 
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
@@ -334,79 +233,277 @@ export default class TaskcreateTable extends Component {
                 tiletype: 'wtms'
             }
         ).addTo(this.map);
-    }
 
-    _handleEndResize (e) {
-        this.menu.isStart = false;
-    }
-    _handleResizingMenu (e) {
-        if (this.menu.isStart) {
-            e.preventDefault();
-            this.menu.count++;
-            let ys = this.menu.count % 5;
-            if (ys === 0 || ys === 1 || ys === 3 || ys === 4) return; // 降低事件执行频率
-            let dx = e.clientX - this.menu.startPos;
-            let menuWidth = this.menu.tempMenuWidth + dx;
-            if (menuWidth > this.menu.maxWidth) menuWidth = this.menu.maxWidth;
-            if (menuWidth < this.menu.minWidth) menuWidth = this.menu.minWidth;
-            this.setState({ menuWidth: menuWidth });
-        }
-    }
-
-    /* 渲染菜单panel */
-    _renderPanel (option) {
-        // console.log('this.state.userCheckedKeys', this.state.userCheckedKeys);
-        let content = this._getPanelData(option.value);
-        if (option && option.value) {
-            switch (option.value) {
-                case 'geojsonFeature_area':
-                    return (
-                        <PkCodeTree
-                            treeData={content}
-                            selectedKeys={this.state.leftkeycode}
-                            onSelect={this._handleSelect.bind(this)}
-                            showIcon={false}
-                        />
-                    );
+        this.map.on('click', function (e) {
+            // coordinates.push({ Lat: e.latlng.lat, Lng: e.latlng.lng });
+            coordinates.push([e.latlng.lat, e.latlng.lng]);
+            if (me.state.polygonData) {
+                me.map.removeLayer(me.state.polygonData);
             }
-        }
+            let polygonData = L.polygon(coordinates, {
+                color: '#3388FF',
+                fillColor: '#93B9F2',
+                fillOpacity: 0.2
+            }).addTo(me.map);
+            me.setState({
+                coordinates,
+                polygonData: polygonData
+            });
+        });
     }
 
-    /* 获取对应图层数据 */
-    _getPanelData (featureName) {
-        var content = {};
-        switch (featureName) {
-            case 'geojsonFeature_area':
-                content = this.state.treeLists;
-                break;
-        }
-        return content;
+    render () {
+        const {
+            treeLists
+        } = this.state;
+        return (
+            <div className='map-container'>
+                <div
+                    ref='appendBody'
+                    className='l-map r-main'
+                    onMouseUp={this._handleEndResize.bind(this)}
+                    onMouseMove={this._handleResizingMenu.bind(this)}
+                >
+                    <div
+                        className={`menuPanel ${
+                            this.state.isNotThree ? '' : 'hide'
+                        } ${
+                            this.state.menuIsExtend ? 'animExtend' : 'animFold'
+                        }`}
+                        style={
+                            this.state.menuIsExtend
+                                ? {
+                                    transform: 'translateX(0)',
+                                    width: this.state.menuWidth
+                                }
+                                : {
+                                    transform: `translateX(-${
+                                        this.state.menuWidth
+                                    }px)`,
+                                    width: this.state.menuWidth
+                                }
+                        }
+                    >
+                        <aside className='aside' draggable='false'>
+                            <DashPanel
+                                tyle={{ height: '200px' }}
+                                onCheck={this._handleAreaCheck.bind(this)}
+                                onSelect={this._handleAreaSelect.bind(this)}
+                                content={treeLists}
+                            />
+                            <div style={{ height: '20px' }} />
+                        </aside>
+                        <div
+                            className='resizeSenseArea'
+                            onMouseDown={this._onStartResizeMenu.bind(this)}
+                        />
+                        {this.state.menuIsExtend ? (
+                            <div
+                                className='foldBtn'
+                                style={{ left: this.state.menuWidth }}
+                                onClick={this._extendAndFold.bind(this)}
+                            >
+                                收起
+                            </div>
+                        ) : (
+                            <div
+                                className='foldBtn'
+                                style={{ left: this.state.menuWidth }}
+                                onClick={this._extendAndFold.bind(this)}
+                            >
+                                展开
+                            </div>
+                        )}
+                    </div>
+                    {this.state.isVisibleMapBtn ? (
+                        <div className='treeControl'>
+                            {/* <iframe allowTransparency={true} className={styles.btnCtro}/> */}
+                            <div>
+                                <Button
+                                    type={
+                                        this.state.mapLayerBtnType
+                                            ? 'primary'
+                                            : 'info'
+                                    }
+                                    onClick={this._toggleTileLayer.bind(this, 1)}
+                                >
+                                    卫星图
+                                </Button>
+                                <Button
+                                    type={
+                                        this.state.mapLayerBtnType
+                                            ? 'info'
+                                            : 'primary'
+                                    }
+                                    onClick={this._toggleTileLayer.bind(this, 2)}
+                                >
+                                    地图
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        ''
+                    )}
+                    <div>
+                        <div
+                            style={
+                                this.state.selectedMenu === '1' &&
+                                this.state.isNotThree
+                                    ? {}
+                                    : { display: 'none' }
+                            }
+                        >
+                            <div
+                                id='mapid'
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    borderLeft: '1px solid #ccc'
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>);
     }
 
     /* 弹出信息框 */
-    _handleSelect (keys, featureName) {
+    async _handleAreaSelect (keys, info) {
+        const {
+            areaLayerList
+        } = this.state;
+        let me = this;
+        console.log('keys', keys);
+        console.log('info', info);
         const {
             actions: { getTreearea }
         } = this.props;
-        const treeNodeName =
-                featureName != null && featureName.selectedNodes.length > 0
-                    ? featureName.selectedNodes[0].props.title
-                    : '';
-
+        const treeNodeName = info && info.node && info.node.props && info.node.props.title;
+        console.log('treeNodeName', treeNodeName);
         if (this.checkMarkers.toString() !== '') {
             for (var i = 0; i <= this.checkMarkers.length - 1; i++) {
+                console.log('this.checkMarkers[i]', this.checkMarkers[i]);
                 this.map.removeLayer(this.checkMarkers[i]);
-                // this.checkMarkers[i]._leaflet_id.remove()
                 delete this.checkMarkers[i];
             }
         }
-
-        this.setState({
-            leftkeycode: keys[0]
-        });
-
         let treearea = [];
-        getTreearea({}, { no: keys[0] }).then(rst => {
+        try {
+            let rst = await getTreearea({}, { no: keys[0] });
+            if (
+                !(
+                    rst &&
+                        rst.content &&
+                        rst.content instanceof Array &&
+                        rst.content.length > 0
+                )
+            ) {
+                return;
+            }
+            let str = rst.content[0].coords;
+            var target1 = str
+                .slice(str.indexOf('(') + 3, str.indexOf(')'))
+                .split(',')
+                .map(item => {
+                    return item.split(' ').map(_item => _item - 0);
+                });
+            treearea.push(target1);
+            let message = {
+
+                key: 3,
+                type: 'Feature',
+                properties: { name: treeNodeName, type: 'area' },
+                geometry: { type: 'Polygon', coordinates: treearea }
+            };
+
+            let layer = this.createMarker(message);
+            areaLayerList[keys[0]] = layer;
+            me.setState({
+                areaLayerList
+            });
+        } catch (e) {
+            console.log('await', e);
+        }
+    }
+
+    async _handleAreaCheck (keys, info) {
+        const {
+            areaLayerList
+        } = this.state;
+        let me = this;
+        // 当前选中的节点
+        let eventKey = info.node.props.eventKey;
+        // 当前的选中状态
+        let checked = info.checked;
+        console.log('_handleAreaCheckkeys', keys);
+        console.log('_handleAreaCheckinfo', info);
+        console.log('_handleAreaCheckeventKey', eventKey);
+        console.log('_handleAreaCheckchecked', checked);
+        try {
+            // 为了让各小班的key值不一样，加入了@@，首先对key进行处理
+            let handleKey = eventKey.split('@@');
+            console.log('handleKey', handleKey);
+            // 如果选中的是细班，则直接添加图层
+            if (handleKey.length === 2) {
+                let selectKey = handleKey[0];
+                if (checked) {
+                    const treeNodeName = info && info.node && info.node.props && info.node.props.title;
+                    // 如果之前添加过，直接将添加过的再次添加，不用再次请求
+                    if (areaLayerList[selectKey]) {
+                        areaLayerList[selectKey].addTo(me.map);
+                    } else {
+                        // 如果不是添加过，需要请求数据
+                        me.addAreaLayer(selectKey, treeNodeName);
+                    }
+                } else {
+                    me.map.removeLayer(areaLayerList[selectKey]);
+                }
+            } else {
+                if (checked) {
+                    console.log('nimahi');
+                    // 如果选中的不是细班，则需要进行遍历，找到此次点击的节点，然后一个个添加
+                    let selectKeys = [];
+                    try {
+                        keys.map((key) => {
+                            let selectKey = key.split('@@');
+                            if (key.indexOf(eventKey) !== -1 && selectKey.length === 2) {
+                                selectKeys.push(selectKey[0]);
+                            }
+                        });
+                    } catch (e) {
+
+                    }
+                    console.log('selectKeys', selectKeys);
+                    // selectKeys.map((seKey) => {
+                    //     if (areaLayerList[seKey]) {
+                    //         areaLayerList[seKey].addTo(me.map);
+                    //     } else {
+                    //         me.addAreaLayer(seKey, '');
+                    //     }
+                    // });
+                } else {
+
+                }
+            }
+        } catch (e) {
+            console.log('分辨是否为细班', e);
+        }
+    }
+
+    async addAreaLayer (selectKey, treeNodeName) {
+        const {
+            areaLayerList
+        } = this.state;
+        const {
+            actions: { getTreearea }
+        } = this.props;
+        let me = this;
+        let treearea = [];
+        try {
+            let rst = await getTreearea({}, { no: selectKey });
             if (
                 !(
                     rst &&
@@ -426,7 +523,6 @@ export default class TaskcreateTable extends Component {
                     return item.split(' ').map(_item => _item - 0);
                 });
             treearea.push(target1);
-
             let message = {
                 key: 3,
                 type: 'Feature',
@@ -434,15 +530,33 @@ export default class TaskcreateTable extends Component {
                 geometry: { type: 'Polygon', coordinates: treearea }
             };
 
-            this.checkMarkers[0] = this.createMarker(
-                message,
-                this.checkMarkers[0]
-            );
-        });
-        // let selItem = this.checkMarkers[0]
-        // if (selItem) {
-        //     selItem.openPopup()
-        // }
+            let layer = this.createMarker(message);
+            areaLayerList[selectKey] = layer;
+            me.setState({
+                areaLayerList
+            });
+        } catch (e) {
+            console.log('await', e);
+        }
+    }
+
+    /* 在地图上添加marker和polygan */
+    createMarker (geo) {
+        // 创建区域图形
+        console.log('geo', geo);
+        let area = L.geoJson(geo, {
+            style: {
+                fillColor: this.fillAreaColor(geo.key),
+                weight: 1,
+                opacity: 1,
+                color: '#201ffd',
+                fillOpacity: 0.3
+            },
+            title: geo.properties.name
+        }).addTo(this.map);
+        this.map.fitBounds(area.getBounds());
+        console.log('area', area);
+        return area;
     }
 
     /* 菜单展开收起 */
@@ -466,5 +580,71 @@ export default class TaskcreateTable extends Component {
             TileLayerUrl: this.tileUrls[index],
             mapLayerBtnType: !this.state.mapLayerBtnType
         });
+    }
+
+    _handleEndResize (e) {
+        this.menu.isStart = false;
+    }
+    _handleResizingMenu (e) {
+        if (this.menu.isStart) {
+            e.preventDefault();
+            this.menu.count++;
+            let ys = this.menu.count % 5;
+            if (ys === 0 || ys === 1 || ys === 3 || ys === 4) return; // 降低事件执行频率
+            let dx = e.clientX - this.menu.startPos;
+            let menuWidth = this.menu.tempMenuWidth + dx;
+            if (menuWidth > this.menu.maxWidth) menuWidth = this.menu.maxWidth;
+            if (menuWidth < this.menu.minWidth) menuWidth = this.menu.minWidth;
+            this.setState({ menuWidth: menuWidth });
+        }
+    }
+
+    fillAreaColor (index) {
+        let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
+        return colors[index % 5];
+    }
+
+    genPopUpContent (geo) {
+        const { properties = {} } = geo;
+        switch (geo.type) {
+            case 'people': {
+                return `<div class="popupBox">
+						<h2><span>姓名：</span>${properties.name}</h2>
+						<h2><span>所属单位：</span>${properties.organization}</h2>
+						<h2><span>联系方式：</span>${properties.person_telephone}</h2>
+						<h2><span>标段：</span>${properties.sectionName}</h2>
+					</div>`;
+            }
+            case 'danger': {
+                return `<div>
+						<h2><span>隐患内容：</span>${properties.name}</h2>
+                        <h2><span>隐患类型：</span>${properties.riskType}</h2>
+                        <h2><span>隐患描述：</span>${properties.Problem}</h2>
+						<h2><span>整改状态：</span>${properties.status}</h2>
+                        <h2 class="btnRow">
+                            <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
+                        </h2>
+					</div>`;
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+
+    // 获取对应的ICON
+    getIconType (type) {
+        switch (type) {
+            case 'people':
+                return 'peopleIcon';
+            case 'safety':
+                return 'cameraIcon';
+            case 'danger':
+                return 'dangerIcon';
+            case 'tree':
+                return 'treeIcon';
+            default:
+                break;
+        }
     }
 }

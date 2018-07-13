@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-11 15:15:26
+ * @Last Modified time: 2018-07-12 11:45:53
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -248,9 +248,7 @@ class OnSite extends Component {
                         <h2><span>隐患描述：</span>${properties.Problem}</h2>
 						<h2><span>整改状态：</span>${properties.status}</h2>
                         <h2 class="btnRow">
-                            <a href="javascript:;" class="btnViewRisk" data-id=${
-    geo.key
-}>查看详情</a>
+                            <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
                         </h2>
 					</div>`;
             }
@@ -287,9 +285,6 @@ class OnSite extends Component {
 
             return oldMarker;
         } else {
-            /**
-             * 增加安全隐患前代码
-             */
             // 创建区域图形
             if (!oldMarker) {
                 let area = L.geoJson(geo, {
@@ -2172,10 +2167,6 @@ class OnSite extends Component {
     }
     //  切换标签页
     tabChange (key) {
-    }
-    /* 退出轨迹查看 */
-    exitTrack () {
-        this.setState({ isShowTrack: false });
     }
     // 退出隐患详情查看
     exitRiskDetail () {
