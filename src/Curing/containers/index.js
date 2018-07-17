@@ -1,3 +1,4 @@
-export Taskcreate from './Taskcreate';
-export Taskreport from './Taskreport';
-export Taskstatis from './Taskstatis';
+export TaskCreate from './TaskCreate';
+export TaskReport from './TaskReport';
+export TaskStatis from './TaskStatis';
+export TaskTeam from './TaskTeam';

@@ -16,7 +16,7 @@ import { TaskcreateTable } from '../components/Taskcreate';
         )
     })
 )
-export default class Taskcreate extends Component {
+export default class TaskCreate extends Component {
     render () {
         return <TaskcreateTable {...this.props} />;
     }

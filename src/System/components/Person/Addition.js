@@ -63,6 +63,10 @@ class Addition extends Component {
                 name: '业主角色',
                 value: roles.filter(role => role.grouptype === 3)
             });
+            systemRoles.push({
+                name: '养护角色',
+                value: roles.filter(role => role.grouptype === 4)
+            });
         } else {
             for (let i = 0; i < user.groups.length; i++) {
                 const rolea = user.groups[i].grouptype;
@@ -93,6 +97,12 @@ class Addition extends Component {
                         systemRoles.push({
                             name: '业主角色',
                             value: roles.filter(role => role.grouptype === 3)
+                        });
+                        break;
+                    case 4:
+                        systemRoles.push({
+                            name: '养护角色',
+                            value: roles.filter(role => role.grouptype === 4)
                         });
                         break;
                     default:

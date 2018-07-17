@@ -16,7 +16,7 @@ import { TaskreportTable } from '../components/Taskreport';
         )
     })
 )
-export default class Taskreport extends Component {
+export default class TaskReport extends Component {
     render () {
         return <TaskreportTable {...this.props} />;
     }

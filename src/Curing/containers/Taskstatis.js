@@ -16,7 +16,7 @@ import { TaskstatisTable } from '../components/Taskstatis';
         )
     })
 )
-export default class Taskstatis extends Component {
+export default class TaskStatis extends Component {
     render () {
         return <TaskstatisTable {...this.props} />;
     }

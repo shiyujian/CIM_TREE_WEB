@@ -143,7 +143,7 @@ export default class Header extends Component {
         const { username = '', name = '', is_superuser = false } = getUser();
         let permissions = getPermissions() || [];
         // permissions.splice(4,1,"appmeta.PROJECT.NURSERY.NONE.READ");
-        // console.log('permissions333',permissions)
+        // console.log('permissions333', permissions);
         return (
             <header className='header'>
                 <a className='head-logo' href='/'>
@@ -171,16 +171,23 @@ export default class Header extends Component {
 									进行处理变换成子模块的路径
 									*/
                                 for (var i = 0; i < permissions.length; i++) {
-                                    if (
-                                        permissions[i].indexOf(menu.id) !==
-                                            -1 &&
-                                        permissions[i] !==
-                                            `appmeta.${menu.id}.READ` &&
-                                        permissions[i].indexOf(`.NONE.READ`) ==
-                                            -1
-                                    ) {
-                                        str = permissions[i];
-                                        break;
+                                    try {
+                                        let missArr = permissions[i].split('.');
+                                        if (missArr[0] === 'appmeta' && missArr[1] === menu.id) {
+                                            if (
+                                                permissions[i].indexOf(menu.id) !==
+                                                    -1 &&
+                                                permissions[i] !==
+                                                    `appmeta.${menu.id}.READ` &&
+                                                permissions[i].indexOf(`.NONE.READ`) ===
+                                                    -1
+                                            ) {
+                                                str = permissions[i];
+                                                break;
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.log('e', e);
                                     }
                                 }
                                 if (str !== undefined) {

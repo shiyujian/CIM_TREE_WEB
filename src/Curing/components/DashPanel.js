@@ -13,7 +13,6 @@ export default class DashPanel extends Component {
     }
 
     onCheck (keys, info) {
-        console.log('yeye:', keys, info);
         this.originOnCheck(keys, info);
     }
 
@@ -52,7 +51,6 @@ export default class DashPanel extends Component {
     render () {
         let { content = [] } = this.props;
         const that = this;
-        console.log('wawa:', content);
         let contents = [];
         for (let j = 0; j < content.length; j++) {
             const element = content[j];

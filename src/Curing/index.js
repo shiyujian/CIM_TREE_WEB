@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-07-04 14:32:29
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-06 09:40:01
+ * @Last Modified time: 2018-07-16 16:02:58
  */
 /**
  *
@@ -43,7 +43,7 @@ export default class Curing extends Component {
     }
 
     render () {
-        const { Taskcreate, Taskreport, Taskstatis } = this.state || {};
+        const { TaskCreate, TaskReport, TaskStatis, TaskTeam } = this.state || {};
         return (
             <div style={{ display: 'flex' }}>
                 <Aside style={{ overflow: 'hidden' }}>
@@ -55,22 +55,28 @@ export default class Curing extends Component {
                 </Aside>
                 <Main>
                     <Switch>
-                        {Taskcreate && (
+                        {TaskCreate && (
                             <Route
                                 path='/curing/taskcreate'
-                                component={Taskcreate}
+                                component={TaskCreate}
                             />
                         )}
-                        {Taskreport && (
+                        {TaskReport && (
                             <Route
                                 path='/curing/taskreport'
-                                component={Taskreport}
+                                component={TaskReport}
                             />
                         )}
-                        {Taskstatis && (
+                        {TaskStatis && (
                             <Route
                                 path='/curing/taskstatis'
-                                component={Taskstatis}
+                                component={TaskStatis}
+                            />
+                        )}
+                        {TaskTeam && (
+                            <Route
+                                path='/curing/taskteam'
+                                component={TaskTeam}
                             />
                         )}
                     </Switch>
@@ -98,6 +104,12 @@ export default class Curing extends Component {
             path: '/curing/taskstatis',
             name: '任务统计',
             icon: <Icon name='file-text' />
+        }, {
+            key: 'TASKTEAM',
+            id: 'CURING.TASKTEAM',
+            path: '/curing/taskteam',
+            name: '养护班组',
+            icon: <Icon name='users' />
         }
     ];
     static defaultOpenKeys = ['TASKCREATE'];
