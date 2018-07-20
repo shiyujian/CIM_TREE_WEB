@@ -1,5 +1,4 @@
-import './Curing.less';
-import { PROJECT_UNITS } from '_platform/api';
+import './OnSite.less';
 
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {
@@ -90,31 +89,6 @@ export const getThinClass = (smallClass, list) => {
     }
 
     return thinClassList;
-};
-
-// 获取标段名称
-export const getSectionName = (section) => {
-    let sectionName = '';
-    try {
-        let arr = section.split('-');
-        if (arr && arr.length === 3) {
-            PROJECT_UNITS.map(project => {
-                if (project.code === arr[0]) {
-                    let units = project.units;
-                    sectionName = project.value;
-                    units.map(unit => {
-                        if (unit.code === section) {
-                            sectionName =
-                            sectionName + unit.value;
-                        }
-                    });
-                }
-            });
-        }
-    } catch (e) {
-        console.log('e', e);
-    }
-    return sectionName;
 };
 // 点击地图上的图标展示的内容
 export const genPopUpContent = (geo) => {

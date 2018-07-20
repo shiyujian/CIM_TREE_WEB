@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import {
-    Button, Modal
+    Button
 } from 'antd';
 import DashPanel from '../DashPanel';
-import {getThinClass, getSmallClass, fillAreaColor} from '../auth';
+import {getThinClass, getSmallClass, fillAreaColor, getSectionName} from '../auth';
 import TaskCreateModal from './TaskCreateModal';
 import '../Curing.less';
 window.config = window.config || {};
 
-export default class TaskcreateTable extends Component {
+export default class TaskCreateTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -18,16 +18,23 @@ export default class TaskcreateTable extends Component {
             isVisibleMapBtn: true,
             mapLayerBtnType: true,
             selectedMenu: '1',
-            treeType: [],
-            projectList: [],
-            unitProjectList: [],
-            coordinates: [],
-            polygon: '',
-            areaLayerList: {},
-            createBtnVisible: false,
-            polygonData: ''
+            projectList: [], // 区域地块项目级数据
+            unitProjectList: [], // 区域地块区块级数据
+            coordinates: [], // 圈选地图各个点的坐标
+            areaLayerList: {}, // 选择各个细班的图层列表
+            createBtnVisible: false, // 先建任务Modal的可视
+            polygonData: '', // 全选地图图层
+            centerPoint: '', // 全选地图的中心点
+            treeNum: 0, // 圈选地图内的树木数量
+            regionThinClass: [], // 圈选地图内的细班
+            totalThinClass: [], // 全部细班
+            regionThinName: '', // 圈选区域内的细班名称
+            regionThinNo: '', // 圈选区域内的细班code
+            regionSectionNo: '', // 圈选区域内的标段code
+            regionSectionName: '', // 圈选区域内的标段名称
+            wkt: ''
+
         };
-        this.checkMarkers = [];
         this.tileLayer = null;
         this.tileLayer2 = null;
         this.map = null;
@@ -55,10 +62,11 @@ export default class TaskcreateTable extends Component {
     };
 
     async componentDidMount () {
+        // 获取地块树数据
         this._loadAreaData();
+        // 初始化地图
         this._initMap();
     }
-
     // 获取地块树数据
     async _loadAreaData () {
         const {
@@ -101,21 +109,31 @@ export default class TaskcreateTable extends Component {
                     });
                 }
             }
-            unitProjectList.map(async section => {
-                let list = await getLittleBan({ no: section.No });
+            let totalThinClass = [];
+            unitProjectList.map(async unitProject => {
+                let list = await getLittleBan({ no: unitProject.No });
                 let smallClassList = getSmallClass(list);
+                let unitProjectThinArr = [];
                 smallClassList.map(smallClass => {
                     let thinClassList = getThinClass(smallClass, list);
+
+                    unitProjectThinArr = unitProjectThinArr.concat(thinClassList);
                     smallClass.children = thinClassList;
                 });
-                section.children = smallClassList;
-                this.setState({ treeLists: projectList });
+                totalThinClass.push({
+                    unitProject: unitProject.No,
+                    thinClass: unitProjectThinArr
+                });
+                unitProject.children = smallClassList;
+                this.setState({
+                    treeLists: projectList,
+                    totalThinClass
+                });
             });
         } catch (e) {
             console.log(e);
         }
     }
-
     /* 初始化地图 */
     _initMap () {
         let me = this;
@@ -159,18 +177,32 @@ export default class TaskcreateTable extends Component {
             if (me.state.polygonData) {
                 me.map.removeLayer(me.state.polygonData);
             }
+            if (me.state.centerPoint) {
+                me.map.removeLayer(me.state.centerPoint);
+            }
             let polygonData = L.polygon(coordinates, {
                 color: 'white',
                 fillColor: '#93B9F2',
                 fillOpacity: 0.2
             }).addTo(me.map);
+            console.log('polygonData', polygonData);
+            // let test = polygonData.getCenter();
+            // // debugger;
+            // console.log('test', test);
+            // console.log('[test.lat, test.lng]', [test.lat, test.lng]);
+            // let centerPoint = L.polygon([[test.lat, test.lng]], {
+            //     color: 'red',
+            //     fillColor: '#93B9F2',
+            //     fillOpacity: 0.2
+            // }).addTo(me.map);
+
             me.setState({
                 coordinates,
                 polygonData: polygonData
+                // centerPoint
             });
         });
     }
-
     render () {
         const {
             treeLists,
@@ -178,7 +210,7 @@ export default class TaskcreateTable extends Component {
             taskModalVisible
         } = this.state;
         return (
-            <div className='map-container'>
+            <div className='Curing-container'>
                 <div
                     ref='appendBody'
                     className='l-map r-main'
@@ -310,10 +342,10 @@ export default class TaskcreateTable extends Component {
             </div>);
     }
 
-    /* 弹出信息框 */
+    /* 选中节点 */
     async _handleAreaSelect (keys, info) {
     }
-
+    // 选择细班是否展示数据，或是隐藏数据
     async _handleAreaCheck (keys, info) {
         const {
             areaLayerList
@@ -323,8 +355,10 @@ export default class TaskcreateTable extends Component {
         let eventKey = info.node.props.eventKey;
         // 当前的选中状态
         let checked = info.checked;
+        console.log('eventKey', eventKey);
+        console.log('keys', keys);
         try {
-            // 为了让各小班的key值不一样，加入了@@，首先对key进行处理
+            // 选中节点对key进行处理
             let handleKey = eventKey.split('-');
             // 如果选中的是细班，则直接添加图层
             if (handleKey.length === 5) {
@@ -336,7 +370,7 @@ export default class TaskcreateTable extends Component {
                         me.map.fitBounds(areaLayerList[eventKey].getBounds());
                     } else {
                         // 如果不是添加过，需要请求数据
-                        me.addAreaLayer(eventKey, treeNodeName);
+                        me._addAreaLayer(eventKey, treeNodeName);
                     }
                 } else {
                     me.map.removeLayer(areaLayerList[eventKey]);
@@ -345,23 +379,24 @@ export default class TaskcreateTable extends Component {
                 if (checked) {
                     // 如果选中的不是细班，则需要进行遍历，找到此次点击的节点，然后一个个添加
                     let selectKeys = [];
+                    const treeNodeName = info && info.node && info.node.props && info.node.props.title;
                     try {
                         keys.map((key) => {
-                            let selectKey = key.split('@@');
-                            if (key.indexOf(eventKey) !== -1 && selectKey.length === 2) {
-                                selectKeys.push(selectKey[0]);
+                            let selectKey = key.split('#');
+                            // if (key.indexOf(eventKey) !== -1 && selectKey.length === 2) {
+                            //     selectKeys.push(selectKey[0]);
+                            // }
+                            if (selectKey.length <= 1) {
+                                selectKeys.push(key);
                             }
+                        });
+                        console.log('selectKeys', selectKeys);
+                        selectKeys.map((selectKey) => {
+                            me._addAreaLayer(selectKey, treeNodeName);
                         });
                     } catch (e) {
 
                     }
-                    // selectKeys.map((seKey) => {
-                    //     if (areaLayerList[seKey]) {
-                    //         areaLayerList[seKey].addTo(me.map);
-                    //     } else {
-                    //         me.addAreaLayer(seKey, '');
-                    //     }
-                    // });
                 } else {
 
                 }
@@ -370,13 +405,15 @@ export default class TaskcreateTable extends Component {
             console.log('分辨是否为细班', e);
         }
     }
-
-    async addAreaLayer (eventKey, treeNodeName) {
+    // 选中细班，则在地图上加载细班图层
+    async _addAreaLayer (eventKey, treeNodeName) {
         const {
             areaLayerList
         } = this.state;
         const {
-            actions: { getTreearea }
+            actions: {
+                getTreearea
+            }
         } = this.props;
         let handleKey = eventKey.split('-');
         let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
@@ -413,7 +450,7 @@ export default class TaskcreateTable extends Component {
                 geometry: { type: 'Polygon', coordinates: treearea }
             };
 
-            let layer = this.createMarker(message);
+            let layer = this._createMarker(message);
             areaLayerList[eventKey] = layer;
             me.setState({
                 areaLayerList
@@ -423,7 +460,7 @@ export default class TaskcreateTable extends Component {
         }
     }
     /* 在地图上添加marker和polygan */
-    createMarker (geo) {
+    _createMarker (geo) {
         // 创建区域图形
         let area = L.geoJson(geo, {
             style: {
@@ -439,10 +476,124 @@ export default class TaskcreateTable extends Component {
         return area;
     }
     // 确定圈选地图
-    _handleCreateTaskOk = () => {
-        this.setState({
-            taskModalVisible: true
-        });
+    _handleCreateTaskOk = async () => {
+        const {
+            actions: {
+                getTreeLocationNumByRegion, // 查询圈选地图内的树木数量
+                getThinClassesByRegion // 查询圈选地图内的细班
+            }
+        } = this.props;
+        const {
+            coordinates,
+            totalThinClass
+        } = this.state;
+        try {
+            let wkt = '';
+            if (coordinates && coordinates.length >= 3) {
+                let len = coordinates.length;
+                for (let i = 0; i < coordinates.length; i++) {
+                    if (i === 0) {
+                        wkt = 'POLYGON((' + wkt + coordinates[i][1] + ' ' + coordinates[i][0] + ',';
+                    } else if (i === len - 1) {
+                        wkt = wkt + coordinates[i][1] + ' ' + coordinates[i][0] + ',' + coordinates[0][1] + ' ' + coordinates[0][0] + '))';
+                    } else {
+                        wkt = wkt + coordinates[i][1] + ' ' + coordinates[i][0] + ',';
+                    }
+                }
+                console.log('coordinates', coordinates);
+                console.log('totalThinClass', totalThinClass);
+                console.log('wkt', wkt);
+                // let treeNum = await getTreeLocationNumByRegion({wkt: wkt});
+                let regionThinClass = await getThinClassesByRegion({wkt: wkt});
+                let regionData = await this._getThinClassName(regionThinClass);
+                console.log('regionData', regionData);
+                let regionThinName = regionData.regionThinName;
+                let regionThinNo = regionData.regionThinNo;
+                let regionSectionNo = regionData.regionSectionNo;
+                let regionSectionName = regionData.regionSectionName;
+                this.setState({
+                    taskModalVisible: true,
+                    wkt,
+                    // treeNum,
+                    regionData,
+                    regionThinName,
+                    regionThinNo,
+                    regionSectionNo,
+                    regionSectionName
+                });
+            }
+        } catch (e) {
+            console.log('树木数量', e);
+        }
+    }
+    // 查找区域内的细班的名称
+    _getThinClassName = async (regionThinClass) => {
+        const {
+            totalThinClass
+        } = this.state;
+
+        let thinNoList = [];
+        let regionThinNo = '';
+        let regionThinName = '';
+        let regionSectionNo = '';
+        let regionSectionName = '';
+        try {
+            regionThinClass.map((thinData, index) => {
+                let section = thinData.Section;
+                let thinNo = thinData.no;
+                let pushState = true;
+                // 获取的thinNo可能又会重复的，需要进行处理
+                thinNoList.map((data) => {
+                    if (data === thinNo) {
+                        pushState = false;
+                    }
+                });
+                if (!pushState) {
+                    return;
+                }
+                thinNoList.push(thinNo);
+                totalThinClass.map((unitProjectData) => {
+                    let unitProject = unitProjectData.unitProject;
+                    // 首先根据区块找到对应的细班list
+                    if (section.indexOf(unitProject) !== -1) {
+                        let children = unitProjectData.thinClass;
+                        children.map((child) => {
+                            // tree结构的数据经过了处理，需要和api获取的数据调整一致
+                            let handleKey = child.No.split('-');
+                            let childNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                            let childSection = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+                            if (childNo.indexOf(thinNo) !== -1 && childSection === section) {
+                                // 找到符合条件的数据的name
+                                let name = child.Name;
+                                let sectionName = getSectionName(section);
+                                regionSectionNo = section;
+                                regionSectionName = sectionName;
+                                if (index === 0) {
+                                    regionThinName = regionThinName + name;
+                                    regionThinNo = regionThinNo + thinNo;
+                                } else {
+                                    regionThinName = regionThinName + ' ,' + name;
+                                    regionThinNo = regionThinNo + ' ,' + thinNo;
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        } catch (e) {
+            console.log('细班名称', e);
+        }
+        let regionData = {
+            regionThinName: regionThinName,
+            regionThinNo: regionThinNo,
+            regionSectionNo: regionSectionNo,
+            regionSectionName: regionSectionName
+        };
+        console.log('regionThinName', regionThinName);
+        console.log('regionThinNo', regionThinNo);
+        console.log('regionSectionNo', regionSectionNo);
+        console.log('regionSectionName', regionSectionName);
+        return regionData;
     }
     // 撤销圈选图层
     _handleCreateTaskCancel =() => {

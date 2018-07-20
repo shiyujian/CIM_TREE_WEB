@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store';
+import * as actions from '../store/taskCreate';
 import { actions as platformActions } from '_platform/store/global';
-import { TaskcreateTable } from '../components/Taskcreate';
+import { TaskCreateTable } from '../components/TaskCreate';
 @connect(
     state => {
-        const { platform } = state;
-        return { platform };
+        const {
+            curing: { taskCreate = {} },
+            platform
+        } = state;
+        return { ...taskCreate, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -18,6 +21,6 @@ import { TaskcreateTable } from '../components/Taskcreate';
 )
 export default class TaskCreate extends Component {
     render () {
-        return <TaskcreateTable {...this.props} />;
+        return <TaskCreateTable {...this.props} />;
     }
 }

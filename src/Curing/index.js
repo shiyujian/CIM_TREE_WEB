@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-07-04 14:32:29
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-16 16:02:58
+ * @Last Modified time: 2018-07-17 21:18:30
  */
 /**
  *
@@ -28,7 +28,7 @@
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { Aside, Main } from '_platform/components/layout';
+import { Aside, Main, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import { Icon } from 'react-fa';
 
@@ -45,8 +45,8 @@ export default class Curing extends Component {
     render () {
         const { TaskCreate, TaskReport, TaskStatis, TaskTeam } = this.state || {};
         return (
-            <div style={{ display: 'flex' }}>
-                <Aside style={{ overflow: 'hidden' }}>
+            <Body >
+                <Aside >
                     <Submenu
                         {...this.props}
                         menus={Curing.menus}
@@ -81,7 +81,7 @@ export default class Curing extends Component {
                         )}
                     </Switch>
                 </Main>
-            </div>
+            </Body>
         );
     }
 

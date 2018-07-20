@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Select } from 'antd';
 import { getUser } from '_platform/auth';
+export const CuringDocCode = window.DeathCode.CURING_TEAM;
 const Option = Select.Option;
 
 export default class PersonTree extends Component {
@@ -8,13 +9,15 @@ export default class PersonTree extends Component {
         super(props);
         this.state = {
             UserOptions: [],
-            users: []
+            users: [],
+            docList: [],
+            optionArr: []
         };
     }
 
     async componentDidMount () {
         const {
-            actions: { getUsers, getRoles }
+            actions: { getCuringGroup }
         } = this.props;
         let user = getUser();
         let sections = user.sections;
@@ -22,43 +25,29 @@ export default class PersonTree extends Component {
         if (!(sections && sections instanceof Array && sections.length > 0)) {
             return;
         }
-        let role = await getRoles();
-        const curingRoles = role.filter(rst => rst.grouptype === 4);
-        let roles = curingRoles.map(item => { return item.id; });
-        console.log('roles', roles);
-        try {
-            let postdata = {};
-            postdata = {
-                roles: roles,
-                sections: sections,
-                is_active: true
-            };
-
-            let users = await getUsers({}, postdata);
-            console.log('users', users);
-            let UserOptions = users.map((user) => {
-                return (<Option key={user.id} value={String(user.id)} title={user.account.person_name + '-' + '(' + user.username + ')'}>
-                    {user.account.person_name + '-' + '(' + user.username + ')' }
-                </Option>);
+        let section = sections[0];
+        let taskTeams = await getCuringGroup({}, {section: section});
+        console.log('taskTeams', taskTeams);
+        if (taskTeams && taskTeams instanceof Array && taskTeams.length > 0) {
+            let optionArr = taskTeams.map((team) => {
+                return <Option key={team.ID} value={JSON.stringify(team)} title={team.GroupName}>{team.GroupName}</Option>;
             });
+            console.log('optionArr', optionArr);
             this.setState({
-                users,
-                UserOptions
+                optionArr
             });
-        } catch (error) {
-            console.log(error);
         }
     };
 
     render () {
         const {
-            UserOptions
+            optionArr
         } = this.state;
         return (
             <Select
                 style={{ width: '100%' }}
                 showSearch
-                allowClear
+                // allowClear
                 optionFilterProp='children'
                 filterOption={(input, option) =>
                     option.props.children
@@ -67,10 +56,14 @@ export default class PersonTree extends Component {
                             input.toLowerCase()
                         ) >= 0
                 }
-                mode='multiple'
+                onSelect={this._handleSelectPer.bind(this)}
             >
-                {UserOptions}
+                {optionArr}
             </Select>
         );
+    }
+
+    _handleSelectPer (value) {
+        this.props.onSelect(value);
     }
 }

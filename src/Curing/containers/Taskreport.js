@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store';
+import * as actions from '../store/taskCreate';
 import { actions as platformActions } from '_platform/store/global';
-import { TaskreportTable } from '../components/Taskreport';
+import { TaskReportTable } from '../components/TaskReport';
 @connect(
     state => {
         const { platform } = state;
@@ -18,6 +18,6 @@ import { TaskreportTable } from '../components/Taskreport';
 )
 export default class TaskReport extends Component {
     render () {
-        return <TaskreportTable {...this.props} />;
+        return <TaskReportTable {...this.props} />;
     }
 }

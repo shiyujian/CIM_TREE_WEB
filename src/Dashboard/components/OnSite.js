@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-13 15:52:00
+ * @Last Modified time: 2018-07-19 14:41:52
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -31,6 +31,7 @@ import DashPanel from './DashPanel';
 import RiskDetail from './RiskDetail';
 import moment from 'moment';
 import PkCodeTree from './PkCodeTree';
+import {getThinClass, getSmallClass, fillAreaColor} from './auth';
 const TabPane = Tabs.TabPane;
 const { RangePicker } = DatePicker;
 
@@ -83,7 +84,8 @@ class OnSite extends Component {
             mapList: {}, // 轨迹列表
             isShowRisk: false,
             treeTypes: [],
-            treeLayerList: {}
+            treeLayerList: {}, // 树种图层list
+            areaLayerList: {} // 区域地块图层list
         };
         this.checkMarkers = [];
         this.tileLayer = null;
@@ -134,18 +136,18 @@ class OnSite extends Component {
             value: 'geojsonFeature_area',
             IconName: 'square'
         },
-        {
-            label: '巡检路线',
-            value: 'geojsonFeature_people',
-            IconUrl: require('./ImageIcon/people.png'),
-            IconName: 'universal-access'
-        },
-        {
-            label: '安全隐患',
-            value: 'geojsonFeature_hazard',
-            IconUrl: require('./ImageIcon/danger.png'),
-            IconName: 'warning'
-        },
+        // {
+        //     label: '巡检路线',
+        //     value: 'geojsonFeature_people',
+        //     IconUrl: require('./ImageIcon/people.png'),
+        //     IconName: 'universal-access'
+        // },
+        // {
+        //     label: '安全隐患',
+        //     value: 'geojsonFeature_hazard',
+        //     IconUrl: require('./ImageIcon/danger.png'),
+        //     IconName: 'warning'
+        // },
         {
             label: '树种筛选',
             value: 'geojsonFeature_treetype',
@@ -158,6 +160,16 @@ class OnSite extends Component {
         let content = this.getPanelData(option.value);
         if (option && option.value) {
             switch (option.value) {
+                // 区域地块
+                case 'geojsonFeature_area':
+                    return (
+                        <PkCodeTree
+                            treeData={content}
+                            selectedKeys={this.state.leftkeycode}
+                            onSelect={this.handleAreaSelect.bind(this)}
+                        />
+                    );
+                // 巡检路线
                 case 'geojsonFeature_people':
                     return (
                         <div>
@@ -179,6 +191,7 @@ class OnSite extends Component {
                             />
                         </div>
                     );
+                // 安全隐患
                 case 'geojsonFeature_hazard':
                     return (
                         <DashPanel
@@ -189,14 +202,7 @@ class OnSite extends Component {
                             featureName={option.value}
                         />
                     );
-                case 'geojsonFeature_area':
-                    return (
-                        <PkCodeTree
-                            treeData={content}
-                            selectedKeys={this.state.leftkeycode}
-                            onSelect={this.handleAreaSelect.bind(this)}
-                        />
-                    );
+                // 树种筛选
                 case 'geojsonFeature_treetype':
                     return (
                         <DashPanel
@@ -448,9 +454,9 @@ class OnSite extends Component {
             }
             unitProjectList.map(async section => {
                 let list = await getLittleBan({ no: section.No });
-                let smallClassList = this.getSmallClass(list);
+                let smallClassList = getSmallClass(list);
                 smallClassList.map(smallClass => {
-                    let thinClassList = this.getThinClass(smallClass, list);
+                    let thinClassList = getThinClass(smallClass, list);
                     smallClass.children = thinClassList;
                 });
                 section.children = smallClassList;
@@ -460,76 +466,76 @@ class OnSite extends Component {
             console.log('获取地块树数据', e);
         }
     }
-    // 小班排列
-    getSmallClass (smallClassList) {
-        // 将小班的code获取到，进行去重
-        let uniqueSmallClass = [];
-        // 进行数组去重的数组
-        let array = [];
+    // // 小班排列
+    // getSmallClass (smallClassList) {
+    //     // 将小班的code获取到，进行去重
+    //     let uniqueSmallClass = [];
+    //     // 进行数组去重的数组
+    //     let array = [];
 
-        let test = [];
-        smallClassList.map(list => {
-            // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
-            let codeName =
-                list.LandNo +
-                '#' +
-                list.RegionNo +
-                '#' +
-                list.SmallClass +
-                '#' +
-                list.SmallClassName;
-            if (list.SmallClass && array.indexOf(codeName) === -1) {
-                uniqueSmallClass.push({
-                    Name: list.SmallClassName
-                        ? list.SmallClassName + '小班'
-                        : list.SmallClass + '小班',
-                    No: codeName
-                });
-                array.push(codeName);
-            } else {
-                test.push({
-                    SmallClassName: list.SmallClassName,
-                    SmallClass: list.SmallClass
-                });
-            }
-        });
-        return uniqueSmallClass;
-    }
+    //     let test = [];
+    //     smallClassList.map(list => {
+    //         // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
+    //         let codeName =
+    //             list.LandNo +
+    //             '#' +
+    //             list.RegionNo +
+    //             '#' +
+    //             list.SmallClass +
+    //             '#' +
+    //             list.SmallClassName;
+    //         if (list.SmallClass && array.indexOf(codeName) === -1) {
+    //             uniqueSmallClass.push({
+    //                 Name: list.SmallClassName
+    //                     ? list.SmallClassName + '小班'
+    //                     : list.SmallClass + '小班',
+    //                 No: codeName
+    //             });
+    //             array.push(codeName);
+    //         } else {
+    //             test.push({
+    //                 SmallClassName: list.SmallClassName,
+    //                 SmallClass: list.SmallClass
+    //             });
+    //         }
+    //     });
+    //     return uniqueSmallClass;
+    // }
     // 细班排列
-    getThinClass (smallClass, list) {
-        let thinClassList = [];
-        let codeArray = [];
-        let nameArray = [];
-        list.map(rst => {
-            let codeName = smallClass.No.split('#');
-            let code = codeName[2];
-            let name = codeName[3];
-            if (name === 'null') {
-                name = null;
-            }
-            // 暂时去掉重复的节点
-            if (
-                rst.ThinClass &&
-                rst.SmallClass === code &&
-                rst.SmallClassName === name
-            ) {
-                let noArr = rst.No.split('-');
-                let No =
-                    noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
-                if (codeArray.indexOf(No) === -1) {
-                    thinClassList.push({
-                        Name: rst.ThinClassName
-                            ? rst.ThinClassName + '细班'
-                            : rst.ThinClass + '细班',
-                        No: No
-                    });
-                    codeArray.push(No);
-                    nameArray.push(rst.ThinClassName);
-                }
-            }
-        });
-        return thinClassList;
-    }
+    // getThinClass (smallClass, list) {
+    //     let thinClassList = [];
+    //     let codeArray = [];
+    //     let nameArray = [];
+    //     list.map(rst => {
+    //         let codeName = smallClass.No.split('#');
+    //         let code = codeName[2];
+    //         let name = codeName[3];
+    //         if (name === 'null') {
+    //             name = null;
+    //         }
+    //         // 暂时去掉重复的节点
+    //         if (
+    //             rst.ThinClass &&
+    //             rst.SmallClass === code &&
+    //             rst.SmallClassName === name
+    //         ) {
+    //             let noArr = rst.No.split('-');
+    //             let No =
+    //                 noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
+    //             if (codeArray.indexOf(No) === -1) {
+    //                 thinClassList.push({
+    //                     Name: rst.ThinClassName
+    //                         ? rst.ThinClassName + '细班'
+    //                         : rst.ThinClass + '细班',
+    //                     No: No
+    //                 });
+    //                 codeArray.push(No);
+    //                 nameArray.push(rst.ThinClassName);
+    //             }
+    //         }
+    //     });
+    //     return thinClassList;
+    // }
     // 获取树种数据
     async getTreeType () {
         const { getTreeTypeAction } = this.props.actions;
@@ -1040,55 +1046,96 @@ class OnSite extends Component {
     }
 
     /* 弹出信息框 */
-    handleAreaSelect (keys, featureName) {
+    handleAreaSelect (keys, info) {
         const {
-            actions: { getTreearea }
-        } = this.props;
-        const treeNodeName =
-            featureName != null && featureName.selectedNodes.length > 0
-                ? featureName.selectedNodes[0].props.title
-                : '';
-        if (this.checkMarkers.toString() !== '') {
-            for (var i = 0; i <= this.checkMarkers.length - 1; i++) {
-                this.map.removeLayer(this.checkMarkers[i]);
-                delete this.checkMarkers[i];
-            }
-        }
+            areaLayerList
+        } = this.state;
+        let me = this;
         this.setState({
             leftkeycode: keys[0]
         });
-        let treearea = [];
-        getTreearea({}, { no: keys[0] }).then(rst => {
-            if (
-                !(
-                    rst &&
-                    rst.content &&
-                    rst.content instanceof Array &&
-                    rst.content.length > 0
-                )
-            ) {
-                return;
+        try {
+            const eventKey = keys[0];
+            for (let v in areaLayerList) {
+                me.map.removeLayer(areaLayerList[v]);
             }
-            let str = rst.content[0].coords;
-            var target1 = str
-                .slice(str.indexOf('(') + 3, str.indexOf(')'))
-                .split(',')
-                .map(item => {
-                    return item.split(' ').map(_item => _item - 0);
-                });
-            treearea.push(target1);
+            if (eventKey) {
+                // 细班的key加入了标段，首先对key进行处理
+                let handleKey = eventKey.split('-');
+                // 如果选中的是细班，则直接添加图层
+                if (handleKey.length === 5) {
+                    const treeNodeName = info && info.node && info.node.props && info.node.props.title;
+                    // 如果之前添加过，直接将添加过的再次添加，不用再次请求
 
-            let message = {
-                key: 3,
-                type: 'Feature',
-                properties: { name: treeNodeName, type: 'area' },
-                geometry: { type: 'Polygon', coordinates: treearea }
-            };
-            this.checkMarkers[0] = this.createMarker(
-                message,
-                this.checkMarkers[0]
-            );
-        });
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].addTo(me.map);
+                        me.map.fitBounds(areaLayerList[eventKey].getBounds());
+                    } else {
+                    // 如果不是添加过，需要请求数据
+                        me._addAreaLayer(eventKey, treeNodeName);
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('处理选中节点', e);
+        }
+    }
+
+    // 选中细班，则在地图上加载细班图层
+    _addAreaLayer = async (eventKey, treeNodeName) => {
+        const {
+            areaLayerList
+        } = this.state;
+        const {
+            actions: { getTreearea }
+        } = this.props;
+        try {
+            let handleKey = eventKey.split('-');
+            let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+            let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+            let me = this;
+            let treearea = [];
+            try {
+                let rst = await getTreearea({}, { no: no });
+                if (
+                    !(
+                        rst &&
+                        rst.content &&
+                        rst.content instanceof Array &&
+                        rst.content.length > 0
+                    )
+                ) {
+                    return;
+                }
+
+                let contents = rst.content;
+                let data = contents.find(content => content.Section === section);
+                let str = data.coords;
+                var target1 = str
+                    .slice(str.indexOf('(') + 3, str.indexOf(')'))
+                    .split(',')
+                    .map(item => {
+                        return item.split(' ').map(_item => _item - 0);
+                    });
+                treearea.push(target1);
+                let message = {
+                    key: 3,
+                    type: 'Feature',
+                    properties: { name: treeNodeName, type: 'area' },
+                    geometry: { type: 'Polygon', coordinates: treearea }
+                };
+
+                let layer = this.createMarker(message);
+                areaLayerList[eventKey] = layer;
+                me.setState({
+                    areaLayerList
+                });
+            } catch (e) {
+                console.log('await', e);
+            }
+        } catch (e) {
+            console.log('加载细班图层', e);
+        }
     }
 
     render () {

@@ -1,14 +1,13 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
-    Collapse,
-    Button
+    Button, Modal
 } from 'antd';
-import PkCodeTree from '../PkCodeTree';
+import DashPanel from '../DashPanel';
+import {getThinClass, getSmallClass, fillAreaColor} from '../auth';
 import '../Curing.less';
-const Panel = Collapse.Panel;
 window.config = window.config || {};
 
-export default class TaskstatisTable extends Component {
+export default class TaskStatisTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -21,8 +20,12 @@ export default class TaskstatisTable extends Component {
             treeType: [],
             projectList: [],
             unitProjectList: [],
-            leftkeycode: ''
+            coordinates: [],
+            polygon: '',
+            areaLayerList: {},
+            polygonData: ''
         };
+        this.checkMarkers = [];
         this.tileLayer = null;
         this.tileLayer2 = null;
         this.map = null;
@@ -50,10 +53,11 @@ export default class TaskstatisTable extends Component {
     };
 
     async componentDidMount () {
+        // 获取地块树数据
         this._loadAreaData();
+        // 初始化地图
         this._initMap();
     }
-
     // 获取地块树数据
     async _loadAreaData () {
         const {
@@ -96,12 +100,11 @@ export default class TaskstatisTable extends Component {
                     });
                 }
             }
-
             unitProjectList.map(async section => {
                 let list = await getLittleBan({ no: section.No });
-                let smallClassList = this._getSmallClass(list);
+                let smallClassList = getSmallClass(list);
                 smallClassList.map(smallClass => {
-                    let thinClassList = this._getThinClass(smallClass, list);
+                    let thinClassList = getThinClass(smallClass, list);
                     smallClass.children = thinClassList;
                 });
                 section.children = smallClassList;
@@ -111,82 +114,9 @@ export default class TaskstatisTable extends Component {
             console.log(e);
         }
     }
-
-    _getSmallClass (smallClassList) {
-        // 将小班的code获取到，进行去重
-        let uniqueSmallClass = [];
-        // 进行数组去重的数组
-        let array = [];
-
-        let test = [];
-        smallClassList.map(list => {
-            // if (!list.SmallClassName) {
-            //     console.log('list', list);
-            // }
-            // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
-            let codeName =
-                list.LandNo +
-                '#' +
-                list.RegionNo +
-                '#' +
-                list.SmallClass +
-                '#' +
-                list.SmallClassName;
-            if (list.SmallClass && array.indexOf(codeName) === -1) {
-                uniqueSmallClass.push({
-                    Name: list.SmallClassName
-                        ? list.SmallClassName + '小班'
-                        : list.SmallClass + '小班',
-                    No: codeName
-                });
-                array.push(codeName);
-            } else {
-                test.push({
-                    SmallClassName: list.SmallClassName,
-                    SmallClass: list.SmallClass
-                });
-            }
-        });
-        return uniqueSmallClass;
-    }
-
-    _getThinClass (smallClass, list) {
-        let thinClassList = [];
-        let codeArray = [];
-        let nameArray = [];
-        list.map(rst => {
-            let codeName = smallClass.No.split('#');
-            let code = codeName[2];
-            let name = codeName[3];
-            if (name === 'null') {
-                name = null;
-            }
-            // 暂时去掉重复的节点
-            if (
-                rst.ThinClass &&
-                rst.SmallClass === code &&
-                rst.SmallClassName === name
-            ) {
-                let noArr = rst.No.split('-');
-                let No =
-                    noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
-                if (codeArray.indexOf(No) === -1) {
-                    thinClassList.push({
-                        Name: rst.ThinClassName
-                            ? rst.ThinClassName + '细班'
-                            : rst.ThinClass + '细班',
-                        No: No
-                    });
-                    codeArray.push(No);
-                    nameArray.push(rst.ThinClassName);
-                }
-            }
-        });
-        return thinClassList;
-    }
-
     /* 初始化地图 */
     _initMap () {
+        let me = this;
         this.map = L.map('mapid', window.config.initLeaflet);
 
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
@@ -200,7 +130,7 @@ export default class TaskstatisTable extends Component {
 
         this.tileLayer2 = L.tileLayer(
             window.config.DASHBOARD_ONSITE +
-                    '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
             {
                 opacity: 1.0,
                 subdomains: [1, 2, 3],
@@ -211,10 +141,12 @@ export default class TaskstatisTable extends Component {
             }
         ).addTo(this.map);
     }
-
     render () {
+        const {
+            treeLists
+        } = this.state;
         return (
-            <div className='map-container'>
+            <div className='Curing-container'>
                 <div
                     ref='appendBody'
                     className='l-map r-main'
@@ -242,21 +174,12 @@ export default class TaskstatisTable extends Component {
                         }
                     >
                         <aside className='aside' draggable='false'>
-                            <Collapse
-                                defaultActiveKey={[this.options[0].value]}
-                                accordion
-                            >
-                                {this.options.map(option => {
-                                    return (
-                                        <Panel
-                                            key={option.value}
-                                            header={option.label}
-                                        >
-                                            {this._renderPanel(option)}
-                                        </Panel>
-                                    );
-                                })}
-                            </Collapse>
+                            <DashPanel
+                                tyle={{ height: '200px' }}
+                                onCheck={this._handleAreaCheck.bind(this)}
+                                onSelect={this._handleAreaSelect.bind(this)}
+                                content={treeLists}
+                            />
                             <div style={{ height: '20px' }} />
                         </aside>
                         <div
@@ -336,77 +259,74 @@ export default class TaskstatisTable extends Component {
             </div>);
     }
 
-    _handleEndResize (e) {
-        this.menu.isStart = false;
+    /* 选中节点 */
+    async _handleAreaSelect (keys, info) {
     }
-    _handleResizingMenu (e) {
-        if (this.menu.isStart) {
-            e.preventDefault();
-            this.menu.count++;
-            let ys = this.menu.count % 5;
-            if (ys === 0 || ys === 1 || ys === 3 || ys === 4) return; // 降低事件执行频率
-            let dx = e.clientX - this.menu.startPos;
-            let menuWidth = this.menu.tempMenuWidth + dx;
-            if (menuWidth > this.menu.maxWidth) menuWidth = this.menu.maxWidth;
-            if (menuWidth < this.menu.minWidth) menuWidth = this.menu.minWidth;
-            this.setState({ menuWidth: menuWidth });
-        }
-    }
+    // 选择细班是否展示数据，或是隐藏数据
+    async _handleAreaCheck (keys, info) {
+        const {
+            areaLayerList
+        } = this.state;
+        let me = this;
+        // 当前选中的节点
+        let eventKey = info.node.props.eventKey;
+        // 当前的选中状态
+        let checked = info.checked;
+        try {
+            // 为了让各小班的key值不一样，加入了@@，首先对key进行处理
+            let handleKey = eventKey.split('-');
+            // 如果选中的是细班，则直接添加图层
+            if (handleKey.length === 5) {
+                if (checked) {
+                    const treeNodeName = info && info.node && info.node.props && info.node.props.title;
+                    // 如果之前添加过，直接将添加过的再次添加，不用再次请求
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].addTo(me.map);
+                        me.map.fitBounds(areaLayerList[eventKey].getBounds());
+                    } else {
+                        // 如果不是添加过，需要请求数据
+                        me._addAreaLayer(eventKey, treeNodeName);
+                    }
+                } else {
+                    me.map.removeLayer(areaLayerList[eventKey]);
+                }
+            } else {
+                if (checked) {
+                    // 如果选中的不是细班，则需要进行遍历，找到此次点击的节点，然后一个个添加
+                    let selectKeys = [];
+                    try {
+                        keys.map((key) => {
+                            let selectKey = key.split('@@');
+                            if (key.indexOf(eventKey) !== -1 && selectKey.length === 2) {
+                                selectKeys.push(selectKey[0]);
+                            }
+                        });
+                    } catch (e) {
 
-    /* 渲染菜单panel */
-    _renderPanel (option) {
-        // console.log('this.state.userCheckedKeys', this.state.userCheckedKeys);
-        let content = this._getPanelData(option.value);
-        if (option && option.value) {
-            switch (option.value) {
-                case 'geojsonFeature_area':
-                    return (
-                        <PkCodeTree
-                            treeData={content}
-                            selectedKeys={this.state.leftkeycode}
-                            onSelect={this._handleSelect.bind(this)}
-                            showIcon={false}
-                        />
-                    );
+                    }
+                } else {
+
+                }
             }
+        } catch (e) {
+            console.log('分辨是否为细班', e);
         }
     }
-
-    /* 获取对应图层数据 */
-    _getPanelData (featureName) {
-        var content = {};
-        switch (featureName) {
-            case 'geojsonFeature_area':
-                content = this.state.treeLists;
-                break;
-        }
-        return content;
-    }
-
-    /* 弹出信息框 */
-    _handleSelect (keys, featureName) {
+    // 选中细班，则在地图上加载细班图层
+    async _addAreaLayer (eventKey, treeNodeName) {
+        const {
+            areaLayerList
+        } = this.state;
         const {
             actions: { getTreearea }
         } = this.props;
-        const treeNodeName =
-                featureName != null && featureName.selectedNodes.length > 0
-                    ? featureName.selectedNodes[0].props.title
-                    : '';
-
-        if (this.checkMarkers.toString() !== '') {
-            for (var i = 0; i <= this.checkMarkers.length - 1; i++) {
-                this.map.removeLayer(this.checkMarkers[i]);
-                // this.checkMarkers[i]._leaflet_id.remove()
-                delete this.checkMarkers[i];
-            }
-        }
-
-        this.setState({
-            leftkeycode: keys[0]
-        });
-
+        let handleKey = eventKey.split('-');
+        let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+        let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+        let me = this;
         let treearea = [];
-        getTreearea({}, { no: keys[0] }).then(rst => {
+        try {
+            let rst = await getTreearea({}, { no: no });
             if (
                 !(
                     rst &&
@@ -418,7 +338,9 @@ export default class TaskstatisTable extends Component {
                 return;
             }
 
-            let str = rst.content[0].coords;
+            let contents = rst.content;
+            let data = contents.find(content => content.Section === section);
+            let str = data.coords;
             var target1 = str
                 .slice(str.indexOf('(') + 3, str.indexOf(')'))
                 .split(',')
@@ -426,7 +348,6 @@ export default class TaskstatisTable extends Component {
                     return item.split(' ').map(_item => _item - 0);
                 });
             treearea.push(target1);
-
             let message = {
                 key: 3,
                 type: 'Feature',
@@ -434,15 +355,30 @@ export default class TaskstatisTable extends Component {
                 geometry: { type: 'Polygon', coordinates: treearea }
             };
 
-            this.checkMarkers[0] = this.createMarker(
-                message,
-                this.checkMarkers[0]
-            );
-        });
-        // let selItem = this.checkMarkers[0]
-        // if (selItem) {
-        //     selItem.openPopup()
-        // }
+            let layer = this._createMarker(message);
+            areaLayerList[eventKey] = layer;
+            me.setState({
+                areaLayerList
+            });
+        } catch (e) {
+            console.log('await', e);
+        }
+    }
+    /* 在地图上添加marker和polygan */
+    _createMarker (geo) {
+        // 创建区域图形
+        let area = L.geoJson(geo, {
+            style: {
+                fillColor: fillAreaColor(geo.key),
+                weight: 1,
+                opacity: 1,
+                color: '#201ffd',
+                fillOpacity: 0.3
+            },
+            title: geo.properties.name
+        }).addTo(this.map);
+        this.map.fitBounds(area.getBounds());
+        return area;
     }
 
     /* 菜单展开收起 */
@@ -466,5 +402,22 @@ export default class TaskstatisTable extends Component {
             TileLayerUrl: this.tileUrls[index],
             mapLayerBtnType: !this.state.mapLayerBtnType
         });
+    }
+
+    _handleEndResize (e) {
+        this.menu.isStart = false;
+    }
+    _handleResizingMenu (e) {
+        if (this.menu.isStart) {
+            e.preventDefault();
+            this.menu.count++;
+            let ys = this.menu.count % 5;
+            if (ys === 0 || ys === 1 || ys === 3 || ys === 4) return; // 降低事件执行频率
+            let dx = e.clientX - this.menu.startPos;
+            let menuWidth = this.menu.tempMenuWidth + dx;
+            if (menuWidth > this.menu.maxWidth) menuWidth = this.menu.maxWidth;
+            if (menuWidth < this.menu.minWidth) menuWidth = this.menu.minWidth;
+            this.setState({ menuWidth: menuWidth });
+        }
     }
 }

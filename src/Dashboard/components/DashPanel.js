@@ -26,23 +26,11 @@ export default class DashPanel extends Component {
             case 'geojsonFeature_people':
                 icClass = 'tr-people';
                 break;
-            case 'geojsonFeature_safety':
-                icClass = 'tr-safety';
-                break;
             case 'geojsonFeature_hazard':
                 icClass = 'tr-hazard';
                 break;
-            case 'geojsonFeature_monitor':
-                icClass = 'tr-monitor';
-                break;
-            case 'geojsonFeature_area':
-                icClass = 'tr-area';
-                break;
-            case 'geojsonFeature_360':
-                icClass = 'tr-allview';
-                break;
             case 'geojsonFeature_treetype':
-                icClass = 'tr-treetype';
+                icClass = 'tr-area';
                 break;
         }
         return icClass;
