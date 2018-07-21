@@ -32,8 +32,10 @@ export default class TaskCreateTable extends Component {
             regionThinNo: '', // 圈选区域内的细班code
             regionSectionNo: '', // 圈选区域内的标段code
             regionSectionName: '', // 圈选区域内的标段名称
-            wkt: ''
-
+            regionArea: 0, // 圈选区域内面积
+            wkt: '',
+            areaData: [],
+            noLoading: false
         };
         this.tileLayer = null;
         this.tileLayer2 = null;
@@ -98,11 +100,6 @@ export default class TaskCreateTable extends Component {
                         });
                     }
                 });
-                this.setState({
-                    projectList,
-                    unitProjectList
-                });
-
                 for (let i = 0; i < projectList.length; i++) {
                     projectList[i].children = unitProjectList.filter(node => {
                         return node.Parent === projectList[i].No;
@@ -165,10 +162,12 @@ export default class TaskCreateTable extends Component {
             // coordinates.push({ Lat: e.latlng.lat, Lng: e.latlng.lng });
             const {
                 coordinates,
-                createBtnVisible
+                createBtnVisible,
+                areaData
             } = me.state;
             console.log('coordinates', coordinates);
             coordinates.push([e.latlng.lat, e.latlng.lng]);
+            areaData.push(e.latlng);
             if (coordinates.length > 2 && !createBtnVisible) {
                 me.setState({
                     createBtnVisible: true
@@ -198,7 +197,8 @@ export default class TaskCreateTable extends Component {
 
             me.setState({
                 coordinates,
-                polygonData: polygonData
+                polygonData: polygonData,
+                areaData
                 // centerPoint
             });
         });
@@ -283,6 +283,7 @@ export default class TaskCreateTable extends Component {
                             <TaskCreateModal
                                 {...this.props}
                                 {...this.state}
+                                onOk={this.handleTaskModalOk.bind(this)}
                                 onCancel={this.handleTaskModalCancel.bind(this)}
                             />
                         ) : ''
@@ -487,6 +488,9 @@ export default class TaskCreateTable extends Component {
             coordinates,
             totalThinClass
         } = this.state;
+        this.setState({
+            taskModalVisible: true
+        });
         try {
             let wkt = '';
             if (coordinates && coordinates.length >= 3) {
@@ -503,23 +507,26 @@ export default class TaskCreateTable extends Component {
                 console.log('coordinates', coordinates);
                 console.log('totalThinClass', totalThinClass);
                 console.log('wkt', wkt);
-                // let treeNum = await getTreeLocationNumByRegion({wkt: wkt});
+                let regionArea = this.computeSignedArea(this.state.areaData);
+                console.log('regionArea', regionArea);
+                let treeNum = await getTreeLocationNumByRegion({wkt: wkt});
                 let regionThinClass = await getThinClassesByRegion({wkt: wkt});
                 let regionData = await this._getThinClassName(regionThinClass);
-                console.log('regionData', regionData);
+                console.log('treeNum', treeNum);
                 let regionThinName = regionData.regionThinName;
                 let regionThinNo = regionData.regionThinNo;
                 let regionSectionNo = regionData.regionSectionNo;
                 let regionSectionName = regionData.regionSectionName;
                 this.setState({
-                    taskModalVisible: true,
                     wkt,
-                    // treeNum,
+                    regionArea,
+                    treeNum,
                     regionData,
                     regionThinName,
                     regionThinNo,
                     regionSectionNo,
-                    regionSectionName
+                    regionSectionName,
+                    noLoading: true
                 });
             }
         } catch (e) {
@@ -595,6 +602,33 @@ export default class TaskCreateTable extends Component {
         console.log('regionSectionName', regionSectionName);
         return regionData;
     }
+
+    computeSignedArea (path) {
+        // 传入path：{
+        //     [{lat:,lng:}],[{lat:,lng:}],[{lat:,lng:}]
+        // }
+        let radius = 6371009;
+        let len = path.length;
+        if (len < 3) return 0;
+        let total = 0;
+        let prev = path[len - 1];
+        let prevTanLat = Math.tan(((Math.PI / 2 - prev.lat / 180 * Math.PI) / 2));
+        let prevLng = (prev.lng) / 180 * Math.PI;
+        for (let i in path) {
+            let tanLat = Math.tan((Math.PI / 2 -
+                (path[i].lat) / 180 * Math.PI) / 2);
+            let lng = (path[i].lng) / 180 * Math.PI;
+            total += this.polarTriangleArea(tanLat, lng, prevTanLat, prevLng);
+            prevTanLat = tanLat;
+            prevLng = lng;
+        }
+        return Math.abs(total * (radius * radius));
+    }
+    polarTriangleArea (tan1, lng1, tan2, lng2) {
+        let deltaLng = lng1 - lng2;
+        let t = tan1 * tan2;
+        return 2 * Math.atan2(t * Math.sin(deltaLng), 1 + t * Math.cos(deltaLng));
+    }
     // 撤销圈选图层
     _handleCreateTaskCancel =() => {
         const {
@@ -608,9 +642,24 @@ export default class TaskCreateTable extends Component {
         });
     }
     // 取消下发任务
+    handleTaskModalOk = () => {
+        const {
+            polygonData
+        } = this.state;
+        this.map.removeLayer(polygonData);
+        this.setState({
+            createBtnVisible: false,
+            polygonData: '',
+            coordinates: [],
+            taskModalVisible: false,
+            noLoading: false
+        });
+    }
+    // 取消下发任务
     handleTaskModalCancel = () => {
         this.setState({
-            taskModalVisible: false
+            taskModalVisible: false,
+            noLoading: false
         });
     }
 

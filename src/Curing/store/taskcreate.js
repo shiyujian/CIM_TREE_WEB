@@ -49,7 +49,8 @@ export const getcCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtyp
 export const getThinClassesByRegion = createFetchAction(`${FOREST_API}/curing/thinclassesbyregion?wkt={{wkt}}`, [], 'GET');
 // 获取范围内栽植的树木数量
 export const getTreeLocationNumByRegion = createFetchAction(`${FOREST_API}/curing/treelocationnumbyregion?wkt={{wkt}}`, [], 'GET');
-
+// 获取班组人员
+export const getCuringGroupMans = createFetchAction(`${FOREST_API}/curing/curinggroupmans?groupid={{groupid}}`, [], 'GET');
 export const actions = {
     getTreearea,
     getUsers,
@@ -72,7 +73,8 @@ export const actions = {
     getCuringGroup,
     getcCuringTypes,
     getThinClassesByRegion,
-    getTreeLocationNumByRegion
+    getTreeLocationNumByRegion,
+    getCuringGroupMans
 };
 export default handleActions({
 

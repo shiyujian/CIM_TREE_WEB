@@ -26,19 +26,14 @@ export const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{co
 export const postDocument = createFetchAction(`${SERVICE_API}/documents/`, [], 'POST');
 // 删除文档
 export const delDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
-// 修改文档
-export const putDocumentOk = createAction(`${ID}_putDocumentOk`);
-export const putDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [putDocumentOk], 'PUT');
 // 获取文档列表
 export const getDocList = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [], 'GET');
+
 // 修改关联用户Modal的visible
 export const changeAddMemVisible = createAction(`${ID}_changeAddMemVisible`);
 // 修改所选择标段，以查找人员
 export const changeSelectSection = createAction(`${ID}_changeSelectSection`);
-
-// 是否重新获取人员信息
-export const isGetMemChange = createAction(`${ID}_isGetMemChange`);
-// 是否重新获取人员信息
+// 修改所选节点的状态
 export const changeSelectState = createAction(`${ID}_changeSelectState`);
 // 养护班组新增
 export const postCuringGroup = createFetchAction(`${FOREST_API}/curing/curinggroup`, [], 'POST');
@@ -47,7 +42,15 @@ export const getCuringGroup = createFetchAction(`${FOREST_API}/curing/curinggrou
 // 删除养护班组
 export const deleteCuringGroup = createFetchAction(`${FOREST_API}/curing/curinggroup/{{ID}}`, [], 'DELETE');
 // 修改所选择节点的班组
-export const changeSelectMemTeam = createAction(`${ID}_changeSelectMemDoc`);
+export const changeSelectMemTeam = createAction(`${ID}_changeSelectMemTeam`);
+// 养护班组新增人员
+export const postCuringGroupMan = createFetchAction(`${FOREST_API}/curing/curinggroupman`, [], 'POST');
+// 将人员信息上传至redux
+export const getCuringGroupMansOk = createAction(`${ID}_getCuringGroupMansOk`);
+// 获取养护班组人员
+export const getCuringGroupMans = createFetchAction(`${FOREST_API}/curing/curinggroupmans?groupid={{groupid}}`, [getCuringGroupMansOk], 'GET');
+// 获取养护班组
+export const deleteCuringGroupMan = createFetchAction(`${FOREST_API}/curing/curinggroupman/{{id}}`, [], 'DELETE');
 
 export const actions = {
     getTreearea,
@@ -61,16 +64,17 @@ export const actions = {
     getDocument,
     delDocument,
     postDocument,
-    putDocument,
-    putDocumentOk,
     changeAddMemVisible,
     changeSelectSection,
     changeSelectMemTeam,
-    isGetMemChange,
     changeSelectState,
     postCuringGroup,
     getCuringGroup,
-    deleteCuringGroup
+    deleteCuringGroup,
+    postCuringGroupMan,
+    getCuringGroupMans,
+    getCuringGroupMansOk,
+    deleteCuringGroupMan
 };
 export default handleActions({
     [changeAddMemVisible]: (state, {payload}) => ({
@@ -85,16 +89,12 @@ export default handleActions({
         ...state,
         selectMemTeam: payload
     }),
-    [putDocumentOk]: (state, {payload}) => ({
-        ...state,
-        selectMemDoc: payload
-    }),
-    [isGetMemChange]: (state, {payload}) => ({
-        ...state,
-        isGetMem: payload
-    }),
     [changeSelectState]: (state, {payload}) => ({
         ...state,
         selectState: payload
+    }),
+    [getCuringGroupMansOk]: (state, {payload}) => ({
+        ...state,
+        curingGroupMans: payload
     })
 }, {});

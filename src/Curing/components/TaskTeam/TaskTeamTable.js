@@ -13,12 +13,17 @@ export default class TaskTeamTable extends Component {
         super(props);
         this.state = {
             addMemberVisible: false,
-            dataSource: [],
-            relateDisabled: true
+            relateDisabled: true,
+            totalUserData: []
         };
     }
 
     async componentDidMount () {
+        const {
+            actions: {
+                getAllUsersData
+            }
+        } = this.props;
         this.user = getUser();
         let sections = this.user.sections;
         sections = JSON.parse(sections);
@@ -28,36 +33,21 @@ export default class TaskTeamTable extends Component {
                 relateDisabled: false
             });
         }
-    };
+        let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
+        totalUserData = JSON.parse(totalUserData);
+        if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
 
-    componentDidUpdate (prevProps, prevState) {
-        const {
-            isGetMem
-        } = this.props;
-        if (isGetMem !== prevProps.isGetMem) {
-            this._getRelMem();
-        }
-    }
-
-    _getRelMem = () => {
-        const {
-            selectMemDoc
-        } = this.props;
-        if (selectMemDoc && selectMemDoc.extra_params && selectMemDoc.extra_params.RelationMem) {
-            let RelationMem = selectMemDoc.extra_params.RelationMem;
-            this.setState({
-                dataSource: RelationMem
-            });
         } else {
-            this.setState({
-                dataSource: []
-            });
+            let userData = await getAllUsersData();
+            totalUserData = userData && userData.content;
         }
-    }
+        this.setState({
+            totalUserData
+        });
+    };
 
     render () {
         const {
-            dataSource,
             relateDisabled
         } = this.state;
         const {
@@ -67,7 +57,8 @@ export default class TaskTeamTable extends Component {
         if (selectState && !relateDisabled) {
             disabled = false;
         }
-        console.log('dataSource', dataSource);
+        let dataSource = this._getRelMemMess();
+
         return (
             <div>
                 <Button style={{marginBottom: 10}} type='primary' disabled={disabled} onClick={this._addMemberModal.bind(this)}>关联用户</Button>
@@ -75,13 +66,33 @@ export default class TaskTeamTable extends Component {
                     style={{width: '100%'}}
                     columns={this.columns}
                     bordered
-                    rowKey='id'
+                    // rowKey='id'
                     dataSource={dataSource}
                 />
                 <AddMember {...this.props} />
             </div>
 
         );
+    }
+    _getRelMemMess = () => {
+        const {
+            curingGroupMans = []
+        } = this.props;
+        const {
+            totalUserData = []
+        } = this.state;
+        let dataSource = [];
+        if (curingGroupMans && curingGroupMans instanceof Array && curingGroupMans.length > 0) {
+            curingGroupMans.map((man) => {
+                totalUserData.map((userData) => {
+                    if (Number(userData.ID) === man.User) {
+                        dataSource.push(userData);
+                    }
+                });
+            });
+        }
+        console.log('dataSource', dataSource);
+        return dataSource;
     }
     _addMemberModal () {
         const {
@@ -102,23 +113,19 @@ export default class TaskTeamTable extends Component {
         },
         {
             title: '名称',
-            dataIndex: 'account.person_name'
+            dataIndex: 'Full_Name'
         },
         {
             title: '用户名',
-            dataIndex: 'username'
-        },
-        {
-            title: '所属部门',
-            dataIndex: 'account.organization'
+            dataIndex: 'User_Name'
         },
         {
             title: '职务',
-            dataIndex: 'account.title'
+            dataIndex: 'Duty'
         },
         {
             title: '手机号码',
-            dataIndex: 'account.person_telephone'
+            dataIndex: 'Phone'
         }
     ];
 }

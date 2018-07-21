@@ -701,7 +701,11 @@ class Login extends Component {
         // window.localStorage.setItem('TREE_LOGIN_USER',
         // 	JSON.stringify(permissions2));
         const {
-            actions: { login, getTasks },
+            actions: {
+                login,
+                getTasks,
+                getAllUsersData
+            },
             history: { replace }
         } = this.props;
         clearUser();
@@ -716,6 +720,16 @@ class Login extends Component {
                 message.error('用户没有被激活');
             } else {
                 if (rst && rst.id) {
+                    getAllUsersData().then((userData) => {
+                        console.log('userData', userData);
+                        if (userData && userData.content) {
+                            let content = userData.content;
+                            window.localStorage.setItem(
+                                'LZ_TOTAL_USER_DATA',
+                                JSON.stringify(content)
+                            );
+                        }
+                    });
                     getTasks({}, { task: 'processing', executor: rst.id }).then(
                         (tasks = []) => {
                             notification.open({

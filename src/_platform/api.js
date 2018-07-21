@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-06 10:52:43
+ * @Last Modified time: 2018-07-21 17:38:40
  */
 /**
  *
@@ -224,90 +224,18 @@ export const DATASOURCEDIRITEMNAME = 'dataresourceDirItem';
 export const DATASOURCEDIRITEMCODE = 'dataresource_dir_item';
 
 // 数据报送模板下载
-export const DataReportTemplate_SafetyFile =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('安全文档数据填报模版.xlsx');
-export const DataReportTemplate_SafetyHiddenDanger =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('安全隐患数据填报模版.xlsx');
-export const DataReportTemplate_SafetySpecial =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('安全专项数据填报模版.xlsx');
 export const DataReportTemplate_ConstructionUnits =
     STATIC_DOWNLOAD_API +
     '/media/documents/meta/' +
     encodeURI('参建单位数据填报模版.xlsx');
-export const DataReportTemplate_UnitProject =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('单位工程数据填报模版.xlsx');
-export const DataReportTemplate_SubdivisionUnitProjectAcceptance =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('分部分项单位项目验收信息表.xlsx');
-export const DataReportTemplate_ProjectVolumeSettlement =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('工程量结算数据填报模版.xlsx');
-export const DataReportTemplate_ValuationList =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('计价清单数据填报模版.xlsx');
-export const DataReportTemplate_SettlementPlan =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('结算计划数据填报模版.xlsx');
-export const DataReportTemplate_SettlementProgress =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('结算进度数据填报模版.xlsx');
-export const DataReportTemplate_ModelType =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('模型类型附件数据填报模版.xlsx');
-export const DataReportTemplate_ModalInformation =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('模型信息数据填报模版.xlsx');
 export const DataReportTemplate_PersonInformation =
     STATIC_DOWNLOAD_API +
     '/media/documents/meta/' +
     encodeURI('人员信息数据填报模版.xlsx');
-export const DataReportTemplate_DesignProgress =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('设计进度数据填报模版.xlsx');
-export const DataReportTemplate_DesignInformation =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('设计信息数据填报模版.xlsx');
-export const DataReportTemplate_ConstructionProgress =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('施工进度数据填报模版.xlsx');
-export const DataReportTemplate_VideoMonitor =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('视频监控数据填报模版.xlsx');
-export const DataReportTemplate_ProjectInformation =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('项目信息数据填报模版.xlsx');
-export const DataReportTemplate_ImageInformation =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('影像信息数据填报模版.xlsx');
 export const DataReportTemplate_Organization =
     STATIC_DOWNLOAD_API +
     '/media/documents/meta/' +
     encodeURI('组织机构数据填报模版.xlsx');
-export const DataReportTemplate_QualityProblem =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('质量问题信息表模版.xlsx');
 
 /** *********************临时资源服务**************************/
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Button, Modal, Table, Checkbox, Notification
+    Button, Modal, Table, Checkbox, Notification, Row
 } from 'antd';
 import { getUser } from '_platform/auth';
 import '../Curing.less';
@@ -15,7 +15,8 @@ export default class AddMember extends Component {
             modalVisible: false,
             roles: [],
             dataSource: [],
-            RelationMem: []
+            RelationMem: [],
+            totalUserData: []
         };
         this.user = null;
     }
@@ -23,7 +24,8 @@ export default class AddMember extends Component {
     async componentDidMount () {
         const {
             actions: {
-                getRoles
+                getRoles,
+                getAllUsersData
             }
         } = this.props;
         this.user = getUser();
@@ -33,6 +35,17 @@ export default class AddMember extends Component {
         if (!(this.sections && this.sections instanceof Array && this.sections.length > 0) && (this.user.username !== 'admin')) {
             return;
         }
+        let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
+        totalUserData = JSON.parse(totalUserData);
+        if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
+
+        } else {
+            let userData = await getAllUsersData();
+            totalUserData = userData && userData.content;
+        }
+        this.setState({
+            totalUserData
+        });
         // 需要找到是养护角色的人
         let role = await getRoles();
         const curingRoles = role.filter(rst => rst.grouptype === 4);
@@ -88,12 +101,14 @@ export default class AddMember extends Component {
     componentDidUpdate (prevProps, prevState) {
         const {
             selectSection,
-            isGetMem
+            // isGetMem,
+            addMemVisible
         } = this.props;
         if (selectSection !== prevProps.selectSection) {
             this._queryMember();
         }
-        if (isGetMem !== prevProps.isGetMem) {
+        debugger;
+        if (addMemVisible !== prevProps.addMemVisible && addMemVisible) {
             this._getRelMem();
         }
     }
@@ -102,16 +117,19 @@ export default class AddMember extends Component {
             addMemVisible
         } = this.props;
         const {
-            users
+            users,
+            RelationMem
         } = this.state;
+        console.log('RelationMem', RelationMem);
         return (
             <div>
                 <Modal
                     title={'关联用户'}
                     visible={addMemVisible}
                     width='90%'
-                    onOk={this._handleAddMem.bind(this)}
+                    // onOk={this._handleAddMem.bind(this)}
                     onCancel={this._handleCancel.bind(this)}
+                    footer={null}
                 >
                     <div>
                         <Table
@@ -121,6 +139,9 @@ export default class AddMember extends Component {
                             columns={this.columns}
                             dataSource={users}
                         />
+                        <Row style={{marginTop: 10}}>
+                            <Button onClick={this._handleCancel.bind(this)} style={{float: 'right'}}type='primary'>关闭</Button>
+                        </Row>
                     </div>
                 </Modal>
             </div>
@@ -130,107 +151,137 @@ export default class AddMember extends Component {
 
     _getRelMem = async () => {
         const {
-            selectMemDoc
-        } = this.props;
-        if (selectMemDoc && selectMemDoc.extra_params && selectMemDoc.extra_params.RelationMem) {
-            let RelationMem = selectMemDoc.extra_params.RelationMem;
-            this.setState({
-                RelationMem: RelationMem
-            });
-        } else {
-            this.setState({
-                RelationMem: []
-            });
-        }
-    }
-
-    _handleAddMem = async () => {
-        const {
-            selectMemDoc,
-            actions: {
-                putDocument,
-                changeAddMemVisible,
-                isGetMemChange
-            }
+            curingGroupMans
         } = this.props;
         const {
-            RelationMem
+            totalUserData
         } = this.state;
-        console.log('RelationMem', RelationMem);
-        try {
-            // 修改文档数据
-            let changeDocumentData = {
-                'extra_params': {
-                    'RelationMem': RelationMem
-                },
-                'basic_params': {
-                    'files': [
-                        selectMemDoc.basic_params.files[0]
-                    ]
-                },
-                'status': 'A',
-                'version': 'A'
-            };
-            let data = await putDocument({code: selectMemDoc.code}, changeDocumentData);
-            console.log('data', data);
-            if (data && data.pk) {
-                Notification.success({
-                    message: '关联用户成功',
-                    duration: 3
+        let RelationMem = [];
+        if (curingGroupMans && curingGroupMans instanceof Array && curingGroupMans.length > 0) {
+            curingGroupMans.map((man) => {
+                totalUserData.map((userData) => {
+                    if (Number(userData.ID) === man.User) {
+                        RelationMem.push(Number(userData.PK));
+                    }
                 });
-                await changeAddMemVisible(false);
-                await isGetMemChange(moment().unix());
-            } else {
-                Notification.error({
-                    message: '关联用户失败',
-                    duration: 3
-                });
-            }
-        } catch (e) {
-            console.log(e);
+            });
         }
+        this.setState({
+            RelationMem: RelationMem
+        });
     }
 
-    _handleCancel () {
+    _handleCancel = async () => {
         const {
             actions: {
                 changeAddMemVisible
-            },
-            selectMemDoc
+            }
         } = this.props;
         changeAddMemVisible(false);
-        if (selectMemDoc && selectMemDoc.extra_params && selectMemDoc.extra_params.RelationMem) {
-            let RelationMem = selectMemDoc.extra_params.RelationMem;
-            this.setState({
-                RelationMem
-            });
-        } else {
-            this.setState({
-                RelationMem: []
-            });
-        }
+        await this.getRelatedMans();
     }
 
-    _check (user, e) {
+    _check = async (user, e) => {
         const {
-            RelationMem = []
+            RelationMem = [],
+            totalUserData = []
         } = this.state;
+        const {
+            actions: {
+                postCuringGroupMan,
+                deleteCuringGroupMan
+            },
+            selectMemTeam,
+            curingGroupMans
+        } = this.props;
         let checked = e.target.checked;
-        if (checked) {
-            RelationMem.push(user);
-        } else {
-            RelationMem.map((member, index) => {
-                if (member.id === user.id) {
-                    RelationMem.splice(index, 1); // 删除该元素
+        console.log('user', user);
+        try {
+            let pk = user.id;
+            let checkUserId = '';
+            totalUserData.map((userData) => {
+                if (userData && userData.PK && Number(userData.PK) === pk) {
+                    checkUserId = userData && userData.ID;
                 }
             });
+            console.log('checkUserId', checkUserId);
+            if (checked) {
+                try {
+                    if (checkUserId) {
+                        let postAddData = {
+                            'GroupID': selectMemTeam.ID,
+                            'GroupName': selectMemTeam.GroupName, // 班组名称
+                            'User': checkUserId, // 用户ID  非PK
+                            'FullName': user.account.person_name || user.username // 用户姓名
+                        };
+                        let addData = await postCuringGroupMan({}, postAddData);
+                        console.log('addData', addData);
+                        if (addData && addData.code && addData.code === 1) {
+                            await this.getRelatedMans();
+                            RelationMem.push(user.id);
+                            Notification.success({
+                                message: '关联用户成功',
+                                duration: 1
+                            });
+                        }
+                    } else {
+                        Notification.error({
+                            message: '关联用户失败',
+                            duration: 2
+                        });
+                    }
+                } catch (e) {
+                    console.log('e', e);
+                }
+            } else {
+                let deleteID = '';
+                curingGroupMans.map((man) => {
+                    if (man.User === checkUserId) {
+                        deleteID = man.ID;
+                    }
+                });
+                let postData = {
+                    id: deleteID
+                };
+                let deleteData = await deleteCuringGroupMan(postData);
+                if (deleteData && deleteData.code && deleteData.code === 1) {
+                    await this.getRelatedMans();
+                    RelationMem.map((memberID, index) => {
+                        if (memberID === user.id) {
+                            RelationMem.splice(index, 1); // 删除该元素
+                        }
+                    });
+                    Notification.success({
+                        message: '取消关联用户成功',
+                        duration: 1
+                    });
+                } else {
+                    Notification.error({
+                        message: '取消关联用户失败',
+                        duration: 2
+                    });
+                }
+                console.log('ddddddddddd', deleteData);
+            }
+        } catch (e) {
+            console.log('ssss', e);
         }
         this.setState({
             RelationMem
         });
+    }
 
-        console.log('111111', e);
-        console.log('22222222', user);
+    getRelatedMans = async () => {
+        const {
+            actions: {
+                getCuringGroupMans
+            },
+            selectMemTeam
+        } = this.props;
+        let postGetData = {
+            groupid: selectMemTeam.ID
+        };
+        await getCuringGroupMans(postGetData);
     }
 
     columns = [
@@ -265,7 +316,7 @@ export default class AddMember extends Component {
             title: '关联',
             render: user => {
                 const { RelationMem = [] } = this.state;
-                const checked = RelationMem.some(member => member.id === user.id);
+                const checked = RelationMem.some(memberID => Number(memberID) === user.id);
 
                 return (
                     <Checkbox

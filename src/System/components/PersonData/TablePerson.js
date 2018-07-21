@@ -232,7 +232,6 @@ export default class TablePerson extends Component {
         return (
             <div>
                 <div>
-                    {/* <Button style={{marginRight:"10px"}} onClick={this.createLink.bind(this,'muban',`${DataReportTemplate_PersonInformation}`)} type="default">模板下载</Button> */}
                     <Button
                         style={{ marginRight: '10px' }}
                         onClick={this.send.bind(this)}

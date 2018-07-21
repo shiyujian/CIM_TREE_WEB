@@ -30,7 +30,7 @@ export default class PersonTree extends Component {
         console.log('taskTeams', taskTeams);
         if (taskTeams && taskTeams instanceof Array && taskTeams.length > 0) {
             let optionArr = taskTeams.map((team) => {
-                return <Option key={team.ID} value={JSON.stringify(team)} title={team.GroupName}>{team.GroupName}</Option>;
+                return <Option key={team.ID} value={team.ID} title={team.GroupName}>{team.GroupName}</Option>;
             });
             console.log('optionArr', optionArr);
             this.setState({

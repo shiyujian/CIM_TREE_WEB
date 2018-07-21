@@ -317,9 +317,9 @@ class AsideTree extends Component {
         const {
             actions: {
                 deleteCuringGroup,
-                isGetMemChange,
                 changeSelectMemTeam,
-                changeSelectState
+                changeSelectState,
+                getCuringGroupMansOk
             }
         } = this.props;
         const {
@@ -339,7 +339,7 @@ class AsideTree extends Component {
                         });
                         changeSelectState(false);
                         changeSelectMemTeam();
-                        isGetMemChange(moment().unix());
+                        getCuringGroupMansOk([]);
                         this._docList(keyArr[1]);
                         this.setState({
                             selected: false
@@ -362,13 +362,13 @@ class AsideTree extends Component {
         }
     }
     // 点击树节点
-    _handleTreeSelect = (key, info) => {
+    _handleTreeSelect = async (key, info) => {
         const {
             actions: {
                 changeSelectSection,
                 changeSelectMemTeam,
-                isGetMemChange,
-                changeSelectState
+                changeSelectState,
+                getCuringGroupMans
             }
         } = this.props;
         const {
@@ -383,31 +383,33 @@ class AsideTree extends Component {
             let keyArr = selectKey.split('^^');
             if (keyArr && keyArr.length === 2) {
                 // 将section上传，根据section获取人员列表
-                let codeArr = keyArr[1].split('_');
-                console.log('codeArr', codeArr);
-                if (codeArr && codeArr.length === 4) {
-                    let section = codeArr[3];
-                    console.log('section', section);
-                    changeSelectSection(section);
-                }
+                console.log('keyArr', keyArr);
+                let section = keyArr[1];
+                console.log('section', section);
+                await changeSelectSection(section);
                 // 将班组信息上传至redux
                 teamsTree.map((list) => {
                     if (list.ID === keyArr[1]) {
                         let taskTeams = list.children;
-                        taskTeams.map((team) => {
-                            if (team.ID === keyArr[0]) {
-                                changeSelectMemTeam(team);
+                        taskTeams.map(async (team) => {
+                            console.log('team.ID', team.ID);
+                            console.log('keyArr[0]', keyArr[0]);
+                            if (team.ID === Number(keyArr[0])) {
+                                await changeSelectMemTeam(team);
                             }
                         });
                     }
                 });
-                //
+                let postData = {
+                    groupid: keyArr[0]
+                };
+                let data = await getCuringGroupMans(postData);
+                console.log('data', data);
             }
         } catch (e) {
             console.log('点击节点', e);
         }
-        isGetMemChange(moment().unix());
-        changeSelectState(selected);
+        await changeSelectState(selected);
         this.setState({
             selected,
             selectKey
