@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-19 14:41:52
+ * @Last Modified time: 2018-07-24 15:01:37
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -466,76 +466,6 @@ class OnSite extends Component {
             console.log('获取地块树数据', e);
         }
     }
-    // // 小班排列
-    // getSmallClass (smallClassList) {
-    //     // 将小班的code获取到，进行去重
-    //     let uniqueSmallClass = [];
-    //     // 进行数组去重的数组
-    //     let array = [];
-
-    //     let test = [];
-    //     smallClassList.map(list => {
-    //         // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
-    //         let codeName =
-    //             list.LandNo +
-    //             '#' +
-    //             list.RegionNo +
-    //             '#' +
-    //             list.SmallClass +
-    //             '#' +
-    //             list.SmallClassName;
-    //         if (list.SmallClass && array.indexOf(codeName) === -1) {
-    //             uniqueSmallClass.push({
-    //                 Name: list.SmallClassName
-    //                     ? list.SmallClassName + '小班'
-    //                     : list.SmallClass + '小班',
-    //                 No: codeName
-    //             });
-    //             array.push(codeName);
-    //         } else {
-    //             test.push({
-    //                 SmallClassName: list.SmallClassName,
-    //                 SmallClass: list.SmallClass
-    //             });
-    //         }
-    //     });
-    //     return uniqueSmallClass;
-    // }
-    // 细班排列
-    // getThinClass (smallClass, list) {
-    //     let thinClassList = [];
-    //     let codeArray = [];
-    //     let nameArray = [];
-    //     list.map(rst => {
-    //         let codeName = smallClass.No.split('#');
-    //         let code = codeName[2];
-    //         let name = codeName[3];
-    //         if (name === 'null') {
-    //             name = null;
-    //         }
-    //         // 暂时去掉重复的节点
-    //         if (
-    //             rst.ThinClass &&
-    //             rst.SmallClass === code &&
-    //             rst.SmallClassName === name
-    //         ) {
-    //             let noArr = rst.No.split('-');
-    //             let No =
-    //                 noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
-    //             if (codeArray.indexOf(No) === -1) {
-    //                 thinClassList.push({
-    //                     Name: rst.ThinClassName
-    //                         ? rst.ThinClassName + '细班'
-    //                         : rst.ThinClass + '细班',
-    //                     No: No
-    //                 });
-    //                 codeArray.push(No);
-    //                 nameArray.push(rst.ThinClassName);
-    //             }
-    //         }
-    //     });
-    //     return thinClassList;
-    // }
     // 获取树种数据
     async getTreeType () {
         const { getTreeTypeAction } = this.props.actions;
@@ -1044,7 +974,6 @@ class OnSite extends Component {
             seeVisible: !this.state.seeVisible
         });
     }
-
     /* 弹出信息框 */
     handleAreaSelect (keys, info) {
         const {

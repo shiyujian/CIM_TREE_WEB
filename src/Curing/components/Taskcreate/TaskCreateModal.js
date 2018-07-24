@@ -108,6 +108,8 @@ class TaskCreateModal extends Component {
                 visible
                 width='700px'
                 footer={footer}
+                closable={false}
+                maskClosable={false}
             >
                 <Spin spinning={this.state.loading}>
                     <Form>

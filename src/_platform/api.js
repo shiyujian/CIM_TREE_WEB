@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-21 17:38:40
+ * @Last Modified time: 2018-07-24 20:07:37
  */
 /**
  *
@@ -447,14 +447,6 @@ export const MODULES = [
                 id: 'DASHBOARD.ONSITE',
                 name: '二维展示'
             },
-            // {
-            //     id: 'DASHBOARD.PLAN',
-            //     name: '巡检路线'
-            // },
-            // {
-            //     id: 'DASHBOARD.DANGER',
-            //     name: '安全隐患'
-            // },
             {
                 id: 'DASHBOARD.PROJECT',
                 name: '工程影像'
@@ -493,7 +485,7 @@ export const MODULES = [
         children: [
             {
                 id: 'DATUM.STANDARD',
-                name: '制度规范'
+                name: '制度标准'
             },
             {
                 id: 'DATUM.ENGINEERING',
@@ -513,50 +505,14 @@ export const MODULES = [
         id: 'QUALITY',
         name: '质量管理',
         children: [
-            // {
-            // 	id: 'QUALITY.TONGJI',
-            // 	name: '质量分析',
-            // },
             {
-                id: 'QUALITY.SCORE',
-                name: '质量评分',
-                children: [
-                    {
-                        id: 'QUALITY.SCORE.SEARCH',
-                        name: '质量管理检查记录'
-                    }
-                ]
+                id: 'QUALITY.SEARCH',
+                name: '质量评分'
             },
             {
                 id: 'QUALITY.APPRAISING',
                 name: '质量评优'
             },
-            //  {
-            // 	id:'QUALITY.YANSHOU.NONE',
-            // 	name: '质量验收',
-            // 	children: [{
-            // 		id: 'QUALITY.CHECK',
-            // 		name: '检验批验收',
-            // 	},{
-            // 		id: 'QUALITY.TIANBAO',
-            // 		name: '进场材料填报',
-            // 	}, {
-            // 		id: 'QUALITY.QUERY',
-            // 		name: '验收查询',
-            // 	}, {
-            // 		id: 'QUALITY.HUAFEN',
-            // 		name: '检验批划分',
-            // 	}, {
-            // 		id: 'QUALITY.SUBITEM',
-            // 		name: '分项验收',
-            // 	}, {
-            // 		id: 'QUALITY.FENBU',
-            // 		name: '分部验收',
-            // 	}, {
-            // 		id: 'QUALITY.DANWEI',
-            // 		name: '单位工程验收',
-            // 	}]
-            // },
             {
                 id: 'QUALITY.DEFECT',
                 name: '质量缺陷'
@@ -591,10 +547,6 @@ export const MODULES = [
                 id: 'SCHEDULE.SCHEDULEANALYZE',
                 name: '种植进度分析'
             }
-            // {
-            //     id: 'SCHEDULE.SHOW',
-            //     name: '种植进度展示'
-            // }
         ]
     },
     {
@@ -718,23 +670,13 @@ export const MODULES = [
             {
                 id: 'CURING.TASKSTATIS',
                 name: '任务统计'
+            },
+            {
+                id: 'CURING.TASKTEAM',
+                name: '养护班组'
             }
         ]
     },
-    // , {
-    // 	id: 'RECEIVE',
-    // 	name: '收发货管理',
-    // 	children: [{
-    // 		id: 'RECEIVE.RECEIVEMANAGEMENT',
-    // 		name: '收货管理',
-    // 	}, {
-    // 		id: 'RECEIVE.DISTRIBUTIONMANAGEMENT',
-    // 		name: '发放管理',
-    // 	}, {
-    // 		id: 'RECEIVE.INVENTORYMANAGEMENT',
-    // 		name: '库存管理',
-    // 	}]
-    // }
     {
         id: 'SELFCARE',
         name: '个人中心',
@@ -751,10 +693,6 @@ export const MODULES = [
                 id: 'SELFCARE.LEAVE',
                 name: '个人请假'
             }
-            // , {
-            // 	id: 'SELFCARE.ACCOUNT',
-            // 	name: '账号管理',
-            // }
         ]
     },
     {
@@ -799,62 +737,6 @@ export const MODULES = [
         id: 'PROJECT',
         name: '项目管理',
         children: [
-            // {
-            // 	id:'PROJECT.LANDAREA.NONE',
-            // 	name: '地块区域',
-            // 	children: [{
-            // 		id: 'PROJECT.PLOTMAGE',
-            // 		name: '地块管理',
-            // 	}, {
-            // 		id: 'PROJECT.AREAMANAGE',
-            // 		name: '区域管理',
-            // 	}, {
-            // 		id: 'PROJECT.SECTIONMANAGE',
-            // 		name: '标段管理',
-            // 	}, {
-            // 		id: 'PROJECT.SMALLCLASS',
-            // 		name: '小班管理',
-            // 	}, {
-            // 		id: 'PROJECT.THINCLASS',
-            // 		name: '细班管理',
-            // 	}]
-            // }, {
-            // 	id:'PROJECT.PROMANAGE.NONE',
-            // 	name: '工程管理',
-            // 	children: [{
-            // 		id: 'PROJECT.PLOTSET',
-            // 		name: '地块设置',
-            // 	}, {
-            // 		id: 'PROJECT.AREASET',
-            // 		name: '区域设置',
-            // 	}, {
-            // 		id: 'PROJECT.UNITPRO',
-            // 		name: '单位工程',
-            // 	}, {
-            // 		id: 'PROJECT.SUBUNITPRO',
-            // 		name: '子单位工程',
-            // 	}, {
-            // 		id: 'PROJECT.SUBPRO',
-            // 		name: '分部工程',
-            // 	}, {
-            // 		id: 'PROJECT.ITEMPRO',
-            // 		name: '分项工程',
-            // 	}]
-            // }, {
-            // 	id:'PROJECT.ORG.NONE',
-            // 	name: '组织机构',
-            // 	children: [{
-            // 		id: 'PROJECT.ORGTYPE',
-            // 		name: '类型管理',
-            // 	}, {
-            // 		id: 'PROJECT.UNITMANAGE',
-            // 		name: '单位管理',
-            // 	}, {
-            // 		id: 'PROJECT.BRANCHMANAGE',
-            // 		name: '部门管理',
-            // 	}]
-            // },
-
             {
                 id: 'PROJECT.DATAMANAGE.NONE',
                 name: '资料管理',
@@ -871,17 +753,6 @@ export const MODULES = [
                         id: 'PROJECT.PRODOC',
                         name: '工程文档'
                     }
-
-                    // , {
-                    // 	id: 'PROJECT.KEYWORD',
-                    // 	name: '工程字段',
-                    // }, {
-                    // 	id: 'PROJECT.TEMPLATE',
-                    // 	name: '模板配置',
-                    // }, {
-                    // 	id: 'PROJECT.DICTIONARIES',
-                    // 	name: '工程文档字典',
-                    // }
                 ]
             },
             {
@@ -963,517 +834,6 @@ export const MODULES = [
         ]
     }
 ];
-
-// MODULES和MODULES2在前海的设置有区别分别是admin用户和其他用户的模块权限
-export const MODULES2 = [
-    {
-        id: 'HOME',
-        name: '首页'
-    },
-    {
-        id: 'DASHBOARD',
-        name: '综合展示',
-        children: [
-            {
-                id: 'DASHBOARD.ONSITE',
-                name: '二维展示'
-            },
-            {
-                id: 'DASHBOARD.PLAN',
-                name: '巡检路线'
-            },
-            {
-                id: 'DASHBOARD.DANGER',
-                name: '安全隐患'
-            },
-            {
-                id: 'DASHBOARD.PROJECT',
-                name: '工程影像'
-            }
-        ]
-    },
-    {
-        id: 'OVERALL',
-        name: '综合管理',
-        children: [
-            {
-                id: 'OVERALL.NEWS',
-                name: '新闻通知'
-            },
-            {
-                id: 'OVERALL.DISPATCH',
-                name: '现场收发文'
-            },
-            {
-                id: 'OVERALL.MATERAIL',
-                name: '物资管理'
-            },
-            {
-                id: 'OVERALL.FORM',
-                name: '表单管理'
-            },
-            {
-                id: 'OVERALL.CHECKIN',
-                name: '考勤管理'
-            }
-        ]
-    },
-    {
-        id: 'DATUM',
-        name: '资料管理',
-        children: [
-            {
-                id: 'DATUM.STANDARD',
-                name: '制度规范'
-            },
-            {
-                id: 'DATUM.ENGINEERING',
-                name: '工程文档'
-            },
-            {
-                id: 'DATUM.REDIOS',
-                name: '工程影像'
-            }
-        ]
-    },
-    {
-        id: 'QUALITY',
-        name: '质量管理',
-        children: [
-            {
-                id: 'QUALITY.TONGJI',
-                name: '质量分析'
-            },
-            {
-                id: 'QUALITY.SCORE',
-                name: '质量评分',
-                children: [
-                    {
-                        id: 'QUALITY.SCORE.SEARCH',
-                        name: '质量管理检查记录'
-                    }
-                ]
-            },
-            {
-                id: 'QUALITY.APPRAISING',
-                name: '质量评优'
-            },
-            {
-                id: 'QUALITY.YANSHOU',
-                name: '质量验收',
-                children: [
-                    {
-                        id: 'QUALITY.TIANBAO',
-                        name: '进场材料填报'
-                    },
-                    {
-                        id: 'QUALITY.QUERY',
-                        name: '验收查询'
-                    },
-                    {
-                        id: 'QUALITY.HUAFEN',
-                        name: '检验批划分'
-                    },
-                    {
-                        id: 'QUALITY.SUBITEM',
-                        name: '分项验收'
-                    },
-                    {
-                        id: 'QUALITY.FENBU',
-                        name: '分部验收'
-                    },
-                    {
-                        id: 'QUALITY.DANWEI',
-                        name: '单位工程验收'
-                    }
-                ]
-            },
-            {
-                id: 'QUALITY.DEFECT',
-                name: '质量缺陷'
-            }
-        ]
-    },
-    {
-        id: 'SCHEDULE',
-        name: '进度管理',
-        children: [
-            {
-                id: 'SCHEDULE.STAGEREPORT',
-                name: '进度填报'
-            },
-            {
-                id: 'SCHEDULE.PROPROGRESS',
-                name: '项目进度'
-            },
-            {
-                id: 'SCHEDULE.ENTERANALYZE',
-                name: '苗木进场分析'
-            },
-            {
-                id: 'SCHEDULE.SCHEDULEANALYZE',
-                name: '种植进度分析'
-            },
-            {
-                id: 'SCHEDULE.SHOW',
-                name: '种植进度展示'
-            }
-        ]
-    },
-    {
-        id: 'SAFETY',
-        name: '安环管理',
-        children: [
-            {
-                id: 'SAFETY',
-                name: '安全动态'
-            },
-            {
-                id: 'SAFETY.SYSTEM',
-                name: '安全体系'
-            },
-            {
-                id: 'SAFETY.HIDDENDANGER',
-                name: '安全隐患'
-            },
-            {
-                id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT',
-                name: '安全文明施工',
-                children: [
-                    {
-                        id: 'SAFETY.RISKEVALUATION',
-                        name: '危险源风险评价'
-                    },
-                    {
-                        id: 'SAFETY.UNBEARABLE',
-                        name: '环境保护'
-                    },
-                    {
-                        id: 'SAFETY.RISKFACTOR',
-                        name: '文明施工'
-                    }
-                ]
-            },
-            {
-                id: 'SAFETY.EDUCATIONREGISTER',
-                name: '安全教育'
-            },
-            {
-                id: 'SAFETY.SAFETYTREND',
-                name: '安全动态管理'
-            }
-        ]
-    },
-    {
-        id: 'FOREST',
-        name: '森林大数据',
-        children: [
-            {
-                id: 'FOREST.INFO',
-                name: '苗木大数据',
-                children: [
-                    {
-                        id: 'FOREST.NURSOVERALLINFO',
-                        name: '苗木综合信息'
-                    },
-                    {
-                        id: 'FOREST.NURSMEASUREINFO',
-                        name: '苗圃测量信息'
-                    },
-                    {
-                        id: 'FOREST.LOCMEASUREINFO',
-                        name: '现场测量信息'
-                    },
-                    {
-                        id: 'FOREST.SUPERVISORINFO',
-                        name: '监理验收信息'
-                    },
-                    {
-                        id: 'FOREST.OWNERINFO',
-                        name: '业主抽查信息'
-                    },
-                    {
-                        id: 'FOREST.CONTRASTINFO',
-                        name: '苗木对比信息'
-                    },
-                    {
-                        id: 'FOREST.FAITHINFO',
-                        name: '供应商诚信信息'
-                    }
-                ]
-            },
-            {
-                id: 'FOREST.FOREST.IMPORT',
-                name: '数据导入',
-                children: [
-                    {
-                        id: 'FOREST.DATAIMPORT',
-                        name: '定位数据导入'
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        id: 'CURING',
-        name: '养护管理',
-        children: [
-            {
-                id: 'CURING.TASKCREATE',
-                name: '任务下发'
-            },
-            {
-                id: 'CURING.TASKREPORT',
-                name: '任务上报'
-            },
-            {
-                id: 'CURING.TASKSTATIS',
-                name: '任务统计'
-            }
-        ]
-    },
-    {
-        id: 'RECEIVE',
-        name: '收发货管理',
-        children: [
-            {
-                id: 'RECEIVE.RECEIVEMANAGEMENT',
-                name: '收货管理'
-            },
-            {
-                id: 'RECEIVE.DISTRIBUTIONMANAGEMENT',
-                name: '发放管理'
-            },
-            {
-                id: 'RECEIVE.INVENTORYMANAGEMENT',
-                name: '库存管理'
-            }
-        ]
-    },
-    {
-        id: 'SELFCARE',
-        name: '个人中心',
-        children: [
-            {
-                id: 'SELFCARE.TASK',
-                name: '个人任务'
-            },
-            {
-                id: 'SELFCARE.QUERY',
-                name: '个人考勤'
-            },
-            {
-                id: 'SELFCARE.LEAVE',
-                name: '个人请假'
-            },
-            {
-                id: 'SELFCARE.ACCOUNT',
-                name: '账号管理'
-            }
-        ]
-    },
-    {
-        id: 'SYSTEM',
-        name: '系统设置',
-        children: [
-            {
-                id: 'SYSTEM.ROLE',
-                name: '角色设置'
-            },
-            {
-                id: 'SYSTEM.PERMISSION',
-                name: '权限设置'
-            },
-            {
-                id: 'SYSTEM.PERSON',
-                name: '用户管理'
-            },
-            {
-                id: 'SYSTEM.WORKFLOW',
-                name: '流程设置'
-            },
-            {
-                id: 'SYSTEM.ORG',
-                name: '组织机构'
-            }
-        ]
-    },
-    {
-        id: 'PROJECT',
-        name: '项目管理',
-        children: [
-            {
-                id: 'PROJECT.LANDAREA',
-                name: '地块区域',
-                children: [
-                    {
-                        id: 'PROJECT.PLOTMAGE',
-                        name: '地块管理'
-                    },
-                    {
-                        id: 'PROJECT.AREAMANAGE',
-                        name: '区域管理'
-                    },
-                    {
-                        id: 'PROJECT.SECTIONMANAGE',
-                        name: '标段管理'
-                    },
-                    {
-                        id: 'PROJECT.SMALLCLASS',
-                        name: '小班管理'
-                    },
-                    {
-                        id: 'PROJECT.THINCLASS',
-                        name: '细班管理'
-                    }
-                ]
-            },
-            {
-                id: 'PROJECT.PROMANAGE',
-                name: '工程管理',
-                children: [
-                    {
-                        id: 'PROJECT.PLOTSET',
-                        name: '地块设置'
-                    },
-                    {
-                        id: 'PROJECT.AREASET',
-                        name: '区域设置'
-                    },
-                    {
-                        id: 'PROJECT.UNITPRO',
-                        name: '单位工程'
-                    },
-                    {
-                        id: 'PROJECT.SUBUNITPRO',
-                        name: '子单位工程'
-                    },
-                    {
-                        id: 'PROJECT.SUBPRO',
-                        name: '分部工程'
-                    },
-                    {
-                        id: 'PROJECT.ITEMPRO',
-                        name: '分项工程'
-                    }
-                ]
-            },
-            {
-                id: 'PROJECT.ORG',
-                name: '组织机构',
-                children: [
-                    {
-                        id: 'PROJECT.ORGTYPE',
-                        name: '类型管理'
-                    },
-                    {
-                        id: 'PROJECT.UNITMANAGE',
-                        name: '单位管理'
-                    },
-                    {
-                        id: 'PROJECT.BRANCHMANAGE',
-                        name: '部门管理'
-                    }
-                ]
-            },
-            {
-                id: 'PROJECT.DATAMANAGE',
-                name: '资料管理',
-                children: [
-                    {
-                        id: 'PROJECT.STANDARD',
-                        name: '制度标准'
-                    },
-                    {
-                        id: 'PROJECT.ENGINEERINGIMAGE',
-                        name: '工程影像'
-                    },
-                    {
-                        id: 'PROJECT.PRODOC',
-                        name: '工程文档'
-                    },
-                    {
-                        id: 'PROJECT.KEYWORD',
-                        name: '工程字段'
-                    },
-                    {
-                        id: 'PROJECT.TEMPLATE',
-                        name: '模板配置'
-                    },
-                    {
-                        id: 'PROJECT.DICTIONARIES',
-                        name: '工程文档字典'
-                    }
-                ]
-            },
-            {
-                id: 'PROJECT.OVERALLMANAGE',
-                name: '综合管理',
-                children: [
-                    {
-                        id: 'PROJECT.MATERIAL',
-                        name: '物资管理'
-                    },
-                    {
-                        id: 'PROJECT.FORM',
-                        name: '表单管理'
-                    }
-                ]
-            },
-            {
-                id: 'PROJECT.SAFETYMANAGE',
-                name: '安环管理',
-                children: [
-                    {
-                        id: 'PROJECT.SAFETYSYSTEM',
-                        name: '安全体系目录'
-                    },
-                    {
-                        id: 'PROJECT.DANGER',
-                        name: '危险源'
-                    },
-                    {
-                        id: 'PROJECT.HAZARD',
-                        name: '安全隐患'
-                    }
-                ]
-            },
-            {
-                id: 'PROJECT.MASSMANAGE',
-                name: '质量管理',
-                children: [
-                    {
-                        id: 'PROJECT.DEFECTS',
-                        name: '质量缺陷'
-                    },
-                    {
-                        id: 'PROJECT.NURSERYTYPE',
-                        name: '类型管理'
-                    },
-                    {
-                        id: 'PROJECT.TREEMANAGE',
-                        name: '树种管理'
-                    }
-                ]
-            },
-            {
-                id: 'PROJECT.NURSERY',
-                name: '苗木管理',
-                children: [
-                    {
-                        id: 'PROJECT.NURSERYTYPE',
-                        name: '类型管理'
-                    },
-                    {
-                        id: 'PROJECT.TREEMANAGE',
-                        name: '树种管理'
-                    }
-                ]
-            }
-        ]
-    }
-];
-
 // const APPLABEL = 'accounts';
 
 // const CONTENTTYPE = 'appmeta';

@@ -51,6 +51,11 @@ export const getThinClassesByRegion = createFetchAction(`${FOREST_API}/curing/th
 export const getTreeLocationNumByRegion = createFetchAction(`${FOREST_API}/curing/treelocationnumbyregion?wkt={{wkt}}`, [], 'GET');
 // 获取班组人员
 export const getCuringGroupMans = createFetchAction(`${FOREST_API}/curing/curinggroupmans?groupid={{groupid}}`, [], 'GET');
+// 修改选择地图的方式
+export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
+// 修改选中节点
+export const changeCheckedKeys = createAction(`${ID}_changeCheckedKeys`);
+
 export const actions = {
     getTreearea,
     getUsers,
@@ -74,8 +79,17 @@ export const actions = {
     getcCuringTypes,
     getThinClassesByRegion,
     getTreeLocationNumByRegion,
-    getCuringGroupMans
+    getCuringGroupMans,
+    changeSelectMap,
+    changeCheckedKeys
 };
 export default handleActions({
-
+    [changeSelectMap]: (state, {payload}) => ({
+        ...state,
+        selectMap: payload
+    }),
+    [changeCheckedKeys]: (state, {payload}) => ({
+        ...state,
+        checkedKeys: payload
+    })
 }, {});

@@ -24,6 +24,20 @@
         color: #333;
         z-index: 999;
         overflow: auto;
+
+        
+        .ant-tree-title{
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          width: 180px;
+        }
+        .ant-tree li .ant-tree-node-content-wrapper{
+            word-break: break-all;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            width: 270px;
+        }
       }
     }
     .drawer {
@@ -156,7 +170,7 @@
       position: absolute;
       z-index: 960;
       top: 6px;
-      right: 80%;
+      left: 300px;
     }
 
     .treeControl3 {

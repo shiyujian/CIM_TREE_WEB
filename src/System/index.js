@@ -17,7 +17,6 @@ export default class System extends Component {
     }
 
     render () {
-        const { Create } = this.state || {};
         return (
             <Body>
                 <Aside>
@@ -35,32 +34,6 @@ export default class System extends Component {
     }
 
     static menus = [
-        // {
-        // 	key: 'code',
-        // 	name: '编码设置',
-        // 	icon: <Icon name="won"/>,
-        // 	children: [{
-        // 		key: 'Dict',
-        // 		id: 'SYSTEM.FIELD',
-        // 		name: '编码字段',
-        // 		path: '/system',
-        // 		exact: true,
-        // 		icon: <Icon name="retweet"/>,
-        // 	}, {
-        // 		key: 'Code',
-        // 		id: 'SYSTEM.CODETYPE',
-        // 		name: '编码类型',
-        // 		exact: true,
-        // 		path: '/system/code',
-        // 		icon: <Icon name="code"/>
-        // 	}, {
-        // 		key: 'Convention',
-        // 		id: 'SYSTEM.CONVENTION',
-        // 		name: '编码配置',
-        // 		path: '/system/convention',
-        // 		icon: <Icon name="money"/>
-        // 	}]
-        // },
         {
             key: 'Role',
             id: 'SYSTEM.ROLE',
@@ -118,30 +91,5 @@ export default class System extends Component {
             path: '/system/blacklist',
             icon: <Icon name='street-view' />
         }
-        // ,{
-        // 	key: 'Document',
-        // 	id: 'SYSTEM.DOCUMENT',
-        // 	name: '文档设置',
-        // 	path: '/system/document',
-        // 	icon: <Icon name="tablet"/>,
-        // },
-        // {
-        // 	key: 'detailed',
-        // 	name: '清单设置',
-        // 	icon: <Icon name="book"/>,
-        // 	children: [{
-        // 		key: 'Tag',
-        // 		id: 'SYSTEM.TAG',
-        // 		name: '工程量项',
-        // 		path: '/system/tag',
-        // 		icon: <Icon name="signal"/>
-        // 	},{
-        // 		key: 'Quantities',
-        // 		id: 'SYSTEM.QUANTITIES',
-        // 		name: '分项工程量',
-        // 		path: '/system/quantities',
-        // 		icon: <Icon name="signal"/>
-        // 	}]
-        // }
     ];
 }
