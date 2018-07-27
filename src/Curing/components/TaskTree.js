@@ -17,6 +17,7 @@ export default class TaskTree extends Component {
     }
 
     onSelect (keys, info) {
+        console.log('sssssssssssssssss');
         this.originOnSelect(keys, info);
     }
 
@@ -31,6 +32,7 @@ export default class TaskTree extends Component {
             if (p) {
                 return (
                     <TreeNode
+                        selectable={false}
                         title={p.Name}
                         key={p.ID}
                     >
@@ -66,7 +68,7 @@ export default class TaskTree extends Component {
         return (
             <div>
                 <Tree
-                    checkable
+                    // checkable
                     // showIcon
                     // checkedKeys={this.state.checkkeys}
                     onCheck={this.onCheck.bind(that)}

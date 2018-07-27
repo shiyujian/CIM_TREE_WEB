@@ -13,8 +13,6 @@ export const getUsers = createFetchAction(`${USER_API}/users/`, []);
 
 export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
 export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //
-// 获取文档列表
-export const getDocList = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [], 'GET');
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
 // 苗木养护任务查询
@@ -46,9 +44,9 @@ export const getCuringGroup = createFetchAction(`${FOREST_API}/curing/curinggrou
 // 获获取养护类型
 export const getcCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
 // 根据范围查询细班
-export const getThinClassesByRegion = createFetchAction(`${FOREST_API}/curing/thinclassesbyregion?wkt={{wkt}}`, [], 'GET');
+export const postThinClassesByRegion = createFetchAction(`${FOREST_API}/curing/thinclassesbyregion`, [], 'POST');
 // 获取范围内栽植的树木数量
-export const getTreeLocationNumByRegion = createFetchAction(`${FOREST_API}/curing/treelocationnumbyregion?wkt={{wkt}}`, [], 'GET');
+export const postTreeLocationNumByRegion = createFetchAction(`${FOREST_API}/curing/treelocationnumbyregion`, [], 'POST');
 // 获取班组人员
 export const getCuringGroupMans = createFetchAction(`${FOREST_API}/curing/curinggroupmans?groupid={{groupid}}`, [], 'GET');
 // 修改选择地图的方式
@@ -61,7 +59,6 @@ export const actions = {
     getUsers,
     getTreeNodeList,
     getLittleBan,
-    getDocList,
     getCuring,
     getCuringTask,
     getCuringMessage,
@@ -77,8 +74,8 @@ export const actions = {
     postCuringGroup,
     getCuringGroup,
     getcCuringTypes,
-    getThinClassesByRegion,
-    getTreeLocationNumByRegion,
+    postThinClassesByRegion,
+    postTreeLocationNumByRegion,
     getCuringGroupMans,
     changeSelectMap,
     changeCheckedKeys

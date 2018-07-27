@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import {
-    Button, Collapse
+    Button, Collapse, Notification
 } from 'antd';
 import DashPanel from '../DashPanel';
-import {getThinClass, getSmallClass, fillAreaColor, getSectionName} from '../auth';
+import {getThinClass, getSmallClass, fillAreaColor, getSectionName, getHandleWktData, getWktData, computeSignedArea} from '../auth';
 import TaskCreateModal from './TaskCreateModal';
 import '../Curing.less';
 import { getUser } from '_platform/auth';
@@ -26,8 +26,7 @@ export default class TaskCreateTable extends Component {
             coordinates: [], // 圈选地图各个点的坐标
             areaLayerList: {}, // 选择各个细班的图层列表
             createBtnVisible: false, // 先建任务Modal的可视
-            polygonData: '', // 全选地图图层
-            centerPoint: '', // 全选地图的中心点
+            polygonData: '', // 圈选地图图层
             treeNum: 0, // 圈选地图内的树木数量
             regionThinClass: [], // 圈选地图内的细班
             totalThinClass: [], // 全部细班
@@ -37,7 +36,6 @@ export default class TaskCreateTable extends Component {
             regionSectionName: '', // 圈选区域内的标段名称
             regionArea: 0, // 圈选区域内面积
             wkt: '',
-            areaData: [],
             noLoading: false,
             treeCoords: {}
         };
@@ -69,6 +67,15 @@ export default class TaskCreateTable extends Component {
     };
 
     async componentDidMount () {
+        const {
+            actions: {
+                changeCheckedKeys,
+                changeSelectMap
+            }
+        } = this.props;
+        this.user = getUser();
+        await changeCheckedKeys([]);
+        await changeSelectMap('细班选择');
         // 获取地块树数据
         this._loadAreaData();
 
@@ -168,8 +175,7 @@ export default class TaskCreateTable extends Component {
             // coordinates.push({ Lat: e.latlng.lat, Lng: e.latlng.lng });
             const {
                 coordinates,
-                createBtnVisible,
-                areaData
+                createBtnVisible
             } = me.state;
             const {
                 selectMap
@@ -177,9 +183,7 @@ export default class TaskCreateTable extends Component {
             if (selectMap === '细班选择') {
                 return;
             }
-            console.log('coordinates', coordinates);
             coordinates.push([e.latlng.lat, e.latlng.lng]);
-            areaData.push(e.latlng);
             if (coordinates.length > 2 && !createBtnVisible) {
                 me.setState({
                     createBtnVisible: true
@@ -188,39 +192,33 @@ export default class TaskCreateTable extends Component {
             if (me.state.polygonData) {
                 me.map.removeLayer(me.state.polygonData);
             }
-            if (me.state.centerPoint) {
-                me.map.removeLayer(me.state.centerPoint);
-            }
             let polygonData = L.polygon(coordinates, {
                 color: 'white',
                 fillColor: '#93B9F2',
                 fillOpacity: 0.2
             }).addTo(me.map);
-            console.log('polygonData', polygonData);
-            // let test = polygonData.getCenter();
-            // // debugger;
-            // console.log('test', test);
-            // console.log('[test.lat, test.lng]', [test.lat, test.lng]);
-            // let centerPoint = L.polygon([[test.lat, test.lng]], {
-            //     color: 'red',
-            //     fillColor: '#93B9F2',
-            //     fillOpacity: 0.2
-            // }).addTo(me.map);
-
             me.setState({
                 coordinates,
-                polygonData: polygonData,
-                areaData
-                // centerPoint
+                polygonData: polygonData
             });
         });
     }
     render () {
         const {
-            treeLists,
             createBtnVisible,
-            taskModalVisible
+            taskModalVisible,
+            coordinates
         } = this.state;
+        const {
+            selectMap
+        } = this.props;
+        let RetreatDisplay = false;
+        let okDisplay = false;
+        if (selectMap === '细班选择') {
+            RetreatDisplay = true;
+        } else if (coordinates.length <= 2) {
+            okDisplay = true;
+        }
         return (
             <div className='Curing-container'>
                 <div
@@ -265,12 +263,7 @@ export default class TaskCreateTable extends Component {
                                     );
                                 })}
                             </Collapse>
-                            {/* <div style={{ height: '20px' }} /> */}
                         </aside>
-                        <div
-                            className='resizeSenseArea'
-                            onMouseDown={this._onStartResizeMenu.bind(this)}
-                        />
                         {this.state.menuIsExtend ? (
                             <div
                                 className='foldBtn'
@@ -293,8 +286,9 @@ export default class TaskCreateTable extends Component {
                         createBtnVisible ? (
                             <div className='treeControl2'>
                                 <div>
-                                    <Button type='primary' style={{marginRight: 10}} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
-                                    <Button type='info' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
+                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
+                                    {RetreatDisplay ? '' : <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
+                                    <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
                                 </div>
                             </div>
                         ) : ''
@@ -311,7 +305,6 @@ export default class TaskCreateTable extends Component {
                     }
                     {this.state.isVisibleMapBtn ? (
                         <div className='treeControl'>
-                            {/* <iframe allowTransparency={true} className={styles.btnCtro}/> */}
                             <div>
                                 <Button
                                     type={
@@ -363,7 +356,6 @@ export default class TaskCreateTable extends Component {
                 </div>
             </div>);
     }
-
     /* 渲染菜单panel */
     renderPanel (option) {
         const {
@@ -382,20 +374,9 @@ export default class TaskCreateTable extends Component {
                             content={treeLists}
                         />
                     );
-                // 养护任务
-                case 'geojsonFeature_task':
-                    return (
-                        <DashPanel
-                            // onCheck={this.handleRiskCheck.bind(this)}
-                            // onSelect={this.handleRiskSelect.bind(this)}
-                            // content={content}
-                            // userCheckKeys={this.state.userCheckedKeys}
-                        />
-                    );
             }
         }
     }
-
     /* 选中节点 */
     async handleAreaSelect (keys, info) {
     }
@@ -436,9 +417,6 @@ export default class TaskCreateTable extends Component {
                     if (areaLayerList[eventKey]) {
                         me.map.removeLayer(areaLayerList[eventKey]);
                     }
-                    // if (treeCoords[eventKey]) {
-                    //     delete treeCoords[eventKey];
-                    // }
                 }
             }
         } catch (e) {
@@ -484,8 +462,6 @@ export default class TaskCreateTable extends Component {
                     return item.split(' ').map(_item => _item - 0);
                 });
             treearea.push(target1);
-            console.log('target1', target1);
-            console.log('treearea', treearea);
             let message = {
                 key: 3,
                 type: 'Feature',
@@ -533,17 +509,27 @@ export default class TaskCreateTable extends Component {
     _handleCreateTaskOk = async () => {
         const {
             actions: {
-                getTreeLocationNumByRegion, // 查询圈选地图内的树木数量
-                getThinClassesByRegion // 查询圈选地图内的细班
+                postTreeLocationNumByRegion, // 查询圈选地图内的树木数量
+                postThinClassesByRegion // 查询圈选地图内的细班
             },
             selectMap,
             checkedKeys
         } = this.props;
         const {
             coordinates,
-            totalThinClass,
             treeCoords
         } = this.state;
+
+        let sections = this.user.sections;
+        this.sections = JSON.parse(sections);
+        // 首先查看有没有关联标段，没有关联的人无法获取人员
+        if (!(this.sections && this.sections instanceof Array && this.sections.length > 0)) {
+            Notification.error({
+                message: '当前登录用户未关联标段，不能下发任务',
+                duration: 2
+            });
+            return;
+        }
         this.setState({
             taskModalVisible: true
         });
@@ -558,17 +544,14 @@ export default class TaskCreateTable extends Component {
                     thinClassCoords = thinClassCoords.concat(arr);
                 }
             });
-            console.log('thinClassCoords', thinClassCoords);
             if (thinClassCoords.length === 1) {
                 coords = thinClassCoords[0];
             } else {
                 coords = thinClassCoords;
             }
         } else if (selectMap === '手动框选') {
-            console.log('coordinates', coordinates);
             coords = coordinates;
         }
-        console.log('coords', coords);
         try {
             // 坐标
             let wkt = '';
@@ -577,48 +560,52 @@ export default class TaskCreateTable extends Component {
             if (selectMap === '细班选择' && thinAreaNum > 1) {
                 wkt = 'MULTIPOLYGON((';
                 coords.map((coord, index) => {
-                    let num = this.computeSignedArea(coord);
-                    console.log('num', num);
+                    let num = computeSignedArea(coord, 1);
                     regionArea = regionArea + num;
-                    console.log('regionArea', regionArea);
-                    console.log('wkt', wkt);
                     if (index === 0) {
-                        wkt = wkt + this._getWktData(coord);
+                        // 获取细班选择坐标wkt
+                        wkt = wkt + getWktData(coord);
                     } else {
-                        wkt = wkt + ',' + this._getWktData(coord);
+                        wkt = wkt + ',' + getWktData(coord);
                     }
                 });
                 wkt = wkt + '))';
             } else if (selectMap === '手动框选') {
                 wkt = 'POLYGON(';
-                wkt = wkt + this._getHandleWktData(coords);
+                // 获取手动框选坐标wkt
+                wkt = wkt + getHandleWktData(coords);
                 wkt = wkt + ')';
-                regionArea = this.computeSignedArea(coords);
-                console.log('regionArea', regionArea);
+                regionArea = computeSignedArea(coords, 2);
             } else {
-                let num = this.computeSignedArea(coords);
-                console.log('num', num);
+                let num = computeSignedArea(coords, 1);
                 regionArea = regionArea + num;
-                console.log('regionArea', regionArea);
-                console.log('wkt', wkt);
                 wkt = 'POLYGON(';
-                wkt = wkt + this._getWktData(coords);
+                wkt = wkt + getWktData(coords);
                 wkt = wkt + ')';
             }
-            console.log('wktwktwktwktwktwktwkt', wkt);
-            console.log('totalThinClass', totalThinClass);
-
-            // 区域内树木数量
-            let treeNum = await getTreeLocationNumByRegion({wkt: wkt});
             // 包括的细班号
-            let regionThinClass = await getThinClassesByRegion({wkt: wkt});
-            console.log('regionThinClass', regionThinClass);
+            let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
             let regionData = await this._getThinClassName(regionThinClass);
-            console.log('treeNum', treeNum);
+            console.log('regionData', regionData);
+            let sectionBool = regionData.sectionBool;
+            if (!sectionBool) {
+                Notification.error({
+                    message: '当前所选区域存在不属于登录用户所在标段，请重新选择区域',
+                    duration: 2
+                });
+                if (this.state.polygonData) {
+                    this.map.removeLayer(this.state.polygonData);
+                }
+                this.resetModalState();
+                this.resetButState();
+                return;
+            }
             let regionThinName = regionData.regionThinName;
             let regionThinNo = regionData.regionThinNo;
             let regionSectionNo = regionData.regionSectionNo;
             let regionSectionName = regionData.regionSectionName;
+            // 区域内树木数量
+            let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
             this.setState({
                 wkt,
                 regionArea,
@@ -634,50 +621,39 @@ export default class TaskCreateTable extends Component {
             console.log('树木数量', e);
         }
     }
-    // 获取手动框选坐标wkt
-    _getHandleWktData (coords) {
-        let wkt = '';
-        let len = coords.length;
-        for (let i = 0; i < coords.length; i++) {
-            if (i === 0) {
-                wkt = '(' + wkt + coords[i][1] + ' ' + coords[i][0] + ',';
-            } else if (i === len - 1) {
-                wkt = wkt + coords[i][1] + ' ' + coords[i][0] + ',' + coords[0][1] + ' ' + coords[0][0] + ')';
-            } else {
-                wkt = wkt + coords[i][1] + ' ' + coords[i][0] + ',';
-            }
-        }
-        return wkt;
-    }
-    // 获取细班选择坐标wkt
-    _getWktData (coords) {
-        let wkt = '';
-        let len = coords.length;
-        for (let i = 0; i < coords.length; i++) {
-            if (i === 0) {
-                wkt = '(' + wkt + coords[i][0] + ' ' + coords[i][1] + ',';
-            } else if (i === len - 1) {
-                wkt = wkt + coords[i][0] + ' ' + coords[i][1] + ',' + coords[0][0] + ' ' + coords[0][1] + ')';
-            } else {
-                wkt = wkt + coords[i][0] + ' ' + coords[i][1] + ',';
-            }
-        }
-        return wkt;
-    }
+
     // 查找区域内的细班的名称
     _getThinClassName = async (regionThinClass) => {
         const {
             totalThinClass
         } = this.state;
 
+        // 细班数组，查看细班是否重复，重复不再查询
         let thinNoList = [];
+        // 经过筛选后的细班No
         let regionThinNo = '';
+        // 经过筛选后的细班Name
         let regionThinName = '';
+        // 经过筛选后的标段No
         let regionSectionNo = '';
+        // 经过筛选后的标段Name
         let regionSectionName = '';
+        // 标段是否是登陆用户所在标段
+        let sectionBool = true;
+        console.log('sections', this.sections);
+        let signSection = this.sections[0];
         try {
             regionThinClass.map((thinData, index) => {
                 let section = thinData.Section;
+                // 如果圈选的区域不在登录用户的标段内，则不能下发任务
+                if (signSection !== section) {
+                    sectionBool = false;
+                    return;
+                }
+                // 如果圈选的区域不在登录用户的标段内，不需要循环获取数据
+                if (!sectionBool) {
+                    return;
+                }
                 let thinNo = thinData.no;
                 let pushState = true;
                 // 获取的thinNo可能又会重复的，需要进行处理
@@ -696,12 +672,12 @@ export default class TaskCreateTable extends Component {
                     if (section.indexOf(unitProject) !== -1) {
                         let children = unitProjectData.thinClass;
                         children.map((child) => {
-                            // tree结构的数据经过了处理，需要和api获取的数据调整一致
+                        // tree结构的数据经过了处理，需要和api获取的数据调整一致
                             let handleKey = child.No.split('-');
                             let childNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
                             let childSection = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
                             if (childNo.indexOf(thinNo) !== -1 && childSection === section) {
-                                // 找到符合条件的数据的name
+                            // 找到符合条件的数据的name
                                 let name = child.Name;
                                 let sectionName = getSectionName(section);
                                 regionSectionNo = section;
@@ -725,78 +701,78 @@ export default class TaskCreateTable extends Component {
             regionThinName: regionThinName,
             regionThinNo: regionThinNo,
             regionSectionNo: regionSectionNo,
-            regionSectionName: regionSectionName
+            regionSectionName: regionSectionName,
+            sectionBool: sectionBool
         };
         return regionData;
     }
-    // 查找区域面积
-    computeSignedArea (path) {
+
+    // 圈选图层返回上一步
+    _handleCreateTaskRetreat = async () => {
         const {
-            selectMap
-        } = this.props;
-        console.log('path', path);
-        let radius = 6371009;
-        let len = path.length;
-        if (len < 3) return 0;
-        let total = 0;
-        let prev = path[len - 1];
-        let indexT = 1;
-        let indexG = 0;
-        if (selectMap === '细班选择') {
-            indexT = 0;
-            indexG = 1;
+            coordinates
+        } = this.state;
+        let me = this;
+        if (me.state.polygonData) {
+            me.map.removeLayer(me.state.polygonData);
         }
-        let prevTanLat = Math.tan(((Math.PI / 2 - prev[indexG] / 180 * Math.PI) / 2));
-        let prevLng = (prev[indexT]) / 180 * Math.PI;
-        for (let i in path) {
-            let tanLat = Math.tan((Math.PI / 2 -
-                (path[i][indexG]) / 180 * Math.PI) / 2);
-            let lng = (path[i][indexT]) / 180 * Math.PI;
-            total += this.polarTriangleArea(tanLat, lng, prevTanLat, prevLng);
-            prevTanLat = tanLat;
-            prevLng = lng;
+        coordinates.pop();
+        if (coordinates.length === 0) {
+            this.resetButState();
+            return;
         }
-        return Math.abs(total * (radius * radius));
-    }
-    polarTriangleArea (tan1, lng1, tan2, lng2) {
-        let deltaLng = lng1 - lng2;
-        let t = tan1 * tan2;
-        return 2 * Math.atan2(t * Math.sin(deltaLng), 1 + t * Math.cos(deltaLng));
+        let polygonData = L.polygon(coordinates, {
+            color: 'white',
+            fillColor: '#93B9F2',
+            fillOpacity: 0.2
+        }).addTo(me.map);
+        me.setState({
+            coordinates,
+            polygonData: polygonData
+        });
     }
     // 撤销圈选图层
     _handleCreateTaskCancel =() => {
         const {
+            areaLayerList,
             polygonData
         } = this.state;
         const {
-            selectMap
-        } = this.props;
-        if (selectMap === '手动框选') {
-            if (polygonData) {
-                this.map.removeLayer(polygonData);
+            actions: {
+                changeCheckedKeys
             }
-            this.setState({
-                createBtnVisible: false,
-                polygonData: '',
-                coordinates: []
-            });
+        } = this.props;
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
         }
+        changeCheckedKeys([]);
+        for (let i in areaLayerList) {
+            this.map.removeLayer(areaLayerList[i]);
+        }
+        this.resetButState();
     }
     // 确认下发任务
     handleTaskModalOk = () => {
         const {
             polygonData
         } = this.state;
-        this.map.removeLayer(polygonData);
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
+        }
+        this.resetModalState();
+        this.resetButState();
+    }
+    // 取消下发任务
+    handleTaskModalCancel = () => {
+        this.resetModalState();
+    }
+    // 取消下发任务时清空之前存储的state
+    resetModalState = () => {
         this.setState({
-            createBtnVisible: false,
-            polygonData: '',
-            coordinates: [],
             taskModalVisible: false,
             noLoading: false,
             treeNum: 0,
             regionThinClass: [],
-            totalThinClass: [],
             regionThinName: '',
             regionThinNo: '',
             regionSectionNo: '',
@@ -805,20 +781,12 @@ export default class TaskCreateTable extends Component {
             wkt: ''
         });
     }
-    // 取消下发任务
-    handleTaskModalCancel = () => {
+    // 取消圈选和按钮的功能
+    resetButState = () => {
         this.setState({
-            taskModalVisible: false,
-            noLoading: false,
-            treeNum: 0,
-            regionThinClass: [],
-            totalThinClass: [],
-            regionThinName: '',
-            regionThinNo: '',
-            regionSectionNo: '',
-            regionSectionName: '',
-            regionArea: 0,
-            wkt: ''
+            createBtnVisible: false,
+            polygonData: '',
+            coordinates: []
         });
     }
     componentDidUpdate (prevProps, prevState) {
@@ -837,33 +805,19 @@ export default class TaskCreateTable extends Component {
                 if (polygonData) {
                     this.map.removeLayer(polygonData);
                 }
-                this.setState({
-                    createBtnVisible: false,
-                    polygonData: '',
-                    coordinates: []
-                });
             } else {
                 changeCheckedKeys([]);
                 for (let i in areaLayerList) {
                     this.map.removeLayer(areaLayerList[i]);
                 }
             }
+            this.resetButState();
         }
     }
     /* 菜单展开收起 */
     _extendAndFold () {
         this.setState({ menuIsExtend: !this.state.menuIsExtend });
     }
-
-    /* 手动调整菜单宽度 */
-    _onStartResizeMenu (e) {
-        e.preventDefault();
-        this.menu.startPos = e.clientX;
-        this.menu.isStart = true;
-        this.menu.tempMenuWidth = this.state.menuWidth;
-        this.menu.count = 0;
-    }
-
     // 切换为2D
     _toggleTileLayer (index) {
         this.tileLayer.setUrl(this.tileUrls[index]);
@@ -872,7 +826,6 @@ export default class TaskCreateTable extends Component {
             mapLayerBtnType: !this.state.mapLayerBtnType
         });
     }
-
     _handleEndResize (e) {
         this.menu.isStart = false;
     }

@@ -20,7 +20,11 @@ export default class DashPanel extends Component {
                 changeSelectMap
             }
         } = this.props;
-        await changeSelectMap('细班选择');
+        try {
+            // await changeSelectMap('细班选择');
+        } catch (e) {
+
+        }
     }
 
     onCheck (keys, info) {
@@ -55,6 +59,7 @@ export default class DashPanel extends Component {
                     title={p.Name}
                     key={p.No}
                     disableCheckbox={disableCheckbox}
+                    selectable={false}
                 >
                     {p.children &&
                         p.children.map(m => {

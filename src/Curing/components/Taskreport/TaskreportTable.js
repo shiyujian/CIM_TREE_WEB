@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import {
-    Button, Modal, Collapse
+    Button, Modal, Collapse, Notification
 } from 'antd';
 import PanelTree from '../PanelTree';
 import TaskTree from '../TaskTree';
-import {getThinClass, getSmallClass, fillAreaColor} from '../auth';
+import {getThinClass, getSmallClass, fillAreaColor, getHandleWktData, computeSignedArea, getSectionName, genPopUpContent} from '../auth';
 import '../Curing.less';
 import { getUser } from '_platform/auth';
+import TaskReportModal from './TaskReportModal';
 const Panel = Collapse.Panel;
 window.config = window.config || {};
 
@@ -20,15 +21,29 @@ export default class TaskReportTable extends Component {
             isVisibleMapBtn: true,
             mapLayerBtnType: true,
             selectedMenu: '1',
-            treeType: [],
-            projectList: [],
-            unitProjectList: [],
+            areaLayerList: {}, // 细班选择图层list
+            TaskTreeData: [], // 养护任务tree数据
+            taskLayerList: {}, // 任务图层list
+            markerLayerList: {}, // 任务图标图层list
+            curingTypes: [], // 养护类型
+            taskMessList: {}, // 养护任务详情list
+            isShowTaskModal: false,
+            taskMess: '',
+            createBtnVisible: false,
             coordinates: [],
-            polygon: '',
-            areaLayerList: {},
-            polygonData: '',
-            TaskTreeData: [],
-            taskLayerList: {}
+            polygonData: '', // 圈选地图图层
+            treeNum: 0, // 圈选地图内的树木数量
+            regionThinClass: [], // 圈选地图内的细班
+            totalThinClass: [], // 全部细班
+            regionThinName: '', // 圈选区域内的细班名称
+            regionThinNo: '', // 圈选区域内的细班code
+            regionSectionNo: '', // 圈选区域内的标段code
+            regionSectionName: '', // 圈选区域内的标段名称
+            regionArea: 0, // 圈选区域内面积
+            wkt: '',
+            selected: false,
+            noLoading: false,
+            taskEventKey: ''
         };
         this.checkMarkers = [];
         this.tileLayer = null;
@@ -74,27 +89,24 @@ export default class TaskReportTable extends Component {
                 getcCuringTypes
             }
         } = this.props;
-        let user = getUser();
-        let sections = user.sections;
+        this.user = getUser();
+        let sections = this.user.sections;
         sections = JSON.parse(sections);
         if (sections && sections instanceof Array && sections.length > 0) {
             let section = sections[0];
             let postData = {
                 section: 'P010-01-01'
             };
-            let curingTypes = await getcCuringTypes();
-            let content = curingTypes && curingTypes.content;
-            if (content && content.length > 0) {
+            let curingTypesData = await getcCuringTypes();
+            let curingTypes = curingTypesData && curingTypesData.content;
+            if (curingTypes && curingTypes.length > 0) {
                 let curingTaskData = await getCuring({}, postData);
-                console.log('curingTaskData', curingTaskData);
                 let curingTasks = curingTaskData.content;
-                console.log('curingTasks', curingTasks);
                 let TaskTreeData = [];
                 curingTasks.map((task) => {
                     if (task && task.ID) {
-                        content.map((type) => {
+                        curingTypes.map((type) => {
                             if (type.ID === task.CuringType) {
-                                console.log('type', type);
                                 let exist = false;
                                 let childData = [];
                                 // 查看TreeData里有无这个类型的数据，有的话，push
@@ -119,7 +131,8 @@ export default class TaskReportTable extends Component {
                     }
                 });
                 this.setState({
-                    TaskTreeData
+                    TaskTreeData,
+                    curingTypes
                 });
             }
         }
@@ -155,26 +168,32 @@ export default class TaskReportTable extends Component {
                         });
                     }
                 });
-                this.setState({
-                    projectList,
-                    unitProjectList
-                });
-
                 for (let i = 0; i < projectList.length; i++) {
                     projectList[i].children = unitProjectList.filter(node => {
                         return node.Parent === projectList[i].No;
                     });
                 }
             }
-            unitProjectList.map(async section => {
-                let list = await getLittleBan({ no: section.No });
+            let totalThinClass = [];
+            unitProjectList.map(async unitProject => {
+                let list = await getLittleBan({ no: unitProject.No });
                 let smallClassList = getSmallClass(list);
+                let unitProjectThinArr = [];
                 smallClassList.map(smallClass => {
                     let thinClassList = getThinClass(smallClass, list);
+
+                    unitProjectThinArr = unitProjectThinArr.concat(thinClassList);
                     smallClass.children = thinClassList;
                 });
-                section.children = smallClassList;
-                this.setState({ treeLists: projectList });
+                totalThinClass.push({
+                    unitProject: unitProject.No,
+                    thinClass: unitProjectThinArr
+                });
+                unitProject.children = smallClassList;
+                this.setState({
+                    treeLists: projectList,
+                    totalThinClass
+                });
             });
         } catch (e) {
             console.log(e);
@@ -206,8 +225,54 @@ export default class TaskReportTable extends Component {
                 tiletype: 'wtms'
             }
         ).addTo(this.map);
+        this.map.on('click', function (e) {
+            const {
+                coordinates,
+                createBtnVisible,
+                selected
+            } = me.state;
+            if (!selected) {
+                return;
+            }
+            coordinates.push([e.latlng.lat, e.latlng.lng]);
+            if (coordinates.length > 0 && !createBtnVisible) {
+                me.setState({
+                    createBtnVisible: true
+                });
+            }
+            if (me.state.polygonData) {
+                me.map.removeLayer(me.state.polygonData);
+            }
+            let polygonData = L.polygon(coordinates, {
+                color: 'blue',
+                fillColor: '#93B9F2',
+                fillOpacity: 0.2
+            }).addTo(me.map);
+            me.setState({
+                coordinates,
+                polygonData: polygonData
+            });
+        });
+        // 任务详情点击事件
+        document
+            .querySelector('.leaflet-popup-pane')
+            .addEventListener('click', async function (e) {
+                let target = e.target;
+                // 绑定隐患详情点击事件
+                if (target.getAttribute('class') === 'btnViewTask') {
+                    me._handleCreateTaskOk();
+                }
+            });
     }
     render () {
+        const {
+            createBtnVisible,
+            coordinates
+        } = this.state;
+        let okDisplay = false;
+        if (coordinates.length <= 2) {
+            okDisplay = true;
+        }
         return (
             <div className='Curing-container'>
                 <div
@@ -252,12 +317,7 @@ export default class TaskReportTable extends Component {
                                     );
                                 })}
                             </Collapse>
-                            {/* <div style={{ height: '20px' }} /> */}
                         </aside>
-                        {/* <div
-                            className='resizeSenseArea'
-                            onMouseDown={this._onStartResizeMenu.bind(this)}
-                        /> */}
                         {this.state.menuIsExtend ? (
                             <div
                                 className='foldBtn'
@@ -278,7 +338,6 @@ export default class TaskReportTable extends Component {
                     </div>
                     {this.state.isVisibleMapBtn ? (
                         <div className='treeControl'>
-                            {/* <iframe allowTransparency={true} className={styles.btnCtro}/> */}
                             <div>
                                 <Button
                                     type={
@@ -305,6 +364,23 @@ export default class TaskReportTable extends Component {
                     ) : (
                         ''
                     )}
+                    {
+                        createBtnVisible ? (
+                            <div className='treeControl2'>
+                                <div>
+                                    {/* <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button> */}
+                                    <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>
+                                    <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
+                                </div>
+                            </div>
+                        ) : ''
+                    }
+                    <TaskReportModal
+                        {...this.props}
+                        {...this.state}
+                        onOk={this.handleModalCancel.bind(this)}
+                        onCancel={this.handleModalCancel.bind(this)}
+                    />
                     <div>
                         <div
                             style={
@@ -426,13 +502,13 @@ export default class TaskReportTable extends Component {
             let contents = rst.content;
             let data = contents.find(content => content.Section === section);
             let str = data.coords;
-            var target1 = str
+            var target = str
                 .slice(str.indexOf('(') + 3, str.indexOf(')'))
                 .split(',')
                 .map(item => {
                     return item.split(' ').map(_item => _item - 0);
                 });
-            treearea.push(target1);
+            treearea.push(target);
             let message = {
                 key: 3,
                 type: 'Feature',
@@ -451,41 +527,52 @@ export default class TaskReportTable extends Component {
     }
     // 任务点击节点
     handleTaskSelect = async (keys, info) => {
-        console.log('keys', keys);
-        console.log('info', info);
-        let me = this;
-        // 当前选中的节点
-        let eventKey = info.node.props.eventKey;
-        // 当前的选中状态
-        let checked = info.checked;
-    }
-    // 任务选中节点
-    handleTaskCheck = async (keys, info) => {
         const {
-            taskLayerList
+            taskLayerList,
+            markerLayerList
         } = this.state;
         let me = this;
         // 当前选中的节点
-        let eventKey = info.node.props.eventKey;
+        let eventKey = keys[0];
         // 当前的选中状态
-        let checked = info.checked;
-        console.log('keys', keys);
-        console.log('info', info);
+        let selected = info.selected;
+        this.setState({
+            selected,
+            taskEventKey: eventKey
+        });
         try {
-            if (checked) {
+            // 需要把圈选地图撤销
+            me._handleCreateTaskCancel();
+            // 单选，需要先全部去除图层
+            for (let i in taskLayerList) {
+                taskLayerList[i].map((layer) => {
+                    this.map.removeLayer(layer);
+                });
+            }
+            for (let i in markerLayerList) {
+                this.map.removeLayer(markerLayerList[i]);
+            }
+            // 选中加载图层
+            if (selected) {
                 if (taskLayerList[eventKey]) {
-                    taskLayerList[eventKey].addTo(me.map);
-                    me.map.fitBounds(taskLayerList[eventKey].getBounds());
+                    taskLayerList[eventKey].map((layer) => {
+                        layer.addTo(me.map);
+                        me.map.fitBounds(layer.getBounds());
+                    });
+                    if (markerLayerList[eventKey]) {
+                        markerLayerList[eventKey].addTo(me.map);
+                    }
                 } else {
                     // 如果不是添加过，需要请求数据
                     me._addTaskLayer(eventKey);
                 }
-            } else {
-                me.map.removeLayer(taskLayerList[eventKey]);
             }
         } catch (e) {
             console.log('任务选中', e);
         }
+    }
+    // 任务选中节点
+    handleTaskCheck = async (keys, info) => {
     }
     _addTaskLayer = async (eventKey) => {
         const {
@@ -497,66 +584,147 @@ export default class TaskReportTable extends Component {
             id: eventKey
         };
         let taskMess = await getCuringMessage(postData);
-        console.log('taskMess', taskMess);
         let planWkt = taskMess.PlanWKT;
-
         let str = '';
-        if (planWkt.indexOf('MULTIPOLYGON') !== -1) {
-            let data = planWkt.slice(planWkt.indexOf('(') + 2, planWkt.indexOf('))') + 1);
-            let arr = data.split(')(');
-            arr.map((a, index) => {
-                if (index === 0) {
-                    str = a.slice(a.indexOf('(') + 1, a.length - 1);
-                } else if (index === arr.length - 1) {
-                    str = a.slice(0, a.indexOf(')'));
-                } else {
-                    str = a;
-                }
-                this._handleCoordLayer();
-            });
-        } else {
-            str = planWkt.slice(planWkt.indexOf('(') + 3, planWkt.indexOf(')'));
+        try {
+            if (planWkt.indexOf('MULTIPOLYGON') !== -1) {
+                let data = planWkt.slice(planWkt.indexOf('(') + 2, planWkt.indexOf('))') + 1);
+                let arr = data.split('),(');
+                arr.map((a, index) => {
+                    if (index === 0) {
+                        str = a.slice(a.indexOf('(') + 1, a.length - 1);
+                    } else if (index === arr.length - 1) {
+                        str = a.slice(0, a.indexOf(')'));
+                    } else {
+                        str = a;
+                    }
+                    // 将图标设置在最后一个图形中，因为最后会聚焦到该位置
+                    if (index === arr.length - 1) {
+                        this._handleCoordLayer(str, taskMess, eventKey, index);
+                    } else {
+                        // 其他图形中不设置图标
+                        this._handleCoordLayer(str, taskMess, eventKey);
+                    }
+                });
+            } else {
+                str = planWkt.slice(planWkt.indexOf('(') + 3, planWkt.indexOf(')'));
+                // 只有一个图形，必须要设置图标
+                this._handleCoordLayer(str, taskMess, eventKey, 1);
+            }
+        } catch (e) {
+            console.log('处理wkt', e);
         }
     }
-    _handleCoordLayer (str, taskMess) {
-        let target1 = str.split(',').map(item => {
-            return item.split(' ').map(_item => _item - 0);
-        });
-        let treeNodeName = taskMess.CuringMans;
-        let treearea = [];
-        treearea.push(target1);
-        let message = {
-            key: 3,
-            type: 'Feature',
-            properties: { name: treeNodeName, type: 'task' },
-            geometry: { type: 'Polygon', coordinates: treearea }
-        };
-        let layer = this._createMarker(message);
-    }
-    /* 在地图上添加marker和polygan */
-    _createMarker (geo) {
-        if (geo.properties.type !== 'area') {
-            if (
-                !geo.geometry.coordinates[0] ||
-                !geo.geometry.coordinates[1]
-            ) {
+    _handleCoordLayer (str, taskMess, eventKey, index) {
+        const {
+            taskLayerList,
+            curingTypes,
+            markerLayerList,
+            taskMessList
+        } = this.state;
+        try {
+            let target = str.split(',').map(item => {
+                return item.split(' ').map(_item => _item - 0);
+            });
+            let treeNodeName = taskMess.CuringMans;
+            let typeName = '';
+            curingTypes.map((type) => {
+                if (type.ID === taskMess.CuringType) {
+                    typeName = type.Base_Name;
+                }
+            });
+            let treearea = [];
+            let status = '未完成';
+            if (taskMess.StartTime && taskMess.EndTime) {
+                status = '已完成';
+            }
+            taskMess.status = status;
+            taskMess.typeName = typeName;
+            taskMessList[eventKey] = taskMess;
+            this.setState({
+                taskMessList
+            });
+            let arr = [];
+            target.map((data, index) => {
+                if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+                    arr.push([data[1], data[0]]);
+                }
+            });
+            treearea.push(arr);
+            let message = {
+                key: 3,
+                type: 'task',
+                properties: {
+                    ID: taskMess.ID,
+                    name: treeNodeName,
+                    type: 'task',
+                    typeName: typeName || '',
+                    status: status || '',
+                    CuringMans: taskMess.CuringMans || '',
+                    CreateTime: taskMess.CreateTime || '',
+                    PlanStartTime: taskMess.PlanStartTime || '',
+                    PlanEndTime: taskMess.PlanEndTime || '',
+                    StartTime: taskMess.StartTime || '',
+                    EndTime: taskMess.EndTime || ''
+                },
+                geometry: { type: 'Polygon', coordinates: treearea }
+            };
+            let layer = this._createMarker(message);
+            // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
+            if (taskLayerList[eventKey]) {
+                taskLayerList[eventKey].push(layer);
+            } else {
+                taskLayerList[eventKey] = [layer];
+            }
+            this.setState({
+                taskLayerList
+            });
+            if (!index) {
                 return;
             }
+            // 设置任务中间的图标
+            let centerData = layer.getCenter();
             let iconType = L.divIcon({
-                className: this.getIconType(geo.type)
+                className: this.getIconType(message.properties.type)
             });
-            let marker = L.marker(geo.geometry.coordinates, {
+            let marker = L.marker([centerData.lat, centerData.lng], {
                 icon: iconType,
-                title: geo.properties.name
+                title: message.properties.name
             });
             marker.bindPopup(
                 L.popup({ maxWidth: 240 }).setContent(
-                    this.genPopUpContent(geo)
+                    genPopUpContent(message)
                 )
             );
             marker.addTo(this.map);
-            return marker;
-        } else {
+            markerLayerList[eventKey] = marker;
+            this.setState({
+                markerLayerList
+            });
+        } catch (e) {
+            console.log('处理str', e);
+        }
+    }
+    // 获取对应的ICON
+    getIconType (type) {
+        switch (type) {
+            case 'task':
+                return 'taskIcon';
+            default:
+                break;
+        }
+    }
+    /* 在地图上添加marker和polygan */
+    _createMarker (geo) {
+        if (geo.properties.type === 'task') {
+            let layer = L.polygon(geo.geometry.coordinates, {
+                color: 'white',
+                fillColor: '#93B9F2',
+                fillOpacity: 0.2
+            }).addTo(this.map);
+            this.map.fitBounds(layer.getBounds());
+            return layer;
+        } else if (geo.properties.type === 'area') {
             // 创建区域图形
             let area = L.geoJson(geo, {
                 style: {
@@ -571,6 +739,222 @@ export default class TaskReportTable extends Component {
             this.map.fitBounds(area.getBounds());
             return area;
         }
+    }
+    // 取消任务详情Modal
+    handleModalCancel = () => {
+        this.setState({
+            isShowTaskModal: false,
+            noLoading: false
+        });
+    }
+    // 确定圈选地图
+    _handleCreateTaskOk = async () => {
+        const {
+            actions: {
+                postTreeLocationNumByRegion, // 查询圈选地图内的树木数量
+                postThinClassesByRegion // 查询圈选地图内的细班
+            }
+        } = this.props;
+        const {
+            coordinates,
+            polygonData,
+            taskEventKey,
+            taskMessList
+        } = this.state;
+
+        let sections = this.user.sections;
+        this.sections = JSON.parse(sections);
+        // 首先查看有没有关联标段，没有关联的人无法获取人员
+        if (!(this.sections && this.sections instanceof Array && this.sections.length > 0)) {
+            Notification.error({
+                message: '当前登录用户未关联标段，不能查看任务',
+                duration: 2
+            });
+            return;
+        }
+        this.setState({
+            isShowTaskModal: true
+        });
+        let coords = coordinates;
+        try {
+            let taskMess = taskMessList[taskEventKey];
+            console.log('taskMess', taskMess);
+            if (polygonData) {
+                // 选择面积
+                let regionArea = 0;
+                // 坐标
+                let wkt = 'POLYGON(';
+                wkt = wkt + getHandleWktData(coords);
+                wkt = wkt + ')';
+                regionArea = computeSignedArea(coords, 2);
+                // 包括的细班号
+                let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
+                let regionData = await this._getThinClassName(regionThinClass);
+                console.log('regionData', regionData);
+                let sectionBool = regionData.sectionBool;
+                // if (!sectionBool) {
+                //     Notification.error({
+                //         message: '当前所选任务不属于登录用户所在标段，请重新选择',
+                //         duration: 2
+                //     });
+                //     this.map.removeLayer(polygonData);
+                //     this.resetModalState();
+                //     this.resetButState();
+                //     return;
+                // }
+                let regionThinName = regionData.regionThinName;
+                let regionThinNo = regionData.regionThinNo;
+                let regionSectionNo = regionData.regionSectionNo;
+                let regionSectionName = regionData.regionSectionName;
+                // 区域内树木数量
+                let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
+                this.setState({
+                    wkt,
+                    regionArea,
+                    treeNum,
+                    regionData,
+                    regionThinName,
+                    regionThinNo,
+                    regionSectionNo,
+                    regionSectionName,
+                    noLoading: true,
+                    taskMess
+                });
+            } else {
+                this.setState({
+                    noLoading: true,
+                    isShowTaskModal: true,
+                    taskMess
+                });
+            }
+        } catch (e) {
+            console.log('树木数量', e);
+        }
+    }
+    // 查找区域内的细班的名称
+    _getThinClassName = async (regionThinClass) => {
+        const {
+            totalThinClass
+        } = this.state;
+
+        // 细班数组，查看细班是否重复，重复不再查询
+        let thinNoList = [];
+        // 经过筛选后的细班No
+        let regionThinNo = '';
+        // 经过筛选后的细班Name
+        let regionThinName = '';
+        // 经过筛选后的标段No
+        let regionSectionNo = '';
+        // 经过筛选后的标段Name
+        let regionSectionName = '';
+        // 标段是否是登陆用户所在标段
+        let sectionBool = true;
+        let signSection = this.sections[0];
+        try {
+            regionThinClass.map((thinData, index) => {
+                let section = thinData.Section;
+                // 如果圈选的区域不在登录用户的标段内，则不能下发任务
+                if (signSection !== section) {
+                    sectionBool = false;
+                    return;
+                }
+                // 如果圈选的区域不在登录用户的标段内，不需要循环获取数据
+                if (!sectionBool) {
+                    return;
+                }
+                let thinNo = thinData.no;
+                let pushState = true;
+                // 获取的thinNo可能又会重复的，需要进行处理
+                thinNoList.map((data) => {
+                    if (data === thinNo) {
+                        pushState = false;
+                    }
+                });
+                if (!pushState) {
+                    return;
+                }
+                thinNoList.push(thinNo);
+                totalThinClass.map((unitProjectData) => {
+                    let unitProject = unitProjectData.unitProject;
+                    // 首先根据区块找到对应的细班list
+                    if (section.indexOf(unitProject) !== -1) {
+                        let children = unitProjectData.thinClass;
+                        children.map((child) => {
+                        // tree结构的数据经过了处理，需要和api获取的数据调整一致
+                            let handleKey = child.No.split('-');
+                            let childNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                            let childSection = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+                            if (childNo.indexOf(thinNo) !== -1 && childSection === section) {
+                            // 找到符合条件的数据的name
+                                let name = child.Name;
+                                let sectionName = getSectionName(section);
+                                regionSectionNo = section;
+                                regionSectionName = sectionName;
+                                if (index === 0) {
+                                    regionThinName = regionThinName + name;
+                                    regionThinNo = regionThinNo + thinNo;
+                                } else {
+                                    regionThinName = regionThinName + ' ,' + name;
+                                    regionThinNo = regionThinNo + ' ,' + thinNo;
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        } catch (e) {
+            console.log('细班名称', e);
+        }
+        let regionData = {
+            regionThinName: regionThinName,
+            regionThinNo: regionThinNo,
+            regionSectionNo: regionSectionNo,
+            regionSectionName: regionSectionName,
+            sectionBool: sectionBool
+        };
+        return regionData;
+    }
+    // 撤销圈选图层
+    _handleCreateTaskCancel =() => {
+        const {
+            polygonData
+        } = this.state;
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
+        }
+        this.resetButState();
+    }
+    // 圈选图层返回上一步
+    _handleCreateTaskRetreat = async () => {
+        const {
+            coordinates
+        } = this.state;
+        let me = this;
+        if (me.state.polygonData) {
+            me.map.removeLayer(me.state.polygonData);
+        }
+        coordinates.pop();
+        if (coordinates.length === 0) {
+            this.resetButState();
+            return;
+        }
+        let polygonData = L.polygon(coordinates, {
+            color: 'blue',
+            fillColor: '#93B9F2',
+            fillOpacity: 0.2
+        }).addTo(me.map);
+        me.setState({
+            coordinates,
+            polygonData: polygonData
+        });
+    }
+    // 取消圈选和按钮的功能
+    resetButState = () => {
+        this.setState({
+            createBtnVisible: false,
+            polygonData: '',
+            coordinates: []
+        });
     }
     /* 菜单展开收起 */
     _extendAndFold () {

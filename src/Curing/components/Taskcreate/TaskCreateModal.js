@@ -279,6 +279,7 @@ class TaskCreateModal extends Component {
             });
             return;
         }
+
         this.props.form.validateFields(async (err, values) => {
             console.log('err', err);
             console.log('values', values);

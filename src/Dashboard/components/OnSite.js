@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-24 15:01:37
+ * @Last Modified time: 2018-07-25 20:56:39
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -136,18 +136,18 @@ class OnSite extends Component {
             value: 'geojsonFeature_area',
             IconName: 'square'
         },
-        // {
-        //     label: '巡检路线',
-        //     value: 'geojsonFeature_people',
-        //     IconUrl: require('./ImageIcon/people.png'),
-        //     IconName: 'universal-access'
-        // },
-        // {
-        //     label: '安全隐患',
-        //     value: 'geojsonFeature_hazard',
-        //     IconUrl: require('./ImageIcon/danger.png'),
-        //     IconName: 'warning'
-        // },
+        {
+            label: '巡检路线',
+            value: 'geojsonFeature_people',
+            IconUrl: require('./ImageIcon/people.png'),
+            IconName: 'universal-access'
+        },
+        {
+            label: '安全隐患',
+            value: 'geojsonFeature_hazard',
+            IconUrl: require('./ImageIcon/danger.png'),
+            IconName: 'warning'
+        },
         {
             label: '树种筛选',
             value: 'geojsonFeature_treetype',
@@ -275,6 +275,7 @@ class OnSite extends Component {
                 let iconType = L.divIcon({
                     className: this.getIconType(geo.type)
                 });
+                console.log('geo.geometry.coordinates', geo.geometry.coordinates);
                 let marker = L.marker(geo.geometry.coordinates, {
                     icon: iconType,
                     title: geo.properties.name
