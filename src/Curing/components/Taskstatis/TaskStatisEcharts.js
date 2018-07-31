@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
-import {DatePicker, Select, Spin} from 'antd';
-import moment from 'moment';
+import {Spin} from 'antd';
 var echarts = require('echarts');
-const Option = Select.Option;
-const {RangePicker} = DatePicker;
 
 export default class TaskStatisEcharts extends Component {
     constructor (props) {
@@ -17,14 +14,8 @@ export default class TaskStatisEcharts extends Component {
 
     componentDidUpdate (prevProps, prevState) {
         const {
-            etime
-        } = this.state;
-        const {
             echartsChange
         } = this.props;
-        if (etime != prevState.etime) {
-            this.query();
-        }
         if (echartsChange && echartsChange !== prevProps.echartsChange) {
             this.query();
         }
@@ -101,10 +92,10 @@ export default class TaskStatisEcharts extends Component {
         };
         myChart1.setOption(option1);
 
-        this.query(1);
+        // this.query(1);
     }
     // 苗木进场总数
-    async query (no) {
+    async query () {
         const {
             curingTypes,
             taskSearchData = []
@@ -113,6 +104,9 @@ export default class TaskStatisEcharts extends Component {
             etime,
             stime
         } = this.state;
+        this.setState({
+            loading: true
+        });
         console.log('ssssssssssssssssssssssssss');
         let postdata = {};
         this.setState({

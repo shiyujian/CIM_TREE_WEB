@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Table, Select, Spin, DatePicker
+    Table, Select, Spin, DatePicker, Notification
 } from 'antd';
 import './TaskStatis.less';
 import TaskStatisEcharts from './TaskStatisEcharts';
@@ -18,7 +18,7 @@ export default class TaskStatisTable extends Component {
         this.state = {
             taskTotalData: [],
             totalThinClass: [],
-            loading: true,
+            loading: false,
             curingTypes: [],
             typeOption: [],
             typeSelect: '',
@@ -34,13 +34,27 @@ export default class TaskStatisTable extends Component {
     }
 
     componentDidMount = async () => {
-        await this._loadCuringTypes();
-        await this._loadAreaData();
-        await this._loadTaskData();
+        this.user = getUser();
+        let sections = this.user.sections;
+        this.sections = JSON.parse(sections);
+        if (this.sections && this.sections instanceof Array && this.sections.length > 0) {
+            this.section = this.sections[0];
+            await this._loadCuringTypes();
+            await this._loadAreaData();
+            await this._loadTaskData();
+        } else {
+            Notification.error({
+                message: '当前用户未关联标段，不能进行查看',
+                duration: 3
+            });
+        }
     }
 
     // 获取养护类型
     _loadCuringTypes = async () => {
+        this.setState({
+            loading: true
+        });
         const {
             actions: { getcCuringTypes }
         } = this.props;
@@ -105,11 +119,7 @@ export default class TaskStatisTable extends Component {
         const {
             curingTypes
         } = this.state;
-        this.user = getUser();
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
-        if (this.sections && this.sections instanceof Array && this.sections.length > 0) {
-            this.section = this.sections[0];
+        if (this.section) {
             let postData = {
                 section: this.section
             };
@@ -144,22 +154,22 @@ export default class TaskStatisTable extends Component {
                         }
                     });
                 } else {
-                    this.setState({
-                        taskTotalData: [],
-                        taskSearchData: [],
-                        loading: false,
-                        echartsChange: moment().unix()
-                    });
+                    this.reSetState();
                 }
             } else {
-                this.setState({
-                    taskTotalData: [],
-                    taskSearchData: [],
-                    loading: false,
-                    echartsChange: moment().unix()
-                });
+                this.reSetState();
             }
+        } else {
+            this.reSetState();
         }
+    }
+
+    reSetState () {
+        this.setState({
+            taskSearchData: [],
+            loading: false,
+            echartsChange: moment().unix()
+        });
     }
 
     getThinClassName = async (task) => {
@@ -349,18 +359,10 @@ export default class TaskStatisTable extends Component {
                         }
                     });
                 } else {
-                    this.setState({
-                        taskSearchData,
-                        loading: false,
-                        echartsChange: moment().unix()
-                    });
+                    this.reSetState();
                 }
             } else {
-                this.setState({
-                    taskSearchData,
-                    loading: false,
-                    echartsChange: moment().unix()
-                });
+                this.reSetState();
             }
         } else {
             Notification.error({
