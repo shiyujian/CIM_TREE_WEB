@@ -107,7 +107,6 @@ export default class AddMember extends Component {
         if (selectSection !== prevProps.selectSection) {
             this._queryMember();
         }
-        debugger;
         if (addMemVisible !== prevProps.addMemVisible && addMemVisible) {
             this._getRelMem();
         }

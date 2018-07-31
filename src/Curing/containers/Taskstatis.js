@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store/taskCreate';
+import * as actions from '../store/taskStatis';
 import { actions as platformActions } from '_platform/store/global';
-import { TaskStatisTable } from '../components/TaskStatis';
+import { TaskStatisPage } from '../components/TaskStatis';
 @connect(
     state => {
-        const { platform } = state;
-        return { platform };
+        const {
+            curing: { taskStatis = {} },
+            platform
+        } = state;
+        return { ...taskStatis, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -18,6 +21,6 @@ import { TaskStatisTable } from '../components/TaskStatis';
 )
 export default class TaskStatis extends Component {
     render () {
-        return <TaskStatisTable {...this.props} />;
+        return <TaskStatisPage {...this.props} />;
     }
 }

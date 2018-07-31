@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store/taskCreate';
+import * as actions from '../store/taskReport';
 import { actions as platformActions } from '_platform/store/global';
 import { TaskReportTable } from '../components/TaskReport';
 @connect(
     state => {
-        const { platform } = state;
-        return { platform };
+        const {
+            curing: { taskReport = {} },
+            platform
+        } = state;
+        return { ...taskReport, platform };
     },
     dispatch => ({
         actions: bindActionCreators(

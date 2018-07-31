@@ -179,6 +179,9 @@ export default class SeedlingsChange extends Component {
                 });
             } else {
                 message.error('请上传jpg,jpeg,png 文件');
+                this.setState({
+                    loading: false
+                });
                 return false;
             }
         },

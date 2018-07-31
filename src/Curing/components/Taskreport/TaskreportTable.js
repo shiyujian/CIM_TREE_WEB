@@ -49,6 +49,7 @@ export default class TaskReportTable extends Component {
         this.tileLayer = null;
         this.tileLayer2 = null;
         this.map = null;
+        this.totalThinClass = [];
         /* 菜单宽度调整 */
         this.menu = {
             startPos: 0,
@@ -74,12 +75,12 @@ export default class TaskReportTable extends Component {
     };
 
     async componentDidMount () {
-        // 获取任务数据
-        this._loadTaskData();
-        // 获取地块树数据
-        this._loadAreaData();
         // 初始化地图
-        this._initMap();
+        await this._initMap();
+        // 获取地块树数据
+        await this._loadAreaData();
+        // 获取任务数据
+        await this._loadTaskData();
     }
     // 获取任务数据
     async _loadTaskData () {
@@ -95,7 +96,7 @@ export default class TaskReportTable extends Component {
         if (sections && sections instanceof Array && sections.length > 0) {
             let section = sections[0];
             let postData = {
-                section: 'P010-01-01'
+                section: section
             };
             let curingTypesData = await getcCuringTypes();
             let curingTypes = curingTypesData && curingTypesData.content;
@@ -174,8 +175,9 @@ export default class TaskReportTable extends Component {
                     });
                 }
             }
-            let totalThinClass = [];
-            unitProjectList.map(async unitProject => {
+            // let totalThinClass = [];
+            for (let i = 0; i < unitProjectList.length; i++) {
+                let unitProject = unitProjectList[i];
                 let list = await getLittleBan({ no: unitProject.No });
                 let smallClassList = getSmallClass(list);
                 let unitProjectThinArr = [];
@@ -185,16 +187,36 @@ export default class TaskReportTable extends Component {
                     unitProjectThinArr = unitProjectThinArr.concat(thinClassList);
                     smallClass.children = thinClassList;
                 });
-                totalThinClass.push({
+                this.totalThinClass.push({
                     unitProject: unitProject.No,
                     thinClass: unitProjectThinArr
                 });
                 unitProject.children = smallClassList;
-                this.setState({
-                    treeLists: projectList,
-                    totalThinClass
-                });
+            }
+            this.setState({
+                treeLists: projectList
             });
+
+            // unitProjectList.map(async unitProject => {
+            //     let list = await getLittleBan({ no: unitProject.No });
+            //     let smallClassList = getSmallClass(list);
+            //     let unitProjectThinArr = [];
+            //     smallClassList.map(smallClass => {
+            //         let thinClassList = getThinClass(smallClass, list);
+
+            //         unitProjectThinArr = unitProjectThinArr.concat(thinClassList);
+            //         smallClass.children = thinClassList;
+            //     });
+            //     totalThinClass.push({
+            //         unitProject: unitProject.No,
+            //         thinClass: unitProjectThinArr
+            //     });
+            //     unitProject.children = smallClassList;
+            //     this.setState({
+            //         treeLists: projectList,
+            //         totalThinClass
+            //     });
+            // });
         } catch (e) {
             console.log(e);
         }
@@ -267,12 +289,8 @@ export default class TaskReportTable extends Component {
     render () {
         const {
             createBtnVisible,
-            coordinates
+            selected
         } = this.state;
-        let okDisplay = false;
-        if (coordinates.length <= 2) {
-            okDisplay = true;
-        }
         return (
             <div className='Curing-container'>
                 <div
@@ -364,17 +382,25 @@ export default class TaskReportTable extends Component {
                     ) : (
                         ''
                     )}
-                    {
-                        createBtnVisible ? (
-                            <div className='treeControl2'>
-                                <div>
-                                    {/* <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button> */}
-                                    <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>
-                                    <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
-                                </div>
-                            </div>
-                        ) : ''
-                    }
+                    <div className='treeControl2'>
+                        <div className='buttonStyle'>
+                            {
+                                selected
+                                    ? <Button type='primary' style={{marginRight: 10}} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
+                                    : ''
+                            }
+                            {
+                                createBtnVisible
+                                    ? (
+                                        <div className='buttonStyle'>
+                                            <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>
+                                            <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
+                                        </div>
+                                    )
+                                    : ''
+                            }
+                        </div>
+                    </div>
                     <TaskReportModal
                         {...this.props}
                         {...this.state}
@@ -536,8 +562,12 @@ export default class TaskReportTable extends Component {
         let eventKey = keys[0];
         // 当前的选中状态
         let selected = info.selected;
+        if (!selected) {
+            this.setState({
+                selected
+            });
+        }
         this.setState({
-            selected,
             taskEventKey: eventKey
         });
         try {
@@ -562,6 +592,9 @@ export default class TaskReportTable extends Component {
                     if (markerLayerList[eventKey]) {
                         markerLayerList[eventKey].addTo(me.map);
                     }
+                    this.setState({
+                        selected
+                    });
                 } else {
                     // 如果不是添加过，需要请求数据
                     me._addTaskLayer(eventKey);
@@ -638,6 +671,12 @@ export default class TaskReportTable extends Component {
             if (taskMess.StartTime && taskMess.EndTime) {
                 status = '已完成';
             }
+            let regionData = this.getTaskThinClassName(taskMess);
+            console.log('regionData', regionData);
+            let sectionName = regionData.regionSectionName;
+            let thinClassName = regionData.regionThinName;
+            taskMess.sectionName = sectionName;
+            taskMess.thinClassName = thinClassName;
             taskMess.status = status;
             taskMess.typeName = typeName;
             taskMessList[eventKey] = taskMess;
@@ -699,10 +738,59 @@ export default class TaskReportTable extends Component {
             marker.addTo(this.map);
             markerLayerList[eventKey] = marker;
             this.setState({
-                markerLayerList
+                markerLayerList,
+                selected: true
             });
         } catch (e) {
             console.log('处理str', e);
+        }
+    }
+    getTaskThinClassName = (task) => {
+        try {
+            let thinClass = task.ThinClass;
+            let section = task.Section;
+            let thinClassList = thinClass.split(',');
+            let regionSectionName = '';
+            let regionThinName = '';
+            console.log('this.totalThinClass', this.totalThinClass);
+            if (thinClassList && thinClassList instanceof Array && thinClassList.length > 0) {
+                thinClassList.map((thinNo, index) => {
+                    this.totalThinClass.map((unitProjectData) => {
+                        let unitProject = unitProjectData.unitProject;
+                        // 首先根据区块找到对应的细班list
+                        if (section.indexOf(unitProject) !== -1) {
+                            let children = unitProjectData.thinClass;
+                            console.log('unitProjectData', unitProjectData);
+                            children.map((child) => {
+                            // tree结构的数据经过了处理，需要和api获取的数据调整一致
+                                let handleKey = child.No.split('-');
+                                let childNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                                let childSection = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+                                debugger;
+                                if (thinNo.indexOf(childNo) !== -1 && childSection === section) {
+                                // 找到符合条件的数据的name
+                                    let name = child.Name;
+                                    let sectionName = getSectionName(section);
+                                    regionSectionName = sectionName;
+                                    if (index === 0) {
+                                        regionThinName = regionThinName + name;
+                                    } else {
+                                        regionThinName = regionThinName + ' ,' + name;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            let regionData = {
+                regionThinName: regionThinName,
+                regionSectionName: regionSectionName
+            };
+            return regionData;
+        } catch (e) {
+            console.log('getTaskThinClassName', e);
         }
     }
     // 获取对应的ICON
@@ -772,21 +860,27 @@ export default class TaskReportTable extends Component {
             });
             return;
         }
-        this.setState({
-            isShowTaskModal: true
-        });
-        let coords = coordinates;
         try {
+            let signSection = this.sections[0];
             let taskMess = taskMessList[taskEventKey];
-            console.log('taskMess', taskMess);
             if (polygonData) {
+                if (coordinates && coordinates.length <= 2) {
+                    Notification.error({
+                        message: '圈选地图区域未形成封闭图形，请重新圈选区域',
+                        duration: 3
+                    });
+                    return;
+                }
+                this.setState({
+                    isShowTaskModal: true
+                });
                 // 选择面积
                 let regionArea = 0;
                 // 坐标
                 let wkt = 'POLYGON(';
-                wkt = wkt + getHandleWktData(coords);
+                wkt = wkt + getHandleWktData(coordinates);
                 wkt = wkt + ')';
-                regionArea = computeSignedArea(coords, 2);
+                regionArea = computeSignedArea(coordinates, 2);
                 // 包括的细班号
                 let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
                 let regionData = await this._getThinClassName(regionThinClass);
@@ -833,9 +927,9 @@ export default class TaskReportTable extends Component {
     }
     // 查找区域内的细班的名称
     _getThinClassName = async (regionThinClass) => {
-        const {
-            totalThinClass
-        } = this.state;
+        // const {
+        //     totalThinClass
+        // } = this.state;
 
         // 细班数组，查看细班是否重复，重复不再查询
         let thinNoList = [];
@@ -853,15 +947,15 @@ export default class TaskReportTable extends Component {
         try {
             regionThinClass.map((thinData, index) => {
                 let section = thinData.Section;
-                // 如果圈选的区域不在登录用户的标段内，则不能下发任务
-                if (signSection !== section) {
-                    sectionBool = false;
-                    return;
-                }
-                // 如果圈选的区域不在登录用户的标段内，不需要循环获取数据
-                if (!sectionBool) {
-                    return;
-                }
+                // // 如果圈选的区域不在登录用户的标段内，则不能下发任务
+                // if (signSection !== section) {
+                //     sectionBool = false;
+                //     return;
+                // }
+                // // 如果圈选的区域不在登录用户的标段内，不需要循环获取数据
+                // if (!sectionBool) {
+                //     return;
+                // }
                 let thinNo = thinData.no;
                 let pushState = true;
                 // 获取的thinNo可能又会重复的，需要进行处理
@@ -874,7 +968,7 @@ export default class TaskReportTable extends Component {
                     return;
                 }
                 thinNoList.push(thinNo);
-                totalThinClass.map((unitProjectData) => {
+                this.totalThinClass.map((unitProjectData) => {
                     let unitProject = unitProjectData.unitProject;
                     // 首先根据区块找到对应的细班list
                     if (section.indexOf(unitProject) !== -1) {

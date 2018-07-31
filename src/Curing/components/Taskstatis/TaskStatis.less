@@ -1,0 +1,43 @@
+.taskPage-container{
+    position: absolute;
+    top: 80px;
+    width: calc(~'100% - 170px');
+    height: 86%;
+    left: 170px;
+    .drawer {
+        height: 36px;
+        line-height: 36px;
+        text-align: center;
+        font-size: 12px;
+        background-color: #bdbbbb;
+        color: #ffffff;
+        border-bottom: 1px solid #e6e6e6;
+      }
+
+    .taskSelect-container{ 
+        display: flex;
+        margin-bottom: 20px;
+        margin-top: 20px;
+
+        .Search-style {
+            width: 100%;
+            margin-right: 20px;
+        }
+        .Select-width {
+            width: calc(~'100% - 90px');
+            margin-right: 20px;
+        }
+        .DatePicker-width {
+            width: calc(~'100% - 90px');
+            margin-right: 20px;
+            display: inline-block;
+        }
+    } 
+}
+.column{
+    table-layout: fixed;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width:150px;
+}

@@ -141,10 +141,10 @@ export const genPopUpContent = (geo) => {
                     <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
                     <h2><span>实际开始时间：</span>${properties.StartTime}</h2>
                     <h2><span>实际结束时间：</span>${properties.EndTime}</h2>
-                    <h2 class="btnRow">
-                        <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
-                    </h2>
                 </div>`;
+            // <h2 class="btnRow">
+            //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
+            // </h2>
         }
         default: {
             return null;

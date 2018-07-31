@@ -1,23 +1,17 @@
 import React, {Component} from 'react';
-import {Row, Col, Input, Icon, DatePicker, Select, Spin} from 'antd';
-import {Cards, SumTotal, DateImg} from '../../components';
-import { FOREST_API, TREETYPENO, PROJECT_UNITS} from '../../../_platform/api';
+import {DatePicker, Select, Spin} from 'antd';
 import moment from 'moment';
-import {groupBy} from 'lodash';
 var echarts = require('echarts');
 const Option = Select.Option;
 const {RangePicker} = DatePicker;
 
-export default class Left extends Component {
+export default class TaskStatisEcharts extends Component {
     constructor (props) {
         super(props);
         this.state = {
             section: '',
-            // etime: moment().add(1, 'days').format('YYYY/MM/DD'),
-            // stime: moment().format('2018/01/01'),
-            stime: moment().format('YYYY/MM/DD 00:00:00'),
-            etime: moment().format('YYYY/MM/DD 23:59:59'),
-            loading: false
+            loading: false,
+            types: []
         };
     }
 
@@ -26,12 +20,12 @@ export default class Left extends Component {
             etime
         } = this.state;
         const {
-            leftkeycode
+            echartsChange
         } = this.props;
         if (etime != prevState.etime) {
             this.query();
         }
-        if (leftkeycode != prevProps.leftkeycode) {
+        if (echartsChange && echartsChange !== prevProps.echartsChange) {
             this.query();
         }
     }
@@ -40,7 +34,7 @@ export default class Left extends Component {
         let myChart1 = echarts.init(document.getElementById('king'));
         let option1 = {
             title: {
-                text: '苗木进场总数'
+                text: '统计分析'
             },
             tooltip: {
                 trigger: 'axis',
@@ -76,20 +70,20 @@ export default class Left extends Component {
                     type: 'value',
                     name: '',
                     axisLabel: {
-                        formatter: '{value} 棵'
+                        formatter: '{value} 平方米'
                     }
                 },
                 {
                     type: 'value',
                     name: '',
                     axisLabel: {
-                        formatter: '{value} 棵'
+                        formatter: '{value} 平方米'
                     }
                 }
             ],
             series: [
                 {
-                    name: '苗木进场总数',
+                    name: '养护面积',
                     type: 'bar',
                     markPoint: {
                         data: [
@@ -112,62 +106,53 @@ export default class Left extends Component {
     // 苗木进场总数
     async query (no) {
         const {
-            leftkeycode,
-            actions: {
-                gettreetype
-            }
+            curingTypes,
+            taskSearchData = []
         } = this.props;
         const {
             etime,
             stime
         } = this.state;
-        if (!leftkeycode)
-            {return};
+        console.log('ssssssssssssssssssssssssss');
         let postdata = {};
         this.setState({
             loading: true
         });
-
-        postdata.no = leftkeycode;
-        postdata.stime = stime;
-        postdata.etime = etime;
-        let rst = await gettreetype({}, postdata);
-        console.log('aaaaaaaaaaaaaarst', rst);
-        let units = [];
+        let types = [];
+        let typesNo = [];
         let data = [];
-
-        if (rst && rst instanceof Array) {
-            PROJECT_UNITS.map((project) => {
-                // 获取正确的项目
-                if (leftkeycode.indexOf(project.code) > -1) {
-                    // 获取项目下的标段
-                    let sections = project.units;
-                    // 将各个标段的数据设置为0
-                    sections.map((section, index) => {
-                        data[index] = 0;
-                        units.push(section.value);
-                    });
-
-                    rst.map(item => {
-                        if (item && item.Section) {
-                            sections.map((section, index) => {
-                                if (item.Section === section.code) {
-                                    data[index] = data[index] + item.Num;
-                                }
-                            });
-                        }
-                    });
+        try {
+            curingTypes.map((type) => {
+                if (type.Base_Name) {
+                    types.push(type.Base_Name);
+                    typesNo.push(type.ID);
                 }
             });
+        } catch (e) {
+            console.log('e', e);
+        }
+        try {
+            typesNo.map((no, index) => {
+                if (!data[index]) {
+                    data[index] = 0;
+                }
+                taskSearchData.map((task) => {
+                    if (task.CuringType === no) {
+                        data[index] += parseInt(task.Area);
+                    }
+                });
+            });
+        } catch (e) {
+
         }
         console.log('data', data);
-        console.log('units', units);
+        postdata.stime = stime;
+        postdata.etime = etime;
         let myChart1 = echarts.init(document.getElementById('king'));
         let option1 = {
-
             xAxis: [
                 {
-                    data: units
+                    data: types
                 }
             ],
             series: [
@@ -178,7 +163,8 @@ export default class Left extends Component {
         };
         myChart1.setOption(option1);
         this.setState({
-            loading: false
+            loading: false,
+            types
         });
     }
 
@@ -186,30 +172,9 @@ export default class Left extends Component {
         return (
             <div>
                 <Spin spinning={this.state.loading}>
-                    <Cards search={this.searchRender()} title='苗木进场总数'>
-                        <div id= 'king' style= {{width: '100%', height: '400px'}} />
-                    </Cards>
+                    <div id='king' style={{width: '100%', height: '300px'}} />
                 </Spin>
             </div>
         );
-    }
-
-    searchRender () {
-        return (<div>
-            <span>选择时间：</span>
-            <RangePicker
-                style={{verticalAlign: 'middle'}}
-                defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'), moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]}
-                showTime={{ format: 'HH:mm:ss' }}
-                format={'YYYY/MM/DD HH:mm:ss'}
-                onChange={this.datepick.bind(this)}
-                onOk={this.datepick.bind(this)}
-             />
-        </div>);
-    }
-
-    datepick (value) {
-        this.setState({stime: value[0] ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''});
-        this.setState({etime: value[1] ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''});
     }
 }
