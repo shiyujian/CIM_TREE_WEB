@@ -53,20 +53,6 @@
 
   }
 
-  .bady {
-    :global(.ant-tree-title) {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-    :global(.ant-tree li .ant-tree-node-content-wrapper) {
-      word-break: break-all;
-      word-wrap: break-word;
-      white-space: pre-wrap;
-      width: 270px;
-    }
-  }
-
   .ant-menu-item > a{
     font-size: 14px;
     border-bottom: solid 1px #bdbbbb;
@@ -134,5 +120,18 @@
   to {
     width: 48px;
   }
+}
+
+:global(.ant-tree-title) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 180px;
+}
+:global(.ant-tree li .ant-tree-node-content-wrapper) {
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  // width: 270px;
 }
 
