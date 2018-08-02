@@ -107,7 +107,7 @@ export default class TaskStatisEcharts extends Component {
         this.setState({
             loading: true
         });
-        console.log('ssssssssssssssssssssssssss');
+        console.log('ssssssssssssssssssssssssss', taskSearchData);
         let postdata = {};
         this.setState({
             loading: true
@@ -166,7 +166,7 @@ export default class TaskStatisEcharts extends Component {
         return (
             <div>
                 <Spin spinning={this.state.loading}>
-                    <div id='king' style={{width: '100%', height: '300px'}} />
+                    <div id='king' style={{width: '100%', height: '350px'}} />
                 </Spin>
             </div>
         );

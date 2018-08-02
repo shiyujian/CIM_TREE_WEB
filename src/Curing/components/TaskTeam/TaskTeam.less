@@ -1,0 +1,38 @@
+.total-main {
+    height: 100%;
+    .aside-main {
+        position: absolute;
+        // right: 0;
+        top: 40px;
+        height: 100%;
+        width: 200px;
+        transition: all .3s;
+        z-index: 980;
+        .aside {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+            background-color: #FFFFFF;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+        
+            
+            :global(.ant-tree-title){
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              width: 180px;
+            }
+            :global(.ant-tree li .ant-tree-node-content-wrapper){
+                word-break: break-all;
+                word-wrap: break-word;
+                white-space: pre-wrap;
+                width: 270px;
+            }
+          }
+    }
+}
+

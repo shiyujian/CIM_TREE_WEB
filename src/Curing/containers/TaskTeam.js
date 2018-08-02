@@ -12,6 +12,7 @@ import {
     TaskTeamTable,
     AsideTree
 } from '../components/TaskTeam';
+import './index.less';
 
 @connect(
     state => {
@@ -32,16 +33,17 @@ import {
 export default class TaskTeam extends Component {
     render () {
         return (
-            <div>
-                <DynamicTitle title='养护班组' {...this.props} />
-                <Sidebar>
-                    <AsideTree
-                        {...this.props}
-                    />
-                </Sidebar>
-                <Content>
-                    <TaskTeamTable {...this.props} {...this.state} />
-                </Content>
+            <div className='taskTeam-Layout'>
+                <AsideTree className='aside-Layout'
+                    {...this.props}
+                />
+                {/* <Content> */}
+                <div className='table-Layout'>
+                    <TaskTeamTable
+                        {...this.props} {...this.state} />
+                </div>
+
+                {/* </Content> */}
             </div>
         );
     }

@@ -29,7 +29,7 @@ export default class Aside extends Component {
                 style={{
                     float: 'left',
                     width: 160,
-                    position: 'relative',
+                    position: 'absolute',
                     minHeight: this.state.minHeight
                 }}
                 className='platform-aside'

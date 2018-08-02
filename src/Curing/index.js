@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-07-04 14:32:29
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-17 21:18:30
+ * @Last Modified time: 2018-08-01 14:38:24
  */
 /**
  *
@@ -28,7 +28,8 @@
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { Aside, Main, Body } from '_platform/components/layout';
+import { Main, Body } from '_platform/components/layout';
+import Aside from './components/Aside';
 import Submenu from '_platform/components/panels/Submenu';
 import { Icon } from 'react-fa';
 

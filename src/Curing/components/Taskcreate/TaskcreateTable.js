@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Button, Collapse, Notification
+    Button, Collapse, Notification, Spin
 } from 'antd';
 import DashPanel from '../DashPanel';
 import {getThinClass, getSmallClass, fillAreaColor, getSectionName, getHandleWktData, getWktData, computeSignedArea} from '../auth';
@@ -37,11 +37,14 @@ export default class TaskCreateTable extends Component {
             regionArea: 0, // 圈选区域内面积
             wkt: '',
             noLoading: false,
-            treeCoords: {}
+            treeCoords: {},
+            treeLoading: false
         };
         this.tileLayer = null;
         this.tileLayer2 = null;
         this.map = null;
+        this.sections = [];
+        this.section = '';
         /* 菜单宽度调整 */
         this.menu = {
             startPos: 0,
@@ -74,6 +77,11 @@ export default class TaskCreateTable extends Component {
             }
         } = this.props;
         this.user = getUser();
+        let sections = this.user.sections;
+        this.sections = JSON.parse(sections);
+        if (this.sections && this.sections instanceof Array && this.sections.length > 0) {
+            this.section = this.sections[0];
+        }
         await changeCheckedKeys([]);
         await changeSelectMap('细班选择');
         // 获取地块树数据
@@ -88,6 +96,9 @@ export default class TaskCreateTable extends Component {
             actions: { getTreeNodeList, getLittleBan }
         } = this.props;
         try {
+            this.setState({
+                treeLoading: true
+            });
             let rst = await getTreeNodeList();
             if (rst instanceof Array && rst.length > 0) {
                 rst.forEach((item, index) => {
@@ -100,17 +111,35 @@ export default class TaskCreateTable extends Component {
             let unitProjectList = [];
             if (rst instanceof Array && rst.length > 0) {
                 rst.map(node => {
-                    if (node.Type === '项目工程') {
-                        projectList.push({
-                            Name: node.Name,
-                            No: node.No
-                        });
-                    } else if (node.Type === '子项目工程') {
-                        unitProjectList.push({
-                            Name: node.Name,
-                            No: node.No,
-                            Parent: node.Parent
-                        });
+                    if (this.user.username === 'admin') {
+                        if (node.Type === '项目工程') {
+                            projectList.push({
+                                Name: node.Name,
+                                No: node.No
+                            });
+                        } else if (node.Type === '子项目工程') {
+                            unitProjectList.push({
+                                Name: node.Name,
+                                No: node.No,
+                                Parent: node.Parent
+                            });
+                        }
+                    } else if (this.section) {
+                        let sectionArr = this.section.split('-');
+                        let projectKey = sectionArr[0];
+                        let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
+                        if (node.Type === '项目工程' && node.No.indexOf(projectKey) !== -1) {
+                            projectList.push({
+                                Name: node.Name,
+                                No: node.No
+                            });
+                        } else if (node.Type === '子项目工程' && node.No.indexOf(unitProjectKey) !== -1) {
+                            unitProjectList.push({
+                                Name: node.Name,
+                                No: node.No,
+                                Parent: node.Parent
+                            });
+                        }
                     }
                 });
                 for (let i = 0; i < projectList.length; i++) {
@@ -137,7 +166,8 @@ export default class TaskCreateTable extends Component {
                 unitProject.children = smallClassList;
                 this.setState({
                     treeLists: projectList,
-                    totalThinClass
+                    totalThinClass,
+                    treeLoading: false
                 });
             });
         } catch (e) {
@@ -359,20 +389,24 @@ export default class TaskCreateTable extends Component {
     /* 渲染菜单panel */
     renderPanel (option) {
         const {
-            treeLists
+            treeLists,
+            treeLoading
         } = this.state;
         if (option && option.value) {
             switch (option.value) {
                 // 区域地块
                 case 'geojsonFeature_area':
                     return (
-                        <DashPanel
-                            {...this.props}
-                            style={{ height: '200px' }}
-                            onCheck={this.handleAreaCheck.bind(this)}
-                            onSelect={this.handleAreaSelect.bind(this)}
-                            content={treeLists}
-                        />
+                        <Spin spinning={treeLoading}>
+                            <DashPanel
+                                {...this.props}
+                                style={{ height: '200px' }}
+                                onCheck={this.handleAreaCheck.bind(this)}
+                                onSelect={this.handleAreaSelect.bind(this)}
+                                content={treeLists}
+                            />
+                        </Spin>
+
                     );
             }
         }
@@ -586,7 +620,6 @@ export default class TaskCreateTable extends Component {
             // 包括的细班号
             let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
             let regionData = await this._getThinClassName(regionThinClass);
-            console.log('regionData', regionData);
             let sectionBool = regionData.sectionBool;
             if (!sectionBool) {
                 Notification.error({
@@ -640,7 +673,6 @@ export default class TaskCreateTable extends Component {
         let regionSectionName = '';
         // 标段是否是登陆用户所在标段
         let sectionBool = true;
-        console.log('sections', this.sections);
         let signSection = this.sections[0];
         try {
             regionThinClass.map((thinData, index) => {

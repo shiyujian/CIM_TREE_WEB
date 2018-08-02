@@ -31,6 +31,7 @@ export default class TaskStatisTable extends Component {
         };
         this.totalThinClass = [];
         this.sections = [];
+        this.section = '';
     }
 
     componentDidMount = async () => {
@@ -83,11 +84,23 @@ export default class TaskStatisTable extends Component {
             let unitProjectList = [];
             if (rst instanceof Array && rst.length > 0) {
                 rst.map(node => {
-                    if (node.Type === '子项目工程') {
-                        unitProjectList.push({
-                            Name: node.Name,
-                            No: node.No
-                        });
+                    if (this.user.username === 'admin') {
+                        if (node.Type === '子项目工程') {
+                            unitProjectList.push({
+                                Name: node.Name,
+                                No: node.No
+                            });
+                        }
+                    } else if (this.section) {
+                        let sectionArr = this.section.split('-');
+                        let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
+                        if (node.Type === '子项目工程' && node.No.indexOf(unitProjectKey) !== -1) {
+                            unitProjectList.push({
+                                Name: node.Name,
+                                No: node.No,
+                                Parent: node.Parent
+                            });
+                        }
                     }
                 });
             }
@@ -128,9 +141,11 @@ export default class TaskStatisTable extends Component {
                 let curingTasks = curingTaskData.content;
                 let taskTotalData = [];
                 if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
-                    curingTasks.map(async (task) => {
+                    for (let i = 0; i < curingTasks.length; i++) {
+                        let task = curingTasks[i];
                         if (task && task.ID) {
-                            curingTypes.map(async (type) => {
+                            for (let t = 0; t < curingTypes.length; t++) {
+                                let type = curingTypes[t];
                                 if (type.ID === task.CuringType) {
                                     // 获取task的养护类型
                                     console.log('type.Base_Name', type.Base_Name);
@@ -143,16 +158,41 @@ export default class TaskStatisTable extends Component {
                                     task.thinClassName = thinClassName;
                                     taskTotalData.push(task);
                                     console.log('taskTotalData', taskTotalData);
-                                    this.setState({
-                                        taskTotalData,
-                                        taskSearchData: taskTotalData,
-                                        loading: false,
-                                        echartsChange: moment().unix()
-                                    });
                                 }
-                            });
+                            }
                         }
+                    }
+                    this.setState({
+                        taskTotalData,
+                        taskSearchData: taskTotalData,
+                        loading: false,
+                        echartsChange: moment().unix()
                     });
+                    // curingTasks.map(async (task) => {
+                    //     if (task && task.ID) {
+                    //         await curingTypes.map(async (type) => {
+                    //             if (type.ID === task.CuringType) {
+                    //                 // 获取task的养护类型
+                    //                 console.log('type.Base_Name', type.Base_Name);
+                    //                 task.typeName = type.Base_Name;
+                    //                 // 获取task的细班和标段名称
+                    //                 let regionData = await this.getThinClassName(task);
+                    //                 let sectionName = regionData.regionSectionName;
+                    //                 let thinClassName = regionData.regionThinName;
+                    //                 task.sectionName = sectionName;
+                    //                 task.thinClassName = thinClassName;
+                    //                 taskTotalData.push(task);
+                    //                 console.log('taskTotalData', taskTotalData);
+                    //                 this.setState({
+                    //                     taskTotalData,
+                    //                     taskSearchData: taskTotalData,
+                    //                     loading: false,
+                    //                     echartsChange: moment().unix()
+                    //                 });
+                    //             }
+                    //         });
+                    //     }
+                    // });
                 } else {
                     this.reSetState();
                 }
@@ -279,6 +319,9 @@ export default class TaskStatisTable extends Component {
                         columns={this.columns}
                         dataSource={taskSearchData}
                         rowKey='ID'
+                        pagination={{
+                            pageSize: 5
+                        }}
                     />
                 </Spin>
             </div>
@@ -398,7 +441,8 @@ export default class TaskStatisTable extends Component {
         },
         {
             title: '细班',
-            dataIndex: 'thinClassName'
+            dataIndex: 'thinClassName',
+            render: text => <div className='column'><span title={text} href='#'>{text}</span></div>
         },
         {
             title: '面积(m^2)',
@@ -415,23 +459,118 @@ export default class TaskStatisTable extends Component {
         },
         {
             title: '创建时间',
-            dataIndex: 'CreateTime'
+            dataIndex: 'CreateTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
         },
         {
             title: '预计开始时间',
-            dataIndex: 'PlanStartTime'
+            dataIndex: 'PlanStartTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
         },
         {
             title: '预计结束时间',
-            dataIndex: 'PlanEndTime'
+            dataIndex: 'PlanEndTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
         },
         {
             title: '实际开始时间',
-            dataIndex: 'StartTime'
+            dataIndex: 'StartTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
         },
         {
             title: '实际结束时间',
-            dataIndex: 'EndTime'
+            dataIndex: 'EndTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
         },
         {
             title: '操作',

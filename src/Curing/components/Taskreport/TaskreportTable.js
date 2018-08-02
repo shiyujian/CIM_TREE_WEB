@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Button, Modal, Collapse, Notification
+    Button, Modal, Collapse, Notification, Spin
 } from 'antd';
 import PanelTree from '../PanelTree';
 import TaskTree from '../TaskTree';
@@ -43,13 +43,16 @@ export default class TaskReportTable extends Component {
             wkt: '',
             selected: false,
             noLoading: false,
-            taskEventKey: ''
+            taskEventKey: '',
+            treeLoading: false
         };
         this.checkMarkers = [];
         this.tileLayer = null;
         this.tileLayer2 = null;
         this.map = null;
         this.totalThinClass = [];
+        this.sections = [];
+        this.section = '';
         /* 菜单宽度调整 */
         this.menu = {
             startPos: 0,
@@ -75,6 +78,12 @@ export default class TaskReportTable extends Component {
     };
 
     async componentDidMount () {
+        this.user = getUser();
+        let sections = this.user.sections;
+        this.sections = JSON.parse(sections);
+        if (this.sections && this.sections instanceof Array && this.sections.length > 0) {
+            this.section = this.sections[0];
+        }
         // 初始化地图
         await this._initMap();
         // 获取地块树数据
@@ -144,6 +153,9 @@ export default class TaskReportTable extends Component {
             actions: { getTreeNodeList, getLittleBan }
         } = this.props;
         try {
+            this.setState({
+                treeLoading: true
+            });
             let rst = await getTreeNodeList();
             if (rst instanceof Array && rst.length > 0) {
                 rst.forEach((item, index) => {
@@ -156,17 +168,35 @@ export default class TaskReportTable extends Component {
             let unitProjectList = [];
             if (rst instanceof Array && rst.length > 0) {
                 rst.map(node => {
-                    if (node.Type === '项目工程') {
-                        projectList.push({
-                            Name: node.Name,
-                            No: node.No
-                        });
-                    } else if (node.Type === '子项目工程') {
-                        unitProjectList.push({
-                            Name: node.Name,
-                            No: node.No,
-                            Parent: node.Parent
-                        });
+                    if (this.user.username === 'admin') {
+                        if (node.Type === '项目工程') {
+                            projectList.push({
+                                Name: node.Name,
+                                No: node.No
+                            });
+                        } else if (node.Type === '子项目工程') {
+                            unitProjectList.push({
+                                Name: node.Name,
+                                No: node.No,
+                                Parent: node.Parent
+                            });
+                        }
+                    } else if (this.section) {
+                        let sectionArr = this.section.split('-');
+                        let projectKey = sectionArr[0];
+                        let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
+                        if (node.Type === '项目工程' && node.No.indexOf(projectKey) !== -1) {
+                            projectList.push({
+                                Name: node.Name,
+                                No: node.No
+                            });
+                        } else if (node.Type === '子项目工程' && node.No.indexOf(unitProjectKey) !== -1) {
+                            unitProjectList.push({
+                                Name: node.Name,
+                                No: node.No,
+                                Parent: node.Parent
+                            });
+                        }
                     }
                 });
                 for (let i = 0; i < projectList.length; i++) {
@@ -194,7 +224,8 @@ export default class TaskReportTable extends Component {
                 unitProject.children = smallClassList;
             }
             this.setState({
-                treeLists: projectList
+                treeLists: projectList,
+                treeLoading: false
             });
 
             // unitProjectList.map(async unitProject => {
@@ -436,20 +467,23 @@ export default class TaskReportTable extends Component {
     renderPanel (option) {
         const {
             treeLists,
-            TaskTreeData
+            TaskTreeData,
+            treeLoading
         } = this.state;
         if (option && option.value) {
             switch (option.value) {
                 // 区域地块
                 case 'geojsonFeature_area':
                     return (
-                        <PanelTree
-                            {...this.props}
-                            tyle={{ height: '200px' }}
-                            onCheck={this._handleAreaCheck.bind(this)}
-                            onSelect={this._handleAreaSelect.bind(this)}
-                            content={treeLists}
-                        />
+                        <Spin spinning={treeLoading}>
+                            <PanelTree
+                                {...this.props}
+                                style={{ height: '200px' }}
+                                onCheck={this._handleAreaCheck.bind(this)}
+                                onSelect={this._handleAreaSelect.bind(this)}
+                                content={treeLists}
+                            />
+                        </Spin>
                     );
                     // 养护任务
                 case 'geojsonFeature_task':
@@ -672,7 +706,6 @@ export default class TaskReportTable extends Component {
                 status = '已完成';
             }
             let regionData = this.getTaskThinClassName(taskMess);
-            console.log('regionData', regionData);
             let sectionName = regionData.regionSectionName;
             let thinClassName = regionData.regionThinName;
             taskMess.sectionName = sectionName;
@@ -752,7 +785,6 @@ export default class TaskReportTable extends Component {
             let thinClassList = thinClass.split(',');
             let regionSectionName = '';
             let regionThinName = '';
-            console.log('this.totalThinClass', this.totalThinClass);
             if (thinClassList && thinClassList instanceof Array && thinClassList.length > 0) {
                 thinClassList.map((thinNo, index) => {
                     this.totalThinClass.map((unitProjectData) => {
@@ -760,7 +792,6 @@ export default class TaskReportTable extends Component {
                         // 首先根据区块找到对应的细班list
                         if (section.indexOf(unitProject) !== -1) {
                             let children = unitProjectData.thinClass;
-                            console.log('unitProjectData', unitProjectData);
                             children.map((child) => {
                             // tree结构的数据经过了处理，需要和api获取的数据调整一致
                                 let handleKey = child.No.split('-');
@@ -849,11 +880,8 @@ export default class TaskReportTable extends Component {
             taskEventKey,
             taskMessList
         } = this.state;
-
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (!(this.sections && this.sections instanceof Array && this.sections.length > 0)) {
+        if (!this.section) {
             Notification.error({
                 message: '当前登录用户未关联标段，不能查看任务',
                 duration: 2
@@ -861,7 +889,7 @@ export default class TaskReportTable extends Component {
             return;
         }
         try {
-            let signSection = this.sections[0];
+            let signSection = this.section;
             let taskMess = taskMessList[taskEventKey];
             if (polygonData) {
                 if (coordinates && coordinates.length <= 2) {
@@ -884,8 +912,7 @@ export default class TaskReportTable extends Component {
                 // 包括的细班号
                 let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
                 let regionData = await this._getThinClassName(regionThinClass);
-                console.log('regionData', regionData);
-                let sectionBool = regionData.sectionBool;
+                // let sectionBool = regionData.sectionBool;
                 // if (!sectionBool) {
                 //     Notification.error({
                 //         message: '当前所选任务不属于登录用户所在标段，请重新选择',
@@ -943,7 +970,7 @@ export default class TaskReportTable extends Component {
         let regionSectionName = '';
         // 标段是否是登陆用户所在标段
         let sectionBool = true;
-        let signSection = this.sections[0];
+        let signSection = this.section;
         try {
             regionThinClass.map((thinData, index) => {
                 let section = thinData.Section;

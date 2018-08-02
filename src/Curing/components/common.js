@@ -1,16 +1,8 @@
 import './Curing.less';
 import { PROJECT_UNITS } from '_platform/api';
-import { getUser } from '_platform/auth';
 
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {
-    let user = getUser();
-    let sections = user.sections;
-    let section = '';
-    sections = JSON.parse(sections);
-    if (sections && sections instanceof Array && sections.length > 0) {
-        section = sections[0];
-    }
     // 将小班的code获取到，进行去重
     let uniqueSmallClass = [];
     // 进行数组去重的数组
@@ -19,6 +11,9 @@ export const getSmallClass = (smallClassList) => {
     let test = [];
     try {
         smallClassList.map(list => {
+            // if (!list.SmallClassName) {
+            //     console.log('list', list);
+            // }
             // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
             let codeName =
                     list.LandNo +
@@ -28,24 +23,6 @@ export const getSmallClass = (smallClassList) => {
                     list.SmallClass +
                     '#' +
                     list.SmallClassName;
-
-            let noArr = list.No.split('-');
-            // 为了让各个细班的code都不一样   把各个细班的code全部加入
-            // let No = noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
-            // 如果小于5 说明没有标段  不符合规则
-            if (noArr.length < 5) {
-                console.log('rst', list);
-                return;
-            }
-            // 项目 + 区块 + 标段
-            let sectionNo = noArr[0] + '-' + noArr[1] + '-' + noArr[4];
-            if (user.username === 'admin') {
-                // console.log('wwwww', sectionNo);
-            } else if (section) {
-                if (sectionNo !== section) {
-                    return;
-                }
-            }
             if (list.SmallClass && array.indexOf(codeName) === -1) {
                 uniqueSmallClass.push({
                     Name: list.SmallClassName

@@ -5,6 +5,7 @@ import { PROJECT_UNITS } from '_platform/api';
 import { getSectionName } from '../auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import './TaskTeam.less';
 const TreeNode = Tree.TreeNode;
 const FormItem = Form.Item;
 export const CuringDocCode = window.DeathCode.CURING_TEAM;
@@ -134,7 +135,7 @@ class AsideTree extends Component {
             wrapperCol: { span: 18 }
         };
         return (
-            <div>
+            <div className='total-main'>
                 <Button
                     style={{marginRight: 10, marginBottom: 10}}
                     type='primary'
@@ -156,21 +157,24 @@ class AsideTree extends Component {
                     删除班组
                     </Button>
                 </Popconfirm>
-                <div>
-                    {teamsTree.length ? (
-                        <Tree
-                            showLine
-                            defaultExpandAll
-                            onSelect={this._handleTreeSelect.bind(this)}
-                        >
-                            {teamsTree.map(p => {
-                                return AsideTree.loop(p);
-                            })}
-                        </Tree>
-                    ) : (
-                        ''
-                    )}
+                <div className='aside-main'>
+                    <div className='aside'>
+                        {teamsTree.length ? (
+                            <Tree
+                                showLine
+                                defaultExpandAll
+                                onSelect={this._handleTreeSelect.bind(this)}
+                            >
+                                {teamsTree.map(p => {
+                                    return AsideTree.loop(p);
+                                })}
+                            </Tree>
+                        ) : (
+                            ''
+                        )}
+                    </div>
                 </div>
+
                 {
                     teamVisible
                         ? (<Modal
