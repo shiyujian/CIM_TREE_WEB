@@ -2,8 +2,12 @@ import React, { Component } from 'react';
 import { Tree } from 'antd';
 const TreeNode = Tree.TreeNode;
 
-export default class PkCodeTree extends Component {
+export default class ThinClassTree extends Component {
     static propTypes = {};
+    constructor (props) {
+        super(props);
+        this.originOnSelect = this.props.onSelect;
+    }
 
     loop (data = [], loopTime) {
         const that = this;
@@ -32,6 +36,10 @@ export default class PkCodeTree extends Component {
         }
     }
 
+    onSelect (keys, info) {
+        this.originOnSelect(keys, info);
+    }
+
     render () {
         const { treeData = [] } = this.props;
         return (
@@ -39,9 +47,7 @@ export default class PkCodeTree extends Component {
                 {treeData.length ? (
                     <Tree
                         showLine
-                        selectedKeys={[this.props.selectedKeys]}
-                        onSelect={this.props.onSelect}
-                        // defaultExpandedKeys={['P009', 'P010', 'P999']}
+                        onSelect={this.onSelect.bind(this)}
                     >
                         {treeData.map(p => {
                             return this.loop(p);

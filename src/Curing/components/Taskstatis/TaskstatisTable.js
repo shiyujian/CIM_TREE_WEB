@@ -5,7 +5,7 @@ import {
 import './TaskStatis.less';
 import TaskStatisEcharts from './TaskStatisEcharts';
 import { getUser } from '_platform/auth';
-import {getThinClass, getSmallClass, getSectionName} from '../auth';
+import {getThinClass, getSmallClass, getSectionName} from '../common';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 const Option = Select.Option;
@@ -32,22 +32,40 @@ export default class TaskStatisTable extends Component {
         this.totalThinClass = [];
         this.sections = [];
         this.section = '';
+        this.totalDataPer = false;
     }
 
     componentDidMount = async () => {
-        this.user = getUser();
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
-        if (this.sections && this.sections instanceof Array && this.sections.length > 0) {
-            this.section = this.sections[0];
-            await this._loadCuringTypes();
-            await this._loadAreaData();
-            await this._loadTaskData();
-        } else {
-            Notification.error({
-                message: '当前用户未关联标段，不能进行查看',
-                duration: 3
+        try {
+            let text = window.localStorage.getItem('QH_USER_DATA');
+            text = JSON.parse(text);
+            console.log('text', text);
+            this.user = getUser();
+            if (text.username === 'admin') {
+                this.totalDataPer = true;
+            }
+            let groups = text.groups || [];
+            groups.map((group) => {
+                if (group.name.indexOf('业主')) {
+                    this.totalDataPer = true;
+                }
             });
+            let sections = this.user.sections;
+            this.sections = JSON.parse(sections);
+            console.log('this.totalDataPer', this.totalDataPer);
+            if ((this.sections && this.sections instanceof Array && this.sections.length > 0) || this.totalDataPer) {
+                this.section = this.sections[0];
+                await this._loadCuringTypes();
+                await this._loadAreaData();
+                await this._loadTaskData();
+            } else {
+                Notification.error({
+                    message: '当前用户未关联标段，不能进行查看',
+                    duration: 3
+                });
+            }
+        } catch (e) {
+            console.log('e', e);
         }
     }
 
@@ -84,7 +102,7 @@ export default class TaskStatisTable extends Component {
             let unitProjectList = [];
             if (rst instanceof Array && rst.length > 0) {
                 rst.map(node => {
-                    if (this.user.username === 'admin') {
+                    if (this.totalDataPer) {
                         if (node.Type === '子项目工程') {
                             unitProjectList.push({
                                 Name: node.Name,
@@ -107,7 +125,7 @@ export default class TaskStatisTable extends Component {
             for (let i = 0; i < unitProjectList.length; i++) {
                 let unitProject = unitProjectList[i];
                 let list = await getLittleBan({ no: unitProject.No });
-                let smallClassList = getSmallClass(list);
+                let smallClassList = getSmallClass(list, this.totalDataPer);
                 let unitProjectThinArr = [];
                 smallClassList.map(smallClass => {
                     let thinClassList = getThinClass(smallClass, list);
@@ -132,70 +150,72 @@ export default class TaskStatisTable extends Component {
         const {
             curingTypes
         } = this.state;
+        let postData = {};
         if (this.section) {
-            let postData = {
+            postData = {
                 section: this.section
             };
-            if (curingTypes && curingTypes.length > 0) {
-                let curingTaskData = await getCuring({}, postData);
-                let curingTasks = curingTaskData.content;
-                let taskTotalData = [];
-                if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
-                    for (let i = 0; i < curingTasks.length; i++) {
-                        let task = curingTasks[i];
-                        if (task && task.ID) {
-                            for (let t = 0; t < curingTypes.length; t++) {
-                                let type = curingTypes[t];
-                                if (type.ID === task.CuringType) {
-                                    // 获取task的养护类型
-                                    console.log('type.Base_Name', type.Base_Name);
-                                    task.typeName = type.Base_Name;
-                                    // 获取task的细班和标段名称
-                                    let regionData = await this.getThinClassName(task);
-                                    let sectionName = regionData.regionSectionName;
-                                    let thinClassName = regionData.regionThinName;
-                                    task.sectionName = sectionName;
-                                    task.thinClassName = thinClassName;
-                                    taskTotalData.push(task);
-                                    console.log('taskTotalData', taskTotalData);
-                                }
+        } else if (this.totalDataPer) {
+            postData = {};
+        } else {
+            this.reSetState();
+            return;
+        }
+        if (curingTypes && curingTypes.length > 0) {
+            let curingTaskData = await getCuring({}, postData);
+            let curingTasks = curingTaskData.content;
+            let taskTotalData = [];
+            if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
+                for (let i = 0; i < curingTasks.length; i++) {
+                    let task = curingTasks[i];
+                    if (task && task.ID) {
+                        for (let t = 0; t < curingTypes.length; t++) {
+                            let type = curingTypes[t];
+                            if (type.ID === task.CuringType) {
+                                // 获取task的养护类型
+                                task.typeName = type.Base_Name;
+                                // 获取task的细班和标段名称
+                                let regionData = await this.getThinClassName(task);
+                                let sectionName = regionData.regionSectionName;
+                                let thinClassName = regionData.regionThinName;
+                                task.sectionName = sectionName;
+                                task.thinClassName = thinClassName;
+                                taskTotalData.push(task);
                             }
                         }
                     }
-                    this.setState({
-                        taskTotalData,
-                        taskSearchData: taskTotalData,
-                        loading: false,
-                        echartsChange: moment().unix()
-                    });
-                    // curingTasks.map(async (task) => {
-                    //     if (task && task.ID) {
-                    //         await curingTypes.map(async (type) => {
-                    //             if (type.ID === task.CuringType) {
-                    //                 // 获取task的养护类型
-                    //                 console.log('type.Base_Name', type.Base_Name);
-                    //                 task.typeName = type.Base_Name;
-                    //                 // 获取task的细班和标段名称
-                    //                 let regionData = await this.getThinClassName(task);
-                    //                 let sectionName = regionData.regionSectionName;
-                    //                 let thinClassName = regionData.regionThinName;
-                    //                 task.sectionName = sectionName;
-                    //                 task.thinClassName = thinClassName;
-                    //                 taskTotalData.push(task);
-                    //                 console.log('taskTotalData', taskTotalData);
-                    //                 this.setState({
-                    //                     taskTotalData,
-                    //                     taskSearchData: taskTotalData,
-                    //                     loading: false,
-                    //                     echartsChange: moment().unix()
-                    //                 });
-                    //             }
-                    //         });
-                    //     }
-                    // });
-                } else {
-                    this.reSetState();
                 }
+                this.setState({
+                    taskTotalData,
+                    taskSearchData: taskTotalData,
+                    loading: false,
+                    echartsChange: moment().unix()
+                });
+                // curingTasks.map(async (task) => {
+                //     if (task && task.ID) {
+                //         await curingTypes.map(async (type) => {
+                //             if (type.ID === task.CuringType) {
+                //                 // 获取task的养护类型
+                //                 console.log('type.Base_Name', type.Base_Name);
+                //                 task.typeName = type.Base_Name;
+                //                 // 获取task的细班和标段名称
+                //                 let regionData = await this.getThinClassName(task);
+                //                 let sectionName = regionData.regionSectionName;
+                //                 let thinClassName = regionData.regionThinName;
+                //                 task.sectionName = sectionName;
+                //                 task.thinClassName = thinClassName;
+                //                 taskTotalData.push(task);
+                //                 console.log('taskTotalData', taskTotalData);
+                //                 this.setState({
+                //                     taskTotalData,
+                //                     taskSearchData: taskTotalData,
+                //                     loading: false,
+                //                     echartsChange: moment().unix()
+                //                 });
+                //             }
+                //         });
+                //     }
+                // });
             } else {
                 this.reSetState();
             }
@@ -226,7 +246,6 @@ export default class TaskStatisTable extends Component {
                         // 首先根据区块找到对应的细班list
                         if (section.indexOf(unitProject) !== -1) {
                             let children = unitProjectData.thinClass;
-                            console.log('unitProjectData', unitProjectData);
                             children.map((child) => {
                             // tree结构的数据经过了处理，需要和api获取的数据调整一致
                                 let handleKey = child.No.split('-');
@@ -237,8 +256,6 @@ export default class TaskStatisTable extends Component {
                                     let name = child.Name;
                                     let sectionName = getSectionName(section);
                                     regionSectionName = sectionName;
-                                    console.log('regionSectionName', regionSectionName);
-                                    console.log('sectionName', sectionName);
                                     if (index === 0) {
                                         regionThinName = regionThinName + name;
                                     } else {
@@ -338,7 +355,6 @@ export default class TaskStatisTable extends Component {
     }
 
     datepick (value) {
-        console.log('datepickdatepick', value);
         let me = this;
         this.setState({
             stime: value[0] ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss') : '',
@@ -362,56 +378,65 @@ export default class TaskStatisTable extends Component {
         } = this.state;
         console.log('this.section', this.section);
         console.log('curingTypes', curingTypes);
+        let postData = {};
         if (this.section) {
-            this.setState({
-                loading: true
-            });
-            let postData = {
+            postData = {
                 section: this.section,
                 stime: stime,
                 etime: etime,
                 curingtype: typeSelect
             };
-            let taskSearchData = [];
-            if (curingTypes && curingTypes.length > 0) {
-                let curingTaskData = await getCuring({}, postData);
-                let curingTasks = curingTaskData.content;
-                if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
-                    curingTasks.map(async (task) => {
-                        if (task && task.ID) {
-                            curingTypes.map(async (type) => {
-                                if (type.ID === task.CuringType) {
-                                    // 获取task的养护类型
-                                    console.log('type.Base_Name', type.Base_Name);
-                                    task.typeName = type.Base_Name;
-                                    // 获取task的细班和标段名称
-                                    let regionData = await this.getThinClassName(task);
-                                    let sectionName = regionData.regionSectionName;
-                                    let thinClassName = regionData.regionThinName;
-                                    task.sectionName = sectionName;
-                                    task.thinClassName = thinClassName;
-                                    taskSearchData.push(task);
-                                    console.log('taskSearchData', taskSearchData);
-                                    this.setState({
-                                        taskSearchData,
-                                        loading: false,
-                                        echartsChange: moment().unix()
-                                    });
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    this.reSetState();
-                }
-            } else {
-                this.reSetState();
-            }
+        } else if (this.totalDataPer) {
+            postData = {
+                stime: stime,
+                etime: etime,
+                curingtype: typeSelect
+            };
         } else {
             Notification.error({
                 message: '当前用户未关联标段，不能进行查看',
                 duration: 3
             });
+            return;
+        }
+        this.setState({
+            loading: true
+        });
+        let taskSearchData = [];
+        if (curingTypes && curingTypes.length > 0) {
+            let curingTaskData = await getCuring({}, postData);
+            let curingTasks = curingTaskData.content;
+            if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
+                for (let i = 0; i < curingTasks.length; i++) {
+                    let task = curingTasks[i];
+                    if (task && task.ID) {
+                        for (let t = 0; t < curingTypes.length; t++) {
+                            let type = curingTypes[t];
+                            if (type.ID === task.CuringType) {
+                                // 获取task的养护类型
+                                console.log('type.Base_Name', type.Base_Name);
+                                task.typeName = type.Base_Name;
+                                // 获取task的细班和标段名称
+                                let regionData = await this.getThinClassName(task);
+                                let sectionName = regionData.regionSectionName;
+                                let thinClassName = regionData.regionThinName;
+                                task.sectionName = sectionName;
+                                task.thinClassName = thinClassName;
+                                taskSearchData.push(task);
+                            }
+                        }
+                    }
+                }
+                this.setState({
+                    taskSearchData,
+                    loading: false,
+                    echartsChange: moment().unix()
+                });
+            } else {
+                this.reSetState();
+            }
+        } else {
+            this.reSetState();
         }
     }
 
@@ -422,7 +447,6 @@ export default class TaskStatisTable extends Component {
                 changeTaskStatisSelectTask
             }
         } = this.props;
-        console.log('record', record);
         changeTaskStatisSelectTask(record);
         changeTaskStatisGisVisible(true);
     }

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-25 20:56:39
+ * @Last Modified time: 2018-08-03 13:54:33
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -23,7 +23,8 @@ import {
     Input,
     Tabs,
     Row,
-    DatePicker
+    DatePicker,
+    Radio
 } from 'antd';
 import { PROJECT_UNITS, FOREST_API } from '_platform/api';
 import './OnSite.less';
@@ -31,8 +32,9 @@ import DashPanel from './DashPanel';
 import RiskDetail from './RiskDetail';
 import moment from 'moment';
 import PkCodeTree from './PkCodeTree';
-import {getThinClass, getSmallClass, fillAreaColor} from './auth';
+import {getThinClass, getSmallClass, fillAreaColor, computeSignedArea} from './auth';
 const TabPane = Tabs.TabPane;
+const RadioGroup = Radio.Group;
 const { RangePicker } = DatePicker;
 
 const Panel = Collapse.Panel;
@@ -85,7 +87,10 @@ class OnSite extends Component {
             isShowRisk: false,
             treeTypes: [],
             treeLayerList: {}, // 树种图层list
-            areaLayerList: {} // 区域地块图层list
+            areaLayerList: {}, // 区域地块图层list
+            eventTitle: '',
+            radioValue: '全部细班',
+            thinClassLayerList: {}
         };
         this.checkMarkers = [];
         this.tileLayer = null;
@@ -163,11 +168,17 @@ class OnSite extends Component {
                 // 区域地块
                 case 'geojsonFeature_area':
                     return (
-                        <PkCodeTree
-                            treeData={content}
-                            selectedKeys={this.state.leftkeycode}
-                            onSelect={this.handleAreaSelect.bind(this)}
-                        />
+                        <div>
+                            <RadioGroup onChange={this.handleRadioChange.bind(this)} value={this.state.radioValue} style={{marginBottom: 10}}>
+                                <Radio value={'全部细班'}>全部细班</Radio>
+                                <Radio value={'实际定位'}>实际定位</Radio>
+                            </RadioGroup>
+                            <PkCodeTree
+                                treeData={content}
+                                selectedKeys={this.state.leftkeycode}
+                                onSelect={this.handleAreaSelect.bind(this)}
+                            />
+                        </div>
                     );
                 // 巡检路线
                 case 'geojsonFeature_people':
@@ -975,14 +986,71 @@ class OnSite extends Component {
             seeVisible: !this.state.seeVisible
         });
     }
-    /* 弹出信息框 */
-    handleAreaSelect (keys, info) {
+    handleRadioChange = async (e) => {
+        console.log('radio checked', e.target.value);
+        this.setState({
+            radioValue: e.target.value
+        });
+    }
+    componentDidUpdate = async (prevState, prevProps) => {
         const {
-            areaLayerList
+            radioValue
+        } = this.state;
+        if (radioValue === '全部细班' && radioValue !== prevState.radioValue) {
+            this.addTotalMapLayer();
+        }
+    }
+    // 添加全部植树图层
+    addTotalMapLayer = () => {
+        const {
+            thinClassLayerList,
+            treeLayerList
+        } = this.state;
+        if (this.tileLayer3) {
+            this.map.removeLayer(this.tileLayer3);
+            this.tileLayer3 = null;
+        }
+        for (let i in treeLayerList) {
+            this.map.removeLayer(treeLayerList[i]);
+        }
+        for (let i in thinClassLayerList) {
+            this.map.removeLayer(thinClassLayerList[i]);
+        }
+        if (this.tileLayer2) {
+            this.tileLayer2.addTo(this.map);
+        } else {
+            this.tileLayer2 = L.tileLayer(
+                window.config.DASHBOARD_ONSITE +
+                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                {
+                    opacity: 1.0,
+                    subdomains: [1, 2, 3],
+                    minZoom: 11,
+                    maxZoom: 21,
+                    storagetype: 0,
+                    tiletype: 'wtms'
+                }
+            ).addTo(this.map);
+        }
+    }
+    /* 弹出信息框 */
+    handleAreaSelect = async (keys, info) => {
+        const {
+            areaLayerList,
+            radioValue,
+            treeLayerList,
+            thinClassLayerList
         } = this.state;
         let me = this;
+        console.log('info', info);
+        console.log('keys', keys);
+        // 当前选中的节点
+        let eventTitle = info.node.props.title;
+        let selected = info.selected;
+        console.log('selected', selected);
         this.setState({
-            leftkeycode: keys[0]
+            leftkeycode: keys[0],
+            eventTitle
         });
         try {
             const eventKey = keys[0];
@@ -1002,7 +1070,42 @@ class OnSite extends Component {
                         me.map.fitBounds(areaLayerList[eventKey].getBounds());
                     } else {
                     // 如果不是添加过，需要请求数据
-                        me._addAreaLayer(eventKey, treeNodeName);
+                        await me._addAreaLayer(eventKey, treeNodeName);
+                    }
+                }
+                if (radioValue === '实际定位') {
+                    let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                    if (me.tileLayer2) {
+                        me.map.removeLayer(me.tileLayer2);
+                    }
+                    if (me.tileLayer3) {
+                        me.map.removeLayer(me.tileLayer3);
+                        me.tileLayer3 = null;
+                    }
+                    for (let i in treeLayerList) {
+                        me.map.removeLayer(treeLayerList[i]);
+                    }
+                    for (let i in thinClassLayerList) {
+                        me.map.removeLayer(thinClassLayerList[i]);
+                    }
+                    if (thinClassLayerList[eventKey]) {
+                        thinClassLayerList[eventKey].addTo(me.map);
+                    } else {
+                        var url = window.config.DASHBOARD_TREETYPE +
+                        `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27`;
+                        let thinClassLayer = L.tileLayer.wms(url,
+                            {
+                                layers: 'xatree:treelocation',
+                                crs: L.CRS.EPSG4326,
+                                format: 'image/png',
+                                maxZoom: 22,
+                                transparent: true
+                            }
+                        ).addTo(this.map);
+                        thinClassLayerList[eventKey] = thinClassLayer;
+                        this.setState({
+                            thinClassLayerList
+                        });
                     }
                 }
             }
@@ -1010,7 +1113,6 @@ class OnSite extends Component {
             console.log('处理选中节点', e);
         }
     }
-
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey, treeNodeName) => {
         const {
@@ -1054,7 +1156,9 @@ class OnSite extends Component {
                     properties: { name: treeNodeName, type: 'area' },
                     geometry: { type: 'Polygon', coordinates: treearea }
                 };
-
+                // console.log('treearea', treearea);
+                // let num = computeSignedArea(target1, 1);
+                // console.log('num', num);
                 let layer = this.createMarker(message);
                 areaLayerList[eventKey] = layer;
                 me.setState({

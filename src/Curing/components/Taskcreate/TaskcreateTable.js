@@ -654,7 +654,6 @@ export default class TaskCreateTable extends Component {
             console.log('树木数量', e);
         }
     }
-
     // 查找区域内的细班的名称
     _getThinClassName = async (regionThinClass) => {
         const {
@@ -738,7 +737,6 @@ export default class TaskCreateTable extends Component {
         };
         return regionData;
     }
-
     // 圈选图层返回上一步
     _handleCreateTaskRetreat = async () => {
         const {
