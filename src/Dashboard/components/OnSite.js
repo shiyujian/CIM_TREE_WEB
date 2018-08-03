@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-03 13:54:33
+ * @Last Modified time: 2018-08-03 14:52:42
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -90,7 +90,12 @@ class OnSite extends Component {
             areaLayerList: {}, // 区域地块图层list
             eventTitle: '',
             radioValue: '全部细班',
-            thinClassLayerList: {}
+            thinClassLayerList: {},
+            coordinates: [],
+            createBtnVisible: false,
+            polygonData: '', // 圈选地图图层
+            areaMeasure: 0,
+            areaMeasureVisible: false
         };
         this.checkMarkers = [];
         this.tileLayer = null;
@@ -364,10 +369,6 @@ class OnSite extends Component {
                 tiletype: 'wtms'
             }
         ).addTo(this.map);
-
-        /**
-         * 增加巡检路线后代码
-         */
         // 巡检路线的代码   地图上边的地点的名称
         L.tileLayer(this.WMSTileLayerUrl, {
             subdomains: [1, 2, 3],
@@ -375,10 +376,6 @@ class OnSite extends Component {
             maxZoom: 17,
             storagetype: 0
         }).addTo(this.map);
-
-        /**
-         * 增加安全隐患后代码
-         */
         // 隐患详情点击事件
         document
             .querySelector('.leaflet-popup-pane')
@@ -417,10 +414,35 @@ class OnSite extends Component {
                 }
             });
 
-        const that = this;
         this.map.on('click', function (e) {
-            // getThinClass(e.latlng.lng,e.latlng.lat);
-            that.getTreeInfo(e.latlng.lng, e.latlng.lat, that);
+            const {
+                radioValue,
+                coordinates,
+                createBtnVisible
+            } = me.state;
+            if (radioValue === '实际定位') {
+                coordinates.push([e.latlng.lat, e.latlng.lng]);
+                if (coordinates.length > 0 && !createBtnVisible) {
+                    me.setState({
+                        createBtnVisible: true
+                    });
+                }
+                if (me.state.polygonData) {
+                    me.map.removeLayer(me.state.polygonData);
+                }
+                let polygonData = L.polygon(coordinates, {
+                    color: 'white',
+                    fillColor: '#93B9F2',
+                    fillOpacity: 0.2
+                }).addTo(me.map);
+                me.setState({
+                    coordinates,
+                    polygonData: polygonData
+                });
+            } else {
+                // getThinClass(e.latlng.lng,e.latlng.lat);
+                me.getTreeInfo(e.latlng.lng, e.latlng.lat, me);
+            }
         });
     }
     // 获取地块树数据
@@ -1171,9 +1193,83 @@ class OnSite extends Component {
             console.log('加载细班图层', e);
         }
     }
-
+    _handleCreateTaskOk = async () => {
+        const {
+            coordinates
+        } = this.state;
+        try {
+            let areaMeasure = computeSignedArea(coordinates, 2);
+            console.log('areaMeasure', areaMeasure);
+            areaMeasure = areaMeasure * 0.0015;
+            console.log('areaMeasure', areaMeasure);
+            this.setState({
+                areaMeasure,
+                areaMeasureVisible: true
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+    _handleCreateTaskCancel = async () => {
+        const {
+            polygonData
+        } = this.state;
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
+        }
+        this.setState({
+            areaMeasureVisible: false
+        });
+        this.resetButState();
+    }
+    _handleCreateTaskRetreat = async () => {
+        const {
+            coordinates
+        } = this.state;
+        let me = this;
+        if (me.state.polygonData) {
+            me.map.removeLayer(me.state.polygonData);
+        }
+        this.setState({
+            areaMeasureVisible: false
+        });
+        coordinates.pop();
+        if (coordinates.length === 0) {
+            this.resetButState();
+            return;
+        }
+        let polygonData = L.polygon(coordinates, {
+            color: 'white',
+            fillColor: '#93B9F2',
+            fillOpacity: 0.2
+        }).addTo(me.map);
+        me.setState({
+            coordinates,
+            polygonData: polygonData
+        });
+    }
+    // 取消圈选和按钮的功能
+    resetButState = () => {
+        this.setState({
+            createBtnVisible: false,
+            polygonData: '',
+            coordinates: []
+        });
+    }
     render () {
-        const { seedlingMess, treeMess, flowMess } = this.state;
+        const {
+            seedlingMess,
+            treeMess,
+            flowMess,
+            createBtnVisible,
+            coordinates,
+            areaMeasure,
+            areaMeasureVisible
+        } = this.state;
+        let okDisplay = false;
+        if (coordinates.length <= 2) {
+            okDisplay = true;
+        }
         return (
             <div className='map-container'>
                 <div
@@ -1220,10 +1316,10 @@ class OnSite extends Component {
                             </Collapse>
                             {/* <div style={{ height: '20px' }} /> */}
                         </aside>
-                        <div
+                        {/* <div
                             className='resizeSenseArea'
                             onMouseDown={this.onStartResizeMenu.bind(this)}
-                        />
+                        /> */}
                         {this.state.menuIsExtend ? (
                             <div
                                 className='foldBtn'
@@ -1242,6 +1338,24 @@ class OnSite extends Component {
                             </div>
                         )}
                     </div>
+                    {
+                        createBtnVisible ? (
+                            <div className='treeControl4'>
+                                <div>
+                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
+                                    <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
+                                    <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
+                                </div>
+                            </div>
+                        ) : ''
+                    }
+                    {
+                        areaMeasureVisible ? (
+                            <div className='areaMeasureLayout'>
+                                <span>{`面积：${areaMeasure} 亩`}</span>
+                            </div>
+                        ) : ''
+                    }
                     {this.state.isVisibleMapBtn ? (
                         <div className='treeControl'>
                             {/* <iframe allowTransparency={true} className={styles.btnCtro}/> */}
@@ -2204,7 +2318,6 @@ class OnSite extends Component {
             </div>
         );
     }
-
     /* 菜单展开收起 */
     extendAndFold () {
         this.setState({ menuIsExtend: !this.state.menuIsExtend });
